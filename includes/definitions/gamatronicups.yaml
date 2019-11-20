@@ -4,5 +4,5 @@ type: power
 mib_dir:
     - gamatronic
 discovery:
-    - sysObjectId:
+    - sysObjectID:
       - .1.3.6.1.4.1.6050.5

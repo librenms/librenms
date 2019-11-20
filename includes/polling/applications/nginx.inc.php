@@ -11,7 +11,6 @@ if (!empty($agent_data['app'][$name])) {
     $nginx = snmp_get($device, '.1.3.6.1.4.1.8072.1.3.2.3.1.2.5.110.103.105.110.120', '-Ovq');
 }
 $nginx = trim($nginx, '"');
-update_application($app, $nginx);
 
 echo ' nginx';
 
@@ -36,6 +35,7 @@ $fields = array(
 
 $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);
+update_application($app, $nginx, $fields);
 
 // Unset the variables we set here
 unset($nginx, $active, $reading, $writing, $waiting, $req, $rrd_name, $rrd_def, $tags);

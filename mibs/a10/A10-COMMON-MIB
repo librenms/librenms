@@ -1,0 +1,241 @@
+	--
+-- File Name : A10-COMMON-MIB.txt
+--
+-- Copyright(C) 2005-2011, A10 Networks Inc. All rights reserved.
+-- Software for all A10 products contain trade secrets and confidential
+-- information of A10 Networks and its subsidiaries and may not be disclosed,
+-- copied, reproduced or distributed to anyone outside of A10 Networks
+-- without prior written consent of A10 Networks, Inc.
+--
+-- Description:     This is the A10 Common MIB file. It's the root of all A10 products MIB OIDs.
+--
+-- History:
+--
+--
+--
+
+A10-COMMON-MIB  DEFINITIONS ::= BEGIN
+--================================================================
+-- A10-COMMON-MIB
+--     A private enterprise MIB for A10 Networks, Inc.
+--================================================================
+        IMPORTS
+                enterprises, OBJECT-IDENTITY, MODULE-IDENTITY
+                        FROM SNMPv2-SMI;
+
+        a10     MODULE-IDENTITY
+                LAST-UPDATED    "200611071327Z"
+                ORGANIZATION    "A10 Networks, Inc."
+                CONTACT-INFO    "Address: A10 Networks, Inc.
+                                          2309 Bering Drive
+                                          San Jose, CA 95131
+                                 Phone:   +1-888-822-7210 (USA/Canada)
+                                          +1-408-325-8676 (International)
+                                 E-mail:  support@A10Networks.com"
+
+                DESCRIPTION     "This file defines the private enterprise MIB of A10 Networks, Inc."
+                ::=  {  enterprises  22610  }
+
+        a10Products OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION "a10Products is the root OBJECT IDENTIFIER from which sysObjectID values are assigned."
+                ::= { a10 1 }
+
+        a10Mgmt OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION "root OID of A10 product management MIBs"
+                ::= { a10 2 }
+
+-- The following are product OIDs
+
+        a10IDsentrie OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION "OID assigned to the IDsentrie family appliances"
+                ::= { a10Products 1 }
+
+        a10IDsentrie1000 OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION "OID assigned to the model, IDsentrie 1000 appliance"
+                ::= { a10IDsentrie 1 }
+
+        a10StealthWatch OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION "OID assigned to the StealthWatch IDentity 1000 appliance"
+                ::= { a10IDsentrie 2 }
+
+        a10RetiEntity1000 OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION "OID assigned to the RetiEntity 1000 appliance"
+                ::= { a10IDsentrie 3 }
+
+        a10EX OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION "OID assigned to the Edge accelerator family appliances"
+                ::= { a10Products 2 }
+
+        a10EX2100 OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION "OID assigned to the model, Edge accelerator EX2100, appliance"
+                ::= { a10EX 1 }
+
+        a10EX2180 OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION "OID assigned to the model, Edge accelerator EX2180, appliance"
+                ::= { a10EX 2 }
+
+        a10EX2200 OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION "OID assigned to the model, Edge accelerator EX2200, appliance"
+                ::= { a10EX 3 }
+
+        a10EX2280 OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION "OID assigned to the model, Edge accelerator EX2280, appliance"
+                ::= { a10EX 4 }
+
+        a10AX OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION "OID assigned to the advanced traffic manager product family"
+                ::= { a10Products 3 }
+
+        a10AX2100 OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION "OID assigned to the model, AX2100 Advanced Traffic Manager"
+                ::= { a10AX 1 }
+
+        a10AX3100 OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION "OID assigned to the model, AX3100 Advanced Traffic Manager"
+                ::= { a10AX 2 }
+
+        a10AX3200 OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION "OID assigned to the model, AX3200 Advanced Traffic Manager"
+                ::= { a10AX 3 }
+
+        a10AX2200 OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION "OID assigned to the model, AX2200 Advanced Traffic Manager"
+                ::= { a10AX 4 }
+
+        a10AX2000 OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION "OID assigned to the model, AX2000 Advanced Traffic Manager"
+                ::= { a10AX 5 }
+
+        a10AX1000 OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION "OID assigned to the model, AX1000 Advanced Traffic Manager"
+                ::= { a10AX 6 }
+
+        a10AX5200 OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION "OID assigned to the model, AX5200 Advanced Traffic Manager"
+                ::= { a10AX 7 }
+
+        a10AX2500 OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION "OID assigned to the model, AX2500 Advanced Traffic Manager"
+                ::= { a10AX 8 }
+
+        a10AX2600 OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION "OID assigned to the model, AX2600 Advanced Traffic Manager"
+                ::= { a10AX 9 }
+
+        a10AX3000 OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION "OID assigned to the model, AX3000 Advanced Traffic Manager"
+                ::= { a10AX 10 }
+
+        a10HitachiBladeServer OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION "OID assigned to the model, Hitachi Blade Server Advanced Traffic Manager"
+                ::= { a10AX 11 }
+
+        a10AX5100 OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION "OID assigned to the model, AX5100 Advanced Traffic Manager"
+                ::= { a10AX 12 }
+
+        a10SoftAX OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION "OID assigned to the model, SoftAX Advanced Traffic Manager"
+                ::= { a10AX 13 }
+
+        a10AX3030 OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION "OID assigned to the model, AX3030 Advanced Traffic Manager"
+                ::= { a10AX 14 }
+
+        a10AX1030 OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION "OID assigned to the model, AX1030 Advanced Traffic Manager"
+                ::= { a10AX 15 }
+
+        a10AX3200-12 OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION "OID assigned to the model, AX3200-12 Advanced Traffic Manager"
+                ::= { a10AX 16 }
+
+        a10AX3400 OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION "OID assigned to the model, AX3400 Advanced Traffic Manager"
+                ::= { a10AX 17 }
+
+        a10AX3530 OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION "OID assigned to the model, AX3530 Advanced Traffic Manager"
+                ::= { a10AX 18 }
+
+        a10AX5630 OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION "OID assigned to the model, AX5630 Advanced Traffic Manager"
+                ::= { a10AX 19 }
+
+        a10TH6430 OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION "OID assigned to the model, TH6430 Unified Application Service Gateway"
+                ::= { a10AX 20 }
+
+        a10TH5430 OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION "OID assigned to the model, TH5430 Unified Application Service Gateway"
+                ::= { a10AX 21 }
+
+        a10TH3030S OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION "OID assigned to the model, TH3030S Unified Application Service Gateway"
+                ::= { a10AX 22 }
+
+        a10TH1030S OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION "OID assigned to the model, TH1030S Unified Application Service Gateway"
+                ::= { a10AX 23 }
+
+        a10TH930S OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION "OID assigned to the model, TH930S Unified Application Service Gateway"
+                ::= { a10AX 24 }
+
+        a10CentMgmt OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION "OID assigned to the centralized management product family"
+                ::= { a10Products 4 }
+
+        a10AGA1 OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION "OID assigned to the model, aGalaxy1 Centralized Management Appliance"
+                ::= { a10CentMgmt 1 }
+
+        a10AGA5000 OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION "OID assigned to the model, aGalaxy5000 Centralized Management Appliance"
+                ::= { a10CentMgmt 2 }
+
+        a10SoftAGA OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION "OID assigned to the model, aGalaxy Centralized Management Virtual Appliance"
+                ::= { a10CentMgmt 3 }
+
+END

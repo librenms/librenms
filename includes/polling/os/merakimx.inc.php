@@ -11,5 +11,5 @@
  */
 
 if (empty($hardware)) {
-    $hardware = $poll_device['sysDescr'];
+    $hardware = $device['sysDescr'];
 }

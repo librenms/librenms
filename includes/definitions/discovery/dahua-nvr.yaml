@@ -1,0 +1,19 @@
+mib: DAHUA-SNMP-MIB
+modules:
+    processors:
+        data:
+            -
+                oid: cpuUsage
+                num_oid: '.1.3.6.1.4.1.1004849.2.1.3.{{ $index }}'
+                descr: CPU Usage
+    sensors:
+        state:
+            data:
+                -
+                    oid: deviceStatus
+                    num_oid: '.1.3.6.1.4.1.1004849.2.1.2.8.{{ $index }}'
+                    descr: 'Device Status'
+                    index: 'deviceStatus.{{ $index }}'
+                    states:
+                        - { value: 0, descr: Bad, graph: 1, generic: 2 }
+                        - { value: 1, descr: Good, graph: 1, generic: 0 }

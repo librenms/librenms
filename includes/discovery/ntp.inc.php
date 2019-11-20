@@ -25,6 +25,12 @@
  * )
  */
 
-if ($device['os_group'] == 'cisco') {
-    include 'includes/discovery/ntp/cisco.inc.php';
+use LibreNMS\Config;
+
+if (file_exists(Config::get('install_dir') . "/includes/discovery/ntp/{$device['os_group']}.inc.php")) {
+    include Config::get('install_dir') . "/includes/discovery/ntp/{$device['os_group']}.inc.php";
+}
+
+if ($device['os'] == 'awplus') {
+    include 'includes/discovery/ntp/awplus.inc.php';
 }

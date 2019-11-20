@@ -9,14 +9,14 @@
  * the source code distribution for details.
  */
 
-$ceragon_type = $poll_device['sysObjectID'];
+$ceragon_type = $device['sysObjectID'];
 $hardware = rewrite_ceraos_hardware($ceragon_type, $device); // function in ./includes/rewrites.php
 if (stristr('IP10', $hardware)) {
     $serial = snmp_get($device, 'genEquipUnitIDUSerialNumber.0', '-Oqv', 'MWRM-UNIT-MIB');
 } else {
     $serial = snmp_get($device, 'genEquipInventorySerialNumber.127', '-Oqv', 'MWRM-UNIT-MIB');
 }
-$multi_get_array = snmp_get_multi($device, 'genEquipMngSwIDUVersionsRunningVersion.1 genEquipUnitLatitude.0 genEquipUnitLongitude.0', '-OQU', 'MWRM-RADIO-MIB');
+$multi_get_array = snmp_get_multi($device, ['genEquipMngSwIDUVersionsRunningVersion.1', 'genEquipUnitLatitude.0', 'genEquipUnitLongitude.0'], '-OQU', 'MWRM-RADIO-MIB');
 d_echo($multi_get_array);
 $version = $multi_get_array[1]['MWRM-UNIT-MIB::genEquipMngSwIDUVersionsRunningVersion'];
 $latitude = $multi_get_array[0]['MWRM-UNIT-MIB::genEquipUnitLatitude'];
@@ -25,9 +25,10 @@ $longitude = $multi_get_array[0]['MWRM-UNIT-MIB::genEquipUnitLongitude'];
 $ifIndex_array = array();
 $ifIndex_array = explode("\n", snmp_walk($device, 'ifIndex', '-Oqv', 'IF-MIB'));
 d_echo($ifIndex_array);
-$snmp_get_oids = "";
+$snmp_get_oids = [];
 foreach ($ifIndex_array as $ifIndex) {
-    $snmp_get_oids .= "ifDescr.$ifIndex ifName.$ifIndex ";
+    $snmp_get_oids[] = "ifDescr.$ifIndex";
+    $snmp_get_oids[] = "ifName.$ifIndex";
 }
 
 $num_radios = 0;

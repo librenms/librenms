@@ -10,6 +10,6 @@
  * the source code distribution for details.
  */
 
-preg_match_all('/Poseidon [0-9]+|[0-9]+.[0-9]+.[0-9]/', $poll_device['sysDescr'], $matches);
+preg_match_all('/Poseidon [0-9]+|[0-9]+.[0-9]+.[0-9]/', $device['sysDescr'], $matches);
 $hardware = $matches[0][0];
 $version = $matches[0][1];

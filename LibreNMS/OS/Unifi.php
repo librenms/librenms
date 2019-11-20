@@ -26,6 +26,7 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCcqDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
@@ -36,6 +37,7 @@ use LibreNMS\Interfaces\Polling\Sensors\WirelessFrequencyPolling;
 use LibreNMS\OS;
 
 class Unifi extends OS implements
+    ProcessorDiscovery,
     WirelessClientsDiscovery,
     WirelessCcqDiscovery,
     WirelessCcqPolling,
@@ -44,6 +46,8 @@ class Unifi extends OS implements
     WirelessPowerDiscovery,
     WirelessUtilizationDiscovery
 {
+    use OS\Traits\FrogfootResources;
+
     private $ccqDivisor = 10;
 
     /**
@@ -273,6 +277,7 @@ class Unifi extends OS implements
         }
         $util_oids = snmpwalk_cache_oid($this->getDevice(), 'unifiRadioCuSelfRx', $util_oids, 'UBNT-UniFi-MIB');
         $util_oids = snmpwalk_cache_oid($this->getDevice(), 'unifiRadioCuSelfTx', $util_oids, 'UBNT-UniFi-MIB');
+        $util_oids = snmpwalk_cache_oid($this->getDevice(), 'unifiRadioOtherBss', $util_oids, 'UBNT-UniFi-MIB');
         $radio_names = $this->getCacheByIndex('unifiRadioRadio', 'UBNT-UniFi-MIB');
 
         $sensors = array();
@@ -303,6 +308,15 @@ class Unifi extends OS implements
                 $index,
                 "Self Tx Util ($name)",
                 $util_oids[$index]['unifiRadioCuSelfTx']
+            );
+            $sensors[] = new WirelessSensor(
+                'utilization',
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.41112.1.6.1.1.1.9.' . $index,
+                'unifi-other',
+                $index,
+                "Other BSS Util ($name)",
+                $util_oids[$index]['unifiRadioOtherBss']
             );
         }
 

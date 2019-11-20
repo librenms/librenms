@@ -1,0 +1,118 @@
+-- ============================================================================
+-- AT-PAE.MIB, Allied Telesis enterprise MIB: PVSTPM module
+--
+-- Copied from ATR-PVSTPM.MIB of pre 2.9.1 release
+--
+-- Copyright (c) 2006 by Allied Telesis, Inc.
+-- All rights reserved.
+-- 
+-- ============================================================================
+
+AT-PVSTPM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY,
+	OBJECT-TYPE,
+	NOTIFICATION-TYPE,
+	Integer32
+		FROM SNMPv2-SMI
+
+	VlanIndex
+		FROM Q-BRIDGE-MIB
+
+	modules
+		FROM AT-SMI-MIB
+
+;
+
+pvstpm MODULE-IDENTITY
+	LAST-UPDATED "200603291651Z"
+	ORGANIZATION "Allied Telesis, Inc"
+	CONTACT-INFO
+		"http://www.alliedtelesis.com"
+	DESCRIPTION
+		"The MIB module for managing PVSTPM enterprise functionality
+		on Allied Telesis switches. "
+
+	REVISION "200603291651Z"
+	DESCRIPTION
+		"Initial revision"
+
+	::= { modules 140 }
+
+-- ============================================================================
+-- ============================================================================
+-- PVSTPM group
+-- ============================================================================
+-- ============================================================================
+
+pvstpmEvents OBJECT IDENTIFIER ::= { pvstpm 0 }
+
+pvstpmEventVariables OBJECT IDENTIFIER ::= { pvstpm 1 }
+
+pvstpmBridgeId OBJECT-TYPE
+	SYNTAX  OCTET STRING
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+			"The bridge identifier for the bridge that sent the trap."
+	::= { pvstpmEventVariables 1 }
+
+pvstpmTopologyChangeVlan OBJECT-TYPE
+	SYNTAX  VlanIndex
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+			"The VLAN ID of the vlan that has experienced a topology change."
+	::= { pvstpmEventVariables 2 }
+
+pvstpmRxPort OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+			"The port the inconsistent BPDU was received on."
+	::= { pvstpmEventVariables 3 }
+
+pvstpmRxVlan OBJECT-TYPE
+	SYNTAX  VlanIndex
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+			"The vlan the inconsistent BPDU was received on."
+	::= { pvstpmEventVariables 4 }
+
+pvstpmTxVlan OBJECT-TYPE
+	SYNTAX  VlanIndex
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+			"The vlan the inconsistent BPDU was transmitted on."
+	::= { pvstpmEventVariables 5 }
+
+pvstpmTopologyChange NOTIFICATION-TYPE
+	OBJECTS {
+		pvstpmBridgeId,
+		pvstpmTopologyChangeVlan
+	}
+	STATUS	current
+	DESCRIPTION
+			"A pvstpmTopologyChange trap signifies that a topology change has
+			occurred on the specified VLAN"
+	::= { pvstpmEvents 1 }
+
+pvstpmInconsistentBPDU NOTIFICATION-TYPE
+	OBJECTS {
+		pvstpmBridgeId,
+		pvstpmRxPort,
+		pvstpmRxVlan,
+		pvstpmTxVlan
+	}
+	STATUS	current
+	DESCRIPTION
+			"A pvstpmInconsistentBPDU trap signifies that an inconsistent PVSTPM packet
+			has been received on a port."
+	::= { pvstpmEvents 2 }
+
+END
+

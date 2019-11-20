@@ -1,0 +1,1559 @@
+	--
+-- File Name : A10-AX-NOTIFICATIONS-V2C.txt
+--
+-- Copyright(C) 2005-2011, A10 Networks Inc. All rights reserved.
+-- Software for all A10 products contain trade secrets and confidential
+-- information of A10 Networks and its subsidiaries and may not be disclosed,
+-- copied, reproduced or distributed to anyone outside of A10 Networks
+-- without prior written consent of A10 Networks, Inc.
+--
+-- Description:     This is the A10 AX SNMP Trap v2 file.
+--
+-- History:
+--
+--
+--
+
+A10-AX-NOTIFICATIONS DEFINITIONS ::= BEGIN
+--================================================================
+-- A10-AX-NOTIFICATIONS
+--      Management MIB for AX SNMP v2c traps
+--================================================================
+  IMPORTS
+
+    DisplayString, PhysAddress, DateAndTime
+      FROM SNMPv2-TC
+
+        InetAddressType
+      FROM INET-ADDRESS-MIB
+
+    axNotification, axLogging
+      FROM A10-AX-MIB
+
+    OBJECT-TYPE, Counter32, Integer32, Unsigned32, Counter64, OBJECT-IDENTITY, NOTIFICATION-TYPE
+      FROM SNMPv2-SMI;
+
+--================================================================
+-- axNotification
+--================================================================
+
+    axNotificationObjects        OBJECT IDENTIFIER ::= { axNotification 1 }
+    axNotifications              OBJECT IDENTIFIER ::= { axNotification 2 }
+
+--================================================================
+-- axNotificationObjects
+--================================================================
+
+    axSystemNotifications        OBJECT IDENTIFIER ::= { axNotifications 1 }
+    axAppNotifications           OBJECT IDENTIFIER ::= { axNotifications 2 }
+    axNetworkNotifications       OBJECT IDENTIFIER ::= { axNotifications 3 }
+    axGslbNotifications          OBJECT IDENTIFIER ::= { axNotifications 5 }
+        axSlbNotifications           OBJECT IDENTIFIER ::= { axNotifications 6 }
+
+--================================================================
+-- axNotifications
+--================================================================
+
+axNotificationMsg OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The information about the related notification."
+        ::= { axNotificationObjects 1 }
+
+axNotificationSLBServer OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The address or host name of the server."
+        ::= { axNotificationObjects 2 }
+
+axNotificationSLBPort OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The service port."
+        ::= { axNotificationObjects 3 }
+
+axNotificationSLBCurConns OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The current total of connections."
+        ::= { axNotificationObjects 4 }
+
+axNotificationVirtualServer OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The address or host name of the virtual server."
+        ::= { axNotificationObjects 5 }
+
+axNotificationVirtualServerPort OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The virtual server port."
+        ::= { axNotificationObjects 6 }
+
+axNotificationVirtualServerPortType OBJECT-TYPE
+        SYNTAX INTEGER {
+                firewall(1),
+                tcp(2),
+                udp(3),
+                rtsp(8),
+                ftp(9),
+                mms(10),
+                fastHTTP(12),
+                http(14),
+                https(15),
+                sslProxy(16),
+                smtp(17),
+                sip(11),
+                sips(19),
+                sip-TCP(18),
+                others(5)
+        }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The virtual server port type."
+        ::= { axNotificationObjects 7 }
+
+axNotificationDroppedPackets OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The number of dropped packets when the event happened."
+        ::= { axNotificationObjects 8 }
+
+axNotificationConfiguredThreshold OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The configured threshold value."
+        ::= { axNotificationObjects 9 }
+
+axNotificationCurrentUsage OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The current usage value."
+        ::= { axNotificationObjects 10 }
+
+axNotificationConnLimit OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The conn-limit."
+        ::= { axNotificationObjects 11 }
+
+axNotificationTrunkID OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The trunk ID"
+        ::= { axNotificationObjects 12 }
+
+axNotificationPortThreshold OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The port threshold"
+        ::= { axNotificationObjects 13 }
+
+axNotificationCurrentUpPorts OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The current up ports"
+        ::= { axNotificationObjects 14 }
+
+axNotificationFanName OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The system fan name."
+        ::= { axNotificationObjects 15 }
+
+axNotificationPowerSupplyName OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The system power supply name."
+        ::= { axNotificationObjects 16 }
+
+axNotificationHAGroup OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The HA group ID."
+        ::= { axNotificationObjects 17 }
+
+axNotificationSLBServiceGroupName OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The service group name."
+        ::= { axNotificationObjects 18 }
+
+axNotificationPartitionId OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The application partition identifier."
+        ::= { axNotificationObjects 19 }
+
+axNotificationVrid OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The VRRP identifier."
+        ::= { axNotificationObjects 20 }
+
+axNotificationPartitionName OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The application partition name."
+        ::= { axNotificationObjects 21 }
+
+axNotificationGslbSiteName OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The GSLB site name."
+        ::= { axNotificationObjects 22 }
+
+axNotificationGslbSiteSlbDeviceName OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The GSLB device name inside a site."
+        ::= { axNotificationObjects 23 }
+
+axNotificationGslbSiteIpServerAddr OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The GSLB IP server address."
+        ::= { axNotificationObjects 24 }
+
+axNotificationGslbServiceIpName OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The GSLB service IP name."
+        ::= { axNotificationObjects 25 }
+
+axNotificationGslbServiceIpAddr OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The GSLB service IP name."
+        ::= { axNotificationObjects 26 }
+
+axNotificationGslbServiceIpPortType OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The GSLB service IP port type."
+        ::= { axNotificationObjects 27 }
+
+axNotificationGslbZoneName OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The GSLB zone name."
+        ::= { axNotificationObjects 28 }
+
+axNotificationGslbZoneServiceProto OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The GSLB zone service protocol name."
+        ::= { axNotificationObjects 29 }
+
+axNotificationGslbZoneServiceName OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The GSLB zone service name."
+        ::= { axNotificationObjects 30 }
+
+axNotificationGslbGroupName OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The GSLB group name."
+        ::= { axNotificationObjects 31 }
+
+axNotificationGslbGroupEntity OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The GSLB group entity (either group member or group master) IP address or local."
+        ::= { axNotificationObjects 32 }
+
+
+axNotificationLicensedModuleName OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The licensed module name."
+        ::= { axNotificationObjects 33 }
+
+axNotificationShutdownReason OBJECT-TYPE
+        SYNTAX INTEGER {
+                tooHighSystemTemperature(1),
+                insufficientPowerSupply(2)
+        }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The reason for the system shut-down."
+        ::= { axNotificationObjects 34 }
+
+axNotificationIpAddressType OBJECT-TYPE
+        SYNTAX          InetAddressType
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The type of IP address."
+        ::= { axNotificationObjects 35 }
+
+axNotificationLicenseDisableDuration OBJECT-TYPE
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The license has been disabled for given seconds."
+        ::= { axNotificationObjects 36 }
+
+axNotificationSslServerCertificateErrCounter OBJECT-TYPE
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The counter for the SSL server certificate errors."
+        ::= { axNotificationObjects 37 }
+
+axNotificationServerSelectionFailureReason OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The reason of server selection failure."
+        ::= { axNotificationObjects 38 }
+
+axNotificationConnectionTypeName OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The name of the type."
+        ::= { axNotificationObjects 39 }
+
+axNotificationSlbObjectChange OBJECT-TYPE
+        SYNTAX INTEGER {
+            create(1),
+            delete(2)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The type of create/delete."
+        ::= { axNotificationObjects 40 }
+
+
+axNotificationCertificateName OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The name of the certificate."
+        ::= { axNotificationObjects 41 }
+
+axNotificationDateTime OBJECT-TYPE
+        SYNTAX      DateAndTime
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Time the event is going to occuer, expired."
+        ::= { axNotificationObjects 42 }
+
+axNotificationSLBServerPortType OBJECT-TYPE
+        SYNTAX INTEGER {
+            tcp(2),
+            udp(3)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The server port type of create/delete."
+        ::= { axNotificationObjects 43 }
+
+axNotificationPartitionResourceName OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The partition resource name."
+        ::= { axNotificationObjects 44 }
+
+axNotificationPartitionResourceUsageLevel OBJECT-TYPE
+        SYNTAX INTEGER {
+                   below(1),
+                   above(2)
+           }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The partition resource usage level."
+        ::= { axNotificationObjects 45 }
+
+axNotificationTacasServerHost OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The TACACS server host."
+        ::= { axNotificationObjects 46 }
+
+axNotificationUpDown OBJECT-TYPE
+    SYNTAX INTEGER {
+        up(1),
+        down(2)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "The type of up or down."
+    ::= { axNotificationObjects 47 }
+
+axNotificationTrueFalse OBJECT-TYPE
+    SYNTAX INTEGER {
+        false(0),
+    true(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "The effective of the notification."
+    ::= { axNotificationObjects 48 }
+
+--================================================================
+-- LSN trap objects start here:
+--================================================================
+
+axNotificationLsnIpAddress OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The LSN IP address string (IPv4/6)."
+        ::= { axNotificationObjects 50 }
+
+axNotificationLsnProtoType OBJECT-TYPE
+        SYNTAX INTEGER {
+                tcp(2),
+                udp(3),
+        icmp(4),
+        icmpV6(5)
+        }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The LSN protocol type."
+        ::= { axNotificationObjects 51 }
+
+axNotificationLsnCurrentUsage OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The LSN current usage."
+        ::= { axNotificationObjects 52 }
+
+axNotificationLsnPoolName OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The NAT pool name."
+        ::= { axNotificationObjects 53 }
+
+axNotificationLsnExceededTimes OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The exceeded times."
+        ::= { axNotificationObjects 54 }
+
+axNotificationLsnFixedNatPortMappingFileName OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The fixed nat port mapping file name."
+        ::= { axNotificationObjects 55 }
+
+axNotificationLsnFixedNatPortMappingFileChangeType OBJECT-TYPE
+        SYNTAX        INTEGER  {
+            create(1),
+            delete(2),
+            reconfigure(3)
+        }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The change type of fixed nat port mapping file."
+        ::= { axNotificationObjects 56 }
+
+--=============================================================
+-- VCS notification object
+--=============================================================
+
+axNotificationOldVcsState OBJECT-TYPE
+        SYNTAX        INTEGER {
+                        vmasterCandidate(0),
+                        activatingSlave(1),
+                        vBlade(2),
+                        vMaster(3),
+                        vMasterTakeover(4)
+                }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The old state of VCS."
+        ::= { axNotificationObjects 57 }
+
+axNotificationNewVcsState OBJECT-TYPE
+        SYNTAX        INTEGER {
+                        vmasterCandidate(0),
+                        activatingSlave(1),
+                        vBlade(2),
+                        vMaster(3),
+                        vMasterTakeover(4)
+                }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The new state of VCS."
+        ::= { axNotificationObjects 58 }
+
+--================================================================
+-- axSystemNotifications
+--================================================================
+
+axSystemStart        NOTIFICATION-TYPE
+        STATUS       current
+        DESCRIPTION  "Notify that the system has started running."
+        ::= { axSystemNotifications 1 }
+
+axSystemShutdown     NOTIFICATION-TYPE
+        STATUS       current
+        DESCRIPTION  "Notify that the system is in the process of being shut down."
+        ::= { axSystemNotifications 2 }
+
+axSystemTempHigh      NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationConfiguredThreshold,
+                        axNotificationCurrentUsage
+                      }
+        STATUS       current
+        DESCRIPTION  "The system tempature is high."
+        ::= { axSystemNotifications 3 }
+
+axFan1Failure      NOTIFICATION-TYPE
+        STATUS       deprecated
+        DESCRIPTION  "The system fan1 is failed."
+        ::= { axSystemNotifications 4 }
+
+axFan2Failure      NOTIFICATION-TYPE
+        STATUS       deprecated
+        DESCRIPTION  "The system fan2 is failed."
+        ::= { axSystemNotifications 5 }
+
+axFan3Failure      NOTIFICATION-TYPE
+        STATUS       deprecated
+        DESCRIPTION  "The system fan3 is failed."
+        ::= { axSystemNotifications 6 }
+
+axUpperPowerSupplyFailure      NOTIFICATION-TYPE
+        STATUS       deprecated
+        DESCRIPTION  "The system upper power supply is failed."
+        ::= { axSystemNotifications 9 }
+
+axLowerPowerSupplyFailure      NOTIFICATION-TYPE
+        STATUS        deprecated
+        DESCRIPTION   "The system lower power supply is failed."
+        ::= { axSystemNotifications 10 }
+
+axPrimaryHardDiskFailure      NOTIFICATION-TYPE
+        STATUS        current
+        DESCRIPTION   "The primary hard disk is failed."
+        ::= { axSystemNotifications 11 }
+
+axSecondaryHardDiskFailure      NOTIFICATION-TYPE
+        STATUS        current
+        DESCRIPTION   "The secondary hard disk is failed."
+        ::= { axSystemNotifications 12 }
+
+axHardDiskUsageHigh      NOTIFICATION-TYPE
+        STATUS        current
+        DESCRIPTION   "The hard disk usage is high."
+        ::= { axSystemNotifications 13 }
+
+axMemoryUsageHigh      NOTIFICATION-TYPE
+        STATUS       current
+        DESCRIPTION  "The memory usage is high."
+        ::= { axSystemNotifications 14 }
+
+axSystemRestart      NOTIFICATION-TYPE
+        STATUS       current
+        DESCRIPTION  "Notify that the agent has been restarted."
+        ::= { axSystemNotifications 15 }
+
+axSystemDropPacketEvent   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationDroppedPackets
+                      }
+        STATUS        current
+        DESCRIPTION   "The AX experiences the packet dropped of axNotificationDroppedPackets."
+        ::= { axSystemNotifications 16 }
+
+axSystemRelieveDropPacketEvent   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationDroppedPackets
+                      }
+        STATUS        current
+        DESCRIPTION   "The AX recovers from the packet dropped before."
+        ::= { axSystemNotifications 17 }
+
+axSystemControlCpuHigh   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationConfiguredThreshold,
+                        axNotificationCurrentUsage
+                      }
+        STATUS        current
+        DESCRIPTION   "The AX control CPU usage is high."
+        ::= { axSystemNotifications 18 }
+
+axSystemDataCpuHigh   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationConfiguredThreshold,
+                        axNotificationCurrentUsage
+                      }
+        STATUS        current
+        DESCRIPTION   "The AX data CPU usage is high."
+        ::= { axSystemNotifications 19 }
+
+axSystemFanFailure   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationFanName
+                      }
+        STATUS        current
+        DESCRIPTION   "The system fan is failed."
+        ::= { axSystemNotifications 20 }
+
+axSystemPowerSupplyFailure   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationPowerSupplyName
+                      }
+        STATUS        current
+        DESCRIPTION   "The system power supply is failed."
+        ::= { axSystemNotifications 21 }
+
+axSystemLicenseRequired   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationLicensedModuleName
+                      }
+        STATUS        current
+        DESCRIPTION   "The system requires the valid license for specific module."
+        ::= { axSystemNotifications 22 }
+
+axSystemLicenseLoadSuccessful   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationLicensedModuleName
+                      }
+        STATUS        current
+        DESCRIPTION   "The system loads the license for specific module successfully."
+        ::= { axSystemNotifications 23 }
+
+axSystemLicenseExpired   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationLicensedModuleName
+                      }
+        STATUS        current
+        DESCRIPTION   "The module license is expired."
+        ::= { axSystemNotifications 24 }
+
+axSystemShutdownForReason  NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationShutdownReason
+                      }
+        STATUS        current
+        DESCRIPTION   "The AX system is mandatorily shut down."
+        ::= { axSystemNotifications 25 }
+
+axFileSystemBecomeReadOnly  NOTIFICATION-TYPE
+        STATUS        current
+        DESCRIPTION   "The file system is becoming the read-only."
+        ::= { axSystemNotifications 26 }
+
+axSystemLicensedModuleDisabledForDuration   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationLicensedModuleName,
+                        axNotificationLicenseDisableDuration
+                      }
+        STATUS        current
+        DESCRIPTION   "The system disables the specific licensed module for the past duration seconds."
+        ::= { axSystemNotifications 27 }
+
+axSystemControlCpuBecomeNormal NOTIFICATION-TYPE
+    OBJECTS       {
+            axNotificationConfiguredThreshold,
+            axNotificationCurrentUsage
+              }
+    STATUS        current
+    DESCRIPTION   "The AX control CPU usage is back to normal."
+    ::= { axSystemNotifications 28 }
+
+axSystemDataCpuBecomeNormal NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationConfiguredThreshold,
+                        axNotificationCurrentUsage
+                      }
+        STATUS        current
+        DESCRIPTION   "The AX data CPU usage is back to normal."
+        ::= { axSystemNotifications 29 }
+
+
+axSystemTempBecomeNormal NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationConfiguredThreshold,
+                        axNotificationCurrentUsage
+                      }
+        STATUS       current
+        DESCRIPTION  "The system tempature is back to normal."
+        ::= { axSystemNotifications 30 }
+
+
+axHardDiskUsageBecomeNormal NOTIFICATION-TYPE
+        STATUS        current
+        DESCRIPTION   "The hard disk usage is back to normal."
+        ::= { axSystemNotifications 31 }
+
+
+axMemoryUsageBecomeNormal      NOTIFICATION-TYPE
+        STATUS       current
+        DESCRIPTION  "The memory usage is back to normal."
+        ::= { axSystemNotifications 32 }
+
+axSystemFanRecover   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationFanName
+                      }
+        STATUS        current
+        DESCRIPTION   "The system fan is recover."
+        ::= { axSystemNotifications 33 }
+
+axSystemPowerSupplyRecover   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationPowerSupplyName
+                      }
+        STATUS        current
+        DESCRIPTION   "The system power supply is recover."
+        ::= { axSystemNotifications 34 }
+
+axSystemConnectionResourceHigh NOTIFICATION-TYPE
+    OBJECTS {
+            axNotificationConnectionTypeName,
+            axNotificationConfiguredThreshold,
+                        axNotificationCurrentUsage
+        }
+    STATUS      current
+        DESCRIPTION   "The system connection is high."
+        ::= { axSystemNotifications 35 }
+
+axSystemConnectionResourceBecomeNormal NOTIFICATION-TYPE
+    OBJECTS {
+            axNotificationConnectionTypeName,
+            axNotificationConfiguredThreshold,
+                        axNotificationCurrentUsage
+        }
+    STATUS      current
+        DESCRIPTION   "The system connection is back to normal."
+        ::= { axSystemNotifications 36 }
+
+axSystemSmpResourceHigh NOTIFICATION-TYPE
+    OBJECTS {
+            axNotificationConnectionTypeName,
+            axNotificationConfiguredThreshold,
+                        axNotificationCurrentUsage
+        }
+    STATUS      current
+        DESCRIPTION   "The system SMP is high."
+        ::= { axSystemNotifications 37 }
+
+axSystemSmpResourceBecomeNormal NOTIFICATION-TYPE
+    OBJECTS {
+            axNotificationConnectionTypeName,
+            axNotificationConfiguredThreshold,
+                        axNotificationCurrentUsage
+        }
+    STATUS      current
+        DESCRIPTION   "The SMP is back to normal."
+        ::= { axSystemNotifications 38 }
+
+axTacacsMonitorServerUpDown NOTIFICATION-TYPE
+    OBJECTS       {
+            axNotificationMsg,
+            axNotificationTacasServerHost,
+            axNotificationUpDown
+    }
+    STATUS        current
+    DESCRIPTION   "The AX Tacacs Monitor Server is up/down."
+    ::= { axSystemNotifications 39 }
+
+axHighPrioritySyslog NOTIFICATION-TYPE
+    OBJECTS       {
+            axNotificationMsg
+              }
+    STATUS        current
+    DESCRIPTION   "The high severity issue such as hardware failure."
+    ::= { axSystemNotifications 41 }
+
+
+--================================================================
+-- axAppNotifications
+--================================================================
+
+axHAStandby      NOTIFICATION-TYPE
+        OBJECTS       { axNotificationMsg, axNotificationHAGroup }
+        STATUS        current
+        DESCRIPTION   "The system is going into standby mode."
+        ::= { axAppNotifications 1 }
+
+axHAActive      NOTIFICATION-TYPE
+        OBJECTS       { axNotificationMsg, axNotificationHAGroup }
+        STATUS        current
+        DESCRIPTION   "The system is going into active mode."
+        ::= { axAppNotifications 2 }
+
+axHAActiveActive      NOTIFICATION-TYPE
+        OBJECTS       { axNotificationMsg, axNotificationHAGroup }
+        STATUS        deprecated
+        DESCRIPTION   "The system is going into active-active mode."
+        ::= { axAppNotifications 3 }
+
+axServiceDown      NOTIFICATION-TYPE
+        OBJECTS       { axNotificationMsg, axNotificationSLBServer, axNotificationSLBPort }
+        STATUS        current
+        DESCRIPTION   "A service is detected DOWN."
+        ::= { axAppNotifications 4 }
+
+axServiceUp      NOTIFICATION-TYPE
+        OBJECTS       { axNotificationMsg, axNotificationSLBServer, axNotificationSLBPort }
+        STATUS        current
+        DESCRIPTION   "A SLB service is up."
+        ::= { axAppNotifications 5 }
+
+axServerDown      NOTIFICATION-TYPE
+        OBJECTS      { axNotificationMsg, axNotificationSLBServer }
+        STATUS        current
+        DESCRIPTION   "A SLB server is down."
+        ::= { axAppNotifications 6 }
+
+axServerUp   NOTIFICATION-TYPE
+        OBJECTS       { axNotificationMsg, axNotificationSLBServer }
+        STATUS        current
+        DESCRIPTION   "A SLB server is up."
+        ::= { axAppNotifications 7 }
+
+axServerConnLimit   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationMsg,
+                        axNotificationSLBServer,
+                        axNotificationSLBCurConns
+                      }
+        STATUS        current
+        DESCRIPTION   "A SLB server has reached the configured connection limits."
+        ::= { axAppNotifications 8 }
+
+axServerConnResume   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationMsg,
+                        axNotificationSLBServer,
+                        axNotificationSLBCurConns
+                      }
+        STATUS        current
+        DESCRIPTION   "A SLB server has reached the configured connection-resume value."
+        ::= { axAppNotifications 9 }
+
+axServiceConnLimit   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationMsg,
+                        axNotificationSLBServer,
+                        axNotificationSLBPort,
+                        axNotificationSLBCurConns
+                      }
+        STATUS        current
+        DESCRIPTION   "A SLB service has reached the configured connection limits."
+        ::= { axAppNotifications 10 }
+
+axServiceConnResume   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationMsg,
+                        axNotificationSLBServer,
+                        axNotificationSLBPort,
+                        axNotificationSLBCurConns
+                      }
+        STATUS        current
+        DESCRIPTION   "A SLB service has reached the configured connection-resume value."
+        ::= { axAppNotifications 11 }
+
+axVirtualServerPortDown   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationMsg,
+                        axNotificationVirtualServer,
+                        axNotificationVirtualServerPort,
+                        axNotificationVirtualServerPortType
+                      }
+        STATUS        current
+        DESCRIPTION   "A SLB virtual server port is down."
+        ::= { axAppNotifications 12 }
+
+axVirtualServerPortUp   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationMsg,
+                        axNotificationVirtualServer,
+                        axNotificationVirtualServerPort,
+                        axNotificationVirtualServerPortType
+                      }
+        STATUS        current
+        DESCRIPTION   "A SLB virtual server port is up."
+        ::= { axAppNotifications 13 }
+
+axApplicationBufferReachLimit   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationConfiguredThreshold,
+                        axNotificationCurrentUsage
+                      }
+        STATUS        current
+        DESCRIPTION   "The AX SLB application buffer usage execeeded the configured threshold."
+        ::= { axAppNotifications 14 }
+
+axVirtualServerPortReachConnLimit   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationMsg,
+                        axNotificationSLBServer,
+                        axNotificationSLBPort,
+                        axNotificationConnLimit
+                      }
+        STATUS        current
+        DESCRIPTION   "A virtual service port has reached the configured connection limits."
+        ::= { axAppNotifications 15 }
+
+axVirtualServerPortReachConnRateLimit   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationMsg,
+                        axNotificationSLBServer,
+                        axNotificationSLBPort,
+                        axNotificationConnLimit
+                      }
+        STATUS        current
+        DESCRIPTION   "A virtual service port has reached the configured connection rate-limits."
+        ::= { axAppNotifications 16 }
+
+axVirtualServerReachConnLimit   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationMsg,
+                        axNotificationSLBServer,
+                        axNotificationConnLimit
+                      }
+        STATUS        current
+        DESCRIPTION   "A virtual server has reached the configured connection limits."
+        ::= { axAppNotifications 17 }
+
+axVirtualServerReachConnRateLimit   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationMsg,
+                        axNotificationSLBServer,
+                        axNotificationConnLimit
+                      }
+        STATUS        current
+        DESCRIPTION   "A virtual server has reached the configured connection rate-limits."
+        ::= { axAppNotifications 18 }
+
+axServerConnRateLimit   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationMsg,
+                        axNotificationSLBServer,
+                        axNotificationSLBCurConns
+                      }
+        STATUS        current
+        DESCRIPTION   "A SLB server has reached the configured conn-rate-limits."
+        ::= { axAppNotifications 19 }
+
+axServiceConnRateLimit   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationMsg,
+                        axNotificationSLBServer,
+                        axNotificationSLBPort,
+                        axNotificationSLBCurConns
+                      }
+        STATUS        current
+        DESCRIPTION   "A SLB service group member has reached the configured conn-rate-limits."
+        ::= { axAppNotifications 20 }
+
+axServiceGroupMemberEnabledForNewConn   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationMsg,
+                        axNotificationSLBServer,
+                        axNotificationSLBPort,
+                        axNotificationSLBServiceGroupName
+                      }
+        STATUS        current
+        DESCRIPTION   "A SLB service group member is enabled to accept the new connection, when the current connections of group members exceed the conn-limit."
+        ::= { axAppNotifications 21 }
+
+axServiceGroupMemberDisabledForNewConn   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationMsg,
+                        axNotificationSLBServiceGroupName,
+                        axNotificationSLBPort
+                      }
+        STATUS        current
+        DESCRIPTION   "A SLB service group member is disabled, when the current connections of group members are reduced to the conn-resume."
+        ::= { axAppNotifications 22 }
+
+axVrrpActive   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationMsg,
+                        axNotificationPartitionName,
+                        axNotificationVrid
+                      }
+        STATUS        current
+        DESCRIPTION   "The vrid, axNotificationVrid, in the specific partition becomes the Active state."
+        ::= { axAppNotifications 23 }
+
+axVrrpStandby   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationMsg,
+                        axNotificationPartitionName,
+                        axNotificationVrid
+                      }
+        STATUS        current
+        DESCRIPTION   "The vrid, axNotificationVrid, in the specific partition becomes the Standby state."
+        ::= { axAppNotifications 24 }
+
+axSslServerCertificateErr   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationMsg,
+                        axNotificationSLBServer,
+                        axNotificationSslServerCertificateErrCounter
+                      }
+        STATUS        current
+        DESCRIPTION   "The SSL server certificate error is detected."
+        ::= { axAppNotifications 25 }
+
+axServerSelectionFailure NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationMsg,
+                        axNotificationSLBServer,
+                        axNotificationSLBPort,
+                        axNotificationServerSelectionFailureReason
+                      }
+        STATUS        current
+        DESCRIPTION   "A SLB server has got a server selection failure."
+        ::= { axAppNotifications 26 }
+
+axVirtualServerUp   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationMsg,
+                        axNotificationVirtualServer,
+            axNotificationPartitionName
+                      }
+        STATUS        current
+        DESCRIPTION   "Slb virtual server is up."
+        ::= { axAppNotifications 27 }
+
+axVirtualServerDown   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationMsg,
+                        axNotificationVirtualServer,
+            axNotificationPartitionName
+                      }
+        STATUS        current
+        DESCRIPTION   "Slb virtual server is down."
+        ::= { axAppNotifications 28 }
+
+axServerDisabled      NOTIFICATION-TYPE
+        OBJECTS      {
+                axNotificationMsg,
+                axNotificationSLBServer,
+                axNotificationTrueFalse,
+                axNotificationPartitionName
+        }
+        STATUS        current
+        DESCRIPTION   "A SLB server is disabled."
+        ::= { axAppNotifications 29 }
+
+axServiceGroupUp      NOTIFICATION-TYPE
+        OBJECTS      {
+                axNotificationMsg,
+                axNotificationSLBServiceGroupName,
+                axNotificationSLBServerPortType,
+                axNotificationPartitionName
+        }
+        STATUS        current
+        DESCRIPTION   "A SLB service group is Up."
+        ::= { axAppNotifications 30 }
+
+axServiceGroupDown      NOTIFICATION-TYPE
+        OBJECTS      {
+                axNotificationMsg,
+                axNotificationSLBServiceGroupName,
+                axNotificationSLBServerPortType,
+                axNotificationPartitionName
+        }
+        STATUS        current
+        DESCRIPTION   "A SLB service group is down."
+        ::= { axAppNotifications 31 }
+
+axServiceGroupMemberUp   NOTIFICATION-TYPE
+    OBJECTS       {
+            axNotificationMsg,
+            axNotificationSLBServiceGroupName,
+            axNotificationSLBServer,
+            axNotificationSLBPort,
+            axNotificationPartitionName
+              }
+    STATUS        current
+    DESCRIPTION   "A SLB service group member is up."
+    ::= { axAppNotifications 32 }
+
+axServiceGroupMemberDown   NOTIFICATION-TYPE
+    OBJECTS       {
+            axNotificationMsg,
+            axNotificationSLBServiceGroupName,
+            axNotificationSLBServer,
+            axNotificationSLBPort,
+            axNotificationPartitionName
+              }
+    STATUS        current
+    DESCRIPTION   "A SLB service group member is down."
+    ::= { axAppNotifications 33 }
+
+axVcsStateChange NOTIFICATION-TYPE
+    OBJECTS {
+            axNotificationMsg,
+            axNotificationOldVcsState,
+            axNotificationNewVcsState
+    }
+    STATUS        current
+    DESCRIPTION   "A VCS state change notification."
+    ::= { axAppNotifications 34 }
+
+axGatewayUp   NOTIFICATION-TYPE
+    OBJECTS       {
+        axNotificationMsg,
+        axNotificationSLBServer,
+        axNotificationPartitionName
+    }
+    STATUS        current
+    DESCRIPTION   "A gateway server is up."
+    ::= { axAppNotifications 35 }
+
+axGatewayDown   NOTIFICATION-TYPE
+    OBJECTS       {
+        axNotificationMsg,
+        axNotificationSLBServer,
+        axNotificationPartitionName
+    }
+    STATUS        current
+    DESCRIPTION   "A gateway server is down."
+    ::= { axAppNotifications 36 }
+
+--================================================================
+-- axNetworkNotifications
+--================================================================
+
+axNetworkTrunkPortsThreshold      NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationTrunkID,
+                        axNotificationPortThreshold,
+                        axNotificationCurrentUpPorts
+                      }
+        STATUS        current
+        DESCRIPTION   "The trunk ports threshold trap."
+        ::= { axNetworkNotifications 1 }
+
+--==================================================================
+-- axSyslog trap
+--==================================================================
+
+    axSyslogTrapPrefix OBJECT-IDENTITY
+        STATUS          current
+        DESCRIPTION     "prefix of A10 logging traps"
+        ::=  {  axLogging  100  }
+
+    axSyslogTrap   NOTIFICATION-TYPE
+        OBJECTS         { axSyslogModuleName, axSyslogPriority, axSyslogMsg }
+        STATUS          current
+        DESCRIPTION     "the syslog messages sent through snmp trap"
+        ::=  {  axSyslogTrapPrefix  1  }
+
+    axSyslogTrapObjects    OBJECT-IDENTITY
+        STATUS          current
+        DESCRIPTION     "Objects of AX syslog trap"
+        ::=  {  axLogging  101  }
+
+    axSyslogModuleName OBJECT-TYPE
+        SYNTAX          DisplayString  ( SIZE ( 0 .. 15  ) )
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION     "The module name sent the syslog message."
+        ::=  {  axSyslogTrapObjects  1  }
+
+    axSyslogPriority   OBJECT-TYPE
+        SYNTAX          Integer32  ( 0 .. 7  )
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION     "The syslog message priority."
+        ::=  {  axSyslogTrapObjects  2  }
+
+    axSyslogMsg    OBJECT-TYPE
+        SYNTAX          OCTET STRING  ( SIZE ( 0 .. 1023  ) )
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION     "The syslog message."
+        ::=  {  axSyslogTrapObjects  3  }
+
+--================================================================
+-- axGslbNotifications
+--================================================================
+
+axGslbSiteAdminEnabled   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationMsg,
+                        axNotificationGslbSiteName,
+                        axNotificationPartitionName
+                      }
+        STATUS        current
+        DESCRIPTION   "The GSLB site is administratively enabled."
+        ::= { axGslbNotifications 1 }
+
+axGslbSiteAdminDisabled   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationMsg,
+                        axNotificationGslbSiteName,
+                        axNotificationPartitionName
+                      }
+        STATUS        current
+        DESCRIPTION   "The GSLB site is administratively disabled."
+        ::= { axGslbNotifications 2 }
+
+axGslbSiteOperationalStateUp   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationMsg,
+                        axNotificationGslbSiteName,
+                        axNotificationPartitionName
+                      }
+        STATUS        current
+        DESCRIPTION   "The GSLB site is operational up."
+        ::= { axGslbNotifications 3 }
+
+axGslbSiteOperationalStateDown   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationMsg,
+                        axNotificationGslbSiteName,
+                        axNotificationPartitionName
+                      }
+        STATUS        current
+        DESCRIPTION   "The GSLB site is operational down."
+        ::= { axGslbNotifications 4 }
+
+axGslbSiteSlbDeviceStateUp   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationMsg,
+                        axNotificationGslbSiteName,
+                        axNotificationGslbSiteSlbDeviceName,
+                        axNotificationPartitionName
+                      }
+        STATUS        current
+        DESCRIPTION   "The GSLB site SLB device status is changed to up."
+        ::= { axGslbNotifications 5 }
+
+axGslbSiteSlbDeviceStateDown   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationMsg,
+                        axNotificationGslbSiteName,
+                        axNotificationGslbSiteSlbDeviceName,
+                        axNotificationPartitionName
+                      }
+        STATUS        current
+        DESCRIPTION   "The GSLB site SLB device status is changed to down."
+        ::= { axGslbNotifications 6 }
+
+axGslbServiceIpAdminEnabled   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationMsg,
+                        axNotificationGslbServiceIpName,
+                        axNotificationGslbServiceIpAddr,
+                        axNotificationPartitionName
+                      }
+        STATUS        current
+        DESCRIPTION   "The GSLB service IP is administratively enabled."
+        ::= { axGslbNotifications 9 }
+
+axGslbServiceIpAdminDisabled   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationMsg,
+                        axNotificationGslbServiceIpName,
+                        axNotificationGslbServiceIpAddr,
+                        axNotificationPartitionName
+                      }
+        STATUS        current
+        DESCRIPTION   "The GSLB service IP is administratively disabled."
+        ::= { axGslbNotifications 10 }
+
+axGslbServiceIpOperationalStateUp   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationMsg,
+                        axNotificationGslbServiceIpName,
+                        axNotificationGslbServiceIpAddr,
+                        axNotificationPartitionName
+                      }
+        STATUS        current
+        DESCRIPTION   "The GSLB service IP is operational up."
+        ::= { axGslbNotifications 11 }
+
+axGslbServiceIpOperationalStateDown   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationMsg,
+                        axNotificationGslbServiceIpName,
+                        axNotificationGslbServiceIpAddr,
+                        axNotificationPartitionName
+                      }
+        STATUS        current
+        DESCRIPTION   "The GSLB service IP is operational down."
+        ::= { axGslbNotifications 12 }
+
+axGslbServiceIpPortStateUp   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationMsg,
+                        axNotificationGslbServiceIpName,
+                        axNotificationGslbServiceIpAddr,
+                        axNotificationGslbServiceIpPortType,
+                        axNotificationPartitionName
+                      }
+        STATUS        current
+        DESCRIPTION   "The GSLB service IP port status is changed to up."
+        ::= { axGslbNotifications 13 }
+
+axGslbServiceIpPortStateDown   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationMsg,
+                        axNotificationGslbServiceIpName,
+                        axNotificationGslbServiceIpAddr,
+                        axNotificationGslbServiceIpPortType,
+                        axNotificationPartitionName
+                      }
+        STATUS        current
+        DESCRIPTION   "The GSLB service IP port status is changed to down."
+        ::= { axGslbNotifications 14 }
+
+axGslbZoneAdminEnabled   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationMsg,
+                        axNotificationGslbZoneName,
+                        axNotificationPartitionName
+                      }
+        STATUS        current
+        DESCRIPTION   "The GSLB zone status is administratively enabled."
+        ::= { axGslbNotifications 15 }
+
+axGslbZoneAdminDisabled   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationMsg,
+                        axNotificationGslbZoneName,
+                        axNotificationPartitionName
+                      }
+        STATUS        current
+        DESCRIPTION   "The GSLB zone status is administratively disabled."
+        ::= { axGslbNotifications 16 }
+
+axGslbZoneOperationalStateUp   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationMsg,
+                        axNotificationGslbZoneName,
+                        axNotificationPartitionName
+                      }
+        STATUS        current
+        DESCRIPTION   "The GSLB zone is operational up."
+        ::= { axGslbNotifications 17 }
+
+axGslbZoneOperationalStateDown   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationMsg,
+                        axNotificationGslbZoneName,
+                        axNotificationPartitionName
+                      }
+        STATUS        current
+        DESCRIPTION   "The GSLB zone is operational down."
+        ::= { axGslbNotifications 18 }
+
+axGslbZoneServiceAdminEnabled   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationMsg,
+                        axNotificationGslbZoneName,
+                        axNotificationGslbZoneServiceProto,
+                        axNotificationGslbZoneServiceName,
+                        axNotificationPartitionName
+                      }
+        STATUS        current
+        DESCRIPTION   "The GSLB zone service is administratively enabled."
+        ::= { axGslbNotifications 19 }
+
+axGslbZoneServiceAdminDisabled   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationMsg,
+                        axNotificationGslbZoneName,
+                        axNotificationGslbZoneServiceProto,
+                        axNotificationGslbZoneServiceName,
+                        axNotificationPartitionName
+                      }
+        STATUS        current
+        DESCRIPTION   "The GSLB zone service is administratively disabled."
+        ::= { axGslbNotifications 20 }
+
+axGslbZoneServiceOperationalStateUp   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationMsg,
+                        axNotificationGslbZoneName,
+                        axNotificationGslbZoneServiceProto,
+                        axNotificationGslbZoneServiceName,
+                        axNotificationPartitionName
+                      }
+        STATUS        current
+        DESCRIPTION   "The GSLB zone service is operational up."
+        ::= { axGslbNotifications 21 }
+
+axGslbZoneServiceOperationalStateDown   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationMsg,
+                        axNotificationGslbZoneName,
+                        axNotificationGslbZoneServiceProto,
+                        axNotificationGslbZoneServiceName,
+                        axNotificationPartitionName
+                      }
+        STATUS        current
+        DESCRIPTION   "The GSLB zone service is operational down."
+        ::= { axGslbNotifications 22 }
+
+axGslbGroupBecomeMaster   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationMsg,
+                        axNotificationGslbGroupName,
+                        axNotificationGslbGroupEntity
+                      }
+        STATUS        current
+        DESCRIPTION   "The GSLB group becomes the Master."
+        ::= { axGslbNotifications 23 }
+
+axGslbGroupRemovedMaster   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationMsg,
+                        axNotificationGslbGroupName,
+                        axNotificationGslbGroupEntity
+                      }
+        STATUS        current
+        DESCRIPTION   "The GSLB group is removed from the Master."
+        ::= { axGslbNotifications 24 }
+
+axGslbGroupMemberJoinGroup   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationMsg,
+                        axNotificationGslbGroupName,
+                        axNotificationGslbGroupEntity
+                      }
+        STATUS        current
+        DESCRIPTION   "The GSLB group member is joining a group."
+        ::= { axGslbNotifications 25 }
+
+axGslbGroupMemberLeaveGroup   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationMsg,
+                        axNotificationGslbGroupName,
+                        axNotificationGslbGroupEntity
+                      }
+        STATUS        current
+        DESCRIPTION   "The GSLB group member is leaving a group."
+        ::= { axGslbNotifications 26 }
+
+--================================================================
+-- axSlbNotifications
+--================================================================
+
+axVirtualServerCreateDelete   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationMsg,
+                        axNotificationVirtualServer,
+            axNotificationPartitionName,
+            axNotificationSlbObjectChange
+                      }
+        STATUS        current
+        DESCRIPTION   "Slb virtual server is added or deleted."
+        ::= { axSlbNotifications 1 }
+
+axVirtualServerPortCreateDelete   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationMsg,
+            axNotificationVirtualServer,
+            axNotificationVirtualServerPort,
+            axNotificationVirtualServerPortType,
+            axNotificationPartitionName,
+            axNotificationSlbObjectChange
+                      }
+        STATUS        current
+        DESCRIPTION   "Slb virtual server port is addeded or deleted."
+        ::= { axSlbNotifications 2 }
+
+axServerCreateDelete   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationMsg,
+                        axNotificationSLBServer,
+            axNotificationPartitionName,
+            axNotificationSlbObjectChange
+                      }
+        STATUS        current
+        DESCRIPTION   "Slb server is added or deleted."
+        ::= { axSlbNotifications 3 }
+
+axServerPortCreateDelete   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationMsg,
+                        axNotificationSLBServer,
+            axNotificationSLBPort,
+            axNotificationSLBServerPortType,
+            axNotificationPartitionName,
+            axNotificationSlbObjectChange
+                      }
+        STATUS        current
+        DESCRIPTION   "Slb server port is added or delete."
+        ::= { axSlbNotifications 4 }
+
+axSslCertificateCreateDelete   NOTIFICATION-TYPE
+        OBJECTS       {
+                        axNotificationMsg,
+                        axNotificationCertificateName,
+            axNotificationPartitionName,
+            axNotificationSlbObjectChange
+                      }
+        STATUS        current
+        DESCRIPTION   "Ssl certification is create or delete."
+        ::= { axSlbNotifications 5 }
+
+axSslCertificateExpiring   NOTIFICATION-TYPE
+    OBJECTS       {
+            axNotificationMsg,
+            axNotificationCertificateName,
+            axNotificationPartitionName,
+--string of time that the certificate is expired or to be expired
+            axNotificationDateTime
+                     }
+       STATUS        current
+       DESCRIPTION   "The certification is going to be expired."
+       ::= { axSlbNotifications 6 }
+
+axPartitionResourceUsageWarning   NOTIFICATION-TYPE
+       OBJECTS       {
+                       axNotificationMsg,
+                       axNotificationPartitionResourceName,
+                       axNotificationPartitionResourceUsageLevel,
+                       axNotificationPartitionName
+                     }
+       STATUS        current
+       DESCRIPTION   "The partition resource usage becomes above/below the configured limitation."
+       ::= { axSlbNotifications 7 }
+
+END

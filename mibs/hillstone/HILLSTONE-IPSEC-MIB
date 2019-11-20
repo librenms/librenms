@@ -1,0 +1,178 @@
+-- *************************************************************************
+-- HILLSTONE-IPSEC-MIB  
+--
+-- Copyright (c) 2009 by Hillstone Networks, Inc.
+-- All rights reserved.
+-- 
+-- Version:      V3    
+-- Description:	 Hillstone Networks IPSEC MIB Object Identifier Assignments
+-- *************************************************************************
+--
+
+HILLSTONE-IPSEC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	hillstoneIpsec			FROM HILLSTONE-SMI
+	NetworkAddress, IpAddress, 
+	Counter, Gauge, TimeTicks	FROM RFC1155-SMI
+	OBJECT-TYPE			FROM RFC-1212;	
+
+          -- textual conventions
+
+          DisplayString ::=
+              OCTET STRING
+          -- This data type is used to model textual information taken
+          -- from the NVT ASCII character set.  By convention, objects
+          -- with this syntax are declared as having
+          --
+          --      SIZE (0..255)
+
+hillstoneIpsecMibObjects OBJECT IDENTIFIER ::= { hillstoneIpsec 1 }
+
+ipsecTunnelTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF IpsecTunnelEntry
+	ACCESS not-accessible
+	STATUS current
+	::= { hillstoneIpsecMibObjects 1 }
+
+IpsecTunnelEntry OBJECT-TYPE
+	SYNTAX IpsecTunnelEntry
+	ACCESS not-accessible
+	STATUS current
+	INDEX { ipsecTunnelIndex }
+	::= { ipsecTunnelTable 1}
+
+IpsecTunnelEntry ::=
+	SEQUENCE{
+		ipsecTunnelIndex
+			INTEGER,
+		ipsecTunnelName
+			DisplayString,
+		ipsecTunnelID
+			INTEGER,
+		ipsecTunnelType
+			INTEGER,
+		ipsecTunnelPeerIp
+			NetworkAddress,
+		ipsecTunnelExIfIndex
+			INTEGER,
+		ipsecTunnelLocalID
+			DisplayString,
+		ipsecTunnelRemoteID
+			DisplayString,
+		ipsecTunnelCryptAlgorithms
+			DisplayString,
+		ipsecTunnelAuthAlgorithms
+			DisplayString,		
+		ipsecTunnelLifeTime
+			TimeTicks,
+		ipsecTunnelStatus
+			INTEGER
+	}
+		
+ipsecTunnelIndex OBJECT-TYPE
+	SYNTAX INTEGER 
+	ACCESS read-only
+	STATUS current
+	 DESCRIPTION 
+		"The index of ipsec tunnel"
+	::= { IpsecTunnelEntry 1 }
+
+ipsecTunnelName OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION 
+		"The name of ipsec tunnel"
+	::= { IpsecTunnelEntry 2 }
+
+ipsecTunnelID OBJECT-TYPE
+	SYNTAX INTEGER 
+	ACCESS read-only
+	STATUS current
+	 DESCRIPTION 
+		"The index of ipsec tunnel"
+	::= { IpsecTunnelEntry 3 }
+
+ipsecTunnelType OBJECT-TYPE
+	SYNTAX INTEGER  {
+		normal (1),
+		pnp (2),
+		dail-up (3),
+		manual (4)
+	}
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION 
+		"The type of tunnel"
+	::= { IpsecTunnelEntry 4 }
+
+ipsecTunnelPeerIp OBJECT-TYPE
+	SYNTAX NetworkAddress
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION 
+		"The peer ip of a ipsec tunnel"
+	::= { IpsecTunnelEntry 5 }
+
+ipsecTunnelExIfIndex OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION 
+		"The local interface of a ipsec tunnel"
+	::= { IpsecTunnelEntry 6 }
+
+ipsecTunnelLocalID OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION 
+		"The local id of a ipsec tunnel"
+	::= { IpsecTunnelEntry 7 }
+
+ipsecTunnelRemoteID OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION 
+		"The remote id of a ipsec tunnel"
+	::= { IpsecTunnelEntry 8 }
+
+ipsecTunnelCryptAlgorithms OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION 
+		"The crypt algorithms of a ipsec tunnel"
+	::= { IpsecTunnelEntry 9 }
+
+ipsecTunnelAuthAlgorithms OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION 
+		"The auth algorithms of a ipsec tunnel"
+	::= { IpsecTunnelEntry 10 }
+
+ipsecTunnelLifeTime OBJECT-TYPE
+	SYNTAX TimeTicks
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION 
+		"The life time of a ipsec tunnel"
+	::= { IpsecTunnelEntry 11 }
+
+ipsecTunnelStatus OBJECT-TYPE
+	SYNTAX INTEGER  {
+		active (1),
+		inactive (2)
+	}
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION 
+		"The status of tunnel"
+	::= { IpsecTunnelEntry 12 }
+
+END
+

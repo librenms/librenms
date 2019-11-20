@@ -1,0 +1,148 @@
+mib: OMNITRON-MIB:OMNITRON-POE-MIB
+modules:
+    sensors:
+        state:
+            data:
+                -
+                    oid: ostPoePortCfgTable
+                    value: ostPoePortPseStatus
+                    num_oid: '.1.3.6.1.4.1.7342.15.2.1.7.{{ $index }}'
+                    descr: 'PSE Port Status {{ $index }}'
+                    group: PSE
+                    state_name: PoePortPseStatus
+                    index: 'pseStatus.{{ $index }}'
+                    states:
+                        - { value: 1, generic: 3, graph: 0, descr: notApplicable }
+                        - { value: 2, generic: 0, graph: 0, descr: pdNormal }
+                        - { value: 3, generic: 1, graph: 0, descr: pdOverCurrent }
+                        - { value: 4, generic: 1, graph: 0, descr: pdBrownOut }
+                        - { value: 5, generic: 2, graph: 0, descr: pdInusfficientPower }
+                -
+                    oid: ostPoePortCfgTable
+                    value: ostPoEPortHeartbeatStatus
+                    num_oid: '.1.3.6.1.4.1.7342.15.2.1.14.{{ $index }}'
+                    descr: 'PSE Port Heartbeat Status {{ $index }}'
+                    group: PSE
+                    index: 'pseHeart.{{ $index }}'
+                    state_name: PoePortHeartbeatStatus
+                    states:
+                        - { value: 1, generic: 3, graph: 0, descr: disabled }
+                        - { value: 2, generic: 0, graph: 0, descr: available }
+                        - { value: 3, generic: 1, graph: 0, descr: errored }
+                        - { value: 4, generic: 2, graph: 0, descr: pseRestart }
+                        - { value: 5, generic: 3, graph: 0, descr: pseShutdown }
+                -
+                    oid: ostEnvironmentalStatusTable
+                    value: ostEnvironmentalPs1Status
+                    num_oid: '.1.3.6.1.4.1.7342.2.1.11.1.1.{{ $index }}'
+                    descr: 'PS1 Status'
+                    group: PSU
+                    index: 'ps1Status.{{ $index }}'
+                    state_name: PSstatus
+                    states:
+                        - { value: 0, generic: 3, graph: 0, descr: notSupported }
+                        - { value: 1, generic: 3, graph: 0, descr: notInstalled }
+                        - { value: 2, generic: 2, graph: 0, descr: notPowered }
+                        - { value: 3, generic: 0, graph: 0, descr: powered }
+                -
+                    oid: ostEnvironmentalStatusTable
+                    value: ostEnvironmentalPs2Status
+                    num_oid: '.1.3.6.1.4.1.7342.2.1.11.1.5.{{ $index }}'
+                    descr: 'PS2 Status'
+                    group: PSU
+                    index: 'ps2Status.{{ $index }}'
+                    state_name: PSstatus
+                    states:
+                        - { value: 0, generic: 3, graph: 0, descr: notSupported }
+                        - { value: 1, generic: 3, graph: 0, descr: notInstalled }
+                        - { value: 2, generic: 2, graph: 0, descr: notPowered }
+                        - { value: 3, generic: 0, graph: 0, descr: powered }
+        current:
+            data:
+                -
+                    oid: ostPoePortCfgTable
+                    value: ostPoePortPseCurrentSupplied
+                    num_oid: '.1.3.6.1.4.1.7342.15.2.1.6.{{ $index }}'
+                    divisor: 1000
+                    descr: 'PSE Port Ouput Current {{ $index }}'
+                    index: 'pseCurrent.{{ $index }}'
+        power:
+            data:
+                -
+                    oid: ostPoeGlobalCfgTable
+                    value: ostPoeGlobalCfgTotalPwr
+                    num_oid: '.1.3.6.1.4.1.7342.15.1.2.{{ $index }}'
+                    descr: Total Power
+                    index: 'pwr.{{ $index }}'
+
+        temperature:
+            data:
+                -
+                    oid: moduleMgtCfgTable
+                    value: cpuTemperature
+                    num_oid: '.1.3.6.1.4.1.7342.2.1.3.1.38.{{ $index }}'
+                    descr: CPU Ambient Temperature
+                    index: 'cpuTemp.{{ $index }}'
+                -
+                    oid: ostEnvironmentalStatusTable
+                    value: ostEnvironmentalTemperature
+                    num_oid: '.1.3.6.1.4.1.7342.2.1.11.1.9.{{ $index }}'
+                    descr: Module Internal Ambient Temperature
+                    index: 'envTemp.{{ $index }}'
+        voltage:
+            data:
+                -
+                    oid: ostPoePortCfgTable
+                    value: ostPoePortPseVoltageSupplied
+                    num_oid: '.1.3.6.1.4.1.7342.15.2.1.5.{{ $index }}'
+                    descr: 'PSE Port Output Voltage {{ $index }}'
+                    group: PSE
+                    index: 'pseVoltage.{{ $index }}'
+                -
+                    oid: moduleMgtCfgTable
+                    value: cpuVoltageIn
+                    divisor: 1000
+                    num_oid: '.1.3.6.1.4.1.7342.2.1.3.1.36.{{ $index }}'
+                    descr: CPU Input Voltage
+                    group: CPU
+                    index: 'cpuVoltIn.{{ $index }}'
+                -
+                    oid: moduleMgtCfgTable
+                    value: cpuVoltageOut
+                    num_oid: '.1.3.6.1.4.1.7342.2.1.3.1.37.{{ $index }}'
+                    divisor: 1000
+                    descr: CPU Output Voltage
+                    group: CPU
+                    index: 'cpuVoltOut{{ $index }}'
+                -
+                    oid: ostEnvironmentalStatusTable
+                    value: ostEnvironmentalPs1VoltageIn
+                    num_oid: '.1.3.6.1.4.1.7342.2.1.11.1.2.{{ $index }}'
+                    divisor: 1000
+                    descr: PS1 Input Voltage
+                    group: PS1
+                    index: 'ps1VoltIn.{{ $index }}'
+                -
+                    oid: ostEnvironmentalStatusTable
+                    value: ostEnvironmentalPs1VoltageOut
+                    num_oid: '.1.3.6.1.4.1.7342.2.1.11.1.3.{{ $index }}'
+                    divisor: 1000
+                    descr: PS1 Output Votlage
+                    group: PS1
+                    index: 'ps1VoltOut.{{ $index }}'
+                -
+                    oid: ostEnvironmentalStatusTable
+                    value: ostEnvironmentalPs2VoltageIn
+                    num_oid: '.1.3.6.1.4.1.7342.2.1.11.1.6.{{ $index }}'
+                    divisor: 1000
+                    descr: PS2 Input Voltage
+                    group: PS2
+                    index: 'ps2VoltIn.{{ $index }}'
+                -
+                    oid: ostEnvironmentalStatusTable
+                    value: ostEnvironmentalPs2VoltageOut
+                    num_oid: '.1.3.6.1.4.1.7342.2.1.11.1.7.{{ $index }}'
+                    divisor: 1000
+                    descr: PS2 Output Voltage
+                    group: PS2
+                    index: 'ps2VoltOut.{{ $index }}'

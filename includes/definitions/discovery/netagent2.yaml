@@ -1,0 +1,44 @@
+mib: UPS-MIB:XPPC-MIB
+modules:
+    sensors:
+        state:
+            data:
+                -
+                    oid: upsBaseBatteryStatus
+                    num_oid: '.1.3.6.1.4.1.935.1.1.1.2.1.1.{{ $index }}'
+                    descr: Battery Status
+                    index: 'upsBaseBatteryStatus.{{ $index }}'
+                    state_name: upsBaseBatteryStatus
+                    states:
+                        - { descr: unknown, graph: 0, value: 1, generic: 3 }
+                        - { descr: BatteryNormal, graph: 0, value: 2, generic: 0 }
+                        - { descr: BatteryLow, graph: 0, value: 3, generic: 1 }
+                -
+                    oid: upsSmartBatteryReplaceIndicator
+                    num_oid: '.1.3.6.1.4.1.935.1.1.1.2.2.5.{{ $index }}'
+                    descr: Battery Replace Status
+                    index: 'upsSmartBatteryReplaceIndicator.{{ $index }}'
+                    state_name: upsSmartBatteryReplaceIndicator
+                    states:
+                        - { descr: noBatteryNeedsReplacing, graph: 0, value: 1, generic: 0 }
+                        - { descr: batteryNeedsReplacing, graph: 0, value: 2, generic: 2 }
+                -
+                    oid: upsEnvWater
+                    num_oid: '.1.3.6.1.4.1.935.1.1.1.9.1.3.{{ $index }}'
+                    descr: Water Status
+                    index: 'upsEnvWater.{{ $index }}'
+                    state_name: upsEnvWater
+                    states:
+                        - { descr: unknown, graph: 0, value: 0, generic: 3 }
+                        - { descr: normal, graph: 0, value: 1, generic: 0 }
+                        - { descr: abnormal, graph: 0, value: 2, generic: 2 }
+                -
+                    oid: upsEnvSmoke
+                    num_oid: '.1.3.6.1.4.1.935.1.1.1.9.1.4.{{ $index }}'
+                    descr: Smoke Status
+                    index: 'upsEnvSmoke.{{ $index }}'
+                    state_name: upsEnvSmoke
+                    states:
+                        - { descr: unknown, graph: 0, value: 0, generic: 3 }
+                        - { descr: normal, graph: 0, value: 1, generic: 0 }
+                        - { descr: abnormal, graph: 0, value: 2, generic: 2 }

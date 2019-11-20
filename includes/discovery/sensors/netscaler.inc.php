@@ -5,7 +5,7 @@ echo ' NetScaler ';
 echo ' Caching OIDs:';
 
 if (!is_array($ns_sensor_array)) {
-    $ns_sensor_array = array();
+    $ns_sensor_array = [];
     echo ' sysHealthCounterValue ';
     $ns_sensor_array = snmpwalk_cache_multi_oid($device, 'sysHealthCounterValue', $ns_sensor_array, 'NS-ROOT-MIB');
 }
@@ -37,22 +37,24 @@ foreach ($ns_sensor_array as $descr => $data) {
         $current = ($current / $divisor);
     };
 
-    discover_sensor(
-        $valid['sensor'],
-        $type,
-        $device,
-        $oid,
-        $descr,
-        'netscaler-health',
-        $descr,
-        $divisor,
-        $multiplier,
-        null,
-        null,
-        null,
-        null,
-        $current
-    );
+    if (is_numeric($current) && $type) {
+        discover_sensor(
+            $valid['sensor'],
+            $type,
+            $device,
+            $oid,
+            $descr,
+            'netscaler-health',
+            $descr,
+            $divisor,
+            $multiplier,
+            null,
+            null,
+            null,
+            null,
+            $current
+        );
+    }
 }
 
 unset($ns_sensor_array);

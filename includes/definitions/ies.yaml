@@ -5,7 +5,10 @@ type: network
 icon: zyxel
 discovery:
     -
-      sysObjectId: .1.3.6.1.4.1.890.
+      sysObjectID: .1.3.6.1.4.1.890.
+      sysObjectID_except: 
+      - .1.3.6.1.4.1.890.1.5.13.10
+      - .1.3.6.1.4.1.890.1.5.13.7
       sysDescr:
         - IES-
 

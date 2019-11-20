@@ -7,10 +7,9 @@ echo('SMART');
 $name = 'smart';
 $app_id = $app['app_id'];
 
-$options      = '-O qv';
+$options      = '-Oqv';
 $oid          = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.5.115.109.97.114.116';
 $output = snmp_walk($device, $oid, $options);
-update_application($app, $output);
 
 $lines = explode("\n", $output);
 
@@ -42,6 +41,7 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('selective', 'GAUGE', 0);
 
 $int=0;
+$metrics = array();
 while (isset($lines[$int])) {
     list($disk, $id5, $id10, $id173, $id177, $id183, $id184, $id187, $id188, $id190, $id194,
         $id196, $id197, $id198, $id199, $id231, $id233, $completed, $interrupted, $read_failure,
@@ -125,8 +125,32 @@ while (isset($lines[$int])) {
         'selective'=>$selective
     );
 
+    $metrics[$disk] = $fields;
     $tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
     data_update($device, 'app', $tags, $fields);
 
     $int++;
 }
+
+
+# smart enhancement id9
+$rrd_name = array('app', $name, $app_id);
+$rrd_def = RrdDefinition::make()
+    ->addDataset('id9', 'GAUGE', 0);
+
+$int=0;
+while (isset($lines[$int])) {
+    list($disk, , , , , , , , , , , , , , , , , , , , , , , , , $id9)=explode(",", $lines[$int]);
+
+    $rrd_name = array('app', $name.'_id9', $app_id, $disk);
+
+    $fields = ['id9' => $id9];
+    $metrics[$disk]['id9'] = $id9;
+    
+    $tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
+    data_update($device, 'app', $tags, $fields);
+
+    $int++;
+}
+
+update_application($app, $output, $metrics);

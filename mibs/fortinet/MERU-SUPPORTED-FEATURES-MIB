@@ -1,0 +1,79 @@
+-- *****************************************************************
+-- Meru Networks Enterprise Specific MIB
+--
+-- Copyright (c) 2005 by Meru Networks
+-- All rights reserved
+--
+-- *****************************************************************
+
+MERU-SUPPORTED-FEATURES-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    NOTIFICATION-TYPE, 
+    OBJECT-TYPE, 
+    MODULE-IDENTITY, 
+    OBJECT-IDENTITY,
+    enterprises, 
+    Counter32, 
+    Counter64, 
+    Gauge32, 
+    TimeTicks, 
+    IpAddress, 
+    Integer32
+        FROM SNMPv2-SMI
+    Ipv6Address
+        FROM IPV6-TC
+    TEXTUAL-CONVENTION, 
+    TimeInterval, 
+    TimeStamp,
+    DateAndTime, 
+    TruthValue, 
+    DisplayString, 
+    MacAddress, 
+    RowStatus
+        FROM SNMPv2-TC
+    mwConfiguration
+        FROM MERU-SMI
+    MwlOnOffSwitch,
+    MwlIpProxyType
+        FROM MERU-TC;
+
+  mwSupportedFeatures  MODULE-IDENTITY
+    LAST-UPDATED "200506050000Z"
+    ORGANIZATION "Meru Networks"
+    CONTACT-INFO "support@merunetworks.com"
+    DESCRIPTION
+        "This MIB defines all the managed objects used to manage the Meru WLAN 
+         Topology Configuration infrastructure"
+    ::= { mwConfiguration 14 } 
+  
+    mwSupport                                OBJECT IDENTIFIER ::= { mwSupportedFeatures 1 }
+    
+  
+  mwSupportChannelDomainCheck  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Regulatory Domain Check Flag"
+    ::= { mwSupport    1 }
+
+  mwSupportLicensingMgmt  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Licensing Management"
+    ::= { mwSupport    2 }
+
+  mwSupportSipProxy  OBJECT-TYPE
+    SYNTAX MwlIpProxyType
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Sip Proxy"
+    ::= { mwSupport    3 }
+
+  
+END
+   

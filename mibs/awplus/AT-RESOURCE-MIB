@@ -1,0 +1,266 @@
+--  ============================================================================
+-- AT-RESOURCE.MIB, Allied Telesis enterprise MIB: hardware resources
+--
+-- Copyright (c) 2008 by Allied Telesis, Inc.
+-- All rights reserved.
+--
+-- ============================================================================
+
+    AT-RESOURCE-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            sysinfo
+                FROM AT-SMI-MIB
+            Unsigned32, OBJECT-TYPE, MODULE-IDENTITY
+                FROM SNMPv2-SMI
+            DisplayString
+                FROM SNMPv2-TC;
+
+
+        resource MODULE-IDENTITY
+            LAST-UPDATED "201405260000Z"
+            ORGANIZATION
+                "Allied Telesis, Inc."
+            CONTACT-INFO
+                "  http://www.alliedtelesis.com"
+            DESCRIPTION
+                "The AT-RESOURCE-MIB contains objects for displaying system
+                hardware resource information."
+            REVISION "201405260000Z"
+            DESCRIPTION
+                "Updated decriptions for hostInfoTable and hostInfoEntry"
+            REVISION "201404300000Z"
+            DESCRIPTION
+                "Updated decriptions to refer to chassisMappingTable"
+            REVISION "201404160000Z"
+            DESCRIPTION
+                "Added more descriptions to rscStkId for VCStack Plus and increase
+                 the range to 1-24."
+            REVISION "201209210000Z"
+            DESCRIPTION
+                "Added chassis switch (e.g. SBx8100) descriptions to stack-related MIB objects"
+            REVISION "201205220300Z"
+            DESCRIPTION
+                "rscStkId range now 1..12 (from 1..8)."
+            REVISION "201006150015Z"
+            DESCRIPTION
+                "MIB revision history dates in descriptions updated."
+            REVISION "200910222300Z"
+            DESCRIPTION
+                "In standalone mode the AT-RESOURCE-MIB was indexed by the
+                default stack member ID of 1.  This has been updated to index
+                by the stack member ID of the device."
+            REVISION "200810201000Z"
+            DESCRIPTION
+                "Add objects for displaying host information. "
+            REVISION "192008090400Z"
+            DESCRIPTION
+                "Initial version."
+            ::= { sysinfo 21 }
+
+
+
+
+--
+-- Node definitions
+--
+
+        rscBoardTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF RscBoardEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of information about boards installed in a device."
+            ::= { resource 1 }
+
+
+        rscBoardEntry OBJECT-TYPE
+            SYNTAX RscBoardEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A conceptual row of entries of rscBoardTable."
+            INDEX { rscStkId, rscResourceId }
+            ::= { rscBoardTable 1 }
+
+
+        RscBoardEntry ::=
+            SEQUENCE {
+                rscStkId
+                    Unsigned32,
+                rscResourceId
+                    Unsigned32,
+                rscBoardType
+                    DisplayString,
+                rscBoardName
+                    DisplayString,
+                rscBoardID
+                    Unsigned32,
+                rscBoardBay
+                    DisplayString,
+                rscBoardRevision
+                    DisplayString,
+                rscBoardSerialNumber
+                    DisplayString
+             }
+
+        rscStkId OBJECT-TYPE
+            SYNTAX Unsigned32 (1..24)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The ID of the stack member. It is a number assigned to
+                a stackable unit by the operating system when it is stacked.
+                An initial value of 1 is given to a stand alone unit. For a
+                chassis switch, it corresponds to the card ID. For VCStack Plus,
+                1-12 refers to the cards on VCS stack member 1 and 13-24 refers
+                to the cards on VCS stack member 2.
+                Refer to chassisMappingTable for more details."
+            ::= { rscBoardEntry 1 }
+
+
+        rscResourceId OBJECT-TYPE
+            SYNTAX Unsigned32 (1..4294967294)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The resource ID number of the board. It is a number assigned to
+                a hardware resource when the operating system detects
+                its existence."
+            ::= { rscBoardEntry 2 }
+
+
+        rscBoardType OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the type of the board. Its value can be
+                'Base', 'Expansion', 'Fan module' or 'PSU', etc."
+            ::= { rscBoardEntry 3 }
+
+
+        rscBoardName OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object represents the name of the board. Its value can be
+                'SwitchBlade x908', 'XEM-12S' or 'AT-PWR05-AC', etc."
+            ::= { rscBoardEntry 4 }
+
+
+        rscBoardID OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object represents the ID number of the board. Its value is an
+                Allied Telesis assigned number, such as 274 for the XEM-12S, or 255
+                for the AT-9924Ts. "
+            ::= { rscBoardEntry 5 }
+
+
+        rscBoardBay OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the board installation location. Its
+                value can be 'Bay1', 'Bay2' or 'PSU1', etc. For a base board,
+                it has a value of a single character space. "
+            ::= { rscBoardEntry 6 }
+
+
+        rscBoardRevision OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..5))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object represents the revision number of the board."
+            ::= { rscBoardEntry 7 }
+
+
+        rscBoardSerialNumber OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object represents the serial number of the board."
+            ::= { rscBoardEntry 8 }
+
+
+        hostInfoTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HostInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A list of host entries."
+            ::= { resource 2 }
+
+
+        hostInfoEntry OBJECT-TYPE
+            SYNTAX HostInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A set of parameters that describe a single host."
+            INDEX { rscStkId }
+            ::= { hostInfoTable 1 }
+
+
+        HostInfoEntry ::=
+            SEQUENCE {
+                hostInfoDRAM
+                    DisplayString,
+                hostInfoFlash
+                    DisplayString,
+                hostInfoUptime
+                    DisplayString,
+                hostInfoBootloaderVersion
+                    DisplayString
+             }
+
+        hostInfoDRAM OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the host DRAM information."
+            ::= { hostInfoEntry 1 }
+
+
+        hostInfoFlash OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the host Flash information."
+            ::= { hostInfoEntry 2 }
+
+
+        hostInfoUptime OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object represents the host up time."
+            ::= { hostInfoEntry 3 }
+
+
+        hostInfoBootloaderVersion OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object represents the host boot loader version."
+            ::= { hostInfoEntry 4 }
+
+
+
+    END
+
+--
+-- at-resource.mib
+--
+

@@ -1,0 +1,993 @@
+-- MIB created 10/11/99 20:28:38, by
+--   SMIC (the next generation) version 1.6.29, November 22, 1994.
+
+IBMFRBRS-MIB DEFINITIONS ::= BEGIN
+
+-- From file: "ibmfrbrs.mi2"
+-- Compile options "G A T M"
+
+IMPORTS
+    Counter32, Integer32, Gauge32, IpAddress
+            FROM SNMPv2-SMI-v1
+    OBJECT-TYPE
+            FROM RFC-1212
+    enterprises
+            FROM RFC1155-SMI
+    DisplayString
+            FROM SNMPv2-TC-v1
+    ifIndex
+            FROM RFC1213-MIB;
+
+ibmfrBRS OBJECT IDENTIFIER ::= { enterprises ibm(2) ibmProd(6) ibmIROC(119) ibmIROCrouting(4) ibmIROCroutingfr(4) 4 }
+-- MODULE-IDENTITY
+--  LastUpdated
+--    9810271200Z
+--  OrgName
+--    IBM
+--  ContactInfo
+--    Randy Worzella
+--     IBM Corporation
+--     800 Park Offices Drive
+--     V28A/664
+--     P.O. Box 12195
+--     Research Triangle Park, NC 27709, USA
+--     Tel:    1 919 254 2202
+--     E-mail: worzella@us.ibm.com
+--  Descr
+--    MIB for managing the Bandwidth Reservation System (BRS) over
+--     Frame Relay links,
+
+ibmfrBRSOperational OBJECT IDENTIFIER ::= { ibmfrBRS 1 }
+ibmfrBRSAdministravive OBJECT IDENTIFIER ::= { ibmfrBRS 2 }
+
+ibmfrBRSInterfaceTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF IbmfrBRSInterfaceEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "FR BRS interface information."
+    ::= { ibmfrBRSOperational 1 }
+
+ibmfrBRSInterfaceEntry OBJECT-TYPE
+    SYNTAX IbmfrBRSInterfaceEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Information related to a particular FR BRS interface."
+    INDEX { ifIndex }
+    ::= { ibmfrBRSInterfaceTable 1 }
+
+IbmfrBRSInterfaceEntry ::= SEQUENCE {
+    ibmfrBRSInterfaceMaxQueue Integer32,
+    ibmfrBRSInterfaceMinQueue Integer32,
+    ibmfrBRSInterfaceTotalBandwidth Integer32,
+    ibmfrBRSInterfaceTotalCircuitClasses Integer32,
+    ibmfrBRSInterfaceDefaultCircuitClassName DisplayString
+    }
+
+ibmfrBRSInterfaceMaxQueue OBJECT-TYPE
+    SYNTAX Integer32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The maximum queue length for each priority queue
+         of each traffic class that is defined for a virtual
+         circuit."
+    ::= { ibmfrBRSInterfaceEntry 1 }
+
+ibmfrBRSInterfaceMinQueue OBJECT-TYPE
+    SYNTAX Integer32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The minimum queue length for each priority queue
+         of each traffic class that is defined for a virtual
+         circuit."
+    ::= { ibmfrBRSInterfaceEntry 2 }
+
+ibmfrBRSInterfaceTotalBandwidth OBJECT-TYPE
+    SYNTAX Integer32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The total bandwidth which is a sum of the individual
+         bandwidth allocations for each circuit class defined
+         for this interface."
+    ::= { ibmfrBRSInterfaceEntry 3 }
+
+ibmfrBRSInterfaceTotalCircuitClasses OBJECT-TYPE
+    SYNTAX Integer32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The total number of circuit classes defined for this
+         interface. This includes the predefined DEFAULT circuit
+         class."
+    ::= { ibmfrBRSInterfaceEntry 4 }
+
+ibmfrBRSInterfaceDefaultCircuitClassName OBJECT-TYPE
+    SYNTAX DisplayString
+--    Rsyntax OCTET STRING(SIZE(0..255))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The name of the circuit class that is considered the
+         default circuit class. It is used for virtual circuits
+         not explicitly assigned to any circuit class."
+    ::= { ibmfrBRSInterfaceEntry 5 }
+
+ibmfrBRSCircuitClassTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF IbmfrBRSCircuitClassEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "FR BRS circuit class information."
+    ::= { ibmfrBRSOperational 2 }
+
+ibmfrBRSCircuitClassEntry OBJECT-TYPE
+    SYNTAX IbmfrBRSCircuitClassEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Information related to a particular circuit class
+         defined for a given FR interface."
+    INDEX { ifIndex, ibmfrBRSCircuitClassName }
+    ::= { ibmfrBRSCircuitClassTable 1 }
+
+IbmfrBRSCircuitClassEntry ::= SEQUENCE {
+    ibmfrBRSCircuitClassName DisplayString,
+    ibmfrBRSCircuitClassBandwidth Integer32,
+    ibmfrBRSCircuitClassPacketXmit Counter32,
+    ibmfrBRSCircuitClassBytesXmit Counter32,
+    ibmfrBRSCircuitClassBytesOverflow Counter32,
+    ibmfrBRSCircuitClassLastPacketXmit Counter32,
+    ibmfrBRSCircuitClassLastBytesXmit Counter32,
+    ibmfrBRSCircuitClassLastBytesOverflow Counter32,
+    ibmfrBRSCircuitClassClearCounters INTEGER
+    }
+
+ibmfrBRSCircuitClassName OBJECT-TYPE
+    SYNTAX DisplayString
+--    Rsyntax OCTET STRING(SIZE(0..255))
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "The name of a circuit class for this interface."
+    ::= { ibmfrBRSCircuitClassEntry 1 }
+
+ibmfrBRSCircuitClassBandwidth OBJECT-TYPE
+    SYNTAX Integer32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The designated percent of bandwidth associated with this
+         circuit class."
+    ::= { ibmfrBRSCircuitClassEntry 2 }
+
+ibmfrBRSCircuitClassPacketXmit OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The total number of packets that have been transmitted
+         by this circuit class."
+    ::= { ibmfrBRSCircuitClassEntry 3 }
+
+ibmfrBRSCircuitClassBytesXmit OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The total number of bytes for packets that have been
+         transmitted by this circuit class."
+    ::= { ibmfrBRSCircuitClassEntry 4 }
+
+ibmfrBRSCircuitClassBytesOverflow OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The total number of bytes for packets that could not be
+         transmitted for this circuit class.  This can be either
+         the maximum queue-length was reached for a priority queue
+         or the packet could not be queued because the priority queue
+         was at the minimum queue length threshold and the packet
+         came from an interface that was running low on receive buffers."
+    ::= { ibmfrBRSCircuitClassEntry 5 }
+
+ibmfrBRSCircuitClassLastPacketXmit OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The last total number of packets that have been transmitted by 
+         this circuit class before the counter was being cleared."
+    ::= { ibmfrBRSCircuitClassEntry 6 }
+
+ibmfrBRSCircuitClassLastBytesXmit OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The last total number of bytes for packets that have been
+         transmitted by this circuit class before the counter was being cleared."
+    ::= { ibmfrBRSCircuitClassEntry 7 }
+
+ibmfrBRSCircuitClassLastBytesOverflow OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The last total number of bytes for packets that could not be
+         transmitted for this circuit class before the counter was being cleared."
+    ::= { ibmfrBRSCircuitClassEntry 8 }
+
+ibmfrBRSCircuitClassClearCounters OBJECT-TYPE
+    SYNTAX INTEGER(0..0)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Clear all statistics counters associated with this circuit class.
+         The counter is cleared immediately on completion of the set operation 
+         and the previous counter values are saved."
+    ::= { ibmfrBRSCircuitClassEntry 9 }
+
+ibmfrBRSCircuitTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF IbmfrBRSCircuitEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "FR BRS virtual circuit information."
+    ::= { ibmfrBRSOperational 3 }
+
+ibmfrBRSCircuitEntry OBJECT-TYPE
+    SYNTAX IbmfrBRSCircuitEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Information related to a particular FR virtual circuit
+         assigned to a circuit class on this FR interface."
+    INDEX { ifIndex, ibmfrBRSCircuitClassName, ibmfrBRSCircuitNumber }
+    ::= { ibmfrBRSCircuitTable 1 }
+
+IbmfrBRSCircuitEntry ::= SEQUENCE {
+    ibmfrBRSCircuitNumber Integer32,
+    ibmfrBRSCircuitMaxQueue Integer32,
+    ibmfrBRSCircuitMinQueue Integer32,
+    ibmfrBRSCircuitTotalBandwidth Integer32,
+    ibmfrBRSCircuitTotalTrafficClasses Integer32,
+    ibmfrBRSCircuitDefaultTrafficClassName DisplayString,
+    ibmfrBRSCircuitDefaultTrafficClassPrio INTEGER,
+    ibmfrBRSCircuitSpecification INTEGER,
+    ibmfrBRSCircuitSuperClassName DisplayString,
+    ibmfrBRSCircuitSVCName DisplayString
+    }
+
+ibmfrBRSCircuitNumber OBJECT-TYPE
+    SYNTAX Integer32
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "For PVC circuit this number is the  FR DLCI identifying this virtual 
+         circuit.
+         For SVC circuit this number is the unique identifier number.  The
+         SVC name can be obtained via ibmfrBRSCircuitSVCName, 
+         ibmfrBRSTrafficClassSVCName, or ibmfrBRSProtFiltSVCName."
+    ::= { ibmfrBRSCircuitEntry 1 }
+
+ibmfrBRSCircuitMaxQueue OBJECT-TYPE
+    SYNTAX Integer32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The maximum queue length for each priority queue
+         of each traffic class that is defined for a virtual
+         circuit. This value overrides the max queue length
+         specified for the interface and indicated by
+         ibmfrBRSInterfaceMaxQueue."
+    ::= { ibmfrBRSCircuitEntry 2 }
+
+ibmfrBRSCircuitMinQueue OBJECT-TYPE
+    SYNTAX Integer32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The minimum queue length for each priority queue
+         of each traffic class that is defined for a virtual
+         circuit. This value overrides the min queue length
+         specified for the interface and indicated by
+         ibmfrBRSInterfaceMinQueue."
+    ::= { ibmfrBRSCircuitEntry 3 }
+
+ibmfrBRSCircuitTotalBandwidth OBJECT-TYPE
+    SYNTAX Integer32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The total bandwidth which is a sum of the individual
+         bandwidth allocations for each traffic class defined
+         for this virtual circuit."
+    ::= { ibmfrBRSCircuitEntry 4 }
+
+ibmfrBRSCircuitTotalTrafficClasses OBJECT-TYPE
+    SYNTAX Integer32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The total number of traffic classes defined for this
+         virtual circuit. This includes the predefined LOCAL
+         and DEFAULT traffic classes."
+    ::= { ibmfrBRSCircuitEntry 5 }
+
+ibmfrBRSCircuitDefaultTrafficClassName OBJECT-TYPE
+    SYNTAX DisplayString
+--    Rsyntax OCTET STRING(SIZE(0..255))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The name of the traffic class that is considered the
+         default traffic class. It is used for protocols and
+         filters not explicitly assigned to any traffic class."
+    ::= { ibmfrBRSCircuitEntry 6 }
+
+ibmfrBRSCircuitDefaultTrafficClassPrio OBJECT-TYPE
+    SYNTAX INTEGER {
+        low(1),
+        normal(2),
+        high(3),
+        urgent(4)
+        }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The priority of the default traffic class."
+    ::= { ibmfrBRSCircuitEntry 7 }
+
+ibmfrBRSCircuitSpecification OBJECT-TYPE
+    SYNTAX INTEGER {
+        defaults(1),
+        specific(2)
+        }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "An indication of which traffic classes are
+         being used by a virtual circuit.
+        
+           defaults(1) - No specific traffic classes
+                         have been defined and the virtual
+                         circuit is using the default
+                         traffic class definitions.
+        
+           specific(2) - Specific traffic classes have
+                         been defined and are being used by
+                         the virtual circuit."
+    ::= { ibmfrBRSCircuitEntry 8 }
+
+ibmfrBRSCircuitSuperClassName OBJECT-TYPE
+    SYNTAX DisplayString
+--    Rsyntax OCTET STRING(SIZE(0..255))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The name of the traffic class that is considered the
+         super traffic class. The protocols and filters assigned          
+         to the super class have the higher priority than those 
+         assigned to any other traffic classes.
+         The null string indicates that the super class doesn't
+         exist."
+    ::= { ibmfrBRSCircuitEntry 9 }
+
+ibmfrBRSCircuitSVCName OBJECT-TYPE
+    SYNTAX DisplayString
+--    Rsyntax OCTET STRING(SIZE(0..255))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The name of the SVC.  This only applies to SVC circuit.  
+         A null string indicates that this circuit is a PVC."
+    ::= { ibmfrBRSCircuitEntry 10 }
+
+ibmfrBRSTrafficClassTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF IbmfrBRSTrafficClassEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "FR BRS traffic class information."
+    ::= { ibmfrBRSOperational 4 }
+
+ibmfrBRSTrafficClassEntry OBJECT-TYPE
+    SYNTAX IbmfrBRSTrafficClassEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Information related to a specific traffic class
+         defined for a particular virtual circuit."
+    INDEX { ifIndex, ibmfrBRSCircuitClassName, ibmfrBRSCircuitNumber, ibmfrBRSTrafficClassName }
+    ::= { ibmfrBRSTrafficClassTable 1 }
+
+IbmfrBRSTrafficClassEntry ::= SEQUENCE {
+    ibmfrBRSTrafficClassName DisplayString,
+    ibmfrBRSTrafficClassBandwidth Integer32,
+    ibmfrBRSTrafficClassTotalPacketXmit Counter32,
+    ibmfrBRSTrafficClassPacketXmitLow Counter32,
+    ibmfrBRSTrafficClassPacketXmitNormal Counter32,
+    ibmfrBRSTrafficClassPacketXmitHigh Counter32,
+    ibmfrBRSTrafficClassPacketXmitUrgent Counter32,
+    ibmfrBRSTrafficClassTotalBytesXmit Counter32,
+    ibmfrBRSTrafficClassBytesXmitLow Counter32,
+    ibmfrBRSTrafficClassBytesXmitNormal Counter32,
+    ibmfrBRSTrafficClassBytesXmitHigh Counter32,
+    ibmfrBRSTrafficClassBytesXmitUrgent Counter32,
+    ibmfrBRSTrafficClassTotalBytesOverflow Counter32,
+    ibmfrBRSTrafficClassBytesOverflowLow Counter32,
+    ibmfrBRSTrafficClassBytesOverflowNormal Counter32,
+    ibmfrBRSTrafficClassBytesOverflowHigh Counter32,
+    ibmfrBRSTrafficClassBytesOverflowUrgent Counter32,
+    ibmfrBRSTrafficClassTotalPacketOverflow Counter32,
+    ibmfrBRSTrafficClassPacketOverflowLow Counter32,
+    ibmfrBRSTrafficClassPacketOverflowNormal Counter32,
+    ibmfrBRSTrafficClassPacketOverflowHigh Counter32,
+    ibmfrBRSTrafficClassPacketOverflowUrgent Counter32,
+    ibmfrBRSTrafficClassTotalLastPacketXmit Counter32,
+    ibmfrBRSTrafficClassLastPacketXmitLow Counter32,
+    ibmfrBRSTrafficClassLastPacketXmitNormal Counter32,
+    ibmfrBRSTrafficClassLastPacketXmitHigh Counter32,
+    ibmfrBRSTrafficClassLastPacketXmitUrgent Counter32,
+    ibmfrBRSTrafficClassTotalLastBytesXmit Counter32,
+    ibmfrBRSTrafficClassLastBytesXmitLow Counter32,
+    ibmfrBRSTrafficClassLastBytesXmitNormal Counter32,
+    ibmfrBRSTrafficClassLastBytesXmitHigh Counter32,
+    ibmfrBRSTrafficClassLastBytesXmitUrgent Counter32,
+    ibmfrBRSTrafficClassTotalLastBytesOverflow Counter32,
+    ibmfrBRSTrafficClassLastBytesOverflowLow Counter32,
+    ibmfrBRSTrafficClassLastBytesOverflowNmal Counter32,
+    ibmfrBRSTrafficClassLastBytesOverflowHigh Counter32,
+    ibmfrBRSTrafficClassLastBytesOverflowUgent Counter32,
+    ibmfrBRSTrafficClassTotalLastPacketOverflow Counter32,
+    ibmfrBRSTrafficClassLastPacketOverflowLow Counter32,
+    ibmfrBRSTrafficClassLastPacketOverflowNmal Counter32,
+    ibmfrBRSTrafficClassLastPacketOverflowHigh Counter32,
+    ibmfrBRSTrafficClassLastPacketOverflowUgent Counter32,
+    ibmfrBRSTrafficClassClearCounters INTEGER,
+    ibmfrBRSTrafficClassSVCName DisplayString
+    }
+
+ibmfrBRSTrafficClassName OBJECT-TYPE
+    SYNTAX DisplayString
+--    Rsyntax OCTET STRING(SIZE(0..255))
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "The name of a traffic class for this virtual
+         circuit."
+    ::= { ibmfrBRSTrafficClassEntry 1 }
+
+ibmfrBRSTrafficClassBandwidth OBJECT-TYPE
+    SYNTAX Integer32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The designated percent of bandwidth associated with this
+         traffic class.
+         Since the super class has higher priority than any other traffic
+         class, the percent of bandwidth is indicated by zero"
+    ::= { ibmfrBRSTrafficClassEntry 2 }
+
+ibmfrBRSTrafficClassTotalPacketXmit OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The total number of packets that have been transmitted
+         by this traffic class."
+    ::= { ibmfrBRSTrafficClassEntry 3 }
+
+ibmfrBRSTrafficClassPacketXmitLow OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The total number of packets that have been transmitted
+         by this traffic class at priority level of low."
+    ::= { ibmfrBRSTrafficClassEntry 4 }
+
+ibmfrBRSTrafficClassPacketXmitNormal OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The total number of packets that have been transmitted
+         by this traffic class at priority level of normal."
+    ::= { ibmfrBRSTrafficClassEntry 5 }
+
+ibmfrBRSTrafficClassPacketXmitHigh OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The total number of packets that have been transmitted
+         by this traffic class at priority level of high."
+    ::= { ibmfrBRSTrafficClassEntry 6 }
+
+ibmfrBRSTrafficClassPacketXmitUrgent OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The total number of packets that have been transmitted
+         by this traffic class at priority level of urgent."
+    ::= { ibmfrBRSTrafficClassEntry 7 }
+
+ibmfrBRSTrafficClassTotalBytesXmit OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The total number of bytes for packets that have been
+         transmitted by this traffic class."
+    ::= { ibmfrBRSTrafficClassEntry 8 }
+
+ibmfrBRSTrafficClassBytesXmitLow OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The total number of bytes that have been transmitted
+         by this traffic class at priority level of low."
+    ::= { ibmfrBRSTrafficClassEntry 9 }
+
+ibmfrBRSTrafficClassBytesXmitNormal OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The total number of bytes that have been transmitted
+         by this traffic class at priority level of normal."
+    ::= { ibmfrBRSTrafficClassEntry 10 }
+
+ibmfrBRSTrafficClassBytesXmitHigh OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The total number of bytes that have been transmitted
+         by this traffic class at priority level of high."
+    ::= { ibmfrBRSTrafficClassEntry 11 }
+
+ibmfrBRSTrafficClassBytesXmitUrgent OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The total number of bytes that have been transmitted
+         by this traffic class at priority level of urgent."
+    ::= { ibmfrBRSTrafficClassEntry 12 }
+
+ibmfrBRSTrafficClassTotalBytesOverflow OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The total number of bytes for packets that could not be
+         transmitted for this traffic class.  This can be either
+         the maximum queue-length was reached for a priority queue
+         or the packet could not be queued because the priority queue
+         was at the minimum queue length threshold and the packet
+         came from an interface that was running low on receive buffers."
+    ::= { ibmfrBRSTrafficClassEntry 13 }
+
+ibmfrBRSTrafficClassBytesOverflowLow OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The total number of bytes for packets that could not be
+         transmitted for this traffic class at priority level of
+         low.  This can be either the maximum queue-length was reached 
+         for a priority queue or the packet could not be queued because 
+         the priority queue was at the minimum queue length threshold and the packet
+         came from an interface that was running low on receive buffers."
+    ::= { ibmfrBRSTrafficClassEntry 14 }
+
+ibmfrBRSTrafficClassBytesOverflowNormal OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The total number of bytes for packets that could not be
+         transmitted for this traffic class at priority level of
+         normal.  This can be either the maximum queue-length was reached 
+         for a priority queue or the packet could not be queued because 
+         the priority queue was at the minimum queue length threshold and 
+         the packet came from an interface that was running low on receive buffers."
+    ::= { ibmfrBRSTrafficClassEntry 15 }
+
+ibmfrBRSTrafficClassBytesOverflowHigh OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The total number of bytes for packets that could not be
+         transmitted for this traffic class at priority level of
+         high.  This can be either the maximum queue-length was reached 
+         for a priority queue or the packet could not be queued because 
+         the priority queue was at the minimum queue length threshold and 
+         the packet came from an interface that was running low on receive buffers."
+    ::= { ibmfrBRSTrafficClassEntry 16 }
+
+ibmfrBRSTrafficClassBytesOverflowUrgent OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The total number of bytes for packets that could not be
+         transmitted for this traffic class at priority level of
+         urgent.  This can be either the maximum queue-length was reached 
+         for a priority queue or the packet could not be queued because 
+         the priority queue was at the minimum queue length threshold and 
+         the packet came from an interface that was running low on receive buffers."
+    ::= { ibmfrBRSTrafficClassEntry 17 }
+
+ibmfrBRSTrafficClassTotalPacketOverflow OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The total number of packets that could not be
+         transmitted for this traffic class.  This can be either
+         the maximum queue-length was reached for a priority queue
+         or the packet could not be queued because the priority queue
+         was at the minimum queue length threshold and the packet
+         came from an interface that was running low on receive buffers."
+    ::= { ibmfrBRSTrafficClassEntry 18 }
+
+ibmfrBRSTrafficClassPacketOverflowLow OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The total number of packets that could not be transmitted for 
+         this traffic class at priority level of low.  This can be either
+         the maximum queue-length was reached for a priority queue
+         or the packet could not be queued because the priority queue
+         was at the minimum queue length threshold and the packet
+         came from an interface that was running low on receive buffers."
+    ::= { ibmfrBRSTrafficClassEntry 19 }
+
+ibmfrBRSTrafficClassPacketOverflowNormal OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The total number of packets that could not be transmitted for 
+         this traffic class at priority level of normal.  This can be either
+         the maximum queue-length was reached for a priority queue
+         or the packet could not be queued because the priority queue
+         was at the minimum queue length threshold and the packet
+         came from an interface that was running low on receive buffers."
+    ::= { ibmfrBRSTrafficClassEntry 20 }
+
+ibmfrBRSTrafficClassPacketOverflowHigh OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The total number of packets that could not be transmitted for 
+         this traffic class at priority level of high.  This can be either
+         the maximum queue-length was reached for a priority queue
+         or the packet could not be queued because the priority queue
+         was at the minimum queue length threshold and the packet
+         came from an interface that was running low on receive buffers."
+    ::= { ibmfrBRSTrafficClassEntry 21 }
+
+ibmfrBRSTrafficClassPacketOverflowUrgent OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The total number of packets that could not be transmitted for 
+         this traffic class at priority level of urgent.  This can be either
+         the maximum queue-length was reached for a priority queue
+         or the packet could not be queued because the priority queue
+         was at the minimum queue length threshold and the packet
+         came from an interface that was running low on receive buffers."
+    ::= { ibmfrBRSTrafficClassEntry 22 }
+
+ibmfrBRSTrafficClassTotalLastPacketXmit OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The last total number of packets that have been transmitted
+         by this traffic class before the counter was being cleared."
+    ::= { ibmfrBRSTrafficClassEntry 23 }
+
+ibmfrBRSTrafficClassLastPacketXmitLow OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The last total number of packets that have been transmitted
+         by this traffic class at priority level of low before the 
+         counter was being cleared."
+    ::= { ibmfrBRSTrafficClassEntry 24 }
+
+ibmfrBRSTrafficClassLastPacketXmitNormal OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The last total number of packets that have been transmitted
+         by this traffic class at priority level of normal before the 
+         counter was being cleared."
+    ::= { ibmfrBRSTrafficClassEntry 25 }
+
+ibmfrBRSTrafficClassLastPacketXmitHigh OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The last total number of packets that have been transmitted
+         by this traffic class at priority level of high before the 
+         counter was being cleared."
+    ::= { ibmfrBRSTrafficClassEntry 26 }
+
+ibmfrBRSTrafficClassLastPacketXmitUrgent OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The last total number of packets that have been transmitted
+         by this traffic class at priority level of urgent before the 
+         counter was being cleared."
+    ::= { ibmfrBRSTrafficClassEntry 27 }
+
+ibmfrBRSTrafficClassTotalLastBytesXmit OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The total number of bytes for packets that have been
+         transmitted by this traffic class before the counter
+         was being cleared."
+    ::= { ibmfrBRSTrafficClassEntry 28 }
+
+ibmfrBRSTrafficClassLastBytesXmitLow OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The total number of bytes for packets that have been
+         transmitted by this traffic class at priority level
+         of low before the counter was being cleared."
+    ::= { ibmfrBRSTrafficClassEntry 29 }
+
+ibmfrBRSTrafficClassLastBytesXmitNormal OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The total number of bytes for packets that have been
+         transmitted by this traffic class at priority level
+         of normal before the counter was being cleared."
+    ::= { ibmfrBRSTrafficClassEntry 30 }
+
+ibmfrBRSTrafficClassLastBytesXmitHigh OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The total number of bytes for packets that have been
+         transmitted by this traffic class at priority level
+         of high before the counter was being cleared."
+    ::= { ibmfrBRSTrafficClassEntry 31 }
+
+ibmfrBRSTrafficClassLastBytesXmitUrgent OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The total number of bytes for packets that have been
+         transmitted by this traffic class at priority level
+         of urgent before the counter was being cleared."
+    ::= { ibmfrBRSTrafficClassEntry 32 }
+
+ibmfrBRSTrafficClassTotalLastBytesOverflow OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The total number of bytes for packets that could not be
+         transmitted for this traffic class before the counter
+         was being cleared."
+    ::= { ibmfrBRSTrafficClassEntry 33 }
+
+ibmfrBRSTrafficClassLastBytesOverflowLow OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The total number of bytes for packets that could not be
+         transmitted for this traffic class at priority level of
+         low before the counter was being cleared."
+    ::= { ibmfrBRSTrafficClassEntry 34 }
+
+ibmfrBRSTrafficClassLastBytesOverflowNmal OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The total number of bytes for packets that could not be
+         transmitted for this traffic class at priority levle of
+         normal before the counter was being cleared."
+    ::= { ibmfrBRSTrafficClassEntry 35 }
+
+ibmfrBRSTrafficClassLastBytesOverflowHigh OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The total number of bytes for packets that could not be
+         transmitted for this traffic class at priority levle of
+         high before the counter was being cleared."
+    ::= { ibmfrBRSTrafficClassEntry 36 }
+
+ibmfrBRSTrafficClassLastBytesOverflowUgent OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The total number of bytes for packets that could not be
+         transmitted for this traffic class at priority levle of
+         urgent before the counter was being cleared."
+    ::= { ibmfrBRSTrafficClassEntry 37 }
+
+ibmfrBRSTrafficClassTotalLastPacketOverflow OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The total number of packets that could not be
+         transmitted for this traffic class before the counter
+         was being cleared."
+    ::= { ibmfrBRSTrafficClassEntry 38 }
+
+ibmfrBRSTrafficClassLastPacketOverflowLow OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The total number of packets that could not be
+         transmitted for this traffic class at priority level of
+         low before the counter was being cleared."
+    ::= { ibmfrBRSTrafficClassEntry 39 }
+
+ibmfrBRSTrafficClassLastPacketOverflowNmal OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The total number of packets that could not be
+         transmitted for this traffic class at priority level of
+         low before the counter was being cleared."
+    ::= { ibmfrBRSTrafficClassEntry 40 }
+
+ibmfrBRSTrafficClassLastPacketOverflowHigh OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The total number of packets that could not be
+         transmitted for this traffic class at priority level of
+         high before the counter was being cleared."
+    ::= { ibmfrBRSTrafficClassEntry 41 }
+
+ibmfrBRSTrafficClassLastPacketOverflowUgent OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The total number of packets that could not be
+         transmitted for this traffic class at priority level of
+         urgent before the counter was being cleared."
+    ::= { ibmfrBRSTrafficClassEntry 42 }
+
+ibmfrBRSTrafficClassClearCounters OBJECT-TYPE
+    SYNTAX INTEGER(0..0)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Clear all the statistics counters associated with this traffic class. 
+         The counters are cleared immediately on completion of the set operation
+         and the previous counter values are saved."
+    ::= { ibmfrBRSTrafficClassEntry 43 }
+
+ibmfrBRSTrafficClassSVCName OBJECT-TYPE
+    SYNTAX DisplayString
+--    Rsyntax OCTET STRING(SIZE(0..255))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The name of the SVC.  This only applies to SVC circuit.  
+         A null string indicates that this circuit is a PVC."
+    ::= { ibmfrBRSTrafficClassEntry 44 }
+
+ibmfrBRSProtFiltTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF IbmfrBRSProtFiltEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "FR BRS protocol/filter information."
+    ::= { ibmfrBRSOperational 5 }
+
+ibmfrBRSProtFiltEntry OBJECT-TYPE
+    SYNTAX IbmfrBRSProtFiltEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Information related to a protocol/filter related
+         to a particular traffic class.
+        
+         Note that the LOCAL traffic class will never appear
+         in this table since it never has a protocol/filter
+         associated with it."
+    INDEX { ifIndex, ibmfrBRSCircuitClassName, ibmfrBRSCircuitNumber, ibmfrBRSTrafficClassName, ibmfrBRSProtFiltId }
+    ::= { ibmfrBRSProtFiltTable 1 }
+
+IbmfrBRSProtFiltEntry ::= SEQUENCE {
+    ibmfrBRSProtFiltId DisplayString,
+    ibmfrBRSProtFiltPrio INTEGER,
+    ibmfrBRSProtFiltDE INTEGER,
+    ibmfrBRSProtFiltSVCName DisplayString
+    }
+
+ibmfrBRSProtFiltId OBJECT-TYPE
+    SYNTAX DisplayString
+--    Rsyntax OCTET STRING(SIZE(0..255))
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "The idenitifer for a protocol/filter."
+    ::= { ibmfrBRSProtFiltEntry 1 }
+
+ibmfrBRSProtFiltPrio OBJECT-TYPE
+    SYNTAX INTEGER {
+        low(1),
+        normal(2),
+        high(3),
+        urgent(4)
+        }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The priority of the protocol/filter within
+         the particular traffic class."
+    ::= { ibmfrBRSProtFiltEntry 2 }
+
+ibmfrBRSProtFiltDE OBJECT-TYPE
+    SYNTAX INTEGER {
+        true(1),
+        false(2)
+        }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "An indication of whether this traffic type should
+         be considered discard eligible from a frame relay
+         point of view."
+    ::= { ibmfrBRSProtFiltEntry 3 }
+
+ibmfrBRSProtFiltSVCName OBJECT-TYPE
+    SYNTAX DisplayString
+--    Rsyntax OCTET STRING(SIZE(0..255))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The name of the SVC.  This only applies to SVC circuit.  
+         A null string indicates that this circuit is a PVC."
+    ::= { ibmfrBRSProtFiltEntry 4 }
+
+
+END
+

@@ -1,0 +1,356 @@
+-- The Alcatel NMC proxy agent MIB
+-- Revision: 1.6
+-- Date:     01/05/29
+-- /* RA CDHva56260 */
+
+ALCATEL-NMC-PROXY-AGENT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    enterprises, OBJECT-TYPE	FROM SNMPv2-SMI
+    TRAP-TYPE			FROM RFC-1215
+    openViewSeverity		FROM HPOV-NNM-MIB;
+
+alcatel OBJECT IDENTIFIER ::= { enterprises 637 }
+abs OBJECT IDENTIFIER ::= { alcatel 64 }
+nmc4755 OBJECT IDENTIFIER ::= { abs 0 }
+notification OBJECT IDENTIFIER ::= { nmc4755 10 }
+nmcProxyAgent OBJECT IDENTIFIER ::= { notification 1 }
+nmcProxyTraps OBJECT IDENTIFIER ::= { nmcProxyAgent 2 }
+
+cmipEventArg OBJECT IDENTIFIER ::= { nmcProxyAgent 1 }
+objectClass OBJECT IDENTIFIER ::= { cmipEventArg 1 }
+objectInstance OBJECT IDENTIFIER ::= { cmipEventArg 2 }
+
+topClass OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"identifier which allows the identification of the system.
+	For instance an Alcatel 4400"
+    ::= { objectClass 1 }
+
+baseClass OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"identifier which allows to identify the impacted object
+	without ambiguity for a given system. For instance
+	a board of a 4400"
+    ::= { objectClass 2 }
+
+containmentTree OBJECT IDENTIFIER ::= { objectInstance 1 }
+a4400 OBJECT IDENTIFIER ::= { containmentTree 89 }
+shelf OBJECT IDENTIFIER ::= { a4400 29 }
+board OBJECT IDENTIFIER ::= { shelf 23 }
+actOrSuEvents OBJECT IDENTIFIER ::= { board 175 }
+terminal OBJECT IDENTIFIER ::= { actOrSuEvents 82 }
+logicalLinks OBJECT IDENTIFIER ::= { a4400 101 }
+dect OBJECT IDENTIFIER ::= { a4400 201 }
+
+rdnDepth OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"value that specifies the depth of the impacted object class
+	inside the containment tree"
+    ::= { objectInstance 2 }
+
+rdnValues OBJECT IDENTIFIER
+	::= { objectInstance 3 }
+
+rdn1 OBJECT IDENTIFIER ::= { rdnValues 1 }
+
+classId1 OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION "object class, level one"
+    ::= { rdn1 1 }
+rdnValue1 OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION "value, level one"
+    ::= { rdn1 2 }
+
+rdn2 OBJECT IDENTIFIER ::= { rdnValues 2 }
+
+classId2 OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION "object class, level two"
+    ::= { rdn2 1 }
+rdnValue2 OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION "value, level two"
+    ::= { rdn2 2 }
+
+rdn3 OBJECT IDENTIFIER ::= { rdnValues 3 }
+
+classId3 OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION "object class, level three"
+    ::= { rdn3 1 }
+rdnValue3 OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION "value, level three"
+    ::= { rdn3 2 }
+
+rdn4 OBJECT IDENTIFIER ::= { rdnValues 4 }
+
+classId4 OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION "object class, level four"
+    ::= { rdn4 1 }
+rdnValue4 OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION "value, level four"
+    ::= { rdn4 2 }
+
+rdn5 OBJECT IDENTIFIER ::= { rdnValues 5 }
+
+classId5 OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION "object class, level five"
+    ::= { rdn5 1 }
+rdnValue5 OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION "value, level five"
+    ::= { rdn5 2 }
+
+eventTime OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"date and time of detection of the notification
+	by the managed system"
+    ::= { cmipEventArg 3 }
+
+eventType OBJECT-TYPE
+    SYNTAX INTEGER {
+        communicationAlarm (2),
+        environmentalAlarm (3),
+        equipmentAlarm (4),
+        processingErrorAlarm (10),
+        qualityOfServiceAlarm (11)
+    }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"OSI type of the notification"
+    ::= { cmipEventArg 4 }
+
+severity OBJECT-TYPE
+    SYNTAX INTEGER {
+        indeterminate (1),
+        critical (2),
+        major (3),
+        minor (4),
+        warning (5),
+        clear (6)
+    }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"OSI severity of the notification"
+    ::= { cmipEventArg 5 }
+
+probableCause OBJECT-TYPE
+    SYNTAX INTEGER {
+	Unknown (0),
+	AdapterError (1),
+	ApplicationSubsystemFailure (2),
+	BandWidthReduced (3),
+	CallEstablishmentError (4),
+	CommunicationsProtocolError (5),
+	CommunicationsSubsystemFailure (6),
+	ConfigurationOrCustomizationError (7),
+	Congestion (8),
+	CorruptData (9),
+	CpuCyclesLimitExceeded (10),
+	DataSetOrModemError (11),
+	DegradedSignal (12),
+	DteDceInterfaceError (13),
+	EnclosureDoorOpen (14),
+	EquipmentMalFunction (15),
+	ExcessiveVibration (16),
+	FileError (17),
+	FireDetected (18),
+	FloodDetected (19),
+	FramingError (20),
+	HeatingVentilationCoolingSystemProblem (21),
+	HumidityUnacceptable (22),
+	InputOutputDeviceError (23),
+	InputDeviceError (24),
+	LANError (25),
+	LeakDetected (26),
+	LocalNodeTransmissionError (27),
+	LossOfFrame (28),
+	LossOfSignal (29),
+	MaterialSupplyExhausted (30),
+	MultiplexerProblem (31),
+	OutOfMemory (32),
+	OutputDeviceError (33),
+	PerformanceDegraded (34),
+	PowerProblem (35),
+	PressureUnacceptable (36),
+	ProcessorProblem (37),
+	PumpFailure (38),
+	QueueSizeExceeded (39),
+	ReceiveFailure (40),
+	ReceiverFailure (41),
+	RemoteNodeTransmissionFailure (42),
+	ResourceAtOrNearingCapacity (43),
+	ResponseTimeExcessive (44),
+	RetransmissionRateExcessive (45),
+	SoftwareError (46),
+	SoftwareProgramAbnormallyTerminated (47),
+	SoftwareProgramError (48),
+	StorageCapacityProblem (49),
+	TemperatureUnacceptable (50),
+	ThresholdCrossed (51),
+	TimingProblem (52),
+	ToxicLeakDetected (53),
+	TransmitFailure (54),
+	TransmitterFailure (55),
+	UnderlyingResourceUnavailable (56),
+	VersionMismatch (57)
+    }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"probable cause of the notification"
+    ::= { cmipEventArg 6 }
+
+voiceIds OBJECT IDENTIFIER ::= { objectInstance 4 }
+
+objectNumber OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS optional
+    DESCRIPTION "Object numeric identifier"
+    ::= { voiceIds 1 }
+
+parentNumber OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS optional
+    DESCRIPTION "Parent object numeric identifier"
+    ::= { voiceIds 2 }
+
+packedForm OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"contains the packed form of a part (or all) of the arguments
+	of a CMIP notification"
+    ::= { cmipEventArg 7 }
+
+notificationId OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"number that permits the exact identification of the
+	alarm that occured"
+    ::= { cmipEventArg 8 }
+
+addText OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS optional
+    DESCRIPTION
+	"contains text information"
+    ::= { cmipEventArg 9 }
+
+packedCmipTrap TRAP-TYPE
+    ENTERPRISE nmcProxyTraps
+    VARIABLES { openViewSeverity, packedForm }
+    DESCRIPTION 
+	"packed forwarded trap :
+	contains a part (or all) of the arguments of the CMIP notification
+	inside one variable binding.
+	The arguments are selected with the NMC.
+	This form suits well to a simple display of informations.
+	HP OpenView Display=> Packed form: $2"
+    ::= 1
+
+startOfResyncTrap TRAP-TYPE
+    ENTERPRISE nmcProxyTraps
+    DESCRIPTION 
+	"start of resynchronization :
+	this trap announces the beginning of the reemission of all
+	the traps corresponding to the active alarms of
+	the managed nodes.
+	HP OpenView Display=> Start of resynchronization: $*"
+    ::= 2
+
+cmipTrap TRAP-TYPE
+    ENTERPRISE nmcProxyTraps
+    VARIABLES { topClass, baseClass, rdnDepth, classId1, rdnValue1, classId2, rdnValue2, classId3, rdnValue3, classId4, rdnValue4, classId5, rdnValue5, eventTime, eventType, severity, probableCause, notificationId, addText }
+    DESCRIPTION 
+	"developped form trap :
+	contains all arguments of the CMIP notification, each of them
+	is placed in one independant variable binding.
+	This form suits well for the processing of informations on
+	a supervision station in a view to build an application,
+	like a topology presentation and animation.
+	HP OpenView Display=> Top class: $1 | Base Class: $2 | Hierarchy height: $3 | ClassId: $4-$6-$8-$10-$12 Values: $5-$7-$9-$11-$13 | Date: $14 | Event type: $15 | Severity: $16 | Probable cause: $17 | Notification ID: $18 | Add Text: $19"
+    ::= 3
+
+startProxyTrap TRAP-TYPE
+    ENTERPRISE nmcProxyTraps
+    DESCRIPTION 
+	"proxy started :
+	this trap announces that a proxy has just been started
+	HP OpenView Display=> Start of NMC proxy $A"
+    ::= 4
+
+stopProxyTrap TRAP-TYPE
+    ENTERPRISE nmcProxyTraps
+    DESCRIPTION 
+	"proxy stopped :
+	this trap announces that a proxy has just been stopped
+	HP OpenView Display=> End of proxy: $A"
+    ::= 5
+
+eventLostTrap TRAP-TYPE
+    ENTERPRISE nmcProxyTraps
+    DESCRIPTION 
+	"event lost :
+	this trap announces that a proxy didn't succeed to send all
+	events and that the operator should perform a resynchronization.
+	HP OpenView Display=> Event lost from $A"
+    ::= 6
+
+topClassStateTrap TRAP-TYPE
+    ENTERPRISE nmcProxyTraps
+    VARIABLES { classId1, rdnValue1, severity, objectNumber, parentNumber }
+    DESCRIPTION 
+	"state trap :
+	contains arguments that describe the current state of a top class
+	object.
+	HP OpenView Display=> Voice element $2 of class $1 has state $3"
+    ::= 7
+
+END

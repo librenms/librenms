@@ -14,7 +14,7 @@ if (!is_array($mempool_cache['junos'])) {
     d_echo($mempool_cache);
 }
 
-$entry = $mempool_cache['junos'][$mempool[mempool_index]];
+$entry = $mempool_cache['junos'][$mempool['mempool_index']];
 
 $perc = $entry['jnxOperatingBuffer'];
 // FIX ME -- Maybe another OID? Some equipment do not provide jnxOperatingDRAMSize like MX960

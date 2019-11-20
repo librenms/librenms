@@ -1,0 +1,80 @@
+-- **********************************************************
+-- Copyright 2016 VMware, Inc.  All rights reserved.
+-- **********************************************************
+
+VMWARE-HEARTBEAT-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, NOTIFICATION-TYPE
+    FROM SNMPv2-SMI
+        MODULE-COMPLIANCE, NOTIFICATION-GROUP
+    FROM SNMPv2-CONF
+        sysUpTime
+    FROM SNMPv2-MIB
+        vmwProductSpecific
+    FROM VMWARE-ROOT-MIB;
+
+    vmwHBMIB MODULE-IDENTITY
+    LAST-UPDATED "201602100000Z"
+    ORGANIZATION "VMware, Inc"
+    CONTACT-INFO
+    "VMware, Inc
+    3401 Hillview Ave
+    Palo Alto, CA 94304
+    Tel: 1-877-486-9273 or 650-427-5000
+    Fax: 650-427-5001
+    Web: http://communities.vmware.com/community/developer/forums/managementapi
+    "
+DESCRIPTION
+     "This MIB module provides a reverse poll for systems that do not yet support polling.
+      See http://kb.vmware.com/kb/2020271 for details on reverse polling in VMware SNMP agents."
+REVISION      "201602100000Z"
+DESCRIPTION
+     "First version."
+::= { vmwHb 66 }
+
+vmwHb OBJECT IDENTIFIER
+    ::= { vmwProductSpecific 190 }
+
+vmwHbNotifications OBJECT IDENTIFIER
+    ::= {vmwHb 0 }
+
+vmwHbHeartbeat NOTIFICATION-TYPE
+    OBJECTS     { sysUpTime }
+    STATUS      current
+    DESCRIPTION
+        "This notification, if the agent is so configured, will be sent
+         on a periodic basis to indicate cimom indication delivery is functioning."
+    ::= { vmwHbNotifications 401 }
+
+-- conformance information
+vmwHbMIBConformance
+OBJECT IDENTIFIER ::= { vmwHb 2 }
+vmwHbMIBCompliances
+OBJECT IDENTIFIER ::= { vmwHbMIBConformance 1 }
+vmwHbMIBGroups  OBJECT IDENTIFIER ::= { vmwHbMIBConformance 2 }
+
+-- compliance statements
+
+vmwHbMIBBasicCompliance MODULE-COMPLIANCE
+STATUS  current
+DESCRIPTION
+    "The compliance statement for entities which implement the
+    VMWARE-HEARTBEAT-MIB."
+MODULE  -- this module
+MANDATORY-GROUPS { vmwHbNotificationGroup }
+GROUP  vmwHbNotificationGroup
+DESCRIPTION
+    "This group is mandatory for systems without polling enabled."
+::= { vmwHbMIBCompliances 4 }
+
+vmwHbNotificationGroup NOTIFICATION-GROUP
+       NOTIFICATIONS {
+       vmwHbHeartbeat
+       }
+       STATUS      current
+       DESCRIPTION
+           "Notifications related to snmp agent reverse poll feature."
+       ::= { vmwHbMIBGroups 2 }
+END
+

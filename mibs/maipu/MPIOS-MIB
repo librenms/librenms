@@ -1,0 +1,2167 @@
+MPIOS-MIB DEFINITIONS ::= BEGIN
+
+-- TITLE:	Maipu Vxworks System Objects
+
+IMPORTS
+	DisplayString, TruthValue,RowStatus, TEXTUAL-CONVENTION
+    					FROM SNMPv2-TC
+						Counter FROM RFC1155-SMI
+	mpMgmt			        FROM MAIPU-SMI
+	Counter64, Counter32, IpAddress, MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32
+					FROM SNMPv2-SMI;
+
+
+mpios	MODULE-IDENTITY
+    LAST-UPDATED "0101050000Z"
+    ORGANIZATION "Maipu DataComm"
+    CONTACT-INFO
+        "	Maipu DataComm
+		Customer Service
+
+		Postal: Consulate Drive
+			Chengdu, Sichuan  610041
+			China
+
+	        Tel: 86-028-5161006
+
+		E-mail: office@maipu.com"
+    DESCRIPTION
+        "The process and memory information of MP2600 infomation!"
+::= { mpMgmt 20 }
+
+-- -------------------------------------------------------------
+-- Textual Conventions
+-- -------------------------------------------------------------
+
+EnabledStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A simple status value for the object."
+    SYNTAX      INTEGER { enabled(1), disabled(2) }
+
+iosSystem	OBJECT IDENTIFIER ::= { mpios 1 }
+
+iosObjects	OBJECT IDENTIFIER ::= { iosSystem 1 }
+
+-- Groups defined in this MIB
+
+sysMemory	OBJECT IDENTIFIER ::= { iosObjects 1 }
+
+--	Memory Group
+
+--	This group provides the memory usage information on the target.
+--	All variables in this group are read only.
+
+
+numBytesFree		OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		" The number of bytes free in the system memory "
+--	DEFAULT		next-function-async std_next_async
+	::= { sysMemory 1 }
+
+numBlocksFree		OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		" The number of blocks free in the system memory "
+--	DEFAULT		next-function-async std_next_async
+	::= { sysMemory 2 }
+
+avgBlockSizeFree	OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		" The average block size that is free in the system memory "
+--	DEFAULT		next-function-async std_next_async
+	::= { sysMemory 3 }
+
+maxBlockSizeFree	OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		" The largest block size that is free in the memory "
+--	DEFAULT		next-function-async std_next_async
+	::= { sysMemory 4 }
+
+numBytesAlloc		OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		" The number of bytes of system memory that have been allocated by
+                  tasks and system services "
+--	DEFAULT		next-function-async std_next_async
+	::= { sysMemory 5 }
+
+numBlocksAlloc		OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		" The number of blocks of system memory that have been allocated in
+                  the system "
+--	DEFAULT		next-function-async std_next_async
+	::= { sysMemory 6 }
+
+avgBlockSizeAlloc	OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		" The average memory block size that has been allocated in the
+                system "
+--	DEFAULT		next-function-async std_next_async
+	::= { sysMemory 7 }
+
+memoryTotalBytes	OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The total available memory bytes"
+--	DEFAULT		next-function-async std_next_async
+	::= { sysMemory 8 }
+
+allocBytesPercent	OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The allocated bytes percent which value is allocated bytes divided
+                by total bytes, This value can be in the range from 0 to 100."
+--	DEFAULT		next-function-async std_next_async
+	::= { sysMemory 9 }
+
+sysTask OBJECT IDENTIFIER ::= { iosObjects 2 }
+
+
+--      Task Group
+
+--      This group provides access to the target's task table.
+--      Tasks can be suspended, created, resumed and deleted.
+--      Individual parameters can also be changed. While changing
+--      task information, it should be remembered that the information
+--      from this group is only a snapshot of the task table entries.
+--      VxWorks tasks can be created by creating an entry in the
+--      tasktable. An entry should be created with an index of zero.
+--      The other parameters that must be specified are: name, priority,
+--       stacksize, entry point and other options.
+
+
+taskTable               OBJECT-TYPE
+        SYNTAX          SEQUENCE OF TaskEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "Represents the target's task table. Each entry in this table
+                 represents a task"
+        ::= { sysTask 1 }
+
+taskEntry               OBJECT-TYPE
+        SYNTAX          TaskEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                " Each entry contains information with regards to a task in the
+                system "
+        INDEX           { taskId }
+        ::= { taskTable 1 }
+
+TaskEntry ::=
+        SEQUENCE {
+                taskId
+                        Unsigned32,
+                taskName
+                        DisplayString,
+                taskPriority
+                        Integer32,
+                taskStatus
+                        INTEGER,
+                taskOptions
+                        Integer32,
+                taskMain
+                        DisplayString,
+                taskStackPtr
+                        Unsigned32,
+                taskStackBase
+                        Unsigned32,
+                taskStackPos
+                        Unsigned32,
+                taskStackEnd
+                        Unsigned32,
+                taskStackSize
+                        Unsigned32,
+                taskStackSizeUsage
+                        Unsigned32,
+                taskStackMaxUsed
+                        Unsigned32,
+                taskStackFree
+                        Unsigned32,
+                taskErrorStatus
+                        Integer32
+        }
+
+taskId                  OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                " This is the task ID assigned by VxWorks to a task in the
+                  system. A taskId of zero specifies a new task."
+        ::= { taskEntry 1 }
+
+taskName                OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                " This is the name of the VxWorks task.  This value can
+                 only be specified (set) at task creation."
+        ::= { taskEntry 2 }
+
+taskPriority            OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "The priority of the VxWorks task.  This value can be
+                 in the range from 0, the highest priority,
+                 to 255, the lowest priority."
+        ::= { taskEntry 3 }
+
+taskStatus              OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                task-ready(1),      -- Task is ready to run.
+                                task-suspended(2),  -- Task is suspended.
+                                task-delay(3),      -- Task is delayed.
+                                task-deleted(4)     -- Task is to be deleted.
+                        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "This field specifies the current task status.  It
+                 can be used to change the current task state.
+                 For example, to suspend a task, the value of
+                 taskStatus is changed to task-suspended,
+                 to delete a task the value is changed to
+                 task-deleted, etc..."
+        ::= { taskEntry 4 }
+
+taskOptions             OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "This value represents the sum of the following
+                 options:
+
+                        value      option
+                         1        VX_SUPERVISOR_MODE(read-only)
+                         2        VX_UNBREAKABLE    (break points ignored)
+                         4        VX_DEALLOC_STACK  (deallocate stack)
+                         8        VX_FP_TASK        (floating point support)
+                        16        VX_STDIO          (read-only)
+                        128        VX_PRIVATE_ENV    (private env. variables)
+                        256        VX_NO_STACK_FILL  (don't fill stack)
+
+                 All the options above can be set at task creation time.
+                 However, once the task is executing the only option
+                 that can be changed is VX_UNBREAKABLE.  The option is
+                 toggled based on the current setting."
+        ::= { taskEntry 5 }
+
+taskMain                OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "This is the name of the entry function for the VxWorks
+                 task.  This name can only be specified when a task
+                 is created (entry added in the table).  The symbol
+                 must exist in the VxWorks target."
+        ::= { taskEntry 6 }
+
+taskStackPtr            OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "This is the saved stack pointer for the task."
+        ::= { taskEntry 7 }
+
+
+taskStackBase           OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "This is the address of the bottom of the stack of
+                 the VxWorks task."
+        ::= { taskEntry 8 }
+
+taskStackPos            OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "This is the effective top of the stack in the current
+                 task state."
+        ::= { taskEntry 9 }
+
+taskStackEnd            OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "This is the address of the top of the stack of the
+                 VxWorks task."
+        ::= { taskEntry 10 }
+
+taskStackSize           OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "This is the actual size of the stack in bytes.  The
+                 size of the stack can only be specified at task
+                 creation (adding an entry to the table)."
+        ::= { taskEntry 11 }
+
+taskStackSizeUsage      OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The number of bytes currently in use by the task from
+                 the stack."
+        ::= { taskEntry 12 }
+
+taskStackMaxUsed        OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "This is the maximum number of bytes that have been used
+                 by the task from the stack."
+        ::= { taskEntry 13 }
+
+taskStackFree           OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "This is the number of bytes that are free currently in
+                 the task stack."
+        ::= { taskEntry 14 }
+
+taskErrorStatus         OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "This is the most recent error status for this task."
+        ::= { taskEntry 15 }
+
+-- *************************
+taskDescr	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+				"This is description for error task. If the task runs well the
+				 string will be null."
+		::= { sysTask 2 }
+
+-- cpu
+-- ******* CPU *******
+sysCpu	OBJECT IDENTIFIER ::= { iosObjects 3 }
+
+sysCpuStatus	OBJECT-TYPE
+		SYNTAX	INTEGER {
+				noSpyCpu(1),
+				spyCpu(2)
+				}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+				"This is the status of collecting CPU utilization rate
+				 which include two status: spyCpu (2), noSpyCpu(1), if you
+				 want to get cpuUtilTable and cpuTaskTable, you must make
+				 status to spy cpu"
+		::= { sysCpu 1 }
+sysCpuTaskTabView	OBJECT-TYPE
+		SYNTAX	INTEGER {
+				detailed(1),
+				simple(2)
+				}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+				"This is the status of cpuTaskTable view:
+				detailed view is showing every task info and
+				simple view is only showing task which had used cpu"
+		::= { sysCpu 2 }
+checkCpuTimeInterval	OBJECT-TYPE
+		SYNTAX	INTEGER	(1..3600)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+				"check cpu time interval,unit is second"
+		::= { sysCpu 3 }
+
+cpuTaskTable               OBJECT-TYPE
+        SYNTAX          SEQUENCE OF CpuTaskEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "Represents the target's task cpu table. Each entry in this table
+                 represents a task"
+        ::= { sysCpu 4 }
+
+cpuTaskEntry               OBJECT-TYPE
+        SYNTAX         CpuTaskEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                " Each entry contains information with regards to a task cpu in the
+                system "
+        INDEX           { cpuTaskId }
+        ::= { cpuTaskTable 1 }
+
+CpuTaskEntry ::=
+        SEQUENCE {
+                cpuTaskId
+                	Integer32,
+                 cpuTaskName
+                	OCTET STRING,
+                cpuTaskPri
+                        Integer32,
+                cpuTaskDeltaUtil
+                        Integer32,
+                cpuTaskDeltaTicks
+                        Integer32,
+	       	cpuTaskAverageUtil
+                        Integer32,
+                cpuTaskTotalTicks
+                        Integer32,
+                cpuTaskCurrentUtil
+                        Integer32
+        }
+
+
+cpuTaskId           OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                " This is the task ID assigned by VxWorks to a task in the
+                  system. A taskId of zero specifies a new task."
+        ::= { cpuTaskEntry 1 }
+
+cpuTaskName           OBJECT-TYPE
+        SYNTAX          OCTET STRING
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                " This is the name of the VxWorks task.  This value can
+                 only be specified (set) at task creation."
+        ::= { cpuTaskEntry 2 }
+
+cpuTaskPri            OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The priority of the VxWorks task.  This value can be
+                 in the range from 0, the highest priority,
+                 to 255, the lowest priority."
+        ::= { cpuTaskEntry 3 }
+
+cpuTaskDeltaUtil            OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The CPU utilization of the VxWorks task during DeltaTicks.
+                 This value can be in the range from 0 to 100."
+        ::= {cpuTaskEntry 4 }
+
+cpuTaskDeltaTicks            OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The task CPU utilization delta ticks."
+        ::= { cpuTaskEntry 5 }
+
+cpuTaskAverageUtil            OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The CPU utilization of the VxWorks task during TotalTicks.
+                 This value can be in the range from 0 to 100."
+        ::= { cpuTaskEntry 6 }
+
+cpuTaskTotalTicks            OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The total ticks till cpuTaskStatus been start, until the
+                 status be end."
+        ::= { cpuTaskEntry 7 }
+
+cpuTaskCurrentUtil            OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The cpu current utilization "
+        ::= { cpuTaskEntry 8 }
+
+cpuUtilTable               OBJECT-TYPE
+        SYNTAX          SEQUENCE OF CpuUtilEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                  " The Sys CPU total utilization table "
+        ::= { sysCpu 5 }
+
+cpuUtilEntry               OBJECT-TYPE
+        SYNTAX          CpuUtilEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                " The Sys CPU utilization table  at a certain period of time,
+                include two kind of time interval: one is from spy cpu to current
+                show cpu, the other is from last show cpu to current show cpu"
+        INDEX           { cpuUtilCpuId }
+        ::= { cpuUtilTable 1 }
+
+CpuUtilEntry ::=
+        SEQUENCE {
+        	cpuUtilCpuId
+                        Integer32,
+                cpuUtilDeltaUtil
+                        Integer32,
+		cpuUtilDeltaUsedTicks
+                        Integer32,
+                cpuUtilDeltaTicks
+                        Integer32,
+                cpuUtilDeltaTimes
+                        Integer32,
+	       	cpuUtilAverageUtil
+                        Integer32,
+                cpuUtilTotalUsedTicks
+                        Integer32,
+                cpuUtilTotalTicks
+                        Integer32,
+                cpuUtilTotalTimes
+                        Integer32,
+                cpuUtilCurrentUtil
+                	Integer32
+            }
+
+cpuUtilCpuId            OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "cpu id for multi-cpu device"
+        ::= { cpuUtilEntry 1 }
+
+cpuUtilDeltaUtil            OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The Sys CPU utilization in delta times"
+        ::= { cpuUtilEntry 2 }
+
+cpuUtilDeltaUsedTicks       OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The System used ticks in delta ticks"
+        ::= { cpuUtilEntry 3 }
+
+cpuUtilDeltaTicks       OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The Sys CPU utilization ticks in delta times"
+        ::= { cpuUtilEntry 4 }
+
+cpuUtilDeltaTimes       OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The delta times, unit is second"
+        ::= { cpuUtilEntry 5 }
+
+
+cpuUtilAverageUtil            OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The Sys CPU utilization in total times"
+        ::= { cpuUtilEntry 6 }
+
+cpuUtilTotalUsedTicks       OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The Sys CPU utilization used ticks in total times"
+        ::= { cpuUtilEntry 7 }
+
+cpuUtilTotalTicks       OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The Sys CPU utilization ticks in total times"
+        ::= { cpuUtilEntry 8 }
+
+cpuUtilTotalTimes       OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The total times, unit is second"
+        ::= { cpuUtilEntry 9 }
+
+cpuUtilCurrentUtil       OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The cpu current utilization"
+        ::= { cpuUtilEntry 10 }
+
+-- sys cpu/mainBoard temperature
+sysTemperature OBJECT IDENTIFIER ::= { iosObjects 4 }
+
+sysCpuTemper	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+				"Get current system environment cpu temperature"
+		::= { sysTemperature 1 }
+
+sysCpuAlertTemper		OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+				"Get or set current system environment cpu alarm temperature
+				default is 85¡ãC"
+		::= { sysTemperature 2 }
+sysMainBoardTemper		OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+				"Get current system environment main borad temperature"
+		::= { sysTemperature 3 }
+
+sysMainBoardAlertTemper	 	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+				"Get or set current system environment main board alarm temperature
+				default is 65 ¡ãC"
+		::= { sysTemperature 4 }
+
+sysAlertTrapInt	 	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+				"Send alert trap time interval when system temperature is always
+				more than alert temperature, unit is second,default is 60 s"
+		::= { sysTemperature 5 }
+------------------------------------------------------------------------------
+sysNFI              	OBJECT IDENTIFIER ::= { iosObjects 200 }
+
+
+------------------------------------------------------------------------------
+sysRtrGbl           	OBJECT IDENTIFIER ::= { sysNFI 1 }
+
+sysRtrCtrl          	OBJECT-TYPE
+                    		SYNTAX  EnabledStatus
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"RTR global switch
+                    			 enable--enable RTR module
+                    			 disable--no RTR module"
+                    		::= { sysRtrGbl 1 }
+
+sysRtrResponder     	OBJECT-TYPE
+                    		SYNTAX  TruthValue
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"Rtr Responder
+                    			 TRUE--Rtr Responder
+                    			 False--no Rtr Responder
+                    			 on valid in jitter entity now"
+                    		::= { sysRtrGbl 2 }
+
+
+------------------------------------------------------------------------------
+sysRtrEntityMgt     	OBJECT IDENTIFIER ::= { sysNFI 2 }
+
+sysRtrEntityTable   	OBJECT-TYPE
+                    		SYNTAX  SEQUENCE OF SysRtrEntityEntry
+                    		MAX-ACCESS  not-accessible
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"Rtr entity table,config or view information about Rtr entity"
+                    		::= { sysRtrEntityMgt 100 }
+
+sysRtrEntityEntry   	OBJECT-TYPE
+                    		SYNTAX  SysRtrEntityEntry
+                    		MAX-ACCESS  not-accessible
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"Rtr entity,config or view information about Rtr entity"
+                    		INDEX  { rtrEntityId }
+                    		::= { sysRtrEntityTable 1 }
+
+SysRtrEntityEntry   	::= SEQUENCE {
+                    			rtrEntityId            INTEGER,
+                    			rtrEntityName          DisplayString,
+                    			rtrEntityType          INTEGER,
+                    			rtrEntityLogType       INTEGER,
+                    			rtrEntityLogMaxSize    INTEGER,
+                    			rtrEntityLogFilter     INTEGER,
+                    			rtrEntityThreshold     INTEGER,
+                    			rtrEntityRowStatus     RowStatus
+                    	             }
+
+
+rtrEntityId         	OBJECT-TYPE
+                    		SYNTAX  INTEGER(1..2000)
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"Rtr entity Id,index"
+                    		::= { sysRtrEntityEntry 1 }
+
+rtrEntityName       	OBJECT-TYPE
+                    		SYNTAX  DisplayString(SIZE(0..40))
+                    		MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"rtr entity name,araised aumatically,read-only"
+                    		::= { sysRtrEntityEntry 2 }
+
+rtrEntityType       	OBJECT-TYPE
+                    		SYNTAX  INTEGER {
+                    			         icmpEcho(1),
+                    			          jitter(2),
+                    			          flowStatistics(3),
+						  udpecho(4)
+                    			        }
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"rtr entity,inlcuding icmpEcho,jitter,flow statistics,udpecho"
+                    		::= { sysRtrEntityEntry 3 }
+
+rtrEntityLogType    	OBJECT-TYPE
+                    		SYNTAX  INTEGER {
+                    			         local(1),
+                    			          remote(2)
+                    			        }
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"RTR entity logging type¡£
+                    			 local£­stored in the device file system
+                    			 remote£­remote services"
+                    		::= { sysRtrEntityEntry 4 }
+
+rtrEntityLogMaxSize 	OBJECT-TYPE
+                    		SYNTAX  INTEGER(1..500)
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"rtr entity's log with max lines, if log type is local"
+                    		::= { sysRtrEntityEntry 5 }
+
+rtrEntityLogFilter  	OBJECT-TYPE
+                    		SYNTAX  INTEGER {
+                    			         all(1),
+                    			          error(2),
+                    			          overThreshold(3)
+                    			        }
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"RTR entity log filter options"
+                    		::= { sysRtrEntityEntry 6 }
+
+rtrEntityThreshold  	OBJECT-TYPE
+                    		SYNTAX  INTEGER(0..100)
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"RTR entity log filter threshhod,only valid with icmpEcho entity"
+                    		::= { sysRtrEntityEntry 7 }
+
+rtrEntityRowStatus  	OBJECT-TYPE
+                    		SYNTAX  RowStatus
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"rtr entity row status"
+                    		::= { sysRtrEntityEntry 8 }
+
+
+------------------------------------------------------------------------------
+sysRtrGroupMgt      	OBJECT IDENTIFIER ::= { sysNFI 3 }
+
+sysRtrGroupTable    	OBJECT-TYPE
+                    		SYNTAX  SEQUENCE OF SysRtrGroupEntry
+                    		MAX-ACCESS  not-accessible
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"Rtr group table"
+                    		::= { sysRtrGroupMgt 100 }
+
+sysRtrGroupEntry    	OBJECT-TYPE
+                    		SYNTAX SysRtrGroupEntry
+                    		MAX-ACCESS  not-accessible
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"Rtr group entity"
+                    		INDEX  { rtrGroupId }
+                    		::= { sysRtrGroupTable 1 }
+
+SysRtrGroupEntry    	::= SEQUENCE {
+                    			rtrGroupId             INTEGER,
+                    			rtrGroupName           DisplayString,
+                    			rtrGroupInterval       INTEGER,
+                    			rtrGroupEntityMembers   DisplayString,
+                    			rtrGroupRowStatus      RowStatus
+                    	             }
+
+
+rtrGroupId          	OBJECT-TYPE
+                    		SYNTAX  INTEGER(1..2000)
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"rtr group id,index"
+                    		::= { sysRtrGroupEntry 1 }
+
+rtrGroupName        	OBJECT-TYPE
+                    		SYNTAX  DisplayString(SIZE(0..40))
+                    		MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"rtr group name,araised aumatically, read-only"
+                    		::= { sysRtrGroupEntry 2 }
+
+rtrGroupInterval    	OBJECT-TYPE
+                    		SYNTAX  INTEGER(0..10000)
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"rtr group interval, seconds"
+                    		::= { sysRtrGroupEntry 3 }
+
+rtrGroupEntityMembers	OBJECT-TYPE
+                    		SYNTAX  DisplayString(SIZE(0..255))
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"RTR group members£¬string type£º
+                    			 1£¬3£¬10-20£¬50
+                    			 string length no more than 255, separated by comma,no space in the string¡£"
+                    		::= { sysRtrGroupEntry 4 }
+
+rtrGroupRowStatus   	OBJECT-TYPE
+                    		SYNTAX  RowStatus
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"rtr group table row status"
+                    		::= { sysRtrGroupEntry 5 }
+
+
+------------------------------------------------------------------------------
+sysRtrScheduleMgt   	OBJECT IDENTIFIER ::= { sysNFI 4 }
+
+sysRtrScheduleTable 	OBJECT-TYPE
+                    		SYNTAX  SEQUENCE OF SysRtrScheduleEntry
+                    		MAX-ACCESS  not-accessible
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"rtr schedule table"
+                    		::= { sysRtrScheduleMgt 100 }
+
+sysRtrScheduleEntry 	OBJECT-TYPE
+                    		SYNTAX  SysRtrScheduleEntry
+                    		MAX-ACCESS  not-accessible
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"rtr schedule table entry"
+                    		INDEX  { rtrScheduleId }
+                    		::= { sysRtrScheduleTable 1 }
+
+SysRtrScheduleEntry 	::= SEQUENCE {
+                    			rtrScheduleId          Unsigned32,
+                    			rtrScheduleType        INTEGER,
+                    			rtrScheduleObjId       INTEGER,
+                    			rtrScheduleStartTimeFlag   INTEGER,
+                    			rtrScheduleAfterTime   DisplayString,
+                    			rtrScheduleStartTime   DisplayString,
+                    			rtrScheduleAgeOut      Unsigned32,
+                    			rtrScheduleLifeFlag    INTEGER,
+                    			rtrScheduleLifeTime    Unsigned32,
+                    			rtrScheduleRepeat      Unsigned32,
+                    			rtrScheduleInterval    Unsigned32,
+                    			rtrScheduleRowStatus   RowStatus
+                    	             }
+
+
+rtrScheduleId       	OBJECT-TYPE
+                    		SYNTAX  Unsigned32
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"rtr schedule Id,index"
+                    		::= { sysRtrScheduleEntry 1 }
+
+rtrScheduleType     	OBJECT-TYPE
+                    		SYNTAX  INTEGER {
+                    			         entity(1),
+                    			          group(2)
+                    			        }
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"rtr schedule type"
+                    		::= { sysRtrScheduleEntry 2 }
+
+rtrScheduleObjId    	OBJECT-TYPE
+                    		SYNTAX  INTEGER(1..2000)
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"id of rtrschedule object which means rtr group or entity."
+                    		::= { sysRtrScheduleEntry 3 }
+
+rtrScheduleStartTimeFlag	OBJECT-TYPE
+                    		SYNTAX  INTEGER {
+                    			         startNow(1),
+                    			          afterTime(2),
+                    			          startTime(3)
+                    			        }
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"RTR schedule start time¡£
+                    			 startNow£»
+                    			 afterTime£»
+                    			 startTime--start at the given time"
+                    		::= { sysRtrScheduleEntry 4 }
+
+rtrScheduleAfterTime	OBJECT-TYPE
+                    		SYNTAX  DisplayString(SIZE(0..12))
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"RTR schedule given time¡£
+                    			 type string£º
+                    			 HH:MM:SS
+                    			 valid when sysRtrScheduleFlag is afterTimeÊ±."
+                    		::= { sysRtrScheduleEntry 5 }
+
+rtrScheduleStartTime	OBJECT-TYPE
+                    		SYNTAX  DisplayString(SIZE(0..40))
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"RTR schedule given time¡£
+                    			 type string£º
+                    			 HH:MM:SS,mm,dd,yyyy
+                    			 valid when sysRtrScheduleFlag is startTime."
+                    		::= { sysRtrScheduleEntry 6 }
+
+rtrScheduleAgeOut   	OBJECT-TYPE
+                    		SYNTAX  Unsigned32(1..2073600)
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"rtr schedule ageout time in second."
+                    		::= { sysRtrScheduleEntry 7 }
+
+rtrScheduleLifeFlag 	OBJECT-TYPE
+                    		SYNTAX  INTEGER {
+                    			         forever(1),
+                    			          repeatAndDie(2)
+                    			        }
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"rtr schedule's life
+                    			 forever,if config, no need to config lifetime and repeat times
+                    			 repeatAndDie,if config, need to config lifetime and repeat times"
+                    		::= { sysRtrScheduleEntry 8 }
+
+rtrScheduleLifeTime 	OBJECT-TYPE
+                    		SYNTAX  Unsigned32(1..2147483647)
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"rtr schedule's lieftime in second,
+                    			valid only when rtrScheduleLifeFlag is repeatAndDie."
+                    		::= { sysRtrScheduleEntry 9 }
+
+rtrScheduleRepeat   	OBJECT-TYPE
+                    		SYNTAX  Unsigned32(1..2147483647)
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"rtr schedule's repeat times,
+					valid only when rtrScheduleLifeFlag is repeatAndDie."
+                    		::= { sysRtrScheduleEntry 10 }
+
+rtrScheduleInterval 	OBJECT-TYPE
+                    		SYNTAX  Unsigned32(1..2147483647)
+                    		MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"rtr schedule interval in second"
+                    		::= { sysRtrScheduleEntry 11 }
+
+rtrScheduleRowStatus	OBJECT-TYPE
+                    		SYNTAX  RowStatus
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"rtr schedule row status"
+                    		::= { sysRtrScheduleEntry 12 }
+
+
+------------------------------------------------------------------------------
+sysRtrIcmpEchoMgt   	OBJECT IDENTIFIER ::= { sysNFI 5 }
+
+sysRtrIcmpEchoTable 	OBJECT-TYPE
+                    		SYNTAX  SEQUENCE OF SysRtrIcmpEchoEntry
+                    		MAX-ACCESS  not-accessible
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"RTR ICMP entity table"
+                    		::= { sysRtrIcmpEchoMgt 100 }
+
+sysRtrIcmpEchoEntry 	OBJECT-TYPE
+                    		SYNTAX SysRtrIcmpEchoEntry
+                    		MAX-ACCESS  not-accessible
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"RTR ICMP entity entry"
+                    		INDEX  { rtrIcmpEchoEntityId }
+                    		::= { sysRtrIcmpEchoTable 1 }
+
+SysRtrIcmpEchoEntry 	::= SEQUENCE {
+                    			rtrIcmpEchoEntityId    INTEGER,
+                    			rtrIcmpEchoTargetIp    IpAddress,
+                    			rtrIcmpEchoPktNum      Unsigned32,
+                    			rtrIcmpEchoPktLen      INTEGER,
+                    			rtrIcmpEchoTimeout     INTEGER,
+                    			rtrIcmpEchoSchInterval	Unsigned32,
+                    			rtrIcmpEchoExtendFlag   TruthValue,
+                    			rtrIcmpEchoVrfName     DisplayString,
+                    			rtrIcmpEchoSourceIp    IpAddress,
+                    			rtrIcmpEchoTos         INTEGER,
+                    			rtrIcmpEchoSetDf       TruthValue,
+                    			rtrIcmpEchoVerifyData   TruthValue,
+                    			rtrIcmpEchoIsScheduling   TruthValue,
+                    			rtrIcmpEchoPktTotalSend   Counter32,
+                    			rtrIcmpEchoPktTotalRcvd   Counter32,
+                    			rtrIcmpEchoSuccessRate   INTEGER,
+                    			rtrIcmpEchoRowStatus   RowStatus
+                    	             }
+
+
+rtrIcmpEchoEntityId 	OBJECT-TYPE
+                    		SYNTAX  INTEGER(1..2000)
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"ICMP entity ID,index"
+                    		::= { sysRtrIcmpEchoEntry 1 }
+
+rtrIcmpEchoTargetIp 	OBJECT-TYPE
+                    		SYNTAX  IpAddress
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"ICMPECHO(ping) destination address"
+                    		::= { sysRtrIcmpEchoEntry 2 }
+
+rtrIcmpEchoPktNum   	OBJECT-TYPE
+                    		SYNTAX  Unsigned32(1..200000000)
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"ICMP PING send packets number once"
+                    		::= { sysRtrIcmpEchoEntry 3 }
+
+rtrIcmpEchoPktLen   	OBJECT-TYPE
+                    		SYNTAX  INTEGER(36..18024)
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"ICMP PING send packets size"
+                    		::= { sysRtrIcmpEchoEntry 4 }
+
+rtrIcmpEchoTimeout  	OBJECT-TYPE
+                    		SYNTAX  INTEGER(1..3600)
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"ICMP ping reply timeout in seconds."
+                    		::= { sysRtrIcmpEchoEntry 5 }
+
+rtrIcmpEchoSchInterval 	OBJECT-TYPE
+                    			SYNTAX  Unsigned32(1..2147483647)
+                    			MAX-ACCESS  read-write
+                    			STATUS  current
+                    			DESCRIPTION
+                    				"IcmpEcho interval in seconds."
+                    			::= { sysRtrIcmpEchoEntry 6 }
+
+rtrIcmpEchoExtendFlag	OBJECT-TYPE
+                    		SYNTAX  TruthValue
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"ICMP extern ping flag,
+                    			have set Tos,verify data,DF,sourceIp and vrf or yet."
+                    		::= { sysRtrIcmpEchoEntry 7 }
+
+rtrIcmpEchoVrfName  	OBJECT-TYPE
+                    		SYNTAX  DisplayString(SIZE(0..40))
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"vrfname type string,
+                    			valid only rtrIcmpEchoExtendFlag is TRUE"
+                    		::= { sysRtrIcmpEchoEntry 8 }
+
+rtrIcmpEchoSourceIp 	OBJECT-TYPE
+                    		SYNTAX  IpAddress
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"ICMP source IP address,
+					valid only rtrIcmpEchoExtendFlag is TRUE."
+                    		::= { sysRtrIcmpEchoEntry 9 }
+
+rtrIcmpEchoTos      	OBJECT-TYPE
+                    		SYNTAX  INTEGER(0..255)
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"ICMP TOS value,
+					valid only rtrIcmpEchoExtendFlag is TRUE."
+                    		::= { sysRtrIcmpEchoEntry 10 }
+
+rtrIcmpEchoSetDf    	OBJECT-TYPE
+                    		SYNTAX  TruthValue
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"ICMP pakcet DF bit,
+                    			valid only rtrIcmpEchoExtendFlag is TRUE"
+                    		::= { sysRtrIcmpEchoEntry 11 }
+
+rtrIcmpEchoVerifyData	OBJECT-TYPE
+                    		SYNTAX  TruthValue
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"ICMP verifay data flag,
+                    			valid only rtrIcmpEchoExtendFlag is TRUE"
+                    		::= { sysRtrIcmpEchoEntry 12 }
+
+rtrIcmpEchoIsScheduling	OBJECT-TYPE
+                    		SYNTAX  TruthValue
+                    		MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"whether icmpEcho entity is in scheduling"
+                    		::= { sysRtrIcmpEchoEntry 13 }
+
+rtrIcmpEchoPktTotalSend	OBJECT-TYPE
+                    		SYNTAX  Counter32
+                    		MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"total packets which send by the ICMP entity."
+                    		::= { sysRtrIcmpEchoEntry 14 }
+
+rtrIcmpEchoPktTotalRcvd	OBJECT-TYPE
+                    		SYNTAX  Counter32
+                    		MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"total packets which receive by the ICMP entity."
+                    		::= { sysRtrIcmpEchoEntry 15 }
+
+rtrIcmpEchoSuccessRate	OBJECT-TYPE
+                    		SYNTAX  INTEGER(0..100)
+                    		MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"total success rate till now"
+                    		::= { sysRtrIcmpEchoEntry 16 }
+
+rtrIcmpEchoRowStatus	OBJECT-TYPE
+                    		SYNTAX  RowStatus
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"ICMP row status"
+                    		::= { sysRtrIcmpEchoEntry 17 }
+
+
+------------------------------------------------------------------------------
+sysRtrJitterMgt     	OBJECT IDENTIFIER ::= { sysNFI 6 }
+
+sysRtrJitterTable   	OBJECT-TYPE
+                    		SYNTAX  SEQUENCE OF SysRtrJitterEntry
+                    		MAX-ACCESS  not-accessible
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"RTR JITTER entity table"
+                    		::= { sysRtrJitterMgt 100 }
+
+sysRtrJitterEntry   	OBJECT-TYPE
+                    		SYNTAX  SysRtrJitterEntry
+                    		MAX-ACCESS  not-accessible
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"RTR JITTER entity entry"
+                    		INDEX  { rtrJitterEntityId }
+                    		::= { sysRtrJitterTable 1 }
+
+SysRtrJitterEntry   	::= SEQUENCE {
+                    			rtrJitterEntityId      INTEGER,
+                    			rtrJitterState         INTEGER,
+                    			rtrJitterTargetIp      IpAddress,
+                    			rtrJitterTargetPort    Unsigned32,
+                    			rtrJitterCodec         INTEGER,
+                    			rtrJitterPktLen        INTEGER,
+                    			rtrJitterPktNum        INTEGER,
+                    			rtrJitterPktInterval   INTEGER,
+                    			rtrJitterSchInterval   Unsigned32,
+                    			rtrJitterSourceIp      IpAddress,
+                    			rtrJitterSourcePort    Unsigned32,
+                    			rtrJitterTimeout       Unsigned32,
+                    			rtrJitterVrfName       DisplayString,
+                    			rtrJitterTos           INTEGER,
+                    			rtrJitterMinRtt        INTEGER,
+                    			rtrJitterMaxRtt        INTEGER,
+                    			rtrJitterPktLossSd     INTEGER,
+                    			rtrJitterPktLossDs     INTEGER,
+                    			rtrJitterDsMin         INTEGER,
+                    			rtrJitterDsMax         INTEGER,
+                    			rtrJitterSdMin         INTEGER,
+                    			rtrJitterSdMax         INTEGER,
+                    			rtrJitterDelayDsMin    INTEGER,
+                    			rtrJitterDelayDsMax    INTEGER,
+                    			rtrJitterDelaySdMin    INTEGER,
+                    			rtrJitterDelaySdMax    INTEGER,
+                    			rtrJitterIcpifMin      DisplayString,
+                    			rtrJitterIcpifMax      DisplayString,
+                    			rtrJitterMosMin        DisplayString,
+                    			rtrJitterMosMax        DisplayString,
+                    			rtrJitterRowStatus     RowStatus
+                    	             }
+
+
+rtrJitterEntityId   	OBJECT-TYPE
+                    		SYNTAX  INTEGER(1..2000)
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"JITTER entity id,index"
+                    		::= { sysRtrJitterEntry 1 }
+
+rtrJitterState          OBJECT-TYPE
+							SYNTAX	INTEGER	{
+										init(1),
+										closed(2),
+										request(3),
+										transmit(4),
+										finished(5)
+											}
+							MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    		"JITTE entity£º1£­init£¬2£­close£¬
+                    		                 3£­send request£¬4-send packets£¬
+                    		                 5£­finish"
+							::= { sysRtrJitterEntry 2 }
+
+rtrJitterTargetIp   	OBJECT-TYPE
+                    		SYNTAX  IpAddress
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"JITTER responder destination ip address"
+                    		::= { sysRtrJitterEntry 3 }
+
+rtrJitterTargetPort 	OBJECT-TYPE
+                    		SYNTAX  Unsigned32(1..65535)
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"JITTER responder destination port"
+                    		::= { sysRtrJitterEntry 4 }
+
+rtrJitterCodec      	OBJECT-TYPE
+                    		SYNTAX  INTEGER {
+                    			         g711MULAW(1),
+                    			          g711ALAW(2),
+                    			          g729A(3),
+                    			          userDefined(4),
+                    			          invalid(5)
+                    			        }
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"JITTER codec type,including:
+                    			1 G711MULAW,2 G711ALAW,3  G729A,4 USER_DEFINED
+                    			5 UNKOWN"
+                    		::= { sysRtrJitterEntry 5 }
+
+rtrJitterPktLen     	OBJECT-TYPE
+                    		SYNTAX  INTEGER(16..1500)
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"JITTER codec packet length,
+                    			read-writable when rtrJitterCodec is USER_DEFINED
+                    			else read-only
+					type:byte."
+                    		::= { sysRtrJitterEntry 6 }
+
+rtrJitterPktNum     	OBJECT-TYPE
+                    		SYNTAX  INTEGER(1..6000)
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"JITTER codec packet number,
+                    			read-writable when rtrJitterCodec is USER_DEFINED
+                    			else read-only."
+                    		::= { sysRtrJitterEntry 7 }
+
+rtrJitterPktInterval	OBJECT-TYPE
+                    		SYNTAX  INTEGER(20..6000)
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"JITTER codec packet send interval,
+                    			read-writable when rtrJitterCodec is USER_DEFINED
+                    			else read-only,
+                    			type:ms"
+                    		::= { sysRtrJitterEntry 8 }
+
+rtrJitterSchInterval 	OBJECT-TYPE
+                    		SYNTAX  Unsigned32(1..2147483647)
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"Jitter schedule interval,
+                    			read-writable when rtrJitterCodec is USER_DEFINED
+                    			else read-only,
+                    			type:s"
+                    		::= { sysRtrJitterEntry 9 }
+
+rtrJitterSourceIp   	OBJECT-TYPE
+                    		SYNTAX  IpAddress
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"JITTER source IP address"
+                    		::= { sysRtrJitterEntry 10 }
+
+rtrJitterSourcePort 	OBJECT-TYPE
+                    		SYNTAX  Unsigned32(1..65535)
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"JITTER source port"
+                    		::= { sysRtrJitterEntry 11 }
+
+rtrJitterTimeout    	OBJECT-TYPE
+                    		SYNTAX  Unsigned32(0..604800000)
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"JITTER timeout value,type:ms,
+                    			notice,the value must no less than then interval between two schedule"
+                    		::= { sysRtrJitterEntry 12 }
+
+rtrJitterVrfName    	OBJECT-TYPE
+                    		SYNTAX  DisplayString(SIZE(0..40))
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"JITTER vrf"
+                    		::= { sysRtrJitterEntry 13 }
+
+rtrJitterTos        	OBJECT-TYPE
+                    		SYNTAX  INTEGER(0..255)
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"JITTER pakcet TOS value"
+                    		::= { sysRtrJitterEntry 14 }
+
+rtrJitterMinRtt     	OBJECT-TYPE
+                    		SYNTAX  INTEGER
+                    		MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"JITTER minimal  round-trip-time value in ms"
+                    		::= { sysRtrJitterEntry 15 }
+
+rtrJitterMaxRtt     	OBJECT-TYPE
+                    		SYNTAX  INTEGER
+                    		MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"JITTER maximal round-trip-time value in ms"
+                    		::= { sysRtrJitterEntry 16 }
+
+rtrJitterPktLossSd  	OBJECT-TYPE
+                    		SYNTAX  INTEGER
+                    		MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"JITTER total lossed pakcets which send by the source "
+                    		::= { sysRtrJitterEntry 17 }
+
+rtrJitterPktLossDs  	OBJECT-TYPE
+                    		SYNTAX  INTEGER
+                    		MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"JITTER total loss pakcets which send by the target"
+                    		::= { sysRtrJitterEntry 18 }
+
+rtrJitterDsMin      	OBJECT-TYPE
+                    		SYNTAX  INTEGER
+                    		MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"JITTER minimal destination to source jitter in millisecond"
+                    		::= { sysRtrJitterEntry 19 }
+
+rtrJitterDsMax      	OBJECT-TYPE
+                    		SYNTAX  INTEGER
+                    		MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"JITTER maximal destionation to source jitter in millisecond"
+                    		::= { sysRtrJitterEntry 20 }
+
+rtrJitterSdMin      	OBJECT-TYPE
+                    		SYNTAX  INTEGER
+                    		MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"JITTER minimal source to destination jitter in millisecond"
+                    		::= { sysRtrJitterEntry 21 }
+
+rtrJitterSdMax      	OBJECT-TYPE
+                    		SYNTAX  INTEGER
+                    		MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"JITTER maximal source to destination jitter in millisecond"
+                    		::= { sysRtrJitterEntry 22 }
+
+rtrJitterDelayDsMin 	OBJECT-TYPE
+                    		SYNTAX  INTEGER
+                    		MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"JITTER minimal destination to source delay in millisecond"
+                    		::= { sysRtrJitterEntry 23 }
+
+rtrJitterDelayDsMax 	OBJECT-TYPE
+                    		SYNTAX  INTEGER
+                    		MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"JITTER maximal destination to source delay in millisecond"
+                    		::= { sysRtrJitterEntry 24 }
+
+rtrJitterDelaySdMin 	OBJECT-TYPE
+                    		SYNTAX  INTEGER
+                    		MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"JITTER minimal souce to destionation delay in millisecond"
+                    		::= { sysRtrJitterEntry 25 }
+
+rtrJitterDelaySdMax 	OBJECT-TYPE
+                    		SYNTAX  INTEGER
+                    		MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"JITTER maximal source to destination delay in millisecond"
+                    		::= { sysRtrJitterEntry 26 }
+
+rtrJitterIcpifMin   	OBJECT-TYPE
+                    		SYNTAX  DisplayString(SIZE(0..40))
+                    		MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"JITTER minimal icpif"
+                    		::= { sysRtrJitterEntry 27 }
+
+rtrJitterIcpifMax   	OBJECT-TYPE
+                    		SYNTAX  DisplayString(SIZE(0..40))
+                    		MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"JITTER maximal icpif"
+                    		::= { sysRtrJitterEntry 28 }
+
+rtrJitterMosMin     	OBJECT-TYPE
+                    		SYNTAX  DisplayString(SIZE(0..40))
+                    		MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"JITTER minimal MOS"
+                    		::= { sysRtrJitterEntry 29 }
+
+rtrJitterMosMax     	OBJECT-TYPE
+                    		SYNTAX  DisplayString(SIZE(0..40))
+                    		MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"JITTER maximal MOS"
+                    		::= { sysRtrJitterEntry 30 }
+
+rtrJitterRowStatus  	OBJECT-TYPE
+                    		SYNTAX  RowStatus
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"JITTER row status"
+                    		::= { sysRtrJitterEntry 31 }
+
+
+------------------------------------------------------------------------------
+sysRtrFlowStatisticsMgt	OBJECT IDENTIFIER ::= { sysNFI 7 }
+
+sysRtrFlowStatisticsTable	OBJECT-TYPE
+                    		SYNTAX  SEQUENCE OF SysRtrFlowStatisticsEntry
+                    		MAX-ACCESS  not-accessible
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"RTR flow statistics table"
+                    		::= { sysRtrFlowStatisticsMgt 100 }
+
+sysRtrFlowStatisticsEntry	OBJECT-TYPE
+                    		SYNTAX SysRtrFlowStatisticsEntry
+                    		MAX-ACCESS  not-accessible
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"RTR flow statistics entry"
+                    		INDEX  { rtrFlStatisticsEntityId }
+                    		::= { sysRtrFlowStatisticsTable 1 }
+
+SysRtrFlowStatisticsEntry	::= SEQUENCE {
+                    			rtrFlStatisticsEntityId   INTEGER,
+                    			rtrFlStatisticsIfName   DisplayString,
+                    			rtrFlStatisticsInterval   INTEGER,
+                    			rtrFlStaInputMaxPkts   Counter64,
+                    			rtrFlStaTmInputMaxPkts   DisplayString,
+                    			rtrFlStaInputMaxFlow   Counter64,
+                    			rtrFlStaTmInputMaxFlow   DisplayString,
+                    			rtrFlStaInputMinPkts   Counter64,
+                    			rtrFlStaTmInputMinPkts   DisplayString,
+                    			rtrFlStaInputMinFlow   Counter64,
+                    			rtrFlStaTmInputMinFlow   DisplayString,
+                    			rtrFlStaOutputMaxPkts   Counter64,
+                    			rtrFlStaTmOutputMaxPkts   DisplayString,
+                    			rtrFlStaOutputMaxFlow   Counter64,
+                    			rtrFlStaTmOutputMaxFlow   DisplayString,
+                    			rtrFlStaOutputMinPkts   Counter64,
+                    			rtrFlStaTmOutputMinPkts   DisplayString,
+                    			rtrFlStaOutputMinFlow   Counter64,
+                    			rtrFlStaTmOutputMinFlow   DisplayString,
+                    			rtrFlowStatisticsRowStatus   RowStatus
+                    	             }
+
+
+rtrFlStatisticsEntityId	OBJECT-TYPE
+                    		SYNTAX  INTEGER(1..2000)
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"flow statistics entity Id"
+                    		::= { sysRtrFlowStatisticsEntry 1 }
+
+rtrFlStatisticsIfName	OBJECT-TYPE
+                    		SYNTAX  DisplayString(SIZE(0..40))
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"interface name which will be statistic"
+                    		::= { sysRtrFlowStatisticsEntry 2 }
+
+rtrFlStatisticsInterval	OBJECT-TYPE
+                    		SYNTAX  INTEGER(10..600)
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"monitor interval in second"
+                    		::= { sysRtrFlowStatisticsEntry 3 }
+
+rtrFlStaInputMaxPkts	OBJECT-TYPE
+                    		SYNTAX  Counter64
+                    		MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"maximal pakcets received once sampling period "
+                    		::= { sysRtrFlowStatisticsEntry 4 }
+
+rtrFlStaTmInputMaxPkts	OBJECT-TYPE
+                    		SYNTAX  DisplayString(SIZE(0..40))
+                    		MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"maximal time between minimal received packets number and miximal received packets number"
+                    		::= { sysRtrFlowStatisticsEntry 5 }
+
+rtrFlStaInputMaxFlow	OBJECT-TYPE
+                    		SYNTAX  Counter64
+                    		MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"maximal flow value received"
+                    		::= { sysRtrFlowStatisticsEntry 6 }
+
+rtrFlStaTmInputMaxFlow	OBJECT-TYPE
+                    		SYNTAX  DisplayString(SIZE(0..40))
+                    		MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"maximal time between minimal flow value and miximal flow vlaue"
+                    		::= { sysRtrFlowStatisticsEntry 7 }
+
+rtrFlStaInputMinPkts	OBJECT-TYPE
+                    		SYNTAX  Counter64
+                    		MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"minimal pakcets received once sampling period "
+                    		::= { sysRtrFlowStatisticsEntry 8 }
+
+rtrFlStaTmInputMinPkts	OBJECT-TYPE
+                    		SYNTAX  DisplayString(SIZE(0..40))
+                    		MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"minimal time between minimal packets number and miximal packets number"
+                    		::= { sysRtrFlowStatisticsEntry 9 }
+
+rtrFlStaInputMinFlow	OBJECT-TYPE
+                    		SYNTAX  Counter64
+                    		MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"minimal flow value received"
+                    		::= { sysRtrFlowStatisticsEntry 10 }
+
+rtrFlStaTmInputMinFlow	OBJECT-TYPE
+                    		SYNTAX  DisplayString(SIZE(0..40))
+                    		MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"minimal time between minimal flow value and miximal flow vlaue"
+                    		::= { sysRtrFlowStatisticsEntry 11 }
+
+rtrFlStaOutputMaxPkts	OBJECT-TYPE
+                    		SYNTAX  Counter64
+                    		MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"maximal pakcets send once sampling period "
+                    		::= { sysRtrFlowStatisticsEntry 12 }
+
+rtrFlStaTmOutputMaxPkts	OBJECT-TYPE
+                    		SYNTAX  DisplayString(SIZE(0..40))
+                    		MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"maximal time between minimal send packets number and miximal send packets number"
+                    		::= { sysRtrFlowStatisticsEntry 13 }
+
+rtrFlStaOutputMaxFlow	OBJECT-TYPE
+                    		SYNTAX  Counter64
+                    		MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"maximal flow send "
+                    		::= { sysRtrFlowStatisticsEntry 14 }
+
+rtrFlStaTmOutputMaxFlow	OBJECT-TYPE
+                    		SYNTAX  DisplayString(SIZE(0..40))
+                    		MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"maximal time between minimal send flow and miximal send flow "
+                    		::= { sysRtrFlowStatisticsEntry 15 }
+
+rtrFlStaOutputMinPkts	OBJECT-TYPE
+                    		SYNTAX  Counter64
+                    		MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"minimal pakcets send once sampling period "
+                    		::= { sysRtrFlowStatisticsEntry 16 }
+
+rtrFlStaTmOutputMinPkts	OBJECT-TYPE
+                    		SYNTAX  DisplayString(SIZE(0..40))
+                    		MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"minimal time between minimal send packets number and miximal send packets number"
+                    		::= { sysRtrFlowStatisticsEntry 17 }
+
+rtrFlStaOutputMinFlow	OBJECT-TYPE
+                    		SYNTAX  Counter64
+                    		MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"minimal flow send "
+                    		::= { sysRtrFlowStatisticsEntry 18 }
+
+rtrFlStaTmOutputMinFlow	OBJECT-TYPE
+                    		SYNTAX  DisplayString(SIZE(0..40))
+                    		MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"minimal time between minimal send flow and miximal send flow "
+                    		::= { sysRtrFlowStatisticsEntry 19 }
+
+rtrFlowStatisticsRowStatus	OBJECT-TYPE
+                    		SYNTAX  RowStatus
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"flow statistics row status"
+                    		::= { sysRtrFlowStatisticsEntry 20 }
+------------------------------------------------------------------------------
+
+sysRtrUdpechoMgt     	OBJECT IDENTIFIER ::= { sysNFI 8 }
+
+sysRtrUdpechoTable   	OBJECT-TYPE
+                    		SYNTAX  SEQUENCE OF SysRtrUdpechoEntry
+                    		MAX-ACCESS  not-accessible
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"RTR UDPECHO entity table"
+                    		::= { sysRtrUdpechoMgt     100 }
+
+sysRtrUdpechoEntry   	OBJECT-TYPE
+                    		SYNTAX  SysRtrUdpechoEntry
+                    		MAX-ACCESS  not-accessible
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"RTR UDPECHO entity entry"
+                    		INDEX  { rtrUdpechoEntityId }
+                    		::= { sysRtrUdpechoTable   1 }
+
+SysRtrUdpechoEntry   	::= SEQUENCE {
+                    			rtrUdpechoEntityId      INTEGER,
+                    			rtrUdpechoState         INTEGER,
+                    			rtrUdpechoTargetIp      IpAddress,
+                    			rtrUdpechoTargetPort    Unsigned32,
+                    			rtrUdpechoPktLen        INTEGER,
+                    			rtrUdpechoSchInterval   Unsigned32,
+                    			rtrUdpechoSourceIp      IpAddress,
+                    			rtrUdpechoSourcePort    Unsigned32,
+                    			rtrUdpechoTimeout       Unsigned32,
+                    			rtrUdpechoVrfName       DisplayString,
+                    			rtrUdpechoTos           INTEGER,
+                    			rtrUdpechoPktLoss          INTEGER,
+					rtrUdpechoPktSucc          INTEGER,
+					rtrUdpechoDelay            INTEGER,
+					rtrUdpechoDelayMin         INTEGER,
+					rtrUdpechoDelayMax         INTEGER,
+                    			rtrUdpechoRowStatus     RowStatus
+                    	             }
+
+
+rtrUdpechoEntityId   	OBJECT-TYPE
+                    		SYNTAX  INTEGER(1..2000)
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"UDPECHO entity id,index"
+                    		::= { sysRtrUdpechoEntry   1 }
+
+rtrUdpechoState          OBJECT-TYPE
+				SYNTAX	INTEGER	{
+					init(1),
+					closed(2),
+					request(3),
+					transmit(4),
+					finished(5)
+						}
+				MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    		"UDPECHO entity£º1£­init£¬2£­close£¬
+                    		                 3£­send request£¬4-send packets£¬
+                    		                 5£­finish"
+				::= { sysRtrUdpechoEntry   2 }
+
+rtrUdpechoTargetIp   	OBJECT-TYPE
+                    		SYNTAX  IpAddress
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"UDPECHO responder destination ip address"
+                    		::= { sysRtrUdpechoEntry   3 }
+
+rtrUdpechoTargetPort 	OBJECT-TYPE
+                    		SYNTAX  Unsigned32(1..65535)
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"UDPECHO responder destination port"
+                    		::= { sysRtrUdpechoEntry   4 }
+
+
+rtrUdpechoPktLen     	OBJECT-TYPE
+                    		SYNTAX  INTEGER(4..1500)
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"UDPECHO packet length"
+                    		::= { sysRtrUdpechoEntry   5 }
+
+
+rtrUdpechoSchInterval 	OBJECT-TYPE
+                    		SYNTAX  Unsigned32(1..65535)
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"UDPECHO schedule interval,
+                   			type:s"
+                    		::= { sysRtrUdpechoEntry   6 }
+
+rtrUdpechoSourceIp   	OBJECT-TYPE
+                    		SYNTAX  IpAddress
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"UDPECHO source IP address"
+                    		::= { sysRtrUdpechoEntry   7 }
+
+rtrUdpechoSourcePort 	OBJECT-TYPE
+                    		SYNTAX  Unsigned32(1..65535)
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"UDPECHO source port"
+                    		::= { sysRtrUdpechoEntry   8 }
+
+rtrUdpechoTimeout    	OBJECT-TYPE
+                    		SYNTAX  Unsigned32(0..604800000)
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"UDPECHO timeout value,type:ms,
+                    			notice,the value must no less than then interval between two schedule"
+                    		::= { sysRtrUdpechoEntry   9 }
+
+rtrUdpechoVrfName    	OBJECT-TYPE
+                    		SYNTAX  DisplayString(SIZE(0..40))
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"UDPECHO vrf"
+                    		::= { sysRtrUdpechoEntry   10 }
+
+rtrUdpechoTos        	OBJECT-TYPE
+                    		SYNTAX  INTEGER(0..255)
+                    		MAX-ACCESS  read-write
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"UDPECHO pakcet TOS value"
+                    		::= { sysRtrUdpechoEntry   11 }
+
+
+rtrUdpechoPktLoss   	OBJECT-TYPE
+                    		SYNTAX  INTEGER
+                    		MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"UDPECHO total lossed pakcets which send by the source "
+                    		::= { sysRtrUdpechoEntry   12 }
+
+rtrUdpechoPktSucc   	OBJECT-TYPE
+                    		SYNTAX  INTEGER
+                    		MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"UDPECHO total pakcets sent and received successfully"
+                    		::= { sysRtrUdpechoEntry   13 }
+
+
+rtrUdpechoDelay	 	OBJECT-TYPE
+                    		SYNTAX  INTEGER
+                    		MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"UDPECHO destination to source and source to destinatino delay in millisecond"
+                    		::= { sysRtrUdpechoEntry   14 }
+
+rtrUdpechoDelayMin	 	OBJECT-TYPE
+                    		SYNTAX  INTEGER
+                    		MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"UDPECHO maximal destination to source and source to destinatino delay in millisecond"
+                    		::= { sysRtrUdpechoEntry   15 }
+
+rtrUdpechoDelayMax	 	OBJECT-TYPE
+                    		SYNTAX  INTEGER
+                    		MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"UDPECHO maximal destination to source and source to destinatino delay in millisecond"
+                    		::= { sysRtrUdpechoEntry   16 }
+
+
+rtrUdpechoRowStatus	  	OBJECT-TYPE
+                    			SYNTAX  RowStatus
+                    			MAX-ACCESS  read-write
+                    			STATUS  current
+                    			DESCRIPTION
+                    				"UDPECHO row status"
+                    		::= { sysRtrUdpechoEntry   17 }
+
+
+------------------------------------------------------------------------------
+
+sysIfStatistic      	OBJECT IDENTIFIER ::= { iosObjects 300 }
+
+
+------------------------------------------------------------------------------
+sysIfPktPriStatistics	OBJECT IDENTIFIER ::= { sysIfStatistic 1 }
+
+sysIfPktPriStaTable      	OBJECT-TYPE
+                    		SYNTAX  SEQUENCE OF   SysIfPktPriStaEntry
+                    		MAX-ACCESS  not-accessible
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"The statistics of interface's flow based on
+								the precedence of IP packet. The index of this table is
+								priority and ifIndex"
+                    		::= { sysIfPktPriStatistics 100 }
+
+sysIfPktPriStaEntry 	OBJECT-TYPE
+                    		SYNTAX  SysIfPktPriStaEntry
+                    		MAX-ACCESS  not-accessible
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"The statistics of interface's flow based on
+								the precedence of IP packet. The index of this table is
+								priority and ifIndex"
+                    		INDEX  { sysIfPktPriority, sysIfIndex }
+                    		::= { sysIfPktPriStaTable 1 }
+
+SysIfPktPriStaEntry 	::= SEQUENCE {
+                    			sysIfPktPriority       INTEGER,
+                    			sysIfIndex             INTEGER,
+                    			sysIfDesc              DisplayString,
+                    			sysIfInOctets          Counter,
+                    			sysIfInUcastPkts       Counter,
+                    			sysIfInNUcastPkts      Counter,
+                    			sysIfInDiscards        Counter,
+                    			sysIfInErrors          Counter,
+                    			sysIfInUnkownProtos    Counter,
+                    			sysIfOutOctets         Counter,
+                    			sysIfOutUcastPkts      Counter,
+                    			sysIfOutNUcastPkts     Counter,
+                    			sysIfOutDiscards       Counter,
+                    			sysIfOutErrors         Counter
+                    	             }
+
+sysIfPktPriority    	OBJECT-TYPE
+						SYNTAX	INTEGER {
+								priority0(1),
+								priority1(2),
+								priority2(3),
+								priority3(4),
+								priority4(5),
+								priority5(6),
+								priority6(7),
+								priority7(8),
+								other(9)
+								}
+                    		MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"The precedence of IP packet, it start from 1 to 9.
+                    			Numeric one represent the precedence 0, two represent
+								1 and so on. 9 represent the number of non-IP packet."
+                    		::= { sysIfPktPriStaEntry 1 }
+
+sysIfIndex          	OBJECT-TYPE
+                    		SYNTAX  INTEGER
+                    		MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"The index of interface in the system"
+                    		::= { sysIfPktPriStaEntry 2 }
+
+sysIfDesc           	OBJECT-TYPE
+                    		SYNTAX  DisplayString(SIZE(0..255))
+                    		MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"The name of interface assigned to"
+                    		::= { sysIfPktPriStaEntry 3 }
+
+sysIfInOctets       	OBJECT-TYPE
+                    		SYNTAX  Counter
+                    		MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"The interface received bytes at specified precedence"
+                    		::= { sysIfPktPriStaEntry 4 }
+
+sysIfInUcastPkts    	OBJECT-TYPE
+                    		SYNTAX  Counter
+                    		MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"The number of subnetwork-unicast packets delivered
+								to a higher-layer protocol with specified precedence."
+                    		::= { sysIfPktPriStaEntry 5 }
+
+sysIfInNUcastPkts   	OBJECT-TYPE
+                    		SYNTAX  Counter
+                    		MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"The number of non-unicast (i.e., subnetwork- broadcast or
+								subnetwork-multicast) packets delivered to a higher-layer
+								protocol."
+                    		::= { sysIfPktPriStaEntry 6 }
+
+sysIfInDiscards     	OBJECT-TYPE
+                    		SYNTAX  Counter
+                    		MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"The number of inbound packets which were chosen to be
+								discarded"
+                    		::= { sysIfPktPriStaEntry 7 }
+
+sysIfInErrors       	OBJECT-TYPE
+                    		SYNTAX  Counter
+                    		MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"The number of inbound packets that contained errors
+								preventing them from being deliverable to a higher-layer
+								protocol."
+                    		::= { sysIfPktPriStaEntry 8 }
+
+sysIfInUnkownProtos 	OBJECT-TYPE
+                    		SYNTAX  Counter
+                    		MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"The number of packets received via the interface which
+								were discarded because of an unknown or unsupported
+								protocol."
+                    		::= { sysIfPktPriStaEntry 9 }
+
+sysIfOutOctets      	OBJECT-TYPE
+                    		SYNTAX  Counter
+                    		MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"The total number of octets transmitted out of the
+								interface, including framing characters."
+                    		::= { sysIfPktPriStaEntry 10 }
+
+sysIfOutUcastPkts   	OBJECT-TYPE
+                    		SYNTAX  Counter
+                    		MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"The total number of packets that higher-level protocols
+								requested be transmitted to a subnetwork-unicast address,
+								including those that were discarded or not sent."
+                    		::= { sysIfPktPriStaEntry 11 }
+
+sysIfOutNUcastPkts  	OBJECT-TYPE
+                    		SYNTAX  Counter
+                    		MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"The total number of packets that higher-level protocols
+								requested be transmitted to a non- unicast (i.e., a
+								subnetwork-broadcast or subnetwork-multicast) address,
+								including those that were discarded or not sent."
+                    		::= { sysIfPktPriStaEntry 12 }
+
+sysIfOutDiscards    	OBJECT-TYPE
+                    		SYNTAX  Counter
+                    		MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"The number of outbound packets which were chosen to be
+								even though no errors had been detected to prevent their
+								being transmitted.  One possible reason for discarding
+								such a packet could be to free up buffer space."
+                    		::= { sysIfPktPriStaEntry 13 }
+
+sysIfOutErrors      	OBJECT-TYPE
+                    		SYNTAX  Counter
+                    		MAX-ACCESS  read-only
+                    		STATUS  current
+                    		DESCRIPTION
+                    			"The number of outbound packets that could not be
+								transmitted because of errors."
+                    		::= { sysIfPktPriStaEntry 14 }
+
+
+END

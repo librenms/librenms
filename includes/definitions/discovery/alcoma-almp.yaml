@@ -1,0 +1,11 @@
+mib: ALCOMA-MIB
+modules:
+    sensors:
+        temperature:
+            data:
+                -
+                    oid:  alMPTemperature
+                    value:  alMPTemperature
+                    num_oid: '.1.3.6.1.4.1.12140.2.3.9.{{ $index }}'
+                    descr: Internal Temp
+                    index: 'alMPTemperatur.{{ $index }}'

@@ -47,6 +47,21 @@ class IPv6 extends IP
     }
 
     /**
+     * Convert a MySQL binary v6 (16-byte) IP address to a printable string.
+     * @param string $ip A binary string containing an IP address, as returned from MySQL's INET6_ATON function
+     * @return string Empty if not valid.
+     */
+    // Fuction is from http://uk3.php.net/manual/en/function.inet-ntop.php
+    public static function ntop($ip)
+    {
+        $len = strlen($ip);
+        if ($len == 16) {
+            return inet_ntop(pack('A' . $len, $ip));
+        }
+        return '';
+    }
+
+    /**
      * Check if the supplied IP is valid.
      * @param string $ipv6
      * @param bool $exclude_reserved Exclude reserved IP ranges.
@@ -68,7 +83,7 @@ class IPv6 extends IP
      */
     public function compressed()
     {
-        return inet6_ntop(inet_pton($this->ip));
+        return self::ntop(inet_pton($this->ip));
     }
 
     /**
@@ -94,7 +109,7 @@ class IPv6 extends IP
             }
         }
         array_unshift($net_bytes, 'n*'); // add pack format
-        return inet6_ntop(call_user_func_array('pack', $net_bytes));
+        return self::ntop(call_user_func_array('pack', $net_bytes));
     }
 
     /**
@@ -144,7 +159,18 @@ class IPv6 extends IP
         // zero pad
         $parts = explode(':', $ip, 8);
         return implode(':', array_map(function ($section) {
-            return zeropad($section, 4);
+            return Rewrite::zeropad($section, 4);
         }, $parts));
+    }
+
+    /**
+     * Convert this IP to an snmp index hex encoded
+     *
+     * @return string
+     */
+    public function toSnmpIndex()
+    {
+        $ipv6_split = str_split(str_replace(':', '', $this->uncompressed()), 2);
+        return implode('.', array_map('hexdec', $ipv6_split));
     }
 }

@@ -1,0 +1,51 @@
+#! /bin/sh
+### BEGIN INIT INFO
+# Provides:          librenms-irc
+# Required-Start:    $syslog $time $remote_fs
+# Required-Stop:     $syslog $time $remote_fs
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: IRC Daemon for LibreNMS
+# Description:       Debian init script for LibreNMS IRC bot
+#                    This daemon is needed to push the alerts to an IRC server
+### END INIT INFO
+#
+# Author:	Aldemir Akpinar <aldemir.akpinar@gmail.com>
+#
+
+if [ ! -f "/etc/default/librenms" ];then
+    IRCDAEMON="/opt/librenms/irc.php"
+    LIBRENMSUSER="librenms"
+fi
+
+# No configurable parameters below
+PATH=/bin:/sbin:/usr/bin:/usr/sbin
+DESC="IRC daemon for LibreNMS"
+NAME="librenms-irc"
+
+test -x $IRCDAEMON || exit 0
+
+. /lib/lsb/init-functions
+
+case "$1" in
+  start)
+	log_daemon_msg "Starting $DESC" "$NAME"
+    start-stop-daemon --start --quiet --oknodo --background --chuid $LIBRENMSUSER --exec "$IRCDAEMON"
+	log_end_msg $?
+    ;;
+  stop)
+	log_daemon_msg "Stopping $DESC" "$NAME"
+    pkill -f "$IRCDAEMON"
+	log_end_msg $?
+    ;;
+  force-reload|restart)
+    $0 stop
+    $0 start
+    ;;
+  *)
+    echo "Usage: /etc/init.d/$NAME {start|stop|restart|force-reload}"
+    exit 1
+    ;;
+esac
+
+exit 0

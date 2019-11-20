@@ -23,7 +23,7 @@
  * @author     Lorenzo Zafra<zafra@ualberta.ca>
  */
 
-$data = explode('; ', $poll_device['sysDescr']);
+$data = explode('; ', $device['sysDescr']);
 
 if (isset($data[1])) {
     $hardware = $data[1];

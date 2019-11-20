@@ -1,0 +1,172 @@
+-- ----------------------------------------------------------------------------
+--
+--  SIAE MICROELETTRONICA s.p.a.
+--                 
+--  Via Michelangelo Buonarroti, 21
+--  20093 - Cologno Monzese
+--  Milano 
+--  ITALY
+--
+-- ----------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
+
+SIAE-RET-MIB
+        DEFINITIONS ::= BEGIN
+
+        IMPORTS
+             MODULE-IDENTITY, OBJECT-TYPE,
+             IpAddress
+        FROM SNMPv2-SMI
+            DisplayString, RowStatus
+        FROM SNMPv2-TC
+             siaeMib
+        FROM SIAE-TREE-MIB;
+
+    remElement MODULE-IDENTITY
+        LAST-UPDATED "201406230000Z"
+        ORGANIZATION "SIAE MICROELETTRONICA spa"
+        CONTACT-INFO
+            "SIAE MICROELETTONICA s.p.a.
+             Via Michelangelo Buonarroti, 21
+             20093 - Cologno Monzese
+             Milano - ITALY
+             Phone :  +39-02-27325-1
+             E-mail: tbd@siaemic.com
+            "
+        DESCRIPTION
+            "Remote Element Table
+            "
+        REVISION "201406230000Z"
+        DESCRIPTION
+            "Fixed IMPORTS clause
+            "
+        REVISION "201402030000Z"
+        DESCRIPTION
+            "Improved description of remoteElementMibVersion
+            "
+        REVISION "201304160000Z"
+        DESCRIPTION 
+            "Initial version 01.00.00
+            "
+    ::= { siaeMib 70 }
+
+----------------------------------------------------------------------------------
+--  remElement GROUP
+----------------------------------------------------------------------------------
+--
+--  This group is used to manage the command log.
+--
+----------------------------------------------------------------------------------
+
+------ Beginning --------------------------------------------------------------
+
+
+-------  Begin of remoteElementTable
+--
+    remoteElementMibVersion  OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Numerical version of this module.
+             The string version of this MIB have the following format:
+                XX.YY.ZZ
+             so, for example, the value 1 should be interpreted as 00.00.01
+             and the value 10001 should be interpreted as 01.00.01."
+        DEFVAL {1}
+    ::= {remElement 1}
+
+    remoteElementTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF     RemoteElementEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table with ISO/OSI remote element that are reacheable from this NE."
+    ::= {remElement 2}
+
+    remoteElementEntry  OBJECT-TYPE
+        SYNTAX      RemoteElementEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Remote element record."
+        INDEX {remoteElementIpAddress}
+    ::= {remoteElementTable 1}
+
+    RemoteElementEntry  ::=
+        SEQUENCE {
+            remoteElementIpAddress      IpAddress,
+            remoteElementGosipAddress   OCTET STRING,
+            remoteElementLabel          DisplayString,
+            remoteElementType           INTEGER,
+            remoteElementRadioBranchId  INTEGER,
+            remoteElementRowStatus      RowStatus
+        }
+
+    remoteElementIpAddress  OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "IP address of remote element."
+    ::= {remoteElementEntry 1}
+
+    remoteElementGosipAddress  OBJECT-TYPE
+        SYNTAX      OCTET STRING    (SIZE(0..20))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Gosip address of remote element."
+    ::= {remoteElementEntry 2}
+
+    remoteElementLabel  OBJECT-TYPE
+        SYNTAX      DisplayString    (SIZE(0..15))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "ASII string used for label the remote element."
+    ::= {remoteElementEntry 3}
+
+    remoteElementType  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             elemManager  (1),
+                             external     (2),
+                             remote       (3),
+                             snm          (4)
+                            }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Type of Remote Network Element:
+              * elemManager: element Manager.
+              * external: the NE is used as a gateway to connect the element.
+              * remote: the equipment connected to the other end of radio link.
+              * snm: equipment managed by SubNetwork Manager."
+    ::= {remoteElementEntry 4}
+
+    remoteElementRadioBranchId  OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "It reports the radio branch connecting the IP adress.
+             (Zero means IP address not directly connected)."
+    ::= {remoteElementEntry 5}
+    
+    remoteElementRowStatus  OBJECT-TYPE 
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Status of this row of remoteElementTable.
+            "
+    ::= {remoteElementEntry 6}
+
+    
+--
+-------  End of remoteElementTable
+
+------ End group -----------------------------------------------------------------
+
+END
+

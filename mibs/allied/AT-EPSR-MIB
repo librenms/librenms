@@ -1,0 +1,221 @@
+-- ============================================================================
+-- AT-ESPR.MIB, Allied Telesis enterprise MIB: Ethernet Protection Switching Ring
+--
+-- Copied from ATR-ESPR.MIB of pre 2.9.1 release
+--
+-- Copyright (c) 2006 by Allied Telesis, Inc.
+-- All rights reserved.
+-- 
+-- ============================================================================
+
+AT-EPSR-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    
+    TEXTUAL-CONVENTION,
+    DisplayString
+        FROM SNMPv2-TC
+    
+    InterfaceIndex
+    	FROM IF-MIB
+	
+	modules,
+	DisplayStringUnsized
+		FROM AT-SMI-MIB
+;
+
+epsr MODULE-IDENTITY
+    LAST-UPDATED "200611221212Z"
+    ORGANIZATION "Allied Telesis, Inc"
+	CONTACT-INFO
+	    "http://www.alliedtelesis.com"
+	DESCRIPTION
+	    "Convert epsrEventVariables into a table entry, so variable of mutiple 
+	     EPSR domains can be obtained."
+    REVISION "200611221212Z"
+
+	DESCRIPTION
+	    "This MIB file contains definitions of managed objects for 
+	    the code module responsible for handling EPSR on Allied Telesis 
+	    switches."
+    REVISION "200602161619Z"
+
+DESCRIPTION
+	"Initial Revision"
+::= { modules 136 }
+
+
+-- ---------------------------------------------------------- --
+-- Textual Conventions
+-- ---------------------------------------------------------- --
+
+EpsrNodeState ::= TEXTUAL-CONVENTION
+STATUS       current
+DESCRIPTION
+    "Defines the node states that can be passed around
+     in EPSR Node Traps."
+SYNTAX INTEGER
+        {
+            idle         (0),
+            complete     (1),
+            failed       (2),
+            linksUp      (3),
+            linksDown    (4),
+            preForward   (5),
+            unknown      (6)
+        }
+
+EpsrInterfaceState ::= TEXTUAL-CONVENTION
+STATUS       current
+DESCRIPTION
+    "Defines the interface states that can be passed around
+     in EPSR Node Traps."
+SYNTAX INTEGER
+        {
+            unknown  (0),
+            blocked  (1),
+            forward  (2)
+        }
+
+-- ---------------------------------------------------------- --
+-- EPSR specific trap definitions
+-- ---------------------------------------------------------- --
+
+epsrEvents    OBJECT IDENTIFIER ::= { epsr 1 }
+
+epsrNodeTrap      NOTIFICATION-TYPE
+	 OBJECTS {
+                epsrNodeTrapType,
+                epsrDomainName,
+                epsrFromState,
+                epsrToState,
+                epsrControlVlanId,
+                epsrPrimaryIfIndex,
+                epsrPrimaryIfState,
+                epsrSecondaryIfIndex,
+                epsrSecondaryIfState
+             }
+     STATUS  current
+     DESCRIPTION
+         "EPSR Master/Transit node state transition trap."
+	 ::= { epsrEvents 1 }
+
+-- ---------------------------------------------------------- --
+-- EPSR Event Variables Object IDs
+-- ---------------------------------------------------------- --
+
+epsrEventVariablesTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF EpsrEventVariablesEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"This table contains rows of epsrEventVariablesEntry."
+		::= { epsr 2 }
+
+epsrEventVariablesEntry OBJECT-TYPE
+	SYNTAX EpsrEventVariablesEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"An entry in the ATL enterprise epsrEventVariablesTable."
+	INDEX { epsrDomainName }
+		::= { epsrEventVariablesTable 1 }
+
+EpsrEventVariablesEntry ::=
+	SEQUENCE {
+		epsrNodeTrapType		INTEGER (0..2),
+		epsrDomainName			DisplayStringUnsized(SIZE(1..15)),
+		epsrFromState 			EpsrNodeState,
+		epsrToState				EpsrNodeState,
+		epsrControlVlanId		INTEGER,
+		epsrPrimaryIfIndex		InterfaceIndex,
+		epsrPrimaryIfState		EpsrInterfaceState,
+		epsrSecondaryIfIndex	InterfaceIndex,
+		epsrSecondaryIfState	EpsrInterfaceState
+	}
+
+
+epsrNodeTrapType OBJECT-TYPE
+		SYNTAX  INTEGER
+        {
+            unknown          (0),
+            masterNodeTrap   (1),
+            transitNodeTrap  (2)
+        }
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+   		"This is the trap type of the EPSR node trap (master/transit)."
+ 	::= { epsrEventVariablesEntry 1 }
+
+
+epsrDomainName OBJECT-TYPE
+		SYNTAX  DisplayStringUnsized (SIZE(1..15))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+   		"Assigned name of the EPSR domain."
+ 	::= { epsrEventVariablesEntry 2 }
+
+epsrFromState OBJECT-TYPE
+		SYNTAX  EpsrNodeState
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+   		"Defined state that an EPSR domain is transitioning from."
+		::= { epsrEventVariablesEntry 3 }
+
+epsrToState OBJECT-TYPE
+		SYNTAX  EpsrNodeState
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+   		"Defined state that an EPSR domain is transitioning to."
+		::= { epsrEventVariablesEntry 4 }
+
+epsrControlVlanId OBJECT-TYPE 
+	SYNTAX  INTEGER
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+   		"VLAN identifier for the control VLAN."
+		::= { epsrEventVariablesEntry 5 }
+
+epsrPrimaryIfIndex OBJECT-TYPE
+		SYNTAX  InterfaceIndex
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+   		"IfIndex of the primary interface."
+		::= { epsrEventVariablesEntry 6 }
+
+epsrPrimaryIfState OBJECT-TYPE
+		SYNTAX  EpsrInterfaceState
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+   		"Defined current state of the primary interface."
+		::= { epsrEventVariablesEntry 7 }
+
+epsrSecondaryIfIndex OBJECT-TYPE
+		SYNTAX  InterfaceIndex
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+   		"IfIndex of the secondary interface."
+		::= { epsrEventVariablesEntry 8 }
+
+epsrSecondaryIfState OBJECT-TYPE
+		SYNTAX  EpsrInterfaceState
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+   		"Defined current state of the secondary interface."
+		::= { epsrEventVariablesEntry 9 }
+
+END
+

@@ -1,0 +1,772 @@
+-- *****************************************************************
+-- DLINKSW-SYSTEM-FILE-MIB: D-Link System File MIB
+--
+--  Copyright (c) 2013 D-Link Corporation, all rights reserved.
+--
+-- *****************************************************************
+
+
+DLINKSW-SYSTEM-FILE-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+            FROM SNMPv2-SMI
+        MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF
+        TEXTUAL-CONVENTION, TruthValue, RowStatus, DisplayString
+		    FROM SNMPv2-TC
+        InetAddressType, InetAddress
+            FROM INET-ADDRESS-MIB
+        InterfaceIndexOrZero
+            FROM IF-MIB
+        dlinkIndustrialCommon
+            FROM DLINK-ID-REC-MIB;
+
+    dlinkSwSystemFileMIB MODULE-IDENTITY
+        LAST-UPDATED    "201308190000Z"
+        ORGANIZATION    "D-Link Corp."
+        CONTACT-INFO
+            "   D-Link Corporation
+
+                Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                        Taipei City 114, Taiwan, R.O.C
+                Tel:     +886-2-66000123
+                E-mail: tsd@dlink.com.tw
+            "
+        DESCRIPTION
+            "This MIB module defines objects for managing system critical files
+            (e.g configuration and firmware.)
+            "
+
+        REVISION        "201308190000Z"
+        DESCRIPTION
+            "Add traps about uploading or downloading image file (dsfUploadImage,
+
+            dsfDownloadImage) and uploading, downloading or saving configuration file
+
+            (dsfUploadCfg, dsfDownloadCfg, dsfSaveCfg)."
+
+        REVISION        "201304240000Z"
+        DESCRIPTION
+            "This is the first version of the MIB file."
+
+        ::= { dlinkIndustrialCommon 14 }
+
+--
+-- Node definitions
+--
+
+    dsfMIBNotifications OBJECT IDENTIFIER ::= { dlinkSwSystemFileMIB 0 }
+    dsfMIBObjects       OBJECT IDENTIFIER ::= { dlinkSwSystemFileMIB 1 }
+    dsfMIBConformance	OBJECT IDENTIFIER ::= { dlinkSwSystemFileMIB 2 }
+
+-- -----------------------------------------------------------------------------
+    dsfBootInfoObjects		OBJECT IDENTIFIER ::= { dsfMIBObjects 1 }
+
+    dsfNextBootCfgUrl OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE (0..799))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the URL of the file to be used as the startup
+            configuration file."
+        ::= { dsfBootInfoObjects 1 }
+
+    dsfNextBootImageUrl OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE (0..799))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the URL of the file to be used as boot image
+            file."
+        ::= { dsfBootInfoObjects 2 }
+
+    dsfCheckingBootImageCheck OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates whether displays the information of the
+            specified next boot image to let user understand whether the
+            specified file is suitable to be a boot image or not, which some
+            information should be displayed such as purpose of the file,
+            version number, time stamp, and checksum etc.
+            The object dsfBootCheckResult indicates the checking result.
+            "
+        ::= { dsfBootInfoObjects 3 }
+
+    dsfBootImageCheckResult OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the information of the specified next boot
+            image such as the purpose of the file, version number, time stamp,
+            and checksum etc.
+            This object is meaningful when dsfNextBootImageUrl is not empty
+            and dsfBootCheckImage is 'true'.
+            "
+        ::= { dsfBootInfoObjects 4 }
+
+-- -----------------------------------------------------------------------------
+    dsfBootImageTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DsfBootImageEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The table is used to display information for boot images of units."
+        ::= { dsfBootInfoObjects 5 }
+
+	dsfBootImageEntry OBJECT-TYPE
+        SYNTAX          DsfBootImageEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry contains version information of a unit."
+        INDEX   {
+            dsfBootImageUnitId,
+            dsfBootImageIndex
+        }
+        ::= { dsfBootImageTable 1 }
+
+    DsfBootImageEntry ::= SEQUENCE {
+		dsfBootImageUnitId 		Unsigned32,
+		dsfBootImageIndex   	Unsigned32,
+		dsfBootImageUrl 		OCTET STRING,
+        dsfBootImageInWorking   TruthValue
+    }
+
+    dsfBootImageUnitId OBJECT-TYPE
+        SYNTAX          Unsigned32 (1..65535)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the unit (stacking device) or slot (chassis
+            device) ID.
+            "
+        ::= { dsfBootImageEntry 1 }
+
+	dsfBootImageIndex OBJECT-TYPE
+        SYNTAX          Unsigned32 (1..65535)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+             "This object indicates the index of boot image."
+        ::= { dsfBootImageEntry 2 }
+
+	dsfBootImageUrl OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE (0..799))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the file name and path of the entry."
+        ::= { dsfBootImageEntry 3 }
+
+    dsfBootImageInWorking OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates whether the entry is the current boot image."
+        ::= { dsfBootImageEntry 4 }
+
+-- -----------------------------------------------------------------------------
+    dsfBootCfgFileTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF DsfBootCfgFileEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The table is used to display boot configuration file of units."
+        ::= { dsfBootInfoObjects 6 }
+
+	dsfBootCfgFileEntry OBJECT-TYPE
+        SYNTAX          DsfBootCfgFileEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry contains the information for boot configuration file of a unit."
+        INDEX   {
+            dsfBootCfgFileUnitId
+        }
+        ::= { dsfBootCfgFileTable 1 }
+
+    DsfBootCfgFileEntry ::= SEQUENCE {
+		dsfBootCfgFileUnitId 	Unsigned32,
+		dsfBootCfgFileUrl 		OCTET STRING
+    }
+
+    dsfBootCfgFileUnitId OBJECT-TYPE
+        SYNTAX          Unsigned32 (1..65535)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the unit (stacking device) or slot (chassis
+            device) ID.
+            "
+        ::= { dsfBootCfgFileEntry 1 }
+
+	dsfBootCfgFileUrl OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE (0..799))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the file name and path of the entry."
+        ::= { dsfBootCfgFileEntry 2 }
+
+-- -----------------------------------------------------------------------------
+    dsfCopyTable OBJECT-TYPE
+       SYNTAX           SEQUENCE OF DsfCopyEntry
+       MAX-ACCESS       not-accessible
+       STATUS           current
+       DESCRIPTION
+           "A table contains the information for file copy. There will at any
+           time be either 0 or 1 row in this table, and the only valid index
+           for this table is 1.  It is only a table so that we may take
+           advantage of the RowStatus textual convention for configuring
+           the copying parameters."
+       ::= { dsfMIBObjects 2 }
+
+    dsfCopyEntry OBJECT-TYPE
+       SYNTAX           DsfCopyEntry
+       MAX-ACCESS       not-accessible
+       STATUS           current
+       DESCRIPTION
+           "An entry contains parameters for copy."
+       INDEX  { dsfCopyIndex }
+       ::= { dsfCopyTable 1 }
+
+    DsfCopyEntry ::= SEQUENCE {
+        dsfCopyIndex                Unsigned32,
+        dsfCopyType                 INTEGER,
+        dsfCopySrcUrl               OCTET STRING,
+        dsfCopyDstUrl               OCTET STRING,
+        dsfCopyRemoteAddrType       InetAddressType,
+        dsfCopyRemoteAddr           InetAddress,
+        dsfCopyUsrName              DisplayString,
+        dsfCopyUsrPwd               DisplayString,
+        dsfCopyRemoteTcpPort        Unsigned32,
+        dsfCopyVrfName              DisplayString,
+        dsfCopyErrorStatus          DisplayString,
+        dsfCopyRowStatus            RowStatus
+        }
+
+    dsfCopyIndex OBJECT-TYPE
+        SYNTAX          Unsigned32 (1)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object uniquely identifies this row.
+            The only legal value for this object is 1."
+        ::= { dsfCopyEntry 1 }
+
+    dsfCopyType OBJECT-TYPE
+        SYNTAX          INTEGER {
+            localToLocal(1),
+            localToTftpRemote(2),
+            localToFtpRemote(3),
+            localToRcpRemote(4),
+            tftpRemoteToLocal(5),
+            ftpRemoteToLocal(6),
+            rcpRemoteToLocal(7)
+        }
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the type of the copy.
+            'localToLocal' - Copy file within the system.
+            'localToTftpRemote' - Upload file remote host via TFTP.
+            'localToFtpRemote'  - Upload file remote host via FTP.
+            'localToRcpRemote'  - Upload file remote host via RCP.
+            'tftpRemoteToLocal' - Download file from remote host via TFTP.
+            'ftpRemoteToLocal'  - Download file from remote host via FTP.
+            'rcpRemoteToLocal'  - Download file from remote host via RCP.
+            "
+       ::= { dsfCopyEntry 2 }
+
+    dsfCopySrcUrl OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE (0..799))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the source URL for the source file to be copied.
+            The special form 'startup-config','running-config','system-log',
+            and 'attack-log' are reserved to indicate the system files.
+            "
+        ::= { dsfCopyEntry 3 }
+
+    dsfCopyDstUrl OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE (0..799))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the destination URL for the copied file.
+            The special form 'startup-config' and 'running-config' are reserved
+            to indicate the system files.
+            "
+        ::= { dsfCopyEntry 4 }
+
+    dsfCopyRemoteAddrType OBJECT-TYPE
+        SYNTAX             InetAddressType
+        MAX-ACCESS         read-create
+        STATUS             current
+        DESCRIPTION
+           "This object indicates the type of address of the remote host.
+           This object is meaningless if dsfCopyType is 'localToLocal'.
+           "
+        DEFVAL             { ipv4 }
+        ::= { dsfCopyEntry 5 }
+
+    dsfCopyRemoteAddr OBJECT-TYPE
+        SYNTAX             InetAddress
+        MAX-ACCESS         read-create
+        STATUS             current
+        DESCRIPTION
+           "This object indicates the address of the remote host.
+           This object is meaningless if dsfCopyType is 'localToLocal'.
+           "
+        ::= { dsfCopyEntry 6 }
+
+    dsfCopyUsrName OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the user name on the source FTP/RCP server.
+            This object is meaningful only when the object dsfCopyType is
+            'localToFtpRemote', 'localToRcpRemote', 'ftpRemoteToLocal, or
+            'rcpRemoteToLocal'.
+            "
+        ::= { dsfCopyEntry 7 }
+
+    dsfCopyUsrPwd OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the password for the user.
+            This object is meaningful only when the object dsfCopyType is
+            'localToFtpRemote' or 'ftpRemoteToLocal'.
+            "
+        ::= { dsfCopyEntry 8 }
+
+    dsfCopyRemoteTcpPort OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the TCP port on the remote FTP server."
+        ::= { dsfCopyEntry 9 }
+
+    dsfCopyVrfName	OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the name of the VRF instance to which the
+            TFTP/FTP/RCP server belongs."
+        ::= { dsfCopyEntry 10 }
+
+    dsfCopyErrorStatus  OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS       current
+        DESCRIPTION
+            "Status of file copy."
+        ::= { dsfCopyEntry 11 }
+
+    dsfCopyRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The status of this conceptual row.
+            The writable columns in a row cannot be changed if the row is
+            'active'."
+        ::= { dsfCopyEntry 12 }
+
+-- -----------------------------------------------------------------------------
+    dsfCfgReplaceTable OBJECT-TYPE
+       SYNTAX           SEQUENCE OF DsfCfgReplaceEntry
+       MAX-ACCESS       not-accessible
+       STATUS           current
+       DESCRIPTION
+           "A table contains the information for replacing the current running
+           configuration file. There will at any time be either 0 or 1 row
+           in this table, and the only valid index for this table is 1."
+       ::= { dsfMIBObjects 3 }
+
+    dsfCfgReplaceEntry OBJECT-TYPE
+       SYNTAX           DsfCfgReplaceEntry
+       MAX-ACCESS       not-accessible
+       STATUS           current
+       DESCRIPTION
+           "An entry contains parameters for configure replace."
+       INDEX  { dsfCfgReplaceIndex }
+       ::= { dsfCfgReplaceTable 1 }
+
+    DsfCfgReplaceEntry ::= SEQUENCE {
+        dsfCfgReplaceIndex               Unsigned32,
+        dsfCfgReplaceSrcType             INTEGER,
+        dsfCfgReplaceSrcUrl              OCTET STRING,
+        dsfCfgReplaceRemoteAddrType      InetAddressType,
+        dsfCfgReplaceRemoteAddr          InetAddress,
+        dsfCfgReplaceUsrName             DisplayString,
+        dsfCfgReplaceUsrPwd              DisplayString,
+        dsfCfgReplaceRemoteTcpPort       Unsigned32,
+        dsfCfgReplaceVrfName             DisplayString,
+        dsfCfgReplaceErrorStatus         DisplayString,
+        dsfCfgReplaceRowStatus           RowStatus
+        }
+
+    dsfCfgReplaceIndex OBJECT-TYPE
+        SYNTAX          Unsigned32 (1)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object uniquely identifies this row.
+            The only legal value for this object is 1."
+        ::= { dsfCfgReplaceEntry 1 }
+
+    dsfCfgReplaceSrcType OBJECT-TYPE
+        SYNTAX          INTEGER {
+            local(1),
+            tftpRemote(2),
+            ftpRemote(3),
+            rcpRemote(4)
+        }
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates where to get the file to replace the current
+            running configuration.
+
+            'local' - Get the replacing configuration file from the system.
+            'tftpRemote' - Get the replacing configuration file from remote host via TFTP.
+            'ftpRemote' - Get the replacing configuration file from remote host via FTP.
+            'rcpRemote' - Get the replacing configuration file from remote host via RCP.
+            "
+       ::= { dsfCfgReplaceEntry 2 }
+
+    dsfCfgReplaceSrcUrl OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE (0..799))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the source URL for the source configuration file
+            to be executed."
+        ::= { dsfCfgReplaceEntry 3 }
+
+    dsfCfgReplaceRemoteAddrType OBJECT-TYPE
+        SYNTAX             InetAddressType
+        MAX-ACCESS         read-create
+        STATUS             current
+        DESCRIPTION
+           "This object indicates the type of address of the remote host.
+           This object is meaningless if dsfCfgReplaceSrcType is 'local'.
+           "
+        DEFVAL             { ipv4 }
+        ::= { dsfCfgReplaceEntry 4 }
+
+    dsfCfgReplaceRemoteAddr OBJECT-TYPE
+        SYNTAX             InetAddress
+        MAX-ACCESS         read-create
+        STATUS             current
+        DESCRIPTION
+           "This object indicates the address of the remote host.
+           This object is meaningless if dsfCfgReplaceSrcType is 'local'.
+           "
+        ::= { dsfCfgReplaceEntry 5 }
+
+    dsfCfgReplaceUsrName OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the user name on the source FTP/RCP server.
+            This object is meaningful only when the object dsfCfgReplaceSrcType is
+            'ftpRemote', 'rcpRemote'.
+            "
+        ::= { dsfCfgReplaceEntry 6 }
+
+    dsfCfgReplaceUsrPwd OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the password for the user.
+            This object is meaningful only when the object dsfCfgReplaceSrcType is
+            'ftpRemote'.
+            "
+        ::= { dsfCfgReplaceEntry 7 }
+
+    dsfCfgReplaceRemoteTcpPort OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the TCP port on the remote FTP server."
+        ::= { dsfCfgReplaceEntry 8 }
+
+    dsfCfgReplaceVrfName	OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the name of the VRF instance to which the
+            TFTP/FTP/RCP server belongs."
+        ::= { dsfCfgReplaceEntry 9 }
+
+    dsfCfgReplaceErrorStatus  OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS       current
+        DESCRIPTION
+            "This object indicates the processing status about the replacement of
+            current running configuration.
+            "
+        ::= { dsfCfgReplaceEntry 10 }
+
+    dsfCfgReplaceRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The status of this conceptual row.
+            The writable columns in a row cannot be changed if the row is
+            'active'."
+        ::= { dsfCfgReplaceEntry 11 }
+
+-- -----------------------------------------------------------------------------
+    dsfIpSrcIfObjects OBJECT IDENTIFIER ::= { dsfMIBObjects 4 }
+
+    dsfIpTftpSrcIf OBJECT-TYPE
+        SYNTAX          InterfaceIndexOrZero
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object specifies the interface whose IP address will be used as
+            the source address for initiating TFTP packets.
+            The special value of 0 indicates the interface is not specified, and
+            IP address of the closest interface will be used.
+            "
+        ::= { dsfIpSrcIfObjects 1 }
+
+    dsfIpFtpSrcIf OBJECT-TYPE
+        SYNTAX          InterfaceIndexOrZero
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object specifies the interface whose IP address will be used as
+            the source address for initiating FTP packets.
+            The special value of 0 indicates the interface is not specified, and
+            IP address of the closest interface will be used.
+            "
+        ::= { dsfIpSrcIfObjects 2 }
+
+    dsfIpRcpSrcIf OBJECT-TYPE
+        SYNTAX          InterfaceIndexOrZero
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object specifies the interface whose IP address will be used as
+            the source address for initiating RCP packets.
+            The special value of 0 indicates the interface is not specified, and
+            IP address of the closest interface will be used.
+            "
+        ::= { dsfIpSrcIfObjects 3 }
+
+-- -----------------------------------------------------------------------------
+    dsfClearRunCfg OBJECT-TYPE
+        SYNTAX      INTEGER   {
+            clear(1),
+            noOp(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This object is used to clear running-config when set to 'clear'.
+            No action is taken if this object is set to 'noOp'.
+            When read, the value 'noOp' is returned."
+        ::= { dsfMIBObjects 5 }
+
+-- -----------------------------------------------------------------------------
+    dsfResetSystem OBJECT-TYPE
+        SYNTAX      INTEGER   {
+            reset(1),
+            noOp(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This object is used to reset system when set to 'reset'.
+            It will clear system configuration, save and reboot the system.
+            No action is taken if this object is set to 'noOp'.
+            When read, the value 'noOp' is returned."
+        ::= { dsfMIBObjects 6 }
+
+-- -----------------------------------------------------------------------------
+-- MIB Notifications statements
+-- -----------------------------------------------------------------------------
+    dsfUploadImage    NOTIFICATION-TYPE
+        STATUS    current
+        DESCRIPTION
+            "The notification is sent when the user uploads
+            image file successfully."
+        ::= { dsfMIBNotifications 1 }
+
+    dsfDownloadImage    NOTIFICATION-TYPE
+        STATUS    current
+        DESCRIPTION
+            "The notification is sent when the user downloads
+            image file successfully."
+        ::= { dsfMIBNotifications 2 }
+
+    dsfUploadCfg    NOTIFICATION-TYPE
+        STATUS    current
+        DESCRIPTION
+            "The notification is sent when the user uploads
+            configuration file successfully."
+        ::= { dsfMIBNotifications 3 }
+
+    dsfDownloadCfg    NOTIFICATION-TYPE
+        STATUS    current
+        DESCRIPTION
+            "The notification is sent when the user downloads
+            configuration file successfully."
+        ::= { dsfMIBNotifications 4 }
+
+    dsfSaveCfg    NOTIFICATION-TYPE
+        STATUS    current
+        DESCRIPTION
+            "The notification is sent when the user saves
+            configuration file successfully."
+        ::= { dsfMIBNotifications 5 }
+
+-- -----------------------------------------------------------------------------
+-- MIB Conformance statements
+-- -----------------------------------------------------------------------------
+    dsfCompliances   OBJECT IDENTIFIER ::= { dsfMIBConformance 1 }
+
+    dsfCompliance MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION
+            "The compliance statement for entities which implement the
+            DLINKSW-SYSTEM-FILE-MIB."
+        MODULE
+            MANDATORY-GROUPS {
+                dsfBootInfoGroup,
+                dsfCopyGroup,
+                dsfCfgReplaceGroup,
+                dsfIpSrcIfGroup,
+                dsfClearCfgGroup
+            }
+        OBJECT  dsfCopyType
+            DESCRIPTION
+                "It is compliant to support only a subset of
+                values: 'localToLocal', 'localToTftpRemote', and
+                'tftpRemoteToLocal'."
+
+        OBJECT  dsfCfgReplaceSrcType
+            DESCRIPTION
+                "It is compliant to support only a subset of
+                values: 'local' and 'tftpRemote'."
+
+        OBJECT  dsfIpTftpSrcIf
+            MIN-ACCESS read-only
+            DESCRIPTION
+                "read-write access is not required."
+
+        OBJECT  dsfIpFtpSrcIf
+            MIN-ACCESS read-only
+            DESCRIPTION
+                "This object is required when FTP and configurable source
+                interface are supported."
+
+         OBJECT  dsfIpRcpSrcIf
+            MIN-ACCESS read-only
+            DESCRIPTION
+                "This object is required when RCP and configurable source
+                interface are supported."
+        ::= { dsfCompliances 1 }
+
+    dsfGroups   OBJECT IDENTIFIER ::= { dsfMIBConformance 2 }
+
+    dsfBootInfoGroup OBJECT-GROUP
+        OBJECTS {
+            dsfNextBootCfgUrl,
+            dsfNextBootImageUrl,
+            dsfCheckingBootImageCheck,
+            dsfBootImageCheckResult,
+            dsfBootImageUrl,
+            dsfBootImageInWorking,
+            dsfBootCfgFileUrl
+        }
+        STATUS      current
+        DESCRIPTION
+            "A collection of objects providing information about the boot configuration
+            and boot image."
+        ::= { dsfGroups 1 }
+
+    dsfCopyGroup OBJECT-GROUP
+        OBJECTS {
+            dsfCopyType,
+            dsfCopySrcUrl,
+            dsfCopyDstUrl,
+            dsfCopyRemoteAddrType,
+            dsfCopyRemoteAddr,
+            dsfCopyUsrName,
+            dsfCopyUsrPwd,
+            dsfCopyRemoteTcpPort,
+            dsfCopyVrfName,
+            dsfCopyErrorStatus,
+            dsfCopyRowStatus
+        }
+        STATUS      current
+        DESCRIPTION
+            "A collection of objects providing information for the parameters
+            of the copy function."
+        ::= { dsfGroups 2 }
+
+    dsfCfgReplaceGroup OBJECT-GROUP
+        OBJECTS {
+            dsfCfgReplaceSrcType,
+            dsfCfgReplaceSrcUrl,
+            dsfCfgReplaceRemoteAddrType,
+            dsfCfgReplaceRemoteAddr,
+            dsfCfgReplaceUsrName,
+            dsfCfgReplaceUsrPwd,
+            dsfCfgReplaceRemoteTcpPort,
+            dsfCfgReplaceVrfName,
+            dsfCfgReplaceErrorStatus,
+            dsfCfgReplaceRowStatus
+        }
+        STATUS      current
+        DESCRIPTION
+            "A collection of objects providing information for the parameters
+            of the configure replace function."
+        ::= { dsfGroups 3 }
+
+    dsfIpSrcIfGroup OBJECT-GROUP
+        OBJECTS {
+            dsfIpTftpSrcIf,
+            dsfIpFtpSrcIf,
+            dsfIpRcpSrcIf
+        }
+        STATUS      current
+        DESCRIPTION
+            "A collection of objects providing information about the interface whose
+            IP address will be used as the source address for initiating TFTP/FTP/RCP
+            packets."
+        ::= { dsfGroups 4 }
+
+    dsfClearCfgGroup OBJECT-GROUP
+        OBJECTS {
+            dsfClearRunCfg,
+            dsfResetSystem
+        }
+        STATUS      current
+        DESCRIPTION
+            "An object providing the clear function."
+        ::= { dsfGroups 5 }
+
+END

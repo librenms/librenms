@@ -1,7 +1,7 @@
 os: vyatta
 text: Vyatta
 type: network
-ifname: 1
+ifname: true
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'Processor Usage' }

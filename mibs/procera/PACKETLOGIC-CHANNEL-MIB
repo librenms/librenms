@@ -1,0 +1,546 @@
+PACKETLOGIC-CHANNEL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	NOTIFICATION-TYPE,
+	MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter64,
+	Unsigned32, TimeTicks FROM SNMPv2-SMI
+	packetlogic2 FROM PACKETLOGIC-MIB
+	DisplayString, DateAndTime FROM SNMPv2-TC
+	CounterBasedGauge64 FROM HCNUM-TC;
+
+channelstats MODULE-IDENTITY
+	LAST-UPDATED "201212131322Z"
+	ORGANIZATION "Procera Networks, Inc."
+	CONTACT-INFO "support@proceranetworks.com"
+	DESCRIPTION "MIB for PacketLogic2 channels"
+	REVISION "201212131322Z"
+	DESCRIPTION " Latest version at the revision date for version GET VERSION HERE"
+
+	::={packetlogic2 2}
+channelCfg	OBJECT IDENTIFIER ::={channelstats 8}
+
+
+
+ChannelInfoEntry ::= SEQUENCE {
+	channelInternalMedia INTEGER,
+	channelExternalMedia INTEGER,
+	channelInternalNegotiatedMedia INTEGER,
+	channelExternalNegotiatedMedia INTEGER,
+	channelActive INTEGER,
+	channelName DisplayString,
+	channelInternalNegotiatedMediaTime Unsigned32,
+	channelexternalNegotiatedMediaTime Unsigned32,
+	channelInfoEntryIndex Integer32
+}
+
+channelInfoTable	OBJECT-TYPE
+	SYNTAX SEQUENCE OF ChannelInfoEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "Conceptual Table"
+	::= {channelstats 17}
+
+channelInfoEntry	OBJECT-TYPE
+	SYNTAX ChannelInfoEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "Conceptual Table"
+	INDEX { channelInfoEntryIndex }
+	::= {channelInfoTable 1}
+
+channelInfoEntryIndex	OBJECT-TYPE
+	SYNTAX Integer32 (1..2147483647)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "Unique Row Index for Conceptual Table"
+	::={channelInfoEntry 999}
+
+
+
+
+
+
+
+
+
+
+NetDeviceEntry ::= SEQUENCE {
+	channelRxPackets None,
+	channelTxPackets None,
+	channelRxBytes None,
+	channelTxBytes None,
+	channelRxErrors None,
+	channelTxErrors None,
+	channelRxDrops None,
+	channelTxDrops None,
+	channelCollisions None,
+	channelMulticast None,
+	channelRxLengthErrors None,
+	channelRxCrcErrors None,
+	channelRxFrameErrors None,
+	channelRxFifoErrors None,
+	channelRxMissedErrors None,
+	channelTxAborted None,
+	channelTxWindowErrors None,
+	channelTxCarrierErrors None,
+	netDeviceEntryIndex Integer32
+}
+
+netDeviceTable	OBJECT-TYPE
+	SYNTAX SEQUENCE OF NetDeviceEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "Conceptual Table"
+	::= {channelstats 25}
+
+netDeviceEntry	OBJECT-TYPE
+	SYNTAX NetDeviceEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "Conceptual Table"
+	INDEX { netDeviceEntryIndex }
+	::= {netDeviceTable 1}
+
+netDeviceEntryIndex	OBJECT-TYPE
+	SYNTAX Integer32 (1..2147483647)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "Unique Row Index for Conceptual Table"
+	::={netDeviceEntry 999}
+
+channelRxPackets	OBJECT IDENTIFIER ::={netDeviceEntry 1}
+
+
+
+channelTxPackets	OBJECT IDENTIFIER ::={netDeviceEntry 2}
+
+
+
+channelRxBytes	OBJECT IDENTIFIER ::={netDeviceEntry 3}
+
+
+
+channelTxBytes	OBJECT IDENTIFIER ::={netDeviceEntry 4}
+
+
+
+channelRxErrors	OBJECT IDENTIFIER ::={netDeviceEntry 5}
+
+
+
+channelTxErrors	OBJECT IDENTIFIER ::={netDeviceEntry 6}
+
+
+
+channelRxDrops	OBJECT IDENTIFIER ::={netDeviceEntry 7}
+
+
+
+channelTxDrops	OBJECT IDENTIFIER ::={netDeviceEntry 8}
+
+
+
+channelCollisions	OBJECT IDENTIFIER ::={netDeviceEntry 9}
+
+
+
+channelMulticast	OBJECT IDENTIFIER ::={netDeviceEntry 10}
+
+
+
+channelRxLengthErrors	OBJECT IDENTIFIER ::={netDeviceEntry 11}
+
+
+
+channelRxCrcErrors	OBJECT IDENTIFIER ::={netDeviceEntry 12}
+
+
+
+channelRxFrameErrors	OBJECT IDENTIFIER ::={netDeviceEntry 13}
+
+
+
+channelRxFifoErrors	OBJECT IDENTIFIER ::={netDeviceEntry 14}
+
+
+
+channelRxMissedErrors	OBJECT IDENTIFIER ::={netDeviceEntry 15}
+
+
+
+channelTxAborted	OBJECT IDENTIFIER ::={netDeviceEntry 16}
+
+
+
+channelTxWindowErrors	OBJECT IDENTIFIER ::={netDeviceEntry 17}
+
+
+
+channelTxCarrierErrors	OBJECT IDENTIFIER ::={netDeviceEntry 18}
+
+
+
+
+channelNumber	OBJECT-TYPE
+	SYNTAX	 Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Number of available channels in system"
+
+	::={channelCfg 1}
+
+channelInternalMedia	OBJECT-TYPE
+	SYNTAX INTEGER { auto(0), hd-10(1), fd-10(2), hd-100(3), fd-100(4), fd-1000(5), fd-10000(6) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "internal_media"
+
+	::={channelInfoEntry 1}
+
+channelExternalMedia	OBJECT-TYPE
+	SYNTAX INTEGER { auto(0), hd-10(1), fd-10(2), hd-100(3), fd-100(4), fd-1000(5), fd-10000(6) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "external_media"
+
+	::={channelInfoEntry 2}
+
+channelInternalNegotiatedMedia	OBJECT-TYPE
+	SYNTAX INTEGER { linkdown(0), hd10(1), fd10(2), hd100(3), fd100(4), fd1000(5), fd10000(6) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "internal_negotiated_media"
+
+	::={channelInfoEntry 3}
+
+channelExternalNegotiatedMedia	OBJECT-TYPE
+	SYNTAX INTEGER { linkdown(0), hd10(1), fd10(2), hd100(3), fd100(4), fd1000(5), fd10000(6) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "external_negotiated_media"
+
+	::={channelInfoEntry 4}
+
+channelActive	OBJECT-TYPE
+	SYNTAX INTEGER { inactive(0), active(1) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "active"
+
+	::={channelInfoEntry 5}
+
+channelName	OBJECT-TYPE
+	SYNTAX	 DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "active"
+
+	::={channelInfoEntry 6}
+
+channelInternalNegotiatedMediaTime	OBJECT-TYPE
+	SYNTAX	 Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "internal_negotiated_media_time"
+
+	::={channelInfoEntry 7}
+
+channelexternalNegotiatedMediaTime	OBJECT-TYPE
+	SYNTAX	 Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "external_negotiated_media_time"
+
+	::={channelInfoEntry 8}
+
+channelInternalRxPackets	OBJECT-TYPE
+	SYNTAX	 Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "RX packets"
+
+	::={channelRxPackets 1}
+
+channelExternalRxPackets	OBJECT-TYPE
+	SYNTAX	 Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "RX packets"
+
+	::={channelRxPackets 2}
+
+channelInternalTxPackets	OBJECT-TYPE
+	SYNTAX	 Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "TX packets"
+
+	::={channelTxPackets 1}
+
+channelExternalTxPackets	OBJECT-TYPE
+	SYNTAX	 Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "TX packets"
+
+	::={channelTxPackets 2}
+
+channelInternalRxBytes	OBJECT-TYPE
+	SYNTAX	 Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "RX speed"
+
+	::={channelRxBytes 1}
+
+channelExternalRxBytes	OBJECT-TYPE
+	SYNTAX	 Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "RX speed"
+
+	::={channelRxBytes 2}
+
+channelInternalTxBytes	OBJECT-TYPE
+	SYNTAX	 Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "TX speed"
+
+	::={channelTxBytes 1}
+
+channelExternalTxBytes	OBJECT-TYPE
+	SYNTAX	 Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "TX speed"
+
+	::={channelTxBytes 2}
+
+channelInternalRxErrors	OBJECT-TYPE
+	SYNTAX	 Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "RX errors"
+
+	::={channelRxErrors 1}
+
+channelExternalRxErrors	OBJECT-TYPE
+	SYNTAX	 Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "RX errors"
+
+	::={channelRxErrors 2}
+
+channelInternalTxErrors	OBJECT-TYPE
+	SYNTAX	 Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "TX errors"
+
+	::={channelTxErrors 1}
+
+channelExternalTxErrors	OBJECT-TYPE
+	SYNTAX	 Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "TX errors"
+
+	::={channelTxErrors 2}
+
+channelInternalRxDrops	OBJECT-TYPE
+	SYNTAX	 Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "RX drops"
+
+	::={channelRxDrops 1}
+
+channelExternalRxDrops	OBJECT-TYPE
+	SYNTAX	 Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "RX drops"
+
+	::={channelRxDrops 2}
+
+channelInternalTxDrops	OBJECT-TYPE
+	SYNTAX	 Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "TX drops"
+
+	::={channelTxDrops 1}
+
+channelExternalTxDrops	OBJECT-TYPE
+	SYNTAX	 Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "TX drops"
+
+	::={channelTxDrops 2}
+
+channelInternalCollisions	OBJECT-TYPE
+	SYNTAX	 Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Collisions"
+
+	::={channelCollisions 1}
+
+channelExternalCollisions	OBJECT-TYPE
+	SYNTAX	 Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Collisions"
+
+	::={channelCollisions 2}
+
+channelInternalMulticast	OBJECT-TYPE
+	SYNTAX	 Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Multicast packets"
+
+	::={channelMulticast 1}
+
+channelExternalMulticast	OBJECT-TYPE
+	SYNTAX	 Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Multicast packets"
+
+	::={channelMulticast 2}
+
+channelInternalRxLengthErrors	OBJECT-TYPE
+	SYNTAX	 Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "RX length errors"
+
+	::={channelRxLengthErrors 1}
+
+channelExternalRxLengthErrors	OBJECT-TYPE
+	SYNTAX	 Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "RX length errors"
+
+	::={channelRxLengthErrors 2}
+
+channelInternalRxCrcErrors	OBJECT-TYPE
+	SYNTAX	 Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "RX CRC errors"
+
+	::={channelRxCrcErrors 1}
+
+channelExternalRxCrcErrors	OBJECT-TYPE
+	SYNTAX	 Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "RX CRC errors"
+
+	::={channelRxCrcErrors 2}
+
+channelInternalRxFrameErrors	OBJECT-TYPE
+	SYNTAX	 Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "RX frame errors"
+
+	::={channelRxFrameErrors 1}
+
+channelExternalRxFrameErrors	OBJECT-TYPE
+	SYNTAX	 Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "RX frame errors"
+
+	::={channelRxFrameErrors 2}
+
+channelINternalRxFifoErrors	OBJECT-TYPE
+	SYNTAX	 Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "RX fifo errors"
+
+	::={channelRxFifoErrors 1}
+
+channelExternalRxFifoErrors	OBJECT-TYPE
+	SYNTAX	 Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "RX fifo errors"
+
+	::={channelRxFifoErrors 2}
+
+channelInternalRxMissedErrors	OBJECT-TYPE
+	SYNTAX	 Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "RX missed errors"
+
+	::={channelRxMissedErrors 1}
+
+channelExternalRxMissedErrors	OBJECT-TYPE
+	SYNTAX	 Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "RX missed errors"
+
+	::={channelRxMissedErrors 2}
+
+channelInternalTxAborted	OBJECT-TYPE
+	SYNTAX	 Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "TX aborted"
+
+	::={channelTxAborted 1}
+
+channelExternalTxAborted	OBJECT-TYPE
+	SYNTAX	 Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "TX aborted"
+
+	::={channelTxAborted 2}
+
+channelInternalTxWindowErrors	OBJECT-TYPE
+	SYNTAX	 Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "TX window errors"
+
+	::={channelTxWindowErrors 1}
+
+channelExternalTxWindowErrors	OBJECT-TYPE
+	SYNTAX	 Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "TX window errors"
+
+	::={channelTxWindowErrors 2}
+
+channelInternalTxCarrierErrors	OBJECT-TYPE
+	SYNTAX	 Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "TX carrier errors"
+
+	::={channelTxCarrierErrors 1}
+
+channelExternalTxCarrierErrors	OBJECT-TYPE
+	SYNTAX	 Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "TX carrier errors"
+
+	::={channelTxCarrierErrors 2}
+
+
+
+END

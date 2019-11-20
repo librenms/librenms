@@ -1,0 +1,315 @@
+--  *****************************************************************
+--  DLINKSW-IMPB-MIB.mib : IP-MAC-Port Binding MIB
+-- 
+--  Copyright (c) 2013 D-Link Corporation, all rights reserved.
+--   
+--  *****************************************************************
+
+DLINKSW-IMPB-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MacAddress,
+    TruthValue
+        FROM SNMPv2-TC
+    InetAddress,
+    InetAddressType
+        FROM INET-ADDRESS-MIB
+    ifIndex,
+    InterfaceIndexOrZero
+        FROM IF-MIB
+    VlanId
+        FROM Q-BRIDGE-MIB
+    dlinkIndustrialCommon
+        FROM DLINK-ID-REC-MIB;
+
+
+dlinkSwImpbMIB MODULE-IDENTITY
+    LAST-UPDATED    "201511060000Z"
+    ORGANIZATION    "D-Link Corp."
+    CONTACT-INFO
+            "        D-Link Corporation
+
+             Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                     Taipei City 114, Taiwan, R.O.C
+             Tel:     +886-2-66000123
+             E-mail: tsd@dlink.com.tw
+            "
+    DESCRIPTION
+        "The MIB module defines objects for IP-MAC-Port Binding feature."
+    
+    REVISION        "201511060000Z"
+    DESCRIPTION
+        "Correct groups name:
+         from 'digImpbClearViolationLogGroup' to 'dImpbClearViolationLogGroup'
+         from 'digImpbNotificationsGroup' to 'dImpbNotificationsGroup'
+         from 'digImpbConfigGroup' to 'dImpbConfigGroup'
+        "
+
+    REVISION        "201310160000Z"
+    DESCRIPTION
+        "Initial revision of this MIB module."
+    ::= { dlinkIndustrialCommon 22 }
+
+
+dImpbNotifications  OBJECT IDENTIFIER
+    ::= { dlinkSwImpbMIB 0 }
+
+dImpbObjects  OBJECT IDENTIFIER
+    ::= { dlinkSwImpbMIB 1 }
+
+dImpbConformance  OBJECT IDENTIFIER
+    ::= { dlinkSwImpbMIB 2 }
+
+-- -----------------------------------------------------------------------------
+dImpbNotifyInfo  OBJECT IDENTIFIER    ::= { dImpbObjects 1 }
+
+dImpbGlobalNotifyEnabled  OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION   
+        "Set to 'true' to enable global SNMP notification
+        for IP-MAC-Port Binding feature.  Setting the object to
+        'false' will disable SNMP notifications."
+    DEFVAL      { false }              
+    ::= { dImpbNotifyInfo 1}
+
+    dImpbViolationIpAddrType OBJECT-TYPE
+        SYNTAX          InetAddressType
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the type of the violation IP address."
+        ::= { dImpbNotifyInfo 2 }
+
+    dImpbViolationIpAddress OBJECT-TYPE
+        SYNTAX          InetAddress
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the IP address of the violation entry."
+        ::= { dImpbNotifyInfo 3 }
+
+dImpbIfConfigTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF DImpbIfConfigEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A table provides the mechanism to enable or disable
+        IP-MAC-Port Binding at each physical interface capable of
+        this feature.
+
+        For IPV4 network, IP-MAC-Port Binding must co-work with 
+        both IPv4 source guard and Dynamic ARP inspection are enabled.
+        For IPv6 network, IP-MAC-Port Binding must co-work with
+        both IPv6 source guard and ND inspection.
+        "
+    ::= { dImpbObjects 2 }
+
+dImpbIfConfigEntry OBJECT-TYPE
+    SYNTAX          DImpbIfConfigEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A row instance contains the configuration to enable
+        or disable IP-MAC-Port Binding as well as the configuration
+        of the filter type at each physical interface capable
+        of IP-MAC-Port Binding feature."
+    INDEX           { ifIndex } 
+    ::= { dImpbIfConfigTable 1 }
+
+DImpbIfConfigEntry ::= SEQUENCE {
+    dImpbIfBindMode INTEGER
+}
+
+dImpbIfBindMode OBJECT-TYPE
+    SYNTAX          INTEGER  {
+        disable(1),
+        strict(2),
+        loose(3)
+    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the IP-MAC-Port Binding access control applied
+        at this interface.
+
+        'disable' indicates that IP-MAC-Port Binding feature is disabled.
+
+        'strict' indicates performing strict-mode access control.
+
+        'loose' indicates to perform loose-mode access control.
+
+        For IPv6 network, IP-MAC-Port Binding must operate in strict mode,
+        otherwise IPv6 source guard and ND inspection cannot be enabled."
+    ::= { dImpbIfConfigEntry 1 }
+ 
+
+-- ---------------------------------------------------------------------------------------------
+dImpbViolationLogTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF DImpbViolationLogEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A table provides the information about the violation of IP-MAC-Port Binding."
+    ::= { dImpbObjects 3 }
+
+dImpbViolationLogEntry OBJECT-TYPE
+    SYNTAX          DImpbViolationLogEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A row instance contains the blocked entry of IP-MAC-Port Binding."
+    INDEX           {
+        ifIndex,
+        dImpbViolationVlan,
+        dImpbViolationMacAddress
+    } 
+    ::= { dImpbViolationLogTable 1 }
+
+DImpbViolationLogEntry ::= SEQUENCE {
+        dImpbViolationVlan         VlanId,
+        dImpbViolationMacAddress   MacAddress,
+        dImpbViolationAction       INTEGER
+}
+
+dImpbViolationVlan OBJECT-TYPE
+    SYNTAX          VlanId
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the VLAN of this entry." 
+    ::= { dImpbViolationLogEntry 1 }
+
+dImpbViolationMacAddress OBJECT-TYPE
+    SYNTAX          MacAddress
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the MAC address of this entry." 
+    ::= { dImpbViolationLogEntry 2 }
+
+dImpbViolationAction OBJECT-TYPE
+    SYNTAX          INTEGER {
+        clear(1),
+        noOp(2)
+    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object is used to remove a specific violation entry when set
+        to 'clear'.
+        No action is taken if this object is set to 'noOp'.
+        When read, the value 'noOp' is returned."
+     ::= { dImpbViolationLogEntry 99 }
+
+-- ---------------------------------------------------------------------------------------------
+dImpbClearObjects  OBJECT IDENTIFIER    ::= { dImpbObjects 4 }
+
+dImpbClearAllViolation OBJECT-TYPE
+    SYNTAX          INTEGER {
+        clear(1),
+        noOp(2)
+    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object is used to clear all violations of IP-MAC-Port Binding when set
+        to 'clear'.
+        No action is taken if this object is set to 'noOp'.
+        When read, the value 'noOp' is returned."
+     ::= { dImpbClearObjects 1 }
+
+dImpbClearViolationByIf OBJECT-TYPE
+    SYNTAX          InterfaceIndexOrZero
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the ifIndex on which all violations will be cleared.
+        
+        When read, the special value 0 is returned."
+     ::= { dImpbClearObjects 2 }
+
+-- Notifications
+    dImpbViolationTrap NOTIFICATION-TYPE
+        OBJECTS  { 
+            ifIndex, 
+            dImpbViolationIpAddrType, 
+            dImpbViolationIpAddress, 
+            dImpbViolationMacAddress,
+            dImpbViolationVlan
+        }
+        STATUS  current
+        DESCRIPTION
+            "The address violation notification is generated when IP-MAC-Port Binding
+            address violation is detected."
+        ::= { dImpbNotifications 1 }
+
+-- Conformance
+
+dImpbMIBCompliances  OBJECT IDENTIFIER
+    ::= { dImpbConformance 1 }
+
+dImpbMIBGroups  OBJECT IDENTIFIER
+    ::= { dImpbConformance 2 }
+
+
+dImpbMIBCompliance MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+        "The compliance statement for the DLINKSW-IMPB-MIB"
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+        dImpbConfigGroup,
+        dImpbNotificationsGroup
+    }
+          
+    GROUP           dImpbClearViolationLogGroup
+    DESCRIPTION
+        "This group is mandatory only for platforms which support
+        clearing violation of IP-MAC-Port Binding."
+
+    ::= { dImpbMIBCompliances 1 }
+
+-- Units of Conformance
+
+dImpbConfigGroup OBJECT-GROUP
+    OBJECTS         {
+        dImpbIfBindMode
+    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects which are used to configure
+        as well as show information regarding the IP-MAC-Port Binding."
+    ::= { dImpbMIBGroups 1 }
+
+dImpbClearViolationLogGroup OBJECT-GROUP
+    OBJECTS         {
+        dImpbViolationAction,
+        dImpbClearAllViolation,
+        dImpbClearViolationByIf
+    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects which are used to clear violation
+         information."
+    ::= { dImpbMIBGroups 2 }
+
+dImpbNotificationsGroup NOTIFICATION-GROUP
+    NOTIFICATIONS   { 
+                        dImpbViolationTrap
+                    }            
+    STATUS          current
+    DESCRIPTION
+        "The collection of objects provides IP-MAC-Port Binding notifications."           
+    ::= { dImpbMIBGroups 3 }
+
+END
+
+

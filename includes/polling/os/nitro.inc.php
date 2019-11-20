@@ -1,12 +1,12 @@
 <?php
 
-if ($device['sysObjectID'] == 'enterprises.23128.1000.1.1') {
+if ($device['sysObjectID'] == '.1.3.6.1.4.1.23128.1000.1.1') {
     $features = 'Enterprise Security Manager';
-} elseif ($device['sysObjectID'] == 'enterprises.23128.1000.3.1') {
+} elseif ($device['sysObjectID'] == '.1.3.6.1.4.1.23128.1000.3.1') {
     $features = 'Event Receiver';
-} elseif ($device['sysObjectID'] == 'enterprises.23128.1000.7.1') {
+} elseif ($device['sysObjectID'] == '.1.3.6.1.4.1.23128.1000.7.1') {
     $features = 'Enterprise Log Manager';
-} elseif ($device['sysObjectID'] == 'enterprises.23128.1000.11.1') {
+} elseif ($device['sysObjectID'] == '.1.3.6.1.4.1.23128.1000.11.1') {
     $features = 'Advanced Correlation Engine';
 } else {
     $features = 'Unknown';

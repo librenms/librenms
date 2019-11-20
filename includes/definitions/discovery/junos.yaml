@@ -1,0 +1,193 @@
+mib: JUNIPER-IFOPTICS-MIB:JNX-OPT-IF-EXT-MIB:IF-MIB:JUNIPER-MIB:JUNIPER-SRX5000-SPU-MONITORING-MIB:JUNIPER-ALARM-MIB:JUNIPER-VIRTUALCHASSIS-MIB
+modules:
+    processors:
+          data:
+              -
+                  oid: jnxOperatingEntry
+                  value: jnxOperatingCPU
+                  num_oid: '.1.3.6.1.4.1.2636.3.1.13.1.8.{{ $index }}'
+                  descr: jnxOperatingDescr
+                  skip_values:
+                    -
+                      oid: jnxOperatingBuffer
+                      op: '='
+                      value: 0
+              -
+                  oid: jnxJsSPUMonitoringObjectsEntry
+                  value: jnxJsSPUMonitoringCPUUsage
+                  num_oid: '.1.3.6.1.4.1.2636.3.39.1.12.1.1.1.4.{{ $index }}'
+                  descr: '{{ $jnxJsSPUMonitoringNodeDescr }}'
+    sensors:
+        pre-cache:
+            data:
+                - oid:
+                    - ifDescr
+                    - jnxFruName
+        chromatic_dispersion:
+            data:
+                -
+                    oid: jnxOpticsPMCurrentTable
+                    value: jnxPMCurChromaticDispersion
+                    num_oid: '.1.3.6.1.4.1.2636.3.71.1.2.1.1.1.{{ $index }}'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    descr: '{{ $ifDescr }} CD'
+                    index: 'jnxPMCurChromaticDispersion.{{ $index }}'
+        delay:
+            data:
+                -
+                    oid: jnxOpticsPMCurrentTable
+                    value: jnxPMCurDiffGroupDelay
+                    num_oid: '.1.3.6.1.4.1.2636.3.71.1.2.1.1.2.{{ $index }}'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    divisor: 1000000000000
+                    descr: '{{ $ifDescr }} DGD'
+                    index: 'jnxPMCurDiffGroupDelay.{{ $index }}'
+        dbm:
+            data:
+                -
+                    oid: jnxOpticsPMCurrentTable
+                    value: jnxPMCurRxInputPower
+                    num_oid: '.1.3.6.1.4.1.2636.3.71.1.2.1.1.8.{{ $index }}'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    divisor: 100
+                    descr: '{{ $ifDescr }} Rx Power'
+                    index: 'jnxPMCurRxInputPower.{{ $index }}'
+                -
+                    oid: jnxOpticsPMCurrentTable
+                    value: jnxPMCurTxOutputPower
+                    num_oid: '.1.3.6.1.4.1.2636.3.71.1.2.1.1.7.{{ $index }}'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    divisor: 100
+                    descr: '{{ $ifDescr }} Tx Power'
+                    index: 'jnxPMCurTxOutputPower.{{ $index }}'
+        quality_factor:
+            data:
+                -
+                    oid: jnxOpticsPMCurrentTable
+                    value: jnxPMCurQ
+                    num_oid: '.1.3.6.1.4.1.2636.3.71.1.2.1.1.5.{{ $index }}'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    divisor: 10
+                    descr: '{{ $ifDescr }} Q2-factor'
+                    index: 'jnxPMCurQ.{{ $index }}'
+        snr:
+            data:
+                -
+                    oid: jnxOpticsPMCurrentTable
+                    value: jnxPMCurSNR
+                    num_oid: '.1.3.6.1.4.1.2636.3.71.1.2.1.1.6.{{ $index }}'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    divisor: 10
+                    descr: '{{ $ifDescr }} electrical SNR'
+                    index: 'jnxPMCurSNR.{{ $index }}'
+        frequency:
+            data:
+                -
+                    oid: jnxOpticsPMCurrentTable
+                    value: jnxPMCurCarFreqOffset
+                    num_oid: '.1.3.6.1.4.1.2636.3.71.1.2.1.1.43.{{ $index }}'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    multiplier: 1000000
+                    descr: '{{ $ifDescr }} Carrier Freq Offset'
+                    index: 'jnxPMCurCarFreqOffset.{{ $index }}'
+        temperature:
+            data:
+                -
+                    oid: jnxOpticsPMCurrentTable
+                    value: jnxPMCurTemperature
+                    num_oid: '.1.3.6.1.4.1.2636.3.71.1.2.1.1.39.{{ $index }}'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    descr: '{{ $ifDescr }} Temperature'
+                    index: 'jnxPMCurTemperature.{{ $index }}'
+        current:
+            data:
+                -
+                    oid: jnxOpticsPMCurrentTable
+                    value: jnxPMCurTxLaserBiasCurrent
+                    num_oid: '.1.3.6.1.4.1.2636.3.71.1.2.1.1.35.{{ $index }}'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    divisor: 1000
+                    descr: '{{ $ifDescr }} Tx Bias'
+                    index: 'jnxPMCurTxLaserBiasCurrent.{{ $index }}'
+        count:
+            data:
+                -
+                    oid: jnxJsSPUMonitoringObjectsTable
+                    value: jnxJsSPUMonitoringCurrentFlowSession
+                    num_oid: '.1.3.6.1.4.1.2636.3.39.1.12.1.1.1.6.{{ $index }}'
+                    high_limit: jnxJsSPUMonitoringMaxFlowSession
+                    group: Sessions
+                    descr: 'Node {{ $jnxJsSPUMonitoringNodeIndex }} FPC {{ $jnxJsSPUMonitoringFPCIndex }} SPU {{ $jnxJsSPUMonitoringSPUIndex }} Flow Count'
+                    index: 'jnxJsSPUMonitoringCurrentFlowSession.{{ $index }}'
+                    skip_values:
+                     - 0
+                -
+                    oid: jnxJsSPUMonitoringObjectsTable
+                    value: jnxJsSPUMonitoringCurrentCPSession
+                    num_oid: '.1.3.6.1.4.1.2636.3.39.1.12.1.1.1.8.{{ $index }}'
+                    high_limit: jnxJsSPUMonitoringMaxCPSession
+                    group: Sessions
+                    descr: 'Node {{ $jnxJsSPUMonitoringNodeIndex }} FPC {{ $jnxJsSPUMonitoringFPCIndex }} SPU {{ $jnxJsSPUMonitoringSPUIndex }} CP Flow Count'
+                    index: 'jnxJsSPUMonitoringCurrentCPSession.{{ $index }}'
+                    skip_values:
+                     - 0
+        state:
+            data:
+                -
+                    oid: jnxYellowAlarmState
+                    value: jnxYellowAlarmState
+                    num_oid: '.1.3.6.1.4.1.2636.3.4.2.2.1.{{ $index }}'
+                    descr: 'Yellow Alarm'
+                    index: '{{ $index }}'
+                    states:
+                        - { value: 1, descr: unknown, graph: 1, generic: 3 }
+                        - { value: 2, descr: off, graph: 1, generic: 0 }
+                        - { value: 3, descr: on, graph: 1, generic: 2 }
+                -
+                    oid: jnxRedAlarmState
+                    value: jnxRedAlarmState
+                    num_oid: '.1.3.6.1.4.1.2636.3.4.2.3.1.{{ $index }}'
+                    descr: 'Red Alarm'
+                    index: '{{ $index }}'
+                    states:
+                        - { value: 1, descr: unknown, graph: 1, generic: 3 }
+                        - { value: 2, descr: off, graph: 1, generic: 0 }
+                        - { value: 3, descr: on, graph: 1, generic: 2 }
+                -
+                    oid: jnxFruState
+                    value: jnxFruState
+                    num_oid: '.1.3.6.1.4.1.2636.3.1.15.1.8.{{ $index }}'
+                    descr: '{{ $jnxFruName }}'
+                    skip_values: 2
+                    index: '{{ $index }}'
+                    states:
+                        - { value: 1, descr: unknown, graph: 1, generic: 3 }
+                        - { value: 2, descr: empty, graph: 1, generic: 3 }
+                        - { value: 3, descr: present, graph: 1, generic: 1 }
+                        - { value: 4, descr: ready, graph: 1, generic: 0 }
+                        - { value: 5, descr: announceOnline, graph: 1, generic: 0 }
+                        - { value: 6, descr: online, graph: 1, generic: 0 }
+                        - { value: 7, descr: anounceOffline, graph: 1, generic: 1 }
+                        - { value: 8, descr: offline, graph: 1, generic: 2 }
+                        - { value: 9, descr: diagnostic, graph: 1, generic: 3 }
+                        - { value: 10, descr: standby, graph: 1, generic: 3 }
+                -
+                    oid: jnxVirtualChassisMemberTable
+                    value: jnxVirtualChassisMemberRole
+                    num_oid: '.1.3.6.1.4.1.2636.3.40.1.4.1.1.1.3.{{ $index }}'
+                    descr: jnxVirtualChassisMemberSerialnumber
+                    group: Virtual Chassis Members
+                    index: 'jnxVirtualChassisMemberSerialnumber.{{ $index }}'
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: master }
+                        - { value: 2, generic: 0, graph: 0, descr: backup }
+                        - { value: 3, generic: 0, graph: 0, descr: linecard }

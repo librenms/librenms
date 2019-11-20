@@ -1,0 +1,202 @@
+-- This module defines enterprise MIBs for NS admin setting
+-- 
+-- Copyright (c) 1999-2004, Juniper Networks, Inc.
+-- All rights reserved.
+
+NETSCREEN-SET-ADMIN-USR-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    netscreenSetting, netscreenSettingMibModule
+        FROM NETSCREEN-SMI
+    Integer32, IpAddress, MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    ;
+
+netscreenSetAdminUsrMibModule MODULE-IDENTITY
+    LAST-UPDATED  "200405032022Z" -- May 03, 2004
+    ORGANIZATION
+        "Juniper Networks, Inc."
+    CONTACT-INFO
+        "Customer Support
+
+         1194 North Mathilda Avenue 
+         Sunnyvale, California 94089-1206
+         USA
+
+         Tel: 1-800-638-8296
+         E-mail: customerservice@juniper.net
+         HTTP://www.juniper.net"
+    DESCRIPTION
+        "This module defines the object that are used to monitor admin 
+         user"
+    REVISION      "200405030000Z" -- May 03, 2004
+    DESCRIPTION
+        "Modified copyright and contact information"
+    REVISION      "200403030000Z" -- March 03, 2004
+    DESCRIPTION
+        "Converted to SMIv2 by Longview Software"
+    REVISION      "200311100000Z" -- November 10, 2003
+    DESCRIPTION
+        "Correct spelling mistake"
+    REVISION      "200109280000Z" -- September 28, 2001
+    DESCRIPTION
+        "No Comment"
+    REVISION      "200105270000Z" -- May 27, 2001
+    DESCRIPTION
+        "Creation Date"
+    ::= { netscreenSettingMibModule 11 }
+
+NsSetAdminUserClientEntry ::= SEQUENCE
+{
+    nsAdminUserClientIndex   Integer32,
+    nsAdminUserClientIp      IpAddress,
+    nsAdminUserClientNetmask IpAddress,
+    nsAdminUserVSYS          Integer32 
+}
+
+NsSetAdminUserLocalEntry ::= SEQUENCE
+{
+    nsAdminUserLocalIndex Integer32,
+    nsAdminUserLocalName  DisplayString,
+    nsAdminUserLocalPriv  Integer32,
+    nsAdminUserLocalRole  Integer32
+}
+
+nsSetAdminUser OBJECT IDENTIFIER ::= { netscreenSetting 11 }
+
+nsSetAdminUserLocalTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF NsSetAdminUserLocalEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This table collects all administration user information stored
+         in  local user database."
+    ::= { nsSetAdminUser 1 }
+
+nsSetAdminUserLocalEntry OBJECT-TYPE
+    SYNTAX        NsSetAdminUserLocalEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Local database administration user attributes."
+    INDEX
+        { nsAdminUserLocalIndex }
+    ::= { nsSetAdminUserLocalTable 1 }
+
+nsAdminUserLocalIndex OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A unique value for user info table.  Its value ranges between
+         0 and 65535 and may not be contiguous."
+    ::= { nsSetAdminUserLocalEntry 1 }
+
+nsAdminUserLocalName OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Administration user name."
+    ::= { nsSetAdminUserLocalEntry 2 }
+
+nsAdminUserLocalPriv OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Administration user's privileges. The smaller the value,  the
+         higher the privileges."
+    ::= { nsSetAdminUserLocalEntry 3 }
+
+nsAdminUserLocalRole OBJECT-TYPE
+    SYNTAX  Integer32 {
+        not-assigned(0),
+        crypto(1),
+        security(2),
+        audit(4)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Administration user's role attributes." 
+    ::= { nsSetAdminUserLocalEntry 4 }
+
+nsAdminUserRadius OBJECT IDENTIFIER ::= { nsSetAdminUser 2 }
+
+nsAdminUserRadiusEnabled OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disabled(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Enable external radius server to authenticate admin user"
+    ::= { nsAdminUserRadius 1 }
+
+nsAdminUserRadiusServer OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "External radius server name"
+    ::= { nsAdminUserRadius 2 }
+
+nsSetAdminUserClientTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF NsSetAdminUserClientEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Management Client IP addresses is used to restrict the
+         administration  ability from one or multiple addresses of a
+         subnet."
+    ::= { nsSetAdminUser 3 }
+
+nsSetAdminUserClientEntry OBJECT-TYPE
+    SYNTAX        NsSetAdminUserClientEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry containing admin client ip information"
+    INDEX
+        { nsAdminUserClientIndex }
+    ::= { nsSetAdminUserClientTable 1 }
+
+nsAdminUserClientIndex OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A unique value for client ip table.  Its value ranges between
+         0 and 65535 and may not be contiguous."
+    ::= { nsSetAdminUserClientEntry 1 }
+
+nsAdminUserClientIp OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Management client ip"
+    ::= { nsSetAdminUserClientEntry 2 }
+
+nsAdminUserClientNetmask OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Management client ip netmask"
+    ::= { nsSetAdminUserClientEntry 3 }
+
+nsAdminUserVSYS OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Vsys ID of the admin user"
+    ::= { nsSetAdminUserClientEntry 4 }
+END
+
+

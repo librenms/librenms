@@ -1,0 +1,305 @@
+ARRIS-CMTS-FFT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    enterprises, MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, Integer32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, TruthValue
+        FROM SNMPv2-TC
+    OBJECT-GROUP, MODULE-COMPLIANCE
+        FROM SNMPv2-CONF
+    ifIndex
+        FROM IF-MIB
+    cmtsCommon
+        FROM ARRIS-MIB;
+
+    cmtsFftMIB  MODULE-IDENTITY
+        LAST-UPDATED "200402270000Z" -- 27th February 2004
+        ORGANIZATION "Arris International"
+        CONTACT-INFO
+            "   Network Management
+                Postal: Arris International.
+                        4400 Cork Airport Business Park
+                        Cork Airport, Kinsale Road
+                        Cork, Ireland.
+                Tel:    +353 21 7305 800
+                Fax:    +353 21 4321 972"
+
+        DESCRIPTION
+            "This MIB manages the FFT software on the Arris CMTS"
+        ::= { cmtsCommon 1 }
+
+    dcxFftObjects OBJECT IDENTIFIER ::= { cmtsFftMIB 1 }
+    
+    dcxFftUpstreamChannelTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF DcxFftUpstreamChannelEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Arris CMTS FFT upstream channel configuration table. An entry in this table
+                exists for each ifEntry with an ifType of docsCableUpstreamInterface (129)
+                that supports FFT collection and reporting."
+        ::= { dcxFftObjects 1 }
+        
+        
+        dcxFftUpstreamChannelEntry OBJECT-TYPE
+            SYNTAX     DcxFftUpstreamChannelEntry
+            MAX-ACCESS not-accessible
+            STATUS     current
+            DESCRIPTION
+                    "Arris FFT upstream channel entry."
+            INDEX { ifIndex }
+            ::= { dcxFftUpstreamChannelTable 1 }
+        
+            DcxFftUpstreamChannelEntry ::= SEQUENCE {
+            	dcxFftSize                     Unsigned32,
+                dcxFftSampleRate               INTEGER,
+                dcxFftCentreFrequency          Integer32,
+                dcxFftWindowing                INTEGER,
+                dcxFftLogAveragingTimeConstant Unsigned32,
+                dcxFftOutputFormat             INTEGER,
+                dcxFftOperatingMode            INTEGER,
+                dcxFftIdleInterval             Unsigned32,
+                dcxFftBurstSid                 Unsigned32,
+                dcxFftBurstIUC                 INTEGER,
+                dcxFftLogicalChannel           INTEGER,
+                dcxFftTriggerCount             Unsigned32,
+                dcxFftEnable                   TruthValue,
+                dcxFftApplyConfig              TruthValue,
+                dcxFftInProgress               TruthValue,
+                dcxFftCurrentTriggers          Unsigned32
+                }
+
+
+         
+            dcxFftSize   OBJECT-TYPE
+                SYNTAX      Unsigned32
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "Number of samples to be collected for FFT. Valid
+                    values are 256, 512, 1024, 2048. The FFT payload size
+                    will be the number of samples multiplied by the number
+                    of bytes per sample as determined by dcxFftOutputFormat.
+                    The duration of the FFT sample will be the number of samples
+                    divided by the sample rate as determined by dcxFftSampleRate."
+                DEFVAL { 2048 }
+                ::= { dcxFftUpstreamChannelEntry 1 }
+
+            dcxFftSampleRate   OBJECT-TYPE
+                SYNTAX      INTEGER { adcRate(1), halfAdcRate(2), quarterAdcRate(3), quadrupleSymbolRate(4) }
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "FFT sample rate based on the input source to the FFT. The input to the FFT
+                    can be the ADC output, the ADC output followed by a down-mixer and half-band
+                    filter, the ADC output followed by a down-mixer and quarter-band filter, or
+                    the received channel's Nyquist filter output."
+                DEFVAL { halfAdcRate }
+                ::= { dcxFftUpstreamChannelEntry 2 }
+
+            dcxFftCentreFrequency   OBJECT-TYPE
+                SYNTAX      Integer32
+                UNITS       "hertz"
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "FFT centre frequency. This object is used only if dcxFftSampleRate is set
+                    to halfAdcRate or quarterAdcRate to set the down-mixer frequency."
+                DEFVAL { 40960000 }
+                ::= { dcxFftUpstreamChannelEntry 3 }
+
+            dcxFftWindowing   OBJECT-TYPE
+                SYNTAX      INTEGER { rectangular(1), hanning(2), hamming(3), blackman(4), blackmanHarris(5) }
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "Set the frequency-domain windowing filter."
+                DEFVAL { blackmanHarris }
+                ::= { dcxFftUpstreamChannelEntry 4 }
+
+            dcxFftLogAveragingTimeConstant  OBJECT-TYPE
+                SYNTAX      Unsigned32 (0..7)
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "Time averaging constant exponent, M. Constant is
+                    2^M. Setting this object to zero disables averaging."
+                DEFVAL { 0 }
+                ::= { dcxFftUpstreamChannelEntry 5 }
+
+            dcxFftOutputFormat  OBJECT-TYPE
+                SYNTAX      INTEGER { raw(1), fftIQ(2), fftPower(3), fftAmplitude(4) }
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "FFT processor output format. Format can be i. raw complex
+                    time-domain I/Q format ii. FFT data in I/Q format iii. FFT
+                    data in power format iv. FFT data in amplitude format. The 
+                    sample sizes are 4 bytes (i. - iii.) and 2 bytes (iv.)"
+                DEFVAL { fftAmplitude }
+                ::= { dcxFftUpstreamChannelEntry 6 }
+
+            dcxFftOperatingMode  OBJECT-TYPE
+                SYNTAX      INTEGER { baseSpectrum(1), burstSpectrum(2), periodicSpectrum(3) }
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "Operating mode of FFT process. Determines whether
+                    the FFT measurement takes place while no CMs are 
+                    transmitting (measuring noise floor), during a CM
+                    burst, or by periodically sampling the spectrum
+                    without regard to scheduling of the upstream."
+                DEFVAL { baseSpectrum }
+                ::= { dcxFftUpstreamChannelEntry 7 }
+        
+            dcxFftIdleInterval  OBJECT-TYPE
+                SYNTAX      Unsigned32
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "Interval in microseconds between consecutive FFT
+                    triggers when dcxFftOperatingMode is baseSpectrum
+                    or periodicSpectrum. This object is not used if
+                    dcxFftOperatingMode is set to burstSpectrum or if
+                    dcxFftTriggerCount is 1."
+                DEFVAL { 50000 }
+                ::= { dcxFftUpstreamChannelEntry 8 }
+            
+            dcxFftBurstSid  OBJECT-TYPE
+                SYNTAX      Unsigned32 (0..16383)
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "SID on which to trigger the FFT process. This 
+                    object is used only if dcxFftOperatingMode is set 
+                    to burstSpectrum."
+                DEFVAL { 1 }
+                ::= { dcxFftUpstreamChannelEntry 9 }
+        
+            dcxFftBurstIUC  OBJECT-TYPE
+                SYNTAX      INTEGER (0..15)
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "IUC type on which to trigger the FFT process. This 
+                    object is used only if dcxFftOperatingMode is set 
+                    to burstSpectrum or periodicSpectrum. A value of 0
+                    means trigger on any IUC type."
+                DEFVAL { 0 }
+                ::= { dcxFftUpstreamChannelEntry 10 }
+        
+            dcxFftLogicalChannel  OBJECT-TYPE
+                SYNTAX      INTEGER (-1..3)
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "Logical channel on which to trigger the FFT process.
+                    This object is used only if dcxFftOperatingMode is
+                    set to periodicSpectrum. A value of -1 means trigger
+                    on any logical channel."
+                DEFVAL { -1 }
+            ::= { dcxFftUpstreamChannelEntry 11 }
+        
+            dcxFftTriggerCount  OBJECT-TYPE
+                SYNTAX      Unsigned32
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "Number of times to trigger FFT when dcxFftEnable and
+                    dcxFftApplyConfig are set to true. Set this object to
+                    zero to trigger FFT continuously."
+                DEFVAL { 0 }
+                ::= { dcxFftUpstreamChannelEntry 12 }
+            
+            dcxFftEnable   OBJECT-TYPE
+                SYNTAX      TruthValue
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "Set to true to enable FFT on this channel. Set to false to 
+                    disable. Setting will take effect when dcxFftApplyConfig is 
+                    set to true"
+                DEFVAL { false }
+                ::= { dcxFftUpstreamChannelEntry 13 }
+                
+            dcxFftApplyConfig   OBJECT-TYPE
+                SYNTAX      TruthValue
+                MAX-ACCESS  read-write
+                STATUS      current
+                DESCRIPTION
+                    "Set to true to trigger an FFT process with configuration 
+                    determined by the other objects in this group. An SNMP GET 
+                    of this object will always return false"
+                ::= { dcxFftUpstreamChannelEntry 14 }
+        
+            dcxFftInProgress   OBJECT-TYPE
+                SYNTAX      TruthValue
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "This object will return true if an FFT process is currently
+                    in progress (having been started by a SET to dcxFftApplyConfig)
+                    for this upstream channel. Returns false otherwise"
+                ::= { dcxFftUpstreamChannelEntry 15 }
+        
+            dcxFftCurrentTriggers   OBJECT-TYPE
+                SYNTAX      Unsigned32
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                    "Number of FFT triggers since the last FFT process was
+                    started."
+                ::= { dcxFftUpstreamChannelEntry 16 }
+
+
+
+    DcxFftPayloadBuffer ::= TEXTUAL-CONVENTION
+        STATUS    current
+        DESCRIPTION
+            "A buffer that contains upstream FFT payload data."
+        SYNTAX    OCTET STRING (SIZE (0..256))
+    
+    dcxFftPayloadTable OBJECT-TYPE
+            SYNTAX     SEQUENCE OF DcxFftPayloadEntry
+            MAX-ACCESS not-accessible
+            STATUS     current
+            DESCRIPTION
+                "Arris CMTS FFT upstream channel payload table."
+            ::= { dcxFftObjects 2 }
+
+        dcxFftPayloadEntry OBJECT-TYPE
+                SYNTAX     DcxFftPayloadEntry
+                MAX-ACCESS not-accessible
+                STATUS     current
+                DESCRIPTION
+                    "Arris CMTS FFT upstream channel payload entry. Multiple entries in this 
+                    table exist for each ifEntry with an ifType of 
+                    docsCableUpstreamInterface (129) that supports the FFT collection and
+                    currently has FFT data to report."
+                INDEX { ifIndex, dcxFftPayloadIndex }
+                ::= { dcxFftPayloadTable 1 }
+
+            DcxFftPayloadEntry ::= SEQUENCE {
+                dcxFftPayloadIndex      Unsigned32,
+                dcxFftPayloadData       DcxFftPayloadBuffer
+                }
+            
+                dcxFftPayloadIndex OBJECT-TYPE
+                    SYNTAX Unsigned32 
+                    MAX-ACCESS not-accessible
+                    STATUS current
+                    DESCRIPTION
+                        "An identifier for the 256-byte buffer available
+                        at the dcxFftPayloadData object."
+                    ::=  { dcxFftPayloadEntry 1 }
+
+                dcxFftPayloadData OBJECT-TYPE
+                    SYNTAX DcxFftPayloadBuffer 
+                    MAX-ACCESS read-only
+                    STATUS current
+                    DESCRIPTION
+                        "The FFT payload data in the buffer identified by
+                        dcxFftPayloadIndex."
+                    ::=  { dcxFftPayloadEntry 2 }
+
+END

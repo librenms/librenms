@@ -1,0 +1,266 @@
+ZYXEL-ZYWALL-ZLD-COMMON-MIB DEFINITIONS ::= BEGIN
+	IMPORTS
+		enterprises
+			FROM RFC1155-SMI
+		OBJECT-TYPE
+			FROM RFC-1212
+		DisplayString
+			FROM RFC1213-MIB
+		TRAP-TYPE
+			FROM RFC-1215
+		NOTIFICATION-TYPE
+			FROM SNMPv2-SMI
+		zywallZLDCommon
+			FROM ZYXEL-MIB;
+
+	-- ZyWALL ZLD Key Groups
+	zldSystem		OBJECT IDENTIFIER ::= { zywallZLDCommon 1 }
+	zldIpSecVPN		OBJECT IDENTIFIER ::= { zywallZLDCommon 2 }
+
+	-- ZyWALL ZLD System
+	sysCPUUsage OBJECT-TYPE
+		SYNTAX  INTEGER
+		MAX-ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"Device CPU load."
+		::= { zldSystem 1 }
+
+	sysRAMUsage OBJECT-TYPE
+		SYNTAX  INTEGER
+		MAX-ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"Device RAM Usage."
+		::= { zldSystem 2 }
+
+	sysCPU5SecUsage OBJECT-TYPE
+		SYNTAX  INTEGER
+		MAX-ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"Average of past 5 secs cpu load."
+		::= { zldSystem 3 }
+		
+	sysCPU1MinUsage OBJECT-TYPE
+		SYNTAX  INTEGER
+		MAX-ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"Average of past 1 min cpu load."
+		::= { zldSystem 4 }
+		
+	sysCPU5MinUsage OBJECT-TYPE
+		SYNTAX  INTEGER
+		MAX-ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"Average of past 5 min cpu load."
+		::= { zldSystem 5 }
+		
+	sysSessionNum OBJECT-TYPE
+		SYNTAX  INTEGER
+		MAX-ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"Device Session Num."
+		::= { zldSystem 6 }
+
+	sysFLASHUsage OBJECT-TYPE
+		SYNTAX  INTEGER
+		MAX-ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"Device FLASH Usage."
+		::= { zldSystem 7 }
+		
+	-- ZyWALL ZLD IpSec VPN
+	vpnIpSecTotalThroughput	OBJECT-TYPE
+		SYNTAX	INTEGER
+		MAX-ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"The VPN total throughput(B/s)."
+		::= { zldIpSecVPN 1 }
+
+	vpnTunnelTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF VPNTunnelEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"A list of VPN tunnel entries. The number depends on product 
+			definition."
+		::= { zldIpSecVPN 2 }
+	
+	vpnTunnelEntry OBJECT-TYPE
+		SYNTAX  VPNTunnelEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+        		"An entry containing comment the information for on a particular 
+                         configured VPN tunnel."
+		INDEX   { vpnTunnelIndex }
+		::= { vpnTunnelTable 1 }
+	
+	VPNTunnelEntry ::= SEQUENCE {
+		vpnTunnelName 	DisplayString,
+		vpnIKEName  	DisplayString,
+		vpnTunnelSPI	DisplayString
+		}
+	
+	vpnTunnelName OBJECT-TYPE
+		SYNTAX	DisplayString
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+     			"The name of VPN tunnel."
+		::= { vpnTunnelEntry 1 }
+
+	vpnIKEName OBJECT-TYPE
+		SYNTAX	DisplayString
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"The name of IKE tunnel."
+		::= { vpnTunnelEntry 2 }
+
+	vpnTunnelSPI OBJECT-TYPE
+		SYNTAX 	DisplayString
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"The security parameter index associated with a VPN tunnel."
+                ::= { vpnTunnelEntry 3 }
+
+	vpnTunnelDisconnected NOTIFICATION-TYPE
+		OBJECTS {vpnTunnelName, vpnIKEName, 
+                         vpnTunnelSPI }
+		STATUS	current
+		DESCRIPTION
+			"The trap indicates that the specified tunnel is disconnected."
+		::= { zldIpSecVPN 3 }
+
+	vpnStatus OBJECT-TYPE
+		SYNTAX  SEQUENCE OF vpnStatusEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"A list of VPN tunnel entries. The number depends on product 
+			definition."
+		::= { zldIpSecVPN 4 }
+
+	vpnStatusEntry OBJECT-TYPE
+		SYNTAX  VPNStatusEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+        		"An entry containing comment the information for on a particular 
+                         configured VPN tunnel."
+		INDEX   { vpnIndex }
+		::= { vpnStatus 1 }
+	
+	VPNStatusEntry ::= SEQUENCE {
+		vpnIndex			Integer,
+		vpnConnectionName 	DisplayString,
+		vpnGateway  		DisplayString,
+		vpnIPVersion		DisplayString,
+		vpnActiveStatus 	Integer,
+		vpnConnectStatus	Integer
+		}
+
+	vpnIndex OBJECT-TYPE
+		SYNTAX	Integer
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+     			"The table index of VPN connection."
+		::= { vpnStatusEntry 1 }
+
+	vpnConnectionName OBJECT-TYPE
+		SYNTAX	DisplayString
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+     			"The name of VPN connection."
+		::= { vpnStatusEntry 2 }
+
+	vpnGateway OBJECT-TYPE
+		SYNTAX	DisplayString
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+     			"The name of VPN gateway."
+		::= { vpnStatusEntry 3 }
+
+	vpnIPVersion OBJECT-TYPE
+		SYNTAX	DisplayString
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+     			"IP version of the VPN connection: either IPv4 or IPv6."
+		::= { vpnStatusEntry 4 }
+
+	vpnActiveStatus OBJECT-TYPE
+		SYNTAX	Integer {
+		          Inactive(0),
+		          Active(1)
+		        }
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+     			"Activation status of VPN connection."
+		::= { vpnStatusEntry 5 }
+
+	vpnConnectStatus OBJECT-TYPE
+		SYNTAX	Integer {
+		          Disconnected(0),
+		          Connected(1)
+		        }
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+     			"Connection status of VPN connection."
+		::= { vpnStatusEntry 6 }
+
+	vpnConnectionCounter OBJECT-TYPE
+		SYNTAX  Integer
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"A list of VPN connection counters." 
+		::= { zldIpSecVPN 5 }
+
+	vpnConnectionTotal OBJECT-TYPE
+		SYNTAX	Counter
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+     			"Total number of VPN connection configured."
+		::= { vpnConnectionCounter 1 }
+
+	vpnConnectionActive OBJECT-TYPE
+		SYNTAX	Counter
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+     			"Number of activated VPN connection."
+		::= { vpnConnectionCounter 2 }
+
+	vpnConnectionConnected OBJECT-TYPE
+		SYNTAX	Counter
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+     			"Number of connected VPN connection."
+		::= { vpnConnectionCounter 3 }
+
+	vpnConnectionDisconnected OBJECT-TYPE
+		SYNTAX	Counter
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+     			"Number of disconnected VPN connection. The
+     			value is equal to vpnConnectionActive minus
+     			vpnConnectionConnected."
+		::= { vpnConnectionCounter 4 }
+END

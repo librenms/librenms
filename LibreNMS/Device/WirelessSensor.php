@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Device;
 
+use LibreNMS\Config;
 use LibreNMS\OS;
 
 class WirelessSensor extends Sensor
@@ -103,9 +104,13 @@ class WirelessSensor extends Sensor
         return $sensor;
     }
 
-    public static function discover(OS $os)
+    public static function runDiscovery(OS $os)
     {
-        foreach (self::getTypes() as $type => $descr) {
+        $types = array_keys(self::getTypes());
+        $submodules = Config::get('discovery_submodules.wireless', $types);
+        $types = array_intersect($types, $submodules);
+
+        foreach ($types as $type) {
             static::discoverType($os, $type);
         }
     }
@@ -124,106 +129,77 @@ class WirelessSensor extends Sensor
      */
     public static function getTypes($valid = false, $device_id = null)
     {
-        // Add new types here
+        // Add new types here translations/descriptions/units in resources/lang/<lang>/wireless.php
         // FIXME I'm really bad with icons, someone please help!
-        static $types = array(
-            'ap-count' => array(
-                'short' => 'APs',
-                'long' => 'AP Count',
-                'unit' => '',
+        static $types = [
+            'ap-count' => [
                 'icon' => 'wifi',
-            ),
-            'clients' => array(
-                'short' => 'Clients',
-                'long' => 'Client Count',
-                'unit' => '',
+            ],
+            'clients' => [
                 'icon' => 'tablet',
-            ),
-            'quality' => array(
-                'short' => 'Quality',
-                'long' => 'Quality',
-                'unit' => '%',
+            ],
+            'quality' => [
                 'icon' => 'feed',
-            ),
-            'capacity' => array(
-                'short' => 'Capacity',
-                'long' => 'Capacity',
-                'unit' => '%',
+            ],
+            'capacity' => [
                 'icon' => 'feed',
-            ),
-            'utilization' => array(
-                'short' => 'Utilization',
-                'long' => 'utilization',
-                'unit' => '%',
+            ],
+            'utilization' => [
                 'icon' => 'percent',
-            ),
-            'rate' => array(
-                'short' => 'Rate',
-                'long' => 'TX/RX Rate',
-                'unit' => 'bps',
+            ],
+            'rate' => [
                 'icon' => 'tachometer',
-            ),
-            'ccq' => array(
-                'short' => 'CCQ',
-                'long' => 'Client Connection Quality',
-                'unit' => '%',
+            ],
+            'ccq' => [
                 'icon' => 'wifi',
-            ),
-            'snr' => array(
-                'short' => 'SNR',
-                'long' => 'Signal-to-Noise Ratio',
-                'unit' => 'dB',
+            ],
+            'snr' => [
                 'icon' => 'signal',
-            ),
-            'mse' => array(
-                'short' => 'MSE',
-                'long' => 'Mean Square Error',
-                'unit' => 'dB',
+            ],
+            'sinr' => [
                 'icon' => 'signal',
-            ),
-            'rssi' => array(
-                'short' => 'RSSI',
-                'long' => 'Received Signal Strength Indicator',
-                'unit' => 'dBm',
+            ],
+            'rsrp' => [
                 'icon' => 'signal',
-            ),
-            'power' => array(
-                'short' => 'Power/Signal',
-                'long' => 'TX/RX Power or Signal',
-                'unit' => 'dBm',
+            ],
+            'rsrq' => [
+                'icon' => 'signal',
+            ],
+            'ssr' => [
+                'icon' => 'signal',
+            ],
+            'mse' => [
+                'icon' => 'signal',
+            ],
+            'xpi' => [
+                'icon' => 'signal',
+            ],
+            'rssi' => [
+                'icon' => 'signal',
+            ],
+            'power' => [
                 'icon' => 'bolt',
-            ),
-            'noise-floor' => array(
-                'short' => 'Noise Floor',
-                'long' => 'Noise Floor',
-                'unit' => 'dBm/Hz',
+            ],
+            'noise-floor' => [
                 'icon' => 'signal',
-            ),
-            'error-ratio' => array(
-                'short' => 'Error Ratio',
-                'long' => 'Bit/Packet Error Ratio',
-                'unit' => '%',
+            ],
+            'errors' => [
                 'icon' => 'exclamation-triangle',
-            ),
-            'error-rate' => array(
-                'short' => 'BER',
-                'long' => 'Bit Error Rate',
-                'unit' => 'bps',
+                'type' => 'counter',
+            ],
+            'error-ratio' => [
                 'icon' => 'exclamation-triangle',
-            ),
-            'frequency' => array(
-                'short' => 'Frequency',
-                'long' => 'Frequency',
-                'unit' => 'MHz',
+            ],
+            'error-rate' => [
+                'icon' => 'exclamation-triangle',
+            ],
+            'frequency' => [
                 'icon' => 'line-chart',
-            ),
-            'distance' => array(
-                'short' => 'Distance',
-                'long' => 'Distance',
-                'unit' => 'km',
+            ],
+            'distance' => [
                 'icon' => 'space-shuttle',
-            ),
-        );
+            ],
+        ];
 
         if ($valid) {
             $sql = 'SELECT `sensor_class` FROM `wireless_sensors`';
@@ -311,6 +287,7 @@ class WirelessSensor extends Sensor
             153 => 5765,
             157 => 5785,
             161 => 5805,
+            165 => 5825,
         );
 
         return $channels[$channel];

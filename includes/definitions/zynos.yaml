@@ -3,11 +3,17 @@ text: 'ZyXEL Ethernet Switch'
 group: zyxel
 type: network
 icon: zyxel
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
 discovery:
     -
-      sysObjectId: .1.3.6.1.4.1.890
+      sysObjectID: .1.3.6.1.4.1.890
       sysDescr_regex:
         - '/^ES/'
         - '/^GS/'
         - '/^MES/'
+        - '/^MGS/'
         - '/^XS/'
+        - '/^XGS/'

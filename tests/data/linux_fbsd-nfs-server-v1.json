@@ -1,0 +1,207 @@
+{
+"applications": {
+    "discovery": {
+        "applications": [ {
+            "app_type": "fbsd-nfs-server",
+            "app_state": "UNKNOWN",
+            "discovered": "1",
+            "app_state_prev": null,
+            "app_status": "",
+            "app_instance": ""
+        } ],
+        "application_metrics": []
+    },
+    "poller": {
+        "applications": [ {
+            "app_type": "fbsd-nfs-server",
+            "app_state": "OK",
+            "discovered": "1",
+            "app_state_prev": "UNKNOWN",
+            "app_status": "",
+            "app_instance": ""
+        } ],
+        "application_metrics": [
+            {
+                "metric": "Access",
+                "value": "2756963",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-server"
+            },
+            {
+                "metric": "Commit",
+                "value": "226823",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-server"
+            },
+            {
+                "metric": "Create",
+                "value": "0",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-server"
+            },
+            {
+                "metric": "Faults",
+                "value": "0",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-server"
+            },
+            {
+                "metric": "Fsinfo",
+                "value": "0",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-server"
+            },
+            {
+                "metric": "Fsstat",
+                "value": "108431",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-server"
+            },
+            {
+                "metric": "Getattr",
+                "value": "2131314",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-server"
+            },
+            {
+                "metric": "Idem",
+                "value": "0",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-server"
+            },
+            {
+                "metric": "Inprog",
+                "value": "0",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-server"
+            },
+            {
+                "metric": "Link",
+                "value": "1250",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-server"
+            },
+            {
+                "metric": "Lookup",
+                "value": "6062252",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-server"
+            },
+            {
+                "metric": "Misses",
+                "value": "20162662",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-server"
+            },
+            {
+                "metric": "Mkdir",
+                "value": "0",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-server"
+            },
+            {
+                "metric": "Mknod",
+                "value": "0",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-server"
+            },
+            {
+                "metric": "Nonidem",
+                "value": "0",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-server"
+            },
+            {
+                "metric": "Opsaved",
+                "value": "0",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-server"
+            },
+            {
+                "metric": "PathConf",
+                "value": "12",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-server"
+            },
+            {
+                "metric": "RdirPlus",
+                "value": "0",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-server"
+            },
+            {
+                "metric": "Read",
+                "value": "8043676",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-server"
+            },
+            {
+                "metric": "Readdir",
+                "value": "221801",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-server"
+            },
+            {
+                "metric": "Readlink",
+                "value": "394",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-server"
+            },
+            {
+                "metric": "Remove",
+                "value": "32375",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-server"
+            },
+            {
+                "metric": "Rename",
+                "value": "31097",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-server"
+            },
+            {
+                "metric": "RetFailed",
+                "value": "0",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-server"
+            },
+            {
+                "metric": "Rmdir",
+                "value": "0",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-server"
+            },
+            {
+                "metric": "Setattr",
+                "value": "43045",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-server"
+            },
+            {
+                "metric": "Symlink",
+                "value": "24",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-server"
+            },
+            {
+                "metric": "Write",
+                "value": "464478",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-server"
+            },
+            {
+                "metric": "WriteOps",
+                "value": "464478",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-server"
+            },
+            {
+                "metric": "WriteRPC",
+                "value": "464478",
+                "value_prev": null,
+                "app_type": "fbsd-nfs-server"
+            }
+        ]
+    }
+}
+}

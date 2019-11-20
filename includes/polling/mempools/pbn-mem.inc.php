@@ -7,7 +7,7 @@ preg_match('/^.* Build (?<build>\d+)/', $device['version'], $version);
 d_echo($version);
 
 // specified MIB supported since build 16607
-if ($version[build] >= 16607) {
+if ($version['build'] >= 16607) {
     $perc = snmp_get($device, 'nmsMemoryPoolUtilization.0', '-OUvQ', 'NMS-MEMORY-POOL-MIB', 'pbn');
     $memory_available = snmp_get($device, 'nmsMemoryPoolTotalMemorySize.0', '-OUvQ', 'NMS-MEMORY-POOL-MIB', 'pbn');
     $mempool['total'] = $memory_available;

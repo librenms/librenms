@@ -11,5 +11,6 @@
  */
 
 $hardware = trim(snmp_get($device, 'partNumber.0', '-Ovq', 'EATON-EPDU-MIB'), '"');
-$version = trim(snmp_get($device, 'firmwareVersion.0', '-Ovq', 'EATON-EPDU-MIB'), '"');
-$serial = trim(snmp_get($device, 'serialNumber.0', '-Ovq', 'EATON-EPDU-MIB'), '"');
+$hardware .= trim(snmp_get($device, 'objectName.0', '-Ovq', 'PDU-MIB'), '"');
+$version = trim(snmp_get($device, 'firmwareVersion.0', '-Ovq', 'EATON-EPDU-MIB:PDU-MIB'), '"');
+$serial = trim(snmp_get($device, 'serialNumber.0', '-Ovq', 'EATON-EPDU-MIB:PDU-MIB'), '"');

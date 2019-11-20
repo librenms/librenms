@@ -1,0 +1,130 @@
+mib: KELVIN-pCOWeb-Chiller-MIB
+modules:
+    sensors:
+        waterflow:
+            data:
+                -
+                    oid: flow-value.0
+                    value: flow-value
+                    divisor: 10
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.2.73.{{ $index }}'
+                    descr: Water Flow Rate
+                    index: 'flow-value.{{ $index }}'
+        eer:
+            data:
+                -
+                    oid: analogObjects.120
+                    value: analogObjects
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.3.{{ $index }}'
+                    descr: Energy Efficiency Ratio
+                    index: 'analogObjects.{{ $index }}'
+        power:
+            data:
+                -
+                    oid: analogObjects.103
+                    value: analogObjects
+                    multiplier: 100
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.2.{{ $index }}'
+                    descr: Power Consumption
+                    index: 'analogObjects.{{ $index }}'
+        current:
+            data:
+                -
+                    oid: amp-value.0
+                    value: amp-value
+                    divisor: 10
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.2.74.{{ $index }}'
+                    descr: Current Consumption
+                    index: 'amp-value.{{ $index }}'
+        temperature:
+            data:
+                -
+                    oid: analogObjects.140
+                    value: analogObjects
+                    divisor: 10
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.2.{{ $index }}'
+                    descr: Temperature Ambient
+                    index: 'analogObjects.{{ $index }}'
+                -
+                    oid: analogObjects.137
+                    value: analogObjects
+                    divisor: 10
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.2.{{ $index }}'
+                    descr: Temperature Out
+                    index: 'analogObjects.{{ $index }}'
+                -
+                    oid: analogObjects.136
+                    value: analogObjects
+                    divisor: 10
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.2.{{ $index }}'
+                    descr: Temperature In
+                    index: 'analogObjects.{{ $index }}'
+        cooling:
+            data:
+                -
+                    oid: cooling-capacity.0
+                    value: cooling-capacity
+                    multiplier: 100
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.2.100.{{ $index }}'
+                    descr: Free Cooling Capacity
+                    index: 'cooling-capacity.{{ $index }}'
+                -
+                    oid: freecooling-capacity.0
+                    value: freecooling-capacity
+                    multiplier: 100
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.2.101.{{ $index }}'
+                    descr: Compressor Cooling Capacity
+                    index: 'freecooling-capacity.{{ $index }}'
+                -
+                    oid: total-capacity.0
+                    value: total-capacity
+                    multiplier: 100
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.2.102.{{ $index }}'
+                    descr: Total cooling Capacity
+                    index: 'total-capacity.{{ $index }}'
+        humidity:
+            data:
+                -
+                    oid: pp1.0
+                    value: pp1
+                    divisor: 10
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.2.90.{{ $index }}'
+                    descr: Hydraulic Pump 1 Speed
+                    index: 'pp1.{{ $index }}'
+                -
+                    oid: pp2.0
+                    value: pp2
+                    divisor: 10
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.2.91.{{ $index }}'
+                    descr: Hydraulic Pump 2 Speed
+                    index: 'pp2.{{ $index }}'
+        pressure:
+            data:
+                -
+                    oid: analogObjects.138
+                    value: analogObjects
+                    multiplier: 10
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.2.{{ $index }}'
+                    descr: Hydraulic Pressure (Suction)
+                    index: 'analogObjects.{{ $index }}'
+                -
+                    oid: analogObjects.133
+                    value: analogObjects
+                    multiplier: 10
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.2.{{ $index }}'
+                    descr: Hydraulic Pressure (Discharge)
+                    index: 'analogObjects.{{ $index }}'
+                -
+                    oid: pressione1.0
+                    value: pressione1
+                    multiplier: 10
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.2.77.{{ $index }}'
+                    descr: Condensation Pressure 1
+                    index: 'pressione1.{{ $index }}'
+                -
+                    oid: pressione2.0
+                    value: pressione2
+                    multiplier: 10
+                    num_oid: '.1.3.6.1.4.1.9839.2.1.2.78.{{ $index }}'
+                    descr: Condensation Pressure 2
+                    index: 'pressione2.{{ $index }}'

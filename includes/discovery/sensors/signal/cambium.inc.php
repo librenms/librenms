@@ -1,17 +1,15 @@
 <?php
 
-$cambium_type = snmp_get($device, 'sysDescr.0', '-Oqv', '');
-$is_epmp = snmp_get($device, 'sysObjectID.0', '-Oqv', '');
 $divisor = 1;
-if (strstr($cambium_type, 'Cambium PTP 50650')) {
+if (strstr($device['sysDescr'], 'Cambium PTP 50650')) {
     $mib = 'CAMBIUM-PTP650-MIB';
     $oid  = '.1.3.6.1.4.1.17713.7.12.2.0';
     $divisor = 10;
-} elseif (strstr($cambium_type, 'PTP250')) {
+} elseif (strstr($device['sysDescr'], 'PTP250')) {
     $oid  = '.1.3.6.1.4.1.17713.250.5.1.0';
     $mib = 'CAMBIUM-PTP250-MIB';
     $divisor = 10;
-} elseif (strstr($is_epmp, '.17713.21')) {
+} elseif (strstr($device['sysObjectID'], '.17713.21')) {
     $epmp_ap = snmp_get($device, 'wirelessInterfaceMode.0', '-Oqv', 'CAMBIUM-PMP80211-MIB');
     $epmp_number = snmp_get($device, 'cambiumSubModeType.0', '-Oqv', 'CAMBIUM-PMP80211-MIB');
     if ($epmp_ap == 1) {

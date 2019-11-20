@@ -1,0 +1,517 @@
+-- *****************************************************************
+-- Optical APS MIB
+-- *****************************************************************
+
+SL-OPT-APS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE,
+	NOTIFICATION-TYPE ,Unsigned32,
+	Counter32,TimeTicks					FROM SNMPv2-SMI
+	DisplayString, TruthValue, RowStatus
+								  		FROM SNMPv2-TC
+	MODULE-COMPLIANCE, OBJECT-GROUP,
+	NOTIFICATION-GROUP                  FROM SNMPv2-CONF
+	InterfaceIndex		               	FROM IF-MIB
+	PerfCurrentCount, PerfIntervalCount,
+	PerfTotalCount                      FROM PerfHist-TC-MIB
+    sitelight			        		FROM SL-NE-MIB;
+
+slOptApsMib MODULE-IDENTITY
+	LAST-UPDATED "200201140000Z"
+	ORGANIZATION "PacketLight Networks Ltd."
+	CONTACT-INFO
+		"Omri_Viner@PacketLight.com"
+	DESCRIPTION
+		"This MIB module describes the Optical APS."
+	::= { sitelight 11 }
+
+
+slOptApsConfig           OBJECT IDENTIFIER ::= {slOptApsMib 1}
+slOptApsTraps            OBJECT IDENTIFIER ::= {slOptApsMib 2}
+slOptApsTraps0            OBJECT IDENTIFIER ::= {slOptApsTraps 0}
+
+--
+-- Transponding APS config Table
+--
+
+optApsConfigTable OBJECT-TYPE
+         SYNTAX SEQUENCE OF OptApsConfigEntry
+         MAX-ACCESS  		not-accessible
+         STATUS  current
+         DESCRIPTION
+             "This table contains objects to configure APS 
+              (Automatic Protection Switching) feature in a Optical 
+              Channel. APS is the ability to configure a pair of Optical 
+              connections for redundancy so that the hardware will 
+              automatically switch the active connection from working connection
+              to the protection connection or vice versa, within 50ms, 
+              when the active connection fails.
+              The optical connections are specified in the 
+              optXpdConnConfigTable in the SL-OPT-MIB.
+              The APS is defined be specifying two entries in this table
+              the backup each other.
+              The optXpdConnConfigTable defines two entries for each dircetion
+              of the connection.
+              Only one of the two entries is used by the optical aps table.
+              The direction that is used is the direction from the User to Network."
+         ::= { slOptApsConfig 1 }
+ 
+optApsConfigEntry OBJECT-TYPE
+        SYNTAX  		OptApsConfigEntry
+        MAX-ACCESS  	not-accessible
+        STATUS  current
+        DESCRIPTION
+            "An entry is identified by two transponding connections
+            that should protect each other." 
+         INDEX   {optApsConfigUserWorkingIndex }
+         ::= { optApsConfigTable 1 }
+
+OptApsConfigEntry ::=
+              SEQUENCE {
+               optApsConfigUserWorkingIndex			InterfaceIndex,
+               optApsConfigNetWorkingIndex			InterfaceIndex,
+               optApsConfigUserProtectingIndex		InterfaceIndex,
+               optApsConfigNetProtectingIndex       InterfaceIndex,
+               optApsConfigScheme					INTEGER,
+               optApsConfigEnable					INTEGER,
+               optApsConfigArchMode                 INTEGER,
+               optApsConfigActiveConnectionRx       INTEGER,
+               optApsConfigActiveConnectionTx       INTEGER,
+               optApsConfigWaitToRestore            Unsigned32,
+               optApsConfigDirection                INTEGER,
+               optApsConfigRevertive                INTEGER,
+               optApsConfigChanStatus               BITS,
+			   optApsConfigChanSignalFailures		Counter32,
+               optApsConfigChanSwitchovers          Counter32,
+               optApsConfigChanLastSwitchover       TimeTicks,
+               optApsConfigSwitchCommand      		INTEGER,
+               optApsConfigSwitchReason       		INTEGER,
+               optApsConfigResetCounters      		INTEGER,
+               optApsConfigActiveRequest			INTEGER,
+               optApsConfigStatus             		RowStatus,
+               optApsConfigLosThreshold				INTEGER
+              }
+ 
+optApsConfigUserWorkingIndex OBJECT-TYPE
+     SYNTAX			InterfaceIndex 
+     MAX-ACCESS		read-create
+     STATUS			current
+     DESCRIPTION
+         "The ifIndex of the working optical interface connected to
+         the User side."
+     ::= { optApsConfigEntry 1 }
+ 
+optApsConfigNetWorkingIndex OBJECT-TYPE
+     SYNTAX    		InterfaceIndex 
+     MAX-ACCESS		read-create
+     STATUS    		current
+     DESCRIPTION
+         "The ifIndex of the working optical interface connected to
+         the Network side."
+     ::= { optApsConfigEntry 2 }
+ 
+optApsConfigUserProtectingIndex OBJECT-TYPE
+     SYNTAX			InterfaceIndex 
+     MAX-ACCESS		read-create
+     STATUS			current
+     DESCRIPTION
+         "The ifIndex of the protecting optical interface connected to
+         the User side. In the case of an Inline connection there is no
+         meaning to the order between the User and Network interfaces because
+         both side of the connections are connected to the Network."
+     ::= { optApsConfigEntry 3 }
+ 
+optApsConfigNetProtectingIndex OBJECT-TYPE
+     SYNTAX    		InterfaceIndex 
+     MAX-ACCESS		read-create
+     STATUS    		current
+     DESCRIPTION
+         "The ifIndex of the protecting optical interface connected to
+         the Network side. In the case of an Inline connection there is no
+         meaning to the order between the User and Network interfaces because
+         both side of the connections are connected to the Network."
+     ::= { optApsConfigEntry 4 }
+ 
+optApsConfigScheme OBJECT-TYPE
+      SYNTAX    INTEGER {
+            equipment(1),
+            facility(2)
+      }
+      MAX-ACCESS    read-create
+      STATUS    current
+      DESCRIPTION
+      	"This object is used to configure the optical 
+      	protection scheme. 
+
+      	equipment : Equipmet protection (with 4 FEO's)
+      	facility  : Facility protection (only 3 FEO's)"
+      ::= { optApsConfigEntry 5 }
+ 
+optApsConfigEnable  OBJECT-TYPE
+     SYNTAX    INTEGER {
+               optApsDisabled (1),
+               optApsEnabled  (2)
+               }
+     MAX-ACCESS    read-create
+     STATUS    current
+     DESCRIPTION
+          "This object is used to enable or disable the APS feature
+           on the working/protection connection pairs. When enabled,
+           the hardware will automatically switch the active connection 
+           from the working connection to the protection connection within 50ms,
+           or vice versa (read-write)."
+     ::= { optApsConfigEntry 6 }
+ 
+optApsConfigArchMode OBJECT-TYPE
+     SYNTAX    INTEGER {
+               onePlusOne(1),
+               oneToOne(2)
+               }
+     MAX-ACCESS read-create
+     STATUS    current
+     DESCRIPTION
+        "This object is used to configure APS architecture mode
+         on the working/protection connection pairs (read-write)."
+   ::= { optApsConfigEntry 7 }
+ 
+optApsConfigActiveConnectionRx OBJECT-TYPE
+         SYNTAX    INTEGER {
+                   optApsWorkingConnection(1),
+                   optApsProtectionConnection(2)
+                   }
+         MAX-ACCESS    read-only
+         STATUS    current
+         DESCRIPTION
+           "This object indicates which Rx connection is currently active. 
+            It could be the working connection, the protection connection or 
+            none if neither working nor protection connection is active. 
+            This object reflects the status of receive direction.
+            If optApsDirection is equal to biDirectional this object should
+            be eual to optApsActiveConnectionRx."
+
+   ::= { optApsConfigEntry 8 }
+ 
+optApsConfigActiveConnectionTx OBJECT-TYPE
+         SYNTAX    INTEGER {
+                   optApsWorkingConnection(1),
+                   optApsProtectionConnection(2)
+                   }
+         MAX-ACCESS    read-only
+         STATUS    current
+         DESCRIPTION
+           "This object indicates which Tx connection is currently active. 
+            It could be the working connection, the protection connection or 
+            none if neither working nor protection connection is active. 
+            This object reflects the status of receive direction.
+            If optApsDirection is equal to biDirectional this object should
+            be eual to optApsActiveConnectionRx."
+   ::= { optApsConfigEntry 9 }
+ 
+optApsConfigWaitToRestore OBJECT-TYPE
+        SYNTAX Unsigned32 (1..12)
+        UNITS "minutes"
+        MAX-ACCESS read-create
+        STATUS    current
+        DESCRIPTION
+                "This object contains interval in minutes to wait 
+                 before attempting to switch back to working connection. 
+                 Not applicable if the connection is configured in 
+                 non-revertive mode, i.e. protection connection will 
+                 continue to be active, even if failures on the 
+                 working connection are cleared. The framer clears the 
+                 signal-fault and signal-degrade when APS switch 
+                 occurs. Please refer to 'optApsRevertive' for 
+                 description of non-revertive (read-write)."
+        ::= { optApsConfigEntry 10 }
+ 
+optApsConfigDirection OBJECT-TYPE
+           SYNTAX    INTEGER {
+                     uniDirectional(1),
+                     biDirectional(2)
+                     }
+           MAX-ACCESS    read-create
+           STATUS    current
+           DESCRIPTION
+              "This object is used to configure the switching 
+               direction which this APS connection supports (read-write). 
+
+               Unidirectional : APS switch only in one direction.
+               Bidirectional  : APS switch in both ends of the conection."
+        ::= { optApsConfigEntry 11 }
+ 
+optApsConfigRevertive OBJECT-TYPE
+       SYNTAX    INTEGER {
+                 nonrevertive(1),
+                 revertive(2)
+                }
+       MAX-ACCESS    read-create
+       STATUS    current
+       DESCRIPTION
+           "This object is used to configure the APS revertive or
+            nonrevertive option (read-write). 
+    
+            revertive : 
+              Will switch the working connection back to active state after
+              the Wait-To-restore interval has expired and the 
+              working connection Signal-Fault/Signal-Degrade has been 
+              cleared. Please refer to 'optApsWaitToRestore' for 
+              description of Wait-To-Restore interval.
+            nonrevertive : 
+              The  protection connection continues to be the active connection,
+              The active connection does not switch to the working connection."
+     ::= { optApsConfigEntry 12 }
+
+optApsConfigChanStatus OBJECT-TYPE
+       SYNTAX     BITS {
+                  lockedOut(0),
+                  sfWorking(1),
+                  sfProtecting(2),
+                  switched(3),
+				  lockedOutRemote(4) 
+               }
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+           "Indicates the current state of the port.
+
+            lockedOut
+            This bit, when applied to a working channel, indicates that
+            the channel is prevented from switching to the protection connection.
+            When applied to the null channel, this bit indicates that no
+            working channel may switch to the protection connection.
+
+            sfWorking
+            A signal failure condition on the working connection is in effect.
+
+            sfProtecting
+            A signal failure condition on the protecting connection is in effect.
+
+            switched
+            The switched bit is applied to a working channel if that
+            channel is currently switched to the protection connection.
+            
+			lockedOutRemote
+			Indicate that the protection is locked out by 
+            command issued on the remote NE."
+       ::= { optApsConfigEntry 13 }
+
+optApsConfigChanSignalFailures OBJECT-TYPE
+       SYNTAX     Counter32
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+           "A count of Signal Failure conditions that have been
+            detected on the incoming signal. This condition occurs
+            when a loss of signal is detected."
+       ::= { optApsConfigEntry 14 }
+
+optApsConfigChanSwitchovers OBJECT-TYPE
+       SYNTAX     Counter32
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+           "The number of times this channel has switched to the protection
+            connection. When queried with index value apsChanNumber set to 0, which
+            is the protection connection, this object will return 0. "
+       ::= { optApsConfigEntry 15 }
+
+optApsConfigChanLastSwitchover OBJECT-TYPE
+       SYNTAX     TimeTicks
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+           "The value of sysUpTime when this channel last completed a switch
+            to the protection connection. If this channel has never switched to the
+            protection connection, or this channel is the protection connection, the value
+            0  will be returned."
+       ::= { optApsConfigEntry 16 }
+
+optApsConfigSwitchCommand OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    clear(1),
+                    lockoutOfProtection(2),
+                    forcedSwitchOfWorking(3),
+                    forcedSwitchOfProtection(4),
+                    manualSwitchOfWorking(5),
+                    manualSwitchOfProtection(6)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "A switch command initiates one external request for evaluation
+        (read-write).
+
+        (1) Clear - Clears all switch commands on the channel.
+
+        (2) Lockout Of Protection - Prevents any of the working channels
+        from switching to the protection connection by issuing a Lockout of
+        Protection request [unless a request of equal priority (i.e., a
+        Lockout of Protection) is already in effect].
+
+        (3) Forced Switch of Working (to Protection) - Switches the
+        working channel to the protection connection unless a request of equal
+        or higher priority is in effect, by issuing a Forced Switch
+        request.
+
+        (4) Forced Switch of Protection (to Working) - Switches the
+        working channel back from the protection connection to the working
+        connection unless a request of equal or higher priority is in effect,
+        by issuing a Forced Switch request.  This command applies only
+        in the 1+1 architecture.
+
+        (5) Manual Switch of Working (to Protection) - Switches the
+        working channel to the protection connection unless a request of equal
+        or higher priority is in effect, by issuing a Manual Switch
+        request.
+
+        (6) Manual Switch of Protection (to Working) - Switches the
+        working channel back from the protection connection to the working
+        connection unless a request of equal or higher priority is in effect,
+        by issuing a Manual Switch request.  This command applies only
+        in the 1+1 architecture for the null.
+
+        Reading this variable always returns zero (0)."
+    DEFVAL  { clear }
+    ::= { optApsConfigEntry 17 }
+ 
+optApsConfigSwitchReason OBJECT-TYPE
+      SYNTAX INTEGER {
+            optApsOther(1),
+            optApsRevertive(2),
+            optApsManual(3),
+            optApsSignalFailure(4),
+            optApsForceSwitch(5),
+            optApsLockOut(6)
+		}
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+          "The reason why APS switch happened. When the working
+           connection on one end fails, its other end is told to do
+           an  APS switch. The following options in the increasing
+           order of priority indicate what type of switch request 
+           it is. 
+
+          optApsRevertive : Switch back to working connection after the 
+            Wait-to-Restore interval is over, and failures are 
+            cleared. It is the lowest priority.
+          optApsManual : Manual switch causes APS switch unless a 
+            request of equal or higher priority is in effect.
+          optApsSignalFailureHigh : switch occured due to SD failure. 
+          optApsForceSwitch : Forced switch forces hardware to switch
+            the active connection even if the other connection (could be 
+            working connection or protection connection) is in alarm.
+          optApsLockOut : This is the highest priority switch. This
+            will override all other requests. 
+          optApsLockOut :  indicates that the last switchover to the 
+            working occurred because of protection lockout."      
+      ::= { optApsConfigEntry 18 }
+
+optApsConfigResetCounters OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    resetCounters(1)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Setting this variable to 1 will cause the counters
+        on all of the Optical APS Config Table to be initialized 
+        to zero (read-write)."
+    ::= { optApsConfigEntry 19 }
+
+optApsConfigActiveRequest OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    optApsOther(1),
+                    optApsRevertive(2),
+                    optApsManual(3),
+                    optApsSignalFailure(4),           
+                    optApsForceSwitch(5),
+                    optApsLockOut(6)
+                 }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Active Switch APS request:
+
+          optApsRevertive : Switch back to working connection after the 
+            Wait-to-Restore interval is over, and failures are 
+            cleared. It is the lowest priority.
+          optApsManual : Manual switch causes APS switch unless a 
+            request of equal or higher priority is in effect.
+          optApsSignalFailure : Switch due to signal failure.
+          optApsForceSwitch : Forced switch forces hardware to switch
+            the active connection even if the other connection (could be 
+            working connection or protection connection) is in alarm.
+          optApsLockOut : This is the highest priority switch. This
+            will override all other requests. 
+          optApsLockOut :  indicates that the last switchover to the 
+            working occurred because of protection lockout."
+    ::= { optApsConfigEntry 20 }
+
+optApsConfigStatus OBJECT-TYPE
+       SYNTAX      RowStatus
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+               "This object is used to create and delete rows in the
+               optApsConfigTable."
+      ::= { optApsConfigEntry 21 }
+
+optApsConfigLosThreshold OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+		"Configured threshold value for LOS detection of the optical switch.
+		This object is applicable only when slmOpticalSwitchExist is TRUE. 
+		The value given in 0.1 dBm units. The range starts with -50.0 dBm."
+	::= { optApsConfigEntry 22 }
+
+
+--                    
+-- APS TRAPS
+--
+
+optApsTrapSwitchover NOTIFICATION-TYPE
+       OBJECTS { optApsConfigUserWorkingIndex, optApsConfigActiveConnectionRx }
+       STATUS  current 
+       DESCRIPTION
+               "An optApsTrapSwitchover notification is sent when the
+               value of an instance of optApsChanSwitchovers increments."
+       ::= { slOptApsTraps 1 }
+
+optApsConfigTableChanged NOTIFICATION-TYPE
+       OBJECTS { optApsConfigUserWorkingIndex }
+       STATUS  current 
+       DESCRIPTION
+               "An optApsConfigTableChanged notification is sent when the
+               content of the optApsConfigTable is changed.
+               The added/deleted entry is identified by the
+               optApsUserWorkingIndex object."
+       ::= { slOptApsTraps 2 }
+
+optApsTrapSwitchover0 NOTIFICATION-TYPE
+       OBJECTS { optApsConfigUserWorkingIndex, optApsConfigActiveConnectionRx }
+       STATUS  current 
+       DESCRIPTION
+               "An optApsTrapSwitchover notification is sent when the
+               value of an instance of optApsChanSwitchovers increments.
+               It is defined to support browsers that don't recognize RFC 2576."
+       ::= { slOptApsTraps0 1 }
+
+optApsConfigTableChanged0 NOTIFICATION-TYPE
+       OBJECTS { optApsConfigUserWorkingIndex }
+       STATUS  current 
+       DESCRIPTION
+               "An optApsConfigTableChanged notification is sent when the
+               content of the optApsConfigTable is changed.
+               The added/deleted entry is identified by the
+               optApsUserWorkingIndex object.
+               It is defined to support browsers that don't recognize RFC 2576."
+       ::= { slOptApsTraps0 2 }
+
+END
+
+
+

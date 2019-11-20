@@ -1,0 +1,269 @@
+-- *****************************************************************
+-- DLINKSW-IPV6-SNOOPING-MIB: IPv6 Snooping MIB
+--
+--  Copyright (c) 2013 D-Link Corporation, all rights reserved.
+--
+-- *****************************************************************
+
+DLINKSW-IPV6-SNOOPING-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    Unsigned32,
+    OBJECT-TYPE
+        FROM SNMPv2-SMI
+
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+
+    TruthValue,
+    RowStatus,
+    DisplayString
+        FROM SNMPv2-TC
+
+    VlanId
+        FROM Q-BRIDGE-MIB
+
+    dlinkIndustrialCommon
+        FROM DLINK-ID-REC-MIB;
+
+dlinkSwIpv6SnoopMIB MODULE-IDENTITY
+    LAST-UPDATED "201307180000Z"
+    ORGANIZATION "D-Link Corp."
+    CONTACT-INFO
+        "        D-Link Corporation
+
+             Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                     Taipei City 114, Taiwan, R.O.C
+             Tel:     +886-2-66000123
+             E-mail: tsd@dlink.com.tw
+        "
+    DESCRIPTION
+        "This MIB module defines objects for IPv6 Snooping."
+    REVISION    "201307180000Z"
+    DESCRIPTION
+         "This is the first version of the MIB file.
+         "
+    ::= { dlinkIndustrialCommon 143 }
+
+--
+-- Textual Conventions
+--
+
+
+-- -----------------------------------------------------------------------------
+dIpv6SnoopNotifications     OBJECT IDENTIFIER ::= { dlinkSwIpv6SnoopMIB 0 }
+dIpv6SnoopObjects           OBJECT IDENTIFIER ::= { dlinkSwIpv6SnoopMIB 1 }
+dIpv6SnoopConformance       OBJECT IDENTIFIER ::= { dlinkSwIpv6SnoopMIB 2 }
+
+dIpv6SnoopGlobal            OBJECT IDENTIFIER ::= { dIpv6SnoopObjects 1 }
+dIpv6SnoopPolicy            OBJECT IDENTIFIER ::= { dIpv6SnoopObjects 2 }
+dIpv6SnoopInterface         OBJECT IDENTIFIER ::= { dIpv6SnoopObjects 3 }
+
+-- -----------------------------------------------------------------------------
+    dIpv6SnoopStationMoveEnabled OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates whether station move function for IPv6
+            snooping entries is enabled.                   
+            When station-move is enabled, the dynamic snooping binding entry
+            with same VLAN ID and MAC address on specific port can move to another
+            port if the Switch detects it.
+            "
+        ::= { dIpv6SnoopGlobal 1 }
+
+-- -----------------------------------------------------------------------------
+    dIpv6SnoopPolicyNumber  OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Indicates the number of entries present in IPv6 snooping policy
+             table."
+        ::= { dIpv6SnoopPolicy 1 }
+
+    dIpv6SnoopPolicyTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DIpv6SnoopPolicyEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The table contains information about IPv6 snooping policies."
+        ::= { dIpv6SnoopPolicy 2 }
+
+    dIpv6SnoopPolicyEntry OBJECT-TYPE
+        SYNTAX          DIpv6SnoopPolicyEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry defined in dIpv6SnoopPolicyTable. An entry is 
+            created/removed when an IPv6 snooping policy is created/deleted."
+        INDEX { dIpv6SnoopPolicyName }
+        ::= { dIpv6SnoopPolicyTable 1 }
+
+    DIpv6SnoopPolicyEntry ::= SEQUENCE {
+        dIpv6SnoopPolicyName              DisplayString,
+        dIpv6SnoopPolicyProtocol          BITS,
+        dIpv6SnoopPolicyLimitAddrCount    Unsigned32,
+        dIpv6SnoopPolicyRowStatus         RowStatus
+    }
+
+    dIpv6SnoopPolicyName OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (1..32))
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the name of the IPv6 snooping policy."
+        ::= { dIpv6SnoopPolicyEntry 1 }
+       
+    dIpv6SnoopPolicyProtocol  OBJECT-TYPE
+        SYNTAX          BITS { 
+            ndp(0),
+            dhcp(1)                      
+        } 
+        MAX-ACCESS      read-create 
+        STATUS          current
+        DESCRIPTION
+            "This object indicates whether the protocol is snooped in the policy.
+            " 
+        ::= { dIpv6SnoopPolicyEntry 2 }
+    
+    dIpv6SnoopPolicyLimitAddrCount OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Indicates the maximum number of IPv6 snooping binding entries.
+            "
+        ::= { dIpv6SnoopPolicyEntry 3 }
+        
+    dIpv6SnoopPolicyRowStatus  OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object allows the dynamic creation and deletion of a policy."
+        ::= { dIpv6SnoopPolicyEntry 99 }
+
+-- -----------------------------------------------------------------------------
+    dIpv6SnoopPolicyAttachTable OBJECT-TYPE
+        SYNTAX       SEQUENCE OF DIpv6SnoopPolicyAttachEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+            "A table provides the mechanism to attach an IPv6 snooping policy
+            at each interface capable of this feature.
+            "
+        ::= { dIpv6SnoopInterface 1 }
+
+    dIpv6SnoopPolicyAttachEntry OBJECT-TYPE
+        SYNTAX       DIpv6SnoopPolicyAttachEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+            "A row instance contains the configuration to policy attaching
+            state for IPv6 Snooping at each interface capable of this feature.
+            "
+        INDEX { dIpv6SnoopPolicyAttachVlanId }
+        ::= { dIpv6SnoopPolicyAttachTable 1 }
+
+    DIpv6SnoopPolicyAttachEntry ::= SEQUENCE {
+        dIpv6SnoopPolicyAttachVlanId       VlanId,
+        dIpv6SnoopPolicyAttachPolicy       DisplayString,
+        dIpv6SnoopPolicyAttachRowStatus    RowStatus
+    }
+ 
+    dIpv6SnoopPolicyAttachVlanId OBJECT-TYPE
+        SYNTAX          VlanId
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The VLAN-ID of the VLAN with which the IPv6 snooping policy
+            is attached." 
+        ::= { dIpv6SnoopPolicyAttachEntry 1 }
+
+    dIpv6SnoopPolicyAttachPolicy OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (1..32))
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+         "This object indicates the name of the snooping policy.
+        "
+    ::= { dIpv6SnoopPolicyAttachEntry 2 }
+
+    dIpv6SnoopPolicyAttachRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The row status variable, used according to installation
+            and removal conventions for conceptual rows."
+        ::= { dIpv6SnoopPolicyAttachEntry 99 }
+
+-- -----------------------------------------------------------------------------
+
+
+-- Conformance
+
+    dIpv6SnoopMIBCompliances    OBJECT IDENTIFIER ::= { dIpv6SnoopConformance 1 }
+
+    dIpv6SnoopMIBGroups         OBJECT IDENTIFIER ::= { dIpv6SnoopConformance 2 }
+
+    dIpv6SnoopMIBCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+            "The compliance statement for DLINKSW-IPV6-SNOOPING-MIB"
+        MODULE
+        MANDATORY-GROUPS {
+            dIpv6SnoopPolicyGroup,
+            dIpv6SnoopPolicyAttachGroup
+        }
+        
+        GROUP           dIpv6SnoopStationMoveCfgGroup
+        DESCRIPTION
+            "This group is optional."
+
+        ::= { dIpv6SnoopMIBCompliances 1 }
+
+-- Units of Conformance
+
+    dIpv6SnoopPolicyGroup OBJECT-GROUP
+    OBJECTS {
+        dIpv6SnoopPolicyNumber,
+        dIpv6SnoopPolicyProtocol,
+        dIpv6SnoopPolicyLimitAddrCount,
+        dIpv6SnoopPolicyRowStatus
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of object which are used to configure as
+         well as show information regarding the IPv6 snooping policy."
+        ::= { dIpv6SnoopMIBGroups 1 }
+
+    dIpv6SnoopPolicyAttachGroup OBJECT-GROUP
+        OBJECTS {
+            dIpv6SnoopPolicyAttachPolicy,
+            dIpv6SnoopPolicyAttachRowStatus
+        }
+        STATUS  current
+        DESCRIPTION
+            "A collection of object which are used to configure as
+            well as show information regarding the attaching policy 
+            of interface."
+        ::= { dIpv6SnoopMIBGroups 2 }
+
+     dIpv6SnoopStationMoveCfgGroup OBJECT-GROUP
+        OBJECTS {
+            dIpv6SnoopStationMoveEnabled
+        }
+        STATUS  current
+        DESCRIPTION
+            "A collection of objects configuring the station move function.
+            "
+        ::= { dIpv6SnoopMIBGroups 3 }
+    
+END
+
+

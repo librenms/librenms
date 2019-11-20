@@ -1,0 +1,188 @@
+modules:
+    sensors:
+        temperature:
+            options:
+                divisor: 100
+                skip_values: 0
+            data:
+              - # RoomAlert 3E internal
+                oid: .1.3.6.1.4.1.20916.1.9.1.1.1.1.0
+                num_oid: '.1.3.6.1.4.1.20916.1.9.1.1.1.1.{{ $index }}'
+                index: 0
+                descr: .1.3.6.1.4.1.20916.1.9.1.1.1.3.0
+              - # RoomAlert 3E sen1
+                oid: .1.3.6.1.4.1.20916.1.9.1.1.2.1.0
+                num_oid: '.1.3.6.1.4.1.20916.1.9.1.1.2.1.{{ $index }}'
+                index: 1
+                descr: .1.3.6.1.4.1.20916.1.9.1.1.2.6.0
+
+              - # RoomAlert 4E internal
+                oid: .1.3.6.1.4.1.20916.1.6.1.1.1.2.0
+                num_oid: '.1.3.6.1.4.1.20916.1.6.1.1.1.2.{{ $index }}'
+                divisor: 1
+                index: 0
+                descr: .1.3.6.1.4.1.20916.1.6.1.1.2.1.0
+              - # RoomAlert 4E sen1
+                oid: .1.3.6.1.4.1.20916.1.6.1.2.1.1.0
+                num_oid: '.1.3.6.1.4.1.20916.1.6.1.2.1.1.{{ $index }}'
+                divisor: 1
+                index: 1
+                descr: .1.3.6.1.4.1.20916.1.6.1.2.1.8.0
+              - # RoomAlert 4E sen2
+                oid: .1.3.6.1.4.1.20916.1.6.1.2.2.1.0
+                num_oid: '.1.3.6.1.4.1.20916.1.6.1.2.2.1.{{ $index }}'
+                divisor: 1
+                index: 2
+                descr: .1.3.6.1.4.1.20916.1.6.1.2.2.8.0
+
+              - # RoomAlert 11E sensor 2
+                oid: .1.3.6.1.4.1.20916.1.3.1.2.1.0
+                num_oid: '.1.3.6.1.4.1.20916.1.3.1.2.1.{{ $index }}'
+                divisor: 1
+                index: 2
+                descr: .1.3.6.1.4.1.20916.1.3.1.2.6.0
+              - # RoomAlert 11E sensor 3
+                oid: .1.3.6.1.4.1.20916.1.3.1.3.1.0
+                num_oid: '.1.3.6.1.4.1.20916.1.3.1.3.1.{{ $index }}'
+                divisor: 1
+                index: 3
+                descr: .1.3.6.1.4.1.20916.1.3.1.3.6.0
+              - # RoomAlert 11E sensor 4
+                oid: .1.3.6.1.4.1.20916.1.3.1.4.1.0
+                num_oid: '.1.3.6.1.4.1.20916.1.3.1.4.1.{{ $index }}'
+                divisor: 1
+                index: 4
+                descr: .1.3.6.1.4.1.20916.1.3.1.4.6.0
+
+              - # RoomAlert 32E/W internal temp
+                oid: .1.3.6.1.4.1.20916.1.8.1.1.1.2.0
+                num_oid: '.1.3.6.1.4.1.20916.1.8.1.1.1.2.{{ $index }}'
+                index: 0
+                descr: Internal Temperature
+              - # RoomAlert 32E/W internal heat
+                oid: .1.3.6.1.4.1.20916.1.8.1.1.4.2.0
+                num_oid: '.1.3.6.1.4.1.20916.1.8.1.1.4.2.{{ $index }}'
+                index: 1
+                descr: Internal Heat Index
+              - # RoomAlert 32E/W ext temp
+                oid: ra32-ext-temp
+                num_oid: '.1.3.6.1.4.1.20916.1.8.1.2.{{ $index }}'
+                value: value
+                descr: Sensor {{ $id }}
+              - # RoomAlert 32W wish temp
+                oid: ra32-wish-temp
+                num_oid: '.1.3.6.1.4.1.20916.1.8.1.4.{{ $index }}'
+                value: value
+                descr: WiSH {{ $id }} Internal
+
+              - # TemPageR 3E internal
+                oid: .1.3.6.1.4.1.20916.1.7.1.1.1.1.0
+                num_oid: '.1.3.6.1.4.1.20916.1.7.1.1.1.1.{{ $index }}'
+                index: 0
+                descr: .1.3.6.1.4.1.20916.1.7.1.1.2.0
+              - # TemPageR 3E sen1
+                oid: .1.3.6.1.4.1.20916.1.7.1.2.1.1.0
+                num_oid: '.1.3.6.1.4.1.20916.1.7.1.2.1.1.{{ $index }}'
+                index: 1
+                descr: .1.3.6.1.4.1.20916.1.7.1.2.1.3.0
+              - # TemPageR 3E sen2
+                oid: .1.3.6.1.4.1.20916.1.7.1.2.2.1.0
+                num_oid: '.1.3.6.1.4.1.20916.1.7.1.2.2.1.{{ $index }}'
+                index: 2
+                descr: .1.3.6.1.4.1.20916.1.7.1.2.2.3.0
+
+              - # TemPageR 4E internal
+                oid: .1.3.6.1.4.1.20916.1.1.1.1.1.0
+                num_oid: '.1.3.6.1.4.1.20916.1.1.1.1.1.{{ $index }}'
+                index: 0
+                descr: Internal
+                high_limit: .1.3.6.1.4.1.20916.1.1.3.1.0
+                low_limit: .1.3.6.1.4.1.20916.1.1.3.2.0
+              - # TemPageR 4E sen1
+                oid: .1.3.6.1.4.1.20916.1.1.1.1.2.0
+                num_oid: '.1.3.6.1.4.1.20916.1.1.1.1.2.{{ $index }}'
+                index: 1
+                descr: Sensor 1
+                high_limit: .1.3.6.1.4.1.20916.1.1.3.3.0
+                low_limit: .1.3.6.1.4.1.20916.1.1.3.4.0
+              - # TemPageR 4E sen2
+                oid: .1.3.6.1.4.1.20916.1.1.1.1.3.0
+                num_oid: '.1.3.6.1.4.1.20916.1.1.1.1.3.{{ $index }}'
+                index: 2
+                descr: Sensor 2
+                high_limit: .1.3.6.1.4.1.20916.1.1.3.5.0
+                low_limit: .1.3.6.1.4.1.20916.1.1.3.6.0
+              - # TemPageR 4E sen3
+                oid: .1.3.6.1.4.1.20916.1.1.1.1.4.0
+                num_oid: '.1.3.6.1.4.1.20916.1.1.1.1.4.{{ $index }}'
+                index: 3
+                descr: Sensor 3
+                high_limit: .1.3.6.1.4.1.20916.1.1.3.7.0
+                low_limit: .1.3.6.1.4.1.20916.1.1.3.8.0
+        humidity:
+            options:
+                divisor: 100
+            data:
+              - # RoomAlert 32E/W
+                oid: .1.3.6.1.4.1.20916.1.8.1.1.2.1.0
+                num_oid: '.1.3.6.1.4.1.20916.1.8.1.1.2.1.{{ $index }}'
+                index: 0
+                descr: Internal Humidity
+        voltage:
+            data:
+              - # RoomAlert 32E/W analog
+                oid: ra32-analog
+                num_oid: '.1.3.6.1.4.1.20916.1.8.1.1.5.{{ $index }}'
+                value: value
+                low_limit: 0
+                high_limit: 5
+                descr: Analog {{ $id }}
+        state:
+            data:
+              - # RoomAlert 3E switch
+                oid: .1.3.6.1.4.1.20916.1.9.1.2.1.0
+                num_oid: '.1.3.6.1.4.1.20916.1.9.1.2.1.{{ $index }}'
+                index: 0
+                descr: .1.3.6.1.4.1.20916.1.9.1.2.2.0
+                states:
+                    - { value: 0, generic: -1, graph: 1, descr: Off }
+                    - { value: 1, generic: 0, graph: 1, descr: On }
+
+              - # RoomAlert 4E switch
+                oid: .1.3.6.1.4.1.20916.1.6.1.3.1.0
+                num_oid: '.1.3.6.1.4.1.20916.1.6.1.3.1.{{ $index }}'
+                index: 0
+                descr: .1.3.6.1.4.1.20916.1.6.1.3.2.0
+                state_name: switch
+                states:
+                    - { value: 0, generic: -1, graph: 1, descr: Off }
+                    - { value: 1, generic: 0, graph: 1, descr: On }
+
+              - # RoomAlert 32E/W power
+                oid: .1.3.6.1.4.1.20916.1.8.1.1.3.1.0
+                num_oid: '.1.3.6.1.4.1.20916.1.8.1.1.3.1.{{ $index }}'
+                index: 0
+                descr: Power Source
+                state_name: power
+                states:
+                    - { value: 0, generic: 1, graph: 1, descr: Battery }
+                    - { value: 1, generic: 0, graph: 1, descr: AC }
+              - # RoomAlert 32E/W relays
+                oid: ra32-relay
+                value: value
+                num_oid: '.1.3.6.1.4.1.20916.1.8.1.1.6.{{ $index }}'
+                descr: Relay {{ $id }}
+                state_name: relay
+                states:
+                    - { value: 0, generic: 0, graph: 1, descr: Open }
+                    - { value: 1, generic: 0, graph: 1, descr: Closed }
+              - # RoomAlert 32E/W switches
+                oid: ra32-switch
+                value: value
+                num_oid: '.1.3.6.1.4.1.20916.1.8.1.3.{{ $index }}'
+                descr: Switch {{ $id }}
+                state_name: switch
+                states:
+                    - { value: 0, generic: -1, graph: 1, descr: Off }
+                    - { value: 1, generic: 0, graph: 1, descr: On }
+

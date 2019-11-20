@@ -1,0 +1,68 @@
+mib: FORTINET-FORTIGATE-MIB
+modules:
+    processors:
+          data:
+              -
+                  oid: fgSysCpuUsage
+                  num_oid: '.1.3.6.1.4.1.12356.101.4.1.3.{{ $index }}'
+                  type: fortigate-fixed
+    sensors:
+        pre-cache:
+            data:
+                -   oid:
+                      - fgVpnTunEntPhase1Name
+                      - fgVpnTunEntPhase2Name
+                      - fgVpnTunEntRemGwyIp
+        state:
+            data:
+                -
+                    oid: fgHwSensors
+                    num_oid: '.1.3.6.1.4.1.12356.101.4.3.2.1.4.{{ $index }}'
+                    index: 'fgHwSensorEntIndex.{{ $index }}'
+                    descr: fgHwSensorEntName
+                    value: fgHwSensorEntAlarmStatus
+                    states:
+                        - { value: 0, descr: OK, graph: 1, generic: 0 }
+                        - { value: 1, descr: ERROR, graph: 1, generic: 2 }
+                -
+                    oid: fgVpnTunEntStatus
+                    num_oid: '.1.3.6.1.4.1.12356.101.12.2.2.1.20.{{ $index }}'
+                    index: 'fgVpnTunEntIndex.{{ $index }}'
+                    descr: "{{ $fgVpnTunEntPhase1Name }}\\{{ $fgVpnTunEntPhase2Name }} ({{ $fgVpnTunEntRemGwyIp }})"
+                    group: IPSEC VPN
+                    value: fgVpnTunEntStatus
+                    states:
+                        - { value: 1, descr: Down, graph: 1, generic: 2 }
+                        - { value: 2, descr: Up, graph: 1, generic: 0 }
+                -
+                    oid: fgVpnSslState
+                    num_oid: '.1.3.6.1.4.1.12356.101.12.2.3.1.1.{{ $index }}'
+                    index: 'fgVpnSslState.{{ $index }}'
+                    descr: "SSL-VPN Status"
+                    group: SSL VPN
+                    value: fgVpnSslState
+                    states:
+                        - { value: 1, descr: Disabled, graph: 1, generic: 3 }
+                        - { value: 2, descr: Enabled, graph: 1, generic: 0 }
+        count:
+            data:
+                -
+                    oid: fgVpnTunnelUpCount
+                    num_oid: '.1.3.6.1.4.1.12356.101.12.1.1.{{ $index }}'
+                    index: 'fgVpnTunnelUpCount.{{ $index }}'
+                    descr: IPSEC VPN tunnels
+                    group: VPN
+                -
+                    oid: fgVpnSslStatsLoginUsers
+                    num_oid: '.1.3.6.1.4.1.12356.101.12.2.3.1.2.{{ $index }}'
+                    index: 'fgVpnSslStatsLoginUsers.{{ $index }}'
+                    descr: SSL VPN Logged users
+                    group: VPN
+                -
+                    oid: fgVpnSslStatsActiveTunnels
+                    num_oid: '.1.3.6.1.4.1.12356.101.12.2.3.1.6.{{ $index }}'
+                    index: 'fgVpnSslStatsActiveTunnels.{{ $index }}'
+                    descr: SSL VPN Active tunnels
+                    group: VPN
+
+

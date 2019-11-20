@@ -1,0 +1,1290 @@
+-- ============================================================================
+-- AT-BOARDS.MIB, Allied Telesis enterprise MIB: boards identifiers
+--
+-- Copyright (c) 2017 by Allied Telesis, Inc.
+-- All rights reserved.
+--
+-- ============================================================================
+
+    AT-BOARDS-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            objects
+                FROM AT-SMI-MIB
+            MODULE-IDENTITY
+                FROM SNMPv2-SMI;
+
+
+        boards MODULE-IDENTITY
+            LAST-UPDATED "201710190000Z"
+            ORGANIZATION
+                "Allied Telesis, Inc."
+            CONTACT-INFO
+                "  http://www.alliedtelesis.com"
+            DESCRIPTION
+                "OID boards is a subtree beneath which board ids are assigned.
+                release is a subtree beneath which release ids are assigned.
+                ifTypes is a subtree beneath which interface type ids are assigned.
+                chips is a subtree beneath which chip ids are assigned."
+            REVISION "201710190000Z"
+            DESCRIPTION
+                "Rename pprx55018XSPQ to pprx55018XSPQm."
+            REVISION "201705110000Z"
+            DESCRIPTION
+                "Added support for pprAtXem2CQ1."
+            REVISION "201704260000Z"
+            DESCRIPTION
+                "Rename AT-FAN05 to AT-FAN08."
+            REVISION "201703310000Z"
+            DESCRIPTION
+                "Remove '_' in the MIB object names to comply with ASN.1.
+                The object names are slightly changed to make it more readable."
+            REVISION "201702010000Z"
+            DESCRIPTION
+                "Added board ID for GS970 products."
+            REVISION "201701180000Z"
+            DESCRIPTION
+                "Added board ID for GS970PS products."
+            REVISION "201610030000Z"
+            DESCRIPTION
+                "Added board ID for x550 products."
+            REVISION "201605060000Z"
+            DESCRIPTION
+                "Added board ID for AT-GS900M Next Generatin products."
+            REVISION "201601080000Z"
+            DESCRIPTION
+                "Added board ID for AT-FS980M products."
+            REVISION "201601060000Z"
+            DESCRIPTION
+                "Added board IDs for additional SBx8100 power supplies"
+            REVISION "201512170000Z"
+            DESCRIPTION
+                "Added board ID for SBx81XLEM and expansion modules."
+            REVISION "201511100000Z"
+            DESCRIPTION
+                "Added new SwitchBlade x908G2/3 products"
+            REVISION "201508090000Z"
+            DESCRIPTION
+                "Added board ID for AT-x9EM/XT4."
+            REVISION "201508050000Z"
+            DESCRIPTION
+                "Added board ID for AT-XS900MX products."
+            REVISION "201507270000Z"
+            DESCRIPTION
+                "Added board ID for SecureHUB products."
+            REVISION "201507220000Z"
+            DESCRIPTION
+                "Add the Virtual Appliance (VAA, 442) board ID."
+            REVISION "201506300000Z"
+            DESCRIPTION
+                "Place AT-AR2050V and AT-AR2010V in the right order."
+            REVISION "201506190000Z"
+            DESCRIPTION
+                "Added board ID for AT-AR2010V."
+            REVISION "201505060000Z"
+            DESCRIPTION
+                "Added board ID for AT-AR2050V."
+            REVISION "201504030000Z"
+            DESCRIPTION
+                "Change the product name from x230-10GPT to x350-10GPT."
+            REVISION "201503160000Z"
+            DESCRIPTION
+                "Correct the board ID for PWR150 and Stack-QS"
+            REVISION "201503120000Z"
+            DESCRIPTION
+                "Corrected the board IDs for AtGS924MX(443), AtGS924MPX(444), AtGS948MX(445) and AtGS948MPX(446)."
+            REVISION "201502190000Z"
+            DESCRIPTION
+                "Corrected the board IDs for x51028GTXR(436) and x51052GTXR(437)."
+            REVISION "201501140000Z"
+            DESCRIPTION
+                "Add board ID for PWR150 power supply for x930."
+            REVISION "201411190000Z"
+            DESCRIPTION
+                "Add board IDs and chip IDs for IE300 product family."
+            REVISION "201411180000Z"
+            DESCRIPTION
+                "Added board IDs for AT-AR3050S and AT-AR4050S."
+            REVISION "201410220000Z"
+            DESCRIPTION
+                "Renaming Ix510 to IE510."
+            REVISION "201409230000Z"
+            DESCRIPTION
+                "Added board IDs for AT-GS924MX, AT-GS924MPX, AT-GS948MX and AT-GS948MPX."
+            REVISION "201408280000Z"
+            DESCRIPTION
+                "Added board IDs for x510L Products."
+            REVISION "201408200000Z"
+            DESCRIPTION
+                "Renaming AT-IE500-Product Family to IE200"
+            REVISION "201407300000Z"
+            DESCRIPTION
+                "Added board ID for pprx51028GTXR and pprx51052GTXR"
+            REVISION "201406090000Z"
+            DESCRIPTION
+                "Added board ID for pprx510DP28GTX"
+            REVISION "201406030000Z"
+            DESCRIPTION
+                "Add board and chip IDs for AT-IE500-Product Family. Added Board IDs for x51028GSXDC and Ix51028GSX."
+            REVISION "201405160000Z"
+            DESCRIPTION
+                "Added dc2500xs (ID 414)"
+            REVISION "201403250000Z"
+            DESCRIPTION
+                "Added AT-STACKQS (ID 418) and corrected AT-x930-28GSTX (ID 390) name"
+            REVISION "201308010000Z"
+            DESCRIPTION
+                "Added x930s (IDs 388-392), x310s (IDs 393-400) and
+                 x230s (IDs 401-409)"
+            REVISION "201307090000Z"
+            DESCRIPTION
+                "Added board ID for pprx510DP52GTX, pprIX528GPX, pprPWR100R and
+                 pprPWR250DCR"
+            REVISION "201206070000Z"
+            DESCRIPTION
+                "Correct a typo for the name from pprXumStk to pprXemStk"
+            REVISION "201205210000Z"
+            DESCRIPTION
+                "Added pprAtSBx81XZ4 for the SBx8112"
+            REVISION "201205150000Z"
+            DESCRIPTION
+                "Changed the board name from pprAtSBx81XZ6 to pprAtSBx81XS6 and
+                 pprAtSBx81GS24 to pprAtSBx81GS24a"
+            REVISION "201203160000Z"
+            DESCRIPTION
+                "Added board ID for x510 series."
+            REVISION "201112180500Z"
+            DESCRIPTION
+                "Added pprSBx81CFC960, pprSBx81GT24a, pprSBx81GP24a,
+                pprSBx81GT40 and pprSBx81XS16boards for the SBx8112"
+            REVISION "201110250000Z"
+            DESCRIPTION
+                "Added AT-SBx81FAN06"
+            REVISION "201109200000Z"
+            DESCRIPTION
+                "Added SBx8100 card products."
+            REVISION "201109150000Z"
+            DESCRIPTION
+                "Added AT-SBx8106 product."
+            REVISION "201109140000Z"
+            DESCRIPTION
+                "Added AT-SBx8112 product."
+            REVISION "201109050000Z"
+            DESCRIPTION
+                "Added board ID for x210-9GT, x210-16GT, x210-24GT."
+            REVISION "201105100000Z"
+            DESCRIPTION
+                "Added board ID for pprXem2XS, pprXem24T, pprXem12Tv2, pprXem12Sv2."
+            REVISION "201104280000Z"
+            DESCRIPTION
+                "Added pics AR030 AR031"
+            REVISION "201104040000Z"
+            DESCRIPTION
+                "Added Rapier 48x product"
+            REVISION "201103080000Z"
+            DESCRIPTION
+                "Corrected syntax problems."
+            REVISION "201012010000Z"
+            DESCRIPTION
+                "Added board ID for pprPWR250DC."
+            REVISION "201010120000Z"
+            DESCRIPTION
+                "Added pprx200GE52T and pprx200GE28T"
+            REVISION "201009070000Z"
+            DESCRIPTION
+                "Generic syntax tidy up"
+            REVISION "201008190000Z"
+            DESCRIPTION
+                "Added board 330 pprAR560"
+            REVISION "201007220000Z"
+            DESCRIPTION
+                "Renamed boardID pprx60024TSPOE220WPSU to pprx60024TSPOEPLUS"
+            REVISION "201006140445Z"
+            DESCRIPTION
+                "MIB revision history dates in descriptions updated."
+            REVISION "201005190000Z"
+            DESCRIPTION
+                "x610 product range, added pprx61048TsPOEPlus,
+                pprx61024TsXPOEPlus, pprx61024TsPOEPlus, pprPWR800, pprPWR1200,
+                pprPWR250, pprx61048TsX, pprx61048Ts, pprx61024TsX, pprx61024Ts, and
+                pprx61024SPX"
+            REVISION "200905150000Z"
+            DESCRIPTION
+                "Added boardID for pprx60024TSPOE and pprx60024TSPOE220WPSU."
+            REVISION "200812110000Z"
+            DESCRIPTION
+                "Added boardID for pprXum100M, pprAtPWR05AC, pprAtPWR05DC and
+                pprXem2XT."
+            REVISION "200811240000Z"
+            DESCRIPTION
+                "Added boardID for x60024TS,x60024TSXP,x60048TS and x60048TSXP."
+            REVISION "200803031500Z"
+            DESCRIPTION
+                "Change
+                Added boards 271,272,282,284-286,288.
+                Added boards 290-297,
+                Added boards 300,304-311."
+            REVISION "200703210000Z"
+            DESCRIPTION
+                "Added boardID for x900-48FS."
+            REVISION "200702070000Z"
+            DESCRIPTION
+                "Added boardID for AT-8824R."
+            REVISION "200606140000Z"
+            DESCRIPTION
+                "Initial version of this MIB module."
+
+            ::= { objects 1 }
+
+
+
+--
+-- Node definitions
+--
+
+        pprIcmAr023 OBJECT IDENTIFIER ::= { boards 39 }
+
+
+        pprIcmAr021s OBJECT IDENTIFIER ::= { boards 40 }
+
+
+        pprIcmAr022 OBJECT IDENTIFIER ::= { boards 41 }
+
+
+        pprIcmAr025 OBJECT IDENTIFIER ::= { boards 45 }
+
+
+        pprIcmAr024 OBJECT IDENTIFIER ::= { boards 46 }
+
+
+        pprAr300 OBJECT IDENTIFIER ::= { boards 49 }
+
+
+        pprAr300L OBJECT IDENTIFIER ::= { boards 52 }
+
+
+        pprAr310 OBJECT IDENTIFIER ::= { boards 53 }
+
+
+        pprAr120 OBJECT IDENTIFIER ::= { boards 54 }
+
+
+        pprAr300Lu OBJECT IDENTIFIER ::= { boards 55 }
+
+
+        pprAr300u OBJECT IDENTIFIER ::= { boards 56 }
+
+
+        pprAr310u OBJECT IDENTIFIER ::= { boards 57 }
+
+
+        pprAr350 OBJECT IDENTIFIER ::= { boards 58 }
+
+
+        pprIcmAr021u OBJECT IDENTIFIER ::= { boards 59 }
+
+
+        pprAr720 OBJECT IDENTIFIER ::= { boards 63 }
+
+
+        pprAr010 OBJECT IDENTIFIER ::= { boards 67 }
+
+
+        pprAr012 OBJECT IDENTIFIER ::= { boards 68 }
+
+
+        pprAr011 OBJECT IDENTIFIER ::= { boards 69 }
+
+
+        pprAr370 OBJECT IDENTIFIER ::= { boards 70 }
+
+
+        pprAr330 OBJECT IDENTIFIER ::= { boards 71 }
+
+
+        pprAr395 OBJECT IDENTIFIER ::= { boards 72 }
+
+
+        pprAr390 OBJECT IDENTIFIER ::= { boards 73 }
+
+
+        pprAr370u OBJECT IDENTIFIER ::= { boards 75 }
+
+
+        pprIcmAr020 OBJECT IDENTIFIER ::= { boards 76 }
+
+
+        pprAr740 OBJECT IDENTIFIER ::= { boards 79 }
+
+
+        pprAr140s OBJECT IDENTIFIER ::= { boards 80 }
+
+
+        pprAr140u OBJECT IDENTIFIER ::= { boards 81 }
+
+
+        pprAr160su OBJECT IDENTIFIER ::= { boards 82 }
+
+
+        pprAr320 OBJECT IDENTIFIER ::= { boards 83 }
+
+
+        pprAr130s OBJECT IDENTIFIER ::= { boards 85 }
+
+
+        pprAr130u OBJECT IDENTIFIER ::= { boards 86 }
+
+
+        pprRapier24 OBJECT IDENTIFIER ::= { boards 87 }
+
+
+        pprNsm0404Pic OBJECT IDENTIFIER ::= { boards 88 }
+
+
+        pprA35SXSC OBJECT IDENTIFIER ::= { boards 89 }
+
+
+        pprA35LXSC OBJECT IDENTIFIER ::= { boards 90 }
+
+
+        pprA36MTRJ OBJECT IDENTIFIER ::= { boards 91 }
+
+
+        pprA37VF45 OBJECT IDENTIFIER ::= { boards 92 }
+
+
+        pprA38LC OBJECT IDENTIFIER ::= { boards 93 }
+
+
+        pprA39Tx OBJECT IDENTIFIER ::= { boards 94 }
+
+
+        pprAr740DC OBJECT IDENTIFIER ::= { boards 95 }
+
+
+        pprNsm0418BRI OBJECT IDENTIFIER ::= { boards 96 }
+
+
+        pprRapier16fSC OBJECT IDENTIFIER ::= { boards 97 }
+
+
+        ppr8624xl80 OBJECT IDENTIFIER ::= { boards 98 }
+
+
+        pprRapier16fMT OBJECT IDENTIFIER ::= { boards 99 }
+
+
+        pprRapier16fMTi OBJECT IDENTIFIER ::= { boards 100 }
+
+
+        pprRapier8t8fSC OBJECT IDENTIFIER ::= { boards 101 }
+
+
+        pprRapier8t8fSCi OBJECT IDENTIFIER ::= { boards 102 }
+
+
+        pprRapier8t8fMT OBJECT IDENTIFIER ::= { boards 103 }
+
+
+        pprRapier8t8fMTi OBJECT IDENTIFIER ::= { boards 104 }
+
+
+        pprRapier8fSC OBJECT IDENTIFIER ::= { boards 105 }
+
+
+        pprRapier8fSCi OBJECT IDENTIFIER ::= { boards 106 }
+
+
+        pprRapier8fMT OBJECT IDENTIFIER ::= { boards 107 }
+
+
+        pprRapier8fMTi OBJECT IDENTIFIER ::= { boards 108 }
+
+
+        pprRapierG6 OBJECT IDENTIFIER ::= { boards 110 }
+
+
+        pprRapierG6SX OBJECT IDENTIFIER ::= { boards 111 }
+
+
+        pprRapierG6LX OBJECT IDENTIFIER ::= { boards 112 }
+
+
+        pprRapierG6MT OBJECT IDENTIFIER ::= { boards 113 }
+
+
+        pprRapier16fSCi OBJECT IDENTIFIER ::= { boards 114 }
+
+
+        pprRapier24i OBJECT IDENTIFIER ::= { boards 115 }
+
+
+        pprAr824 OBJECT IDENTIFIER ::= { boards 116 }
+
+
+        pprAr816fSC OBJECT IDENTIFIER ::= { boards 117 }
+
+
+        pprAr816fSCi OBJECT IDENTIFIER ::= { boards 118 }
+
+
+        pprAr816fMT OBJECT IDENTIFIER ::= { boards 119 }
+
+
+        pprAr816fMTi OBJECT IDENTIFIER ::= { boards 120 }
+
+
+        pprAr88t8fSC OBJECT IDENTIFIER ::= { boards 121 }
+
+
+        pprAr88t8fSCi OBJECT IDENTIFIER ::= { boards 122 }
+
+
+        pprAr88t8fMT OBJECT IDENTIFIER ::= { boards 123 }
+
+
+        pprAr88t8fMTi OBJECT IDENTIFIER ::= { boards 124 }
+
+
+        pprAr88fSC OBJECT IDENTIFIER ::= { boards 125 }
+
+
+        pprAr88fSCi OBJECT IDENTIFIER ::= { boards 126 }
+
+
+        pprAr88fMT OBJECT IDENTIFIER ::= { boards 127 }
+
+
+        pprAr88fMTi OBJECT IDENTIFIER ::= { boards 128 }
+
+
+        pprAr824i OBJECT IDENTIFIER ::= { boards 129 }
+
+
+        pprAt8724XL OBJECT IDENTIFIER ::= { boards 130 }
+
+
+        pprAt8748XL OBJECT IDENTIFIER ::= { boards 131 }
+
+
+        pprAt8724XLDC OBJECT IDENTIFIER ::= { boards 132 }
+
+
+        pprAt8748XLDC OBJECT IDENTIFIER ::= { boards 133 }
+
+
+        pprAt8824 OBJECT IDENTIFIER ::= { boards 134 }
+
+
+        pprAt8824DC OBJECT IDENTIFIER ::= { boards 135 }
+
+
+        ppr8724XLDC OBJECT IDENTIFIER ::= { boards 141 }
+
+
+        ppr8748XLDC OBJECT IDENTIFIER ::= { boards 142 }
+
+
+        pprRapier24iDcNEBS OBJECT IDENTIFIER ::= { boards 144 }
+
+
+        pprAt8724XLDcNEBS OBJECT IDENTIFIER ::= { boards 146 }
+
+
+        pprAt8848DC OBJECT IDENTIFIER ::= { boards 147 }
+
+
+        pprRapier48 OBJECT IDENTIFIER ::= { boards 148 }
+
+
+        pprAt8848 OBJECT IDENTIFIER ::= { boards 149 }
+
+
+        pprRapier48i OBJECT IDENTIFIER ::= { boards 150 }
+
+
+        pprNsm0424BRI OBJECT IDENTIFIER ::= { boards 151 }
+
+
+        pprIcmAR026 OBJECT IDENTIFIER ::= { boards 153 }
+
+
+        ppr9816GF OBJECT IDENTIFIER ::= { boards 157 }
+
+
+        ppr9812TF OBJECT IDENTIFIER ::= { boards 158 }
+
+
+        pprSbChassis4AC OBJECT IDENTIFIER ::= { boards 159 }
+
+
+        pprSbChassis4DC OBJECT IDENTIFIER ::= { boards 160 }
+
+
+        pprSbChassis8AC OBJECT IDENTIFIER ::= { boards 161 }
+
+
+        pprSbChassis8DC OBJECT IDENTIFIER ::= { boards 162 }
+
+
+        pprSbChassis16AC OBJECT IDENTIFIER ::= { boards 163 }
+
+
+        pprSbChassis16DC OBJECT IDENTIFIER ::= { boards 164 }
+
+
+        pprSbControl OBJECT IDENTIFIER ::= { boards 165 }
+
+
+        pprSbControlDTM OBJECT IDENTIFIER ::= { boards 166 }
+
+
+        pprSb48t OBJECT IDENTIFIER ::= { boards 167 }
+
+
+        pprSb96t OBJECT IDENTIFIER ::= { boards 168 }
+
+
+        pprSb32fSC OBJECT IDENTIFIER ::= { boards 169 }
+
+
+        pprSb32fMT OBJECT IDENTIFIER ::= { boards 170 }
+
+
+        pprSb8fRJ OBJECT IDENTIFIER ::= { boards 172 }
+
+
+        pprSb8fSXSC OBJECT IDENTIFIER ::= { boards 173 }
+
+
+        pprSb8fSXMT OBJECT IDENTIFIER ::= { boards 174 }
+
+
+        pprSb8fLXSC OBJECT IDENTIFIER ::= { boards 175 }
+
+
+        pprSb8fLXMT OBJECT IDENTIFIER ::= { boards 176 }
+
+
+        pprAr410 OBJECT IDENTIFIER ::= { boards 177 }
+
+
+        pprA40SC OBJECT IDENTIFIER ::= { boards 178 }
+
+
+        pprA40MTRJ OBJECT IDENTIFIER ::= { boards 179 }
+
+
+        pprA41SC OBJECT IDENTIFIER ::= { boards 180 }
+
+
+        pprA41MTRJ OBJECT IDENTIFIER ::= { boards 181 }
+
+
+        pprAr725 OBJECT IDENTIFIER ::= { boards 182 }
+
+
+        pprAr745 OBJECT IDENTIFIER ::= { boards 183 }
+
+
+        pprSb8GBIC OBJECT IDENTIFIER ::= { boards 184 }
+
+
+        pprA42GBIC OBJECT IDENTIFIER ::= { boards 185 }
+
+
+        ppr9816GB OBJECT IDENTIFIER ::= { boards 186 }
+
+
+        ppr9812T OBJECT IDENTIFIER ::= { boards 187 }
+
+
+        pprNsm048DS3 OBJECT IDENTIFIER ::= { boards 188 }
+
+
+        pprAr450 OBJECT IDENTIFIER ::= { boards 191 }
+
+
+        pprAr450Dual OBJECT IDENTIFIER ::= { boards 192 }
+
+
+        pprSbExpander OBJECT IDENTIFIER ::= { boards 193 }
+
+
+        pprAr725DC OBJECT IDENTIFIER ::= { boards 194 }
+
+
+        pprAr745DC OBJECT IDENTIFIER ::= { boards 195 }
+
+
+        pprAr410v2 OBJECT IDENTIFIER ::= { boards 196 }
+
+
+        pprAr410v3 OBJECT IDENTIFIER ::= { boards 197 }
+
+
+        pprIcmAr027 OBJECT IDENTIFIER ::= { boards 198 }
+
+
+        ppr8948EX OBJECT IDENTIFIER ::= { boards 202 }
+
+
+        ppr8948i OBJECT IDENTIFIER ::= { boards 203 }
+
+
+        ppr9816GBDC OBJECT IDENTIFIER ::= { boards 204 }
+
+
+        ppr9812TDC OBJECT IDENTIFIER ::= { boards 205 }
+
+
+        pprIcmAr021v2s OBJECT IDENTIFIER ::= { boards 206 }
+
+
+        pprA50 OBJECT IDENTIFIER ::= { boards 207 }
+
+
+        pprA51 OBJECT IDENTIFIER ::= { boards 208 }
+
+
+        pprA52 OBJECT IDENTIFIER ::= { boards 209 }
+
+
+        pprA53 OBJECT IDENTIFIER ::= { boards 210 }
+
+
+        pprFanA01 OBJECT IDENTIFIER ::= { boards 212 }
+
+
+        pprAtPwr01AC OBJECT IDENTIFIER ::= { boards 213 }
+
+
+        pprAtPwr01DC OBJECT IDENTIFIER ::= { boards 214 }
+
+
+        pprAtFan01 OBJECT IDENTIFIER ::= { boards 215 }
+
+
+        pprSb24RJ OBJECT IDENTIFIER ::= { boards 216 }
+
+
+        pprSb1XFP OBJECT IDENTIFIER ::= { boards 217 }
+
+
+        ppr9924T OBJECT IDENTIFIER ::= { boards 218 }
+
+
+        ppr9924SP OBJECT IDENTIFIER ::= { boards 219 }
+
+
+        ppr9924TEMC OBJECT IDENTIFIER ::= { boards 220 }
+
+
+        ppr9924T4SP OBJECT IDENTIFIER ::= { boards 221 }
+
+
+        pprAR440 OBJECT IDENTIFIER ::= { boards 227 }
+
+
+        pprAR441 OBJECT IDENTIFIER ::= { boards 228 }
+
+
+        pprAR442 OBJECT IDENTIFIER ::= { boards 229 }
+
+
+        pprAR443 OBJECT IDENTIFIER ::= { boards 230 }
+
+
+        pprAR444 OBJECT IDENTIFIER ::= { boards 231 }
+
+
+        pprAR420 OBJECT IDENTIFIER ::= { boards 232 }
+
+
+        pprAt8624T2M OBJECT IDENTIFIER ::= { boards 239 }
+
+
+        pprA46Tx OBJECT IDENTIFIER ::= { boards 240 }
+
+
+        pprAR550 OBJECT IDENTIFIER ::= { boards 241 }
+
+
+        pprAR551 OBJECT IDENTIFIER ::= { boards 242 }
+
+
+        pprAR552 OBJECT IDENTIFIER ::= { boards 243 }
+
+
+        pprC8724MLB OBJECT IDENTIFIER ::= { boards 248 }
+
+
+        pprAt86482SP OBJECT IDENTIFIER ::= { boards 252 }
+
+
+        pprAt8624POE OBJECT IDENTIFIER ::= { boards 253 }
+
+
+        pprAtPwr01RAC OBJECT IDENTIFIER ::= { boards 254 }
+
+
+        pprAtFan01R OBJECT IDENTIFIER ::= { boards 255 }
+
+
+        ppr9924Ts OBJECT IDENTIFIER ::= { boards 256 }
+
+
+        pprAR570 OBJECT IDENTIFIER ::= { boards 258 }
+
+
+        pprAtPwr02AC OBJECT IDENTIFIER ::= { boards 264 }
+
+
+        pprAtPwr02RAC OBJECT IDENTIFIER ::= { boards 265 }
+
+
+        pprAtXum10G OBJECT IDENTIFIER ::= { boards 266 }
+
+
+        pprAtXum12T OBJECT IDENTIFIER ::= { boards 267 }
+
+
+        pprAtXum12SFP OBJECT IDENTIFIER ::= { boards 268 }
+
+
+        pprSb24SFP OBJECT IDENTIFIER ::= { boards 269 }
+
+
+        pprAR770 OBJECT IDENTIFIER ::= { boards 270 }
+
+
+        pprx90024XT OBJECT IDENTIFIER ::= { boards 271 }
+
+
+        pprx90024XS OBJECT IDENTIFIER ::= { boards 272 }
+
+
+        pprAtXum10Gi OBJECT IDENTIFIER ::= { boards 273 }
+
+
+        pprAtXum12SFPi OBJECT IDENTIFIER ::= { boards 274 }
+
+
+        pprAtXum12Ti OBJECT IDENTIFIER ::= { boards 275 }
+
+
+        pprAR415S OBJECT IDENTIFIER ::= { boards 276 }
+
+
+        pprAR415SDC OBJECT IDENTIFIER ::= { boards 277 }
+
+
+        pprAR550SDP OBJECT IDENTIFIER ::= { boards 278 }
+
+
+        ppr8948iN OBJECT IDENTIFIER ::= { boards 279 }
+
+
+        pprAtXum12TiN OBJECT IDENTIFIER ::= { boards 280 }
+
+
+        pprx90024XTN OBJECT IDENTIFIER ::= { boards 281 }
+
+
+        pprSwitchBladex908 OBJECT IDENTIFIER ::= { boards 282 }
+
+
+        pprRapier48w OBJECT IDENTIFIER ::= { boards 283 }
+
+
+        pprAt8316XLCR OBJECT IDENTIFIER ::= { boards 284 }
+
+
+        pprAt8324XLCR OBJECT IDENTIFIER ::= { boards 285 }
+
+
+        pprXemStk OBJECT IDENTIFIER ::= { boards 286 }
+
+
+        pprAt8824R OBJECT IDENTIFIER ::= { boards 287 }
+
+
+        pprx90012XTS OBJECT IDENTIFIER ::= { boards 288 }
+
+
+        pprX90048FS OBJECT IDENTIFIER ::= { boards 289 }
+
+
+        pprx60024TS OBJECT IDENTIFIER ::= { boards 290 }
+
+
+        pprx60024TSXP OBJECT IDENTIFIER ::= { boards 291 }
+
+
+        pprAt9724TS OBJECT IDENTIFIER ::= { boards 292 }
+
+
+        pprAt9724TSXP OBJECT IDENTIFIER ::= { boards 293 }
+
+
+        pprx60048TS OBJECT IDENTIFIER ::= { boards 294 }
+
+
+        pprx60048TSXP OBJECT IDENTIFIER ::= { boards 295 }
+
+
+        pprAt9748TS OBJECT IDENTIFIER ::= { boards 296 }
+
+
+        pprAt9748TSXP OBJECT IDENTIFIER ::= { boards 297 }
+
+
+        pprXum100M OBJECT IDENTIFIER ::= { boards 298 }
+
+
+        pprAtPWR05AC OBJECT IDENTIFIER ::= { boards 299 }
+
+
+        pprIcmAr021v3s OBJECT IDENTIFIER ::= { boards 300 }
+
+
+        pprRapier48wb OBJECT IDENTIFIER ::= { boards 301 }
+
+
+        pprRapier48wAC OBJECT IDENTIFIER ::= { boards 302 }
+
+
+        pprRapier48wbAC OBJECT IDENTIFIER ::= { boards 303 }
+
+
+        pprX30024TS OBJECT IDENTIFIER ::= { boards 304 }
+
+
+        pprXemPOE OBJECT IDENTIFIER ::= { boards 305 }
+
+
+        pprXem2XP OBJECT IDENTIFIER ::= { boards 306 }
+
+
+        pprATStackXG OBJECT IDENTIFIER ::= { boards 307 }
+
+
+        pprATEMXP OBJECT IDENTIFIER ::= { boards 308 }
+
+
+        pprATLBM OBJECT IDENTIFIER ::= { boards 309 }
+
+
+        pprAt8624TCR OBJECT IDENTIFIER ::= { boards 310 }
+
+
+        pprAt8624POECR OBJECT IDENTIFIER ::= { boards 311 }
+
+
+        pprAtSBx8112 OBJECT IDENTIFIER ::= { boards 316 }
+
+
+        pprAtSBx81CFC400 OBJECT IDENTIFIER ::= { boards 317 }
+
+
+        pprAtSBx81GP24 OBJECT IDENTIFIER ::= { boards 318 }
+
+        pprAtSBx81XZ4 OBJECT IDENTIFIER ::= { boards 319 }
+
+        pprAtSBx8161SYSAC OBJECT IDENTIFIER ::= { boards 320 }
+
+
+        pprAtSBx8165POEAC OBJECT IDENTIFIER ::= { boards 321 }
+
+
+        pprAtSBx81FAN OBJECT IDENTIFIER ::= { boards 322 }
+
+
+        pprAtPWR05DC OBJECT IDENTIFIER ::= { boards 323 }
+
+
+        pprXem2XT OBJECT IDENTIFIER ::= { boards 325 }
+
+
+        pprx60024TSPOE OBJECT IDENTIFIER ::= { boards 326 }
+
+
+        pprx60024TSPOEPLUS OBJECT IDENTIFIER ::= { boards 327 }
+
+
+        pprAR560 OBJECT IDENTIFIER ::= { boards 330 }
+
+
+        pprx61048TsXPOEPlus OBJECT IDENTIFIER ::= { boards 331 }
+
+
+        pprx61048TsPOEPlus OBJECT IDENTIFIER ::= { boards 332 }
+
+
+        pprx61024TsXPOEPlus OBJECT IDENTIFIER ::= { boards 333 }
+
+
+        pprx61024TsPOEPlus OBJECT IDENTIFIER ::= { boards 334 }
+
+
+        pprPWR800 OBJECT IDENTIFIER ::= { boards 336 }
+
+
+        pprPWR1200 OBJECT IDENTIFIER ::= { boards 337 }
+
+
+        pprPWR250 OBJECT IDENTIFIER ::= { boards 338 }
+
+
+        pprx61048TsX OBJECT IDENTIFIER ::= { boards 339 }
+
+
+        pprx61048Ts OBJECT IDENTIFIER ::= { boards 340 }
+
+
+        pprx61024TsX OBJECT IDENTIFIER ::= { boards 341 }
+
+
+        pprx61024Ts OBJECT IDENTIFIER ::= { boards 342 }
+
+
+        pprx61024SPX OBJECT IDENTIFIER ::= { boards 343 }
+
+
+        pprRapier48xDC OBJECT IDENTIFIER ::= { boards 345 }
+
+
+        pprAR030  OBJECT IDENTIFIER ::= { boards 347 }
+
+
+        pprx200GE52T OBJECT IDENTIFIER ::= { boards 348 }
+
+
+        pprx200GE28T OBJECT IDENTIFIER ::= { boards 349 }
+
+
+        pprXem2XS OBJECT IDENTIFIER ::= { boards 350 }
+
+
+        pprPWR250DC OBJECT IDENTIFIER ::= { boards 351 }
+
+
+        pprAtSBx81GT24 OBJECT IDENTIFIER ::= { boards 352 }
+
+
+        pprAtSBx81GS24a OBJECT IDENTIFIER ::= { boards 353 }
+
+
+        pprAtSBx81XS6 OBJECT IDENTIFIER ::= { boards 354 }
+
+
+        pprXem24T OBJECT IDENTIFIER ::= { boards 356 }
+
+
+        pprAR031 OBJECT IDENTIFIER ::= { boards 357 }
+
+
+        pprXem12Tv2 OBJECT IDENTIFIER ::= { boards 358 }
+
+
+        pprXem12Sv2 OBJECT IDENTIFIER ::= { boards 359 }
+
+
+        pprx2109GT OBJECT IDENTIFIER ::= { boards 367 }
+
+
+        pprx21016GT OBJECT IDENTIFIER ::= { boards 368 }
+
+
+        pprx21024GT OBJECT IDENTIFIER ::= { boards 369 }
+
+
+        pprx51028GTX OBJECT IDENTIFIER ::= { boards 370 }
+
+
+        pprx51028GPX OBJECT IDENTIFIER ::= { boards 371 }
+
+
+        pprx51028GSX OBJECT IDENTIFIER ::= { boards 372 }
+
+
+        pprx51052GTX OBJECT IDENTIFIER ::= { boards 373 }
+
+
+        pprx51052GPX OBJECT IDENTIFIER ::= { boards 374 }
+
+
+        pprAtSBx8106 OBJECT IDENTIFIER ::= { boards 375 }
+
+        pprAtSBx81FAN06  OBJECT IDENTIFIER ::= { boards 376 }
+        pprSBx81CFC960  OBJECT IDENTIFIER ::= { boards 377 }
+        pprSBx81GT24a  OBJECT IDENTIFIER ::= { boards 378 }
+        pprSBx81GP24a  OBJECT IDENTIFIER ::= { boards 379 }
+        pprSBx81GT40  OBJECT IDENTIFIER ::= { boards 381 }
+        pprSBx81XS16  OBJECT IDENTIFIER ::= { boards 382 }
+
+        pprAtSBxPWRSYS1DC OBJECT IDENTIFIER ::= { boards 383 }
+
+        pprPWR100R  OBJECT IDENTIFIER ::= { boards 384 }
+        pprPWR250DCR  OBJECT IDENTIFIER ::= { boards 385 }
+
+        pprx510DP52GTX OBJECT IDENTIFIER ::= { boards 386 }
+        pprIX528GPX OBJECT IDENTIFIER ::= { boards 387 }
+
+        pprx93028GTX OBJECT IDENTIFIER ::= { boards 388 }
+        pprx93028GPX OBJECT IDENTIFIER ::= { boards 389 }
+        pprx93028GSTX OBJECT IDENTIFIER ::= { boards 390 }
+        pprx93052GTX OBJECT IDENTIFIER ::= { boards 391 }
+        pprx93052GPX OBJECT IDENTIFIER ::= { boards 392 }
+
+        pprx31026FT OBJECT IDENTIFIER ::= { boards 393 }
+        pprx31050FT OBJECT IDENTIFIER ::= { boards 394 }
+        pprx31026FP OBJECT IDENTIFIER ::= { boards 395 }
+        pprx31050FP OBJECT IDENTIFIER ::= { boards 396 }
+        pprx31026GT OBJECT IDENTIFIER ::= { boards 397 }
+        pprx31050GT OBJECT IDENTIFIER ::= { boards 398 }
+        pprx31026GP OBJECT IDENTIFIER ::= { boards 399 }
+        pprx31050GP OBJECT IDENTIFIER ::= { boards 400 }
+
+        pprx23010GT OBJECT IDENTIFIER ::= { boards 401 }
+        pprx23018GT OBJECT IDENTIFIER ::= { boards 402 }
+        pprx23028GT OBJECT IDENTIFIER ::= { boards 403 }
+        pprx23052GT OBJECT IDENTIFIER ::= { boards 404 }
+        pprx23010GP OBJECT IDENTIFIER ::= { boards 405 }
+        pprx23018GP OBJECT IDENTIFIER ::= { boards 406 }
+        pprx23028GP OBJECT IDENTIFIER ::= { boards 407 }
+        pprx23052GP OBJECT IDENTIFIER ::= { boards 408 }
+
+        pprx35010GPT OBJECT IDENTIFIER ::= { boards 409 }
+
+        pprIE2006GT OBJECT IDENTIFIER ::= { boards 410 }
+        pprIE2006GP OBJECT IDENTIFIER ::= { boards 411 }
+        pprIE2006GPW OBJECT IDENTIFIER ::= { boards 412 }
+
+        pprdc2552xs OBJECT IDENTIFIER ::= { boards 414 }
+
+        pprATStackQS OBJECT IDENTIFIER ::= { boards 419 }
+        pprATx9emXT4 OBJECT IDENTIFIER ::= { boards 420 }
+
+        pprx51028GSXDC OBJECT IDENTIFIER ::= { boards 421 }
+
+        pprIE51028GSX OBJECT IDENTIFIER ::= { boards 422 }
+
+        pprAR3050S OBJECT IDENTIFIER ::= { boards 423 }
+        pprAR4050S OBJECT IDENTIFIER ::= { boards 426 }
+
+        pprIE2006FT OBJECT IDENTIFIER ::= { boards 429 }
+        pprIE2006FP OBJECT IDENTIFIER ::= { boards 430 }
+
+        pprx510DP28GTX OBJECT IDENTIFIER ::= { boards 431 }
+
+        pprx510L28GT OBJECT IDENTIFIER ::= { boards 432 }
+        pprx510L52GT OBJECT IDENTIFIER ::= { boards 433 }
+        pprx510L28GP OBJECT IDENTIFIER ::= { boards 434 }
+        pprx510L52GP OBJECT IDENTIFIER ::= { boards 435 }
+
+        pprx51028GTXR OBJECT IDENTIFIER ::= { boards 436 }
+        pprx51052GTXR OBJECT IDENTIFIER ::= { boards 437 }
+
+        pprIE30012GT OBJECT IDENTIFIER ::= { boards 438 }
+        pprIE30012GP OBJECT IDENTIFIER ::= { boards 439 }
+        pprIE30012GS OBJECT IDENTIFIER ::= { boards 440 }
+        pprIE30020GST OBJECT IDENTIFIER ::= { boards 441 }
+
+        pprVAA OBJECT IDENTIFIER ::= { boards 442 }
+
+        pprAtGS924MX OBJECT IDENTIFIER ::= { boards 443 }
+        pprAtGS924MPX OBJECT IDENTIFIER ::= { boards 444 }
+        pprAtGS948MX OBJECT IDENTIFIER ::= { boards 445 }
+        pprAtGS948MPX OBJECT IDENTIFIER ::= { boards 446 }
+
+        pprAtSBx81XLEM OBJECT IDENTIFIER ::= { boards 447 }
+        pprAtSBx81XLEMemXS8 OBJECT IDENTIFIER ::= { boards 448 }
+        pprAtSBx81XLEMemQ2 OBJECT IDENTIFIER ::= { boards 449 }
+        pprAtSBx81XLEMemXT4 OBJECT IDENTIFIER ::= { boards 450 }
+        pprAtSBx81XLEMemGT8 OBJECT IDENTIFIER ::= { boards 451 }
+
+        pprAtSBxPWRSYS2AC OBJECT IDENTIFIER ::= { boards 452 }
+
+        pprPWR150 OBJECT IDENTIFIER ::= { boards 453 }
+        pprAR2050V OBJECT IDENTIFIER ::= { boards 454 }
+        pprAR2010V OBJECT IDENTIFIER ::= { boards 455 }
+
+        pprAtXS916MXT OBJECT IDENTIFIER ::= { boards 456 }
+        pprAtXS916MXS OBJECT IDENTIFIER ::= { boards 457 }
+        pprAtXS916MXP OBJECT IDENTIFIER ::= { boards 458 }
+
+        pprSH51028GTX OBJECT IDENTIFIER ::= { boards 459 }
+        pprSH51052GTX OBJECT IDENTIFIER ::= { boards 460 }
+        pprSH51028GPX OBJECT IDENTIFIER ::= { boards 461 }
+        pprSH51052GPX OBJECT IDENTIFIER ::= { boards 462 }
+        pprSH23010GP OBJECT IDENTIFIER ::= { boards 463 }
+        pprSH23018GP OBJECT IDENTIFIER ::= { boards 464 }
+        pprSH23028GP OBJECT IDENTIFIER ::= { boards 465 }
+        pprSH2109GT OBJECT IDENTIFIER ::= { boards 466 }
+        pprSH21016GT OBJECT IDENTIFIER ::= { boards 467 }
+        pprSH21024GT OBJECT IDENTIFIER ::= { boards 468 }
+        pprSH31026FT OBJECT IDENTIFIER ::= { boards 469 }
+        pprSH31050FT OBJECT IDENTIFIER ::= { boards 470 }
+        pprSH31026FP OBJECT IDENTIFIER ::= { boards 471 }
+        pprSH31050FP OBJECT IDENTIFIER ::= { boards 472 }
+        pprSH23010GT OBJECT IDENTIFIER ::= { boards 473 }
+        pprSH23018GT OBJECT IDENTIFIER ::= { boards 474 }
+        pprSH23028GT OBJECT IDENTIFIER ::= { boards 475 }
+
+        pprAtFS980M9 OBJECT IDENTIFIER ::= { boards 476 }
+        pprAtFS980M9PS OBJECT IDENTIFIER ::= { boards 477 }
+        pprAtFS980M18 OBJECT IDENTIFIER ::= { boards 478 }
+        pprAtFS980M18PS OBJECT IDENTIFIER ::= { boards 479 }
+        pprAtFS980M28 OBJECT IDENTIFIER ::= { boards 480 }
+        pprAtFS980M28PS OBJECT IDENTIFIER ::= { boards 481 }
+        pprAtFS980M52 OBJECT IDENTIFIER ::= { boards 482 }
+        pprAtFS980M52PS OBJECT IDENTIFIER ::= { boards 483 }
+
+        pprSBx908G2 OBJECT IDENTIFIER ::= { boards 484 }
+        pprSBx908G3 OBJECT IDENTIFIER ::= { boards 485 }
+        pprAtFan08 OBJECT IDENTIFIER ::= { boards 486 }
+        pprAtXem2QS4 OBJECT IDENTIFIER ::= { boards 487 }
+        pprAtXem2XS12 OBJECT IDENTIFIER ::= { boards 488 }
+        pprAtXem2XT12 OBJECT IDENTIFIER ::= { boards 489 }
+        pprAtXem3QS8 OBJECT IDENTIFIER ::= { boards 490 }
+
+        pprx55018XTQ OBJECT IDENTIFIER ::= { boards 491 }
+        pprx55018XSQ OBJECT IDENTIFIER ::= { boards 492 }
+        pprx55018XSPQm OBJECT IDENTIFIER ::= { boards 493 }
+        pprAtXem2CQ1 OBJECT IDENTIFIER ::= { boards 494 }
+
+        pprAtGS910M OBJECT IDENTIFIER ::= { boards 496 }
+        pprAtGS910MP OBJECT IDENTIFIER ::= { boards 497 }
+        pprAtGS918M OBJECT IDENTIFIER ::= { boards 498 }
+        pprAtGS918MP OBJECT IDENTIFIER ::= { boards 499 }
+        pprAtGS928M OBJECT IDENTIFIER ::= { boards 500 }
+        pprAtGS928MP OBJECT IDENTIFIER ::= { boards 501 }
+        pprAtGS952M OBJECT IDENTIFIER ::= { boards 502 }
+        pprAtGS952MP OBJECT IDENTIFIER ::= { boards 503 }
+
+        pprAtGS970M28PS OBJECT IDENTIFIER ::= { boards 534 }
+        pprAtGS970M18PS OBJECT IDENTIFIER ::= { boards 535 }
+        pprAtGS970M10PS OBJECT IDENTIFIER ::= { boards 536 }
+
+        pprAtGS970M28 OBJECT IDENTIFIER ::= { boards 537 }
+        pprAtGS970M18 OBJECT IDENTIFIER ::= { boards 538 }
+        pprAtGS970M10 OBJECT IDENTIFIER ::= { boards 539 }
+
+        release OBJECT IDENTIFIER ::= { objects 2 }
+
+
+        iftypes OBJECT IDENTIFIER ::= { objects 3 }
+
+
+        ifaceEth OBJECT IDENTIFIER ::= { iftypes 1 }
+
+
+        ifaceSyn OBJECT IDENTIFIER ::= { iftypes 2 }
+
+
+        ifaceAsyn OBJECT IDENTIFIER ::= { iftypes 3 }
+
+
+        ifaceBri OBJECT IDENTIFIER ::= { iftypes 4 }
+
+
+        ifacePri OBJECT IDENTIFIER ::= { iftypes 5 }
+
+
+        ifacePots OBJECT IDENTIFIER ::= { iftypes 6 }
+
+
+        ifaceGBIC OBJECT IDENTIFIER ::= { iftypes 7 }
+
+
+        chips OBJECT IDENTIFIER ::= { objects 4 }
+
+
+        chip68020Cpu OBJECT IDENTIFIER ::= { chips 1 }
+
+
+        chip68340Cpu OBJECT IDENTIFIER ::= { chips 2 }
+
+
+        chip68302Cpu OBJECT IDENTIFIER ::= { chips 3 }
+
+
+        chip68360Cpu OBJECT IDENTIFIER ::= { chips 4 }
+
+
+        chip860TCpu OBJECT IDENTIFIER ::= { chips 5 }
+
+
+        chipMips4kcCpu OBJECT IDENTIFIER ::= { chips 6 }
+
+
+        chipRtc1 OBJECT IDENTIFIER ::= { chips 21 }
+
+
+        chipRtc2 OBJECT IDENTIFIER ::= { chips 22 }
+
+
+        chipRtc3 OBJECT IDENTIFIER ::= { chips 23 }
+
+
+        chipRtc4 OBJECT IDENTIFIER ::= { chips 24 }
+
+
+        chipRam1mb OBJECT IDENTIFIER ::= { chips 31 }
+
+
+        chipRam2mb OBJECT IDENTIFIER ::= { chips 32 }
+
+
+        chipRam3mb OBJECT IDENTIFIER ::= { chips 33 }
+
+
+        chipRam4mb OBJECT IDENTIFIER ::= { chips 34 }
+
+
+        chipRam6mb OBJECT IDENTIFIER ::= { chips 36 }
+
+
+        chipRam8mb OBJECT IDENTIFIER ::= { chips 38 }
+
+
+        chipRam12mb OBJECT IDENTIFIER ::= { chips 42 }
+
+
+        chipRam16mb OBJECT IDENTIFIER ::= { chips 46 }
+
+
+        chipRam20mb OBJECT IDENTIFIER ::= { chips 50 }
+
+
+        chipRam32mb OBJECT IDENTIFIER ::= { chips 62 }
+
+
+        chipFlash1mb OBJECT IDENTIFIER ::= { chips 71 }
+
+
+        chipFlash2mb OBJECT IDENTIFIER ::= { chips 72 }
+
+
+        chipFlash3mb OBJECT IDENTIFIER ::= { chips 73 }
+
+
+        chipFlash4mb OBJECT IDENTIFIER ::= { chips 74 }
+
+
+        chipFlash6mb OBJECT IDENTIFIER ::= { chips 76 }
+
+
+        chipFlash8mb OBJECT IDENTIFIER ::= { chips 78 }
+
+
+        chipPem OBJECT IDENTIFIER ::= { chips 120 }
+
+
+
+    END
+
+--
+-- AT-BOARDS-MIB.my
+--

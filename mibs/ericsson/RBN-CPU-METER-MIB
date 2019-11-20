@@ -1,0 +1,359 @@
+-- %DNP% $Id: RBN-CPU-METER-MIB.my,v 1.1.2.2.434.4 2011/12/16 22:31:28 chiachun Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/RBN-CPU-METER-MIB.my,v $
+-- *****************************************************************
+-- RBN-CPU-METER-MIB    The RBN CPU utilization MIB
+--
+-- Copyright (c) 1999, 2003, 2011 Ericsson AB.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+RBN-CPU-METER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE, Integer32, Unsigned32, Counter32, Gauge32
+                FROM SNMPv2-SMI
+        MODULE-COMPLIANCE,
+        OBJECT-GROUP
+                FROM SNMPv2-CONF
+        TEXTUAL-CONVENTION, DisplayString
+                FROM SNMPv2-TC
+        rbnMgmt
+                FROM RBN-SMI
+        RbnPercentage
+                FROM RBN-TC;
+
+rbnCpuMeterMIB MODULE-IDENTITY
+        LAST-UPDATED    "201112131800Z" -- Dec 13, 2011    
+        ORGANIZATION    "Ericsson AB."
+        CONTACT-INFO
+                "       Ericsson AB.
+
+                Postal: 100 Headquarters Dr
+                        San Jose, CA 95134
+                        USA
+
+                 Phone: +1 408 750 5000
+                   Fax: +1 408 750 5599
+
+                "
+        DESCRIPTION
+                "This management information module measures CPU 
+                utilization on a device."
+
+    REVISION      "201112131800Z" -- Dec 13, 2011
+    DESCRIPTION
+        "Added rbnCpuMeterFiveSecondPeak, rbnCpuMeterOneMinutePeak, and
+        rbnCpuMeterFiveMinutePeak to monitor system peak CPU usage. Updated
+        conformance information."
+
+    REVISION      "201101191800Z" -- Jan 19, 2011
+    DESCRIPTION
+        "Update CONTACT-INFO & ORGANIZATION. Corrected max length of
+        rbnCpuProcName"
+
+    REVISION      "200212160000Z" -- December 16, 2002
+    DESCRIPTION
+        "Added a per process table to monitor the cpu usage of
+         each of the processes on the system."
+
+    REVISION      "200206260000Z" -- June 26, 2002
+    DESCRIPTION
+        "Updated CONTACT-INFO. Deprecated TEXTUAL-CONVENTION: Percentage.  
+        Use RbnPercentage in SYNTAX."
+
+    REVISION      "200205290000Z" -- May 29, 2002
+    DESCRIPTION
+        "Update/correct CONTACT-INFO. Fix syntax errors on IMPORTS list."
+
+    REVISION      "199906162300Z"
+    DESCRIPTION
+        "Creation of the CPU meter MIB."
+        ::= { rbnMgmt 6 }
+
+
+rbnCpuMeterMIBObjects OBJECT IDENTIFIER
+        ::= { rbnCpuMeterMIB 1 }
+
+rbnCpuMeterMIBConformance OBJECT IDENTIFIER
+        ::= { rbnCpuMeterMIB 2 }
+
+rbnCpuProcMIBObjects OBJECT IDENTIFIER
+        ::= { rbnCpuMeterMIB 3 }
+
+Percentage ::= TEXTUAL-CONVENTION
+    STATUS deprecated
+    DESCRIPTION
+    "This Textual Convention describes an object that stores 
+     a whole integer percentage value."
+    SYNTAX Integer32 (0..100)    
+
+-- MIB Objects
+
+rbnCpuMeterFiveSecondAvg OBJECT-TYPE
+        SYNTAX      RbnPercentage
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Provides the CPU usage percentage over the first five
+                 second period in the scheduler."
+        ::= { rbnCpuMeterMIBObjects 1 }
+
+rbnCpuMeterOneMinuteAvg OBJECT-TYPE
+        SYNTAX      RbnPercentage
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Provides a cumulative average of the CPU usage percentage
+                 over a one minute period."
+        ::= { rbnCpuMeterMIBObjects 2 }
+
+rbnCpuMeterFiveMinuteAvg OBJECT-TYPE
+        SYNTAX      RbnPercentage
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Provides a cumulative average of the CPU usage percentage
+                 over a five minute period." 
+        ::= { rbnCpuMeterMIBObjects 3 }
+
+rbnCpuMeterFiveSecondPeak OBJECT-TYPE
+        SYNTAX      RbnPercentage
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The peak CPU usage percentage over the first five
+                 second period."
+        ::= { rbnCpuMeterMIBObjects 4 }
+
+rbnCpuMeterOneMinutePeak OBJECT-TYPE
+        SYNTAX      RbnPercentage
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The peak CPU usage percentage over a one minute
+                 period."
+        ::= { rbnCpuMeterMIBObjects 5 }
+
+rbnCpuMeterFiveMinutePeak OBJECT-TYPE
+        SYNTAX      RbnPercentage
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The peak CPU usage percentage over a five minute
+                 period." 
+        ::= { rbnCpuMeterMIBObjects 6 }
+
+--
+-- Per Process Table
+--
+
+rbnCpuProcTable OBJECT-TYPE
+        SYNTAX       SEQUENCE OF RbnCpuProcEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+                "This table contains the objects which identify cpu processes.
+                With respect to creation and deletion of entries in this table,
+                rows in the table are created or deleted as processes are started 
+                or terminated."
+
+        ::= { rbnCpuProcMIBObjects 1 }
+
+rbnCpuProcEntry OBJECT-TYPE
+        SYNTAX       RbnCpuProcEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+                "A conceptual row in the rbnCpuProcTable."
+        INDEX        { IMPLIED rbnCpuProcName }
+
+        ::= { rbnCpuProcTable 1 }
+
+RbnCpuProcEntry ::=
+        SEQUENCE {
+                rbnCpuProcName          DisplayString,
+                rbnCpuProcPriority      Unsigned32,
+                rbnCpuProcTime          Counter32,
+                rbnCpuProcCalls         Counter32,
+                rbnCpuProc5Sec          RbnPercentage,
+                rbnCpuProc1Min          RbnPercentage,
+                rbnCpuProc5Min          RbnPercentage,
+                rbnCpuProcLongest       Gauge32
+        }
+
+rbnCpuProcName OBJECT-TYPE
+        SYNTAX       DisplayString (SIZE (1..114))
+        MAX-ACCESS   read-only 
+        STATUS       current
+        DESCRIPTION
+                "The name for this process."
+
+        ::= { rbnCpuProcEntry 1 }
+
+rbnCpuProcPriority OBJECT-TYPE
+        SYNTAX       Unsigned32 (0..255)
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+                "The priority of this process. This value ranges 
+                from 0 to 255, with 0 being the highest priority."
+
+        ::= { rbnCpuProcEntry 2 }
+
+rbnCpuProcTime OBJECT-TYPE
+        SYNTAX       Counter32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+                "The total time, in milliseconds, that has been spent 
+                in this process."
+
+        ::= { rbnCpuProcEntry 3 }
+
+rbnCpuProcCalls OBJECT-TYPE
+        SYNTAX       Counter32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+                "The number of times that this process has acquired
+                 the cpu."
+
+        ::= { rbnCpuProcEntry 4 }
+
+rbnCpuProc5Sec OBJECT-TYPE
+        SYNTAX       RbnPercentage
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+                "The average cpu usage in a 5 second window for this process."
+
+        ::= { rbnCpuProcEntry 5 }
+
+rbnCpuProc1Min OBJECT-TYPE
+        SYNTAX       RbnPercentage
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+                "The average cpu usage in a 1 minute window for this process."
+
+        ::= { rbnCpuProcEntry 6 }
+
+rbnCpuProc5Min OBJECT-TYPE
+        SYNTAX       RbnPercentage
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+                "The average cpu usage in a 5 minute window for this process."
+
+        ::= { rbnCpuProcEntry 7 }
+
+rbnCpuProcLongest OBJECT-TYPE
+        SYNTAX       Gauge32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+                "The maximum time, in milliseconds, spent in this process."
+
+        ::= { rbnCpuProcEntry 8 }
+
+-- Conformance Information
+
+
+rbnCpuMeterMIBGroups OBJECT IDENTIFIER ::= 
+        { rbnCpuMeterMIBConformance 1 }
+
+rbnCpuMeterMIBCompliances OBJECT IDENTIFIER ::=
+        { rbnCpuMeterMIBConformance 2 }
+
+rbnCpuProcGroups OBJECT IDENTIFIER ::=
+        { rbnCpuMeterMIBConformance 3 }
+
+-- Compliance Statements
+
+rbnCpuMeterMIBCompliance MODULE-COMPLIANCE
+        STATUS      deprecated 
+        DESCRIPTION
+                "The compliance statement for the CPU meter MIB."
+        MODULE      -- this module
+        MANDATORY-GROUPS 
+                {
+                    rbnCpuMeterStatsGroup
+                }
+        ::= { rbnCpuMeterMIBCompliances 1 }
+
+rbnCpuMeterMIBCompliance1 MODULE-COMPLIANCE
+        STATUS      deprecated 
+        DESCRIPTION
+                "The compliance statement for the CPU meter MIB
+                with added support for per process monitoring."
+        MODULE      -- this module
+        MANDATORY-GROUPS 
+                {
+                    rbnCpuMeterStatsGroup,
+                    rbnCpuProcGroup
+                }
+        ::= { rbnCpuMeterMIBCompliances 2 }
+
+rbnCpuMeterMIBCompliance2 MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION
+                "The compliance statement for the CPU meter MIB
+                with added support for per process monitoring."
+        MODULE      -- this module
+        MANDATORY-GROUPS 
+                {
+                    rbnCpuMeterStatsGroup2,
+                    rbnCpuProcGroup
+                }
+        ::= { rbnCpuMeterMIBCompliances 3 }
+
+-- Units of Conformance
+
+rbnCpuMeterStatsGroup OBJECT-GROUP
+        OBJECTS 
+              {
+                rbnCpuMeterFiveSecondAvg,
+                rbnCpuMeterOneMinuteAvg,
+                rbnCpuMeterFiveMinuteAvg
+              }
+        STATUS      deprecated 
+        DESCRIPTION
+                "A collection of objects providing CPU utilization
+                 information."
+        ::= { rbnCpuMeterMIBGroups 1 }
+
+rbnCpuProcGroup     OBJECT-GROUP
+        OBJECTS {
+                rbnCpuProcName,
+                rbnCpuProcPriority,
+                rbnCpuProcTime,
+                rbnCpuProcCalls,
+                rbnCpuProc5Sec,
+                rbnCpuProc1Min,
+                rbnCpuProc5Min,
+                rbnCpuProcLongest
+        }
+        STATUS       current
+        DESCRIPTION
+                "The collection of all objects used for monitoring cpu
+                utilization of each process."
+        ::= { rbnCpuProcGroups 1}
+
+rbnCpuMeterStatsGroup2 OBJECT-GROUP
+        OBJECTS 
+              {
+                rbnCpuMeterFiveSecondAvg,
+                rbnCpuMeterOneMinuteAvg,
+                rbnCpuMeterFiveMinuteAvg,
+                rbnCpuMeterFiveSecondPeak,
+                rbnCpuMeterOneMinutePeak,
+                rbnCpuMeterFiveMinutePeak
+              }
+        STATUS      current
+        DESCRIPTION
+                "A collection of objects providing CPU utilization
+                information."
+        ::= { rbnCpuMeterMIBGroups 2 }
+END

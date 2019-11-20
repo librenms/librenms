@@ -1,0 +1,852 @@
+--  ============================================================================
+-- AT-VCSTACK.MIB, Allied Telesis enterprise MIB: Virtual Chassis Stack
+--
+-- Copyright (c) 2009 by Allied Telesis, Inc.
+-- All rights reserved.
+--
+-- ============================================================================
+
+    AT-VCSTACK-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            sysinfo
+                FROM AT-SMI-MIB
+            IpAddress, Integer32, Unsigned32, Counter32, OBJECT-TYPE,
+            MODULE-IDENTITY, NOTIFICATION-TYPE
+                FROM SNMPv2-SMI
+            DisplayString, MacAddress, TruthValue
+                FROM SNMPv2-TC;
+
+
+        vcstack MODULE-IDENTITY
+            LAST-UPDATED "201705110000Z"
+
+            ORGANIZATION
+                "Allied Telesis, Inc"
+            CONTACT-INFO
+                "http://www.alliedtelesis.com"
+            DESCRIPTION
+                "This MIB file contains definitions of managed objects for
+                Virtual Chassis Stacking in AlliedWare Plus. "
+            REVISION "201705110000Z"
+            DESCRIPTION
+                "Added new field expansionModule to vcstackActiveStkHardware and
+                 deprecated fields xemStk(1), stackXG(4) and x6EMXS2(5).
+                 Added the missing field stackQS(6) as it is supported on x930."
+            REVISION "201412240000Z"
+            DESCRIPTION
+                "Allow value range (0-12) for object vcstackBayid"
+            REVISION "201407040000Z"
+            DESCRIPTION
+                "Added a new value for object vcstackStatus"
+            REVISION "201405260000Z"
+            DESCRIPTION
+                "Updated vcstackStkPortxNeighbourId descriptions for VCS+."
+            REVISION "201404240000Z"
+            DESCRIPTION
+                "Deprecated vcstackStkPort1Status, vcstackStkPort1NeighbourId,
+                 vcstackStkPort2Status, vcstackStkPort2NeighbourId"
+            REVISION "201404150000Z"
+            DESCRIPTION
+                "Added vcstackPortTable table"
+            REVISION "201404090000Z"
+            DESCRIPTION
+                "Updated vcstackVirtualMacAddr description with small change in behaviour"
+            REVISION "201111030000Z"
+            DESCRIPTION "Add x6EM/XS2 hardware type"
+            REVISION "201009070000Z"
+            DESCRIPTION
+                "Generic syntax tidy up"
+            REVISION "201009030000Z"
+            DESCRIPTION
+                "Added disabled master monitoring object and a new resiliency-link status"
+            REVISION "201006150015Z"
+            DESCRIPTION
+                "MIB revision history dates in descriptions updated."
+            REVISION "201005240119Z"
+            DESCRIPTION
+                "OID of vcstackTraps was reverted to 6 but deprecated. Added vcstackNotifications"
+            REVISION "201001150039Z"
+            DESCRIPTION
+                "Changed the OID value of vcstackTraps from 6 to 0 to meet RFC 3584 3.1"
+            REVISION "200911050000Z"
+            DESCRIPTION
+                "Obsoleted fallback-config, added new status object"
+            REVISION "200906080000Z"
+            DESCRIPTION
+                "Added stack master object and corrected allowable ranges
+                for learned neighbour stack ID's."
+            REVISION "200901200000Z"
+            DESCRIPTION
+                "Added Virtual MAC address objects."
+            REVISION "200803190000Z"
+            DESCRIPTION
+                "Initial version."
+            ::= { sysinfo 13 }
+
+
+
+
+--
+-- Node definitions
+--
+
+--
+-- The VCS Notification Objects (For RFC3584 compliance)
+--
+        vcstackNotifications OBJECT IDENTIFIER ::= { vcstack 0 }
+
+
+        vcstackRoleChangeNotify NOTIFICATION-TYPE
+            OBJECTS { vcstackId, vcstackRole }
+            STATUS current
+            DESCRIPTION
+                "A notification generated when the stack member's role is changed."
+            ::= { vcstackNotifications 1 }
+
+
+        vcstackMemberJoinNotify NOTIFICATION-TYPE
+            OBJECTS { vcstackId, vcstackNbrMemberIdNotify }
+            STATUS current
+            DESCRIPTION
+                "A notification generated when a member joins in the stack."
+            ::= { vcstackNotifications 2 }
+
+
+        vcstackMemberLeaveNotify NOTIFICATION-TYPE
+            OBJECTS { vcstackId, vcstackNbrMemberIdNotify }
+            STATUS current
+            DESCRIPTION
+                "A notification generated when a member leaves from the stack."
+            ::= { vcstackNotifications 3 }
+
+
+        vcstackResiliencyLinkHealthCheckReceivingNotify NOTIFICATION-TYPE
+            OBJECTS { vcstackId, vcstackResiliencyLinkInterfaceName }
+            STATUS current
+            DESCRIPTION
+                "A notification generated when the resiliency link is activated."
+            ::= { vcstackNotifications 4 }
+
+
+        vcstackResiliencyLinkHealthCheckTimeOutNotify NOTIFICATION-TYPE
+            OBJECTS { vcstackId, vcstackResiliencyLinkInterfaceName }
+            STATUS current
+            DESCRIPTION
+                "A notification generated when the slave's receive timer has timed out
+                indicating that the Slave has lost contact with the Master
+                via the resiliency link."
+            ::= { vcstackNotifications 5 }
+
+
+        vcstackStkPortLinkUpNotify NOTIFICATION-TYPE
+            OBJECTS { vcstackId, vcstackStkPortNameNotify }
+            STATUS current
+            DESCRIPTION
+                "A notification generated when the link of stack port is up."
+            ::= { vcstackNotifications 6 }
+
+
+        vcstackStkPortLinkDownNotify NOTIFICATION-TYPE
+            OBJECTS { vcstackId, vcstackStkPortNameNotify }
+            STATUS current
+            DESCRIPTION
+                "A notification generated when the link of stack port is down."
+            ::= { vcstackNotifications 7 }
+
+
+        vcstackNbrMemberIdNotify OBJECT-TYPE
+            SYNTAX Unsigned32 (1..8)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The stack member id of the neighbor of the member sent this notification."
+            ::= { vcstackNotifications 8 }
+
+
+        vcstackStkPortNameNotify OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The stack port name related this notification."
+            ::= { vcstackNotifications 9 }
+
+
+        vcstackStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                normalOperation(1),
+                operatingInFailoverState(2),
+                standaloneUnit(3),
+                ringTopologyBroken(4),
+                vcsDisabled(5),
+                allStkPortsNotUp(6)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The overall stack status."
+            ::= { vcstack 1 }
+
+
+        vcstackOperationalStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enabled(1),
+                disabled(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Whether the stack is enabled or disabled."
+            ::= { vcstack 2 }
+
+
+        vcstackMgmtVlanId OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The current stacking management VLAN ID."
+            ::= { vcstack 3 }
+
+
+        vcstackMgmtVlanSubnetAddr OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The current stacking management VLAN subnet address."
+            ::= { vcstack 4 }
+
+
+        vcstackTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF VCStackEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A list of stack members."
+            ::= { vcstack 5 }
+
+
+        vcstackEntry OBJECT-TYPE
+            SYNTAX VCStackEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A set of parameters that describe the status of a stack member"
+            INDEX { vcstackId }
+            ::= { vcstackTable 1 }
+
+
+        VCStackEntry ::=
+            SEQUENCE {
+                vcstackId
+                    Unsigned32,
+                vcstackPendingId
+                    Unsigned32,
+                vcstackMacAddr
+                    MacAddress,
+                vcstackPriority
+                    Unsigned32,
+                vcstackRole
+                    INTEGER,
+                vcstackLastRoleChange
+                    DisplayString,
+                vcstackHostname
+                    DisplayString,
+                vcstackProductType
+                    DisplayString,
+                vcstackSWVersionAutoSync
+                    TruthValue,
+                vcstackFallbackConfigStatus
+                    INTEGER,
+                vcstackFallbackConfigFilename
+                    DisplayString,
+                vcstackResiliencyLinkStatus
+                    INTEGER,
+                vcstackResiliencyLinkInterfaceName
+                    DisplayString,
+                vcstackActiveStkHardware
+                    INTEGER,
+                vcstackStkPort1Status
+                    INTEGER,
+                vcstackStkPort1NeighbourId
+                    Unsigned32,
+                vcstackStkPort2Status
+                    INTEGER,
+                vcstackStkPort2NeighbourId
+                    Unsigned32,
+                vcstackNumMembersJoined
+                    Counter32,
+                vcstackNumMembersLeft
+                    Counter32,
+                vcstackNumIdConflict
+                    Counter32,
+                vcstackNumMasterConflict
+                    Counter32,
+                vcstackNumMasterFailover
+                    Counter32,
+                vcstackNumStkPort1NbrIncompatible
+                    Counter32,
+                vcstackNumStkPort2NbrIncompatible
+                    Counter32,
+                vcstackReadinessStatus
+                    INTEGER
+             }
+
+        vcstackId OBJECT-TYPE
+            SYNTAX Unsigned32 (1..8)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Stack member ID."
+            ::= { vcstackEntry 1 }
+
+
+        vcstackPendingId OBJECT-TYPE
+            SYNTAX Unsigned32 (1..8)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The pending stack member ID."
+            ::= { vcstackEntry 2 }
+
+
+        vcstackMacAddr OBJECT-TYPE
+            SYNTAX MacAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Stack member's hardware MAC address."
+            ::= { vcstackEntry 3 }
+
+
+        vcstackPriority OBJECT-TYPE
+            SYNTAX Unsigned32 (0..255)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The priority for election of the stack master. The lowest number has the highest priority."
+            ::= { vcstackEntry 4 }
+
+
+        vcstackRole OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                leaving(1),
+                discovering(2),
+                synchronizing(3),
+                backupMember(4),
+                pendingMaster(5),
+                disabledMaster(6),
+                fallbackMaster(7),
+                activeMaster(8)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Stack member's role in the stack.
+                Note: value type fallbackMaster(7) is deprecated."
+            ::= { vcstackEntry 5 }
+
+
+        vcstackLastRoleChange OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The time and date when the stack member last changed its role in the stack."
+            ::= { vcstackEntry 6 }
+
+
+        vcstackHostname OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Stack member's hostname."
+            ::= { vcstackEntry 7 }
+
+
+        vcstackProductType OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Stack members product type."
+            ::= { vcstackEntry 8 }
+
+
+        vcstackSWVersionAutoSync OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Whether or not to automatically upgrade the stack member's software."
+            ::= { vcstackEntry 9 }
+
+
+        vcstackFallbackConfigStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                fileExists(1),
+                fileNotFound(2),
+                notConfigured(3)
+                }
+            MAX-ACCESS read-only
+            STATUS obsolete
+            DESCRIPTION
+                "The status of the fallback configuration file.
+                For AW+ releases, this object is not supported as from software
+                release 5.3.4."
+            ::= { vcstackEntry 10 }
+
+
+        vcstackFallbackConfigFilename OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS obsolete
+            DESCRIPTION
+                "The filename of the fallback configuration file.
+                For AW+ releases, this object is not supported as from software
+                release 5.3.4."
+            ::= { vcstackEntry 11 }
+
+
+        vcstackResiliencyLinkStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                configured(1),
+                successful(2),
+                failed(3),
+                notConfigured(4),
+                stopped(5)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The status of the stack members resilency link."
+            ::= { vcstackEntry 12 }
+
+
+        vcstackResiliencyLinkInterfaceName OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The name of the interface the resiliency link is configured on."
+            ::= { vcstackEntry 13 }
+
+
+        vcstackActiveStkHardware OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                xemStk(1),
+                builtinStackingPorts(2),
+                none(3),
+                stackXG(4),
+                x6EMXS2(5),
+                stackQS(6),
+                expansionModule(7)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The stack ports hardware type.
+                Note: Value type none(3) is deprecated.
+                Value types xemStk(1), stackXG(4) and x6EMXS2(5) are deprecated as
+                these modules are no longer supported."
+            ::= { vcstackEntry 14 }
+
+
+        vcstackStkPort1Status OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                down(1),
+                neighbourIncompatible(2),
+                discoveringNeighbour(3),
+                learntNeighbour(4)
+                }
+            MAX-ACCESS read-only
+            STATUS deprecated
+            DESCRIPTION
+                "Status of the stack port 1."
+            ::= { vcstackEntry 15 }
+
+
+        vcstackStkPort1NeighbourId OBJECT-TYPE
+            SYNTAX Unsigned32 (0..8)
+            MAX-ACCESS read-only
+            STATUS deprecated
+            DESCRIPTION
+                "The ID of the neighbour on stack port 1. A value of zero
+                indicates no learned neighbour. For VCStack Plus, 1-12 refers
+                to the cards on chassis member 1 and 13-24 refers to the cards
+                on chassis member 2. Refer to chassisMappingTable for more details."
+            ::= { vcstackEntry 16 }
+
+
+        vcstackStkPort2Status OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                down(1),
+                neighbourIncompatible(2),
+                discoveringNeighbour(3),
+                learntNeighbour(4)
+                }
+            MAX-ACCESS read-only
+            STATUS deprecated
+            DESCRIPTION
+                "Status of the stack port 2."
+            ::= { vcstackEntry 17 }
+
+
+        vcstackStkPort2NeighbourId OBJECT-TYPE
+            SYNTAX Unsigned32 (0..8)
+            MAX-ACCESS read-only
+            STATUS deprecated
+            DESCRIPTION
+                "The ID of the neighbour on stack port 2. A value of zero
+                indicates no learned neighbour.  For VCStack Plus, 1-12 refers
+                to the cards on chassis member 1 and 13-24 refers to the cards
+                on chassis member 2. Refer to chassisMappingTable for more details."
+            ::= { vcstackEntry 18 }
+
+
+        vcstackNumMembersJoined OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of times the stack acquires a member."
+            ::= { vcstackEntry 19 }
+
+
+        vcstackNumMembersLeft OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of times the stack loses a member."
+            ::= { vcstackEntry 20 }
+
+
+        vcstackNumIdConflict OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of times that a stack member ID conflicts."
+            ::= { vcstackEntry 21 }
+
+
+        vcstackNumMasterConflict OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of times that a stack master conflict occurs."
+            ::= { vcstackEntry 22 }
+
+
+        vcstackNumMasterFailover OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of times that the stack master fails."
+            ::= { vcstackEntry 23 }
+
+
+        vcstackNumStkPort1NbrIncompatible OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of times that the neighbour is detected as incompatible on stack port 1."
+            ::= { vcstackEntry 24 }
+
+
+        vcstackNumStkPort2NbrIncompatible OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of times that the neighbour is detected as incompatible on stack port 2."
+            ::= { vcstackEntry 25 }
+
+
+        vcstackReadinessStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                init(1),
+                syncing(2),
+                ready(3),
+                syncError(4)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Indicates how readily a stack member can take over as master
+                if the current stack master were to fail. Possible values are:
+
+                init (1) - the stack member is completing startup initialization.
+                syncing (2) - the stack member is synchronizing state information
+                with the stack master following startup.
+                ready (3) - the stack member is fully synchronized with the current
+                master and is ready to take over immediately.
+                syncError (4) - state information on the stack member is not correctly
+                synchronized with the current stack master.
+
+                For a stack member to take over as stack master with the least possible
+                network disruption, it must have the 'ready (3)' status."
+            ::= { vcstackEntry 26 }
+
+
+--
+-- The VCS SNMP Trap Objects (Deprecated and replaced by vcstackNotifications )
+--
+
+        vcstackTraps OBJECT IDENTIFIER ::= { vcstack 6 }
+
+
+        vcstackRoleChange NOTIFICATION-TYPE
+            OBJECTS { vcstackId, vcstackRole }
+            STATUS deprecated
+            DESCRIPTION
+                "A trap generated when the stack member's role is changed."
+            ::= { vcstackTraps 1 }
+
+
+        vcstackMemberJoin NOTIFICATION-TYPE
+            OBJECTS { vcstackId, vcstackNbrMemberId }
+            STATUS deprecated
+            DESCRIPTION
+                "A trap generated when a member joins in the stack."
+            ::= { vcstackTraps 2 }
+
+
+        vcstackMemberLeave NOTIFICATION-TYPE
+            OBJECTS { vcstackId, vcstackNbrMemberId }
+            STATUS deprecated
+            DESCRIPTION
+                "A trap generated when a member leaves from the stack."
+            ::= { vcstackTraps 3 }
+
+
+        vcstackResiliencyLinkHealthCheckReceiving NOTIFICATION-TYPE
+            OBJECTS { vcstackId, vcstackResiliencyLinkInterfaceName }
+            STATUS deprecated
+            DESCRIPTION
+                "A trap generated when the resiliency link is activated."
+            ::= { vcstackTraps 4 }
+
+
+        vcstackResiliencyLinkHealthCheckTimeOut NOTIFICATION-TYPE
+            OBJECTS { vcstackId, vcstackResiliencyLinkInterfaceName }
+            STATUS deprecated
+            DESCRIPTION
+                "A trap generated when the slave's receive timer has timed out
+                indicating that the Slave has lost contact with the Master
+                via the resiliency link."
+            ::= { vcstackTraps 5 }
+
+
+        vcstackStkPortLinkUp NOTIFICATION-TYPE
+            OBJECTS { vcstackId, vcstackStkPortName }
+            STATUS deprecated
+            DESCRIPTION
+                "A trap generated when the link of stack port is up."
+            ::= { vcstackTraps 6 }
+
+
+        vcstackStkPortLinkDown NOTIFICATION-TYPE
+            OBJECTS { vcstackId, vcstackStkPortName }
+            STATUS deprecated
+            DESCRIPTION
+                "A trap generated when the link of stack port is down."
+            ::= { vcstackTraps 7 }
+
+
+        vcstackNbrMemberId OBJECT-TYPE
+            SYNTAX Unsigned32 (1..8)
+            MAX-ACCESS accessible-for-notify
+            STATUS deprecated
+            DESCRIPTION
+                "The stack member id of the neighbor of the member sent this trap."
+            ::= { vcstackTraps 8 }
+
+
+        vcstackStkPortName OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS accessible-for-notify
+            STATUS deprecated
+            DESCRIPTION
+                "The stack port name related this trap."
+            ::= { vcstackTraps 9 }
+
+
+        vcstackVirtualMacAddressStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enabled(1),
+                disabled(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Whether the virtual MAC address is enabled or disabled."
+            ::= { vcstack 7 }
+
+
+        vcstackVirtualChassisId OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The current virtual chassis ID."
+            ::= { vcstack 8 }
+
+
+        vcstackVirtualMacAddr OBJECT-TYPE
+            SYNTAX MacAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The virtual MAC address used by the stack.
+
+                 If the virtual MAC address feature is not enabled, this returns
+                 the hardware MAC address used by the system."
+            ::= { vcstack 9 }
+
+
+        vcstackMasterId OBJECT-TYPE
+            SYNTAX Unsigned32 (1..8)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The stack ID of the master unit."
+            ::= { vcstack 10 }
+
+
+        vcstackDisabledMasterMonitoringStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enabled(1),
+                disabled(2),
+                inactive(3)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Whether the disabled master monitoring is enabled or disabled."
+            ::= { vcstack 11 }
+
+
+--
+-- Mib table for stacking ports
+--
+        vcstackPortTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF VCStackPortEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A list of stack ports."
+            ::= { vcstack 12 }
+
+
+        vcstackPortEntry OBJECT-TYPE
+            SYNTAX VCStackPortEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A set of parameters that describe the status of a stack port"
+            INDEX { vcstackMemberId, vcstackBayId, vcstackPort }
+            ::= { vcstackPortTable 1 }
+
+
+        VCStackPortEntry ::=
+            SEQUENCE {
+                vcstackMemberId
+                    Unsigned32,
+                vcstackBayId
+                    Unsigned32,
+                vcstackPort
+                    Unsigned32,
+                vcstackPortString
+                    DisplayString,
+                vcstackPortStatus
+                    INTEGER,
+                vcstackPortNeighbourName
+                    DisplayString
+            }
+
+
+        vcstackMemberId OBJECT-TYPE
+            SYNTAX Unsigned32 (1..8)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Stack member ID"
+            ::= { vcstackPortEntry 1 }
+
+
+        vcstackBayId OBJECT-TYPE
+            SYNTAX Unsigned32 (0..12)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Stack member bay number"
+            ::= { vcstackPortEntry 2 }
+
+
+        vcstackPort OBJECT-TYPE
+            SYNTAX Unsigned32 (1..4)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Stack port number"
+            ::= { vcstackPortEntry 3 }
+
+
+        vcstackPortString OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Display stack port name as a string"
+            ::= { vcstackPortEntry 4 }
+
+
+        vcstackPortStatus OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+            down(1),
+            neighbourIncompatible(2),
+            discoveringNeighbour(3),
+            learntNeighbour(4)
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Status of stack port."
+            ::= { vcstackPortEntry 5 }
+
+
+        vcstackPortNeighbourName OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+               "The port name of the neighbour the is connected
+                to. None means no neighbour present"
+           ::= { vcstackPortEntry 6 }
+
+    END
+
+--
+-- at-vcstack.mib
+--
+

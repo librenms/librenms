@@ -2,11 +2,11 @@ os: endian
 text: Endian
 type: firewall
 group: unix
-ifname: 1
+ifname: true
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'Processor Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }
-processor_stacked: 1
+processor_stacked: true
 discovery:
     - sysDescr_regex: '/^Linux.*endian/'

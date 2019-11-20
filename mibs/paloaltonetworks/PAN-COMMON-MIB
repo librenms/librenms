@@ -1,0 +1,2182 @@
+-- ***********************************************
+-- PAN-COMMON-MIB.my
+--
+-- MIB for the common MIB objects implemented by all
+-- Palo Alto devices.
+-- ***********************************************
+
+PAN-COMMON-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+		MODULE-IDENTITY, OBJECT-IDENTITY,
+		OBJECT-TYPE, NOTIFICATION-TYPE,
+		Integer32
+			FROM SNMPv2-SMI
+--		MODULE-COMPLIANCE, OBJECT-GROUP
+--			FROM SNMPv2-CONF
+		TEXTUAL-CONVENTION
+            		FROM SNMPv2-TC
+		DisplayString, TruthValue
+			FROM SNMPv2-TC
+		TcChassisType
+			FROM PAN-GLOBAL-TC
+		panModules, panCommonMib
+			FROM PAN-GLOBAL-REG;
+
+	panCommonMibModule MODULE-IDENTITY
+		LAST-UPDATED			"201409040000Z"
+		ORGANIZATION			"Palo Alto Networks"
+		CONTACT-INFO			"
+					Customer Support
+					Palo Alto Networks
+					4401 Great America Pkwy
+					Santa Clara, CA 95054-1211
+
+					+1 866-898-9087
+					support at paloaltonetworks dot com"
+
+		DESCRIPTION				"
+			A MIB module containing definitions of managed objects
+			implemented by all Palo Alto Networks' products."
+        REVISION                "201406300000Z"
+        DESCRIPTION             "
+            Rev 2.3
+                        Added entries for Log Collector."
+        REVISION                "201409040000Z"
+        DESCRIPTION             "
+            Rev 2.2
+                        Added entries for Wildfire content versions.
+                        Added entry for new platform PA 3060."
+		REVISION				"201403060000Z"
+		DESCRIPTION				"
+			Rev 2.1
+                        Fixed a capitalization error with PanVsysEntry."
+		REVISION				"201303010000Z"
+		DESCRIPTION				"
+			Rev 2.0
+                        Updated with panGlobalProtect and panVsysTable."
+        REVISION                "201102091610Z"
+		DESCRIPTION				"
+			Rev 1.0
+			Initial version of MIB module PAN-COMMON-MIB."
+
+		::= { panModules 3 }
+
+	panCommonConfMib OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for MIB conformance statements."
+		::= { panCommonMib 1 }
+
+	panCommonObjs OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for common MIB objects."
+		::= { panCommonMib 2 }
+
+	panCommonEvents OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for common MIB events."
+		::= { panCommonMib 3 }
+
+	-- Top level groups
+
+	panSys OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for common system objects."
+		::= { panCommonObjs 1 }
+
+	panChassis OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for common chassis information."
+		::= { panCommonObjs 2 }
+
+	panSession OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for common session information."
+		::= { panCommonObjs 3 }
+
+	panMgmt OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for common Management plane information."
+		::= { panCommonObjs 4 }
+
+	panGlobalProtect OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for common GlobalProtect information."
+		::= { panCommonObjs 5 }
+
+	panLogCollector OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for common Log Collector information."
+		::= { panCommonObjs 6 }
+
+    panDeviceLogging OBJECT-IDENTITY
+        STATUS					current
+        DESCRIPTION				"
+            Sub-tree for common Device information."
+        ::= { panCommonObjs 7 }
+
+    panGlobalCounters OBJECT-IDENTITY
+        STATUS                  current
+        DESCRIPTION             "
+            Sub-tree for common Global counters."
+        ::= { panSys 19 }
+
+	----------------------------------------------------------------------
+	-- System objects
+
+	panSysSwVersion OBJECT-TYPE
+		SYNTAX      DisplayString
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Full software version. The first two components of the full
+			version are the major and minor versions. The third component
+			indicates the maintenance release number and the fourth,
+			the build number."
+		::= { panSys 1 }
+
+	panSysHwVersion OBJECT-TYPE
+		SYNTAX      DisplayString
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Hardware version of the unit."
+		::= { panSys 2 }
+
+	panSysSerialNumber OBJECT-TYPE
+		SYNTAX      DisplayString
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The serial number of the unit. If not available,
+			an empty string is returned."
+		::= { panSys 3 }
+
+	panSysTimeZoneOffset OBJECT-TYPE
+		SYNTAX      Integer32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The offset in seconds from UTC of the system's time zone.
+			Values are negative for locations west of UTC and positive
+			for locations east of UTC."
+		::= { panSys 4 }
+
+	panSysDaylightSaving OBJECT-TYPE
+		SYNTAX      TruthValue
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Whether daylight savings are in currently in effect for the
+			system's time zone."
+		::= { panSys 5 }
+
+	panSysVpnClientVersion OBJECT-TYPE
+		SYNTAX      DisplayString
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Currently installed VPN client package version.  If
+			package is not installed, 0.0.0 is returned."
+		::= { panSys 6 }
+
+	panSysAppVersion OBJECT-TYPE
+		SYNTAX      DisplayString
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Currently installed application definition version.  If 
+			no application definition is found, 0 is returned."
+		::= { panSys 7 }
+
+	panSysAvVersion OBJECT-TYPE
+		SYNTAX      DisplayString
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Currently installed antivirus version.  If no antivirus 
+			is found, 0 is returned."
+		::= { panSys 8 }
+
+	panSysThreatVersion OBJECT-TYPE
+		SYNTAX      DisplayString 
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Currently installed threat definition version.  If no
+			threat definition is found, 0 is returned."
+		::= { panSys 9 }
+
+	panSysUrlFilteringVersion OBJECT-TYPE
+		SYNTAX      DisplayString 
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Currently installed URL filtering version.  If no URL
+			filtering is installed, 0 is returned."
+		::= { panSys 10 }
+
+	panSysHAState OBJECT-TYPE
+		SYNTAX      DisplayString 
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Current high-availability state."
+		::= { panSys 11 }
+
+	panSysHAPeerState OBJECT-TYPE
+		SYNTAX      DisplayString
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Current peer high-availability state."
+		::= { panSys 12 }
+
+	panSysHAMode OBJECT-TYPE
+		SYNTAX      DisplayString 
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Current high-availability mode (disabled, 
+			active-passive, or active-active)."
+		::= { panSys 13 }
+
+	panSysUrlFilteringDatabase OBJECT-TYPE
+		SYNTAX      DisplayString
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Current installed URL filtering database
+			(surfcontrol, brightcloud, etc)"
+		::= { panSys 14 }
+
+	panSysGlobalProtectClientVersion OBJECT-TYPE
+		SYNTAX      DisplayString
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Currently installed global-protect client package version. 
+			If package is not installed, 0.0.0 is returned."
+		::= { panSys 15 }
+
+	panSysOpswatDatafileVersion OBJECT-TYPE
+		SYNTAX      DisplayString
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Currently installed opswat database version. 
+			If package is not installed, 0 is returned."
+		::= { panSys 16 }
+
+        panSysWildfireVersion OBJECT-TYPE
+                SYNTAX      DisplayString
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                        "Currently installed wildfire content version.  If no wildfire content 
+                         is found, 0 is returned."
+                ::= { panSys 17 }
+
+        panSysWildfirePrivateCloudVersion OBJECT-TYPE
+                SYNTAX      DisplayString
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                        "Currently installed wildfire private cloud content version.  If no wpc
+                        is found, 0 is returned."
+                ::= { panSys 18 }
+
+        panSysAppReleaseDate OBJECT-TYPE
+                SYNTAX      DisplayString
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                        "Currently installed application definition release date.  If 
+                        no release date is found, unknown is returned."
+                ::= { panSys 20 }
+
+        panSysThreatReleaseDate OBJECT-TYPE
+                SYNTAX      DisplayString
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                        "Currently installed threat release date.  If
+                        no release date is found, unknown is returned."
+                ::= { panSys 21 }
+
+        panSysAvReleaseDate OBJECT-TYPE
+                SYNTAX      DisplayString
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                        "Currently installed antivirus release date.  If
+                        no release date is found, unknown is returned."
+                ::= { panSys 22 }
+
+        panSysWfReleaseDate OBJECT-TYPE
+                SYNTAX      DisplayString
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                        "Currently installed WildFire release date.  If
+                        no release date is found, unknown is returned."
+                ::= { panSys 23 }
+
+	----------------------------------------------------------------------
+	-- Chassis
+
+	panChassisType OBJECT-TYPE
+		SYNTAX      DisplayString
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Chassis type for this Palo Alto device."
+		::= { panChassis 1 }
+
+	panMSeriesMode OBJECT-TYPE
+		SYNTAX      DisplayString
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Series Mode for this Palo Alto device."
+		::= { panChassis 2 }
+
+
+	----------------------------------------------------------------------
+	-- Session
+
+	panSessionUtilization OBJECT-TYPE
+		SYNTAX      Integer32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Session table utilization percentage. Values should
+			be between 0 and 100."
+		::= { panSession 1 }
+
+	panSessionMax OBJECT-TYPE
+		SYNTAX      Integer32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Total number of sessions supported."
+		::= { panSession 2 }
+
+	panSessionActive OBJECT-TYPE
+		SYNTAX      Integer32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Total number of active sessions."
+		::= { panSession 3 }
+
+	panSessionActiveTcp OBJECT-TYPE
+		SYNTAX      Integer32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Total number of active TCP sessions."
+		::= { panSession 4 }
+
+	panSessionActiveUdp OBJECT-TYPE
+		SYNTAX      Integer32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Total number of active UDP sessions."
+		::= { panSession 5 }
+
+	panSessionActiveICMP OBJECT-TYPE
+		SYNTAX      Integer32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Total number of active ICMP sessions."
+		::= { panSession 6 }
+
+	panSessionActiveSslProxy OBJECT-TYPE
+		SYNTAX      Integer32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Total number of active SSL proxy sessions."
+		::= { panSession 7 }
+
+	panSessionSslProxyUtilization OBJECT-TYPE
+		SYNTAX      Integer32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"SSL proxy Session utilization percentage. Values should
+			be between 0 and 100."
+		::= { panSession 8 }
+
+	panVsysTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF PanVsysEntry
+        MAX-ACCESS      not-accessible
+		STATUS			current
+		DESCRIPTION
+			"VSYS table"
+		::= { panSession 9 }
+        
+    panZoneTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF PanZoneEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION             "    
+            Sub-tree for the current active connectionsPerSecond (CPS) values
+            for each zone present."
+        ::= { panSession 10 }
+
+    panIfTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF PanIfEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION             "    
+            Sub-tree for the current active connectionsPerSecond (CPS) values
+            for each interface present."
+        ::= { panSession 11 }
+
+
+	----------------------------------------------------------------------
+	-- VsysTable 
+
+    panVsysEntry OBJECT-TYPE
+		SYNTAX          PanVsysEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Entries are created when the Vsys's are added to the
+            entVsysTable."
+    INDEX           { panVsysId }
+    ::= { panVsysTable 1 }
+
+    PanVsysEntry ::= SEQUENCE {
+        panVsysId                       Integer32,
+	    panVsysName                     DisplayString,
+	    panVsysSessionUtilizationPct    Integer32,
+    	panVsysActiveSessions           Integer32,
+    	panVsysMaxSessions              Integer32,
+        panVsysActiveTcpCps             Unsigned32,    
+        panVsysActiveUdpCps             Unsigned32,    
+        panVsysActiveOtherIpCps         Unsigned32 
+       }
+       
+	panVsysId OBJECT-TYPE
+		SYNTAX      Integer32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Vsys id"
+		::= { panVsysEntry 1 }
+
+	panVsysName OBJECT-TYPE
+		SYNTAX      DisplayString
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"User assigned vsys name (empty string if not available)"
+		::= { panVsysEntry 2 }
+
+	panVsysSessionUtilizationPct OBJECT-TYPE
+		SYNTAX      Integer32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Vsys utilization percentage, if session limit is configured.
+            If session limit is not configured, this value is '0'"
+		::= { panVsysEntry 3 }
+
+	panVsysActiveSessions OBJECT-TYPE
+		SYNTAX      Integer32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Active sessions on this Vsys"
+		::= { panVsysEntry 4 }
+
+	panVsysMaxSessions OBJECT-TYPE
+		SYNTAX      Integer32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Max sessions on this Vsys, if session limit is configured.
+            If session limit is not configured, this value is '0'"
+		::= { panVsysEntry 5 }
+
+    panVsysActiveTcpCps OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Number of active Tcp Connections per second for thie vSys."
+        ::= { panVsysEntry 6 }
+
+    panVsysActiveUdpCps OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Number of active Udp Connections per second for thie vSys."
+        ::= { panVsysEntry 7 }
+
+    panVsysActiveOtherIpCps OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Number of active Other IP Connections per second for thie vSys."
+        ::= { panVsysEntry 8 }
+
+	----------------------------------------------------------------------
+	-- Mgmt
+
+	panMgmtPanoramaConnected OBJECT-TYPE
+		SYNTAX      DisplayString
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Current Connection status to Panorama Server (connected, not-connected)"
+		::= { panMgmt 1 }
+
+	panMgmtPanorama2Connected OBJECT-TYPE
+		SYNTAX      DisplayString
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Current Connection status to Panorama2 Server (connected, not-connected)"
+		::= { panMgmt 2 }
+
+	----------------------------------------------------------------------
+	-- GlobalProtect 
+
+	panGPGatewayUtilization OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION
+			"GlobalProtect gateway utilization"
+		::= { panGlobalProtect 1 }
+
+	----------------------------------------------------------------------
+	-- GlobalProtect gateway utilization 
+
+	panGPGWUtilizationPct OBJECT-TYPE
+		SYNTAX      Integer32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"GlobalProtect Gateway utilization percentage"
+		::= { panGPGatewayUtilization 1 }
+
+	panGPGWUtilizationMaxTunnels OBJECT-TYPE
+		SYNTAX      Integer32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Max tunnels allowed"
+		::= { panGPGatewayUtilization 2 }
+
+	panGPGWUtilizationActiveTunnels OBJECT-TYPE
+		SYNTAX      Integer32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Number of active tunnels"
+		::= { panGPGatewayUtilization 3 }
+ 
+    --------------------------------------------------------------------
+    -- Device Logging MIB
+    panDeviceLoggingLogRate OBJECT-IDENTITY
+        STATUS                  current
+        DESCRIPTION             "
+            Sub-tree for Device Logging Rate statistics."
+        ::= { panDeviceLogging 1 }
+
+    panDeviceLoggingLogTypeStatTable OBJECT-TYPE
+        SYNTAX                  SEQUENCE OF PanDeviceLoggingLogTypeStatEntry
+        MAX-ACCESS              not-accessible
+        STATUS                  current
+        DESCRIPTION             "
+            Sub-tree for the statistics for different log types on the Device."
+        ::= { panDeviceLogging 2 }
+
+    panDeviceLoggingLogUsageTable OBJECT-TYPE
+        SYNTAX                  SEQUENCE OF PanDeviceLoggingLogUsageEntry
+        MAX-ACCESS              not-accessible
+        STATUS                  current
+        DESCRIPTION             "
+            Sub-tree for Log Usage and days retained for different log types on the Device.
+            Log Disk Usage is avaiable as MB (in use)."
+        ::= { panDeviceLogging 3 }
+
+    panDeviceLoggingExtFwd OBJECT-IDENTITY
+        STATUS                  current
+        DESCRIPTION             "
+            Sub-tree for tracking dropped logs as ther are forwarded from device."
+        ::= { panDeviceLogging 4 }
+
+    panDeviceLoggingCollectorConnectionTable OBJECT-TYPE
+        SYNTAX                  SEQUENCE OF PanDeviceLoggingCollectorConnectionEntry
+        MAX-ACCESS              not-accessible
+        STATUS                  current
+        DESCRIPTION             "
+            Sub-tree for tracking various log collection entities connected to  device."
+        ::= { panDeviceLogging 5 }
+
+
+    ---------------------------------------------------------------------------
+    -- panDeviceLoggingLogRate
+
+    panDeviceIncomingLogRate OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The incoming rate in logs/s on the Device."
+        ::= { panDeviceLoggingLogRate 1 }
+ 
+    panDeviceWriteLogRate OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The write rate in logs/s on the Device."
+        ::= { panDeviceLoggingLogRate 2 }
+
+    ---------------------------------------------------------------------------
+    -- panDeviceLoggingLogTypeStatTable
+
+    panDeviceLoggingLogTypeStatEntry OBJECT-TYPE
+        SYNTAX          PanDeviceLoggingLogTypeStatEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Entries are created when the panLcLogUsage are added to the panLcLogUsageTable."
+    INDEX           { panDeviceLoggingDevice, panDeviceLoggingLogType }
+    ::= { panDeviceLoggingLogTypeStatTable  1 }
+    
+    PanDeviceLoggingLogTypeStatEntry ::= SEQUENCE {
+        panDeviceLoggingDevice                      DisplayString,
+        panDeviceLoggingDeviceIndex                 Integer32,
+        panDeviceLoggingLogType                     DisplayString,
+        panDeviceLoggingLogLastLogCreated           TimeStamp,
+        panDeviceLoggingLogLastLogFwded             TimeStamp,
+        panDeviceLoggingLogLastSeqNumberFwded       Counter64,
+        panDeviceLoggingLogLastSeqNumberAck         Counter64,
+        panDeviceLoggingLogTotalLogsFwded           Counter64
+    }
+
+    panDeviceLoggingDevice OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Device Information (Name or Serial Number)."
+        ::= { panDeviceLoggingLogTypeStatEntry 1 }
+    
+    panDeviceLoggingDeviceIndex OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Index as mentioned in panDeviceLoggingCollectorConnection table."
+        ::= { panDeviceLoggingLogTypeStatEntry 2 }
+
+    panDeviceLoggingLogType OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Type of log."
+        ::= { panDeviceLoggingLogTypeStatEntry 3 }
+
+    panDeviceLoggingLogLastLogCreated OBJECT-TYPE
+        SYNTAX      TimeStamp
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Time of the last log creation."
+        ::= { panDeviceLoggingLogTypeStatEntry 4 }
+
+    panDeviceLoggingLogLastLogFwded OBJECT-TYPE
+        SYNTAX      TimeStamp
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Time at which last log was forwarded."
+        ::= { panDeviceLoggingLogTypeStatEntry 5 }
+
+    panDeviceLoggingLogLastSeqNumberFwded OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Sequence number of the last log that was forwarded."
+        ::= { panDeviceLoggingLogTypeStatEntry 6 }
+
+    panDeviceLoggingLogLastSeqNumberAck OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Sequence number of the last log that was acknowledged."
+        ::= { panDeviceLoggingLogTypeStatEntry 7 }
+
+    panDeviceLoggingLogTotalLogsFwded OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total number of logs forwarded."
+        ::= { panDeviceLoggingLogTypeStatEntry 8 }
+
+    --------------------------------------------------------------------
+    -- PanDeviceLoggingLogUsageEntry
+    
+    panDeviceLoggingLogUsageEntry OBJECT-TYPE
+        SYNTAX          PanDeviceLoggingLogUsageEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Entries are created when the panDeviceLoggingLogUsage are added to the panDeviceLoggingLogUsageTable."
+    INDEX           { panDeviceLoggingLogUsageLogType }
+    ::= { panDeviceLoggingLogUsageTable  1 } 
+
+    PanDeviceLoggingLogUsageEntry ::= SEQUENCE {
+        panDeviceLoggingLogUsageLogType              DisplayString,
+        panDeviceLoggingDiskUsageDiskSpacePct        FloatValue,
+        panDeviceLoggingDiskUsageRetention           Unsigned32,
+        panDeviceLoggingDiskQuotaPct                 FloatValue,
+        panDeviceLoggingDiskQuota                    FloatValue 
+       }
+
+    panDeviceLoggingLogUsageLogType OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Log type for Device. "
+        ::= { panDeviceLoggingLogUsageEntry 1 }
+
+    panDeviceLoggingDiskUsageDiskSpacePct OBJECT-TYPE
+        SYNTAX      FloatValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Disk Usage (MB) for particular log type for Device. "
+        ::= { panDeviceLoggingLogUsageEntry 2 }
+
+    panDeviceLoggingDiskUsageRetention OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Log Rentention for particular log type for Device. "
+        ::= { panDeviceLoggingLogUsageEntry 3 }
+   
+    panDeviceLoggingDiskQuotaPct OBJECT-TYPE
+        SYNTAX      FloatValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Disk Quota percentage for particular log type for Device. "
+        ::= { panDeviceLoggingLogUsageEntry 4 }
+
+    panDeviceLoggingDiskQuota OBJECT-TYPE
+        SYNTAX      FloatValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Disk Quota for particular log type for Device. "
+        ::= { panDeviceLoggingLogUsageEntry 5 }
+
+    ----------------------------------------------------------------------
+    -- panDeviceLoggingExtFwd
+
+    panDeviceLoggingExtFwdCount OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total count for logs forwarded."
+        ::= { panDeviceLoggingExtFwd 1 }
+ 
+     panDeviceLoggingExtFwdQueueDrop OBJECT-TYPE
+         SYNTAX      Counter64
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+             "Counter for logs dropped due to queue being full."
+         ::= { panDeviceLoggingExtFwd 2 }
+
+    panDeviceLoggingExtFwdStatsSendErr OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Counter for logs discarded due to sending error."
+        ::= { panDeviceLoggingExtFwd 3 }
+
+     panDeviceLoggingExtFwdStatsTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF PanDeviceLoggingExtFwdStatsEntry
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This table shows the status of logs as they are forwarded via syslog, Traps, email and
+             http/https from this Device."
+        ::= { panDeviceLoggingExtFwd 4 }
+
+   --------------------------------------------------------------------
+   -- panDeviceLoggingExtFwdStatsTable
+    panDeviceLoggingExtFwdStatsEntry OBJECT-TYPE
+        SYNTAX          PanDeviceLoggingExtFwdStatsEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Entries are created when panDeviceLoggingExtFwdStats are added to panDeviceLoggingExtFwdStatsTable."
+    INDEX       { panDeviceLoggingExtFwdStatsTableType }
+    ::= { panDeviceLoggingExtFwdStatsTable  1 }
+
+    PanDeviceLoggingExtFwdStatsEntry ::= SEQUENCE {
+        panDeviceLoggingExtFwdStatsTableType                 DisplayString,
+        panDeviceLoggingExtFwdStatsTableEnqueueCount         Counter64,
+        panDeviceLoggingExtFwdStatsTableSendCount            Counter64,
+        panDeviceLoggingExtFwdStatsTableDropCount            Counter64,
+        panDeviceLoggingExtFwdStatsTableQueueDepth           Counter64,
+        panDeviceLoggingExtFwdStatsTable1minAvgSendRate      Unsigned32
+    }
+
+     panDeviceLoggingExtFwdStatsTableType OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Name of method used to forward logs."
+        ::= { panDeviceLoggingExtFwdStatsEntry 1 }
+
+    panDeviceLoggingExtFwdStatsTableEnqueueCount OBJECT-TYPE
+       SYNTAX      Counter64
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           "Counter for number of logs enqueued."
+       ::= { panDeviceLoggingExtFwdStatsEntry 2 }
+
+    panDeviceLoggingExtFwdStatsTableSendCount OBJECT-TYPE
+       SYNTAX      Counter64
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           "Counter for number of logs sent."
+       ::= { panDeviceLoggingExtFwdStatsEntry 3 }
+
+    panDeviceLoggingExtFwdStatsTableDropCount OBJECT-TYPE
+       SYNTAX      Counter64
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           "Counter for number of logs dropped."
+       ::= { panDeviceLoggingExtFwdStatsEntry 4 }
+
+    panDeviceLoggingExtFwdStatsTableQueueDepth OBJECT-TYPE
+       SYNTAX      Counter64
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           "Counter for depth of queue."
+       ::= { panDeviceLoggingExtFwdStatsEntry 5 }
+
+    panDeviceLoggingExtFwdStatsTable1minAvgSendRate OBJECT-TYPE
+      SYNTAX      Unsigned32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "Counter for depth of queue."
+      ::= { panDeviceLoggingExtFwdStatsEntry 6 }
+
+    -------------------------------------------------------------------
+    -- panDeviceLoggingCollectorConnectionTable
+
+    panDeviceLoggingCollectorConnectionEntry    OBJECT-TYPE
+        SYNTAX          PanDeviceLoggingCollectorConnectionEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Entries are created when the panDeviceLogging are added to the panDeviceLoggingCollectorConnectionTable."
+    INDEX           { panDeviceLoggingCollectorConnectionIP }
+    ::= { panDeviceLoggingCollectorConnectionTable  1 }  
+    
+    PanDeviceLoggingCollectorConnectionEntry  ::= SEQUENCE {
+        panDeviceLoggingCollectorConnectionType         DisplayString,
+        panDeviceLoggingCollectorConnectionIP           DisplayString,
+        panDeviceLoggingCollectorConnectionHostname     DisplayString,
+        panDeviceLoggingCollectorConnectionStatus       DisplayString
+    }
+    
+    panDeviceLoggingCollectorConnectionType OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Type of log collection entity (CMS/LC)."
+        ::= { panDeviceLoggingCollectorConnectionEntry 1 }
+
+    panDeviceLoggingCollectorConnectionIP OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "IP of log collection entity (CMS/LC) for non-7K and Gryphon.
+             Will display connection ID for 7K and Gryphon."
+        ::= { panDeviceLoggingCollectorConnectionEntry 2 }
+
+    panDeviceLoggingCollectorConnectionHostname OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Hostname of log collection entity (CMS/LC)."
+        ::= { panDeviceLoggingCollectorConnectionEntry 3 }    
+    
+    panDeviceLoggingCollectorConnectionStatus OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Connection status of log collection entity (CMS/LC)."
+        ::= { panDeviceLoggingCollectorConnectionEntry 4 }
+
+	----------------------------------------------------------------------
+	-- LogCollector
+
+    panLcStat OBJECT-IDENTITY
+        STATUS                  current
+        DESCRIPTION             "
+            Sub-tree for the Log collection statistics."
+        ::= { panLogCollector 1 }
+
+    FloatValue ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT  "d-2"
+        STATUS         current
+        DESCRIPTION
+             " This data type is used to represent Float values."
+        SYNTAX        OCTET STRING (SIZE(0..64))
+
+	----------------------------------------------------------------------
+	-- LogCollector Stats
+ 
+    panLcLogRate OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The write rate in logs/s on the Log Collection"
+        ::= { panLcStat 1 }
+
+    panLcLogDuration OBJECT-IDENTITY
+        STATUS                  deprecated
+        DESCRIPTION             "
+            Sub-tree for the Log Duration on the Log Collector. Log
+            Duration is Expressed in Days of storage."
+        ::= { panLcStat 2 }
+
+    panLcDiskUsageTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF PanLcDiskUsageEntry
+        MAX-ACCESS      not-accessible
+        STATUS          deprecated
+        DESCRIPTION             "
+            Sub-tree for the Log Disk Usage on the Log Collector. Log
+            Disk Usage is available as MB in use."
+        ::= { panLcStat 3 }
+
+    panLcLogUsageTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF PanLcLogUsageEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION             "
+            Sub-tree for the Log Usage and data retention on the Log Collector(non localDB). 
+            Log Disk Usage is available as MB in use."
+        ::= { panLcStat 4 }
+
+    panLocalLogUsageTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF PanLocalLogUsageEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION             "
+            Sub-tree for the Log Usage and data retention on the Log Collector(localDB). 
+            Log Disk Usage is available as MB in use."
+        ::= { panLcStat 5 }
+
+    panLcLogDurationTraffic OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      deprecated
+        DESCRIPTION
+            "The Log duration (in days) for the traffic logs on the Log Collector"
+        ::= { panLcLogDuration 1 }
+
+    panLcLogDurationConfig OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      deprecated
+        DESCRIPTION
+            "The Log duration (in days) for the config logs on the Log Collector"
+        ::= { panLcLogDuration 2 }
+
+    panLcLogDurationSystem OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      deprecated
+        DESCRIPTION
+            "The Log duration (in days) for the system logs on the Log Collector"
+        ::= { panLcLogDuration 3 }
+
+    panLcLogDurationThreat OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      deprecated
+        DESCRIPTION
+            "The Log duration (in days) for the threat logs on the Log Collector"
+        ::= { panLcLogDuration 4 }
+
+    panLcLogDurationAppstat OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      deprecated
+        DESCRIPTION
+            "The Log duration (in days) for the appstat logs on the Log Collector"
+        ::= { panLcLogDuration 5 }
+
+    panLcLogDurationTrsum OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      deprecated
+        DESCRIPTION
+            "The Log duration (in days) for the trsum logs on the Log Collector"
+        ::= { panLcLogDuration 6 }
+
+    panLcLogDurationThsum OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      deprecated
+        DESCRIPTION
+            "The Log duration (in days) for the thsum logs on the Log Collector"
+        ::= { panLcLogDuration 7 }
+
+    panLcLogDurationEvent OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      deprecated
+        DESCRIPTION
+            "The Log duration (in days) for the event logs on the Log Collector"
+        ::= { panLcLogDuration 8 }
+
+    panLcLogDurationAlarm OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      deprecated
+        DESCRIPTION
+            "The Log duration (in days) for the alarm logs on the Log Collector"
+        ::= { panLcLogDuration 9 }
+
+    panLcLogDurationHipmatch OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      deprecated
+        DESCRIPTION
+            "The Log duration (in days) for the hipmatch logs on the Log Collector"
+        ::= { panLcLogDuration 10 }
+
+    panLcLogDurationUserid OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      deprecated
+        DESCRIPTION
+            "The Log duration (in days) for the userid logs on the Log Collector"
+        ::= { panLcLogDuration 11 }
+
+    panLcDiskUsageEntry OBJECT-TYPE
+        SYNTAX          PanLcDiskUsageEntry
+        MAX-ACCESS      not-accessible
+        STATUS          deprecated
+        DESCRIPTION
+            "Entries are created when the panLcDiskUsage are added to the
+            panLcDiskUsageTable."
+    INDEX           { panLcDiskUsageId }
+    ::= { panLcDiskUsageTable 1 }
+
+    PanLcDiskUsageEntry ::= SEQUENCE {
+        panLcDiskUsageId                Integer32,
+        panLcDiskUsage                  Unsigned32
+       }
+
+    panLocalLogUsageEntry OBJECT-TYPE
+        SYNTAX          PanLocalLogUsageEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Entries are created when the panLocalLogUsage are added to the panLocalLogUsageTable."
+    INDEX           { panLcLogType }
+    ::= { panLocalLogUsageTable  1 }  
+
+    PanLocalLogUsageEntry ::= SEQUENCE {
+        panLocalLogType                      DisplayString,
+        panLocalDiskUsageDiskSpace           FloatValue,
+        panLocalDiskUsageRetention           Unsigned32,
+        panLocalDiskQuota                    FloatValue,
+        panLocalDiskQuotaPct                 FloatValue
+       }    
+
+    panLocalLogType OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Log type for Log Collector. "
+        ::= { panLocalLogUsageEntry 1 }
+
+    panLocalDiskUsageDiskSpace OBJECT-TYPE
+        SYNTAX      FloatValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Disk Usage (in MB) for particular log type for Log Collector. "
+        ::= { panLocalLogUsageEntry 2 }
+
+    panLocalDiskUsageRetention OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Log Rentention for particular log type for Log Collector. "
+        ::= { panLocalLogUsageEntry 3 }
+
+    panLocalDiskQuota OBJECT-TYPE
+        SYNTAX      FloatValue 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Disk Quota (in GB) for particular log type for Log Collector. "
+        ::= { panLocalLogUsageEntry 4 }
+
+    panLocalDiskQuotaPct OBJECT-TYPE
+        SYNTAX      FloatValue 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Disk Quota Percentage for particular log type for Log Collector. "
+        ::= { panLocalLogUsageEntry 5 }
+
+
+    panLcLogUsageEntry OBJECT-TYPE
+        SYNTAX          PanLcLogUsageEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Entries are created when the panLcLogUsage are added to the panLcLogUsageTable."
+    INDEX           { panLcLogType }
+    ::= { panLcLogUsageTable  1 }
+
+    PanLcLogUsageEntry ::= SEQUENCE {
+        panLcLogType                      DisplayString,
+        panLcDiskUsageDiskSpacePct        FloatValue,
+        panLcDiskUsageRetention           Unsigned32,
+        panLcDiskQuotaPct                 FloatValue
+       }
+
+    panLcLogType OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Log type for Log Collector. "
+        ::= { panLcLogUsageEntry 1 }
+
+    panLcDiskUsageDiskSpacePct OBJECT-TYPE
+        SYNTAX      FloatValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Disk Usage Percentage for particular log type for Log Collector
+             aggregated over all disks. "
+        ::= { panLcLogUsageEntry 2 }
+
+    panLcDiskUsageRetention OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Log Rentention for particular log type for Log Collector. "
+        ::= { panLcLogUsageEntry 3 }
+    
+    panLcDiskQuotaPct OBJECT-TYPE
+        SYNTAX      FloatValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Disk Quota Percentage for particular log type for Log Collector
+             aggregated over all disks. "
+        ::= { panLcLogUsageEntry 4 }
+    
+    panLcDiskUsageId OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      deprecated
+        DESCRIPTION
+            "The Log disk id"
+        ::= { panLcDiskUsageEntry 1 }
+
+    panLcDiskUsage OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      deprecated
+        DESCRIPTION
+            "The Log disk usage on the Log Collector"
+        ::= { panLcDiskUsageEntry 2 }
+
+    panLcIsRedundancyMember OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "True value indicates this Log Collector is part of a Collector Group with Redundancy is enabled"
+        ::= { panLogCollector 2 }
+
+    panLcLogFwdStatsTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF PanLcLogFwdStatsEntry
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This table shows the status of logs as they are forwarded via syslog, Traps, email and 
+             http/https from this Log Collector."
+        ::= { panLogCollector 3 }
+    ------------------------------------------------------------------
+    -- panLcLogFwdStatsTable
+        
+    panLcLogFwdStatsEntry OBJECT-TYPE
+        SYNTAX          PanLcLogFwdStatsEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION    
+            "Entries are created when panLcLogFwdStats are added to panLcLogFwdStatsTable."
+    INDEX       { panLcLogFwdStatsTableType }
+    ::= { panLcLogFwdStatsTable  1 }
+    
+    PanLcLogFwdStatsEntry ::= SEQUENCE {
+        panLcLogFwdStatsTableType             DisplayString,
+        panLcLogFwdStatsTableEnqueueCount     Counter64,
+        panLcLogFwdStatsTableSendCount        Counter64,
+        panLcLogFwdStatsTableDropCount        Counter64,
+        panLcLogFwdStatsTableQueueDepth       Counter64
+    }
+
+     panLcLogFwdStatsTableType OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Name of method used to forward logs."
+        ::= { panLcLogFwdStatsEntry 1 } 
+
+    panLcLogFwdStatsTableEnqueueCount OBJECT-TYPE
+       SYNTAX      Counter64
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           "Counter for number of logs enqueued."
+       ::= { panLcLogFwdStatsEntry 2 } 
+    
+    panLcLogFwdStatsTableSendCount OBJECT-TYPE
+       SYNTAX      Counter64
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           "Counter for number of logs sent."
+       ::= { panLcLogFwdStatsEntry 3 } 
+
+    panLcLogFwdStatsTableDropCount OBJECT-TYPE
+       SYNTAX      Counter64
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           "Counter for number of logs dropped."
+       ::= { panLcLogFwdStatsEntry 4 } 
+    
+    panLcLogFwdStatsTableQueueDepth OBJECT-TYPE
+       SYNTAX      Counter64
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           "Counter for depth of queue."
+       ::= { panLcLogFwdStatsEntry 5 } 
+  
+    -- panLcLoggingConnectedDeviceTable
+
+    panLcLoggingConnectedDeviceTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF PanLcLoggingConnectedDeviceEntry
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This table shows the details of all devices logging to this Log Collector."
+        ::= { panLogCollector 4 }
+
+    panLcLoggingConnectedDeviceEntry OBJECT-TYPE
+         SYNTAX          PanLcLoggingConnectedDeviceEntry
+         MAX-ACCESS      not-accessible
+         STATUS          current
+         DESCRIPTION
+             "Entries are created when panLcLoggingConnectedDevice are added to panLcLoggingConnectedDeviceTable."
+     INDEX       { panLcLoggingConnectedDeviceConnectionId }
+     ::= { panLcLoggingConnectedDeviceTable  1 }
+
+    PanLcLoggingConnectedDeviceEntry ::= SEQUENCE {
+         panLcLoggingConnectedDeviceName                DisplayString,
+         panLcLoggingConnectedDeviceConnectionId        DisplayString,
+         panLcLoggingConnectedIdLogRate                 Unsigned32
+     }
+
+    panLcLoggingConnectedDeviceName OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Name of the device being polled."
+        ::= { panLcLoggingConnectedDeviceEntry 1 }
+
+    panLcLoggingConnectedDeviceConnectionId OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Connection id of the device being polled."
+        ::= { panLcLoggingConnectedDeviceEntry 2 }
+
+    panLcLoggingConnectedIdLogRate OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Logging rate for the connection."
+        ::= { panLcLoggingConnectedDeviceEntry 3 }
+
+    -- panLcLoggingDeviceTable 
+
+     panLcLoggingDeviceTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF PanLcLoggingDeviceEntry
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This table shows the details of logs forwarded by devices logging to this Log Collector."
+        ::= { panLogCollector 5 }
+     
+     panLcLoggingDeviceEntry  OBJECT-TYPE
+         SYNTAX          PanLcLoggingDeviceEntry
+         MAX-ACCESS      not-accessible
+         STATUS          current
+         DESCRIPTION
+             "Entries are created when panLcLoggingDevice are added to panLcLoggingDeviceTable."
+     INDEX       { panLcLoggingDeviceConnectionId,
+                   panLcLoggingLogType }
+     ::= { panLcLoggingDeviceTable  1 }
+
+     PanLcLoggingDeviceEntry ::= SEQUENCE {
+         panLcLoggingDeviceConnectionId        DisplayString,
+         panLcLoggingLogType                   DisplayString,
+         panLcLogTypeLastLogRecd               TimeStamp,
+         panLcLogTypeLastSeqNumRecd            Counter64,
+         panLcLogTypeLastLogGen                TimeStamp
+     }
+    
+    panLcLoggingDeviceConnectionId OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Connection id of the device being polled."
+        ::= { panLcLoggingDeviceEntry 1 }
+
+    panLcLoggingLogType OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Log Type of the log being polled."
+        ::= { panLcLoggingDeviceEntry 2 }
+        
+    panLcLogTypeLastLogRecd  OBJECT-TYPE
+        SYNTAX      TimeStamp
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Time at which the last log was received."
+        ::= { panLcLoggingDeviceEntry 3 }
+
+    panLcLogTypeLastSeqNumRecd  OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Last sequence number received for a type of log."
+        ::= { panLcLoggingDeviceEntry 4 }
+
+    panLcLogTypeLastLogGen  OBJECT-TYPE
+        SYNTAX      TimeStamp
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Time at which the last log was generated."
+        ::= { panLcLoggingDeviceEntry 5 }
+
+    ----------------------------------------------------------------------
+	-- Events
+
+	panCommonEventObjs OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Branch for objects meant only to be sent in event varbinds."
+		::= { panCommonEvents 1 }
+
+	panCommonEventEvents OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Branch for the events themselves."
+		::= { panCommonEvents 2 }
+
+	panCommonEventEventsV2 OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Branch for SNMPv2 events. The OIDs for SNMPv2 events should
+			have a zero as the next-to-last sub-identifier (as specified
+			in RFC1902)."
+		::= { panCommonEventEvents 0 }
+
+	-- Objects sent only in events
+
+	panCommonEventDescr OBJECT-TYPE
+		SYNTAX					DisplayString
+		MAX-ACCESS				accessible-for-notify
+		STATUS					current
+		DESCRIPTION
+			"String that provides a textual description of the event."
+		::= { panCommonEventObjs 1 }
+
+	-- Event descriptions
+
+	panCommonEventLog NOTIFICATION-TYPE
+		OBJECTS { panCommonEventDescr }
+		STATUS  current
+		DESCRIPTION
+			"A config/system/firewall/threat log"
+		::= { panCommonEventEventsV2 1 }
+
+	----------------------------------------------------------------------
+	-- GlobalCounters 
+
+	panAhoSw OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+		STATUS					current
+		DESCRIPTION
+			"The total usage of software for AHO"
+		::= { panGlobalCounters 1 }
+
+	panDfaSw OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+		STATUS					current
+		DESCRIPTION
+			"The total number of dfa match using software"
+		::= { panGlobalCounters 2 }
+
+	panFlowHostServiceAllow OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+		STATUS					current
+		DESCRIPTION
+			"Device management session allowed"
+		::= { panGlobalCounters 3 }
+
+	panHaPathmonSent OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+		STATUS					current
+		DESCRIPTION
+			"HA path-monitoring packets sent"
+		::= { panGlobalCounters 4 }
+        
+	panAhoFpga OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+		STATUS					current
+		DESCRIPTION
+			"The total requests to FPGA for AHO"
+		::= { panGlobalCounters 5 }
+
+	panDfaFpga OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+		STATUS					current
+		DESCRIPTION
+			"The total requests to FPGA for DFA"
+		::= { panGlobalCounters 6 }
+
+	panFpgaPkt OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+		STATUS					current
+		DESCRIPTION
+			"The packets held because of requests to FPGA"
+		::= { panGlobalCounters 7 }
+
+	panGlobalCountersDOSCounters OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION
+			"Sub-tree for Global DOS counters"
+		::= { panGlobalCounters 8 }
+
+	panGlobalCountersDropCounters OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION
+			"Sub-tree for Global Drop counters"
+		::= { panGlobalCounters 9 }
+
+	panGlobalCountersIPFragmentationCounters OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION
+			"Sub-tree for Global IPFragmentation counters"
+		::= { panGlobalCounters 10 }
+
+	panGlobalCountersTCPState OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION
+			"Sub-tree for Global TCPState counters"
+		::= { panGlobalCounters 11 }
+
+    panGlobalCountersTunnelInspect OBJECT-IDENTITY
+        STATUS                  current
+        DESCRIPTION
+            "Sub-tree for Global Tunnel (GRE, IPSEC and GTP) counters"
+        ::= { panGlobalCounters 12 }
+
+
+	----------------------------------------------------------------------
+    -- Global DOS Counters
+
+	panFlowDosAgMaxSessLimit OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+		STATUS					current
+		DESCRIPTION
+			"Session limit reached for aggregate profile, drop session"
+		::= { panGlobalCountersDOSCounters 1 }
+
+	panFlowDosBlkNumEntries OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+		STATUS					current
+		DESCRIPTION
+			"Number of entries in DOS block table"
+		::= { panGlobalCountersDOSCounters 2 }
+
+	panFlowDosClMaxSessLimit OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+		STATUS					current
+		DESCRIPTION
+			"Session limit reached for classified profile, drop session"
+		::= { panGlobalCountersDOSCounters 3 }
+        
+	panFlowDosClSyncookieAckErr OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+		STATUS					current
+		DESCRIPTION
+			"TCP SYN cookies: Invalid ACKs received, classified profile"
+		::= { panGlobalCountersDOSCounters 4 }
+
+	panFlowDosClSyncookieAckRcv OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+		STATUS					current
+		DESCRIPTION
+			"TCP SYN cookies: ACKs to cookies received, classified profile"
+		::= { panGlobalCountersDOSCounters 5 }
+
+	panFlowDosClSyncookieBlkDur OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+		STATUS					current
+		DESCRIPTION
+			"Packets dropped: Flagged for blocking and under block duration for cl"
+		::= { panGlobalCountersDOSCounters 6 }
+
+	panFlowDosClSyncookieMax OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+		STATUS					current
+		DESCRIPTION
+			"Packet dropped: SYN cookies maximum threshold reached, classified pro"
+		::= { panGlobalCountersDOSCounters 7 }
+
+	panFlowDosClSyncookieSent OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+		STATUS					current
+		DESCRIPTION
+			"TCP SYN cookies: cookies sent, classified profile"
+		::= { panGlobalCountersDOSCounters 8 }
+
+	panFlowMeterVsysThrottle OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+		STATUS					current
+		DESCRIPTION
+			"Session metering: sessions throttled by vsys configuration"
+		::= { panGlobalCountersDOSCounters 9 }
+
+
+	panFlowPolicyDeny OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+		STATUS					current
+		DESCRIPTION
+			"Session setup: denied by policy"
+		::= { panGlobalCountersDOSCounters 10 }
+
+	panFlowPolicyNat OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+		STATUS					current
+		DESCRIPTION
+			"Session setup: source NAT IP/port allocation error"
+		::= { panGlobalCountersDOSCounters 11 }
+
+	panFlowScanDrop OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+		STATUS					current
+		DESCRIPTION
+			"Session setup: denied by scan detection"
+		::= { panGlobalCountersDOSCounters 12 }
+
+	panFlowDosDropIpBlocked OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+		STATUS					current
+		DESCRIPTION
+			"Packets dropped: Flagged for blocking and under block duration by oth"
+		::= { panGlobalCountersDOSCounters 13 }
+
+	panFlowDosRedIcmp OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+		STATUS					current
+		DESCRIPTION
+			"Packets dropped: Zone protection protocol 'icmp' RED"
+		::= { panGlobalCountersDOSCounters 14 }
+
+	panFlowDosRedIcmp6 OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+		STATUS					current
+		DESCRIPTION
+			"Packets dropped: Zone protection protocol 'icmpv6' RED"
+		::= { panGlobalCountersDOSCounters 15 }
+
+
+	panFlowDosRedIp OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+		STATUS					current
+		DESCRIPTION
+			"Packets dropped: Zone protection protocol 'other-ip' RED"
+		::= { panGlobalCountersDOSCounters 16 }
+
+	panFlowDosRedTcp OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+		STATUS					current
+		DESCRIPTION
+			"Packets dropped: Zone protection protocol 'tcp-syn' RED"
+		::= { panGlobalCountersDOSCounters 17 }
+
+	panFlowDosRedUdp OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+		STATUS					current
+		DESCRIPTION
+			"Packets dropped: Zone protection protocol 'udp' RED"
+		::= { panGlobalCountersDOSCounters 18 }
+
+	panFlowDosRuleAgBlkDur OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+		STATUS					current
+		DESCRIPTION
+			"Packets dropped: Flagged for blocking and under block duration for ag"
+		::= { panGlobalCountersDOSCounters 19 }
+
+	panFlowDosRuleAgRedAct OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+		STATUS					current
+		DESCRIPTION
+			"Packets dropped: Activate aggregate RED threshold reached, random ear"
+		::= { panGlobalCountersDOSCounters 20 }
+
+	panFlowDosRuleAgRedMax OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+		STATUS					current
+		DESCRIPTION
+			"Packets dropped: Maximal aggregate RED threshold reached"
+		::= { panGlobalCountersDOSCounters 21 }
+
+	panFlowDosRuleDeny OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+		STATUS					current
+		DESCRIPTION
+			"Packets dropped: Denied action by DoS policy"
+		::= { panGlobalCountersDOSCounters 22 }
+
+	panFlowDosRuleDrop OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+		STATUS					current
+		DESCRIPTION
+			"Packets dropped: Rate limited or IP blocked"
+		::= { panGlobalCountersDOSCounters 23 }
+
+	panFlowDosRuleDropAggr OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+		STATUS					current
+		DESCRIPTION
+			"Packets dropped: due to aggregate rate limiting"
+		::= { panGlobalCountersDOSCounters 24 }
+
+	panFlowDosRuleDropClBlkDur OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+		STATUS					current
+		DESCRIPTION
+			"Packets dropped: Flagged for blocking and under block duration for cl"
+		::= { panGlobalCountersDOSCounters 25 }
+
+	panFlowDosRuleDropClRedAct OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+		STATUS					current
+		DESCRIPTION
+			"Packets dropped: Activate classified RED threshold reached, random ea"
+		::= { panGlobalCountersDOSCounters 26 }
+
+	panFlowDosRuleDropClRedMax OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+		STATUS					current
+		DESCRIPTION
+			"Packets dropped: Maximal classified RED threshold reached"
+		::= { panGlobalCountersDOSCounters 27 }
+
+	panFlowDosRuleDropClassified OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+		STATUS					current
+		DESCRIPTION
+			"Packets dropped: due to classified rate limiting"
+		::= { panGlobalCountersDOSCounters 28 }
+
+	panFlowDosSyncookieBlkDur OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+		STATUS					current
+		DESCRIPTION
+			"Packets dropped: Flagged for blocking and under block duration for ag"
+		::= { panGlobalCountersDOSCounters 29 }
+
+	panFlowDosSyncookieMax OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+		STATUS					current
+		DESCRIPTION
+			"Packet dropped: SYN cookies maximum threshold reached, aggregate prof"
+		::= { panGlobalCountersDOSCounters 30 }
+
+	panFlowDosZoneRedAct OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+		STATUS					current
+		DESCRIPTION
+			"Packets dropped: Activate zone RED threshold reached, random early dr"
+		::= { panGlobalCountersDOSCounters 31 }
+
+	panFlowDosZoneRedMax OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+		STATUS					current
+		DESCRIPTION
+			"Packets dropped: Maximal zone RED threshold reached"
+		::= { panGlobalCountersDOSCounters 32 }
+        
+    panFlowDosBlkSwEntries OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+        STATUS					current
+        DESCRIPTION
+            "Number of entries in DOS Software block table"
+        ::= { panGlobalCountersDOSCounters 33 }
+    
+    panFlowDosBlkHwEntries OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+            "Number of entries in DOS Hardware block table"
+        ::= { panGlobalCountersDOSCounters 34 } 
+
+
+ -------------------------------------------------------------------------------------------------------
+ -- Pan Global Drop Counters
+
+	panFlowFwdL3TtlZero OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+		STATUS					current
+		DESCRIPTION
+			"Packets dropped: IP TTL reaches zero"
+		::= { panGlobalCountersDropCounters 1 }
+
+	panFlowMeterHostThrottle OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+		STATUS					current
+		DESCRIPTION
+			"Session metering: sessions throttled by management session threshold"
+		::= { panGlobalCountersDropCounters 2 }
+
+	panFlowHostServiceDeny OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+		STATUS					current
+		DESCRIPTION
+			"Device management session denied"
+		::= { panGlobalCountersDropCounters 3 }
+        
+	panFlowHostServiceUnknown OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+		STATUS					current
+		DESCRIPTION
+			"Session discarded: unknown application to control plane"
+		::= { panGlobalCountersDropCounters 4 }
+
+	panPktAllocFailure OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+		STATUS					current
+		DESCRIPTION
+			"Packet allocation error"
+		::= { panGlobalCountersDropCounters 5 }
+
+	panPktAllocFailureCos OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+		STATUS					current
+		DESCRIPTION
+			"Packet allocation error due to QoS control"
+		::= { panGlobalCountersDropCounters 6 }
+
+	panSessionDiscard OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+		STATUS					current
+		DESCRIPTION
+			"Session set to discard by security policy check"
+		::= { panGlobalCountersDropCounters 7 }
+
+ ------------------------------------------------------------------------------------------------------
+ -- Pan Global IPFragmentation Counters
+
+	panFlowIpfragFragErr OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+		STATUS					current
+		DESCRIPTION
+			"Packet dropped: IP fragmentation error"
+		::= { panGlobalCountersIPFragmentationCounters 1 }
+
+	panFlowIpfragRecv OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+		STATUS					current
+		DESCRIPTION
+			"IP fragments received"
+		::= { panGlobalCountersIPFragmentationCounters 2 }
+
+------------------------------------------------------------------------------------------------------
+-- Pan Global TCP State Counters
+
+	panTcpAllocWqeFailed OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+		STATUS					current
+		DESCRIPTION
+			"wqe allocation failure in tcp"
+		::= { panGlobalCountersTCPState 1 }
+
+	panTcpDeny OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+		STATUS					current
+		DESCRIPTION
+			"session denied because of failure in tcp reassembly"
+		::= { panGlobalCountersTCPState 2 }
+
+	panTcpDropOutOfWnd OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+		STATUS					current
+		DESCRIPTION
+			"out-of-window packets dropped"
+		::= { panGlobalCountersTCPState 3 }
+        
+	panTcpDropPacket OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+		STATUS					current
+		DESCRIPTION
+			"packets dropped because of failure in tcp reassembly"
+		::= { panGlobalCountersTCPState 4 }
+
+	panFlowActionClose OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+		STATUS					current
+		DESCRIPTION
+			"TCP sessions closed via injecting RST"
+		::= { panGlobalCountersTCPState 5 }
+
+	panFlowActionReset OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+		STATUS					current
+		DESCRIPTION
+			"TCP clients reset via responding RST"
+		::= { panGlobalCountersTCPState 6 }
+
+	panFlowTcpNonSyn OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+		STATUS					current
+		DESCRIPTION
+			"Non-SYN TCP packets without session match"
+		::= { panGlobalCountersTCPState 7 }
+
+
+	panTcpExceedSegLimit OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+		STATUS					current
+		DESCRIPTION
+			"packets dropped due to the limitation on global tcp out-of-order pack"
+		::= { panGlobalCountersTCPState 8 }
+
+    ------------------------------------------------------------------------------------------------------
+    -- Pan Global Tunnel State Counters
+
+    panFlowTciGreDecapSuccess OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+            "Total GRE sessions tunnel inspected"
+        ::= { panGlobalCountersTunnelInspect 1 }
+    
+    panFlowTciGreDecapFailed OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+            "Total GRE sessions for failed tunnel inspected"
+        ::= { panGlobalCountersTunnelInspect 2 }
+
+    panFlowTciGreDecapUnknown OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+            "Total unknown tunnel inspection packets in GRE tunnel [passed|dropped]"
+        ::= { panGlobalCountersTunnelInspect 3 }
+
+    panFlowTciIpsecDecapSuccess OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+            "Total Ipsec sessions tunnel inspected"
+        ::= { panGlobalCountersTunnelInspect 4 }
+
+    panFlowTciIpsecDecapFailed OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+            "Total IPSEC sessions for failed tunnel inspected"
+        ::= { panGlobalCountersTunnelInspect 5 }
+
+    panFlowTciIpsecDecapUnknown OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+            "Total unknown tunnel inspection packets in IPSEC tunnel [passed|dropped]"
+        ::= { panGlobalCountersTunnelInspect 6 }
+
+    panFlowTciGtpDecapSuccess OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+            "Total GTP sessions tunnel inspected"
+        ::= { panGlobalCountersTunnelInspect 7 }
+
+    panFlowTciGtpDecapFailed OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+            "Total GTP sessions for failed tunnel inspected"
+        ::= { panGlobalCountersTunnelInspect 8 }
+
+    panFlowTciGtpDecapUnknown OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+            "Total unknown tunnel inspection packets in GTP tunnel[passed|dropped]"
+        ::= { panGlobalCountersTunnelInspect 9 }
+
+    ---------------------------------------------------------------
+    -- panIfTable
+
+    panIfEntry OBJECT-TYPE
+        SYNTAX          PanIfEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Entries are created when panIfCPS are added to the panIfCPSTable."
+    INDEX           { ifIndex  }
+    ::= { panIfTable 1 }
+
+    PanIfEntry  ::= SEQUENCE {
+        ifIndex                 Unsigned32,
+        ifDescr                 DisplayString,
+        panIfActiveTcpCps       Unsigned32,
+        panIfActiveUdpCps       Unsigned32,
+        panIfActiveOtherIpCps   Unsigned32
+    }
+
+    ifIndex OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+            "Index of the interface"
+        ::= { panIfEntry 1 }
+    
+    ifDescr OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+            "Description (name) of the interface"
+        ::= { panIfEntry 2 }
+    
+    panIfActiveTcpCps OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+            "Number of active TCP connections per second for this interface."
+        ::= { panIfEntry 3 }
+    
+    panIfActiveUdpCps OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+            "Number of active UDP connections per second for this interface."
+        ::= { panIfEntry 4 }
+    
+    panIfActiveOtherIpCps OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+            "Number of active Other IP connections per second for this interface."
+        ::= { panIfEntry 5 }
+    
+   ---------------------------------------------------------------
+    -- panZoneTable
+
+    panZoneEntry OBJECT-TYPE
+        SYNTAX          PanZoneEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Entries are created when panZoneCPS are added to the panZoneCPSTable."
+    INDEX           { ifIndex  }
+    ::= { panZoneTable 1 }
+
+    PanZoneEntry  ::= SEQUENCE {
+        panZoneName               DisplayString,
+        panZoneActiveTcpCps       Unsigned32,
+        panZoneActiveUdpCps       Unsigned32,
+        panZoneActiveOtherIpCps   Unsigned32
+    }
+
+    panZoneName OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+            "Zone name for the interface"
+        ::= { panZoneEntry 1 }
+
+    panZoneActiveTcpCps OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+            "Number of active TCP connections per second for this zone."
+        ::= { panZoneEntry 2 }
+
+    panZoneActiveUdpCps OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+            "Number of active UDP connections per second for this zone."
+        ::= { panZoneEntry 3 }
+
+    panZoneActiveOtherIpCps OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+            "Number of active Other IP connections per second for this zone."
+        ::= { panZoneEntry 4 }
+    
+
+--------------------------------------------------------------------------------------------------------
+END

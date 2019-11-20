@@ -1,0 +1,96 @@
+-- Copyright 2005, 2006 MITEL Networks Corporation
+-- All rights reserved.
+-- This MITEL SNMP Management Information Base Specification
+-- (Specification) embodies MITEL's confidential and
+-- proprietary intellectual property. MITEL retains all
+-- title and ownership in the Specification, including any
+-- revisions.
+
+-- This Specification is supplied "AS IS", and MITEL makes
+-- no warranty, either express or implied, as to the use,
+-- operation, condition, or performance of the Specification.
+
+MITEL-APPLICATION-PLATFORM-LIST-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-IDENTITY
+            FROM SNMPv2-SMI
+        mitelIdentification
+           FROM MITEL-MIB;
+
+    mitelIdApplicationPlatforms    MODULE-IDENTITY
+        LAST-UPDATED      "201402111200Z"
+        ORGANIZATION      "MITEL Networks Corporation"
+        CONTACT-INFO      "Standards Group,
+                           Postal:    MITEL Networks Corporation
+                           350 Legget Drive, PO Box 13089
+                           Kanata, Ontario
+                           Canada  K2K 2W7
+                           Tel: +1 613 592 2122
+                           Fax: +1 613 592 4784
+                           URL: www.mitel.com"
+        DESCRIPTION       "Replaced E-Mail: std@mitel.com with URL: www.mitel.com."
+        REVISION          "201402111200Z"
+        DESCRIPTION       "The MITEL Application Patform List MIB module.
+                           Platforms that provide a base for Mitel applications.
+                           These typically will be used for the sysObjectID
+                           Field."
+        REVISION          "200608100000Z"
+        DESCRIPTION       "Adding additional compute platforms to the list of 
+                           Application Servers."
+        REVISION          "200508242134Z"
+        DESCRIPTION       "Created."
+    ::= { mitelIdentification 6 }
+
+    -- ****************************************************************
+    -- The mitelIdApplicationPlatforms...
+    -- ****************************************************************
+
+    mitelIdAppPlatManagementApplicationServer     OBJECT-IDENTITY
+         STATUS            current
+        DESCRIPTION       "The Mitel Networks MAS application server platform."
+        ::= { mitelIdApplicationPlatforms 1 } 
+
+    mitelIdAppPlatLXTelephonyServer     OBJECT-IDENTITY
+         STATUS            current
+        DESCRIPTION       "The Mitel Networks LX Telephony server platform."
+        ::= { mitelIdApplicationPlatforms 2 } 
+
+    mitelIdAppPlatMXTelephonyServer     OBJECT-IDENTITY
+         STATUS            current
+        DESCRIPTION       "The Mitel Networks MX Telephony server platform."
+        ::= { mitelIdApplicationPlatforms 3 } 
+
+    mitelIdAppPlatCXTelephonyServer     OBJECT-IDENTITY
+         STATUS            current
+        DESCRIPTION       "The Mitel Networks CX Telephony server platform."
+        ::= { mitelIdApplicationPlatforms 4 } 
+
+    mitelIdAppPlatCXiTelephonyServer     OBJECT-IDENTITY
+         STATUS            current
+        DESCRIPTION       "The Mitel Networks CXi Telephony server platform."
+        ::= { mitelIdApplicationPlatforms 5 } 
+
+    mitelIdAppPlatLiteTelephonyServer     OBJECT-IDENTITY
+         STATUS            current
+        DESCRIPTION       "The Mitel Networks Lite Telephony server platform."
+        ::= { mitelIdApplicationPlatforms 6 } 
+
+    mitelIdAppPlatMXeTelephonyServer     OBJECT-IDENTITY
+         STATUS            current
+        DESCRIPTION       "The Mitel Networks MXe Telephony server platform."
+        ::= { mitelIdApplicationPlatforms 7 } 
+
+    mitelIdAppPlatAXTelephonyServer     OBJECT-IDENTITY
+         STATUS            current
+        DESCRIPTION       "The Mitel Networks AX Telephony server platform."
+        ::= { mitelIdApplicationPlatforms 8 } 
+
+    mitelIdAppPlatMXTTelephonyServer     OBJECT-IDENTITY
+         STATUS            current
+        DESCRIPTION       "The Mitel Networks MXT Telephony server platform."
+        ::= { mitelIdApplicationPlatforms 9 } 
+
+-- MITEL-APPLICATION-PLATFORM-LIST-MIB
+
+END

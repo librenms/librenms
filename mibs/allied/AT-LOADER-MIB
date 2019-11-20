@@ -1,0 +1,183 @@
+-- ============================================================================
+-- AT-ETH.MIB, Allied Telesis enterprise MIB: LOADER module
+--
+-- Extracted from ATROUTER.MIB of pre 2.9.1 release
+--
+-- June 2006, Stan Xiang
+--
+-- Copyright (c) 2006 by Allied Telesis, Inc.
+-- All rights reserved.
+-- 
+-- ============================================================================
+
+AT-LOADER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, 
+    OBJECT-TYPE, 
+    NOTIFICATION-TYPE
+    	FROM SNMPv2-SMI
+
+    DisplayString,
+    TruthValue
+        FROM SNMPv2-TC
+
+	ifIndex
+		FROM IF-MIB
+
+	modules,
+	DisplayStringUnsized
+		FROM AT-SMI-MIB
+;
+                                 
+loader MODULE-IDENTITY
+    LAST-UPDATED "200702071010Z"
+    ORGANIZATION "Allied Telesis, Inc"
+	CONTACT-INFO
+	    "http://www.alliedtelesis.com"
+
+	DESCRIPTION
+	    "To handle upload, object loadStatus is upgraded, as well as the
+	     description for objects loadServer and loadFilename."
+
+    REVISION "200702071010Z"
+
+	DESCRIPTION
+	    "This MIB file contains definitions of managed objects for the
+	    LOAD module. "
+
+    REVISION "200606281222Z"
+DESCRIPTION
+	"Initial Revision"
+
+::= { modules 48 }
+
+-- The load group. This consists of a static and dynamic entry of load
+-- information and a load status variable.
+
+-- The load table. This consists of a static and dynamic entry of load
+-- information. The static information will be used if there is no dynamic
+-- information available.
+
+loadTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LoadEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The table of load parameters, dynamic and static."
+    ::= { loader 1 }
+
+loadEntry OBJECT-TYPE
+    SYNTAX      LoadEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A single entry of load parameters. This contains the
+            parameters required to perform a load from the router."
+    INDEX   { loadIndex }
+    ::= { loadTable 1 }
+
+LoadEntry ::=
+    SEQUENCE {
+        loadIndex
+            INTEGER,
+        loadServer
+            IpAddress,
+        loadDestination
+            INTEGER,
+        loadFilename
+            DisplayString,
+        loadDelay
+            INTEGER
+    }
+
+loadIndex OBJECT-TYPE
+    SYNTAX      INTEGER {
+                static(1),
+                dynamic(2)
+            }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "There are two sets of load information, dynamic and static.
+            The dynamic information is used once, then cleared. The static
+            information is used whenever the dynamic information is not
+            available. The dynamic information is also used to indicate the
+            current load parameters when a load is in progress."
+    ::= { loadEntry 1 }
+
+loadServer OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The IP address from which load will load or upload."
+    ::= { loadEntry 2 }
+
+loadDestination OBJECT-TYPE
+    SYNTAX      INTEGER {
+                undefined(1),
+                nvs(2),
+                flash(3)
+            }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The destination of the file loaded, either flash or nvs
+            memory, or undefined."
+    ::= { loadEntry 3 }
+
+loadFilename OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The file name of the file being loaded or uploaded."
+    ::= { loadEntry 4 }
+
+loadDelay OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "A delay in seconds between the initiation of the load and the
+            start of the load. This allows for time to set up TFTP servers
+            in cases where the terminal and TFTP server are using the same
+            piece of equipment but will not work simultaneously."
+    ::= { loadEntry 5 }
+
+-- The load status value. This is used to start and reset a load, and to
+-- report on the progress of a load.
+
+loadStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                idle(1),        -- loader is doing nothing
+                wait(2),        -- loader is waiting to start
+                loading(3),     -- loader is loading a file
+                complete(4),    -- loader has successfully completed a load
+                reset(5),       -- loader was aborted
+                actionload(6),  -- cause a load to start
+                actionstop(7),   -- cause a load/upload to stop
+                actionupload(8)  -- cause a upload to start
+            }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Status and action object for the load module. The values 1 to
+            5 are read-only values and reflect the state of the load
+            module. Values 4 and 5 (complete and reset) are 'read-once',
+            that is, if their values are read, either by SNMP or by manager
+            console command, then they will be changed back to idle(1). The
+            action values (6,7,8) cause a start and stop of the load/upload
+            process respectively. Starting the load/upload can only occur if this
+            field has the values 1, 4, or 5. Stopping the load can only
+            occur is this field has the values 2 or 3. Reading the value of
+            the loadStatus after one of actionstart or actionstop has been
+            set will give one of the values 1 to 5.
+            Note: A single exception to the above rules is that if the value
+            of loadStatus is idle(1), then a write of 1 to this variable will
+            succeed without generating an error. This exception is to allow
+            certain SNMP test suites to test this variable without throwing
+            up errors."
+    ::= { loader 2 }
+END

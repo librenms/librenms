@@ -1,0 +1,105 @@
+PT-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE FROM SNMPv2-SMI
+        MODULE-COMPLIANCE,
+        OBJECT-GROUP    FROM SNMPv2-CONF
+        miniLink       FROM MINI-LINK-MIB;
+        
+    pt MODULE-IDENTITY
+        LAST-UPDATED "201701211200Z"
+        ORGANIZATION "Ericsson"
+        CONTACT-INFO
+            "Anders Ekvall
+             Postal: Ericsson AB,
+             E-Mail: anders.ekvall@ericsson.com"
+
+        DESCRIPTION
+            "This is the MIB of PT specifics.
+            The entPhysical and ifIndex used are based on the MOC below:
+            IP_INTERFACE_MOC  10000
+            LANX_PORT_MOC     20000
+            WANX_PORT_MOC     30000
+            PT_MOC            40000
+            OM_MOC            50000
+            RMM_MOC           60000
+            SFP_MOC           70000
+            WIFI_MOC          80000
+            RJ45_MOC          90000
+            XPIC_MOC         100000
+            CT_MOC           110000
+            RLT_MOC          120000
+        
+            As MOI, slot and port are added according to:
+            Slot no * 100
+            Port no * 1
+            
+            For example an SFP in slot 1 port 3: 70103"
+
+        REVISION      "201701211200Z"
+        DESCRIPTION
+            "MOC and MOI explained."
+
+        REVISION      "201603091200Z"
+        DESCRIPTION
+            "Validated."
+            
+        REVISION      "201602101230Z"
+        DESCRIPTION
+            "The initial version of this MIB module."
+
+        ::= { miniLink 2 }
+
+
+    -- ************
+    -- * PT       *     
+    -- ************
+    
+       ptDeviceType OBJECT-TYPE
+        SYNTAX      OBJECT IDENTIFIER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object represents type of the PT. Always set to the
+             same value as 'sysObjectID'."
+        ::= { pt 1 }   
+
+--ptTrap    ::= { pt 2 }
+--ptFM      ::= { pt 3 }
+--ptMonitor ::= { pt 4 }
+--ptPM      ::= { pt 5 }
+--ptSFP     ::= { pt 6 }
+--ptRadioLink ::= { pt 7 }
+
+    ptConformance OBJECT IDENTIFIER ::= { pt 8 }  
+    
+--
+-- Conformance
+--
+
+    ptCompliances OBJECT IDENTIFIER ::= { ptConformance 1 }
+    ptGroups      OBJECT IDENTIFIER ::= { ptConformance 2 }
+
+    ptCompliance MODULE-COMPLIANCE
+        STATUS current
+        DESCRIPTION
+            "The compliance statement for SNMP entities which implement everything."
+        MODULE -- This Module
+        MANDATORY-GROUPS { ptCompleteGroup }
+        ::= { ptCompliances 1 }
+
+    ptCompleteGroup OBJECT-GROUP
+        OBJECTS
+        {
+            ptDeviceType
+        }
+        STATUS current
+        DESCRIPTION
+            "A collection of all current objects in this MIB module."
+        ::= { ptGroups 1 }
+        
+END
+
+
+

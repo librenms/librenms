@@ -25,7 +25,7 @@
 
 namespace LibreNMS\Tests;
 
-class FunctionsTest extends \PHPUnit_Framework_TestCase
+class FunctionsTest extends TestCase
 {
     public function testMacCleanToReadable()
     {
@@ -49,5 +49,87 @@ class FunctionsTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(isHexString('aF 28 02 CE'));
         $this->assertFalse(isHexString('a5 fj 53'));
         $this->assertFalse(isHexString('a5fe53'));
+    }
+
+    public function testLinkify()
+    {
+        $input = 'foo@demo.net	bar.ba@test.co.uk
+www.demo.com	http://foo.co.uk/
+sdfsd ftp://192.168.1.1/help/me/now.php
+http://regexr.com/foo.html?q=bar
+https://mediatemple.net.';
+
+        $expected = 'foo@demo.net	bar.ba@test.co.uk
+www.demo.com	<a href="http://foo.co.uk/">http://foo.co.uk/</a>
+sdfsd <a href="ftp://192.168.1.1/help/me/now.php">ftp://192.168.1.1/help/me/now.php</a>
+<a href="http://regexr.com/foo.html?q=bar">http://regexr.com/foo.html?q=bar</a>
+<a href="https://mediatemple.net">https://mediatemple.net</a>.';
+
+        $this->assertSame($expected, linkify($input));
+    }
+
+    public function testDynamicDiscoveryGetValue()
+    {
+        $pre_cache = array(
+            'firstdata' => array(
+                0 => array('temp' => 1),
+                1 => array('temp' => 2),
+            ),
+            'high' => array(
+                0 => array('high' => 3),
+                1 => array('high' => 4),
+            ),
+            'table' => array(
+                0 => array('first' => 5, 'second' => 6),
+                1 => array('first' => 7, 'second' => 8),
+            ),
+            'single' => array('something' => 9),
+            'oneoff' => 10,
+            'singletable' => array(
+                11 => array('singletable' => 'Pickle')
+            ),
+            'doubletable' => array(
+                12 => array('doubletable' => 'Mustard'),
+                13 => array('doubletable' => 'BBQ')
+            ),
+        );
+
+        $data = array('value' => 'temp', 'oid' => 'firstdata');
+        $this->assertNull(dynamic_discovery_get_value('missing', 0, $data, $pre_cache));
+        $this->assertSame('yar', dynamic_discovery_get_value('default', 0, $data, $pre_cache, 'yar'));
+        $this->assertSame(2, dynamic_discovery_get_value('value', 1, $data, $pre_cache));
+
+        $data = array('oid' => 'high');
+        $this->assertSame(3, dynamic_discovery_get_value('high', 0, $data, $pre_cache));
+
+        $data = array('oid' => 'table');
+        $this->assertSame(5, dynamic_discovery_get_value('first', 0, $data, $pre_cache));
+        $this->assertSame(7, dynamic_discovery_get_value('first', 1, $data, $pre_cache));
+        $this->assertSame(6, dynamic_discovery_get_value('second', 0, $data, $pre_cache));
+        $this->assertSame(8, dynamic_discovery_get_value('second', 1, $data, $pre_cache));
+
+        $this->assertSame(9, dynamic_discovery_get_value('single', 0, $data, $pre_cache));
+        $this->assertSame(10, dynamic_discovery_get_value('oneoff', 3, $data, $pre_cache));
+        $this->assertSame('Pickle', dynamic_discovery_get_value('singletable', 11, $data, $pre_cache));
+        $this->assertSame('BBQ', dynamic_discovery_get_value('doubletable', 13, $data, $pre_cache));
+    }
+
+    public function testParseAtTime()
+    {
+        $this->assertEquals(time(), parse_at_time('now'), 'now did not match');
+        $this->assertEquals(time()+180, parse_at_time('+3m'), '+3m did not match');
+        $this->assertEquals(time()+7200, parse_at_time('+2h'), '+2h did not match');
+        $this->assertEquals(time()+172800, parse_at_time('+2d'), '+2d did not match');
+        $this->assertEquals(time()+63115200, parse_at_time('+2y'), '+2y did not match');
+        $this->assertEquals(time()-180, parse_at_time('-3m'), '-3m did not match');
+        $this->assertEquals(time()-7200, parse_at_time('-2h'), '-2h did not match');
+        $this->assertEquals(time()-172800, parse_at_time('-2d'), '-2d did not match');
+        $this->assertEquals(time()-63115200, parse_at_time('-2y'), '-2y did not match');
+        $this->assertEquals(429929439, parse_at_time('429929439'));
+        $this->assertEquals(212334234, parse_at_time(212334234));
+        $this->assertEquals(time()-43, parse_at_time('-43'), '-43 did not match');
+        $this->assertEquals(0, parse_at_time('invalid'));
+        $this->assertEquals(606614400, parse_at_time('March 23 1989 UTC'));
+        $this->assertEquals(time()+86400, parse_at_time('+1 day'));
     }
 }

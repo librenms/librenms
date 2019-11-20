@@ -1,0 +1,253 @@
+--
+-- Copyright (c) 2006-2013. Aerohive Netowrks, Inc
+-- All rights reserved.
+
+AH-MRP-MIB DEFINITIONS ::= BEGIN
+
+--
+-- Imports
+--
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE
+		FROM SNMPv2-SMI
+	ahAPMRP, AhString, AhNodeID 
+		FROM AH-SMI-MIB
+	ifIndex, ifEntry 
+		FROM IF-MIB;
+
+ahMRP MODULE-IDENTITY
+         LAST-UPDATED  "201608310000Z"  --  Aug 31, 2016
+         ORGANIZATION  "Aerohive Networks, Inc"
+         CONTACT-INFO  "info@aerohive.com
+                        1011 McCarthy Boulevard
+                        Milpitas, CA 95035"
+         DESCRIPTION   "This module contains the MIB definition of 
+			mesh routing protocol (MRP) related information."
+	 
+	 ::=  {  ahAPMRP  1  }
+
+
+AhLinkType ::= TEXTUAL-CONVENTION
+   STATUS        current
+   DESCRIPTION   "Interface type - (ETHERNET, WIRELESS)"
+   SYNTAX        INTEGER {
+                   ahETHERNET    (0), -- ethernet link
+                   ahWIRELESS    (1)  -- wireless link
+                 }
+
+--
+-- Neighbour
+--         neighborID
+--         linkCost
+--         RSSI
+--         linkUpTime
+--
+-- Neighbours are attached to wireless interface with Backhaul mode only
+--
+
+ahNeighborTable	OBJECT-TYPE
+	SYNTAX      SEQUENCE  OF  NeighborEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION "Table of directly connected APs"
+	::=  {  ahMRP  1  }
+
+ahNeighborEntry	OBJECT-TYPE
+	SYNTAX		NeighborEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"Individual entry of neighbor table"
+	INDEX		{  ifIndex, ahNeighberAPId }
+	::=  {  ahNeighborTable  1  }
+
+NeighborEntry  ::=  SEQUENCE {
+	ahNeighberAPId		AhNodeID,
+	ahLinkCost      	Counter32,
+	ahRSSI				Integer32,
+	ahLinkUptime    	Counter32,
+	ahLinkType			AhLinkType,
+    ahRxDataFrames    	Counter32,
+    ahRXDataOctets    	Counter32,
+    ahRxMgtFrames		Counter32,        
+    ahRxUnicastFrames	Counter32,
+    ahRxMulticastFrames	Counter32,
+    ahRxBroadcastFrames	Counter32,
+    ahTxDataFrames		Counter32,
+  	ahTxBeDataFrames	Counter32,
+  	ahTxBgDataFrames	Counter32,
+  	ahTxViDataFrames	Counter32,
+  	ahTxVoDataFrames	Counter32,
+    ahTxMgtFrames		Counter32,
+    ahTxDataOctets		Counter32,
+    ahTxUnicastFrames	Counter32,
+    ahTxMulticastFrames	Counter32,
+    ahTxBroadcastFrames	Counter32
+}
+
+ahNeighberAPId OBJECT-TYPE	
+        SYNTAX	    AhNodeID
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "Uniquely identifies an AP - neighbor."
+	::=  {  ahNeighborEntry  1  }
+
+ahLinkCost OBJECT-TYPE	
+        SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "neighbour cost metrice."
+	::=  {  ahNeighborEntry  2  }
+
+ahRSSI OBJECT-TYPE	
+        SYNTAX	    Integer32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "An indicator for the RSSI of the neighbour node 
+			derived from last NDP message"
+	::=  {  ahNeighborEntry  3  }
+
+ahLinkUptime OBJECT-TYPE	
+        SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "Link up time in second"
+	::=  {  ahNeighborEntry  4  }
+
+ahLinkType OBJECT-TYPE	
+        SYNTAX	    AhLinkType
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "Is it a ethernet link or wireless link."
+	::=  {  ahNeighborEntry  5  }
+
+ahRxDataFrames OBJECT-TYPE	
+        SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of data frames received 
+			from the neighbor AP"
+	::=  {  ahNeighborEntry  6 }
+
+ahRXDataOctets OBJECT-TYPE	
+        SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of data octets received 
+			from the neighbor AP"
+	::=  {  ahNeighborEntry  7 }
+
+ahRxMgtFrames OBJECT-TYPE	
+        SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of mgt frames received 
+			from the neighbor AP"
+	::=  {  ahNeighborEntry  8 }
+
+ahRxUnicastFrames OBJECT-TYPE	
+        SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of unitcast frames received 
+			from the neighbor AP"
+	::=  {  ahNeighborEntry  9 }
+
+ahRxMulticastFrames OBJECT-TYPE	
+        SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of multicast frames received
+			from the neighbor AP."
+	::=  {  ahNeighborEntry  10 }
+	
+ahRxBroadcastFrames OBJECT-TYPE	
+        SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of broadcast frames received
+			from the neighbor AP."
+	::=  {  ahNeighborEntry  11 }
+
+ahTxDataFrames OBJECT-TYPE	
+        SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of transmitted data frames
+			from the neighbor AP."
+	::=  {  ahNeighborEntry  12 }
+
+ahTxMgtFrames OBJECT-TYPE	
+        SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of transmitted management frames
+			from the neighbor AP."
+	::=  {  ahNeighborEntry  13 }
+
+ahTxDataOctets OBJECT-TYPE	
+        SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of transmitted data in octets
+			from the neighbor AP."
+	::=  {  ahNeighborEntry  14 }
+
+ahTxUnicastFrames OBJECT-TYPE	
+        SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of unitcast frames transmitted 
+			from the neighbor AP"
+	::=  {  ahNeighborEntry  15 }
+
+ahTxMulticastFrames OBJECT-TYPE	
+        SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of multicast frames transmitted
+			from the neighbor AP."
+	::=  {  ahNeighborEntry  16 }
+	
+ahTxBroadcastFrames OBJECT-TYPE	
+        SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of broadcast frames transmitted
+			from the neighbor AP."
+	::=  {  ahNeighborEntry  17 }
+
+ahTxBeDataFrames OBJECT-TYPE	
+    SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of transmitted best effort priority data frames
+			from the AP to its neighbor."
+	::=  {  ahNeighborEntry  18 }
+	
+ahTxBgDataFrames OBJECT-TYPE	
+    SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of transmitted back ground priority data frames
+			from the AP to its neighbor."
+	::=  {  ahNeighborEntry  19 }
+	
+ahTxViDataFrames OBJECT-TYPE	
+    SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of transmitted video priority data frames
+			from the AP to its neighbor."
+	::=  {  ahNeighborEntry  20 }
+	
+ahTxVoDataFrames OBJECT-TYPE	
+    SYNTAX	    Counter32
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION "The number of transmitted voice priority data frames
+			from the AP to its neighbor."
+	::=  {  ahNeighborEntry  21 }
+
+END
+

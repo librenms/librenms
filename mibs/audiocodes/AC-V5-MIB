@@ -1,0 +1,871 @@
+
+AC-V5-MIB DEFINITIONS ::= BEGIN
+
+
+    IMPORTS
+       
+
+        OBJECT-TYPE, 
+        MODULE-IDENTITY                             FROM SNMPv2-SMI
+        TAddress, 
+        DisplayString, 
+        DateAndTime, TEXTUAL-CONVENTION             FROM SNMPv2-TC
+        IpAddress                                   FROM RFC1155-SMI
+        Unsigned32,
+        Integer32,
+        enterprises                                 FROM SNMPv2-SMI
+		RowStatus      			 					FROM SNMPv2-TC
+		SnmpAdminString								FROM SNMP-FRAMEWORK-MIB
+		InetAddressType, InetAddress        FROM INET-ADDRESS-MIB
+		MODULE-COMPLIANCE, OBJECT-GROUP,
+		NOTIFICATION-GROUP                  FROM SNMPv2-CONF
+		audioCodes,       
+        acRegistrations,
+        acGeneric, 
+        acProducts,acBoardMibs		FROM AUDIOCODES-TYPES-MIB;
+
+       
+acV5  MODULE-IDENTITY       
+    LAST-UPDATED "200911251109Z"          --Wednesday, November 25, 2009
+    ORGANIZATION "AudioCodes Ltd"
+    CONTACT-INFO
+    "Postal: Support
+	     AudioCodes LTD
+             1 Hayarden Street
+             Airport City 
+	     Lod, ISRAEL 70151
+     Tel:    972-3-9764000
+     Fax:    972-3-9764040
+     Email:  support@audiocodes.com
+     Web:    www.audiocodes.com"		
+
+    DESCRIPTION       
+    ""
+
+
+
+    ::= {acBoardMibs 13}  
+
+
+
+
+
+
+
+
+     acV5Configuration OBJECT IDENTIFIER ::= {acV5 1}
+
+
+     acv5Interfce OBJECT IDENTIFIER ::= {acV5Configuration 1}
+
+
+     -- ****************************************
+     -- acV5Interfce table declaration
+     -- ****************************************
+     acV5InterfceTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcV5InterfceEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       ::= {acv5Interfce 1}
+
+
+
+     -- ****************************************
+     -- acV5Interfce table entry
+     -- ****************************************
+     acV5InterfceEntry OBJECT-TYPE
+       SYNTAX AcV5InterfceEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acV5InterfceIndex}
+       ::= {acV5InterfceTable 1}
+
+
+
+     -- ****************************************
+     -- acV5Interfce TABLE
+     -- ****************************************
+     AcV5InterfceEntry ::= SEQUENCE {
+       acV5InterfceIndex                               Unsigned32,
+       acV5InterfceRowStatus                           RowStatus,
+       acV5InterfceAction                              INTEGER,
+       acV5InterfceActionResult                        INTEGER,
+       acV5InterfceOperationalState                    INTEGER,
+       acV5InterfceAdminState                          INTEGER,
+       acV5InterfceActiveSignalingLink                 INTEGER,
+       acV5InterfceIdNotEqual                          INTEGER,
+       acV5InterfceVariantNotEqual                     INTEGER,
+       acV5InterfceIDCheckTimeOutError                 INTEGER,
+       acV5InterfceL2StartupFailed                     INTEGER,
+       acV5InterfceRestartFailed                       INTEGER,
+       acV5InterfceControlProtocolDataLinkError        INTEGER,
+       acV5InterfceLinkControlProtocolDataLinkError    INTEGER,
+       acV5InterfceBCCProtocolDataLinkError            INTEGER,
+       acV5InterfcePSTNProtocolDataLinkError           INTEGER,
+       acV5InterfceProtectionDL1Error                  INTEGER,
+       acV5InterfceProtectionDL2Error                  INTEGER,
+       acV5InterfceType                                INTEGER,
+       acV5InterfceProtocolSide                        INTEGER,
+       acV5InterfceId                                  Integer32,
+       acV5InterfceVariantId                           Unsigned32,
+       acV5InterfceLogicalCchannelId                   Unsigned32,
+       acV5InterfceTraceLevel                          INTEGER,
+       acV5InterfceNumberOfPortsInCard                 Unsigned32,
+       acV5InterfceEnableRegisterRecallConfiguration   INTEGER,
+       acV5InterfceRegisterRecallDurationType          Unsigned32
+     }
+
+
+
+     acV5InterfceIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..30)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "
+AC INI-Param: V5Interfaces_Index"
+       ::= {acV5InterfceEntry 1}
+
+
+
+     acV5InterfceRowStatus OBJECT-TYPE
+       SYNTAX RowStatus
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "ROWSTATUS Field for line.
+Access: Online.
+AC INI-Param: N/A"
+       ::= {acV5InterfceEntry 2}
+
+
+
+     acV5InterfceAction OBJECT-TYPE
+       SYNTAX INTEGER {
+                  offline(0)
+,
+                  protectionSwitchOver(1)
+,
+                  inService(2)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Actions that are carried out on the interfaces.
+ 1 - Switch protection links. To follow the result of this
+action see changes in value in the acV5InterfaceActiveLink object.
+Access: Online.
+AC INI-Param: N/A"
+       ::= {acV5InterfceEntry 3}
+
+
+
+     acV5InterfceActionResult OBJECT-TYPE
+       SYNTAX INTEGER {
+                  succeeded(0)
+,
+                  inProgress(1)
+,
+                  failed(2)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Mangement Field for ACTIONS RESULT.
+AC INI-Param: N/A"
+       ::= {acV5InterfceEntry 4}
+
+
+
+     acV5InterfceOperationalState OBJECT-TYPE
+       SYNTAX INTEGER {
+                  offline(0)
+,
+                  busy(1)
+,
+                  inService(2)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The interface's operational state.
+ 0 - Offline
+ 1 - Interface is being started up
+ 2 - Operational.
+AC INI-Param: N/A"
+       ::= {acV5InterfceEntry 5}
+
+
+
+     acV5InterfceAdminState OBJECT-TYPE
+       SYNTAX INTEGER {
+                  offline(0)
+,
+                  inService(2)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Administrative state of the V5 interface.
+Changing admin state effects the operational with in 95sec.
+If the acv5InterfceOperationalState value hasn't changed with
+in this time - the operation should be regarded as failed.
+AC INI-Param: V5Interfaces_V5AdminState"
+       ::= {acV5InterfceEntry 6}
+
+
+
+     acV5InterfceActiveSignalingLink OBJECT-TYPE
+       SYNTAX INTEGER {
+                  notConfigured(-1)
+,
+                  primary(0)
+,
+                  secondary(1)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Which link is active primary or secondary.
+AC INI-Param: V5Interfaces_InterfaceType"
+       ::= {acV5InterfceEntry 7}
+
+
+
+     acV5InterfceIdNotEqual OBJECT-TYPE
+       SYNTAX INTEGER {
+                  cleared(0)
+,
+                  raised(1)
+,
+                  unknown(2)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Interface Id isn't equal on both sides.
+ 0 - cleared - no error
+ 1 - raised - error found
+ 2 - unknown - not tested yet.
+AC INI-Param: N/A"
+       ::= {acV5InterfceEntry 8}
+
+
+
+     acV5InterfceVariantNotEqual OBJECT-TYPE
+       SYNTAX INTEGER {
+                  cleared(0)
+,
+                  raised(1)
+,
+                  unknown(2)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Variant Id isn't equal on both sides.
+ 0 - cleared - no error
+ 1 - raised - error found
+ 2 - unknown - not tested yet.
+AC INI-Param: N/A"
+       ::= {acV5InterfceEntry 9}
+
+
+
+     acV5InterfceIDCheckTimeOutError OBJECT-TYPE
+       SYNTAX INTEGER {
+                  cleared(0)
+,
+                  raised(1)
+,
+                  unknown(2)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "ID check time out error.
+ 0 - cleared - no error
+ 1 - raised - error found
+ 2 - unknown - not tested yet.
+AC INI-Param: N/A"
+       ::= {acV5InterfceEntry 10}
+
+
+
+     acV5InterfceL2StartupFailed OBJECT-TYPE
+       SYNTAX INTEGER {
+                  cleared(0)
+,
+                  raised(1)
+,
+                  unknown(2)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Layer 2 startup failed.
+ 0 - cleared - no error
+ 1 - raised - error found
+ 2 - unknown - not tested yet.
+AC INI-Param: N/A"
+       ::= {acV5InterfceEntry 11}
+
+
+
+     acV5InterfceRestartFailed OBJECT-TYPE
+       SYNTAX INTEGER {
+                  cleared(0)
+,
+                  raised(1)
+,
+                  unknown(2)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Restart failed.
+ 0 - cleared - no error
+ 1 - raised - error found
+ 2 - unknown - not tested yet.
+AC INI-Param: N/A"
+       ::= {acV5InterfceEntry 12}
+
+
+
+     acV5InterfceControlProtocolDataLinkError OBJECT-TYPE
+       SYNTAX INTEGER {
+                  cleared(0)
+,
+                  raised(1)
+,
+                  unknown(2)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Control protocol data link error.
+ 0 - cleared - no error
+ 1 - raised - error found
+ 2 - unknown - not tested yet.
+AC INI-Param: N/A"
+       ::= {acV5InterfceEntry 13}
+
+
+
+     acV5InterfceLinkControlProtocolDataLinkError OBJECT-TYPE
+       SYNTAX INTEGER {
+                  cleared(0)
+,
+                  raised(1)
+,
+                  unknown(2)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Link control protocol data link error.
+ 0 - cleared - no error
+ 1 - raised - error found
+ 2 - unknown - not tested yet.
+AC INI-Param: N/A"
+       ::= {acV5InterfceEntry 14}
+
+
+
+     acV5InterfceBCCProtocolDataLinkError OBJECT-TYPE
+       SYNTAX INTEGER {
+                  cleared(0)
+,
+                  raised(1)
+,
+                  unknown(2)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "BCC protocol data link error.
+ 0 - cleared - no error
+ 1 - raised - error found
+ 2 - unknown - not tested yet.
+AC INI-Param: N/A"
+       ::= {acV5InterfceEntry 15}
+
+
+
+     acV5InterfcePSTNProtocolDataLinkError OBJECT-TYPE
+       SYNTAX INTEGER {
+                  cleared(0)
+,
+                  raised(1)
+,
+                  unknown(2)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "PSTN protocol data link error.
+ 0 - cleared - no error
+ 1 - raised - error found
+ 2 - unknown - not tested yet.
+AC INI-Param: N/A"
+       ::= {acV5InterfceEntry 16}
+
+
+
+     acV5InterfceProtectionDL1Error OBJECT-TYPE
+       SYNTAX INTEGER {
+                  cleared(0)
+,
+                  raised(1)
+,
+                  unknown(2)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Protection data link 1 error.
+ 0 - cleared - no error
+ 1 - raised - error found
+ 2 - unknown - not tested yet.
+AC INI-Param: N/A"
+       ::= {acV5InterfceEntry 17}
+
+
+
+     acV5InterfceProtectionDL2Error OBJECT-TYPE
+       SYNTAX INTEGER {
+                  cleared(0)
+,
+                  raised(1)
+,
+                  unknown(2)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Protection data link 2 error.
+ 0 - cleared - no error
+ 1 - raised - error found
+ 2 - unknown - not tested yet.
+AC INI-Param: N/A"
+       ::= {acV5InterfceEntry 18}
+
+
+
+     acV5InterfceType OBJECT-TYPE
+       SYNTAX INTEGER {
+                  v52(1)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Type of the V5 interface: V5.1 or V5.2(only V5.2 is supported).
+AC INI-Param: V5Interfaces_InterfaceType"
+       ::= {acV5InterfceEntry 19}
+
+
+
+     acV5InterfceProtocolSide OBJECT-TYPE
+       SYNTAX INTEGER {
+                  an-Side(0)
+,
+                  le-Side(1)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "AN or LE side of the V5 protocol.
+AC INI-Param: V5Interfaces_ProtocolSide"
+       ::= {acV5InterfceEntry 20}
+
+
+
+     acV5InterfceId OBJECT-TYPE
+       SYNTAX Integer32 (-1..16777215)
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "V5 interface identifier.
+Access: Online.
+AC INI-Param: V5Interfaces_V5InterfaceId"
+       ::= {acV5InterfceEntry 21}
+
+
+
+     acV5InterfceVariantId OBJECT-TYPE
+       SYNTAX Unsigned32 (0..127)
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "V5 variant identifier.
+Access: Online.
+AC INI-Param: V5Interfaces_VariantId"
+       ::= {acV5InterfceEntry 22}
+
+
+
+     acV5InterfceLogicalCchannelId OBJECT-TYPE
+       SYNTAX Unsigned32 (0..65535)
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Identifies a group of C-paths.
+Access: Online.
+AC INI-Param: V5Interfaces_LogicalCchannelId"
+       ::= {acV5InterfceEntry 23}
+
+
+
+     acV5InterfceTraceLevel OBJECT-TYPE
+       SYNTAX INTEGER {
+                  noTrace(0)
+,
+                  full-Trace-No-Duplication(20)
+,
+                  full-Trace-With-Duplication(21)
+,
+                  layer3-Up-Trace-No-Duplication(22)
+,
+                  layer3-Up-Trace-With-Duplication(23)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Trace level1: 
+ 0 - No trace
+ 20 - Full trace no duplication
+ 21 - Full trace with duplication
+ 22 - Layers up trace no duplication
+ 23 - Layers up trace with duplication.
+Access: Online.
+AC INI-Param: V5Interfaces_TraceLevel"
+       ::= {acV5InterfceEntry 24}
+
+
+
+     acV5InterfceNumberOfPortsInCard OBJECT-TYPE
+       SYNTAX Unsigned32 (0..65533)
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Define the number of the port in the interface cards.
+Access: Online.
+AC INI-Param: V5Interfaces_NumberOfV5PortsInCard "
+       ::= {acV5InterfceEntry 25}
+
+
+
+     acV5InterfceEnableRegisterRecallConfiguration OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "In V5.2 Enable configuration of the register recall duration
+type in the AN.
+Access: Online.
+AC INI-Param: V5Interfaces_EnableRegisterRecallConfiguration"
+       ::= {acV5InterfceEntry 26}
+
+
+
+     acV5InterfceRegisterRecallDurationType OBJECT-TYPE
+       SYNTAX Unsigned32 (0..65535)
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "V5.2 Register Recall duration type value.
+Access: Online.
+AC INI-Param: V5Interfaces_RegisterRecallDurationType"
+       ::= {acV5InterfceEntry 27}
+
+
+
+     acV5Link OBJECT IDENTIFIER ::= {acV5Configuration 2}
+
+
+     -- ****************************************
+     -- acV5Link table declaration
+     -- ****************************************
+     acV5LinkTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcV5LinkEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       ::= {acV5Link 1}
+
+
+
+     -- ****************************************
+     -- acV5Link table entry
+     -- ****************************************
+     acV5LinkEntry OBJECT-TYPE
+       SYNTAX AcV5LinkEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acV5LinkIndex}
+       ::= {acV5LinkTable 1}
+
+
+
+     -- ****************************************
+     -- acV5Link TABLE
+     -- ****************************************
+     AcV5LinkEntry ::= SEQUENCE {
+       acV5LinkIndex                                   Unsigned32,
+       acV5LinkRowStatus                               RowStatus,
+       acV5LinkAction                                  INTEGER,
+       acV5LinkActionResult                            INTEGER,
+       acV5LinkIdCheckStatus                           INTEGER,
+       acV5LinkOperationalState                        INTEGER,
+       acV5LinkInterfaceIndx                           Unsigned32,
+       acV5LinkId                                      Integer32,
+       acV5LinkType                                    INTEGER
+     }
+
+
+
+     acV5LinkIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..62)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Points to the V5 interface to which  the link belongs.
+AC INI-Param: V5Links_Index"
+       ::= {acV5LinkEntry 1}
+
+
+
+     acV5LinkRowStatus OBJECT-TYPE
+       SYNTAX RowStatus
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "ROWSTATUS Field for line.
+Access: Online.
+AC INI-Param: N/A"
+       ::= {acV5LinkEntry 2}
+
+
+
+     acV5LinkAction OBJECT-TYPE
+       SYNTAX INTEGER {
+                  unBlock(0)
+,
+                  block(1)
+,
+                  linkIdCheck(2)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "V5 action  on the link  (Unblock,  Block or LinkIdCheck)
+The result of block and unblock can be seen in the values of
+the acV5LinkActionResult or acV5LinkOperationalState object.
+The results for the link ID check action can be seen in the
+acV5LinkIdCheckStatus object.
+Access: Online.
+AC INI-Param: N/A"
+       ::= {acV5LinkEntry 3}
+
+
+
+     acV5LinkActionResult OBJECT-TYPE
+       SYNTAX INTEGER {
+                  succeeded(0)
+,
+                  inProgress(1)
+,
+                  failed(2)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Mangement Field for ACTIONS RESULT.
+AC INI-Param: N/A"
+       ::= {acV5LinkEntry 4}
+
+
+
+     acV5LinkIdCheckStatus OBJECT-TYPE
+       SYNTAX INTEGER {
+                  succes(0)
+,
+                  failure(1)
+,
+                  testRejected(2)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Link ID check status.
+AC INI-Param: N/A"
+       ::= {acV5LinkEntry 5}
+
+
+
+     acV5LinkOperationalState OBJECT-TYPE
+       SYNTAX INTEGER {
+                  operational(0)
+,
+                  blocked(1)
+,
+                  failed(2)
+,
+                  blockedAndFailed(3)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The link's operational state.
+ 0 - Operational
+ 1 - Link is blocked from use
+ 2 - Link is in failed state
+ 3  - link is in failed state but also blocked.
+AC INI-Param: N/A"
+       ::= {acV5LinkEntry 6}
+
+
+
+     acV5LinkInterfaceIndx OBJECT-TYPE
+       SYNTAX Unsigned32 (0..30)
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Points to the V5 interface to which  the link belongs.
+Access: Online.
+AC INI-Param: V5Links_V5InterfaceIndex"
+       ::= {acV5LinkEntry 7}
+
+
+
+     acV5LinkId OBJECT-TYPE
+       SYNTAX Integer32 (-1..16777215)
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Identifier of the V5 link.
+Access: Online.
+AC INI-Param: V5Links_LinkId"
+       ::= {acV5LinkEntry 8}
+
+
+
+     acV5LinkType OBJECT-TYPE
+       SYNTAX INTEGER {
+                  normal(0)
+,
+                  primary(1)
+,
+                  secondary(2)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "V5 Link type: primary, secondary or normal.
+Access: Online.
+AC INI-Param: V5Links_LinkType"
+       ::= {acV5LinkEntry 9}
+
+
+
+     acV5Action OBJECT IDENTIFIER ::= {acV5 3}
+
+
+     acV5PortAction OBJECT IDENTIFIER ::= {acV5Action 1}
+
+
+     acV5PortActionType OBJECT-TYPE
+       SYNTAX INTEGER {
+                  none(0)
+,
+                  removeAllPorts(1)
+,
+                  removeIFPorts(2)
+,
+                  actionDone(10)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "The action type to be performed.
+Access: Online.
+AC INI-Param: N/A"
+       ::= {acV5PortAction 1}
+
+
+
+     acV5PortActionID OBJECT-TYPE
+       SYNTAX Unsigned32 (0..4294967295)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Random number used to identify an action with its result.
+Access: Online.
+AC INI-Param: N/A"
+       ::= {acV5PortAction 2}
+
+
+
+     acV5PortActionParams OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..200))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "String defining the paprameters for the specific action.
+Access: Online.
+AC INI-Param: N/A"
+       ::= {acV5PortAction 3}
+
+
+
+     acV5PortActionResult OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..200))
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Action result.
+AC INI-Param: N/A"
+       ::= {acV5PortAction 4}
+
+
+
+
+
+END

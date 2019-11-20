@@ -13,23 +13,22 @@
  */
 
 session_start();
+session_write_close();
 if (isset($_SESSION['stage']) && $_SESSION['stage'] == 2) {
-    $_SESSION['build-ok'] = true;
     $init_modules = array('web', 'nodb');
     require realpath(__DIR__ . '/..') . '/includes/init.php';
 } else {
     $init_modules = array('web', 'auth', 'alerts');
     require realpath(__DIR__ . '/..') . '/includes/init.php';
 
-    if (!$_SESSION['authenticated']) {
-        echo "Unauthenticated\n";
-        exit;
+    if (!Auth::check()) {
+        die('Unauthorized');
     }
 }
 
 set_debug($_REQUEST['debug']);
-$id = str_replace('/', '', $_REQUEST['id']);
+$id = basename($_REQUEST['id']);
 
-if (isset($id)) {
-    require $config['install_dir'] . "/html/includes/output/$id.inc.php";
+if ($id && is_file(\LibreNMS\Config::get('install_dir') . "/includes/html/output/$id.inc.php")) {
+    require \LibreNMS\Config::get('install_dir') . "/includes/html/output/$id.inc.php";
 }

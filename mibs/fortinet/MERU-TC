@@ -1,0 +1,2809 @@
+-- *****************************************************************
+-- MeruNetworks Text Convention MIB
+--
+-- Copyright (c) 2005 by MeruNetworks
+-- All rights reserved
+--
+-- *****************************************************************
+
+  
+MERU-TC DEFINITIONS ::= BEGIN
+
+IMPORTS
+  MODULE-IDENTITY
+    FROM SNMPv2-SMI
+  TEXTUAL-CONVENTION,
+  DisplayString
+    FROM SNMPv2-TC
+  meru-modules
+    FROM MERU-SMI;
+
+  meruTextualConventions MODULE-IDENTITY
+    LAST-UPDATED "200506050000Z"
+    ORGANIZATION "Meru Networks"
+    CONTACT-INFO "support@merunetworks.com"
+    DESCRIPTION
+      	"This MIB defines all the managed objects used to manage the Meru 
+        WLAN infrastructure"
+    ::= { meru-modules 1 }
+
+  
+      
+   MwlAclEnvState ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes ACL Environment State"
+        SYNTAX  INTEGER {
+          aclEnvDisabled (0),           -- Disabled  
+          aclEnvAllow (1),              -- Permit List Enabled  
+          aclEnvDeny (2)                -- Deny List Enabled  
+        } 
+      
+      
+   MwlAddressAssignmentType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes IP Address Assignment Type"
+        SYNTAX  INTEGER {
+          ipAssignmentStatic (1),       -- Static IP address assigned  
+          ipAssignmentDynamic (2),      -- IP address discovered  
+          ipAssignmentDynamicDhcp (3),  -- DHCP  
+          ipAssignmentUnknown (4)       -- Unknown  
+        } 
+      
+      
+   MwlAddressIfAssignmentType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Interface IP Address Assignment Type"
+        SYNTAX  INTEGER {
+          ifIpAssignmentNone (0),       -- No IP address assigned  
+          ifIpAssignmentStatic (1),     -- Static IP address assigned  
+          ifIpAssignmentDhcp (2)        -- DHCP  
+        } 
+      
+      
+   MwlApIpAssignmentType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes AP IP Address Assignment Type"
+        SYNTAX  INTEGER {
+          apIpAssignmentNone (0),       -- No IP   
+          apIpAssignmentStatic (1),     -- Static IP  
+          apIpAssignmentDhcp (2)        -- DHCP  
+        } 
+      
+      
+   MwlAdministrativeState ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Administrative State for Controller"
+        SYNTAX  INTEGER {
+          adminStateUnlocked (1),       -- Unlocked  
+          adminStateLocked (2),         -- Locked  
+          adminStateShuttingDown (3),   -- ShuttingDown  
+          adminStateUnknown (4),        -- Unknown  
+          adminStateForceShuttingDown (5)     -- Force Shutting Down  
+        } 
+      
+      
+   MwlAdmissionControl ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Quality-of-Service Admission Control"
+        SYNTAX  INTEGER {
+          admitall (0),                 -- Admit all  
+          pendingflag (1),              -- Request Pending  
+          rejectflag (2)                -- Reject Request  
+        } 
+      
+      
+   MwlAntennaSet ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Antenna Set Types"
+        SYNTAX  INTEGER {
+          antennaSetUnknown (0),        -- Unknown antenna  
+          antennaSetInternal (1),       -- Fixed  
+          antennaSetExternal (2),       -- External  
+          antennaSetExternalDualMode (3),     -- External Dual-Mode  
+          antennaSetRsAntenna (4)       -- RS-Antenna  
+        } 
+      
+      
+   MwlApAssignType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes AP Assignment Types"
+        SYNTAX  INTEGER {
+          assignApUnknown (0),          -- Unknown AP type  
+          siblingAp (1),                -- Sibling AP  
+          assignedAp (2),               -- Assigned Station  
+          discoveredAp (3)              -- Discovered AP or Station  
+        } 
+      
+      
+   MwlApType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes AP Types"
+        SYNTAX  INTEGER {
+          apUnknown (0),                -- Unknown AP type  
+          apStation (1),                -- Station  
+          apAccessPoint (2)             -- Access point  
+        } 
+      
+      
+   MwlApIndoorOutdoorType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes AP Location Type"
+        SYNTAX  INTEGER {
+          apIndoor (0),                 -- Indoor AP  
+          apOutdoor (1)                 -- Outdoor AP  
+        } 
+      
+      
+   MwlApMode ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes AP Modes"
+        SYNTAX  INTEGER {
+          apModeService (1),            -- Service Mode  
+          apModeScanRogues (100),       -- ScanRogues Mode  
+          apModeScanSpectrum (101)      -- ScanSpectrum Mode  
+        } 
+      
+      
+   MwlAuthenticationAlgorithm ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Authentication Algorithm"
+        SYNTAX  INTEGER {
+          nmsAuthenticationAlg8021x (1),     -- 802.1x  
+          nmsAuthenticationAlgMd5 (2),     -- MD5  
+          nmsAuthenticationAlgTls (3),     -- TLS  
+          nmsAuthenticationAlgTtls (4),     -- TTLS  
+          nmsAuthenticationAlgPeap (5),     -- PEAP  
+          nmsAuthenticationAlgWeb (6)     -- WEB  
+        } 
+      
+      
+   MwlAuthenticationType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Authentication Type"
+        SYNTAX  INTEGER {
+          nmsAuthenticationTypeLocal (1),     -- local  
+          nmsAuthenticationTypeRadius (2),     -- radius  
+          nmsAuthenticationTypeTacacs (3)     -- tacacs+  
+        } 
+      
+      
+   MwlManagementFrameProtection ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Management Frame Protection  Type"
+        SYNTAX  INTEGER {
+          nmsManagementFrameProtectionTypeDisable (0),     -- disable  
+          nmsManagementFrameProtectionTypeCapable (1),     -- capable  
+          nmsManagementFrameProtectionTypeRequired (2)     -- required  
+        } 
+      
+      
+   MwlCaptivePortalAuthenticationType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Captive Portal Authentication Type"
+        SYNTAX  INTEGER {
+          nmsCaptivePortalAuthenticationTypeRadius (0),     -- radius  
+          nmsCaptivePortalAuthenticationTypeLocal (1),     -- local  
+          nmsCaptivePortalAuthenticationTypeLocalRadius (2)     -- local and radius  
+        } 
+      
+      
+   MwlCaptivePortalExternalServerType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes External Server Type"
+        SYNTAX  INTEGER {
+          nmsCpExternalServerFortinetConnect (0),     -- Fortinet-Connect  
+          nmsCpExternalServerFortinetPresence (1)     -- Fortinet-Presence  
+        } 
+      
+      
+   MwlCaptivePortalModeType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Captive Portal Mode Type"
+        SYNTAX  INTEGER {
+          nmsCaptivePortalModeTypeDefault (0),     -- default  
+          nmsCaptivePortalModeTypeCustom (1)     -- custom  
+        } 
+      
+      
+   MwlAuthSuiteBits ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Authentication Suites"
+        SYNTAX  BITS {
+          authNone (0),                 -- None  
+          authEap (1),                  -- EAP  
+          authPsk (2),                  -- Pre-shared Key  
+          authCert (3),                 -- Cert-Auth  
+          authAll (4)                   -- All  
+        } 
+      
+      
+   MwlActionStatus ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Action status. Currently used by reboot only"
+        SYNTAX  INTEGER {
+          actionNone (0),               -- None  
+          actionStart (1),              -- Start  
+          actionStop (2),               -- Stop  
+          actionInProgress (3),         -- InProgress  
+          actionError (4),              -- Error  
+          actionDone  (5),              -- Done  
+          actionForceStart  (6)         -- Start  
+        } 
+      
+      
+   MwlAlarmState ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Alarm State"
+        SYNTAX  INTEGER {
+          alarmStateNoAlarm (1),        -- No Alarm  
+          alarmStateMinor (2),          -- Minor  
+          alarmStateMajor (3),          -- Major  
+          alarmStateCritical (4)        -- Critical  
+        } 
+      
+      
+   MwlNotificationType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Notification Types"
+        SYNTAX  INTEGER {
+          notifUnknown (0),             -- Unknown  
+          notifLinkDown (101),          -- Link Down  
+          notifApDown (102),            -- AP Down  
+          notifApWirelessIfDown (103),  -- AP Wireless Interface Down  
+          notifApSoftwareVersionMismatch (104),     -- AP Software Version Mismatch  
+          notifSoftwareLicenseExpired (105),     -- Software License Expired  
+          notifSoftwareLicenseViolated (106),     -- Software License Violated  
+          notifMasterDown (107),        -- N+1 detected MASTER Down  
+          notifApWirelessIfStationCapacityFull (108),     -- AP Wireless If Station Capacity Full  
+          notifWncMemoryUsageHigh (109),-- Controller Memory Usage High  
+          notifWncCpuUsageHigh (110),   -- Controller CPU Usage High  
+          notifApMemoryUsageHigh (111), -- AP Memory Usage High  
+          notifApCpuUsageHigh (112),    -- AP CPU Usage High  
+          notifDhcpAddressPoolExhausted (113),     -- DHCP Address Pool Exhausted  
+          notifWatchdogFailure (114),   -- Watchdog Failure  
+          notifApRadioCardFailure (115),-- AP Radio Card Failure  
+          notifRadiusServerFailure (116),     -- Radius Server Failed  
+          notifRogueApDetected (117),   -- Rogue AP Detected  
+          notifApRuntimeError (118),    -- AP Runtime Error  
+          notifAlarmHistoryFull (119),  -- Alarm History Full  
+          notifEventLogFull (120),      -- Event Log Full  
+          notifPowerModuleFailure (121),-- Power Module Failure  
+          notifFanModuleFailure (122),  -- Fan Module Failure  
+          notifApWirelessIfDownDuetoFallbackChannelNotFound (123),     -- AP Wireless Interface Down  
+          notifApLicenseExceeded (124), -- AP License Exceeded  
+          notifNewApPostChPl (125),     -- New AP in the network after channel planning  
+          notifAdminLoginFailure (201), -- Admin Login Failure  
+          notif8021xAuthFailure (202),  -- 802.1x Authentication Failure  
+          notifTkipIntegrityCheckFailure (203),     -- TKIP Message Integrity Check Failure  
+          notifMicCounterMeasureActivation (204),     -- MIC Counter Measure Activation  
+          notifCacLimitReached (205),   -- CAC limit is reached  
+          notifControllerIpAddressChange (206),     -- Controller IP Address Change  
+          notifDfsChannelUpdate (207),  -- DFS Channel Update  
+          notifCertificateError (208),  -- Certificate Error  
+          notifCertificateInstalled (209),     -- Certificate Installed  
+          notifRadiusServerSwitchover (210),     -- Radius Server Switchover  
+          notifRadiusServerSwitchoverFailure (211),     -- Accounting Radius Server Switchover  
+          notifAlarmHistoryThresholdExceed (212),     -- Alarm History Reached Threshold  
+          notifEventLogThresholdExceed (213),     -- Event Log Reaches Threshold  
+          notifRadiusServerRestored (214),     -- Primary Radius Server Restored  
+          notifSystemIdChanged (215),   -- System ID Changed  
+          notifInterferenceDetected (216),     -- Interference detected  
+          notifHighChannelUtilization (217),     -- High Channel Utilization  
+          notifLowChannelQuality (218), -- Low Channel Quality  
+          notifNoLicenseEnforcementExpired (219),     --   
+          notifPowerNotAtDisableLacp (220),     --   
+          notifSwitchNotSupportDisableLacp (221),     --   
+          notifAp822HwRevNotSupported (222),     --   
+          notifOap832PowerNotSupported (223),     -- PowerSuppyType 802.3af  
+          notifReinitDb (224),          -- Reinit of DB  
+          notifApModelNotSupported (225),     -- AP model not supported  
+          notifServiceDown (226),       -- Service Down  
+          notifPlanningChannelBad (227),-- Planning channel not good  
+          notifImproperApRfPositioning (228),     -- RF positioning of AP is not proper  
+          notifMcaChannelChange (229),  -- Channel changed due to dynamic update from ARRP  
+          notifApPowerChanged (230)     --   
+        } 
+      
+      
+   MwlNotificationSeverity ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Notification Severity"
+        SYNTAX  INTEGER {
+          notificationSevInfo (0),      -- Information  
+          notificationSevMajor (1),     -- Major  
+          notificationSevMinor (2),     -- Minor  
+          notificationSevCritical (3),  -- Critical  
+          notificationSevClear (4),     -- Clear  
+          notificationSevUpdate (5)     -- Update  
+        } 
+      
+      
+   MwlAntenna ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Antenna Sides"
+        SYNTAX  INTEGER {
+          antennaNothing (0),           -- None  
+          antenna1 (1),                 -- Left  
+          antenna2 (2),                 -- Right  
+          antennaBoth (3),              -- Both   
+          antennaAll (4)                -- All   
+        } 
+      
+      
+   MwlAssignmentAlgorithm ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Assignment Algorithm"
+        SYNTAX  INTEGER {
+          assignmentAlgoRssi (1),       -- RSSI  
+          assignmentAlgoPressure (2),   -- Pressure  
+          assignmentAlgoActivity (3),   -- Activity  
+          assignmentAlgoRssiTrending (4),     -- RSSI Trending  
+          assignmentAlgoAvailRsrc (5),  -- Avail Rsrc  
+          assignmentAlgoUnknown (6)     -- Unknown  
+        } 
+      
+      
+   MwlAssociationState ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Association State"
+        SYNTAX  INTEGER {
+          assocstateprobing (0),        -- Probing  
+          assocstateauthentication (1), -- Authenticating  
+          assocstateassociated (2)      -- Associated  
+        } 
+      
+      
+   MwlApAuthState ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Aithentication State"
+        SYNTAX  INTEGER {
+          apAuthKeyed (0),              -- Authorized  
+          apAuthNokey (1),              -- Authorization Denied  
+          apUnauth (2)                  -- No Authentication Attempted  
+        } 
+      
+      
+   MwlAvailabilityStatus ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Availability Status"
+        SYNTAX  INTEGER {
+          availStatusPowerOff (1),      -- Power off  
+          availStatusOffline (2),       -- Offline  
+          availStatusOnline (3),        -- Online  
+          availStatusFailed (4),        -- Failed  
+          availStatusInTest (5),        -- In Test  
+          availStatusNotInstalled (6)   -- Not Installed  
+        } 
+      
+      
+   MwlBeaconCoordinationMode ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Beacon Coordination Mode"
+        SYNTAX  INTEGER {
+          beaconCoordinationModeCoordinated (0),     -- centralized  
+          beaconCoordinationModeLocal (1),     -- Beacon coordination performed locally  
+          beaconCoordinationModeDistributed (2)     -- distributed  
+        } 
+      
+      
+   MwlBlock ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Rogue AP blocking"
+        SYNTAX  INTEGER {
+          blockNone (0),                -- No mitigation  
+          blockSelected (1),            -- Block only BSSIDs in blocked list  
+          blockAll (2),                 -- Block all BSSIDs that are not in the ACL  
+          wiredRogue (3)                -- Block Clients seen on the wire  
+        } 
+      
+      
+   MwlCoordAlgorithm ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Coordination Algorithm"
+        SYNTAX  INTEGER {
+          coordAlgoDefault (1),         -- Default  
+          coordAlgoUnknown (2)          -- Unknown  
+        } 
+      
+      
+   MwlCypherSuiteBits ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Cypher Suites"
+        SYNTAX  BITS {
+          cypherNone (0),               -- None  
+          cypherWep40 (1),              -- WEP64  
+          cypherWep104 (2),             -- WEP128  
+          cypherTkip (4),               -- TKIP  
+          cypherCcmp (8),               -- CCMP-AES  
+          cypherCcmpTkip (16),          -- CCMP/TKIP  
+          cypherWpiSms4 (32),           -- WPI-SMS4  
+          cypherClear (64),             -- Clear  
+          cypherAll (127)               -- all  
+        } 
+      
+      
+   MwlL2BridgingsBits ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes the following types"
+        SYNTAX  BITS {
+          bridgingNone (0),             -- None  
+          bridgingAirf (1),             -- AirFortress  
+          bridgingIpv6 (2),             -- IPV6  
+          bridgingAtalk (4)             -- AppleTalk  
+        } 
+      
+      
+   MwlACMSupportsBits ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes the following types"
+        SYNTAX  BITS {
+          acmNone (0),                  -- None  
+          acmVoice (1),                 -- ACM Voice  
+          acmVideo (2)                  -- ACM Video  
+        } 
+      
+      
+   MwlDropPolicy ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Policies for dropping packets for Quality-of-Service"
+        SYNTAX  INTEGER {
+          drophead (0),                 -- Head  
+          droptail (1)                  -- Tail  
+        } 
+      
+      
+   MwlDataplaneMode ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Dataplane Mode"
+        SYNTAX  INTEGER {
+          dataplaneModeTunneled (0),    -- Tunneled  
+          dataplaneModeBridged (1)      -- Bridged  
+        } 
+      
+      
+   MwlProfileOwner ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Profile Owner"
+        SYNTAX  INTEGER {
+          profileOwnerController (0),   -- controller  
+          profileOwnerNmsServer (1)     -- nms-server  
+        } 
+      
+      
+   MwlApRole ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes AP Role"
+        SYNTAX  INTEGER {
+          apRoleAccess (0),             -- access  
+          apRoleGateway (1),            -- gateway  
+          apRoleWireless (2)            -- wireless  
+        } 
+      
+      
+   MwlEncryptionAlgorithm ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Encryption Algorithm"
+        SYNTAX  INTEGER {
+          encryptionWep (1),            -- WEP  
+          encryptionTkip (2),           -- TKIP  
+          encryptionCcmp (3),           -- CCMP  
+          encryptionUnknown (4),        -- none  
+          encryptionClear (5)           -- Clear  
+        } 
+      
+      
+   MwlIfAdministrativeState ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Interface Administrative State"
+        SYNTAX  INTEGER {
+          adminStateDown (1),           -- Down  
+          adminStateUp (2),             -- Up  
+          adminStateTesting (3)         -- Testing  
+        } 
+      
+      
+   MwlOperChanChangeReason ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Operational Channel Change Reason"
+        SYNTAX  INTEGER {
+          operChanChangeNone (0),       -- None  
+          operChanChangeDfs (1),        -- Dfs  
+          operChanChangeMesh (2)        -- Mesh  
+        } 
+      
+      
+   MwlOperStatusChangeReason ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Operational Status Change Reason"
+        SYNTAX  INTEGER {
+          operStatusChangeFailure (0),  -- Failure  
+          operStatusChangeDfs (1)       -- Dfs  
+        } 
+      
+      
+   MwlEssApAdminMode ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes ESS-ATS AdminMode"
+        SYNTAX  INTEGER {
+          essApAdminModeDown (1),       -- Down  
+          essApAdminModeUp (2),         -- Up  
+          essApAdminModeScanRogues (3), -- ScanRogues  
+          essApAdminModeUnlicensed (4), -- NoLicense  
+          essAdminModeDisabled (5),     -- Disabled  
+          essAdminModeNoservice (6),    -- NoService  
+          essApAdminModePowerdown (7),  -- PowerDown  
+          essApAdminModeScanSpectrum (8)-- ScanSpectrum  
+        } 
+      
+      
+   MwlLedMode ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes LED Mode"
+        SYNTAX  INTEGER {
+          ledModeNormal (0),            -- Normal  
+          ledModeNodeId (1),            -- NodeId  
+          ledModeBlink (2),             -- Blink  
+          ledModeDark (3)               -- Dark  
+        } 
+      
+      
+   MwlLogSeverity ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Log Severity"
+        SYNTAX  INTEGER {
+          logSevEmerg (0),              -- Emergency  
+          logSevAlert (1),              -- Alert  
+          logSevCritical (2),           -- Critical  
+          logSevError (3),              -- Error  
+          logSevWarn (4),               -- Warn  
+          logSevNotice (5),             -- Notice  
+          logSevInfo (6),               -- Info  
+          logSevDebug (7),              -- Debug  
+          logSevTotal (8)               -- Total  
+        } 
+      
+      
+   MwlLogType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Log Type"
+        SYNTAX  INTEGER {
+          logUnknown (0),               -- Unknown  
+          logApDetected (1),            -- ApDetected  
+          logDbBackup (2),              -- DbBackup  
+          logDbRestore (3),             -- DbRestore  
+          logSwUpgrade (4),             -- SwUpgrade  
+          logConfigAdd (5),             -- Add Configuration  
+          logConfigMod (6),             -- Modify Configuration  
+          logConfigDel (7),             -- Delete Configuration  
+          logCertExpiry (8),            -- SSL Certificate  
+          logVlan (9),                  -- VLAN  
+          logHaStart (10),              -- HA Start  
+          logHaShutdown (11),           -- HA Shutdown  
+          logHaNodeDead (12),           -- HA Node Dead  
+          logHaStatus (13),             -- HA Node Status  
+          logHaConfigErr (14),          -- HA Node Config Err  
+          logHaLinkStatus (15),         -- HA Node Link Status  
+          logApAdministrativeReboot (16),     -- AP Administrative Reboot Requested  
+          logControllerAdministrativeReboot (17),     -- Controller Administrative Reboot Requested  
+          logDiscLicensingFailure (18), -- AP licensing failed  
+          logMicCountermeasure (19),    -- MIC Countermeasure  
+          logMicFailureAp (20),         -- MIC Failure from AP  
+          logMicFailureClient (21),     -- MIC Failure from Client  
+          logTypeTotal (22)             -- Total  
+        } 
+      
+      
+   MwlMimoMode ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes MIMO Mode Values"
+        SYNTAX  INTEGER {
+          nmsMimoMode2x2 (0),           -- 2x2  
+          nmsMimoMode3x3 (1),           -- 3x3  
+          nmsMimoMode1x1 (2),           -- 1x1  
+          nmsMimoMode4x4 (3)            -- 4x4  
+        } 
+      
+      
+   MwlNatType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes NAT Type"
+        SYNTAX  INTEGER {
+          natTypeNone (1),              -- None  
+          natTypeStaticOneToOne (2),    -- Static  
+          natTypeDynamicOneToOne (3),   -- Dynamic1to1  
+          natTypeDynamicNapt (4),       -- DynamicNapt  
+          natTypeUnknown (5)            -- Unknown  
+        } 
+      
+      
+   MwlNetProtocol ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Supported Network Protocols"
+        SYNTAX  INTEGER {
+          nmsIpprotoUnknown (0),        -- Unknown  
+          nmsIpprotoTcp (6),            -- TCP  
+          nmsIpprotoUdp (17)            -- UDP  
+        } 
+      
+      
+   MwlNmsInterfaceType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Interface Type"
+        SYNTAX  INTEGER {
+          ifTypeActive (0),             -- Active  
+          ifTypeRedundant (1)           -- Redundant  
+        } 
+      
+      
+   MwlNodeRelationship ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Node Relationship"
+        SYNTAX  INTEGER {
+          noderelationshipnone (1),     -- None  
+          noderelationshipbound (2),    -- Bound  
+          noderelationshipvisible (3)   -- Visible  
+        } 
+      
+      
+   MwlNodeType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Node Type"
+        SYNTAX  INTEGER {
+          nodeTypeWnc (1),     -- Controller  
+          nodeTypeAp (2),     -- Access point  
+          nodeTypeAsc (3),     -- ASC  
+          nodeTypeSta (10),             -- Station  
+          nodeTypeOther (11),           -- other  
+          nodeTypeUnknown (12)          -- unknown  
+        } 
+      
+      
+   MwlOperationalState ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Operational State"
+        SYNTAX  INTEGER {
+          operationalStateUnknown (0),  -- Unknown  
+          operationalStateEnabled (1),  -- Enabled  
+          operationalStateDisabled (2), -- Disabled  
+          operationalStateUnlicensed (3),     -- NoLicense  
+          operationalStateEnabledWith11nlic (4),     -- EnabledWNLicense  
+          operationalStatePowerDown (5) -- PowerDown  
+        } 
+      
+      
+   MwlPowerSupply ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Power Supply Type"
+        SYNTAX  INTEGER {
+          powerSupply8023Af (0),        -- 802.3-af  
+          powerSupply8023At (1),        -- 802.3-at  
+          powerSupply5vDc (2),          -- 5V-DC  
+          powerSupplyDual8023Af (3),    -- dual-802.3-af  
+          powerSupply12vDc (4),         -- 12V-DC  
+          powerSupply8023AtPlus (5)     -- 802.3-at-plus  
+        } 
+      
+      
+   MwlRadiusMacDelimiter ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes RADIUS MAC Delimiter type"
+        SYNTAX  INTEGER {
+          radiusMacDelimiterNone (0),   -- None  
+          radiusMacDelimiterHyphen (1), -- Hyphen (-)  
+          radiusMacDelimiterSingleHyphen (2),     -- Single Hyphen (-)  
+          radiusMacDelimiterColon (4)   -- Colon (:)  
+        } 
+      
+      
+   MwlRadiusPasswordType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes RADIUS Password Type"
+        SYNTAX  INTEGER {
+          radiusPasswordTypeSharedSecret (0),     -- Shared Key  
+          radiusPasswordTypeMacAddress (1)     -- MAC Address  
+        } 
+      
+      
+   MwlWlanOptimize ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes WLAN Optimization Type"
+        SYNTAX  INTEGER {
+          optimizeNone (0),             -- No Optimization  
+          optimizePerformance (1),      -- Optimize For Performance  
+          optimizeHandoff (2),          -- Optimize For Handoff  
+          optimizeCoverage (3),         -- Optimize For Coverage  
+          optimizeInteroperability (4), -- Optimize For Interoperability  
+          optimizeRogueap (5)           -- Optimize For Rogue AP Mitigation  
+        } 
+      
+      
+   MwlOnOffSwitch ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes On/Off Switches"
+        SYNTAX  INTEGER {
+          nmsOff (0),                   -- Off  
+          nmsOn (1)                     -- On  
+        } 
+      
+      
+   MwlPublishEssId ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Publish Essid Options"
+        SYNTAX  INTEGER {
+          publishEssidOff (0),          -- Off  
+          publishEssidOn (1),           -- On  
+          publishEssid24g (2),          -- 2.4GHz Only  
+          publishEssid5g (3)            -- 5GHz Only  
+        } 
+      
+      
+   MwlAllOnSelectedSwitch ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes All ON/Selected Switches"
+        SYNTAX  INTEGER {
+          nmsSelected (0),              -- Selected  
+          nmsAllOn (1)                  -- All ON  
+        } 
+      
+      
+   MwlPrivacyBit ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Privacy Bit"
+        SYNTAX  INTEGER {
+          privacyBitAuto (0),           -- Auto  
+          privacyBitOn (1),             -- On  
+          privacyBitOff (2)             -- Off  
+        } 
+      
+      
+   MwlQosAction ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes QoS Actions"
+        SYNTAX  INTEGER {
+          nmsQosActionForward (1),     -- FORWARD  
+          nmsQosActionCapture (2),     -- CAPTURE  
+          nmsQosActionDrop (3)     -- DROP  
+        } 
+      
+      
+   MwlQosCodec ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes QoS CODEC Types"
+        SYNTAX  INTEGER {
+          nmsCodecDefault (1),     -- Default  
+          nmsCodecaG711ULaw64k (2),     -- G.711, U-law, 64kbps  
+          nmsCodeca1016 (3),  -- 1016 Audio, Payload Type 1  
+          nmsCodecaG721 (4),  -- G721 Audio, Payload Type 2  
+          nmsCodecaGsm (5),    -- GSM Audio, Payload Type 3  
+          nmsCodecaG7231 (6),-- G7231 Audio, Payload Type 4  
+          nmsCodecaDv14 (7),  -- DV14 Audio, Payload Type 5  
+          nmsCodecaDv142 (8),     -- DV14.2 Audio, Payload Type 6  
+          nmsCodecaLpc (9),    -- IPC Audio, Payload Type 7  
+          nmsCodecaG711ALaw64k (10),     -- G.711 A-law Audio, Payload Type 8  
+          nmsCodecaG722 (11),  -- G.722 Audio, Payload Type 9  
+          nmsCodecaG7221 (12),-- G.7221 Audio, Payload Type * (24kbps)  
+          nmsCodecaG722132k (13),     -- G.7221 Audio, Payload Type * (32kbps)  
+          nmsCodecaMpa (14),    -- MPA Audio, Payload Type 14  
+          nmsCodecaG728 (15),  -- G728 Audio: Payload Type 15  
+          nmsCodecaG729 (16),  -- G729 Audio: Payload Type 16  
+          nmsCodecaRed (17),    -- MSN Codec Audio, Payload Type *  
+          nmsCodecaSiren (18),-- Vivo Siren Audio, Payload Type *  
+          nmsCodecvH261 (19),  -- H.261 Video  
+          nmsCodecvH263 (20)   -- H.263 Video  
+        } 
+      
+      
+   MwlQosProtocol ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes QoS Protocols"
+        SYNTAX  INTEGER {
+          qosprotocolsip (1),           -- SIP  
+          qosprotocolh323 (2),          -- H.323   
+          qosprotocolsccp (3),          -- SCCP  
+          qosprotocolhttp (4),          -- HTTP  
+          qosprotocolother (5),         -- other  
+          qosprotocolnone (6),          -- none  
+          qosprotocolunknown (7)        -- unknown  
+        } 
+      
+      
+   MwlQosCodecProtocol ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Qos Codec Protocols"
+        SYNTAX  INTEGER {
+          qoscodecprotocolsip (1),      -- SIP  
+          qoscodecprotocolh323 (2),     -- H.323   
+          qoscodecprotocolsccp (3),     -- SCCP  
+          qoscodecprotocolhttp (4),     -- HTTP  
+          qoscodecprotocolnone (5),     -- other  
+          qoscodecprotocolunknown (6)   -- unknown  
+        } 
+      
+      
+   MwlQosCallState ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes the following types"
+        SYNTAX  INTEGER {
+          qoscalldisconnectedstate (0), -- Disconnected  
+          qoscallconnectedstate (1),    -- Connected  
+          qoscallholdstate (2),         -- On-Hold  
+          qoscallconferencingstate (3)  -- Conferencing  
+        } 
+      
+      
+   MwlServiceAction ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Service Actions"
+        SYNTAX  INTEGER {
+          nmsServiceActionAdd (1),      -- Add  
+          nmsServiceActionRemove (2),   -- Delete  
+          nmsServiceActionChange (3)    -- Modify  
+        } 
+      
+      
+   MwlSecurityPolicyAction ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes the following types"
+        SYNTAX  INTEGER {
+          securityPolicyActionDeny (0), -- Deny  
+          securityPolicyActionAllow (1),-- Forward to Default VLAN  
+          securityPolicyActionRedirect (2),     -- Forward to Configured VLAN  
+          securityPolicyActionNum (3)   -- Number of enum values  
+        } 
+      
+      
+   MwlL2SecurityModeBits ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes L2 Security Modes"
+        SYNTAX  BITS {
+          l2SecurityModeNone (0),       -- None  
+          l2SecurityModeOpen (1),       -- Open  
+          l2SecurityMode8021x (2),      -- 802.1x  
+          l2SecurityModeSwk (4),        -- Static WEP keys  
+          l2SecurityModeWpa (8),        -- WPA  
+          l2SecurityModeWpaPsk (16),    -- WPA PSK  
+          l2SecurityModeWpa2 (32),      -- WPA2  
+          l2SecurityModeWpa2Psk (64),   -- WPA2 PSK  
+          l2SecurityModeMixed (128),    -- MIXED  
+          l2SecurityModeMixedPsk (256), -- MIXED_PSK  
+          l2SecurityModeWai (512),      -- WAI  
+          l2SecurityModeWaiPsk (1024),  -- WAI PSK  
+          l2SecurityModeAll (2047)      -- Wildcard  
+        }   
+       
+   MwlL2SecurityMode ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes L2 Security Modes"
+        SYNTAX  INTEGER {
+          l2SecurityModeNone (0),       -- None  
+          l2SecurityModeOpen (1),       -- Open  
+          l2SecurityMode8021x (2),      -- 802.1x  
+          l2SecurityModeSwk (4),        -- Static WEP keys  
+          l2SecurityModeWpa (8),        -- WPA  
+          l2SecurityModeWpaPsk (16),    -- WPA PSK  
+          l2SecurityModeWpa2 (32),      -- WPA2  
+          l2SecurityModeWpa2Psk (64),   -- WPA2 PSK  
+          l2SecurityModeMixed (128),    -- MIXED  
+          l2SecurityModeMixedPsk (256), -- MIXED_PSK  
+          l2SecurityModeWai (512),      -- WAI  
+          l2SecurityModeWaiPsk (1024),  -- WAI PSK  
+          l2SecurityModeAll (2047)      -- Wildcard  
+        } 
+      
+      
+   MwlTunnelTerminationModeBits ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Tunnel Termination Modes"
+        SYNTAX  BITS {
+          tunnelTerminationNone (0),    -- None  
+          tunnelTerminationPeap (1),    -- PEAP  
+          tunnelTerminationTtls (2)     -- TTLS  
+        } 
+      
+      
+   MwlL2SecurityDetailMode ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes L2 Security Modes"
+        SYNTAX  INTEGER {
+          stationSecurityModeNone (0),  -- None  
+          stationSecurityModeOpen (1),  -- Clear  
+          stationSecurityMode8021x (2), -- 802.1x  
+          stationSecurityModeSwk (4),   -- Static WEP keys  
+          stationSecurityModeWpa (8),   -- WPA  
+          stationSecurityModeWpaPsk (16),     -- WPA PSK  
+          stationSecurityModeWpa2 (32), -- WPA2  
+          stationSecurityModeWpa2Psk (64),     -- WPA2 PSK  
+          stationSecurityModeMixed (128),     -- MIXED  
+          stationSecurityModeMixedPsk (256),     -- MIXED_PSK  
+          stationSecurityModeAll (511), -- Wildcard  
+          stationSecurityMode8021xInProgress (512),     -- 802.1x-in-prog  
+          stationSecurityModeWpaInProgress (1024),     -- WPA-in-prog  
+          stationSecurityModeWpaPskInProgress (2048),     -- WPA PSK-in-prog  
+          stationSecurityModeWpa2InProgress (4096),     -- WPA2-in-prog  
+          stationSecurityModeWpa2PskInProgress (8192),     -- WPA2 PSK-in-prog  
+          stationSecurityModeMixedInProgress (16384),     -- MIXED-in-prog  
+          stationSecurityModeMixedPskInProgress (32768)     -- MIXED_PSK-in-prog  
+        } 
+      
+      
+   MwlL3SecurityMode ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes L3 Security Modes"
+        SYNTAX  INTEGER {
+          l3SecurityModeOpen (1),       -- None  
+          l3SecurityModeVpn (2),        -- VPN Only  
+          l3SecurityModeWebauth (4),    -- WebAuth  
+          l3SecurityModeAll (7)         -- All Modes  
+        } 
+      
+      
+   MwlCaptivePortalMode ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Captive Portal"
+        SYNTAX  INTEGER {
+          captivePortalDisabled (0),    -- Disabled  
+          captivePortalModeVpn (1),     -- VPN  
+          captivePortalModeWebauth (2), -- WebAuth  
+          captivePortalModeAll (3)      -- VPN/Web-Auth  
+        } 
+      
+      
+   MwlCaptivePortalAuthState ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Captive Portal Authentication State"
+        SYNTAX  INTEGER {
+          captivePortalStateClear (0),  -- Open  
+          captivePortalStateWebauth (1) -- WEBAUTH  
+        } 
+      
+      
+   MwlCaptivePortalAuthMethod ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Captive Portal Authentication Method"
+        SYNTAX  INTEGER {
+          captivePortalAuthMethodInternal (0),     -- internal  
+          captivePortalAuthMethodExternal (1)     -- external  
+        } 
+      
+      
+   MwlSnmpPrivilege ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes SNMP Privileges"
+        SYNTAX  INTEGER {
+          snmpRo (1),                   -- read-only  
+          snmpRw (2)                    -- read-write  
+        } 
+      
+      
+   MwlSnmpV3AuthProtocol ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes SNMPv3 Authentication Protocol"
+        SYNTAX  INTEGER {
+          snmpV3UsmNoAuth (0),          -- read-only  
+          snmpV3UsmHmacMd5Auth (1),     -- read-only  
+          snmpV3UsmHmacShaAuth (2)      -- read-only  
+        } 
+      
+      
+   MwlSnmpV3PrivProtocol ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes SNMPv3 Privacy Protocol"
+        SYNTAX  INTEGER {
+          snmpV3UsmNoPriv (0),          -- read-only  
+          snmpV3UsmDesPriv (1)          -- read-only  
+        } 
+      
+      
+   MwlTransmitRateBGBits ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes 802.11bg Transmit Rates"
+        SYNTAX  BITS {
+          bgtransmitRateNotSupported (0),     -- None  
+          bgtransmitRate1 (1),          -- 1 Mbps  
+          bgtransmitRate2 (2),          -- 2 Mbps  
+          bgtransmitRate55 (4),         -- 5.5 Mbps  
+          bgtransmitRate11 (8),         -- 11 Mbps  
+          bgtransmitRate6 (16),         -- 6 Mbps  
+          bgtransmitRate9 (32),         -- 9 Mbps  
+          bgtransmitRate12 (64),        -- 12 Mbps  
+          bgtransmitRate18 (128),       -- 18 Mbps  
+          bgtransmitRate22 (256),       -- 22 Mbps  
+          bgtransmitRate24 (512),       -- 24 Mbps  
+          bgtransmitRate33 (1024),      -- 33 Mbps  
+          bgtransmitRate36 (2048),      -- 36 Mbps  
+          bgtransmitRate48 (4096),      -- 48 Mbps  
+          bgtransmitRate54 (8192)       -- 54 Mbps  
+        } 
+      
+      
+   MwlTransmitRateBits ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes 802.11b Transmit Rates"
+        SYNTAX  BITS {
+          transmitRateNotSupported (0), -- None  
+          transmitRate1 (1),            -- 1 Mbps  
+          transmitRate2 (2),            -- 2 Mbps  
+          transmitRate55 (4),           -- 5.5 Mbps  
+          transmitRate11 (8)            -- 11 Mbps  
+        } 
+      
+      
+   MwlTransmitRateAGBits ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes 802.11ag Transmit Rates"
+        SYNTAX  BITS {
+          agtransmitRateNotSupported (0),     -- None  
+          agtransmitRate6 (16),         -- 6 Mbps  
+          agtransmitRate9 (32),         -- 9 Mbps  
+          agtransmitRate12 (64),        -- 12 Mbps  
+          agtransmitRate18 (128),       -- 18 Mbps  
+          agtransmitRate22 (256),       -- 22 Mbps  
+          agtransmitRate24 (512),       -- 24 Mbps  
+          agtransmitRate33 (1024),      -- 33 Mbps  
+          agtransmitRate36 (2048),      -- 36 Mbps  
+          agtransmitRate48 (4096),      -- 48 Mbps  
+          agtransmitRate54 (8192)       -- 54 Mbps  
+        } 
+      
+      
+   MwlTransmitRateHTBits ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes 802.11n HT Transmit Rates"
+        SYNTAX  BITS {
+          httransmitRate31 (2147483648),     -- MCS 31  
+          httransmitRateNotSupported (0),     -- None  
+          httransmitRate0 (1),          -- MCS 0  
+          httransmitRate1 (2),          -- MCS 1  
+          httransmitRate2 (4),          -- MCS 2  
+          httransmitRate3 (8),          -- MCS 3  
+          httransmitRate4 (16),         -- MCS 4  
+          httransmitRate5 (32),         -- MCS 5  
+          httransmitRate6 (64),         -- MCS 6  
+          httransmitRate7 (128),        -- MCS 7  
+          httransmitRate8 (256),        -- MCS 8  
+          httransmitRate9 (512),        -- MCS 9  
+          httransmitRate10 (1024),      -- MCS 10  
+          httransmitRate11 (2048),      -- MCS 11  
+          httransmitRate12 (4096),      -- MCS 12  
+          httransmitRate13 (8192),      -- MCS 13  
+          httransmitRate14 (16384),     -- MCS 14  
+          httransmitRate15 (32768),     -- MCS 15  
+          httransmitRate16 (65536),     -- MCS 16  
+          httransmitRate17 (131072),    -- MCS 17  
+          httransmitRate18 (262144),    -- MCS 18  
+          httransmitRate19 (524288),    -- MCS 19  
+          httransmitRate20 (1048576),   -- MCS 20  
+          httransmitRate21 (2097152),   -- MCS 21  
+          httransmitRate22 (4194304),   -- MCS 22  
+          httransmitRate23 (8388608),   -- MCS 23  
+          httransmitRate24 (16777216),  -- MCS 24  
+          httransmitRate25 (33554432),  -- MCS 25  
+          httransmitRate26 (67108864),  -- MCS 26  
+          httransmitRate27 (134217728), -- MCS 27  
+          httransmitRate28 (268435456), -- MCS 28  
+          httransmitRate29 (536870912), -- MCS 29  
+          httransmitRate30 (1073741824) -- MCS 30  
+        } 
+      
+      
+   MwlTransmitRateVHT ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes 802.11ac VHT Transmit Rates"
+        SYNTAX  INTEGER {
+          acTransmitRateMcs07 (0),      -- MCS 0-7  
+          acTransmitRateMcs08 (1),      -- MCS 0-8  
+          acTransmitRateMcs09 (2),      -- MCS 0-9  
+          acTransmitRateNone (3)        -- None  
+        } 
+      
+      
+   MwlUpgradeState ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Software Upgrade State"
+        SYNTAX  INTEGER {
+          upgradeStart (1),             -- The upgrade has just started  
+          upgradeInProgress (2),        -- The upgrade is in progress  
+          upgradeFailed (3),            -- The upgrade has failed  
+          upgradeDone (4)               -- The upgrade has completed successfully  
+        } 
+      
+      
+   MwlVlanType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes VLAN Type"
+        SYNTAX  INTEGER {
+          vlanNone (0),                 -- No Tunnel  
+          vlanDefaultOnly (1),          -- Configured VLAN Only  
+          vlanRadiusOnly (2),           -- RADIUS VLAN Only  
+          vlanRadiusAndDefault (3),     -- RADIUS And Configured VLAN  
+          vlanGre (4),                  -- GRE  
+          vlanPool (5)                  -- VLAN pool  
+        } 
+      
+      
+   MwlAirFirewall ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes the following types"
+        SYNTAX  INTEGER {
+          airfirewallNone (0),          -- None  
+          airfirewallOuis (1)           -- Air Firewall  
+        } 
+      
+      
+   MwlOffHours ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes the following types"
+        SYNTAX  INTEGER {
+          offhoursNone (0),             -- None  
+          offhours (1)                  -- Daily Out-of-service  
+        } 
+      
+      
+   MwlOffHoursService ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes OffHours Service"
+        SYNTAX  INTEGER {
+          offhoursNoservice (0),        -- No Wlan  
+          offhoursNowireless (1)        -- No Wifi for Anybody  
+        } 
+      
+      
+   MwlDailyOutOfService ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Daily Out of Service"
+        SYNTAX  INTEGER {
+          noDailyOutOfService (0),      -- No Daily Out of Service  
+          dailyOutOfServiceOff (1),     -- Daily Out of Service is Off  
+          dailyOutOfServiceOn (2)       -- Daily Out of Service is On  
+        } 
+      
+      
+   MwlVpnStatus ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes VPN Status"
+        SYNTAX  INTEGER {
+          clearActive (0),              -- Clear Active  
+          vpnBypass (1),                -- Bypass VPN  
+          vpnActive (2),                -- VPN Active  
+          webAuthActive (4),            -- Web Auth Active  
+          vpnWebActive (5)              -- VPN and Web-Auth Active  
+        } 
+      
+      
+   MwlVpnDetailStatus ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes VPN Status"
+        SYNTAX  INTEGER {
+          stationClearActive (0),       -- Clear Active  
+          stationVpnBypass (1),         -- Bypass VPN  
+          stationVpnActive (2),         -- VPN Active  
+          stationWebAuthActive (4),     -- Web Auth Active  
+          stationVpnWebActive (5),      -- VPN and Web-Auth Active  
+          stationVpnInProgress (8),     -- VPN in Progress  
+          stationWebauthInProgress (16),-- WebAuth in Progress  
+          stationVpnWebauthInProgress (32)     -- VPN-WebAuth in Progress  
+        } 
+      
+      
+   MwlSslUsrAuthProtocolType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes SSL Authentication Protocol Types"
+        SYNTAX  INTEGER {
+          sslAuthProtocolUnknown (0),   -- Unknown  
+          sslAuthProtocolNone (1),      -- None  
+          sslAuthProtocolChap (2)       -- chap  
+        } 
+      
+      
+   MwlDhGroupType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Diffie-Hellman Groups for IKE Policy"
+        SYNTAX  INTEGER {
+          dhGroup2 (2),                 -- Group 2  
+          dhGroup3 (3),                 -- Group 3  
+          dhGroup4 (4),                 -- Group 4  
+          dhGroup5 (5)                  -- Group 5  
+        } 
+      
+      
+   MwlIpSecModeType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes IPSEC Mode Types"
+        SYNTAX  INTEGER {
+          ipsecUnknownMode (0),         -- Unknown  
+          ipsecTunnelMode (1)           -- Tunnel  
+        } 
+      
+      
+   MwlIpSecDataChannelType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes IPSEC Data Channel Types"
+        SYNTAX  INTEGER {
+          ipsecUnknown (0),             -- Unsupported  
+          ipsecEsp (1)                  -- ESP  
+        } 
+      
+      
+   MwlIpEncryptionAlgorithm ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes IP Encryption Algorithm"
+        SYNTAX  INTEGER {
+          encryptionUnknownAlgorithm (0),     -- Unsupported  
+          encryption3des (1)            -- 3DES  
+        } 
+      
+      
+   MwlIpAuthenticateAlgorithm ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes IP Authentication Algorithm"
+        SYNTAX  INTEGER {
+          authUnknown (0),              -- Unsupported  
+          authPreShareKey (1)           -- Pre-shared Key  
+        } 
+      
+      
+   MwlIpHashAlgorithm ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes IP Hash Algorithm"
+        SYNTAX  INTEGER {
+          hashUnknown (0),              -- Unsupported  
+          hashSha (1),                  -- Secure Hash Algorithm  
+          hashMd5 (2)                   -- Message Digest Algorithm 5  
+        } 
+      
+      
+   MwlIpSecAuthAlgorithm ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes IPSEC Authentication Algorithms"
+        SYNTAX  INTEGER {
+          ipsecAuthUnknown (0),         -- Unsupported  
+          ipsecAuthShaHmac (1),         -- sha-hmac  
+          ipsecAuthMd5Hmac (2)          -- md5-hmac  
+        } 
+      
+      
+   MwlCertFileType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes SSL Certificate File Types"
+        SYNTAX  INTEGER {
+          certUnknownType (0),          -- Unsupported Type  
+          certPemType (1),              -- Privacy-Enhanced Mail (PEM)-formatted file.  
+          certPfxType (2)               -- Personal Information Exchange (PFX)-formatted file.  
+        } 
+      
+      
+   MwlUrlType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes URL Type"
+        SYNTAX  INTEGER {
+          cliBadUrl (0),                -- Unknown FT type  
+          cliFtpUrl (1),                -- ftp  
+          cliTftpUrl (2),               -- tftp  
+          cliSftpUrl (3),               -- sftp  
+          cliHttpUrl (4),               -- http  
+          cliHttpsUrl (5),              -- https  
+          cliScpUrl (6),                -- scp  
+          cliFileUrl (7)                -- file  
+        } 
+      
+      
+   MwlCertificateFormType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Certificate Form Type"
+        SYNTAX  INTEGER {
+          nmsShortForm (0),             -- Short  
+          nmsLongForm (1)               -- Long  
+        } 
+      
+      
+   MwlRadiusServerSelect ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes RADIUS Server Types"
+        SYNTAX  INTEGER {
+          nmsRadiusServerNone (0),      -- None  
+          nmsRadiusServerPrimary (1),   -- primary  
+          nmsRadiusServerSecondary (2), -- secondary  
+          nmsRadiusServerAll (3)        -- all  
+        } 
+      
+      
+   MwlDiscoveryOrder ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Discovery Order"
+        SYNTAX  INTEGER {
+          discoveryFromL2First (0),     -- L2 preferred  
+          discoveryFromL2Only (1),      -- L2 only  
+          discoveryFromL3First (2),     -- L3 preferred  
+          discoveryFromL3Only (3)       -- L3 only  
+        } 
+      
+      
+   MwlApDiscoveryState ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes AP Discovery State"
+        SYNTAX  INTEGER {
+          noDiscoveryLayer (0),         -- None  
+          discoveryFromL2 (1),          -- L2  
+          discoveryFromL3 (2)           -- L3  
+        } 
+      
+      
+   MwlLicenseType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes License Type"
+        SYNTAX  INTEGER {
+          featureTrial (0),             -- Trial  
+          featurePermanent (1)          -- Permanent  
+        } 
+      
+      
+   MwlLicenseReserveType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes License Reserve Type"
+        SYNTAX  INTEGER {
+          countedLicense (0),           -- Limited  
+          uncountedLicense (1)          -- Unlimited  
+        } 
+      
+      
+   MwlSofwFeatureType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Software Feature Type"
+        SYNTAX  INTEGER {
+          sofwControllerBasic (0),      -- Controller  
+          sofwApBasic (1),              -- AP100  
+          sofwFeatMax (2)               -- MAXFEAT  
+        } 
+      
+      
+   MwlSofwControllerType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Software Controller Type"
+        SYNTAX  INTEGER {
+          sofwAll (0),                  -- Not Applicable  
+          sofwController (1),           -- Active Controller  
+          sofwStdbyController (2)       -- Standby Controller  
+        } 
+      
+      
+   MwlDscpType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes DiffServ Class Types"
+        SYNTAX  INTEGER {
+          dscpDisabled (-1),            -- DiffServ Disabled  
+          dscpCs0 (0),                  -- DiffServ class CS0/DE/Best-Effort (DSCP Value: 000000)  
+          dscpCs1 (8),                  -- DiffServ class CS1 (DSCP Value: 001000)  
+          dscpAf11 (10),                -- DiffServ class AF11, AF1 DP-low (DSCP Value: 001010)  
+          dscpAf12 (12),                -- DiffServ class AF12, AF1 DP-med (DSCP Value: 001100)  
+          dscpAf13 (14),                -- DiffServ class AF13, AF1 DP-high (DSCP Value: 001110)  
+          dscpCs2 (16),                 -- DiffServ class CS2 (DSCP Value: 010000)  
+          dscpAf21 (18),                -- DiffServ class AF21 (DSCP Value: 010010)  
+          dscpAf22 (20),                -- DiffServ class AF22 (DSCP Value: 010100)  
+          dscpAf23 (22),                -- DiffServ class AF23 (DSCP Value: 010110)  
+          dscpCs3 (24),                 -- DiffServ class CS3 (DSCP Value: 011000)  
+          dscpAf31 (26),                -- DiffServ class AF31 (DSCP Value: 011010)  
+          dscpAf32 (28),                -- DiffServ class AF32 (DSCP Value: 011100)  
+          dscpAf33 (30),                -- DiffServ class AF33 (DSCP Value: 011110)  
+          dscpCs4 (32),                 -- DiffServ class CS4 (DSCP Value: 100000)  
+          dscpAf41 (34),                -- DiffServ class AF41 (DSCP Value: 100010)  
+          dscpAf42 (36),                -- DiffServ class AF42 (DSCP Value: 100100)  
+          dscpAf43 (38),                -- DiffServ class AF43 (DSCP Value: 100110)  
+          dscpCs5 (40),                 -- DiffServ class CS5 (DSCP Value: 101000)  
+          dscpEfphb (46),               -- DiffServ class EF (DSCP Value: 101110)  
+          dscpCs6 (48),                 -- DiffServ class CS6 (DSCP Value: 110000)  
+          dscpCs7 (56)                  -- DiffServ class CS7 (DSCP Value: 111000)  
+        } 
+      
+      
+   MwlControllerHwType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Controller Hardware Type"
+        SYNTAX  INTEGER {
+          wncUnknownModel (0),          -- Unknown  
+          wncDevelPc (1),               -- Development PC  
+          wncMc1000 (2),                -- MC1000  
+          wncMc1100 (3),                -- MC1100  
+          wncMc3000 (4),                -- MC3000  
+          wncMc500 (5),                 -- MC500  
+          wncMc500a (6),                -- MC500a  
+          wncMc5000 (7),                -- MC5000  
+          wncMc4000 (8),                -- MC4000  
+          wncMc4100 (9),                -- MC4100  
+          wncMc1500 (11),               -- MC1500  
+          wncMc3200 (13),               -- MC3200  
+          wncMc4200 (14),               -- MC4200  
+          wncMc6000 (15),               -- MC6000  
+          wncMc1500v (16),              -- MC1500V  
+          wncMc3200v (17),              -- MC3200V  
+          wncMc4200v (18),              -- MC4200V  
+          wncMc1550 (19),               -- MC1550  
+          wncMc1550v (20),              -- MC1550V  
+          wncFwc50d (21),               -- FWC50D  
+          wncFwc2hd (22),               -- FWC2HD  
+          wncFwc5hd (23)                -- FWC5HD  
+        } 
+      
+      
+   MwlWncControllerState ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Controller State"
+        SYNTAX  INTEGER {
+          wncStandalone (0),            -- Standalone Controller  
+          wncMaster (1),                -- Master Controller  
+          wncSlave (2),                 -- Slave Controller  
+          wncCluster (3)                -- Cluster Member  
+        } 
+      
+      
+   MwlApHwType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes AP Hardware Types"
+        SYNTAX  INTEGER {
+          apUnknownModel (0),           -- Unknown  
+          ap300 (12),                   -- AP3xx  
+          ap310 (13),                   -- AP310  
+          ap311 (14),                   -- AP311  
+          ap320 (15),                   -- AP320  
+          ap301 (18),                   -- AP301  
+          ap302 (19),                   -- AP302  
+          ap301i (20),                  -- AP301i  
+          ap310i (21),                  -- AP310i  
+          ap302i (22),                  -- AP302i  
+          ap320i (23),                  -- AP320i  
+          ap1010 (24),                  -- AP1010  
+          ap1020 (25),                  -- AP1020  
+          psm3x (26),                   -- PSM3x  
+          ap400 (27),                   -- AP400  
+          ap433e (28),                  -- AP433e  
+          ap433i (29),                  -- AP433i  
+          ap432e (30),                  -- AP432e  
+          ap432i (31),                  -- AP432i  
+          ap1010e (32),                 -- AP1010e  
+          ap1020e (33),                 -- AP1020e  
+          ap433is (34),                 -- AP433is  
+          ap433es (35),                 -- AP433es  
+          oap432e (36),                 -- OAP432e  
+          oap433e (37),                 -- OAP433e  
+          oap433es (38),                -- OAP433es  
+          ap110 (39),                   -- AP110  
+          ap120 (40),                   -- AP120  
+          ap1014i (41),                 -- AP1014i  
+          ap332e (42),                  -- AP332e  
+          ap332i (43),                  -- AP332i  
+          ap832e (44),                  -- AP832e  
+          ap832i (45),                  -- AP832i  
+          ap822e (46),                  -- AP822e  
+          ap822i (47),                  -- AP822i  
+          ap122 (48),                   -- AP122  
+          oap832e (49),                 -- OAP832e  
+          fap421evi (50),               -- FAP-U421EV  
+          fap423eve (51),               -- FAP-U423EV  
+          ofap422ev (52)                -- FAP-U422EV  
+        } 
+      
+      
+   MwlApRegulatoryType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes AP Regulatory Types"
+        SYNTAX  INTEGER {
+          ap1000RegIndex (1),           -- AP1000  
+          ap300Mb72RegIndex (2),        -- AP300-MB72  
+          ap300Mb82RegIndex (3),        -- AP300-MB82  
+          ap400RegIndex (4),            -- AP400  
+          ap110RegIndex (5),            -- AP110  
+          ap330RegIndex (6),            -- AP330  
+          ap800RegIndex (7),            -- AP800  
+          ap800bRegIndex (8),           -- AP800B  
+          ap122RegIndex (9),            -- AP122  
+          oap800RegIndex (10),          -- OAP800  
+          fap421RegIndex (11),          -- FAP421  
+          fap423RegIndex (12),          -- FAP423  
+          ofap422RegIndex (13)          -- OFAP422  
+        } 
+      
+      
+   MwlApRfType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes AP RF Type"
+        SYNTAX  INTEGER {
+          apRfUnknownModel (0),         -- Unknown  
+          apRf1 (1),                    -- RF1  
+          apRf2 (2),                    -- RF2  
+          apRf3 (3),                    -- RF3  
+          apRf4 (4),                    -- RF4  
+          apRf5 (5),                    -- RF5  
+          apRf6 (6),                    -- RF6  
+          apRf7 (7),                    -- RF7  
+          apRf8 (8),                    -- RF8  
+          apRf9 (9),                    -- RF9  
+          apRf10 (10),                  -- RF10  
+          apRf11 (11),                  -- RF11  
+          apRf12 (12),                  -- RF12  
+          apRf13 (13),                  -- RF13  
+          apRf14 (14),                  -- RF14  
+          apRf15 (15),                  -- RF15  
+          apRf16 (16),                  -- RF16  
+          apRf17 (17),                  -- RF17  
+          apRf18 (18),                  -- RF18  
+          apRf19 (19),                  -- RF19  
+          apRf20 (20),                  -- RF20  
+          apRf21 (21),                  -- RF21  
+          apRf22 (22)                   -- RF22  
+        } 
+      
+      
+   MwlApIfModeType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes AP Interface Mode"
+        SYNTAX  INTEGER {
+          apModeUnknown (0),            -- Unknown  
+          apBMode (1),                  -- 802.11b  
+          apAMode (2),                  -- 802.11a  
+          apAbMode (3),                 -- 802.11ab  
+          apGMode (4),                  -- 802.11g  
+          apBgMode (5),                 -- 802.11bg  
+          apAgMode (6),                 -- 802.11ag  
+          apAbgMode (7),                -- 802.11abg  
+          apNMode (8),                  -- 802.11n  
+          apBnMode (9),                 -- 802.11bn  
+          apAnMode (10),                -- 802.11an  
+          apAbnMode (11),               -- 802.11abn  
+          apGnMode (12),                -- 802.11gn  
+          apBgnMode (13),               -- 802.11bgn  
+          apAgnMode (14),               -- 802.11agn  
+          apAbgnMode (15),              -- 802.11abgn  
+          apAn1s20Mode (16),            -- 802.11an1s20  
+          apAn1s40Mode (17),            -- 802.11an1s40  
+          apAn2s20Mode (18),            -- 802.11an2s20  
+          apAn2s40Mode (19),            -- 802.11an2s40  
+          apAn3s20Mode (20),            -- 802.11an3s20  
+          apAn3s40Mode (21),            -- 802.11an3s40  
+          apBgn1s20Mode (22),           -- 802.11bgn1s20  
+          apBgn1s40Mode (23),           -- 802.11bgn1s40  
+          apBgn2s20Mode (24),           -- 802.11bgn2s20  
+          apBgn2s40Mode (25),           -- 802.11bgn2s40  
+          apBgn3s20Mode (26),           -- 802.11bgn3s20  
+          apBgn3s40Mode (27),           -- 802.11bgn3s40  
+          apAc1s20Mode (28),            -- 802.11ac1s20  
+          apAc1s40Mode (29),            -- 802.11ac1s40  
+          apAc1s80Mode (30),            -- 802.11ac1s80  
+          apAbgnAcMode (31),            -- 802.11abgn_ac  
+          apAc2s20Mode (32),            -- 802.11ac2s20  
+          apAc2s40Mode (33),            -- 802.11ac2s40  
+          apAc2s80Mode (34),            -- 802.11ac2s80  
+          apAc3s20Mode (35),            -- 802.11ac3s20  
+          apAc3s40Mode (36),            -- 802.11ac3s40  
+          apAc3s80Mode (37),            -- 802.11ac3s80  
+          apAnAcMode (38),              -- 802.11an_ac  
+          apAn4s20Mode (39),            -- 802.11an4s20  
+          apAn4s40Mode (40),            -- 802.11an4s40  
+          apBgn4s20Mode (41),           -- 802.11bgn4s20  
+          apBgn4s40Mode (42),           -- 802.11bgn4s40  
+          apAc4s20Mode (43),            -- 802.11ac4s20  
+          apAc4s40Mode (44),            -- 802.11ac4s40  
+          apAc4s80Mode (45)             -- 802.11ac4s80  
+        } 
+      
+      
+   MwlApIfConfigModeType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes AP Interface Configuration Mode"
+        SYNTAX  INTEGER {
+          apConfigModeUnknown (0),      -- Unknown  
+          apConfigBMode (1),            -- 802.11b  
+          apConfigAMode (2),            -- 802.11a  
+          apConfigGMode (4),            -- 802.11g  
+          apConfigBgMode (5),           -- 802.11bg  
+          apConfigAnMode (10),          -- 802.11an  
+          apConfigBgnMode (13),         -- 802.11bgn  
+          apConfigAcMode (18)           -- 802.11ac  
+        } 
+      
+      
+   MwlAntennaType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Antenna Type"
+        SYNTAX  INTEGER {
+          antennaConnNone (0),          -- Unknown  
+          antennaConn24g (1),           -- 2.4GHz  
+          antennaConn5g (2),            -- 5GHz  
+          antennaConnDual (3),          -- Dual  
+          antennaConnExt (4),           -- External  
+          antennaConnInt (5)            -- Internal  
+        } 
+      
+      
+   MwlBandType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes RF Band Type"
+        SYNTAX  INTEGER {
+          rfband24g (1),                -- 2.4GHz  
+          rfband5g (2)                  -- 5GHz  
+        } 
+      
+      
+   MwlChannelBandType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Channel Band Type"
+        SYNTAX  INTEGER {
+          channelBMode (1),             -- 802.11b  
+          channelAMode (2),             -- 802.11a  
+          channelGMode (3),             -- 802.11g  
+          channelBgMode (4),            -- 802.11bg  
+          channelAbgnMode20mhz (5),     -- 802.11abgn20Mhz  
+          channelAbgnMode40mhzAbove (6),-- 802.11abgn40MhzAbove  
+          channelAbgnMode40mhzBelow (7),-- 802.11abgn40MhzBelow  
+          channelNMode20mhz (8),        -- 802.11n20Mhz  
+          channelNMode40mhzAbove (9),   -- 802.11n40MhzAbove  
+          channelNMode40mhzBelow (10),  -- 802.11n40MhzBelow  
+          channelAcMode (11)            -- 802.11ac  
+        } 
+      
+      
+   MwlAntennaSetLocation ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Antenna Set Selection"
+        SYNTAX  INTEGER {
+          antennaSetLocUnknown (0),     -- Unknown  
+          antennaSetLocLeft (1),        -- Left  
+          antennaSetLocRight (2),       -- Right  
+          antennaSetLoc1 (4),           -- A1  
+          antennaSetLoc2 (8),           -- A2  
+          antennaSetLoc3 (16),          -- A3  
+          antennaSetLoc4 (32),          -- A4  
+          antennaSetLoc5 (64),          -- A5  
+          antennaSetLoc6 (128),         -- A6  
+          antennaSetLoc7 (256),         -- A7  
+          antennaSetLoc8 (512),         -- A8  
+          antennaSetLoc9 (1024),        -- A9  
+          antennaSetLocIntegrated (2048),     -- Integrated  
+          antennaSetLocInternal (4096)  -- Internal  
+        } 
+      
+      
+   MwlIfDataRateOptionType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Interface Data Rate Option Types"
+        SYNTAX  INTEGER {
+          dataRateManual (0),           -- Manual  
+          dataRateAuto (1)              -- Automatic  
+        } 
+      
+      
+   MwlAntennaLinkType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Antenna Link Type"
+        SYNTAX  INTEGER {
+          antennaLinkUnknown (0),       -- Unknown  
+          antennaLinkPmp (1),           -- Point-To-Multi-Point  
+          antennaLinkPtp (2)            -- Point-To-Point  
+        } 
+      
+      
+   MwlDuplexModeType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Duplex Mode Types"
+        SYNTAX  INTEGER {
+          nmsDuplexFull (0),            -- Full Duplex  
+          nmsDuplexHalf (1)             -- Half Duplex  
+        } 
+      
+      
+   MwlBgProtectionModeType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes 802.11bg Protection Mode Types"
+        SYNTAX  INTEGER {
+          bgProtectionAuto (0),         -- Auto  
+          bgProtectionOn (1),           -- On  
+          bgProtectionOff (2)           -- Off  
+        } 
+      
+      
+   MwlHtProtectionModeType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes 802.11HT Protection Mode Types"
+        SYNTAX  INTEGER {
+          htProtectionAuto (0),         -- Auto  
+          htProtectionOn (1),           -- On  
+          htProtectionOff (2)           -- Off  
+        } 
+      
+      
+   MwlIpProxyType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes the following types"
+        SYNTAX  INTEGER {
+          nmsGeneric (0),               -- Generic  
+          nmsIpPathFinder (1),          -- IPPathFinder  
+          nmsEnumerationHeader (2)      -- EnumerationHeader  
+        } 
+      
+      
+   MwlFirewallCapability ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes none/configured/radius-configured"
+        SYNTAX  INTEGER {
+          firewallNone (0),             -- none  
+          firewallConfigured (1),       -- configured  
+          firewallRadiusConfigured (2)  -- radius-configured  
+        } 
+      
+      
+   MwlSecurityLogging ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Security Logging Options"
+        SYNTAX  INTEGER {
+          securityloggingOff (0),       -- Off  
+          securityloggingAllow (1),     -- Allow  
+          securityloggingDeny (2),      -- Deny  
+          securityloggingAll (3)        -- All  
+        } 
+      
+      
+   MwlPMKcachingBits ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes PMK Caching Options"
+        SYNTAX  BITS {
+          pmkCachingDisabled (0),       -- Disabled  
+          pmkCachingEnabled (1)         -- Enabled  
+        } 
+      
+      
+   MwlKDDI ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Key Rotation Options"
+        SYNTAX  INTEGER {
+          kddiDisabled (0),             -- Disabled  
+          kddiEnabled (1)               -- Enabled  
+        } 
+      
+      
+   MwlVcellType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Virtual Cell Type"
+        SYNTAX  INTEGER {
+          nmsVcellPap (0),              -- On  
+          nmsVcellVcell (1)             -- Off  
+        } 
+      
+      
+   MwlFilterModeType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes IGMP Snoop filter Mode Types"
+        SYNTAX  INTEGER {
+          exclude (0),                  -- Source Exclude  
+          include (1)                   -- Source Include  
+        } 
+      
+      
+   MwlBgRadioMode ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes AP150 Vcell Enable/Disable"
+        SYNTAX  INTEGER {
+          virtualMode (1),              -- Enable  
+          nonVirtualMode (2)            -- Disable  
+        } 
+      
+      
+   MwlThrdPartyIdsIps ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Third Party Ids/Ips"
+        SYNTAX  INTEGER {
+          thrdPidsIpsSnortWireless (1), -- Enabled  
+          thrdPidsIpsNone (2)           -- Disabled  
+        } 
+      
+      
+   MwlQosRulesMatchClassBits ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Qos Rules Match Class"
+        SYNTAX  BITS {
+          qosrulesmatchclassOff (0),    -- Off  
+          qosrulesmatchclassOn (1)      -- On  
+        }   
+       
+   MwlQosRulesMatchClass ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Qos Rules Match Class"
+        SYNTAX  INTEGER {
+          qosrulesmatchclassOff (0),    -- Off  
+          qosrulesmatchclassOn (1)      -- On  
+        } 
+      
+      
+   MwlChannelWidth ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Channel Width"
+        SYNTAX  INTEGER {
+          channelWidth20 (1),           -- 20 MHz  
+          channelWidth40Above (2),      -- 40 MHz Extension channel above  
+          channelWidth40Below (3),      -- 40 MHz Extension channel below  
+          channelWidth80 (4)            -- 80 MHz  
+        } 
+      
+      
+   MwlBonding ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Bonding Mode"
+        SYNTAX  INTEGER {
+          bondingSingle (0),            -- Single Mode  
+          bondingDual (1),              -- Dual Mode  
+          bondingNone (2)               -- None  
+        } 
+      
+      
+   MwlConnectivityStatus ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Connected/Disconnected Switch"
+        SYNTAX  INTEGER {
+          nmsDisconnected (0),          -- Disconnected  
+          nmsConnected (1)              -- Connected  
+        } 
+      
+      
+   MwlCapabilityModeBits ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Capability Mode of station"
+        SYNTAX  BITS {
+          nmsStaCapabilityNone (0),     -- None  
+          nmsStaWmmMode (1),            -- WMM Mode  
+          nmsStaApsdMode (2),           -- APSD Mode  
+          nmsSta80211RMode (4),         -- 802.11r Mode  
+          nmsSta80211KMode (8),         -- 802.11k Mode  
+          nmsSta80211UMode (16),        -- 802.11u Mode  
+          nmsSta80211VMode (32),        -- 802.11v Mode  
+          nmsSta80211WMode (64)         -- 802.11w Mode  
+        } 
+      
+      
+   MwlClientType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Client Type of station"
+        SYNTAX  INTEGER {
+          nmsClientData (1),            -- Data client  
+          nmsClientSipPhone (2)         -- SIP Phone client  
+        } 
+      
+      
+   MwlDeviceType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Station Type"
+        SYNTAX  INTEGER {
+          nmsStationWireless (0),       -- Wireless Station  
+          nmsStationWired (1)           -- Wired Station  
+        } 
+      
+      
+   MwlStationState ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Station State"
+        SYNTAX  INTEGER {
+          nmsStationStateUnknown (0),   -- Unknown  
+          nmsStationStateInit (1),      -- init-state  
+          nmsStationStateVlan (2),      -- VLAN-state  
+          nmsStationStateAssign (3),    -- assigned-state  
+          nmsStationStateAssociated (4),-- associated  
+          nmsStationState8021x (5),     -- 802.1x-State  
+          nmsStationStateKey (6),       -- Key State  
+          nmsStationStateIpDiscover (7),-- ip-discovery  
+          nmsStationStateCaptivePortal (8),     -- captive-portal  
+          nmsStationStateDisassociated (9)     -- disassociated  
+        } 
+      
+      
+   MwlStaDiagStap ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Station Diagnostics Statistics Type"
+        SYNTAX  INTEGER {
+          staMacFilterAclCnt (1),       -- Station MAC Filter ACL Count  
+          staMacFilterAclFailCnt (2),   -- Station MAC Filter ACL Fail Count  
+          staWepKeyIndexMismatchCnt (3),-- Station WEP Key Index Mismatch Count  
+          staAssignFailCnt (4),         -- Station Assignment Fail Count  
+          staAssociationCnt (5),        -- Station Association Count  
+          staKeyExchangeCnt (6),        -- Station Key Exchange Count  
+          staKeyExchangeFailCnt (7),    -- Station Key Exchange Fail Count  
+          staMicFailCnt (8),            -- Station MIC Fail Count  
+          staIpDiscoveryCnt (9),        -- Station IP Address Change Count  
+          staRadiusAuthCnt (10),        -- Station MAC Filter Radius Count  
+          staRadiusAuthFailCnt (11),    -- Station MAC Filter Radius Fail Count  
+          staCpGuestUserAuthCnt (12),   -- Station Captive Portal Guest User Count  
+          staCpGuestUserFailCnt (13),   -- Station Captive Portal Guest User Fail Count  
+          staDecryptFailCnt (14),       -- Station Decrypt Fail Count  
+          staSoftHandoffCnt (15)        -- Station Soft Handoff Count  
+        } 
+      
+      
+   MwlEnableDisableOption ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Enable/Disable Option"
+        SYNTAX  INTEGER {
+          nmsDisable (0),               -- Disable  
+          nmsEnable (1)                 -- Enable  
+        } 
+      
+      
+   MwlSourceEnableDisableOption ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Enable/Disable Option"
+        SYNTAX  INTEGER {
+          nmsSourceEnable (1),          -- Enable  
+          nmsSourceDisable (2)          -- Disable  
+        } 
+      
+      
+   MwlLocationSourceOption ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Location Source Option"
+        SYNTAX  INTEGER {
+          nmsLocationSourceWifi (1),    -- WIFI  
+          nmsLocationSourceBle (2),     -- BLE  
+          nmsLocationSourceAll (3)      -- All  
+        } 
+      
+      
+   MwlReportFormatType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes legacy/forti-presence"
+        SYNTAX  INTEGER {
+          nmsReportFormatFortiPresence (1),     -- Forti-Presence  
+          nmsReportFormatLegacy (2)     -- Legacy  
+        } 
+      
+      
+   MwlPacketCaptureMode ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes L2/L3 Option"
+        SYNTAX  INTEGER {
+          l2Mode (0),                   -- l2 mode  
+          l3Mode (1)                    -- l3 mode  
+        } 
+      
+      
+   MwlRxTxOption ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Rx/Tx/Both Option"
+        SYNTAX  INTEGER {
+          rxOnly (0),                   -- rx only  
+          txOnly (1),                   -- tx only  
+          rxTxBoth (2)                  -- Both RxTx  
+        } 
+      
+      
+   MwlRateLimitMode ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Rate Limit Option"
+        SYNTAX  INTEGER {
+          station (0),                  -- station  
+          cumulative (1)                -- cumulative  
+        } 
+      
+      
+   MwlBandSteeringMode ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Band Steering Mode"
+        SYNTAX  INTEGER {
+          bandSteeringDisable (0),      -- Band Steering Disable  
+          bandASteering (1),            -- Band Steering to A Band  
+          bandNSteering (2)             -- Band Steering to N Band  
+        } 
+      
+      
+   MwlPapBroadcastSsidMode ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes SSID Broadcast for Vport Mode"
+        SYNTAX  INTEGER {
+          papBroadcastSsidDisabled (0), -- Disabled  
+          papBroadcastSsidAlways (1),   -- Always  
+          papBroadcastSsidTillAssociation (2)     -- Till-Association  
+        } 
+      
+      
+   MwlEncapsulationType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Packet Capture Profile Encapsulation Type"
+        SYNTAX  INTEGER {
+          ppi (0),                      -- ppi  
+          legacy (1)                    -- legacy  
+        } 
+      
+      
+   MwlUplinkType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Uplink Type"
+        SYNTAX  INTEGER {
+          nmsUplink (0),                -- Uplink  
+          nmsDownlink (1),              -- Downlink  
+          nmsUplinkLacp (2)             -- Uplink-lacp  
+        } 
+      
+      
+   MwlVpnConnectivityStatus ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes VPN Connection Status"
+        SYNTAX  INTEGER {
+          vpnDisconnected (0),          -- Disconnected  
+          vpnConnected (1)              -- Connected  
+        } 
+      
+      
+   MwlVpnAuthenticationStatus ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes VPN Authentication Status"
+        SYNTAX  INTEGER {
+          vpnUnknown (0),               -- Unknown  
+          vpnNoCertificate (1),         -- No Certificate  
+          vpnValidCertificate (2),      -- Valid Certificate  
+          vpnInvalidCertificate (3),    -- Invalid Certificate  
+          vpnCertificateRevoked (4),    -- Certificate Revoked  
+          vpnCertificateExpired (5),    -- Certificate Expired  
+          vpnCertificateUnknownCa (6)   -- Unknown CA Certificate  
+        } 
+      
+      
+   MwlVpnAuthenticationType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes VPN Authentication Type"
+        SYNTAX  INTEGER {
+          vpnAuthTypeUnknown (0),       -- Unknown  
+          vpnAuthTypeX509Certificate (1)-- X509 Certificate  
+        } 
+      
+      
+   MwlCertificateStatus ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Certificate Status"
+        SYNTAX  INTEGER {
+          certStatusUnknown (0),        -- Unknown  
+          certStatusNotInstalled (1),   -- Not Installed  
+          certStatusInstalled (2)       -- Installed  
+        } 
+      
+      
+   MwlCertRequestStatus ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Certificate Request Status"
+        SYNTAX  INTEGER {
+          certReqStatusNone (0),        -- None  
+          certReqStatusCsrGenerated (1),-- CSR Generated  
+          certReqStatusCsrGenerationInProgress (2),     -- CSR Generation In Progress  
+          certReqStatusCsrGenerationFailed (3),     -- CSR Generation Failed  
+          certReqStatusCsrUploadFailed (4),     -- CSR Upload Failed  
+          certReqStatusCertInstalled (5),     -- Certificate Installed  
+          certReqStatusCertInstallationInProgress (6),     -- Certificate Installation In Progress  
+          certReqStatusCertDownloadFailed (7),     -- Certificate Download Failed  
+          certReqStatusCertInstallationFailed (8),     -- Certificate Installation Failed  
+          certReqStatusCertDeleted (9), -- Certificate Deleted  
+          certReqStatusCertDeletionInProgress (10),     -- Certificate Deletion In Progress  
+          certReqStatusCertDeletionFailed (11),     -- Certificate Deletion Failed  
+          certReqStatusCaCertDownloaded (12),     -- CA Certificate Downloaded  
+          certReqStatusCaCertDownloadInProgress (13),     -- CA Certificate Download In Progress  
+          certReqStatusCaCertDownloadFailed (14)     -- CA Certificate Download Failed  
+        } 
+      
+      
+   MwlFastEthernetType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes FastEthernet Type"
+        SYNTAX  INTEGER {
+          nmsPrimaryFastethernet (1),   -- Primary Ethernet  
+          nmsSecondaryFastethernet (2)  -- Secondary Ethernet  
+        } 
+      
+      
+   MwlVpnMode ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Vpn Connectivity Mode"
+        SYNTAX  INTEGER {
+          modeNonVpn (0),               -- Non-VPN  
+          modeVpn (1)                   -- VPN  
+        } 
+      
+      
+   MwlRegionSettings ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Region Settings"
+        SYNTAX  INTEGER {
+          regionUnknown (0),            -- Unknown  
+          regionUs (1),                 -- US  
+          regionIntl (2)                -- International  
+        } 
+      
+      
+   MwlSpectrumBandsBits ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Spectrum Bands"
+        SYNTAX  BITS {
+          spectrumSubbandNone (0),      -- None  
+          spectrumSubband24ghz (1),     -- 2.4GHz, channels, 1-14  
+          spectrumSubband5ghzLow (2),   -- 5GHz low-band, channels 36-64  
+          spectrumSubband5ghzMedium (4),-- 5GHz mid-band, channels 100-140  
+          spectrumSubband5ghzHigh (8)   -- 5GHz high-band, channels 149-165  
+        } 
+      
+      
+   MwlESSRFVirtualizationMode ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes ESS RF Virtualization Mode"
+        SYNTAX  INTEGER {
+          essRfVmodeVcell (0),          -- Virtual Cell  
+          essRfVmodeVport (1),          -- Virtual Port  
+          essRfVmodeNcell (2)           -- Native Cell  
+        } 
+      
+      
+   MwlIFRFVirtualizationMode ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Interface RF Virtualization Mode"
+        SYNTAX  INTEGER {
+          ifRfVmodeVport (0),           -- Virtual Port  
+          ifRfVmodeNcell (1)            -- Native Cell  
+        } 
+      
+      
+   MwlYesNoSwitch ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Yes/No Switches"
+        SYNTAX  INTEGER {
+          nmsNo (0),                    -- No  
+          nmsYes (1)                    -- Yes  
+        } 
+      
+      
+   MwlIpMode ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes IP Address Modes"
+        SYNTAX  INTEGER {
+          modeUnknown (0),              -- Unknown Mode  
+          modeIpv4 (1),                 -- IPv4 Mode  
+          modeIpv6 (2),                 -- IPv6 Mode  
+          modeDualStackIp (3)           -- Dual Stack IP  
+        } 
+      
+      
+   MwlChannelCenterFrequency ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes ChannelCenterFrequency"
+        SYNTAX  INTEGER {
+          channelCenterFrequency0 (0),  -- 0  
+          channelCenterFrequency42 (42),-- 42  
+          channelCenterFrequency58 (58),-- 58  
+          channelCenterFrequency106 (106),     -- 106  
+          channelCenterFrequency122 (122),     -- 122  
+          channelCenterFrequency155 (155)     -- 155  
+        } 
+      
+      
+   MwlNetworkType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Network Type"
+        SYNTAX  INTEGER {
+          networkTypeWired (0),         -- Wired  
+          networkTypeWireless (1)       -- Wireless  
+        } 
+      
+      
+   MwlIpv6AddrType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes IPV6 Address Types"
+        SYNTAX  INTEGER {
+          ipv4Addr (0),                 -- IPV4 Address  
+          globalUnicastAddr (1),        -- Global Unicast Address  
+          globalUnicastDhcpAddr (2),    -- Global Unicast DHCP Address  
+          linkLocalAddr (3),            -- Link Local Address  
+          tempAddr (4)                  -- Temporary Address  
+        } 
+      
+      
+   MwlvenueGroup ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Hotspot Venue Group"
+        SYNTAX  INTEGER {
+          venueGroupUnspecified (0),    -- Unspecified  
+          venueGroupAssembly (1),       -- Assembly  
+          venueGroupBusiness (2),       -- Business  
+          venueGroupEducational (3),    -- Educational  
+          venueGroupFactoryIndustrial (4),     -- Factory and Industrial  
+          venueGroupInstitutional (5),  -- Institutional  
+          venueGroupMercantile (6),     -- Mercantile  
+          venueGroupResidential (7),    -- Residential  
+          venueGroupStorage (8),        -- Storage  
+          venueGroupUtilityMiscellaneous (9),     -- Utility and Miscellaneous  
+          venueGroupVehicular (10),     -- Vehicular  
+          venueGroupOutdoor (11)        -- Outdoor  
+        } 
+      
+      
+   MwlvenueType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Hotspot Venue  Type"
+        SYNTAX  INTEGER {
+          venueGroupTypeUnspecified (0),-- Unspecified  
+          venueTypeAssemblyArena (101), -- Assembly-Arena  
+          venueTypeAssemblyStadium (102),     -- Assembly-Stadium  
+          venueTypeAssemblyPassengerTerminal (103),     -- Assembly-Passenger Terminal  
+          venueTypeAssemblyAmphitheater (104),     -- Assembly-Amphitheater  
+          venueTypeAssemblyAmusementPark (105),     -- Assembly-Amusement Park  
+          venueTypeAssemblyPlaceOfWorship (106),     -- Assembly-Place of Worship  
+          venueTypeAssemblyConventionCenter (107),     -- Assembly-Convention Center  
+          venueTypeAssemblyLibrary (108),     -- Assembly-Library  
+          venueTypeAssemblyMuseum (109),-- Assembly-Museum  
+          venueTypeAssemblyRestaurant (110),     -- Assembly-Restaurant  
+          venueTypeAssemblyTheater (111),     -- Assembly-Theater  
+          venueTypeAssemblyBar (112),   -- Assembly-Bar  
+          venueTypeAssemblyCoffeeShop (113),     -- Assembly-Coffee Shop  
+          venueTypeAssemblyZooAquarium (114),     -- Assembly-Zoo or Aquarium  
+          venueTypeAssemblyEmergencyCoordinationCenter (115),     -- Assembly-Emergency Coordination Center  
+          venueTypeBusinessDoctorDentistOffice (201),     -- Business-Doctor or Dentist Office  
+          venueTypeBusinessBank (202),  -- Business-Bank  
+          venueTypeBusinessFireStation (203),     -- Business-Fire Station  
+          venueTypeBusinessPoliceStation (204),     -- Business-Police Station  
+          venueTypeBusinessPostOffice (206),     -- Business-Post Office  
+          venueTypeBusinessProfessionalOffice (207),     -- Business-Professional Office  
+          venueTypeBusinessResearchDevelopmentFacility (208),     -- Business-Research and Development Facility  
+          venueTypeBusinessAttorneyOffice (209),     -- Business-Attorney Office  
+          venueTypeEducationalSchoolPrimary (301),     -- Educational-School,Primary  
+          venueTypeEducationalSchoolSecondary (302),     -- Educational-School,Secondary  
+          venueTypeEducationalUniversityCollege (303),     -- Educational-University or College  
+          venueTypeFactoryIndustrialFactory (401),     -- Factory-Industrial  
+          venueTypeInstitutionalHospital (501),     -- Institutional-Hospital  
+          venueTypeInstitutionalLongTermCareFacility (502),     -- Institutional-Long-Term Care Facility  
+          venueTypeInstitutionalAlcoholDrugRehabilitationCenter (503),     -- Institutional-Alcohol and Drug Re-habilitation Center  
+          venueTypeInstitutionalGroupHome (504),     -- Institutional-Group Home  
+          venueTypeInstitutionalPrisonJail (505),     -- Institutional-Prison or Jail  
+          venueTypeMercantileRetailStore (601),     -- Mercantile-Retail Store  
+          venueTypeMercantileGroceryMarket (602),     -- Mercantile-Grocery Market  
+          venueTypeMercantileAutomotiveServiceStation (603),     -- Mercantile-Automotive Service Station  
+          venueTypeMercantileShoppingMall (604),     -- Mercantile-Shopping Mall  
+          venueTypeMercantileGasStation (605),     -- Mercantile-Gas Station  
+          venueTypeResidentialPrivateResidence (701),     -- Residential-Private Residence  
+          venueTypeResidentialHotelMotel (702),     -- Residential-Hotel or Motel  
+          venueTypeResidentialDormitory (703),     -- Residential-Dormitory  
+          venueTypeResidentialBoardingHouse (704),     -- Residential-Boarding House  
+          venueTypeVehicularAutomobileTruck (1001),     -- Vehicular-Automobile or Truck  
+          venueTypeVehicularAirplane (1002),     -- Vehicular-Airplane  
+          venueTypeVehicularBus (1003), -- Vehicular-Bus  
+          venueTypeVehicularFerry (1004),     -- Vehicular-Ferry  
+          venueTypeVehicularShipBoat (1005),     -- Vehicular-Ship or Boat  
+          venueTypeVehicularTrain (1006),     -- Vehicular-Train  
+          venueTypeVehicularMortorBike (1007),     -- Vehicular-Mortor Bike  
+          venueTypeOutdoorMuniMesh (1101),     -- Outdoor-Muni-mesh Network  
+          venueTypeOutdoorCityPark (1102),     -- Outdoor-City Park  
+          venueTypeOutdoorRestArea (1103),     -- Outdoor-Rest Area  
+          venueTypeOutdoorTrafficControl (1104),     -- Outdoor-Traffic Control  
+          venueTypeOutdoorBusStop (1105),     -- Outdoor-Bus Stop  
+          venueTypeOutdoorKiosk (1106)  -- Outdoor-Kiosk  
+        } 
+      
+      
+   MwlHotspotAccessNetworkType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Hotspot Access Network Type"
+        SYNTAX  INTEGER {
+          hotspotAccessNetworkTypePrivateNetwork (0),     -- Private Network  
+          hotspotAccessNetworkTypePrivateNetworkWithGuestAccess (1),     -- Private Network with Guest Acesss  
+          hotspotAccessNetworkTypeChargeablePublicNetwork (2),     -- Chargeable Public Network  
+          hotspotAccessNetworkTypeFreePublicNetwork (3),     -- Free Public Network  
+          hotspotAccessNetworkTypePersonalDeviceNetwork (4),     -- Personal Device Network  
+          hotspotAccessNetworkTypeEmergencyServicesOnlyNetwork (5),     -- Emergency Services Only Network  
+          hotspotAccessNetworkTypeTestExperimentalNetwork (14),     -- Test or Experimental Network  
+          hotspotAccessNetworkTypeWildcardNetwork (15)     -- Wildcard Network  
+        } 
+      
+      
+   MwlHotspotAuthenType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Hotspot Authentication Type"
+        SYNTAX  INTEGER {
+          hotspotAuthenTypeAcceptanceTermsConditions (0),     -- Acceptance of Terms and Conditions  
+          hotspotAuthenTypeOnlineEnrollmentSupported (1),     -- On-line enrollment supported  
+          hotspotAuthenTypeHttpHttpsRedirection (2),     -- http/https redirection  
+          hotspotAuthenTypeDnsRedirection (3)     -- DNS redirection  
+        } 
+      
+      
+   MwlIPv6AvailabilityType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes IP version 6 Availability Type"
+        SYNTAX  INTEGER {
+          ipv6AvailabilityTypeNotAvailable (0),     -- Address type not available  
+          ipv6AvailabilityTypeAvailable (1),     -- Address type available  
+          ipv6AvailabilityTypeNotKnown (2)     -- Availability of the address type not known  
+        } 
+      
+      
+   MwlIPv4AvailabilityType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes IP version 4 Availability Type"
+        SYNTAX  INTEGER {
+          ipv4AvailabilityTypeNotAvailable (0),     -- Address type not available  
+          ipv4AvailabilityTypeAvailable (1),     -- Address type available  
+          ipv4AvailabilityTypePortRestrictedAddressAvailable (2),     -- Port-restricted IPv4 address available  
+          ipv4AvailabilityTypeSingleNatedPrivateAddressAvailable (3),     -- Single NATed private IPv4 address available  
+          ipv4AvailabilityTypeDoubleNatedPrivateAddressAvailable (4),     -- Double NATed private IPv4 address available  
+          ipv4AvailabilityTypePortRestrictedSingleNatedPrivateAddressAvailable (5),     -- Port-restricted IPv4 address and single NATed IPv4 address available  
+          ipv4AvailabilityTypePortRestrictedDoubleNatedPrivateAddressAvailable (6),     -- Port-restricted IPv4 address and double NATed IPv4 address available  
+          ipv4AvailabilityTypeNotKnown (7)     -- Availability of the address type is not known  
+        } 
+      
+      
+   MwlNAIRealmAuthMethod ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes NAI Realm Authenticatin Method"
+        SYNTAX  INTEGER {
+          naiRealmAuthMethodEapTlsCertificate (0),     -- EAP TLS Certificate  
+          naiRealmAuthMethodEapTtlsMschapv2UsernamePassword (1)     -- EAP TTLS MSCHAPv2 Username/Password  
+        } 
+      
+      
+   MwlApGroupType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes AP Group Type"
+        SYNTAX  INTEGER {
+          apGroupTypeLocation (0)       -- Location Type  
+        } 
+      
+      
+   MwlVpnClientProtocol ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Supported VPN Client Protocols"
+        SYNTAX  INTEGER {
+          vpnClientProtoTcp (0),        -- TCP  
+          vpnClientProtoUdp (1)         -- UDP  
+        } 
+      
+      
+   MwlRadiusCalledStationIdType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes RADIUS CalledStationId Type"
+        SYNTAX  INTEGER {
+          radiusCalledStationIdTypeDefault (0),     -- Default  
+          radiusCalledStationIdTypeMacAddress (1),     -- MacAddress  
+          radiusCalledStationIdTypeMacAddressSsid (2)     -- MacAddress:SSID  
+        } 
+      
+      
+   MwlServiceDataFeature ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Service Data Feature"
+        SYNTAX  INTEGER {
+          serviceDataServiceConnect (0),-- Service-Control  
+          serviceDataApplicationVisibility (1)     -- Application-Visibility  
+        } 
+      
+      
+   MwlServiceDataType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Service Data Type"
+        SYNTAX  INTEGER {
+          serviceDataServiceConnectService (0),     -- Service  
+          serviceDataServiceConnectLocation (1),     -- Location  
+          serviceDataServiceConnectEssidVlan (2),     -- SSID/VLAN  
+          serviceDataServiceConnectNetwork (3),     -- Wired/Wireless  
+          serviceDataAppVisibilityApplication (4),     -- Application  
+          serviceDataAppVisibilityEssid (5),     -- Essid  
+          serviceDataAppVisibilityStation (6),     -- Station  
+          serviceDataAppVisibilityAp (7)-- AP  
+        } 
+      
+      
+   MwlServiceDataFilterType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Service Data Filter Type"
+        SYNTAX  INTEGER {
+          serviceDataFilterEssid (0),   -- EssId  
+          serviceDataFilterAp (1),      -- AP  
+          serviceDataFilterLocation (2),-- ApGroup  
+          serviceDataFilterEssidAp (3), -- EssId/AP  
+          serviceDataFilterEssidLocation (4)     -- EssId/ApGroup  
+        } 
+      
+      
+   MwlRedirectionProtocol ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Redirection Protocol"
+        SYNTAX  INTEGER {
+          redirectionProtocolHttps (0), -- https  
+          redirectionProtocolHttp (1)   -- http  
+        } 
+      
+      
+   MwlApRebootReasonCode ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes AP Reboot Reason Code"
+        SYNTAX  INTEGER {
+          apRebootReasonCodeInvalid (0),-- invalid  
+          apRebootReasonCodeManual (1), -- Manual  
+          apRebootReasonCodeConfigChange (2),     -- Config Change  
+          apRebootReasonCodeWatchdog (3),     -- Watchdog  
+          apRebootReasonCodeLostConnection (4),     -- Lost Connection  
+          apRebootReasonCodeSoftwareUpgrade (5),     -- Software Upgrade  
+          apRebootReasonCodeRadioFailure (6),     -- Radio Failure  
+          apRebootReasonCodeInvalidPower (7),     -- Invalid Power  
+          apRebootReasonCodeUnknown (8),-- Unknown  
+          apRebootReasonCodeCannotDownloadConfig (9),     -- Cannot Download Config  
+          apRebootReasonCodeRestoreDefault (10),     -- Restore Default  
+          apRebootReasonCodeApCrash (11),     -- Ats Crash  
+          apRebootReasonCodeKernelCrash (12),     -- Kernel Crash  
+          apRebootReasonCodeSoftLockup (13),     -- Soft Lockup  
+          apRebootReasonCodeBandspeedTerminated (14),     -- BandSpeed Service Terminated  
+          apRebootReasonCodeLastEntry (15)     -- Last Entry  
+        } 
+      
+      
+   MwlBridgedVlanType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Bridged VLAN Type"
+        SYNTAX  INTEGER {
+          noVlan (0),                   -- No VLAN  
+          staticVlanOnly (1),           -- Static VLAN Only  
+          radiusVlanOnly (2),           -- RADIUS VLAN Only  
+          radiusAndStaticVlan (3)       -- RADIUS And Static VLAN  
+        } 
+      
+      
+   MwlCliCmdGenWriteMode ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Write Mode"
+        SYNTAX  INTEGER {
+          cliCmdGenWriteModeOverwrite (0),     -- Overwrite  
+          cliCmdGenWriteModeAppend (1)  -- Append  
+        } 
+      
+      
+   MwlVoiceClientType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Voice Client Type"
+        SYNTAX  INTEGER {
+          voiceClientTypeNone (0),      -- none  
+          voiceClientTypeAscom (1),     -- ascom  
+          voiceClientTypeSpectralink (2)-- spectralink  
+        } 
+      
+      
+   MwlMMProtocolType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes MMP Protocol Type"
+        SYNTAX  INTEGER {
+          mmpTypeBinary (0),            -- Basic  
+          mmpTypeKv (1)                 -- KeyValue  
+        } 
+      
+      
+   MwlApMacAssignOption ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes eth0/eth1 Option"
+        SYNTAX  INTEGER {
+          nmsEth0 (0),                  -- eth0  
+          nmsEth1 (1)                   -- eth1  
+        } 
+      
+      
+   MwlNplus1NotifType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes N+1 Notification Type"
+        SYNTAX  INTEGER {
+          nplus1NotifTypeNp1Stop (1),   -- N+1 Stop  
+          nplus1NotifTypeReboot (2),    -- Reboot  
+          nplus1NotifTypeUpgrade (3),   -- Upgrade  
+          nplus1NotifTypeTakeover (4),  -- Takeover  
+          nplus1NotifTypeFallback (5),  -- Fallback  
+          nplus1NotifTypeIpConflict (6),-- IP Conflict  
+          nplus1NotifTypeGatewayUp (7), -- Gateway Up  
+          nplus1NotifTypeGatewayDown (8),     -- Gateway Down  
+          nplus1NotifTypeSlave (9)      -- Slave  
+        } 
+      
+      
+   MwlTimerType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Timer Type"
+        SYNTAX  INTEGER {
+          timerTypeAbsolute (0),        -- absolute  
+          timerTypePeriodic (1)         -- periodic  
+        } 
+      
+      
+   MwlApplicationActionType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Application Action Type"
+        SYNTAX  INTEGER {
+          appActionTypeAllow (0),       -- Allow  
+          appActionTypeBlock (1)        -- Block  
+        } 
+      
+      
+   MwlAppVisibilityFlowType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Application Visibility Flow Type"
+        SYNTAX  INTEGER {
+          appVisibilityFlowTypeAllowed (0),     -- Allowed  
+          appVisibilityFlowTypeBlocked (1)     -- Blocked  
+        } 
+      
+      
+   MwlApplicationBWUnit ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Application Bandwidth Unit"
+        SYNTAX  INTEGER {
+          appBwUnitKbps (0),            -- Kbps  
+          appBwUnitMbps (1),            -- Mbps  
+          appBwUnitGbps (2)             -- Gbps  
+        } 
+      
+      
+   MwlDaysOfTheWeekBits ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Days Of The Week"
+        SYNTAX  BITS {
+          daysOfTheWeekNotSupported (0),-- None  
+          daysOfTheWeekSunday (1),      -- Sunday  
+          daysOfTheWeekMonday (2),      -- Monday  
+          daysOfTheWeekTuesday (4),     -- Tuesday  
+          daysOfTheWeekWednesday (8),   -- Wednesday  
+          daysOfTheWeekThursday (16),   -- Thursday  
+          daysOfTheWeekFriday (32),     -- Friday  
+          daysOfTheWeekSaturday (64)    -- Saturday  
+        } 
+      
+      
+   MwlTimerIntervalState ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Timer Within or Out Of Interval"
+        SYNTAX  INTEGER {
+          nmsTimerStateInInterval (0),  -- In  
+          nmsTimerStateOutOfInterval (1)-- Out  
+        } 
+      
+      
+   MwlEssIdType ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Type of EssId"
+        SYNTAX  INTEGER {
+          nmsEssidTypeRegular (0),      -- Regular  
+          nmsEssidTypeBackup (1)        -- Backup  
+        } 
+      
+      
+   MwlState ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Start/done Option"
+        SYNTAX  INTEGER {
+          nmsStateUnknown (0),          -- Unknown  
+          nmsStateStart (1),            -- Start  
+          nmsStateDone (2)              -- Done  
+        } 
+      
+      
+   MwlTxBeamSupport ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Tx Beamforming support type"
+        SYNTAX  INTEGER {
+          nmsTxBeamformingDisabled (0), -- Disabled  
+          nmsTxBeamformingSuMimo (1),   -- SU MIMO  
+          nmsTxBeamformingMuMimo (2)    -- MU MIMO  
+        } 
+      
+      
+   MwlMcaApStatus ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            "This object describes Planned/Unplanned AP"
+        SYNTAX  INTEGER {
+          nmsMcaUnplanned (0),          -- Unplanned  
+          nmsMcaPlanned (1)             -- Planned  
+        } 
+      
+   MwlArrayDataTypeAction ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+            " This defines the actions for the array data type" 
+        SYNTAX INTEGER { 
+           addValue (1),
+           deleteValue (2),
+           updateValue (3)
+        }
+     
+END
+   

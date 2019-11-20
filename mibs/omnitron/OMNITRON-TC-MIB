@@ -1,0 +1,873 @@
+OMNITRON-TC-MIB DEFINITIONS ::= BEGIN
+
+-- *****************************************************************************
+-- TEXTUAL-CONVENTIONs MIB for Omnitron Systems Technology Enterprise MIBs
+-- *****************************************************************************
+
+IMPORTS
+    MODULE-IDENTITY, Integer32, Unsigned32, Counter64, enterprises
+        FROM SNMPv2-SMI         -- RFC-2578
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC;         -- RFC 2579
+
+
+ostOmnitronTcMib MODULE-IDENTITY
+    LAST-UPDATED "201505131200Z"     -- May 13, 2015
+    ORGANIZATION "Omnitron Systems Technology, Inc."
+    CONTACT-INFO "Omnitron Systems Technology, Inc.
+                  38 Tesla
+                  Irvine, CA 92618-4670
+                  USA
+
+             Tel: (949) 250 6510
+             Fax: (949) 250 6514
+          E-mail: info@omnitron-systems.com
+   International:  949 250 6510
+
+                  Technical Support and Customer Service
+             Tel: (800) 675 8410
+          E-mail: support@omnitron-systems.com
+   International:  949 250 6510"
+
+    DESCRIPTION
+            "Omnitron TC MIB for use with v5.2 iConverter Management Modules
+             and NetOutlook
+
+             Copyright 2015 Omnitron Systems Technology, Inc.
+             All rights reserved
+            "
+
+    REVISION    "201505131200Z"     -- May 13, 2015
+    DESCRIPTION "Added OstIpv6Addr, OstIpAddr
+                "
+
+    REVISION    "201501211200Z"     -- January 21, 2015
+    DESCRIPTION "Initial version of v5.2 MIB.
+                   Added OstAccessibiltyType from the OMNITRON-ACL-MIB
+                "
+    ::= { enterprises 7342 11 }
+
+omnitron                OBJECT IDENTIFIER ::= { enterprises 7342 }
+icAgent                 OBJECT IDENTIFIER ::= { omnitron 1 }
+
+
+-- *****************************************************************************
+-- Textual Conventions (TC)
+-- *****************************************************************************
+-- TC definitions are placed in alphabetical order
+
+OstAccessibiltyType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Accessibilty type enumeration.
+
+         deny(1)       Access to the module is not allowed
+         permit(2)     Access to the module is allowed
+        "
+    SYNTAX      INTEGER {
+                  deny        (1),
+                  permit      (2)
+                }
+
+
+OstClassOfService ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+       "Class of service setting.  0=discard, 1=lowest class, 4=highest class"
+    SYNTAX      Unsigned32 (0..4)
+
+
+OstClockFreq ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-2"
+    STATUS      current
+    DESCRIPTION
+        "Clock frequency in hundreths of MHz."
+    SYNTAX      Unsigned32
+
+
+OstCosL2cpDstAddr ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+        "L2CP destination address enumeration.
+
+         Index | Destination Address | Name
+         ------+--------------------+---------
+             1 | 01-80-C2-00-00-00   | RSTP
+             2 | 01-80-C2-00-00-01   | Pause
+             3 | 01-80-C2-00-00-02   | LACP
+             4 | 01-80-C2-00-00-02   | Marker
+             5 | 01-80-C2-00-00-02   | Link OAM
+             6 | 01-80-C2-00-00-02   |
+             7 | 01-80-C2-00-00-03   | 802.1x
+             8 | 01-80-C2-00-00-04   | IEEE MAC
+             9 | 01-80-C2-00-00-05   |
+            10 | 01-80-C2-00-00-06   |
+            11 | 01-80-C2-00-00-07   | E-LMI
+            12 | 01-80-C2-00-00-08   | Pr Bridge
+            13 | 01-80-C2-00-00-09   |
+            14 | 01-80-C2-00-00-0A   |
+            15 | 01-80-C2-00-00-0B   |
+            16 | 01-80-C2-00-00-0C   |
+            17 | 01-80-C2-00-00-0D   | GVRP
+            18 | 01-80-C2-00-00-0E   | LLDP
+            19 | 01-80-C2-00-00-0F   |
+            20 | 01-80-C2-00-00-20   | GARP
+        "
+    SYNTAX      Unsigned32 (1..20)
+
+
+OstCosNameString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS      current
+    DESCRIPTION
+       "A class of service name."
+    SYNTAX      OCTET STRING (SIZE(1..45))
+
+
+OstCosNameStringOrNone ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS      current
+    DESCRIPTION
+       "A class of service name or an empty string."
+    SYNTAX      OCTET STRING (SIZE(0..45))
+
+
+OstCosTrustType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "CoS trust type enumeration.
+
+         Green traffic is marked with low drop precedence and yellow
+         traffic is marked with high drop precedence.
+
+         cosTrust(1)        Trust frame. The frames priority
+                            determines the egress class.
+
+         cosUsePri(2)       Use the priority ostCosPriority for the
+                            frame. The frame will egress with ostCosPriority
+                            priority and ostCosPrirority determines the
+                            egress class.
+
+         cosUseClass(3)     Use the class ostCosClass for the frame.
+                            The frame will egress with the frames
+                            priority and the ostCosClass egress class.
+
+         cosUsePriClass(4)  Use the priority ostCosPriority and class
+                            ostCosClass for the frame. The frames will
+                            egress with ostCosPri and ostCosClass egress
+                            class.
+
+         cosGreenYellow(5)  Use ostCosGreenPriority and ostCosGreenClass for
+                            green traffic. Use ostCosYellowPriority and
+                            ostCosYellowClass for yellow traffic.
+        "
+    SYNTAX      INTEGER {
+                  cosTrust          (1),
+                  cosUsePri         (2),
+                  cosUseClass       (3),
+                  cosUsePriClass    (4),
+                  cosGreenYellow    (5)
+                }
+
+
+OstEgressSchedulingProfileIndexType ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+       "A value that uniquely identifies an Egress Scheduling Profile.
+
+        The valid values are 1 to X, where X is the maximum supported profile.
+        The maximum value for X for the GM4 is 4.
+       "
+    SYNTAX      Unsigned32 (1..8)
+
+
+OstEgressQueueIndexType ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+       "A value that uniquely identifies an Egress Queue.
+
+        The valid values are 1 to X, where X is the maximum supported profile.
+        The maximum value for X for the GM4 is 4.
+       "
+    SYNTAX      Unsigned32 (1..8)
+
+
+OstElpsProtectType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "A value that represents the ELPS protection type.  The value can be one
+        of the following:
+
+        e1plus1UniNoAps(1)   1 unidirectional without APS communication
+        e1plus1UniAps(2)     1 unidirectional switching with APS communication
+        e1plus1BiAps(3)      1 bidirectional w/APS communication
+        e1to1(4)             1:1 bidirectional w/APS communication
+        notAvailable(5)      Protect Type is unknown or not available, value returned
+                                 for status read, not allowed to write
+       "
+    SYNTAX      INTEGER {
+                  e1plus1UniNoAps (1),
+                  e1plus1UniAps   (2),
+                  e1plus1BiAps    (3),
+                  e1to1           (4),
+                  notAvailable    (5)
+                }
+
+
+OstElpsRequestStates ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "A value that represents the current request/state of either the local or
+        remote (partner) ELPS instance.  The value can be one of the following:
+
+        noRequest(0)             No Request (NR), lowest priority
+        doNotRevert(1)           Do Not Revert (DNR)
+        revertRequest(2)         Revert request (RR)
+        exercise(4)              Exercise APS protocol (EXER)
+        waitToRestore(5)         Wait to restore (WTR)
+        manualSwitchWorking(6)   Manual swtich to working (MS-W)
+        manualSwitch(7)          Manual switch (MS)
+        signalDegrade(9)         Signal degrade (SD)
+        signalFailWorking(11)    Signal fail for working (SF)
+        forcedSwitch(13)         Forced switch (FS)
+        signalFailProtection(14) Signal fail for protection (SF-P)
+        lockoutProtection(15)    Lock of protection (LO), highest priority
+        notAvailable(16)         Status is unknown or not available, value returned
+                                 for status read, not allowed to write
+       "
+    SYNTAX      INTEGER {
+                  noRequest            (0),
+                  doNotRevert          (1),
+                  revertRequest        (2),
+                  exercise             (4),
+                  waitToRestore        (5),
+                  manualSwitchWorking  (6),
+                  manualSwitch         (7),
+                  signalDegrade        (9),
+                  signalFailWorking    (11),
+                  forcedSwitch         (13),
+                  signalFailProtection (14),
+                  lockoutProtection    (15),
+                  notAvailable         (16)
+                }
+
+
+OstElpsSignalStates ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "A value that represents the requested or bridged signal for either
+        the local or remote (partner) ELPS instance.  The value can be one of
+        the following:
+
+        nullSignal(0)            Null signal. This indicates the signal that
+                                 the near-end requests be carried over the
+                                 protection path
+        normalSignal(1)          Normal traffic signal. This indicates the
+                                 signal that is bridged onto the protection
+                                 path.
+        notAvailable(2)          Protect Type is unknown or not available, value
+                                 returned for status read, not allowed to write
+       "
+    SYNTAX      INTEGER {
+                  nullSignal           (0),
+                  normalSignal         (1),
+                  notAvailable         (2)
+                }
+
+
+OstErpsLinkState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "A value that represents the current port link state. This is a
+        function that indicates whether the current port is linked.
+        The value can be one of the following:
+
+        na(0)                    Not Applicable, port state is unknown
+        up(1)                    Port is linked and capable of passing traffic
+        down(2)                  Port is not linked and is not capable of
+                                 passing traffic
+       "
+    SYNTAX      INTEGER {
+                  na(0),
+                  up(1),
+                  down(2)
+                }
+
+
+OstErpsPortState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "A value that represents the current forwarding state of the port.
+        The value can be one of the following:
+
+        na(0)                    Not Applicable, port state is unknown
+        forward(1)               Port is in the forwarding state
+        blocked(2)               Port is in the blocked state
+       "
+    SYNTAX      INTEGER {
+                  na(0),
+                  forward(1),
+                  blocked(2)
+                }
+
+
+OstErpsPortType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "A value that represents the Ring Port type. The value can be one of the
+        following:
+
+        rp0(1)                   Ring Port 0
+        rp1(2)                   Ring Port 1
+       "
+    SYNTAX      INTEGER {
+                  rp0(1),
+                  rp1(2)
+                }
+
+
+OstErpsRingStates ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "A value that represents the current request/state of either the local or
+        remote (partner) ERPS instance.  The value can be one of the following:
+
+        noRequest(0)             No Request (NR), local, lowest priority
+        rapsNr(1)                Ring APS (R-APS) No Request (NR), remote
+        rapsNrRb(2)              Ring APS (R-APS) No Request (NR), RPL Blocked (RB), remote
+        wtbRunning(3)            Wait to Block (WTB) running, local
+        wtbExpires(4)            Wait to Block (WTB) expires, local
+        wtrRunning(5)            Wait to Restore (WTR) running, local
+        wtrExpires(6)            Wait to Restore (WTR) expires, local
+        manualSwitch(7)          Manual Switch (MS), local
+        rapsManualSwitch(8)      Ring APS (R-APS) Manual Switch (MS), remote
+        rapsSignalFail(9)        Ring APS (R-APS) Signal Fail (SF), remote
+        localClearSignalFail(10) Local clear Signal Fail (SF), local
+        localSignalFail(11)      Local Signal Fail (SF), local
+        rapsForcedSwitch(12)     Ring APS (R-APS) Forced Switch (FS), remote
+        forcedSwtich(13)         Forced Switch (FS), local
+        clear(14)                Clear, local
+       "
+    REFERENCE
+       "[ITU-T G.8032] Table 10-1"
+    SYNTAX      INTEGER {
+                  noRequest            (0),
+                  rapsNr               (1),
+                  rapsNrRb             (2),
+                  wtbRunning           (3),
+                  wtbExpires           (4),
+                  wtrRunning           (5),
+                  wtrExpires           (6),
+                  manualSwitch         (7),
+                  rapsManualSwitch     (8),
+                  rapsSignalFail       (9),
+                  localClearSignalFail (10),
+                  localSignalFail      (11),
+                  rapsForcedSwitch     (12),
+                  forcedSwtich         (13),
+                  clear                (14)
+                }
+
+
+OstErpsRingStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "A value that represents the current ring status. This is state machine node
+        state value for the ERPS instance.  The value can be one of the
+        following:
+
+        initializing(1)          State machine initialization
+        idle(2)                  Idle State (A)
+        protection(3)            Protection (B)
+        manualSwitch(4)          Manual Switch (C)
+        forcedSwitch(5)          Forced Switch (D)
+        pending(6)               Pending (E)
+       "
+    REFERENCE
+       "[ITU-T G.8032] Table 10-2"
+    SYNTAX      INTEGER {
+                  initializing         (1),
+                  idle                 (2),
+                  protection           (3),
+                  manualSwitch         (4),
+                  forcedSwitch         (5),
+                  pending              (6)
+                }
+
+
+OstErrorString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS      current
+    DESCRIPTION
+       "The SNMP error string for further definition of a SNMP error."
+    SYNTAX      OCTET STRING (SIZE(0..255))
+
+
+OstEvcNameString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS      current
+    DESCRIPTION
+       "An EVC name."
+    SYNTAX      OCTET STRING (SIZE(1..45))
+
+
+OstEvcNameStringOrNone ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS      current
+    DESCRIPTION
+       "An EVC name or an empty string."
+    SYNTAX      OCTET STRING (SIZE(0..45))
+
+
+OstFileNameString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS      current
+    DESCRIPTION
+       "A internal file name."
+    SYNTAX      OCTET STRING (SIZE(1..45))
+
+
+OstFingerprintString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS      current
+    DESCRIPTION
+       "The fingerprint value for SSH protocol."
+    SYNTAX      OCTET STRING (SIZE(1..64))
+
+
+OstFloatValue ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS      current
+    DESCRIPTION
+       "Floating point data type as represented in an octet string.
+        Legal values and precision are indicated by the appropriate object.
+        Only numbers and the decimal place are legal digit values.
+
+        Example values:
+           1000
+           1500.05
+           1545.25
+       "
+    SYNTAX      OCTET STRING (SIZE(0..20))
+
+
+OstFrameCount64 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+        "Frame counter value."
+    SYNTAX      Counter64
+
+
+OstFrameSizeList ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS      current
+    DESCRIPTION
+       "
+        Denotes a list of one or more frame sizes.
+
+        1. Frame sizes have a value from 64 to 10240 bytes for the GM3, GM4,
+           and GM4-PoE. Frame sizes have a value from 64 to 10240 bytes for
+           the XM5.
+
+        2. Individual frame sizes are included when separated by a comma ','.
+
+        3. A range of frame sizes is included when separated by '..'.
+
+        4. A range of sizes ending in a colon and a value, i.e. start..end:value,
+           is the frame increment size for the next iteration (min value is 4)
+
+        5. Ranges must be organized min size to max size, i.e. min..max
+
+        6. Individual sizes can be mixed in any order
+
+        Example values:
+          64
+          64..1024:64
+          64,128,256,512,1024,1280,1518,10000
+       "
+    SYNTAX      OCTET STRING (SIZE(1..255))
+
+
+OstIndexIntegerNextFree ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+       "An integer which may be used as a new index in a table.
+
+        The special value of 0 indicates that no more new entries can
+        be created in the relevant table.
+
+        When a MIB is used for configuration, an object with this
+        SYNTAX always contains a legal value (if non-zero) for an
+        index that is not currently used in the relevant table. The
+        Command Generator (Network Management Application) reads this
+        variable and uses the (non-zero) value read when creating a
+        new row with an SNMP SET.  When the SET is performed, the
+        Command Responder (agent) MUST determine whether the value is
+        indeed still unused; Two Network Management Applications may
+        attempt to create a row (configuration entry) simultaneously
+        and use the same value. If it is currently unused, the SET
+        succeeds and the Command Responder (agent) changes the value
+        of this object, according to an implementation-specific
+        algorithm.  If the value is in use, however, the SET fails.
+        The Network Management Application MUST then re-read this
+        variable to obtain a new usable value.
+
+        An OBJECT-TYPE definition using this SYNTAX MUST specify the
+        relevant table for which the object is providing this
+        functionality.
+       "
+    SYNTAX      Unsigned32 (0..16)
+
+
+OstIpPriorityList ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS      current
+    DESCRIPTION
+       "Selects IP priority values.  Valid values are from 0 to 63.
+        Format:
+            X       selects a single PCP priority value
+            X..Y    selects a range of PCP priority values, X to Y
+            X,Y     selects PCP priority values seperated by a comma
+        Example values:
+         0
+         2..5
+         0,2..5
+       "
+    SYNTAX      OCTET STRING (SIZE(0..14))
+
+
+OstIpv6Addr ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "2x:2x:2x:2x:2x:2x:2x:2x"
+    STATUS      current
+    DESCRIPTION
+       "This data type is used to model the IPv6 address. This is a
+        binary string of up to 8 octets in network byte-order.
+       "
+    SYNTAX      OCTET STRING (SIZE(16..16))
+
+
+OstIpAddr ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS      current
+    DESCRIPTION
+       "This data type is used to model both IPv4 and IPv6 addresses. It
+        is a hexadecimcal octet string with separators between number groups:
+        either '.' for IPv4 or ':' for IPv6. The IP type is derived based upon
+        the format of the string. Valid IP addreses:
+            '192.168.1.220'
+            'fe80:0000:0:0:1234:5678:abcd:efff'
+
+       "
+    SYNTAX      OCTET STRING (SIZE(0..39))
+
+
+OstMhfCreation ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Indicates if the Management Entity can create MHFs.
+
+        The valid values are:
+                ostMHFdefault(2) MHFs can be created on this VID on any
+                        Bridge port through which this VID can pass.
+                ostMHFexplicit(3) MHFs can be created for this VID only on
+                        Bridge ports through which this VID can
+                        pass, and only if a MEP is created at some
+                        lower MD Level.
+       "
+    SYNTAX      INTEGER {
+                  ostMHFdefault (1),
+                  ostMHFexplicit (2)
+                }
+
+
+OstMipdMethodOfCreation ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Indicates the method of how this Mip table entry was created
+        The valid values are:
+                ostExplicit(1) indicates the Mip was created explicitly
+                        through a command.
+                ostImplicitMa(2) indicates the Mip was created implicitly
+                        through the MA command.
+                ostImplicitMde(3) indicates the Mip was created implicitly
+                        through the CFM default Md table.
+                ostExplicitImplicitMa(4) indicates the Mip was created both
+                        implicitly and explicitly through the MA command.
+        "
+    SYNTAX      INTEGER {
+                ostExplicit(1),
+                ostImplicitMa(2),
+                ostImplicitMde(3),
+                ostExplicitImplicitMa(4)
+                }
+
+
+OstModeType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The module Mode Type as AP, SP or neither.
+
+         normal(1)   Not specifically AP or SP
+         ap(2)       Access Provider
+         sp(3)       Service Provider
+        "
+    SYNTAX INTEGER {
+        normal (1),
+        ap    (2),
+        sp     (3)
+    }
+
+
+OstModuleSingleIndex ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+       "A value that uniquely identifies the chassis and slot in which the module is located.
+       Base 10 Format: CCSS where
+            CC is the chassis index, 1 to 99
+            SS is the slot index, 1 to 99"
+    SYNTAX      Unsigned32 (101..9999)
+
+
+OstPcpPriorityList ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS      current
+    DESCRIPTION
+       "Selects PCP priority values.  Valid values are from 0 to 7.
+        Format:
+            X       selects a single PCP priority value
+            X..Y    selects a range of PCP priority values, X to Y
+            X,Y     selects PCP priority values seperated by a comma
+        Example values:
+         0
+         2..5
+         0,2..5
+       "
+    SYNTAX      OCTET STRING (SIZE(0..14))
+
+
+OstPortClockType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "A value that indicates the TDM port recovery state/mode.
+       "
+    SYNTAX      INTEGER {
+        adaptiveIdle(1),
+        adaptiveAcqu(2),
+        adaptiveTrk1(3),
+        adaptiveTrk2(4),
+        holdOver(5),
+        coax(6),
+        internal(7),
+        line(8)
+    }
+
+
+OstPortList ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS      current
+    DESCRIPTION
+       "Denotes a list of one or more ports, separated by comma characters, in the
+        form of an ASCII string, which is case insensitive.
+
+        Port  Description
+        ----  ------------------
+         1    Port 1
+         2    Port 2
+         3    Port 3
+         4    Port 4
+         5    Port 5
+         6    Port 6
+         7    Port 7
+         8    Port 8
+         9    Port 9
+         10   Port 10
+         11   Port 11
+         12   Port 12
+         13   Port 13
+         14   Port 14
+         15   Port 15
+         16   Port 16
+         17   Port 17
+         a    backplane port A
+         b    backplane port B
+         mgt1 management port 1
+         mgt2 management port 2
+         all  includes all ports
+
+        Example: '1,2,a,mgt1'
+        "
+    SYNTAX      OCTET STRING
+
+
+OstPortNumber ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+       "This object selects the port number for the specific test
+        instance that is configured.
+
+        This value is dependent upon actual product accessed. The port number
+        for a specific port can be determined by selecting the module type
+        and then the port that is accessed. A value of '0' indicates that
+        no port is defined.
+
+        Module Type        P1   P2   P3   P4   P5   BP A  BP B  Mgt1  Mgt2
+        -----------------  ---  ---  ---  ---  ---  ----  ----  ----  ----
+        3-port plug-in     1    2    3    n/a  n/a  4     5     6     7
+        3-port standalone  1    2    3    n/a  n/a  n/a   n/a   6     7
+        2-port plug-in     1    2    n/a  n/a  n/a  3     4     5     6
+        2-port standalone  1    2    n/a  n/a  n/a  n/a   n/a   5     6
+        4-port             1    2    3    4    n/a  5     6     n/a   n/a
+        5-port             1    2    3    4    5    n/a   n/a   6     7
+
+        For the 7 port module: Port 1 - Port 7 are ports 1 - 7 are the front
+        facing ports, port 8 is the dedicated management port, port 9 is Mgt1
+        and port 10 is Mgt2.
+
+        For the 16 port module: Port 1 - Port 16 are the customer facing
+        ports, port 17 is the dedicated management port, port 18 is Mgt1 and
+        port 19 is Mgt2.
+
+        Other values are undefined.
+      "
+    SYNTAX      Unsigned32 (0..99)
+
+
+OstPortSingleIndex ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+       "A value that uniquely identifies a module port, and the chassis and slot in
+       which the module is located.
+       Base 10 Format: CCSSPP where
+            CC is the chassis index, 1 to 99
+            SS is the slot index, 1 to 99
+            PP is the port index, 1 to 99"
+    SYNTAX      Unsigned32 (10101..999999)
+
+
+OstPriority ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+       "Priority setting."
+    SYNTAX      Unsigned32 (0..7)
+
+
+OstProbeNameString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS      current
+    DESCRIPTION
+       "An EVC name."
+    SYNTAX      OCTET STRING (SIZE(1..45))
+
+
+OstProfileNameString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS      current
+    DESCRIPTION
+       "A test profile name."
+    SYNTAX      OCTET STRING (SIZE(1..45))
+
+
+OstTestResultType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "A value that indicates the result of a test.  The value can be one of
+        the following:
+
+        pass(1)              Indicates the test has passed successfully
+        fail(2)              Indicates the test has failed
+        oversubscribe(3)     Indicates the test failed due to oversubscription
+                             of a resource
+       "
+    SYNTAX      INTEGER {
+                  pass            (1),
+                  fail            (2),
+                  oversubscribe   (3)
+                }
+
+
+OstTestStatusType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "A value that indicates the status of the current test instance.  The
+        value can be one of the following:
+
+        testNotStarted(1)    Current test instance has not started yet,
+                             not fully configured, or waiting for loop-up
+        testInProcess(2)     Current test instance is currently running
+        testStopped(3)       Current test instance has been stopped after running
+                             for a period of time
+        testCompleted(4)     Current test instance has completed
+        testInitializing(5)  Current test is the process of starting, used to
+                             restart a test in process, completed, or stopped
+       "
+    SYNTAX      INTEGER {
+                  testNotStarted  (1),
+                  testInProcess   (2),
+                  testStopped     (3),
+                  testCompleted   (4),
+                  testInitializing(5)
+                }
+
+
+OstUnsigned64 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+       "A non-negative 64-bit bit integer, without counter semantics, between 0
+        and 2^64-1 inclusive (0 to 18446744073709551615 decimal).
+
+        It can have a MAX-ACCESS of read-only or read-write.
+
+        SYNTAX is Counter64 for the encoding rules only.
+       "
+    SYNTAX      Counter64
+
+
+OstUserNameString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS      current
+    DESCRIPTION
+       "A string that is used to identify a specific user."
+    SYNTAX      OCTET STRING (SIZE(1..32))
+
+
+OstVlanId ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+        "The VLAN-ID that uniquely identifies a VLAN.  This
+        is the 12-bit VLAN-ID used in the VLAN Tag header."
+    SYNTAX      Integer32 (0..4095)
+
+
+OstVlanIdList ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS      current
+    DESCRIPTION
+       "Denotes a list of one or more VLAN IDs.
+       VLAN IDs have a value of 0 to 4095.
+       Individual VLAN IDs are included when separated by a comma ','.
+       A range of VLAN IDs is included when separated by '..'.
+       An asterisk indicates untagged data.
+       'rest' selects remaining VLAN IDs.
+       'all' selects all VLAN IDs.
+       Example values:
+         100,110
+         100..110
+         100,110,200..210
+         100,110,200..210,500..510
+       "
+    SYNTAX      OCTET STRING (SIZE(0..110))
+
+
+END

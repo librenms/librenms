@@ -1,0 +1,232 @@
+-- Copyright 2017 BlueCat Networks. All rights reserved.
+-- *****************************************************************
+-- BCN-TFTP-MIB.mib:  BlueCat Networks TFTP services
+--
+--
+-- December 2010, Fabian Ischia
+--
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+BCN-TFTP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-IDENTITY,
+    OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    DisplayString, TruthValue
+        FROM SNMPv2-TC
+    OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    BcnAlarmSeverity
+        FROM BCN-TC-MIB
+    bcnServices
+        FROM BCN-SMI-MIB;
+
+bcnTftpMIB MODULE-IDENTITY
+    LAST-UPDATED	"201011301200Z"
+    ORGANIZATION	"BlueCat Networks"
+    CONTACT-INFO
+        "BlueCat Networks. Customer Care.
+
+        North America
+        Call: +1.866.491.2228
+        Europe
+        Call: +44.8081.011.306
+        Other
+        Call: +1.416.646.8433
+        
+        Email: support@bluecatnetworks.com"
+    DESCRIPTION
+        "This module provides status as well as statistical information
+        about the TFTP service."
+    REVISION "201011301200Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { bcnTftp 1 }
+
+bcnTftp OBJECT IDENTIFIER  ::= { bcnServices 3 }
+
+-- Organization
+
+bcnTftpObjects OBJECT IDENTIFIER 
+    ::= { bcnTftp 2 }
+
+bcnTftpNotification OBJECT IDENTIFIER 
+    ::= { bcnTftp 3 }
+
+bcnTftpConformance OBJECT IDENTIFIER 
+    ::= { bcnTftp 4 }
+
+
+-- Data objects
+
+bcnTftpServiceStatus OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "General state of the TFTP Service."
+    ::= { bcnTftpObjects 1 }
+
+bcnTftpSerOperState OBJECT-TYPE
+    SYNTAX      INTEGER {
+      running(1),
+      notRunning(2),
+      starting(3),
+      stopping(4),
+      fault(5)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Operational state of the Service. The possible states are:
+        running(1)    The service is running normally.
+        notRunning(2) The service is stopped either intentionally (i.e.:
+                      the service is not supposed to run on this node) or
+                      unintentionally (a problem has occurred).
+        starting(3)   The service is in the process of starting, either
+                      for the first time of after an event occurred.
+        stopping(4)   The service is in the process of stopping. Stopping
+                      a service might be necessary after a configuration
+                      change.
+        fault(5)      An error has been detected and the state is undefined.
+        "
+    ::= { bcnTftpServiceStatus 1 }
+
+bcnTftpServiceStatistics OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "TFTP statistics objects container"
+    ::= { bcnTftpObjects 2 }
+
+bcnTftpSerDirs OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Number of directories on the TFTP subtree." 
+    ::= { bcnTftpServiceStatistics 1 }
+
+bcnTftpSerFiles OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Number of files on the TFTP subtree." 
+    ::= { bcnTftpServiceStatistics 2 }
+
+bcnTftpSerFilesSize OBJECT-TYPE
+    SYNTAX          Unsigned32
+	UNITS			"KBytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The sum of the size of all files in kilobytes.
+		Notice that this value does not include the actual space on disk
+        based on disk geometry allocation or space used up by directories." 
+    ::= { bcnTftpServiceStatistics 3 }
+
+bcnTftpSerPartialList OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The TFTP information is partial.
+		 The value 'false' indicates that the information provided for
+         directories, files and size is complete. The entire TFTP tree
+         was explored.
+         The value 'true' indicates that some problem prevented the
+         exploration of the entire TFTP tree, the information provided
+         is therefore partially correct." 
+    ::= { bcnTftpServiceStatistics 4 }
+
+-- Notification definitions
+
+bcnTftpNotificationEvents OBJECT IDENTIFIER 
+    ::= { bcnTftpNotification 0 }
+
+bcnTftpNotificationData OBJECT IDENTIFIER 
+    ::= { bcnTftpNotification 1 }
+
+-- Notification data
+
+bcnTftpAlarmSeverity OBJECT-TYPE
+    SYNTAX          BcnAlarmSeverity
+    MAX-ACCESS      accessible-for-notify
+    STATUS          current
+    DESCRIPTION
+        "Severity classification for the alarm."
+    ::= { bcnTftpNotificationData 1 }
+
+bcnTftpAlarmInfo OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      accessible-for-notify
+    STATUS          current
+    DESCRIPTION
+        "Descriptive information about the alarm event."
+    ::= { bcnTftpNotificationData 2 }
+
+
+-- Notification events
+
+bcnTftpAlarmNotif NOTIFICATION-TYPE
+    OBJECTS {   
+                bcnTftpSerOperState,
+                bcnTftpAlarmSeverity,
+                bcnTftpAlarmInfo
+            }
+    STATUS          current
+    DESCRIPTION
+        "A bcnTftpAlarmNotif signifies that the TFTP service has transitioned
+        state or a particular event has been detected on the service."
+   ::= { bcnTftpNotificationEvents 1 }
+
+-- Conformance
+
+bcnTftpServiceCompliances OBJECT IDENTIFIER 
+    ::= { bcnTftpConformance 1 }
+
+bcnTftpServiceGroups OBJECT IDENTIFIER 
+    ::= { bcnTftpConformance 2 }
+
+
+bcnTftpServiceStatusGroup OBJECT-GROUP
+    OBJECTS { 
+          bcnTftpSerOperState, bcnTftpSerDirs, bcnTftpSerFiles,
+          bcnTftpSerFilesSize, bcnTftpSerPartialList
+    }
+    STATUS current
+    DESCRIPTION "Status conformance."
+    ::= { bcnTftpServiceGroups 1 }
+
+
+bcnTftpNotificationEventGroup NOTIFICATION-GROUP
+    NOTIFICATIONS { 
+          bcnTftpAlarmNotif
+    }
+    STATUS current
+    DESCRIPTION "Server statistics conformance."
+    ::= { bcnTftpServiceGroups 2 }
+
+bcnTftpNotificationDataGroup OBJECT-GROUP
+    OBJECTS { 
+          bcnTftpAlarmSeverity, 
+          bcnTftpAlarmInfo
+    }
+    STATUS current
+    DESCRIPTION "Server statistics conformance."
+    ::= { bcnTftpServiceGroups 3 }
+
+
+bcnTftpStatusCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION "Basic conformance"
+    MODULE -- This module
+    MANDATORY-GROUPS {
+        bcnTftpServiceStatusGroup,
+        bcnTftpNotificationEventGroup, 
+        bcnTftpNotificationDataGroup }
+    ::= {bcnTftpServiceCompliances 1 }
+
+
+END

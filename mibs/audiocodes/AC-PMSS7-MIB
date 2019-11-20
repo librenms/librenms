@@ -1,0 +1,2835 @@
+
+AC-PM-SS7-MIB DEFINITIONS ::= BEGIN
+
+
+    IMPORTS
+       
+
+        OBJECT-TYPE, 
+        MODULE-IDENTITY                             FROM SNMPv2-SMI
+        TAddress, 
+        DisplayString, 
+        DateAndTime, TEXTUAL-CONVENTION             FROM SNMPv2-TC
+        IpAddress                                   FROM RFC1155-SMI
+        Unsigned32,
+		Integer32,
+        enterprises                                 FROM SNMPv2-SMI
+		SnmpAdminString								FROM SNMP-FRAMEWORK-MIB
+		audioCodes,       
+		acRegistrations,
+		acGeneric, 
+		acProducts,acBoardMibs,acPerformance		FROM AUDIOCODES-TYPES-MIB;
+
+       
+acPMSS7  MODULE-IDENTITY       
+    LAST-UPDATED "200909231811Z"          --Wednesday, September 23, 2009
+    ORGANIZATION "AudioCodes Ltd"
+    CONTACT-INFO
+    "Postal: Support
+	AudioCodes LTD
+             	1 Hayarden Street
+             	Airport City 
+	Lod, ISRAEL 70151
+     Tel:    972-3-9764000
+     Fax:    972-3-9764040
+     Email:  support@audiocodes.com
+     Web:    www.audiocodes.com"		
+		
+
+    DESCRIPTION       
+    "The AC-PM-SS7 MIB offers performance monitoring
+For the SS7 related elements in Audiocodes' devices.
+The Configuration sub-tree is for configuring the interval
+Period length for the entire AC-PM-SS7 MIB, and the 
+different tables' thresholds.
+The Data sub-tree presents the tables of monitored
+elements.
+
+Note  - for the entire MIB the value (-1) means the value
+Asked for is either not supported or currently not relevant
+(this is for when values asked for are for intervals not yet
+recorded."
+
+
+
+    ::= {acPerformance 13}  
+
+
+
+
+
+
+
+
+     acPMSS7Configuration OBJECT IDENTIFIER ::= {acPMSS7 1}
+
+
+     acPMSS7ConfigurationPeriodLength OBJECT-TYPE
+       SYNTAX Unsigned32 (0..894780)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Length of monitoring intervals for entire MIB. Time is in minutes.
+Access: Online."
+       ::= {acPMSS7Configuration 1}
+
+
+
+     acPMSS7ConfigurationResetTotalCounters OBJECT-TYPE
+       SYNTAX INTEGER {
+                  resetCountersDone(1)
+,
+                  resetTotalCounters(2)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Total-Counters Reset.  To reset the total counters, set the
+value of this object to resetTotalCounters(2).
+Access: Online."
+       ::= {acPMSS7Configuration 2}
+
+
+
+     acPMSS7Data OBJECT IDENTIFIER ::= {acPMSS7 2}
+
+
+     acPMSS7DataTimeFromStartOfInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The time in seconds since the start of the current interval.
+MIB specific."
+       ::= {acPMSS7Data 1}
+
+
+
+     acPMSS7Links OBJECT IDENTIFIER ::= {acPMSS7Data 31}
+
+
+     -- ****************************************
+     -- acPMSS7TxMSU table declaration
+     -- ****************************************
+     acPMSS7TxMSUTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMSS7TxMSUEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Number of transmitted MSU's per SS7 link."
+       ::= {acPMSS7Links 1}
+
+
+
+     -- ****************************************
+     -- acPMSS7TxMSU table entry
+     -- ****************************************
+     acPMSS7TxMSUEntry OBJECT-TYPE
+       SYNTAX AcPMSS7TxMSUEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMSS7TxMSULink,acPMSS7TxMSUInterval}
+       ::= {acPMSS7TxMSUTable 1}
+
+
+
+     -- ****************************************
+     -- acPMSS7TxMSU TABLE
+     -- ****************************************
+     AcPMSS7TxMSUEntry ::= SEQUENCE {
+       acPMSS7TxMSULink                                Unsigned32,
+       acPMSS7TxMSUInterval                            Unsigned32,
+       acPMSS7TxMSUVal                                 Counter32,
+       acPMSS7TxMSUTotal                               Integer32
+     }
+
+
+
+     acPMSS7TxMSULink OBJECT-TYPE
+       SYNTAX Unsigned32 (0..63)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Link number.
+0 is the first link."
+       ::= {acPMSS7TxMSUEntry 1}
+
+
+
+     acPMSS7TxMSUInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMSS7TxMSUEntry 2}
+
+
+
+     acPMSS7TxMSUVal OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMSS7TxMSUEntry 3}
+
+
+
+     acPMSS7TxMSUTotal OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Total since last reset."
+       ::= {acPMSS7TxMSUEntry 4}
+
+
+
+     -- ****************************************
+     -- acPMSS7RxMSU table declaration
+     -- ****************************************
+     acPMSS7RxMSUTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMSS7RxMSUEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Number of received MSU's per SS7 link."
+       ::= {acPMSS7Links 2}
+
+
+
+     -- ****************************************
+     -- acPMSS7RxMSU table entry
+     -- ****************************************
+     acPMSS7RxMSUEntry OBJECT-TYPE
+       SYNTAX AcPMSS7RxMSUEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMSS7RxMSULink,acPMSS7RxMSUInterval}
+       ::= {acPMSS7RxMSUTable 1}
+
+
+
+     -- ****************************************
+     -- acPMSS7RxMSU TABLE
+     -- ****************************************
+     AcPMSS7RxMSUEntry ::= SEQUENCE {
+       acPMSS7RxMSULink                                Unsigned32,
+       acPMSS7RxMSUInterval                            Unsigned32,
+       acPMSS7RxMSUVal                                 Counter32,
+       acPMSS7RxMSUTotal                               Integer32
+     }
+
+
+
+     acPMSS7RxMSULink OBJECT-TYPE
+       SYNTAX Unsigned32 (0..63)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Link number.
+0 is the first link."
+       ::= {acPMSS7RxMSUEntry 1}
+
+
+
+     acPMSS7RxMSUInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMSS7RxMSUEntry 2}
+
+
+
+     acPMSS7RxMSUVal OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMSS7RxMSUEntry 3}
+
+
+
+     acPMSS7RxMSUTotal OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Total since last reset."
+       ::= {acPMSS7RxMSUEntry 4}
+
+
+
+     -- ****************************************
+     -- acPMSS7TxLSSU table declaration
+     -- ****************************************
+     acPMSS7TxLSSUTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMSS7TxLSSUEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Number of transmitted LSSU's per SS7 link."
+       ::= {acPMSS7Links 3}
+
+
+
+     -- ****************************************
+     -- acPMSS7TxLSSU table entry
+     -- ****************************************
+     acPMSS7TxLSSUEntry OBJECT-TYPE
+       SYNTAX AcPMSS7TxLSSUEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMSS7TxLSSULink,acPMSS7TxLSSUInterval}
+       ::= {acPMSS7TxLSSUTable 1}
+
+
+
+     -- ****************************************
+     -- acPMSS7TxLSSU TABLE
+     -- ****************************************
+     AcPMSS7TxLSSUEntry ::= SEQUENCE {
+       acPMSS7TxLSSULink                               Unsigned32,
+       acPMSS7TxLSSUInterval                           Unsigned32,
+       acPMSS7TxLSSUVal                                Counter32,
+       acPMSS7TxLSSUTotal                              Integer32
+     }
+
+
+
+     acPMSS7TxLSSULink OBJECT-TYPE
+       SYNTAX Unsigned32 (0..63)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Link number.
+0 is the first link."
+       ::= {acPMSS7TxLSSUEntry 1}
+
+
+
+     acPMSS7TxLSSUInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMSS7TxLSSUEntry 2}
+
+
+
+     acPMSS7TxLSSUVal OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMSS7TxLSSUEntry 3}
+
+
+
+     acPMSS7TxLSSUTotal OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Total since last reset."
+       ::= {acPMSS7TxLSSUEntry 4}
+
+
+
+     -- ****************************************
+     -- acPMSS7RxLSSU table declaration
+     -- ****************************************
+     acPMSS7RxLSSUTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMSS7RxLSSUEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Number of received LSSU's per SS7 link."
+       ::= {acPMSS7Links 4}
+
+
+
+     -- ****************************************
+     -- acPMSS7RxLSSU table entry
+     -- ****************************************
+     acPMSS7RxLSSUEntry OBJECT-TYPE
+       SYNTAX AcPMSS7RxLSSUEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMSS7RxLSSULink,acPMSS7RxLSSUInterval}
+       ::= {acPMSS7RxLSSUTable 1}
+
+
+
+     -- ****************************************
+     -- acPMSS7RxLSSU TABLE
+     -- ****************************************
+     AcPMSS7RxLSSUEntry ::= SEQUENCE {
+       acPMSS7RxLSSULink                               Unsigned32,
+       acPMSS7RxLSSUInterval                           Unsigned32,
+       acPMSS7RxLSSUVal                                Counter32,
+       acPMSS7RxLSSUTotal                              Integer32
+     }
+
+
+
+     acPMSS7RxLSSULink OBJECT-TYPE
+       SYNTAX Unsigned32 (0..63)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Link number.
+0 is the first link."
+       ::= {acPMSS7RxLSSUEntry 1}
+
+
+
+     acPMSS7RxLSSUInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMSS7RxLSSUEntry 2}
+
+
+
+     acPMSS7RxLSSUVal OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMSS7RxLSSUEntry 3}
+
+
+
+     acPMSS7RxLSSUTotal OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Total since last reset."
+       ::= {acPMSS7RxLSSUEntry 4}
+
+
+
+     -- ****************************************
+     -- acPMSS7TxFISU table declaration
+     -- ****************************************
+     acPMSS7TxFISUTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMSS7TxFISUEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Number of transmitted FISU's per SS7 link."
+       ::= {acPMSS7Links 5}
+
+
+
+     -- ****************************************
+     -- acPMSS7TxFISU table entry
+     -- ****************************************
+     acPMSS7TxFISUEntry OBJECT-TYPE
+       SYNTAX AcPMSS7TxFISUEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMSS7TxFISULink,acPMSS7TxFISUInterval}
+       ::= {acPMSS7TxFISUTable 1}
+
+
+
+     -- ****************************************
+     -- acPMSS7TxFISU TABLE
+     -- ****************************************
+     AcPMSS7TxFISUEntry ::= SEQUENCE {
+       acPMSS7TxFISULink                               Unsigned32,
+       acPMSS7TxFISUInterval                           Unsigned32,
+       acPMSS7TxFISUVal                                Counter32,
+       acPMSS7TxFISUTotal                              Integer32
+     }
+
+
+
+     acPMSS7TxFISULink OBJECT-TYPE
+       SYNTAX Unsigned32 (0..63)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Link number.
+0 is the first link."
+       ::= {acPMSS7TxFISUEntry 1}
+
+
+
+     acPMSS7TxFISUInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMSS7TxFISUEntry 2}
+
+
+
+     acPMSS7TxFISUVal OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMSS7TxFISUEntry 3}
+
+
+
+     acPMSS7TxFISUTotal OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Total since last reset."
+       ::= {acPMSS7TxFISUEntry 4}
+
+
+
+     -- ****************************************
+     -- acPMSS7RxFISU table declaration
+     -- ****************************************
+     acPMSS7RxFISUTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMSS7RxFISUEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Number of received FISU's per SS7 link."
+       ::= {acPMSS7Links 6}
+
+
+
+     -- ****************************************
+     -- acPMSS7RxFISU table entry
+     -- ****************************************
+     acPMSS7RxFISUEntry OBJECT-TYPE
+       SYNTAX AcPMSS7RxFISUEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMSS7RxFISULink,acPMSS7RxFISUInterval}
+       ::= {acPMSS7RxFISUTable 1}
+
+
+
+     -- ****************************************
+     -- acPMSS7RxFISU TABLE
+     -- ****************************************
+     AcPMSS7RxFISUEntry ::= SEQUENCE {
+       acPMSS7RxFISULink                               Unsigned32,
+       acPMSS7RxFISUInterval                           Unsigned32,
+       acPMSS7RxFISUVal                                Counter32,
+       acPMSS7RxFISUTotal                              Integer32
+     }
+
+
+
+     acPMSS7RxFISULink OBJECT-TYPE
+       SYNTAX Unsigned32 (0..63)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Link number.
+0 is the first link."
+       ::= {acPMSS7RxFISUEntry 1}
+
+
+
+     acPMSS7RxFISUInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMSS7RxFISUEntry 2}
+
+
+
+     acPMSS7RxFISUVal OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMSS7RxFISUEntry 3}
+
+
+
+     acPMSS7RxFISUTotal OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Total since last reset."
+       ::= {acPMSS7RxFISUEntry 4}
+
+
+
+     -- ****************************************
+     -- acPMSS7TxSignalUnits table declaration
+     -- ****************************************
+     acPMSS7TxSignalUnitsTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMSS7TxSignalUnitsEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Number of transmitted Signaling units per SS7 link"
+       ::= {acPMSS7Links 7}
+
+
+
+     -- ****************************************
+     -- acPMSS7TxSignalUnits table entry
+     -- ****************************************
+     acPMSS7TxSignalUnitsEntry OBJECT-TYPE
+       SYNTAX AcPMSS7TxSignalUnitsEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMSS7TxSignalUnitsLink,acPMSS7TxSignalUnitsInterval}
+       ::= {acPMSS7TxSignalUnitsTable 1}
+
+
+
+     -- ****************************************
+     -- acPMSS7TxSignalUnits TABLE
+     -- ****************************************
+     AcPMSS7TxSignalUnitsEntry ::= SEQUENCE {
+       acPMSS7TxSignalUnitsLink                        Unsigned32,
+       acPMSS7TxSignalUnitsInterval                    Unsigned32,
+       acPMSS7TxSignalUnitsVal                         Counter32,
+       acPMSS7TxSignalUnitsTotal                       Integer32
+     }
+
+
+
+     acPMSS7TxSignalUnitsLink OBJECT-TYPE
+       SYNTAX Unsigned32 (0..63)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Link number.
+0 is the first link."
+       ::= {acPMSS7TxSignalUnitsEntry 1}
+
+
+
+     acPMSS7TxSignalUnitsInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMSS7TxSignalUnitsEntry 2}
+
+
+
+     acPMSS7TxSignalUnitsVal OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMSS7TxSignalUnitsEntry 3}
+
+
+
+     acPMSS7TxSignalUnitsTotal OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Total since last reset."
+       ::= {acPMSS7TxSignalUnitsEntry 4}
+
+
+
+     -- ****************************************
+     -- acPMSS7RxSignalUnits table declaration
+     -- ****************************************
+     acPMSS7RxSignalUnitsTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMSS7RxSignalUnitsEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Number of received Signaling units per SS7 link"
+       ::= {acPMSS7Links 8}
+
+
+
+     -- ****************************************
+     -- acPMSS7RxSignalUnits table entry
+     -- ****************************************
+     acPMSS7RxSignalUnitsEntry OBJECT-TYPE
+       SYNTAX AcPMSS7RxSignalUnitsEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMSS7RxSignalUnitsLink,acPMSS7RxSignalUnitsInterval}
+       ::= {acPMSS7RxSignalUnitsTable 1}
+
+
+
+     -- ****************************************
+     -- acPMSS7RxSignalUnits TABLE
+     -- ****************************************
+     AcPMSS7RxSignalUnitsEntry ::= SEQUENCE {
+       acPMSS7RxSignalUnitsLink                        Unsigned32,
+       acPMSS7RxSignalUnitsInterval                    Unsigned32,
+       acPMSS7RxSignalUnitsVal                         Counter32,
+       acPMSS7RxSignalUnitsTotal                       Integer32
+     }
+
+
+
+     acPMSS7RxSignalUnitsLink OBJECT-TYPE
+       SYNTAX Unsigned32 (0..63)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Link number.
+0 is the first link."
+       ::= {acPMSS7RxSignalUnitsEntry 1}
+
+
+
+     acPMSS7RxSignalUnitsInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMSS7RxSignalUnitsEntry 2}
+
+
+
+     acPMSS7RxSignalUnitsVal OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMSS7RxSignalUnitsEntry 3}
+
+
+
+     acPMSS7RxSignalUnitsTotal OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Total since last reset."
+       ::= {acPMSS7RxSignalUnitsEntry 4}
+
+
+
+     -- ****************************************
+     -- acPMSS7TxOctets table declaration
+     -- ****************************************
+     acPMSS7TxOctetsTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMSS7TxOctetsEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Number of transmitted Octets per SS7 link - Q.752 3.1"
+       ::= {acPMSS7Links 9}
+
+
+
+     -- ****************************************
+     -- acPMSS7TxOctets table entry
+     -- ****************************************
+     acPMSS7TxOctetsEntry OBJECT-TYPE
+       SYNTAX AcPMSS7TxOctetsEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMSS7TxOctetsLink,acPMSS7TxOctetsInterval}
+       ::= {acPMSS7TxOctetsTable 1}
+
+
+
+     -- ****************************************
+     -- acPMSS7TxOctets TABLE
+     -- ****************************************
+     AcPMSS7TxOctetsEntry ::= SEQUENCE {
+       acPMSS7TxOctetsLink                             Unsigned32,
+       acPMSS7TxOctetsInterval                         Unsigned32,
+       acPMSS7TxOctetsVal                              Counter32,
+       acPMSS7TxOctetsTotal                            Integer32
+     }
+
+
+
+     acPMSS7TxOctetsLink OBJECT-TYPE
+       SYNTAX Unsigned32 (0..63)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Link number.
+0 is the first link."
+       ::= {acPMSS7TxOctetsEntry 1}
+
+
+
+     acPMSS7TxOctetsInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMSS7TxOctetsEntry 2}
+
+
+
+     acPMSS7TxOctetsVal OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMSS7TxOctetsEntry 3}
+
+
+
+     acPMSS7TxOctetsTotal OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Total since last reset."
+       ::= {acPMSS7TxOctetsEntry 4}
+
+
+
+     -- ****************************************
+     -- acPMSS7RxOctets table declaration
+     -- ****************************************
+     acPMSS7RxOctetsTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMSS7RxOctetsEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Number of received Octets per SS7 link - Q.752 3.4"
+       ::= {acPMSS7Links 10}
+
+
+
+     -- ****************************************
+     -- acPMSS7RxOctets table entry
+     -- ****************************************
+     acPMSS7RxOctetsEntry OBJECT-TYPE
+       SYNTAX AcPMSS7RxOctetsEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMSS7RxOctetsLink,acPMSS7RxOctetsInterval}
+       ::= {acPMSS7RxOctetsTable 1}
+
+
+
+     -- ****************************************
+     -- acPMSS7RxOctets TABLE
+     -- ****************************************
+     AcPMSS7RxOctetsEntry ::= SEQUENCE {
+       acPMSS7RxOctetsLink                             Unsigned32,
+       acPMSS7RxOctetsInterval                         Unsigned32,
+       acPMSS7RxOctetsVal                              Counter32,
+       acPMSS7RxOctetsTotal                            Integer32
+     }
+
+
+
+     acPMSS7RxOctetsLink OBJECT-TYPE
+       SYNTAX Unsigned32 (0..63)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Link number.
+0 is the first link."
+       ::= {acPMSS7RxOctetsEntry 1}
+
+
+
+     acPMSS7RxOctetsInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMSS7RxOctetsEntry 2}
+
+
+
+     acPMSS7RxOctetsVal OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMSS7RxOctetsEntry 3}
+
+
+
+     acPMSS7RxOctetsTotal OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Total since last reset."
+       ::= {acPMSS7RxOctetsEntry 4}
+
+
+
+     -- ****************************************
+     -- acPMSS7MTP2NoAckRx table declaration
+     -- ****************************************
+     acPMSS7MTP2NoAckRxTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMSS7MTP2NoAckRxEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Number of  MTP2 Not Ack received (from far end) per SS7 link - Q.752 1.9"
+       ::= {acPMSS7Links 11}
+
+
+
+     -- ****************************************
+     -- acPMSS7MTP2NoAckRx table entry
+     -- ****************************************
+     acPMSS7MTP2NoAckRxEntry OBJECT-TYPE
+       SYNTAX AcPMSS7MTP2NoAckRxEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMSS7MTP2NoAckRxLink,acPMSS7MTP2NoAckRxInterval}
+       ::= {acPMSS7MTP2NoAckRxTable 1}
+
+
+
+     -- ****************************************
+     -- acPMSS7MTP2NoAckRx TABLE
+     -- ****************************************
+     AcPMSS7MTP2NoAckRxEntry ::= SEQUENCE {
+       acPMSS7MTP2NoAckRxLink                          Unsigned32,
+       acPMSS7MTP2NoAckRxInterval                      Unsigned32,
+       acPMSS7MTP2NoAckRxVal                           Counter32,
+       acPMSS7MTP2NoAckRxTotal                         Integer32
+     }
+
+
+
+     acPMSS7MTP2NoAckRxLink OBJECT-TYPE
+       SYNTAX Unsigned32 (0..63)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Link number.
+0 is the first link."
+       ::= {acPMSS7MTP2NoAckRxEntry 1}
+
+
+
+     acPMSS7MTP2NoAckRxInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMSS7MTP2NoAckRxEntry 2}
+
+
+
+     acPMSS7MTP2NoAckRxVal OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMSS7MTP2NoAckRxEntry 3}
+
+
+
+     acPMSS7MTP2NoAckRxTotal OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Total since last reset."
+       ::= {acPMSS7MTP2NoAckRxEntry 4}
+
+
+
+     -- ****************************************
+     -- acPMSS7DiscMSU table declaration
+     -- ****************************************
+     acPMSS7DiscMSUTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMSS7DiscMSUEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "MSUs discarded due to SL congestion - transmit and receive - Q.752 3.10"
+       ::= {acPMSS7Links 12}
+
+
+
+     -- ****************************************
+     -- acPMSS7DiscMSU table entry
+     -- ****************************************
+     acPMSS7DiscMSUEntry OBJECT-TYPE
+       SYNTAX AcPMSS7DiscMSUEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMSS7DiscMSULink,acPMSS7DiscMSUInterval}
+       ::= {acPMSS7DiscMSUTable 1}
+
+
+
+     -- ****************************************
+     -- acPMSS7DiscMSU TABLE
+     -- ****************************************
+     AcPMSS7DiscMSUEntry ::= SEQUENCE {
+       acPMSS7DiscMSULink                              Unsigned32,
+       acPMSS7DiscMSUInterval                          Unsigned32,
+       acPMSS7DiscMSUVal                               Counter32,
+       acPMSS7DiscMSUTotal                             Integer32
+     }
+
+
+
+     acPMSS7DiscMSULink OBJECT-TYPE
+       SYNTAX Unsigned32 (0..63)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Link number.
+0 is the first link."
+       ::= {acPMSS7DiscMSUEntry 1}
+
+
+
+     acPMSS7DiscMSUInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMSS7DiscMSUEntry 2}
+
+
+
+     acPMSS7DiscMSUVal OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMSS7DiscMSUEntry 3}
+
+
+
+     acPMSS7DiscMSUTotal OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Total since last reset."
+       ::= {acPMSS7DiscMSUEntry 4}
+
+
+
+     -- ****************************************
+     -- acPMSS7InService table declaration
+     -- ****************************************
+     acPMSS7InServiceTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMSS7InServiceEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Duration of SS7 link at in-service state in percentage (in last 30 minutes) - Q.752 1.1"
+       ::= {acPMSS7Links 13}
+
+
+
+     -- ****************************************
+     -- acPMSS7InService table entry
+     -- ****************************************
+     acPMSS7InServiceEntry OBJECT-TYPE
+       SYNTAX AcPMSS7InServiceEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMSS7InServiceLink,acPMSS7InServiceInterval}
+       ::= {acPMSS7InServiceTable 1}
+
+
+
+     -- ****************************************
+     -- acPMSS7InService TABLE
+     -- ****************************************
+     AcPMSS7InServiceEntry ::= SEQUENCE {
+       acPMSS7InServiceLink                            Unsigned32,
+       acPMSS7InServiceInterval                        Unsigned32,
+       acPMSS7InServiceVal                             Gauge32,
+       acPMSS7InServiceTimeAboveHighThreshold          Integer32,
+       acPMSS7InServiceTimeBetweenThresholds           Integer32
+     }
+
+
+
+     acPMSS7InServiceLink OBJECT-TYPE
+       SYNTAX Unsigned32 (0..63)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Link number.
+0 is the first link."
+       ::= {acPMSS7InServiceEntry 1}
+
+
+
+     acPMSS7InServiceInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMSS7InServiceEntry 2}
+
+
+
+     acPMSS7InServiceVal OBJECT-TYPE
+       SYNTAX Gauge32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMSS7InServiceEntry 3}
+
+
+
+     acPMSS7InServiceTimeAboveHighThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is above what was determined
+as the high threshold. In this case - 'In Service'."
+       ::= {acPMSS7InServiceEntry 4}
+
+
+
+     acPMSS7InServiceTimeBetweenThresholds OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is between what were
+determined as the low and high thresholds. In this case -
+not 'In Service'."
+       ::= {acPMSS7InServiceEntry 5}
+
+
+
+     -- ****************************************
+     -- acPMSS7OutOfService table declaration
+     -- ****************************************
+     acPMSS7OutOfServiceTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMSS7OutOfServiceEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Duration of SS7 link at out-of-service state in percentage (in last 30 minutes) - Q.752 2.1"
+       ::= {acPMSS7Links 14}
+
+
+
+     -- ****************************************
+     -- acPMSS7OutOfService table entry
+     -- ****************************************
+     acPMSS7OutOfServiceEntry OBJECT-TYPE
+       SYNTAX AcPMSS7OutOfServiceEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMSS7OutOfServiceLink,acPMSS7OutOfServiceInterval}
+       ::= {acPMSS7OutOfServiceTable 1}
+
+
+
+     -- ****************************************
+     -- acPMSS7OutOfService TABLE
+     -- ****************************************
+     AcPMSS7OutOfServiceEntry ::= SEQUENCE {
+       acPMSS7OutOfServiceLink                         Unsigned32,
+       acPMSS7OutOfServiceInterval                     Unsigned32,
+       acPMSS7OutOfServiceVal                          Gauge32,
+       acPMSS7OutOfServiceTimeAboveHighThreshold       Integer32,
+       acPMSS7OutOfServiceTimeBetweenThresholds        Integer32
+     }
+
+
+
+     acPMSS7OutOfServiceLink OBJECT-TYPE
+       SYNTAX Unsigned32 (0..63)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Link number.
+0 is the first link."
+       ::= {acPMSS7OutOfServiceEntry 1}
+
+
+
+     acPMSS7OutOfServiceInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMSS7OutOfServiceEntry 2}
+
+
+
+     acPMSS7OutOfServiceVal OBJECT-TYPE
+       SYNTAX Gauge32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMSS7OutOfServiceEntry 3}
+
+
+
+     acPMSS7OutOfServiceTimeAboveHighThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is above what was determined
+as the high threshold. In this case - 'Out Of Service'."
+       ::= {acPMSS7OutOfServiceEntry 4}
+
+
+
+     acPMSS7OutOfServiceTimeBetweenThresholds OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is between what were
+determined as the low and high thresholds. In this case -
+not 'Out of Service'."
+       ::= {acPMSS7OutOfServiceEntry 5}
+
+
+
+     acPMSS7LinkSets OBJECT IDENTIFIER ::= {acPMSS7Data 41}
+
+
+     -- ****************************************
+     -- acPMSS7SN0LSOutOfService table declaration
+     -- ****************************************
+     acPMSS7SN0LSOutOfServiceTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMSS7SN0LSOutOfServiceEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Duration of SS7 linkSet within Signaling node 0 at Out-of-service state in percentage (in last 30 minutes) -Q.752 5.2"
+       ::= {acPMSS7LinkSets 1}
+
+
+
+     -- ****************************************
+     -- acPMSS7SN0LSOutOfService table entry
+     -- ****************************************
+     acPMSS7SN0LSOutOfServiceEntry OBJECT-TYPE
+       SYNTAX AcPMSS7SN0LSOutOfServiceEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMSS7SN0LSOutOfServiceLinkSet,acPMSS7SN0LSOutOfServiceInterval}
+       ::= {acPMSS7SN0LSOutOfServiceTable 1}
+
+
+
+     -- ****************************************
+     -- acPMSS7SN0LSOutOfService TABLE
+     -- ****************************************
+     AcPMSS7SN0LSOutOfServiceEntry ::= SEQUENCE {
+       acPMSS7SN0LSOutOfServiceLinkSet                 Unsigned32,
+       acPMSS7SN0LSOutOfServiceInterval                Unsigned32,
+       acPMSS7SN0LSOutOfServiceVal                     Gauge32,
+       acPMSS7SN0LSOutOfServiceTimeAboveHighThreshold  Integer32,
+       acPMSS7SN0LSOutOfServiceTimeBetweenThresholds   Integer32
+     }
+
+
+
+     acPMSS7SN0LSOutOfServiceLinkSet OBJECT-TYPE
+       SYNTAX Unsigned32 (0..31)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Link Set number.
+0 is the first link."
+       ::= {acPMSS7SN0LSOutOfServiceEntry 1}
+
+
+
+     acPMSS7SN0LSOutOfServiceInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMSS7SN0LSOutOfServiceEntry 2}
+
+
+
+     acPMSS7SN0LSOutOfServiceVal OBJECT-TYPE
+       SYNTAX Gauge32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMSS7SN0LSOutOfServiceEntry 3}
+
+
+
+     acPMSS7SN0LSOutOfServiceTimeAboveHighThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is above what was determined
+as the high threshold. In this case - 'Out Of Service'."
+       ::= {acPMSS7SN0LSOutOfServiceEntry 4}
+
+
+
+     acPMSS7SN0LSOutOfServiceTimeBetweenThresholds OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is between what were
+determined as the low and high thresholds. In this case -
+not 'Out of Service'."
+       ::= {acPMSS7SN0LSOutOfServiceEntry 5}
+
+
+
+     -- ****************************************
+     -- acPMSS7SN1LSOutOfService table declaration
+     -- ****************************************
+     acPMSS7SN1LSOutOfServiceTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMSS7SN1LSOutOfServiceEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Duration of SS7 linkSet within Signaling node 1 at Out-of-service state in percentage (in last 30 minutes) -Q.752 5.2"
+       ::= {acPMSS7LinkSets 2}
+
+
+
+     -- ****************************************
+     -- acPMSS7SN1LSOutOfService table entry
+     -- ****************************************
+     acPMSS7SN1LSOutOfServiceEntry OBJECT-TYPE
+       SYNTAX AcPMSS7SN1LSOutOfServiceEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMSS7SN1LSOutOfServiceLinkSet,acPMSS7SN1LSOutOfServiceInterval}
+       ::= {acPMSS7SN1LSOutOfServiceTable 1}
+
+
+
+     -- ****************************************
+     -- acPMSS7SN1LSOutOfService TABLE
+     -- ****************************************
+     AcPMSS7SN1LSOutOfServiceEntry ::= SEQUENCE {
+       acPMSS7SN1LSOutOfServiceLinkSet                 Unsigned32,
+       acPMSS7SN1LSOutOfServiceInterval                Unsigned32,
+       acPMSS7SN1LSOutOfServiceVal                     Gauge32,
+       acPMSS7SN1LSOutOfServiceTimeAboveHighThreshold  Integer32,
+       acPMSS7SN1LSOutOfServiceTimeBetweenThresholds   Integer32
+     }
+
+
+
+     acPMSS7SN1LSOutOfServiceLinkSet OBJECT-TYPE
+       SYNTAX Unsigned32 (0..31)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Link Set number.
+0 is the first link."
+       ::= {acPMSS7SN1LSOutOfServiceEntry 1}
+
+
+
+     acPMSS7SN1LSOutOfServiceInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMSS7SN1LSOutOfServiceEntry 2}
+
+
+
+     acPMSS7SN1LSOutOfServiceVal OBJECT-TYPE
+       SYNTAX Gauge32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMSS7SN1LSOutOfServiceEntry 3}
+
+
+
+     acPMSS7SN1LSOutOfServiceTimeAboveHighThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is above what was determined
+as the high threshold. In this case - 'Out Of Service'."
+       ::= {acPMSS7SN1LSOutOfServiceEntry 4}
+
+
+
+     acPMSS7SN1LSOutOfServiceTimeBetweenThresholds OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is between what were
+determined as the low and high thresholds. In this case -
+not 'Out of Service'."
+       ::= {acPMSS7SN1LSOutOfServiceEntry 5}
+
+
+
+     acPMSS7SignalingNodes OBJECT IDENTIFIER ::= {acPMSS7Data 51}
+
+
+     -- ****************************************
+     -- acPMSS7TxMTP3Octets table declaration
+     -- ****************************************
+     acPMSS7TxMTP3OctetsTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMSS7TxMTP3OctetsEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Number of transmitted MTP3 octets per SS7 MTP3 node"
+       ::= {acPMSS7SignalingNodes 1}
+
+
+
+     -- ****************************************
+     -- acPMSS7TxMTP3Octets table entry
+     -- ****************************************
+     acPMSS7TxMTP3OctetsEntry OBJECT-TYPE
+       SYNTAX AcPMSS7TxMTP3OctetsEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMSS7TxMTP3OctetsSN,acPMSS7TxMTP3OctetsInterval}
+       ::= {acPMSS7TxMTP3OctetsTable 1}
+
+
+
+     -- ****************************************
+     -- acPMSS7TxMTP3Octets TABLE
+     -- ****************************************
+     AcPMSS7TxMTP3OctetsEntry ::= SEQUENCE {
+       acPMSS7TxMTP3OctetsSN                           Unsigned32,
+       acPMSS7TxMTP3OctetsInterval                     Unsigned32,
+       acPMSS7TxMTP3OctetsVal                          Counter32,
+       acPMSS7TxMTP3OctetsTotal                        Integer32
+     }
+
+
+
+     acPMSS7TxMTP3OctetsSN OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "SN number.
+0 is the first SN."
+       ::= {acPMSS7TxMTP3OctetsEntry 1}
+
+
+
+     acPMSS7TxMTP3OctetsInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMSS7TxMTP3OctetsEntry 2}
+
+
+
+     acPMSS7TxMTP3OctetsVal OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMSS7TxMTP3OctetsEntry 3}
+
+
+
+     acPMSS7TxMTP3OctetsTotal OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Total since last reset."
+       ::= {acPMSS7TxMTP3OctetsEntry 4}
+
+
+
+     -- ****************************************
+     -- acPMSS7RxMTP3Octets table declaration
+     -- ****************************************
+     acPMSS7RxMTP3OctetsTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMSS7RxMTP3OctetsEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Number of received MTP3 octets per SS7 MTP3 node"
+       ::= {acPMSS7SignalingNodes 2}
+
+
+
+     -- ****************************************
+     -- acPMSS7RxMTP3Octets table entry
+     -- ****************************************
+     acPMSS7RxMTP3OctetsEntry OBJECT-TYPE
+       SYNTAX AcPMSS7RxMTP3OctetsEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMSS7RxMTP3OctetsSN,acPMSS7RxMTP3OctetsInterval}
+       ::= {acPMSS7RxMTP3OctetsTable 1}
+
+
+
+     -- ****************************************
+     -- acPMSS7RxMTP3Octets TABLE
+     -- ****************************************
+     AcPMSS7RxMTP3OctetsEntry ::= SEQUENCE {
+       acPMSS7RxMTP3OctetsSN                           Unsigned32,
+       acPMSS7RxMTP3OctetsInterval                     Unsigned32,
+       acPMSS7RxMTP3OctetsVal                          Counter32,
+       acPMSS7RxMTP3OctetsTotal                        Integer32
+     }
+
+
+
+     acPMSS7RxMTP3OctetsSN OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "SN number.
+0 is the first SN."
+       ::= {acPMSS7RxMTP3OctetsEntry 1}
+
+
+
+     acPMSS7RxMTP3OctetsInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMSS7RxMTP3OctetsEntry 2}
+
+
+
+     acPMSS7RxMTP3OctetsVal OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMSS7RxMTP3OctetsEntry 3}
+
+
+
+     acPMSS7RxMTP3OctetsTotal OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Total since last reset."
+       ::= {acPMSS7RxMTP3OctetsEntry 4}
+
+
+
+     -- ****************************************
+     -- acPMSS7TxMTP3MSU table declaration
+     -- ****************************************
+     acPMSS7TxMTP3MSUTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMSS7TxMTP3MSUEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Number of transmitted MTP3 MSU's per SS7 MTP3 node"
+       ::= {acPMSS7SignalingNodes 3}
+
+
+
+     -- ****************************************
+     -- acPMSS7TxMTP3MSU table entry
+     -- ****************************************
+     acPMSS7TxMTP3MSUEntry OBJECT-TYPE
+       SYNTAX AcPMSS7TxMTP3MSUEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMSS7TxMTP3MSUSN,acPMSS7TxMTP3MSUInterval}
+       ::= {acPMSS7TxMTP3MSUTable 1}
+
+
+
+     -- ****************************************
+     -- acPMSS7TxMTP3MSU TABLE
+     -- ****************************************
+     AcPMSS7TxMTP3MSUEntry ::= SEQUENCE {
+       acPMSS7TxMTP3MSUSN                              Unsigned32,
+       acPMSS7TxMTP3MSUInterval                        Unsigned32,
+       acPMSS7TxMTP3MSUVal                             Counter32,
+       acPMSS7TxMTP3MSUTotal                           Integer32
+     }
+
+
+
+     acPMSS7TxMTP3MSUSN OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "SN number.
+0 is the first SN."
+       ::= {acPMSS7TxMTP3MSUEntry 1}
+
+
+
+     acPMSS7TxMTP3MSUInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMSS7TxMTP3MSUEntry 2}
+
+
+
+     acPMSS7TxMTP3MSUVal OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMSS7TxMTP3MSUEntry 3}
+
+
+
+     acPMSS7TxMTP3MSUTotal OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Total since last reset."
+       ::= {acPMSS7TxMTP3MSUEntry 4}
+
+
+
+     -- ****************************************
+     -- acPMSS7RxMTP3MSU table declaration
+     -- ****************************************
+     acPMSS7RxMTP3MSUTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMSS7RxMTP3MSUEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Number of received MTP3 MSU's per SS7 MTP3 node"
+       ::= {acPMSS7SignalingNodes 4}
+
+
+
+     -- ****************************************
+     -- acPMSS7RxMTP3MSU table entry
+     -- ****************************************
+     acPMSS7RxMTP3MSUEntry OBJECT-TYPE
+       SYNTAX AcPMSS7RxMTP3MSUEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMSS7RxMTP3MSUSN,acPMSS7RxMTP3MSUInterval}
+       ::= {acPMSS7RxMTP3MSUTable 1}
+
+
+
+     -- ****************************************
+     -- acPMSS7RxMTP3MSU TABLE
+     -- ****************************************
+     AcPMSS7RxMTP3MSUEntry ::= SEQUENCE {
+       acPMSS7RxMTP3MSUSN                              Unsigned32,
+       acPMSS7RxMTP3MSUInterval                        Unsigned32,
+       acPMSS7RxMTP3MSUVal                             Counter32,
+       acPMSS7RxMTP3MSUTotal                           Integer32
+     }
+
+
+
+     acPMSS7RxMTP3MSUSN OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "SN number.
+0 is the first SN."
+       ::= {acPMSS7RxMTP3MSUEntry 1}
+
+
+
+     acPMSS7RxMTP3MSUInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMSS7RxMTP3MSUEntry 2}
+
+
+
+     acPMSS7RxMTP3MSUVal OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMSS7RxMTP3MSUEntry 3}
+
+
+
+     acPMSS7RxMTP3MSUTotal OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Total since last reset."
+       ::= {acPMSS7RxMTP3MSUEntry 4}
+
+
+
+     -- ****************************************
+     -- acPMSS7TxMTP3UPU table declaration
+     -- ****************************************
+     acPMSS7TxMTP3UPUTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMSS7TxMTP3UPUEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Number of transmitted MTP3 User Part Unavailable messages per SS7 MTP3 node"
+       ::= {acPMSS7SignalingNodes 5}
+
+
+
+     -- ****************************************
+     -- acPMSS7TxMTP3UPU table entry
+     -- ****************************************
+     acPMSS7TxMTP3UPUEntry OBJECT-TYPE
+       SYNTAX AcPMSS7TxMTP3UPUEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMSS7TxMTP3UPUSN,acPMSS7TxMTP3UPUInterval}
+       ::= {acPMSS7TxMTP3UPUTable 1}
+
+
+
+     -- ****************************************
+     -- acPMSS7TxMTP3UPU TABLE
+     -- ****************************************
+     AcPMSS7TxMTP3UPUEntry ::= SEQUENCE {
+       acPMSS7TxMTP3UPUSN                              Unsigned32,
+       acPMSS7TxMTP3UPUInterval                        Unsigned32,
+       acPMSS7TxMTP3UPUVal                             Counter32,
+       acPMSS7TxMTP3UPUTotal                           Integer32
+     }
+
+
+
+     acPMSS7TxMTP3UPUSN OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "SN number.
+0 is the first SN."
+       ::= {acPMSS7TxMTP3UPUEntry 1}
+
+
+
+     acPMSS7TxMTP3UPUInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMSS7TxMTP3UPUEntry 2}
+
+
+
+     acPMSS7TxMTP3UPUVal OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMSS7TxMTP3UPUEntry 3}
+
+
+
+     acPMSS7TxMTP3UPUTotal OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Total since last reset."
+       ::= {acPMSS7TxMTP3UPUEntry 4}
+
+
+
+     -- ****************************************
+     -- acPMSS7RxMTP3UPU table declaration
+     -- ****************************************
+     acPMSS7RxMTP3UPUTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMSS7RxMTP3UPUEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Number of received MTP3 User Part Unavailable messages per SS7 MTP3 node"
+       ::= {acPMSS7SignalingNodes 6}
+
+
+
+     -- ****************************************
+     -- acPMSS7RxMTP3UPU table entry
+     -- ****************************************
+     acPMSS7RxMTP3UPUEntry OBJECT-TYPE
+       SYNTAX AcPMSS7RxMTP3UPUEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMSS7RxMTP3UPUSN,acPMSS7RxMTP3UPUInterval}
+       ::= {acPMSS7RxMTP3UPUTable 1}
+
+
+
+     -- ****************************************
+     -- acPMSS7RxMTP3UPU TABLE
+     -- ****************************************
+     AcPMSS7RxMTP3UPUEntry ::= SEQUENCE {
+       acPMSS7RxMTP3UPUSN                              Unsigned32,
+       acPMSS7RxMTP3UPUInterval                        Unsigned32,
+       acPMSS7RxMTP3UPUVal                             Counter32,
+       acPMSS7RxMTP3UPUTotal                           Integer32
+     }
+
+
+
+     acPMSS7RxMTP3UPUSN OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "SN number.
+0 is the first SN."
+       ::= {acPMSS7RxMTP3UPUEntry 1}
+
+
+
+     acPMSS7RxMTP3UPUInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMSS7RxMTP3UPUEntry 2}
+
+
+
+     acPMSS7RxMTP3UPUVal OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMSS7RxMTP3UPUEntry 3}
+
+
+
+     acPMSS7RxMTP3UPUTotal OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Total since last reset."
+       ::= {acPMSS7RxMTP3UPUEntry 4}
+
+
+
+     -- ****************************************
+     -- acPMSS7MTP3MSUDiscarded table declaration
+     -- ****************************************
+     acPMSS7MTP3MSUDiscardedTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMSS7MTP3MSUDiscardedEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Number of discarded MTP3 MSU's per SS7 MTP3 node"
+       ::= {acPMSS7SignalingNodes 7}
+
+
+
+     -- ****************************************
+     -- acPMSS7MTP3MSUDiscarded table entry
+     -- ****************************************
+     acPMSS7MTP3MSUDiscardedEntry OBJECT-TYPE
+       SYNTAX AcPMSS7MTP3MSUDiscardedEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMSS7MTP3MSUDiscardedSN,acPMSS7MTP3MSUDiscardedInterval}
+       ::= {acPMSS7MTP3MSUDiscardedTable 1}
+
+
+
+     -- ****************************************
+     -- acPMSS7MTP3MSUDiscarded TABLE
+     -- ****************************************
+     AcPMSS7MTP3MSUDiscardedEntry ::= SEQUENCE {
+       acPMSS7MTP3MSUDiscardedSN                       Unsigned32,
+       acPMSS7MTP3MSUDiscardedInterval                 Unsigned32,
+       acPMSS7MTP3MSUDiscardedVal                      Counter32,
+       acPMSS7MTP3MSUDiscardedTotal                    Integer32
+     }
+
+
+
+     acPMSS7MTP3MSUDiscardedSN OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "SN number.
+0 is the first SN."
+       ::= {acPMSS7MTP3MSUDiscardedEntry 1}
+
+
+
+     acPMSS7MTP3MSUDiscardedInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMSS7MTP3MSUDiscardedEntry 2}
+
+
+
+     acPMSS7MTP3MSUDiscardedVal OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMSS7MTP3MSUDiscardedEntry 3}
+
+
+
+     acPMSS7MTP3MSUDiscardedTotal OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Total since last reset."
+       ::= {acPMSS7MTP3MSUDiscardedEntry 4}
+
+
+
+     -- ****************************************
+     -- acPMSS7MTP3MSUDiscardedRtDataErr table declaration
+     -- ****************************************
+     acPMSS7MTP3MSUDiscardedRtDataErrTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMSS7MTP3MSUDiscardedRtDataErrEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Number of MTP3 Msu's discarded Due to Routing Data error per SS7 MTP3 node - Q.752 5.5"
+       ::= {acPMSS7SignalingNodes 8}
+
+
+
+     -- ****************************************
+     -- acPMSS7MTP3MSUDiscardedRtDataErr table entry
+     -- ****************************************
+     acPMSS7MTP3MSUDiscardedRtDataErrEntry OBJECT-TYPE
+       SYNTAX AcPMSS7MTP3MSUDiscardedRtDataErrEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMSS7MTP3MSUDiscardedRtDataErrSN,acPMSS7MTP3MSUDiscardedRtDataErrInterval}
+       ::= {acPMSS7MTP3MSUDiscardedRtDataErrTable 1}
+
+
+
+     -- ****************************************
+     -- acPMSS7MTP3MSUDiscardedRtDataErr TABLE
+     -- ****************************************
+     AcPMSS7MTP3MSUDiscardedRtDataErrEntry ::= SEQUENCE {
+       acPMSS7MTP3MSUDiscardedRtDataErrSN              Unsigned32,
+       acPMSS7MTP3MSUDiscardedRtDataErrInterval        Unsigned32,
+       acPMSS7MTP3MSUDiscardedRtDataErrVal             Counter32,
+       acPMSS7MTP3MSUDiscardedRtDataErrTotal           Integer32
+     }
+
+
+
+     acPMSS7MTP3MSUDiscardedRtDataErrSN OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "SN number.
+0 is the first SN."
+       ::= {acPMSS7MTP3MSUDiscardedRtDataErrEntry 1}
+
+
+
+     acPMSS7MTP3MSUDiscardedRtDataErrInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMSS7MTP3MSUDiscardedRtDataErrEntry 2}
+
+
+
+     acPMSS7MTP3MSUDiscardedRtDataErrVal OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMSS7MTP3MSUDiscardedRtDataErrEntry 3}
+
+
+
+     acPMSS7MTP3MSUDiscardedRtDataErrTotal OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Total since last reset."
+       ::= {acPMSS7MTP3MSUDiscardedRtDataErrEntry 4}
+
+
+
+     -- ****************************************
+     -- acPMSS7RxMTP3TFCMsg table declaration
+     -- ****************************************
+     acPMSS7RxMTP3TFCMsgTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMSS7RxMTP3TFCMsgEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Number of MTP3 TFC messages received per SS7 MTP3 node "
+       ::= {acPMSS7SignalingNodes 9}
+
+
+
+     -- ****************************************
+     -- acPMSS7RxMTP3TFCMsg table entry
+     -- ****************************************
+     acPMSS7RxMTP3TFCMsgEntry OBJECT-TYPE
+       SYNTAX AcPMSS7RxMTP3TFCMsgEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMSS7RxMTP3TFCMsgSN,acPMSS7RxMTP3TFCMsgInterval}
+       ::= {acPMSS7RxMTP3TFCMsgTable 1}
+
+
+
+     -- ****************************************
+     -- acPMSS7RxMTP3TFCMsg TABLE
+     -- ****************************************
+     AcPMSS7RxMTP3TFCMsgEntry ::= SEQUENCE {
+       acPMSS7RxMTP3TFCMsgSN                           Unsigned32,
+       acPMSS7RxMTP3TFCMsgInterval                     Unsigned32,
+       acPMSS7RxMTP3TFCMsgVal                          Counter32,
+       acPMSS7RxMTP3TFCMsgTotal                        Integer32
+     }
+
+
+
+     acPMSS7RxMTP3TFCMsgSN OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "SN number.
+0 is the first SN."
+       ::= {acPMSS7RxMTP3TFCMsgEntry 1}
+
+
+
+     acPMSS7RxMTP3TFCMsgInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMSS7RxMTP3TFCMsgEntry 2}
+
+
+
+     acPMSS7RxMTP3TFCMsgVal OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMSS7RxMTP3TFCMsgEntry 3}
+
+
+
+     acPMSS7RxMTP3TFCMsgTotal OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Total since last reset."
+       ::= {acPMSS7RxMTP3TFCMsgEntry 4}
+
+
+
+     acPMSS7MPT2Timers OBJECT IDENTIFIER ::= {acPMSS7Data 61}
+
+
+     -- ****************************************
+     -- acPMSS7MTP2T1Expiry table declaration
+     -- ****************************************
+     acPMSS7MTP2T1ExpiryTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMSS7MTP2T1ExpiryEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Number of MTP2 T1 expiry per SS7 link"
+       ::= {acPMSS7MPT2Timers 1}
+
+
+
+     -- ****************************************
+     -- acPMSS7MTP2T1Expiry table entry
+     -- ****************************************
+     acPMSS7MTP2T1ExpiryEntry OBJECT-TYPE
+       SYNTAX AcPMSS7MTP2T1ExpiryEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMSS7MTP2T1ExpiryLink,acPMSS7MTP2T1ExpiryInterval}
+       ::= {acPMSS7MTP2T1ExpiryTable 1}
+
+
+
+     -- ****************************************
+     -- acPMSS7MTP2T1Expiry TABLE
+     -- ****************************************
+     AcPMSS7MTP2T1ExpiryEntry ::= SEQUENCE {
+       acPMSS7MTP2T1ExpiryLink                         Unsigned32,
+       acPMSS7MTP2T1ExpiryInterval                     Unsigned32,
+       acPMSS7MTP2T1ExpiryVal                          Counter32,
+       acPMSS7MTP2T1ExpiryTotal                        Integer32
+     }
+
+
+
+     acPMSS7MTP2T1ExpiryLink OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Link number.
+0 is the first link."
+       ::= {acPMSS7MTP2T1ExpiryEntry 1}
+
+
+
+     acPMSS7MTP2T1ExpiryInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMSS7MTP2T1ExpiryEntry 2}
+
+
+
+     acPMSS7MTP2T1ExpiryVal OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMSS7MTP2T1ExpiryEntry 3}
+
+
+
+     acPMSS7MTP2T1ExpiryTotal OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Total since last reset."
+       ::= {acPMSS7MTP2T1ExpiryEntry 4}
+
+
+
+     -- ****************************************
+     -- acPMSS7MTP2T2Expiry table declaration
+     -- ****************************************
+     acPMSS7MTP2T2ExpiryTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMSS7MTP2T2ExpiryEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Number of MTP2 T2 expiry per SS7 link"
+       ::= {acPMSS7MPT2Timers 2}
+
+
+
+     -- ****************************************
+     -- acPMSS7MTP2T2Expiry table entry
+     -- ****************************************
+     acPMSS7MTP2T2ExpiryEntry OBJECT-TYPE
+       SYNTAX AcPMSS7MTP2T2ExpiryEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMSS7MTP2T2ExpiryLink,acPMSS7MTP2T2ExpiryInterval}
+       ::= {acPMSS7MTP2T2ExpiryTable 1}
+
+
+
+     -- ****************************************
+     -- acPMSS7MTP2T2Expiry TABLE
+     -- ****************************************
+     AcPMSS7MTP2T2ExpiryEntry ::= SEQUENCE {
+       acPMSS7MTP2T2ExpiryLink                         Unsigned32,
+       acPMSS7MTP2T2ExpiryInterval                     Unsigned32,
+       acPMSS7MTP2T2ExpiryVal                          Counter32,
+       acPMSS7MTP2T2ExpiryTotal                        Integer32
+     }
+
+
+
+     acPMSS7MTP2T2ExpiryLink OBJECT-TYPE
+       SYNTAX Unsigned32 (0..63)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Link number.
+0 is the first link."
+       ::= {acPMSS7MTP2T2ExpiryEntry 1}
+
+
+
+     acPMSS7MTP2T2ExpiryInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMSS7MTP2T2ExpiryEntry 2}
+
+
+
+     acPMSS7MTP2T2ExpiryVal OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMSS7MTP2T2ExpiryEntry 3}
+
+
+
+     acPMSS7MTP2T2ExpiryTotal OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Total since last reset."
+       ::= {acPMSS7MTP2T2ExpiryEntry 4}
+
+
+
+     -- ****************************************
+     -- acPMSS7MTP2T3Expiry table declaration
+     -- ****************************************
+     acPMSS7MTP2T3ExpiryTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMSS7MTP2T3ExpiryEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Number of MTP2 T3 expiry per SS7 link"
+       ::= {acPMSS7MPT2Timers 3}
+
+
+
+     -- ****************************************
+     -- acPMSS7MTP2T3Expiry table entry
+     -- ****************************************
+     acPMSS7MTP2T3ExpiryEntry OBJECT-TYPE
+       SYNTAX AcPMSS7MTP2T3ExpiryEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMSS7MTP2T3ExpiryLink,acPMSS7MTP2T3ExpiryInterval}
+       ::= {acPMSS7MTP2T3ExpiryTable 1}
+
+
+
+     -- ****************************************
+     -- acPMSS7MTP2T3Expiry TABLE
+     -- ****************************************
+     AcPMSS7MTP2T3ExpiryEntry ::= SEQUENCE {
+       acPMSS7MTP2T3ExpiryLink                         Unsigned32,
+       acPMSS7MTP2T3ExpiryInterval                     Unsigned32,
+       acPMSS7MTP2T3ExpiryVal                          Counter32,
+       acPMSS7MTP2T3ExpiryTotal                        Integer32
+     }
+
+
+
+     acPMSS7MTP2T3ExpiryLink OBJECT-TYPE
+       SYNTAX Unsigned32 (0..63)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Link number.
+0 is the first link."
+       ::= {acPMSS7MTP2T3ExpiryEntry 1}
+
+
+
+     acPMSS7MTP2T3ExpiryInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMSS7MTP2T3ExpiryEntry 2}
+
+
+
+     acPMSS7MTP2T3ExpiryVal OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMSS7MTP2T3ExpiryEntry 3}
+
+
+
+     acPMSS7MTP2T3ExpiryTotal OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Total since last reset."
+       ::= {acPMSS7MTP2T3ExpiryEntry 4}
+
+
+
+     -- ****************************************
+     -- acPMSS7MTP2T4Expiry table declaration
+     -- ****************************************
+     acPMSS7MTP2T4ExpiryTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMSS7MTP2T4ExpiryEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Number of MTP2 T4 expiry per SS7 link"
+       ::= {acPMSS7MPT2Timers 4}
+
+
+
+     -- ****************************************
+     -- acPMSS7MTP2T4Expiry table entry
+     -- ****************************************
+     acPMSS7MTP2T4ExpiryEntry OBJECT-TYPE
+       SYNTAX AcPMSS7MTP2T4ExpiryEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMSS7MTP2T4ExpiryLink,acPMSS7MTP2T4ExpiryInterval}
+       ::= {acPMSS7MTP2T4ExpiryTable 1}
+
+
+
+     -- ****************************************
+     -- acPMSS7MTP2T4Expiry TABLE
+     -- ****************************************
+     AcPMSS7MTP2T4ExpiryEntry ::= SEQUENCE {
+       acPMSS7MTP2T4ExpiryLink                         Unsigned32,
+       acPMSS7MTP2T4ExpiryInterval                     Unsigned32,
+       acPMSS7MTP2T4ExpiryVal                          Counter32,
+       acPMSS7MTP2T4ExpiryTotal                        Integer32
+     }
+
+
+
+     acPMSS7MTP2T4ExpiryLink OBJECT-TYPE
+       SYNTAX Unsigned32 (0..63)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Link number.
+0 is the first link."
+       ::= {acPMSS7MTP2T4ExpiryEntry 1}
+
+
+
+     acPMSS7MTP2T4ExpiryInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMSS7MTP2T4ExpiryEntry 2}
+
+
+
+     acPMSS7MTP2T4ExpiryVal OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMSS7MTP2T4ExpiryEntry 3}
+
+
+
+     acPMSS7MTP2T4ExpiryTotal OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Total since last reset."
+       ::= {acPMSS7MTP2T4ExpiryEntry 4}
+
+
+
+     -- ****************************************
+     -- acPMSS7MTP2T5Expiry table declaration
+     -- ****************************************
+     acPMSS7MTP2T5ExpiryTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMSS7MTP2T5ExpiryEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Number of MTP2 T5 expiry per SS7 link"
+       ::= {acPMSS7MPT2Timers 5}
+
+
+
+     -- ****************************************
+     -- acPMSS7MTP2T5Expiry table entry
+     -- ****************************************
+     acPMSS7MTP2T5ExpiryEntry OBJECT-TYPE
+       SYNTAX AcPMSS7MTP2T5ExpiryEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMSS7MTP2T5ExpiryLink,acPMSS7MTP2T5ExpiryInterval}
+       ::= {acPMSS7MTP2T5ExpiryTable 1}
+
+
+
+     -- ****************************************
+     -- acPMSS7MTP2T5Expiry TABLE
+     -- ****************************************
+     AcPMSS7MTP2T5ExpiryEntry ::= SEQUENCE {
+       acPMSS7MTP2T5ExpiryLink                         Unsigned32,
+       acPMSS7MTP2T5ExpiryInterval                     Unsigned32,
+       acPMSS7MTP2T5ExpiryVal                          Counter32,
+       acPMSS7MTP2T5ExpiryTotal                        Integer32
+     }
+
+
+
+     acPMSS7MTP2T5ExpiryLink OBJECT-TYPE
+       SYNTAX Unsigned32 (0..63)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Link number.
+0 is the first link."
+       ::= {acPMSS7MTP2T5ExpiryEntry 1}
+
+
+
+     acPMSS7MTP2T5ExpiryInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMSS7MTP2T5ExpiryEntry 2}
+
+
+
+     acPMSS7MTP2T5ExpiryVal OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMSS7MTP2T5ExpiryEntry 3}
+
+
+
+     acPMSS7MTP2T5ExpiryTotal OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Total since last reset."
+       ::= {acPMSS7MTP2T5ExpiryEntry 4}
+
+
+
+     -- ****************************************
+     -- acPMSS7MTP2T6Expiry table declaration
+     -- ****************************************
+     acPMSS7MTP2T6ExpiryTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMSS7MTP2T6ExpiryEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Number of MTP2 T6 expiry per SS7 link"
+       ::= {acPMSS7MPT2Timers 6}
+
+
+
+     -- ****************************************
+     -- acPMSS7MTP2T6Expiry table entry
+     -- ****************************************
+     acPMSS7MTP2T6ExpiryEntry OBJECT-TYPE
+       SYNTAX AcPMSS7MTP2T6ExpiryEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMSS7MTP2T6ExpiryLink,acPMSS7MTP2T6ExpiryInterval}
+       ::= {acPMSS7MTP2T6ExpiryTable 1}
+
+
+
+     -- ****************************************
+     -- acPMSS7MTP2T6Expiry TABLE
+     -- ****************************************
+     AcPMSS7MTP2T6ExpiryEntry ::= SEQUENCE {
+       acPMSS7MTP2T6ExpiryLink                         Unsigned32,
+       acPMSS7MTP2T6ExpiryInterval                     Unsigned32,
+       acPMSS7MTP2T6ExpiryVal                          Counter32,
+       acPMSS7MTP2T6ExpiryTotal                        Integer32
+     }
+
+
+
+     acPMSS7MTP2T6ExpiryLink OBJECT-TYPE
+       SYNTAX Unsigned32 (0..63)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Link number.
+0 is the first link."
+       ::= {acPMSS7MTP2T6ExpiryEntry 1}
+
+
+
+     acPMSS7MTP2T6ExpiryInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMSS7MTP2T6ExpiryEntry 2}
+
+
+
+     acPMSS7MTP2T6ExpiryVal OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMSS7MTP2T6ExpiryEntry 3}
+
+
+
+     acPMSS7MTP2T6ExpiryTotal OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Total since last reset."
+       ::= {acPMSS7MTP2T6ExpiryEntry 4}
+
+
+
+     -- ****************************************
+     -- acPMSS7MTP2T7Expiry table declaration
+     -- ****************************************
+     acPMSS7MTP2T7ExpiryTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMSS7MTP2T7ExpiryEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Number of MTP2 T7 expiry per SS7 link"
+       ::= {acPMSS7MPT2Timers 7}
+
+
+
+     -- ****************************************
+     -- acPMSS7MTP2T7Expiry table entry
+     -- ****************************************
+     acPMSS7MTP2T7ExpiryEntry OBJECT-TYPE
+       SYNTAX AcPMSS7MTP2T7ExpiryEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMSS7MTP2T7ExpiryLink,acPMSS7MTP2T7ExpiryInterval}
+       ::= {acPMSS7MTP2T7ExpiryTable 1}
+
+
+
+     -- ****************************************
+     -- acPMSS7MTP2T7Expiry TABLE
+     -- ****************************************
+     AcPMSS7MTP2T7ExpiryEntry ::= SEQUENCE {
+       acPMSS7MTP2T7ExpiryLink                         Unsigned32,
+       acPMSS7MTP2T7ExpiryInterval                     Unsigned32,
+       acPMSS7MTP2T7ExpiryVal                          Counter32,
+       acPMSS7MTP2T7ExpiryTotal                        Integer32
+     }
+
+
+
+     acPMSS7MTP2T7ExpiryLink OBJECT-TYPE
+       SYNTAX Unsigned32 (0..63)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Link number.
+0 is the first link."
+       ::= {acPMSS7MTP2T7ExpiryEntry 1}
+
+
+
+     acPMSS7MTP2T7ExpiryInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMSS7MTP2T7ExpiryEntry 2}
+
+
+
+     acPMSS7MTP2T7ExpiryVal OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMSS7MTP2T7ExpiryEntry 3}
+
+
+
+     acPMSS7MTP2T7ExpiryTotal OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Total since last reset."
+       ::= {acPMSS7MTP2T7ExpiryEntry 4}
+
+
+
+
+
+END

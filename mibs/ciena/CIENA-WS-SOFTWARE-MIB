@@ -1,0 +1,778 @@
+-- This file was automatically generated from ciena-ws-software.yang. Do not edit.
+
+CIENA-WS-SOFTWARE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    cienaWsConfig
+        FROM CIENA-WS-MIB
+    StringMaxl128, StringMaxl256, StringMaxl32, StringMaxl64
+        FROM CIENA-WS-TYPEDEFS-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    Integer32, MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, TruthValue
+        FROM SNMPv2-TC;
+
+cienaWsSoftwareMIB MODULE-IDENTITY
+    LAST-UPDATED "201707180000Z"
+    ORGANIZATION "Ciena Corporation"
+    CONTACT-INFO "Web URL: http://www.ciena.com/
+Postal:  7035 Ridge Road
+        Hanover, Maryland 21076
+        U.S.A.
+Phone:   +1 800-921-1144
+Fax:     +1 410-694-5750"
+    DESCRIPTION "This module defines software information representation for Ciena's Waveserver."
+    REVISION "201707180000Z"
+    DESCRIPTION "Waveserver Release 1.5
+Removed 'Read only attribute' from 'index' description.
+Removed 'config true' from all entries.
+Obsolete: 'ws-software-reset-last-command-file' rpc.
+Obsolete: 'ws-software-reset-last-config-file' rpc."
+    REVISION "201703020000Z"
+    DESCRIPTION "Waveserver R1.4 revision.
+
+- Added coldrestartrequired enum to the upgrade-op-state.
+- Added force option to ws-software-install and ws-software-activate RPCs.
+- Added RPC ws-software-clear-cold-restart-required-alarm. 
+- Aligned MIB files to respect YANG read/write status."
+    REVISION "201611030000Z"
+    DESCRIPTION "Waveserver Rel 1.3 revised.
+'ws-software/installed' has been restructred. 
+The change is made to support when number of installed items exceeds five."
+    REVISION "201606140000Z"
+    DESCRIPTION "Waveserver Rel 1.2 revised.
+Major restructuring of this YANG module."
+    REVISION "201509290000Z"
+    DESCRIPTION "Initial version."
+    ::= { cienaWsConfig 14 }
+
+SoftwareOpState ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { unknown(0), normal(1), upgradeinprogress(2), restartinprogress(3), subsystemfailed(4), systemloaderror(5) }
+
+SoftwareRtncode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "Return code value used in the software module. 0 indicate success. None-zero indicate failure."
+    SYNTAX Unsigned32
+
+UpgradeOpState ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { unknown(0), idle(1), downloadinprogress(2), downloadcomplete(3), downloadfailed(4), installationinprogress(5), installationcomplete(6), installationfailed(7), activationinprogress(8), activationcomplete(9), activationfailed(10), commitinprogress(11), commitcomplete(12), commitfailed(13), cancelinprogress(14), cancelcomplete(15), cancelfailed(16), manualcommit(17), manualcancel(18), coldrestartrequired(19) }
+
+cwsSoftwareStatusTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsSoftwareStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Waveserver software status information."
+    ::= { cienaWsSoftwareMIB 3 }
+
+cwsSoftwareStatusEntry OBJECT-TYPE
+    SYNTAX CwsSoftwareStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsSoftwareStatusTable."
+    INDEX { cwsSoftwareStatusTableSnmpKey }
+    ::= { cwsSoftwareStatusTable 1 }
+
+CwsSoftwareStatusEntry ::= SEQUENCE { 
+    cwsSoftwareStatusTableSnmpKey Integer32,
+    cwsSoftwareStatusSoftwareOperationalState SoftwareOpState,
+    cwsSoftwareStatusUpgradeOperationalState UpgradeOpState,
+    cwsSoftwareStatusCommittedVersion StringMaxl32,
+    cwsSoftwareStatusActiveVersion StringMaxl32,
+    cwsSoftwareStatusUpgradeToVersion StringMaxl32,
+    cwsSoftwareStatusLastOperation StringMaxl128 
+}
+
+cwsSoftwareStatusTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsSoftwareStatus"
+    ::= { cwsSoftwareStatusEntry 1 }
+
+cwsSoftwareStatusSoftwareOperationalState OBJECT-TYPE
+    SYNTAX SoftwareOpState
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The current software operational state."
+    ::= { cwsSoftwareStatusEntry 2 }
+
+cwsSoftwareStatusUpgradeOperationalState OBJECT-TYPE
+    SYNTAX UpgradeOpState
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The current upgrade operational state."
+    ::= { cwsSoftwareStatusEntry 3 }
+
+cwsSoftwareStatusCommittedVersion OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The software committed version."
+    ::= { cwsSoftwareStatusEntry 4 }
+
+cwsSoftwareStatusActiveVersion OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The software active version."
+    ::= { cwsSoftwareStatusEntry 5 }
+
+cwsSoftwareStatusUpgradeToVersion OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The software upgrade-to version."
+    ::= { cwsSoftwareStatusEntry 6 }
+
+cwsSoftwareStatusLastOperation OBJECT-TYPE
+    SYNTAX StringMaxl128
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The software upgrade last operation."
+    ::= { cwsSoftwareStatusEntry 7 }
+
+cwsSoftwareCheckStatusReportTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsSoftwareCheckStatusReportEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Waveserver Software Check Status Report. This status report is generated after rpc ws-software-check has been run."
+    ::= { cienaWsSoftwareMIB 4 }
+
+cwsSoftwareCheckStatusReportEntry OBJECT-TYPE
+    SYNTAX CwsSoftwareCheckStatusReportEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsSoftwareCheckStatusReportTable."
+    INDEX { cwsSoftwareCheckStatusReportTableSnmpKey }
+    ::= { cwsSoftwareCheckStatusReportTable 1 }
+
+CwsSoftwareCheckStatusReportEntry ::= SEQUENCE { 
+    cwsSoftwareCheckStatusReportTableSnmpKey Integer32,
+    cwsSoftwareCheckStatusReportActiveReleaseVersion StringMaxl32,
+    cwsSoftwareCheckStatusReportServerReleaseVersion StringMaxl32,
+    cwsSoftwareCheckStatusReportLocalReleaseVersion StringMaxl32,
+    cwsSoftwareCheckStatusReportServerHostname StringMaxl32,
+    cwsSoftwareCheckStatusReportServerPath StringMaxl256,
+    cwsSoftwareCheckStatusReportTimestamp StringMaxl128,
+    cwsSoftwareCheckStatusReportCheckOperationalState SoftwareOpState,
+    cwsSoftwareCheckStatusReportCheckUpgradeState UpgradeOpState,
+    cwsSoftwareCheckStatusReportRequiredActivationType StringMaxl32,
+    cwsSoftwareCheckStatusReportServiceInterruptionActivation TruthValue 
+}
+
+cwsSoftwareCheckStatusReportTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsSoftwareCheckStatusReport"
+    ::= { cwsSoftwareCheckStatusReportEntry 1 }
+
+cwsSoftwareCheckStatusReportActiveReleaseVersion OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The software active version."
+    ::= { cwsSoftwareCheckStatusReportEntry 2 }
+
+cwsSoftwareCheckStatusReportServerReleaseVersion OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The remote server release version."
+    ::= { cwsSoftwareCheckStatusReportEntry 3 }
+
+cwsSoftwareCheckStatusReportLocalReleaseVersion OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The Local release version."
+    ::= { cwsSoftwareCheckStatusReportEntry 4 }
+
+cwsSoftwareCheckStatusReportServerHostname OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The remote server host name."
+    ::= { cwsSoftwareCheckStatusReportEntry 5 }
+
+cwsSoftwareCheckStatusReportServerPath OBJECT-TYPE
+    SYNTAX StringMaxl256
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The remote server path name."
+    ::= { cwsSoftwareCheckStatusReportEntry 6 }
+
+cwsSoftwareCheckStatusReportTimestamp OBJECT-TYPE
+    SYNTAX StringMaxl128
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The check status timestamp"
+    ::= { cwsSoftwareCheckStatusReportEntry 7 }
+
+cwsSoftwareCheckStatusReportCheckOperationalState OBJECT-TYPE
+    SYNTAX SoftwareOpState
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The Check Operational State of the check status report."
+    ::= { cwsSoftwareCheckStatusReportEntry 8 }
+
+cwsSoftwareCheckStatusReportCheckUpgradeState OBJECT-TYPE
+    SYNTAX UpgradeOpState
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Check Upgrade State of the check status report."
+    ::= { cwsSoftwareCheckStatusReportEntry 9 }
+
+cwsSoftwareCheckStatusReportRequiredActivationType OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The activation type required for upgrading the remote version: cold restart or warm restart."
+    ::= { cwsSoftwareCheckStatusReportEntry 10 }
+
+cwsSoftwareCheckStatusReportServiceInterruptionActivation OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "This is to indicate whether the system service will be interrupted if the remote version is upgraded."
+    ::= { cwsSoftwareCheckStatusReportEntry 11 }
+
+cwsSoftwareUpgradeServerTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsSoftwareUpgradeServerEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Waveserver remote upgrade server information."
+    ::= { cienaWsSoftwareMIB 5 }
+
+cwsSoftwareUpgradeServerEntry OBJECT-TYPE
+    SYNTAX CwsSoftwareUpgradeServerEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsSoftwareUpgradeServerTable."
+    INDEX { cwsSoftwareUpgradeServerTableSnmpKey }
+    ::= { cwsSoftwareUpgradeServerTable 1 }
+
+CwsSoftwareUpgradeServerEntry ::= SEQUENCE { 
+    cwsSoftwareUpgradeServerTableSnmpKey Integer32,
+    cwsSoftwareUpgradeServerIndex Unsigned32,
+    cwsSoftwareUpgradeServerServer StringMaxl64,
+    cwsSoftwareUpgradeServerMode INTEGER,
+    cwsSoftwareUpgradeServerRemotePath OCTET STRING,
+    cwsSoftwareUpgradeServerLoginId StringMaxl32,
+    cwsSoftwareUpgradeServerPassword StringMaxl32 
+}
+
+cwsSoftwareUpgradeServerTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsSoftwareUpgradeServer"
+    ::= { cwsSoftwareUpgradeServerEntry 1 }
+
+cwsSoftwareUpgradeServerIndex OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Unique id."
+    ::= { cwsSoftwareUpgradeServerEntry 2 }
+
+cwsSoftwareUpgradeServerServer OBJECT-TYPE
+    SYNTAX StringMaxl64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Remote server hostname or IP address"
+    ::= { cwsSoftwareUpgradeServerEntry 3 }
+
+cwsSoftwareUpgradeServerMode OBJECT-TYPE
+    SYNTAX INTEGER { tftp(0), ftp(1), sftp(2), scp(3) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "The protocol to access server, supported protcols are ftp, tftp, sftp, scp"
+    ::= { cwsSoftwareUpgradeServerEntry 4 }
+
+cwsSoftwareUpgradeServerRemotePath OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE(0..256))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "The remote server file system path that stores the RPM and bundle xml files."
+    ::= { cwsSoftwareUpgradeServerEntry 5 }
+
+cwsSoftwareUpgradeServerLoginId OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "The user name string to authenticate remote server."
+    ::= { cwsSoftwareUpgradeServerEntry 6 }
+
+cwsSoftwareUpgradeServerPassword OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "The password for the username."
+    ::= { cwsSoftwareUpgradeServerEntry 7 }
+
+cwsSoftwareUpgradeLogListTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsSoftwareUpgradeLogListEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsSoftwareMIB 6 }
+
+cwsSoftwareUpgradeLogListEntry OBJECT-TYPE
+    SYNTAX CwsSoftwareUpgradeLogListEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsSoftwareUpgradeLogListTable."
+    INDEX { cwsSoftwareUpgradeLogListLogIndex }
+    ::= { cwsSoftwareUpgradeLogListTable 1 }
+
+CwsSoftwareUpgradeLogListEntry ::= SEQUENCE { 
+    cwsSoftwareUpgradeLogListLogIndex Integer32,
+    cwsSoftwareUpgradeLogListDateAndTime StringMaxl64,
+    cwsSoftwareUpgradeLogListText StringMaxl256 
+}
+
+cwsSoftwareUpgradeLogListLogIndex OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Softsare log index. Unique id, read-only attribute."
+    ::= { cwsSoftwareUpgradeLogListEntry 1 }
+
+cwsSoftwareUpgradeLogListDateAndTime OBJECT-TYPE
+    SYNTAX StringMaxl64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The software log date and time, in string format."
+    ::= { cwsSoftwareUpgradeLogListEntry 2 }
+
+cwsSoftwareUpgradeLogListText OBJECT-TYPE
+    SYNTAX StringMaxl256
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The software log text."
+    ::= { cwsSoftwareUpgradeLogListEntry 3 }
+
+cwsSoftwareActiveSoftwareTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsSoftwareActiveSoftwareEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Waveserver active software information."
+    ::= { cienaWsSoftwareMIB 7 }
+
+cwsSoftwareActiveSoftwareEntry OBJECT-TYPE
+    SYNTAX CwsSoftwareActiveSoftwareEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsSoftwareActiveSoftwareTable."
+    INDEX { cwsSoftwareActiveSoftwareTableSnmpKey }
+    ::= { cwsSoftwareActiveSoftwareTable 1 }
+
+CwsSoftwareActiveSoftwareEntry ::= SEQUENCE { 
+    cwsSoftwareActiveSoftwareTableSnmpKey Integer32,
+    cwsSoftwareActiveSoftwareVersion StringMaxl32,
+    cwsSoftwareActiveSoftwareBuildNumber StringMaxl32,
+    cwsSoftwareActiveSoftwareBuildDate StringMaxl32,
+    cwsSoftwareActiveSoftwareCatalogName StringMaxl64,
+    cwsSoftwareActiveSoftwareNumberOfComponents Unsigned32 
+}
+
+cwsSoftwareActiveSoftwareTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsSoftwareActiveSoftware"
+    ::= { cwsSoftwareActiveSoftwareEntry 1 }
+
+cwsSoftwareActiveSoftwareVersion OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Active software release version."
+    ::= { cwsSoftwareActiveSoftwareEntry 2 }
+
+cwsSoftwareActiveSoftwareBuildNumber OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Active software release build number."
+    ::= { cwsSoftwareActiveSoftwareEntry 3 }
+
+cwsSoftwareActiveSoftwareBuildDate OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Active software release build date."
+    ::= { cwsSoftwareActiveSoftwareEntry 4 }
+
+cwsSoftwareActiveSoftwareCatalogName OBJECT-TYPE
+    SYNTAX StringMaxl64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Active software release catalog name."
+    ::= { cwsSoftwareActiveSoftwareEntry 5 }
+
+cwsSoftwareActiveSoftwareNumberOfComponents OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The active software release component count."
+    ::= { cwsSoftwareActiveSoftwareEntry 6 }
+
+cwsSoftwareActivecomponentsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsSoftwareActivecomponentsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsSoftwareMIB 8 }
+
+cwsSoftwareActivecomponentsEntry OBJECT-TYPE
+    SYNTAX CwsSoftwareActivecomponentsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsSoftwareActivecomponentsTable."
+    INDEX { cwsSoftwareActivecomponentsComponentIndex }
+    ::= { cwsSoftwareActivecomponentsTable 1 }
+
+CwsSoftwareActivecomponentsEntry ::= SEQUENCE { 
+    cwsSoftwareActivecomponentsComponentIndex Integer32,
+    cwsSoftwareActivecomponentsName StringMaxl32,
+    cwsSoftwareActivecomponentsVersion StringMaxl32,
+    cwsSoftwareActivecomponentsBuildNumber StringMaxl32,
+    cwsSoftwareActivecomponentsStatus INTEGER 
+}
+
+cwsSoftwareActivecomponentsComponentIndex OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "The active software component index. Unique id, read-only attribute."
+    ::= { cwsSoftwareActivecomponentsEntry 1 }
+
+cwsSoftwareActivecomponentsName OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The active software component name."
+    ::= { cwsSoftwareActivecomponentsEntry 2 }
+
+cwsSoftwareActivecomponentsVersion OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The active software component version."
+    ::= { cwsSoftwareActivecomponentsEntry 3 }
+
+cwsSoftwareActivecomponentsBuildNumber OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The active software component build number."
+    ::= { cwsSoftwareActivecomponentsEntry 4 }
+
+cwsSoftwareActivecomponentsStatus OBJECT-TYPE
+    SYNTAX INTEGER { unknown(0), active(1), failed(2), pending(3), restarting(4) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The active software component status."
+    ::= { cwsSoftwareActivecomponentsEntry 5 }
+
+cwsSoftwareBootPartitionListTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsSoftwareBootPartitionListEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsSoftwareMIB 9 }
+
+cwsSoftwareBootPartitionListEntry OBJECT-TYPE
+    SYNTAX CwsSoftwareBootPartitionListEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsSoftwareBootPartitionListTable."
+    INDEX { cwsSoftwareBootPartitionListIndex }
+    ::= { cwsSoftwareBootPartitionListTable 1 }
+
+CwsSoftwareBootPartitionListEntry ::= SEQUENCE { 
+    cwsSoftwareBootPartitionListIndex Integer32,
+    cwsSoftwareBootPartitionListName INTEGER,
+    cwsSoftwareBootPartitionListVersion StringMaxl32,
+    cwsSoftwareBootPartitionListDate StringMaxl32,
+    cwsSoftwareBootPartitionListState INTEGER,
+    cwsSoftwareBootPartitionListIntegrityCheck INTEGER 
+}
+
+cwsSoftwareBootPartitionListIndex OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique id, read-only attribute."
+    ::= { cwsSoftwareBootPartitionListEntry 1 }
+
+cwsSoftwareBootPartitionListName OBJECT-TYPE
+    SYNTAX INTEGER { unknown(0), kernel0(1), bootloader0(2), kernel1(3), bootloader1(4), firmware0(5), firmware1(6), backupbl(7) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The partition name."
+    ::= { cwsSoftwareBootPartitionListEntry 2 }
+
+cwsSoftwareBootPartitionListVersion OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The partition version."
+    ::= { cwsSoftwareBootPartitionListEntry 3 }
+
+cwsSoftwareBootPartitionListDate OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The partition date."
+    ::= { cwsSoftwareBootPartitionListEntry 4 }
+
+cwsSoftwareBootPartitionListState OBJECT-TYPE
+    SYNTAX INTEGER { unknown(0), active(1), standby(2), notapplicable(3) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The partition state."
+    ::= { cwsSoftwareBootPartitionListEntry 5 }
+
+cwsSoftwareBootPartitionListIntegrityCheck OBJECT-TYPE
+    SYNTAX INTEGER { unknown(0), pass(1), invalid(2) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The partition integrity check."
+    ::= { cwsSoftwareBootPartitionListEntry 6 }
+
+cwsSoftwareVersionsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsSoftwareVersionsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsSoftwareMIB 10 }
+
+cwsSoftwareVersionsEntry OBJECT-TYPE
+    SYNTAX CwsSoftwareVersionsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsSoftwareVersionsTable."
+    INDEX { cwsSoftwareVersionsIndex }
+    ::= { cwsSoftwareVersionsTable 1 }
+
+CwsSoftwareVersionsEntry ::= SEQUENCE { 
+    cwsSoftwareVersionsIndex Integer32,
+    cwsSoftwareVersionsVersion StringMaxl32,
+    cwsSoftwareVersionsBuildNumber StringMaxl32,
+    cwsSoftwareVersionsBuildTag StringMaxl32,
+    cwsSoftwareVersionsBuildDate StringMaxl32,
+    cwsSoftwareVersionsSize Unsigned32,
+    cwsSoftwareVersionsNumberOfComponents Unsigned32 
+}
+
+cwsSoftwareVersionsIndex OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique id, read-only attribute."
+    ::= { cwsSoftwareVersionsEntry 1 }
+
+cwsSoftwareVersionsVersion OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The software installed version."
+    ::= { cwsSoftwareVersionsEntry 2 }
+
+cwsSoftwareVersionsBuildNumber OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The software installed build number."
+    ::= { cwsSoftwareVersionsEntry 3 }
+
+cwsSoftwareVersionsBuildTag OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The software installed build tag."
+    ::= { cwsSoftwareVersionsEntry 4 }
+
+cwsSoftwareVersionsBuildDate OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The software release build date."
+    ::= { cwsSoftwareVersionsEntry 5 }
+
+cwsSoftwareVersionsSize OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The software package size in MB."
+    ::= { cwsSoftwareVersionsEntry 6 }
+
+cwsSoftwareVersionsNumberOfComponents OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The installed software component count."
+    ::= { cwsSoftwareVersionsEntry 7 }
+
+cwsSoftwareInstalledcomponentsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsSoftwareInstalledcomponentsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsSoftwareMIB 11 }
+
+cwsSoftwareInstalledcomponentsEntry OBJECT-TYPE
+    SYNTAX CwsSoftwareInstalledcomponentsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsSoftwareInstalledcomponentsTable."
+    INDEX { cwsSoftwareVersionsIndex, cwsSoftwareInstalledcomponentsComponentIndex }
+    ::= { cwsSoftwareInstalledcomponentsTable 1 }
+
+CwsSoftwareInstalledcomponentsEntry ::= SEQUENCE { 
+    cwsSoftwareInstalledcomponentsComponentIndex Integer32,
+    cwsSoftwareInstalledcomponentsName StringMaxl32,
+    cwsSoftwareInstalledcomponentsVersion StringMaxl32,
+    cwsSoftwareInstalledcomponentsBuildNumber StringMaxl32,
+    cwsSoftwareInstalledcomponentsBuildTag StringMaxl32,
+    cwsSoftwareInstalledcomponentsBuildTimestamp StringMaxl32,
+    cwsSoftwareInstalledcomponentsBuildSize Unsigned32 
+}
+
+cwsSoftwareInstalledcomponentsComponentIndex OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique id, read-only attribute."
+    ::= { cwsSoftwareInstalledcomponentsEntry 1 }
+
+cwsSoftwareInstalledcomponentsName OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The installed software component name."
+    ::= { cwsSoftwareInstalledcomponentsEntry 2 }
+
+cwsSoftwareInstalledcomponentsVersion OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The installed software component version."
+    ::= { cwsSoftwareInstalledcomponentsEntry 3 }
+
+cwsSoftwareInstalledcomponentsBuildNumber OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The installed software component build number."
+    ::= { cwsSoftwareInstalledcomponentsEntry 4 }
+
+cwsSoftwareInstalledcomponentsBuildTag OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The installed software component build tag."
+    ::= { cwsSoftwareInstalledcomponentsEntry 5 }
+
+cwsSoftwareInstalledcomponentsBuildTimestamp OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The installed software component build timestamp."
+    ::= { cwsSoftwareInstalledcomponentsEntry 6 }
+
+cwsSoftwareInstalledcomponentsBuildSize OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The installed software component build size."
+    ::= { cwsSoftwareInstalledcomponentsEntry 7 }
+
+
+
+-- Conformance statements
+cienaWsSoftwareObjects OBJECT IDENTIFIER
+    ::= { cienaWsSoftwareMIB 1 }
+
+cienaWsSoftwareConformance OBJECT IDENTIFIER
+    ::= { cienaWsSoftwareMIB 2 }
+
+cienaWsSoftwareGroups OBJECT IDENTIFIER
+    ::= { cienaWsSoftwareConformance 1 }
+
+cienaWsSoftwareGroup OBJECT-GROUP
+    OBJECTS { 
+        cwsSoftwareStatusSoftwareOperationalState,
+        cwsSoftwareStatusUpgradeOperationalState,
+        cwsSoftwareStatusCommittedVersion,
+        cwsSoftwareStatusActiveVersion,
+        cwsSoftwareStatusUpgradeToVersion,
+        cwsSoftwareStatusLastOperation,
+        cwsSoftwareCheckStatusReportActiveReleaseVersion,
+        cwsSoftwareCheckStatusReportServerReleaseVersion,
+        cwsSoftwareCheckStatusReportLocalReleaseVersion,
+        cwsSoftwareCheckStatusReportServerHostname,
+        cwsSoftwareCheckStatusReportServerPath,
+        cwsSoftwareCheckStatusReportTimestamp,
+        cwsSoftwareCheckStatusReportCheckOperationalState,
+        cwsSoftwareCheckStatusReportCheckUpgradeState,
+        cwsSoftwareCheckStatusReportRequiredActivationType,
+        cwsSoftwareCheckStatusReportServiceInterruptionActivation,
+        cwsSoftwareUpgradeServerIndex,
+        cwsSoftwareUpgradeServerServer,
+        cwsSoftwareUpgradeServerMode,
+        cwsSoftwareUpgradeServerRemotePath,
+        cwsSoftwareUpgradeServerLoginId,
+        cwsSoftwareUpgradeServerPassword,
+        cwsSoftwareUpgradeLogListDateAndTime,
+        cwsSoftwareUpgradeLogListText,
+        cwsSoftwareActiveSoftwareVersion,
+        cwsSoftwareActiveSoftwareBuildNumber,
+        cwsSoftwareActiveSoftwareBuildDate,
+        cwsSoftwareActiveSoftwareCatalogName,
+        cwsSoftwareActiveSoftwareNumberOfComponents,
+        cwsSoftwareActivecomponentsName,
+        cwsSoftwareActivecomponentsVersion,
+        cwsSoftwareActivecomponentsBuildNumber,
+        cwsSoftwareActivecomponentsStatus,
+        cwsSoftwareBootPartitionListName,
+        cwsSoftwareBootPartitionListVersion,
+        cwsSoftwareBootPartitionListDate,
+        cwsSoftwareBootPartitionListState,
+        cwsSoftwareBootPartitionListIntegrityCheck,
+        cwsSoftwareVersionsVersion,
+        cwsSoftwareVersionsBuildNumber,
+        cwsSoftwareVersionsBuildTag,
+        cwsSoftwareVersionsBuildDate,
+        cwsSoftwareVersionsSize,
+        cwsSoftwareVersionsNumberOfComponents,
+        cwsSoftwareInstalledcomponentsName,
+        cwsSoftwareInstalledcomponentsVersion,
+        cwsSoftwareInstalledcomponentsBuildNumber,
+        cwsSoftwareInstalledcomponentsBuildTag,
+        cwsSoftwareInstalledcomponentsBuildTimestamp,
+        cwsSoftwareInstalledcomponentsBuildSize
+    }
+    STATUS current
+    DESCRIPTION "Conformance Group"
+    ::= { cienaWsSoftwareGroups 1 }
+
+cienaWsSoftwareCompliances OBJECT IDENTIFIER
+    ::= { cienaWsSoftwareConformance 2 }
+
+cienaWsSoftwareCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION "Compliance"
+    MODULE MANDATORY-GROUPS { cienaWsSoftwareGroup }
+    ::= { cienaWsSoftwareCompliances 1 }
+
+END -- End module

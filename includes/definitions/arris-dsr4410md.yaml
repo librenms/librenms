@@ -1,0 +1,34 @@
+os: arris-dsr4410md
+text: 'Arris Satellite Receiver'
+type: network
+icon: arris
+mib_dir:
+    - arris
+over:
+    - { graph: device_wireless_rssi, text: Sat Signal Level }
+    - { graph: device_wireless_quality, text: Sat Signal Quality }
+discovery:
+    -
+      snmpget: 
+          oid: .1.3.6.1.4.1.1166.1.621.14.2.0
+          op: 'contains'
+          value: DSR
+discovery_modules:
+    ports: false
+    mempools: false
+    processors: false
+    fdb-table: false
+    stp: false
+    ntp: false
+    bgp-peers: false
+    arp-table: false
+    vlans: false
+    ucd-diskio: false
+    cisco-vrf-lite: false
+    entity-physical: false
+    ports-stack: false
+    ipv6-addresses: false
+    services: false
+    discovery-protocols: false
+    hr-device: false
+    storage: false

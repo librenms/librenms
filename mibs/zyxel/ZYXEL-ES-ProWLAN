@@ -1,0 +1,36 @@
+-- **********************************************
+-- ZyXEL Communications Corporation
+--
+-- Enterprise Solution MIB definitions
+-- ProWLAN MIBs 
+--
+-- LiKuang Tsai
+--
+-- Copyright by ZyXEL Communications Corp.
+-- All rights reserved.
+-- **********************************************
+
+ZYXEL-ES-ProWLAN DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+	MODULE-IDENTITY,
+	OBJECT-IDENTITY,
+	OBJECT-TYPE		FROM SNMPv2-SMI
+
+	OBJECT-GROUP,
+	MODULE-COMPLIANCE	FROM SNMPv2-CONF
+
+	esProductSpecific			FROM ZYXEL-ES-SMI;
+
+esProWLAN MODULE-IDENTITY
+	LAST-UPDATED	"201010060000Z"    
+	ORGANIZATION "Enterprise Solution ZyXEL"     
+	CONTACT-INFO
+		""	   
+	DESCRIPTION
+		"The subtree for ProWLAN product line"
+	::= { esProductSpecific 1 }
+                               	                           
+END
+

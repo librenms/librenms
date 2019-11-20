@@ -1,0 +1,25 @@
+ASENTRIA-ROOT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY,
+	enterprises
+		FROM SNMPv2-SMI;
+
+asentria MODULE-IDENTITY
+	LAST-UPDATED "201003090000Z"
+	ORGANIZATION "Asentria Corporation"
+	CONTACT-INFO
+     "Phone:  206-344-8800
+      Fax:    206-344-2116
+      Email:  support@asentria.com"
+    DESCRIPTION
+      "Asentria root MIB module"
+    REVISION      "201003090000Z"
+    DESCRIPTION
+      "Updated CONTACT-INFO comment."
+    REVISION      "200709090000Z"
+    DESCRIPTION
+      "Asentria root MIB module"
+    ::= { enterprises 3052 }
+    --1.3.6.1.4.1.3052
+END

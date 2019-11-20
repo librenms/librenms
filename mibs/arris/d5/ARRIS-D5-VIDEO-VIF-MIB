@@ -1,0 +1,238 @@
+ARRIS-D5-VIDEO-VIF-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        arrisD5UEQam
+            FROM ARRIS-MIB
+        MODULE-IDENTITY,
+        NOTIFICATION-TYPE,
+        OBJECT-TYPE,
+        Integer32,
+        Unsigned32
+                FROM SNMPv2-SMI
+        DateAndTime,
+        TEXTUAL-CONVENTION,
+        RowStatus,
+        TruthValue
+                FROM SNMPv2-TC
+        OBJECT-GROUP,
+        NOTIFICATION-GROUP,
+        MODULE-COMPLIANCE
+                FROM SNMPv2-CONF
+        ifIndex,
+        InterfaceIndex
+                FROM IF-MIB
+        InetAddress,
+        InetAddressType
+                FROM INET-ADDRESS-MIB
+        SnmpAdminString 
+                FROM SNMP-FRAMEWORK-MIB;
+
+    arrisD5UEQamVIFMib MODULE-IDENTITY
+		LAST-UPDATED "200712170000Z" -- 17th December 2007
+		ORGANIZATION "Arris Group"
+		CONTACT-INFO
+				"       Software Development
+						Postal: ARRIS Group
+										3871 Lakefield Drive
+										Suwanee, GA 30024
+										USA
+						Tel:    800-469-6569
+						Fax:    678-473-8770"
+
+		DESCRIPTION
+				"This MIB manages the virtual-interfaces on the
+				 ARRIS D5 product"
+		::= { arrisD5UEQam 14 }
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+-- VIRTUAL-INTERFACE LOOPBACK TABLE
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+    d5UEQamVirtualInterfaceLbTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF D5UEQamVirtualInterfaceLbEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Arris UEQ Proprietry Virtual-Interface Loopback Table"
+        ::= { arrisD5UEQamVIFMib 1 }
+    
+    d5UEQamVirtualInterfaceLbEntry OBJECT-TYPE
+        SYNTAX      D5UEQamVirtualInterfaceLbEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A row in the d5UEQamVirtualInterfaceLbTable.
+            An entry in this table exists for each loopback
+		    configured as a virtual-interface" 
+        INDEX {d5UEQamVirtualInterfaceLbVifNumber}
+        ::= { d5UEQamVirtualInterfaceLbTable 1 }
+    
+    D5UEQamVirtualInterfaceLbEntry ::= SEQUENCE {
+		d5UEQamVirtualInterfaceLbVifNumber          Unsigned32,
+		d5UEQamVirtualInterfaceLbNumber             Unsigned32,
+		d5UEQamVirtualInterfaceLbIpAddress          IpAddress,
+		d5UEQamVirtualInterfaceLbIpMask             IpAddress,
+		d5UEQamVirtualInterfaceLbIpBCastAddress     IpAddress,
+		d5UEQamVirtualInterfaceLbIpDHCP             TruthValue,
+		d5UEQamVirtualInterfaceLbManagementAccess   TruthValue,
+		d5UEQamVirtualInterfaceLbAdminState         TruthValue,
+        d5UEQamVirtualInterfaceLbIfIndex            InterfaceIndex,
+        d5UEQamVirtualInterfaceLbStatus             RowStatus
+    }
+
+    d5UEQamVirtualInterfaceLbVifNumber OBJECT-TYPE
+        SYNTAX          Unsigned32 (1..2)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "virtual-interface identifier"
+        ::= { d5UEQamVirtualInterfaceLbEntry 1 }
+
+    d5UEQamVirtualInterfaceLbNumber OBJECT-TYPE
+        SYNTAX          Unsigned32 (1..16)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "number of loopback interface to be used as a virtual-interface"
+        ::= { d5UEQamVirtualInterfaceLbEntry 2 }
+
+    d5UEQamVirtualInterfaceLbIpAddress OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION 
+            "primary ip address of virtual-interface"
+        ::= { d5UEQamVirtualInterfaceLbEntry 3 }   
+
+    d5UEQamVirtualInterfaceLbIpMask OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION 
+            "primary ip subnet mask of virtual-interface"
+        ::= { d5UEQamVirtualInterfaceLbEntry 4 }   
+
+    d5UEQamVirtualInterfaceLbIpBCastAddress OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION 
+            "primary ip subnet broadcast address 
+	        of virtual-interface"
+        ::= { d5UEQamVirtualInterfaceLbEntry 5 }   
+
+    d5UEQamVirtualInterfaceLbIpDHCP OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION 
+	        "states if the ip addresses was configured via DHCP or not"
+        ::= { d5UEQamVirtualInterfaceLbEntry 6 }
+
+    d5UEQamVirtualInterfaceLbManagementAccess OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION 
+	        "controls management-access state of virtual-interface"
+        ::= { d5UEQamVirtualInterfaceLbEntry 7 }
+
+    d5UEQamVirtualInterfaceLbAdminState OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION 
+	        "controls admin state of virtual-interface"
+        ::= { d5UEQamVirtualInterfaceLbEntry 8 }
+
+    d5UEQamVirtualInterfaceLbIfIndex OBJECT-TYPE
+        SYNTAX     InterfaceIndex
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The ifIndex value of the virtual-interface."
+        ::= { d5UEQamVirtualInterfaceLbEntry 9 }
+
+    d5UEQamVirtualInterfaceLbStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS	read-create
+        STATUS	current
+        DESCRIPTION
+            "Controls and reflects the status of rows in this table." 
+        ::= { d5UEQamVirtualInterfaceLbEntry 10 }
+
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+-- VIRTUAL-INTERFACE PHYSICAL TABLE
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+    d5UEQamVirtualInterfacePhyTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF D5UEQamVirtualInterfacePhyEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Arris D5 UEQ Virtual-Interface Table"
+        ::= { arrisD5UEQamVIFMib 2 }
+    
+    d5UEQamVirtualInterfacePhyEntry OBJECT-TYPE
+        SYNTAX      D5UEQamVirtualInterfacePhyEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A row in the d5UEQamVirtualInterfacePhyTable.
+            An entry in this table exists for each physical port
+		    configured as a member of a virtual-interface" 
+        INDEX {d5UEQamVirtualInterfacePhyNumber, d5UEQamVirtualInterfacePhyPriority}
+        ::= { d5UEQamVirtualInterfacePhyTable 1 }
+    
+    D5UEQamVirtualInterfacePhyEntry ::= SEQUENCE {
+		d5UEQamVirtualInterfacePhyNumber     Unsigned32,
+        d5UEQamVirtualInterfacePhyPriority   Unsigned32,
+        d5UEQamVirtualInterfacePhyIfIndex    InterfaceIndex,
+        d5UEQamVirtualInterfacePhyVlan       Unsigned32,
+        d5UEQamVirtualInterfacePhyStatus     RowStatus
+    }
+    
+    d5UEQamVirtualInterfacePhyNumber OBJECT-TYPE
+        SYNTAX          Unsigned32(1..2)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "virtual-interface number, virtual-interface must exist before 
+             attempting to add/remove a subinterface "
+        ::= { d5UEQamVirtualInterfacePhyEntry 1 }
+
+    d5UEQamVirtualInterfacePhyPriority OBJECT-TYPE
+        SYNTAX          Unsigned32(1..6)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "virtual-interface priority, 1 indicates highest priority,
+             6 is the lowest. Order in which physical links will become
+             operational "
+        ::= { d5UEQamVirtualInterfacePhyEntry 2 }
+
+    d5UEQamVirtualInterfacePhyIfIndex OBJECT-TYPE
+        SYNTAX     InterfaceIndex
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+            "The ifIndex value of the subinterface being added to or removed from the 
+             virtual-interface, must be primary subinterface of a port."
+        ::= { d5UEQamVirtualInterfacePhyEntry 3 }
+
+    d5UEQamVirtualInterfacePhyVlan OBJECT-TYPE
+        SYNTAX          Unsigned32(0..4094)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "vlan to be used when the link becomes operational, zero indicates unencapsulated"
+        ::= { d5UEQamVirtualInterfacePhyEntry 4 }
+
+    d5UEQamVirtualInterfacePhyStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS	read-create
+        STATUS	current
+        DESCRIPTION
+            "Controls and reflects the status of rows in this table." 
+        ::= { d5UEQamVirtualInterfacePhyEntry 5 }
+
+END

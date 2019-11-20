@@ -25,14 +25,46 @@
 
 namespace LibreNMS\Tests;
 
-class AlertTest extends \PHPUnit_Framework_TestCase
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use RecursiveRegexIterator;
+use RegexIterator;
+
+class AlertTest extends TestCase
 {
     public function testJsonAlertCollection()
     {
         $rules = get_rules_from_json();
-        $this->assertInternalType('array', $rules);
+        $this->assertIsArray($rules);
         foreach ($rules as $rule) {
-            $this->assertInternalType('array', $rule);
+            $this->assertIsArray($rule);
         }
+    }
+
+    public function testTransports()
+    {
+        foreach ($this->getTransportFiles() as $file => $_unused) {
+            $parts = explode('/', $file);
+            $transport  = ucfirst(str_replace('.php', '', array_pop($parts)));
+            $class = 'LibreNMS\\Alert\\Transport\\'.$transport;
+            if (!class_exists($class)) {
+                $this->assertTrue(false, "The transport $transport does not exist");
+            } else {
+                $methods = ['deliverAlert', 'configTemplate', 'contact'.$transport];
+                foreach ($methods as $method) {
+                    if (!method_exists($class, $method)) {
+                        $this->assertTrue(false, "The transport $transport does not have the method $method");
+                    }
+                }
+            }
+        }
+
+        $this->expectNotToPerformAssertions();
+    }
+
+    private function getTransportFiles()
+    {
+        $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator('LibreNMS/Alert/Transport'));
+        return new RegexIterator($iterator, '/^.+\.php$/i', RecursiveRegexIterator::GET_MATCH);
     }
 }

@@ -1,0 +1,436 @@
+-- **********************************************
+-- ZyXEL Communications Corporation
+--
+-- Enterprise Solution MIB definitions
+-- WIRELESS MIBs (WIRELESS)
+--
+-- Copyright by ZyXEL Communications Corp.
+-- All rights reserved.
+-- **********************************************
+
+ZYXEL-ES-WIRELESS DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+	MODULE-IDENTITY,
+	OBJECT-IDENTITY,
+	OBJECT-TYPE			FROM SNMPv2-SMI
+
+	OBJECT-GROUP,
+	MODULE-COMPLIANCE	FROM SNMPv2-CONF
+
+	DisplayString, MacAddress, DateAndTime	FROM SNMPv2-TC
+
+	esMgmt				FROM ZYXEL-ES-SMI;
+
+
+--
+-- Node: esWireless
+-- includes wlanRadioTable, wlanStationTable, wlanStatisticsTable, wlanTraps
+--
+
+esWireless MODULE-IDENTITY
+	LAST-UPDATED		"201009200000Z"
+	ORGANIZATION	"Enterprise Solution ZyXEL"
+	CONTACT-INFO		""
+	DESCRIPTION
+		"The sub tree for Wireless information"
+	::= { esMgmt 5 }
+
+
+--
+-- Node: wlanRadioTable
+--
+
+wlanRadioTable OBJECT-TYPE
+        SYNTAX		SEQUENCE OF WlanRadioEntry
+        MAX-ACCESS	not-accessible
+        STATUS		current
+        DESCRIPTION
+		"This table lists WLAN Radio information. Use chipIndex as the index of each entry"
+        ::= { esWireless 1 }
+
+wlanRadioEntry OBJECT-TYPE
+        SYNTAX		WlanRadioEntry
+        MAX-ACCESS	not-accessible
+        STATUS		current
+        DESCRIPTION
+		"An entry describing WLAN Radio information for each chip."
+        INDEX {ifIndex }
+        ::= {  wlanRadioTable 1 }
+
+WlanRadioEntry ::= SEQUENCE {
+	wlanCurrentChannel	INTEGER,
+	wlanStationCount		Unsigned32,
+	wlanSupportedChannel	OCTET STRING,
+	wlanMode			INTEGER,
+	wlanChannel			INTEGER,
+	}
+
+    	wlanCurrentChannel OBJECT-TYPE
+ 		SYNTAX		INTEGER {
+ 			device_is_disable(0),
+ 			channel-01_2412mhz(1),
+ 			channel-02_2417mhz(2),
+ 			channel-03_2422mhz(3),
+ 			channel-04_2427mhz(4),
+			channel-05_2432mhz(5),
+			channel-06_2437mhz(6),
+			channel-07_2442mhz(7),
+			channel-08_2447mhz(8),
+			channel-09_2452mhz(9),
+			channel-10_2457mhz(10),
+			channel-11_2462mhz(11),
+			channel-12_2467mhz(12),
+			channel-13_2472mhz(13),
+
+			channel-36_5180mhz(36),
+			channel-40_5200mhz(40),
+			channel-44_5220mhz(44),
+			channel-48_5240mhz(48),
+			channel-52_5260mhz(52),
+			channel-56_5280mhz(56),
+			channel-60_5300mhz(60),
+			channel-64_5320mhz(64),
+			channel-100_5500mhz(100),
+			channel-104_5520mhz(104),
+			channel-108_5540mhz(108),
+			channel-112_5560mhz(112),
+			channel-116_5580mhz(116),
+			channel-120_5600mhz(120),
+			channel-124_5620mhz(124),
+			channel-128_5640mhz(128),
+			channel-132_5660mhz(132),
+			channel-136_5680mhz(136),
+			channel-140_5700mhz(140),
+			channel-149_5745mhz(149),
+			channel-153_5765mhz(153),
+			channel-157_5785mhz(157),
+			channel-161_5805mhz(161),
+			channel-165_5825mhz(165)
+ 		}
+	        MAX-ACCESS	read-only
+	        STATUS		current
+	        DESCRIPTION
+			"The current operating wireless channel."
+	        ::= { wlanRadioEntry 1 }
+
+	wlanStationCount OBJECT-TYPE
+	 	SYNTAX		Unsigned32
+	        MAX-ACCESS	read-only
+	        STATUS		current
+	        DESCRIPTION
+			"The total numbers of associated stations"
+	        ::= { wlanRadioEntry 2 }
+
+	wlanSupportedChannel OBJECT-TYPE
+	 	SYNTAX		OCTET STRING
+	        MAX-ACCESS	read-only
+	        STATUS		current
+	        DESCRIPTION
+			"The wireless channels supported by WLAN in this regulatory domain"
+	        ::= { wlanRadioEntry 3 }
+
+	wlanMode OBJECT-TYPE
+	 	SYNTAX		INTEGER {
+			mode_2_4G(1),
+	 		mode_5G(2)
+		}
+	        MAX-ACCESS	read-write
+	        STATUS		current
+	        DESCRIPTION
+			"The control for WLAN radio mode."
+	        ::= { wlanRadioEntry 5 }
+
+	wlanChannel   OBJECT-TYPE
+ 		SYNTAX		INTEGER {
+ 			channel-01_2412mhz(1),
+ 			channel-02_2417mhz(2),
+ 			channel-03_2422mhz(3),
+ 			channel-04_2427mhz(4),
+			channel-05_2432mhz(5),
+			channel-06_2437mhz(6),
+			channel-07_2442mhz(7),
+			channel-08_2447mhz(8),
+			channel-09_2452mhz(9),
+			channel-10_2457mhz(10),
+			channel-11_2462mhz(11),
+			channel-12_2467mhz(12),
+			channel-13_2472mhz(13),
+
+			channel-36_5180mhz(36),
+			channel-40_5200mhz(40),
+			channel-44_5220mhz(44),
+			channel-48_5240mhz(48),
+			channel-52_5260mhz(52),
+			channel-56_5280mhz(56),
+			channel-60_5300mhz(60),
+			channel-64_5320mhz(64),
+			channel-100_5500mhz(100),
+			channel-104_5520mhz(104),
+			channel-108_5540mhz(108),
+			channel-112_5560mhz(112),
+			channel-116_5580mhz(116),
+			channel-120_5600mhz(120),
+			channel-124_5620mhz(124),
+			channel-128_5640mhz(128),
+			channel-132_5660mhz(132),
+			channel-136_5680mhz(136),
+			channel-140_5700mhz(140),
+			channel-149_5745mhz(149),
+			channel-153_5765mhz(153),
+			channel-157_5785mhz(157),
+			channel-161_5805mhz(161),
+			channel-165_5825mhz(165)
+ 		}
+	        MAX-ACCESS	read-write
+	        STATUS		current
+	        DESCRIPTION
+			"The control for WLAN channel. When setting this
+			parameter, the value should be a subset of all supported channel"
+	        ::= { wlanRadioEntry 6 }
+
+
+--
+-- Node: wlanStationTable
+--
+
+wlanStationTable OBJECT-TYPE
+        SYNTAX		SEQUENCE OF WlanStationEntry
+        MAX-ACCESS	not-accessible
+        STATUS		current
+        DESCRIPTION
+		"This table lists the associated stations."
+        ::= { esWireless 2 }
+
+wlanStationEntry OBJECT-TYPE
+        SYNTAX		WlanStationEntry
+        MAX-ACCESS	not-accessible
+        STATUS		current
+        DESCRIPTION
+		"An entry describing the station information."
+        INDEX { stationIndex  }
+        ::= {  wlanStationTable 1 }
+
+WlanStationEntry ::= SEQUENCE {
+	stationIndex			Integer32,
+	stationMacAddress		MacAddress,
+	stationAssociatedTime	DateAndTime,
+	stationSSID			OCTET STRING
+	}
+
+	stationIndex OBJECT-TYPE
+	        SYNTAX		Integer32 (1..2147483647)
+	        MAX-ACCESS	not-accessible
+	        STATUS		current
+	        DESCRIPTION
+			"Index of stations."
+	        ::= { wlanStationEntry 1 }
+
+	stationMacAddress OBJECT-TYPE
+	        SYNTAX		MacAddress             
+	        MAX-ACCESS	read-only
+	        STATUS		current
+	        DESCRIPTION
+			"The MAC Addresss of the station."
+	        DEFVAL { "public" }
+	        ::= { wlanStationEntry 2 }
+
+	stationAssociatedTime OBJECT-TYPE
+	        SYNTAX		DateAndTime
+	        MAX-ACCESS	read-only
+	        STATUS		current
+	        DESCRIPTION
+			"The associated time of the station."
+	        ::= { wlanStationEntry 3 }
+
+	stationSSID OBJECT-TYPE
+	        SYNTAX		OCTET STRING
+	        MAX-ACCESS	read-only
+	        STATUS		current
+	        DESCRIPTION
+			"The associated ssid."
+	        ::= { wlanStationEntry 4 }
+
+
+--
+-- Node: wlanStatistics
+--
+
+wlanStatisticsTable OBJECT-TYPE
+        SYNTAX		SEQUENCE OF WlanStatisticsEntry
+        MAX-ACCESS	not-accessible
+        STATUS		current
+        DESCRIPTION
+		"This table lists WLAN statistics information. Use chipIndex as the index of each entry"
+        ::= { esWireless 3 }
+
+wlanStatisticsEntry OBJECT-TYPE
+        SYNTAX		WlanStatisticsEntry
+        MAX-ACCESS	not-accessible
+        STATUS		current
+        DESCRIPTION
+		"An entry describing WLAN statistics information."
+        INDEX { ifIndex  }
+        ::= {  wlanStatisticsTable 1 }
+
+WlanStatisticsEntry ::= SEQUENCE {
+	dot11FailedCount				Counter64,
+	dot11RetryCount 				Counter64,
+	dot11ACKFailureCount 			Counter64,
+	dot11ReceivedFragmentCount   	Counter64,
+	dot11TransmittedFrameCount		Counter64,
+	dot11ReceivedPktCount     		Counter64,
+	dot11TransmittedPktCount 		Counter64
+	}
+
+	dot11FailedCount  OBJECT-TYPE
+	        SYNTAX		Counter64
+	        MAX-ACCESS	read-only
+	        STATUS		current
+	        DESCRIPTION
+		        "This counter shall increment when an MSDU is not transmitted
+		        successfully due to the number of transmit attempts exceeding
+		        either the  dot11ShortRetryLimit or dot11LongRetryLimit. "
+		::= {  wlanStatisticsEntry 1 }
+
+	dot11RetryCount OBJECT-TYPE
+	        SYNTAX		Counter64
+	        MAX-ACCESS	read-only
+	        STATUS		current
+	        DESCRIPTION
+			"This counter shall increment when an MSDU is successfully
+			transmitted after one or more retransmissions."
+		::= {  wlanStatisticsEntry 2 }
+
+	dot11ACKFailureCount OBJECT-TYPE
+	        SYNTAX		Counter64
+	        MAX-ACCESS	read-only
+	        STATUS		current
+	        DESCRIPTION
+			"This counter shall increment when an ACK is not received
+			when expected."
+		::= {  wlanStatisticsEntry 3 }
+
+	dot11ReceivedFragmentCount OBJECT-TYPE
+	        SYNTAX		Counter64
+	        MAX-ACCESS	read-only
+	        STATUS		current
+	        DESCRIPTION
+			"This counter shall be incremented for each successful received
+			MPDU of type Data or Management."
+		::= {  wlanStatisticsEntry 4 }
+
+	dot11TransmittedFrameCount  OBJECT-TYPE
+	        SYNTAX		Counter64
+	        MAX-ACCESS	read-only
+	        STATUS		current
+	        DESCRIPTION
+			"This counter shall increment for each successfully transmitted MSDU."
+		::= {  wlanStatisticsEntry 5 }
+
+	dot11ReceivedPktCount  OBJECT-TYPE
+	        SYNTAX		Counter64
+	        MAX-ACCESS	read-only
+	        STATUS		current
+	        DESCRIPTION
+			"This counter shall increment for each successfully received packets."
+		::= {  wlanStatisticsEntry 6 }
+
+	dot11TransmittedPktCount  OBJECT-TYPE
+	        SYNTAX		Counter64
+	        MAX-ACCESS	read-only
+	        STATUS		current
+	        DESCRIPTION
+			"This counter shall increment for each successfully transmitted packets."
+		::= {  wlanStatisticsEntry 7 }
+
+
+--
+-- Node: wlanTraps
+--
+                  
+                  
+	wlanTraps			OBJECT-IDENTITY
+		STATUS		current
+		DESCRIPTION
+			"The subtree for WIRELESS"
+		::= { esWireless 4 }
+
+	trapsControl			OBJECT-IDENTITY
+		STATUS		current
+		DESCRIPTION
+			"The subtree for CAPWAP"
+		::= { wlanTraps 1 }
+
+	trapsFormat			OBJECT-IDENTITY
+		STATUS		current
+		DESCRIPTION
+			"The subtree for CAPWAP"
+		::= { wlanTraps 2 }
+
+	trapsItems			OBJECT-IDENTITY
+		STATUS		current
+		DESCRIPTION
+			"The subtree for CAPWAP"
+		::= { wlanTraps 3 }
+        
+                                                      
+-- Traps Control
+ 	wlanTrapsControl OBJECT-TYPE
+ 		SYNTAX INTEGER {
+ 			enable(1),
+ 			disable(2)
+ 		}
+ 		MAX-ACCESS	read-write
+ 		STATUS		current
+ 		DESCRIPTION
+			"Controls wireless group traps enable or disable."
+		::= { trapsControl 1 }
+
+-- Trap Format
+ 	trapGenericMessage OBJECT-TYPE
+		SYNTAX		DisplayString
+	    	MAX-ACCESS	accessible-for-notify
+	    	STATUS		current
+	    	DESCRIPTION
+			"Provide generic information on traps."
+		::= { trapsFormat 1 }
+
+	trapMACAddress OBJECT-TYPE
+	    	SYNTAX		MacAddress     
+	    	MAX-ACCESS	accessible-for-notify
+	    	STATUS		current
+	    	DESCRIPTION
+			"Represents MAC address of the device or the host which triggers the trap."
+		::= { trapsFormat 2 }
+
+	trapWlanSSID OBJECT-TYPE
+	    	SYNTAX		DisplayString
+	    	MAX-ACCESS	accessible-for-notify
+	    	STATUS		current
+	    	DESCRIPTION
+			"The SSID name which the wireless client associates."
+		::= { trapsFormat 3 }
+
+
+--  Trap Items
+	wlanStaAssociation NOTIFICATION-TYPE
+		STATUS		current
+		DESCRIPTION
+			"Wireless client assocication notification."
+		::= { trapsItems 1 }
+
+	wlanStaDisassociation	NOTIFICATION-TYPE
+		STATUS			current
+		DESCRIPTION
+			"Wireless client disassocication notification."
+		::= { trapsItems 2 }
+
+	wlanStaAuthFail	NOTIFICATION-TYPE
+		STATUS		current
+		DESCRIPTION
+			"Wireless client authentication failed."
+		::= { trapsItems 3 }
+
+END

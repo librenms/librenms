@@ -1,0 +1,536 @@
+-- This module defines enterprise MIBs for NAT
+-- 
+-- Copyright (c) 1999-2004, Juniper Networks, Inc.
+-- All rights reserved.
+
+NETSCREEN-NAT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    netscreenNAT
+        FROM NETSCREEN-SMI
+    Integer32, IpAddress, MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    ;
+
+netscreenNATMibModule MODULE-IDENTITY
+    LAST-UPDATED  "200503032022Z" -- March 03, 2005
+    ORGANIZATION
+        "Juniper Networks, Inc."
+    CONTACT-INFO
+        "Customer Support
+
+         1194 North Mathilda Avenue 
+         Sunnyvale, California 94089-1206
+         USA
+
+         Tel: 1-800-638-8296
+         E-mail: customerservice@juniper.net
+         HTTP://www.juniper.net"
+    DESCRIPTION
+        "Added dip pool utilization attribute" 
+    REVISION      "200503030000Z" -- March 03, 2005
+    DESCRIPTION
+        "This module defines the managed objects for Netscreen NAT"
+    REVISION      "200405030000Z" -- May 03, 2004
+    DESCRIPTION
+        "Modified copyright and contact information"
+    REVISION      "200403030000Z" -- March 03, 2004
+    DESCRIPTION
+        "Converted to SMIv2 by Longview Software"
+    REVISION      "200306030000Z" -- June 03, 2003
+    DESCRIPTION
+        "Change VIP configuration per physical interface"
+    REVISION      "200105270000Z" -- May 27, 2001
+    DESCRIPTION
+        "Creation Date"
+    ::= { netscreenNAT 0 }
+
+NsNatDipEntry ::= SEQUENCE
+{
+    nsNatDipIndex     Integer32,
+    nsNatDipId        Integer32,
+    nsNatDipLow       IpAddress,
+    nsNatDipHigh      IpAddress,
+    nsNatDipIfIp      IpAddress,
+    nsNatDipIfNetmask IpAddress,
+    nsNatDipPTEnable  INTEGER,
+    nsNatDipVsys      Integer32,
+    nsNatDipUtil      Integer32
+}
+
+NsNatDipPPortEntry ::= SEQUENCE
+{
+    nsNatDipPPortIndex              Integer32,
+    nsNatDipAllPort                 Integer32,
+    nsNatDipAllocatedPort           Integer32,
+    nsNatDipAvailablePort           Integer32,
+    nsNatDipAllocatedPairedPort     Integer32,
+    nsNatDipAvailablePairedPort     Integer32,
+}
+
+NsNatMipEntry ::= SEQUENCE
+{
+    nsNatMipIndex     Integer32,
+    nsNatMipIp        IpAddress,
+    nsNatMipNetmask   IpAddress,
+    nsNatMipHost      IpAddress,
+    nsNatMipIfIp      IpAddress,
+    nsNatMipIfNetmask IpAddress,
+    nsNatMipVsys      Integer32
+}
+
+NsNatVipCfgEntry ::= SEQUENCE
+{
+    nsNatVipCfgIndex       Integer32,
+    nsNatVipCfgIp          IpAddress,
+    nsNatVipCfgPort        Integer32,
+    nsNatVipCfgService     DisplayString,
+    nsNatVipCfgStatus      INTEGER,
+    nsNatVipCfgLoadBalance INTEGER
+}
+
+NsNatVipServerEntry ::= SEQUENCE
+{
+    nsNatVipServerIndex       Integer32,
+    nsNatVipServerVIP         IpAddress,
+    nsNatVipServerService     Integer32,
+    nsNatVipServerLoadBalance INTEGER,
+    nsNatVipServerIp          IpAddress,
+    nsNatVipServerWeight      Integer32,
+    nsNatVipServerStatus      INTEGER
+}
+
+nsNatMipTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF NsNatMipEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Mapped IP(MIP) is a direct one-to-one maping of traffic
+         destined  for one IP address ot another IP address. On
+         NetScreen device,  MIP addresses for tunnel and untrusted
+         interfaces can be created."
+    ::= { netscreenNAT 1 }
+
+nsNatMipEntry OBJECT-TYPE
+    SYNTAX        NsNatMipEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry containing attributes of a mip address"
+    INDEX
+        { nsNatMipIndex }
+    ::= { nsNatMipTable 1 }
+
+nsNatMipIndex OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A unique value for each address. Its value ranges between 0
+         and 65535 and may not be contingous."
+    ::= { nsNatMipEntry 1 }
+
+nsNatMipIp OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "mip address. A MIP must be in the same subnet as the tunnel
+         interface to which it is linked to; however, for the untrusted
+         interface, a MIP does not need to be in the same subnet. In
+         either case, a MIP must not  be the same as the interface
+         address or be in any DIP pool that might  also be on that
+         subnet."
+    ::= { nsNatMipEntry 2 }
+
+nsNatMipNetmask OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Subnet mask for this MIP."
+    ::= { nsNatMipEntry 3 }
+
+nsNatMipHost OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Host ip address mip mapping to."
+    ::= { nsNatMipEntry 4 }
+
+nsNatMipIfIp OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Interface's ip address that a MIP is linked to."
+    ::= { nsNatMipEntry 5 }
+
+nsNatMipIfNetmask OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Interface's netmask that a MIP is linked to."
+    ::= { nsNatMipEntry 6 }
+
+nsNatMipVsys OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Virtual system this mip belongs to."
+    ::= { nsNatMipEntry 7 }
+
+nsNatDipTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF NsNatDipEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A DIP(Dynamic IP) pool is a range of IP addresses from which
+         the NetScreen device can dynamically take addresses to use when
+         performing NAT on the source IP address of outgoing or incoming
+         IP packets."
+    ::= { netscreenNAT 2 }
+
+nsNatDipEntry OBJECT-TYPE
+    SYNTAX        NsNatDipEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry containing attributes of a dynamic address"
+    INDEX
+        { nsNatDipIndex }
+    ::= { nsNatDipTable 1 }
+
+nsNatDipIndex OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A unique value for each address.  Its value ranges between 0
+         and 65535 and may not be contigous."
+    ::= { nsNatDipEntry 1 }
+
+nsNatDipId OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "DIP pool id."
+    ::= { nsNatDipEntry 2 }
+
+nsNatDipLow OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Start IP Address Range. The range of addresses in a DIP pool
+         must be in the same subnet as the interface IP address, but the
+         DIP pool  should not contain the interface IP or any MIP or VIP
+         address that might on that subnet."
+    ::= { nsNatDipEntry 3 }
+
+nsNatDipHigh OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "End IP Address Range. The range of addresses in a DIP pool
+         must be in the same subnet as the interface IP address, but the
+         DIP pool  should not contain the interface IP or any MIP or VIP
+         address that might on that subnet."
+    ::= { nsNatDipEntry 4 }
+
+nsNatDipIfIp OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Interface's ip address that a DIP is linked to."
+    ::= { nsNatDipEntry 5 }
+
+nsNatDipIfNetmask OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "interface's ip address that a DIP is linked to."
+    ::= { nsNatDipEntry 6 }
+
+nsNatDipPTEnable OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Enable Port Translation"
+    ::= { nsNatDipEntry 7 }
+
+nsNatDipVsys OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "virtual system this dip belongs to"
+    ::= { nsNatDipEntry 8 }
+
+nsNatDipUtil OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "dip pool utilzation for this entry. Only applicable to fixed dip.  If this is not a fixed dip this will return 0"
+    ::= { nsNatDipEntry 9 }
+
+nsNatDipPPortTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF NsNatDipPPortEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "show pseudo port allocated status of a dynamic address"
+    ::= { netscreenNAT 4 }
+
+nsNatDipPPortEntry OBJECT-TYPE
+    SYNTAX        NsNatDipPPortEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry show pseudo port allocated status of a dynamic address"
+    INDEX
+        { nsNatDipPPortIndex }
+    ::= { nsNatDipPPortTable 1 }
+
+nsNatDipPPortIndex OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A unique value for each address.  Its value ranges between 0
+         and 65535 and may not be contigous."
+    ::= { nsNatDipPPortEntry 1 }
+
+nsNatDipAllPort OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "All port of the dip"
+    ::= { nsNatDipPPortEntry 2 }
+
+nsNatDipAllocatedPort OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Allocated port of the dip"
+    ::= { nsNatDipPPortEntry 3 }
+
+nsNatDipAvailablePort OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Available port of the dip"
+    ::= { nsNatDipPPortEntry 4 }
+
+nsNatDipAllocatedPairedPort OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Allocated paired port of the dip"
+    ::= { nsNatDipPPortEntry 5 }
+
+nsNatDipAvailablePairedPort OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Available paired port of the dip"
+    ::= { nsNatDipPPortEntry 6 }
+
+nsNatVip OBJECT IDENTIFIER ::= { netscreenNAT 3 }
+
+nsNatVipCfgTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF NsNatVipCfgEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "VIP(Virtual IP) allows you to map routable IP addresses to
+         internal servers, therby providing transparent connections for
+         a NAT networks to the Internet. This table collects all VIP
+         configurations in NetScreen device."
+    ::= { nsNatVip 1 }
+
+nsNatVipCfgEntry OBJECT-TYPE
+    SYNTAX        NsNatVipCfgEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Each entry in the nsNatVipCfgTable holds a set of
+         configuration parameters associated with an instance of VIP."
+    INDEX
+        { nsNatVipCfgIndex }
+    ::= { nsNatVipCfgTable 1 }
+
+nsNatVipCfgIndex OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A unique value for each vip configuation.  Its value ranges
+         between 1 and 65535 and may not be contingous."
+    ::= { nsNatVipCfgEntry 1 }
+
+nsNatVipCfgIp OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The IP address for the VIP, which must be in the same subnet
+         as the  untrusted interface and can even be the same address as
+         the untrusted interface."
+    ::= { nsNatVipCfgEntry 2 }
+
+nsNatVipCfgPort OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The port number for communication between the trusted server
+         and the untrusted interfce on the NetScreen device."
+    ::= { nsNatVipCfgEntry 3 }
+
+nsNatVipCfgService OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..255))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Service for the server on the trusted interface."
+    ::= { nsNatVipCfgEntry 4 }
+
+nsNatVipCfgStatus OBJECT-TYPE
+    SYNTAX        INTEGER {
+        not-available(0),
+        available(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The status of the server on the trusted/DMZ interface."
+    ::= { nsNatVipCfgEntry 5 }
+
+nsNatVipCfgLoadBalance OBJECT-TYPE
+    SYNTAX        INTEGER {
+        null(0),
+        round-robin(1),
+        weighted-round-robin(2),
+        least-conns(3),
+        weighted-least-conns(4)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Load balance algorithm for the Virtual IP servers."
+    ::= { nsNatVipCfgEntry 6 }
+
+nsNatVipServerTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF NsNatVipServerEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Ballancing the loads on NetScreen servers allow traffic
+         intended for a server(one IP address on the untrusted network)
+         to be mapped to several different IP addresses on the DMZ or
+         trusted network. There can be up to eight servers in one load
+         balancing group, which apperas as a single virtual server.This
+         table collects all the  server pool configurations for the
+         virtual ip server."
+    ::= { nsNatVip 2 }
+
+nsNatVipServerEntry OBJECT-TYPE
+    SYNTAX        NsNatVipServerEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry containing attributes of a vip configuration's server
+         pool."
+    INDEX
+        { nsNatVipServerIndex }
+    ::= { nsNatVipServerTable 1 }
+
+nsNatVipServerIndex OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A unique value for each vip server  configuation.  Its value
+         ranges between 1 and 65535 and may not be contigous."
+    ::= { nsNatVipServerEntry 1 }
+
+nsNatVipServerVIP OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The IP address for the VIP."
+    ::= { nsNatVipServerEntry 2 }
+
+nsNatVipServerService OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Service provideing through the VIP."
+    ::= { nsNatVipServerEntry 3 }
+
+nsNatVipServerLoadBalance OBJECT-TYPE
+    SYNTAX        INTEGER {
+        null(0),
+        round-robin(1),
+        weighted-round-robin(2),
+        least-conns(3),
+        weighted-least-conns(4)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Load balance algorithm for the vitural IP servers."
+    ::= { nsNatVipServerEntry 4 }
+
+nsNatVipServerIp OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Virtual IP server's IP address."
+    ::= { nsNatVipServerEntry 5 }
+
+nsNatVipServerWeight OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Loadbalance algorithm weight."
+    ::= { nsNatVipServerEntry 6 }
+
+nsNatVipServerStatus OBJECT-TYPE
+    SYNTAX        INTEGER {
+        down(0),
+        up(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Virtual IP server's status."
+    ::= { nsNatVipServerEntry 7 }
+
+END
+
+

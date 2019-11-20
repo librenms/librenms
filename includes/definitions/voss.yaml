@@ -1,0 +1,25 @@
+os: voss
+text: 'Extreme VOSS'
+type: network
+icon: extremevoss
+mib_dir:
+    - nortel
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.1916.2.302 #VSP-7432CQ
+        - .1.3.6.1.4.1.2272.201
+        - .1.3.6.1.4.1.2272.202
+        - .1.3.6.1.4.1.2272.203
+        - .1.3.6.1.4.1.2272.205
+        - .1.3.6.1.4.1.2272.206
+        - .1.3.6.1.4.1.2272.208
+        - .1.3.6.1.4.1.2272.209
+        - .1.3.6.1.4.1.2272.210
+        - .1.3.6.1.4.1.2272.212
+        - .1.3.6.1.4.1.2272.220
+good_if:
+    - 'Virtual Services Platform'

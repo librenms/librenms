@@ -1,0 +1,2588 @@
+   CAMBIUM-PTP500-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+      Integer32, IpAddress,
+      enterprises
+         FROM SNMPv2-SMI
+      MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+         FROM SNMPv2-CONF
+      DisplayString
+         FROM SNMPv2-TC;
+
+   cambium MODULE-IDENTITY
+      LAST-UPDATED "201403141604Z"
+      ORGANIZATION "Cambium Networks Ltd."
+      CONTACT-INFO
+         "Post:  Simon Whitaker
+                 Cambium Networks Ltd.
+                 Unit B2,
+                 Linhay Business Park,
+                 Eastern Road,
+                 Ashburton,
+                 Devon.
+                 TQ13 7UP
+                 United Kingdom
+         Phone:  +44 (0) 1364 655 500
+         Email:  simon.whitaker@cambiumnetworks.com"
+      DESCRIPTION
+         "MIB for 105Mbps non-line-of-sight (NLOS) wireless ethernet bridge."
+      REVISION "201403141604Z"
+      DESCRIPTION "PTP500-05-04:
+         Added aAAControl group containing user table."
+      REVISION "201302080838Z"
+      DESCRIPTION "PTP500-05-03:
+         Removed encryptionEnabledMismatchTrap.
+         Renamed dfsChannelChangeTrap to channelChangeTrap."
+      REVISION "201207091750Z"
+      DESCRIPTION "PTP500-05-02:
+         Corrected REVISION DESCRIPTION clause for 05-01."
+      REVISION "201203281037Z"
+      DESCRIPTION "PTP500-05-01:
+         Updated ORGANIZATION and CONTACT-INFO.
+         Replaced syslogLocalLog with syslogState.
+         Added licensedCapacity and capacityLicenseMismatchTrap as part of SKU reduction.
+         Added support for HTTPS.
+         Added enabledDiagnosticAlarms attribute.
+         Added support for syslog client.
+         Removed lineOfSightModeInactive trap as part of SKU reduction (LOS no longer supported)."
+      REVISION "201107131657Z"
+      DESCRIPTION "PTP500-04-01:
+         Added latitude, longitude, altitude, searchState, accessMethod and groupID."
+      REVISION "201009221449Z"
+      DESCRIPTION "PTP500-04-00:
+         Changed root OID.
+         Added SNMPv3 support, TDD sync, DFS Table, BIT STRING types now OCTET STRING.
+         Added linkName, siteName.
+         Renamed ethernet attributes & traps."
+      REVISION "200905290925Z"
+      DESCRIPTION "PTP500-03-02: Added Telecoms circuit emulation."
+      REVISION "200811041022Z"
+      DESCRIPTION "PTP500-03-00: Added Link Symmetry."
+      REVISION "200806261644Z"
+      DESCRIPTION "PTP500-02-00: Added IEEE 802.1q & 802.1ad VLAN support."
+      REVISION "200804111808Z"
+      DESCRIPTION "PTP500-01-00"
+      ::= { enterprises 17713 }
+
+   -- Groups in cambium
+   ptp                OBJECT IDENTIFIER ::= { cambium 1 }
+   ptmp               OBJECT IDENTIFIER ::= { cambium 2 }
+   ptp500             OBJECT IDENTIFIER ::= { cambium 5 }
+
+   -- Groups in ptp500
+   dfs                OBJECT IDENTIFIER ::= { ptp500 3 }
+   configuration      OBJECT IDENTIFIER ::= { ptp500 5 }
+   ethernet           OBJECT IDENTIFIER ::= { ptp500 6 }
+   telecom            OBJECT IDENTIFIER ::= { ptp500 7 }
+   licence            OBJECT IDENTIFIER ::= { ptp500 8 }
+   management         OBJECT IDENTIFIER ::= { ptp500 9 }
+   phyControl         OBJECT IDENTIFIER ::= { ptp500 10 }
+   phyStatus          OBJECT IDENTIFIER ::= { ptp500 12 }
+   alarms             OBJECT IDENTIFIER ::= { ptp500 13 }
+   smtp               OBJECT IDENTIFIER ::= { ptp500 15 }
+   snmpControl        OBJECT IDENTIFIER ::= { ptp500 16 }
+   sntp               OBJECT IDENTIFIER ::= { ptp500 17 }
+   reset              OBJECT IDENTIFIER ::= { ptp500 18 }
+   versions           OBJECT IDENTIFIER ::= { ptp500 19 }
+   pubStats           OBJECT IDENTIFIER ::= { ptp500 20 }
+   encryption         OBJECT IDENTIFIER ::= { ptp500 22 }
+   tDDControl         OBJECT IDENTIFIER ::= { ptp500 23 }
+   aAAControl         OBJECT IDENTIFIER ::= { ptp500 25 }
+   syslogControl      OBJECT IDENTIFIER ::= { ptp500 24 }
+   supplementary      OBJECT IDENTIFIER ::= { ptp500 96 }
+   ptpGroups          OBJECT IDENTIFIER ::= { ptp500 98 }
+   ptpTraps           OBJECT IDENTIFIER ::= { ptp500 99 }
+   ptpTrapPrefix      OBJECT IDENTIFIER ::= { ptpTraps 0 }
+
+   -- Compliance information
+   --
+   ptpCompliance MODULE-COMPLIANCE
+      STATUS current
+      DESCRIPTION
+         "The compliance statement for the Cambium PTP MIB"
+      MODULE -- this module
+         MANDATORY-GROUPS { dfsGroup
+                          , configurationGroup
+                          , ethernetGroup
+                          , telecomGroup
+                          , licenceGroup
+                          , managementGroup
+                          , phyControlGroup
+                          , phyStatusGroup
+                          , alarmsGroup
+                          , smtpGroup
+                          , snmpControlGroup
+                          , sntpGroup
+                          , resetGroup
+                          , versionsGroup
+                          , pubStatsGroup
+                          , encryptionGroup
+                          , tDDControlGroup
+                          , aAAControlGroup
+                          , syslogControlGroup
+                          , supplementaryGroup
+                          , notificationsGroup
+                          } 
+         ::= { ptp500 97 }
+
+   dfsGroup OBJECT-GROUP
+      OBJECTS { dfsTableNumber
+              , dfsMeans
+              , dfsNineNinePointNinePercentiles
+              , dfsPeaks
+              }
+      STATUS  current
+      DESCRIPTION "The dfs object group."
+      ::= { ptpGroups 3 }
+
+   configurationGroup OBJECT-GROUP
+      OBJECTS { iPAddress
+              , subnetMask
+              , gatewayIPAddress
+              , targetMACAddress
+              , masterSlaveMode
+              , maximumTransmitPower
+              , antennaGain
+              , cableLoss
+              , eIRP
+              , channelBandwidth
+              , remoteIPAddress
+              , linkName
+              , siteName
+              , accessMethod
+              , groupID
+              }
+      STATUS  current
+      DESCRIPTION "The configuration object group."
+      ::= { ptpGroups 5 }
+
+   ethernetGroup OBJECT-GROUP
+      OBJECTS { dataPortAutoNegotiation
+              , dataPortAutoNegAdvertisement
+              , dataPortAutoMdix
+              , dataPortStatus
+              , dataPortSpeedAndDuplex
+              , dataPortWirelessDownAlert
+              , useVLANForManagementInterfaces
+              , vLANManagementPriority
+              , vLANManagementVID
+              , vLANPriorityTableNumber
+              , vLANPriorityQueueMapping
+              }
+      STATUS  current
+      DESCRIPTION "The ethernet object group."
+      ::= { ptpGroups 6 }
+
+   telecomGroup OBJECT-GROUP
+      OBJECTS { telecomsInterface
+              , telecomsChannelStatus
+              , telecomsLineCode
+              , telecomsCableLength
+              , telecomsLoopback
+              }
+      STATUS  current
+      DESCRIPTION "The telecom object group."
+      ::= { ptpGroups 7 }
+
+   licenceGroup OBJECT-GROUP
+      OBJECTS { regionCode
+              , productVariant
+              , productName
+              , ethernetFiberSupport
+              , frequencyVariant
+              , bandwidthVariant
+              , constantPowerSpectralDensity
+              , sNMPv3Enable
+              , licensedCapacity
+              }
+      STATUS  current
+      DESCRIPTION "The licence object group."
+      ::= { ptpGroups 8 }
+
+   managementGroup OBJECT-GROUP
+      OBJECTS { installStatus
+              , installArmState
+              , tFTPServerIPAddress
+              , tFTPServerPortNumber
+              , tFTPSoftwareUpgradeFileName
+              , tFTPStartSoftwareUpgrade
+              , tFTPSoftwareUpgradeStatus
+              , tFTPSoftwareUpgradeStatusText
+              , tFTPSoftwareUpgradeStatusAdditionalText
+              , hTTPAccessEnabled
+              , telnetAccessEnabled
+              , hTTPPortNumber
+              , hTTPSPortNumber
+              , telnetPortNumber
+              , hTTPSAccessEnabled
+              }
+      STATUS  current
+      DESCRIPTION "The management object group."
+      ::= { ptpGroups 9 }
+
+   phyControlGroup OBJECT-GROUP
+      OBJECTS { linkSymmetry
+              , linkModeOptimisation
+              , userConfiguredMaxModulationMode
+              , remoteMaximumTransmitPower
+              }
+      STATUS  current
+      DESCRIPTION "The phyControl object group."
+      ::= { ptpGroups 10 }
+
+   phyStatusGroup OBJECT-GROUP
+      OBJECTS { receivePower
+              , vectorError
+              , transmitPower
+              , range
+              , linkLoss
+              , receiveChannel
+              , transmitChannel
+              , receiveModulationMode
+              , transmitModulationMode
+              , receiveFreqMHz
+              , transmitFreqMHz
+              , signalStrengthRatio
+              , receiveFreqKHz
+              , transmitFreqKHz
+              , searchState
+              }
+      STATUS  current
+      DESCRIPTION "The phyStatus object group."
+      ::= { ptpGroups 12 }
+
+   alarmsGroup OBJECT-GROUP
+      OBJECTS { unitOutOfCalibration
+              , incompatibleRegionCodes
+              , noWirelessChannelAvailable
+              , wirelessLinkDisabledWarning
+              , dataPortDisabledWarning
+              , dataPortConfigurationMismatch
+              , incompatibleMasterAndSlave
+              , tDDSynchronizationStatus
+              , tDDSynchronizationAlarm
+              , linkModeOptimizationMismatch
+              , capacityLicenseMismatch
+              }
+      STATUS  current
+      DESCRIPTION "The alarms object group."
+      ::= { ptpGroups 13 }
+
+   smtpGroup OBJECT-GROUP
+      OBJECTS { sMTPEmailAlert
+              , sMTPServerIPAddress
+              , sMTPServerPortNumber
+              , sMTPSourceEmailAddress
+              , sMTPDestinationEmailAddress
+              , sMTPEnabledMessages
+              }
+      STATUS  current
+      DESCRIPTION "The smtp object group."
+      ::= { ptpGroups 15 }
+
+   snmpControlGroup OBJECT-GROUP
+      OBJECTS { sNMPPortNumber
+              , sNMPCommunityString
+              , sNMPTrapTableNumber
+              , sNMPTrapVersion
+              , sNMPEnabledTraps
+              , enabledDiagnosticAlarms
+              , sNMPSendAllTrapsAtStartup
+              , sNMPTrapIPAddress
+              , sNMPTrapPortNumber
+              }
+      STATUS  current
+      DESCRIPTION "The snmpControl object group."
+      ::= { ptpGroups 16 }
+
+   sntpGroup OBJECT-GROUP
+      OBJECTS { sNTPState
+              , sNTPServerIPAddress
+              , sNTPServerPortNumber
+              , sNTPPollInterval
+              , sNTPSync
+              , sNTPLastSync
+              , systemClock
+              , timeZone
+              , daylightSaving
+              }
+      STATUS  current
+      DESCRIPTION "The sntp object group."
+      ::= { ptpGroups 17 }
+
+   resetGroup OBJECT-GROUP
+      OBJECTS { systemReset
+              }
+      STATUS  current
+      DESCRIPTION "The reset object group."
+      ::= { ptpGroups 18 }
+
+   versionsGroup OBJECT-GROUP
+      OBJECTS { softwareVersion
+              , hardwareVersion
+              , secondarySoftwareVersion
+              , bootVersion
+              }
+      STATUS  current
+      DESCRIPTION "The versions object group."
+      ::= { ptpGroups 19 }
+
+   pubStatsGroup OBJECT-GROUP
+      OBJECTS { receiveDataRate
+              , transmitDataRate
+              , aggregateDataRate
+              , wirelessLinkAvailability
+              , wirelessLinkStatus
+              , byteErrorRatio
+              , receiveModulationModeDetail
+              }
+      STATUS  current
+      DESCRIPTION "The pubStats object group."
+      ::= { ptpGroups 20 }
+
+   encryptionGroup OBJECT-GROUP
+      OBJECTS { encryptionAlgorithm
+              }
+      STATUS  current
+      DESCRIPTION "The encryption object group."
+      ::= { ptpGroups 22 }
+
+   tDDControlGroup OBJECT-GROUP
+      OBJECTS { tDDSynchronizationMode
+              }
+      STATUS  current
+      DESCRIPTION "The tDDControl object group."
+      ::= { ptpGroups 23 }
+
+   aAAControlGroup OBJECT-GROUP
+      OBJECTS { userTableNumber
+              , userName
+              , userRole
+              , userEnabled
+              , userPassword
+              }
+      STATUS  current
+      DESCRIPTION "The aAAControl object group."
+      ::= { ptpGroups 25 }
+
+   syslogControlGroup OBJECT-GROUP
+      OBJECTS { syslogClient
+              , syslogState
+              }
+      STATUS  current
+      DESCRIPTION "The syslogControl object group."
+      ::= { ptpGroups 24 }
+
+   supplementaryGroup OBJECT-GROUP
+      OBJECTS { longitude
+              , latitude
+              , altitude
+              }
+      STATUS  current
+      DESCRIPTION "The supplementary object group."
+      ::= { ptpGroups 96 }
+
+   notificationsGroup NOTIFICATION-GROUP
+      NOTIFICATIONS { channelChangeTrap
+                    , dfsImpulsiveInterferenceTrap
+                    , dataPortStatusTrap
+                    , telecomsChannelStatusTrap
+                    , telecomsLoopbackTrap
+                    , regionCodeTrap
+                    , installStatusTrap
+                    , installArmStateTrap
+                    , unitOutOfCalibrationTrap
+                    , incompatibleRegionCodesTrap
+                    , noWirelessChannelAvailableTrap
+                    , wirelessLinkDisabledWarningTrap
+                    , dataPortDisabledWarningTrap
+                    , dataPortConfigurationMismatchTrap
+                    , incompatibleMasterAndSlaveTrap
+                    , sNTPSyncTrap
+                    , tDDSynchronizationAlarmTrap
+                    , linkModeOptimizationMismatchTrap
+                    , capacityLicenseMismatchTrap
+                    , syslogStateTrap
+                    , syslogLocalNearlyFullTrap
+                    , syslogLocalWrappedTrap
+                    , syslogClientTrap
+                    }
+      STATUS current
+      DESCRIPTION "The notifications group."
+      ::= { ptpGroups 99 }
+
+ 
+   DfsTableEntry ::=
+      SEQUENCE { dfsTableIndex INTEGER
+               , dfsMeans Integer32
+               , dfsNineNinePointNinePercentiles Integer32
+               , dfsPeaks Integer32
+      }
+ 
+   dfsTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF DfsTableEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION 
+        " A table storing a snapshot of various DFS measurements for each channel"
+      ::= { dfs 2 }
+ 
+   dfsTableEntry OBJECT-TYPE
+      SYNTAX DfsTableEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION 
+        "Table DfsTable"
+      INDEX { dfsTableIndex }
+      ::= { dfsTable 1 }
+ 
+   VLANPriorityTableEntry ::=
+      SEQUENCE { vLANPriorityQueueMapping INTEGER
+               , vLANPriorityTableIndex INTEGER
+      }
+ 
+   vLANPriorityTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF VLANPriorityTableEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION 
+        " A priority queue mapping table. This is a list of packet queues indexed by VLAN priority."
+      ::= { ethernet 15 }
+ 
+   vLANPriorityTableEntry OBJECT-TYPE
+      SYNTAX VLANPriorityTableEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION 
+        "Table VLANPriorityTable"
+      INDEX { vLANPriorityTableIndex }
+      ::= { vLANPriorityTable 1 }
+ 
+   SNMPTrapTableEntry ::=
+      SEQUENCE { sNMPTrapTableIndex INTEGER
+               , sNMPTrapIPAddress IpAddress
+               , sNMPTrapPortNumber INTEGER
+      }
+ 
+   sNMPTrapTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF SNMPTrapTableEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION 
+        " SNMP trap configuration table."
+      ::= { snmpControl 4 }
+ 
+   sNMPTrapTableEntry OBJECT-TYPE
+      SYNTAX SNMPTrapTableEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION 
+        "Table SNMPTrapTable"
+      INDEX { sNMPTrapTableIndex }
+      ::= { sNMPTrapTable 1 }
+ 
+   UserTableEntry ::=
+      SEQUENCE { userTableIndex INTEGER
+               , userName OCTET STRING
+               , userRole INTEGER
+               , userEnabled INTEGER
+               , userPassword OCTET STRING
+      }
+ 
+   userTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF UserTableEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION 
+        " The User Table Control group contains objects specifically for user account management."
+      ::= { aAAControl 2 }
+ 
+   userTableEntry OBJECT-TYPE
+      SYNTAX UserTableEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION 
+        "Table UserTable"
+      INDEX { userTableIndex }
+      ::= { userTable 1 }
+ 
+   -- Dfs group attribute definitions 
+   --
+   dfsTableNumber OBJECT-TYPE
+      SYNTAX INTEGER (1..63)
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "Number of entries in the dfsTable"  
+      ::= { dfs 1 } 
+ 
+   -- DfsTable group attribute definitions 
+   --
+   dfsTableIndex OBJECT-TYPE
+      SYNTAX INTEGER (1..63)
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+             "used to index values in the dfsTable."  
+      ::= { dfsTableEntry 1 } 
+ 
+   dfsMeans OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "Snapshot of DFS means"  
+      ::= { dfsTableEntry 2 } 
+ 
+   dfsNineNinePointNinePercentiles OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "Snapshot of DFS 99.9 percentiles"  
+      ::= { dfsTableEntry 3 } 
+ 
+   dfsPeaks OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "Snapshot of DFS peaks"  
+      ::= { dfsTableEntry 4 } 
+ 
+   -- Configuration group attribute definitions 
+   --
+   iPAddress OBJECT-TYPE
+      SYNTAX IpAddress
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "Internet protocol (IP) address. This address is used by 
+             the family of Internet protocols to uniquely identify the 
+             unit on a network. NB: A system reboot is required to 
+             activate changes to this attribute."  
+      ::= { configuration 1 } 
+ 
+   subnetMask OBJECT-TYPE
+      SYNTAX IpAddress
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "A subnet allows the flow of network traffic between 
+             hosts to be segregated based on a network configuration. 
+             By organizing hosts into logical groups, subnetting can 
+             improve network security and performance. NB: A system 
+             reboot is required to activate changes to this attribute"  
+      ::= { configuration 2 } 
+ 
+   gatewayIPAddress OBJECT-TYPE
+      SYNTAX IpAddress
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "The IP address of a computer on the current network that 
+             is currently acting as a network gateway. A gateway acts 
+             as an entrance / exit to packets from / to other 
+             networks. NB: A system reboot is required to activate 
+             changes to this attribute"  
+      ::= { configuration 3 } 
+ 
+   targetMACAddress OBJECT-TYPE
+      SYNTAX OCTET STRING (SIZE(6))
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "MAC address of the PTP wireless unit forming the other 
+             end of the PTP link"  
+      ::= { configuration 4 } 
+ 
+   masterSlaveMode OBJECT-TYPE
+      SYNTAX INTEGER {
+                       master(0),
+                       slave(1)
+                     }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The PTP wireless link operates using a master and slave 
+             relationship"  
+      ::= { configuration 5 } 
+ 
+   maximumTransmitPower OBJECT-TYPE
+      SYNTAX INTEGER (-100..27)
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "Maximum transmit power the wireless unit is permitted to 
+             use when establishing and maintaining the wireless link"  
+      ::= { configuration 6 } 
+ 
+   antennaGain OBJECT-TYPE
+      SYNTAX INTEGER (0..610)
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "Antenna Gain. Expressed in 10ths of dBi. NB: This 
+             attribute is ignored for variants with an integral 
+             antenna."  
+      ::= { configuration 7 } 
+ 
+   cableLoss OBJECT-TYPE
+      SYNTAX INTEGER (0..255)
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "Loss in the cable between the ODU and the antenna. 
+             Expressed in 10ths of dB. NB: This attribute is ignored 
+             for variants with an integral antenna."  
+      ::= { configuration 8 } 
+ 
+   eIRP OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "Effective Isotropic Radiated Power (EIRP) describes the 
+             strength of the radio signal leaving the wireless unit. 
+             Expressed in 10ths of dBm"  
+      ::= { configuration 9 } 
+ 
+   channelBandwidth OBJECT-TYPE
+      SYNTAX INTEGER {
+                       bw30MHz(0),
+                       bw15MHz(1),
+                       bw10MHz(2),
+                       bw5MHz(3),
+                       bw20MHz(4)
+                     }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "This control sets the bandwidth of the transmit and 
+             receive radio channels"  
+      ::= { configuration 11 } 
+ 
+   remoteIPAddress OBJECT-TYPE
+      SYNTAX IpAddress
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "IP Address of the peer wireless unit"  
+      ::= { configuration 12 } 
+ 
+   linkName OBJECT-TYPE
+      SYNTAX DisplayString (SIZE(0..63))
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "Name of the PTP link allocated by the System 
+             Administrator. Used to establish a connection with the 
+             correct PTP wireless unit at the other end of the link. 
+             NOTE: The link name MUST be the same at both ends of the 
+             PTP link."  
+      ::= { configuration 14 } 
+ 
+   siteName OBJECT-TYPE
+      SYNTAX DisplayString (SIZE(0..63))
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "This field contains a user-provided description of the 
+             site name together with any additional notes"  
+      ::= { configuration 15 } 
+ 
+   accessMethod OBJECT-TYPE
+      SYNTAX INTEGER {
+                       linkAccess(0),
+                       linkNameAccess(1),
+                       groupAccess(2)
+                     }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "This controls whether the link can be established 
+             between pre-paired Master-Slave using MAC addresses (Link 
+             Access) or by using link name (Link Name Access)"  
+      ::= { configuration 16 } 
+ 
+   groupID OBJECT-TYPE
+      SYNTAX INTEGER (0..255)
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "When Access Method is set to Group Access, the Group ID 
+             identifies all the units belonging to the same group. 
+             Group Access is only supported on some platforms"  
+      ::= { configuration 17 } 
+ 
+   -- Ethernet group attribute definitions 
+   --
+   dataPortAutoNegotiation OBJECT-TYPE
+      SYNTAX INTEGER {
+                       disabled(0),
+                       enabled(1)
+                     }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "This controls whether the local Ethernet interface 
+             configuration is automatically negotiated or forced. Do 
+             not use a forced setting together with auto negotiation 
+             at the Ethernet link partner. If you want to run your 
+             Ethernet link at a fixed speed and duplex then you would 
+             normally leave auto negotiation enabled and only enable 
+             the single Auto Neg Advertisement option that you want 
+             the link to run in - FORCING ETHERNET CONFIGURATION IS A 
+             LAST RESORT WHICH SHOULD ONLY BE PERFORMED IF YOU ARE 
+             HAVING PROBLEMS WITH AUTO NEGOTIATION - AND YOU MUST 
+             ENSURE THAT YOU CONFIGURE BOTH THIS UNIT AND THE ETHERNET 
+             LINK PARTNER TO WHICH IT IS CONNECTED IDENTICALLY (THE 
+             LINK PARTNER MUST NOT HAVE AUTO NEGOTIATION ENABLED 
+             EITHER, OTHERWISE A DUPLEX MISMATCH WILL OCCUR). NB: The 
+             new setting will only take effect after a system reboot."  
+      ::= { ethernet 1 } 
+ 
+   dataPortAutoNegAdvertisement OBJECT-TYPE
+      SYNTAX BITS {
+                    negInvalid(2),
+                    neg10MbpsHalfDuplex(3),
+                    neg10MbpsFullDuplex(4),
+                    neg100MbpsHalfDuplex(5),
+                    neg100MbpsFullDuplex(6),
+                    negUnknown1(7)
+                  }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "This sets the different Ethernet configurations that 
+             will be advertised during auto negotiation. NB: The new 
+             setting will only take effect after a system reboot. 
+             WARNING: Duplex mismatch may result if both ends of the 
+             Ethernet link do not have the same settings. Do not auto 
+             negotiation together with a fixed setting at the Ethernet 
+             link partner. WARNING: Make sure that you select 
+             option(s) that you know your connected equipment can 
+             cater for!"  
+      ::= { ethernet 2 } 
+ 
+   dataPortAutoMdix OBJECT-TYPE
+      SYNTAX INTEGER {
+                       disabled(0),
+                       enabled(1)
+                     }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "This enables/disables the Auto MDI/MDIX capability. NB: 
+             The new setting will only take effect after a system 
+             reboot"  
+      ::= { ethernet 3 } 
+ 
+   dataPortStatus OBJECT-TYPE
+      SYNTAX INTEGER {
+                       down(0),
+                       copperLinkUp(1),
+                       fiberLinkUp(2)
+                     }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "Current status of the Ethernet link. NB: a change of 
+             state may generate an SNMP trap and/or SMTP email alert"  
+      ::= { ethernet 4 } 
+ 
+   dataPortSpeedAndDuplex OBJECT-TYPE
+      SYNTAX INTEGER {
+                       speed1000MbpsFullDuplex(0),
+                       speed100MbpsFullDuplex(1),
+                       speed100MbpsHalfDuplex(2),
+                       speed10MbpsFullDuplex(3),
+                       speed10MbpsHalfDuplex(4),
+                       speedUnknown6(5)
+                     }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The current speed and duplex of the Ethernet link"  
+      ::= { ethernet 5 } 
+ 
+   dataPortWirelessDownAlert OBJECT-TYPE
+      SYNTAX INTEGER {
+                       disabled(0),
+                       enabled(1)
+                     }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "When enabled, this causes the Ethernet link to be 
+             dropped briefly when the wireless link drops. This is so 
+             that spanning tree algorithms can quickly detect that 
+             there is a problem."  
+      ::= { ethernet 6 } 
+ 
+   useVLANForManagementInterfaces OBJECT-TYPE
+      SYNTAX INTEGER {
+                       noVLANTagging(0),
+                       iEEE8021QTaggedCTagType8100(1),
+                       iEEE8021adTaggedSTagorBTagType88a8(2)
+                     }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "This controls whether the management interfaces 
+             (WWW/SNMP/SMTP/SNTP) use VLAN tags or not. NB: The new 
+             setting will only take effect after a system reboot"  
+      ::= { ethernet 7 } 
+ 
+   vLANManagementPriority OBJECT-TYPE
+      SYNTAX INTEGER (0..7)
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "This VLAN Priority (0-7) will be included in packets 
+             generated by the management interfaces. NB: The new 
+             setting will only take effect after a system reboot"  
+      ::= { ethernet 8 } 
+ 
+   vLANManagementVID OBJECT-TYPE
+      SYNTAX INTEGER (0..4094)
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "This VLAN VID (0-4094) will be included in packets 
+             generated by the management interfaces. NB: The new 
+             setting will only take effect after a system reboot"  
+      ::= { ethernet 11 } 
+ 
+   vLANPriorityTableNumber OBJECT-TYPE
+      SYNTAX INTEGER (9)
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "Number of entries in the vLANPriorityTable."  
+      ::= { ethernet 14 } 
+ 
+   -- VLANPriorityTable group attribute definitions 
+   --
+   vLANPriorityQueueMapping OBJECT-TYPE
+      SYNTAX INTEGER {
+                       q0(0),
+                       q1(1),
+                       q2(2),
+                       q3(3),
+                       q4(4),
+                       q5(5),
+                       q6(6),
+                       q7(7)
+                     }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "Mapping of VLAN priority flag to packet queue. The 
+             higher the queue number the greater its priority."  
+      ::= { vLANPriorityTableEntry 1 } 
+ 
+   vLANPriorityTableIndex OBJECT-TYPE
+      SYNTAX INTEGER {
+                       p0(1),
+                       p1(2),
+                       p2(3),
+                       p3(4),
+                       p4(5),
+                       p5(6),
+                       p6(7),
+                       p7(8),
+                       untagged(9)
+                     }
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+             "VLAN priority flag, used to index values in the 
+             vLANPriorityTable."  
+      ::= { vLANPriorityTableEntry 2 } 
+ 
+   -- Telecom group attribute definitions 
+   --
+   telecomsInterface OBJECT-TYPE
+      SYNTAX INTEGER {
+                       none(0),
+                       e1(1),
+                       t1(2)
+                     }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The line interface type. If this is set to 'None' then 
+             the telecoms interfaces are disabled, and the telecom 
+             group attributes will be ignored."  
+      ::= { telecom 1 } 
+ 
+   telecomsChannelStatus OBJECT-TYPE
+      SYNTAX INTEGER {
+                       disabled(0),
+                       noSignalLocal(1),
+                       noSignalRemote(2),
+                       noSignalLocalandRemote(3),
+                       up(4),
+                       remoteTiming(5),
+                       noSignalLocalandRemoteTiming(6)
+                     }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "Current status of telecoms channel. NB: a change of 
+             state may generate an SNMP trap and/or SMTP email alert"  
+      ::= { telecom 2 } 
+ 
+   telecomsLineCode OBJECT-TYPE
+      SYNTAX INTEGER {
+                       aMI(0),
+                       b8ZSHDB3(1)
+                     }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The line code setting of the telecoms interface. This 
+             must match the setting of the device connected to this 
+             interface"  
+      ::= { telecom 4 } 
+ 
+   telecomsCableLength OBJECT-TYPE
+      SYNTAX INTEGER {
+                       feet133(0),
+                       feet266(1),
+                       feet399(2),
+                       feet533(3),
+                       feet655(4)
+                     }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The length of the cable connected to the telecoms 
+             interface, measured in feet"  
+      ::= { telecom 6 } 
+ 
+   telecomsLoopback OBJECT-TYPE
+      SYNTAX INTEGER {
+                       none(0),
+                       copper(1),
+                       wireless(2)
+                     }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The loopback status of telecoms channel. This is 
+             intended for installation testing and should be set to 
+             'None' for normal operation. The wire connections to a 
+             unit can be tested by applying a 'Copper' loopback to the 
+             local unit. The wireless connection to the remote unit 
+             can be tested by applying a 'Wireless' loopback to the 
+             remote unit with no loopback on the local unit. When 
+             applying a wireless loopback, please ensure that the 
+             other end of the link has a loopback setting of 'None'. 
+             NB: a change of state may generate an SNMP trap and/or 
+             SMTP email alert"  
+      ::= { telecom 8 } 
+ 
+   -- Licence group attribute definitions 
+   --
+   regionCode OBJECT-TYPE
+      SYNTAX INTEGER {
+                       regionCodeInvalid(0),
+                       regionCode1(1),
+                       regionCode2(2),
+                       regionCode3(3),
+                       regionCode4(4),
+                       regionCode5(5),
+                       regionCode6(6),
+                       regionCode7(7),
+                       regionCode8(8),
+                       regionCode9(9),
+                       regionCode10(10),
+                       regionCode11(11),
+                       regionCode12(12),
+                       regionCode13(13),
+                       regionCode14(14),
+                       regionCode15(15),
+                       regionCode16(16),
+                       regionCode17(17),
+                       regionCode18(18),
+                       regionCode19(19),
+                       regionCode20(20),
+                       regionCode21(21),
+                       regionCode22(22),
+                       regionCode23(23),
+                       regionCode24(24),
+                       regionCode25(25),
+                       regionCode26(26),
+                       regionCode27(27),
+                       regionCode28(28),
+                       regionCode29(29),
+                       regionCode30(30),
+                       regionCode31(31)
+                     }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The region code prohibits the wireless unit from 
+             operating outside the regulated limits. An invalid region 
+             code indicates a corrupted licence key. NB: a change of 
+             state may generate an SNMP trap and/or SMTP email alert"  
+      ::= { licence 1 } 
+ 
+   productVariant OBJECT-TYPE
+      SYNTAX INTEGER {
+                       pTPxx400Full(0),
+                       pTPxx400Deprecated1(1),
+                       pTPxx400Deprecated2(2),
+                       pTPxx400Lite(3),
+                       spare1(4),
+                       pTPxx300(5),
+                       spare2(6),
+                       spare3(7),
+                       pTPxx500FullDeprecated(8),
+                       pTPxx500LiteDeprecated(9),
+                       pTPxx500(10),
+                       pTPxx600Lite(11),
+                       pTPxx600Full(12),
+                       spare5(13),
+                       spare6(14),
+                       pTP800(15)
+                     }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The product variant"  
+      ::= { licence 2 } 
+ 
+   productName OBJECT-TYPE
+      SYNTAX DisplayString (SIZE(0..63))
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "Name of the product variant"  
+      ::= { licence 3 } 
+ 
+   ethernetFiberSupport OBJECT-TYPE
+      SYNTAX INTEGER {
+                       disabled(0),
+                       enabled(1)
+                     }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "Ethernet fiber support availability on this wireless 
+             unit"  
+      ::= { licence 4 } 
+ 
+   frequencyVariant OBJECT-TYPE
+      SYNTAX INTEGER {
+                       freq5800MHz(0),
+                       freq5400MHz(1),
+                       freq4900MHz(2),
+                       freq2500MHz(3),
+                       freq5800MHz2(4),
+                       freq5400MHz2(5),
+                       freq4500MHz(6),
+                       freq5900MHz(7),
+                       freq5200MHz(8),
+                       freq5100MHz(9),
+                       freq4800MHz(10)
+                     }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "Frequency variant of the wireless unit"  
+      ::= { licence 5 } 
+ 
+   bandwidthVariant OBJECT-TYPE
+      SYNTAX INTEGER {
+                       bw30MHz(0),
+                       bw15MHz(1),
+                       bw10MHz(2),
+                       bw5MHz(3),
+                       bw20MHz(4)
+                     }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "Bandwidth variant of the wireless unit"  
+      ::= { licence 6 } 
+ 
+   constantPowerSpectralDensity OBJECT-TYPE
+      SYNTAX INTEGER {
+                       constant(0),
+                       fullPower(1)
+                     }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "Constant power spectral density mode control"  
+      ::= { licence 7 } 
+ 
+   sNMPv3Enable OBJECT-TYPE
+      SYNTAX INTEGER {
+                       disabled(0),
+                       enabled(1)
+                     }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "SNMPv3 availability control"  
+      ::= { licence 9 } 
+ 
+   licensedCapacity OBJECT-TYPE
+      SYNTAX INTEGER {
+                       capacity25Mbps(0),
+                       capacity52Mbps(1),
+                       capacity105Mbps(2)
+                     }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "Maximum allowable data rate for ethernet frames 
+             permitted by the licence key. The actual data rate 
+             depends upon the prevailing wireless conditions"  
+      ::= { licence 11 } 
+ 
+   -- Management group attribute definitions 
+   --
+   installStatus OBJECT-TYPE
+      SYNTAX INTEGER {
+                       ok(0),
+                       wrongPeer(1)
+                     }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "A non-zero value indicates that signalling was received 
+             with the wrong MAC address or a mismatched link name. NB: 
+             It is very unusual to detect this, because units with 
+             mis-configured Target MAC Address will normally fail to 
+             establish a wireless link. However, rare circumstances 
+             may establish a partial wireless link and detect this 
+             situation. NB: A non-zero value on start-up, or a change 
+             of value during operation, may generate an SNMP trap 
+             and/or SMTP email alert"  
+      ::= { management 3 } 
+ 
+   installArmState OBJECT-TYPE
+      SYNTAX INTEGER {
+                       disarmed(0),
+                       armed(1)
+                     }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "Indicates if the unit is being installed. NB: a value 
+             other than 'disarmed' on startup, or a change of state 
+             during operation may generate an SNMP trap and/or SMTP 
+             email alert"  
+      ::= { management 4 } 
+ 
+   tFTPServerIPAddress OBJECT-TYPE
+      SYNTAX IpAddress
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "IP address of the TFTP Server from which the TFTP 
+             Software Upgrade File Name will be retrieved"  
+      ::= { management 5 } 
+ 
+   tFTPServerPortNumber OBJECT-TYPE
+      SYNTAX INTEGER (0..65535)
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "The port number of the TFTP Server from which the TFTP 
+             Software Upgrade File Name will be retrieved"  
+      ::= { management 6 } 
+ 
+   tFTPSoftwareUpgradeFileName OBJECT-TYPE
+      SYNTAX DisplayString (SIZE(0..127))
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "Filename of the Software Upgrade to be loaded from the 
+             TFTP Server"  
+      ::= { management 7 } 
+ 
+   tFTPStartSoftwareUpgrade OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "Write '1' to this attribute to start the TFTP software 
+             upgrade process. The attribute will be reset to 0 when 
+             the upgrade process has finished"  
+      ::= { management 8 } 
+ 
+   tFTPSoftwareUpgradeStatus OBJECT-TYPE
+      SYNTAX INTEGER {
+                       idle(0),
+                       uploadinprogress(1),
+                       uploadsuccessfulprogrammingFLASH(2),
+                       upgradesuccessfulreboottorunthenewsoftwareimage(3),
+                       upgradefailed(4)
+                     }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The current status of the TFTP Software upgrade process"  
+      ::= { management 9 } 
+ 
+   tFTPSoftwareUpgradeStatusText OBJECT-TYPE
+      SYNTAX DisplayString (SIZE(0..127))
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "Descriptive text describing the status of the TFTP 
+             Software upgrade process, including any error details"  
+      ::= { management 10 } 
+ 
+   tFTPSoftwareUpgradeStatusAdditionalText OBJECT-TYPE
+      SYNTAX DisplayString (SIZE(0..127))
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "Any additional text describing the status of the TFTP 
+             Software upgrade process, including any error details"  
+      ::= { management 11 } 
+ 
+   hTTPAccessEnabled OBJECT-TYPE
+      SYNTAX INTEGER {
+                       no(0),
+                       yes(1)
+                     }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "This controls whether or not HTTP access is enabled, 
+             i.e. if this is disabled (0) then the unit will not 
+             respond to any requests on the HTTP port. Remote 
+             management via HTTPS is not affected by this setting. Any 
+             change in this setting will not take effect until the 
+             unit has been rebooted. (Factory default = Enabled)"  
+      ::= { management 12 } 
+ 
+   telnetAccessEnabled OBJECT-TYPE
+      SYNTAX INTEGER {
+                       no(0),
+                       yes(1)
+                     }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "This controls whether or not Telnet access is enabled, 
+             i.e. if this is disabled (0) then the unit will not 
+             respond to any requests on the TELNET port. Any change in 
+             this setting will not take effect until the unit has been 
+             rebooted. (Factory default = Disabled)"  
+      ::= { management 13 } 
+ 
+   hTTPPortNumber OBJECT-TYPE
+      SYNTAX INTEGER (0..65535)
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "This controls the port number for HTTP access. A value 
+             of zero will use the default port number. Any change in 
+             this setting will not take effect until the unit has been 
+             rebooted. (Factory default = 80)"  
+      ::= { management 14 } 
+ 
+   hTTPSPortNumber OBJECT-TYPE
+      SYNTAX INTEGER (0..65535)
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "This controls the port number for HTTPS access. A value 
+             of zero will use the default port number. Availability of 
+             HTTPS is controlled via the Licence Key. Any change in 
+             this setting will not take effect until the unit has been 
+             rebooted. (Factory default = 443)"  
+      ::= { management 15 } 
+ 
+   telnetPortNumber OBJECT-TYPE
+      SYNTAX INTEGER (0..65535)
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "This controls the port number for TELNET access. A value 
+             of zero will use the default port number. Any change in 
+             this setting will not take effect until the unit has been 
+             rebooted. (Factory default = 23)"  
+      ::= { management 16 } 
+ 
+   hTTPSAccessEnabled OBJECT-TYPE
+      SYNTAX INTEGER {
+                       no(0),
+                       yes(1)
+                     }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "This controls whether or not HTTPS access is enabled, 
+             i.e. if this is disabled (0) then the unit will not 
+             respond to any requests on the HTTPS port. Remote 
+             management via HTTP is not affected by this setting. Any 
+             change in this setting will not take effect until the 
+             unit has been rebooted. (Factory default = Enabled)"  
+      ::= { management 17 } 
+ 
+   -- PhyControl group attribute definitions 
+   --
+   linkSymmetry OBJECT-TYPE
+      SYNTAX INTEGER {
+                       symmetryAdaptive(0),
+                       symmetry3to1(1),
+                       symmetry1to1(2),
+                       symmetry1to3(3)
+                     }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "In fixed asymmetric mode (3 to 1) the transmit time is 
+             three times as long as the receive time. In fixed 
+             symmetric mode (1 to 1) the unit spends an equal amount 
+             of time transmitting and receiving. In fixed asymmetric 
+             mode (1 to 3) the receive time is three times as long as 
+             the transmit time. In adaptive mode the transmit and 
+             receive periods adjust with applied load. NB: only 
+             applicable for master nodes."  
+      ::= { phyControl 1 } 
+ 
+   linkModeOptimisation OBJECT-TYPE
+      SYNTAX INTEGER {
+                       iPTraffic(0),
+                       tDMTraffic(1)
+                     }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "Optimises the wireless link behavior for the type of 
+             traffic to be carried. In 'IP Traffic' mode, the wireless 
+             link will minimise transmission errors by automatically 
+             adapting the modulation mode. In 'TDM Traffic' mode, the 
+             wireless link will minimise transmission latency and 
+             preserve throughput by maintaining a higher modulation 
+             mode in the presence of a limited number of errors. The 
+             'TDM Traffic' mode is recommended for E1/T1 applications 
+             and connectionless protocols."  
+      ::= { phyControl 2 } 
+ 
+   userConfiguredMaxModulationMode OBJECT-TYPE
+      SYNTAX INTEGER {
+                       modBpsk50percent(0),
+                       modQpsk50percent(1),
+                       modQpsk75percent(2),
+                       mod16qam50percent(3),
+                       mod16qam75percent(4),
+                       mod64qam67percent(5),
+                       mod64qam83percent(6)
+                     }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "The maximum receive modulation mode controls the MAX 
+             mode used for adaptive modulation. NOTE: This attribute 
+             is automatically disabled when the installation agent is 
+             armed. To disarm the installation agent use the 
+             installation wizard"  
+      ::= { phyControl 3 } 
+ 
+   remoteMaximumTransmitPower OBJECT-TYPE
+      SYNTAX INTEGER (-100..27)
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "Maximum transmit power the remote wireless unit is 
+             permitted to use when establishing and maintaining the 
+             wireless link"  
+      ::= { phyControl 4 } 
+ 
+   -- PhyStatus group attribute definitions 
+   --
+   receivePower OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "Receive power expressed in tenths of a dBm"  
+      ::= { phyStatus 1 } 
+ 
+   vectorError OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The vector error measurement compares the received 
+             signal's IQ modulation characteristics to an ideal signal 
+             to determine the composite error vector magnitude. The 
+             value represented by this attribute is the average vector 
+             error over the previous second expressed in tenths of a 
+             dB"  
+      ::= { phyStatus 2 } 
+ 
+   transmitPower OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "Transmit power expressed in tenths of a dBm"  
+      ::= { phyStatus 3 } 
+ 
+   range OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "Distance between the two peer wireless units expressed 
+             in tenths of a kilometer"  
+      ::= { phyStatus 4 } 
+ 
+   linkLoss OBJECT-TYPE
+      SYNTAX INTEGER (-500..500)
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The wireless link loss expressed in tenths of a dB"  
+      ::= { phyStatus 5 } 
+ 
+   receiveChannel OBJECT-TYPE
+      SYNTAX INTEGER (0..63)
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "Current active receive channel"  
+      ::= { phyStatus 6 } 
+ 
+   transmitChannel OBJECT-TYPE
+      SYNTAX INTEGER (0..63)
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "Current active transmit channel"  
+      ::= { phyStatus 7 } 
+ 
+   receiveModulationMode OBJECT-TYPE
+      SYNTAX INTEGER {
+                       modAcquisition(0),
+                       modBpsk50percent(1),
+                       modQpsk50percentSingle(2),
+                       modQpsk75percentSingle(3),
+                       mod16qam50percentSingle(4),
+                       mod16qam75percentSingle(5),
+                       mod64qam67percentSingle(6),
+                       mod64qam83percentSingle(7),
+                       modReserved1(8),
+                       modQpsk50percentDual(9),
+                       modQpsk75percentDual(10),
+                       mod16qam50percentDual(11),
+                       mod16qam75percentDual(12),
+                       mod64qam67percentDual(13),
+                       mod64qam83percentDual(14),
+                       modReserved2(15)
+                     }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "Current active receive modulation mode"  
+      ::= { phyStatus 8 } 
+ 
+   transmitModulationMode OBJECT-TYPE
+      SYNTAX INTEGER {
+                       modAcquisition(0),
+                       modBpsk50percent(1),
+                       modQpsk50percentSingle(2),
+                       modQpsk75percentSingle(3),
+                       mod16qam50percentSingle(4),
+                       mod16qam75percentSingle(5),
+                       mod64qam67percentSingle(6),
+                       mod64qam83percentSingle(7),
+                       modReserved1(8),
+                       modQpsk50percentDual(9),
+                       modQpsk75percentDual(10),
+                       mod16qam50percentDual(11),
+                       mod16qam75percentDual(12),
+                       mod64qam67percentDual(13),
+                       mod64qam83percentDual(14),
+                       modReserved2(15)
+                     }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "Current active transmit modulation mode"  
+      ::= { phyStatus 9 } 
+ 
+   receiveFreqMHz OBJECT-TYPE
+      SYNTAX INTEGER (0..5925)
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "Current receive frequency expressed in integer MHz"  
+      ::= { phyStatus 11 } 
+ 
+   transmitFreqMHz OBJECT-TYPE
+      SYNTAX INTEGER (0..5925)
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "Current transmit frequency expressed in integer MHz"  
+      ::= { phyStatus 12 } 
+ 
+   signalStrengthRatio OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "Signal strength ratio (Vertical / Horizontal) : the 
+             number of dB larger the Vertical antenna input is than 
+             the Horizontal antenna input expressed in tenths of a dB"  
+      ::= { phyStatus 13 } 
+ 
+   receiveFreqKHz OBJECT-TYPE
+      SYNTAX INTEGER (0..5925000)
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "Current receive frequency expressed as KHz"  
+      ::= { phyStatus 14 } 
+ 
+   transmitFreqKHz OBJECT-TYPE
+      SYNTAX INTEGER (0..5925000)
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "Current transmit frequency expressed as KHz"  
+      ::= { phyStatus 15 } 
+ 
+   searchState OBJECT-TYPE
+      SYNTAX INTEGER {
+                       registering(0),
+                       searching(1),
+                       acquiring(2),
+                       registeringAcquiring2(3)
+                     }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "Search status of the wireless modem. 'Registering' means 
+             that the modem has locked to an OFDM signal, and the 
+             wireless link is up. 'Searching' means that no wireless 
+             signal has been detected. 'Acquiring' means that a 
+             wireless signal has been detected, but the modem has not 
+             locked to an OFDM signal."  
+      ::= { phyStatus 16 } 
+ 
+   -- Alarms group attribute definitions 
+   --
+   unitOutOfCalibration OBJECT-TYPE
+      SYNTAX INTEGER {
+                       calibrated(0),
+                       partialCalibration(1),
+                       invalidCalibration(2),
+                       bandwidthvariantunsupportedPAsShutdown(3),
+                       outOfCalibrationPAsShutdown(4)
+                     }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The unit is out of calibration"  
+      ::= { alarms 1 } 
+ 
+   incompatibleRegionCodes OBJECT-TYPE
+      SYNTAX INTEGER {
+                       ok(0),
+                       incompatibleLicenceKeys(1)
+                     }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The master and slave units have incompatible region 
+             codes. NB: Both units must have compatible licence keys"  
+      ::= { alarms 4 } 
+ 
+   noWirelessChannelAvailable OBJECT-TYPE
+      SYNTAX INTEGER {
+                       ok(0),
+                       noWirelessChannelAvailable(1)
+                     }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "Spectrum Management was unable to locate a suitable 
+             wireless channel to operate on"  
+      ::= { alarms 5 } 
+ 
+   wirelessLinkDisabledWarning OBJECT-TYPE
+      SYNTAX INTEGER {
+                       ok(0),
+                       disabledBySNMPifAdminStatus(1)
+                     }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The SNMP ifAdminStatus of the wireless interface has 
+             disabled wireless traffic"  
+      ::= { alarms 6 } 
+ 
+   dataPortDisabledWarning OBJECT-TYPE
+      SYNTAX INTEGER {
+                       ok(0),
+                       disabledBySNMPifAdminStatus(1)
+                     }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The SNMP ifAdminStatus of the Ethernet interface has 
+             disabled Ethernet traffic"  
+      ::= { alarms 7 } 
+ 
+   dataPortConfigurationMismatch OBJECT-TYPE
+      SYNTAX INTEGER {
+                       noError(0),
+                       mismatchDetected(1)
+                     }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The detection of Ethernet fragments (runt packets) when 
+             the link is in full duplex is an indication of an 
+             auto-negotiation or forced configuration mismatch"  
+      ::= { alarms 9 } 
+ 
+   incompatibleMasterAndSlave OBJECT-TYPE
+      SYNTAX INTEGER {
+                       ok(0),
+                       incompatibleProductVariants(1),
+                       differentSoftwareVersionsRunning(2)
+                     }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "A non-zero value indicates that the master and slave 
+             ends of a link are different hardware products, or have 
+             different software versions. NB: It is very unusual to 
+             detect this, because incompatible units will normally 
+             fail to establish a wireless link. However, some 
+             combinations may establish a partial wireless link and 
+             detect this situation. NB: A non-zero value may generate 
+             an SNMP trap and/or SMTP email alert"  
+      ::= { alarms 10 } 
+ 
+   tDDSynchronizationStatus OBJECT-TYPE
+      SYNTAX INTEGER {
+                       locked(0),
+                       holdover(1),
+                       holdoverNotConnected(2),
+                       acquiringLock(3),
+                       noTimingReference(4),
+                       timingSystemNotConnected(5),
+                       initialising(6),
+                       clusterTimingMaster(7),
+                       tDDSyncNotActive(8)
+                     }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "An alarm value (displayed in red) indicates that one of 
+             the following conditions has not been met (i) An external 
+             timing system is connected or internal timing has been 
+             configured. (ii) The timing system is providing a useable 
+             reference. (iii) The ODU is locked to this reference."  
+      ::= { alarms 11 } 
+ 
+   tDDSynchronizationAlarm OBJECT-TYPE
+      SYNTAX INTEGER {
+                       ok(0),
+                       notSynchronized(1),
+                       timingSystemFailure(2)
+                     }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "Not Synchronized indicates failure of the external 
+             timing system for a period greater than the holdover 
+             timer. TDD frame timing will have drifted, and this link 
+             may cause interference with other links in a synchronized 
+             network. Timing System Failure is an early warning, 
+             indicating that 80% of the holdover period has expired."  
+      ::= { alarms 13 } 
+ 
+   linkModeOptimizationMismatch OBJECT-TYPE
+      SYNTAX INTEGER {
+                       ok(0),
+                       linkModeOptimizationMismatch(1)
+                     }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The remote node of this link has been configured with a 
+             different link mode optimization"  
+      ::= { alarms 14 } 
+ 
+   capacityLicenseMismatch OBJECT-TYPE
+      SYNTAX INTEGER {
+                       ok(0),
+                       mismatchDetected(1)
+                     }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The local and remote units have different licensed 
+             capacity and/or the full capacity trial has been 
+             activated at only one unit. The wireless link is 
+             operating at the capacity of the lowest capacity unit"  
+      ::= { alarms 16 } 
+ 
+   -- Smtp group attribute definitions 
+   --
+   sMTPEmailAlert OBJECT-TYPE
+      SYNTAX INTEGER {
+                       disabled(0),
+                       enabled(1)
+                     }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "Simple Mail Transfer Protocol is used to send equipment 
+             alerts via email to a specified email address. This 
+             utility can only be configured by the system 
+             administrator"  
+      ::= { smtp 1 } 
+ 
+   sMTPServerIPAddress OBJECT-TYPE
+      SYNTAX IpAddress
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "IP address of the SMTP server"  
+      ::= { smtp 2 } 
+ 
+   sMTPServerPortNumber OBJECT-TYPE
+      SYNTAX INTEGER (0..65535)
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "Port number of the SMTP server"  
+      ::= { smtp 3 } 
+ 
+   sMTPSourceEmailAddress OBJECT-TYPE
+      SYNTAX DisplayString (SIZE(0..63))
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "The 'from' email address used when constructing the 
+             automatically generated e-mail message"  
+      ::= { smtp 4 } 
+ 
+   sMTPDestinationEmailAddress OBJECT-TYPE
+      SYNTAX DisplayString (SIZE(0..63))
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "The 'to' email address used when constructing the 
+             automatically generated e-mail message"  
+      ::= { smtp 5 } 
+ 
+   sMTPEnabledMessages OBJECT-TYPE
+      SYNTAX BITS {
+                    telecomsChannelUpDown(1),
+                    unknown6(2),
+                    dataPortUpDown(3),
+                    enabledDiagnosticAlarms(4),
+                    dFSImpulseInterference(5),
+                    channelChange(6),
+                    wirelessLinkUpDown(7)
+                  }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "This controls which SMTP messages the unit will send"  
+      ::= { smtp 6 } 
+ 
+   -- SnmpControl group attribute definitions 
+   --
+   sNMPPortNumber OBJECT-TYPE
+      SYNTAX INTEGER (0..65535)
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "The IP port number used to access the SNMP MIB (i.e. 
+             Gets and Sets) (default = 161). NB: A system reboot is 
+             required to activate changes to this attribute"  
+      ::= { snmpControl 1 } 
+ 
+   sNMPCommunityString OBJECT-TYPE
+      SYNTAX DisplayString (SIZE(0..63))
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "The SNMP community string. NB: A system reboot is 
+             required to activate changes to this attribute"  
+      ::= { snmpControl 2 } 
+ 
+   sNMPTrapTableNumber OBJECT-TYPE
+      SYNTAX INTEGER (2)
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "Number of entries in the sNMPTrapTable."  
+      ::= { snmpControl 3 } 
+ 
+   sNMPTrapVersion OBJECT-TYPE
+      SYNTAX INTEGER {
+                       v1(0),
+                       v2c(1)
+                     }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "The SNMP protocol version to use for SNMP Traps. NB: A 
+             system reboot is required to activate changes to this 
+             attribute"  
+      ::= { snmpControl 5 } 
+ 
+   sNMPEnabledTraps OBJECT-TYPE
+      SYNTAX BITS {
+                    unknown8(0),
+                    dataPortUpDown(1),
+                    authenticationFailure(2),
+                    enabledDiagnosticAlarms(3),
+                    dFSImpulseInterference(4),
+                    channelChange(5),
+                    wirelessLinkUpDown(6),
+                    coldStart(7),
+                    telecomsChannelUpDown(15)
+                  }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "This controls which SNMP Traps the unit will send"  
+      ::= { snmpControl 6 } 
+ 
+   enabledDiagnosticAlarms OBJECT-TYPE
+      SYNTAX BITS {
+                    incompatibleMasterAndSlave(0),
+                    incompatibleRegionCodes(1),
+                    unknown6(2),
+                    unknown5(3),
+                    unitOutOfCalibration(4),
+                    installArmState(5),
+                    installStatus(6),
+                    regionCode(7),
+                    telecomsChannelStatus(8),
+                    unknown15(9),
+                    dataPortStatus(10),
+                    dataPortDisabledWarning(11),
+                    wirelessLinkDisabledWarning(12),
+                    sNTPSynchronizationFailed(13),
+                    noWirelessChannelAvailable(14),
+                    dataPortConfigurationMismatch(15),
+                    syslogClientDisabledWarning(16),
+                    licensedCapacityMismatch(17),
+                    syslogLocalWrapped(18),
+                    syslogLocalNearlyFull(19),
+                    syslogLocalEnableDisable(20),
+                    linkModeOptimizationMismatch(21),
+                    tDDSynchronizationAlarm(22),
+                    telecomsChannelLoopback(23)
+                  }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "Controls which individual diagnostic alarms are enabled. 
+             The unit may be configured to generate SNMP traps and/or 
+             SMTP email alerts for these enabled alarms by selecting 
+             'Enabled Diagnostic Alarms' on the 'SNMP Enabled Traps' 
+             and/or 'SMTP Enabled Messages' attributes"  
+      ::= { snmpControl 7 } 
+ 
+   sNMPSendAllTrapsAtStartup OBJECT-TYPE
+      SYNTAX INTEGER {
+                       disabled(0),
+                       enabled(1)
+                     }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "Controls whether cleared traps are reported at start-up 
+             as well as raised traps. Only enabled traps will be 
+             reported. NB: Traps corresponding to transient events 
+             (i.e. not associated with an alarm or status value) are 
+             only sent when required and not at start-up."  
+      ::= { snmpControl 8 } 
+ 
+   -- SNMPTrapTable group attribute definitions 
+   --
+   sNMPTrapTableIndex OBJECT-TYPE
+      SYNTAX INTEGER (1..2)
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+             "SNMP trap value, used to index the SNMPTrapTable."  
+      ::= { sNMPTrapTableEntry 1 } 
+ 
+   sNMPTrapIPAddress OBJECT-TYPE
+      SYNTAX IpAddress
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "The IP address to which all SNMP Traps are sent. An IP 
+             Address of 0.0.0.0 disables all TRAP generation. NB: A 
+             system reboot is required to activate changes to this 
+             attribute."  
+      ::= { sNMPTrapTableEntry 2 } 
+ 
+   sNMPTrapPortNumber OBJECT-TYPE
+      SYNTAX INTEGER (0..65535)
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "Destination port for SNMP Traps (default=162). A value 
+             of 0 will disable the trap receiver. NB: A system reboot 
+             is required to activate changes to this attribute."  
+      ::= { sNMPTrapTableEntry 3 } 
+ 
+   -- Sntp group attribute definitions 
+   --
+   sNTPState OBJECT-TYPE
+      SYNTAX INTEGER {
+                       disabled(0),
+                       enabled(1)
+                     }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "SNTP control state"  
+      ::= { sntp 1 } 
+ 
+   sNTPServerIPAddress OBJECT-TYPE
+      SYNTAX IpAddress
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "The IP address of a valid SNTP server"  
+      ::= { sntp 2 } 
+ 
+   sNTPServerPortNumber OBJECT-TYPE
+      SYNTAX INTEGER (0..65535)
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "The IP port number of the SNTP server. Defaults to port 
+             123."  
+      ::= { sntp 3 } 
+ 
+   sNTPPollInterval OBJECT-TYPE
+      SYNTAX INTEGER (60..43200)
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "The SNTP server polling interval"  
+      ::= { sntp 4 } 
+ 
+   sNTPSync OBJECT-TYPE
+      SYNTAX INTEGER {
+                       noSync(0),
+                       inSync(1)
+                     }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "If SNTP Sync fails then check the server settings in the 
+             Remote Management page, or disable SNTP. NB: a change of 
+             state may generate an SNMP trap and/or SMTP email alert"  
+      ::= { sntp 5 } 
+ 
+   sNTPLastSync OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "Last SNTP sync time"  
+      ::= { sntp 6 } 
+ 
+   systemClock OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "System clock presented as local time"  
+      ::= { sntp 7 } 
+ 
+   timeZone OBJECT-TYPE
+      SYNTAX INTEGER {
+                       gmtMinus1200(0),
+                       gmtMinus1130(1),
+                       gmtMinus1100(2),
+                       gmtMinus1030(3),
+                       gmtMinus1000(4),
+                       gmtMinus0930(5),
+                       gmtMinus0900(6),
+                       gmtMinus0830(7),
+                       gmtMinus0800(8),
+                       gmtMinus0730(9),
+                       gmtMinus0700(10),
+                       gmtMinus0630(11),
+                       gmtMinus0600(12),
+                       gmtMinus0530(13),
+                       gmtMinus0500(14),
+                       gmtMinus0430(15),
+                       gmtMinus0400(16),
+                       gmtMinus0330(17),
+                       gmtMinus0300(18),
+                       gmtMinus0230(19),
+                       gmtMinus0200(20),
+                       gmtMinus0130(21),
+                       gmtMinus0100(22),
+                       gmtMinus0030(23),
+                       gmtZero(24),
+                       gmtPlus0030(25),
+                       gmtPlus0100(26),
+                       gmtPlus0130(27),
+                       gmtPlus0200(28),
+                       gmtPlus0230(29),
+                       gmtPlus0300(30),
+                       gmtPlus0330(31),
+                       gmtPlus0400(32),
+                       gmtPlus0430(33),
+                       gmtPlus0500(34),
+                       gmtPlus0530(35),
+                       gmtPlus0600(36),
+                       gmtPlus0630(37),
+                       gmtPlus0700(38),
+                       gmtPlus0730(39),
+                       gmtPlus0800(40),
+                       gmtPlus0830(41),
+                       gmtPlus0900(42),
+                       gmtPlus0930(43),
+                       gmtPlus1000(44),
+                       gmtPlus1030(45),
+                       gmtPlus1100(46),
+                       gmtPlus1130(47),
+                       gmtPlus1200(48),
+                       gmtPlus1230(49),
+                       gmtPlus1300(50)
+                     }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "Time zone offsets from Greenwich Mean Time (GMT)"  
+      ::= { sntp 8 } 
+ 
+   daylightSaving OBJECT-TYPE
+      SYNTAX INTEGER {
+                       disabled(0),
+                       enabled(1)
+                     }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "Daylight Saving Time"  
+      ::= { sntp 9 } 
+ 
+   -- Reset group attribute definitions 
+   --
+   systemReset OBJECT-TYPE
+      SYNTAX INTEGER {
+                       running(0),
+                       consoleReboot(1)
+                     }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "Setting this attribute to '1' will cause a system 
+             reboot. NB: a system reboot will apply any pending new 
+             settings held in memory"  
+      ::= { reset 1 } 
+ 
+   -- Versions group attribute definitions 
+   --
+   softwareVersion OBJECT-TYPE
+      SYNTAX DisplayString (SIZE(0..63))
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "Current software version"  
+      ::= { versions 1 } 
+ 
+   hardwareVersion OBJECT-TYPE
+      SYNTAX DisplayString (SIZE(0..63))
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "Hardware platform version"  
+      ::= { versions 2 } 
+ 
+   secondarySoftwareVersion OBJECT-TYPE
+      SYNTAX DisplayString (SIZE(0..63))
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "Secondary software version, used when the primary 
+             software image is invalid or erased"  
+      ::= { versions 3 } 
+ 
+   bootVersion OBJECT-TYPE
+      SYNTAX DisplayString (SIZE(0..63))
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "Boot code software version"  
+      ::= { versions 4 } 
+ 
+   -- PubStats group attribute definitions 
+   --
+   receiveDataRate OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "Average data rate over the last one second interval 
+             (kbps)"  
+      ::= { pubStats 1 } 
+ 
+   transmitDataRate OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "Average data rate over the last one second interval 
+             (kbps)"  
+      ::= { pubStats 2 } 
+ 
+   aggregateDataRate OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "Average data rate over the last one second interval 
+             (kbps)"  
+      ::= { pubStats 3 } 
+ 
+   wirelessLinkAvailability OBJECT-TYPE
+      SYNTAX INTEGER (0..1000000)
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "Link availability calculated since the last reset of the 
+             system counters, as a percentage multiplied by 10000 to 
+             give four decimal places of precision"  
+      ::= { pubStats 4 } 
+ 
+   wirelessLinkStatus OBJECT-TYPE
+      SYNTAX INTEGER {
+                       up(0),
+                       registering(1),
+                       acquiring(2),
+                       searching(3),
+                       radarCAC(4),
+                       initialising(5)
+                     }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "Current status of the wireless link"  
+      ::= { pubStats 5 } 
+ 
+   byteErrorRatio OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "Reciprocal of the byte error ratio calculated since the 
+             last reset of the system counters"  
+      ::= { pubStats 6 } 
+ 
+   receiveModulationModeDetail OBJECT-TYPE
+      SYNTAX INTEGER {
+                       runningAtMaximumReceiveMode(0),
+                       runningAtUserConfiguredMaxModulationMode(1),
+                       restrictedBecauseInstallationIsArmed(2),
+                       restrictedBecauseOfByteErrorsOnTheWirelessLink(3),
+                       restrictedBecauseTheLinkParametersAreUpdating(4),
+                       restrictedBecauseChannelChangeIsInProgress(5),
+                       restrictedDueToTheLowEthernetLinkSpeed(6),
+                       runningAtMaximumReceiveModeForChannelBandwidth(7),
+                       limitedByTheWirelessConditions(8)
+                     }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The reason for the current receive modulation mode"  
+      ::= { pubStats 7 } 
+ 
+   -- Encryption group attribute definitions 
+   --
+   encryptionAlgorithm OBJECT-TYPE
+      SYNTAX INTEGER {
+                       none(0),
+                       aESRijndael(1),
+                       aES256bitRijndael(2)
+                     }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The Encryption Algorithm used by the wireless link. NB: 
+             A system reboot is required to activate changes to this 
+             attribute. NB: The same Encryption Algorithm must be 
+             configured at BOTH ends of the link for it to function 
+             correctly"  
+      ::= { encryption 1 } 
+ 
+   -- TDDControl group attribute definitions 
+   --
+   tDDSynchronizationMode OBJECT-TYPE
+      SYNTAX INTEGER {
+                       disabled(0),
+                       enabled(1)
+                     }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "TDD Synchronization Mode selection"  
+      ::= { tDDControl 1 } 
+ 
+   -- AAAControl group attribute definitions 
+   --
+   userTableNumber OBJECT-TYPE
+      SYNTAX INTEGER (1..10)
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "Number of entries in the userTable"  
+      ::= { aAAControl 1 } 
+ 
+   -- UserTable group attribute definitions 
+   --
+   userTableIndex OBJECT-TYPE
+      SYNTAX INTEGER (1..10)
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+             "used to index values in the userTable."  
+      ::= { userTableEntry 1 } 
+ 
+   userName OBJECT-TYPE
+      SYNTAX OCTET STRING
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "User name which must be entered, along with the 
+             appropriate password, in order to gain access to the 
+             system."  
+      ::= { userTableEntry 2 } 
+ 
+   userRole OBJECT-TYPE
+      SYNTAX INTEGER {
+                       readOnly(0),
+                       systemAdministrator(1),
+                       securityOfficer(2)
+                     }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "Role of the selected user. A Security Officer has access 
+             to and can modify all settings. A System Administrator 
+             has access to and can modify all non-security settings. A 
+             Read Only user can view settings, but cannot make any 
+             changes."  
+      ::= { userTableEntry 3 } 
+ 
+   userEnabled OBJECT-TYPE
+      SYNTAX INTEGER {
+                       disabled(0),
+                       enabled(1)
+                     }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "Enable / Disable the selected user"  
+      ::= { userTableEntry 4 } 
+ 
+   userPassword OBJECT-TYPE
+      SYNTAX OCTET STRING
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "User password, which must be entered in order to gain 
+             access to the system."  
+      ::= { userTableEntry 5 } 
+ 
+   -- SyslogControl group attribute definitions 
+   --
+   syslogClient OBJECT-TYPE
+      SYNTAX INTEGER {
+                       disabled(0),
+                       enabled(1)
+                     }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "Enable or disable the syslog client"  
+      ::= { syslogControl 1 } 
+ 
+   syslogState OBJECT-TYPE
+      SYNTAX INTEGER {
+                       disabled(0),
+                       enabled(1)
+                     }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+             "The syslog service has been enabled or disabled"  
+      ::= { syslogControl 2 } 
+ 
+   -- Supplementary group attribute definitions 
+   --
+   longitude OBJECT-TYPE
+      SYNTAX DisplayString (SIZE(0..19))
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "The longitude of the unit, measured in decimal degrees. 
+             This object is set by the SNMP manager and has no 
+             internal function."  
+      ::= { supplementary 1 } 
+ 
+   latitude OBJECT-TYPE
+      SYNTAX DisplayString (SIZE(0..19))
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "The latitude of the unit, measured in decimal degrees. 
+             This object is set by the SNMP manager and has no 
+             internal function."  
+      ::= { supplementary 2 } 
+ 
+   altitude OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "The altitude of the unit, measured in metres. This 
+             object is set by the SNMP manager and has no internal 
+             function."  
+      ::= { supplementary 3 } 
+ 
+   -- Enterprise NOTIFICATION definitions
+   --
+
+   channelChangeTrap NOTIFICATION-TYPE
+      OBJECTS { receiveChannel }
+      STATUS current
+      DESCRIPTION "The PTP radio has changed wireless channel.
+                 This has been caused by either
+                 i) mandatory radar avoidance,
+                    a DFS impulsive interference event will also be
+                    detected,
+                 or
+                 ii) Dynamic Spectrum Optimization, (DSO)
+                     DSO improves link performance by selecting the
+                     most appropriate transmit and receive channels
+                     with the lowest level of interference."
+      ::= { ptpTrapPrefix 1 }
+
+   dfsImpulsiveInterferenceTrap NOTIFICATION-TYPE
+      OBJECTS { receiveChannel }
+      STATUS current
+      DESCRIPTION "DFS impulsive interference detected event"
+      ::= { ptpTrapPrefix 2 }
+
+   dataPortStatusTrap NOTIFICATION-TYPE
+      OBJECTS { dataPortStatus }
+      STATUS current
+      DESCRIPTION
+             "Current status of the Ethernet link. NB: a change of 
+             state may generate an SNMP trap and/or SMTP email alert"  
+      ::= { ptpTrapPrefix 3 }
+
+   telecomsChannelStatusTrap NOTIFICATION-TYPE
+      OBJECTS { telecomsChannelStatus }
+      STATUS current
+      DESCRIPTION
+             "Current status of telecoms channel. NB: a change of 
+             state may generate an SNMP trap and/or SMTP email alert"  
+      ::= { ptpTrapPrefix 4 }
+
+   telecomsLoopbackTrap NOTIFICATION-TYPE
+      OBJECTS { telecomsLoopback }
+      STATUS current
+      DESCRIPTION
+             "The loopback status of telecoms channel. This is 
+             intended for installation testing and should be set to 
+             'None' for normal operation. The wire connections to a 
+             unit can be tested by applying a 'Copper' loopback to the 
+             local unit. The wireless connection to the remote unit 
+             can be tested by applying a 'Wireless' loopback to the 
+             remote unit with no loopback on the local unit. When 
+             applying a wireless loopback, please ensure that the 
+             other end of the link has a loopback setting of 'None'. 
+             NB: a change of state may generate an SNMP trap and/or 
+             SMTP email alert"  
+      ::= { ptpTrapPrefix 6 }
+
+   regionCodeTrap NOTIFICATION-TYPE
+      OBJECTS { regionCode }
+      STATUS current
+      DESCRIPTION
+             "The region code prohibits the wireless unit from 
+             operating outside the regulated limits. An invalid region 
+             code indicates a corrupted licence key. NB: a change of 
+             state may generate an SNMP trap and/or SMTP email alert"  
+      ::= { ptpTrapPrefix 8 }
+
+   installStatusTrap NOTIFICATION-TYPE
+      OBJECTS { installStatus }
+      STATUS current
+      DESCRIPTION
+             "A non-zero value indicates that signalling was received 
+             with the wrong MAC address or a mismatched link name. NB: 
+             It is very unusual to detect this, because units with 
+             mis-configured Target MAC Address will normally fail to 
+             establish a wireless link. However, rare circumstances 
+             may establish a partial wireless link and detect this 
+             situation. NB: A non-zero value on start-up, or a change 
+             of value during operation, may generate an SNMP trap 
+             and/or SMTP email alert"  
+      ::= { ptpTrapPrefix 9 }
+
+   installArmStateTrap NOTIFICATION-TYPE
+      OBJECTS { installArmState }
+      STATUS current
+      DESCRIPTION
+             "Indicates if the unit is being installed. NB: a value 
+             other than 'disarmed' on startup, or a change of state 
+             during operation may generate an SNMP trap and/or SMTP 
+             email alert"  
+      ::= { ptpTrapPrefix 10 }
+
+   unitOutOfCalibrationTrap NOTIFICATION-TYPE
+      OBJECTS { unitOutOfCalibration }
+      STATUS current
+      DESCRIPTION
+             "The unit is out of calibration"  
+      ::= { ptpTrapPrefix 11 }
+
+   incompatibleRegionCodesTrap NOTIFICATION-TYPE
+      OBJECTS { incompatibleRegionCodes }
+      STATUS current
+      DESCRIPTION
+             "The master and slave units have incompatible region 
+             codes. NB: Both units must have compatible licence keys"  
+      ::= { ptpTrapPrefix 14 }
+
+   noWirelessChannelAvailableTrap NOTIFICATION-TYPE
+      OBJECTS { noWirelessChannelAvailable }
+      STATUS current
+      DESCRIPTION
+             "Spectrum Management was unable to locate a suitable 
+             wireless channel to operate on"  
+      ::= { ptpTrapPrefix 15 }
+
+   wirelessLinkDisabledWarningTrap NOTIFICATION-TYPE
+      OBJECTS { wirelessLinkDisabledWarning }
+      STATUS current
+      DESCRIPTION
+             "The SNMP ifAdminStatus of the wireless interface has 
+             disabled wireless traffic"  
+      ::= { ptpTrapPrefix 16 }
+
+   dataPortDisabledWarningTrap NOTIFICATION-TYPE
+      OBJECTS { dataPortDisabledWarning }
+      STATUS current
+      DESCRIPTION
+             "The SNMP ifAdminStatus of the Ethernet interface has 
+             disabled Ethernet traffic"  
+      ::= { ptpTrapPrefix 17 }
+
+   dataPortConfigurationMismatchTrap NOTIFICATION-TYPE
+      OBJECTS { dataPortConfigurationMismatch }
+      STATUS current
+      DESCRIPTION
+             "The detection of Ethernet fragments (runt packets) when 
+             the link is in full duplex is an indication of an 
+             auto-negotiation or forced configuration mismatch"  
+      ::= { ptpTrapPrefix 19 }
+
+   incompatibleMasterAndSlaveTrap NOTIFICATION-TYPE
+      OBJECTS { incompatibleMasterAndSlave }
+      STATUS current
+      DESCRIPTION
+             "A non-zero value indicates that the master and slave 
+             ends of a link are different hardware products, or have 
+             different software versions. NB: It is very unusual to 
+             detect this, because incompatible units will normally 
+             fail to establish a wireless link. However, some 
+             combinations may establish a partial wireless link and 
+             detect this situation. NB: A non-zero value may generate 
+             an SNMP trap and/or SMTP email alert"  
+      ::= { ptpTrapPrefix 20 }
+
+   sNTPSyncTrap NOTIFICATION-TYPE
+      OBJECTS { sNTPSync }
+      STATUS current
+      DESCRIPTION
+             "If SNTP Sync fails then check the server settings in the 
+             Remote Management page, or disable SNTP. NB: a change of 
+             state may generate an SNMP trap and/or SMTP email alert"  
+      ::= { ptpTrapPrefix 21 }
+
+   tDDSynchronizationAlarmTrap NOTIFICATION-TYPE
+      OBJECTS { tDDSynchronizationAlarm }
+      STATUS current
+      DESCRIPTION
+             "Not Synchronized indicates failure of the external 
+             timing system for a period greater than the holdover 
+             timer. TDD frame timing will have drifted, and this link 
+             may cause interference with other links in a synchronized 
+             network. Timing System Failure is an early warning, 
+             indicating that 80% of the holdover period has expired."  
+      ::= { ptpTrapPrefix 22 }
+
+   linkModeOptimizationMismatchTrap NOTIFICATION-TYPE
+      OBJECTS { linkModeOptimizationMismatch }
+      STATUS current
+      DESCRIPTION
+             "The remote node of this link has been configured with a 
+             different link mode optimization"  
+      ::= { ptpTrapPrefix 25 }
+
+   capacityLicenseMismatchTrap NOTIFICATION-TYPE
+      OBJECTS { capacityLicenseMismatch }
+      STATUS current
+      DESCRIPTION
+             "The local and remote units have different licensed 
+             capacity and/or the full capacity trial has been 
+             activated at only one unit. The wireless link is 
+             operating at the capacity of the lowest capacity unit"  
+      ::= { ptpTrapPrefix 27 }
+
+   syslogStateTrap NOTIFICATION-TYPE
+      OBJECTS { syslogState }
+      STATUS current
+      DESCRIPTION
+             "The syslog service has been enabled or disabled"  
+      ::= { ptpTrapPrefix 30 }
+
+   syslogLocalNearlyFullTrap NOTIFICATION-TYPE
+      STATUS current
+      DESCRIPTION "The syslog local log is nearly full (90%)"
+      ::= { ptpTrapPrefix 31 }
+
+   syslogLocalWrappedTrap NOTIFICATION-TYPE
+      STATUS current
+      DESCRIPTION "The syslog local log has wrapped"
+      ::= { ptpTrapPrefix 32 }
+
+   syslogClientTrap NOTIFICATION-TYPE
+      OBJECTS { syslogClient }
+      STATUS current
+      DESCRIPTION
+             "Enable or disable the syslog client"  
+      ::= { ptpTrapPrefix 33 }
+
+   END

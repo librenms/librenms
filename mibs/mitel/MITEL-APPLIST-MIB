@@ -1,0 +1,158 @@
+-- Copyright 2005, 2006, 2007 MITEL Networks Corporation
+-- All rights reserved.
+-- This MITEL SNMP Management Information Base Specification
+-- (Specification) embodies MITEL's confidential and
+-- proprietary intellectual property. MITEL retains all
+-- title and ownership in the Specification, including any
+-- revisions.
+
+-- This Specification is supplied "AS IS", and MITEL makes
+-- no warranty, either express or implied, as to the use,
+-- operation, condition, or performance of the Specification.
+
+MITEL-APPLIST-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-IDENTITY
+            FROM SNMPv2-SMI
+        mitelIdentification
+           FROM MITEL-MIB;
+
+    mitelIdApplications    MODULE-IDENTITY
+        LAST-UPDATED      "201402111200Z"
+        ORGANIZATION      "MITEL Networks Corporation"
+        CONTACT-INFO      "Standards Group,
+                           Postal:    MITEL Networks Corporation
+                           350 Legget Drive, PO Box 13089
+                           Kanata, Ontario
+                           Canada  K2K 2W7
+                           Tel: +1 613 592 2122
+                           Fax: +1 613 592 4784
+                           URL: www.mitel.com"
+        DESCRIPTION       "Replaced E-Mail: std@mitel.com with URL: www.mitel.com."
+        REVISION          "201402111200Z"
+        DESCRIPTION       "The MITEL Application List MIB module.
+                           Applications that provide value-added capabilities.
+                           These typically will not be used for the sysObjectID
+                           Field but for additional identification of applications
+                           That are within a platform."
+        REVISION          "200811250000Z"
+        DESCRIPTION       "Adding some more Mitel Apps."
+        REVISION          "200810020000Z"
+        DESCRIPTION       "Added the Unified Communications Server application to the
+                           list of known Mitel Apps."
+        REVISION          "200808130000Z"
+        DESCRIPTION       "Added the Nupoint Unified Messenger application to the
+                           list of known Mitel Apps."
+        REVISION          "200706070000Z"
+        DESCRIPTION       "Renamed 'Mitel Application Suite' application to 
+                           'Suite Application Service'."
+        REVISION          "200704090000Z"
+        DESCRIPTION       "Adding the Mitel Application Suite application to the 
+                           list of known Mitel Apps.."
+        REVISION          "200702120000Z"
+        DESCRIPTION       "Adding the Secure Call Record Connector application to the 
+                           list of known Mitel Apps.."
+        REVISION          "200608100000Z"
+        DESCRIPTION       "Adding the LiCS application to the list of known Mitel Apps.."
+        REVISION          "200502232134Z"
+        DESCRIPTION       "Created."
+    ::= { mitelIdentification 7 }
+
+    -- ****************************************************************
+    -- The mitelIdApplications...
+    -- ****************************************************************
+
+    mitelIdAppMasTeleworker  OBJECT-IDENTITY
+         STATUS            current
+        DESCRIPTION       "The Mitel Networks MAS Teleworker application that can 
+                           run the MAS application server platform."
+        ::= { mitelIdApplications 1 } 
+
+    mitelIdAppMasOfficeServerSuite  OBJECT-IDENTITY
+        STATUS            current
+        DESCRIPTION       "The Mitel Networks MAS Office Server Suite application 
+                           that runs on the MAS application server platform."
+       ::= { mitelIdApplications 2 }
+
+    mitelIdAppMasManagedVpn  OBJECT-IDENTITY
+        STATUS            current
+        DESCRIPTION       "The Mitel Networks MAS Managed VPN application that runs 
+                           on the MAS application server platform."
+        ::= { mitelIdApplications 3 }
+
+    mitelIdAppMasMobileExtention  OBJECT-IDENTITY
+        STATUS            current
+        DESCRIPTION       "The Mitel Networks MAS Managed Mobile Extention application 
+                           that runs on the MAS application server platform."
+        ::= { mitelIdApplications 4 }
+
+    mitelIdAppCallServer  OBJECT-IDENTITY
+        STATUS            current
+        DESCRIPTION       "The Mitel Networks Call Server application 
+                           that runs on various application server platforms."
+        ::= { mitelIdApplications 5 }
+
+    mitelIdAppQuickConference  OBJECT-IDENTITY
+        STATUS            current
+        DESCRIPTION       "The Mitel Quick Conference application 
+                           that runs on various application server platforms."
+        ::= { mitelIdApplications 6 }
+
+    mitelIdAppSecureCallRecConn  OBJECT-IDENTITY
+        STATUS            current
+        DESCRIPTION       "The Mitel Secure Call Record Connector product application 
+                           that runs on various application server platforms."
+        ::= { mitelIdApplications 7 }
+
+    mitelIdAppSuiteAppService  OBJECT-IDENTITY
+        STATUS            current
+        DESCRIPTION       "The Suite Application Service application that runs on 
+                           various application server platforms."
+        ::= { mitelIdApplications 8 }
+
+    mitelIdAppAudioWebConferencing  OBJECT-IDENTITY
+        STATUS            current
+        DESCRIPTION       "The Mitel/Intertel Audio Web Conferencing product application 
+                           that runs on various application server platforms."
+        ::= { mitelIdApplications 9 }
+
+    mitelIdAppCustomerServiceManager  OBJECT-IDENTITY
+        STATUS            current
+        DESCRIPTION       "The Mitel/Intertel Customer Service Manager application that runs on 
+                           various application server platforms."
+        ::= { mitelIdApplications 10 }
+
+    mitelIdAppNupointUnifiedMessenger  OBJECT-IDENTITY
+        STATUS            current
+        DESCRIPTION       "The Mitel Nupoint Unified Messenger application that runs on 
+                           various application server platforms."
+        ::= { mitelIdApplications 11 }
+
+    mitelIdAppUnifiedCommunicationsServer  OBJECT-IDENTITY
+        STATUS            current
+        DESCRIPTION       "The Mitel Unified Communications Server application that runs on 
+                           various application server platforms."
+        ::= { mitelIdApplications 12 }
+
+    mitelIdAppUnifiedIPClient  OBJECT-IDENTITY
+        STATUS            current
+        DESCRIPTION       "The Mitel Unified IP Client application that runs on 
+                           various application server platforms."
+        ::= { mitelIdApplications 13 }
+
+    mitelIdAppMediaServiceManager  OBJECT-IDENTITY
+        STATUS            current
+        DESCRIPTION       "The Mitel Media Service Manager application that runs on 
+                           various application server platforms."
+        ::= { mitelIdApplications 14 }
+
+    mitelIdAppMitelCommunicationDirectorManager  OBJECT-IDENTITY
+        STATUS            current
+        DESCRIPTION       "The Mitel Communication Director Manager application that runs on 
+                           various application server platforms."
+        ::= { mitelIdApplications 15 }
+
+-- MITEL-APPLIST-MIB
+
+END

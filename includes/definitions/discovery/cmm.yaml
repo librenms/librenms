@@ -1,0 +1,13 @@
+modules:
+    sensors:
+        state:
+            data:
+                -
+                    oid: CMM3-MIB::powerStatus
+                    value: powerStatus
+                    num_oid: '.1.3.6.1.4.1.161.19.3.4.4.1.1.5.{{ $index }}'
+                    index: powerStatus.{{ $index }}
+                    descr: Power Status {{ $index }}
+                    states:
+                        - { value: 0, generic: 2, graph: 1, descr: Power Off }
+                        - { value: 1, generic: 0, graph: 1, descr: Power On }

@@ -21,7 +21,7 @@ $config['base_url']        = "/";
 #$config['rrdcached']    = "unix:/var/run/rrdcached.sock";
 
 ### Default community
-$config['snmp']['community'] = array("public");
+$config['snmp']['community'] = array('public');
 
 ### Authentication Model
 $config['auth_mechanism'] = "mysql"; # default, other options: ldap, http-auth

@@ -23,7 +23,7 @@
  * @author     Lorenzo Zafra<zafra@ualberta.ca>
  */
 
-preg_match('~(?\'hardware\'.*?),\sFirmware\srev:\s(?\'version\'.*) \d\d\/\d\d\/\d\d~', $poll_device['sysDescr'], $matches);
+preg_match('~(?\'hardware\'.*?),\sFirmware\srev:\s(?\'version\'.*) \d\d\/\d\d\/\d\d~', $device['sysDescr'], $matches);
 
 if ($matches['hardware']) {
     $hardware = $matches['hardware'];

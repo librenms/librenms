@@ -1,0 +1,277 @@
+{
+    "applications": {
+        "discovery": {
+            "applications": [
+                {
+                    "app_type": "freeradius",
+                    "app_state": "UNKNOWN",
+                    "discovered": "1",
+                    "app_state_prev": null,
+                    "app_status": "",
+                    "app_instance": ""
+                }
+            ],
+            "application_metrics": []
+        },
+        "poller": {
+            "applications": [
+                {
+                    "app_type": "freeradius",
+                    "app_state": "OK",
+                    "discovered": "1",
+                    "app_state_prev": "UNKNOWN",
+                    "app_status": "",
+                    "app_instance": ""
+                }
+            ],
+            "application_metrics": [
+                {
+                    "metric": "access_accepts",
+                    "value": "235",
+                    "value_prev": null,
+                    "app_type": "freeradius"
+                },
+                {
+                    "metric": "access_challenges",
+                    "value": "490",
+                    "value_prev": null,
+                    "app_type": "freeradius"
+                },
+                {
+                    "metric": "access_rejects",
+                    "value": "4",
+                    "value_prev": null,
+                    "app_type": "freeradius"
+                },
+                {
+                    "metric": "access_requests",
+                    "value": "7758",
+                    "value_prev": null,
+                    "app_type": "freeradius"
+                },
+                {
+                    "metric": "acct_dropped_requests",
+                    "value": "0",
+                    "value_prev": null,
+                    "app_type": "freeradius"
+                },
+                {
+                    "metric": "acct_duplicate_requests",
+                    "value": "0",
+                    "value_prev": null,
+                    "app_type": "freeradius"
+                },
+                {
+                    "metric": "acct_invalid_requests",
+                    "value": "0",
+                    "value_prev": null,
+                    "app_type": "freeradius"
+                },
+                {
+                    "metric": "acct_malformed_requests",
+                    "value": "0",
+                    "value_prev": null,
+                    "app_type": "freeradius"
+                },
+                {
+                    "metric": "acct_requests",
+                    "value": "1685",
+                    "value_prev": null,
+                    "app_type": "freeradius"
+                },
+                {
+                    "metric": "acct_responses",
+                    "value": "1685",
+                    "value_prev": null,
+                    "app_type": "freeradius"
+                },
+                {
+                    "metric": "acct_unknown_types",
+                    "value": "0",
+                    "value_prev": null,
+                    "app_type": "freeradius"
+                },
+                {
+                    "metric": "auth_dropped_requests",
+                    "value": "5",
+                    "value_prev": null,
+                    "app_type": "freeradius"
+                },
+                {
+                    "metric": "auth_duplicate_requests",
+                    "value": "5",
+                    "value_prev": null,
+                    "app_type": "freeradius"
+                },
+                {
+                    "metric": "auth_invalid_requests",
+                    "value": "0",
+                    "value_prev": null,
+                    "app_type": "freeradius"
+                },
+                {
+                    "metric": "auth_malformed_requests",
+                    "value": "0",
+                    "value_prev": null,
+                    "app_type": "freeradius"
+                },
+                {
+                    "metric": "auth_responses",
+                    "value": "729",
+                    "value_prev": null,
+                    "app_type": "freeradius"
+                },
+                {
+                    "metric": "auth_unknown_types",
+                    "value": "0",
+                    "value_prev": null,
+                    "app_type": "freeradius"
+                },
+                {
+                    "metric": "proxy_access_accepts",
+                    "value": "0",
+                    "value_prev": null,
+                    "app_type": "freeradius"
+                },
+                {
+                    "metric": "proxy_access_challenges",
+                    "value": "0",
+                    "value_prev": null,
+                    "app_type": "freeradius"
+                },
+                {
+                    "metric": "proxy_access_rejects",
+                    "value": "0",
+                    "value_prev": null,
+                    "app_type": "freeradius"
+                },
+                {
+                    "metric": "proxy_access_requests",
+                    "value": "0",
+                    "value_prev": null,
+                    "app_type": "freeradius"
+                },
+                {
+                    "metric": "proxy_acct_dropped_requests",
+                    "value": "0",
+                    "value_prev": null,
+                    "app_type": "freeradius"
+                },
+                {
+                    "metric": "proxy_acct_duplicate_requests",
+                    "value": "0",
+                    "value_prev": null,
+                    "app_type": "freeradius"
+                },
+                {
+                    "metric": "proxy_acct_invalid_requests",
+                    "value": "0",
+                    "value_prev": null,
+                    "app_type": "freeradius"
+                },
+                {
+                    "metric": "proxy_acct_malformed_requests",
+                    "value": "0",
+                    "value_prev": null,
+                    "app_type": "freeradius"
+                },
+                {
+                    "metric": "proxy_acct_requests",
+                    "value": "0",
+                    "value_prev": null,
+                    "app_type": "freeradius"
+                },
+                {
+                    "metric": "proxy_acct_responses",
+                    "value": "0",
+                    "value_prev": null,
+                    "app_type": "freeradius"
+                },
+                {
+                    "metric": "proxy_acct_unknown_types",
+                    "value": "0",
+                    "value_prev": null,
+                    "app_type": "freeradius"
+                },
+                {
+                    "metric": "proxy_auth_dropped_requests",
+                    "value": "0",
+                    "value_prev": null,
+                    "app_type": "freeradius"
+                },
+                {
+                    "metric": "proxy_auth_duplicate_requests",
+                    "value": "0",
+                    "value_prev": null,
+                    "app_type": "freeradius"
+                },
+                {
+                    "metric": "proxy_auth_invalid_requests",
+                    "value": "0",
+                    "value_prev": null,
+                    "app_type": "freeradius"
+                },
+                {
+                    "metric": "proxy_auth_malformed_requests",
+                    "value": "0",
+                    "value_prev": null,
+                    "app_type": "freeradius"
+                },
+                {
+                    "metric": "proxy_auth_responses",
+                    "value": "0",
+                    "value_prev": null,
+                    "app_type": "freeradius"
+                },
+                {
+                    "metric": "proxy_auth_unknown_types",
+                    "value": "0",
+                    "value_prev": null,
+                    "app_type": "freeradius"
+                },
+                {
+                    "metric": "queue_len_acct",
+                    "value": "0",
+                    "value_prev": null,
+                    "app_type": "freeradius"
+                },
+                {
+                    "metric": "queue_len_auth",
+                    "value": "0",
+                    "value_prev": null,
+                    "app_type": "freeradius"
+                },
+                {
+                    "metric": "queue_len_detail",
+                    "value": "0",
+                    "value_prev": null,
+                    "app_type": "freeradius"
+                },
+                {
+                    "metric": "queue_len_internal",
+                    "value": "0",
+                    "value_prev": null,
+                    "app_type": "freeradius"
+                },
+                {
+                    "metric": "queue_len_proxy",
+                    "value": "0",
+                    "value_prev": null,
+                    "app_type": "freeradius"
+                },
+                {
+                    "metric": "queue_pps_in",
+                    "value": "0",
+                    "value_prev": null,
+                    "app_type": "freeradius"
+                },
+                {
+                    "metric": "queue_pps_out",
+                    "value": "0",
+                    "value_prev": null,
+                    "app_type": "freeradius"
+                }
+            ]
+        }
+    }
+}

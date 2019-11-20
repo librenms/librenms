@@ -1,0 +1,117 @@
+ARRIS-C3-NTP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter32
+        FROM SNMPv2-SMI
+    RowStatus
+        FROM SNMPv2-TC
+    cmtsC3
+        FROM ARRIS-MIB;
+
+    cmtsC3NTPMIB  MODULE-IDENTITY
+        LAST-UPDATED "200403300000Z" -- 30th March 2004
+        ORGANIZATION "Arris International"
+        CONTACT-INFO
+            "   Network Management
+                Postal: Arris International.
+                        4400 Cork Airport Business Park
+                        Cork Airport, Kinsale Road
+                        Cork, Ireland.
+                Tel:    +353 21 7305 800
+                Fax:    +353 21 4321 972"
+
+        DESCRIPTION
+            "This MIB manages the NTP software on the Arris CMTS C3"
+        ::= { cmtsC3 7 }
+
+    dcxNTPObjects OBJECT IDENTIFIER ::= { cmtsC3NTPMIB 1 }
+
+    dcxNTPServerTable OBJECT-TYPE
+        SYNTAX	SEQUENCE OF DcxNTPServerEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+        "This table contains a list of the NTP servers that the CMTS is
+        configured to use.  If the table is empty, then no NTP servers
+        are specified, and the time will be read from the on-board RTC
+        (Real Time Clock).  Each NTP server in this table will be queried,
+        but only the master NTP server will be used to update the system
+        time."
+        ::= { dcxNTPObjects 1 }
+
+    dcxNTPServerEntry	OBJECT-TYPE
+        SYNTAX	DcxNTPServerEntry
+        MAX-ACCESS	not-accessible
+        STATUS			current
+        DESCRIPTION
+            "An entry describing an NTP server.  Entries are ordered by dcxNTPServerIndex."
+        INDEX { dcxNTPServerIp }
+        ::= { dcxNTPServerTable 1 }
+
+    DcxNTPServerEntry ::= SEQUENCE {
+        dcxNTPServerIp					IpAddress,
+        dcxNTPServerInterval		Integer32,
+        dcxNTPServerSuccess		Counter32,
+        dcxNTPServerAttempts		Counter32,
+        dcxNTPServerOffset	Integer32,
+        dcxNTPServerStatus	RowStatus
+    }
+
+    dcxNTPServerIp		OBJECT-TYPE
+        SYNTAX		IpAddress
+        MAX-ACCESS	not-accessible
+        STATUS		current
+        DESCRIPTION
+            "The IP address to which this entry's addressing information pertains."
+        ::= { dcxNTPServerEntry 1 }
+
+    dcxNTPServerInterval	OBJECT-TYPE
+        SYNTAX	Integer32
+        MAX-ACCESS	read-create
+        STATUS	current
+        DESCRIPTION
+            "The interval for which the CMTS will wait before trying to connect to the NTP server (in seconds)."
+        DEFVAL	{ 300 }
+        ::= { dcxNTPServerEntry 2 }
+
+    dcxNTPServerSuccess	OBJECT-TYPE
+        SYNTAX	Counter32
+        MAX-ACCESS	read-only
+        STATUS	current
+        DESCRIPTION
+            "The number of times the NTP server has been successfully polled."
+        ::= { dcxNTPServerEntry 3 }
+
+    dcxNTPServerAttempts	OBJECT-TYPE
+        SYNTAX	Counter32
+        MAX-ACCESS	read-only
+        STATUS	current
+        DESCRIPTION
+            "The number of times the NTP server has been polled."
+        ::= { dcxNTPServerEntry 4 }
+
+    dcxNTPServerOffset	OBJECT-TYPE
+        SYNTAX	Integer32
+        MAX-ACCESS	read-only
+        STATUS	current
+        DESCRIPTION
+            "The offset (in seconds) from which the NTP server differs from the CMTS."
+        ::= { dcxNTPServerEntry 5 }
+
+    dcxNTPServerStatus	OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS	read-create
+        STATUS	current
+        DESCRIPTION
+            "Controls and reflects the status of rows in this table.  Rows in this table may be created by either the create-and-go or create-and-wait paradigms.  There is no restriction on changing values in a row of this table while the row is active."
+        ::= { dcxNTPServerEntry 6 }
+
+    dcxNTPMasterServer OBJECT-TYPE
+        SYNTAX		IpAddress
+        MAX-ACCESS	read-write
+        STATUS			current
+        DESCRIPTION
+            "This value contains the IP of the current master NTP server as specified in dcxNTPServerTable.  An IP address of 0.0.0.0 will be displayed if the NTP master server is not in the list, or not configured."
+        ::= { dcxNTPObjects 2 }
+
+ END

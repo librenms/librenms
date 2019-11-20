@@ -1,0 +1,89 @@
+--
+-- Copyright (c) 2006-2013. Aerohive Netowrks, Inc
+-- All rights reserved.
+
+AH-SMI-MIB DEFINITIONS ::= BEGIN
+
+--
+-- Imports
+--
+
+IMPORTS MODULE-IDENTITY, OBJECT-TYPE, enterprises
+		        FROM SNMPv2-SMI 
+        TEXTUAL-CONVENTION, MacAddress
+		        FROM SNMPv2-TC;
+
+--
+-- Module Identity
+--        
+
+aerohive MODULE-IDENTITY
+         LAST-UPDATED  "201608310000Z"  --  Aug 31, 2016
+         ORGANIZATION  "Aerohive Networks, Inc"
+         CONTACT-INFO  "info@aerohive.com
+                        1011 McCarthy Boulevard
+                        
+                        Milpitas, CA 95035"
+         DESCRIPTION
+           "This is the MIB module for object type definitions
+	    that are used throughout the Aerohive Networks enterprise MIBs."
+
+                                                                                                
+         ::= {  enterprises  26928 }
+ 
+
+ahProduct          OBJECT IDENTIFIER ::= { aerohive 1 }
+
+ahAP     	   OBJECT IDENTIFIER ::= { ahProduct 1 }
+ahAPCommon         OBJECT IDENTIFIER ::= { ahAP 1 }
+ahAPTrap	   OBJECT IDENTIFIER ::= { ahAPCommon 1 }
+ahAPInterface	   OBJECT IDENTIFIER ::= { ahAPCommon 2 }
+ahAPMRP            OBJECT IDENTIFIER ::= { ahAPCommon 3 }
+ahAPIDP            OBJECT IDENTIFIER ::= { ahAPCommon 4 }
+
+ahAPHiveAP020-ag            OBJECT IDENTIFIER ::= { ahAP 2 }
+ahAPHiveAP028-ag            OBJECT IDENTIFIER ::= { ahAP 3 }
+ahAPHiveAP320-n           OBJECT IDENTIFIER ::= { ahAP 4 }
+ahAPHiveAP340-n           OBJECT IDENTIFIER ::= { ahAP 5 }
+
+AhString ::= TEXTUAL-CONVENTION
+   STATUS        current
+   DESCRIPTION   "A text string with 32 octets"
+   SYNTAX        OCTET STRING (SIZE (0..32))
+
+AhNodeID ::= TEXTUAL-CONVENTION
+   STATUS        current
+   DESCRIPTION   "Mgmt MAC address in hex decimal notation"
+   SYNTAX        MacAddress
+                                      
+AhInterfaceType ::= TEXTUAL-CONVENTION
+   STATUS        current
+   DESCRIPTION   "Interface type - (PHYSICAL, VIRTUAL)"
+   SYNTAX        INTEGER {
+                   ahPHYSICAL     (0), -- physical Interface
+                   ahVIRTURAL    (1)  -- logical Interface
+                 }
+
+AhInterfaceMode ::= TEXTUAL-CONVENTION
+   STATUS        current
+   DESCRIPTION   "Interface role types"
+   SYNTAX        INTEGER {
+                   ahNotUsed    (0), -- interface is not used
+                   ahAccess     (1), -- interface is used for access 
+                   ahBackhaul   (2), -- interface is used for backhaul
+                   ahBridge     (3)  -- interface is used for bridge
+                 }
+
+AhMACProtocol ::= TEXTUAL-CONVENTION
+   STATUS        current
+   DESCRIPTION   "Radio Mode"
+   SYNTAX        INTEGER {
+                   ah11a        (0), -- A mode 
+                   ah11b        (1), -- B mode
+                   ah11g        (2), -- G mode
+                   ah11na       (3), -- NA mode
+                   ah11ng       (4)  -- NG mode
+                 }
+
+END
+

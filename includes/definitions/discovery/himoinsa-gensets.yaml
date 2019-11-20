@@ -1,0 +1,113 @@
+mib: DISMUNTELv00-MIB
+modules:
+    sensors:
+        frequency:
+            data:
+                -
+                    oid: conmutationmeasuresTable
+                    num_oid: '.1.3.6.1.4.1.41809.1.49.1.1.{{ $index }}'
+                    value: mainsFreqConm
+                    index: 'mainsFreqConm.{{ $index }}'
+                    descr: Mains frequency
+                    divisor: 10
+                -
+                    oid: conmutationmeasuresTable
+                    num_oid: '.1.3.6.1.4.1.41809.1.49.1.8.{{ $index }}'
+                    value: genFreqConm
+                    index: 'genFreqConm.{{ $index }}'
+                    descr: Genset frequency
+                    divisor: 10
+        voltage:
+            data:
+                -
+                    oid: conmutationmeasuresTable
+                    num_oid: '.1.3.6.1.4.1.41809.1.49.1.2.{{ $index }}'
+                    value: mainsVL12Conm
+                    index: 'mainsVL12Conm.{{ $index }}'
+                    descr: Mains voltage 12
+                -
+                    oid: conmutationmeasuresTable
+                    num_oid: '.1.3.6.1.4.1.41809.1.49.1.3.{{ $index }}'
+                    value: mainsVL23Conm
+                    index: 'mainsVL23Conm.{{ $index }}'
+                    descr: Mains voltage 23
+                -
+                    oid: conmutationmeasuresTable
+                    num_oid: '.1.3.6.1.4.1.41809.1.49.1.4.{{ $index }}'
+                    value: mainsVL13Conm
+                    index: 'mainsVL13Conm.{{ $index }}'
+                    descr: Mains voltage 13
+                -
+                    oid: conmutationmeasuresTable
+                    num_oid: '.1.3.6.1.4.1.41809.1.49.1.5.{{ $index }}'
+                    value: mainsVL1NConm
+                    index: 'mainsVL1NConm.{{ $index }}'
+                    descr: Mains voltage 1N
+                -
+                    oid: conmutationmeasuresTable
+                    num_oid: '.1.3.6.1.4.1.41809.1.49.1.6.{{ $index }}'
+                    value: mainsVL2NConm
+                    index: 'mainsVL2NConm.{{ $index }}'
+                    descr: Mains voltage 2N
+                -
+                    oid: conmutationmeasuresTable
+                    num_oid: '.1.3.6.1.4.1.41809.1.49.1.7.{{ $index }}'
+                    value: mainsVL3NConm
+                    index: 'mainsVL3NConm.{{ $index }}'
+                    descr: Mains voltage 3N
+                -
+                    oid: conmutationmeasuresTable
+                    num_oid: '.1.3.6.1.4.1.41809.1.49.1.9.{{ $index }}'
+                    value: genVL12Conm
+                    index: 'genVL12Conm.{{ $index }}'
+                    descr: Genset voltage 12
+                -
+                    oid: conmutationmeasuresTable
+                    num_oid: '.1.3.6.1.4.1.41809.1.49.1.10.{{ $index }}'
+                    value: genVL23Conm
+                    index: 'genVL23Conm.{{ $index }}'
+                    descr: Genset voltage 23
+                -
+                    oid: conmutationmeasuresTable
+                    num_oid: '.1.3.6.1.4.1.41809.1.49.1.11.{{ $index }}'
+                    value: genVL13Conm
+                    index: 'genVL13Conm.{{ $index }}'
+                    descr: Genset voltage 13
+                -
+                    oid: conmutationmeasuresTable
+                    num_oid: '.1.3.6.1.4.1.41809.1.49.1.12.{{ $index }}'
+                    value: genVL1NConm
+                    index: 'genVL1NConm.{{ $index }}'
+                    descr: Genset voltage 1N
+                -
+                    oid: conmutationmeasuresTable
+                    num_oid: '.1.3.6.1.4.1.41809.1.49.1.13.{{ $index }}'
+                    value: genVL2NConm
+                    index: 'genVL2NConm.{{ $index }}'
+                    descr: Genset voltage 2N
+                -
+                    oid: conmutationmeasuresTable
+                    num_oid: '.1.3.6.1.4.1.41809.1.49.1.14.{{ $index }}'
+                    value: genVL3NConm
+                    index: 'genVL3NConm.{{ $index }}'
+                    descr: Genset voltage 3N
+        current:
+            data:
+                -
+                    oid: conmutationmeasuresTable
+                    num_oid: '.1.3.6.1.4.1.41809.1.49.1.15.{{ $index }}'
+                    value: ph1AmpConm
+                    index: 'ph1AmpConm.{{ $index }}'
+                    descr: Phase current 1
+                -
+                    oid: conmutationmeasuresTable
+                    num_oid: '.1.3.6.1.4.1.41809.1.49.1.16.{{ $index }}'
+                    value: ph2AmpConm
+                    index: 'ph2AmpConm.{{ $index }}'
+                    descr: Phase current 2
+                -
+                    oid: conmutationmeasuresTable
+                    num_oid: '.1.3.6.1.4.1.41809.1.49.1.17.{{ $index }}'
+                    value: ph3AmpConm
+                    index: 'ph3AmpConm.{{ $index }}'
+                    descr: Phase current 3

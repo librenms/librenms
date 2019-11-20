@@ -1,0 +1,1036 @@
+MIMOSA-NETWORKS-PTMP-MIB DEFINITIONS ::= BEGIN
+
+--  Copyright (C) 2017, Mimosa Networks, Inc. All Rights Reserved.
+--
+--  Mimosa Networks MIB
+--  Revision: 0.3
+--  Date: April 05, 2017
+--
+--  Mimosa Networks, Inc.
+--  469 El Camino Real, Suite 100
+--  Santa Clara, CA 95050
+--  support@mimosa.co
+--
+--  This MIB defines the MIB specification for Mimosa Network's Products
+--
+--  Mimosa reserves the right to make changes to this MIB specification as
+--  well as other information related to this specification without prior
+--  notice.  The user of this specification should consult Mimosa Networks,
+--  to determine if any such changes have been made.
+--
+--  Current MIBs are available from Mimosa Networks at the following URLs:
+--
+--      http://help.mimosa.co
+--
+--  In no event shall Mimosa Networks, Inc. be liable for any indirect,
+--  consequential, special or incidental damages whatsoever (including
+--  but not limited to lost profits or lost revenue) arising out of or
+--  related to this specification or the information contained in it.
+--  This non-liability extends to even if Mimosa Networks Inc. has been
+--  advised of, known, or should have known, the potential for such damages.
+
+--  Mimosa Networks, Inc. hereby grants end-users, and other parties a
+--  a non-exclusive license to use this MIB specification in order to
+--  manage products of Mimosa Networks, Inc.
+
+
+IMPORTS
+    OBJECT-TYPE, MODULE-IDENTITY,
+    IpAddress, Integer32, Counter64,
+    Unsigned32                              FROM SNMPv2-SMI
+
+    DisplayString, TruthValue,
+    MacAddress, TimeStamp                   FROM SNMPv2-TC
+
+    MODULE-COMPLIANCE, OBJECT-GROUP         FROM SNMPv2-CONF
+
+    DecimalOne, DecimalTwo,
+    Mimosa5GHzFrequency,
+    Mimosa5GHzChannelNumber                 FROM MIMOSA-MIB-TC
+
+    mimosaWireless, mimosaConformanceGroup  FROM MIMOSA-NETWORKS-BASE-MIB;
+
+
+-- *****************************************************************
+-- ***       Mimosa PTMP variables are specified below.          ***
+-- *****************************************************************
+
+mimosaPtmp  MODULE-IDENTITY
+    LAST-UPDATED    "201704050000Z"
+    ORGANIZATION    "Mimosa Networks"
+    CONTACT-INFO
+        "
+            Postal: Mimosa Networks, Inc.
+                    469 El Camino Real, Suite 100
+                    Santa Clara, CA 95050
+                    US
+
+               Tel: +1-408-628-1277
+
+            E-mail: inquiry@mimosa.co
+        "
+    DESCRIPTION
+        "The MIB module for Mimosa PTMP products"
+    REVISION        "201704050000Z"
+    DESCRIPTION
+            "The first version of this MIB"
+    ::= { mimosaWireless 9 }
+
+mimosaPtmpSsid          OBJECT IDENTIFIER ::= { mimosaPtmp 1 }
+mimosaPtmpLinkInfo      OBJECT IDENTIFIER ::= { mimosaPtmp 2 }
+mimosaPtmpChannelPower  OBJECT IDENTIFIER ::= { mimosaPtmp 3 }
+mimosaPtmpApStats       OBJECT IDENTIFIER ::= { mimosaPtmp 4 }
+mimosaPtmpClientInfo    OBJECT IDENTIFIER ::= { mimosaPtmp 5 }
+mimosaPtmpClientStats   OBJECT IDENTIFIER ::= { mimosaPtmp 6 }
+mimosaPtmpMgmtInfo      OBJECT IDENTIFIER ::= { mimosaPtmp 7 }
+
+
+-- *************************************************************************
+-- ***      Mimosa SSID Information variables are specified below.       ***
+-- *************************************************************************
+
+mimosaPtmpSsidTable                 OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MimosaPtmpSsidEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of A5 SSID entries"
+    ::= { mimosaPtmpSsid 1 }
+
+
+mimosaPtmpSsidEntry                 OBJECT-TYPE
+    SYNTAX      MimosaPtmpSsidEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Entry that describes each SSID and all its related configuration"
+    INDEX   { mimosaPtmpSsidIndex }
+    ::= { mimosaPtmpSsidTable 1 }
+
+MimosaPtmpSsidEntry ::=
+    SEQUENCE {
+        mimosaPtmpSsidIndex                 Integer32,
+        mimosaPtmpSsidName                  DisplayString,
+        mimosaPtmpSsidType                  INTEGER,
+        mimosaPtmpSsidEnabled               TruthValue,
+        mimosaPtmpSsidBroadcastEnabled      TruthValue,
+        mimosaPtmpSsidIsolationEnabled      TruthValue
+   }
+
+mimosaPtmpSsidIndex                 OBJECT-TYPE
+    SYNTAX      Integer32(1..24)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Describes the index used to access a particular entry in the SSID
+        table."
+    ::= { mimosaPtmpSsidEntry 1 }
+
+mimosaPtmpSsidName                  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the name of the SSID"
+    ::= { mimosaPtmpSsidEntry 2 }
+
+mimosaPtmpSsidType                  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    hotspot(0),
+                    cpe(1)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the type of clients that will connect to this SSID. CPE
+         represents fixed, or Hotspot represents mobile devices"
+    ::= { mimosaPtmpSsidEntry 3 }
+
+mimosaPtmpSsidEnabled               OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes if the SSID is enabled (True) or disabled (False)"
+    ::= { mimosaPtmpSsidEntry 4 }
+
+mimosaPtmpSsidBroadcastEnabled      OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes if the Broadcast feature for this SSID is enabled or 
+        disabled"
+    ::= { mimosaPtmpSsidEntry 5 }
+
+mimosaPtmpSsidIsolationEnabled      OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes if the client isolation is enabled or disabled"
+    ::= { mimosaPtmpSsidEntry 6 }
+
+
+-- *************************************************************************
+-- *** Mimosa PTMP Link Information variables are specified below.       ***
+-- *************************************************************************
+
+mimosaPtmpWirelessMode              OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    srs (1),
+                    wifiinterop (2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the wireless protocol configured on the Mimosa Device"
+    ::= { mimosaPtmpLinkInfo 1 }
+
+mimosaPtmpWirelessGender            OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    a (1),
+                    b (2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the wireless protocol gender that defines the transmit
+         and receive timing"
+    ::= { mimosaPtmpLinkInfo 2 }
+
+mimosaPtmpWirelessTrafficSplit      OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes how the bandwidth is split between the AP and Station"
+    ::= { mimosaPtmpLinkInfo 3 }
+
+mimosaPtmpWirelessWindowLength      OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the length of the transmit time slot in milliseconds"
+    ::= { mimosaPtmpLinkInfo 4 }
+
+-- *************************************************************************
+-- *** Mimosa Radio Channel Power Information variables are specified  . ***
+-- *************************************************************************
+
+mimosaPtmpAutoChannelEnabled        OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes if the Auto Channel feature is Enabled or Disabled. This
+         function selects the channel that results in the best RF
+         performance."
+    ::= { mimosaPtmpChannelPower 1 }
+
+mimosaPtmpAntennaGain               OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the antenna gain for connectorized version of the device.
+        Measured in dBi."
+    ::= { mimosaPtmpChannelPower 2 }
+
+mimosaPtmpChannelPowerTable         OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MimosaPtmpChannelPowerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of Channel and Power related information per radio."
+    ::= { mimosaPtmpChannelPower 3 }
+
+mimosaPtmpChannelPowerEntry         OBJECT-TYPE
+    SYNTAX      MimosaPtmpChannelPowerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing channel and power information"
+    INDEX   { mimosaPtmpChPwrRadioIndex }
+    ::= { mimosaPtmpChannelPowerTable 1 }
+
+MimosaPtmpChannelPowerEntry ::=
+    SEQUENCE {
+        mimosaPtmpChPwrRadioIndex       Unsigned32,
+        mimosaPtmpChPwrRadioName        DisplayString,
+        mimosaPtmpChPwrCntrFreqCfg      Mimosa5GHzFrequency,
+        mimosaPtmpChPwrPrimChannelCfg   Mimosa5GHzChannelNumber,
+        mimosaPtmpChPwrChWidthCfg       Unsigned32,
+        mimosaPtmpChPwrTxPowerCfg       Integer32,
+        mimosaPtmpChPwrCntrFreqCur      Mimosa5GHzFrequency,
+        mimosaPtmpChPwrPrimChannelCur   Mimosa5GHzChannelNumber,
+        mimosaPtmpChPwrChWidthCur       Unsigned32,
+        mimosaPtmpChPwrTxPowerCur       Integer32,
+        mimosaPtmpChPwrAgcMode          INTEGER,
+        mimosaPtmpChPwrMinRxPower       Integer32
+    }
+
+mimosaPtmpChPwrRadioIndex           OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Describes the index of the radio."
+    ::= { mimosaPtmpChannelPowerEntry 1 }
+
+mimosaPtmpChPwrRadioName            OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the name of the radio."
+    ::= { mimosaPtmpChannelPowerEntry 2 }
+
+mimosaPtmpChPwrCntrFreqCfg          OBJECT-TYPE
+    SYNTAX      Mimosa5GHzFrequency
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the configured center frequency of the channel used on the
+         access point. The center frequency represents the absolute center
+         of the selected channel width without any offset. Measured in MHz"
+    ::= { mimosaPtmpChannelPowerEntry 3 }
+
+mimosaPtmpChPwrPrimChannelCfg       OBJECT-TYPE
+    SYNTAX      Mimosa5GHzChannelNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the primary channel number that corresponds with the
+         operating frequency."
+    ::= { mimosaPtmpChannelPowerEntry 4 }
+
+mimosaPtmpChPwrChWidthCfg           OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the channel width for access point operation: 20 MHz,
+         40 MHz or 80 MHz"
+    ::= { mimosaPtmpChannelPowerEntry 5 }
+
+mimosaPtmpChPwrTxPowerCfg           OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the desired transmit power level. The allowed options
+         are determined by a combination of country and chosen frequency.
+         Measured in dBm"
+    ::= { mimosaPtmpChannelPowerEntry 6 }
+
+mimosaPtmpChPwrCntrFreqCur          OBJECT-TYPE
+    SYNTAX      Mimosa5GHzFrequency
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the current center frequency of the channel used on the
+         access point. The center frequency represents the absolute center
+         of the selected channel width without any offset. Measured in MHz"
+    ::= { mimosaPtmpChannelPowerEntry 7 }
+
+mimosaPtmpChPwrPrimChannelCur       OBJECT-TYPE
+    SYNTAX      Mimosa5GHzChannelNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the current primary channel number that corresponds with the
+         operating frequency."
+    ::= { mimosaPtmpChannelPowerEntry 8 }
+
+mimosaPtmpChPwrChWidthCur           OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the current channel width for access point operation: 20 MHz,
+         40 MHz or 80 MHz"
+    ::= { mimosaPtmpChannelPowerEntry 9 }
+
+mimosaPtmpChPwrTxPowerCur           OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the current transmit power level. The allowed options
+         are determined by a combination of country and chosen frequency.
+         Measured in dBm"
+    ::= { mimosaPtmpChannelPowerEntry 10 }
+
+mimosaPtmpChPwrAgcMode              OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    off (0),
+                    manual (1)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the setting for Automatic Gain Control (AGC) feature,
+        which is used to set the signal level below which the radio
+        ignores incoming RF interference. The choices are Off or Manual"
+    ::= { mimosaPtmpChannelPowerEntry 11 }
+
+mimosaPtmpChPwrMinRxPower           OBJECT-TYPE
+    SYNTAX      Integer32 (-90..-10)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the Rx power level (in manual AGC Mode) below your
+        expected signal, but above other interference, measured in dBm"
+    ::= { mimosaPtmpChannelPowerEntry 12 }
+
+mimosaPtmpChannelExclusionTable     OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MimosaPtmpChannelExclusionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of Exclusions and Restrictions"
+    ::= { mimosaPtmpChannelPower 4 }
+
+mimosaPtmpChannelExclusionEntry     OBJECT-TYPE
+    SYNTAX      MimosaPtmpChannelExclusionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Entry that describes each SSID and all its related configuration"
+    INDEX   { mimosaPtmpChannelExclusionIndex }
+    ::= { mimosaPtmpChannelExclusionTable 1 }
+
+MimosaPtmpChannelExclusionEntry ::=
+    SEQUENCE {
+        mimosaPtmpChannelExclusionIndex     Integer32,
+        mimosaPtmpChannelExclusionStart     Integer32,
+        mimosaPtmpChannelExclusionEnd       Integer32
+   }
+
+mimosaPtmpChannelExclusionIndex     OBJECT-TYPE
+    SYNTAX      Integer32 (1..16)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Describes the index used to access a particular entry in the
+        Exclusion list table."
+    ::= { mimosaPtmpChannelExclusionEntry 1 }
+
+mimosaPtmpChannelExclusionStart     OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the lower limit for the exclusion range, not including
+        this frequency"
+    ::= { mimosaPtmpChannelExclusionEntry 2 }
+
+mimosaPtmpChannelExclusionEnd       OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the upper limit for the exclusion range, not including
+         this frequency."
+    ::= { mimosaPtmpChannelExclusionEntry 3 }
+
+
+-- *************************************************************************
+-- *** Mimosa Access Point Statistics                                    ***
+-- *************************************************************************
+mimosaPtmpApStatsRxBytes            OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the number of bytes received by the AP in single-User mode"
+        ::= { mimosaPtmpApStats 1 }
+
+mimosaPtmpApStatsTxBytes            OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the number of bytes transmitted by the AP in single-user
+        mode"
+        ::= { mimosaPtmpApStats 2 }
+
+mimosaPtmpApStatsRxPkts             OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the number of packets received by the AP in single-user mode"
+        ::= { mimosaPtmpApStats 3 }
+
+mimosaPtmpApStatsTxPkts             OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the number of packets transmitted by the AP in
+        single-user mode"
+        ::= { mimosaPtmpApStats 4 }
+
+mimosaPtmpApStatsTxPer              OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the packet error rate on the transmit path of the
+        AP, in single-user mode"
+        ::= { mimosaPtmpApStats 5 }
+
+mimosaPtmpApStatsLastUpdated        OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the last updated time for these statistics"
+        ::= { mimosaPtmpApStats 6 }
+
+
+-- *************************************************************************
+-- *** Mimosa Access Point Client Information                            ***
+-- *************************************************************************
+
+mimosaPtmpClientInfoTable           OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MimosaPtmpClientInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of all the associated clients and related information of
+        each of them."
+    ::= { mimosaPtmpClientInfo 1 }
+
+mimosaPtmpClientInfoEntry           OBJECT-TYPE
+    SYNTAX      MimosaPtmpClientInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Entry that describes each client and related configuration and
+        statistics."
+    INDEX   { mimosaPtmpClientInfoIndex }
+    ::= { mimosaPtmpClientInfoTable 1 }
+
+MimosaPtmpClientInfoEntry ::=
+    SEQUENCE { mimosaPtmpClientInfoIndex        Unsigned32,
+               mimosaPtmpClientInfoMacAddress   MacAddress,
+               mimosaPtmpClientName             DisplayString,
+               mimosaPtmpClientFWVersion        DisplayString,
+               mimosaPtmpClientIPAddress        IpAddress,
+               mimosaPtmpClientAssociatedTime   TimeStamp,
+               mimosaPtmpClientPlanName         DisplayString,
+               mimosaPtmpClientUlCommitted      Unsigned32,
+               mimosaPtmpClientUlPeak           Unsigned32,
+               mimosaPtmpClientDlCommitted      Unsigned32,
+               mimosaPtmpClientDlPeak           Unsigned32,
+               mimosaPtmpClientInfoLastUpdated  TimeStamp }
+
+mimosaPtmpClientInfoIndex           OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Describes the index used to access a particular entry in the
+        Client Traffic Shaping Information table."
+    ::= { mimosaPtmpClientInfoEntry 1 }
+
+mimosaPtmpClientInfoMacAddress      OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the MAC address of the client associated to this access-
+        point."
+    ::= { mimosaPtmpClientInfoEntry 2 }
+
+mimosaPtmpClientName                OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the name associated with this client."
+    ::= { mimosaPtmpClientInfoEntry 3 }
+
+mimosaPtmpClientFWVersion           OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the firmware version of this client.
+
+        This is supported only if the client is a Mimosa device."
+    ::= { mimosaPtmpClientInfoEntry 4 }
+
+mimosaPtmpClientIPAddress           OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the IP Address associated with this client."
+    ::= { mimosaPtmpClientInfoEntry 5 }
+
+mimosaPtmpClientAssociatedTime      OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes how long the client is associated with this access-point."
+    ::= { mimosaPtmpClientInfoEntry 6 }
+
+mimosaPtmpClientPlanName            OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the Traffic Shaping plan associated with this client."
+    ::= { mimosaPtmpClientInfoEntry 7 }
+
+mimosaPtmpClientUlCommitted         OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the Uplink Committed Rate configured for the client."
+    ::= { mimosaPtmpClientInfoEntry 8 }
+
+mimosaPtmpClientUlPeak              OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the Uplink Peak Rate configured for the client."
+    ::= { mimosaPtmpClientInfoEntry 9 }
+
+mimosaPtmpClientDlCommitted         OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the Downlink Committed Rate configured for the client."
+    ::= { mimosaPtmpClientInfoEntry 10 }
+
+mimosaPtmpClientDlPeak              OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the Downlink Peak Rate configured for the client."
+    ::= { mimosaPtmpClientInfoEntry 11 }
+
+mimosaPtmpClientInfoLastUpdated     OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the last updated time of this information for the Client."
+    ::= { mimosaPtmpClientInfoEntry 12 }
+
+
+-- *************************************************************************
+-- *** Mimosa Access Point Client Statistics                             ***
+-- *************************************************************************
+
+mimosaPtmpClientStatsTable          OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MimosaPtmpClientStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of all the associated clients and related information of each
+         of them."
+
+    ::= { mimosaPtmpClientStats 1 }
+
+mimosaPtmpClientStatsEntry          OBJECT-TYPE
+    SYNTAX      MimosaPtmpClientStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Entry that describes each client all its related configuration and
+        statistics."
+    INDEX   { mimosaPtmpClientStatsIndex }
+    ::= { mimosaPtmpClientStatsTable 1 }
+
+MimosaPtmpClientStatsEntry ::=
+    SEQUENCE { mimosaPtmpClientStatsIndex           Unsigned32,
+               mimosaPtmpClientStatsMacAddress      MacAddress,
+               mimosaPtmpClientAssocBW              Unsigned32,
+               mimosaPtmpClientRxBytes              Counter64,
+               mimosaPtmpClientTxBytes              Counter64,
+               mimosaPtmpClientRxPkts               Counter64,
+               mimosaPtmpClientTxPkts               Counter64,
+               mimosaPtmpClientRxPhyRate            Unsigned32,
+               mimosaPtmpClientTxPhyRate            Unsigned32,
+               mimosaPtmpClientTxAvgPer             DecimalTwo,
+               mimosaPtmpClientRssiAvg              DecimalOne,
+               mimosaPtmpClientStatsLastUpdated     TimeStamp
+             }
+
+mimosaPtmpClientStatsIndex          OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Describes the index used to access a particular entry in the
+        Client Information table."
+    ::= { mimosaPtmpClientStatsEntry 1 }
+
+mimosaPtmpClientStatsMacAddress          OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the MAC address of the client associated to this access-
+        point."
+    ::= { mimosaPtmpClientStatsEntry 2 }
+
+mimosaPtmpClientAssocBW             OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the associated bandwidth of the client."
+    ::= { mimosaPtmpClientStatsEntry 3 }
+
+mimosaPtmpClientRxBytes             OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the number of bytes received from this client."
+    ::= { mimosaPtmpClientStatsEntry 4 }
+
+mimosaPtmpClientTxBytes             OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the number of bytes transmitted to this client."
+    ::= { mimosaPtmpClientStatsEntry 5 }
+
+mimosaPtmpClientRxPkts              OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the number of packets received from this client."
+    ::= { mimosaPtmpClientStatsEntry 6 }
+
+mimosaPtmpClientTxPkts              OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the number of packets transmitted to this client."
+    ::= { mimosaPtmpClientStatsEntry 7 }
+
+mimosaPtmpClientRxPhyRate           OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the receive rate of this client."
+    ::= { mimosaPtmpClientStatsEntry 8 }
+
+mimosaPtmpClientTxPhyRate           OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the transmit rate of this client."
+    ::= { mimosaPtmpClientStatsEntry 9 }
+
+mimosaPtmpClientTxAvgPer            OBJECT-TYPE
+    SYNTAX      DecimalTwo
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the average packet error rate on the transmit side for
+        this client."
+    ::= { mimosaPtmpClientStatsEntry 10 }
+
+mimosaPtmpClientRssiAvg             OBJECT-TYPE
+    SYNTAX      DecimalOne
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the average RSSI for this Client."
+    ::= { mimosaPtmpClientStatsEntry 11 }
+
+mimosaPtmpClientStatsLastUpdated         OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the last updated time of this information for the Client."
+    ::= { mimosaPtmpClientStatsEntry 12 }
+
+
+-- *************************************************************************
+-- *** Mimosa PTMP Management Information variables are specified below. ***
+-- *************************************************************************
+
+mimosaPtmpMgmtIpAddress             OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the IP Address configured on the Mimosa Device"
+    ::= { mimosaPtmpMgmtInfo 1 }
+
+mimosaPtmpMgmtIpNetmask             OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the IP netmask configured on the Mimosa Device"
+    ::= { mimosaPtmpMgmtInfo 2 }
+
+mimosaPtmpMgmtIpGateway             OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the IP Address of the Gateway configured on the Mimosa
+        Device"
+    ::= { mimosaPtmpMgmtInfo 3 }
+
+mimosaPtmpMgmtIpMode                OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (4..6))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the IP Address assignment mode configured on the Mimosa
+        Device"
+    ::= { mimosaPtmpMgmtInfo 4 }
+
+mimosaPtmpMgmtPrimaryDNS            OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the IP Address of the Primary DNS server configured on the
+        Mimosa Device"
+    ::= { mimosaPtmpMgmtInfo 5 }
+
+mimosaPtmpMgmtSecondaryDNS          OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the IP Address of the Secondary DNS server configured on the
+        Mimosa Device"
+    ::= { mimosaPtmpMgmtInfo 6 }
+
+mimosaPtmpMgmtVlanStatus            OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    disable (0),
+                    enable (1)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the status of management vlan configured on the Mimosa Device"
+    ::= { mimosaPtmpMgmtInfo 7 }
+
+mimosaPtmpMgmtVlanId                OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the management vlan-id configured on the Mimosa Device"
+    ::= { mimosaPtmpMgmtInfo 8 }
+
+mimosaPtmpMgmtVlanPassthrough       OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    disable (0),
+                    enable (1)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the status of the vlan passthrough configured on the Mimosa Device"
+    ::= { mimosaPtmpMgmtInfo 9 }
+
+mimosaPtmpMgmtEthernetMac           OBJECT-TYPE
+    SYNTAX      MacAddress 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the Ethernet MAC address configured on the Mimosa Device"
+    ::= { mimosaPtmpMgmtInfo 10 }
+
+---
+---  Conformance/Compliance Statements
+---
+mimosaPtmpConformance         OBJECT IDENTIFIER ::= { mimosaConformanceGroup 2 }
+
+mimosaPtmpCompliances         OBJECT IDENTIFIER ::= { mimosaPtmpConformance 1 }
+mimosaPtmpGroups              OBJECT IDENTIFIER ::= { mimosaPtmpConformance 2 }
+
+
+mimosaPtmpCompliance      MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for PTMP supported Access Points that
+        implement this MIB."
+    MODULE
+        GROUP mimosaPtmpSsidGroup
+        DESCRIPTION
+            "The mimosaPtmpSsidGroup is mandatory only for access-point device
+            supporting PTMP."
+
+        GROUP mimosaPtmpLinkInfoGroup
+        DESCRIPTION
+            "The mimosaPtmpLinkInfoGroup is mandatory only for access-point
+            device supporting PTMP."
+
+        GROUP mimosaPtmpChannelPowerGroup
+        DESCRIPTION
+            "The mimosaPtmpChannelPowerGroup is mandatory only for access-point
+            device supporting PTMP."
+
+        GROUP mimosaPtmpApStatsGroup
+        DESCRIPTION
+            "The mimosaPtmpApStatsGroup is mandatory only for access-point
+            device supporting PTMP."
+
+        GROUP mimosaPtmpClientStatsGroup
+        DESCRIPTION
+            "The mimosaPtmpClientStatsGroup is mandatory only for access-point
+            device supporting PTMP."
+
+        GROUP mimosaPtmpClientInfoGroup
+        DESCRIPTION
+            "The mimosaPtmpClientInfoGroup is mandatory only for access-point
+            device supporting PTMP."
+
+        GROUP mimosaPtmpMgmtInfoGroup
+        DESCRIPTION
+            "The mimosaPtmpMgmtInfoGroup is mandatory only for access-point
+            device supporting PTMP."
+    ::= { mimosaPtmpCompliances 1 }
+
+
+mimosaPtmpSsidGroup                 OBJECT-GROUP
+    OBJECTS {
+            mimosaPtmpSsidName,
+            mimosaPtmpSsidType,
+            mimosaPtmpSsidEnabled,
+            mimosaPtmpSsidBroadcastEnabled,
+            mimosaPtmpSsidIsolationEnabled
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for the SSID Table."
+    ::= { mimosaPtmpGroups 1 }
+
+mimosaPtmpLinkInfoGroup             OBJECT-GROUP
+    OBJECTS {
+            mimosaPtmpWirelessMode,
+            mimosaPtmpWirelessGender,
+            mimosaPtmpWirelessTrafficSplit,
+            mimosaPtmpWirelessWindowLength
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for the wireless link objects."
+    ::= { mimosaPtmpGroups 2 }
+
+mimosaPtmpChannelPowerGroup         OBJECT-GROUP
+    OBJECTS {
+            mimosaPtmpAutoChannelEnabled,
+            mimosaPtmpAntennaGain,
+            mimosaPtmpChPwrRadioName,
+            mimosaPtmpChPwrCntrFreqCfg,
+            mimosaPtmpChPwrPrimChannelCfg,
+            mimosaPtmpChPwrChWidthCfg,
+            mimosaPtmpChPwrTxPowerCfg,
+            mimosaPtmpChPwrCntrFreqCur,
+            mimosaPtmpChPwrPrimChannelCur,
+            mimosaPtmpChPwrChWidthCur,
+            mimosaPtmpChPwrTxPowerCur,
+            mimosaPtmpChPwrAgcMode,
+            mimosaPtmpChPwrMinRxPower,
+            mimosaPtmpChannelExclusionStart,
+            mimosaPtmpChannelExclusionEnd
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for the wireless channel and power settings."
+    ::= { mimosaPtmpGroups 3 }
+
+mimosaPtmpApStatsGroup              OBJECT-GROUP
+    OBJECTS {
+            mimosaPtmpApStatsRxBytes,
+            mimosaPtmpApStatsTxBytes,
+            mimosaPtmpApStatsRxPkts,
+            mimosaPtmpApStatsTxPkts,
+            mimosaPtmpApStatsTxPer,
+            mimosaPtmpApStatsLastUpdated
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects describing the AP related statistics."
+    ::= { mimosaPtmpGroups 4 }
+
+mimosaPtmpClientInfoGroup           OBJECT-GROUP
+    OBJECTS {
+            mimosaPtmpClientName,
+            mimosaPtmpClientFWVersion,
+            mimosaPtmpClientIPAddress,
+            mimosaPtmpClientAssociatedTime,
+            mimosaPtmpClientPlanName,
+            mimosaPtmpClientUlCommitted,
+            mimosaPtmpClientUlPeak,
+            mimosaPtmpClientDlCommitted,
+            mimosaPtmpClientDlPeak,
+            mimosaPtmpClientInfoLastUpdated
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects describing the client details."
+    ::= { mimosaPtmpGroups 5 }
+    
+mimosaPtmpClientStatsGroup          OBJECT-GROUP
+    OBJECTS {
+            mimosaPtmpClientStatsMacAddress,
+            mimosaPtmpClientAssocBW,
+            mimosaPtmpClientRxBytes,
+            mimosaPtmpClientRxPkts,
+            mimosaPtmpClientTxPkts,
+            mimosaPtmpClientRssiAvg,
+            mimosaPtmpClientRxPhyRate,
+            mimosaPtmpClientTxAvgPer,
+            mimosaPtmpClientTxPhyRate,
+            mimosaPtmpClientTxBytes,
+            mimosaPtmpClientStatsLastUpdated
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects describing the client statistics."
+    ::= { mimosaPtmpGroups 6 }
+
+mimosaPtmpMgmtInfoGroup             OBJECT-GROUP
+    OBJECTS {
+            mimosaPtmpMgmtIpAddress,
+            mimosaPtmpMgmtIpNetmask,
+            mimosaPtmpMgmtIpGateway,
+            mimosaPtmpMgmtIpMode,
+            mimosaPtmpMgmtPrimaryDNS,
+            mimosaPtmpMgmtSecondaryDNS,
+            mimosaPtmpMgmtVlanStatus,
+            mimosaPtmpMgmtVlanId,
+            mimosaPtmpMgmtVlanPassthrough,
+            mimosaPtmpMgmtEthernetMac
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects describing the client details."
+    ::= { mimosaPtmpGroups 7 }
+
+END
+

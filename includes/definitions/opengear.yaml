@@ -1,9 +1,11 @@
 os: opengear
 text: Opengear
-type: OOB Management
+type: 'OOB Management'
 icon: opengear
+over:
+    - { graph: device_signal, text: 'Signal' }
 mib_dir:
     - opengear
 discovery:
-    - sysObjectId:
+    - sysObjectID:
         - .1.3.6.1.4.1.25049.1

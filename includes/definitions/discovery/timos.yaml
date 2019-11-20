@@ -1,0 +1,134 @@
+mib: TIMETRA-SYSTEM-MIB:TIMETRA-CHASSIS-MIB:TIMETRA-SUBSCRIBER-MGMT-MIB
+modules:
+    processors:
+          data:
+              -
+                  oid: sgiCpuUsage
+                  num_oid: '.1.3.6.1.4.1.6527.3.1.2.1.1.1.{{ $index }}'
+
+    sensors:
+        state:
+            data:
+                -
+                    oid: tmnxHwTable
+                    value: tmnxHwAlarmState
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.1.8.1.24.{{ $index }}'
+                    descr: '{{ $tmnxHwName }} {{ $tmnxHwSerialNumber }} {{ $tmnxHwFailureReason }}'
+                    index: 'tmnxHwID.{{ $index }}'
+                    states:
+                        - { value: 0, generic: 3, graph: 0, descr: unknown }
+                        - { value: 1, generic: 2, graph: 0, descr: alarmActive }
+                        - { value: 2, generic: 0, graph: 0, descr: alarmCleared }
+                -
+                    oid: tmnxChassisTable
+                    value: tmnxChassisCriticalLEDState
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.1.3.1.12.{{ $index }}'
+                    descr: 'Critical LED'
+                    index: 'tmnxChassisCriticalLEDState.1'
+                    states:
+                        - { value: 0, generic: 3, graph: 0, descr: NotApplicable }
+                        - { value: 1, generic: 0, graph: 0, descr: Off }
+                        - { value: 2, generic: 2, graph: 0, descr: Red }
+                        - { value: 3, generic: 1, graph: 0, descr: Amber }
+                        - { value: 4, generic: 1, graph: 0, descr: Yellow }
+                        - { value: 5, generic: 0, graph: 0, descr: Green }
+                        - { value: 6, generic: 1, graph: 0, descr: AmberBlink }
+                        - { value: 7, generic: 1, graph: 0, descr: YellowBlink }
+                        - { value: 8, generic: 0, graph: 0, descr: GreenBlink }
+                        - { value: 9, generic: 2, graph: 0, descr: RedBlink }
+                -
+                    oid: tmnxChassisTable
+                    value: tmnxChassisMajorLEDState
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.1.3.1.13.{{ $index }}'
+                    descr: 'Major LED'
+                    index: 'tmnxChassisMajorLEDState.1'
+                    states:
+                        - { value: 0, generic: 3, graph: 0, descr: NotApplicable }
+                        - { value: 1, generic: 0, graph: 0, descr: Off }
+                        - { value: 2, generic: 2, graph: 0, descr: Red }
+                        - { value: 3, generic: 1, graph: 0, descr: Amber }
+                        - { value: 4, generic: 1, graph: 0, descr: Yellow }
+                        - { value: 5, generic: 0, graph: 0, descr: Green }
+                        - { value: 6, generic: 1, graph: 0, descr: AmberBlink }
+                        - { value: 7, generic: 1, graph: 0, descr: YellowBlink }
+                        - { value: 8, generic: 0, graph: 0, descr: GreenBlink }
+                        - { value: 9, generic: 2, graph: 0, descr: RedBlink }
+                -
+                    oid: tmnxChassisTable
+                    value: tmnxChassisMinorLEDState
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.1.3.1.14.{{ $index }}'
+                    descr: 'Minor LED'
+                    index: 'tmnxChassisMinorLEDState.1'
+                    states:
+                        - { value: 0, generic: 3, graph: 0, descr: NotApplicable }
+                        - { value: 1, generic: 0, graph: 0, descr: Off }
+                        - { value: 2, generic: 2, graph: 0, descr: Red }
+                        - { value: 3, generic: 1, graph: 0, descr: Amber }
+                        - { value: 4, generic: 1, graph: 0, descr: Yellow }
+                        - { value: 5, generic: 0, graph: 0, descr: Green }
+                        - { value: 6, generic: 1, graph: 0, descr: AmberBlink }
+                        - { value: 7, generic: 1, graph: 0, descr: YellowBlink }
+                        - { value: 8, generic: 0, graph: 0, descr: GreenBlink }
+                        - { value: 9, generic: 2, graph: 0, descr: RedBlink }
+                -
+                    oid: tmnxChassisTable
+                    value: tmnxChassisOverTempState
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.1.3.1.24.{{ $index }}'
+                    descr: 'Chassis Over Temp'
+                    index: 'tmnxChassisOverTempState.1'
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: Ok }
+                        - { value: 2, generic: 2, graph: 0, descr: OverTemp }
+
+        temperature:
+            data:
+                -
+                    oid: tmnxHwTable
+                    value: tmnxHwTemperature
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.1.8.1.18.{{ $index }}'
+                    descr: '{{ $tmnxHwName }}'
+                    index: 'tmnxHwID.{{ $index }}'
+                    high_limit: tmnxHwTempThreshold
+                    skip_values:
+                        -
+                          oid: tmnxHwTempSensor
+                          op: '='
+                          value: 2
+        load:
+            data:
+                -
+                    oid: tmnxPhysChassisFanEntry
+                    value: tmnxPhysChassisFanSpeedPercent
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.1.24.1.1.5.{{ $index }}'
+                    descr: 'Fanspeed {{ $index }}'
+                    index: 'tmnxPhysChassisFanSpeedPercent.{{ $index }}'
+        count:
+            data:
+                -
+                    oid: tmnxSubMgmtSystStatsTable
+                    value: tmnxSubMgmtSystSSubscribers
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.33.1.107.1.65.{{ $index }}'
+                    descr: 'Active subscribers on this system'
+                    index: 'tmnxSubMgmtSystSSubscribers.{{ $index }}'
+                    group: 'Subscribers'
+                -
+                    oid: tmnxSubMgmtSystStatsTable
+                    value: tmnxSubMgmtSystSV4
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.33.1.107.1.25.{{ $index }}'
+                    descr: 'V4 hosts on this system'
+                    index: 'tmnxSubMgmtSystSV4.{{ $index }}'
+                    group: 'Subscribers'
+                -
+                    oid: tmnxSubMgmtSystStatsTable
+                    value: tmnxSubMgmtSystSV6
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.33.1.107.1.27.{{ $index }}'
+                    descr: 'V6 hosts on this system'
+                    index: 'tmnxSubMgmtSystSV6.{{ $index }}'
+                    group: 'Subscribers'
+                -
+                    oid: tmnxSubMgmtSystStatsTable
+                    value: tmnxSubMgmtSystSTotal
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.33.1.107.1.33.{{ $index }}'
+                    descr: 'Total hosts on this system'
+                    index: 'tmnxSubMgmtSystSTotal.{{ $index }}'
+                    group: 'Subscribers'

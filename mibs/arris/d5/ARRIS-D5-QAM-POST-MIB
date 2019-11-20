@@ -1,0 +1,441 @@
+    ARRIS-D5-QAM-POST-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            D5Program
+                FROM ARRIS-D5-VIDEO-MIB           
+            arrisD5UEQam
+                FROM ARRIS-MIB
+            TenthdBmV
+                FROM DOCS-IF-MIB            
+            ifIndex, InterfaceIndex         
+                FROM IF-MIB         
+            PhysicalIndex
+                FROM ENTITY-MIB
+            d5QamMib
+                FROM ARRIS-D5-QAM-MIB
+            OBJECT-GROUP, MODULE-COMPLIANCE         
+                FROM SNMPv2-CONF            
+            Integer32, Unsigned32, Counter32, OBJECT-TYPE, MODULE-IDENTITY          
+                FROM SNMPv2-SMI         
+            TruthValue, RowStatus, DisplayString            
+                FROM SNMPv2-TC;
+    
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.2
+        d5QamPOSTMib MODULE-IDENTITY 
+            LAST-UPDATED "200909090909Z"        -- September 09, 2009 at 09:09 GMT
+            ORGANIZATION 
+                "Arris International"
+            CONTACT-INFO 
+                "Network Management
+                Postal: Arris International.
+                        4400 Cork Airport Business Park
+                        Cork Airport, Kinsale Road
+                        Cork, Ireland.
+                Tel:    +353 21 7305 800
+                Fax:    +353 21 4321 972"
+            DESCRIPTION 
+                "Arris D5 UEQ QAM Manufacturing MIB"
+            ::= { d5QamMib 2 }
+
+        
+    
+    
+--
+-- Node definitions
+--
+    
+-- ------------------------------------------------------------------------
+-- QAM POST section
+-- ------------------------------------------------------------------------
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.2.1
+        d5QamMemoryTestTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF D5QamMemoryTestEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table contains a list of QAM POST tests and test-results for
+                each of the memory banks"
+            ::= { d5QamPOSTMib 1 }
+
+        
+        -- 1.3.6.1.4.1.4115.1.8.1.5.2.1.1
+        d5QamMemoryTestEntry OBJECT-TYPE
+            SYNTAX D5QamMemoryTestEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry for a single memory bank POST test and result."
+            INDEX { d5QamMemoryTestSlotId, d5QamMemoryTestBankId }
+            ::= { d5QamMemoryTestTable 1 }
+
+        
+        D5QamMemoryTestEntry ::=
+            SEQUENCE { 
+                d5QamMemoryTestSlotId
+                    Unsigned32,
+                d5QamMemoryTestBankId
+                    Unsigned32,
+                d5QamMemoryTestDescription
+                    DisplayString,
+                d5QamMemoryTestChip
+                    INTEGER,
+                d5QamMemoryTestExecute
+                    INTEGER,
+                d5QamMemoryTestResultVector
+                    Unsigned32,
+                d5QamMemoryTestResultRegister
+                    Unsigned32,
+                d5QamMemoryTestResultAddress
+                    Unsigned32
+             }
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.2.1.1.1
+        d5QamMemoryTestSlotId OBJECT-TYPE
+            SYNTAX Unsigned32 (1..6)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "QAM card associated with a particular test."
+            ::= { d5QamMemoryTestEntry 1 }
+
+        
+        -- 1.3.6.1.4.1.4115.1.8.1.5.2.1.1.2
+        d5QamMemoryTestBankId OBJECT-TYPE
+            SYNTAX Unsigned32 (1..4)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A unique identifier specifying a particular memory bank."
+            ::= { d5QamMemoryTestEntry 2 }
+
+        
+        -- 1.3.6.1.4.1.4115.1.8.1.5.2.1.1.3
+        d5QamMemoryTestDescription OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "A textual description of the the memory bank."
+            ::= { d5QamMemoryTestEntry 3 }
+
+        
+        -- 1.3.6.1.4.1.4115.1.8.1.5.2.1.1.4
+        d5QamMemoryTestChip OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                chip1(1),
+                chip2(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Select a particular chip for a DVT test, this field
+                is ignored for all other tests"
+            ::= { d5QamMemoryTestEntry 4 }
+
+        
+        -- 1.3.6.1.4.1.4115.1.8.1.5.2.1.1.5
+        d5QamMemoryTestExecute OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                idle(1),
+                running(2),
+                stop(3),
+                startDataPinTest(4),
+                startAddressPinTest(5),
+                startMemorySweepTest(6),
+                startDVTWriteCycles(7),
+                startDVTReadCycles(8)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Control for starting a test and checking for test completion.
+                Only a value of stop or startXXX is allowed on write access.
+                Only a value of idle or running is allowed on read access."
+            ::= { d5QamMemoryTestEntry 5 }
+
+        
+        -- 1.3.6.1.4.1.4115.1.8.1.5.2.1.1.6
+        d5QamMemoryTestResultVector OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Last test result vector, its interpretation is test specific"
+            ::= { d5QamMemoryTestEntry 6 }
+
+        
+        -- 1.3.6.1.4.1.4115.1.8.1.5.2.1.1.7
+        d5QamMemoryTestResultRegister OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Last test result register, its interpretation is test specific"
+            ::= { d5QamMemoryTestEntry 7 }
+
+        
+        -- 1.3.6.1.4.1.4115.1.8.1.5.2.1.1.8
+        d5QamMemoryTestResultAddress OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Last test result address, its interpretation is test specific"
+            ::= { d5QamMemoryTestEntry 8 }
+
+-- QAM RS232 Bus --
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.2.2
+        d5QamRS232Table OBJECT-TYPE
+            SYNTAX SEQUENCE OF D5QamRS232Entry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table allow access to RS232 bus of available QAM cards"
+            ::= { d5QamPOSTMib 2 }
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.2.2.1
+        d5QamRS232Entry OBJECT-TYPE
+            SYNTAX D5QamRS232Entry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry for a single QAM card RS232 bus."
+            INDEX { d5QamRS232SlotId }
+            ::= { d5QamRS232Table 1 }
+
+        D5QamRS232Entry ::=
+            SEQUENCE { 
+                d5QamRS232SlotId
+                    Unsigned32,
+                d5QamRS232Status
+                    Unsigned32,
+                d5QamRS232Data
+                    OCTET STRING
+             }
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.2.2.1.1
+        d5QamRS232SlotId OBJECT-TYPE
+            SYNTAX Unsigned32 (1..6)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Slot associated with a particular QAM card."
+            ::= { d5QamRS232Entry 1 }
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.2.2.1.2
+        d5QamRS232Status OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Retrieve the status of the RS232 bus as documented in 
+                D5 Mux & PHY FPGAs Firmware Interface Specification section [2.4.14]"
+            ::= { d5QamRS232Entry 2 }
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.2.2.1.3
+        d5QamRS232Data OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..64))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "On writing, the octet string is pushed to the RS232 transmit FIFO
+                 and flushed to the QAM micro-controller.
+                 On reading, the octet string contains the content of the RS232
+                 receive FIFO."
+            ::= { d5QamRS232Entry 3 }
+        
+-- QAM ECL Bus --
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.2.3
+        d5QamECLTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF D5QamECLEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table allow access to ECL bus of available QAM cards"
+            ::= { d5QamPOSTMib 3 }
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.2.3.1
+        d5QamECLEntry OBJECT-TYPE
+            SYNTAX D5QamECLEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry for a single QAM card ECL bus."
+            INDEX { d5QamECLSlotId }
+            ::= { d5QamECLTable 1 }
+
+        D5QamECLEntry ::=
+            SEQUENCE { 
+                d5QamECLSlotId
+                    Unsigned32,
+                d5QamECLAddress
+                    Unsigned32,
+                d5QamECLValue
+                    Unsigned32,
+                d5QamECLExecute
+                    INTEGER
+             }
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.2.3.1.1
+        d5QamECLSlotId OBJECT-TYPE
+            SYNTAX Unsigned32 (1..6)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Slot associated with a particular QAM card."
+            ::= { d5QamECLEntry 1 }
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.2.3.1.2
+        d5QamECLAddress OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "the ECL address for the transaction"
+            ::= { d5QamECLEntry 2 }
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.2.3.1.3
+        d5QamECLValue OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The ECL value for the write transaction, or the result of a
+                 Read transaction."
+            ::= { d5QamECLEntry 3 }
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.2.3.1.4
+        d5QamECLExecute OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                idle(1),
+                fail(2),
+                readFpga(3),
+                writeFpga(4),
+                readMicro(5),
+                writeMicro(6)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Control for an ECL transaction.
+                Only a value of read or write is allowed on write access.
+                Only a value of idle, running or fail is allowed on read access."
+            ::= { d5QamECLEntry 4 }
+        
+-- QAM Configuration Control --
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.2.4
+        d5QamConfigurationControlTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF D5QamConfigurationControlEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table allow controlling internal aspects of QAM card configuration"
+            ::= { d5QamPOSTMib 4 }
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.2.4.1
+        d5QamConfigurationControlEntry OBJECT-TYPE
+            SYNTAX D5QamConfigurationControlEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry for a single QAM card configuration."
+            INDEX { d5QamConfigurationControlSlotId }
+            ::= { d5QamConfigurationControlTable 1 }
+
+        D5QamConfigurationControlEntry ::=
+            SEQUENCE { 
+                d5QamConfigurationControlSlotId
+                    Unsigned32,
+                d5QamConfigurationControlResetNow
+                    TruthValue,
+                d5QamConfigurationControlManufacturingTests
+                    TruthValue,
+                d5QamConfigurationControlPreDistortionCoefs
+                    TruthValue
+             }
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.2.4.1.1
+        d5QamConfigurationControlSlotId OBJECT-TYPE
+            SYNTAX Unsigned32 (1..6)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Slot associated with a particular QAM card."
+            ::= { d5QamConfigurationControlEntry 1 }
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.2.4.1.2
+        d5QamConfigurationControlResetNow OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Setting this object to true(1) causes the device to reset.
+                 Reading this object always returns false(2)."
+            ::= { d5QamConfigurationControlEntry 2 }
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.2.4.1.3
+        d5QamConfigurationControlManufacturingTests OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Enable/disable manufacturing tests."
+            ::= { d5QamConfigurationControlEntry 3 }
+
+        -- 1.3.6.1.4.1.4115.1.8.1.5.2.4.1.4
+        d5QamConfigurationControlPreDistortionCoefs OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Enable/disable pre-distortion coefficients usage."
+            ::= { d5QamConfigurationControlEntry 4 }
+
+-- ------------------------------------------------------------------------
+-- QAM Conformance section
+-- ------------------------------------------------------------------------
+        
+        -- 1.3.6.1.4.1.4115.1.8.1.5.2.99
+        d5QamPOSTConformance OBJECT IDENTIFIER ::= { d5QamPOSTMib 99 }
+
+        
+        -- 1.3.6.1.4.1.4115.1.8.1.5.2.99.1
+        d5QamPOSTGroups OBJECT IDENTIFIER ::= { d5QamPOSTConformance 1 }
+
+        
+        -- 1.3.6.1.4.1.4115.1.8.1.5.2.99.1.1
+        d5QamPOSTGroup OBJECT-GROUP
+            OBJECTS { 
+                d5QamMemoryTestDescription, d5QamMemoryTestChip, d5QamMemoryTestExecute,
+                d5QamMemoryTestResultVector, d5QamMemoryTestResultRegister, d5QamMemoryTestResultAddress,
+                d5QamRS232Status, d5QamRS232Data, d5QamECLAddress, d5QamECLValue, d5QamECLExecute }
+            STATUS current
+            DESCRIPTION 
+                "Description."
+            ::= { d5QamPOSTGroups 1 }
+
+        
+        -- 1.3.6.1.4.1.4115.1.8.1.5.2.99.2
+        d5QamPOSTCompliances OBJECT IDENTIFIER ::= { d5QamPOSTConformance 2 }
+
+        
+        -- 1.3.6.1.4.1.4115.1.8.1.5.2.99.2.1
+        d5QamPOSTCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "Description."
+            MODULE -- this module
+                MANDATORY-GROUPS { d5QamPOSTGroup }
+            ::= { d5QamPOSTCompliances 1 }
+
+        
+    
+    END

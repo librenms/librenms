@@ -1,0 +1,225 @@
+WRI-CPU-MIB DEFINITIONS ::= BEGIN
+	IMPORTS
+			MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32,
+			Integer32, TimeTicks, Counter64,enterprises,
+			NOTIFICATION-TYPE,Unsigned32                       
+							FROM SNMPv2-SMI       
+			TEXTUAL-CONVENTION,RowStatus
+							FROM SNMPv2-TC
+			wri,wriProducts			
+							FROM WRI-SMI;	
+
+	-- CPU monitor       
+	msppCpu			MODULE-IDENTITY
+        LAST-UPDATED    "201001110000Z"
+        ORGANIZATION    "Wuhan FiberHome Networks Co.,Ltd."
+        CONTACT-INFO
+                "  FHN Customer Service
+                   Tel: 027-87693784"
+        DESCRIPTION
+                "The MIB module to describe the monitor for cpu."
+        REVISION        "201001110000Z" 
+        DESCRIPTION
+                "Add some attributes for cpu table."
+        REVISION        "200901110000Z" 
+        DESCRIPTION
+                "Init version for cpu monitor."
+        ::=   {msppChassis 4}
+
+
+	mspp         	OBJECT IDENTIFIER ::= { wriProducts 8012 }
+	msppChassis		OBJECT IDENTIFIER ::=   {mspp 1}		
+
+	--	msppCpu			OBJECT IDENTIFIER ::=   {msppChassis 4}
+		
+		cpuTable OBJECT-TYPE
+			SYNTAX  SEQUENCE OF CpuEntry
+			MAX-ACCESS   not-accessible
+			STATUS  current
+			DESCRIPTION
+			         "Cpu information table."
+			::= { msppCpu 1 }
+
+		cpuEntry OBJECT-TYPE
+			SYNTAX CpuEntry
+			MAX-ACCESS   not-accessible
+			STATUS  current
+			DESCRIPTION
+		         	"An entry in the cpu table."
+			INDEX {cpuIndex }
+			::= { cpuTable 1 }
+		
+		CpuEntry ::=
+		    SEQUENCE {
+		    cpuIndex          		Unsigned32,
+		    cpuUsage           		Counter32,
+		    cpuMaxUsage        	Counter32,
+		    cpuHthreshold   	Counter32,
+		    cpuLthreshold   	Counter32,
+		    cpuOneTrap				INTEGER,
+		    cpuStatus				INTEGER,
+		    cpuDescr				OCTET STRING,
+		    cpuAllSetting			OCTET STRING,
+			cpuLastOneMinuteUsage       Counter32,
+			cpuLastFiveMinuteUsage      Counter32,
+			--xf add 2014-7-2
+			cpuIndexDescr			OCTET STRING
+			}
+		-- The following section describes the components of the table.
+
+			cpuIndex OBJECT-TYPE
+				SYNTAX  Unsigned32
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"Cpu index."
+				::= { cpuEntry 1 }
+
+
+			cpuUsage OBJECT-TYPE
+				SYNTAX  Counter32
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The current usage of cpu"
+				::= { cpuEntry 2 }
+				
+			cpuMaxUsage OBJECT-TYPE
+				SYNTAX  Counter32
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"Max usage of cpu."
+				::= { cpuEntry 3 }
+	
+			cpuHthreshold OBJECT-TYPE
+				SYNTAX  Counter32
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"High threshold of cpu."
+				::= { cpuEntry 4 } 
+				
+	        cpuLthreshold OBJECT-TYPE
+				SYNTAX  Counter32
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"low threshold of cpu."
+				::= { cpuEntry 5 }  
+	
+			cpuOneTrap OBJECT-TYPE
+				SYNTAX  INTEGER{
+					enable(1),
+					disable(2)
+				}
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"Trap enable or not of the cpu"
+				::= { cpuEntry 6 }   
+			
+			cpuStatus OBJECT-TYPE
+				SYNTAX  INTEGER{
+					normal(0),
+					highoverflow(1)
+				}
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"Cpu status"
+				::= { cpuEntry 7 }  				
+				
+			cpuDescr OBJECT-TYPE
+				SYNTAX  OCTET STRING
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"Cpu description."
+				::= { cpuEntry 8}       
+				
+			cpuAllSetting OBJECT-TYPE
+				SYNTAX  OCTET STRING
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"All parameter operation for the cpu."
+				::= { cpuEntry 9 } 
+			
+			cpuLastOneMinuteUsage OBJECT-TYPE
+				SYNTAX  Counter32
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The last-1-minute usage of cpu"
+				::= { cpuEntry 10 }
+
+			cpuLastFiveMinuteUsage OBJECT-TYPE
+				SYNTAX  Counter32
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The last-5-minute usage of cpu"
+				::= { cpuEntry 11 }
+				
+			-- xf add 2014-7-2
+			cpuIndexDescr	OBJECT-TYPE
+				SYNTAX  OCTET STRING
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+					"Cpu index description."
+				::= { cpuEntry 12 } 
+				
+
+			cpuTrap			OBJECT IDENTIFIER ::=   {msppCpu 2}
+		
+			cpuOverThreshold NOTIFICATION-TYPE
+       			OBJECTS {cpuUsage,cpuHthreshold,cpuLthreshold}
+       			STATUS  current
+       			DESCRIPTION
+       	        	"mspp cpu over threshold trap."
+				::= { cpuTrap 1}
+				
+			cpuUnderThreshold NOTIFICATION-TYPE
+       			OBJECTS {cpuUsage,cpuHthreshold,cpuLthreshold}
+       			STATUS  current
+       			DESCRIPTION
+       	        	"mspp cpu under threshold trap."
+				::= { cpuTrap 2}
+				
+			cpuRecoverThreshold NOTIFICATION-TYPE
+       			OBJECTS {cpuUsage,cpuHthreshold,cpuLthreshold}
+       			STATUS  current
+       			DESCRIPTION
+       	        	"mspp cpu recover threshold trap."
+				::= { cpuTrap 3}
+			
+			cpuGeneral			OBJECT IDENTIFIER ::=   {msppCpu 3}
+			
+			cpuNum OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"Cpu numbers"
+				::= { cpuGeneral 1 }
+			cpuTrapEnable OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"Enable cpu trap or not."
+				::= { cpuGeneral 2 }    
+				
+			cpuMonitor OBJECT-TYPE
+				SYNTAX  INTEGER{
+					enable(1),
+					disable(2)
+				}
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"Enable cpu monitor or not."
+				::= { cpuGeneral 3 }
+END

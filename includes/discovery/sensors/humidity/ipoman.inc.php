@@ -3,7 +3,7 @@
 // FIXME: EMD "stack" support
 // FIXME: What to do with IPOMANII-MIB::ipmEnvEmdConfigHumiOffset.0 ?
 echo ' IPOMANII-MIB ';
-$emd_installed = snmp_get($device, 'IPOMANII-MIB::ipmEnvEmdStatusEmdType.0', ' -Oqv');
+$emd_installed = snmp_get($device, 'IPOMANII-MIB::ipmEnvEmdStatusEmdType.0', '-Oqv');
 
 if ($emd_installed == 'eMD-HT') {
     $descr      = snmp_get($device, 'IPOMANII-MIB::ipmEnvEmdConfigHumiName.0', '-Oqv');

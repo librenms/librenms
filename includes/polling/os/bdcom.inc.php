@@ -6,7 +6,7 @@ Compiled: 2011-11-1 15:57:26 by SYS
 ROM: System Bootstrap,Version 0.3.2,Serial num:27072980
 */
 
-preg_match('/BDCOM\(tm\) ([A-Z0-9]+) Software, Version (.*)\nCompiled: (.*)\n(.*),Serial num:([0-9]+)/', $poll_device['sysDescr'], $matches);
+preg_match('/BDCOM\(tm\) ([A-Z0-9]+) Software, Version (.*)\nCompiled: (.*)\n(.*),Serial num:([0-9]+)/', $device['sysDescr'], $matches);
 
 $hardware = $matches['1'];
 $version  = $matches['2'];

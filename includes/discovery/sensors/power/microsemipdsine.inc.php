@@ -24,7 +24,7 @@
  */
 
 // Power consumption per port
-$oids = snmpwalk_cache_oid_num($device, '1.3.6.1.4.1.7428.1.2.1.1.1.3.1', array());
+$oids = snmpwalk_cache_oid_num($device, '1.3.6.1.4.1.7428.1.2.1.1.1.3.1', []);
 
 foreach ($oids as $oid => $data) {
     $current_id = substr($oid, strrpos($oid, '.') + 1);

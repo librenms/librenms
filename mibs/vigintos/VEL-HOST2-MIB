@@ -1,0 +1,565 @@
+VEL-HOST2-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	vel					FROM VEL-MIB
+	DisplayString		FROM RFC1213-MIB
+	TRAP-TYPE           FROM RFC-1215
+	MODULE-IDENTITY, OBJECT-TYPE
+						FROM SNMPv2-SMI;
+		
+host2 MODULE-IDENTITY
+	LAST-UPDATED	"201508121000Z"
+	ORGANIZATION	"Vigintos Elektronika"
+	CONTACT-INFO   	"Contact:
+
+                	Web: http://www.vigintos.com
+                	Email: ve@vigintos.com
+    
+                	Address: Ozo 4, Vilnius, LT-08200, Lithuania
+                	Tel:	+37052477465
+                	Fax:	+37052477466"
+
+	DESCRIPTION		"This is the MIB file of Host Controller 2."
+
+	REVISION		"201303070800Z"
+	
+	DESCRIPTION		"Host Controller 2 MIB File."
+              
+	::= {vel 5}
+	
+host2Name OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+				"Host Controller name."
+	::= {host2 1}
+	
+host2Version OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+				"Host Controller version"
+	::= {host2 2}
+	
+host2LoaderVersion OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+				"Host Controller loader version"
+	::= {host2 3}
+	
+--	************ Host Command Table ***************************	
+	
+host2CmdTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF Host2CmdEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+				"A list of Host Controller command entries."
+	::= {host2 4}
+
+	host2CmdEntry OBJECT-TYPE
+		SYNTAX		Host2CmdEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+					"An entry of Host Controller commands."
+		INDEX		{ host2CmdIndex }
+		::= {host2CmdTable 1}
+
+		Host2CmdEntry ::= SEQUENCE {
+			host2CmdIndex	INTEGER,
+ 			host2CmdName	DisplayString,
+ 			host2CmdExecute	INTEGER
+ 			}
+
+ 		host2CmdIndex OBJECT-TYPE
+ 			SYNTAX		INTEGER(1..255)
+ 			MAX-ACCESS	read-only
+ 			STATUS		current
+ 			DESCRIPTION
+ 						"An id for each command."
+ 			::= {host2CmdEntry 1}
+
+ 		host2CmdName OBJECT-TYPE
+ 			SYNTAX		DisplayString(SIZE(0..255))
+ 			MAX-ACCESS	read-only
+ 			STATUS		current
+ 			DESCRIPTION
+ 						"The name of a command."
+ 			::= {host2CmdEntry 2}
+
+ 		host2CmdExecute OBJECT-TYPE
+ 			SYNTAX		INTEGER {no(0), yes(1)}
+ 			MAX-ACCESS	read-write
+ 			STATUS		current
+ 			DESCRIPTION
+ 						"Instructions to execute the command of host.
+						If value no(0) is sent, the command will not be executed.
+						If value yes(1) is sent, the command will be executed."
+ 			::= {host2CmdEntry 3}
+
+--	************ End Host Command Table ***********************
+
+--	************ History **************************************	
+
+host2HistoryTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF Host2HistoryEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+				"A list of Host Controller history entries."
+	::= {host2 5}
+	
+	host2HistoryEntry OBJECT-TYPE
+		SYNTAX		Host2HistoryEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+					"An entry of Host Controller history."
+		INDEX		{ host2HisIndex }
+		::= {host2HistoryTable 1}
+		
+		Host2HistoryEntry ::= SEQUENCE {
+			host2HisIndex	INTEGER,
+			host2HisRecord	DisplayString
+			}
+			
+		host2HisIndex OBJECT-TYPE
+			SYNTAX		INTEGER(1..1008)
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+						"Unique index for each event."
+			::= {host2HistoryEntry 1}
+			
+		host2HisRecord OBJECT-TYPE
+			SYNTAX		DisplayString(SIZE(0..255))
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+						"The text description of an event."
+			::= {host2HistoryEntry 2}
+
+--	************ End History **********************************
+
+--	************ Devices **************************************
+
+--	************ Device Attributes ***************************
+
+host2DevAttrTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF Host2DevAttrEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+				"A list of device attributes entries."
+	::= {host2 6}
+	
+	host2DevAttrEntry OBJECT-TYPE
+		SYNTAX		Host2DevAttrEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+					"An entry of device attributes."
+		INDEX		{host2DevIndex}
+		::= {host2DevAttrTable 1}
+
+		Host2DevAttrEntry ::= SEQUENCE {
+			host2DevIndex		INTEGER,
+			host2DevLocalAddr	INTEGER,
+			host2DevTypeNumber	INTEGER,
+			host2DevLanState	INTEGER
+			}
+			
+		host2DevIndex OBJECT-TYPE
+			SYNTAX		INTEGER(1..14)
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+						"Unique ID for each device."
+			::= {host2DevAttrEntry 1}
+			
+		host2DevLocalAddr OBJECT-TYPE
+			SYNTAX		INTEGER(2..15)
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+						"Local address for each device."
+			::= {host2DevAttrEntry 2}
+			
+		host2DevTypeNumber OBJECT-TYPE
+			SYNTAX		INTEGER(0..65535)
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+						"Number of type for each device."
+			::= {host2DevAttrEntry 3}
+			
+		host2DevLanState OBJECT-TYPE
+			SYNTAX		INTEGER{disconnected(0), connected(1)}
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+						"Network connection state for each device."
+			::= {host2DevAttrEntry 4}
+
+--	************ End Device Attributes ***********************
+
+--	************ Textual Data Table ***********************************
+
+host2DevTxtTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF Host2DevTxtEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+				"A list of textual data that are read from the devices.
+				If device is disconnected, there is no entry for this device in the table."
+	::= {host2 7}
+
+	host2DevTxtEntry OBJECT-TYPE
+		SYNTAX		Host2DevTxtEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+					"An entry of textual data of devices."
+		INDEX		{host2DevIndex, host2DevTxtIndex}
+		::= {host2DevTxtTable 1}
+			
+		Host2DevTxtEntry ::= SEQUENCE {
+			host2DevTxtIndex	INTEGER,
+			host2DevTxtName		DisplayString,
+			host2DevTxtValue	DisplayString
+			}
+			
+		host2DevTxtIndex OBJECT-TYPE
+			SYNTAX		INTEGER(1..255)
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+						"Unique ID for each textual data of device."
+			::= {host2DevTxtEntry 1}
+			
+		host2DevTxtName OBJECT-TYPE
+			SYNTAX		DisplayString(SIZE(0..255))
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+						"The description of textual data of device."
+			::= {host2DevTxtEntry 2}
+			
+		host2DevTxtValue OBJECT-TYPE
+			SYNTAX		DisplayString(SIZE(0..255))
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+						"The value of textual data of device."
+			::= {host2DevTxtEntry 3}
+			
+--	************ End Textual Data Table *******************************
+
+--	************ Event Table ****************************************
+
+host2DevEvtTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF Host2DevEvtEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+				"A list of events of devices entries.
+				If device is disconnected, there is no entry for this device in the table."
+	::= {host2 8}
+
+	host2DevEvtEntry OBJECT-TYPE
+		SYNTAX		Host2DevEvtEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+					"An entry of events of devices."
+		INDEX		{host2DevIndex, host2DevEvtIndex}
+		::= {host2DevEvtTable 1}
+
+		Host2DevEvtEntry ::= SEQUENCE {
+			host2DevEvtIndex	INTEGER,
+			host2DevEvtName		DisplayString,
+			host2DevEvtType		INTEGER,
+			host2DevEvtState	INTEGER
+			}
+
+			host2DevEvtIndex OBJECT-TYPE
+				SYNTAX		INTEGER(1..255)
+				MAX-ACCESS	read-only
+				STATUS		current
+				DESCRIPTION
+						"Id for each event."
+				::= {host2DevEvtEntry 1}
+
+			host2DevEvtName OBJECT-TYPE
+				SYNTAX		DisplayString(SIZE(0..255))
+				MAX-ACCESS	read-only
+				STATUS		current
+				DESCRIPTION
+							"The description of a event."
+				::= {host2DevEvtEntry 2}
+				
+			host2DevEvtType OBJECT-TYPE
+				SYNTAX		INTEGER {notice(0), warning(1), alarm(2)}
+				MAX-ACCESS	read-only
+				STATUS		current
+				DESCRIPTION
+							"The type of a event."
+				::= {host2DevEvtEntry 3}
+
+			host2DevEvtState OBJECT-TYPE
+				SYNTAX		INTEGER (0..1)
+				MAX-ACCESS	read-only
+				STATUS		current
+				DESCRIPTION
+							"The state of a event."
+				::= {host2DevEvtEntry 4}
+
+-- ************ End Event Table ************************************
+
+--	************ Parameter Table ***********************************
+
+host2DevParTable	OBJECT-TYPE
+	SYNTAX		SEQUENCE OF Host2DevParEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+				"A list of parameters of devices entries.
+				If device is disconnected, there is no entry for this device in the table."
+	::= {host2 9}
+
+	host2DevParEntry OBJECT-TYPE
+		SYNTAX		Host2DevParEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+					"An entry of parameters of devices."
+		INDEX		{host2DevIndex, host2DevParIndex}
+		::= {host2DevParTable 1}
+
+		Host2DevParEntry ::= SEQUENCE {
+			host2DevParIndex		INTEGER,
+			host2DevParName			DisplayString,
+			host2DevParValue		DisplayString,
+			host2DevParUnit			DisplayString,
+			host2DevParStateType	INTEGER,
+			host2DevParState		INTEGER
+			}
+
+ 		host2DevParIndex OBJECT-TYPE
+ 			SYNTAX		INTEGER(1..255)
+ 			MAX-ACCESS	read-only
+ 			STATUS		current
+ 			DESCRIPTION
+ 						"Unique ID for each parameter."
+ 			::= {host2DevParEntry 1}
+
+ 		host2DevParName OBJECT-TYPE
+ 			SYNTAX		DisplayString(SIZE(0..255))
+ 			MAX-ACCESS	read-only
+ 			STATUS		current
+ 			DESCRIPTION
+ 						"The name of a parameter."
+			::= {host2DevParEntry 2}
+
+ 		host2DevParValue OBJECT-TYPE
+ 			SYNTAX		DisplayString(SIZE(0..7))
+ 			MAX-ACCESS	read-only
+ 			STATUS		current
+ 			DESCRIPTION
+ 						"The value of a parameter."
+ 			::= {host2DevParEntry 3}
+
+ 		host2DevParUnit OBJECT-TYPE
+ 			SYNTAX		DisplayString(SIZE(0..3))
+ 			MAX-ACCESS	read-only
+ 			STATUS		current
+ 			DESCRIPTION
+ 						"The measurement unit of a parameter."
+ 			::= {host2DevParEntry 4}
+
+ 		host2DevParStateType OBJECT-TYPE
+ 			SYNTAX		INTEGER {notice(0), warning(1), alarm(2)}
+ 			MAX-ACCESS	read-only
+ 			STATUS		current
+ 			DESCRIPTION
+ 						"The type of state of a parameter."
+ 			::= {host2DevParEntry 5}
+
+ 		host2DevParState OBJECT-TYPE
+ 			SYNTAX		INTEGER {noAlarm(0), lessThanMin(1), greatherThanMax(2), blocked(3)}
+ 			MAX-ACCESS	read-only
+ 			STATUS		current
+ 			DESCRIPTION
+ 						"The state of a parameter."
+ 			::= {host2DevParEntry 6}
+
+--	************ End Parameter Table *******************************
+
+--	************ Quantity Table *************************************
+
+host2DevQntTable	OBJECT-TYPE
+ 	SYNTAX		SEQUENCE OF Host2DevQntEntry
+ 	MAX-ACCESS	not-accessible
+ 	STATUS		current
+ 	DESCRIPTION
+ 				"A list of quantities of devices entries.
+				If device is disconnected, there is no entry for this device in the table."
+ 	::= {host2 10}
+ 	
+ 	 host2DevQntEntry OBJECT-TYPE
+ 		SYNTAX		Host2DevQntEntry
+ 		MAX-ACCESS	not-accessible
+ 		STATUS		current
+ 		DESCRIPTION
+ 					"An entry of quantities of device."
+ 		INDEX		{host2DevIndex, host2DevQntIndex}
+ 		::= {host2DevQntTable 1}
+ 		
+ 		Host2DevQntEntry ::= SEQUENCE {
+			host2DevQntIndex	INTEGER,
+ 			host2DevQntName		DisplayString,
+ 			host2DevQntValue	DisplayString,
+			host2DevQntMin		DisplayString,
+			host2DevQntMax		DisplayString,
+			host2DevQntAccess	INTEGER
+ 			}
+ 
+  		host2DevQntIndex OBJECT-TYPE
+ 			SYNTAX		INTEGER(1..255)
+ 			MAX-ACCESS	read-only
+ 			STATUS		current
+ 			DESCRIPTION
+ 						"An id for each quantity."
+ 			::= {host2DevQntEntry 1}	
+ 
+  		host2DevQntName OBJECT-TYPE
+ 			SYNTAX		DisplayString(SIZE(0..255))
+ 			MAX-ACCESS	read-only
+ 			STATUS		current
+ 			DESCRIPTION
+ 						"The name of a quantity."
+ 			::= {host2DevQntEntry 2}	
+ 
+		host2DevQntValue OBJECT-TYPE
+ 			SYNTAX		DisplayString(SIZE(0..12))
+ 			MAX-ACCESS	read-write
+ 			STATUS		current
+ 			DESCRIPTION
+ 						"The value of a quantity."
+ 			::= {host2DevQntEntry 3}
+
+		host2DevQntMin OBJECT-TYPE
+ 			SYNTAX		DisplayString(SIZE(0..12))
+ 			MAX-ACCESS	read-only
+ 			STATUS		current
+ 			DESCRIPTION
+ 						"The minimum value of a quantity."
+ 			::= {host2DevQntEntry 4}
+
+		host2DevQntMax OBJECT-TYPE
+ 			SYNTAX		DisplayString(SIZE(0..12))
+ 			MAX-ACCESS	read-only
+ 			STATUS		current
+ 			DESCRIPTION
+ 						"The maximum value of a quantity."
+ 			::= {host2DevQntEntry 5}
+ 					
+		host2DevQntAccess OBJECT-TYPE
+ 			SYNTAX		INTEGER {read-only(0), read-write(1)}
+ 			MAX-ACCESS	read-only
+ 			STATUS		current
+ 			DESCRIPTION
+ 						"The access to change the value of a quantity."
+ 			::= {host2DevQntEntry 6}
+			
+--	************ End Quantity Table *************************************
+
+--	************ Command Table *************************************
+
+host2DevCmdTable	OBJECT-TYPE
+ 	SYNTAX		SEQUENCE OF Host2DevCmdEntry
+ 	MAX-ACCESS	not-accessible
+ 	STATUS		current
+ 	DESCRIPTION
+ 				"A list of commands of devices entries.
+				If device is disconnected, there is no entry for this device in the table."
+ 	::= {host2 11}
+
+ 	host2DevCmdEntry OBJECT-TYPE
+ 		SYNTAX		Host2DevCmdEntry
+ 		MAX-ACCESS	not-accessible
+ 		STATUS		current
+ 		DESCRIPTION
+ 					"An entry of commands of device."
+ 		INDEX		{host2DevIndex, host2DevCmdIndex}
+ 		::= {host2DevCmdTable 1}
+
+		Host2DevCmdEntry ::= SEQUENCE {
+			host2DevCmdIndex	INTEGER,
+ 			host2DevCmdName		DisplayString,
+ 			host2DevCmdExecute	INTEGER
+ 			}
+ 					
+ 		host2DevCmdIndex OBJECT-TYPE
+ 			SYNTAX		INTEGER(1..255)
+ 			MAX-ACCESS	read-only
+ 			STATUS		current
+ 			DESCRIPTION
+ 						"An id for each command."
+ 			::= {host2DevCmdEntry 1}
+
+ 		host2DevCmdName OBJECT-TYPE
+ 			SYNTAX		DisplayString(SIZE(0..255))
+ 			MAX-ACCESS	read-only
+ 			STATUS		current
+ 			DESCRIPTION
+ 						"The name of a command."
+ 			::= {host2DevCmdEntry 2}
+
+ 		host2DevCmdExecute OBJECT-TYPE
+ 			SYNTAX		INTEGER {no(0), yes(1)}
+ 			MAX-ACCESS	read-write
+ 			STATUS		current
+ 			DESCRIPTION
+ 						"Instructions to execute the command of device.
+						If value no(0) is sent, the command will not be executed.
+						If value yes(1) is sent, the command will be executed."
+ 			::= {host2DevCmdEntry 3}
+
+--	************ End Command Table *********************************
+
+--	************ End Devices **********************************
+
+--	************ Traps ****************************************
+
+host2DevConnectionTrap TRAP-TYPE
+	ENTERPRISE  host2
+	VARIABLES   {host2DevLanState }
+	DESCRIPTION
+						"This trap is sent when the status of network connection of device is changed.
+						There can be two types of network connection status: connected or disconnected."
+ 	::= 5001
+ 	
+host2DevEvtStateTrap TRAP-TYPE
+	ENTERPRISE  host2
+	VARIABLES   {host2DevEvtState}
+	DESCRIPTION
+						"This trap is sent when the state of device is changed: for example,
+						 device can enter stand-by mode or there is an alarm, not associated with parameters measured."
+ 	::= 5002
+ 	
+host2DevParStateTrap TRAP-TYPE
+	ENTERPRISE  host2
+	VARIABLES   {host2DevParState}
+	DESCRIPTION
+						"This trap is sent when the state of measured parameters is changed."
+ 	::= 5003
+
+--	************ End Traps ************************************
+
+END

@@ -1,0 +1,189 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "",
+                    "sysObjectID": ".1.3.6.1.4.1.43906.1",
+                    "sysDescr": "Tegile IntelliFlash (3.5.4.1.171031) SNMP Agent",
+                    "sysContact": null,
+                    "version": null,
+                    "hardware": "",
+                    "features": null,
+                    "location": null,
+                    "os": "intelliflash",
+                    "type": "storage",
+                    "serial": null,
+                    "icon": "tegile.svg"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "storage": {
+        "discovery": {
+            "storage": [
+                {
+                    "storage_mib": "intelliflash-pl",
+                    "storage_index": "1",
+                    "storage_type": "ONLINE",
+                    "storage_descr": "ZebiSystem-B",
+                    "storage_size": 249381038592,
+                    "storage_units": 1,
+                    "storage_used": 131131516416,
+                    "storage_free": 0,
+                    "storage_perc": 0,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                },
+                {
+                    "storage_mib": "intelliflash-pl",
+                    "storage_index": "2",
+                    "storage_type": "ONLINE",
+                    "storage_descr": "ZebiSystem-A",
+                    "storage_size": 249271112704,
+                    "storage_units": 1,
+                    "storage_used": 131131610112,
+                    "storage_free": 0,
+                    "storage_perc": 0,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                },
+                {
+                    "storage_mib": "intelliflash-pl",
+                    "storage_index": "3",
+                    "storage_type": "ONLINE",
+                    "storage_descr": "pool-a",
+                    "storage_size": 23776899446784,
+                    "storage_units": 1,
+                    "storage_used": 8246337208320,
+                    "storage_free": 0,
+                    "storage_perc": 0,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                },
+                {
+                    "storage_mib": "intelliflash-pr",
+                    "storage_index": "3.1",
+                    "storage_type": "1",
+                    "storage_descr": "fileserver",
+                    "storage_size": 6352124462592,
+                    "storage_units": 1,
+                    "storage_used": 6347866291712,
+                    "storage_free": 0,
+                    "storage_perc": 0,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                },
+                {
+                    "storage_mib": "intelliflash-pr",
+                    "storage_index": "3.2",
+                    "storage_type": "1",
+                    "storage_descr": "servers",
+                    "storage_size": 2940800152064,
+                    "storage_units": 1,
+                    "storage_used": 2936541981184,
+                    "storage_free": 0,
+                    "storage_perc": 0,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                },
+                {
+                    "storage_mib": "intelliflash-pr",
+                    "storage_index": "3.3",
+                    "storage_type": "1",
+                    "storage_descr": "Backups",
+                    "storage_size": 4258197504,
+                    "storage_units": 1,
+                    "storage_used": 26624,
+                    "storage_free": 0,
+                    "storage_perc": 0,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                }
+            ]
+        },
+        "poller": {
+            "storage": [
+                {
+                    "storage_mib": "intelliflash-pl",
+                    "storage_index": "1",
+                    "storage_type": "ONLINE",
+                    "storage_descr": "ZebiSystem-B",
+                    "storage_size": 249381038592,
+                    "storage_units": 1,
+                    "storage_used": 131131516416,
+                    "storage_free": 118249522176,
+                    "storage_perc": 53,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                },
+                {
+                    "storage_mib": "intelliflash-pl",
+                    "storage_index": "2",
+                    "storage_type": "ONLINE",
+                    "storage_descr": "ZebiSystem-A",
+                    "storage_size": 249271112704,
+                    "storage_units": 1,
+                    "storage_used": 131131610112,
+                    "storage_free": 118139502592,
+                    "storage_perc": 53,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                },
+                {
+                    "storage_mib": "intelliflash-pl",
+                    "storage_index": "3",
+                    "storage_type": "ONLINE",
+                    "storage_descr": "pool-a",
+                    "storage_size": 23776899446784,
+                    "storage_units": 1,
+                    "storage_used": 8246337208320,
+                    "storage_free": 15530562238464,
+                    "storage_perc": 35,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                },
+                {
+                    "storage_mib": "intelliflash-pr",
+                    "storage_index": "3.1",
+                    "storage_type": "1",
+                    "storage_descr": "fileserver",
+                    "storage_size": 21878431237632,
+                    "storage_units": 1,
+                    "storage_used": 6347866291712,
+                    "storage_free": 15530564945920,
+                    "storage_perc": 29,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                },
+                {
+                    "storage_mib": "intelliflash-pr",
+                    "storage_index": "3.2",
+                    "storage_type": "1",
+                    "storage_descr": "servers",
+                    "storage_size": 18467106927104,
+                    "storage_units": 1,
+                    "storage_used": 2936541981184,
+                    "storage_free": 15530564945920,
+                    "storage_perc": 16,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                },
+                {
+                    "storage_mib": "intelliflash-pr",
+                    "storage_index": "3.3",
+                    "storage_type": "1",
+                    "storage_descr": "Backups",
+                    "storage_size": 15530564972544,
+                    "storage_units": 1,
+                    "storage_used": 26624,
+                    "storage_free": 15530564945920,
+                    "storage_perc": 0,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                }
+            ]
+        }
+    }
+}

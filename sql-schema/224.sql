@@ -1,0 +1,1 @@
+ALTER TABLE processes MODIFY command TEXT NOT NULL;

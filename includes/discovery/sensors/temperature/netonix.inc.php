@@ -25,7 +25,7 @@
 
 echo 'Netonix: ';
 // NETONIX-SWITCH-MIB::tempTable .1.3.6.1.4.1.46242.3
-$oids = snmpwalk_cache_multi_oid($device, 'tempTable', array(), 'NETONIX-SWITCH-MIB', 'netonix');
+$oids = snmpwalk_cache_multi_oid($device, 'tempTable', [], 'NETONIX-SWITCH-MIB', 'netonix');
 if (is_array($oids)) {
     foreach ($oids as $index => $entry) {
         if (is_numeric($entry['temp']) && is_numeric($index) && $entry['temp'] > '0') {

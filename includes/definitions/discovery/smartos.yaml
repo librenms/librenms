@@ -1,0 +1,39 @@
+mib: MSERIES-ENVMON-MIB:MSERIES-PORT-MIB
+modules:
+    sensors:
+        state:
+            data:
+                -
+                    oid: smartPortTable
+                    num_oid: '.1.3.6.1.4.1.30826.1.3.1.2.1.1.6.{{ $index }}'
+                    value: smartPortStatus
+                    descr: '{{ $smartPortAlias }} - {{ $smartPortName }}'
+                    index: 'smartPortStatus.{{ $index }}'
+                    state_name: smartPortStatus
+                    states:
+                        - { value: 1, generic: 0, graph: 1, descr: idle }
+                        - { value: 2, generic: 2, graph: 1, descr: down }
+                        - { value: 3, generic: 0, graph: 1, descr: up }
+                        - { value: 4, generic: 1, graph: 1, descr: high }
+                        - { value: 5, generic: 1, graph: 1, descr: low }
+                        - { value: 6, generic: 1, graph: 1, descr: eyeSafety }
+                        - { value: 7, generic: 3, graph: 1, descr: cd }
+                        - { value: 8, generic: 3, graph: 1, descr: ncd }
+        temperature:
+            data:
+                -
+                    oid: smartEnvMonTemperatureTable
+                    value: smartEnvMonTemperatureValue
+                    num_oid: '.1.3.6.1.4.1.30826.1.4.1.1.1.3.{{ $index }}'
+                    descr: smartEnvMonTemperatureDescr
+        power:
+            data:
+                -
+                    oid: smartPortTable
+                    value: smartPortPower
+                    num_oid: '.1.3.6.1.4.1.30826.1.3.1.2.1.1.5.{{ $index }}'
+                    divisor: 10
+                    descr: '{{ $smartPortAlias }} - {{ $smartPortName }}'
+                    low_limit: smartPortLowPowerAlarmThreshold
+                    high_limit: smartPortHighPowerAlarmThreshold
+                    skip_values: -400

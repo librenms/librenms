@@ -1,0 +1,1639 @@
+-- =================================================================
+-- Copyright (C) 2015 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description: flash mangement mib
+-- Reference:   huawei enterprise mib
+-- Version:     V2.04
+-- History:
+--             initial version 2002-12-20
+-- =================================================================
+
+    HUAWEI-FLASH-MAN-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            huaweiUtility            
+                FROM HUAWEI-MIB            
+            OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP            
+                FROM SNMPv2-CONF            
+            TimeTicks, IpAddress, Integer32, Gauge32, Counter32, 
+            OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE            
+                FROM SNMPv2-SMI            
+            DisplayString, TimeStamp, TruthValue, RowStatus, TEXTUAL-CONVENTION            
+                FROM SNMPv2-TC;
+    
+    
+--  1.3.6.1.4.1.2011.6.9
+        hwFlash MODULE-IDENTITY 
+            LAST-UPDATED "201502100001Z"        -- Feb 10, 2015 at 00:00 GMT
+            ORGANIZATION 
+                  "Huawei Technologies Co.,Ltd."
+            CONTACT-INFO 
+                  "Huawei Industrial Base
+                    Bantian, Longgang
+                     Shenzhen 518129
+                     People's Republic of China
+                     Website: http://www.huawei.com
+                     Email: support@huawei.com
+                   "
+		DESCRIPTION 
+                "The HUAWEI-FLASH-MIB contains objects to manage the device flash cards
+                and flash card operations. There are no constraints on this MIB.
+                "
+               REVISION "201502100001Z"
+	
+		DESCRIPTION 
+                "The HUAWEI-FLASH-MIB contains objects to manage the device flash cards
+                and flash card operations. There are no constraints on this MIB.
+                "
+               REVISION "201501260001Z"
+			
+			DESCRIPTION 
+                "The HUAWEI-FLASH-MIB contains objects to manage the device flash cards
+                and flash card operations. There are no constraints on this MIB.
+                "
+               REVISION "201412150001Z"
+			   
+			   DESCRIPTION 
+                "The HUAWEI-FLASH-MIB contains objects to manage the device flash cards
+                and flash card operations. There are no constraints on this MIB.
+                "
+               REVISION "201307090001Z"
+			   
+                DESCRIPTION 
+                "The HUAWEI-FLASH-MIB contains objects to manage the device flash cards
+                and flash card operations. There are no constraints on this MIB.
+                "
+               REVISION "200207010000Z"        -- July 01, 2002 at 00:00 GMT\
+
+               
+        
+               
+
+
+
+                        DESCRIPTION
+                "The initial revision of this MIB module ."
+            ::= { huaweiUtility 9 }
+        
+    
+--
+-- Textual conventions
+--
+    
+        HwFlashPartitionStatus ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "If the flash partition is not programmable, the value will be 
+                'readOnly(1)'; If the current image is running from this partition,
+                the value will be 'runFromFlash(2)';
+                If the flash partition is programmable, the value will be 'readWrite(3) '.
+                "
+            SYNTAX INTEGER
+                {
+                readOnly(1),
+                runFromFlash(2),
+                readWrite(3)
+                }
+            
+        HwFlashPartitionUpgradeMode ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "Flash partition upgrade method, ie., method by which
+                new files can be downloaded into the partition.
+                FLH stands for Flash Load Helper, a feature provided
+                on run-from-Flash systems for upgrading Flash. This
+                feature uses the bootstrap code in ROMs to help in 
+                automatic download.
+                This object should be retrieved if the partition 
+                status is runFromFlash(2).
+                If the partition status    is readOnly(1), the upgrade 
+                method would depend on the reason for the readOnly 
+                status.    For eg., it may simply be a matter of installing 
+                the programming jumper, or it may require execution of a 
+                later version of software that supports the Flash chips.
+                
+                unknown(1)      -     the current system image does not know
+                        how Flash can be programmed. A possible
+                        method would be to reload the ROM image
+                        and perform the upgrade manually.
+                rxbootFLH(2)    -     the Flash Load Helper is available to
+                        download files to Flash. A copy-to-flash
+                        command can be used and this system image
+                        will automatically reload the Rxboot image
+                        in ROM and direct it to carry out the 
+                        download request.
+                direct(3)       -     will be done directly by this image.
+                "
+            SYNTAX INTEGER
+                {
+                unknown(1),
+                rxbootFLH(2),
+                direct(3)
+                }
+            
+--  Textual conventions
+-- 
+        HwFlashOperationStatus ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "The status of the specified operation can be one of the follows.
+                
+                opInProgress(1) : the operation is in process.
+                
+                opSuccess(2) :  the operation has been completed successfully.
+                
+                opInvalid(3) : the command is invalid or command-protocol-device 
+                       combination is unsupported by the system.
+                
+                opInvalidProtocol(4) :invalid protocol is specified
+                
+                opInvalidSourceName(5) :invalid source file name is specified.    
+                
+                opInvalidDestName(6) :invalid target name is specified.    
+                
+                opInvalidServerAddress(7) :invalid server address is specified
+                
+                opDeviceBusy(8) :the device is in use and locked by another process
+                
+                opDeviceOpenError(9) :invalid device name is specified.
+                
+                opDeviceError(10) :    device read, write or erase error
+                
+                opDeviceNotProgrammable(11) :device is read-only but a write or erase operation was specified
+                
+                opDeviceFull(12) :    device is filled to capacity
+                
+                opFileOpenError(13) :invalid file name; file not found in partition
+                
+                opFileTransferError(14) :file transfer was unsuccessful
+                
+                opFileChecksumError(15) :file checksum in Flash is invalid
+                
+                opNoMemory(16) :system is running in low on memory
+                
+                opAuthFail(17) :authentication failure
+            
+                opUnknownFailure(18) :failure which is unknown
+            
+                opAbort(19) : transfer operation has been abort
+
+                opInvalidSourceAddress(20) : transfer operation has been abort
+                                
+               opInvalidSourceInterface(21) : transfer operation has been abort
+               opCurrentVersionFileConfilt(22) : conflict between target file and system file"
+            SYNTAX INTEGER
+                {
+                opInProgress(1),
+                opSuccess(2),
+                opInvalid(3),
+                opInvalidProtocol(4),
+                opInvalidSourceName(5),
+                opInvalidDestName(6),
+                opInvalidServerAddress(7),
+                opDeviceBusy(8),
+                opDeviceOpenError(9),
+                opDeviceError(10),
+                opDeviceNotProgrammable(11),
+                opDeviceFull(12),
+                opFileOpenError(13),
+                opFileTransferError(14),
+                opFileChecksumError(15),
+                opNoMemory(16),
+                opAuthFail(17),
+                opUnknownFailure(18),
+                opAbort(19), 
+                opInvalidSourceAddress(20),
+                opInvalidSourceInterface(21),
+                opCurrentVersionFileConfilt(22)
+                }
+            
+    
+--
+-- Node definitions
+--
+    
+--  Huawei flash device mangement mib object
+-- 1.3.6.1.4.1.2011.6.9.1
+        huaweiFlashManMIBObjects OBJECT IDENTIFIER ::= { hwFlash 1 }
+        
+--  The flash device information.
+-- 1.3.6.1.4.1.2011.6.9.1.1
+        huaweiFlashDevice OBJECT IDENTIFIER ::= { huaweiFlashManMIBObjects 1 }
+        
+--  1.3.6.1.4.1.2011.6.9.1.1.1
+        hwFlhSupportNum OBJECT-TYPE
+            SYNTAX Integer32 (1..32)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Specifies the total number of flash which the
+                system supported.
+                
+                The MIB should not be loaded if there is no flash 
+                on the device, therefore the value of the object is at least 1."
+            ::= { huaweiFlashDevice 1 }
+        
+--  1.3.6.1.4.1.2011.6.9.1.1.2
+        hwFlashTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwFlashEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table gives the properties of all the flashes on the device .
+                
+                "
+            ::= { huaweiFlashDevice 2 }
+        
+--  1.3.6.1.4.1.2011.6.9.1.1.2.1
+        hwFlashEntry OBJECT-TYPE
+            SYNTAX HwFlashEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                The entries of hwFlashTable."
+            INDEX { hwFlhIndex }
+            ::= { hwFlashTable 1 }
+        
+        HwFlashEntry ::=
+            SEQUENCE { 
+                hwFlhIndex
+                    Integer32,
+                hwFlhSize
+                    Integer32,
+                hwFlhPos
+                    Integer32,
+                hwFlhName
+                    DisplayString,
+                hwFlhChipNum
+                    Integer32,
+                hwFlhDescr
+                    DisplayString,
+                hwFlhInitTime
+                    TimeStamp,
+                hwFlhRemovable
+                    TruthValue,
+                hwFlhPartitionBool
+                    TruthValue,
+                hwFlhMinPartitionSize
+                    Integer32,
+                hwFlhMaxPartitions
+                    Integer32,
+                hwFlhPartitionNum
+                    Integer32
+             }
+
+--  1.3.6.1.4.1.2011.6.9.1.1.2.1.1
+        hwFlhIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..32)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The index of hwFlashTable. It has the minimum value of 1, and  
+                maximum value of the same as the value of hwFlhSupportNum."
+            ::= { hwFlashEntry 1 }
+        
+--  1.3.6.1.4.1.2011.6.9.1.1.2.1.2
+        hwFlhSize OBJECT-TYPE
+            SYNTAX Integer32
+            UNITS "bytes"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Specifies the total size of the Flash device indexed by hwFlhIndex.
+                The value will be zero if the flash is removed for a removable 
+                device."
+            ::= { hwFlashEntry 2 }
+        
+--  1.3.6.1.4.1.2011.6.9.1.1.2.1.3
+        hwFlhPos OBJECT-TYPE
+            SYNTAX Integer32 (0..2147483647)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The position of the flash device on the system.This object is 
+                an index of entPhysicalTable in ENTITY-MIB . If the value of this object
+                is 0, the main processor is indicated."
+            ::= { hwFlashEntry 3 }
+        
+--  1.3.6.1.4.1.2011.6.9.1.1.2.1.4
+        hwFlhName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..16))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The flash device name used to refer to the
+                device within the system. "
+            ::= { hwFlashEntry 4 }
+        
+--  1.3.6.1.4.1.2011.6.9.1.1.2.1.5
+        hwFlhChipNum OBJECT-TYPE
+            SYNTAX Integer32 (1..64)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The chip numbers in the flash device.
+                "
+            ::= { hwFlashEntry 5 }
+        
+--  1.3.6.1.4.1.2011.6.9.1.1.2.1.6
+        hwFlhDescr OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..64))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Description of the purpose of the flash device on the system.
+                "
+            ::= { hwFlashEntry 6 }
+        
+--  1.3.6.1.4.1.2011.6.9.1.1.2.1.8
+        hwFlhInitTime OBJECT-TYPE
+            SYNTAX TimeStamp
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The system time at which device was initialized.
+                For fixed devices, this will be the system's boot up time.
+                For removable devices, it will be the time at which 
+                the device was inserted. It may be a later time if device was inserted later.
+                If a device can be partitioned and repartitioned,
+                it will be the time of repartitioning."
+            ::= { hwFlashEntry 8 }
+        
+--  1.3.6.1.4.1.2011.6.9.1.1.2.1.9
+        hwFlhRemovable OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The object indicates whether the flash indexed can be removed or not.
+                The true(1) value indicates the flash device CAN be removed .The false(2) value
+                indicates the flash device CANNOT be removed ."
+            ::= { hwFlashEntry 9 }
+        
+--  1.3.6.1.4.1.2011.6.9.1.1.2.1.11
+        hwFlhPartitionBool OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The object indicates whether the flash indexed can be partitioned or not.
+                The true(1) value indicates the flash device CAN be partitioned. The false(2) value 
+                indicates the flash device CANNOT be partitioned.The actual partition state depends 
+                on the value of hwFlhDevicePartions."
+            ::= { hwFlashEntry 11 }
+        
+--  1.3.6.1.4.1.2011.6.9.1.1.2.1.12
+        hwFlhMinPartitionSize OBJECT-TYPE
+            SYNTAX Integer32
+            UNITS "bytes"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Minimum partition size the device supported.
+                If hwFlhDevicePartitionBool is false, the value
+                of this object is the same as hwFlhDeviceSize.
+                "
+            ::= { hwFlashEntry 12 }
+        
+--  1.3.6.1.4.1.2011.6.9.1.1.2.1.13
+        hwFlhMaxPartitions OBJECT-TYPE
+            SYNTAX Integer32 (1..8)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The maximum count of partitions which the system supports
+                for this Flash device.If hwFlhPartitionBool is false,
+                the object value is 1."
+            ::= { hwFlashEntry 13 }
+        
+--  1.3.6.1.4.1.2011.6.9.1.1.2.1.14
+        hwFlhPartitionNum OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The actual number of partitions supported by the system for 
+                this Flash device.If hwFlhPartitionBool is false,
+                the object value is 1."
+            ::= { hwFlashEntry 14 }
+        
+--  1.3.6.1.4.1.2011.6.9.1.1.3
+        hwFlashChips OBJECT IDENTIFIER ::= { huaweiFlashDevice 3 }
+        
+--  1.3.6.1.4.1.2011.6.9.1.1.3.1
+        hwFlhChipTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwFlhChipEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Table of Flash device chip properties for each
+                initialized Flash device.
+                This table is meant primarily for aiding error
+                diagnosis.
+                "
+            ::= { hwFlashChips 1 }
+        
+--  1.3.6.1.4.1.2011.6.9.1.1.3.1.1
+        hwFlhChipEntry OBJECT-TYPE
+            SYNTAX HwFlhChipEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The entry of hwFlhChipTable"
+            INDEX { hwFlhIndex, hwFlhChipSerialNo }
+            ::= { hwFlhChipTable 1 }
+        
+        HwFlhChipEntry ::=
+            SEQUENCE { 
+                hwFlhChipSerialNo
+                    Integer32,
+                hwFlhChipID
+                    DisplayString,
+                hwFlhChipDescr
+                    DisplayString,
+                hwFlhChipWriteTimesLimit
+                    Integer32,
+                hwFlhChipWriteTimes
+                    Counter32,
+                hwFlhChipEraseTimesLimit
+                    Integer32,
+                hwFlhChipEraseTimes
+                    Counter32
+             }
+
+--  1.3.6.1.4.1.2011.6.9.1.1.3.1.1.1
+        hwFlhChipSerialNo OBJECT-TYPE
+            SYNTAX Integer32 (1..64)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Index of hwFlhChipTable."
+            ::= { hwFlhChipEntry 1 }
+        
+--  1.3.6.1.4.1.2011.6.9.1.1.3.1.1.2
+        hwFlhChipID OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..5))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The manufacturer and device code for a chip.
+                The device code is in the lower byte.And 
+                The manufacturer code is in the Upper byte.
+                Unknown chip code is presented as 00:00.            
+                
+                "
+            ::= { hwFlhChipEntry 2 }
+        
+--  1.3.6.1.4.1.2011.6.9.1.1.3.1.1.3
+        hwFlhChipDescr OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..32))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The description of the flash chip.
+                e.g. 'Intel 27F008SA'                
+                "
+            ::= { hwFlhChipEntry 3 }
+        
+--  1.3.6.1.4.1.2011.6.9.1.1.3.1.1.4
+        hwFlhChipWriteTimesLimit OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The maximum number of write retries done at any
+                single location before declaring a write failure.
+                "
+            ::= { hwFlhChipEntry 4 }
+        
+--  1.3.6.1.4.1.2011.6.9.1.1.3.1.1.5
+        hwFlhChipWriteTimes OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object will provide a cumulative count
+                (since last system boot up or initialization) of 
+                the number of write retries that were done in the chip.
+                If no writes have been done to Flash, the count
+                will be zero. Typically, a maximum of 25 retries are 
+                done on a single location before flagging a write
+                error.
+                A management station is expected to get this object
+                for each chip in a partition after a write failure
+                in that partition. To keep a track of retries for
+                a given write operation, the management station would 
+                have to retrieve the values for the concerned chips 
+                before and after any write operation.
+                It is a cumulative count of write retries that were done in the chip.
+                "
+            ::= { hwFlhChipEntry 5 }
+        
+--  1.3.6.1.4.1.2011.6.9.1.1.3.1.1.6
+        hwFlhChipEraseTimesLimit OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The maximum number of erase retries done within
+                an erase sector before declaring an erase failure.
+                "
+            ::= { hwFlhChipEntry 6 }
+        
+--  1.3.6.1.4.1.2011.6.9.1.1.3.1.1.7
+        hwFlhChipEraseTimes OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object will provide a cumulative count
+                (since last system boot up or initialization) of 
+                the number of erase retries that were done in the chip.
+                Typically, a maximum of 2000 retries are done in a 
+                single erase zone (which may be a full chip or a 
+                portion, depending on the chip technology) before 
+                flagging an erase error.
+                A management station is expected to get this object
+                for each chip in a partition after an erase failure
+                in that partition. To keep a track of retries for
+                a given erase operation, the management station would 
+                have to retrieve the values for the concerned chips 
+                before and after any erase operation.
+                Note that erase may be done through an independent
+                command, or through a copy-to-flash command.
+                "
+            ::= { hwFlhChipEntry 7 }
+        
+--  1.3.6.1.4.1.2011.6.9.1.1.4
+        hwFlashPartitions OBJECT IDENTIFIER ::= { huaweiFlashDevice 4 }
+        
+--  1.3.6.1.4.1.2011.6.9.1.1.4.1
+        hwFlhPartitionTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwFlhPartitionEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Table of flash device partition properties for each 
+                initialized flash partition. Whenever there is no 
+                explicit partitioning done, a single partition spanning
+                the entire device will be assumed to exist. There will 
+                therefore always be at least one partition on a device.
+                "
+            ::= { hwFlashPartitions 1 }
+        
+--  1.3.6.1.4.1.2011.6.9.1.1.4.1.1
+        hwFlhPartitionEntry OBJECT-TYPE
+            SYNTAX HwFlhPartitionEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry in the table of flash partition properties 
+                for each initialized flash partition. Each entry
+                will be indexed by a device number and a partition
+                number within the device.
+                "
+            INDEX { hwFlhIndex, hwFlhPartIndex }
+            ::= { hwFlhPartitionTable 1 }
+        
+        HwFlhPartitionEntry ::=
+            SEQUENCE { 
+                hwFlhPartIndex
+                    Integer32,
+                hwFlhPartFirstChip
+                    Integer32,
+                hwFlhPartLastChip
+                    Integer32,
+                hwFlhPartSpace
+                    Integer32,
+                hwFlhPartSpaceFree
+                    Gauge32,
+                hwFlhPartFileNum
+                    Integer32,
+                hwFlhPartChecksumMethod
+                    INTEGER,
+                hwFlhPartStatus
+                    HwFlashPartitionStatus,
+                hwFlhPartUpgradeMode
+                    HwFlashPartitionUpgradeMode,
+                hwFlhPartName
+                    DisplayString,
+                hwFlhPartRequireErase
+                    TruthValue,
+                hwFlhPartFileNameLen
+                    Integer32
+             }
+
+--  1.3.6.1.4.1.2011.6.9.1.1.4.1.1.1
+        hwFlhPartIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..8)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The one of indexes which specifies a partition in system.
+                It is the sequence number of partitions.
+                "
+            ::= { hwFlhPartitionEntry 1 }
+        
+--  1.3.6.1.4.1.2011.6.9.1.1.4.1.1.2
+        hwFlhPartFirstChip OBJECT-TYPE
+            SYNTAX Integer32 (1..64)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The first chip's sequence number in the 
+                partition, by which a chip can be indexed in 
+                chip table. 
+                "
+            ::= { hwFlhPartitionEntry 2 }
+        
+--  1.3.6.1.4.1.2011.6.9.1.1.4.1.1.3
+        hwFlhPartLastChip OBJECT-TYPE
+            SYNTAX Integer32 (1..64)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The last chip's sequence number in the 
+                partition, by which a chip can be indexed in 
+                chip table. 
+                "
+            ::= { hwFlhPartitionEntry 3 }
+        
+--  1.3.6.1.4.1.2011.6.9.1.1.4.1.1.4
+        hwFlhPartSpace OBJECT-TYPE
+            SYNTAX Integer32
+            UNITS "bytes"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The total space of the flash partition.
+                The following should be satisfied:
+                hwFlhPartSpace = n*hwFlhMinPartitionSize
+                "
+            ::= { hwFlhPartitionEntry 4 }
+        
+--  1.3.6.1.4.1.2011.6.9.1.1.4.1.1.5
+        hwFlhPartSpaceFree OBJECT-TYPE
+            SYNTAX Gauge32
+            UNITS "bytes"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The Flash partition's free space.                 
+                "
+            ::= { hwFlhPartitionEntry 5 }
+        
+--  1.3.6.1.4.1.2011.6.9.1.1.4.1.1.6
+        hwFlhPartFileNum OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of all the file in the flash 
+                partition."
+            ::= { hwFlhPartitionEntry 6 }
+        
+--  1.3.6.1.4.1.2011.6.9.1.1.4.1.1.7
+        hwFlhPartChecksumMethod OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                simpleChecksum(1),
+                undefined(2),
+                simpleCRC(3)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The Checksum algorithm identifier 
+                checksum method which the
+                file system uses.
+                "
+            ::= { hwFlhPartitionEntry 7 }
+        
+--  1.3.6.1.4.1.2011.6.9.1.1.4.1.1.8
+        hwFlhPartStatus OBJECT-TYPE
+            SYNTAX HwFlashPartitionStatus
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The flash partition status.
+                If device is not programmable the value of it will be 'readOnly(1)';
+                If the current image is running from this partition, the value of it 
+                will be 'runFromFlash(2)';
+                If device is programmable the value of it will be 'readWrite(3) '.                
+                "
+            ::= { hwFlhPartitionEntry 8 }
+        
+--  1.3.6.1.4.1.2011.6.9.1.1.4.1.1.9
+        hwFlhPartUpgradeMode OBJECT-TYPE
+            SYNTAX HwFlashPartitionUpgradeMode
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The upgrade method of Flash partition, ie., method by which
+                new files can be downloaded into the partition.
+                FLH stands for Flash Load Helper, a feature provided
+                on run-from-Flash systems for upgrading Flash. This
+                feature uses the bootstrap code in ROMs to help in 
+                automatic download.
+                This object should be retrieved if the partition 
+                status is runFromFlash(2).
+                If the partition status    is readOnly(1), the upgrade 
+                method would depend on the reason for the readOnly 
+                status.    For eg., it may simply be a matter of installing 
+                the programming jumper, or it may require execution of a 
+                later version of software that supports the Flash chips.
+                
+                unknown(1)      -     the current system image does not know
+                        how Flash can be programmed. A possible
+                        method would be to reload the ROM image
+                        and perform the upgrade manually.
+                rxbootFLH(2)    -     the Flash Load Helper is available to
+                        download files to Flash. A copy-to-flash
+                        command can be used and this system image
+                        will automatically reload the Rxboot image
+                        in ROM and direct it to carry out the 
+                        download request.
+                direct(3)       -     will be done directly by this image."
+            ::= { hwFlhPartitionEntry 9 }
+        
+--  1.3.6.1.4.1.2011.6.9.1.1.4.1.1.10
+        hwFlhPartName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..16))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The  name of flash partition.
+                It was referred by the system."
+            ::= { hwFlhPartitionEntry 10 }
+        
+--  1.3.6.1.4.1.2011.6.9.1.1.4.1.1.11
+        hwFlhPartRequireErase OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Indicates whether the partition of flash needed
+                to be erased or not before write operation on it."
+            ::= { hwFlhPartitionEntry 11 }
+        
+--  1.3.6.1.4.1.2011.6.9.1.1.4.1.1.12
+        hwFlhPartFileNameLen OBJECT-TYPE
+            SYNTAX Integer32 (1..256)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The maximum length of file name in the system.
+                "
+            ::= { hwFlhPartitionEntry 12 }
+        
+--  1.3.6.1.4.1.2011.6.9.1.1.4.2
+        hwFlhFiles OBJECT IDENTIFIER ::= { hwFlashPartitions 2 }
+        
+--  1.3.6.1.4.1.2011.6.9.1.1.4.2.1
+        huaweiFlhFileTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HuaweiFlhFileEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Table of information for files in a Flash partition.
+                "
+            ::= { hwFlhFiles 1 }
+        
+--  1.3.6.1.4.1.2011.6.9.1.1.4.2.1.1
+        huaweiFlhFileEntry OBJECT-TYPE
+            SYNTAX HuaweiFlhFileEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry in the table of Flash file properties 
+                for each initialized Flash partition. Each entry
+                represents a file and gives details about the file.
+                An entry is indexed using the device number,
+                partition number within the device, and file 
+                number within the partition.
+                "
+            INDEX { hwFlhIndex, hwFlhPartIndex, hwFlhFileIndex }
+            ::= { huaweiFlhFileTable 1 }
+        
+        HuaweiFlhFileEntry ::=
+            SEQUENCE { 
+                hwFlhFileIndex
+                    Integer32,
+                hwFlhFileName
+                    DisplayString,
+                hwFlhFileSize
+                    Integer32,
+                hwFlhFileStatus
+                    INTEGER,
+                hwFlhFileChecksum
+                    OCTET STRING,
+                hwFlhFileTime
+                    TimeStamp
+             }
+
+--  1.3.6.1.4.1.2011.6.9.1.1.4.2.1.1.1
+        hwFlhFileIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..2147483647)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The index of the table ."
+            ::= { huaweiFlhFileEntry 1 }
+        
+--  1.3.6.1.4.1.2011.6.9.1.1.4.2.1.1.2
+        hwFlhFileName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..255))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                A valid file name supported by the file system.
+                "
+            ::= { huaweiFlhFileEntry 2 }
+        
+--  1.3.6.1.4.1.2011.6.9.1.1.4.2.1.1.3
+        hwFlhFileSize OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The file size in bytes, which doesn't include the file header of filesystem.
+                The minimum value of it will be 1.
+                "
+            ::= { huaweiFlhFileEntry 3 }
+        
+--  1.3.6.1.4.1.2011.6.9.1.1.4.2.1.1.4
+        hwFlhFileStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                deleted(1),
+                invalidChecksum(2),
+                valid(3)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The status maybe follows:
+                deleted(1):The file is in recycle.
+                checksumWrong(2):The checksum of file is invalid;
+                valid(3):A valid file.
+                "
+            ::= { huaweiFlhFileEntry 4 }
+        
+--  1.3.6.1.4.1.2011.6.9.1.1.4.2.1.1.5
+        hwFlhFileChecksum OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The file checksum located in the header of file.
+                "
+            ::= { huaweiFlhFileEntry 5 }
+
+-- 1.3.6.1.4.1.2011.6.9.1.1.4.2.1.1.6
+        hwFlhFileTime OBJECT-TYPE
+            SYNTAX TimeStamp
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+            The file checksum located in the header of file.
+                "
+            ::= { huaweiFlhFileEntry 6 }
+        
+--  The operation on the flash.
+-- 1.3.6.1.4.1.2011.6.9.1.2
+        huaweiFlashOperate OBJECT IDENTIFIER ::= { huaweiFlashManMIBObjects 2 }
+        
+--  1.3.6.1.4.1.2011.6.9.1.2.1
+        huaweiFlhOpTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HuaweiFlhOpEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of Flash copy operation entries. Each
+                entry represents a Flash copy operation (to or 
+                from Flash) that has been initiated.
+                "
+            ::= { huaweiFlashOperate 1 }
+        
+--  1.3.6.1.4.1.2011.6.9.1.2.1.1
+        huaweiFlhOpEntry OBJECT-TYPE
+            SYNTAX HuaweiFlhOpEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A Flash copy operation entry. Each entry consists 
+                of a command, a source, and optional parameters such
+                as protocol to be used, a destination, a server address,
+                etc. 
+                
+                A management station wishing to create an entry should
+                first generate a pseudo-random serial number to be used
+                as the index to this sparse table.  The station should
+                then create the associated instance of the row status
+                object. It must also, either in the same or in successive 
+                PDUs, create the associated instance of the command and
+                parameter objects. It should also modify the default values 
+                for any of the parameter objects if the defaults are not 
+                appropriate.
+                
+                Once the appropriate instances of all the command
+                objects have been created, either by an explicit SNMP
+                set request or by default, the row status should be set
+                to active to initiate the operation. Note that this entire
+                procedure may be initiated via a single set request which
+                specifies a row status    of createAndGo as well as specifies
+                valid values for the non-defaulted parameter objects.
+                
+                Once an operation has been activated, it cannot be
+                stopped. 
+                
+                Once the operation completes, the management station should
+                retrieve the value of the status object (and time if
+                desired), and delete the entry.  In order to prevent old
+                entries from clogging the table, entries will be aged out,
+                but an entry will never be deleted within 5 minutes of
+                completing.
+                "
+            INDEX { hwFlhOperIndex }
+            ::= { huaweiFlhOpTable 1 }
+        
+        HuaweiFlhOpEntry ::=
+            SEQUENCE { 
+                hwFlhOperIndex
+                    Integer32,
+                hwFlhOperType
+                    INTEGER,
+                hwFlhOperProtocol
+                    INTEGER,
+                hwFlhOperServerAddress
+                    IpAddress,
+                hwFlhOperServerUser
+                    DisplayString,
+                hwFlhOperPassword
+                    DisplayString,
+                hwFlhOperSourceFile
+                    DisplayString,
+                hwFlhOperDestinationFile
+                    DisplayString,
+                hwFlhOperStatus
+                    HwFlashOperationStatus,
+                hwFlhOperEndNotification
+                    TruthValue,
+                hwFlhOperProgress
+                    TimeTicks,
+                hwFlhOperRowStatus
+                    RowStatus,
+                hwFlhOperServerPort
+                    Integer32,               
+                hwFlhOperSourceAddress
+                    IpAddress,
+                hwFlhOperSourceInterface
+                    OCTET STRING,
+                hwFlhOperMemSize
+                    Integer32,
+        hwFlhOperVpnInstanceName
+            OCTET STRING,
+                hwFlhOperTotalFileLength
+                    Integer32,            
+        hwFlhOperTransferProgress
+            Integer32,
+            hwFlhOperErrorReason
+               DisplayString,
+            hwFlhOperServerIpv6Address
+               OCTET STRING			   
+             }
+
+--  1.3.6.1.4.1.2011.6.9.1.2.1.1.1
+        hwFlhOperIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..2147483647)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                Specifies the index of an entry. It is a 
+                random value when creating an entry."
+            ::= { huaweiFlhOpEntry 1 }
+        
+--  1.3.6.1.4.1.2011.6.9.1.2.1.1.2
+        hwFlhOperType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                net2FlashWithErase(1),
+                net2FlashWithoutErase(2),
+                flash2Net(3),
+                delete(4)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Specifies the operation to be executed. 
+                
+                net2FlashWithErase    Copy a file to flash; erase
+                            flash before copy.
+                            Use the FTP protocol or SFTP protocol.
+                net2FlashWithoutErase     Same with net2FlashWithErase.    
+
+                flash2Net        Copy a file from flash using
+                            the FTP protocol or SFTP protocol.
+                            
+                delete      delete file or directory by source file name.
+                "
+            ::= { huaweiFlhOpEntry 2 }
+        
+--  1.3.6.1.4.1.2011.6.9.1.2.1.1.3
+        hwFlhOperProtocol OBJECT-TYPE
+            SYNTAX INTEGER { ftp(1),sftp(2),tftp(3) }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Specifies the protocol used to transfer file.
+                The default value of it is ftp. When hwFlhOperProtocol is specified as SFTP, only 
+                password authentication-type is valid.
+
+              
+                "
+            DEFVAL { ftp }
+            ::= { huaweiFlhOpEntry 3 }
+        
+--  1.3.6.1.4.1.2011.6.9.1.2.1.1.4
+        hwFlhOperServerAddress OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                The address of remote host acting as server for any operation.
+                "
+            ::= { huaweiFlhOpEntry 4 }
+        
+--  1.3.6.1.4.1.2011.6.9.1.2.1.1.5
+        hwFlhOperServerUser OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..255))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                When use ftp or sftp to transfer files, the user name must be 
+                specified by this node.
+                "
+            ::= { huaweiFlhOpEntry 5 }
+        
+--  1.3.6.1.4.1.2011.6.9.1.2.1.1.6
+        hwFlhOperPassword OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..255))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Remote user password for copy via ftp protocol. Optional.
+                This object will be ignored for protocols other than
+                ftp and sftp. "
+            ::= { huaweiFlhOpEntry 6 }
+        
+--  1.3.6.1.4.1.2011.6.9.1.2.1.1.7
+        hwFlhOperSourceFile OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..255))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Specifies the Source file name to be transferred . 
+                It may be located on flash or remote server.
+                It may include the file path if it is applicable.
+                It must be specified.
+                
+                "
+            ::= { huaweiFlhOpEntry 7 }
+        
+--  1.3.6.1.4.1.2011.6.9.1.2.1.1.8
+        hwFlhOperDestinationFile OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..255))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Specifies the destination file name to be transferred . 
+                It may be located on flash or remote server.
+                It may include the file path if it is applicable.
+                If it is not specified , the destination file name
+                is the same as source file name for application."
+            ::= { huaweiFlhOpEntry 8 }
+        
+--  1.3.6.1.4.1.2011.6.9.1.2.1.1.9
+        hwFlhOperStatus OBJECT-TYPE
+            SYNTAX HwFlashOperationStatus
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The status of  operation. 
+                The status of the specified  operation can be one of the follows.
+                
+                opInProgress(1) : the operation is in process.
+                
+                opSuccess(2) :  the operation has been completed successfully.
+                
+                opInvalid(3) : the command is invalid or command-protocol-device 
+                       combination is unsupported by the system.
+                
+                opInvalidProtocol(4) :invalid protocol is specified
+                
+                opInvalidSourceName(5) :invalid source file name is specified.    
+                
+                opInvalidDestName(6) :invalid target name is specified.    
+                
+                opInvalidServerAddress(7) :invalid server address is specified
+                
+                opDeviceBusy(8) :the device is in use and locked by another process
+                
+                opDeviceOpenError(9) :invalid device name is specified.
+                
+                opDeviceError(10) :    device read, write or erase error
+                
+                opDeviceNotProgrammable(11) :device is read-only but a write or erase operation was specified
+                
+                opDeviceFull(12) :    device is filled to capacity
+                
+                opFileOpenError(13) :invalid file name; file not found in partition
+                
+                opFileTransferError(14) :file transfer was unsuccessfull
+                
+                opFileChecksumError(15) :file checksum in Flash si invalid
+                
+                opNoMemory(16) :system is running in low on memory
+                
+                opAuthFail(17) :authentication failure
+            
+         opUnknownFailure(18) :failure which is unknown
+            
+        opAbort(19) : transfer operation has been aborted
+
+        opInvalidSourceAddress(20) : invalid source IP is specified.
+                
+        opInvalidSourceInterface(21) : invalid source interface is specified.
+        
+        opCurrentVersionFileConfilt(22) : conflict between target file and system file"
+            ::= { huaweiFlhOpEntry 9 }
+        
+--  1.3.6.1.4.1.2011.6.9.1.2.1.1.10
+        hwFlhOperEndNotification OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                If the value of it is specified 'true',a notification 
+                will be generated at the end of the operation.
+                Otherwise no notification will be generated.
+                "
+            DEFVAL { false }
+            ::= { huaweiFlhOpEntry 10 }
+        
+--  1.3.6.1.4.1.2011.6.9.1.2.1.1.11
+        hwFlhOperProgress OBJECT-TYPE
+            SYNTAX TimeTicks
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The progress described as the time taken for
+                the operation.
+                "
+            ::= { huaweiFlhOpEntry 11 }
+        
+--  1.3.6.1.4.1.2011.6.9.1.2.1.1.12
+        hwFlhOperRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The status of this table entry. 
+                When the status is active : 
+                (1) In the situation that the specified transfer operation by 
+                ftp/tftp is in progress, the transfer operation will be aborted 
+                if the status is set to notInService. 
+                (2) In any other situations, the specified operation will not be 
+                aborted even if the status is set to notInService.
+                "
+            ::= { huaweiFlhOpEntry 12 }
+            
+--  1.3.6.1.4.1.2011.6.9.1.2.1.1.13
+        hwFlhOperServerPort OBJECT-TYPE
+            SYNTAX Integer32(1..65535)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+               "This object specifies the SFTP/FTP server port that is used for file transfer 
+                only if the value of hwFlhOperProtocol is sftp/ftp.  
+                The default SFTP server port is 22 if no port is specified.  
+                The default FTP server port is 21 if no port is specified. 
+                If the value of hwFlhOperProtocol is not sftp/ftp, this object is ignored by the 
+                implementation. "
+            ::= { huaweiFlhOpEntry 13 }
+
+--  1.3.6.1.4.1.2011.6.9.1.2.1.1.14
+    hwFlhOperSourceAddress OBJECT-TYPE    
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The source IP address. When hwFlhOperType is specified as  net2FlashWithErase,
+            net2FlashWithoutErase or flash2Net, the source IP address 
+            of the client may be specified or not. Default is 0.0.0.0 .
+            If the source type is set to both of IP address and interface, 
+            the former has the priority."        
+        DEFVAL { 0 }
+        ::= { huaweiFlhOpEntry 14 }     
+        
+--  1.3.6.1.4.1.2011.6.9.1.2.1.1.15        
+    hwFlhOperSourceInterface OBJECT-TYPE    
+        SYNTAX      OCTET STRING (SIZE (1..47))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The name of the source interface.When hwFlhOperType is specified as  
+            net2FlashWithErase,net2FlashWithoutErase or flash2Net,the source interface 
+            of the FTP/TFTP client may be specified or not. If the source 
+            type is set to both of IP address and interface,the former has 
+            the priority."    
+        ::= { huaweiFlhOpEntry 15 } 
+        
+--  1.3.6.1.4.1.2011.6.9.1.2.1.1.16
+         hwFlhOperMemSize OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object specifies the reserved space (in KBs) guaranteed by a host. 
+                The value 0 indicates that no space need be reserved. The default value is 0. This 
+                object is optional when hwFlhOperType is specified as net2FlashWithErase or 
+                net2FlashWithoutErase in the Set operation. This object is unavailable when 
+                hwFlhOperType is specified as flash2Net or delete in the Set operation. "
+            ::= { huaweiFlhOpEntry 16 }
+            
+    hwFlhOperVpnInstanceName OBJECT-TYPE
+       SYNTAX      OCTET STRING (SIZE (1..31))
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "The vpn instance name of the file server."
+       ::= { huaweiFlhOpEntry 17 }
+                   
+            
+    hwFlhOperTotalFileLength OBJECT-TYPE
+       SYNTAX Integer32 (0..2147483647)
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "The total length of the file, in bytes."
+       ::= { huaweiFlhOpEntry 18 }                
+                
+    hwFlhOperTransferProgress OBJECT-TYPE
+       SYNTAX Integer32 (0..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The transfer progress of the file."
+       ::= { huaweiFlhOpEntry 19 }            
+    hwFlhOperErrorReason OBJECT-TYPE
+       SYNTAX DisplayString (SIZE (1..255))
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The failure reason of operation."
+       ::= { huaweiFlhOpEntry 20 }
+    hwFlhOperServerIpv6Address OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE (0..46))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The address of remote host acting as Ipv6 server for any operation."    
+        ::= { huaweiFlhOpEntry 21 }	   
+                   
+        hwFlhSyncTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwFlhSyncEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of Flash synchronize operate include copy/delete etc."
+            ::= { huaweiFlashOperate 2 }
+            
+        hwFlhSyncEntry OBJECT-TYPE
+            SYNTAX HwFlhSyncEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A Flash synchronize operation entry. Each entry consists 
+                of a synchronize command, such as copy,delete etc."
+            INDEX { hwFlhSyncIndex }
+            ::= { hwFlhSyncTable 1 }
+        
+        HwFlhSyncEntry ::=
+            SEQUENCE { 
+                hwFlhSyncIndex
+                    Integer32,
+                hwFlhSyncType
+                    INTEGER,
+                hwFlhSyncRange
+                    INTEGER,
+                hwFlhSyncSourcePath
+                    DisplayString,
+                hwFlhSyncSourceFile
+                    DisplayString,
+                hwFlhSyncDestinationPath
+                    DisplayString,
+                hwFlhSyncDestinationFile
+                    DisplayString,
+                hwFlhSyncRowStatus
+                    RowStatus
+             }
+        hwFlhSyncIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..2147483647)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Specifies the index of an entry.
+                It is a random value when creating an entry."
+            ::= { hwFlhSyncEntry 1 }
+        hwFlhSyncType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                net2FlashCopy(1)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Synchronize operation type to be executed. 
+                net2FlashCopy    Net operate copy a file from one board to another;"
+            ::= { hwFlhSyncEntry 2 }
+        hwFlhSyncRange OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                designate(1),
+                all(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Synchronize operation range to be executed. 
+                designate   Net designate a object to be handled as synchronize destination;
+                all        Net make all chassis and all board as handled object;"
+            ::= { hwFlhSyncEntry 3 }
+        hwFlhSyncSourcePath OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..255))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The source board path to be transferred.
+                It must be specified."
+            ::= { hwFlhSyncEntry 4 }
+        hwFlhSyncSourceFile OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..255))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The source file name to be transferred . 
+                It is located on the flash of the mainboard of a chassis.
+                It is combine with the hwFlhSyncSourcePath to specify the absolute file name.
+                It must be specified."
+            ::= { hwFlhSyncEntry 5 }
+        hwFlhSyncDestinationPath OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..255))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The destination board path to be transferred.
+                It must be specified."
+            ::= { hwFlhSyncEntry 6 }
+        hwFlhSyncDestinationFile OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..255))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The destination file name to be transferred . 
+                It is combine with the hwFlhSyncDestinationPath to specify the absolute file name.
+                It must be specified."
+            ::= { hwFlhSyncEntry 7 }
+        hwFlhSyncRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The row status of this table entry."
+            ::= { hwFlhSyncEntry 8 }
+            
+--  1.3.6.1.4.1.2011.6.9.1.3
+        huaweiFlashNotification OBJECT IDENTIFIER ::= { huaweiFlashManMIBObjects 3 }
+        
+--  1.3.6.1.4.1.2011.6.9.1.3.2
+        hwFlhOperNotification NOTIFICATION-TYPE
+            OBJECTS { hwFlhOperStatus }
+            STATUS current
+            DESCRIPTION 
+                "A hwFlhOperNotification is sent only when hwFlhOperEndNotification is true."
+            ::= { huaweiFlashNotification 1 }
+            
+        hwFlhSyncSuccessNotification NOTIFICATION-TYPE
+            OBJECTS { hwFlhSyncSourceFile, hwFlhSyncDestinationFile }
+            STATUS current
+            DESCRIPTION 
+                "A hwFlhSyncSuccessNotification is sent when the file copy operation successful."
+            ::= { huaweiFlashNotification 2 }
+            
+        hwFlhSyncFailNotification NOTIFICATION-TYPE
+            OBJECTS { hwFlhSyncSourceFile, hwFlhSyncDestinationFile }
+            STATUS current
+            DESCRIPTION 
+                "A hwFlhSyncFailNotification is sent when the file copy operation failed."
+            ::= { huaweiFlashNotification 3 }
+        
+        huaweiStorageDevice OBJECT IDENTIFIER ::= { huaweiFlashManMIBObjects 4 }
+        hwStorageTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwStorageEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table gives the properties of all the storage devices on the device .
+                "
+            ::= { huaweiStorageDevice 2 }
+        hwStorageEntry OBJECT-TYPE
+            SYNTAX HwStorageEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                The entries of hwStorageTable."
+            INDEX { hwStorageIndex }
+            ::= { hwStorageTable 1 }
+        HwStorageEntry ::=
+            SEQUENCE { 
+                hwStorageIndex
+                    Integer32,
+                hwStorageType
+                    INTEGER,
+                hwStorageSpace
+                    Integer32,
+                hwStorageSpaceFree
+                    Integer32,
+                hwStorageName
+                    DisplayString,
+                hwStorageDescr
+                    DisplayString
+             }
+        hwStorageIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..255)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The index of hwStorageTable. It has the minimum value of 1. "
+            ::= { hwStorageEntry 1 }
+        hwStorageType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                flash(1),
+                hardDisk(2),
+                cfCard(3),
+                usbDisk(4),
+                sdCard(5)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The type of all the storage devices on the device "
+            ::= { hwStorageEntry 2 }
+        hwStorageSpace OBJECT-TYPE
+            SYNTAX Integer32
+            UNITS "kbytes"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Specifies the total size of the storage devices  indexed by hwStorageTable."
+            ::= { hwStorageEntry 3 }
+        hwStorageSpaceFree OBJECT-TYPE
+            SYNTAX Integer32
+            UNITS "kbytes"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The free space of the storage devices.        
+                "
+            ::= { hwStorageEntry 4 }
+        hwStorageName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..32))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The storage devices name used to refer to the
+                device within the system. "
+            ::= { hwStorageEntry 5 }
+        hwStorageDescr OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Description of the purpose of the storage devices on the system.
+                "
+            ::= { hwStorageEntry 6 }
+--  1.3.6.1.4.1.2011.6.9.2
+        huaweiFlashMIBConformance OBJECT IDENTIFIER ::= { hwFlash 2 }
+        
+--  1.3.6.1.4.1.2011.6.9.2.1
+        hwFlhMIBCompliances OBJECT IDENTIFIER ::= { huaweiFlashMIBConformance 1 }
+        
+--  1.3.6.1.4.1.2011.6.9.2.1.1
+        hwFlhMIBCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                " 
+                The compliance statement for 
+                entities that support the huawei Flash MIB.
+                "
+            MODULE -- this module
+                MANDATORY-GROUPS { hwFlhGroup, hwFlhChipGroup, hwFlhPartitionGroup, hwFlhFileGroup, hwFlhOperationGroup, 
+                    hwFlhNotificationGroup }
+            ::= { hwFlhMIBCompliances 1 }
+        
+--  1.3.6.1.4.1.2011.6.9.2.2
+        huaweiFlashMIBGroups OBJECT IDENTIFIER ::= { huaweiFlashMIBConformance 2 }
+        
+--  1.3.6.1.4.1.2011.6.9.2.2.1
+        hwFlhGroup OBJECT-GROUP
+            OBJECTS { hwFlhSupportNum, hwFlhSize, hwFlhPos, hwFlhName, hwFlhChipNum, 
+                hwFlhDescr, hwFlhInitTime, hwFlhRemovable, hwFlhPartitionBool, hwFlhMinPartitionSize, 
+                hwFlhMaxPartitions, hwFlhPartitionNum, hwFlhIndex }
+            STATUS current
+            DESCRIPTION 
+                "A collection of objects on  Flash device level information.
+                "
+            ::= { huaweiFlashMIBGroups 1 }
+        
+--  1.3.6.1.4.1.2011.6.9.2.2.3
+        hwFlhChipGroup OBJECT-GROUP
+            OBJECTS { hwFlhChipID, hwFlhChipDescr, hwFlhChipWriteTimesLimit, hwFlhChipWriteTimes, hwFlhChipEraseTimesLimit, 
+                hwFlhChipEraseTimes }
+            STATUS current
+            DESCRIPTION 
+                "A collection of objects on chip level information.
+                "
+            ::= { huaweiFlashMIBGroups 3 }
+        
+--  1.3.6.1.4.1.2011.6.9.2.2.4
+        hwFlhPartitionGroup OBJECT-GROUP
+            OBJECTS { hwFlhPartFirstChip, hwFlhPartLastChip, hwFlhPartSpace, hwFlhPartSpaceFree, hwFlhPartFileNum, 
+                hwFlhPartChecksumMethod, hwFlhPartStatus, hwFlhPartUpgradeMode, hwFlhPartName, hwFlhPartRequireErase, 
+                hwFlhPartFileNameLen }
+            STATUS current
+            DESCRIPTION 
+                "A collection of objects providing on partition level information. 
+                "
+            ::= { huaweiFlashMIBGroups 4 }
+        
+--  1.3.6.1.4.1.2011.6.9.2.2.5
+        hwFlhFileGroup OBJECT-GROUP
+            OBJECTS { hwFlhFileName, hwFlhFileSize, hwFlhFileStatus, hwFlhFileChecksum }
+            STATUS current
+            DESCRIPTION 
+                "A collection of objects on file level information.
+                "
+            ::= { huaweiFlashMIBGroups 5 }
+        
+--  1.3.6.1.4.1.2011.6.9.2.2.6
+        hwFlhOperationGroup OBJECT-GROUP
+            OBJECTS { hwFlhOperType, hwFlhOperProtocol, hwFlhOperServerAddress, hwFlhOperServerUser, hwFlhOperPassword, 
+                hwFlhOperSourceFile, hwFlhOperDestinationFile, hwFlhOperStatus, hwFlhOperEndNotification, hwFlhOperProgress, 
+                hwFlhOperRowStatus, hwFlhOperServerPort, hwFlhOperSourceAddress, hwFlhOperSourceInterface , hwFlhOperMemSize,
+                hwFlhSyncType, hwFlhSyncRange, 
+                hwFlhSyncSourcePath, hwFlhSyncSourceFile, hwFlhSyncDestinationPath, hwFlhSyncDestinationFile, hwFlhSyncRowStatus,hwFlhOperServerIpv6Address }
+            STATUS current
+            DESCRIPTION 
+                "A collection of objects of flash operations.
+                "
+            ::= { huaweiFlashMIBGroups 6 }
+        
+--  1.3.6.1.4.1.2011.6.9.2.2.7
+        hwFlhNotificationGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwFlhOperNotification, hwFlhSyncSuccessNotification, hwFlhSyncFailNotification }
+            STATUS current
+            DESCRIPTION 
+                "The collection of notifications in the module"
+            ::= { huaweiFlashMIBGroups 7 }
+        
+        hwStorageGroup OBJECT-GROUP
+            OBJECTS { hwStorageType, hwStorageSpace, hwStorageSpaceFree, hwStorageName, hwStorageDescr
+                 }
+            STATUS current
+            DESCRIPTION 
+                "Description."
+            ::= { huaweiFlashMIBGroups 8 }
+    
+    END
+
+--
+-- HUAWEI-FLASH-MAN-MIB.mib
+--

@@ -1,6 +1,8 @@
 <?php
 
 // Build a dictionary of vlans in database
+use LibreNMS\Config;
+
 $vlans_dict = array();
 foreach (dbFetchRows("SELECT `vlan_id`, `vlan_vlan` from `vlans` WHERE `device_id` = ?", array($device['device_id'])) as $vlan_entry) {
     $vlans_dict[$vlan_entry['vlan_vlan']] = $vlan_entry['vlan_id'];
@@ -14,12 +16,17 @@ foreach ($sql_result as $entry) {
     $existing_fdbs[(int)$entry['vlan_id']][$entry['mac_address']] = $entry;
 }
 
-$insert = array(); // populate $insert with database entries
-if ($device['os'] == 'ios' || $device['os'] == 'iosxe') {
-    include $config['install_dir'] . '/includes/discovery/fdb-table/ios.inc.php';
-} else {
+$insert = []; // populate $insert with database entries
+if (file_exists(Config::get('install_dir') . "/includes/discovery/fdb-table/{$device['os']}.inc.php")) {
+    require Config::get('install_dir') . "/includes/discovery/fdb-table/{$device['os']}.inc.php";
+} elseif ($device['os'] == 'ios' || $device['os'] == 'iosxe'|| $device['os'] == 'nxos') {
+    //ios,iosxe,nxos are all Cisco
+    include Config::get('install_dir') . '/includes/discovery/fdb-table/ios.inc.php';
+}
+
+if (empty($insert)) {
     // Check generic Q-BRIDGE-MIB and BRIDGE-MIB
-    include $config['install_dir'] . '/includes/discovery/fdb-table/bridge.inc.php';
+    include Config::get('install_dir') . '/includes/discovery/fdb-table/bridge.inc.php';
 }
 
 if (!empty($insert)) {
@@ -33,15 +40,20 @@ if (!empty($insert)) {
 
                 if ($existing_fdbs[$vlan_id][$mac_address_entry]['port_id'] != $new_port) {
                     $port_fdb_id = $existing_fdbs[$vlan_id][$mac_address_entry]['ports_fdb_id'];
-
                     dbUpdate(
-                        array('port_id' => $new_port),
+                        array('port_id' => $new_port, 'updated_at' => array('NOW()'),),
                         'ports_fdb',
                         '`device_id` = ? AND `vlan_id` = ? AND `mac_address` = ?',
                         array($device['device_id'], $vlan_id, $mac_address_entry)
                     );
                     echo 'U';
                 } else {
+                    dbUpdate(
+                        array('updated_at' => array('NOW()'),), //we need to do this unless we use Eloquent "update" method
+                        'ports_fdb',
+                        '`device_id` = ? AND `vlan_id` = ? AND `mac_address` = ?',
+                        array($device['device_id'], $vlan_id, $mac_address_entry)
+                    );
                     echo '.';
                 }
                 unset($existing_fdbs[$vlan_id][$mac_address_entry]);
@@ -51,6 +63,8 @@ if (!empty($insert)) {
                     'mac_address' => $mac_address_entry,
                     'vlan_id' => $vlan_id,
                     'device_id' => $device['device_id'],
+                    'created_at' => array('NOW()'), //we need to do this unless we use Eloquent "create" method
+                    'updated_at' => array('NOW()'), //we need to do this unless we use Eloquent "update" method
                 );
 
                 dbInsert($new_entry, 'ports_fdb');
@@ -61,17 +75,9 @@ if (!empty($insert)) {
         echo PHP_EOL;
     }
 
+    //We do not delete anything here, as daily.sh will take care of the cleaning.
+
     // Delete old entries from the database
-    foreach ($existing_fdbs as $vlan_id => $entries) {
-        foreach ($entries as $entry) {
-            dbDelete(
-                'ports_fdb',
-                '`port_id` = ? AND `mac_address` = ? AND `vlan_id` = ? and `device_id` = ?',
-                array($entry['port_id'], $entry['mac_address'], $entry['vlan_id'], $entry['device_id'])
-            );
-            d_echo("Deleting: {$entry['mac_address']}\n", '-');
-        }
-    }
 }
 
 unset(

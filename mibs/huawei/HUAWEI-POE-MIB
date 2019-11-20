@@ -1,0 +1,720 @@
+
+--  ===========================================================
+-- Copyright (C)  2009 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description:    HUAWEI POE MIB Definition 
+-- Reference:      This mib was extracted from IEEE 802.3af
+-- Version:        V1.0
+-- History:        Liuhui ,2009-08-24, Create
+-- ===========================================================
+
+	HUAWEI-POE-MIB DEFINITIONS ::= BEGIN
+ 
+		IMPORTS
+			hwDatacomm			
+				FROM HUAWEI-MIB			
+			InterfaceIndex			
+				FROM IF-MIB			
+			EnabledStatus			
+				FROM P-BRIDGE-MIB			
+			OBJECT-GROUP, NOTIFICATION-GROUP			
+				FROM SNMPv2-CONF			
+			Integer32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE			
+				FROM SNMPv2-SMI;
+	
+	
+		hwPoeMIB MODULE-IDENTITY 
+			LAST-UPDATED "200908241133Z"		-- August 24, 2009 at 11:33 GMT
+			ORGANIZATION 
+				"Huawei Technologies co.,Ltd."
+			CONTACT-INFO 
+				"R&D BeiJing, Huawei Technologies co.,Ltd.
+				Huawei Bld.,NO.3 Xinxi Rd., 
+				Shang-Di Information Industry Base,
+				Hai-Dian District Beijing P.R. China
+				Zip:100085 
+				Http://www.huawei.com                       
+				E-mail:support@huawei.com"
+			DESCRIPTION 
+				"The HUAWEI-POE-MIB contains objects to manage POE."
+			::= { hwDatacomm 195 }
+		
+	
+--
+-- Node definitions
+--
+	
+		hwPoeGlobalObjects OBJECT IDENTIFIER ::= { hwPoeMIB 1 }
+		
+		
+		hwPoePower OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object identifies the maximum POE power of the system."
+			::= { hwPoeGlobalObjects 1 }
+			
+		hwPoePowerRsvPercent OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object identifies the reserved percent of total POE power."
+			::= { hwPoeGlobalObjects 4 }
+		
+		hwPoePowerUtilizationThreshold OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object identifies the utilization threshold of total POE power."
+			::= { hwPoeGlobalObjects 5 }		
+		
+		hwPoeSlotTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwPoeSlotEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This object indicates the slot configuration table of POE."
+			::= { hwPoeMIB 2 }
+		
+		
+		hwPoeSlotEntry OBJECT-TYPE
+			SYNTAX HwPoeSlotEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This object indicates the entry of the slot configuration table of POE."
+			INDEX { hwPoeSlotId }
+			::= { hwPoeSlotTable 1 }
+		
+		HwPoeSlotEntry ::=
+			SEQUENCE { 
+				hwPoeSlotId
+					Integer32,
+				hwPoeSlotMaximumPower
+					Integer32,
+				hwPoeSlotAvailablePower
+					Integer32,
+				hwPoeSlotReferencePower
+					Integer32,
+				hwPoeSlotConsumingPower
+					Integer32,
+				hwPoeSlotPeakPower
+					Integer32,
+				hwPoeSlotLegacyDetect
+					EnabledStatus,
+				hwPoeSlotPowerManagementManner
+					INTEGER,
+				hwPoeSlotIsPoeDevice
+					OCTET STRING,
+				hwPoeDimmId
+				  Integer32,
+				hwPoeSlotPowerRsvPercent
+				  Integer32,
+				hwPoeSlotPowerUtilizationThreshold
+				  Integer32
+			 }
+
+		
+		hwPoeSlotId OBJECT-TYPE
+			SYNTAX Integer32 (0..8)
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This object identifies the slot ID."
+			::= { hwPoeSlotEntry 1 }
+		
+		
+		hwPoeSlotMaximumPower OBJECT-TYPE
+			SYNTAX Integer32 (0..1600000)
+			UNITS "mW"
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object identifies the maximum power set by users. The value is expressed in mW."
+			DEFVAL { '1B1980'h }
+			::= { hwPoeSlotEntry 2 }
+		
+		
+		hwPoeSlotAvailablePower OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object idenfies the available Power. The value is expressed in mW."
+			::= { hwPoeSlotEntry 3 }
+		
+		
+		hwPoeSlotReferencePower OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object identifies the total reference power of a slot. The value is expressed in mW."
+			::= { hwPoeSlotEntry 4 }
+		
+		
+		hwPoeSlotConsumingPower OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object identifies the total consuming power of a slot. The value is expressed in mW."
+			::= { hwPoeSlotEntry 5 }
+		
+		
+		hwPoeSlotPeakPower OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object identifies the total peak power of a slot. The value is expressed in mW."
+			::= { hwPoeSlotEntry 6 }
+		
+		
+		hwPoeSlotLegacyDetect OBJECT-TYPE
+			SYNTAX EnabledStatus
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object indicates the compatibility detection of a non-standard device. (1:enable;  2:disable(default))"
+			DEFVAL { disabled }
+			::= { hwPoeSlotEntry 7 }
+		
+		
+		hwPoeSlotPowerManagementManner OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				manual(1),
+				auto(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object identifies the power management manner. (1:manual, 2:auto(default))."
+			DEFVAL { auto }
+			::= { hwPoeSlotEntry 8 }
+		
+		
+		hwPoeSlotIsPoeDevice OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates whether the device supports PoE."
+			::= { hwPoeSlotEntry 9 }
+		
+
+		hwPoeDimmId OBJECT-TYPE
+			SYNTAX Integer32 (0..1)
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"This object identifies the DIMM ID."
+			::= { hwPoeSlotEntry 10 }
+
+		hwPoeSlotPowerRsvPercent OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object identifies the reserved percent of POE power in slot."
+			::= { hwPoeSlotEntry 11 }
+
+		hwPoeSlotPowerUtilizationThreshold OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object identifies the utilization threshold of total POE power in slot."
+			::= { hwPoeSlotEntry 12 }
+		
+		hwPoePortTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwPoePortEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This object indicates the table that contains the configuration parameters of a POE interface. One entry corresponds to a POE interface."
+			::= { hwPoeMIB 3 }
+		
+		
+		hwPoePortEntry OBJECT-TYPE
+			SYNTAX HwPoePortEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This object indicates the entry of POE Port Table."
+			INDEX { hwPoePortIfIndex }
+			::= { hwPoePortTable 1 }
+		
+		HwPoePortEntry ::=
+			SEQUENCE { 
+				hwPoePortIfIndex
+					InterfaceIndex,
+				hwPoePortName
+					OCTET STRING,
+				hwPoePortEnable
+					EnabledStatus,
+				hwPoePortPriority
+					INTEGER,
+				hwPoePortMaximumPower
+					Integer32,
+				hwPoePortPowerOnStatus
+					OCTET STRING,
+				hwPoePortPowerStatus
+					OCTET STRING,
+				hwPoePortPdClass
+					Integer32,
+				hwPoePortReferencePower
+					Integer32,
+				hwPoePortConsumingPower
+					Integer32,
+				hwPoePortPeakPower
+					Integer32,
+				hwPoePortAveragePower
+					Integer32,
+				hwPoePortCurrent
+					OCTET STRING,
+				hwPoePortVoltage
+					OCTET STRING,
+				hwPoePortManualOperation
+					INTEGER
+			 }
+
+		
+		hwPoePortIfIndex OBJECT-TYPE
+			SYNTAX InterfaceIndex
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This object indicates the interface index."
+			::= { hwPoePortEntry 1 }
+		
+		
+		hwPoePortName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the interface name."
+			::= { hwPoePortEntry 2 }
+		
+		
+		hwPoePortEnable OBJECT-TYPE
+			SYNTAX EnabledStatus
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object indicates the enabling status of an interface. (1:enable(default);  2:disable)"
+			DEFVAL { enable }
+			::= { hwPoePortEntry 3 }
+		
+		
+		hwPoePortPriority OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				critical(1),
+				high(2),
+				low(3)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object identifies the priority of an interface. (1:critical, 2:high, 3:low(default))"
+			DEFVAL { low }
+			::= { hwPoePortEntry 4 }
+		
+		
+		hwPoePortMaximumPower OBJECT-TYPE
+			SYNTAX Integer32 (0..30000)
+			UNITS "mW"
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object identifies the maximum power of an interface.The value is expressed in mW."
+			DEFVAL { '9088'h }
+			::= { hwPoePortEntry 5 }
+		
+		
+		hwPoePortPowerOnStatus OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the powering status of an interface."
+			::= { hwPoePortEntry 6 }
+		
+		
+		hwPoePortPowerStatus OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the status of an interface."
+			::= { hwPoePortEntry 7 }
+		
+		
+		hwPoePortPdClass OBJECT-TYPE
+			SYNTAX Integer32 (0..7)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object identifies the class of a PD."
+			::= { hwPoePortEntry 8 }
+		
+		
+		hwPoePortReferencePower OBJECT-TYPE
+			SYNTAX Integer32 (0..30000)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object identifies the guaranteed power of an interface. The value is expressed in mW."
+			::= { hwPoePortEntry 9 }
+		
+		
+		hwPoePortConsumingPower OBJECT-TYPE
+			SYNTAX Integer32 (0..30000)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object identifies the consuming power of an interface. The value is expressed in mW."
+			::= { hwPoePortEntry 10 }
+		
+		
+		hwPoePortPeakPower OBJECT-TYPE
+			SYNTAX Integer32 (0..30000)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object identifies the peak power of an interface. The value is expressed in mW."
+			::= { hwPoePortEntry 11 }
+		
+		
+		hwPoePortAveragePower OBJECT-TYPE
+			SYNTAX Integer32 (0..30000)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object identifies the average power of an interface. The value is expressed in mW."
+			::= { hwPoePortEntry 12 }
+		
+		
+		hwPoePortCurrent OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the current of an interface. The value is expressed in mA."
+			::= { hwPoePortEntry 13 }
+		
+		
+		hwPoePortVoltage OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the voltage of an interface. The value is expressed in V."
+			::= { hwPoePortEntry 14 }
+		
+		
+		hwPoePortManualOperation OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				powerOff(1),
+				powerOn(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object indicates that a PD connected to an interface is powered on or powered off manually."
+			::= { hwPoePortEntry 15 }
+		
+
+		
+		hwPoeTrapObjects OBJECT IDENTIFIER ::= { hwPoeMIB 39 }
+		
+		hwPoePdPriority OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				critical(1),
+				high(2),
+				low(3)
+				}
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"This object identifies the PD priority.(1:critical, 2:high, 3:low(default))"
+			::= { hwPoeTrapObjects 1 }
+		
+		hwPoeSlotNum OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"This object identifies the slot ID."
+			::= { hwPoeTrapObjects 2 }
+
+		hwPoeCurConsumPower OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"This object identifies the current consuming power."
+			::= { hwPoeTrapObjects 3 }
+
+		hwPoeConsumPowerThreshold OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"This object identifies the threshold of consuming power."
+			::= { hwPoeTrapObjects 4 }
+			
+		hwPoeDeviceID OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"This object identifies the device ID."
+			::= { hwPoeTrapObjects 5 }
+		
+		hwFrameID OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"This object identifies the CSS Frame ID."
+			::= { hwPoeTrapObjects 6 }
+			
+		hwPoeNotification OBJECT IDENTIFIER ::= { hwPoeMIB 40 }
+		
+		
+		hwPoeDimmError NOTIFICATION-TYPE
+			OBJECTS { hwPoeSlotNum, hwPoeDimmId }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the Dimm chip error."
+			::= { hwPoeNotification 1 }
+		
+		
+		hwPoePowerOff NOTIFICATION-TYPE
+			OBJECTS { hwPoePortName }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates a PD connected to an interface is powered off."
+			::= { hwPoeNotification 2 }
+		
+		
+		hwPoePowerOn NOTIFICATION-TYPE
+			OBJECTS { hwPoePortName }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that a PD connected to an interface is powered on."
+			::= { hwPoeNotification 3 }
+		
+		
+		hwPoeSlotPowerOverload NOTIFICATION-TYPE
+			OBJECTS { hwPoeSlotNum, hwPoeSlotConsumingPower }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that the power consumed by a slot exceeds the threshold."
+			::= { hwPoeNotification 4 }
+		
+		
+		hwPoeSlotPowerOverloadResume NOTIFICATION-TYPE
+			OBJECTS { hwPoeSlotNum, hwPoeSlotConsumingPower }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that the power consumed by a slot does not exceed the threshold."
+			::= { hwPoeNotification 5 }
+		
+		
+		hwPoePdPowerOverload NOTIFICATION-TYPE
+			OBJECTS { hwPoePortName, hwPoePortConsumingPower, hwPoePortMaximumPower }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the power consumed by a PD connected to an interface exceeds the threshold."
+			::= { hwPoeNotification 6 }
+		
+		
+		hwPoePdPowerOverloadResume NOTIFICATION-TYPE
+			OBJECTS { hwPoePortName, hwPoePortConsumingPower, hwPoePortMaximumPower }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that the power consumed by a PD connected to an interface does not exceed the threshold."
+			::= { hwPoeNotification 7 }
+		
+		hwPoePdConnected NOTIFICATION-TYPE
+			OBJECTS { hwPoePortName }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that a PD is connected to an interface."
+			::= { hwPoeNotification 8 }
+		
+		
+		hwPoePdDisconnected NOTIFICATION-TYPE
+			OBJECTS { hwPoePortName }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that a PD is disconnected from an interface."
+			::= { hwPoeNotification 9 }
+		
+		hwPoePdClassInvalid NOTIFICATION-TYPE
+			OBJECTS { hwPoePortName }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that a PD of an invalid class is detected."
+			::= { hwPoeNotification 10 }
+		
+		hwPoePdClassOvercurrent NOTIFICATION-TYPE
+			OBJECTS { hwPoePortName }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that overcurrent occurs during the classification of a PD."
+			::= { hwPoeNotification 11 }
+		
+		hwPoePdPowerOvercurrent NOTIFICATION-TYPE
+			OBJECTS { hwPoePortName }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that overcurrent occurs during the powering of a PD."
+			::= { hwPoeNotification 12 }
+		
+		hwPoePdPowerOvercurrentResume NOTIFICATION-TYPE
+			OBJECTS { hwPoePortName }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that overcurrent is rectified."
+			::= { hwPoeNotification 13 }
+		
+		hwPoePowerOnFail NOTIFICATION-TYPE
+			OBJECTS { hwPoePortName }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that a PD fails to be powered on."
+			::= { hwPoeNotification 14 }
+		
+		hwPoePowerOffCurrentLimits NOTIFICATION-TYPE
+			OBJECTS { hwPoePortName }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that a PD is powered off because its current meets or exceeds the limit of current."
+			::= { hwPoeNotification 15 }
+		
+		hwPoePdPriorityDifferent NOTIFICATION-TYPE
+			OBJECTS { hwPoePortName, hwPoePortPriority, hwPoePdPriority }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that the priority of PD is different from the port."
+			::= { hwPoeNotification 16 }
+		
+		hwPoePowerOverUtilizationThreshold  NOTIFICATION-TYPE
+		  OBJECTS { hwPoeDeviceID, hwPoeCurConsumPower, hwPoeConsumPowerThreshold}
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that the PSE is overdrawing power."
+			::= { hwPoeNotification 17 }
+		
+		hwPoePowerOverUtilizationThresholdResume  NOTIFICATION-TYPE
+		  OBJECTS { hwPoeDeviceID, hwPoeCurConsumPower, hwPoeConsumPowerThreshold}
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that the PSE is not overdrawing power."
+			::= { hwPoeNotification 18 }
+			
+		hwPoeBoardInsertedWrongFrame  NOTIFICATION-TYPE
+		  OBJECTS {hwFrameID, hwPoeSlotNum }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that the poe board is inserted in the frame does not support poe."
+			::= { hwPoeNotification 19 }			
+						
+		hwPoePowerAbsent  NOTIFICATION-TYPE
+		  OBJECTS {hwFrameID, hwPoeSlotNum }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that the poe power is absent."
+			::= { hwPoeNotification 20 }
+
+		hwPoePowerAbsentResume  NOTIFICATION-TYPE
+		  OBJECTS {hwFrameID, hwPoeSlotNum }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that the poe power is present."
+			::= { hwPoeNotification 21 }
+
+		hwPoeRpsPowerOutputAlarm  NOTIFICATION-TYPE
+		  OBJECTS {hwPoeSlotNum }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that the RPS power can not provide POE power for this device."
+			::= { hwPoeNotification 22 }
+
+		hwPoeRpsPowerOutputAlarmResume  NOTIFICATION-TYPE
+		  OBJECTS {hwPoeSlotNum }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that the RPS power can provide POE power for this device."
+			::= { hwPoeNotification 23 }
+
+		
+		hwPoeConformance OBJECT IDENTIFIER ::= { hwPoeMIB 100 }
+		
+		
+		hwPoeGroups OBJECT IDENTIFIER ::= { hwPoeConformance 1 }
+		
+		
+		hwPoeSlotGroup OBJECT-GROUP
+			OBJECTS { hwPoeSlotMaximumPower, hwPoeSlotReferencePower, hwPoeSlotConsumingPower, hwPoeSlotPeakPower, hwPoeSlotPowerManagementManner, 
+				hwPoeSlotIsPoeDevice, hwPoeSlotLegacyDetect, hwPoeSlotPowerRsvPercent, hwPoeSlotPowerUtilizationThreshold, hwPoeDimmId,
+				hwPoeSlotAvailablePower }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the POE's slot table group."
+			::= { hwPoeGroups 1 }
+		
+		
+		hwPoePortGroup OBJECT-GROUP
+			OBJECTS { hwPoePortEnable, hwPoePortPriority, hwPoePortMaximumPower, hwPoePortPowerOnStatus, hwPoePortPowerStatus, 
+				hwPoePortReferencePower, hwPoePortName, hwPoePortConsumingPower, hwPoePortPeakPower, hwPoePortAveragePower, 
+				hwPoePortCurrent, hwPoePortVoltage, hwPoePortManualOperation, hwPoePortPdClass }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the POE's port table group."
+			::= { hwPoeGroups 2 }
+		
+		
+		hwPoeGlobalGroup OBJECT-GROUP
+			OBJECTS { hwPoePowerUtilizationThreshold, hwPoePowerRsvPercent, hwPoePower }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the POE's global table group."
+			::= { hwPoeGroups 3 }
+		
+		
+		hwPoeNotificationGroup NOTIFICATION-GROUP
+			NOTIFICATIONS { hwPoeDimmError, hwPoePowerOff, hwPoePowerOn, hwPoePdPowerOverload, hwPoePdPowerOverloadResume, 
+				hwPoePdConnected, hwPoePdDisconnected, hwPoePdClassInvalid, hwPoePdClassOvercurrent, hwPoePdPowerOvercurrent, 
+				hwPoePdPowerOvercurrentResume, hwPoePowerOnFail, hwPoePowerOffCurrentLimits, hwPoePowerOverUtilizationThresholdResume , hwPoePowerOverUtilizationThreshold , 
+				hwPoePdPriorityDifferent, hwPoeSlotPowerOverload, hwPoeSlotPowerOverloadResume , hwPoeBoardInsertedWrongFrame ,hwPoePowerAbsent,hwPoePowerAbsentResume,
+				hwPoeRpsPowerOutputAlarm, hwPoeRpsPowerOutputAlarmResume }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the POE's notification table group."
+			::= { hwPoeGroups 4 }
+		
+		hwPoeTrapObjectsGroup OBJECT-GROUP
+			OBJECTS { hwPoePdPriority, hwPoeSlotNum, hwPoeCurConsumPower,hwPoeConsumPowerThreshold,hwPoeDeviceID,hwFrameID }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwPoeGroups 5 }
+		
+	
+	END
+
+--
+-- HUAWEI-POE-MIB.mib
+--

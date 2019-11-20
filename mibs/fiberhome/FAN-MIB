@@ -1,0 +1,400 @@
+FAN-MIB DEFINITIONS ::= BEGIN
+	IMPORTS
+			MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32,
+			Integer32, TimeTicks, Counter64,enterprises,
+			NOTIFICATION-TYPE,Unsigned32                        
+							FROM SNMPv2-SMI       
+			TEXTUAL-CONVENTION,RowStatus
+							FROM SNMPv2-TC
+			wri,wriProducts			
+							FROM WRI-SMI;
+	
+
+
+	-- fan monitor
+	
+	msppFan			MODULE-IDENTITY
+        LAST-UPDATED    "201001110000Z"
+        ORGANIZATION    "Wuhan FiberHome Networks Co.,Ltd."
+        CONTACT-INFO
+                "  FHN Customer Service
+                   Tel: 027-87693784"
+        DESCRIPTION
+                "The MIB module to describe the monitor for fan."
+        REVISION        "201001110000Z" 
+        DESCRIPTION
+                "Add some attributes for fan table."
+        REVISION        "200901110000Z" 
+        DESCRIPTION
+                "Init version for fan monitor."
+        ::=   {msppChassis 11}
+	
+	mspp         	OBJECT IDENTIFIER ::= { wriProducts 8012 }
+	msppChassis		OBJECT IDENTIFIER ::=   {mspp 1}
+	
+	EntryStatus ::= TEXTUAL-CONVENTION
+		STATUS current
+		DESCRIPTION
+				"entry status."
+		SYNTAX INTEGER 
+		{
+				valid(1),
+				createRequest(2),
+				underCreation(3),
+				invalid(4)
+		}
+	
+	
+	--msppFan			OBJECT IDENTIFIER ::=   {msppChassis 11}
+		
+		fanTable OBJECT-TYPE
+			SYNTAX  SEQUENCE OF FanEntry
+			MAX-ACCESS   not-accessible
+			STATUS  current
+			DESCRIPTION
+			         "fan information table."
+			::= { msppFan 1 }
+
+		fanEntry OBJECT-TYPE
+			SYNTAX FanEntry
+			MAX-ACCESS   not-accessible
+			STATUS  current
+			DESCRIPTION
+		         	"An entry in the fan table."
+			INDEX {fanIndex,fanCtrlNumIndex }
+			::= { fanTable 1 }
+		
+		FanEntry ::=
+		    SEQUENCE {
+		    fanIndex          		INTEGER,
+			fanCtrlNumIndex         Unsigned32,
+		    fanSpeed           		INTEGER,
+		    fanLThreshold      		INTEGER,
+		    fanHThreshold      		INTEGER,
+		    fanState          		INTEGER,
+		    fanCtrlId				INTEGER
+			}
+		-- The following section describes the components of the table.
+
+			fanIndex OBJECT-TYPE
+				SYNTAX  INTEGER(1..20)
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"Unique index for the fan."
+				::= { fanEntry 1 }
+
+			fanCtrlNumIndex OBJECT-TYPE
+				SYNTAX  Unsigned32
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"Unique index for the fan crtl."
+				::= { fanEntry 2 }
+				
+			fanSpeed OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"Current speed for the fan in rolls per minute."
+				::= { fanEntry 3 }
+				
+			fanLThreshold OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION                         
+						"The lower threshold of speed for the fan in rolls per minute."
+				::= { fanEntry 4 }
+				
+			fanHThreshold OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"The high threshold of speed for the fan in rolls per minute."
+				::= { fanEntry 5 }
+				
+			fanState OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"States for the fan."
+				::= { fanEntry 6 } 
+				
+			fanCtrlId OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"controller index for the fan."
+				::= { fanEntry 7 } 
+
+		fanTrap			OBJECT IDENTIFIER ::=   {msppFan 2}
+		
+		fanUp NOTIFICATION-TYPE
+       		OBJECTS {fanCtrlState}
+       		STATUS  current
+       		DESCRIPTION
+               	"mspp fan up trap."
+			::= { fanTrap 1}
+		
+		fanDown NOTIFICATION-TYPE
+	       	OBJECTS {fanCtrlState}
+       		STATUS  current
+       		DESCRIPTION
+               	"mspp fan down trap"
+			::= { fanTrap 2}
+		
+		fanOk NOTIFICATION-TYPE
+       		OBJECTS {fanCtrlState}
+       		STATUS  current
+       		DESCRIPTION
+               	"mspp fan ok trap."
+			::= { fanTrap 3}
+		
+		fanFault NOTIFICATION-TYPE
+	       	OBJECTS {fanCtrlState}
+       		STATUS  current
+       		DESCRIPTION
+               	"mspp fan fault trap.fanState==1,overflow, fanState==2 tooslow"
+			::= { fanTrap 4}
+		
+		fanGeneral			OBJECT IDENTIFIER ::=   {msppFan 3}
+		fanBits OBJECT-TYPE
+				SYNTAX  Counter32
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"Bitsmap for all fans being on."
+				::= { fanGeneral 1 }
+		fanNum OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"Fan numbers."
+				::= { fanGeneral 2 }
+		fanTrapEnable OBJECT-TYPE
+				SYNTAX  INTEGER{
+					enable(1),
+					disable(2)
+				}
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"Enable fan trap or not."
+				::= { fanGeneral 3 }
+		fanMonitorEnable OBJECT-TYPE
+				SYNTAX  INTEGER{
+					enable(1),
+					disable(2)
+				}
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"Enable fan monitor or not."
+				::= { fanGeneral 4 }   
+				
+		fanCtrlTable OBJECT-TYPE
+			SYNTAX  SEQUENCE OF FanCtrlEntry
+			MAX-ACCESS   not-accessible
+			STATUS  current
+			DESCRIPTION
+			         "fan controller information table."
+			::= { msppFan 4 }
+
+		fanCtrlEntry OBJECT-TYPE
+			SYNTAX FanCtrlEntry
+			MAX-ACCESS   not-accessible
+			STATUS  current
+			DESCRIPTION
+		         	"An entry in the fan controller table."
+			INDEX {fanCtrlIndex }
+			::= { fanCtrlTable 1 }
+		
+		FanCtrlEntry ::=
+		    SEQUENCE {
+		    fanCtrlIndex          		Unsigned32,
+		    fanCtrlSpeed           		INTEGER,
+		    fanCtrlLThreshold      		INTEGER,
+		    fanCtrlHThreshold      		INTEGER,
+		    fanCtrlState          		INTEGER,
+		    fanCtrlSerial				OCTET STRING,
+		    fanCtrlDescr		        OCTET STRING,
+		    fanCtrlTrapEnable			INTEGER,   
+		    fanCtrlType					INTEGER,
+		    fanCtrlMode					INTEGER,
+		    fanCtrlAllSetting			OCTET STRING,
+			-- xf add 2014-7-2
+			fanCtrlIndexDescr			OCTET STRING
+			}
+		-- The following section describes the components of the table.
+
+			fanCtrlIndex OBJECT-TYPE
+				SYNTAX  Unsigned32
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"Unique index for the fan controller."
+				::= { fanCtrlEntry 1 }
+
+			fanCtrlSpeed OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"Current speed for the fan controller in rolls per minute."
+				::= { fanCtrlEntry 2 }  
+			
+			fanCtrlLThreshold OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"The lower threshold for the fan controller in rolls per minute."
+				::= { fanCtrlEntry 3 }
+				
+			fanCtrlHThreshold OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"The high threshold for the fan controller in rolls per minute."
+				::= { fanCtrlEntry 4 }
+				
+			fanCtrlState OBJECT-TYPE
+				SYNTAX  INTEGER{     
+					normal(0),
+					highoverflow(1),
+					lowunderflow(2),  
+					counteroverflow(4)
+				}
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"States for the fan controller."
+				::= { fanCtrlEntry 5 } 
+			
+			fanCtrlSerial OBJECT-TYPE
+				SYNTAX  OCTET STRING
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"Serial for the fan controller."
+				::= { fanCtrlEntry 6 }   
+				
+			fanCtrlDescr OBJECT-TYPE
+				SYNTAX  OCTET STRING
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"Description for the fan controller."
+				::= { fanCtrlEntry 7 } 
+				
+			fanCtrlTrapEnable OBJECT-TYPE
+				SYNTAX  INTEGER{
+					enable(1),
+					disable(2)
+				}
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"Trap enable or not for the fan controller."
+				::= { fanCtrlEntry 8 }		 
+				
+			fanCtrlType OBJECT-TYPE
+				SYNTAX  INTEGER{
+					dc(0),
+					reserved(1)
+				}
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"Type for the fan controller."
+				::= { fanCtrlEntry 9 }		
+				
+			fanCtrlMode OBJECT-TYPE
+				SYNTAX  INTEGER{
+				   fixedspeed(1),
+				   temperatureControl(2),
+				   temperatureControlEx(3)
+				}
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"Mode for the fan controller."
+				::= { fanCtrlEntry 10 }  
+				
+			 fanCtrlAllSetting OBJECT-TYPE
+				SYNTAX  OCTET STRING
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"All parameter operation for the fan controller."
+				::= { fanCtrlEntry 11 }   
+				
+		 	--xf add 2014-7-2
+			fanCtrlIndexDescr OBJECT-TYPE
+				SYNTAX  OCTET STRING
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"Fan controller descrption."
+				::= { fanCtrlEntry 12 } 
+			
+		 fanTmprtrCtrlTable OBJECT-TYPE
+			SYNTAX  SEQUENCE OF FanTmprtrCtrlEntry
+			MAX-ACCESS   not-accessible
+			STATUS  current
+			DESCRIPTION
+			         "Fan temperatrue control table."
+			::= { msppFan 5 }
+
+		fanTmprtrCtrlEntry OBJECT-TYPE
+			SYNTAX FanTmprtrCtrlEntry
+			MAX-ACCESS   not-accessible
+			STATUS  current
+			DESCRIPTION
+		         	"An entry in the fan temperature control table."
+			INDEX {fanCtrlIndex, fanTemperatureVaule}
+			::= { fanTmprtrCtrlTable 1 }
+		
+		FanTmprtrCtrlEntry ::=
+		    SEQUENCE {
+		    fanTemperatureVaule          Integer32,
+		    fanTemperatureSpeed    		 INTEGER,
+		    fanTemperatureStatus   		 EntryStatus
+		}
+		-- The following section describes the components of the table.
+
+			fanTemperatureVaule OBJECT-TYPE
+				SYNTAX  Integer32(1..100)
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"Unique temperature index for the table."
+				::= { fanTmprtrCtrlEntry 1 }     
+				
+			fanTemperatureSpeed OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"Fan speed of this temperature."
+				::= { fanTmprtrCtrlEntry 2 }
+
+			fanTemperatureStatus OBJECT-TYPE
+				SYNTAX  EntryStatus
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"Row status of the table."
+				::= { fanTmprtrCtrlEntry 3 }
+
+
+
+		
+END

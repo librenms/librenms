@@ -1,0 +1,1549 @@
+NBS-SLA-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE, MODULE-IDENTITY, OBJECT-IDENTITY,
+    Unsigned32, Counter32, Counter64
+        FROM SNMPv2-SMI
+
+    InterfaceIndex
+        FROM IF-MIB
+
+    nbs
+        FROM NBS-MIB
+    ;
+
+nbsSlaMib  MODULE-IDENTITY
+    LAST-UPDATED "201610190000Z" -- October 19, 2016
+    ORGANIZATION "NBS"
+    CONTACT-INFO
+      "For technical support, please contact your service channel"
+    DESCRIPTION
+      "MIB for representing Service Level Agreement (SLA) information"
+    ::= { nbs 216 }
+
+
+-- *******************************************************************
+-- NBS-SLA-MIB local defines
+-- *******************************************************************
+
+nbsSlaTrafficGenGrp  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+      "Traffic Generation configuration and reporting capabilities"
+    ::= { nbsSlaMib 1 }
+
+nbsSlaLossGainGrp  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+      "Loss Gain Analysis configuration and reporting capabilities"
+    ::= { nbsSlaMib 2 }
+
+nbsSlaPerfMonGrp  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+      "Performance Monitoring configuration and reporting capabilities"
+    ::= { nbsSlaMib 3 }
+
+-- *******************************************************************
+--
+-- the nbsSlaTrafficGenTable
+--
+-- *******************************************************************
+
+nbsSlaTrafficGenTableSize OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The number of entries in nbsSlaTrafficGenTable"
+        ::= { nbsSlaTrafficGenGrp 1 }
+
+nbsSlaTrafficGenTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF NbsSlaTrafficGenEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "Traffic Generation information."
+        ::= { nbsSlaTrafficGenGrp 2 }
+
+NbsSlaTrafficGenEntry ::= SEQUENCE {
+        nbsSlaTrafficGenIfIndex            InterfaceIndex,
+        nbsSlaTrafficGenAction             INTEGER,
+        nbsSlaTrafficGenFrameSize          INTEGER,
+        nbsSlaTrafficGenFrameSizeType      INTEGER,
+        nbsSlaTrafficGenFrameCount         Unsigned32,
+        nbsSlaTrafficGenFrameCountType     INTEGER,
+        nbsSlaTrafficGenInterPacketGap     INTEGER,
+        nbsSlaTrafficGenMaxHeaders         INTEGER,
+        nbsSlaTrafficGenMaxPattern         INTEGER,
+        nbsSlaTrafficGenHeaders            OCTET STRING,
+        nbsSlaTrafficGenDaType             INTEGER,
+        nbsSlaTrafficGenDa                 OCTET STRING,
+        nbsSlaTrafficGenSaType             INTEGER,
+        nbsSlaTrafficGenSa                 OCTET STRING,
+        nbsSlaTrafficGenTagType            INTEGER,
+        nbsSlaTrafficGenTag                OCTET STRING,
+        nbsSlaTrafficGenPattern            OCTET STRING,
+        nbsSlaTrafficGenPatternType        INTEGER
+}
+
+nbsSlaTrafficGenEntry      OBJECT-TYPE
+        SYNTAX      NbsSlaTrafficGenEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "The Traffic Generation port's information"
+        INDEX { nbsSlaTrafficGenIfIndex }
+        ::= { nbsSlaTrafficGenTable 1 }
+
+nbsSlaTrafficGenIfIndex   OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "The Mib2 ifIndex of this Traffic Generation port"
+        ::= { nbsSlaTrafficGenEntry 1 }
+
+nbsSlaTrafficGenAction OBJECT-TYPE
+        SYNTAX      INTEGER{
+        notSupported    (1),
+        start           (2),
+        stop            (3)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+        "Different actions to activate the traffic generation. There
+        are three frame generation activities: specify, start, and
+        stop. Specifying and actually starting traffic may be done
+        together or separately. In fact, it is reasonable to specify
+        once, then start (and stop) many times."
+        DEFVAL { stop }
+        ::= { nbsSlaTrafficGenEntry 2 }
+
+nbsSlaTrafficGenFrameSize  OBJECT-TYPE
+        SYNTAX      INTEGER (64..9600)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+        "Frame Size range from 64 to 9600"
+        DEFVAL { 64 }
+        ::= { nbsSlaTrafficGenEntry 3 }
+
+nbsSlaTrafficGenFrameSizeType OBJECT-TYPE
+        SYNTAX      INTEGER{
+        notSupported    (1),
+        random          (2),
+        fixed           (3)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+        "Specifies the size of generated frames: random, or per
+        'nbsSlaTrafficGenFrameSize' bytes. The random value range is limited
+        by ANDing it with (the mask value) 'nbsSlaTrafficGenFrameSize'; a
+        zero result is treated as 64."
+        DEFVAL { fixed }
+        ::= { nbsSlaTrafficGenEntry 4 }
+
+nbsSlaTrafficGenFrameCount  OBJECT-TYPE
+        SYNTAX      Unsigned32 (1..4294967294)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+        "Number of frames to generate when a fixed count is desired."
+        DEFVAL { 1 }
+        ::= { nbsSlaTrafficGenEntry 5 }
+
+nbsSlaTrafficGenFrameCountType OBJECT-TYPE
+        SYNTAX      INTEGER{
+        notSupported    (1),
+        continuous      (2),
+        fixed           (3)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+        "Specifies how many frames to generate: a continuous stream that is
+        manually stopped, or a fixed count."
+        DEFVAL { continuous }
+        ::= { nbsSlaTrafficGenEntry 6 }
+
+nbsSlaTrafficGenInterPacketGap  OBJECT-TYPE
+        SYNTAX      INTEGER (12..134217727)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+        "Specifies the number of bytes between generated frames;
+        this determines the traffic rate. The default (1249928)
+        sets an approx rate of 100/10/1 fps at 1000/100/10 Mbps."
+        DEFVAL { 1249928 }
+        ::= { nbsSlaTrafficGenEntry 7 }
+
+nbsSlaTrafficGenMaxHeaders  OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "Maximum number of bytes supported in nbsSlaTrafficGenHeaders;
+        zero if not supported"
+        ::= { nbsSlaTrafficGenEntry 8 }
+
+nbsSlaTrafficGenMaxPattern  OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "Maximum number of bytes supported in nbsSlaTrafficGenPattern;
+        zero if not supported"
+        ::= { nbsSlaTrafficGenEntry 9 }
+
+nbsSlaTrafficGenHeaders OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE(48))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+        "Specifies the 48 bytes following the first 64 bytes of generated
+        frames. The remainder of the frame is filled with Pattern bytes."
+        DEFVAL { '000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'h }
+        ::= { nbsSlaTrafficGenEntry 10 }
+
+nbsSlaTrafficGenDa OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE(6))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "Destination Address - MAC address"
+        DEFVAL { '000000000000'h }
+        ::= { nbsSlaTrafficGenEntry 11 }
+
+nbsSlaTrafficGenDaType OBJECT-TYPE
+        SYNTAX      INTEGER{
+        notSupported    (1),
+        random          (2),
+        fixed           (3),
+        increment       (4)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+        "Specifies the handling of the DA in the Header bytes:
+        generate a random value for each frame, use the same
+        value for each frame, or increment the initial value
+        by 1 for each frame."
+        DEFVAL { random }
+        ::= { nbsSlaTrafficGenEntry 12 }
+
+nbsSlaTrafficGenSa OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE(6))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "Source Address - MAC address"
+        DEFVAL { '000000000000'h }
+        ::= { nbsSlaTrafficGenEntry 13 }
+
+nbsSlaTrafficGenSaType OBJECT-TYPE
+        SYNTAX      INTEGER{
+        notSupported    (1),
+        random          (2),
+        fixed           (3),
+        increment       (4)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+        "Specifies the handling of the SA in the Header bytes:
+        generate a random value for each frame, use the same
+        value for each frame, or increment the initial value
+        by 1 for each frame."
+        DEFVAL { random }
+        ::= { nbsSlaTrafficGenEntry 14 }
+
+nbsSlaTrafficGenTag  OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE(4))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "VLAN tag or e-type plus initial data If VLAN tagging is not
+           specified (i.e. Tag does not begin as 81-00), then the first
+           two bytes of Tag define the frame type, and the last two Tag
+           bytes are the first two data bytes"
+        DEFVAL { '00000000'h }
+        ::= { nbsSlaTrafficGenEntry 15 }
+
+nbsSlaTrafficGenTagType OBJECT-TYPE
+        SYNTAX      INTEGER{
+        notSupported    (1),
+        random          (2),
+        fixed           (3),
+        increment       (4)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+        "Specifies the handling of the Tag in the Header bytes:
+        generate a random value for each frame, use the same
+        value for each frame, or increment the initial value
+        by 1 for each frame."
+        DEFVAL { random }
+        ::= { nbsSlaTrafficGenEntry 16 }
+
+nbsSlaTrafficGenPattern OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE(4))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+        "The one to four Pattern bytes are replicated as needed to fill-out
+        the frame to the specified size"
+        DEFVAL { '00000000'h }
+        ::= { nbsSlaTrafficGenEntry 17 }
+
+nbsSlaTrafficGenPatternType OBJECT-TYPE
+        SYNTAX      INTEGER{
+        notSupported    (1),
+        random          (2),
+        fixed           (3)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+        "Specifies the handling of the Pattern bytes that fill-out
+        generated frames: generate a random value for each frame,
+        or use the same value for each frame."
+        DEFVAL { random }
+        ::= { nbsSlaTrafficGenEntry 18 }
+
+-- ********************************************************************
+-- Loss/Gain Analysis (LGA)
+-- ********************************************************************
+
+nbsSlaLossGainTableSize OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The number of entries in nbsSlaLossGainTable"
+        ::= { nbsSlaLossGainGrp 1 }
+
+nbsSlaLossGainTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF NbsSlaLossGainEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+        "Contains a description of Loss/Gain Traffic Analysis information."
+        ::= { nbsSlaLossGainGrp 2 }
+
+NbsSlaLossGainEntry ::= SEQUENCE {
+        nbsSlaLossGainIfIndex            InterfaceIndex,
+        nbsSlaLossGainAction             INTEGER,
+        nbsSlaLossGainInterval           INTEGER,
+        nbsSlaLossGainEthMax             INTEGER,
+
+        -- Discrepancies in the most recent interval,
+        -- between select counters on two modules (Tx - Rx);
+        -- while these deltas are declared as 'Counter64',
+        -- they are actually signed 64-bit integer values
+        nbsSlaLossGainRdAllFrames        Counter64, -- Integer64,
+        nbsSlaLossGainRdBadFrames        Counter64, -- Integer64,
+        nbsSlaLossGainRdDiscards         Counter64, -- Integer64,
+        nbsSlaLossGainRdUcastFrames      Counter64, -- Integer64,
+        nbsSlaLossGainRdMcastFrames      Counter64, -- Integer64,
+        nbsSlaLossGainRdBcastFrames      Counter64, -- Integer64,
+        nbsSlaLossGainRdSize64           Counter64, -- Integer64,
+        nbsSlaLossGainRdSize65to127      Counter64, -- Integer64,
+        nbsSlaLossGainRdSize128to255     Counter64, -- Integer64,
+        nbsSlaLossGainRdSize256to511     Counter64, -- Integer64,
+        nbsSlaLossGainRdSize512to1023    Counter64, -- Integer64,
+        nbsSlaLossGainRdSize1024toEthMax Counter64, -- Integer64,
+        nbsSlaLossGainRdSizeEthMaxto2047 Counter64, -- Integer64,
+        nbsSlaLossGainRdSize2048to4095   Counter64, -- Integer64,
+        nbsSlaLossGainRdSize4096to8191   Counter64, -- Integer64,
+        nbsSlaLossGainRdSize8192orMore   Counter64, -- Integer64,
+        nbsSlaLossGainRdFrameDivisor     Counter64,
+        nbsSlaLossGainRdAllOctets        Counter64, -- Integer64,
+        nbsSlaLossGainRdBadOctets        Counter64, -- Integer64,
+        nbsSlaLossGainRdOctetDivisor     Counter64,
+        nbsSlaLossGainRdTimeSpan         Counter32,
+
+        -- Discrepancies accumulated over all intervals,
+        -- between select counters on two modules (Tx - Rx);
+        -- while these deltas are declared as 'Counter64',
+        -- they are actually signed 64-bit integer values
+        nbsSlaLossGainAdAllFrames        Counter64, -- Integer64,
+        nbsSlaLossGainAdBadFrames        Counter64, -- Integer64,
+        nbsSlaLossGainAdDiscards         Counter64, -- Integer64,
+        nbsSlaLossGainAdUcastFrames      Counter64, -- Integer64,
+        nbsSlaLossGainAdMcastFrames      Counter64, -- Integer64,
+        nbsSlaLossGainAdBcastFrames      Counter64, -- Integer64,
+        nbsSlaLossGainAdSize64           Counter64, -- Integer64,
+        nbsSlaLossGainAdSize65to127      Counter64, -- Integer64,
+        nbsSlaLossGainAdSize128to255     Counter64, -- Integer64,
+        nbsSlaLossGainAdSize256to511     Counter64, -- Integer64,
+        nbsSlaLossGainAdSize512to1023    Counter64, -- Integer64,
+        nbsSlaLossGainAdSize1024toEthMax Counter64, -- Integer64,
+        nbsSlaLossGainAdSizeEthMaxto2047 Counter64, -- Integer64,
+        nbsSlaLossGainAdSize2048to4095   Counter64, -- Integer64,
+        nbsSlaLossGainAdSize4096to8191   Counter64, -- Integer64,
+        nbsSlaLossGainAdSize8192orMore   Counter64, -- Integer64,
+        nbsSlaLossGainAdFrameDivisor     Counter64,
+        nbsSlaLossGainAdAllOctets        Counter64, -- Integer64,
+        nbsSlaLossGainAdBadOctets        Counter64, -- Integer64,
+        nbsSlaLossGainAdOctetDivisor     Counter64,
+        nbsSlaLossGainAdTimeSpan         Counter32
+}
+
+nbsSlaLossGainEntry  OBJECT-TYPE
+        SYNTAX      NbsSlaLossGainEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+        "Loss/Gain Traffic Analysis entry"
+        INDEX { nbsSlaLossGainIfIndex }
+        ::= { nbsSlaLossGainTable 1 }
+
+-- Objects for table support
+
+nbsSlaLossGainIfIndex   OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "The Mib2 ifIndex of this Loss Gain Analysis port"
+        ::= { nbsSlaLossGainEntry 1 }
+
+nbsSlaLossGainAction   OBJECT-TYPE
+        SYNTAX      INTEGER {
+        notSupported    (1),
+        inactive        (2),
+        start           (3),
+        stop            (4),
+        inProgress      (5)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+        "Traffic Analysis (loss/gain) activity status."
+        DEFVAL { notSupported }
+        ::= { nbsSlaLossGainEntry 2 }
+
+nbsSlaLossGainInterval OBJECT-TYPE
+        SYNTAX      INTEGER (10..86400)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+        "Traffic Analysis (loss/gain) sampling time interval (sec).
+        Practical range allowed is 10 seconds to 1 day."
+        DEFVAL { 60 }
+        ::= { nbsSlaLossGainEntry 3 }
+
+nbsSlaLossGainEthMax OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The maximum size of normal Ethernet frames used when tabulating frames
+        by size, to divide the range 1024-2047 in two: 1024 to EthMax, and
+        EthMax+1 to 2047. It is typically 1518, or 1522 for tagged frames."
+        DEFVAL { 1518 }
+        ::= { nbsSlaLossGainEntry 4 }
+
+nbsSlaLossGainRdAllFrames  OBJECT-TYPE
+        SYNTAX      Counter64 -- Integer64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The count of all frames (good+bad) lost/gained (-/+) in the
+        most recent interval.
+
+        Not supported value: 0x80000000"
+        ::= { nbsSlaLossGainEntry 5 }
+
+nbsSlaLossGainRdBadFrames  OBJECT-TYPE
+        SYNTAX      Counter64 -- Integer64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The count of all bad frames lost/gained (-/+) in the
+        most recent interval.
+
+        Not supported value: 0x80000000"
+        ::= { nbsSlaLossGainEntry 6 }
+
+nbsSlaLossGainRdDiscards  OBJECT-TYPE
+        SYNTAX      Counter64 -- Integer64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The count of all bad frames lost/gained (-/+) in the
+        most recent interval.
+
+        Not supported value: 0x80000000"
+        ::= { nbsSlaLossGainEntry 7 }
+
+nbsSlaLossGainRdUcastFrames   OBJECT-TYPE
+        SYNTAX      Counter64 -- Integer64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The count of good unicast frames lost/gained (-/+) in the
+        most recent interval.
+
+        Not supported value: 0x80000000"
+        ::= { nbsSlaLossGainEntry 8 }
+
+nbsSlaLossGainRdMcastFrames  OBJECT-TYPE
+        SYNTAX      Counter64 -- Integer64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The count of good multicast frames lost/gained (-/+) in the
+        most recent interval.
+
+        Not supported value: 0x80000000"
+        ::= { nbsSlaLossGainEntry 9 }
+
+nbsSlaLossGainRdBcastFrames   OBJECT-TYPE
+        SYNTAX      Counter64 -- Integer64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The count of good broadcast frames lost/gained (-/+) in the
+        most recent interval.
+
+        Not supported value: 0x80000000"
+        ::= { nbsSlaLossGainEntry 10 }
+
+nbsSlaLossGainRdSize64     OBJECT-TYPE
+        SYNTAX      Counter64 -- Integer64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The count of all 64 byte frames lost/gained (-/+) in the
+        most recent interval.
+
+        Not supported value: 0x80000000"
+        ::= { nbsSlaLossGainEntry 11 }
+
+nbsSlaLossGainRdSize65to127 OBJECT-TYPE
+        SYNTAX      Counter64 -- Integer64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The count of all 65-127 byte frames lost/gained (-/+) in the
+        most recent interval.
+
+        Not supported value: 0x80000000"
+        ::= { nbsSlaLossGainEntry 12 }
+
+nbsSlaLossGainRdSize128to255 OBJECT-TYPE
+        SYNTAX      Counter64 -- Integer64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The count of all 128-255 byte frames lost/gained (-/+) in
+        the most recent interval.
+
+        Not supported value: 0x80000000"
+        ::= { nbsSlaLossGainEntry 13 }
+
+nbsSlaLossGainRdSize256to511 OBJECT-TYPE
+        SYNTAX      Counter64 -- Integer64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The count of all 256-511 byte frames lost/gained (-/+) in
+        the most recent interval.
+
+        Not supported value: 0x80000000"
+        ::= { nbsSlaLossGainEntry 14 }
+
+nbsSlaLossGainRdSize512to1023 OBJECT-TYPE
+        SYNTAX      Counter64 -- Integer64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The count of all 512-1023 byte frames lost/gained (-/+) in
+        the most recent interval.
+
+        Not supported value: 0x80000000"
+        ::= { nbsSlaLossGainEntry 15 }
+
+nbsSlaLossGainRdSize1024toEthMax OBJECT-TYPE
+        SYNTAX      Counter64 -- Integer64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The count of all 1024-'EthMax' byte frames lost/gained (-/+) in
+        the most recent interval.
+
+        Not supported value: 0x80000000"
+        ::= { nbsSlaLossGainEntry 16 }
+
+nbsSlaLossGainRdSizeEthMaxto2047 OBJECT-TYPE
+        SYNTAX      Counter64 -- Integer64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The count of all 'EthMax'+1-2047 byte frames lost/gained (-/+) in
+        the most recent interval.
+
+        Not supported value: 0x80000000"
+        ::= { nbsSlaLossGainEntry 17 }
+
+nbsSlaLossGainRdSize2048to4095 OBJECT-TYPE
+        SYNTAX      Counter64 -- Integer64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The count of all 2048-4095 byte frames lost/gained (-/+) in
+        the most recent interval.
+
+        Not supported value: 0x80000000"
+        ::= { nbsSlaLossGainEntry 18 }
+
+nbsSlaLossGainRdSize4096to8191 OBJECT-TYPE
+        SYNTAX      Counter64 -- Integer64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The count of all 4096-8191 byte frames lost/gained (-/+) in
+        the most recent interval.
+
+        Not supported value: 0x80000000"
+        ::= { nbsSlaLossGainEntry 19 }
+
+nbsSlaLossGainRdSize8192orMore OBJECT-TYPE
+        SYNTAX      Counter64 -- Integer64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The count of all 2048-plus byte frames lost/gained (-/+) in
+        the most recent interval.
+
+        Not supported value: 0x80000000"
+        ::= { nbsSlaLossGainEntry 20 }
+
+nbsSlaLossGainRdFrameDivisor OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The divisor to calculate frame loss/gain ratios for the most
+        recent interval."
+        ::= { nbsSlaLossGainEntry 21 }
+
+nbsSlaLossGainRdAllOctets OBJECT-TYPE
+        SYNTAX      Counter64 -- Integer64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The count of all frame octets lost/gained (-/+) in the most
+        recent interval.
+
+        Not supported value: 0x80000000"
+        ::= { nbsSlaLossGainEntry 22 }
+
+nbsSlaLossGainRdBadOctets OBJECT-TYPE
+        SYNTAX      Counter64 -- Integer64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The count of bad frame octets observed in the most
+        recent interval.
+
+        Not supported value: 0x80000000"
+        ::= { nbsSlaLossGainEntry 23 }
+
+nbsSlaLossGainRdOctetDivisor OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The divisor to calculate octet loss/gain ratios for the most
+        recent interval."
+        ::= { nbsSlaLossGainEntry 24 }
+
+nbsSlaLossGainRdTimeSpan OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The time span (tenths of a sec) for the most recent
+        interval."
+        ::= { nbsSlaLossGainEntry 25 }
+
+nbsSlaLossGainAdAllFrames  OBJECT-TYPE
+        SYNTAX      Counter64 -- Integer64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The accumulated count of all frames (good+bad) lost/gained
+        (-/+) over all intervals.
+
+        Not supported value: 0x80000000"
+        ::= { nbsSlaLossGainEntry 26 }
+
+nbsSlaLossGainAdBadFrames  OBJECT-TYPE
+        SYNTAX      Counter64 -- Integer64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The accumulated count of all bad frames lost/gained
+        (-/+) over all intervals.
+
+        Not supported value: 0x80000000"
+        ::= { nbsSlaLossGainEntry 27 }
+
+nbsSlaLossGainAdDiscards  OBJECT-TYPE
+        SYNTAX      Counter64 -- Integer64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The count of all bad frames lost/gained (-/+) in the
+        most recent interval.
+
+        Not supported value: 0x80000000"
+        ::= { nbsSlaLossGainEntry 28 }
+
+nbsSlaLossGainAdUcastFrames   OBJECT-TYPE
+        SYNTAX      Counter64 -- Integer64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The accumulated count of good unicast frames lost/gained
+        (-/+) over all intervals.
+
+        Not supported value: 0x80000000"
+        ::= { nbsSlaLossGainEntry 29 }
+
+nbsSlaLossGainAdMcastFrames  OBJECT-TYPE
+        SYNTAX      Counter64 -- Integer64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The accumulated count of good multicast frames lost/gained
+        (-/+) over all intervals.
+
+        Not supported value: 0x80000000"
+        ::= { nbsSlaLossGainEntry 30 }
+
+nbsSlaLossGainAdBcastFrames   OBJECT-TYPE
+        SYNTAX      Counter64 -- Integer64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The accumulated count of good broadcast frames lost/gained
+        (-/+) over all intervals.
+
+        Not supported value: 0x80000000"
+        ::= { nbsSlaLossGainEntry 31 }
+
+nbsSlaLossGainAdSize64     OBJECT-TYPE
+        SYNTAX      Counter64 -- Integer64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The accumulated count of all 64 byte frames lost/gained
+        (-/+) over all intervals.
+
+        Not supported value: 0x80000000"
+        ::= { nbsSlaLossGainEntry 32 }
+
+nbsSlaLossGainAdSize65to127 OBJECT-TYPE
+        SYNTAX      Counter64 -- Integer64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The accumulated count of all 65-127 byte frames lost/gained
+        (-/+) over all intervals.
+
+        Not supported value: 0x80000000"
+        ::= { nbsSlaLossGainEntry 33 }
+
+nbsSlaLossGainAdSize128to255 OBJECT-TYPE
+        SYNTAX      Counter64 -- Integer64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The accumulated count of all 128-255 byte frames lost/gained
+        (-/+) over all intervals.
+
+        Not supported value: 0x80000000"
+        ::= { nbsSlaLossGainEntry 34 }
+
+nbsSlaLossGainAdSize256to511 OBJECT-TYPE
+        SYNTAX      Counter64 -- Integer64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The accumulated count of all 256-511 byte frames lost/gained
+        (-/+) over all intervals.
+
+        Not supported value: 0x80000000"
+        ::= { nbsSlaLossGainEntry 35 }
+
+nbsSlaLossGainAdSize512to1023 OBJECT-TYPE
+        SYNTAX      Counter64 -- Integer64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The accumulated count of all 512-1023 byte frames
+        lost/gained (-/+) over all intervals.
+
+        Not supported value: 0x80000000"
+        ::= { nbsSlaLossGainEntry 36 }
+
+nbsSlaLossGainAdSize1024toEthMax OBJECT-TYPE
+        SYNTAX      Counter64 -- Integer64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The accumulated count of all 1024-'EthMax' byte frames
+        lost/gained (-/+) over all intervals.
+
+        Not supported value: 0x80000000"
+        ::= { nbsSlaLossGainEntry 37 }
+
+nbsSlaLossGainAdSizeEthMaxto2047 OBJECT-TYPE
+        SYNTAX      Counter64 -- Integer64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The accumulated count of all 'EthMax'+1-2047 byte frames
+        lost/gained (-/+) over all intervals.
+
+        Not supported value: 0x80000000"
+        ::= { nbsSlaLossGainEntry 38 }
+
+nbsSlaLossGainAdSize2048to4095 OBJECT-TYPE
+        SYNTAX      Counter64 -- Integer64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The accumulated count of all 2048-4095 byte frames
+        lost/gained (-/+) over all intervals.
+
+        Not supported value: 0x80000000"
+        ::= { nbsSlaLossGainEntry 39 }
+
+nbsSlaLossGainAdSize4096to8191 OBJECT-TYPE
+        SYNTAX      Counter64 -- Integer64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The accumulated count of all 4096-8191 byte frames
+        lost/gained (-/+) over all intervals.
+
+        Not supported value: 0x80000000"
+        ::= { nbsSlaLossGainEntry 40 }
+
+nbsSlaLossGainAdSize8192orMore OBJECT-TYPE
+        SYNTAX      Counter64 -- Integer64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The accumulated count of all 8192-plus byte frames
+        lost/gained (-/+) over all intervals.
+
+        Not supported value: 0x80000000"
+        ::= { nbsSlaLossGainEntry 41 }
+
+nbsSlaLossGainAdFrameDivisor OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The divisor to calculate frame loss/gain ratios over all intervals."
+        ::= { nbsSlaLossGainEntry 42 }
+
+nbsSlaLossGainAdAllOctets OBJECT-TYPE
+        SYNTAX      Counter64 -- Integer64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The accumulated count of all frame octets lost/gained (-/+)
+        over all intervals.
+
+        Not supported value: 0x80000000"
+        ::= { nbsSlaLossGainEntry 43 }
+
+nbsSlaLossGainAdBadOctets OBJECT-TYPE
+        SYNTAX      Counter64 -- Integer64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The accumulated count of all bad octets observed
+        over all intervals.
+
+        Not supported value: 0x80000000"
+        ::= { nbsSlaLossGainEntry 44 }
+
+nbsSlaLossGainAdOctetDivisor OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The divisor to calculate octet loss/gain ratios over all intervals."
+        ::= { nbsSlaLossGainEntry 45 }
+
+nbsSlaLossGainAdTimeSpan OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The accumulated time span (tenths of a sec) for all intervals."
+        ::= { nbsSlaLossGainEntry 46 }
+
+-- ********************************************************************
+-- Performance Monitoring (PM)
+-- ********************************************************************
+
+nbsSlaPerfMonTableSize OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The number of entries in nbsSlaPerfMonTable"
+        ::= { nbsSlaPerfMonGrp 1 }
+
+nbsSlaPerfMonTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF NbsSlaPerfMonEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+        "Contains a description of Performance Monitoring information."
+        ::= { nbsSlaPerfMonGrp 2 }
+
+NbsSlaPerfMonEntry ::= SEQUENCE {
+
+        nbsSlaPerfMonIfIndex             InterfaceIndex,
+        nbsSlaPerfMonAction              INTEGER,
+        nbsSlaPerfMonSize                INTEGER,
+        nbsSlaPerfMonDuration            INTEGER,
+        nbsSlaPerfMonTimeLeft            INTEGER,
+        nbsSlaPerfMonEthMax              INTEGER,
+
+        -- Average
+        nbsSlaPerfMonAvgAllSizes         Counter32,
+        nbsSlaPerfMonAvg64               Counter32,
+        nbsSlaPerfMonAvg65to127          Counter32,
+        nbsSlaPerfMonAvg128to255         Counter32,
+        nbsSlaPerfMonAvg256to511         Counter32,
+        nbsSlaPerfMonAvg512to1023        Counter32,
+        nbsSlaPerfMonAvg1024toEthMax     Counter32,
+        nbsSlaPerfMonAvgEthMaxto2047     Counter32,
+        nbsSlaPerfMonAvg2048to4095       Counter32,
+        nbsSlaPerfMonAvg4096to8191       Counter32,
+        nbsSlaPerfMonAvg8192orMore       Counter32,
+
+        -- Minimum
+        nbsSlaPerfMonMinAllSizes         Counter32,
+        nbsSlaPerfMonMin64               Counter32,
+        nbsSlaPerfMonMin65to127          Counter32,
+        nbsSlaPerfMonMin128to255         Counter32,
+        nbsSlaPerfMonMin256to511         Counter32,
+        nbsSlaPerfMonMin512to1023        Counter32,
+        nbsSlaPerfMonMin1024toEthMax     Counter32,
+        nbsSlaPerfMonMinEthMaxto2047     Counter32,
+        nbsSlaPerfMonMin2048to4095       Counter32,
+        nbsSlaPerfMonMin4096to8191       Counter32,
+        nbsSlaPerfMonMin8192orMore       Counter32,
+
+        -- Maximum
+        nbsSlaPerfMonMaxAllSizes         Counter32,
+        nbsSlaPerfMonMax64               Counter32,
+        nbsSlaPerfMonMax65to127          Counter32,
+        nbsSlaPerfMonMax128to255         Counter32,
+        nbsSlaPerfMonMax256to511         Counter32,
+        nbsSlaPerfMonMax512to1023        Counter32,
+        nbsSlaPerfMonMax1024toEthMax     Counter32,
+        nbsSlaPerfMonMaxEthMaxto2047     Counter32,
+        nbsSlaPerfMonMax2048to4095       Counter32,
+        nbsSlaPerfMonMax4096to8191       Counter32,
+        nbsSlaPerfMonMax8192orMore       Counter32,
+
+        -- Count of frames
+        nbsSlaPerfMonFramesAllSizes      Counter64,
+        nbsSlaPerfMonFrames64            Counter64,
+        nbsSlaPerfMonFrames65to127       Counter64,
+        nbsSlaPerfMonFrames128to255      Counter64,
+        nbsSlaPerfMonFrames256to511      Counter64,
+        nbsSlaPerfMonFrames512to1023     Counter64,
+        nbsSlaPerfMonFrames1024toEthMax  Counter64,
+        nbsSlaPerfMonFramesEthMaxto2047  Counter64,
+        nbsSlaPerfMonFrames2048to4095    Counter64,
+        nbsSlaPerfMonFrames4096to8191    Counter64,
+        nbsSlaPerfMonFrames8192orMore    Counter64,
+
+        -- Count of octets
+        nbsSlaPerfMonOctetsAllSizes      Counter64,
+        nbsSlaPerfMonOctets64            Counter64,
+        nbsSlaPerfMonOctets65to127       Counter64,
+        nbsSlaPerfMonOctets128to255      Counter64,
+        nbsSlaPerfMonOctets256to511      Counter64,
+        nbsSlaPerfMonOctets512to1023     Counter64,
+        nbsSlaPerfMonOctets1024toEthMax  Counter64,
+        nbsSlaPerfMonOctetsEthMaxto2047  Counter64,
+        nbsSlaPerfMonOctets2048to4095    Counter64,
+        nbsSlaPerfMonOctets4096to8191    Counter64,
+        nbsSlaPerfMonOctets8192orMore    Counter64
+}
+
+nbsSlaPerfMonEntry  OBJECT-TYPE
+        SYNTAX      NbsSlaPerfMonEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+        "Performance Monitoring entry"
+        INDEX { nbsSlaPerfMonIfIndex }
+        ::= { nbsSlaPerfMonTable 1 }
+
+nbsSlaPerfMonIfIndex   OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "The Mib2 ifIndex of this Performance Monitoring port"
+        ::= { nbsSlaPerfMonEntry 1 }
+
+nbsSlaPerfMonAction   OBJECT-TYPE
+        SYNTAX      INTEGER {
+        notSupported    (1),
+        inactive        (2),
+        start           (3),
+        stop            (4),
+        reflect         (5),
+        forward         (6),
+        inProgress      (7),
+        complete        (8),
+        stopping        (9)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+        "Traffic Analysis (performance monitoring) activity status."
+        DEFVAL { inactive }
+        ::= { nbsSlaPerfMonEntry 2 }
+
+nbsSlaPerfMonSize   OBJECT-TYPE
+        SYNTAX      INTEGER (1..9600)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+        "Performance Monitoring frame size specification:
+        1 = random-sized frames in the range 64-127 bytes
+        2 = random-sized frames in the range 64-255 bytes
+        3 = random-sized frames in the range 64-511 bytes
+        4 = random-sized frames in the range 64-1023 bytes
+        5 = random-sized frames in the range 64-2047 bytes
+        6 = random-sized frames in the range 64-4095 bytes
+        7 = random-sized frames in the range 64-8191 bytes
+        64..9600 = fixed-size frames of specified byte count."
+        DEFVAL { 5 }
+        ::= { nbsSlaPerfMonEntry 3 }
+
+nbsSlaPerfMonDuration OBJECT-TYPE
+        SYNTAX      INTEGER (60..604800)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+        "Performance Monitoring time duration (sec). Practical range
+        allowed is 1 minute to 1 week."
+        DEFVAL { 60 }
+        ::= { nbsSlaPerfMonEntry 4 }
+
+nbsSlaPerfMonTimeLeft OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "Amount of time remaining in the monitoring duration (sec); a negative
+        value means not available."
+        DEFVAL { 60 }
+        ::= { nbsSlaPerfMonEntry 5 }
+
+nbsSlaPerfMonEthMax OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The maximum size of normal Ethernet frames used when tabulating frames
+        by size, to divide the range 1024-2047 in two: 1024 to EthMax, and
+        EthMax+1 to 2047. It is typically 1518, or 1522 for tagged frames."
+        DEFVAL { 1518 }
+        ::= { nbsSlaPerfMonEntry 6 }
+
+nbsSlaPerfMonAvgAllSizes OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The average transit time (nanosec) for monitored frames."
+        ::= { nbsSlaPerfMonEntry 7 }
+
+nbsSlaPerfMonAvg64 OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The average transit time (nanosec) for monitored 64 byte
+        frames."
+        ::= { nbsSlaPerfMonEntry 8 }
+
+nbsSlaPerfMonAvg65to127  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The average transit time (nanosec) for monitored 65-127 byte
+        frames."
+        ::= { nbsSlaPerfMonEntry 9 }
+
+nbsSlaPerfMonAvg128to255 OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The average transit time (nanosec) for monitored 128-255
+        byte frames."
+        ::= { nbsSlaPerfMonEntry 10 }
+
+nbsSlaPerfMonAvg256to511  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The average transit time (nanosec) for monitored 256-511
+        byte frames."
+        ::= { nbsSlaPerfMonEntry 11 }
+
+nbsSlaPerfMonAvg512to1023 OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The average transit time (nanosec) for monitored 512-1023
+        byte frames."
+        ::= { nbsSlaPerfMonEntry 12 }
+
+nbsSlaPerfMonAvg1024toEthMax  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The average transit time (nanosec) for monitored 1024-'EthMax'
+        byte frames."
+        ::= { nbsSlaPerfMonEntry 13 }
+
+nbsSlaPerfMonAvgEthMaxto2047 OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The average transit time (nanosec) for monitored 'EthMax'+1-2047
+        byte frames."
+        ::= { nbsSlaPerfMonEntry 14 }
+
+nbsSlaPerfMonAvg2048to4095 OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The average transit time (nanosec) for monitored 2048-4095
+        byte frames."
+        ::= { nbsSlaPerfMonEntry 15 }
+
+nbsSlaPerfMonAvg4096to8191 OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The average transit time (nanosec) for monitored 4096-8191
+        byte frames."
+        ::= { nbsSlaPerfMonEntry 16 }
+
+nbsSlaPerfMonAvg8192orMore  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The average transit time (nanosec) for monitored 8192-plus
+        byte frames."
+        ::= { nbsSlaPerfMonEntry 17 }
+
+nbsSlaPerfMonMinAllSizes OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The minimum transit time (nanosec) for monitored frames."
+        ::= { nbsSlaPerfMonEntry 18 }
+
+nbsSlaPerfMonMin64 OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The minimum transit time (nanosec) for monitored 64
+        byte frames."
+        ::= { nbsSlaPerfMonEntry 19 }
+
+nbsSlaPerfMonMin65to127  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The minimum transit time (nanosec) for monitored 65-127
+        byte frames."
+        ::= { nbsSlaPerfMonEntry 20 }
+
+nbsSlaPerfMonMin128to255 OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The minimum transit time (nanosec) for monitored 128-255
+        byte frames."
+        ::= { nbsSlaPerfMonEntry 21 }
+
+nbsSlaPerfMonMin256to511  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The minimum transit time (nanosec) for monitored 256-511
+        byte frames."
+        ::= { nbsSlaPerfMonEntry 22 }
+
+nbsSlaPerfMonMin512to1023 OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The minimum transit time (nanosec) for monitored 512-1023
+        byte frames."
+        ::= { nbsSlaPerfMonEntry 23 }
+
+nbsSlaPerfMonMin1024toEthMax  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The minimum transit time (nanosec) for monitored 1024-'EthMax'
+        byte frames."
+        ::= { nbsSlaPerfMonEntry 24 }
+
+nbsSlaPerfMonMinEthMaxto2047 OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The minimum transit time (nanosec) for monitored 'EthMax'+1-2047
+        byte frames."
+        ::= { nbsSlaPerfMonEntry 25 }
+
+nbsSlaPerfMonMin2048to4095 OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The minimum transit time (nanosec) for monitored 2048-4095
+        byte frames."
+        ::= { nbsSlaPerfMonEntry 26 }
+
+nbsSlaPerfMonMin4096to8191 OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The minimum transit time (nanosec) for monitored 4096-8191
+        byte frames."
+        ::= { nbsSlaPerfMonEntry 27 }
+
+nbsSlaPerfMonMin8192orMore  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The minimum transit time (nanosec) for monitored 8192-plus
+        byte frames."
+        ::= { nbsSlaPerfMonEntry 28 }
+
+nbsSlaPerfMonMaxAllSizes OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The maximum transit time (nanosec) for monitored frames."
+        ::= { nbsSlaPerfMonEntry 29 }
+
+nbsSlaPerfMonMax64 OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The maximum transit time (nanosec) for monitored 64
+        byte frames."
+        ::= { nbsSlaPerfMonEntry 30 }
+
+nbsSlaPerfMonMax65to127  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The maximum transit time (nanosec) for monitored 65-127
+        byte frames."
+        ::= { nbsSlaPerfMonEntry 31 }
+
+nbsSlaPerfMonMax128to255 OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The maximum transit time (nanosec) for monitored 128-255
+        byte frames."
+        ::= { nbsSlaPerfMonEntry 32 }
+
+nbsSlaPerfMonMax256to511  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The maximum transit time (nanosec) for monitored 256-511
+        byte frames."
+        ::= { nbsSlaPerfMonEntry 33 }
+
+nbsSlaPerfMonMax512to1023 OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The maximum transit time (nanosec) for monitored 512-1023
+        byte frames."
+        ::= { nbsSlaPerfMonEntry 34 }
+
+nbsSlaPerfMonMax1024toEthMax  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The maximum transit time (nanosec) for monitored 1024-'EthMax'
+        byte frames."
+        ::= { nbsSlaPerfMonEntry 35 }
+
+nbsSlaPerfMonMaxEthMaxto2047 OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The maximum transit time (nanosec) for monitored 'EthMax'+1-2047
+        byte frames."
+        ::= { nbsSlaPerfMonEntry 36 }
+
+nbsSlaPerfMonMax2048to4095 OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The maximum transit time (nanosec) for monitored 4096-8191
+        byte frames."
+        ::= { nbsSlaPerfMonEntry 37 }
+
+nbsSlaPerfMonMax4096to8191 OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The maximum transit time (nanosec) for monitored 4096-8191
+        byte frames."
+        ::= { nbsSlaPerfMonEntry 38 }
+
+nbsSlaPerfMonMax8192orMore  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The maximum transit time (nanosec) for monitored 8192-plus
+        byte frames."
+        ::= { nbsSlaPerfMonEntry 39 }
+
+nbsSlaPerfMonFramesAllSizes OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The count of all monitored frames."
+        ::= { nbsSlaPerfMonEntry 40 }
+
+nbsSlaPerfMonFrames64 OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The count of all monitored 64 byte frames."
+        ::= { nbsSlaPerfMonEntry 41 }
+
+nbsSlaPerfMonFrames65to127  OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The count of all monitored 65-127 byte frames."
+        ::= { nbsSlaPerfMonEntry 42 }
+
+nbsSlaPerfMonFrames128to255 OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The count of all monitored 128-255 byte frames."
+        ::= { nbsSlaPerfMonEntry 43 }
+
+nbsSlaPerfMonFrames256to511  OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The count of all monitored 256-511 byte frames."
+        ::= { nbsSlaPerfMonEntry 44 }
+
+nbsSlaPerfMonFrames512to1023 OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The count of all monitored 512-1023 byte frames."
+        ::= { nbsSlaPerfMonEntry 45 }
+
+nbsSlaPerfMonFrames1024toEthMax  OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The count of all monitored 1024-'EthMax' byte frames."
+        ::= { nbsSlaPerfMonEntry 46 }
+
+nbsSlaPerfMonFramesEthMaxto2047 OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The count of all monitored 'EthMax'+1-2047 byte frames."
+        ::= { nbsSlaPerfMonEntry 47 }
+
+nbsSlaPerfMonFrames2048to4095  OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The count of all monitored 2048-4095 byte frames."
+        ::= { nbsSlaPerfMonEntry 48 }
+
+nbsSlaPerfMonFrames4096to8191  OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The count of all monitored 4096-8191 byte frames."
+        ::= { nbsSlaPerfMonEntry 49 }
+
+nbsSlaPerfMonFrames8192orMore  OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The count of all monitored 8192-plus byte frames."
+        ::= { nbsSlaPerfMonEntry 50 }
+
+nbsSlaPerfMonOctetsAllSizes OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The count of octets in all monitored frames."
+        ::= { nbsSlaPerfMonEntry 51 }
+
+nbsSlaPerfMonOctets64 OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The count of octets in all monitored 64 byte frames."
+        ::= { nbsSlaPerfMonEntry 52 }
+
+nbsSlaPerfMonOctets65to127  OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The count of octets in all monitored 65-127 byte frames."
+        ::= { nbsSlaPerfMonEntry 53 }
+
+nbsSlaPerfMonOctets128to255 OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The count of octets in all monitored 128-255 byte frames."
+        ::= { nbsSlaPerfMonEntry 54 }
+
+nbsSlaPerfMonOctets256to511  OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The count of octets in all monitored 256-511 byte frames."
+        ::= { nbsSlaPerfMonEntry 55 }
+
+nbsSlaPerfMonOctets512to1023 OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The count of octets in all monitored 512-1023 byte frames."
+        ::= { nbsSlaPerfMonEntry 56 }
+
+nbsSlaPerfMonOctets1024toEthMax  OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The count of octets in all monitored 1024-'EthMax' byte frames."
+        ::= { nbsSlaPerfMonEntry 57 }
+
+nbsSlaPerfMonOctetsEthMaxto2047 OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The count of octets in all monitored 'EthMax'+1-2047 byte frames."
+        ::= { nbsSlaPerfMonEntry 58 }
+
+nbsSlaPerfMonOctets2048to4095  OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The count of octets in all monitored 2048-4095 byte frames."
+        ::= { nbsSlaPerfMonEntry 59 }
+
+nbsSlaPerfMonOctets4096to8191 OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The count of octets in all monitored 4096-8191 byte frames."
+        ::= { nbsSlaPerfMonEntry 60 }
+
+nbsSlaPerfMonOctets8192orMore  OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The count of octets in all monitored 8192-plus byte frames."
+        ::= { nbsSlaPerfMonEntry 61 }
+
+
+
+END

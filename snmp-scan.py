@@ -25,11 +25,12 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import argparse
+from argparse import RawTextHelpFormatter
 import json
 from collections import namedtuple
 from multiprocessing import Pool
 from os import path, chdir
-from socket import gethostbyname, gethostbyaddr, herror
+from socket import gethostbyname, gethostbyaddr, herror, gaierror
 from subprocess import check_output, CalledProcessError
 from sys import stdout
 from time import time
@@ -113,14 +114,18 @@ def scan_host(ip):
 
     try:
         try:
+            # attempt to convert IP to hostname, if anything goes wrong, just use the IP
             tmp = gethostbyaddr(ip)[0]
             if gethostbyname(tmp) == ip:  # check that forward resolves
                 hostname = tmp
-        except herror:
+        except (herror, gaierror):
             pass
 
         try:
-            add_output = check_output(['/usr/bin/env', 'php', 'addhost.php', hostname or ip])
+            arguments = ['/usr/bin/env', 'php', 'addhost.php', hostname or ip]
+            if args.ping:
+                arguments.insert(3, args.ping)
+            add_output = check_output(arguments)
             return Result(ip, hostname, Outcome.ADDED, add_output)
         except CalledProcessError as err:
             output = err.output.decode().rstrip()
@@ -141,12 +146,14 @@ if __name__ == '__main__':
     ###################
     # Parse arguments #
     ###################
-    parser = argparse.ArgumentParser(description='Scan network for snmp hosts and add them to LibreNMS.')
+    parser = argparse.ArgumentParser(description='Scan network for snmp hosts and add them to LibreNMS.', formatter_class=RawTextHelpFormatter)
     parser.add_argument('network', action='append', nargs='*', type=str, help="""CIDR noted IP-Range to scan. Can be specified multiple times
-    This argument is only required if $config['nets'] is not set
-    Example: 192.168.0.0/24
-    Example: 192.168.0.0/31 will be treated as an RFC3021 p-t-p network with two addresses, 192.168.0.0 and 192.168.0.1
-    Example: 192.168.0.1/32 will be treated as a single host address""")
+This argument is only required if 'nets' config is not set
+Example: 192.168.0.0/24
+Example: 192.168.0.0/31 will be treated as an RFC3021 p-t-p network with two addresses, 192.168.0.0 and 192.168.0.1
+Example: 192.168.0.1/32 will be treated as a single host address""")
+    parser.add_argument('-P', '--ping', action='store_const', const="-b", default="", help="""Add the device as an ICMP only device if it replies to ping but not SNMP.
+Example: """ + __file__ + """ -P 192.168.0.0/24""")
     parser.add_argument('-t', dest='threads', type=int,
                         help="How many IPs to scan at a time.  More will increase the scan speed," +
                              " but could overload your system. Default: {}".format(THREADS))
@@ -188,7 +195,7 @@ if __name__ == '__main__':
 
     # make sure we have something to scan
     if not CONFIG.get('nets', []) and not netargs:
-        parser.error('$config[\'nets\'] is not set in config.php, you must specify a network to scan')
+        parser.error('\'nets\' is not set in your LibreNMS config, you must specify a network to scan')
 
     # check for valid networks
     networks = []

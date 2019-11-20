@@ -1,4 +1,4 @@
---- ArubaOS 6.5.2.0_59123
+--- ArubaOS 8.5.0.0_70258
 -- vim:set ts=4 sw=4: 
 WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
 
@@ -47,6 +47,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
 	   ArubaAntennaSetting,
        ArubaMeshRole,
 	   ArubaHTMode,
+	   ArubaPortSpeed,
 	   ArubaHTExtChannel
 	   		FROM ARUBA-TC
 
@@ -227,9 +228,12 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
          wlanAPConnectedAsStandby   INTEGER,
          wlanAPServiceTag           DisplayString,
          wlanAPConnectedAsDatazone  INTEGER,
+		 wlanAPIpv6Address 			DisplayString(SIZE(0..45)),
          wlanAPFlexRadioMode        ArubaFlexRadioMode,
          wlanAPdot11aAntennaGain10x	Integer32,
-         wlanAPdot11gAntennaGain10x	Integer32
+         wlanAPdot11gAntennaGain10x	Integer32,
+         wlanAPDual5GMode           ArubaEnableValue,
+         wlanAPActiveIpAddress      DisplayString(SIZE(0..45))
    }
 
    	wlanAPMacAddress OBJECT-TYPE
@@ -672,6 +676,16 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
             "
         ::= { wlsxWlanAPEntry 43 }
 
+        wlanAPIpv6Address OBJECT-TYPE
+        SYNTAX       DisplayString(SIZE(0..45))
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "
+            IPv6 Address of the Access Point
+            "
+        ::= { wlsxWlanAPEntry 44 }
+
         wlanAPFlexRadioMode OBJECT-TYPE
         SYNTAX       ArubaFlexRadioMode
         MAX-ACCESS   read-only
@@ -680,27 +694,47 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
             "
                         Flex Radio Operating Mode
             "
-        ::= { wlsxWlanAPEntry 44 }
- 
-   	wlanAPdot11aAntennaGain10x	OBJECT-TYPE
-         SYNTAX       Integer32
-         MAX-ACCESS   read-only
-         STATUS       current
-         DESCRIPTION
-            "
-			Configured antenna  gain for 'A' Radio (antennaGain*10)
-            "
         ::= { wlsxWlanAPEntry 45 }
-
-   	wlanAPdot11gAntennaGain10x	OBJECT-TYPE
+    wlanAPdot11aAntennaGain10x  OBJECT-TYPE
          SYNTAX       Integer32
          MAX-ACCESS   read-only
          STATUS       current
          DESCRIPTION
             "
-			Configured antenna  gain for 'G' Radio (antennaGain*10)
+            Configured antenna  gain for 'A' Radio (antennaGain*10)
             "
         ::= { wlsxWlanAPEntry 46 }
+
+    wlanAPdot11gAntennaGain10x  OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+            Configured antenna  gain for 'G' Radio (antennaGain*10)
+            "
+        ::= { wlsxWlanAPEntry 47 }
+ 
+    wlanAPDual5GMode OBJECT-TYPE
+        SYNTAX       ArubaDual5GMode
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "
+                        Dual5GHz Operating Mode 
+            "
+        ::= { wlsxWlanAPEntry 48 }
+
+        wlanAPActiveIpAddress  OBJECT-TYPE
+        SYNTAX       DisplayString(SIZE(0..45))
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "
+            IPv4 or IPv6 Address of the Access Point
+            "
+        ::= { wlsxWlanAPEntry 49 }
+
 
 -- Radio table is indexed by the Mac Address of the AP and the type of the
 -- radio.
@@ -1344,7 +1378,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
 
    	wlanStaApBssid OBJECT-TYPE
          SYNTAX       MacAddress
-         MAX-ACCESS   not-accessible
+         MAX-ACCESS   read-only
          STATUS       current
          DESCRIPTION
             "
@@ -3859,7 +3893,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
    wlsxWlanAPWiredStatsTable  OBJECT-TYPE
           SYNTAX       SEQUENCE OF WlanAPWiredStatsEntry
           MAX-ACCESS   not-accessible
-      STATUS       current
+      STATUS       deprecated
       DESCRIPTION
                 "
                         This Table lists the Wired statistics of all the Access Points
@@ -3870,7 +3904,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
    wlsxWlanAPWiredStatsEntry OBJECT-TYPE
           SYNTAX       WlanAPWiredStatsEntry
           MAX-ACCESS   not-accessible
-      STATUS       current
+      STATUS       deprecated
       DESCRIPTION
              "Access Point Wired Stats entry"
           INDEX {wlanAPMacAddress}
@@ -3889,7 +3923,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
    wlanAPWiredRxPkts OBJECT-TYPE
          SYNTAX       Counter32
          MAX-ACCESS   read-only
-         STATUS       current
+         STATUS       deprecated
          DESCRIPTION
             "
                         This attribute indicates the total packets received from the
@@ -3900,7 +3934,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
    wlanAPWiredRxDroppedPkts OBJECT-TYPE
          SYNTAX       Counter32
          MAX-ACCESS   read-only
-         STATUS       current
+         STATUS       deprecated
          DESCRIPTION
             "
                         This attribute indicates the total dropped packets received
@@ -3911,7 +3945,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
    wlanAPWiredRxBytes OBJECT-TYPE
          SYNTAX       Counter32
          MAX-ACCESS   read-only
-         STATUS       current
+         STATUS       deprecated
          DESCRIPTION
             "
                         This attribute indicates the total bytes of correct packets
@@ -3922,7 +3956,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
    wlanAPWiredTxBytes OBJECT-TYPE
          SYNTAX       Counter32
          MAX-ACCESS   read-only
-         STATUS       current
+         STATUS       deprecated
          DESCRIPTION
             "
                         This attribute indicates the total bytes transmitted from
@@ -3933,7 +3967,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
    wlanAPWiredRxRate OBJECT-TYPE
          SYNTAX       Gauge32
          MAX-ACCESS   read-only
-         STATUS       current
+         STATUS       deprecated
          DESCRIPTION
             "
                         This attribute indicates the data rate (kbyte/s)
@@ -3944,7 +3978,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
    wlanAPWiredTxRate OBJECT-TYPE
          SYNTAX       Gauge32
          MAX-ACCESS   read-only
-         STATUS       current
+         STATUS       deprecated
          DESCRIPTION
             "
                         This attribute indicates the data rate (kbyte/s)
@@ -4223,6 +4257,187 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
                          transmitted from the AP radio wireless side.
             "
         ::= { wlsxWlanAPRadioStatsEntry 15 }
+
+-- AP Wired Port Stats table
+
+   wlsxWlanAPWiredPortStatsTable  OBJECT-TYPE
+          SYNTAX       SEQUENCE OF WlanAPWiredPortStatsEntry
+          MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION
+                "
+                        This Table lists the Wired statistics of all the Access Points
+                         connected to the controller.
+                "
+      ::= { wlsxWlanAccessPointStatsGroup 10 }
+
+   wlsxWlanAPWiredPortStatsEntry OBJECT-TYPE
+          SYNTAX       WlanAPWiredPortStatsEntry
+          MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION
+             "Access Point Wired Port Stats entry"
+          INDEX {wlanAPMacAddress, wlanAPPortIndex}
+      ::= { wlsxWlanAPWiredPortStatsTable 1 }
+
+   WlanAPWiredPortStatsEntry ::=
+     SEQUENCE {
+                 wlanAPPortIndex                            Integer32,
+                 wlanAPPortName                             DisplayString,
+                 wlanAPWiredPortRxPkts                      Counter32,
+                 wlanAPWiredPortRxDroppedPkts               Counter32,
+                 wlanAPWiredPortRxErrors                    Counter32,
+                 wlanAPWiredPortRxBytes                     Counter32,
+                 wlanAPWiredPortTxPkts                      Counter32,
+                 wlanAPWiredPortTxDroppedPkts               Counter32,
+                 wlanAPWiredPortTxErrors                    Counter32,
+                 wlanAPWiredPortTxBytes                     Counter32,
+                 wlanAPWiredPortRxRate                      Gauge32,
+                 wlanAPWiredPortTxRate                      Gauge32,
+                 wlanAPWiredPortSpeed                       ArubaPortSpeed
+   }
+
+    wlanAPPortIndex OBJECT-TYPE
+         SYNTAX       Integer32(0..7)
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION
+            "
+			AP Wired Port Mac Index (Offset from base Mac Address)
+            "
+        ::= { wlsxWlanAPWiredPortStatsEntry 1 }
+
+    wlanAPPortName OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..16))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			AP Wired Port Name
+            "
+        ::= { wlsxWlanAPWiredPortStatsEntry 2 }
+
+   wlanAPWiredPortRxPkts OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        This attribute indicates the total packets received from the
+                         AP wired side.
+            "
+        ::= { wlsxWlanAPWiredPortStatsEntry 3 }
+
+   wlanAPWiredPortRxDroppedPkts OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        This attribute indicates the total dropped packets received
+                         from the AP wired side.
+            "
+        ::= { wlsxWlanAPWiredPortStatsEntry 4 }
+
+   wlanAPWiredPortRxErrors OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        This attribute indicates the total number of error packets
+                         received from the AP wired side.
+            "
+        ::= { wlsxWlanAPWiredPortStatsEntry 5 }
+
+   wlanAPWiredPortRxBytes OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        This attribute indicates the total bytes of correct packets
+                         received from the AP wired side.
+            "
+        ::= { wlsxWlanAPWiredPortStatsEntry 6 }
+
+   wlanAPWiredPortTxPkts OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        This attribute indicates the total packets transmitted from the
+                         AP wired side.
+            "
+        ::= { wlsxWlanAPWiredPortStatsEntry 7 }
+
+   wlanAPWiredPortTxDroppedPkts OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        This attribute indicates the total dropped packets transmitted
+                         from the AP wired side.
+            "
+        ::= { wlsxWlanAPWiredPortStatsEntry 8 }
+
+   wlanAPWiredPortTxErrors OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        This attribute indicates the total number of error packets
+                         transmitted from the AP wired side.
+            "
+        ::= { wlsxWlanAPWiredPortStatsEntry 9 }
+
+
+   wlanAPWiredPortTxBytes OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        This attribute indicates the total bytes transmitted from
+                         the AP wired side.
+            "
+        ::= { wlsxWlanAPWiredPortStatsEntry 10 }
+
+   wlanAPWiredPortRxRate OBJECT-TYPE
+         SYNTAX       Gauge32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        This attribute indicates the data rate (kbyte/s)
+                         received from AP wired side in sampling interval.
+            "
+        ::= { wlsxWlanAPWiredPortStatsEntry 11 }
+
+   wlanAPWiredPortTxRate OBJECT-TYPE
+         SYNTAX       Gauge32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        This attribute indicates the data rate (kbyte/s)
+                         transmitted from AP wired side in sampling interval.
+            "
+        ::= { wlsxWlanAPWiredPortStatsEntry 12 }
+
+   wlanAPWiredPortSpeed OBJECT-TYPE
+         SYNTAX       ArubaPortSpeed
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                        This attribute indicates the speed of the port
+            "
+        ::= { wlsxWlanAPWiredPortStatsEntry 13 }
+
 
 -- wlsxWlanStationStatsGroup contains all the statistics observed by different 
 -- Air Monitors attached to this controller. 

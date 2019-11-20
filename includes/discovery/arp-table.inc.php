@@ -23,23 +23,28 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
+use LibreNMS\Config;
+
 if (key_exists('vrf_lite_cisco', $device) && (count($device['vrf_lite_cisco'])!=0)) {
     $vrfs_lite_cisco = $device['vrf_lite_cisco'];
 } else {
-    $vrfs_lite_cisco = array(array('context_name'=>null));
+    $vrfs_lite_cisco = array(array('context_name'=>''));
 }
 
 foreach ($vrfs_lite_cisco as $vrf) {
     $context = $vrf['context_name'];
     $device['context_name']=$context;
 
-    $arp_data = snmpwalk_group($device, 'ipNetToPhysicalPhysAddress', 'IP-MIB');
-    $arp_data = snmpwalk_group($device, 'ipNetToMediaPhysAddress', 'IP-MIB', 1, $arp_data);
+    if (file_exists(Config::get('install_dir') . "/includes/discovery/arp-table/{$device['os']}.inc.php")) {
+        include Config::get('install_dir') . "/includes/discovery/arp-table/{$device['os']}.inc.php";
+    } else {
+        $arp_data = snmpwalk_group($device, 'ipNetToPhysicalPhysAddress', 'IP-MIB');
+        $arp_data = snmpwalk_group($device, 'ipNetToMediaPhysAddress', 'IP-MIB', 1, $arp_data);
+    }
 
-    $existing_data = dbFetchRows(
-        "SELECT * from `ipv4_mac` WHERE `device_id`=? AND `context_name`=?",
-        array($device['device_id'], $context)
-    );
+    $sql = "SELECT * from `ipv4_mac` WHERE `device_id`=? AND `context_name`=?";
+    $existing_data = dbFetchRows($sql, array($device['device_id'], $context));
+
     $ipv4_addresses = array_map(function ($data) {
         return $data['ipv4_address'];
     }, $existing_data);
@@ -80,7 +85,7 @@ foreach ($vrfs_lite_cisco as $vrf) {
                     'device_id'    => $device['device_id'],
                     'mac_address'  => $mac,
                     'ipv4_address' => $ip,
-                    'context_name' => $context,
+                    'context_name' => (string)$context,
                 );
             }
         }
@@ -111,10 +116,7 @@ foreach ($vrfs_lite_cisco as $vrf) {
     }
 
     // remove entries that no longer have an owner
-    dbQuery('DELETE `ipv4_mac` FROM `ipv4_mac`
- LEFT JOIN `ports` ON `ipv4_mac`.`port_id` = `ports`.`port_id` 
- LEFT JOIN `devices` ON `ipv4_mac`.`device_id` = `devices`.`device_id` 
- WHERE `ports`.`port_id` IS NULL OR `devices`.`device_id` IS NULL');
+    dbDeleteOrphans('ipv4_mac', array('ports.port_id', 'devices.device_id'));
 
     echo PHP_EOL;
     unset(

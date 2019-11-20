@@ -1,0 +1,171 @@
+--  Title:    DPS-TEXT-RTU.MIB
+--  Version:  v1.0 for SNMPv2c
+--
+--  Copyright @ 2011 DPS Inc. All Rights Reserved
+--
+--  This MIB defines objects for the DPS TEXT RTU products.
+--
+-- DPS CBH 8/2011
+--
+
+DPS-TEXT-RTU-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	DisplayString
+		FROM SNMPv2-TC
+	OBJECT-TYPE
+		FROM SNMPv2-SMI
+	NOTIFICATION-TYPE
+		FROM SNMPv2-SMI
+	Integer32
+		FROM SNMPv2-SMI
+	dpsAlarmControl
+		FROM DPS-MIB-V38;
+
+dpsTEXTRTUv2 OBJECT IDENTIFIER ::= {dpsAlarmControl 5}
+
+dpsTEXTRTUv2Ident OBJECT IDENTIFIER ::= {dpsTEXTRTUv2 1}
+
+--Textual Conventions
+
+AnalogThresholds ::= TEXTUAL-CONVENTION
+        STATUS          current
+        DESCRIPTION "Highest threshold level crossed, if MJ, MN is assumed.  Will be blank if alarm is not from an analog sources"
+        SYNTAX INTEGER {
+                noAlarms	(0),
+				minorUnder	(1),
+				minorOver	(2),
+				majorUnder	(3),
+				majorOver	(4),
+				notDetected (5)
+        }
+		
+RTUCAction ::= TEXTUAL-CONVENTION
+        STATUS          current
+        DESCRIPTION "Requested action.  Latch, release, and momentary will affect relays.  Sync(s) will resend traps for currently active alarms(TEXT RTU will ignore if invalid)."
+        SYNTAX INTEGER {
+                latch(1),
+				release(2),
+				momentary(3),
+				syncStanding(4),
+				syncAnalogs(5)
+        }
+
+--Device identifying objects
+
+dpsTEXTRTUv2DateTime OBJECT-TYPE
+	SYNTAX  DisplayString
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION "The RTU system date and time."
+	::= {dpsTEXTRTUv2Ident  1}
+
+dpsTEXTRTUv2DeviceType OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Device type of far end SMS device as received in SMS messages to SMS receiver.  ie NG216_G3"
+	::= {dpsTEXTRTUv2Ident  2}
+
+dpsTEXTRTUv2Phone OBJECT-TYPE
+	SYNTAX  DisplayString
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "The phone number of the far end or originating SMS RTU, only SMS RTUs will have/respond to this variable"
+	::= {dpsTEXTRTUv2Ident 3}
+
+	
+-- Alarm identifying objects
+
+dpsTEXTRTUv2AlarmGrid OBJECT IDENTIFIER ::= {dpsTEXTRTUv2 2}
+
+dpsTEXTRTUv2ADisplay OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "TEXT RTU display number.  See the usermanual for display mapping information"
+	::= {dpsTEXTRTUv2AlarmGrid 1}
+
+dpsTEXTRTUv2APoint OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "TEXT RTU point number.  See the usermanual for point mapping information"
+	::= {dpsTEXTRTUv2AlarmGrid 2}
+
+dpsTEXTRTUv2APntDesc OBJECT-TYPE
+	SYNTAX  DisplayString
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "A description of this point."
+	::= {dpsTEXTRTUv2AlarmGrid 3}
+
+dpsTEXTRTUv2AState OBJECT-TYPE
+	SYNTAX  DisplayString
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "The current state of this point."
+	::= {dpsTEXTRTUv2AlarmGrid 4}
+
+dpsTEXTRTUAnalogvalue OBJECT-TYPE
+	SYNTAX  DisplayString
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "The current value of the channel.  Will be blank if alarm is not from an analog source"
+	::= {dpsTEXTRTUv2AlarmGrid 5}		
+
+dpsTEXTRTUAnalogthresholds OBJECT-TYPE
+	SYNTAX  AnalogThresholds
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "Highest threshold level crossed, if MJ, MN is assumed.  Will be blank if alarm is not from an analog sources"
+	::= {dpsTEXTRTUv2AlarmGrid 6}
+	
+-- TEXT RTU Control Commands
+	
+dpsTEXTRTUv2ControlGrid OBJECT IDENTIFIER ::= {dpsTEXTRTUv2 3}
+
+dpsTEXTRTUv2CDisplay OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION "RTU_port_address display number."
+	::= {dpsTEXTRTUv2ControlGrid 1}
+
+dpsTEXTRTUv2CPoint OBJECT-TYPE
+	SYNTAX  Integer32 (1..64)
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION "RTU_port_display point number (1-64)."
+	::= {dpsTEXTRTUv2ControlGrid 2}
+
+dpsTEXTRTUv2CMOMTime OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION "Momentary latch time (in milliseconds).  If value is blank, the default of 600ms will be used"
+	::= {dpsTEXTRTUv2ControlGrid 3}
+
+dpsTEXTRTUv2CAction OBJECT-TYPE
+	SYNTAX  RTUCAction
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION "Requested action.  Latch, release, and momentary will affect relays.  Sync(s) will resend traps for currently active alarms(TEXT RTU will ignore if invalid)."
+	::= {dpsTEXTRTUv2ControlGrid 4}
+	
+	
+-- DPS SMS RTU traps.  Traps generated from SMS receiver indicating event on far end SMS RTU
+
+dpsTEXTRTUv2AlarmSet NOTIFICATION-TYPE
+	OBJECTS {	sysDescr, sysLocation, dpsTEXTRTUv2DateTime, dpsTEXTRTUv2DeviceType, dpsTEXTRTUv2Phone, dpsTEXTRTUv2ADisplay, dpsTEXTRTUv2APoint, dpsTEXTRTUv2APntDesc, dpsTEXTRTUv2AState, dpsTEXTRTUAnalogvalue }
+    STATUS current
+	DESCRIPTION "Generated when alarm is received from far end SMS device to SMS receiver."
+    ::= { dpsTEXTRTUv2 100 }
+
+dpsTEXTRTUv2AlarmClear NOTIFICATION-TYPE
+	OBJECTS {	sysDescr, sysLocation, dpsTEXTRTUv2DateTime, dpsTEXTRTUv2DeviceType, dpsTEXTRTUv2Phone, dpsTEXTRTUv2ADisplay, dpsTEXTRTUv2APoint, dpsTEXTRTUv2APntDesc, dpsTEXTRTUv2AState, dpsTEXTRTUAnalogvalue }
+    STATUS current
+	DESCRIPTION "Generated when clear is received from far end SMS device to SMS receiver."
+    ::= { dpsTEXTRTUv2 200 }
+
+END

@@ -1,0 +1,314 @@
+-- Copyright 2017 BlueCat Networks. All rights reserved.
+-- *****************************************************************
+-- BCN-HA-MIB.mib:  BlueCat Networks HA services
+--
+--
+-- December 2010, Fabian Ischia
+--
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+BCN-HA-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-IDENTITY,
+    OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    InetAddress, InetAddressType
+        FROM INET-ADDRESS-MIB
+    OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    BcnAlarmSeverity
+        FROM BCN-TC-MIB
+    bcnServices
+        FROM BCN-SMI-MIB;
+
+bcnHaMIB MODULE-IDENTITY
+    LAST-UPDATED	"201012150000Z"
+    ORGANIZATION	"BlueCat Networks"
+    CONTACT-INFO
+        "BlueCat Networks. Customer Care.
+
+        North America
+        Call: +1.866.491.2228
+        Europe
+        Call: +44.8081.011.306
+        Other
+        Call: +1.416.646.8433
+        
+        Email: support@bluecatnetworks.com"
+    DESCRIPTION
+        "This module provides status as well as statistical information
+        about the HA service."
+    REVISION "201012150000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { bcnHa 1 }
+
+bcnHa OBJECT IDENTIFIER  ::= { bcnServices 5 }
+
+-- Organization
+
+bcnHaObjects OBJECT IDENTIFIER 
+    ::= { bcnHa 2 }
+
+bcnHaNotification OBJECT IDENTIFIER 
+    ::= { bcnHa 3 }
+
+bcnHaConformance OBJECT IDENTIFIER 
+    ::= { bcnHa 4 }
+
+
+-- Data objects
+
+bcnHaServiceStatus OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "General state of the HA Service."
+    ::= { bcnHaObjects 1 }
+
+bcnHaSerOperState OBJECT-TYPE
+    SYNTAX      INTEGER {
+      standalone(1),
+      active(2),
+      passive(3),
+      stopped(4),
+      stopping(5),
+      becomingActive(6),
+      becomingPassive(7),
+      fault(8)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Operational state of the Service. The possible states are:
+        standalone(1) The node is not configured to provide clustering
+                      services.
+        active(2)     The system is operational and the node is providing
+                      clustering services.
+        passive(3)    The system is operational and the node is active as
+                      a passive standby for the cluster.
+        stopped(4)    The service is stopped either intentionally (i.e.:
+                      the service is not supposed to run on this node) or
+                      unintentionally (a problem has occurred).
+                      This state might apply to both standalong and
+                      clustered nodes.
+        stopping(5)   The service is in the process of stopping. Stopping
+                      a service might be necessary after a configuration
+                      change.
+        becomingActive (6)  The node is becoming active, either as a result
+                      of a switchover or by initial start.
+        becomingPassive (7) The node is failing over. Another node is taking
+                      charge of the services.
+        fault(8)      An error has been detected and the state is undefined.
+        "
+    ::= { bcnHaServiceStatus 1 }
+
+bcnHaSerReplicationState OBJECT-TYPE
+    SYNTAX      INTEGER {
+      notConfigured(1),
+      replicating(2),
+      synchronized(3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current state of the replication. All nodes in a cluster 
+        must be in synch in order for HA to work correctly. The nodes
+        might be temporarily out of synch during cluster creation or
+        when one of the nodes has been down for a while."
+    ::= { bcnHaServiceStatus 2 }
+
+
+bcnHaSerAddressTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BcnHaSerAddressEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table keeps the information about the network addresses
+        for the clustered nodes. Most of the time this table will contain
+        one or two rows, depending on the type of IPs configured for
+        clustering."
+    ::= { bcnHaServiceStatus 3 }
+
+bcnHaSerAddressEntry OBJECT-TYPE
+    SYNTAX      BcnHaSerAddressEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+	DESCRIPTION "A logical row in the bcnHaSerAddressTable."
+    INDEX { bcnHaSerAddrTableIndex }
+    ::= { bcnHaSerAddressTable 1 }
+
+BcnHaSerAddressEntry ::=
+    SEQUENCE {
+        bcnHaSerAddrTableIndex          Unsigned32,
+        bcnHaSerVirtualAddressType      InetAddressType,
+        bcnHaSerVirtualAddress          InetAddress,
+        bcnHaSerPhysicalAddressType     InetAddressType,
+        bcnHaSerPhysicalAddress         InetAddress,
+        bcnHaSerPeerAddressType         InetAddressType,
+        bcnHaSerPeerAddress             InetAddress
+    }
+
+bcnHaSerAddrTableIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This index will normally be 0 or 1"
+    ::= { bcnHaSerAddressEntry  1 }
+
+
+bcnHaSerVirtualAddressType  OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The type of address stored in bcnHaSerVirtualAddress."
+    ::= { bcnHaSerAddressEntry 2 }
+
+bcnHaSerVirtualAddress  OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The virtual IP address configured for this node. The type
+        of this mib variable is defined in bcnHaSerVirtualAddressType.
+        This address binds to the active node at all times."
+    ::= { bcnHaSerAddressEntry 3 }
+
+bcnHaSerPhysicalAddressType  OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The type of address stored in bcnHaSerPhysicalAddress."
+    ::= { bcnHaSerAddressEntry 4 }
+
+bcnHaSerPhysicalAddress  OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The physical IP address configured for this node. The type
+        of this mib variable is defined in bcnHaSerPhisicalAddressType.
+        This address is not affected by switchover events."
+    ::= { bcnHaSerAddressEntry 5 }
+
+bcnHaSerPeerAddressType  OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The type of address stored in bcnHaSerPeerAddress."
+    ::= { bcnHaSerAddressEntry 6 }
+
+bcnHaSerPeerAddress  OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The physical IP address configured for the peer node. The type
+        of this mib variable is defined in bcnHaSerPeerAddressType.
+        This address is not affected by switchover events."
+    ::= { bcnHaSerAddressEntry 7 }
+
+-- Notification definitions
+
+bcnHaNotificationEvents OBJECT IDENTIFIER 
+    ::= { bcnHaNotification 0 }
+
+bcnHaNotificationData OBJECT IDENTIFIER 
+    ::= { bcnHaNotification 1 }
+
+-- Notification data
+
+bcnHaAlarmSeverity OBJECT-TYPE
+    SYNTAX          BcnAlarmSeverity
+    MAX-ACCESS      accessible-for-notify
+    STATUS          current
+    DESCRIPTION
+        "Severity classification for the alarm."
+    ::= { bcnHaNotificationData 1 }
+
+bcnHaAlarmInfo OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      accessible-for-notify
+    STATUS          current
+    DESCRIPTION
+        "Descriptive information about the alarm event."
+    ::= { bcnHaNotificationData 2 }
+
+
+-- Notification events
+
+bcnHaAlarmNotif NOTIFICATION-TYPE
+    OBJECTS {   
+                bcnHaSerOperState,
+                bcnHaAlarmSeverity,
+                bcnHaAlarmInfo
+            }
+    STATUS          current
+    DESCRIPTION
+        "A bcnHaAlarmNotif signifies that the HA service has transitioned
+        state or a particular event has been detected on the service."
+   ::= { bcnHaNotificationEvents 1 }
+
+-- Conformance
+
+bcnHaServiceCompliances OBJECT IDENTIFIER 
+    ::= { bcnHaConformance 1 }
+
+bcnHaServiceGroups OBJECT IDENTIFIER 
+    ::= { bcnHaConformance 2 }
+
+
+bcnHaServiceStatusGroup OBJECT-GROUP
+    OBJECTS { 
+          bcnHaSerOperState, 
+          bcnHaSerReplicationState,
+          bcnHaSerVirtualAddressType,
+          bcnHaSerVirtualAddress,
+          bcnHaSerPhysicalAddressType,
+          bcnHaSerPhysicalAddress,
+          bcnHaSerPeerAddressType,
+          bcnHaSerPeerAddress
+    }
+    STATUS current
+    DESCRIPTION "Status conformance."
+    ::= { bcnHaServiceGroups 1 }
+
+
+bcnHaNotificationEventGroup NOTIFICATION-GROUP
+    NOTIFICATIONS { 
+          bcnHaAlarmNotif
+    }
+    STATUS current
+    DESCRIPTION "Server statistics conformance."
+    ::= { bcnHaServiceGroups 2 }
+
+bcnHaNotificationDataGroup OBJECT-GROUP
+    OBJECTS { 
+          bcnHaAlarmSeverity, 
+          bcnHaAlarmInfo
+    }
+    STATUS current
+    DESCRIPTION "Server statistics conformance."
+    ::= { bcnHaServiceGroups 3 }
+
+
+bcnHaStatusCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION "Basic conformance"
+    MODULE -- This module
+    MANDATORY-GROUPS {
+        bcnHaServiceStatusGroup,
+        bcnHaNotificationEventGroup, 
+        bcnHaNotificationDataGroup }
+    ::= {bcnHaServiceCompliances 1 }
+
+
+END

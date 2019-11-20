@@ -1,0 +1,164 @@
+-- **********************************************************************
+-- HILLSTONE-SYSTEM-MIB 
+--
+-- Copyright (c) 2009 by Hillstone Networks, Inc.
+-- All rights reserved.
+-- 
+-- Version:      V3    
+-- Description:	 Hillstone Networks SYSTEM MIB Object Identifier Assignments
+-- **********************************************************************
+--
+
+HILLSTONE-SYSTEM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY			FROM SNMPv2-SMI
+	NetworkAddress, IpAddress, 
+	Counter, Gauge, TimeTicks	FROM RFC1155-SMI    
+	TruthValue                      FROM SNMPv2-TC
+	hillstoneSys			FROM HILLSTONE-SMI;
+	
+          -- textual conventions
+
+          DisplayString ::=
+              OCTET STRING
+          -- This data type is used to model textual information taken
+          -- from the NVT ASCII character set.  By convention, objects
+          -- with this syntax are declared as having
+          --
+          --      SIZE (0..255)
+          
+hillstoneSysMibObjects OBJECT IDENTIFIER ::= { hillstoneSys 1 }
+
+-- hillstone systems
+sysSerialNumber OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS mandatory
+	::= { hillstoneSysMibObjects 1 }
+
+sysSoftware OBJECT-TYPE
+	SYNTAX DisplayString 
+	ACCESS read-only
+	STATUS mandatory
+	::= { hillstoneSysMibObjects 2 }
+
+sysCPU OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	::= { hillstoneSysMibObjects 3 }
+
+sysTotalMemory OBJECT-TYPE
+	SYNTAX Gauge32
+	ACCESS read-only
+	STATUS mandatory
+	::= { hillstoneSysMibObjects 4 }
+
+sysCurMemory OBJECT-TYPE
+	SYNTAX Gauge32
+	ACCESS read-only
+	STATUS mandatory
+	::= { hillstoneSysMibObjects 5 }
+	
+sysTotalSession OBJECT-TYPE
+	SYNTAX Counter
+	ACCESS read-only
+	STATUS mandatory
+	::= { hillstoneSysMibObjects 6 }
+
+sysCurSession OBJECT-TYPE
+	SYNTAX Gauge32
+	ACCESS read-only
+	STATUS mandatory
+	::= { hillstoneSysMibObjects 7 }
+
+sysHAStatus OBJECT-TYPE
+	SYNTAX INTEGER
+	   {
+		none (0),
+		init (1),
+		hello (2),
+		backup (3),
+		master (4),
+		slase (5),
+		AA-mode (6)
+	   }
+	ACCESS read-only
+	STATUS mandatory
+	::= { hillstoneSysMibObjects 8 }
+
+sysSnmpStackStatus OBJECT-TYPE
+    SYNTAX TruthValue
+    ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"The running status of snmp Stack."
+    ::= { hillstoneSysMibObjects 9 } 
+    
+sysTr069StackStatus OBJECT-TYPE
+    SYNTAX TruthValue
+    ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"The running status of tr069 stack."
+    ::= { hillstoneSysMibObjects 10 } 
+    
+sysVedorOUI OBJECT-TYPE
+    SYNTAX DisplayString
+    ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"The oui code of the Tr069 stack.."
+    ::= { hillstoneSysMibObjects 11 } 
+    
+sysLogStackStatus OBJECT-TYPE
+    SYNTAX TruthValue
+    ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"The running status of syslog stack."
+    ::= { hillstoneSysMibObjects 12 } 
+    
+sysLogServerAddress1 OBJECT-TYPE   
+    SYNTAX DisplayString
+    ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"The syslog receiver addrees 1."
+    ::= { hillstoneSysMibObjects 13 }  
+    
+sysLogServerAddress2 OBJECT-TYPE   
+    SYNTAX DisplayString
+    ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"The syslog receiver addrees 2."
+    ::= { hillstoneSysMibObjects 14 }  
+    
+sysDeviceReloadAction OBJECT-TYPE
+    SYNTAX INTEGER
+    {
+	reloadUnAvailable(1),
+	reloadAtOnce(2)
+    }
+    ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"The actioin of reloading the device. when the value is set to 2,the device will reboot at once."
+    ::= { hillstoneSysMibObjects 15 } 
+
+sysStatisticsPeriod OBJECT-TYPE
+   SYNTAX INTEGER
+    {
+	oneDay(1)
+    }
+    ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"The period of statistics.  default statistics  period is 24hours"
+    ::= { hillstoneSysMibObjects 16 } 
+
+	
+END
+

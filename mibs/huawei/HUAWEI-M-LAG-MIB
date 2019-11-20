@@ -1,0 +1,233 @@
+-- =================================================================
+-- Copyright (C) 2016 by HUAWEI TECHNOLOGIES. All rights reserved
+-- 
+-- Description: M-LAG huawei mib define
+-- Reference: M-LAG 
+-- Version: V2.00
+-- History:
+--    <liuquan 00231012>,<2016.11.22>,<create>
+-- =================================================================
+         
+HUAWEI-M-LAG-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        hwDatacomm            
+            FROM HUAWEI-MIB
+        hwETrunkMIB            
+            FROM HUAWEI-E-TRUNK-MIB
+		MacAddress
+			FROM SNMPv2-TC
+        OBJECT-GROUP, NOTIFICATION-GROUP, MODULE-COMPLIANCE
+            FROM SNMPv2-CONF            
+        OBJECT-TYPE, MODULE-IDENTITY, OBJECT-IDENTITY, NOTIFICATION-TYPE, Integer32, Unsigned32
+            FROM SNMPv2-SMI                
+        entPhysicalName
+      	    FROM ENTITY-MIB;
+ 
+    hwMLagMIB MODULE-IDENTITY 
+            LAST-UPDATED "201611221109Z"        
+            ORGANIZATION 
+                  "Huawei Technologies Co.,Ltd."
+            CONTACT-INFO 
+                  "Huawei Industrial Base
+				   Bantian, Longgang
+				   Shenzhen 518129
+				   People's Republic of China
+				   Website: http://www.huawei.com
+				   Email: support@huawei.com
+				  "
+            DESCRIPTION 
+                "Please provide the descritpion."
+		    REVISION    "201611221109Z"   
+            DESCRIPTION "V2.00, Updated to include dfs peer down alarm for M-LAG."
+			
+            REVISION    "201611221109Z"   
+            DESCRIPTION "V1.02, Updated to include heart lost alarm for M-LAG."
+			
+            REVISION    "201611221109Z"   
+            DESCRIPTION "V1.01, Updated to include support for M-LAG."
+
+            REVISION    "201611221109Z"   
+            DESCRIPTION "V1.00, initial version."
+    
+            ::= { hwETrunkMIB 8 }
+
+    
+-- Top-level structure of the MIB
+
+hwMLagObjects        OBJECT IDENTIFIER ::= { hwMLagMIB 1 }
+hwMLagNotifications  OBJECT IDENTIFIER ::= { hwMLagMIB 2 }
+hwMLagConformance    OBJECT IDENTIFIER ::= { hwMLagMIB 3 }
+
+--MIB Objects
+   
+   hwMLagConsistencyType1 OBJECT-TYPE
+       SYNTAX OCTET STRING
+       MAX-ACCESS  accessible-for-notify
+       STATUS      current
+       DESCRIPTION
+           "The type of M-LAG consistency check."
+       ::= { hwMLagObjects 1 }
+       
+   hwMLagConsistencyType2 OBJECT-TYPE
+       SYNTAX OCTET STRING
+       MAX-ACCESS  accessible-for-notify
+       STATUS      current
+       DESCRIPTION
+           "The type of M-LAG consistency check."
+       ::= { hwMLagObjects 2 }
+       
+    hwmlagDfsPeerDownTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF HwmlagDfsPeerDownEntry
+		MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION 
+            "The type of DFS peer status goes down."
+        ::= { hwMLagObjects 3 }
+
+	
+	hwmlagDfsPeerDownEntry OBJECT-TYPE
+		SYNTAX HwmlagDfsPeerDownEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+				"Entries of Dfs peer status goes down table."
+		INDEX { hwdfsGroupId, hwsysMac, hwdfsType, hwdfsPeerAddress }
+                ::= { hwmlagDfsPeerDownTable 1 }
+				
+	HwmlagDfsPeerDownEntry ::=
+		SEQUENCE {
+					hwdfsGroupId
+						Unsigned32,
+					hwsysMac
+						MacAddress,
+					hwdfsType
+						OCTET STRING,
+					hwdfsPeerAddress
+						OCTET STRING
+                 }
+				 
+    hwdfsGroupId OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS accessible-for-notify
+		STATUS current
+		DESCRIPTION
+				"Dfs Group id."
+                ::= { hwmlagDfsPeerDownEntry 1 }
+				 
+	hwsysMac OBJECT-TYPE
+		SYNTAX MacAddress
+		MAX-ACCESS accessible-for-notify
+		STATUS current
+		DESCRIPTION
+				"MAC of system from dfs peer."
+                ::= { hwmlagDfsPeerDownEntry 2 }
+				
+	hwdfsType OBJECT-TYPE
+		SYNTAX OCTET STRING
+		MAX-ACCESS accessible-for-notify
+		STATUS current
+		DESCRIPTION
+				"The type of dfs-group which contains M-LAG or Active-Active Gateway."
+                ::= { hwmlagDfsPeerDownEntry 3 }
+				
+	hwdfsPeerAddress OBJECT-TYPE
+		SYNTAX OCTET STRING
+		MAX-ACCESS accessible-for-notify
+		STATUS current
+		DESCRIPTION
+				"Peer address from dfs peer."
+                ::= { hwmlagDfsPeerDownEntry 4 }
+    
+	   
+-- Notifications
+
+    hwMLagConsistencyCheckType1 NOTIFICATION-TYPE
+    	OBJECTS { hwMLagConsistencyType1 }
+        STATUS current
+        DESCRIPTION 
+            "Trap message is generated when
+			there is type1 inconsistency configuration between the two devices of M-LAG."
+        ::= { hwMLagNotifications 1 }
+    
+     hwMLagConsistencyCheckType1Resume NOTIFICATION-TYPE
+    	OBJECTS { hwMLagConsistencyType1 }
+        STATUS current
+        DESCRIPTION 
+            "The expected state trap of M-LAG resumed."
+        ::= { hwMLagNotifications 2 }
+        
+    hwMLagConsistencyCheckType2 NOTIFICATION-TYPE
+        OBJECTS {hwMLagConsistencyType2 }
+        STATUS current
+        DESCRIPTION 
+            "Trap message is generated when 
+			there is type1 inconsistency configuration between the two devices of M-LAG."
+        ::= { hwMLagNotifications 3 }        
+
+    hwMLagConsistencyCheckType2Resume NOTIFICATION-TYPE
+        OBJECTS {hwMLagConsistencyType2 }
+        STATUS current
+        DESCRIPTION 
+            "The expected state trap of M-LAG resumed."
+        ::= { hwMLagNotifications 4 }
+      
+    hwMLagHeartLost NOTIFICATION-TYPE
+        STATUS current
+        DESCRIPTION 
+            "Trap message is generated when
+			heart beat state is lost."
+        ::= { hwMLagNotifications 5 }
+    
+     hwMLagHeartLostResume NOTIFICATION-TYPE
+        STATUS current
+        DESCRIPTION 
+            "The expected state of M-LAG heart resumed."
+        ::= { hwMLagNotifications 6 }
+
+     hwMlagDfsPeerDown NOTIFICATION-TYPE
+		OBJECTS {hwdfsGroupId, hwsysMac, hwdfsType, hwdfsPeerAddress}
+        STATUS current
+        DESCRIPTION 
+            "Trap message is generated when
+			dfs peer status goes down."
+        ::= { hwMLagNotifications 7 }
+    
+    hwMlagDfsPeerDownResume NOTIFICATION-TYPE
+		OBJECTS {hwdfsGroupId, hwsysMac, hwdfsType, hwdfsPeerAddress}
+        STATUS current
+        DESCRIPTION 
+            "The expected state of dfs peer status goes down resumed."
+        ::= { hwMLagNotifications 8 }
+	
+-- Conformance
+
+    hwMlagGroups OBJECT IDENTIFIER ::= { hwMLagConformance 1 }
+    
+    hwMLagObjectGroup OBJECT-GROUP
+        OBJECTS { hwMLagConsistencyType1, hwMLagConsistencyType2 }
+        STATUS current
+        DESCRIPTION 
+            "The object group."
+        ::= { hwMlagGroups 1 }
+        
+    hwMLagNotificationGroup NOTIFICATION-GROUP
+        NOTIFICATIONS { hwMLagConsistencyCheckType1, hwMLagConsistencyCheckType1Resume, hwMLagConsistencyCheckType2, hwMLagConsistencyCheckType2Resume , hwMLagHeartLost, hwMLagHeartLostResume, hwMlagDfsPeerDown, hwMlagDfsPeerDownResume}
+        STATUS current
+        DESCRIPTION 
+            "The notification group."
+        ::= { hwMlagGroups 2 }        
+        
+    hwMLagCompliances OBJECT IDENTIFIER ::= { hwMLagConformance 2 }
+                    
+    hwMLagCompliance MODULE-COMPLIANCE
+	STATUS current
+	DESCRIPTION
+            "The core compliance statement for all implementations."
+	MODULE -- this module
+	MANDATORY-GROUPS  {
+		hwMLagObjectGroup, hwMLagNotificationGroup  		            		            		            
+	    }
+	    ::= { hwMLagCompliances 1 }
+
+END

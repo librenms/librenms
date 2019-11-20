@@ -1,0 +1,45 @@
+mib: CPQPOWER-MIB
+modules:
+    sensors:
+        current:
+            data:
+                -
+                    oid: mpduOutputEntry
+                    value: mpduOutputCurrent
+                    num_oid: '.1.3.6.1.4.1.232.165.5.2.1.1.7.{{ $index }}'
+                    skip_values: -1
+                    divisor: 100
+                    index: 'mpduOutputCurrent.{{ $index }}'
+                    descr: 'MPDU #{{ $mpduOutputIndex }} Current'
+        load:
+            data:
+                -
+                    oid: mpduOutputEntry
+                    value: mpduOutputPercentLoad
+                    num_oid: '.1.3.6.1.4.1.232.165.5.2.1.1.5.{{ $index }}'
+                    skip_values: -1
+                    divisor: 10
+                    index: 'mpduOutputPercentLoad.{{ $index }}'
+                    descr: 'MPDU #{{ $mpduOutputIndex }} Load'
+                    warn_limit: 80
+                    high_limit: 90
+        power:
+            data:
+                -
+                    oid: mpduOutputEntry
+                    value: mpduOutputPowerFactor
+                    num_oid: '.1.3.6.1.4.1.232.165.5.2.1.1.10.{{ $index }}'
+                    skip_values: -1
+                    divisor: 100
+                    index: 'mpduOutputPowerFactor.{{ $index }}'
+                    descr: 'MPDU #{{ $mpduOutputIndex }} Power'
+        voltage:
+            data:
+                -
+                    oid: mpduOutputEntry
+                    value: mpduOutputVoltage
+                    num_oid: '.1.3.6.1.4.1.232.165.5.2.1.1.6.{{ $index }}'
+                    skip_values: -1
+                    divisor: 10
+                    index: 'mpduOutputVoltage.{{ $index }}'
+                    descr: 'MPDU #{{ $mpduOutputIndex }} Voltage'

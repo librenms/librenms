@@ -1,0 +1,3795 @@
+OMNITRON-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, IpAddress, Integer32, Unsigned32, Counter32,
+    Counter64
+        FROM SNMPv2-SMI  -- RFC-2578
+    DisplayString, TruthValue, TimeInterval
+        FROM SNMPv2-TC   -- RFC-2579
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF -- RFC-2580
+    omnitron, OstVlanId, OstModeType, icAgent, OstPortNumber, OstPortList
+        FROM OMNITRON-TC-MIB;
+
+omnitronMIB MODULE-IDENTITY
+    LAST-UPDATED "201510211200Z"     -- October 21, 2015
+    ORGANIZATION "Omnitron Systems Technology, Inc."
+    CONTACT-INFO "Omnitron Systems Technology, Inc.
+                  38 Tesla
+                  Irvine, CA 92618-4670
+                  USA
+
+             Tel: (949) 250 6510
+             Fax: (949) 250 6514
+          E-mail: info@omnitron-systems.com
+   International: +1 949 250 6510
+
+                  Technical Support and Customer Service
+             Tel: (800) 675 8410
+          E-mail: support@omnitron-systems.com
+   International: +1 949 250 6510"
+
+    DESCRIPTION
+            "Omnitron MIB for use with v5.2 iConverter Management Modules
+             and NetOutlook
+
+             Copyright 2015 Omnitron Systems Technology, Inc.
+             All rights reserved
+            "
+
+    REVISION    "201510211200Z"     -- October 21, 2015
+    DESCRIPTION "Added modHwRev and modPcbRev
+                "
+
+    REVISION    "201501191200Z"     -- January 19, 2015
+    DESCRIPTION "Initial version of v5.2 MIB.
+                   Updated resetmod and modreset to allow reboot from backup
+                "
+    ::= { omnitron 3 }
+
+prodAgent                   OBJECT IDENTIFIER ::= { omnitron 2 }
+omnitronConformance         OBJECT IDENTIFIER ::= { omnitron 4 }
+omnitronProducts            OBJECT IDENTIFIER ::= { omnitron 5 }
+
+
+-------------------------------------------------------------------------------
+-- Omnitron Product Object IDs
+-------------------------------------------------------------------------------
+
+managementModule OBJECT IDENTIFIER ::= { omnitronProducts 1 }
+
+
+-------------------------------------------------------------------------------
+-- iConverter Agent Group
+-------------------------------------------------------------------------------
+
+chassis    OBJECT-TYPE
+    SYNTAX      Integer32 (1..19)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Holds the chassis number of the selected IP"
+    ::= { icAgent 6 }
+
+selfSlot    OBJECT-TYPE
+    SYNTAX      Integer32 (1..22)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Holds the slot number of the selected IP"
+    ::= { icAgent 8 }
+
+-------------------------------------------------------------------------------
+-- Chassis Table
+-------------------------------------------------------------------------------
+
+chassisTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ChassisEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "This a table of chassis and their modules."
+    ::= { icAgent 1 }
+
+chassisEntry OBJECT-TYPE
+    SYNTAX      ChassisEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Chassis modules."
+    INDEX       { chassisnum, slotnum }
+    ::= { chassisTable 1 }
+
+ChassisEntry ::= SEQUENCE {
+    chassisnum  Integer32,
+    slotnum     Integer32,
+    chassistype Integer32,
+    prodtype    Integer32,
+    chassisname DisplayString,
+    partnum     DisplayString,
+    serialnum   DisplayString,
+    manufdate   DisplayString,
+    softrev     Integer32,
+    prodrev     Integer32,
+    ledstat     Integer32,
+    switchstat  Integer32,
+    extended1   Integer32,
+    extended2   Integer32,
+    extended3   Integer32,
+    extended4   Integer32,
+    extended5   Integer32,
+    extended6   Integer32,
+    resetmod    Integer32,
+    wrswitch    Integer32,
+    modulename  DisplayString
+    }
+
+chassisnum  OBJECT-TYPE
+    SYNTAX      Integer32 (1..19)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The chassis where the module resides. Ranges in value from 1 - 19."
+    ::= { chassisEntry 1 }
+
+slotnum     OBJECT-TYPE
+    SYNTAX      Integer32 (1..22)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The slot number of the module.
+        For the 19 slot chassis it ranges in value from 1-22.
+        For the 2 slot chassis it ranges in value from 1-2."
+    ::= { chassisEntry 2 }
+
+chassistype OBJECT-TYPE
+    SYNTAX      Integer32 (1..6)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Type of chassis:
+        1 = 19 module chassis
+        2 = 2 module chassis
+        3 = 5 module chassis
+        4 = 1 module chassis
+        5 = stand alone chassis
+        6 = 1-module redundant power chassis"
+    ::= { chassisEntry 3 }
+
+prodtype    OBJECT-TYPE
+    SYNTAX      Integer32 (1..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The product type of the module:
+        61 = iConverter NMM
+        64 = iConverter Power Supply (19 Module)
+        65 = iConverter 10FL/T Ethernet
+        66 = iConverter 100 Fx/Tx Ethernet
+        67 = iConverter Fiber/Fiber
+        68 = iConverter 10/100 Ethernet
+        70 = iConverter 2FXM slave
+        72 = iConverter GX/X
+        74 = iConverter Tx/2Tx Ethernet
+        75 = iConverter Gx Gigabit Ethernet
+        76 = iConverter Tx/2Fx Ethernet
+        77 = iConverter T1/E1
+        79 = iConverter 4Tx Ethernet
+        80 = iConverter 10/100M
+        81 = iConverter GX/T Ethernet
+        82 = iConverter Power Supply (5 Module)
+        83 = iConverter GX/F Ethernet
+        84 = iConverter 2FX Ethernet
+        85 = iConverter 10T/2 Ethernet
+        86 = iConverter 10/100VT Ethernet
+        87 = iConverter 4Tx VT
+        88 = iConverter RS 422/485
+        89 = iConverter T3/E3
+        90 = iConverter 10/100M slave
+        92 = iConverter RS 232
+        93 = iConverter GX/TM
+        94 = iConverter GX/TM slave
+        95 = iConverter 2GXM
+        96 = iConverter 2FXM
+        97 = iConverter GM3 2xSFP
+        98 = iConverter 2GXM slave
+        99 = iConverter GM3 2xUTP
+        100= iConverter 10/100M2
+        101= iConverter 2FXM2
+        102= iConverter GM3 SFP/2xUTP
+        103= iConverter 1-Module Redundant Powered Chassis
+        104= iConverter Gx AN
+        105= iConverter GX/TM2
+        106= iConverter 2GX/TM2
+        107= iConverter 4xT1/E1 Mux
+        108= iConverter GM3 2xSFP/UTP
+        109= iConverter GM3 3xSFP
+        110= iConverter X.21
+        112= iConverter GM3 3xUTP
+        113= iConverter GM3 FF/UTP or SFP/UTP
+        114= iConverter CWDM
+        115= iConverter XG
+        117= iConverter TM3
+        119= iConverter 4GT
+        120= iConverter GM4 2xSFP/TP
+        136= iConverter XGT+
+        137= iConverter GM4 5-Port
+        142= iConverter GX/T2
+        143= iConverter GM4-HPoE or GM4-PoE+
+        253= iConverter GM3 2XSFP
+        254= iConverter GM3 1xSFP/2xUTP
+        255= iConverter Unknown"
+    ::= { chassisEntry 4 }
+
+chassisname OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "The name of the chassis.
+
+        For the M2 modules the max size is 32 octets.
+
+        For the GM3, GM4, XM5 the max size is 64 octets when a module is
+        accessed directly through the serial port, or via its own IP address
+        for Telnet, SSH, or SNMP.
+
+        For the GM3, GM4, XM5 when the object is indirectly accessed via the
+        backplane, through IP-less, or through 802.3ah peer-to-peer the value
+        is truncated to 32 bytes.
+       "
+    ::= { chassisEntry 5 }
+
+partnum     OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..8))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The part number of the module."
+    ::= { chassisEntry 6 }
+
+serialnum   OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(8))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The serial number of the module."
+    ::= { chassisEntry 7 }
+
+manufdate   OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(8))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The date the module was manufactured in form YYYYMMDD."
+    ::= { chassisEntry 8 }
+
+softrev     OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The software revision of the module software."
+    ::= { chassisEntry 9 }
+
+prodrev     OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The product revision of the module."
+    ::= { chassisEntry 10 }
+
+ledstat     OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The status of any first 32 LEDs on the module, excluding the power LED.
+        If an LED is missing its number is skipped.
+
+        For an eight LED position device the following is the decoding:
+        ledstat.7 is the top LED position
+        ledstat.6 is the second LED position
+        ledstat.5 is the third LED position
+        ledstat.4 is the fourth LED position
+        ledstat.3 is the fifth LED position
+        ledstat.2 is the sixth LED position
+        ledstat.1 is the seventh LED position
+        ledstat.0 is the eighth and bottom LED position
+
+        For devices that have 32 or less LEDs this object contains all
+        the LEDs. For those devices that have more than 32 LEDs, LEDs 33
+        and above are only covered by the modExpLedStatus object.
+       "
+    ::= { chassisEntry 11 }
+
+switchstat  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The status of any DIP switches on the module.
+        DIP switch 1 is switchstat.0,
+        DIP switch 2 is switchstat.1,
+        DIP switch 3 is switchstat.2, etc.
+
+        DIP switch bank 1 is switches 0-7
+        DIP switch bank 2 is switches 8-15
+
+        Front panel switches start at switchstat.7 for the top switch,
+        switchstat.6 for the next switch, etc."
+    ::= { chassisEntry 12 }
+
+extended1   OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "General extended status for the module. Normally this is the
+        actual setting of the DIP switch selection."
+    ::= { chassisEntry 13 }
+
+extended2   OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "General extended status for the module"
+    ::= { chassisEntry 14 }
+
+extended3   OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "General extended status for the module"
+    ::= { chassisEntry 15 }
+
+extended4   OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "General extended status for the module"
+    ::= { chassisEntry 16 }
+
+extended5   OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "General extended status for the module"
+    ::= { chassisEntry 17 }
+
+extended6   OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "General extended status for the module"
+    ::= { chassisEntry 18 }
+
+resetmod   OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Writing to this variable resets the module.  This variable is a write only.
+
+        Writing a zero (0) will reboot to the current working application image
+
+        Writing a one (1) will reboot to the backup application image if
+         available
+       "
+    ::= { chassisEntry 19 }
+
+wrswitch   OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Writing to this variable updates the module switch settings.
+        See switchstat above for the explanation."
+    ::= { chassisEntry 20 }
+
+modulename   OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The name of the module"
+    ::= { chassisEntry 21 }
+
+
+-------------------------------------------------------------------------------
+-- Enhanced iConverter Agent Group
+-------------------------------------------------------------------------------
+
+enhancedchassisTable OBJECT IDENTIFIER ::= { prodAgent 1 }
+
+moduleCount OBJECT-TYPE
+    SYNTAX  Integer32 (1..22)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of modules in the chassis table"
+              ::= { enhancedchassisTable 1 }
+
+moduleTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ModuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "This a table of modules in the enhances chassis table. It contains as many
+                 entries as specified by moduleCount"
+    ::= { enhancedchassisTable 2 }
+
+moduleEntry OBJECT-TYPE
+    SYNTAX      ModuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Chassis modules."
+    INDEX       { modchassnum, modslotnum }
+    ::= { moduleTable 1 }
+
+ModuleEntry ::= SEQUENCE {
+    modchassnum                 Integer32,
+    modslotnum                  Integer32,
+    modchasstype                Integer32,
+    modprodtype                 Integer32,
+    modsoftrev                  Integer32,
+    modprodrev                  Integer32,
+    modreset                    Integer32,
+    modnumports                 Integer32,
+    modchassname                DisplayString,
+    modpartnum                  DisplayString,
+    modserialnum                DisplayString,
+    modmanufdate                DisplayString,
+    modname                     DisplayString,
+    modportvlan                 Integer32,
+    modextfeaturebits           Integer32,
+    modswbuildnum               Integer32,
+    modenable802dot1qProcessing Integer32,
+    modtagsubstitution          Integer32,
+    modcommitVLANchanges        Integer32,
+    modvlanTableClear           Integer32,
+    modcommitNMMCfgChanges      Integer32,
+    modLM80volts                Integer32,
+    modLM80currents             Integer32,
+    modLM80misc                 Integer32,
+    modRestoreFactoryDefaults   Integer32,
+    coreStatusOnly              Integer32,
+    ingressPolicingType         Integer32,
+    vlanservicetag              Integer32,
+    defaultForwardingMap        Integer32,
+    modFpgaRev                  DisplayString,
+    modExpPartNumber            DisplayString,
+    modExpSoftwareRev           DisplayString,
+    modExpLedStatus             OCTET STRING,
+    modHwRev                    DisplayString,
+    modPcbRev                   DisplayString
+    }
+
+modchassnum     OBJECT-TYPE
+    SYNTAX      Integer32 (1..19)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The chassis where the module resides."
+    ::= { moduleEntry 1 }
+
+modslotnum      OBJECT-TYPE
+    SYNTAX      Integer32 (1..22)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The slot number within a chassis."
+    ::= { moduleEntry 2 }
+
+modchasstype    OBJECT-TYPE
+    SYNTAX      Integer32 (1..6)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The type of chassis in which the module resides."
+    ::= { moduleEntry 3 }
+
+modprodtype     OBJECT-TYPE
+    SYNTAX      Integer32 (1..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The chassis where the module resides."
+    ::= { moduleEntry 4 }
+
+modsoftrev      OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The modules software revision."
+    ::= { moduleEntry 5 }
+
+modprodrev      OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The modules product revision."
+    ::= { moduleEntry 6 }
+
+modreset        OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Writing to this variable resets the module.  This variable is a write only.
+
+        Writing a zero (0) will reboot to the current working application image
+
+        Writing a one (1) will reboot to the backup application image if
+         available
+       "
+    ::= { moduleEntry 7 }
+
+modnumports     OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The number of ports in this module."
+    ::= { moduleEntry 8 }
+
+modchassname    OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The name of the chassis in which the individual module resides in.
+
+        For the M2 modules the max size is 32 octets.
+
+        For the GM3, GM4, XM5 the max size is 64 octets when a module is
+        accessed directly through the serial port, or via its own IP address
+        for Telnet, SSH, or SNMP.
+
+        For the GM3, GM4, XM5 when the object is indirectly accessed via the
+        backplane, through IP-less, or through 802.3ah peer-to-peer the value
+        is truncated to 32 bytes.
+       "
+    ::= { moduleEntry 9 }
+
+modpartnum      OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..8))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The model of the individual module."
+    ::= { moduleEntry 10 }
+
+modserialnum    OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(8))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The serial number of the individual module."
+    ::= { moduleEntry 11 }
+
+modmanufdate    OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(8))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The manufacturing date of the individual module."
+    ::= { moduleEntry 12 }
+
+modname         OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The name of the individual module."
+    ::= { moduleEntry 13 }
+
+modportvlan     OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The portvlan map of an individual module. The low order bits encode the possible values.
+    The following are the connection paths that exists between the ports on the module:
+        Used on types 69, 72, 81, 83, 84, 86
+            bit0 - Port 1 to Port 2
+            bit1 - Port 1 to Backplane Port A
+            bit2 - Port 1 to Backplane Port B
+            bit3 - Port 2 to Backplane Port A
+            bit4 - Port 2 to Backplane Port B
+            bit5 - Backplane Port A to Backplane Port B
+        Used on types 70, 80, 90, 93, 94, 95, 96, 98, 100, 101, 105, 106
+            bit0 - Port 1 to Port 2
+            bit1 - Port 1 to Backplane Port A
+            bit2 - Port 1 to Backplane Port B
+            bit3 - Port 2 to Backplane Port A
+            bit4 - Port 2 to Backplane Port B
+            bit5 - Backplane Port A to Backplane Port B
+            bit6 - Port 1 to Mgt
+            bit7 - Port 2 to Mgt
+            bit8 - Backplane A to Mgt
+            bit9 - Backplane B to Mgt
+        Used on types 102, 108, 109, 112
+            bit0 - Port 1-2-3 interconnect
+            bit1 - Port 1-2-3 to Backplane Port A
+            bit2 - Port 1-2-3 to Backplane Port B
+            bit3 - Backplane Port A to Backplane Port B
+            bit4 - Port 1 to Mgt
+            bit5 - Port 2 to Mgt
+            bit6 - Port 3 to Mgt
+            bit7 - Backplane A to Mgt
+            bit8 - Backplane B to Mgt
+        Used on types 97, 99, 113
+            bit0 - Port 1 to Port 2
+            bit1 - Port 1 to Backplane Port A
+            bit2 - Port 1 to Backplane Port B
+            bit3 - Port 2 to Backplane Port A
+            bit4 - Port 2 to Backplane Port B
+            bit5 - Backplane Port A to Backplane Port B
+            bit6 - Port 1 to Mgt
+            bit7 - Port 2 to Mgt
+            bit8 - Backplane A to Mgt
+            bit9 - Backplane B to Mgt
+        Used on types 79, 87
+            bit0 - Port 1-2-3-4 interconnect
+            bit1 - Port 1-2-3-4 to backplane A
+            bit2 - Port 1-2-3-4 to backplane B
+            bite 3 Backplane A to Backplane B
+        Used on type 103
+            bit0 - Port A to Backplane A
+            bit1 - Port A to Backplane B
+            bit2 - Port B to Backplane A
+            bit3 - Port B to Backplane B
+            bit4 - Port A to Port B"
+    ::= { moduleEntry 14 }
+
+modextfeaturebits   OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The module's extended features bits.
+                 The bit definitions are:
+                 bit0 - module is capable of being field upgradeable
+                 bit1 - module supports MIB Statistics
+                 bit2 - module supports Memory I/O extended registers
+                 bit3 - module supports Tag Vlan feature
+                 bit4 - module configured as Secure Slave
+                 bit5 - module configured as Secure Proxy
+                 bit6 - module configured as Secure Master
+                 bit7 - module supports 802.3ah OAM Client
+                 bit8 - module supports SFP parameters for port1
+                 bit9 - module supports SFP parameters for port2
+                 bit10 - module supports SFP parameters for port3
+                 bit11 - module supports SFP parameters for port4
+                 bit12 - module supports AH event notification
+                 bit13 - 1-module redundant power chassis supports contact closure status
+                 bit14 - 1-module redundant power chassis supports power over ethernet
+                 bit15 - 1-module redundant power chassis RJ45 connector is installed
+                 bit16 - 1-module redundant power chassis fan is installed
+                 bit17 - when this bit is on the module is a remote slave
+                 bit18 - module supports unidirectional on port1
+                 bit19 - module supports unidirectional on port2
+                 bit20 - module supports unidirectional on port3
+                 bit21 - extended power supply
+                 bit22 - module supports SNMPv3
+                 bit23 - module is NMM2 capable
+                 bit24 - fan is installed
+                 bit25 - generic module class supports 802.1ag/Y.1731
+                 bit26 - module GM3 class supports 802.1ag/Y.1731
+                 bit27 - module GM4 class
+                 bit28 - port 1 is an XFP port
+                 bit29 - port 2 is an XFP port
+                 "
+    ::= { moduleEntry 15 }
+
+modswbuildnum   OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The module's software build number."
+    ::= { moduleEntry 16 }
+
+modenable802dot1qProcessing OBJECT-TYPE
+    SYNTAX      Integer32 (0..1)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Enables or disables 802_1q processing.
+                0 = disable
+                1 = enable"
+    ::= { moduleEntry 17 }
+
+modtagsubstitution  OBJECT-TYPE
+    SYNTAX      Integer32 (0..1)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Enables or disables substitution of 802_1q tags.
+                 Currently not implemented
+                 by any supported module"
+    ::= { moduleEntry 18 }
+
+modcommitVLANchanges OBJECT-TYPE
+    SYNTAX  Integer32 (0..1)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION "VLAN information is applied to the module and data saved
+                 to persistent storage.  This variable is a write only."
+    ::= { moduleEntry 19 }
+
+modvlanTableClear OBJECT-TYPE
+    SYNTAX  Integer32 (0..1)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION "VLAN table for the module Vlan table to be cleared.  This variable is a write only."
+    ::= { moduleEntry 20 }
+
+modcommitNMMCfgChanges OBJECT-TYPE
+    SYNTAX  Integer32 (0..1)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION "Management module configuration information is applied to the module and data saved
+                 to persistent storage.  This variable is a write only."
+    ::= { moduleEntry 21 }
+
+modLM80volts OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "8 bits each of PS1 Voltage(msB), PS2 Voltage, Total Voltage and an unused byte(lsB).
+                1-module redundant power chassis."
+    ::= { moduleEntry 22 }
+
+modLM80currents OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "8 bits each of PS1 Current(msB) (mA/10), PS2 Current, Total Current and an
+                unused byte(lsB).  1-module redundant power chassis."
+    ::= { moduleEntry 23 }
+
+modLM80misc OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "8 bits each of Temperature(msB) .5C/bit and 2 unused byte(lsB).  1-module redundant power chassis."
+    ::= { moduleEntry 24 }
+
+modRestoreFactoryDefaults OBJECT-TYPE
+    SYNTAX  Integer32 (0..6)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+       "Management module configuration information is restored to factory
+        defaults.  This variable is a write only. Different types of restore
+        defaults are supported:
+
+        restoreFactoryDefaults(0,1)     Restores factory defaults
+        restoreLocalDefaults(2)         Restores defaults from local file
+        restorePreviousConfig(3)        Restores the previously saved
+                                          configuration. This is useful to regress
+                                          to a known working setup.
+        restoreFactoryDefaultsKeepIp(4) Restores factory defaults but keeps IP
+                                           based settings
+        restoreLocalDefaultsKeepIp(5)   Restores defaults from local file but
+                                           keeps IP based settings.
+        restorePreviousConfigKeepIp(6)  Restores the previously saved
+                                           configuration but keeps IP based
+                                           settings.
+       "
+    ::= { moduleEntry 25 }
+
+coreStatusOnly OBJECT-TYPE
+    SYNTAX      Integer32 (0..1)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Enable(1) or disable(0) Core Status Only."
+    DEFVAL {0}
+    ::= { moduleEntry 26 }
+
+ingressPolicingType  OBJECT-TYPE
+    SYNTAX      Integer32(1..3)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Sets the module global policy used to count bytes for bandwidth
+        calculation purposes. This is available on the GM3 & GM4. This is
+        not available on the XM5.
+
+        1 = L1 includes all bytes in frame, interframe gap and preamble
+        2 = L2 includes all bytes in frame, including Layer 2 header and CRC
+        3 = L3 includes Layer 3 information only, excludes Layer 2 header and CRC
+       "
+    ::= { moduleEntry 27 }
+
+vlanservicetag  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Value for service tag."
+    ::= { moduleEntry 28 }
+
+defaultForwardingMap  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Bit vector for default forwarding map where:
+            bit0 - Port 1
+            bit1 - Port 2
+            bit2 - Port 3
+            bit3 - Port 4
+            bit4 - Port BPA
+            bit5 - Port BPB"
+    ::= { moduleEntry 29 }
+
+modFpgaRev OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The current revision of the FPGA."
+    ::= { moduleEntry 30 }
+
+modExpPartNumber      OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The expanded part number of the individual module.
+
+        The modpartnum object indicates the compressed version of the
+        part number name. If this field is not supported in a module it is
+        left as a null length string.
+       "
+    ::= { moduleEntry 31 }
+
+modExpSoftwareRev      OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The expanded software revision of the individual module.
+
+        This object allows for an enhanced version of the software revision
+        that include a major and minor component. Major and Minor are always
+        numeric values while the rev value can be a number or an alpha. For
+        instance: 1.0, 1.1, 3.2A, 1.1.2.
+
+        The two digit modsoftrev object includes the major and minor revision.
+        A modsoftrev of '32' would be shown in this object as '3.2'. This object
+        allows the minor number to be expanded beyond a single digit as shown
+        above by '3.2A' above, even though modsoftrev would be '32'.
+
+
+        The modswbuildnum is independent of this scheme, but the complete
+        revision is sometimes referred together as a concatenated value. For
+        instance is '3.2A' is the sofware rev and '1234' is the build number, the
+        concatenated value is '3.2A.1234'.
+       "
+    ::= { moduleEntry 32 }
+
+
+modExpLedStatus OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is the expanded LED status of the individual module. This
+        object reflects the state, color, and blinking rate of each individual
+        LED.
+
+        Each LED is represented by a single octet. The first octet in the
+        string is the first LED, the second octet in the string is the
+        second LED, until the last LED. The length of the object indicates
+        the number of LEDs of the modules. Non-installed (missing) LEDs return
+        a value of all zeros.
+
+        Each octet is encoded in the following way:
+
+        Bits 0:1 indicate the LED color and state
+           0x0 = LED is off
+           0x1 = LED is amber
+           0x2 = LED is green
+           0x3 = LED is both amber and green (red)
+
+        Bits 2:4 indicate the LED blinking frequency
+           0x0 = LED is solid
+           0x1 = LED is blinking at 10 Hz
+           0x2 = LED is blinking at 5 Hz
+           0x3 = LED is blinking at 2 Hz
+           0x4 = LED is blinking at 1 Hz
+           0x5 = LED is blinking at 1/2 Hz
+
+        Bits 5:7 are currently undefined and return 0x0 for this product
+        revision.
+       "
+    ::= { moduleEntry 33 }
+
+modHwRev OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The current hardware revision of the module."
+    ::= { moduleEntry 34 }
+
+modPcbRev OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The current PCB revision of the module."
+    ::= { moduleEntry 35 }
+
+
+-------------------------------------------------------------------------------
+-- Management Module Configuration Variables Table
+-------------------------------------------------------------------------------
+
+moduleMgtCfgTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ModuleMgtCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "This is a table of the management module configuration variables."
+    ::= { enhancedchassisTable 3 }
+
+moduleMgtCfgEntry OBJECT-TYPE
+    SYNTAX      ModuleMgtCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Chassis modules."
+    INDEX       { modchassnum, modslotnum }
+    ::= { moduleMgtCfgTable 1 }
+
+ModuleMgtCfgEntry ::= SEQUENCE {
+    sysAdminStatus        Integer32,
+    sysDateTime           DisplayString,
+    macAddr               DisplayString,
+    ipAddr                IpAddress,
+    subnetmask            IpAddress,
+    gateway               IpAddress,
+    readCommunity         DisplayString,
+    writeCommunity        DisplayString,
+    mychassnum            Integer32,
+    mmname                DisplayString,
+    traphost1             IpAddress,
+    traphost2             IpAddress,
+    traphost3             IpAddress,
+    traphost4             IpAddress,
+    traphost5             IpAddress,
+    traphost6             IpAddress,
+    traphost7             IpAddress,
+    traphost8             IpAddress,
+    sysloc                DisplayString,
+    syscon                DisplayString,
+    serialpass            DisplayString,
+    telnetpass            DisplayString,
+    ftppasswrd            DisplayString,
+    keepAliveInterval     Integer32,
+    vlanIdOst             OstVlanId,
+    nmmCfgSerialBaudrate  Integer32,
+    enabledFunctions      Integer32,
+    enableSNMPFunction    Integer32,
+    nmmCfgState           Integer32,
+    nmmSecureMode         Integer32,
+    nmmSecureConnState    Integer32,
+    nmmIpProtocolState    Integer32,
+    nmmIpDisabled         Integer32,
+    vlanPri               Integer32,
+    enableSNMPWrites      Integer32,
+    cpuVoltageIn          Integer32,
+    cpuVoltageOut         Integer32,
+    cpuTemperature        Integer32,
+    nmmSecureSlaveSlot    Integer32,
+    dhcpIpAddr            IpAddress,
+    dhcpSubnetmask        IpAddress,
+    dhcpGateway           IpAddress,
+    nmmOAMmgmtMode        Integer32,
+    customertag           Integer32,
+    servicetag            Integer32,
+    cnodeControl          Integer32,
+    cnodeCIR              Integer32,
+    enableSNMPv3Function  Integer32,
+    slaveWrite            Integer32,
+    snmpTrapType          Integer32,
+    capsMask              Unsigned32,
+    slaveTraps            Integer32,
+    slaveTrapsForward     Integer32,
+    ipAddr2               IpAddress,
+    subnetmask2           IpAddress,
+    gateway2              IpAddress,
+    ipaddrEVCassociation  DisplayString,
+    ipaddr2EVCassociation DisplayString,
+    bootpEnable           TruthValue,
+    tftpEnable            TruthValue,
+    tftpServerIpAddress   IpAddress,
+    dhcptftpServerIpAddress  IpAddress,
+    tftpFileName          DisplayString,
+    modeType              OstModeType,
+    dhcpPortNumber        Integer32,
+    dhcpTagVid            OstVlanId,
+    trapSrcIpSelect       Unsigned32,
+    muxGroupDefaults      TruthValue,
+    portFwdCpu            INTEGER,
+    portFwdCpuList        OstPortList
+    }
+
+sysAdminStatus OBJECT-TYPE
+    SYNTAX      Integer32 (0..1)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This variable provides the status for a management module's ability to make
+                changes to the system. In backplane slave, a management module cannot make
+                system modification.  Modifications must be performed from a management
+                module acting as a backplane master.
+
+                0 = read only (can only view configuration settings)
+                1 = read-write (can view and modify configuration settings)."
+    ::= { moduleMgtCfgEntry 1 }
+
+sysDateTime OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(19))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "This variable provides the date and time in display format:
+                    nn/dd/yyyy hh:mm:ss
+                    where nn = 2 digit month, dd = 2 digit day, yyyy = 4 digit year
+                          hh - 2 digit hour 0-23, mm = 2 digit minutes 0-59, ss = 2 digit secs 0-59"
+    ::= { moduleMgtCfgEntry 2 }
+
+macAddr     OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(17))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "MAC address of the management module"
+    ::= { moduleMgtCfgEntry 3 }
+
+ipAddr      OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "IP of the management module"
+    ::= { moduleMgtCfgEntry 4 }
+
+subnetmask  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "subnetmask for the management module"
+    ::= { moduleMgtCfgEntry 5 }
+
+gateway     OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "IP address for the gateway the management module will use."
+    ::= { moduleMgtCfgEntry 6 }
+
+readCommunity OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "SNMP read community name."
+    ::= { moduleMgtCfgEntry 7 }
+
+writeCommunity OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "SNMP set community name."
+    ::= { moduleMgtCfgEntry 8 }
+
+mychassnum     OBJECT-TYPE
+    SYNTAX      Integer32 (1..19)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "NMMs chassis number."
+    ::= { moduleMgtCfgEntry 9 }
+
+mmname         OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Management Modules chassis name.
+
+        For the M2 modules the max size is 32 octets.
+
+        For the GM3, GM4, XM5 the max size is 64 octets when a module is
+        accessed directly through the serial port, or via its own IP address
+        for Telnet, SSH, or SNMP.
+
+        For the GM3, GM4, XM5 when the object is indirectly accessed via the
+        backplane, through IP-less, or through 802.3ah peer-to-peer the value
+        is truncated to 32 bytes.
+       "
+    ::= { moduleMgtCfgEntry 10 }
+
+traphost1       OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "NMMs traphost1 IP address."
+    ::= { moduleMgtCfgEntry 11 }
+
+traphost2       OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "NMMs traphost2 IP address."
+    ::= { moduleMgtCfgEntry 12 }
+
+traphost3       OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "NMMs traphost3 IP address."
+    ::= { moduleMgtCfgEntry 13 }
+
+traphost4       OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "NMMs traphost4 IP address."
+    ::= { moduleMgtCfgEntry 14 }
+
+traphost5       OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "NMMs traphost5 IP address."
+    ::= { moduleMgtCfgEntry 15 }
+
+traphost6       OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "NMMs traphost6 IP address."
+    ::= { moduleMgtCfgEntry 16 }
+
+traphost7       OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "NMMs traphost7 IP address."
+    ::= { moduleMgtCfgEntry 17 }
+
+traphost8       OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "NMMs traphost8 IP address."
+    ::= { moduleMgtCfgEntry 18 }
+
+sysloc          OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Management Modules system location.
+
+        For the M2 modules the max size is 32 octets.
+
+        For the GM3, GM4, XM5 the max size is 64 octets when a module is
+        accessed directly through the serial port, or via its own IP address
+        for Telnet, SSH, or SNMP.
+
+        For the GM3, GM4, XM5 when the object is indirectly accessed via the
+        backplane, through IP-less, or through 802.3ah peer-to-peer the value
+        is truncated to 32 bytes.
+       "
+    ::= { moduleMgtCfgEntry 19 }
+
+syscon          OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Management Modules system Contact information.
+
+        For the M2 modules the max size is 32 octets.
+
+        For the GM3, GM4, XM5 the max size is 64 octets when a module is
+        accessed directly through the serial port, or via its own IP address
+        for Telnet, SSH, or SNMP.
+
+        For the GM3, GM4, XM5 when the object is indirectly accessed via the
+        backplane, through IP-less, or through 802.3ah peer-to-peer the value
+        is truncated to 32 bytes.
+       "
+    ::= { moduleMgtCfgEntry 20 }
+
+serialpass      OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "NMMs serial interface password."
+    ::= { moduleMgtCfgEntry 21 }
+
+telnetpass      OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "NMMs telnet interface password."
+    ::= { moduleMgtCfgEntry 22 }
+
+ftppasswrd      OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "NMMs ftp password."
+    ::= { moduleMgtCfgEntry 23 }
+
+keepAliveInterval OBJECT-TYPE
+    SYNTAX      Integer32 (10..600)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "This the interval used by the NMM to send out keep alive traps."
+    ::= { moduleMgtCfgEntry 24 }
+
+vlanIdOst       OBJECT-TYPE
+    SYNTAX      OstVlanId
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Management module VLAN tagged packet ID."
+    ::= { moduleMgtCfgEntry 25 }
+
+nmmCfgSerialBaudrate  OBJECT-TYPE
+    SYNTAX      Integer32 (1..9)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "This variable defines the baud rate for the serial interface to the NMM.
+                 Where:
+                   1 = 300 bps
+                   2 = 1200 bps
+                   3 = 2400 bps
+                   4 = 4800 bps
+                   5 = 9600 bps
+                   6 = 19200 bps
+                   7 = 38400 bps
+                   8 = 57600 bps
+                   9 = 115200 bps"
+    ::= { moduleMgtCfgEntry 26 }
+
+enabledFunctions OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "This variable defines which special functions are enabled at the NMM.
+                 Where:
+                    0x01 = Keep Alive trap enabled
+                    0x02 = Telnet enabled
+                    0x04 = FTP enabled
+                    0x08 = switch reload enabled
+                    0x10 = VLAN enabled
+                    0x20 = sw1 block enabled
+                    0x40 = DHCP client enabled
+                    0x80 = Trap 99 processing enabled"
+    ::= { moduleMgtCfgEntry 27 }
+
+enableSNMPFunction OBJECT-TYPE
+    SYNTAX      Integer32 (0..1)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "This variable defines whether the SNMP Agent is enabled at the NMM.
+                 Where:
+                   00 = SNMP disabled
+                   01 = SNMP enabled"
+    ::= { moduleMgtCfgEntry 28 }
+
+nmmCfgState  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This variable defines the state of the configuration changes made to the NMM.
+                 Where:
+                   0x00 = No changes
+                   0x02 = Changes Pending (not saved in Flash)
+                   0x04 = Saved in Flash, Pending NMM reboot"
+    ::= { moduleMgtCfgEntry 29 }
+
+nmmSecureMode  OBJECT-TYPE
+    SYNTAX      Integer32 (0..3)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "This variable defines the mode the Management module will operate in when configured for SECURE COMMUNICATIONS.
+                 Where:
+                   0x00 = No Secure Communications
+                   0x01 = Secure Proxy
+                   0x02 = Secure Slave
+                   0x03 = Secure Master"
+    ::= { moduleMgtCfgEntry 30 }
+
+nmmSecureConnState  OBJECT-TYPE
+    SYNTAX      Integer32 (0..3)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This variable returns the secure connection state between the proxy and secure slave.
+                 Where:
+                   0x00 = Not connected
+                   0x01 = Connection Pending
+                   0x02 = Connection established
+                   0x03 = Connection terminating"
+    ::= { moduleMgtCfgEntry 31 }
+
+nmmIpProtocolState OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This variable defines whether the IP protocol is active or disabled.
+                 0 = Active
+                 1 = Disabled"
+    ::= { moduleMgtCfgEntry 32 }
+
+nmmIpDisabled  OBJECT-TYPE
+    SYNTAX      Integer32 (0..1)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "This variable defines the configuration value for IP protocol's desired state.
+                 0 = ipActive
+                 1 = ipDisabled"
+    ::= { moduleMgtCfgEntry 33 }
+
+vlanPri         OBJECT-TYPE
+    SYNTAX      Integer32 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Management module VLAN tagged packet priority."
+    ::= { moduleMgtCfgEntry 34 }
+
+enableSNMPWrites OBJECT-TYPE
+    SYNTAX      Integer32 (0..1)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Permit SNMP SET operations."
+    ::= { moduleMgtCfgEntry 35 }
+
+cpuVoltageIn    OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "voltage input to cpu."
+    ::= { moduleMgtCfgEntry 36 }
+
+cpuVoltageOut   OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Voltage out from the cpu."
+    ::= { moduleMgtCfgEntry 37 }
+
+cpuTemperature  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The ambient temperature of the CPU."
+    ::= { moduleMgtCfgEntry 38 }
+
+nmmSecureSlaveSlot  OBJECT-TYPE
+    SYNTAX      Integer32 (0..19)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The slot number of the secure slave in the remote chassis when configured for SECURE COMMUNICATIONS."
+    ::= { moduleMgtCfgEntry 39 }
+
+dhcpIpAddr      OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "IP of the management module as assigned by a DHCP server"
+    ::= { moduleMgtCfgEntry 40 }
+
+dhcpSubnetmask  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "subnetmask of the management module as assigned by a DHCP server"
+    ::= { moduleMgtCfgEntry 41 }
+
+dhcpGateway      OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Gateway IP address of the management module as assigned by a DHCP Server"
+    ::= { moduleMgtCfgEntry 42 }
+
+nmmOAMmgmtMode  OBJECT-TYPE
+    SYNTAX      Integer32 (1..5)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "This variable configures the protocol the Management module will use to communicate
+                 with remote chassis when operating in secure mode.
+                 Where:
+                   0x01 = (OAM_OFF)         No Secure Communications protocol
+                   0x02 = (Auto SECURE_OAM) Use OST proprietary protocol, force remote to switch if not in the OAM_OFF mode
+                   0x03 = (Auto AH_OAM)     Use AH protocol, force remote to switch if not in the OAM_OFF mode
+                   0x04 = (SECURE_OAM)      Use OST proprietary protocol, remote is not forced to switch and must match modes to connect
+                   0x05 = (AH_OAM)          Use AH protocol, remote is not forced to switch and must match modes to connect"
+    ::= { moduleMgtCfgEntry 43 }
+
+customertag     OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Value for customer tag."
+    ::= { moduleMgtCfgEntry 44 }
+
+servicetag      OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Value for service tag."
+    ::= { moduleMgtCfgEntry 45 }
+
+cnodeControl    OBJECT-TYPE
+    SYNTAX      Integer32 (0..1)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Controls whether the module is operating as a Cnode."
+    ::= { moduleMgtCfgEntry 46 }
+
+cnodeCIR        OBJECT-TYPE
+    SYNTAX      Integer32 (1..3)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Cnode CIR
+                   Where: 1 =  64 Kbps
+                          2 = 128 Kbps
+                          3 = 192 Kbps"
+    ::= { moduleMgtCfgEntry 47 }
+
+enableSNMPv3Function OBJECT-TYPE
+    SYNTAX      Integer32 (0..1)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "This variable defines whether the SNMPv3 Agent is enabled at the NMM.
+                 Where:
+                   00 = SNMP disabled
+                   01 = SNMP enabled"
+    ::= { moduleMgtCfgEntry 48 }
+
+slaveWrite OBJECT-TYPE
+    SYNTAX      Integer32 (0..1)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "This variable defines whether the module should be allowed to make
+                 configurations to itself when in the chassis slave mode.
+                 Where:
+                   00 = slaveWrite disabled
+                   01 = slaveWrite enabled"
+    ::= { moduleMgtCfgEntry 49 }
+
+snmpTrapType OBJECT-TYPE
+    SYNTAX      Integer32 (1..3)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "This variable defines which version of SNMP traps are supported, where:
+                   1 = SNMPv1 traps
+                   2 = SNMPv2c traps
+                   3 = SNMPv3 traps"
+    ::= { moduleMgtCfgEntry 50 }
+
+capsMask OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Capablility bits for this management module."
+    ::= { moduleMgtCfgEntry 51 }
+
+slaveTraps OBJECT-TYPE
+    SYNTAX      Integer32 (0..1)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "This variable defines whether the module should be allowed to
+                 transmit traps out ethernet ports eventhough it is not a chassis master.
+                 Where:
+                   00 = slaveTraps disabled
+                   01 = slaveTraps enabled"
+    ::= { moduleMgtCfgEntry 52 }
+
+slaveTrapsForward OBJECT-TYPE
+    SYNTAX      Integer32 (0..1)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "This variable defines whether the module should be allowed to
+                 forward traps to the chassis master when module is a chassis slave. Default is forward.
+                 Where:
+                   00 = slaveTrapsForward disabled
+                   01 = slaveTrapsForward enabled"
+    ::= { moduleMgtCfgEntry 53 }
+
+ipAddr2     OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "IP 2 of the management module"
+    ::= { moduleMgtCfgEntry 54 }
+
+subnetmask2 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "subnetmask 2 for the management module"
+    ::= { moduleMgtCfgEntry 55}
+
+gateway2    OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "IP address for the gateway 2 the management module will use."
+    ::= { moduleMgtCfgEntry 56 }
+
+ipaddrEVCassociation OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..45))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "*** This object is deprecated ***
+
+        EVC associated with ipaddr 1.
+       "
+    ::= { moduleMgtCfgEntry 57 }
+
+ipaddr2EVCassociation OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..45))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "*** This object is deprecated ***
+
+        EVC associated with ipaddr 2.
+       "
+    ::= { moduleMgtCfgEntry 58 }
+
+bootpEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Enable or disable BOOTP."
+    DEFVAL {2}
+    ::= { moduleMgtCfgEntry 59 }
+
+tftpEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Enable or disable TFTP."
+ DEFVAL {2}
+    ::= { moduleMgtCfgEntry 60 }
+
+tftpServerIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "TFTP server IP address."
+    ::= { moduleMgtCfgEntry 61 }
+
+dhcptftpServerIpAddress      OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "TFTP Server IP address as assigned by a DHCP Server"
+    ::= { moduleMgtCfgEntry 62 }
+
+tftpFileName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..23))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Selects the TFTP file name."
+    ::= { moduleMgtCfgEntry 63 }
+
+modeType OBJECT-TYPE
+    SYNTAX      OstModeType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Sets the module Mode Type to normal, AP, or SP."
+    ::= { moduleMgtCfgEntry 64 }
+
+dhcpPortNumber OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Sets the DHCP port number.
+                 2 port module:  1=None, 2=Port 1, 3=Port 2, 4=BP A, 5=BP B
+                 3 port module:  1=None, 2=Port 1, 3=Port 2, 4=Port 3, 5=BP A, 6=BP B
+                 5 ports and higher modules: 1=None, 2..n+1 = Port 1..n
+       "
+    ::= { moduleMgtCfgEntry 65 }
+
+dhcpTagVid OBJECT-TYPE
+    SYNTAX      OstVlanId
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Sets the DHCP Tag VLAN ID."
+    ::= { moduleMgtCfgEntry 66 }
+
+trapSrcIpSelect OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..2)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Selects the trap source address, IP1(1) or IP2(2)."
+    ::= { moduleMgtCfgEntry 67 }
+
+muxGroupDefaults OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object when written sets the Mux Grouping defaults for a management
+        module. When read the value always returns 'false'.
+
+        Writing this sets the Mux Group EVC and bandwidth profile configurations.
+       "
+    ::= { moduleMgtCfgEntry 68 }
+
+portFwdCpu  OBJECT-TYPE
+    SYNTAX      INTEGER {
+        all            (0),
+        port1          (1),
+        port2          (2),
+        backplaneA     (3),
+        backplaneB     (4)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object enables forwarding of managment traffic from the selected
+        ports only for M2 modules only. Management traffic from ports not defined
+        is dropped.
+
+        all(0)                      Management traffic forwarded from all ports
+        port1(1)                    Management traffic forwarded from Port 1 only
+        port2(2)                    Management traffic forwarded from Port 2 only
+        backplaneA(3)               Management traffic forwarded from BP A only
+        backplaneB(4)               Management traffic forwarded from BP B only
+       "
+    DEFVAL { all }
+    ::= { moduleMgtCfgEntry 69 }
+
+portFwdCpuList OBJECT-TYPE
+    SYNTAX      OstPortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object enables forwarding of managment traffic from the selected
+        ports only for M3, M4, and M5 modules only. Management traffic from
+        ports not defined is dropped.
+       "
+    DEFVAL { "all" }
+    ::= { moduleMgtCfgEntry 70 }
+
+
+-------------------------------------------------------------------------------
+-- Port Table  - may have more than one per module
+-------------------------------------------------------------------------------
+
+modulePortsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ModulePortsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "This a table of Ports per module. There are as many entries as
+                 specified by modnumports in the moduleEntry"
+    ::= { enhancedchassisTable 4 }
+
+modulePortsEntry OBJECT-TYPE
+    SYNTAX      ModulePortsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Ports per module table."
+    INDEX       { modchassnum, modslotnum, portnum }
+    ::= { modulePortsTable 1 }
+
+ModulePortsEntry ::= SEQUENCE {
+    portnum                         OstPortNumber,
+    portState                       INTEGER,
+    portEgressRate                  Integer32,
+    portpriority                    Integer32,
+    portcanonicalformatIndicator    Integer32,
+    portvlanidentifier              Integer32,
+    portmlistcriteria               Integer32,
+    portingresssecurity             Integer32,
+    portegresspolicy                Integer32,
+    portIngressRate                 Integer32,
+    portSpeed                       Integer32,
+    portUnidirectionalAhOamEnable   Integer32,
+    portIngressRateDropOrPause      Integer32,
+    portIngressRateCBS              Integer32,
+    portL2CPmgntProcessing          Integer32,
+    portEgressQosPolicy             Integer32,
+    portAccessType                  Integer32,
+    portStatsClear                  Integer32,
+    portLinkState                   Integer32,
+    portDuplex                      INTEGER,
+    portMacAddress                  DisplayString
+    }
+
+portnum       OBJECT-TYPE
+    SYNTAX      OstPortNumber
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Used to get or set state of port."
+    ::= { modulePortsEntry 1 }
+
+portState    OBJECT-TYPE
+    SYNTAX INTEGER {
+        undefined (0),
+        disabled (1),
+        enabled (2),
+        unused (3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Used to get or set state of port."
+    ::= { modulePortsEntry 2 }
+
+portEgressRate    OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Used to get or set the port throughput limit selection.
+    The following are the limits are enforced by module type:
+        Used on types 80, 96, 70, 90, 86, 84, 87 (lower limit=0, upper limit=7)
+        where:
+        0 = 100 Mbps
+        1 = 128 kbps
+        2 = 256 kbps
+        3 = 512 kbps
+        4 = 1 Mbps
+        5 = 2 Mbps
+        6 = 4 Mbps
+        7 = 8 Mbps
+        Used on types 100, 101 (lower limit=1, upper limit=20)
+        where:
+        1 = 64 kbps
+        2 = 128 kbps
+        3 = 256 kbps
+        4 = 512 kbps
+        5 = 768 kbps
+        6 = 1 Mbps
+        7 = 2 Mbps
+        8 = 3 Mbps
+        9 = 4 Mbps
+        10 = 5 Mbps
+        11 = 6 Mbps
+        12 = 7 Mbps
+        13 = 8 Mbps
+        14 = 9 Mbps
+        15 = 10 Mbps
+        16 = 20 Mbps
+        17 = 30 Mbps
+        18 = 40 Mbps
+        19 = 50 Mbps
+        20 = 100 Mbps
+        Used on types 105, 106 (lower limit=1, upper limit=33)
+        1 = 64 kbps
+        2 = 128 kbps
+        3 = 256 kbps
+        4 = 512 kbps
+        5 = 768 kbps
+        6 = 1 Mbps
+        7 = 2 Mbps
+        8 = 3 Mbps
+        9 = 4 Mbps
+        10 = 5 Mbps
+        11 = 6 Mbps
+        12 = 7 Mbps
+        13 = 8 Mbps
+        14 = 9 Mbps
+        15 = 10 Mbps
+        16 = 20 Mbps
+        17 = 30 Mbps
+        18 = 40 Mbps
+        19 = 50 Mbps
+        20 = 60 Mbps
+        21 = 70 Mbps
+        22 = 80 Mbps
+        23 = 90 Mbps
+        24 = 100 Mbps
+        25 = 200 Mbps
+        26 = 300 Mbps
+        27 = 400 Mbps
+        28 = 500 Mbps
+        29 = 600 Mbps
+        30 = 700 Mbps
+        31 = 800 Mbps
+        32 = 900 Mbps
+        33 = 1000 Mbps
+        Types 97, 99, 102, 108, 109, 112, 113 use numeric values in kpbs
+        with a lower limit of 64 and an upper limit of 1,000,000.
+        Types not listed have no limit."
+    ::= { modulePortsEntry 3 }
+
+portpriority    OBJECT-TYPE
+    SYNTAX      Integer32 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Used to get or set port user-priority."
+    ::= { modulePortsEntry 4 }
+
+portcanonicalformatIndicator    OBJECT-TYPE
+    SYNTAX      Integer32 (0..1)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Used to get or set port cfi.  Currently not used and defaulted to 0"
+    ::= { modulePortsEntry 5 }
+
+portvlanidentifier  OBJECT-TYPE
+    SYNTAX      Integer32 (0..4095)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Used to get or set port VID."
+    ::= { modulePortsEntry 6 }
+
+portmlistcriteria   OBJECT-TYPE
+    SYNTAX      Integer32 (0..1)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Used to get or set port membership criteria."
+    ::= { modulePortsEntry 7 }
+
+portingresssecurity OBJECT-TYPE
+    SYNTAX      Integer32 (0..1)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Used to get or set port ingress security."
+    ::= { modulePortsEntry 8 }
+
+portegresspolicy    OBJECT-TYPE
+    SYNTAX      Integer32 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Used to get or set port egress policy."
+    ::= { modulePortsEntry 9 }
+
+portIngressRate    OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Used to get or set the port throughput limit selection.
+    The following are the limits are enforced by module type:
+        Used on types 80, 96, 70, 90, 86, 84, 87 (lower limit=0, upper limit=7)
+        where:
+        0 = 100 Mbps
+        1 = 128 kbps
+        2 = 256 kbps
+        3 = 512 kbps
+        4 = 1 Mbps
+        5 = 2 Mbps
+        6 = 4 Mbps
+        7 = 8 Mbps
+        Used on types 100, 101 (lower limit=64, upper limit=100,000)
+        Values are number of kbps per second, i.e. rate = value x 1000, units in bps
+        Used on types 97, 99, 102, 105, 106, 108, 109, 112, 113 (lower limit=64, upper limit=1,000,000)
+        Values are number of kbps per second, i.e. rate = value x 1000, units in bps
+        Types not listed have no limit."
+    ::= { modulePortsEntry 10 }
+
+portSpeed          OBJECT-TYPE
+    SYNTAX      Integer32 (0..4)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Used to get the port speed.
+                    0 = undefined
+                    1 = speed10Mbps
+                    2 = speed100Mbps
+                    3 = speed1Gbps
+                    4 = speed10Gbps"
+    ::= { modulePortsEntry 11 }
+
+portUnidirectionalAhOamEnable OBJECT-TYPE
+    SYNTAX      Integer32 (0..1)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Used to get/set the unidirectional support.
+                    0 = uniDisabled
+                    1 = uniEnabled"
+    ::= { modulePortsEntry 12 }
+
+portIngressRateDropOrPause  OBJECT-TYPE
+    SYNTAX      Integer32 (0..2)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Used to get/set behavior on overflow.
+                    0 = undefined
+                    1 = inDrop
+                    2 = inPause"
+    ::= { modulePortsEntry 13 }
+
+portIngressRateCBS  OBJECT-TYPE
+    SYNTAX      Integer32 (5..256000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Used to get or set the port throughput limit selection."
+    ::= { modulePortsEntry 14 }
+
+portL2CPmgntProcessing  OBJECT-TYPE
+    SYNTAX      Integer32 (0..3)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Used to get or set the port L2Cp processing method.
+                    0 = undefined
+                    1 = inDrop
+                    2 = inForward
+                    3 = inTunnel"
+    ::= { modulePortsEntry 15 }
+
+portEgressQosPolicy  OBJECT-TYPE
+    SYNTAX      Integer32 (0..2)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Used to get or set the port egress QoS Policy.
+                    0 = undefined
+                    1 = fairWeight
+                    2 = starving"
+    ::= { modulePortsEntry 16 }
+
+portAccessType  OBJECT-TYPE
+    SYNTAX      Integer32 (0..3)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Used to get or set the port access type.
+                    0 = undefined
+                    1 = tunnel
+                    2 = access
+                    3 = trunk"
+    ::= { modulePortsEntry 17 }
+
+portStatsClear  OBJECT-TYPE
+    SYNTAX      Integer32(0..1)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Used to clear the statistics table for this port"
+    ::= { modulePortsEntry 18 }
+
+portLinkState   OBJECT-TYPE
+    SYNTAX      Integer32(0..1)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Reports the link state of the port.
+                        0 = No link
+                        1 = Linked"
+    ::= { modulePortsEntry 19 }
+
+portDuplex    OBJECT-TYPE
+    SYNTAX      INTEGER {
+        undefined     (0),
+        halfDuplex    (1),
+        fullDuplex    (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The object indcates the linked port duplex mode.
+
+        undefined(0)         Port is not linked or state of duplex is unknown
+        halfDuplex(1)        Port is linked at half duplex
+        fullDuplex(2)        Port is linked at full duplex
+       "
+    ::= { modulePortsEntry 20 }
+
+portMacAddress OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(17))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "MAC address of the port. If a MAC address doesn't exist on a
+                 port the value returned is all zeros."
+    ::= { modulePortsEntry 21 }
+
+
+-------------------------------------------------------------------------------
+-- Statistics Table
+-------------------------------------------------------------------------------
+
+portStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PortStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "This a table of Statistics per port."
+    ::= { enhancedchassisTable 5 }
+
+portStatsEntry OBJECT-TYPE
+    SYNTAX      PortStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "extended module statitical information."
+    INDEX       { modchassnum, modslotnum, portnum }
+    ::= { portStatsTable 1 }
+
+PortStatsEntry ::= SEQUENCE {
+    txOctets                Counter32,
+    txDropPkts              Counter32,
+    txBroadcastPkts         Counter32,
+    txMulticastPkts         Counter32,
+    txUnicastPkts           Counter32,
+    txGoodPkts              Counter32,
+    txErrorPkts             Counter32,
+    txPausePkts             Counter32,
+    txCollisions            Counter32,
+    txSingleCollision       Counter32,
+    txMultipleCollision     Counter32,
+    txDeferedTransmit       Counter32,
+    txLateCollision         Counter32,
+    txExcessiveCollision    Counter32,
+    txDroppedEvents         Counter32,
+    rxOctets                Counter32,
+    rxDropPkts              Counter32,
+    rxBroadcastPkts         Counter32,
+    rxMulticastPkts         Counter32,
+    rxUnicastPkts           Counter32,
+    rxGoodPkts              Counter32,
+    rxTotalPkts             Counter32,
+    rxErrorPkts             Counter32,
+    rxPausePkts             Counter32,
+    rxUndersizePkts         Counter32,
+    rxOversizePkts          Counter32,
+    rxFragments             Counter32,
+    rxJabbers               Counter32,
+    rxAlignmentErrors       Counter32,
+    rxFCSErrors             Counter32,
+    rxSymbolErrors          Counter32,
+    rxCRCAlignErrors        Counter32,
+    rxPackets64             Counter32,
+    rxPackets65to127        Counter32,
+    rxPackets128to255       Counter32,
+    rxPackets256to511       Counter32,
+    rxPackets512to1023      Counter32,
+    rxPackets1024to1518     Counter32,
+    txOctets64              Counter64,
+    rxOctets64              Counter64
+    }
+
+txOctets                OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Statistics counter - Object name explains its usage."
+    ::= { portStatsEntry 1 }
+
+txDropPkts              OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Statistics counter - Object name explains its usage."
+    ::= { portStatsEntry 2 }
+
+txBroadcastPkts         OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Statistics counter - Object name explains its usage."
+    ::= { portStatsEntry 3 }
+
+txMulticastPkts         OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Statistics counter - Object name explains its usage."
+    ::= { portStatsEntry 4 }
+
+txUnicastPkts           OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Statistics counter - Object name explains its usage."
+    ::= { portStatsEntry 5 }
+
+txGoodPkts              OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Statistics counter - Object name explains its usage."
+    ::= { portStatsEntry 6 }
+
+txErrorPkts             OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Statistics counter - Object name explains its usage."
+    ::= { portStatsEntry 7 }
+
+txPausePkts             OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Statistics counter - Object name explains its usage."
+    ::= { portStatsEntry 8 }
+
+txCollisions            OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Statistics counter - Object name explains its usage."
+    ::= { portStatsEntry 9 }
+
+txSingleCollision       OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Statistics counter - Object name explains its usage."
+    ::= { portStatsEntry 10 }
+
+txMultipleCollision     OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Statistics counter - Object name explains its usage."
+    ::= { portStatsEntry 11 }
+
+txDeferedTransmit       OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Statistics counter - Object name explains its usage."
+    ::= { portStatsEntry 12 }
+
+txLateCollision         OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Statistics counter - Object name explains its usage."
+    ::= { portStatsEntry 13 }
+
+txExcessiveCollision    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Statistics counter - Object name explains its usage."
+    ::= { portStatsEntry 14 }
+
+txDroppedEvents         OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Statistics counter - Object name explains its usage."
+    ::= { portStatsEntry 15 }
+
+rxOctets                OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Statistics counter - Object name explains its usage."
+    ::= { portStatsEntry 16 }
+
+rxDropPkts              OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Statistics counter - Object name explains its usage."
+    ::= { portStatsEntry 17 }
+
+rxBroadcastPkts         OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Statistics counter - Object name explains its usage."
+    ::= { portStatsEntry 18 }
+
+rxMulticastPkts         OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Statistics counter - Object name explains its usage."
+    ::= { portStatsEntry 19 }
+
+rxUnicastPkts           OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Statistics counter - Object name explains its usage."
+    ::= { portStatsEntry 20 }
+
+rxGoodPkts              OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Statistics counter - Object name explains its usage."
+    ::= { portStatsEntry 21 }
+
+rxTotalPkts             OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Statistics counter - Object name explains its usage."
+    ::= { portStatsEntry 22 }
+
+rxErrorPkts             OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Statistics counter - Object name explains its usage."
+    ::= { portStatsEntry 23 }
+
+rxPausePkts             OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Statistics counter - Object name explains its usage."
+    ::= { portStatsEntry 24 }
+
+rxUndersizePkts         OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Statistics counter - Object name explains its usage."
+    ::= { portStatsEntry 25 }
+
+rxOversizePkts          OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Statistics counter - Object name explains its usage."
+    ::= { portStatsEntry 26 }
+
+rxFragments             OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Statistics counter - Object name explains its usage."
+    ::= { portStatsEntry 27 }
+
+rxJabbers               OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Statistics counter - Object name explains its usage."
+    ::= { portStatsEntry 28 }
+
+rxAlignmentErrors       OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Statistics counter - Object name explains its usage."
+    ::= { portStatsEntry 29 }
+
+rxFCSErrors             OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Statistics counter - Object name explains its usage."
+    ::= { portStatsEntry 30 }
+
+rxSymbolErrors          OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Statistics counter - Object name explains its usage."
+    ::= { portStatsEntry 31 }
+
+rxCRCAlignErrors        OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Statistics counter - Object name explains its usage."
+    ::= { portStatsEntry 32 }
+
+rxPackets64             OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Statistics counter - packets of octet count in object name."
+    ::= { portStatsEntry 33 }
+
+rxPackets65to127        OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Statistics counter - packets of octet count in object name."
+    ::= { portStatsEntry 34 }
+
+rxPackets128to255       OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Statistics counter - packets of octet count in object name."
+    ::= { portStatsEntry 35 }
+
+rxPackets256to511       OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Statistics counter - packets of octet count in object name."
+    ::= { portStatsEntry 36 }
+
+rxPackets512to1023      OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Statistics counter - packets of octet count in object name."
+    ::= { portStatsEntry 37 }
+
+rxPackets1024to1518     OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Statistics counter - packets of octet count in object name."
+    ::= { portStatsEntry 38 }
+
+txOctets64              OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "64 bit octet transmission counter."
+    ::= { portStatsEntry 39 }
+
+rxOctets64              OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "64 bit octet receive counter."
+    ::= { portStatsEntry 40 }
+
+
+-------------------------------------------------------------------------------
+-- Module VLAN Table
+-------------------------------------------------------------------------------
+
+moduleVLANTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ModuleVLANEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "This a table of VLAN entries per module. There is a
+                 maximum of 64 valid entries in the table"
+    ::= { enhancedchassisTable 6 }
+
+moduleVLANEntry OBJECT-TYPE
+    SYNTAX      ModuleVLANEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "VLAN module table."
+    INDEX       { modchassnum, modslotnum, index }
+    ::= { moduleVLANTable 1 }
+
+ModuleVLANEntry ::= SEQUENCE {
+    index               Integer32,
+    validityflag        Integer32,
+    vlanidentifier      Integer32,
+    port1Membership     Integer32,
+    port2Membership     Integer32,
+    port3Membership     Integer32,
+    port4Membership     Integer32,
+    port5Membership     Integer32,
+    port6Membership     Integer32
+    }
+
+index       OBJECT-TYPE
+    SYNTAX      Integer32 (1..64)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Used to get or set elements in the vlan table entry."
+    ::= { moduleVLANEntry 1 }
+
+validityflag OBJECT-TYPE
+    SYNTAX      Integer32 (0..1)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Used to set or delete a VLAN table entry.
+        0 = entry does not exists or is to be deleted,
+        1 = entry to be created or re-activated (in the case the entry
+            was modified, the module needs to be notified of the change.
+            This would constitute a re-activation."
+    ::= { moduleVLANEntry 2 }
+
+vlanidentifier  OBJECT-TYPE
+    SYNTAX      Integer32 (0..4095)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Used to set or get the vlan identifier.
+                valid settable range is 0-4095"
+    ::= { moduleVLANEntry 3 }
+
+port1Membership OBJECT-TYPE
+    SYNTAX      Integer32 (0..1)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Used to set or get the port's membership in the specified vlan.
+            0 = not a member
+            1 = include in membership"
+    ::= { moduleVLANEntry 4 }
+
+port2Membership OBJECT-TYPE
+    SYNTAX      Integer32 (0..1)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Used to set or get the port's membership in the specified vlan.
+            0 = not a member
+            1 = include in membership"
+    ::= { moduleVLANEntry 5 }
+
+port3Membership OBJECT-TYPE
+    SYNTAX      Integer32 (0..1)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Used to set or get the port's membership in the specified vlan.
+            0 = not a member
+            1 = include in membership"
+    ::= { moduleVLANEntry 6 }
+
+
+port4Membership OBJECT-TYPE
+    SYNTAX      Integer32 (0..1)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Used to set or get the port's membership in the specified vlan.
+            0 = not a member
+            1 = include in membership"
+    ::= { moduleVLANEntry 7 }
+
+port5Membership OBJECT-TYPE
+    SYNTAX      Integer32 (0..1)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Used to set or get the port's membership in the specified vlan.
+            0 = not a member
+            1 = include in membership"
+    ::= { moduleVLANEntry 8 }
+
+port6Membership OBJECT-TYPE
+    SYNTAX      Integer32 (0..1)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Used to set or get the port's membership in the specified vlan.
+            0 = not a member
+            1 = include in membership"
+    ::= { moduleVLANEntry 9 }
+
+
+-------------------------------------------------------------------------------
+-- Port AH Table
+-------------------------------------------------------------------------------
+
+portAHTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PortAHEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "This is a table of AH parameter entries per port."
+    ::= { enhancedchassisTable 7 }
+
+portAHEntry OBJECT-TYPE
+    SYNTAX      PortAHEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "AH port table."
+    INDEX       { modchassnum, modslotnum, portnum }
+    ::= { portAHTable 1 }
+
+PortAHEntry ::= SEQUENCE {
+    ahEnabled                         Integer32,
+    ahLpbkMode                        Integer32,
+    ahLocalMode                       Integer32,
+    ahRemoteMode                      Integer32,
+    ahLocalMuxState                   Integer32,
+    ahRemoteMuxState                  Integer32,
+    ahLocalParserState                Integer32,
+    ahRemoteParserState               Integer32,
+    ahLocalSupportVar                 Integer32,
+    ahLocalLinkFlags                  Integer32,
+    ahLocalLpbkTimeout                Integer32,
+    ahRemoteSupportVar                Integer32,
+    ahRemoteLinkFlags                 Integer32,
+    ahRemoteLpbkTimeout               Integer32,
+    ahLocalOUI                        OCTET STRING,
+    ahRemoteOUI                       OCTET STRING,
+    ahErroredSymbolPeriodWindow       Unsigned32,
+    ahErroredSymbolPeriodThreshold    Unsigned32,
+    ahErroredFrameWindow              Unsigned32,
+    ahErroredFrameThreshold           Unsigned32,
+    ahErroredFramePeriodWindow        Unsigned32,
+    ahErroredFramePeriodThreshold     Unsigned32,
+    ahErroredFrameSecondsWindow       Unsigned32,
+    ahErroredFrameSecondsThreshold    Unsigned32,
+    ahRemoteLinkPort                  Integer32,
+    ahSymbolErrorRunningTotal         Unsigned32,
+    ahSymbolErrorEventTotal           Unsigned32,
+    ahFrameErrorRunningTotal          Unsigned32,
+    ahFrameErrorEventTotal            Unsigned32,
+    ahFramePeriodRunningTotal         Unsigned32,
+    ahFramePeriodEventTotal           Unsigned32,
+    ahFrameSecondsSummaryRunningTotal Unsigned32,
+    ahFrameSecondsSummaryEventTotal   Unsigned32,
+    ahClearStatistics                 TruthValue,
+    ahTransmissionRate                Unsigned32,
+    ahCriticalEventMode               Unsigned32,
+    ahCriticalEventTrapList           OCTET STRING
+    }
+
+ahEnabled       OBJECT-TYPE
+    SYNTAX      Integer32 (0..1)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Used to get or set the state of the AH protocol over specified port.
+            0 = disable - this port is not actively using the AH protocol
+            1 = enabled - this port is actively using the AH protocol"
+    ::= { portAHEntry 1 }
+
+ahLpbkMode      OBJECT-TYPE
+    SYNTAX      Integer32 (0..1)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Used to get or set the state of the OAM remote loopback.
+            0 = off - remote loopback is not active
+            1 = on  - remote loopback has been activated"
+    ::= { portAHEntry 2 }
+
+ahLocalMode     OBJECT-TYPE
+    SYNTAX      Integer32 (0..3)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Used to get or set the mode AH OAM Client.
+            0 = PASSIVE - Does not initiate discovery or remote loopbacks
+            1 = ACTIVE  - Initiates discovery process and may initiate remote loopbacks
+            2 = PASSIVE, PROTECTED - Same as PASSIVE but disallows configuration requests from link partner using AH extensions
+            3 = ACTIVE,  PROTECTED - Same as ACTIVE but disallows configuration requests from link partner using AH extensions"
+    ::= { portAHEntry 3 }
+
+ahRemoteMode    OBJECT-TYPE
+    SYNTAX      Integer32 (0..3)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Used to get or set the mode AH OAM Client.
+            0 = PASSIVE - Does not initiate discovery or remote loopbacks
+            1 = ACTIVE  - Initiates discovery process and may initiate remote loopbacks
+            2 = PASSIVE, PROTECTED - Same as PASSIVE but disallows configuration requests from link partner using AH extensions
+            3 = ACTIVE,  PROTECTED - Same as ACTIVE but disallows configuration requests from link partner using AH extensions"
+    ::= { portAHEntry 4 }
+
+ahLocalMuxState OBJECT-TYPE
+    SYNTAX      Integer32 (0..1)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Used to get local multiplexer state.
+            0 = FWD - Multiplexer passes MAC client frames to subordinate sublayer
+            1 = DISCARD  - Multiplexer discards MAC client frames"
+    ::= { portAHEntry 5 }
+
+ahRemoteMuxState        OBJECT-TYPE
+    SYNTAX      Integer32 (0..1)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Used to get remote multiplexer state.
+            0 = FWD     - Multiplexer passes MAC client frames to subordinate sublayer
+            1 = DISCARD - Multiplexer discards MAC client frames"
+    ::= { portAHEntry 6 }
+
+ahLocalParserState      OBJECT-TYPE
+    SYNTAX      Integer32 (0..2)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Used to get local parser state.
+            0 = FWD      - Parser passes received non-OAMPDUs to subordinate sublayer
+            1 = LOOPBACK - Parser passes received non-OAMPDUs to Multiplexer during remote loopback test
+            2 = DISCARD  - Parser discards received non-OAMPDUs"
+    ::= { portAHEntry 7 }
+
+ahRemoteParserState     OBJECT-TYPE
+    SYNTAX      Integer32 (0..2)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Used to get remote parser state.
+            0 = FWD      - Parser passes received non-OAMPDUs to subordinate sublayer
+            1 = LOOPBACK - Parser passes received non-OAMPDUs to Multiplexer during remote loopback test
+            2 = DISCARD  - Parser discards received non-OAMPDUs"
+    ::= { portAHEntry 8 }
+
+ahLocalSupportVar       OBJECT-TYPE
+    SYNTAX      Integer32 (0..63)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Used to get local configured features supported in bit encoded value.
+
+        where:
+          bit0 = OAM Mode
+          bit1 = Unidirectional support
+          bit2 = Loopback Support
+          bit3 = interprets link events
+          bit4 = Variable Retrieval
+          bit5 = Critical Event
+       "
+    ::= { portAHEntry 9 }
+
+ahLocalLinkFlags        OBJECT-TYPE
+    SYNTAX      Integer32 (0..127)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Used to get Link Event status in bit encoded value.
+            where:
+                bit0  = Link Fault
+                bit1  = Dying Gasp
+                bit2  = Critical Event
+                bit3  = Local Evaluating
+                bit4  = Local Stable
+                bit5  = Remote Evaluating
+                bit6  = Remote Stable"
+    ::= { portAHEntry 10 }
+
+ahLocalLpbkTimeout      OBJECT-TYPE
+    SYNTAX      Integer32 (0..300)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Used to get/set Remote Loopback timeout.
+            Value is in seconds with range 0 - 300."
+    ::= { portAHEntry 11 }
+
+ahRemoteSupportVar      OBJECT-TYPE
+    SYNTAX      Integer32 (0..31)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Used to get remote configured features supported in bit encoded value.
+
+        where:
+          bit0 = OAM Mode
+          bit1 = Unidirectional support
+          bit2 = Loopback Support
+          bit3 = interprets link events
+          bit4 = Variable Retrieval
+          bit5 = Critical Event
+       "
+    ::= { portAHEntry 12 }
+
+ahRemoteLinkFlags       OBJECT-TYPE
+    SYNTAX      Integer32 (0..127)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Used to get Link Event status in bit encoded value.
+                bit0  = Link Fault
+                bit1  = Dying Gasp
+                bit2  = Critical Event
+                bit3  = Local Evaluating
+                bit4  = Local Stable
+                bit5  = Remote Evaluating
+                bit6  = Remote Stable"
+    ::= { portAHEntry 13 }
+
+ahRemoteLpbkTimeout     OBJECT-TYPE
+    SYNTAX      Integer32 (0..300)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Used to get/set Remote Loopback timeout.
+            Value is in seconds with range 0 - 300."
+    ::= { portAHEntry 14 }
+
+ahLocalOUI      OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(3))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Used to get the Organizational Unique ID of the local port."
+    ::= { portAHEntry 15 }
+
+ahRemoteOUI     OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(3))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Used to get the Organizational Unique ID of the remote port."
+    ::= { portAHEntry 16 }
+
+ahErroredSymbolPeriodWindow       OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..60)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Used to get or set errored symbol period window for the local port."
+    ::= { portAHEntry 17 }
+
+ahErroredSymbolPeriodThreshold    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Used to get or set errored symbol period threshold for the local port."
+    ::= { portAHEntry 18 }
+
+ahErroredFrameWindow      OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..60)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Used to get or set the errored symbol window for the local port."
+    ::= { portAHEntry 19 }
+
+ahErroredFrameThreshold   OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Used to get or set the errored symbol threshold for the local port."
+    ::= { portAHEntry 20 }
+
+ahErroredFramePeriodWindow        OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..60)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Used to get or set the errored frame period window for the local port."
+    ::= { portAHEntry 21 }
+
+ahErroredFramePeriodThreshold     OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Used to get or set the errored frame period threshold for the local port."
+    ::= { portAHEntry 22 }
+
+ahErroredFrameSecondsWindow       OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..900)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Used to get or set the errored frame seconds window for the local port."
+    ::= { portAHEntry 23 }
+
+ahErroredFrameSecondsThreshold    OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Used to get or set the errored frame seconds threshold for the local port."
+    ::= { portAHEntry 24 }
+
+ahRemoteLinkPort OBJECT-TYPE
+    SYNTAX      Integer32 (0..5)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Used to get the port number of the remote partner.
+            Value is in the Range 1-5.  A zero port number indicates no connection or not supported"
+    ::= { portAHEntry 25 }
+
+ahSymbolErrorRunningTotal OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the 802.3ah Symbol Error Running Total value from
+        the last OAM sublayer reset or clear operation.
+
+        A value of zero indicates that no symbol errors have been detected since
+        the last reset or clear. For each symbol error detected the value of the
+        object increments.
+       "
+    ::= { portAHEntry 26 }
+
+ ahSymbolErrorEventTotal OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the number of 802.3ah Errored Symbol Period Event
+        TLVs that have been generated since the OAM sublayer was reset or the
+        counters have been cleared.
+
+        A value of zero indicates that no Errored Symbol Period Event TLVs
+        have been generated. For each Errored Symbol Period Event TLV generated
+        the value of the object increments.
+       "
+    ::= { portAHEntry 27 }
+
+ahFrameErrorRunningTotal OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the sum of the 802.3ah errored frames that have been
+        detected since the OAM sublayer was reset or clear operation.
+
+        A value of zero indicates that no errored frames have been detected since
+        the last reset or clear. For each errored frame the value of the
+        object increments.
+       "
+    ::= { portAHEntry 28 }
+
+ ahFrameErrorEventTotal OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the number of 802.3ah Errored Frame Event TLVs
+        that have been generated since the OAM sublayer was reset or the
+        counters have been cleared.
+
+        A value of zero indicates that no Errored Frame Event TLVs
+        have been generated. For each Errored Frame Event Event TLV generated
+        the value of the object increments.
+       "
+    ::= { portAHEntry 29 }
+
+ahFramePeriodRunningTotal OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the sum of 802.3ah the frame errors that
+        have been detected that have been since the OAM sublayer was reset or
+        clear operation.
+
+        A value of zero indicates that no errored frames have been detected since
+        the last reset or clear. For each errored frame the value of the
+        object increments.
+       "
+    ::= { portAHEntry 30 }
+
+ ahFramePeriodEventTotal OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the number of 802.3ah Errored Frame Period Event
+        TLVs that have been generated since the OAM sublayer was reset or the
+        counters have been cleared.
+
+        A value of zero indicates that no Errored Frame Period Event TLVs
+        have been generated. For each Errored Symbol Period Event TLV generated
+        the value of the object increments.
+       "
+    ::= { portAHEntry 31 }
+
+ahFrameSecondsSummaryRunningTotal OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the sum of the 802.3ah errored frame seconds that
+        have been detected that have been since the OAM sublayer was reset or
+        clear operation.
+
+        A value of zero indicates that no errored frame seconds have been detected
+        since the last reset or clear. For each errored frame the value of the
+        object increments.
+       "
+    ::= { portAHEntry 32 }
+
+ ahFrameSecondsSummaryEventTotal OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the number of 802.3ah Errored Frame Seconds
+        Summary Event TLVs that have been generated since the OAM sublayer was
+        reset or the counters have been cleared.
+
+        A value of zero indicates that no Errored Frame Seconds Summary Event
+        TLVs have been generated. For each Errored Symbol Period Event TLV
+        generated the value of the object increments.
+       "
+    ::= { portAHEntry 33 }
+
+ ahClearStatistics OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object when written clears the 802.3ah statistic counters associated with
+        a specific port. When read the value always returns 'false'.
+
+        Writing this value does not change any items in the configuration table.
+       "
+    ::= { portAHEntry 34 }
+
+ ahTransmissionRate OBJECT-TYPE
+    SYNTAX      Unsigned32  (5..100)
+    UNITS       "Frames/sec"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object sets maximum 802.3ah PDU transmission rate. The default
+        value is 10 (10 frames per second)
+       "
+    ::= { portAHEntry 35 }
+
+ahCriticalEventMode      OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..1)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Used to get or set the state of the local critical event mode.
+            0 = local critical events not enabled
+            1 = local critical events are enabled
+       "
+    ::= { portAHEntry 36 }
+
+ahCriticalEventTrapList OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..45))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Used to the SNMP traps which will cause the generation of
+        a local critical event. It is a list of zero or more trap numbers
+        separated by a comma or range, '..'.
+
+        Example values:
+         5
+         5,110,112
+         100..110
+         5,110,90..95,100..105
+
+        The default value is an emtpy string, no SNMP traps generate a local
+        critical event.
+       "
+    ::= { portAHEntry 37 }
+
+
+------------------------------------------------------------------------------
+-- Port SFP Table
+-------------------------------------------------------------------------------
+
+portSFPTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PortSFPEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "This is a table of AH parameter entries per port."
+    ::= { enhancedchassisTable 8 }
+
+portSFPEntry OBJECT-TYPE
+    SYNTAX      PortSFPEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "SFP port table."
+    INDEX       { modchassnum, modslotnum, portnum }
+    ::= { portSFPTable 1 }
+
+PortSFPEntry ::= SEQUENCE {
+    portSFPstatus              Integer32,
+    portSFPpageA0              OCTET STRING,
+    portSFPpageA2              OCTET STRING,
+    portSfpBitRate             OCTET STRING,
+    portSfpVendorName          OCTET STRING,
+    portSfpVendorPartNumber    OCTET STRING,
+    portSfpVendorSerialNumber  OCTET STRING,
+    portSfpDateCode            OCTET STRING,
+    portSfpTemperature         OCTET STRING,
+    portSfpVcc                 OCTET STRING,
+    portSfpBiasCurrent         OCTET STRING,
+    portSfpTxPower             OCTET STRING,
+    portSfpRxPower             OCTET STRING
+    }
+
+portSFPstatus   OBJECT-TYPE
+    SYNTAX      Integer32 (0..2)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Used to get present or absence of SFP device.
+                    0 = undefined
+                    1 = notPresent
+                    2 = present"
+    ::= { portSFPEntry 1 }
+
+portSFPpageA0   OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(256))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Used to get SFP device EEPROM address A0"
+    ::= { portSFPEntry 2 }
+
+portSFPpageA2   OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(256))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Used to get SFP device EEPROM address A2"
+    ::= { portSFPEntry 3 }
+
+portSfpBitRate OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..8))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "SFP Bitrate in Mbps"
+    ::= { portSFPEntry 4 }
+
+portSfpVendorName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "SFP Vendor Name"
+    ::= { portSFPEntry 5 }
+
+portSfpVendorPartNumber OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "SFP Vendor Name"
+    ::= { portSFPEntry 6 }
+
+portSfpVendorSerialNumber OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "SFP Serial Number"
+    ::= { portSFPEntry 7 }
+
+portSfpDateCode OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..10))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "SFP Date Code"
+    ::= { portSFPEntry 8 }
+
+portSfpTemperature OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..8))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "SFP tempearture in degrees Centigrade"
+    ::= { portSFPEntry 9 }
+
+portSfpVcc OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..8))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "SFP VCC in volts"
+    ::= { portSFPEntry 10 }
+
+portSfpBiasCurrent OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..8))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "SFP Bias Current in millamps"
+    ::= { portSFPEntry 11 }
+
+portSfpTxPower OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..8))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "SFP Transmission power in dBm"
+    ::= { portSFPEntry 12 }
+
+portSfpRxPower OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..8))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "SFP Transmission power in dBm"
+    ::= { portSFPEntry 13 }
+
+
+-------------------------------------------------------------------------------
+-- SNMPv3 User Table
+-------------------------------------------------------------------------------
+
+userTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF UserEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "This is a table of SNMPv3 users."
+    ::= { enhancedchassisTable 9 }
+
+userEntry OBJECT-TYPE
+    SYNTAX      UserEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "User table entry."
+    INDEX       { modchassnum, modslotnum, userIndex }
+    ::= { userTable 1 }
+
+UserEntry ::= SEQUENCE {
+    userIndex                   Integer32,
+    snmpv3UserName              DisplayString,
+    snmpv3SecurityLevel         Integer32,
+    snmpv3AuthPassword          OCTET STRING,
+    snmpv3PrivPassword          OCTET STRING,
+    snmpv3UserType              Integer32
+    }
+
+userIndex       OBJECT-TYPE
+    SYNTAX      Integer32 (1..4)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "User table index"
+    ::= { userEntry 1 }
+
+snmpv3UserName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "SNMPv3 user name."
+    ::= { userEntry 2 }
+
+snmpv3SecurityLevel OBJECT-TYPE
+    SYNTAX      Integer32 (0..3)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "SNMPv3 security level
+                    0 = undefined
+                    1 = no authentication/no privacy
+                    2 = authentication/no privacy
+                    3 = authentication/privacy"
+    ::= { userEntry 3 }
+
+snmpv3AuthPassword OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1..16))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "SNMPv3 user authentication password."
+    ::= { userEntry 4 }
+
+snmpv3PrivPassword OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1..16))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "SNMPv3 user privacy password."
+    ::= { userEntry 5 }
+
+snmpv3UserType OBJECT-TYPE
+    SYNTAX      Integer32 (0..4)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "SNMPv3 User Type
+                    0 = undefined
+                    1 = admin
+                    2 = read-write
+                    3 = read-only
+                    4 = deny"
+    ::= { userEntry 6 }
+
+
+--------------------------------------------------------------------------------
+-- User Session Status Table
+--------------------------------------------------------------------------------
+
+ostProtocolStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OstProtocolStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table supports the Serial, Telnet, FTP user session status."
+    ::= { enhancedchassisTable 10 }
+
+ostProtocolStatusEntry OBJECT-TYPE
+    SYNTAX      OstProtocolStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This is a user protocol table entry."
+    INDEX       { modchassnum, modslotnum, userIndex, ostProtocolStatusIndex}
+    ::= { ostProtocolStatusTable 1 }
+
+OstProtocolStatusEntry ::= SEQUENCE {
+    ostProtocolStatusIndex                Unsigned32,
+    ostProtocolStatusType                 INTEGER,
+    ostProtocolStatusState                INTEGER,
+    ostProtocoManagementPort              INTEGER,
+    ostProtocolStatusIpAddress            IpAddress,
+    ostProtocolStatusSessionOpenLockTime  TimeInterval
+    }
+
+ostProtocolStatusIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "An index that is used to identify a specific user protocol session.
+
+        The index should remain constant until the session is closed.
+       "
+    ::= { ostProtocolStatusEntry 1 }
+
+ostProtocolStatusType OBJECT-TYPE
+    SYNTAX      INTEGER {
+        serial    (1),
+        telnet    (2),
+        ftp       (3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the specific user protocol session identity
+        state.
+
+        serial    (1)  User protocol session type is the serial port
+        telnet    (2)  User protocol session type is TELNET
+        ftp       (3)  User protocol session type is FTP
+       "
+    ::= { ostProtocolStatusEntry 2 }
+
+ostProtocolStatusState OBJECT-TYPE
+    SYNTAX      INTEGER {
+        inactive  (1),
+        active    (2),
+        lockedout (3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the status of the specific user protocol session
+        state.
+
+        inactive(1)   User is currently inactive (reserved value, not used)
+        active(2)     User is currently authenticated and active
+        lockedout(3)  User is currently locked out for authentication and
+                      cannot become active until the locked out timeout
+                      expires and the user status goes back to idle.
+       "
+    ::= { ostProtocolStatusEntry 3 }
+
+ostProtocoManagementPort OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notDefined  (1),
+        mgt1        (2),
+        mgt2        (3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the status of the specific user protocol session
+        state. It is not applicable to the 'serial' interface or to a
+        session type that is locked out. In these cases the object is returned
+        with a value of 'notDefined'.
+
+        notDefined(1)  Management port is unknown or undefined
+        mgt1(2)        Management Port 1 association
+        mgt2(3)        Management Port 2 association
+
+       "
+    ::= { ostProtocolStatusEntry 4 }
+
+ostProtocolStatusIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the IP address of the specific user protocol
+        session. It is not applicable to the 'serial' interface or to a
+        session type that is locked out. In these cases this object is returned
+        as '0.0.0.0'.
+       "
+    ::= { ostProtocolStatusEntry 5 }
+
+ostProtocolStatusSessionOpenLockTime OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The object indicates the time a specific user protocol session has
+        been open or is locked out, in 0.01 seconds, based upon the value of
+        ostProtocolStatusState.
+       "
+    ::= { ostProtocolStatusEntry 6 }
+
+
+--------------------------------------------------------------------------------
+-- Environmental Status Table
+--------------------------------------------------------------------------------
+
+ostEnvironmentalStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OstEnvironmentalStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table supports the module environmental status objects."
+    ::= { enhancedchassisTable 11 }
+
+ostEnvironmentalStatusEntry OBJECT-TYPE
+    SYNTAX      OstEnvironmentalStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This is an environmental table entry."
+    INDEX       { modchassnum, modslotnum }
+    ::= { ostEnvironmentalStatusTable 1 }
+
+OstEnvironmentalStatusEntry ::= SEQUENCE {
+    ostEnvironmentalPs1Status             INTEGER,
+    ostEnvironmentalPs1VoltageIn          Integer32,
+    ostEnvironmentalPs1VoltageOut         Unsigned32,
+    ostEnvironmentalPs1CurrentOut         Unsigned32,
+
+    ostEnvironmentalPs2Status             INTEGER,
+    ostEnvironmentalPs2VoltageIn          Integer32,
+    ostEnvironmentalPs2VoltageOut         Unsigned32,
+    ostEnvironmentalPs2CurrentOut         Unsigned32,
+
+    ostEnvironmentalTemperature           Integer32,
+
+    ostEnvironmentalFan1Status            INTEGER,
+    ostEnvironmentalFan1Speed             Unsigned32,
+    ostEnvironmentalFan2Status            INTEGER,
+    ostEnvironmentalFan2Speed             Unsigned32,
+    ostEnvironmentalFan3Status            INTEGER,
+    ostEnvironmentalFan3Speed             Unsigned32
+    }
+
+ostEnvironmentalPs1Status OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notApplicable        (0),
+        notInstalled         (1),
+        installedNotPowered  (2),
+        installedPowered     (3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the status of Power Supply PS1 or PSA.
+
+        notApplicable(0)        Power Supply PS1/PSA is not supported
+        notInstalled(1)         Power Supply PS1/PSA is not installed
+        installedNotPowered(2)  Power Supply PS1/PSA is installed, but not powered
+        installedPowered(3)     Power Supply PS1/PSA is installed and powered
+       "
+    ::= { ostEnvironmentalStatusEntry 1 }
+
+ostEnvironmentalPs1VoltageIn OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "millivolts"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates PS1/PSA voltage input in millivolts.
+
+        A value of zero indicates that no voltage is applied or the power
+        supply is incapable of supplying a voltage input reading.
+       "
+
+    ::= { ostEnvironmentalStatusEntry 2 }
+
+ostEnvironmentalPs1VoltageOut OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "millivolts"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates PS1/PSA voltage output in millivolts.
+
+        A value of zero indicates that no voltage is output or the power
+        supply is incapable of supplying a voltage output reading.
+       "
+    ::= { ostEnvironmentalStatusEntry 3 }
+
+ostEnvironmentalPs1CurrentOut OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "milliamps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates PS1/PSA current output in millianmps.
+
+        A value of zero indicates that no current is output or the power
+        supply is incapable of supplying a current output reading.
+       "
+    ::= { ostEnvironmentalStatusEntry 4 }
+
+ostEnvironmentalPs2Status OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notApplicable        (0),
+        notInstalled         (1),
+        installedNotPowered  (2),
+        installedPowered     (3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the status of Power Supply PS2 or PSB.
+
+        notApplicable(0)        Power Supply PS2/PSB is not supported
+        notInstalled(1)         Power Supply PS2/PSB is not installed
+        installedNotPowered(2)  Power Supply PS2/PSB is installed, but not powered
+        installedPowered(3)     Power Supply PS2/PSB is installed and powered
+       "
+    ::= { ostEnvironmentalStatusEntry 5 }
+
+ostEnvironmentalPs2VoltageIn OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "millivolts"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates PS2/PSB voltage input in millivolts.
+
+        A value of zero indicates that no voltage is applied or the power
+        supply is incapable of supplying a voltage input reading.
+       "
+    ::= { ostEnvironmentalStatusEntry 6 }
+
+ostEnvironmentalPs2VoltageOut OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "millivolts"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates PS2/PSB voltage output in millivolts.
+
+        A value of zero indicates that no voltage is output or the power
+        supply is incapable of supplying a voltage output reading.
+       "
+    ::= { ostEnvironmentalStatusEntry 7 }
+
+ostEnvironmentalPs2CurrentOut OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "milliamps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates PS2/PSB current output in millianmps.
+
+        A value of zero indicates that no current is output or the power
+        supply is incapable of supplying a current output reading.
+       "
+    ::= { ostEnvironmentalStatusEntry 8 }
+
+ostEnvironmentalTemperature OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "degrees centigrade"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the module internal ambient temperature in
+        degrees centigrade.
+
+        A value of zero indicates that the current temperature is 0 degrees or
+        the module incapable of supplying a temperature reading.
+       "
+    ::= { ostEnvironmentalStatusEntry 9 }
+
+ostEnvironmentalFan1Status OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notApplicable        (0),
+        notInstalled         (1),
+        installedNotPowered  (2),
+        installedPowered     (3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the status of Fan 1.
+
+        notApplicable(0)        Fan 1 is not supported
+        notInstalled(1)         Fan 1 is not installed
+        installedNotPowered(2)  Fan 1 is installed, but not powered
+        installedPowered(3)     Fan 1 is installed and powered
+       "
+    ::= { ostEnvironmentalStatusEntry 10 }
+
+ostEnvironmentalFan1Speed OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "rpm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the speed of Fan 1 in RPM (revolutions per minute)
+
+        A value of zero indicates that the current fan speed is 0 RPM or
+        the fan is not supported or installed.
+       "
+    ::= { ostEnvironmentalStatusEntry 11 }
+
+ostEnvironmentalFan2Status OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notApplicable        (0),
+        notInstalled         (1),
+        installedNotPowered  (2),
+        installedPowered     (3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the status of Fan 2.
+
+        notApplicable(0)        Fan 2 is not supported
+        notInstalled(1)         Fan 2 is not installed
+        installedNotPowered(2)  Fan 2 is installed, but not powered
+        installedPowered(3)     Fan 2 is installed and powered
+       "
+    ::= { ostEnvironmentalStatusEntry 12 }
+
+ostEnvironmentalFan2Speed OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "rpm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the speed of Fan 2 in RPM (revolutions per minute)
+
+        A value of zero indicates that the current fan speed is 0 RPM or
+        the fan is not supported or installed.
+       "
+    ::= { ostEnvironmentalStatusEntry 13 }
+
+ostEnvironmentalFan3Status OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notApplicable        (0),
+        notInstalled         (1),
+        installedNotPowered  (2),
+        installedPowered     (3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the status of Fan 3.
+
+        notApplicable(0)        Fan 3 is not supported
+        notInstalled(1)         Fan 3 is not installed
+        installedNotPowered(2)  Fan 3 is installed, but not powered
+        installedPowered(3)     Fan 3 is installed and powered
+       "
+    ::= { ostEnvironmentalStatusEntry 14 }
+
+ostEnvironmentalFan3Speed OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "rpm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the speed of Fan 3 in RPM (revolutions per minute)
+
+        A value of zero indicates that the current fan speed is 0 RPM or
+        the fan is not supported or installed.
+       "
+    ::= { ostEnvironmentalStatusEntry 15 }
+
+
+-------------------------------------------------------------------------------
+-- Conformance
+-------------------------------------------------------------------------------
+
+omnitronCompliances OBJECT IDENTIFIER ::= { omnitronConformance 1 }
+omnitronGroups      OBJECT IDENTIFIER ::= { omnitronConformance 2 }
+
+-- compliance statements
+
+omnitronCompliance MODULE-COMPLIANCE
+    STATUS       current
+    DESCRIPTION "The compliance statement for OMNITRON iConverter modules."
+    MODULE
+        MANDATORY-GROUPS { omnitronGroup }
+        GROUP omnitronSFPGroup
+        DESCRIPTION "The omnitronSFPGroup is only mandatory for ports which have SFPs."
+    ::= { omnitronCompliances 1 }
+
+-- units of conformance
+
+omnitronGroup OBJECT-GROUP
+    OBJECTS {
+        chassis,
+        selfSlot,
+
+        chassisnum,
+        slotnum,
+        chassistype,
+        prodtype,
+        chassisname,
+        partnum,
+        serialnum,
+        manufdate,
+        softrev,
+        prodrev,
+        ledstat,
+        switchstat,
+        extended1,
+        extended2,
+        extended3,
+        extended4,
+        extended5,
+        extended6,
+        resetmod,
+        wrswitch,
+        modulename,
+
+        moduleCount,
+        modchassnum,
+        modslotnum,
+        modchasstype,
+        modprodtype,
+        modsoftrev,
+        modprodrev,
+        modreset,
+        modnumports,
+        modchassname,
+        modpartnum,
+        modserialnum,
+        modmanufdate,
+        modname,
+        modportvlan,
+        modextfeaturebits,
+        modswbuildnum,
+        modenable802dot1qProcessing,
+        modtagsubstitution,
+        modcommitVLANchanges,
+        modvlanTableClear,
+        modcommitNMMCfgChanges,
+        modLM80volts,
+        modLM80currents,
+        modLM80misc,
+        modRestoreFactoryDefaults,
+
+        sysAdminStatus,
+        sysDateTime,
+        macAddr,
+        ipAddr,
+        subnetmask,
+        gateway,
+        readCommunity,
+        writeCommunity,
+        mychassnum,
+        mmname,
+        traphost1,
+        traphost2,
+        traphost3,
+        traphost4,
+        traphost5,
+        traphost6,
+        traphost7,
+        traphost8,
+        sysloc,
+        syscon,
+        serialpass,
+        telnetpass,
+        ftppasswrd,
+        keepAliveInterval,
+        vlanIdOst,
+        nmmCfgSerialBaudrate,
+        enabledFunctions,
+        enableSNMPFunction,
+        nmmCfgState,
+        nmmSecureMode,
+        nmmSecureConnState,
+        nmmIpProtocolState,
+        nmmIpDisabled,
+        vlanPri,
+        enableSNMPWrites,
+        cpuVoltageIn,
+        cpuVoltageOut,
+        cpuTemperature,
+        nmmSecureSlaveSlot,
+        dhcpIpAddr,
+        dhcpSubnetmask,
+        dhcpGateway,
+        nmmOAMmgmtMode,
+        customertag,
+        servicetag,
+        cnodeControl,
+        cnodeCIR,
+        enableSNMPv3Function,
+        slaveWrite,
+        snmpTrapType,
+        capsMask,
+        slaveTraps,
+        slaveTrapsForward,
+        coreStatusOnly,
+        ingressPolicingType,
+        vlanservicetag,
+        defaultForwardingMap,
+        modFpgaRev,
+        modExpPartNumber,
+        modExpSoftwareRev,
+        modExpLedStatus,
+        modHwRev,
+        modPcbRev,
+
+        ipAddr2,
+        subnetmask2,
+        gateway2,
+        ipaddrEVCassociation,
+        ipaddr2EVCassociation,
+        bootpEnable,
+        tftpEnable,
+        tftpServerIpAddress,
+        dhcptftpServerIpAddress,
+        tftpFileName,
+        modeType,
+        dhcpPortNumber,
+        dhcpTagVid,
+        trapSrcIpSelect,
+        muxGroupDefaults,
+        portFwdCpu,
+        portFwdCpuList,
+
+        portState,
+        portEgressRate,
+        portpriority,
+        portcanonicalformatIndicator,
+        portvlanidentifier,
+        portmlistcriteria,
+        portingresssecurity,
+        portegresspolicy,
+        portIngressRate,
+        portSpeed,
+        portUnidirectionalAhOamEnable,
+        portIngressRateDropOrPause,
+        portIngressRateCBS,
+        portL2CPmgntProcessing,
+        portEgressQosPolicy,
+        portAccessType,
+        portStatsClear,
+        portLinkState,
+        portDuplex,
+        portMacAddress,
+
+        txOctets,
+        txDropPkts,
+        txBroadcastPkts,
+        txMulticastPkts,
+        txUnicastPkts,
+        txGoodPkts,
+        txErrorPkts,
+        txPausePkts,
+        txCollisions,
+        txSingleCollision,
+        txMultipleCollision,
+        txDeferedTransmit,
+        txLateCollision,
+        txExcessiveCollision,
+        txDroppedEvents,
+        rxOctets,
+        rxDropPkts,
+        rxBroadcastPkts,
+        rxMulticastPkts,
+        rxUnicastPkts,
+        rxGoodPkts,
+        rxTotalPkts,
+        rxErrorPkts,
+        rxPausePkts,
+        rxUndersizePkts,
+        rxOversizePkts,
+        rxFragments,
+        rxJabbers,
+        rxAlignmentErrors,
+        rxFCSErrors,
+        rxSymbolErrors,
+        rxCRCAlignErrors,
+        rxPackets64,
+        rxPackets65to127,
+        rxPackets128to255,
+        rxPackets256to511,
+        rxPackets512to1023,
+        rxPackets1024to1518,
+        txOctets64,
+        rxOctets64,
+
+        validityflag,
+        vlanidentifier,
+        port1Membership,
+        port2Membership,
+        port3Membership,
+        port4Membership,
+        port5Membership,
+        port6Membership,
+
+        ahEnabled,
+        ahLpbkMode,
+        ahLocalMode,
+        ahRemoteMode,
+        ahLocalMuxState,
+        ahRemoteMuxState,
+        ahLocalParserState,
+        ahRemoteParserState,
+        ahLocalSupportVar,
+        ahLocalLinkFlags,
+        ahLocalLpbkTimeout,
+        ahRemoteSupportVar,
+        ahRemoteLinkFlags,
+        ahRemoteLpbkTimeout,
+        ahLocalOUI,
+        ahRemoteOUI,
+        ahErroredSymbolPeriodWindow,
+        ahErroredSymbolPeriodThreshold,
+        ahErroredFrameWindow,
+        ahErroredFrameThreshold,
+        ahErroredFramePeriodWindow,
+        ahErroredFramePeriodThreshold,
+        ahErroredFrameSecondsWindow,
+        ahErroredFrameSecondsThreshold,
+        ahRemoteLinkPort,
+        ahSymbolErrorRunningTotal,
+        ahSymbolErrorEventTotal,
+        ahFrameErrorRunningTotal,
+        ahFrameErrorEventTotal,
+        ahFramePeriodRunningTotal,
+        ahFramePeriodEventTotal,
+        ahFrameSecondsSummaryRunningTotal,
+        ahFrameSecondsSummaryEventTotal,
+        ahClearStatistics,
+        ahTransmissionRate,
+        ahCriticalEventMode,
+        ahCriticalEventTrapList,
+
+        snmpv3UserName,
+        snmpv3SecurityLevel,
+        snmpv3AuthPassword,
+        snmpv3PrivPassword,
+        snmpv3UserType,
+
+        ostProtocolStatusType,
+        ostProtocolStatusState,
+        ostProtocoManagementPort,
+        ostProtocolStatusIpAddress,
+        ostProtocolStatusSessionOpenLockTime,
+
+        ostEnvironmentalPs1Status,
+        ostEnvironmentalPs1VoltageIn,
+        ostEnvironmentalPs1VoltageOut,
+        ostEnvironmentalPs1CurrentOut,
+        ostEnvironmentalPs2Status,
+        ostEnvironmentalPs2VoltageIn,
+        ostEnvironmentalPs2VoltageOut,
+        ostEnvironmentalPs2CurrentOut,
+        ostEnvironmentalTemperature,
+        ostEnvironmentalFan1Status,
+        ostEnvironmentalFan1Speed,
+        ostEnvironmentalFan2Status,
+        ostEnvironmentalFan2Speed,
+        ostEnvironmentalFan3Status,
+        ostEnvironmentalFan3Speed
+
+    }
+    STATUS       current
+    DESCRIPTION "A collection of Omnitron objects."
+    ::= { omnitronGroups 1 }
+
+
+omnitronSFPGroup OBJECT-GROUP
+    OBJECTS {
+        portSFPstatus,
+        portSFPpageA0,
+        portSFPpageA2,
+        portSfpBitRate,
+        portSfpVendorName,
+        portSfpVendorPartNumber,
+        portSfpVendorSerialNumber,
+        portSfpDateCode,
+        portSfpTemperature,
+        portSfpVcc,
+        portSfpBiasCurrent,
+        portSfpTxPower,
+        portSfpRxPower
+    }
+    STATUS       current
+    DESCRIPTION "A collection of Omnitron port SFP objects."
+    ::= { omnitronGroups 2 }
+
+
+END

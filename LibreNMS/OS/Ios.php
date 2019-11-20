@@ -28,12 +28,15 @@ namespace LibreNMS\OS;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
-use LibreNMS\OS;
+use LibreNMS\OS\Shared\Cisco;
+use LibreNMS\OS\Traits\CiscoCellular;
 
-class Ios extends OS implements
+class Ios extends Cisco implements
     WirelessClientsDiscovery,
     WirelessRssiDiscovery
 {
+    use CiscoCellular;
+
     /**
      * @return array Sensors
      */
@@ -85,30 +88,6 @@ class Ios extends OS implements
                 'ports'
             );
         }
-        return $sensors;
-    }
-
-    /**
-     * Discover wireless RSSI (Received Signal Strength Indicator). This is in dBm. Type is rssi.
-     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
-     *
-     * @return array
-     */
-    public function discoverWirelessRssi()
-    {
-        $data = snmpwalk_cache_oid($this->getDevice(), 'c3gCurrentGsmRssi', array(), 'CISCO-WAN-3G-MIB');
-        foreach ($data as $index => $entry) {
-            $sensors[] = new WirelessSensor(
-                'rssi',
-                $this->getDeviceId(),
-                '.1.3.6.1.4.1.9.9.661.1.3.4.1.1.1.' . $index,
-                'ios',
-                $index,
-                'RSSI: Chain ' . str_replace('1.', '', $index),
-                $entry['c3gCurrentGsmRssi.1']
-            );
-        }
-
         return $sensors;
     }
 }

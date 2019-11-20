@@ -1,0 +1,251 @@
+-- **********************************************************
+-- Copyright 2008 VMware, Inc.  All rights reserved.
+-- **********************************************************
+
+VMWARE-VC-EVENT-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+        SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+        MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+        -- add these for HP SIM
+        --vmwProductSpecific
+        --FROM VMWARE-ROOT-MIB;
+        -- remove these for HP SIM
+        vmwVC
+        FROM VMWARE-PRODUCTS-MIB
+        VmwLongSnmpAdminString
+        FROM VMWARE-TC-MIB;
+
+    vmwVCMIB MODULE-IDENTITY
+    LAST-UPDATED "200912150000Z"
+    ORGANIZATION "VMware, Inc"
+    CONTACT-INFO
+    "VMware, Inc
+    3401 Hillview Ave
+    Palo Alto, CA 94304
+    Tel: 1-877-486-9273 or 650-427-5000
+    Fax: 650-427-5001
+    Web: http://communities.vmware.com/community/developer/forums/managementapi
+    "
+DESCRIPTION
+     "This MIB module identifies vCenter Trap notifications (traps or inform)."
+REVISION      "200912150000Z"
+DESCRIPTION
+     "Notification vpxdAlarm is now obsolete and is replaced with vpxdAlarmInfo,
+     new object group vmwVCAlarmGroup is created making the vmwVCAlarmInfoGroup
+     obsolete, new notification group vmwVCAlarmNotificationGroup is created
+     making vmwVCNotificationGroup obsolete,new varbinds vmwVpxdTargetObj and
+     vmwVpxdTargetObjType are added, var binds vmwVpxdHostName, vmwVpxdVMName
+     and vmwVpxdTrapType have become obsolete."
+REVISION      "200909080000Z"
+DESCRIPTION
+     "VC SNMP Agent has always used UTF-8 in notifications,
+      update this MIB module to reflect that."
+
+REVISION      "200905270000Z"
+DESCRIPTION
+     "Updated comments on the alarm trap and parameters with more detail."
+REVISION      "200904060000Z"
+DESCRIPTION
+    "Swap vmwVpxdNewStatus and vmwVpxdOldStatus to match code implementation."
+REVISION      "200903170000Z"
+DESCRIPTION
+    "Changed vmwVpxdObjValue be of type vmwLongDisplayString"
+REVISION      "200802220000Z"
+DESCRIPTION
+    "This is the first revision in SMIv2 format. Prior version was published as SMIv1.
+     Notifications were formerly in the VMWARE-TRAPS-MIB module."
+::= { vmwVC 1 }
+
+
+-- product compatiblity: smilint warning: redefinition of vmwVC in VMWARE-PRODUCTS-MIB
+-- The folowing redefinition of vmwVC is a workaround for HP SIM which
+-- doesn't process IMPORTS more than one level deep.
+-- vmwVC OBJECT IDENTIFIER ::= { vmwProductSpecific 3 }
+
+vmwVCNotifications OBJECT IDENTIFIER ::= {vmwVC 0 }
+
+-- **********************************************************
+-- Notifications by an agent that implements this mib module
+-- **********************************************************
+
+vpxdAlarm NOTIFICATION-TYPE
+    OBJECTS { vmwVpxdTrapType, vmwVpxdHostName, vmwVpxdVMName,
+	      vmwVpxdOldStatus, vmwVpxdNewStatus, vmwVpxdObjValue }
+    STATUS      obsolete
+    DESCRIPTION
+        "This notification is sent on entity alarm state change, by the vCenter Server SNMP agent.
+         This information is also available through the vSphere client, through the Alarms screen,
+         or through the Managed Object Browser(MOB) interface for alarms at
+         https://<vCenter Server machine address>/mob/?moid=AlarmManager.
+         Listing individual objects of a specific type or ID can be done through the PropertyCollector SDK API.
+         See http://www.vmware.com/support/developer/vc-sdk/visdk2xpubs/ReferenceGuide/vmodl.query.PropertyCollector.html
+         for details."
+    ::= { vmwVCNotifications 201 }
+
+vpxdDiagnostic NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent on starting or restarting vCenter Server,
+         on requesting a test notification explicitly, and can also be
+         configured to be sent periodically at a specified time interval via
+         vCenter Server configuration by the vCenter Server SNMP agent."
+    ::= { vmwVCNotifications 202 }
+
+vpxdAlarmInfo NOTIFICATION-TYPE
+    OBJECTS { vmwVpxdTargetObjType, vmwVpxdOldStatus, vmwVpxdNewStatus, vmwVpxdObjValue, vmwVpxdTargetObj }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent on entity alarm state change, by the vCenter Server SNMP agent.
+         This information is also available through the vSphere client, through the Alarms screen,
+         or through the Managed Object Browser(MOB) interface for alarms at
+         https://<vCenter Server machine address>/mob/?moid=AlarmManager.
+         Listing individual objects of a specific type or ID can be done through the PropertyCollector SDK API.
+         See http://www.vmware.com/support/developer/vc-sdk/visdk2xpubs/ReferenceGuide/vmodl.query.PropertyCollector.html
+         for details."
+    ::= { vmwVCNotifications 203 }
+
+-- **********************************************************
+-- Notification parameters
+-- **********************************************************
+
+vmwVpxdTrapType OBJECT-TYPE
+    SYNTAX     SnmpAdminString
+    MAX-ACCESS accessible-for-notify
+    STATUS     obsolete
+    DESCRIPTION
+	"This is the alarm notification type."
+    ::= { vmwVC 301 }
+
+vmwVpxdHostName OBJECT-TYPE
+    SYNTAX     SnmpAdminString
+    MAX-ACCESS accessible-for-notify
+    STATUS     obsolete
+    DESCRIPTION
+	"This is the name of the vSphere host in the notification."
+    ::= { vmwVC 302 }
+
+vmwVpxdVMName OBJECT-TYPE
+    SYNTAX     SnmpAdminString
+    MAX-ACCESS accessible-for-notify
+    STATUS     obsolete
+    DESCRIPTION
+        "This is the name of the VM in the notification."
+    ::= { vmwVC 303 }
+
+vmwVpxdOldStatus OBJECT-TYPE
+    SYNTAX     SnmpAdminString
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+	"This is the old status in the notification."
+    ::= { vmwVC 304 }
+
+vmwVpxdNewStatus OBJECT-TYPE
+    SYNTAX     SnmpAdminString
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+	"This is the new status in the notification."
+    ::= { vmwVC 305 }
+
+vmwVpxdObjValue OBJECT-TYPE
+    SYNTAX     VmwLongSnmpAdminString
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+	"This is the current object value in the notification."
+    ::= { vmwVC 306 }
+
+vmwVpxdTargetObj OBJECT-TYPE
+    SYNTAX     SnmpAdminString
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+	"This is the current object in the notification. This may be
+	one of esx host name, vm name, or other. This value must not be empty."
+    ::= { vmwVC 307 }
+
+vmwVpxdTargetObjType OBJECT-TYPE
+    SYNTAX   INTEGER { unknown(1), host(2), vm(3), other(4)}
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+	"This is the alarm target object type."
+    ::= { vmwVC 308 }
+
+-- conformance information
+vmwVCMIBConformance OBJECT IDENTIFIER ::= { vmwVCMIB 2 }
+vmwVCMIBCompliances OBJECT IDENTIFIER ::= { vmwVCMIBConformance 1 }
+vmwVCMIBGroups OBJECT IDENTIFIER ::= { vmwVCMIBConformance 2 }
+
+-- compliance statements
+vmwVCMIBBasicCompliance MODULE-COMPLIANCE
+    STATUS     obsolete
+    DESCRIPTION
+        "The compliance statement for entities which implement VMWARE-VC-EVENT-MIB."
+    MODULE -- this module
+    MANDATORY-GROUPS { vmwVCAlarmInfoGroup, vmwVCNotificationGroup }
+    ::= { vmwVCMIBCompliances 2 }
+
+-- compliance statements
+vmwVCMIBBasicComplianceRev2 MODULE-COMPLIANCE
+    STATUS     current
+    DESCRIPTION
+        "The compliance statement for entities which implement VMWARE-VC-EVENT-MIB."
+    MODULE -- this module
+    MANDATORY-GROUPS { vmwVCAlarmGroup, vmwVCAlarmNotificationGroup }
+    ::= { vmwVCMIBCompliances 3 }
+
+vmwVCAlarmInfoGroup OBJECT-GROUP
+    OBJECTS {
+    vmwVpxdTrapType,
+    vmwVpxdHostName,
+    vmwVpxdVMName,
+    vmwVpxdOldStatus,
+    vmwVpxdNewStatus,
+    vmwVpxdObjValue
+    }
+    STATUS obsolete
+    DESCRIPTION
+	"These objects provide alarm notification details."
+    ::= { vmwVCMIBGroups 1 }
+
+vmwVCNotificationGroup NOTIFICATION-GROUP
+       NOTIFICATIONS {
+          vpxdAlarm,
+          vpxdDiagnostic
+       }
+       STATUS obsolete
+       DESCRIPTION
+           "Group of objects describing notifications (traps)."
+       ::= { vmwVCMIBGroups 2 }
+
+vmwVCAlarmGroup OBJECT-GROUP
+    OBJECTS {
+    vmwVpxdTargetObjType,
+    vmwVpxdOldStatus,
+    vmwVpxdNewStatus,
+    vmwVpxdObjValue,
+    vmwVpxdTargetObj
+    }
+    STATUS current
+    DESCRIPTION
+	"These objects provide alarm notification details."
+    ::= { vmwVCMIBGroups 3 }
+
+vmwVCAlarmNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+		vpxdAlarmInfo,
+        vpxdDiagnostic
+    }
+    STATUS current
+    DESCRIPTION
+    "Group of objects describing notifications (traps)."
+    ::= { vmwVCMIBGroups 4 }
+
+END -- end of VMWARE-VC-EVENT-MIB.

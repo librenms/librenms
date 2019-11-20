@@ -1,0 +1,992 @@
+-- *****************************************************************
+-- DLINKSW-AAA-SERVER-MIB:  D-Link AAA Server MIB
+--
+--  Copyright (c) 2013 D-Link Corporation, all rights reserved.
+--
+-- *****************************************************************
+
+DLINKSW-AAA-SERVER-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, Counter32, Unsigned32
+        FROM SNMPv2-SMI
+        MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF
+        DisplayString,  RowStatus,  TEXTUAL-CONVENTION
+            FROM SNMPv2-TC
+        InetAddressType, InetAddress
+            FROM INET-ADDRESS-MIB
+        InterfaceIndex
+            FROM IF-MIB
+        dAaaMIBObjects
+        FROM DLINKSW-AAA-COMMON-MIB;
+
+
+    dlinkSwAAAServerMIB MODULE-IDENTITY
+        LAST-UPDATED    "201307180000Z"
+        ORGANIZATION    "D-Link Corp."
+        CONTACT-INFO
+            "D-Link Corporation
+
+            Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                    Taipei City 114, Taiwan, R.O.C
+            Tel:     +886-2-66000123
+            E-mail: tsd@dlink.com.tw
+            "
+        DESCRIPTION
+            "This MIB provides configuration and statistics reflecting the state
+            of AAA Server operation within the device and AAA communications
+            with external servers.
+
+            AAA stands for authentication, authorization, and accounting
+
+            The AAA Server MIB provides the following information:
+            1) A Table for configuring AAA servers
+            2) Identities of external AAA servers
+            3) Distinct statistics for each AAA function
+            4) Status of servers providing AAA functions
+
+            A server is defined as a logical entity which provides any of the
+            three AAA functions. A TACACS+ server consists of all three
+            functions with a single IP address and single TCP port.
+            A RADIUS server consists of the authentication/accounting pair
+            with a single IP address but distinct UDP ports, or it may be
+            just one of authentication or accounting. It is possible to have
+            two distinct RADIUS servers at the same IP address, one providing
+            authentication only, the other accounting only.
+
+            Note: Regarding RADIUS server statistics please refer to
+            RADIUS-AUTH-CLIENT-MIB (RFC2618) and RADIUS-ACCT-CLIENT-MIB (RFC2620)
+            "
+        REVISION     "201307180000Z"
+        DESCRIPTION
+            "This is the first version of the MIB file.
+            "
+        ::= { dAaaMIBObjects 2 }
+
+
+    DlinkAAAProtocol ::= TEXTUAL-CONVENTION
+        STATUS          current
+        DESCRIPTION
+            "Protocol used with this server.
+            none(0) - No protocol specified, this value is read-only.
+            tacacsplus(1) - TACACS+
+
+            radius(2)   - RADIUS
+            "
+        REFERENCE
+            "
+             RFC 2865 Remote Authentication Dial In User Service
+              (RADIUS)
+             RFC 2866 RADIUS Accounting
+             The TACACS+ Protocol Version 1.78, Internet Draft
+            "
+        SYNTAX      INTEGER {
+            none(0),
+            tacacsplus(1),
+            radius(2)
+        }
+
+    DlinkAAAGroupName ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT    "32a"
+        STATUS          current
+        DESCRIPTION
+            "Represents group name.
+
+            The following name are reserved and cannot be created by user:
+            enable, none, local, tacacs, xtacacs, tacacs+, radius
+            "
+        SYNTAX   OCTET STRING (SIZE(0..32))
+
+
+     VrfName ::= TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION
+     "Represents VRF name.
+     "
+     SYNTAX       OCTET STRING (SIZE(1..32))
+
+
+-- -----------------------------------------------------------------------------
+    dAaaSrvMIBNotifications   OBJECT IDENTIFIER ::= { dlinkSwAAAServerMIB 0 }
+    dAaaSrvMIBObjects         OBJECT IDENTIFIER ::= { dlinkSwAAAServerMIB 1 }
+    dAaaSrvMIBConformance     OBJECT IDENTIFIER ::= { dlinkSwAAAServerMIB 2 }
+
+-- -----------------------------------------------------------------------------
+    dasConfig  OBJECT   IDENTIFIER ::= { dAaaSrvMIBObjects 1    }
+
+-- -----------------------------------------------------------------------------
+    dasServerConfigTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF DasServerConfigEntry
+        MAX-ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This table consists of a list of configurations for each
+            AAA server. An entry is created/removed when a new server
+            is created/removed.
+
+            The following table describes examples of AAA servers.
+
+            Protocol   Index AddressType IPv6Address   AuthenPort AcctPort Key    Priority
+            ---------- ----- ----------- ------------- ---------- -------- ------ --------
+            tacacsplus 1     ipv6        2000::2       49         0               1
+            tacacsplus 2     ipv4        10.0.0.1      49         0               3
+            tacacsplus 3     ipv4        192.168.1.254 49         0               2
+            radius     1     ipv4        192.168.1.254 1812       1813            1
+            radius     2     ipv4        20.0.0.12     1812       1813            2
+            "
+        ::= { dasConfig 1 }
+
+    dasServerConfigEntry OBJECT-TYPE
+        SYNTAX      DasServerConfigEntry
+        MAX-ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry consists of an AAA server configuration.
+
+            An entry is created/removed when a server is defined
+            or undefined with configuration commands via CLI
+            or by issuing appropriate SNMP sets.
+
+            A management station wishing to create an entry should
+            first generate a random number to be used as the index
+            to this sparse table. The station should then create the
+            associated instance of the row status and row index objects.
+
+            dasServerPriority is automatically assigned once the entry is
+            made active and reflects the relative priority of the
+            defined server with respect to already configured servers.
+            Newly-created servers will be assigned the lowest priority.
+            To reassign server priorities to existing server entries,
+            it may be necessary to destroy and recreate entries in order
+            of priority.
+
+            Upon reload, dasServerIndex values may be changed, but the
+            priorities that were saved before reload will be retained,
+            with lowest priority number corresponding to the higher
+            priority servers.
+            "
+        INDEX {
+                    dasServerProtocol,
+            dasServerIndex
+         }
+        ::= { dasServerConfigTable 1}
+
+    DasServerConfigEntry ::=    SEQUENCE {
+        dasServerProtocol           DlinkAAAProtocol,
+        dasServerIndex              Unsigned32,
+        dasServerAddrType           InetAddressType,
+        dasServerAddress            InetAddress,
+        dasServerAuthenPort         Unsigned32,
+        dasServerAcctPort           Unsigned32,
+        dasServerKey                DisplayString,
+        dasServerTimeout            Unsigned32,
+        dasServerRetransmit         Unsigned32,
+        dasServerPriority           Unsigned32,
+        dasServerRowStatus          RowStatus
+    }
+
+    dasServerProtocol OBJECT-TYPE
+        SYNTAX          DlinkAAAProtocol
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The variable indicates the protocol of the corresponding AAA server.
+            "
+       ::= { dasServerConfigEntry 1 }
+
+    dasServerIndex OBJECT-TYPE
+        SYNTAX      Unsigned32 (1..4294967295)
+        MAX-ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A management station wishing to initiate a new AAA server
+            configuration should use a random value for this object
+            when creating an instance of dasServerConfigEntry.
+            "
+        ::= { dasServerConfigEntry 2 }
+
+    dasServerAddrType OBJECT-TYPE
+        SYNTAX      InetAddressType
+        MAX-ACCESS      read-create
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the address type of the AAA server.
+            "
+        ::= { dasServerConfigEntry 3 }
+
+    dasServerAddress OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS      read-create
+        STATUS      current
+        DESCRIPTION
+            "The address of the server.
+            "
+        ::= { dasServerConfigEntry 4 }
+
+    dasServerAuthenPort OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..65535)
+        MAX-ACCESS      read-create
+        STATUS      current
+        DESCRIPTION
+            "UDP/TCP port used for authentication in the configuration
+            For TACACS+, this object should be explicitly set.
+            Default value is 1812 for RADIUS.
+            "
+        DEFVAL  { 1812 }
+        ::= { dasServerConfigEntry 5 }
+
+    dasServerAcctPort OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..65535)
+        MAX-ACCESS      read-create
+        STATUS      current
+        DESCRIPTION
+            "UDP/TCP port used for accounting service in the configuration
+            For TACACS+, the value of dasServerAcctPort is ignored.
+            dasServerAuthenPort will be used instead.
+
+            Default value is 1813 for RADIUS.
+            "
+        DEFVAL { 1813 }
+        ::= { dasServerConfigEntry 6 }
+    
+    dasServerKey    OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE  (0..254))
+        MAX-ACCESS      read-create
+        STATUS      current
+        DESCRIPTION
+            "The server key to be used with this server. 
+            The maximum length for RADIUS is 32 characters.
+            The maximum length for TACACS+ is 254 characters.
+            When read, a zero length string will be returned for security reasons.
+           "
+        DEFVAL { "" }
+        ::= { dasServerConfigEntry 7 }
+
+    dasServerTimeout OBJECT-TYPE
+        SYNTAX      Unsigned32 (1..255)
+        MAX-ACCESS      read-create
+        STATUS      current
+        DESCRIPTION
+            "The time in seconds for waiting server reply.
+
+            Default value is 5 seconds.
+            "
+        DEFVAL { 5 }
+        ::= { dasServerConfigEntry 8 }
+
+    dasServerRetransmit OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..20)
+        MAX-ACCESS      read-create
+        STATUS      current
+        DESCRIPTION
+            "The retransmit times of requests to the server
+            when no response is received.
+            For TACACS+, the value of dasServerRetransmit is ignored.
+
+            Default value is 2 for RADIUS.
+            "
+        DEFVAL { 2 }
+        ::= { dasServerConfigEntry 9}
+
+
+    dasServerPriority  OBJECT-TYPE
+        SYNTAX      Unsigned32 (1..4294967295)
+        MAX-ACCESS      read-only
+        STATUS      current
+        DESCRIPTION
+            "A number that indicates the priority of the server in
+            this entry. Lower numbers indicate higher priority.
+            "
+        ::= { dasServerConfigEntry 10 }
+
+
+    dasServerRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS      read-create
+        STATUS      current
+        DESCRIPTION
+            "The status of this entry.
+            "
+        ::= { dasServerConfigEntry 99 }
+
+-- -----------------------------------------------------------------------------
+    dasRadiusServerDeadTime OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..1440)
+        MAX-ACCESS      read-write
+        STATUS      current
+        DESCRIPTION
+            "This variable controls the default duration
+            of time to skip the unresponsive server.
+
+            The valid range is 0 to 1440 (24 hours).
+            When setting to 0, the unresponsive server
+            will not be marked as dead.
+
+            The default value is 0.
+            "
+        DEFVAL { 0 }
+        ::= { dasConfig 2 }
+
+-- -----------------------------------------------------------------------------
+    dasStatistics        OBJECT IDENTIFIER ::= { dAaaSrvMIBObjects 2    }
+
+    dasTacplusStatisticsTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DasTacplusStatisticsEntry
+        MAX-ACCESS          not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table consists of a list of statistics for each TACACS+ server.
+
+            The following table describes examples of TACACS+ servers statistics.
+
+            Protocol   Index SocketOpens SocketCloses TotalPktSend TotalPktRecv ReferenceCount
+            ---------- ----- ----------- ------------ ------------ ------------ --------------
+            tacacsplus 1     1           1            0            0            0
+            tacacsplus 2     5           5            20           20           5
+            tacacsplus 3     10          10           25           25           10
+            "
+        ::= { dasStatistics 1 }
+
+    dasTacplusStatisticsEntry OBJECT-TYPE
+        SYNTAX          DasTacplusStatisticsEntry
+        MAX-ACCESS          not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry consists of statistical information about a particular server.
+
+            Objects in this table are read-only and appear automatically whenever a
+            TACACS+ server in the dasServerConfigTable is made active.
+            "
+        AUGMENTS { dasServerConfigEntry }
+        ::= { dasTacplusStatisticsTable 1 }
+
+    DasTacplusStatisticsEntry::=      SEQUENCE {
+        dasTacplusSocketOpens           Counter32,
+        dasTacplusSocketCloses          Counter32,
+        dasTacplusTotalPktSent          Counter32,
+        dasTacplusTotalPktRecv          Counter32,
+        dasTacplusReferenceCount        Counter32
+    }
+
+    dasTacplusSocketOpens OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS          read-only
+        STATUS          current
+        DESCRIPTION
+            "The number of successful TCP socket connections to the TACACS+ server.
+            "
+       ::= { dasTacplusStatisticsEntry 1 }
+
+    dasTacplusSocketCloses OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS          read-only
+        STATUS          current
+        DESCRIPTION
+            "The number of successfully closed TCP socket attempts.
+            "
+        ::= { dasTacplusStatisticsEntry 2 }
+
+    dasTacplusTotalPktSent OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS          read-only
+        STATUS          current
+        DESCRIPTION
+            "The number of packets sent to the TACACS+ server
+            "
+        ::= { dasTacplusStatisticsEntry 3 }
+
+    dasTacplusTotalPktRecv OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS          read-only
+        STATUS          current
+        DESCRIPTION
+            "The number of packets received from the TACACS+ server.
+            "
+        ::= { dasTacplusStatisticsEntry 4 }
+
+    dasTacplusReferenceCount OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS          read-only
+        STATUS          current
+        DESCRIPTION
+            "The number of packets received from the TACACS+ server.
+            "
+        ::= { dasTacplusStatisticsEntry 5 }
+
+-- -----------------------------------------------------------------------------
+    dasGroup         OBJECT IDENTIFIER ::= { dAaaSrvMIBObjects 3    }
+    dasGroupTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DasGroupEntry
+        MAX-ACCESS          not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table consists of a list of configurations for each
+            AAA server group. An entry is created/removed when a new server group
+            is created/removed.
+
+            The following table describes examples of AAA groups.
+
+            Protocol   Name
+            ---------- ----------
+            tacacsplus tac_con
+            tacacsplus tac_telnet
+            radius     rad_acct
+            radius     rad_ssh
+            "
+        ::= { dasGroup  1 }
+
+    dasGroupEntry OBJECT-TYPE
+        SYNTAX      DasGroupEntry
+        MAX-ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An AAA server group configuration identified by its protocol,
+            and its name.
+
+            An entry is created/removed when a server group is defined
+            or undefined with configuration commands via CLI
+            or by issuing appropriate sets to this table using snmp.
+            "
+        INDEX {
+                dasGroupProtocol,
+                dasGroupName
+            }
+        ::= { dasGroupTable 1}
+
+    DasGroupEntry ::=    SEQUENCE {
+            dasGroupProtocol       DlinkAAAProtocol,
+            dasGroupName           DlinkAAAGroupName,
+            dasGroupRowStatus      RowStatus
+        }
+
+    dasGroupProtocol OBJECT-TYPE
+        SYNTAX          DlinkAAAProtocol
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The variable denotes the protocol used by the
+            managed device with the AAA group corresponding to
+            this entry in the table.
+            "
+        ::= { dasGroupEntry 1 }
+
+    dasGroupName    OBJECT-TYPE
+        SYNTAX    DlinkAAAGroupName
+        MAX-ACCESS    not-accessible
+        STATUS    current
+        DESCRIPTION
+            "The server group name.
+            "
+        DEFVAL { "" }
+        ::= { dasGroupEntry 2 }
+
+    dasGroupRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS      read-create
+        STATUS      current
+        DESCRIPTION
+			"The status of this table entry. Once the entry status is
+			set to active, the associated entry cannot be modified
+			except destroyed by setting this object to destroy(6).
+			"
+        ::= { dasGroupEntry 3 }
+
+-- dasGroupServerTable
+
+    dasGroupServerTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF DasGroupServerEntry
+        MAX-ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This table consists of a list of configurations for each
+            AAA server group. An entry is created/removed when a new server group
+            is created/removed.
+
+            The following table describes examples of AAA server groups.
+
+            Protocol   Name       SrvIndex AddressType   IPv6Address    Priority
+            ---------- ---------- -------- ------------- -------------  --------
+            tacacsplus tac_con    1        ipv6          2000::2            1
+            tacacsplus tac_telnet 2        ipv4          10.0.0.1           2
+            tacacsplus tac_telnet 3        ipv4          192.168.1.254      3
+            radius     rad_ssh    1        ipv4          20.0.0.12          1
+            radius     rad_ssh    2        ipv4          20.0.0.13          2
+            radius     rad_ssh    3        ipv4          20.0.0.14          3
+            radius     rad_ssh    4        ipv4          20.0.0.15          4
+            "
+        ::= { dasGroup  2 }
+
+    dasGroupServerEntry OBJECT-TYPE
+        SYNTAX      DasGroupServerEntry
+        MAX-ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An AAA server group configuration identified by its protocol,
+            its name and its index.
+
+            An entry is created/removed when a server group is defined
+            or undefined with configuration commands via CLI
+            or by issuing appropriate sets to this table using snmp.
+
+            A management station wishing to create an entry should
+            first generate a random number to be used as the index
+            to this sparse table.
+
+            dasGroupSrvPriority is automatically assigned once the entry is
+            made active and reflects the relative priority of the
+            defined server with respect to already configured servers.
+            Newly-created servers will be assigned the lowest priority.
+            To reassign server priorities to existing server entries,
+            it may be necessary to destroy and recreate entries in order
+            of priority.
+
+            Upon reload, dasGroupSrvIndex values may be changed, but the
+            priorities that were saved before reload will be retained,
+            with lowest priority number corresponding to the higher
+            priority servers.
+            "
+        INDEX {
+            dasGroupProtocol,
+            dasGroupName,
+            dasGroupSrvIndex
+            }
+        ::= { dasGroupServerTable 1}
+
+    DasGroupServerEntry ::=  SEQUENCE {
+            dasGroupSrvIndex               Unsigned32,
+            dasGroupSrvAddrType            InetAddressType,
+            dasGroupSrvAddress             InetAddress,
+            dasGroupSrvPriority            Unsigned32,
+            dasGroupServerRowStatus        RowStatus
+        }
+
+    dasGroupSrvIndex OBJECT-TYPE
+        SYNTAX      Unsigned32 (1..4294967295)
+        MAX-ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A management station wishing to initiate a new AAA server
+            group configuration should use a random value for this object
+            when creating an instance of dasGroupEntry.
+
+            The RowStatus semantics of the dasGroupConfigRowStatus object
+            will prevent access conflicts.
+            "
+        ::= { dasGroupServerEntry 1 }
+
+    dasGroupSrvAddrType OBJECT-TYPE
+        SYNTAX      InetAddressType
+        MAX-ACCESS      read-create
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the type of network address denoted
+            in dasGroupSrvAddress object.
+            "
+        ::= { dasGroupServerEntry 2 }
+
+    dasGroupSrvAddress OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS      read-create
+        STATUS      current
+        DESCRIPTION
+            "The address of the server of the entry.
+            "
+        ::= { dasGroupServerEntry 3 }
+
+
+    dasGroupSrvPriority  OBJECT-TYPE
+        SYNTAX      Unsigned32 (1..4294967295)
+        MAX-ACCESS      read-only
+        STATUS      current
+        DESCRIPTION
+            "A number that indicates the priority of the server in
+            this group. Lower numbers indicate higher priority.
+            "
+        ::= { dasGroupServerEntry 4 }
+
+    dasGroupServerRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The status of this table entry. Once the entry status is
+            set to active, the associated entry cannot be modified
+            except destroyed by setting this object to destroy(6).
+            "
+        ::= { dasGroupServerEntry 5 }
+
+
+-- -----------------------------------------------------------------------------
+    dasVrf                   OBJECT IDENTIFIER ::= { dAaaSrvMIBObjects 4    }
+
+    dasGroupVrfTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DasGroupVrfEntry
+        MAX-ACCESS          not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table shows current VRF configurations for each
+            AAA server group, allows existing VRF to be removed
+            and new ones to be created.
+
+            The following table describes the examples of VRF setting for AAA
+            server groups.
+
+            Protocol   group Name   VRF name
+            ---------- ----------   ----------
+            tacacsplus tac_con      vrf1
+            tacacsplus tac_telnet   vrf_taplus
+            radius     rad_acct     vrf_radius
+            radius     rad_ssh      vrf_100
+            "
+        ::= { dasVrf    1 }
+
+    dasGroupVrfEntry OBJECT-TYPE
+        SYNTAX          DasGroupVrfEntry
+        MAX-ACCESS          not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An AAA group VRF configuration identified by its protocol
+            and its group name.
+
+            An entry is created/removed when a VRF setting is defined
+            or undefined with configuration commands via CLI
+            or by issuing appropriate sets to this table using snmp.
+
+            When a group VRF configuration is deleted, indicates the
+            server group will use the global (default) routing table.
+            "
+        INDEX {
+            dasGroupProtocol,
+            dasGroupName
+        }
+        ::= { dasGroupVrfTable 1}
+
+    DasGroupVrfEntry ::=    SEQUENCE {
+            dasGroupVrfName                   VrfName,
+            dasGroupVrfConfigRowStatus        RowStatus
+        }
+
+    dasGroupVrfName OBJECT-TYPE
+        SYNTAX      VrfName
+        MAX-ACCESS      read-create
+        STATUS      current
+        DESCRIPTION
+            "The VRF name of the entry.
+            "
+        ::= { dasGroupVrfEntry 1 }
+
+    dasGroupVrfConfigRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The status of this table entry.
+            "
+        ::= { dasGroupVrfEntry 2 }
+
+
+-- -----------------------------------------------------------------------------
+    dasSrcIf                 OBJECT IDENTIFIER ::= { dAaaSrvMIBObjects 5    }
+
+    dasGroupSrcIfTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF DasGroupSrcIfEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This table consists of a list of source interface configurations
+            for each AAA server group.
+            "
+        ::= { dasSrcIf  1 }
+
+    dasGroupSrcIfEntry OBJECT-TYPE
+        SYNTAX      DasGroupSrcIfEntry
+        MAX-ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An AAA group source interface configuration identified
+            by its protocol and its group name.
+
+            An entry is created/removed when a source interface setting
+            is defined or undefined with configuration commands via CLI
+            or by issuing appropriate sets to this table using snmp.
+
+            Note: The group name of radius and tacacs+ are reserved group
+            names and its corresponding source interface is global setting
+            for RADIUS and TACACS+ servers respectively. If both global
+            and group-specific have the source interface settings,
+            the setting of group-specific takes precedence.
+            "
+        INDEX {
+            dasGroupProtocol,
+        dasGroupName,
+        dasGroupSrcAddrType
+            }
+            ::= { dasGroupSrcIfTable 1}
+
+    DasGroupSrcIfEntry ::=     SEQUENCE {
+            dasGroupSrcAddrType             InetAddressType,
+            dasGroupSrcIfIndex              InterfaceIndex,
+            dasGroupSrcIfConfigRowStatus    RowStatus
+        }
+
+    dasGroupSrcAddrType OBJECT-TYPE
+        SYNTAX      InetAddressType
+        MAX-ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the type of the address which will be used
+            as source address for sending RADIUS packets.
+            "
+        ::= { dasGroupSrcIfEntry 1 }
+
+    dasGroupSrcIfIndex  OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS      read-create
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the ifIndex of the interface whose IP/IPv6
+            address will be used as source IP/IPv6 address for sending RADIUS packets.
+            "
+        ::= { dasGroupSrcIfEntry 2 }
+
+    dasGroupSrcIfConfigRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS      read-create
+        STATUS      current
+        DESCRIPTION
+            "The status of this table entry.
+            "
+        ::= { dasGroupSrcIfEntry 3 }
+
+-- -----------------------------------------------------------------------------
+    dasClear                 OBJECT IDENTIFIER ::= { dAaaSrvMIBObjects 6    }
+
+    dasClearServerStatTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF DasClearServerStatEntry
+        MAX-ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This table is used to clear statistics of the AAA servers.
+            "
+        ::= { dasClear  1 }
+
+    dasClearServerStatEntry OBJECT-TYPE
+        SYNTAX      DasClearServerStatEntry
+        MAX-ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry which can be used to clear the statistics of the AAA server.
+            "
+        INDEX {
+            dasServerProtocol,
+            dasServerIndex
+        }
+        ::= { dasClearServerStatTable 1}
+
+    DasClearServerStatEntry ::=     SEQUENCE {
+            dasClearServerStatAction        INTEGER
+        }
+
+    dasClearServerStatAction OBJECT-TYPE
+            SYNTAX      INTEGER {
+                clear(1),
+                noOp(2)
+            }
+        MAX-ACCESS      read-write
+        STATUS      current
+        DESCRIPTION
+            "This object is used to clear statistics of an AAA server when set
+            to 'clear'.
+            No action is taken if this object is set to 'noOp'.
+            When read, the value 'noOp' is returned."
+        ::= { dasClearServerStatEntry 1 }
+
+-- -----------------------------------------------------------------------------
+    dasClearServerStatByGroup OBJECT-TYPE
+        SYNTAX      DlinkAAAGroupName
+        MAX-ACCESS      read-write
+        STATUS      current
+        DESCRIPTION
+            "This object is used to clear AAA server statistics based on group name.
+            Setting this object to the group name which you want to clear.
+            When read, a zero length string is returned."
+        ::= {dasClear 2}
+
+    dasClearServerStatByProtocol OBJECT-TYPE
+        SYNTAX      DlinkAAAProtocol
+        MAX-ACCESS      read-write
+        STATUS      current
+        DESCRIPTION
+            "This object is used to clear AAA server statistics based on protocol.
+            Setting this object to the protocol which you want to clear.
+            When read, none(0) is returned."
+        ::= {dasClear 3}
+    dasClearAllServerStat OBJECT-TYPE
+        SYNTAX      INTEGER {
+                clear(1),
+                noOp(2)
+            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This object is used to clear all AAA server statistics when set
+            to 'clear'.
+            No action is taken if this object is set to 'noOp'.
+            When read, the value 'noOp' is returned."
+        ::= {dasClear 4}
+
+
+
+-- ******************************************************************
+-- Conformance and Compliance
+-- ******************************************************************
+
+    dasMIBCompliances  OBJECT IDENTIFIER ::= { dAaaSrvMIBConformance 1 }
+
+-- compliance statements
+
+    dasMIBCompliance MODULE-COMPLIANCE
+        STATUS          current
+        DESCRIPTION
+            "The compliance statement for entities which implement the
+            DLINKSW-AAA-SERVER-MIB."
+        MODULE      -- this module
+        MANDATORY-GROUPS    {
+            dasConfigGroup,
+            dasTacplusStatisticsGroup
+        }
+
+        GROUP dasSrvGroupGroup
+        DESCRIPTION
+            "This group is mandatory only for the platform which supports
+            AAA server group configuration.
+            "
+
+        GROUP dasVrfGroup
+        DESCRIPTION
+            "This group is mandatory only for the platform which supports
+            AAA VRF configuration.
+            "
+
+        GROUP dasSrcIfGroup
+        DESCRIPTION
+            "This group is mandatory only for the platform which supports
+            AAA source interface configuration.
+            "
+
+        GROUP dasClearStatGroup
+        DESCRIPTION
+            "This group is mandatory only for the platform which supports
+            clear server statistics.
+            "
+
+        OBJECT      dasServerAddrType
+        MIN-ACCESS  read-only
+        DESCRIPTION
+            "Write access is not required after server entry created."
+
+        OBJECT      dasServerAddress
+        MIN-ACCESS  read-only
+        DESCRIPTION
+            "Write access is not required after server entry created."
+
+        OBJECT      dasServerKey
+        MIN-ACCESS  read-only
+        DESCRIPTION
+            "The maximum length of RADIUS server host is 32 characters.
+            The maximum length of TACACS+ server host 254 characters.
+            When read, a zero length string will be returned for security reasons."
+
+       ::= { dasMIBCompliances  1 }
+
+
+-- units of conformance
+
+    dasMIBGroups       OBJECT IDENTIFIER ::= { dAaaSrvMIBConformance 2 }
+
+    dasTacplusStatisticsGroup OBJECT-GROUP
+        OBJECTS {
+            dasTacplusSocketOpens,
+            dasTacplusSocketCloses,
+            dasTacplusTotalPktSent,
+            dasTacplusTotalPktRecv,
+            dasTacplusReferenceCount
+        }
+        STATUS          current
+        DESCRIPTION
+            "Objects for providing AAA tacacs+ server statistics and status.
+            "
+        ::= { dasMIBGroups 1 }
+
+    dasConfigGroup OBJECT-GROUP
+        OBJECTS {
+            dasRadiusServerDeadTime,
+            dasServerAddrType,
+            dasServerAddress,
+            dasServerAuthenPort,
+            dasServerAcctPort,            
+            dasServerTimeout,
+            dasServerRetransmit,
+            dasServerKey,
+            dasServerPriority,
+            dasServerRowStatus
+        }
+        STATUS          current
+        DESCRIPTION
+            "Objects for configuring the AAA servers.
+            "
+        ::= { dasMIBGroups 2 }
+
+    dasSrvGroupGroup OBJECT-GROUP
+        OBJECTS {
+                dasGroupRowStatus,
+            dasGroupSrvAddrType,
+            dasGroupSrvAddress,
+                dasGroupSrvPriority,
+            dasGroupServerRowStatus
+        }
+        STATUS          current
+        DESCRIPTION
+            "Objects for configuring the AAA server groups.
+            "
+        ::= { dasMIBGroups 3 }
+
+    dasVrfGroup OBJECT-GROUP
+            OBJECTS {
+                dasGroupVrfName,
+                dasGroupVrfConfigRowStatus
+            }
+            STATUS      current
+            DESCRIPTION
+                "Objects for configuring the AAA VRF setting.
+            "
+        ::= { dasMIBGroups 4 }
+
+    dasSrcIfGroup OBJECT-GROUP
+            OBJECTS {                
+                dasGroupSrcIfIndex,
+                dasGroupSrcIfConfigRowStatus
+            }
+            STATUS      current
+            DESCRIPTION
+                "Objects for configuring the AAA source interface setting.
+            "
+        ::= { dasMIBGroups 5 }
+
+    dasClearStatGroup OBJECT-GROUP
+            OBJECTS {
+                dasClearServerStatAction,
+                dasClearServerStatByGroup,
+                dasClearServerStatByProtocol,
+                dasClearAllServerStat
+            }
+            STATUS      current
+            DESCRIPTION
+                "Objects for clear the AAA server statistics.
+                "
+        ::= { dasMIBGroups 6 }
+
+END
+
+

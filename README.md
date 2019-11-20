@@ -1,4 +1,4 @@
-[![Scrutinizer Status](https://scrutinizer-ci.com/g/librenms/librenms/badges/build.png?b=master)](https://scrutinizer-ci.com/g/librenms/librenms/build-status/master) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/librenms/librenms/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/librenms/librenms/?branch=master) [![Travis Status](https://travis-ci.org/librenms/librenms.svg?branch=master)](https://travis-ci.org/librenms/librenms)
+[![Scrutinizer Status](https://scrutinizer-ci.com/g/librenms/librenms/badges/build.png?b=master)](https://scrutinizer-ci.com/g/librenms/librenms/build-status/master) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/librenms/librenms/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/librenms/librenms/?branch=master) [![Travis Status](https://travis-ci.com/librenms/librenms.svg?branch=master)](https://travis-ci.org/librenms/librenms)
 
 Introduction
 ------------
@@ -31,11 +31,12 @@ Participating
 -------------
 
 You can participate in the project by:
-- Talking to us on IRC ([##librenms on Freenode][4]) or [Twitter][3].
+- Talking to us on [Discord](https://t.libren.ms/discord) or [Twitter][3].
 - Joining the [LibreNMS Community](https://community.librenms.org)
 - Improving the [documentation][5].
-- Cloning the [repo][2] and filing [bug reports][18] and [pull requests][19] on github.
-  See [CONTRIBUTING][15] for more details.
+- Cloning the [repo][2] and filing [pull requests][19] on github.
+- [Bug Reports](https://community.librenms.org) on our Community Fourms
+- See [CONTRIBUTING][15] for more details.
 
 
 VM image
@@ -44,7 +45,7 @@ VM image
 You can try LibreNMS by downloading a VM image.  Currently, a Ubuntu-based
 image is supplied and has been tested with [VirtualBox][8].
 
-Download one of the [VirtualBox images][11] we have available, documentation is provided which details 
+Download one of the [VirtualBox images][11] we have available, documentation is provided which details
 login credentials and setup details.
 
 License
@@ -83,7 +84,7 @@ exception):
 [1]: https://groups.google.com/forum/#!forum/librenms-project "LibreNMS"
 [2]: https://github.com/librenms/librenms "Main LibreNMS GitHub repo"
 [3]: https://twitter.com/librenms "@LibreNMS on Twitter"
-[4]: irc://irc.freenode.net/##librenms "LibreNMS IRC channel"
+[4]: https://t.libren.ms/discord "Discord LibreNMS Server"
 [5]: https://github.com/librenms/librenms/tree/master/doc/
 [6]: http://freenode.net/changuide "Freenode channel guidelines"
 [7]: http://freenode.net/catalysts "Freenode community catalysts"

@@ -1,0 +1,3800 @@
+ASAM-SYSTEM-MIB DEFINITIONS ::= BEGIN
+
+-- =============================================================================
+--  This specification is published by Alcatel-Lucent under Non-Disclosure
+--  Agreement(s) (NDA) with specific parties and has to be considered as
+--  Confidential Information as defined in such NDA.
+--  Alcatel-Lucent reserves the right to revise this document for any reason,
+--  including but not limited to conformity with standards promulgated by
+--  various agencies, utilisation of advances in the state of the technical
+--  areas, or the reflection of changes in the design of any equipment,
+--  techniques, or procedures described or referred to herein.
+--  The product specifications and other technical or performance information
+--  contained herein are subject to change without notice.
+--  Updates of this document will be issued under the above NDA's.
+--  Alcatel-Lucent makes no representation or warranty, expressed or implied,
+--  with respect to the sufficiency, accuracy, or utility of any information or
+--  opinion contained herein. Alcatel-Lucent expressly advises that any use of
+--  for any purpose or reliance upon this technical reference is at the risk of
+--  the user and that Alcatel-Lucent shall not be liable for any damage or
+--  injury incurred by any person arising out of the sufficiency, accuracy, or
+--  utility of any information or opinion contained herein.
+--  This document is not to be construed as a suggestion to any manufacturer
+--  to modify or change any of its products, nor does this document represent
+--  any commitment by Alcatel-Lucent to sell or purchase any product.
+--  Nothing contained herein shall be construed as conferring by implication,
+--  estoppel, or otherwise any license or right under any patent, whether or
+--  not the use of any information herein necessarily employs an invention of
+--  any existing or later issued patent.
+--  Alcatel-Lucent reserves the right not to offer any or all of these products
+--  and to withdraw any or all of them at any future time.
+-- Copyright (C) 2010, Alcatel-Lucent. All Rights Reserved.
+-- =============================================================================
+--
+--  MODULE-IDENTITY
+--  LAST-UPDATED "201609280000Z"
+--  ORGANIZATION "Nokia"
+--  CONTACT-INFO "email:asam.mibsupport@alcatel-lucent.com"
+--  DESCRIPTION
+--     "The ASAM System MIB contains objects from very diverse domains.
+--      Basically, it groups a number of objects that did not find a place
+--      in the other ASAM MIBs."
+--
+--  REVISION "2017100600000Z"
+--  DESCRIPTION																					
+--      Editor: Marita Saveyn
+--      Changes:
+--           Add new bitpositions to asamSystemActivatedCDEExtended   
+--              105	DropStandbyLinkTraffic (ISR5602 ALU02391965: 
+--                     [MX][Static LAG] Standby link is forwarding traffic 
+--                     from network to LEMI - users)
+--                                                    
+--  REVISION "201703100000Z"
+--  DESCRIPTION																					
+--      Editor: Marita Saveyn
+--      Changes:
+--           Add new bitpositions to asamSystemActivatedCDEExtended   (ISR57	ALU02331338, ALU02291323)
+--              90 LimitedTL1ForXGSPON
+--              91 IsAttAricentOntSupported
+--                                                    
+--  REVISION "201703100000Z"
+--  DESCRIPTION																					
+--      Editor: Marita Saveyn
+--      Changes:
+--           Add new bitpositions to asamSystemActivatedCDEExtended   (ISR5102q	ALU02209041)
+--              89 FwWatchdogFeatureForL2PlusLt
+--                                                    
+--  REVISION "201703060000Z"
+--  DESCRIPTION																					
+--      Editor: Marita Saveyn
+--      Changes:
+--           Add new bitpositions to asamSystemActivatedCDEExtended   (ISR5601 ALU02097716 ALU02097756 ALU02337081)
+--              88 PmCdrCount5Min
+--                                                    
+--  REVISION "201702230000Z"
+--  DESCRIPTION																					
+--      Editor: Marita Saveyn
+--      Changes:
+--           Add new bitpositions to asamSystemActivatedCDEExtended   (ISR56 ALU02097709 ALU02333221)
+--              87 IsSipSelfRingingSupported
+--                                                    
+--  REVISION "201701030000Z"
+--  DESCRIPTION																					
+--      Editor: Marita Saveyn
+--      Changes:
+--           Add new bitpositions to asamSystemActivatedCDEExtended   (ISR5601 ALU02279440 ALU02331340)
+--              86 MigrationNDLTCtoNDLTKAllowed
+--                                                   
+--  REVISION "201701030000Z"
+--  DESCRIPTION																					
+--      Editor: Marita Saveyn
+--      Changes:
+--           Add new bitpositions to asamSystemActivatedCDEExtended   (ISR57 ALU02130289 ISR5601 ALU02327994)
+--              85 DtagAlarmsForClockDefects
+--
+--  REVISION "201701030000Z"
+--  DESCRIPTION																					
+--      Editor: Marita Saveyn
+--      Changes:
+--           Add new bitpositions to asamSystemActivatedCDEExtended   (ISR5601 ALU02183319 ALU02326253)
+--              84 EfmOamOrgSpecOlidSupport
+--
+--  REVISION "201701030000Z"
+--  DESCRIPTION																					
+--      Editor: Marita Saveyn
+--      Changes:
+--           Add new bitpositions to asamSystemActivatedCDEExtended   (ISR5501EF ALU02307618)
+--              83 SupportNotTodOntClockSync
+--
+--  REVISION "201612170000Z"
+--  DESCRIPTION																					
+--      Editor: Marita Saveyn
+--      Changes:
+--           Add new bitpositions to asamSystemActivatedCDEExtended   (ISR56 ALU02301192)
+--              81 IsMegacoLawfulInterceptSupported
+--           Add new bitpositions to asamSystemActivatedCDEExtended   (ISR56 ALU02283589)
+--              82 MiiUniversalBbServSupport
+--   
+--  REVISION "201611210000Z"
+--  DESCRIPTION
+--      Editor: James LUO
+--      Changes:
+--           Add new MIB:asamSystemMIB 62/63/64/65 (ISR56 ALU02270522).
+--
+--  REVISION "201605240000Z"
+--  DESCRIPTION																					
+--      Editor: Erik Umans
+--      Changes:
+--           Add new bitpositions to asamSystemActivatedCDEExtended   (ISR56 ALU02287649)
+--              79 ArpRemoteIdCheckDisable
+--           Add new bitpositions to asamSystemActivatedCDEExtended   (ISR56 ALU02287529)
+--              80 VplusVectLowspectrumOnlySupported
+--
+--  REVISION "201609280000Z"
+--  DESCRIPTION
+--      Editor: Giridhararoopan Gangatharan
+--      Changes:
+--           RCR ALU02171369: add new object asamRelayIdSyntax to asamSystemMIB
+--           Also add new field asamAccessNtPortSyntax to asamAccessLoopIdSyntax
+
+--  REVISION "201608290000Z"
+--  DESCRIPTION																					
+--      Editor: Murugan Balraj
+--      Changes:
+--           updated licenseFeatureIndex for ERPS Feature.
+
+--  REVISION "201605240000Z"
+--  DESCRIPTION																					
+--      Editor: Marita Saveyn
+--      Changes:
+--           Add new bitpositions to asamSystemActivatedCDEExtended   (ISR56 ALU02188042)
+--              78 CablePairIdentificationEnhancement
+--
+--  REVISION "201605240000Z"
+--  DESCRIPTION																					
+--      Editor: Marita Saveyn
+--      Changes:
+--           Add new bitpositions to asamSystemActivatedCDEExtended   (ISR5501 ALU02272081)
+--              77 ArpPollingAndSnooping
+--
+--  REVISION "201605240000Z"
+--  DESCRIPTION																					
+--      Editor: Marita Saveyn
+--      Changes:
+--           Add new bitpositions to asamSystemActivatedCDEExtended   (ISR5202d ALU02268809)
+--              76 GponIsSupportingRunTimeSetMcPbit
+--
+--  REVISION "201605240000Z"
+--  DESCRIPTION																					
+--      Editor: Marita Saveyn
+--      Changes:
+--           Add new bitpositions to asamSystemActivatedCDEExtended   (ISR5302d ALU02253541, ISR5501 ALU02254714)
+--              75 VvplsUnknownMcDrop
+--
+--  REVISION "201605240000Z"
+--  DESCRIPTION
+--      Editor: Tom Van Peteghem
+--      Changes:
+--           FR ALU02212385 : asamTechSupportActionFile length is (0-255) in MIB,
+--                            but Node not accepting empty string
+--           Changed range for
+--                  asamTechSupportSessionFile OBJECT-TYPE
+--                  asamTechSupportActionFile OBJECT-TYPE
+--           from 0..255 to 1..255
+--
+--  REVISION "201605240000Z"
+--  DESCRIPTION																					
+--      Editor: Marita Saveyn
+--      Changes:
+--           RCR ALU02195802
+--           Add new field asamSystemRFOverlayModule to enable or disable the RF Overlay Module
+--
+--  REVISION "201605180000Z"
+--  DESCRIPTION																					
+--      Editor: Marita Saveyn
+--      Changes:
+--           Add new bitpositions to asamSystemActivatedCDEExtended   (ISR5501 ALU02163221)
+--              74 RemoveDhcpSessionIfPortAdminDown ALU02198126
+--
+--  REVISION "201605130000Z"
+--  DESCRIPTION																					
+--      Editor: Marita Saveyn
+--      Changes:
+--           Add new bitpositions to asamSystemActivatedCDEExtended   (ISR5501 ALU02163221)
+--              73 SupportRemoteShelfOnLtPort
+--
+--  REVISION "201605020000Z"
+--  DESCRIPTION																					
+--      Editor: Dominic L A J S
+--      Changes:
+--           RCR ALU02074765 : Zero-touch provisioning - solution
+--               Zero touch provision (ZTP) support for ISAM
+--           Add new field for Zero-touch provisioning state
+--            asamSystemZTPState
+--
+--  REVISION "201603220000Z"
+--  DESCRIPTION
+--      Editor: Tom Van Peteghem
+--      Changes:
+--           RCR ALU02116497 : Operator triggered (on-demand) TS-file
+--               generation for datapath troubleshooting - Legacy Fiber LTs
+--           Add new fields for On Demand TechSupport file generation
+--            asamTechSupportOnDemandFreeSessionId
+--            asamTechSupportActionTable
+--            asamTechSupportSessionTable
+--
+--  REVISION "201602010000Z"
+--  DESCRIPTION
+--      Editor: Marita Saveyn
+--      Changes:
+--           Add new bitpositions to asamSystemActivatedCDEExtended
+--              72 IsStunnelMipSupported
+--
+--  REVISION "201602010000Z"
+--  DESCRIPTION
+--      Editor: Marita Saveyn
+--      Changes:
+--           Add new bitpositions to asamSystemActivatedCDEExtended
+--              69  MigrationRDLTCtoRDLTDAllowed
+--              70  MigrationNDLTFtoNDLTJAllowed
+--              71  MigrationNDLTGtoNDLTKAllowed
+--
+--  REVISION "201602010000Z"
+--  DESCRIPTION
+--      Editor: Marita Saveyn
+--      Changes:
+--           Add new bitpositions to asamSystemActivatedCDEExtended as they were missing
+--              60  QosBandwidtProfileConfigOnUni
+--              61  QosQueuesAggrConfigSupport
+--              62  ModifyNbrOfPortsOnOntCardAllowed
+--              63  LtBootPriority
+--              64  NetworkItfMtuDefault
+--
+--  REVISION "20151207100000Z"
+--  DESCRIPTION
+--      Editor: Patrick Codron
+--      Changes:
+--          TechSupport enable/disable + purge files
+--          Reset Root Cause Analyzer - Part Ia  ISR54 ALU02033829
+--
+--  REVISION "201601040000Z"
+--  DESCRIPTION
+--      Editor: Marita Saveyn
+--      Changes:
+--           Add new bitpositions to asamSystemActivatedCDEExtended
+--             68  LldpSubtypeInterfaceName                 ISR5404
+--
+--  REVISION "201511080000Z"
+--  DESCRIPTION
+--     "Editor:Qiong K WU
+--      Changes:
+--      RCR: ALU02004304, Next generation NT (FANT-G)
+--      Add two objects asamSystemScalingMode and asamSystemOperationalScalingMode "
+
+--  REVISION "201510160000Z"
+--  DESCRIPTION
+--      Editor: Marita Saveyn
+--      Changes:
+--           Add new bitpositions to asamSystemActivatedCDEExtended
+--             67  ReducedPresenceIndicationTimeout          ISR5403w
+--
+--  REVISION "201512060000Z "
+--  DESCRIPTION
+--      Editor: LU Hao D
+--      Changes:
+--           Add licenseFeatureIndex for VULA in RCR ALU02023899
+--
+--  REVISION "20151027100000Z"
+--  DESCRIPTION
+--      Editor: Marita Saveyn
+--      Changes:
+--           Add new bitpositions to asamSystemActivatedCDEExtended
+--             66  CpuFilterPortRange                         ISR54 ALU01999842
+--
+--  REVISION "201510160000Z"
+--  DESCRIPTION
+--      Editor: Marita Saveyn
+--      Changes:
+--           Add new bitpositions to asamSystemActivatedCDEExtended
+--             64  NetworkItfMtuDefault                       ISR5202
+--             65  RemovePasswordSpecialCharReq               ISR53
+--
+--  REVISION "201516100000Z"
+--  DESCRIPTION
+--      Editor: Marita Saveyn
+--      Changes:
+--           Add new bitpositions to asamSystemActivatedCDEExtended
+--             59  IsQosMarkerProfInnerPbitSupported         ISR5201  ALU02073027 ALU02091526 ALU02091549
+--
+--  REVISION "201506100000Z"
+--  DESCRIPTION
+--      Editor: Marita Saveyn
+--      Changes:
+--           Add new bitpositions to asamSystemActivatedCDEExtended
+--             58  DisableSfpAlcatelStringCheckPtpLt         ISR5201  ALU02064549 ALU02089457 ALU02089457
+--
+--  REVISION "201506080000Z"
+--  DESCRIPTION
+--      Editor: Marita Saveyn
+--      Changes:
+--           Add new bitpositions to asamSystemActivatedCDEExtended
+--             57  MaskParityError         ISR5201  ALU01861706
+--
+--  REVISION "201506060000Z"
+--  DESCRIPTION
+--      Editor: Tom Batsele
+--      Changes:
+--           systemmac applicable for ISAM 7367 SX/ 7363 MX systems (Standalone Single-board  Vectoring Box and NGVR)
+--           ALU02074195 Show system MAC address on SX and MX
+--
+--  REVISION "201504170000Z"
+--  DESCRIPTION
+--      Editor: Marita Saveyn
+--      Changes:
+--           Add new bitpositions to asamSystemActivatedCDEExtended
+--             56  HguTr069Configuration           ISR53    ALU02047957 ALU02069691
+--
+--  REVISION "201503130000Z "
+--  DESCRIPTION
+--     "Version:
+--      Editor: Sebastien Deronne
+--      Changes: RCR ALU01936333 : G.Fast support "
+--
+--  REVISION "201502270000Z"
+--  DESCRIPTION
+--      Editor: Marita Saveyn
+--      Changes:
+--           Add new bitpositions to asamSystemActivatedCDEExtented
+--             55  UseSpecificHoldOffTime         ISR5201    ALU01977350 ALU02053292
+--
+--  REVISION "201502200000Z"
+--  DESCRIPTION
+--      Editor: Marita Saveyn
+--      Changes:
+--           Add new bitpositions to asamSystemActivatedCDEExtended
+--             53  SwPoliceNdMldProtoAt100Pps       ISR52    ALU02026722
+--             54  IsPPPOEDownstreamRelayEnabled    ISR5201  ALU01894700 ALU01991513
+--
+--  REVISION "201501050000Z"
+--  DESCRIPTION
+--      Editor: Marita Saveyn
+--      Changes:
+--           Add new bitpositions to asamSystemActivatedCDEExtended
+--             49  EponUniDimensionScaleup
+--             50  EontPerformanceMonitorOptimization
+--             51  EponQuickPonCutover
+--             52  PppDhcpTlv90Tlv91OptionAdd
+--
+--  REVISION "201411050000Z "
+--  DESCRIPTION
+--     "Version:
+--      Editor: Gerda Mertens
+--      Changes: RCR ALU01985707 : Vplus support "
+--
+--  REVISION "201410020000Z"
+--  DESCRIPTION
+--      Editor: Marita Saveyn
+--      Changes:
+--           * ALU01884252 Extend the CDE bitmap > 32 entries
+--             Added MIB Object asamSystemActivatedCDEExtented"
+--
+-- REVISION "201405200000Z"
+--  DESCRIPTION
+--     "Editor: Liangming Cheng
+--      Changes:
+--      *  RCR ALU01863065: Supporting of selection of voice image (H248/SIP) to run
+--         "Add a new OID: asamSystemVoiceOswp"
+--
+-- REVISION "201310100000Z"
+--  DESCRIPTION
+--     "Editor: Balaji Thirunavukkarasu
+--      Changes:
+--      *  R5.0 RCR ALU01878634
+--         "Add asamSystemAutoSwitchAtmPtm and asamSystemAutoSwitchVdslStepUpDelay"
+--
+-- REVISION "201310080000Z"
+--  DESCRIPTION
+--     "Editor: Zhigang B Long
+--       Changes:
+--        RCR ALU01887505 : NGVR support GPON uplink.
+--      * Add two new object IDs: asamSystemUplinkMode and
+--        asamSystemCurrentUplinkMode."
+--
+-- REVISION "201309250000Z"
+--  DESCRIPTION
+--     "Editor: Sowrirajan Padmanabhan
+--      Changes:
+--      *  Add extra licence key 38
+--         "Ethernet OAM Y1731 Performance monitoring functions"
+--
+-- REVISION "201309180000Z"
+--  DESCRIPTION
+--     "Editor: Tom Van Peteghem
+--      Changes:
+--      *  Add extra licence key 37
+--         "Vlan Translation Table Extended Usage"
+--
+--  REVISION "201308010000Z"
+--  DESCRIPTION
+--     "Editor: Balaji Thirunavukkarasu
+--      Changes: RCR ALU01878634 : Auto-switching between ATMoADSL and PTMoVDSL
+--      * Add asamSystemAutoSwitchAtmPtm and asamSystemAutoSwitchVdslStepUpDelay
+--
+-- REVISION "201303250000Z"
+--  DESCRIPTION
+--      Editor:Poongothai Kuppusamy Sampath
+--      Changes:
+--      *  Modify description of 'NT MPLS'
+--         to 'MPLS Advanced Resiliency'
+--
+-- REVISION "201303010000Z"
+--  DESCRIPTION
+--      "Editor:Stefan Sturm
+--      Changes:
+--      *  remove asamEthernetShapingRate since obsolete for all NT typess
+--
+-- REVISION "201302140000Z"
+--  DESCRIPTION
+--     "Version:3FE21961EAAA_FDT1238.V4.5.1.10.1
+--      Editor:Karthik Chandra Bose S
+--      Changes:
+--      *  Modify description of '802.1Q CCI enabled MEPS'
+--         to 'Ethernet OAM Advanced Monitoring Functions'
+--
+--  REVISION "201301170000Z"
+--  DESCRIPTION
+--     "Version:
+--      Editor:Jianhong Fu
+--      Changes:
+--      *  Add asamSystemCustomerId for ISR4.6 (RCR ALU01849954)
+--
+--  REVISION "201209100000Z "
+--  DESCRIPTION
+--     "Version:
+--      Editor: Luc Hordies
+--      Changes: RCR ALU01802654 : Crosstalk cancellation from legacy lines into
+--               G.vector lines in DS "
+--
+--  REVISION "201208310000Z"
+--  DESCRIPTION
+--     "Version:
+--      Editor:Lakshmi Eswaran
+--      Changes:
+--      *  Add asamSystemALSState for ISR4.5 (ALU01809489)
+
+--  REVISION "201207180000Z"
+--  DESCRIPTION
+--     "Version:
+--      Editor:Feifei Shang
+--      Changes:
+--      *  Add timeZoneOffset(24) for ISR4.5
+
+--  REVISION "201201270000Z"
+--  DESCRIPTION
+--     "Version:3EC15532AAAA_V4.4.0.0.2
+--      Editor:Gerrit Verdickt
+--      Changes:
+--      *  Add systemMaxLtLinkSpeed fortygbps(40)
+--      *  Add licenseFeatureIndex for 40 Gbps enabled LT
+--
+--
+--  REVISION "201111170000Z"
+--  DESCRIPTION
+--     "Version:3EC15532AAAA_V4.4.0.0.1
+--      Editor:Tom Batsele
+--      Changes:
+--      * Add 1 license counter for MPLS
+--
+--  REVISION "201111090000Z"
+--  DESCRIPTION
+--     "Version:3EC15532AAAA_V4.4.0.0.0
+--      Editor:Rommy Volders
+--      Changes:
+--      * Add 1 license counter for 802.1Q CCI enabled MEPS
+--
+--  REVISION "201104261200Z"
+--  DESCRIPTION
+--     "Version:3EC15532EAAA_FDT1170.V4.3.0.3.1
+--      Editor:Arulmurugan Velumani
+--      Changes:
+--      * Add new license counter for : Green DSL L2 mode
+--
+--  REVISION "201101280000Z "
+--  DESCRIPTION
+--     "Version: 3EC15532AAAA_FDT1205.V4.3.0.2.1
+--      Editor: Zhang YI M
+--      Changes: ALU00979025 Extend size of loop-id-syntax from 64 to 80"
+--
+--  REVISION "201101140000Z "
+--  DESCRIPTION
+--     "Version: 3EC15532AAAA_V4.3.0.0.0
+--      Editor: Gerda Mertens
+--      Changes: RCR ALU00123664 Licensing support for Vectoring on VDSL2"
+--
+--  REVISION "201010220000Z "
+--  DESCRIPTION
+--     "Version: 3EC15532AAAA_V4.2.0.9.0
+--      Editor:  Bozhi Zheng
+--      Changes: RCR ALU00123702, comment the counter of license key shdsl-ctc"
+--
+--  REVISION "201007290000Z "
+--  DESCRIPTION
+--     "Version: 3EC15532AAAA_V4.2.0.5.0
+--      Editor: Karel Meijfroidt
+--      Changes: ALU00721710 Extend size of asamMibVersion object"
+--
+--  REVISION     "201005310000Z"
+--  ORGANIZATION "Alcatel-Lucent"
+--  DESCRIPTION
+--    "Version: 3EC15532AAAA_V4.2.0.5.0
+--     Editor: Bart Libert
+--     Changes:
+--          * FR ALU00159851
+--            removed clock related elements that are now in the NRT_MIB
+--
+--  REVISION "201005270000Z "
+--  DESCRIPTION
+--     "Version: 3EC15532AAAA_V4.2.0.0.1
+--      Editor: Luc Gijselink
+--      Changes: Licensing support for Gxr (RAC)
+--               ALU00159917"
+--
+--  REVISION     "201005310000Z"
+--  ORGANIZATION "Alcatel-Lucent"
+--  DESCRIPTION
+--    "Version: 3EC15532AAAA_ V4.2.0.0.8
+--     Editor: Gang Zhu
+--     Changes:
+--      * Licensing support for IPv6 security on RCR ALU00123682
+--
+--  REVISION     "201005310000Z"
+--  ORGANIZATION "Alcatel-Lucent"
+--  DESCRIPTION
+--    "Version: 3EC15532AAAA_V4.2.0.0.8
+--     Editor: Gang Zhu
+--     Changes:
+--      * Licensing support for IPv6 security on RCR ALU00123682
+--
+--  REVISION     "201004080000Z"
+--  ORGANIZATION "Alcatel-Lucent"
+--  DESCRIPTION
+--    "Version: 3EC15532EAAA_V4.1.0.1.3
+--     Editor: Lieve Dierick
+--     Changes:
+--      * FR ALU00249381
+--        asamShutdownBitMap range value (1..4294967295) replaced by (0..4294967295)"
+--
+--  REVISION "201002110000Z "
+--  DESCRIPTION
+--     "Version: 3EC15532AAAA_ V4.2.0.0.2
+--      Editor: Miranda De Bock
+--      Changes: IR ANTmt:
+--               - add 10Gbps and 20Gbps to asamSystemLicenseMgmtTable
+--     - add tengbps and twentyGbps to systemMaxLtLinkSpeed
+--
+--  REVISION "201001280000Z "
+--  DESCRIPTION
+--     "Version: 3EC15532AAAA_V4.2.0.0.1
+--      Editor: Karel Meijfroidt
+--      Changes: License support for ARQ"
+--
+--  REVISION "200911050000Z "
+--  DESCRIPTION
+--     "Version: 3EC15532AAAA_ V4.0.10.0.1
+--      Editor: Yihui Zhang
+--      Changes: - Disable asamProtocolSyntaxConfigurationTable support,
+--                 all syntax string and port number method object become system level configuration.
+--                 New syntax string introduced for GPON LT. (BDFam52637)"
+
+--
+--  REVISION "200910270000Z "
+--  DESCRIPTION
+--     "Version: 3EC15532AAAA_V4.2.0.0.0
+--      Editor: Lieve Dierick
+--      Changes: Licensing support for SRA on VDSL2
+--               ANTmt15167"
+--
+--  REVISION "200909230000Z "
+--  DESCRIPTION
+--     "Version: 3EC15532AAAA_ V4.1.0.0.5
+--      Editor: Peter Van Mele
+--      Changes: - Licensing support for SHSL cross-talk cancellation
+--               ANTmt76246
+--               - Document how to see difference between ETSI and ANSI stream"
+--
+--  REVISION "200908250000Z "
+--  DESCRIPTION
+--     "Version: 3EC15532AAAA_ V4.1.0.0.4
+--      Editor: Peter Van Mele
+--      Changes: Licensing support for NT load balancing/redundancy
+--               ANTmt72355"
+--
+--  REVISION "200907150000Z"
+--  DESCRIPTION
+--     "Version: 3EC15532EAAA_V4.0.0.2.1
+--      Editor: Patrick Swinkels
+--      Changes:
+--           * RCR ANTmt37998 - Synchronisation - DTAG requirements
+--           * RCR ANTmt52520 : Sync DTAG MIB impact drop in mainstream."
+--
+--  REVISION "2009081350000Z "
+--  DESCRIPTION
+--     "Version: 3EC15532AAAA_ V4.1.0.0.6
+--      Editor: Sven Dhuyvetter
+--      Changes: Management port on FD-REM
+--               ANTmt62854 - R3.7.01 (ARCOR maintenance release)
+--               ANTms55514 - R4.1 (general customer release).
+--
+--
+-- REVISION     "200907100000Z"  -* July 10, 2009
+-- DESCRIPTION
+--    "Version: 3EC15532EAAA_V4.0.0.2.0
+--     Editor: Jean Samoise
+--     Changes:
+--      * IR ANTmt55931:
+--        HighCap NT-LT auto-neg: add systemMaxLtLinkSpeed."
+--
+-- REVISION     "200906030000Z"  -* June 3, 2009
+-- DESCRIPTION  "Version: 3EC37309EAAA_V4.0.0.3.0
+--              Editor: Karel Meijfroidt
+--              * ANTmt55877:  Rebase latest version of the MIB to R4.0.02."
+--
+--  REVISION "200904070000Z"
+--  DESCRIPTION
+--     "Version: 3EC15532EAAA_V4.0.0.2.0
+--      Editor: Karel Meijfroidt
+--      Changes:
+--           * IR ANTmt52100 :
+--             Merged R3.7.10 version of the MIB to R4.0.02. This includes
+--             the changes done by Lucien Marcotte for SYNCE feature (Basic
+--             and Enhanced Clock Mgmt objects)."
+--
+--
+--  REVISION "200904150000Z"
+--  DESCRIPTION
+--     "Version: 3EC15532EAAA_V4.1.0.1.0
+--      Editor: Diankun Zhang
+--      Changes:
+--           * RCR ANTms03717 :
+--             Update description of item operateStatus of cpuLoadEntry :
+--             finished(4) should be idle(4)."
+--
+--  REVISION "200902200000Z"
+--  DESCRIPTION
+--     "Version: 3EC15532EAAA_V4.0.0.1.1
+--      Editor: Karel Meijfroidt
+--      Changes:
+--           * FR ANTmt39491 :
+--             Change description of some of the license counters."
+--
+--  REVISION "200807300000Z"
+--  DESCRIPTION
+--     "Version: 3EC15532EAAA_V3.7.1.1.0
+--      Editor: Sven Dhuyvetter
+--      Changes:
+--           * RCR ANTms79645 : Network port addressing change
+--             introduce new port addressing mode: sequential/slotBased."
+--
+--  REVISION "200811210000Z"
+--  DESCRIPTION
+--     "Version: 3EC15532EAAA_V3.7.0.0.1
+--      Editor:  Li Jie
+--      Changes:
+--            * update asamSysStatusBitMap description:
+--              Bit 8: this bit indicates that alarm 'Invalid xVPS Pair
+--              Redundancy Data' (LSM Redundancy 131 nbr 2) was raised.
+--              The purpose of using this bit is to  clear this alarm
+--              by using asamSysStatusClearBitMap.
+--              The purpose of using this bit is to clear the alarms 'Invalid
+--              xVPS Pair Redundancy Data' by using asamSysStatusClearBitMap."
+--
+--  REVISION "200806180000Z"
+--  DESCRIPTION
+--     "Version:3EC15532EAAA_V3.7.1.0.0
+--      Editor: Shaistha Rumana
+--      Changes:
+--      *"additional object asamActualSysClkBITSMode is supported
+--        from R37 onwards."
+
+--  REVISION "200803130000Z"
+--  DESCRIPTION
+--     "Version: 3EC15532EAAA_V3.7.0.0.0
+--      Editor: Zheng Bozhi
+--      Change:
+--           * ANTms51673: Annex-J/M on IFX 72p MultiADSL ISDN"
+
+--  REVISION "200709260000Z"
+--  DESCRIPTION
+--     "Version:3EC15532EAAA_V3.5.0.2.1
+--      Editor: Shwetha Bhaskar
+--      Changes:
+--      * additional value for actual-clock-priority removed
+--         from this release onwards.
+--      * new value <notApplicable> removed under the type
+--           SysClkSrcPriorityScheme."
+--
+--  REVISION "200710240000Z"
+--  DESCRIPTION
+--     "Version:3EC15532EAAA_V3.5.0.2.0
+--      Editor: Shwteha Bhaskar
+--      Changes:
+--      * additional value for external-source supported
+--         from this release onwards.FR ANTms62849 triggering these changes.
+--      * new value <autoselect> added under the type
+--           asamSysClkBITSMode."
+--
+--  REVISION "200710260000Z"
+--  DESCRIPTION
+--     "Version: 3EC15532EAAA_V3.6.0.0.0
+--      Editor: Daniel Gravelle
+--      Changes:
+--           * RCR ANTms35338: CDE Framework.
+--             Added MIB Objects asamSystemAccessOperatorID and
+--             asamSystemActivatedCDE for CDE Framework support."
+--
+--  REVISION "200709260000Z"
+--  DESCRIPTION
+--     "Version:3EC15532EAAA_V3.4.0.2.0
+--      Editor: Prashant Srivastava
+--      Changes:
+--      * additional value for actual-clock-priority supported
+--         from this release onwards. FR ANTms35449 triggering
+--         these changes.
+--      * new value <notApplicable> added under the type
+--           SysClkSrcPriorityScheme."
+--
+--  REVISION "200706260000Z"
+--  DESCRIPTION
+--     "Version: 3EC15532EAAA_V3.5.0.0.3
+--      Editor: Jean-Claude Del Col
+--      Changes:
+--           * RCR BDFhw77928 : VDSL2 IKA ADSL1/2 PSD shaping.
+--             Add a new license counter for ADSL1/2 PSD shaping : update
+--             of licenseFeatureIndex entry and licenseCounter."
+--
+--  REVISION "200706140000Z"
+--  DESCRIPTION
+--     "Version: 3EC15532EAAA_V3.5.0.0.2
+--      Editor: Fan Min
+--      Changes:
+--            * update asamSysStatusBitMap description:
+--              Bit 7: this bit indicates that one or several <xVPS
+--              configuration loss> alarms (PlugInUnit2 alarm nbr 11)
+--              were raised.
+--              The purpose of using this bit is to clear the alarms by
+--              using asamSysStatusClearBitMap."
+--
+--  REVISION "200705290000Z"
+--  DESCRIPTION
+--     "Version: 3EC15532EAAA_V3.5.0.0.1
+--      Editor: Bakri Aboukarr
+--      Changes:
+--      * update asamSystemId description: Accept all printable characters"
+--
+--  REVISION "200705030000Z"
+--  DESCRIPTION
+--     "Version: 3EC15532EAAA_V3.5.0.0.0
+--      Editor: Jean-Claude Del Col
+--      Changes:
+--      * Add new license counter for :
+--               1.XDSL per-line Overrule.
+--               2.Impulse Noise sensor."
+--
+--  REVISION "200703120000Z"
+--  DESCRIPTION
+--     "Version: 3EC15532EAAA_V3.4.0.0.1
+--      Editor: Laurent Deru
+--      Changes:
+--       * Add new license counter for UPBO Policing : update of
+--         licenseFeatureIndex entry and licenseCounter entry."
+--
+--  REVISION "200702150500Z"
+--  DESCRIPTION
+--     "Version: 3EC15532EAAA_V3.4.0.0.0
+--      Editor: Kou Jinhai
+--      Changes:
+--        * Add swVersion group for show SW version.
+--          Add systemMonitor group for monitor CPU load and memory usage and
+--          show the result of monitoring."
+--
+--  REVISION "200702141200Z"
+--  DESCRIPTION
+--     "Version: 3EC15532EAAA_V3.3.0.3.0
+--      Editor: Mohan Babu.M
+--      Changes:
+--     *Support for underscore character in the System Id."
+--
+--  REVISION "20061113000Z"
+--  DESCRIPTION
+--     "Version: 3EC15532EAAA_V3.3.0.2.0
+--      Editor : Katrien SCHARRE
+--      Changes:
+--        *Add text convention RowConfigState."
+--
+--  REVISION "20060926000Z"
+--  DESCRIPTION
+--     "Version: 3EC15532EAAA_V3.3.0.0.0
+--      Editor: Kou Jinhai
+--      Changes:
+--        * Environment monitor relay group is added to support configurable
+--          enable/disable of this environment monitor relay feature."
+--
+--  REVISION "20060100900Z"
+--  DESCRIPTION
+--     "Version: 3EC15532EAAA_E3.1.0.0
+--      Editor: ma liya
+--      Changes:
+--       *  asamAccessLoopIdSyntax group is added to support configurable Line
+--          Id and the format of option82.
+--          The syntax of asamSystemID is changed to extend system ID to 64
+--          characters from 20 characters."
+--
+--  REVISION "200512021200Z"
+--  DESCRIPTION
+--     "Version: 3EC15532EAAA_E2.4.3.0.0
+--      Editor: Satish Balagopalan
+--      Changes:
+--      * RCR BDFhw37384: Support for BITS two external clock sources."
+--
+--  REVISION "20601231200Z"
+--  DESCRIPTION
+--     "Version: 3EC15532EAAA_V2.4.3.0.0
+--      Editor: Manjunath.marigoudar@Wipro Technologies
+--      Changes:
+--      * (asamCraftLoginStatus) new variable added in changeOccuredtrap."
+--
+--  REVISION "200507051200Z"
+--  DESCRIPTION
+--     "Version: 3EC15532EAAA_E2.4.0.0
+--      Editor: Li Jing
+--      Changes:
+--      * RCR BDFhw34319 - an item of licenseFeatureIndex
+--         is added for IPOA-CC feature."
+--
+--  REVISION "200506041200Z"
+--  DESCRIPTION
+--     "Version: 3EC15532EAAA_E2.3.0.0
+--      Editor: Pradeep Hosaritthi
+--      Changes:
+--      * RCR BDFhw37384-Clock objects support from this
+--        release for BITS feature."
+--
+--  REVISION "200411221200Z"
+--  DESCRIPTION
+--     "Version: 3EC15532EAAA_E2.0.0.0
+--      Editor: Jun B Zhang
+--      Changes:
+--      * license key management added."
+--
+--  REVISION "200410141200Z"
+--  DESCRIPTION
+--     "Version: 3EC15532EAAA_E2.0.0.0
+--      Editor: Steven Luykx
+--      Changes:
+--      * RCR BDhw42976 System MAC adresses added."
+--
+--  REVISION "200401201200Z"
+--  DESCRIPTION
+--     "Version: 3EC15532EAAA_E1.0.0.0
+--      Editor: Rafael Van Driessche
+--      Changes:
+--      * A number of objects that have no use for ISAM have been indicated
+--        as not supported.
+--      * Object asamMibVersion has been indicated as being non-persistent.
+--      * The range of object asamEthernetShapingRate has been corrected."
+--
+--  REVISION "200107121200Z"
+--  DESCRIPTION
+--     "Version: 3EC15532AAAA_E5.0.0.0
+--      Editor: Rafael Van Driessche
+--      Changes:
+--      * Object asamSysStatusSetBitMap has been made obsolete.
+--      * Object asamAWSnumberOfSets has been made obsolete.
+--      * Object asamDiskStatusBitMap has been made obsolete.
+--      * Object asamNetworkPosition has been made obsolete.
+--      * Object asamMigrationStatus has been made obsolete.
+--      * Objects in asamSystemClockSelect group have been made obsolete.
+--      * Object asamShutdownBitMap has become supported.
+--      * Objects have been added related with selection of the system clock.
+--      * Object asamSystemInitProgress has been added."
+--
+--  REVISION "199911051200Z"
+--  DESCRIPTION
+--     "Version: 3EC15532AAAA_R3.0.1
+--      Editor: unknown
+--      Changes:
+--      * asamSysStatusBitMap: new values possible for backup/restore
+--      * asamMibVersion object added."
+--
+--  REVISION "199904031200Z"
+--  DESCRIPTION
+--     "Version: 3EC15532AAAA_R3.0.0
+--      Editor: unknown
+--      Changes:
+--      * Add asamSystemMigration group which contains:
+--        - asamMigrationStatus object for database migration control.
+--      * Add asamSystemClockSelect group which contains:
+--        - objects to allow clock selection;
+--        - objects to reflect clock state."
+--
+-- ===========================================================================
+
+   IMPORTS asam FROM SYSTEM-MIB
+           Counter, Gauge  FROM RFC1155-SMI
+           OBJECT-TYPE   FROM RFC-1212
+           EqptSlotIndex FROM ASAM-EQUIP-MIB
+  
+           MacAddress     FROM BRIDGE-MIB
+           NetworkTimeInSeconds, NetworkTimeInMiliSeconds FROM ASAM-TC-MIB
+           DateAndTime,RowStatus,TruthValue      FROM SNMPv2-TC
+           Unsigned32     FROM SNMPv2-SMI
+           IpAddress      FROM RFC1155-SMI
+
+
+   ;
+
+
+   asamSystemMIB            OBJECT IDENTIFIER ::= { asam 9 }
+
+   asamSysBootpInfo         OBJECT IDENTIFIER ::= { asamSystemMIB 2 }
+
+   asamSystemMigration      OBJECT IDENTIFIER ::= { asamSystemMIB 11 }
+
+   asamSystemClockSelect    OBJECT IDENTIFIER ::= { asamSystemMIB 12 }
+
+   asamSystemLicenseMgmt    OBJECT IDENTIFIER ::= { asamSystemMIB 17 }
+
+   asamSysMacAdresses       OBJECT IDENTIFIER ::= { asamSystemMIB 22 }
+
+   asamCraftLogin           OBJECT IDENTIFIER ::= { asamSystemMIB 25 }
+
+   asamAccessLoopIdSyntax   OBJECT IDENTIFIER ::= { asamSystemMIB 26 }
+
+   environmentMonitorRelay  OBJECT IDENTIFIER ::= { asamSystemMIB 27 }
+
+   swVersion                OBJECT IDENTIFIER ::= { asamSystemMIB 28 }
+
+   systemMonitor            OBJECT IDENTIFIER ::= { asamSystemMIB 29 }
+
+   asamRelayIdSyntax        OBJECT IDENTIFIER ::= { asamSystemMIB 58 }
+
+   --
+   -- Part 1: Objects to specify the OAM channel via which the BOOTP request
+   --         must be issued.  These objects are not applicable for ISAM.
+   --
+
+   asamSystemIpAtmVcVpi OBJECT-TYPE
+      SYNTAX INTEGER (0..4095)
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "To issue a BOOTP request over an ATM connection on the network
+          interface, a PVC must be defined.
+          This is the VPI value for that PVC.
+
+          ALCATEL NOTE:
+             SUPPORT: NO   INSRVMOD: YES  RANGE: 0..4095
+             PERSIST: YES  DEFVALUE: 0    UNITS: -"
+      ::= { asamSysBootpInfo 1 }
+
+   asamSystemIpAtmVcVci OBJECT-TYPE
+      SYNTAX INTEGER (0..65535)
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "To issue a BOOTP request over an ATM connection on the network
+          interface, a PVC must be defined.
+          This is the VCI value for that PVC.
+
+          ALCATEL NOTE:
+             SUPPORT: NO    INSRVMOD: YES   RANGE: 0..65535
+             PERSIST: YES   DEFVALUE: 32    UNITS: -"
+      ::= { asamSysBootpInfo 2 }
+
+   --
+   -- Part 2: Various system objects.
+   --
+
+   asamSystemID OBJECT-TYPE
+      SYNTAX OCTET STRING(SIZE(0..64))
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "The asamSystemID object represents the SID (System ID) of the NE
+          and is used to identify the NE.
+
+          The System ID may only include printable ASCII characters from '!'
+          (33 Decimal, 21 Hex) to '~' (126 Decimal, 7E Hex) inclusive and must
+          be unique for each NE in a managed network.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: YES   RANGE: See above
+             PERSIST: YES   DEFVALUE:       UNITS: -"
+      ::= { asamSystemMIB 3 }
+
+   asamSysStatusBitMap OBJECT-TYPE
+      SYNTAX INTEGER (1..4294967295)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "Status bitmap:
+          Bit 0: bit 0 is set if and only if none of the other bits is set.
+          Bit 1: bit 1 set indicates that persistent data has been lost
+                 including data necessary to establish OAM connectivity.
+          Bit 2: bit 2 set indicates that persistent data has been lost but
+                 not including data necessary to establish OAM connectivity.
+          Bit 3: bit 3 set indicates that a power-on reset has occured.  Notice
+                 that this also means that all reset-safe data has been lost.
+          Bit 4: bit 4 set indicates that a reset other than a power-on reset
+                 has occured.
+          Bit 5: not used anymore.
+          Bit 6: this bit indicates that alarm 'SHub configuration loss' (EQUIP
+                 alarm nbr 28) was raised. The purpose of using this bit is to
+                 clear this alarm by using asamSysStatusClearBitMap.
+          Bit 7: this bit indicates that one or several 'xVPS configuration
+                 loss' alarms (PlugInUnit2 alarm nbr 11) were raised.
+                 The purpose of using this bit is to clear the alarms by using
+                 asamSysStatusClearBitMap.
+          Bit 8: this bit indicates that alarm 'Invalid xVPS Pair Redundancy Data'
+                 (LSM Redundancy 131 nbr 2) was raised. The purpose of using this
+                 bit is to clear this alarm by using asamSysStatusClearBitMap.
+
+          Bit 9 .. 31 : reserved for future extensions.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: 1..4294967295
+             PERSIST: YES   DEFVALUE: NA   UNITS: -"
+      ::= { asamSystemMIB 4 }
+
+   asamSysStatusClearBitMap OBJECT-TYPE
+      SYNTAX INTEGER (1..4294967295)
+      ACCESS write-only
+      STATUS mandatory
+      DESCRIPTION
+         "Clear status bitmap:
+          In order to be able to clear the status bitmap, e.g. to clear the loss
+          of persistent data alarm, this bitmap has to be used by writing a 1 to
+          the corresponding bit position.  Bit 0 in the status bitmap cannot be
+          cleared in this way.  Therefore, the system will refuse a Set request
+          that attempts to set bit 0 in the asamSysStatusClearBitMap.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: YES   RANGE: 1..4294967295
+             PERSIST: NO    DEFVALUE: NA    UNITS: -"
+      ::= { asamSystemMIB 5 }
+
+   asamSysStatusSetBitMap OBJECT-TYPE
+      SYNTAX INTEGER (1..4294967295)
+      ACCESS write-only
+      STATUS obsolete
+      DESCRIPTION
+         "Set status bitmap:
+          In order to be able to set the status bitmap, this bitmap has to be
+          used by writing a 1 to the corresponding bit position."
+      ::= { asamSystemMIB 6 }
+
+   asamAWSnumberOfSets OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-write
+      STATUS obsolete
+      DESCRIPTION
+         "Reserved for AWS for synchronisation purposes."
+      ::= { asamSystemMIB 7 }
+
+   asamDiskStatusBitMap OBJECT-TYPE
+      SYNTAX INTEGER (1..4294967295)
+      ACCESS read-write
+      STATUS obsolete
+      DESCRIPTION
+         "Disk status bitmap:
+          Bit 0: by setting bit 0, all persistent data is synced (forced) to
+                 disk.
+          Bit 1: by setting bit 1, the ASAM disk is locked, otherwise the ASAM
+                 disk is not locked.  Disk locked means it is impossible to
+                 change persistent data  -->  any change by a manager is
+                 ignored.
+          Bit 2..31 : reserved for future use."
+      ::= { asamSystemMIB 8 }
+
+   asamShutdownBitMap OBJECT-TYPE
+      SYNTAX INTEGER (0..4294967295)
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "Shutdown bitmap:
+          Bit 0: by setting bit 0, the ASAM is prepared for shutdown;
+                 it is recommended to do this before extracting the active NT
+                 in a simplex system; the bit will be cleared again by
+                 extracting and reinserting the NT board.
+          Bit 1..31 : reserved for future use.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: YES   RANGE: 0..4294967295
+             PERSIST: NO    DEFVALUE: NA    UNITS: -"
+      ::= { asamSystemMIB 9 }
+
+   asamNetworkPosition OBJECT-TYPE
+      SYNTAX INTEGER (1..2)
+      ACCESS read-write
+      STATUS obsolete
+      DESCRIPTION
+         "Indicates whether the ASAM is a hub-ASAM (1) or a subtending ASAM.
+          The default is hub-ASAM."
+      ::= { asamSystemMIB 10 }
+
+   --
+   -- Part 3: Object related with system migration.  This object is obsolete.
+   --
+
+   asamMigrationStatus OBJECT-TYPE
+      SYNTAX INTEGER {
+         idle (1),
+         migrating (2),
+         rollBackPossible (3),
+         forceRollBack (4),
+         removeRollBackDatabase (5)
+      }
+      ACCESS read-write
+      STATUS obsolete
+      DESCRIPTION
+         "The asamMigrationStatus object represent the ASAM's status for what
+          concerns its migration capabilities.
+          Whereas two of the six values, viz. 'forceRollBack' and
+          'removeRollBackDatabase' may be specified in a management protocol
+          set operation, three values wil be returned in response to a
+          management protocol retrieval operation: 'idle', 'migrating' and
+          'rollBackPossible'.  That is, when queried, this object can
+          represent only three migration related states of the ASAM: the
+          ASAM has no specific migration state, i.e. it is simply operational
+          (the object has value 'idle'); the ASAM is busy migrating (the
+          object has value 'migrating'); or, the ASAM has recently migrated
+          but is still able to rol back to the previous configuration (the
+          object has value 'rollBackPossible'.  Whenever a management station
+          wishes the ASAM to roll back to its previous configuration it has
+          to set this object to value 'forceRollBack'. Setting the object to
+          value 'removeRollBackDatabase' informs the ASAM it has not
+          support the rollback feature anymore. As a result the ASAM will
+          perform clean up operations (e.g. free the roll back database).
+
+          Remark: this object is subject to improvement in future releases
+          (e.g.  coupling of data and software upgrade/rollback)."
+      ::= { asamSystemMigration 1 }
+
+   --
+   -- Part 4: Another bunch of system objects.
+   --
+
+   asamMibVersion OBJECT-TYPE
+      SYNTAX OCTET STRING(SIZE(0..28))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This variable identifies the version of the management interface
+          of the ASAM, i.e. it uniquely identifies the complete set of MIBs
+          that together constitute the management interface.  The version
+          is a string of the form dccdddddcccc_Vx.x.x.y.z, with d representing
+          a decimal digit, c representing an uppercase character, and x, y, z
+          representing a decimal number between 0 and 99.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= { asamSystemMIB 13 }
+
+-- asamEthernetShapingRate OBJECT-TYPE
+--    SYNTAX INTEGER (128..2000)
+--    ACCESS read-write
+--    STATUS mandatory
+--    DESCRIPTION
+--       "Ethernet frame shaping rate in kbit/s.
+--
+--        This object is only meaningful for a system with an Ethernet based
+--        management interface, which is always the case for the ISAM.
+--        In such a case, the system will shape the outgoing Ethernet frames
+--        on its management interface to the configured rate.
+--
+--        ALCATEL NOTE:
+--           SUPPORT: YES   INSRVMOD: YES   RANGE: 128..2000
+--           PERSIST: YES   DEFVALUE: 128   UNITS: kbit/s"
+--    ::= { asamSystemMIB 14 }
+
+   asamSystemInitProgress OBJECT-TYPE
+      SYNTAX INTEGER (0..100)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "Progress of the system initialization indicated as a percentage.
+
+          When the system starts its initialization, it will at first not be
+          reachable for SNMP managers.  However, as soon as the initialization
+          has progressed far enough, the system will allow Get requests from
+          managers on this object.  From then on, managers can poll the value
+          of this variable to monitor the progress of the initialization.  Get
+          requests on other objects and all Set requests will still be refused
+          by the system.  When the progress has reached 100% (initialization
+          complete), the system will allow all SNMP access.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: 0..100
+             PERSIST: NO    DEFVALUE: NA   UNITS: percent"
+      ::= { asamSystemMIB 15 }
+
+   asamPnPEnable OBJECT-TYPE
+      SYNTAX INTEGER {
+         enabled (1),
+         disabled (2)
+      }
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+         "This variable allows the manager to enable/disable the Plug-and-Play
+          functionality.  When enabled, the ASAM will, upon installation, start
+          up autonomously without intervention of a local craftsman. Otherwise,
+          a Craft Terminal is required to provide the necessary configuration
+          to the ASAM so that it can start up and set up communication with the
+          manager.
+
+          ALCATEL NOTE:
+             SUPPORT: NO    INSRVMOD: YES           RANGE: 1..2
+             PERSIST: YES   DEFVALUE: enabled (1)   UNITS: -"
+      ::= { asamSystemMIB 16 }
+
+   --
+   -- Part 6: Objects related with license key management.
+   --
+
+   asamLicenseNumberOfChanges OBJECT-TYPE
+      SYNTAX          Counter
+      ACCESS          read-only
+      STATUS          mandatory
+      DESCRIPTION
+         "Wrap around counter for the number of changes of the licenseCounter
+          object. The counter is incremented each time the licenseCounter is
+          incremented for one of the features. Not persistent data.
+
+          ALCATEL NOTE:
+             SUPPORT: YES    INSRVMOD: NA           RANGE: see above
+             PERSIST: NO     DEFVALUE: NA           UNITS: -"
+
+     ::=  { asamSystemLicenseMgmt 1 }
+
+   asamSystemLicenseMgmtTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF AsamSystemLicenseMgmtEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "The license key management table."
+     ::=  { asamSystemLicenseMgmt 2 }
+
+   asamSystemLicenseMgmtEntry OBJECT-TYPE
+      SYNTAX AsamSystemLicenseMgmtEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "An entry in the asamSystemLicenseMgmtTable."
+      INDEX {licenseFeatureIndex}
+     ::= {asamSystemLicenseMgmtTable 1}
+
+   AsamSystemLicenseMgmtEntry ::=
+      SEQUENCE {
+               licenseFeatureIndex INTEGER,
+               licenseCounter      INTEGER
+               }
+
+   licenseFeatureIndex OBJECT-TYPE
+      SYNTAX INTEGER (1..255)
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+        " This object is used by the asamSystemLicenseMgmtTable to identify a
+          row of this table. Each row corresponds to a system feature that is
+          monitored to support license management at the manager.
+          Following integer values are defined:
+            1.   ADSL2+
+            2.   READSL2
+            3.   IGMP
+            4.   BVB
+            5.   Annex-M
+            6.   IP-Forwarding
+            7.   PPPoX Relay
+            8.   PPPoX Termination
+            9.   802.1x
+            10.  SELT
+            11.  reserved
+            12.  reserved
+            13.  IPOA-CC and IPOA-RB
+            14.  UPBO Policing
+            15.  XDSL-PerLine-Overrule
+            16.  Impulse Noise Sensor
+            17.  ADSL1/2 PSD Shaping
+            18.  Annex-J
+            19.  SyncE Clock source
+            20.  2.5 Gbps enabled LT
+            21.  NT load sharing + redundancy
+            22.  SHDSL cross-talk cancellation
+            23.  SRA on VDSL2
+            24.  ARQ
+            25.  10 Gbps enabled LT
+            26.  20 Gbps enabled LT
+            27.  Gxr
+            28.  IPv6 security
+            29.  Lawful Intercept
+            30.  Vectoring crosstalk
+            31.  Green DSL L2 mode
+            32.  Ethernet OAM Advanced Monitoring Functions
+            33.  MPLS Advanced Resiliency
+            34.  40 Gpbs enabled LT
+            35.  Type-B protection
+            36.  Vectoring Legacy FEXT cancellation
+            37.  Vlan Translation Table Extended Usage
+            38.  Ethernet OAM Y1731 Performance Monitoring Functions
+            39.  Vplus
+            40.  GFast
+            41.  VULA
+            42.  Multi-vsg
+            43.  Ethernet Ring Protection Switching 
+
+      ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA           RANGE: 1..43
+             PERSIST: NO    DEFVALUE: NA           UNITS: -"
+
+      ::= {asamSystemLicenseMgmtEntry 1}
+
+
+
+   licenseCounter OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "The counter associated with the monitoring of the feature that
+          corresponds to the licenseFeatureIndex value.
+
+          1.  For ADSL2+, the counter indicates the number of XDSL lines for which
+          an ADSL2+ operational mode (POTS and/or ISDN) is enabled in its
+          configuration and supported by the LT board and for which
+          the XDSL board is equipped.
+
+          2.  For READSL2, the counter indicates the number of XDSL lines for which
+          a READSL2 operational mode (US mode 1 and/or US mode2) is enabled in
+          its configuration and supported by the LT board and for which the
+          XDSL board is equipped..
+
+          3. For IGMP, the counter indicates the number of DSL subscriber lines
+          for which an IGMP control channel has been configured.
+
+          4. For BVB, the counter indicates whether BVB is enabled (value 1) or
+          Disabled (value 0) in the ASAM and in ISAM this item is reserved.
+
+          5. For xDSL Annex-M, the counter indicates the number of DSL subscriber
+          line which is configured for Annex-M.
+
+          6. For IP-Forwarding, the counter indicates the number of DSL subscriber
+          lines configured for Layer-3, such as IP forwarding, RFC1483R/Br with
+          virtual routers, Layer-3 QoS features, IP anti-spoofing, IP filters.
+
+          7. For PPPoX Relay, the counter indicates the number of DSL subscriber
+          lines for which PPP CrossConnect has been configured.
+
+          8. For PPPoX Termination, the counter indicates the number of DSL
+          subscriber line for which PPPoE termination or PPPoA termination has
+          been configured.
+
+          9. For 802.1x, the counter indicates the number of DSL subscriber lines
+          for which 802.1x has been configured as 'enabled'
+
+          10. For SELT, the counter indicates the number of DSL subscriber lines
+          configured for G.selt usage and enables the collection of line test
+          data.
+
+          11. (reserved)
+          12. (reserved)
+
+          13. For IPoA-CC and IPoA-RB, the counter indicates the number of DSL
+          subscriber lines which are configured for IPoA cross connect or  IPoA
+          with ehanced i-bridge mode.
+
+          14. For UPBO Policing, the counter indicates the number of XDSL lines for
+          which a VDSL2 opmode has been selected, for which UPBO Policing pbo
+          mode has been enabled in its configuration and supported by the
+          LT board  and for which the XDSL board is equipped.
+          The counter is decremented when one
+          of these conditions is not met anymore.
+
+          15. For XDSL-Perline-Overrule, the counter indicates the number of XDSL
+          lines for which the per-line overrule data has been used in its
+          configuration and for which the XDSL board is equipped.
+          The counter is decremented when one of these conditions is not
+          met anymore.
+
+          16. For Impulse Noise Sensor, the counter indicates the number of XDSL
+          lines for which the Impulse Noise Sensor is enabled (insEnable
+          set to 1 in the Line Conf Table) and for which the XDSL board is
+          equipped. The counter is decremented if the XDSL line is unconfigured
+          ( once the INS feature has been enabled, it cannot be disabled anymore
+          unless the line is unconfigured ).
+
+          17. For ADSL1/2 PSD Shaping, the counter indicates the number of XDSL
+          lines for which ADSL1 or ADSL2 opMode is enabled with DBPO shaping
+          in its configuration. The counter is incremented when a XDSL line
+          has its operating mode enabled for ADSL1 or ADSL2 and a DPBO profile
+          is assigned to that line (DPBO board profile or a line profile) and
+          the respective board is equipped and planned and supports ADSL1/2 PSD
+          Shaping.
+          The counter is decremented when the DPBO profile (DPBO board or line
+          profile) of a xDSL line is unassigned or a xDSL line has its
+          operating mode disabled for ADSL1 or ADSL2.
+
+          18. For xDSL Annex-J, the counter indicates the number of DSL subscriber
+          line which is configured for Annex-J.
+
+          19. For syncE clock source, the counter indicates the number of
+          Synchronous Ethernet ports are configured as a clock source.
+
+          20. For 2.5 Gbps enabled LT, the counter indicates the number of LTs
+          that have an uplink that is running at 2.5 Gbps speed.
+
+          21. When NT load sharing + redundancy is supported, the counter indicates
+          1, else the counter indicates 0.
+
+          22. For SHDSL CTC, the counter indicates actual the number of SHDSL
+          subscriber lines for which cross-talk cancellation (CTC) is enabled and
+          for which the SHDSL board is equipped.
+          In current, this key isn't used, and the counter always keep as zero.
+
+          23. For SRA on VDSL2, the counter indicates the number of XDSL lines
+          for which a VDSL2 opmode has been selected, for which SRA mode has been
+          enabled in its configuration and supported by the LT board and for
+          which the XDSL board is equipped.
+          The counter is decremented when one of these conditions is not met
+          anymore.
+
+          24. For ARQ, the counter indicates the number of XDSL lines for which
+          ARQ is enabled in the configuration, supported by the LT board and
+          for which the XDSL board is equipped.
+
+          25. For 10 Gbps enabled LT, the counter indicates the number of LTs
+          that have an uplink that is running at 10 Gbps speed.
+
+          26. For 20 Gbps enabled LT, the counter indicates the number of LTs
+          that have an uplink that is running at 20 Gbps speed.
+
+          27. For Gxr, the counter indicates the number of lines that are
+          enabled for resource control via Diameter Gxr interface.
+
+          28. For IPv6 security, the counter indicates the number of access lines
+          (DSL, Ethernet or ONT UNI) where one or more IPv6 security features are
+          activated.
+
+          29. For Higig NT, the counter indicates whether lawful intercept is
+          enabled (value 1) or Disabled (value 0).
+
+          30. For Vectoring crosstalk, the counter indicates the number of XDSL
+          lines on which a vectoring profile has been assigned to by configuration,
+          supported by the LT board and for which the XDSL board is equipped.
+
+          31. For Green DSL L2 mode, the counter indicates the number
+          of xDSL lines which are equipped and configured with L2 mode
+          enabled.
+
+          32. For Ethernet OAM Advanced Monitoring Functions, the counter indicates
+          the numberof MEPS which can send and/or receive CFM Continuity Check
+          Messages.
+
+          33. For Higig NT, the counter indicates whether MPLS-FRR or MPLS LSR
+          is being used (value 1) or not used (value 0).The counter is only valid
+          on NANT-E and FANT-F boards. For other NTs, the value should always be 0,
+          as MPLS-FRR and MPLS LSR are not supported.
+
+          34. For 40 Gbps enabled LT, the counter indicates the number of LTs
+          that have an uplink that is running at 40 Gbps speed.
+
+          35. For Type-B protection, the counter indicates the number of protection
+          groups in the system that are configured by the operator. The counter is
+          only valid on NANT-E and FANT-F boards. For other NTs, the value should
+          always be 0, as protection group creation is not allowed. The value is
+          between 0 (no protection group) and 62 (maximum allowed by the system).
+
+          36. For Vectoring Legacy FEXT Cancellation, the counter indicates the
+          number of XDSL lines on which one of the Legacy FEXT Cancellation methods
+          has been enabled by configuration, supported by the LT board and for
+          which the XDSL board is equipped.
+
+          37. For Vlan Translation Table Extended Usage, the counter indicates the
+          number of line cards making use of Vlan Translation Resources in
+          an extended way.
+
+          38. For Ethernet OAM Y1731 Performance monitoring functions, the counter
+          indicates the number of MEPs in the system in which Y1731 performance
+          monitoring functions have been enabled.
+
+          39. For Vplus, the counter indicates the number of XDSL lines for which
+          a vplus opmode has been selected by configuration and supported by
+          the LT board and for which the XDSL board is equipped.
+          The counter is decremented when this condition is not met anymore.
+
+          40. For GFast, the counter indicates the number of XDSL lines for which
+          41. For VULA, the counter indicates the number of FELT-B planned as uplink mode
+          42. For Multiple SG, the counter indicates the number of SIP terminations created in the local access node
+          the G.fast operational mode is enabled by the configuration,
+          supported by the LT board and for which the LT board is equipped.
+          43. For Ethernet Ring Protection Switching, the counter indicates whether Ethernet Ring 
+          Protection Switching is enabled (value 1) or Disabled (value 0).
+
+          ALCATEL NOTE:
+             SUPPORT: YES    INSRVMOD: NA           RANGE: see above
+             PERSIST: NO     DEFVALUE: NA           UNITS: -"
+
+     ::= {asamSystemLicenseMgmtEntry 2}
+
+   systemMaxLtLinkSpeed   OBJECT-TYPE
+      SYNTAX INTEGER
+      {
+        onegbps(1),
+        twodot5gbps (2),
+        tengbps(10),
+        twentygbps(20),
+        fortygbps(40)
+        }
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+      "An enum indicating high capacity is enabled. Applicable for high capacity
+       NT's. This object is not applicable to ISAM 7367 SX / 7363 MX systems (Standalone
+       Single-board  Vectoring Box and NGVR).
+
+       ALCATEL NOTE:
+           SUPPORT: YES    INSRVMOD: NO           RANGE: 1,2,10,20 or 40
+           PERSIST: YES    DEFVALUE: onegbps      UNITS: NA"
+
+      ::= { asamSystemLicenseMgmt 3 }
+
+--OID 18..21 are reserved for ASAM applications
+
+   systemMac OBJECT-TYPE
+      SYNTAX OCTET STRING(SIZE(6))
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "On ISAM FD with SHUB: Specifies MAC address of the LANX interface(100baseT)  of the NT
+          This field should/must only be modified when the shelf does not support the SMAS functionality.
+          On ISAM 7367 SX/ 7363 MX systems (Standalone Single-board  Vectoring Box and NGVR)
+          this object is read only. It allows to get the MAC address of the system (e.g used for IP communication)
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA    RANGE: See above
+             PERSIST: YES   DEFVALUE: NA    UNITS: -"
+
+      ::= { asamSysMacAdresses 1 }
+
+   lanxBaseMac OBJECT-TYPE
+      SYNTAX OCTET STRING(SIZE(6))
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+          "Identifies the LANX MAC start adress. This field should/must only be
+           modified when the shelf does not support the SMAS functionality. This
+           object is not applicable to ISAM 7367 SX / 7363 MX systems (Standalone
+           Single-board  Vectoring Box and NGVR)
+
+             SUPPORT: YES   INSRVMOD: NA    RANGE: See above
+             PERSIST: YES   DEFVALUE: NA    UNITS: -"
+      ::= { asamSysMacAdresses 2 }
+
+   lanxRangeMac OBJECT-TYPE
+      SYNTAX INTEGER (0..65535)
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "Specifies the range of MAC adresses on LANX. The LANX MAC address
+          range is currently equal to 24(number of LANX interfaces). This field
+          should/must only be modified when the shelf does not support the SMAS
+          functionality. This object is not applicable to ISAM 7367 SX/ 7363 MX systems
+          (Standalone Single-board  Vectoring Box and NGVR)
+
+             SUPPORT: YES   INSRVMOD: NA    RANGE: 0..65535
+             PERSIST: YES   DEFVALUE: 24    UNITS: -"
+      ::= { asamSysMacAdresses 3 }
+
+   outbandManMac OBJECT-TYPE
+      SYNTAX OCTET STRING(SIZE(6))
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+          "Specifies Outband Management MACAddress. This field
+          should/must only be modified when the shelf does not support the SMAS
+          functionality. This object is not applicable to ISAM 7367 SX/ 7363 MX systems
+          (Standalone Single-board  Vectoring Box and NGVR)
+
+             SUPPORT: YES   INSRVMOD: NA    RANGE: See above
+             PERSIST: YES   DEFVALUE: NA    UNITS: -"
+      ::= { asamSysMacAdresses 4 }
+
+   asamSuperuserAuthByRadius OBJECT-TYPE
+      SYNTAX INTEGER {
+        enabled (1),
+        disabled (2)
+      }
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "The TL1/CLI user ID SUPERUSER/isadmin is optionally authenticated by
+         RADIUS based on this object. When disabled, SUPERUSER/isadmin is always
+         authenticated by the local user database. When enabled, SUPERUSER/
+         isadminauthentication is initially attempted with RADIUS, but the
+         authentication will fall back to the local TL1/CLI user database, if
+         all RADIUS servers are disabled, or the RADIUS servers are not
+         responding successfully to the authentication request.
+
+            ALCATEL NOTE:
+              SUPPORT: YES
+              PERSIST: YES
+              INSRVMOD: NA
+              RANGE: 1..2
+              DEFVALUE: 2
+              UNITS: NA"
+              DEFVAL { disabled }
+      ::= { asamSystemMIB 20 }
+
+   timeZoneOffset OBJECT-TYPE
+      SYNTAX          INTEGER (-780..840)
+      ACCESS          read-write
+      STATUS          mandatory
+      DESCRIPTION
+         "This object allows a manager to set the Time Zone Offset of the
+          system.
+          ALCATEL NOTE:
+                   SUPPORT:     YES
+                   PERSIST:     YES
+                   INSRVMOD:    NA
+                   RANGE:       -780...840
+                   DEFVALUE:    0
+                   UNITS:       minutes"
+    ::= { asamSystemMIB 24 }
+
+   asamCraftLoginStatus  OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "Specifies whether user has been logged in or not
+          1-user logged in
+          0-no user logged in.
+
+             SUPPORT: YES   INSRVMOD: NA    RANGE: See above
+             PERSIST: YES   DEFVALUE: NA    UNITS: -"
+      ::= { asamCraftLogin 1 }
+
+
+   asamPortNumberingMethodSystem OBJECT-TYPE
+      SYNTAX INTEGER {
+         logicalSlotId  (1),
+         positionBasedSlotId (2),
+         typeBasedSlotId (3),
+         legacyPositionBasedSlotId (4)
+      }
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "This object defines the Line ID format at the system level.
+         logicalSlotId (1) is a numbering method defined for equipment
+         identification in the MIB.
+         positionBasedSlotId (2) numbers all boards from left to rightor
+         from bottom to top starting from 1.
+         typeBasedSlotId (3) numbers -per slot-type- as indicated on
+         the shelf, in case there is no indication on the shelf it numbers
+         -per slot-type- from left to right or from bottom to top starting
+         with 1.
+         legacyPositionBasedSlotId (4) is identical to position-based
+         numbering except for aram-b/d where the numbering corresponds with
+         the logicalSlotId based numbering plus 1.
+
+        ALCATEL NOTE:
+              SUPPORT: YES
+              PERSIST: YES
+              INSRVMOD: NA
+              RANGE: see above
+              DEFVALUE: 1
+              UNITS: NA"
+      ::= { asamAccessLoopIdSyntax 1 }
+
+
+   asamAccessLoopAtmBasedDslSyntax OBJECT-TYPE
+      SYNTAX OCTET STRING(SIZE(0..80))
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "This variable defines the syntax for generating a loop id
+          for ATM based DSL lines terminated by DSL LT.
+          It is a string to define a specified format at system level.
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: YES  RANGE: See above
+             PERSIST: YES    DEFVALUE:      UNITS: -"
+      ::= { asamAccessLoopIdSyntax 3 }
+
+   asamAccessLoopEthBasedDslSyntax OBJECT-TYPE
+      SYNTAX OCTET STRING(SIZE(0..80))
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "This variable defines the syntax for generating a loop id
+          for Ethernet based DSL lines terminated by DSL LT and
+          for Ethernet lines terminated by Ethernet LT.
+          It is a string to define  a specified format at system level.
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: YES  RANGE: See above
+             PERSIST: YES    DEFVALUE:      UNITS: -"
+      ::= { asamAccessLoopIdSyntax 4 }
+
+   asamAccessLoopEthBasedPonSyntax OBJECT-TYPE
+      SYNTAX OCTET STRING(SIZE(0..80))
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "This variable defines the syntax for generating a loop id for Ethernet
+          based DSL line terminated by GPON ONTs, and for Ethernet lines terminated
+          by GPON ONTs. GPON ONTs are connected to the system via a GPON
+          transmission technology.
+          It is a string to define  a specified format at the system level.
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: YES  RANGE: See above
+             PERSIST: YES    DEFVALUE:      UNITS: -"
+      ::= { asamAccessLoopIdSyntax 5 }
+
+   asamAccessLoopEthBasedEPonSyntax OBJECT-TYPE
+      SYNTAX OCTET STRING(SIZE(0..80))
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "This variable defines the syntax for generating a loop id for Ethernet
+          based DSL line terminated by EPON ONTs, and for Ethernet lines terminated
+          by EPON ONTs. EPON ONTs are connected to the system via an EPON
+          transmission technology.
+          It is a string to define  a specified format at the system level.
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: YES  RANGE: See above
+             PERSIST: YES    DEFVALUE:      UNITS: -"
+      ::= { asamAccessLoopIdSyntax 6 }
+
+asamAccessLoopEthBasedNgpon2Syntax OBJECT-TYPE
+      SYNTAX OCTET STRING(SIZE(0..80))
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "This variable defines the syntax for generating a loop id for Ethernet
+          based DSL line terminated by NGPON2 ONTs, and for Ethernet lines
+          terminated by NGPON2 ONTs. NGPON2 ONTs are connected to the system via a
+          NGPON2 transmission technology.
+          It is a string to define a specified format at the system level.
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: YES  RANGE: See above
+             PERSIST: YES    DEFVALUE:      UNITS: -"
+      ::= { asamAccessLoopIdSyntax 7 }
+
+   asamAccessLoopNtPortSyntax OBJECT-TYPE
+      SYNTAX OCTET STRING(SIZE(0..80))
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "This variable defines the syntax for generating a access loop id 
+          for NT ports.
+          It is a string to define a specified format at system level. 
+          ALCATEL NOTE: 
+             SUPPORT: YES   INSRVMOD: YES  RANGE: See above
+             PERSIST: YES    DEFVALUE:      UNITS: -"
+      ::= { asamAccessLoopIdSyntax 8 }
+
+   environmentMonitorRelayMode OBJECT-TYPE
+      SYNTAX INTEGER {
+         enabled (1),
+         disabled (2)
+       }
+      ACCESS   read-write
+      STATUS   mandatory
+      DESCRIPTION
+        " This variable allows the manager to enable/disable the environment
+          monitoring relay functionality. When enabled, the environment data
+          will be relayed between monitoring box and supervision server.
+          Otherwise, it will stop the relay.
+        ALCATEL NOTE:
+             SUPPORT: NO    INSRVMOD: YES           RANGE: 1..2
+             PERSIST: YES   DEFVALUE: disable (2)   UNITS: -"
+      ::= {environmentMonitorRelay 1}
+
+   swEtsiVersion OBJECT-TYPE
+--    SYNTAX   DisplayString(SIZE(0..50))
+--  Use no DisplayString instead of OCTET STRING
+      SYNTAX   OCTET STRING(SIZE(0..50))
+      ACCESS   read-only
+      STATUS   mandatory
+      DESCRIPTION
+        " This object holds the Software version for ETSI market.
+          (e.g. R4.1). It will be empty if not supported for ETSI market.
+          To ease parsing by AMS, the format of this string is constrained as to
+          be Rn.n*.n* where n is any integer value, and * is any string of ASCII
+          character only containing alphabetic [a-zA-Z] characters combined
+          with _ and -.
+        ALCATEL NOTE:
+            ACCESS:      NA           USAGE:       NA
+            PERSIST:     NA           INSRVMOD:    NA
+            RANGE:       NA           DEFVALUE:    NA
+            UNITS:       NA           SPARSE:      NA
+            DESCR:       NA"
+    ::= {swVersion 1}
+
+  swAnsiVersion OBJECT-TYPE
+--    SYNTAX   DisplayString(SIZE(0..50))
+--  Use no DisplayString instead of OCTET STRING
+     SYNTAX   OCTET STRING(SIZE(0..50))
+     ACCESS   read-only
+     STATUS   mandatory
+     DESCRIPTION
+        " This object holds the Software version for ANSI market.
+          (such as FGN4.1.0). It will be empty if not supported for ANSI market.
+          To ease parsing by AMS, the format of this string is constrained as to
+          be Rn.n*.n* where n is any integer value, and * is any string of ASCII
+          character only containing alphabetic [a-zA-Z] characters combined
+          with _ and -.
+          Examples: R4.5.02c, R4.8b, R04.07.10 ...
+        ALCATEL NOTE:
+            ACCESS:      NA           USAGE:       NA
+            PERSIST:     NA           INSRVMOD:    NA
+            RANGE:       NA           DEFVALUE:    NA
+            UNITS:       NA           SPARSE:      NA
+            DESCR:       NA"
+     ::= {swVersion 2}
+
+  cpuLoadTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF CpuLoadEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "The CPU load monitor table.
+         ALCATEL NOTE:
+            TABLESIZE:     max nmbr of slots "
+      ::=  { systemMonitor 1 }
+
+   asamRelayAtmBasedDslSyntax OBJECT-TYPE
+      SYNTAX OCTET STRING(SIZE(0..80))
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "This variable defines the syntax for generating a relay id 
+          for Atm based DSL lines terminated by DSL LT. 
+          It is a string to define  a specified format at system level.
+          ALCATEL NOTE: 
+             SUPPORT: YES   INSRVMOD: YES  RANGE: See above
+             PERSIST: YES    DEFVALUE:      UNITS: -"
+      ::= { asamRelayIdSyntax 1 }
+
+   asamRelayEthBasedDslSyntax OBJECT-TYPE
+      SYNTAX OCTET STRING(SIZE(0..80))
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "This variable defines the syntax for generating a relay id 
+          for Ethernet based DSL lines terminated by DSL LT and
+          for Ethernet lines terminated by Ethernet LT.
+          It is a string to define  a specified format at system level.
+          ALCATEL NOTE: 
+             SUPPORT: YES   INSRVMOD: YES  RANGE: See above
+             PERSIST: YES    DEFVALUE:      UNITS: -"
+      ::= { asamRelayIdSyntax 2 }
+
+   asamRelayNtPortSyntax OBJECT-TYPE
+      SYNTAX OCTET STRING(SIZE(0..80))
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "This variable defines the syntax for generating a relay id 
+          for NT ports.
+          It is a string to define a specified format at system level. 
+          ALCATEL NOTE: 
+             SUPPORT: YES   INSRVMOD: YES  RANGE: See above
+             PERSIST: YES    DEFVALUE:      UNITS: -"
+      ::= { asamRelayIdSyntax 3 }
+
+   cpuLoadEntry OBJECT-TYPE
+      SYNTAX CpuLoadEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+            "An entry in the cpuLoadTable. The index of the entry is slotId.
+            An entry represents the CPU load of the board in the slot.
+            The CPU load includes detail value and average value respectively.
+            The slot can be NT slot or LT slot.
+            Row creation : An entry is created by the system when a board
+            is planning
+            Row deletion : An entry is deleted by the system when a board
+            is unplanning.
+            Index usage : the index is the slot id.
+            Note that entries will be presented to the SNMP manager in full
+            lexicographical order."
+      INDEX { slotId }
+      ::= { cpuLoadTable 1}
+
+   CpuLoadEntry ::=
+      SEQUENCE {
+               slotId           INTEGER (1..65535),
+               startMonitorTime NetworkTimeInSeconds,
+               cpuLoadDetail    OCTET STRING(SIZE(180)),
+               cpuLoadAverage   Gauge,
+               operateStatus    INTEGER
+               }
+
+   slotId OBJECT-TYPE
+      SYNTAX INTEGER (1..65535)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          " the slotId has the same value as eqptSlotId of ASAM-EQUIP-MIB.
+        ALCATEL NOTE:
+            ACCESS:      NA            USAGE:       NA
+            PERSIST:     NO            INSRVMOD:    NA
+            RANGE:       NA            DEFVALUE:    0
+            UNITS:       NA            SPARSE:      NO
+            DESCR:       NA"
+     ::= { cpuLoadEntry 1}
+
+   startMonitorTime OBJECT-TYPE
+      SYNTAX NetworkTimeInSeconds
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The start timestamp of CPU load monitor is the network
+          time in seconds.
+          It indicates the start time of last 3 minutes or less monitoring.
+          The startMonitorTime is the time at which the last CPU load
+          detail & average was computed - reset every second after
+          3 minutes from monitor start time.
+          The startMonitorTime is the monitor task start time if the interval
+          time between start and stop is less than 3 minutes. The
+          startMonitorTime is (stop monitor task time - 3 minutes) if the
+          interval time between start and stop is larger than 3 minutes.
+        ALCATEL NOTE:
+            ACCESS:      NA            USAGE:       NA
+            PERSIST:     NO            INSRVMOD:    NA
+            RANGE:       NA            DEFVALUE:    0
+            UNITS:       NA            SPARSE:      NO
+            DESCR:       NA"
+     ::= { cpuLoadEntry 2}
+
+   cpuLoadDetail OBJECT-TYPE
+      SYNTAX OCTET STRING(SIZE(180))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+            " The cpuLoadDetail object represents the CPU load percent value
+            (x100%) in detail for 180 measurement points.
+            The length of this object is always 180 octets. One octet represents
+            one CPU load value of one measurement. One measurement generates one
+            sample value. The measure time of a sample is a second. The maximum
+            measure time is 180 seconds. So the maximum number of samples is 180.
+            The interval time between start and stop (or show) operation may be
+            less 180 seconds. So the sample number may be less than 180. The left
+            octet will be padded with H'FF if the sample number is less than 180
+            and keeps the octet length always 180.
+            The type of cpuLoadDetail variable is OCTET STRING. Each octet can
+            be intepreted as a double-digit (binary ecoded value) integer.
+            The cpuLoadDetail indicates 180 double-digit (binary value) integers.
+            Each integer indicates the CPU load percent value of a measurement.
+            The order of measurement value is:
+            In case of the measurement time is >= 180 seconds, only the last 180
+            samples are keeped; the 1st octet is the 1st measurement value of the
+            last 180 sample; the 2nd octet is the 2nd measurement value of the
+            last 180 sample; the 180th octet is the 180th measurement value of
+            the last 180 sample. A wrap around buffer will be used to store the
+            measurement values.
+            In case of the measurement time is < 180 seconds, the samples are
+            less than 180, the 1st octet is the measurement value of 1st sample;
+            the 2nd octet is the measurement value of 2nd sample; the left
+            octet will be padded with H'FF; so the 180th octet is H'FF.
+
+        ALCATEL NOTE:
+            ACCESS:      NA            USAGE:       NA
+            PERSIST:     NO            INSRVMOD:    NA
+            RANGE:       NA            DEFVALUE:    'FFh'
+            UNITS:       NA            SPARSE:      NO
+            DESCR:       NA"
+     ::= { cpuLoadEntry 3}
+
+  cpuLoadAverage OBJECT-TYPE
+      SYNTAX Gauge
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         " The average value of CPU load. It is percent value (x100%).
+         It is the average of detail CPU load value.
+         One sample is generated for each second during CPU load measurement
+         time. The maximum measurement time is 180 seconds.
+         The maximum sample number is 180.
+         cpuLoadAverage is average of all 180 sample values if the monitoring
+         time is equal or longer than 180 seconds. It should be the average
+         of sample values measured in the time between start monitor and
+         stop monitor if the interval time between start and stop is less
+         than 180 seconds.
+        ALCATEL NOTE:
+            ACCESS:      NA            USAGE:       NA
+            PERSIST:     NO            INSRVMOD:    NA
+            RANGE:       0..100        DEFVALUE:    0
+            UNITS:       percentage    SPARSE:      NO
+            DESCR:       NA"
+     ::= { cpuLoadEntry 4}
+
+
+   operateStatus OBJECT-TYPE
+      SYNTAX INTEGER{
+                     start(1),
+                     stop(2),
+                     proceeding(3),
+                     idle(4),
+                     not-operational(5)
+                    }
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "The operate status for start/stop CPU load monitoring operation.
+          The maximum measurement time is 180 seconds.
+          One sample is generated for a second.
+          The maximum sample number is 180. Only the latest 180 sample values
+          are kept. The previous value beyond 180 is overwritten.
+          The operator should start monitor firstly, then show the CPU load
+          and stop monitor.
+          The <start(1)> and <stop(2)> are for operation (action). The
+          <proceeding(3)>, <idle(4)>, and <not-operational(5)>
+          indicate the states of the monitor.
+          ===================                         ===============
+          | not-operational | --- board planning ===> |    idle     |
+          ===================                         ===============
+          ===================                         ===============
+          |     idle        | --- start monitor  ===> |  proceeding |
+          ===================                         ===============
+          ===================                         ===============
+          | proceeding      | --- stop monitor   ===> |    idle     |
+          ===================                         ===============
+          ===================                           ==================
+          | idle,proceeding | --- board unplanning ===> |not-operational |
+          ===================                           ==================
+        ALCATEL NOTE:
+            ACCESS:      NA            USAGE:       NA
+            PERSIST:     NO            INSRVMOD:    YES
+            RANGE:       NA            DEFVALUE:    idle
+            UNITS:       NA            SPARSE:      NO
+            DESCR:       NA"
+     ::= { cpuLoadEntry 5}
+
+
+  memUsageTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF MemUsageEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "The memory usage monitor table."
+      ::=  { systemMonitor 2 }
+
+   memUsageEntry OBJECT-TYPE
+      SYNTAX MemUsageEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "An entry in the memUsageTable. The index of the entry is slotId.
+          An entry represents the memory usage of the board in the slot.
+          The memory usage includes total size and used size respectively.
+          The solt can be NT slot or LT slot."
+      INDEX { slotId }
+      ::= { memUsageTable 1}
+
+   MemUsageEntry ::=
+      SEQUENCE {
+               totalMemSize     Gauge,
+               memAbsoluteUsage Gauge
+               }
+
+   totalMemSize OBJECT-TYPE
+      SYNTAX Gauge
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "The total memory size on board. It just indicates the size of
+          total semi and dynamical memory.
+          ALCATEL NOTE:
+             SUPPORT: YES    INSRVMOD: NO           RANGE: NA
+             PERSIST: NO     DEFVALUE: NA           UNITS: Mbyte"
+      ::= { memUsageEntry 1}
+
+   memAbsoluteUsage OBJECT-TYPE
+      SYNTAX Gauge
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "The used memory size in absolute value. It indicates total used
+          size of semi and dynamical memory.
+          ALCATEL NOTE:
+             SUPPORT: YES    INSRVMOD: NO           RANGE: NA
+             PERSIST: NO     DEFVALUE: NA           UNITS: Mbyte"
+      ::= { memUsageEntry 2}
+
+-- OID 30..32 are reserved for other applications.
+--    (7342 FTTU, 7354 FTTB, LiteSpan ANIT-A)
+
+   asamSystemAccessOperatorID OBJECT-TYPE
+      SYNTAX INTEGER (0..65535)
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "The Access Operator ID is a unique identifier representing an operator.
+          This identifier is randomly generated by ALU, then assigned to an
+          operator.
+
+          The identifier is configured at the operator's premises.
+
+          A value of ZERO signifies that an access operator ID has not been
+          configured.  Decimal values 1 to 15 are reserved for future use.
+
+          ALCATEL NOTE:
+            ACCESS: NA
+            USAGE: NA
+            PERSIST: YES
+            INSRVMOD: YES
+            RANGE: 0..65535
+            DEFVALUE: 0
+            UNITS: NA
+            SPARSE: NA
+            DESCR: NA"
+      ::= { asamSystemMIB 33 }
+
+   asamSystemActivatedCDE OBJECT-TYPE
+      SYNTAX INTEGER (1..4294967295)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "The Activated CDE is a bitmap listing the CDE features that are active.
+
+          CDE features are activated during system startup only, and are
+          based on the configured Access Operator ID.
+
+          This field can display upto 32 bits (big endian)
+
+          Following list specifies which CDE feature is defined for each bit:
+
+           1  NASPortIDWithTwoDigits
+           2  VRRPProxyForEiBridge
+           3  MgntVLANpbit6
+           4  IgmpAntiSpoofingDisabled
+           5  TL1UdpModifiedBehaviour
+           6  vMACPortIdFromLine
+           7  IsdnBATextBasedIID
+           8  MCTransparencyForiBridge
+           9  ActivateStdConfForIhubNT
+          10  TransactionManagement
+          11  MACAddressMobility
+          12  UniversalSFP
+          13  ShdslCTC
+          14  UpLoopAttenuationOffset
+          15  L2DslLtSwARPRelay
+          16  MigrationNVLTDtoNDLTGAllowed
+          17  pre-R35PPPQoSHandling
+          18  XdslAutoswitchSupported
+          19  IsSFPReassignmentAllowed
+          20  IsVMACLogicalSlotidSupported
+          21  ShdslParametersNotReportedWhenPairCut
+          22  DualXfpAllowedNCNCH
+          23  GPONRemoteDSTagsTreatment
+          24  XdslDefaultProfileModelTR165
+          25  IsIpv6LightLlaIpantispoofingSupport
+          26  MultipleExternalSFTPServers
+          27  IsdnBaPermanentL2Agw
+          28  EmopOnuMulticastProvision
+          29  IsCodetelLegacyModeSupport
+          30  IsRtpDelayInMsecSupported
+          31  TL1pre-R4010Behaviour
+          32  DSPSyncDelaySupported
+
+          ALCATEL NOTE:
+            ACCESS: NA
+            USAGE: NA
+            PERSIST: NA
+            INSRVMOD: NA
+            RANGE: NA
+            DEFVALUE: NA
+            UNITS: NA
+            SPARSE: NA
+            DESCR: NA"
+      ::= { asamSystemMIB 34 }
+
+   asamSystemPortAddressingMode OBJECT-TYPE
+      SYNTAX INTEGER {
+         sequential (1),
+         slotBased (2)
+                     }
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+         "This object allows the manager to configure the faceplate port
+          addressing mode used by operators in CLI and TL1.
+          With the mode set to <sequential>, the operator must specify the port
+          as a sequential number that span the various cards in the system.
+          With the mode set to <slotBased>, the operator must specify the
+          ports as a combination of card type, rack/slot, port type
+          and faceplate port number.
+          In the current release this object is still read only, in future
+          releases the default <sequential> mode for legacy ports and systems
+          can be changed to <slotBased>.
+          New systems with non-legacy ports (overlapping port numbers, XFPs),
+          this object is set to <slotBased> and cannot be changed.
+          The default for this object is <sequential> on legacy systems and
+          <slotBased> on new systems.
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: YES           RANGE: 1..2
+             PERSIST: YES   DEFVALUE: see above     UNITS: -"
+      ::= { asamSystemMIB 35 }
+
+    peripheralMgntMacFilterTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF PeripheralMgntMacFilterEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "The peripheral management mac filter table.
+
+          For enhanced security in remote cabinets, it is possible to restrict
+          allowed destination MAC addresses in upstream Ethernet traffic on the
+          peripheral port to a white-list of 20 allowed MAC address ranges.
+
+          Each entry of this list consists of an Original manufacturer Unique
+          Identifier (OUI) value, covering the 3 Most Significant Bytes (MSB)
+          of the public MAC address.
+
+          A begin and end value of a single consecutive range of MAC addresses
+          for the above OUI covers at maximum the full 3 Least Significant
+          Bytes (LSB) of the public MAC address.
+
+            ALCATEL NOTE:
+                 TABLESIZE:  20
+                 DESCR:      NA"
+
+      ::=  { asamSystemMIB 36 }
+
+   peripheralMgntMacFilterEntry OBJECT-TYPE
+      SYNTAX PeripheralMgntMacFilterEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "A filter entry in the management mac filter table.
+          On the NRCD-B the filter is a filter on the destination mac address of
+          the frames received over this port.
+          On other cards/systems, the
+          filter is a filter on the source mac address of the frames received
+          over this port.
+
+          Unused filter entries have a start and end MAC address of
+          00.00.00.00.00.00, which is the default.
+
+          A special filter entry 7F.FF.FF.00.00.00 - 7F.FF.FF.FF.FF.FF is
+          provided to always match with any mac address. Adding
+          this entry therefore disables the MAC filter.
+
+          Both MAC addresses in a single filter entry always have the same OUI.
+         "
+
+      INDEX { peripheralMgntMacFilterIndex }
+      ::= { peripheralMgntMacFilterTable 1}
+
+   PeripheralMgntMacFilterEntry ::=
+      SEQUENCE {
+               peripheralMgntMacFilterIndex          INTEGER (1..20),
+               peripheralMgntMacFilterMacRangeFirst  MacAddress,
+               peripheralMgntMacFilterMacRangeLast   MacAddress
+               }
+
+   peripheralMgntMacFilterIndex OBJECT-TYPE
+      SYNTAX INTEGER (1..20)
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "The index for the peripheralMgntMacFilter table. A maximum of 20 mac
+          filters is supported.
+
+      ALCATEL NOTE:
+             SUPPORT: YES    INSRVMOD: YES    RANGE: 1..20
+             PERSIST: YES    DEFVALUE: NA     UNITS: NA"
+
+      ::= { peripheralMgntMacFilterEntry 1}
+
+   peripheralMgntMacFilterMacRangeFirst OBJECT-TYPE
+      SYNTAX MacAddress
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "Specifies the first MAC address of the allowed range.
+          Default value 00.00.00.00.00.00
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA      RANGE: See above
+             PERSIST: YES   DEFVALUE: 0       UNITS: -"
+
+      ::= { peripheralMgntMacFilterEntry 2 }
+
+   peripheralMgntMacFilterMacRangeLast OBJECT-TYPE
+      SYNTAX MacAddress
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "Specifies the last MAC address of the allowed range.
+          At least the OUI part should match the OUI of the
+          peripheralMgntMacFilterMacRangeFirst MAC address.
+          Default value 00.00.00.00.00.00
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA      RANGE: See above
+             PERSIST: YES   DEFVALUE: 0       UNITS: -"
+
+      ::= { peripheralMgntMacFilterEntry 3 }
+
+asamLiSeparate OBJECT-TYPE
+     SYNTAX     INTEGER
+                {
+                  disabled (0),
+                  enabled (1)
+                }
+     ACCESS     read-write
+     STATUS     mandatory
+     DESCRIPTION
+         "
+            Parameter used to create a separate LI management plane; i.e to
+            restrict creation/modification of operators that can access lawful
+            intercept data. This object is not applicable to ISAM 7367 SX / 7363 MX
+            systems (Standalone Single-board  Vectoring Box and NGVR).
+
+           'disabled':
+              CLI user with security privileges can:
+                -set li-user,li-admin user privileges
+                -create a LI view
+                -attach a LI view to a usergroup
+                -modify a LI view
+              SNMP user with view on USM,VACM MIB's can:
+                -create a LI view
+                        -attach a LI view to a usergroup
+                -modify a LI view
+
+           'enabled':
+              CLI user with security and li-admin user privilege can:
+                -set li-user,li-admin user privileges
+                -create a LI view
+                -attach a LI view to a usergroup
+                -modify a LI view
+              SNMP user with view on USM,VACM and IHUB LI ADMIN MIB's can:
+                    -create a LI view
+                        -attach a LI view to a usergroup
+                -modify a LI view
+
+           Notes:
+            LI view= view with access on IHUB LI MIB and/or IHUB LI ADMIN MIB
+            Before setting this value to enabled make sure that:
+            - a CLI user exist with li-admin privilege.
+            - a SNMP user exist with access to IHUB LI ADMIN MIB
+
+           ALCATEL NOTE: Applicable to higig NTs
+             SUPPORT: YES   INSRVMOD: NA          RANGE: NA
+             PERSIST: YES   DEFVALUE: disabled    UNITS: NA
+
+          "
+     DEFVAL { disabled }
+     ::=  { asamSystemMIB 37 }
+
+asamSystemALSState OBJECT-TYPE
+     SYNTAX     INTEGER
+                {
+                  disabled (1),
+                  enabled (2)
+                }
+     ACCESS     read-write
+     STATUS     mandatory
+     DESCRIPTION
+         "Parameter used to enable / disable ALS (Automatic Laser Shutdown) system wide.
+          ALS enable / disable will be applied only for NT & NTIO xFPs.
+
+          'disabled':
+              System wide ALS is disabled
+
+          'enabled':
+              System wide ALS is enabled
+
+          Notes:
+              Applicable to
+         xFP type : Optical only
+         NTs : NANT-D, FANT-F xFPs
+         NTIOs : NCNC-B/C/D/E/F/H xFPs
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: YES        RANGE: NA
+             PERSIST: YES   DEFVALUE: enabled    UNITS: NA
+
+          "
+     DEFVAL { enabled }
+     ::=  { asamSystemMIB 41 }
+
+asamSystemCustomerId OBJECT-TYPE
+      SYNTAX OCTET STRING(SIZE(0..64))
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+          "A textual string identifying the customer assigned in system level.
+           Default value is 'available', which means system customer id is
+           not configured.
+
+         ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: YES        RANGE: NA
+             PERSIST: YES   DEFVALUE: available  UNITS: -"
+      ::= { asamSystemMIB 43 }
+
+asamSystemAutoSwitchAtmPtm OBJECT-TYPE
+     SYNTAX     INTEGER
+                {
+                  enable (1),
+                  disable (2)
+                }
+     ACCESS     read-write
+     STATUS     mandatory
+     DESCRIPTION
+        "This parameter allows the manager to enable or disable an Auto-Switching
+         between ATMoADSLx and PTMoVDSLx at system wide.
+         The supported values are,
+          1 (enable)  - enables auto-switching between ATM and PTM at system wide.
+          2 (disable) - disables auto-switching between ATM and PTM at system wide.
+
+         ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: YES        RANGE: NA
+             PERSIST: YES   DEFVALUE: disable    UNITS: NA
+
+          "
+     DEFVAL { disable }
+     ::=  { asamSystemMIB 44 }
+
+asamSystemAutoSwitchVdslStepUpDelay OBJECT-TYPE
+      SYNTAX INTEGER (0..65535)
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "This parameter allows the manager to set delay time (in seconds) for
+         auto-switch stepup to VDSL service. The auto-switch step-up request for
+         VDSL service will be considered for the xdsl line failure (LOS/LPR) which
+         received after this delay time from the time of fallback to ATMoADSLx
+         service.
+         The supported values are 0 to 65535.
+
+         ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: YES     RANGE: 0..65535
+             PERSIST: YES   DEFVALUE: 3600    UNITS: seconds "
+
+      DEFVAL { 3600 }
+      ::= { asamSystemMIB 45 }
+
+asamSystemUplinkMode OBJECT-TYPE
+      SYNTAX     INTEGER
+                 {
+                    auto (1),
+                    ptp  (2),
+                    gpon (3),
+                    bonded (4)
+                 }
+      ACCESS     read-write
+      STATUS     mandatory
+      DESCRIPTION
+          "Parameter used to configure uplink mode.
+           Notes:
+            After changing uplink-mode, new value only takes effect after system reboot.
+
+           ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: YES        RANGE: NA
+             PERSIST: YES   DEFVALUE: auto       UNITS: NA  "
+      DEFVAL { auto }
+      ::=  { asamSystemMIB 46 }
+
+
+      asamSystemCurrentUplinkMode OBJECT-TYPE
+      SYNTAX     INTEGER
+                 {
+                    ptp  (1),
+                    gpon (2),
+                    bonded (3)
+                 }
+      ACCESS     read-only
+      STATUS     mandatory
+      DESCRIPTION
+          "Parameter used to current uplink mode.
+
+           ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: YES        RANGE: NA
+             PERSIST: YES   DEFVALUE: NA         UNITS: NA  "
+      ::=  { asamSystemMIB 47 }
+
+   asamSystemVoiceOswp OBJECT-TYPE
+      SYNTAX INTEGER {
+        novoice (0),
+        h248 (1),
+        sip (2)
+      }
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+         "The voice software when system startup.
+
+         ALCATEL NOTE:
+             SUPPORT: YES    INSRVMOD: YES       RANGE: 0..2
+             PERSIST: YES    DEFVALUE: sip(2)    UNITS: -"
+      DEFVAL { sip }
+        ::= { asamSystemMIB 48 }
+
+   asamSystemActivatedCDEExtended OBJECT-TYPE
+      SYNTAX OCTET STRING(SIZE(32))
+
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "The Activated CDE is a bitmap listing the CDE features that are active.
+
+          CDE features are activated during system startup only, and are
+          based on the configured Access Operator ID.
+          This field can display upto 256 bits (big endian)
+
+          Following list specifies which CDE feature is defined for each bit:
+
+           1	NASPortIDWithTwoDigits
+           2	VRRPProxyForEiBridge
+           3	MgntVLANpbit6
+           4	IgmpAntiSpoofingDisabled
+           5	TL1UdpModifiedBehaviour
+           6	vMACPortIdFromLine
+           7	IsdnBATextBasedIID
+           8	MCTransparencyForiBridge
+           9	ActivateStdConfForIhubNT
+          10	TransactionManagement
+          11	MACAddressMobility
+          12	UniversalSFP
+          13	ShdslCTC
+          14	UpLoopAttenuationOffset
+          15	L2DslLtSwARPRelay
+          16	MigrationNVLTDtoNDLTGAllowed
+          17	pre-R35PPPQoSHandling
+          18	XdslAutoswitchSupported
+          19	IsSFPReassignmentAllowed
+          20	IsVMACLogicalSlotidSupported
+          21	ShdslParametersNotReportedWhenPairCut
+          22	DualXfpAllowedNCNCH
+          23	GPONRemoteDSTagsTreatment
+          24	XdslDefaultProfileModelTR165
+          25	IsIpv6LightLlaIpantispoofingSupport
+          26	MultipleExternalSFTPServers
+          27	IsdnBaPermanentL2Agw
+          28	EmopOnuMulticastProvision
+          29	IsCodetelLegacyModeSupport
+          30	IsRtpDelayInMsecSupported
+          31	TL1pre-R4010Behaviour
+          32	DSPSyncDelaySupported
+          33	DhcpOption82Transparent
+          34	AutomaticPMCollection
+          35	LineIdDisplayPANIHeader
+          36	ANCP-RFC6320CompliantentProtocolSupported
+          37	CVlanPBitBasedSchedulingDS
+          38	IsLineShaperEnabled
+          39	CVLANRangeBasedCtrlProtocolAwareness
+          40	FourQueuesUpstreamCatan
+          41	CMCCInteroperabilityNPBridgeFiltering
+          42	IsPTMLineShaperDisabled
+          43	PopulateDHCPOption82.2InHex
+          44	L3Multicast
+          45	IGMPMarkPriorityBitToValue6
+          46	ItfSubnetScale32
+          47	IsAutoPortResetSupported
+          48 ReducedDsObcPolicer
+          49 EponUniDimensionScaleup
+          50 EontPerformanceMonitorOptimization
+          51 EponQuickPonCutover
+          52 PppDhcpTlv90Tlv91OptionAdd
+          53 SwPoliceNdMldProtoAt100Pps
+          54 IsPPPOEDownstreamRelayEnabled
+          55 UseSpecificHoldOffTime
+          56 HguTr069Configuration
+          57 MaskParityError
+          58 DisableSfpAlcatelStringCheckPtpLt
+          59 IsQosMarkerProfInnerPbitSupported
+          60 QosBandwidtProfileConfigOnUni
+          61 QosQueuesAggrConfigSupport
+          62 ModifyNbrOfPortsOnOntCardAllowed
+          63 LtBootPriority
+          64 NetworkItfMtuDefault
+          65 RemovePasswordSpecialCharReq
+          66 CpuFilterPortRange
+          67 ReducedPresenceIndicationTimeout
+          68 LldpSubtypeInterfaceName
+					69 MigrationRDLTCtoRDLTDAllowed
+ 					70 MigrationNDLTFtoNDLTJAllowed
+					71 MigrationNDLTGtoNDLTKAllowed     
+          72 IsStunnelMipSupported   
+          73 SupportRemoteShelfOnLtPort
+          74 RemoveDhcpSessionIfPortAdminDown
+          75 VvplsUnknownMcDrop
+          76 GponIsSupportingRunTimeSetMcPbit
+          77 ArpPollingAndSnooping
+          78 CablePairIdentificationEnhancement
+          79 ArpRemoteIdCheckDisable
+          80 VplusVectLowspectrumOnlySupported
+          81 IsMegacoLawfulInterceptSupported
+          82 MiiUniversalBbServSupport
+          83 SupportNotTodOntClockSync
+          84 EfmOamOrgSpecOlidSupport
+          85 DtagAlarmsForClockDefects
+          86 MigrationNDLTCtoNDLTKAllowed
+          87 IsSipSelfRingingSupported
+          88 PmCdrCount5Min
+          89 FwWatchdogFeatureForL2PlusLt
+          90 LimitedTL1ForXGSPON
+          91 IsAttAricentOntSupported
+          92 IsSipQuickLinetestSupported
+          93 IsMegacoQuickLinetestSupported
+          94 SupportIgmpRowidSyncByMibReset
+          95 OnuProvisioningBasedOnOnuType
+          96 IfNameIncludesAidInfo
+          97 CrossVlanPolicerSharing
+          98 StunnelCvlanPbitRemark
+          99 MaxMacPerUplinkMx
+          100 OperatorSpecificTrapsSupported
+          101 DhcpTransparency
+          105 DropStandbyLinkTraffic
+
+
+          ALCATEL NOTE:                                    
+            ACCESS: NA
+            USAGE: NA
+            PERSIST: NA
+            INSRVMOD: NA
+            RANGE: NA
+            DEFVALUE: NA
+            UNITS: NA
+            SPARSE: NA
+            DESCR: NA"
+      ::= { asamSystemMIB 49 }
+
+   asamSuperuserAuthByTacacsPlus OBJECT-TYPE
+      SYNTAX INTEGER {
+        enabled (1),
+        disabled (2)
+      }
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "The TL1/CLI user ID SUPERUSER/isadmin is optionally authenticated by
+         Tacacs+ based protocol on this object. When disabled, SUPERUSER/isadmin
+         is always authenticated by the local user database. When enabled,
+         SUPERUSER/isadmin authentication is initially attempted with Tacacs+,but
+         the authentication will fall back to the local TL1/CLI user database, if
+         all Tacacs+ servers are disabled, or the Tacacs+ servers are not
+         responding successfully to the authentication request.
+         Note that Tacacs+ is applicable only for CLI user from R5.2 onwards.
+
+            ALCATEL NOTE:
+              SUPPORT: YES
+              PERSIST: YES
+              INSRVMOD: NA
+              RANGE: 1..2
+              DEFVALUE: 2
+              UNITS: NA"
+              DEFVAL { disabled }
+      ::= { asamSystemMIB 50 }
+
+   asamExternalLedsStatus OBJECT-TYPE
+      SYNTAX INTEGER {
+        enabled (1),
+        disabled (2)
+      }
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "This MIB object is used to administratively turn off LEDs which are visible from the
+         outside on some equipment practices like sealed remotes. By default, LEDs are enabled which
+         means they are working normally and represent the actual status of the concerned item. If
+         LEDs are disabled, they won't show any light even though an error status should be reported.
+
+         This MIB object is only supported on some equipment practices. If not supported this
+         MIB object will return enabled when read.
+
+            ALCATEL NOTE:
+              SUPPORT: YES
+              PERSIST: YES
+              INSRVMOD: NA
+              RANGE: 1..2
+              DEFVALUE: 1
+              UNITS: NA"
+              DEFVAL { enabled }
+      ::= { asamSystemMIB 51 }
+
+    asamSystemMirrorVoice OBJECT-TYPE
+      SYNTAX     INTEGER
+                 {
+                    disabled(1),
+                    ingress(2),
+                    egress(3),
+                    both(4)
+                }
+      ACCESS     read-write
+      STATUS     mandatory
+      DESCRIPTION
+        "Enable/disable voice mirror of ingress/egress/both voice packets.
+        Default value is Disabled
+         ALCATEL NOTE:
+             ACCESS:     NA       USAGE:      OPT
+             PERSIST:    YES      INSRVMOD:   YES
+             RANGE:      1..4     DEFVALUE:   1[disabled]
+             UNITS:      NA       SPARSE:     NA
+             DESCR:      NA"
+             DEFVAL { disabled }
+      ::=  { asamSystemMIB 52 }
+
+   --  ==================================================================
+   --  |                    START TECH SUPPORT OBJECTS                  |
+   --  ==================================================================
+
+
+ techSupport              OBJECT IDENTIFIER ::= { asamSystemMIB 53 }
+
+ asamTechSupportEnableDisable OBJECT-TYPE
+      SYNTAX INTEGER {
+        disabled (1),
+        enabled (2)
+      }
+      ACCESS          read-write
+      STATUS          mandatory
+      DESCRIPTION
+         "Enable/disable the techSupport functionality
+          This attribute is only available on equipment practices
+          that support this feature.
+          When not supported noSuchName will be returned.
+          ALCATEL NOTE:
+             SUPPORT: YES     INSRVMOD: NA           RANGE: 1..2
+             PERSIST: NO      DEFVALUE: enabled (2)  UNITS: NA"
+     DEFVAL { enabled }
+     ::=  { techSupport 1 }
+
+     TechSupportSessionId ::= INTEGER (0..65535)
+
+     TechSupportSessionType ::=    INTEGER {
+                                              crashLog(1),
+                                              boardOnDemand(2),
+                                              ifIndexOnDemand(3)
+                                           }
+
+
+
+
+ asamTechSupportPurgeFiles OBJECT-TYPE
+   SYNTAX INTEGER
+          {
+             noAction(1),
+             purge   (2)
+          }
+      ACCESS          read-write
+      STATUS          mandatory
+      DESCRIPTION
+        "This object is a button-like object and is used to clear all
+         collected TechSupport files. Next to the Tech Support files
+         related to board crashes, also all on-demand files wil be
+         removed.
+         Setting this object with value noAction will be accepted but
+         has no effect.
+         Value noAction will be returned when read.
+          ALCATEL NOTE:
+             SUPPORT: YES     INSRVMOD: NA           RANGE: 1..2
+             PERSIST: YES     DEFVALUE: 1            UNITS: NA"
+     DEFVAL { noAction }
+     ::=  { techSupport 2 }
+
+ asamTechSupportOnDemandFreeSessionId OBJECT-TYPE
+   SYNTAX TechSupportSessionId
+      ACCESS read-only
+      STATUS          mandatory
+      DESCRIPTION
+        "This object provides a free session id that can be used for launching
+         an on demand Tech Support file session via asamTechSupportActionTable
+
+          ALCATEL NOTE:
+             SUPPORT: YES     INSRVMOD: NA           RANGE: 0..65535
+             PERSIST: NO      DEFVALUE: NA           UNITS: NA"
+     ::=  { techSupport 3 }
+
+   asamTechSupportActionTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF AsamTechSupportActionEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "The TechSupport Action Table
+          Use this table to launch On Demand Tech Support File generation"
+     ::=  { techSupport 4 }
+
+   asamTechSupportActionEntry OBJECT-TYPE
+      SYNTAX AsamTechSupportActionEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "An entry in the asamTechSupportSessionTable."
+      INDEX { asamTechSupportActionId}
+     ::= {asamTechSupportActionTable 1}
+
+   AsamTechSupportActionEntry ::=
+      SEQUENCE {
+               asamTechSupportActionId           INTEGER,
+               asamTechSupportActionEvent        INTEGER,
+               asamTechSupportActionSessionId    TechSupportSessionId,
+               asamTechSupportActionType         TechSupportSessionType,
+               asamTechSupportActionObject       INTEGER,
+               asamTechSupportActionServerIP     IpAddress,
+               asamTechSupportActionFile         OCTET STRING(SIZE(1..255))
+               }
+
+   asamTechSupportActionId OBJECT-TYPE
+      SYNTAX INTEGER  (1..1)
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+        "The index of the Tech Support Action Table Session
+         Entry with id 1 exists and is to be used for creating
+         new tech support on demand requets.
+
+      ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NO           RANGE: 0..65535
+             PERSIST: YES   DEFVALUE: NA           UNITS: -"
+
+      ::= {asamTechSupportActionEntry 1}
+
+   asamTechSupportActionEvent OBJECT-TYPE
+   SYNTAX INTEGER
+          {
+             generate (1),
+             clear    (2)
+          }
+      ACCESS          read-write
+      STATUS          mandatory
+      DESCRIPTION
+        "Indicate which action to trigger.
+         The Following scenarios are possible:
+         - Generate an On Demand TS File
+           A set with the below fields specified will generate an on-demand
+           Tech Support file generation for a dedicated board.
+           It will result in the creation of a row in the
+           asamTechSupportSessionTable by which the progress of the generation
+           can be followed. When the Session goes into done state, then the
+           corresponding file can be retrieved from /pub/TS/ONDEMAND
+           The Mandatory fields to be set in one PDU are
+             asamTechSupportActionEvent : MUST be generate (1)
+             asamTechSupportActionType : MUST be boardOnDemand (2)
+             asamTechSupportActionObject : Equipment Slot ID
+             asamTechSupportActionFile : filename to write
+           In case a dedicated SessionId is wanted, it can be set via the following
+           optional field:
+             asamTechSupportActionSessionId : requested session id
+           asamTechSupportActionServerIP is also an optional fields which if
+           set should be fixed to value 0
+         - Clear an On Demand TS File
+           A set with the below fields will results in the removal of the entry
+           from the asamTechSupportSessionTable and the corresponding file from disk.
+           The Mandatory fields to e set in 1 PDU are
+             asamTechSupportActionEvent : MUST be clear(2)
+             asamTechSupportActionSessionId : SessionId to remove
+
+          ALCATEL NOTE:
+             SUPPORT: YES     INSRVMOD: NA           RANGE: 1..2
+             PERSIST: YES     DEFVALUE: 1            UNITS: NA"
+     DEFVAL { generate }
+     ::=  { asamTechSupportActionEntry 2 }
+
+   asamTechSupportActionSessionId OBJECT-TYPE
+      SYNTAX TechSupportSessionId
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+        "Specify this value in case a dedicated session ID is
+         to be used for this request. To find a good unique session-id, a read
+         can be done to asamTechSupportOnDemandFreeSessionId. If a value of 0 is
+         given, then the system will automatically select a session Id.
+
+
+      ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NO           RANGE: 0..65535
+             PERSIST: YES   DEFVALUE: NA           UNITS: -"
+
+      ::= {asamTechSupportActionEntry 3}
+
+   asamTechSupportActionType OBJECT-TYPE
+      SYNTAX TechSupportSessionType
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "The type corresponding to the stored or requested Tech Support File.
+          - crashLog : type for auto generated crashlog TS files for boards
+          - boardOnDemand : type for requesting an on-demand TS file for boards
+          - ifIndexOnDemand : type for requesting an on-demand TS file for a specific ifIndex
+
+          Currently only boardOnDemand is supported. The other values will be rejected.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NO    RANGE: 2 or 3
+             PERSIST: YES   DEFVALUE: NA    UNITS: -"
+      ::= { asamTechSupportActionEntry 4 }
+
+
+   asamTechSupportActionObject OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "Identifier that indicates for which object that the Tech Support File was
+          generated or requested.
+          For a boardOnDemand(2) request, the asamTechSupportSessionObject needs to be set to
+          the Equipment Slot Id of the board for which the Tech Support file is to be generated.
+          For a ifIndexOnDemand(3) request, the asamTechSupportSessionObject needs to be set to
+          the if-index corresponding to the PON or ONT.
+
+          Currently only boardOnDemand(2) requests are supported, hence the value for
+          this field needs to be populated with the Equipment Slot Id.
+
+          ALCATEL NOTE:
+             SUPPORT: YES    INSRVMOD: NO           RANGE: see above
+             PERSIST: YES    DEFVALUE: NA           UNITS: -"
+
+     ::= {asamTechSupportActionEntry 5}
+
+   asamTechSupportActionServerIP OBJECT-TYPE
+      SYNTAX IpAddress
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "The IP address of the server where the Tech Support File will be uploaded to.
+          or 0.0.0.0 in case the file needs to be stored locally on the node.
+
+          Currently only a value of 0 is accepted as input.
+          This field is an optional field, but if specified, then it must be set to 0.
+
+          ALCATEL NOTE:
+             SUPPORT: YES    INSRVMOD: NO           RANGE: see above
+             PERSIST: YES    DEFVALUE: NA           UNITS: -"
+
+     ::= {asamTechSupportActionEntry 6}
+
+   asamTechSupportActionFile OBJECT-TYPE
+      SYNTAX OCTET STRING(SIZE(1..255))
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "The filename that identifies the Tech Support File.
+          2 restrictions apply
+           - For storing locally on the Node
+             identified via asamTechSupportActionServerIP = 0
+             size of asamTechSupportActionFile is max 13 characters
+             structure : filename (only ._- allowed as special characters)
+           - For storing on a remote server
+             server is identified via asamTechSupportActionServerIP = a.b.c.d
+             allowed length of asamTechSupportActionFile is max 255 chars
+             structure : path/filename
+
+          ALCATEL NOTE:
+             SUPPORT: YES    INSRVMOD: NO           RANGE: see above
+             PERSIST: YES    DEFVALUE: NA           UNITS: -"
+
+     ::= {asamTechSupportActionEntry 7}
+
+   asamTechSupportSessionTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF AsamTechSupportSessionEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "The TechSupport Session Table"
+     ::=  { techSupport 5 }
+
+   asamTechSupportSessionEntry OBJECT-TYPE
+      SYNTAX AsamTechSupportSessionEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "An entry in the asamTechSupportSessionTable."
+      INDEX { asamTechSupportSessionId}
+     ::= {asamTechSupportSessionTable 1}
+
+   AsamTechSupportSessionEntry ::=
+      SEQUENCE {
+               asamTechSupportSessionId             TechSupportSessionId,
+               asamTechSupportSessionType           TechSupportSessionType,
+               asamTechSupportSessionObject         INTEGER,
+               asamTechSupportSessionServerIP       IpAddress,
+               asamTechSupportSessionFile           OCTET STRING(SIZE(1..255)),
+               asamTechSupportSessionStatus         INTEGER,
+               asamTechSupportSessionError          INTEGER,
+               asamTechSupportSessionSize           INTEGER,
+               asamTechSupportSessionTime           NetworkTimeInSeconds
+               }
+   asamTechSupportSessionId OBJECT-TYPE
+      SYNTAX TechSupportSessionId
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+        "A unique value to identify a Tech Support Session
+
+      ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NO           RANGE: 0..65535
+             PERSIST: YES   DEFVALUE: NA           UNITS: -"
+
+      ::= {asamTechSupportSessionEntry 1}
+
+   asamTechSupportSessionType OBJECT-TYPE
+      SYNTAX TechSupportSessionType
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "The type corresponding to the stored or requested Tech Support File.
+          - crashLog : type for auto generated crashlog TS files for boards
+          - boardOnDemand : type for requesting an on-demand TS file for boards
+          - ifIndexOnDemand : type for requesting an on-demand TS file for a specific ifIndex
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NO    RANGE: 1,2 or 3
+             PERSIST: YES   DEFVALUE: NA    UNITS: -"
+      ::= { asamTechSupportSessionEntry 2 }
+
+
+   asamTechSupportSessionObject OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "Identifier that indicates for which object that the Tech Support File was
+          generated or requested.
+          2 cases exist:
+            - asamTechSupportSessionObject = slotId
+                 for asamTechSupportSessionType crashLog or boardOnDemand
+            - asamTechSupportSessionObject = ifIndex
+                 for asamTechSupportSessionType ifIndexOnDemand
+
+          ALCATEL NOTE:
+             SUPPORT: YES    INSRVMOD: NO           RANGE: see above
+             PERSIST: YES    DEFVALUE: NA           UNITS: -"
+
+     ::= {asamTechSupportSessionEntry 3}
+
+   asamTechSupportSessionServerIP OBJECT-TYPE
+      SYNTAX IpAddress
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "The IP address of the server where the Tech Support File will be uploaded to.
+
+          ALCATEL NOTE:
+             SUPPORT: YES    INSRVMOD: NO           RANGE: see above
+             PERSIST: YES    DEFVALUE: NA           UNITS: -"
+
+     ::= {asamTechSupportSessionEntry 4}
+
+   asamTechSupportSessionFile OBJECT-TYPE
+      SYNTAX OCTET STRING(SIZE(1..255))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "The filename that identifies the Tech Support File.
+          format
+           - filename [max 13 characters]
+           - fileserver:path/filename [ max 255 chars]
+
+          ALCATEL NOTE:
+             SUPPORT: YES    INSRVMOD: NO           RANGE: see above
+             PERSIST: YES    DEFVALUE: NA           UNITS: -"
+
+     ::= {asamTechSupportSessionEntry 5}
+
+   asamTechSupportSessionStatus OBJECT-TYPE
+      SYNTAX INTEGER {
+             busy(1),
+             failed(2),
+             done(3)
+      }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object shows the status for a session-entry.
+          The initial status is busy(1).
+          When the generation completes successfully, then it goes to done(3).
+          In case of an error, then it goes to failed(2) state and the failure
+          reason can be found by reading the asamTechSupportSessionError field.
+
+          ALCATEL NOTE:
+             SUPPORT: YES    INSRVMOD: NO           RANGE: see above
+             PERSIST: YES    DEFVALUE: NA           UNITS: -"
+
+     ::= {asamTechSupportSessionEntry 6}
+
+   asamTechSupportSessionError OBJECT-TYPE
+      SYNTAX INTEGER {
+             no-error(1),
+             conv-error(2),
+             send-ping(3),
+             ts-not-avail(4),
+             inv-ping-resp(5),
+             send-gen(6),
+             gen-timeout(7),
+             inv-gen-resp(8),
+             send-info(9),
+             info-timeout(10),
+             inv-info-resp(11),
+             request-data(12),
+             data-timeout(13),
+             inv-data-resp(14),
+             res-acquiring(15),
+             res-acq-timeout(16),
+             incomplete(17),
+             res-not-avai(18),
+             disk-file-error(19),
+             encrytion-error(20)
+      }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object shows error information for a failed session-entry.
+
+          ALCATEL NOTE:
+             SUPPORT: YES    INSRVMOD: NO           RANGE: see above
+             PERSIST: YES    DEFVALUE: NA           UNITS: -"
+
+     ::= {asamTechSupportSessionEntry 7}
+
+   asamTechSupportSessionSize OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object shows the size of the collected TS file
+
+          ALCATEL NOTE:
+             SUPPORT: YES    INSRVMOD: NO           RANGE: see above
+             PERSIST: YES    DEFVALUE: NA           UNITS: -"
+
+     ::= {asamTechSupportSessionEntry 8}
+
+   asamTechSupportSessionTime OBJECT-TYPE
+      SYNTAX NetworkTimeInSeconds
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "Shows the Time in seconds from 1900 when the TS-entry was
+          collected.
+
+          ALCATEL NOTE:
+             SUPPORT: YES    INSRVMOD: NA           RANGE: see above
+             PERSIST: NO     DEFVALUE: NA           UNITS: -"
+
+     ::= {asamTechSupportSessionEntry 9}
+
+   --  ==================================================================
+   --  |                      END TECH SUPPORT OBJECTS                  |
+   --  ==================================================================
+
+
+   asamSystemScalingMode   OBJECT-TYPE
+      SYNTAX INTEGER
+      {
+        l2plus(1),
+        l3plusHost(2),
+        l3plusLPM(3)
+      }
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+      "An enum indicating configured scaling mode of BroadCom switch. Applicable for FX next generation NT(FANT-G).
+       l2plus-Mode with L2 FDB table having higher scaling of 256K with l3 scaling as in legacy FANT-F ( L3 host -16K + L3 LPM- 16K)
+       l3plusHost-Mode with L3 host/ARP table having  higher scaling of 16K -IPv4 + 32K - IPv6 + 4K -IPMC with L2 FDB - 96K & L3 LPM -16K as in legacy FANT-F
+       l3plusLPM-Mode with L3 LPM/route table having  higher scaling of 16K - IPv4 + 24K - IPv6  with L2 FDB - 32K & L3 host as in l3plus_host mode
+       This object is not applicable to ISAM 7367 SX/ 7363 MX systems (Standalone Single-board  Vectoring Box and NGVR).
+
+       ALCATEL NOTE:
+
+           SUPPORT: YES    INSRVMOD: NO           RANGE: 1..3
+           PERSIST: YES    DEFVALUE: 1            UNITS: NA"
+
+      ::= { asamSystemMIB 54 }
+
+   asamSystemOperationalScalingMode   OBJECT-TYPE
+      SYNTAX INTEGER
+     {
+        l2plus(1),
+        l3plusHost(2),
+        l3plusLPM(3)
+      }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+      "An enum indicating operational scaling mode of BroadCom switch. Applicable for FX next generation NT(FANT-G).
+       l2plus-Mode with L2 FDB table having higher scaling of 256K with l3 scaling as in legacy FANT-F ( L3 host -16K + L3 LPM- 16K)
+       l3plusHost-Mode with L3 host/ARP table having  higher scaling of 16K -IPv4 + 32K - IPv6 + 4K -IPMC with L2 FDB - 96K & L3 LPM -16K as in legacy FANT-F
+       l3plusLPM-Mode with L3 LPM/route table having  higher scaling of 16K - IPv4 + 24K - IPv6  with L2 FDB - 32K & L3 host as in l3plus_host mode
+       This object is not applicable to ISAM 7367 SX/ 7363 MX systems (Standalone Single-board  Vectoring Box and NGVR).
+
+       ALCATEL NOTE:
+           SUPPORT: YES    INSRVMOD: NO           RANGE: 1..3
+           PERSIST: NO     DEFVALUE: 1            UNITS: NA"
+
+      ::= { asamSystemMIB 55 }
+
+  asamSystemZTPState OBJECT-TYPE
+     SYNTAX     INTEGER
+                {
+                  disabled (1),
+                  enabled (2)
+                }
+     ACCESS     read-write
+     STATUS     mandatory
+     DESCRIPTION
+         " Enable/disable the ZTP (Zero Touch Provision) functionality
+          This attribute is only available on equipment practices
+          that support this feature.
+          If not supported this MIB object will return disabled when read.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: YES        RANGE: NA
+             PERSIST: YES   DEFVALUE: disabled (1)   UNITS: NA
+
+          "
+     DEFVAL { disabled }
+     ::=  { asamSystemMIB 56 }
+     
+  asamSystemRFOverlayModule OBJECT-TYPE
+     SYNTAX     INTEGER
+                {
+                  disabled (1),
+                  enabled (2)
+                }
+     ACCESS     read-write
+     STATUS     mandatory
+     DESCRIPTION
+        "This MIB object is used to enable or disable the RF Overlay Module (SX-8F and SX-16F only).
+         This MIB object is only supported on some equipment practices. 
+         If not supported this MIB object will return disabled when read.
+
+            ALCATEL NOTE:
+              SUPPORT: YES
+              PERSIST: YES
+              INSRVMOD: NA
+              RANGE: 1..2
+              DEFVALUE: 1
+              UNITS: NA
+          "
+      DEFVAL { disabled }
+      ::= { asamSystemMIB 57 }
+
+     asamSystemArpPollingInterval OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+          "The value of the object asamSystemArpPollingInterval specifies ARP polling interval. The range of the value is from 120s to 1096s.The default polling interval is 120s.
+      ALCATEL NOTE:
+                ACCESS:      RW            USAGE:       MAND
+                PERSIST:     YES           INSRVMOD:    NO
+                RANGE:       120..1096     DEFVALUE:    120
+                UNITS:       NA            SPARSE:      NA
+                DESCR:       NA
+          "
+      DEFVAL { 120 }
+      ::= { asamSystemMIB 59 }
+               
+   asamUplinkOutbandMgntIpAddress  OBJECT-TYPE
+     SYNTAX     IpAddress
+     ACCESS     read-write
+     STATUS     mandatory
+     DESCRIPTION
+         "This MIB object is used to save uplink based out-band manangement IP.
+          This MIB object is only supported on 7363 MX and 7367 8F/16F/48U SX (Spumante based IWF).
+
+            ALCATEL NOTE:
+              SUPPORT: YES
+              PERSIST: YES
+              INSRVMOD: YES
+              RANGE: NA
+              DEFVALUE: 0.0.0.0
+              UNITS: NA
+         "
+      DEFVAL { 120 }
+      ::= { asamSystemMIB 60 }
+
+   asamUplinkOutbandMgntNetMask  OBJECT-TYPE
+     SYNTAX     IpAddress
+     ACCESS     read-write
+     STATUS     mandatory
+     DESCRIPTION
+         "This MIB object is used to save uplink based out-band manangement IP's netmask.
+          This MIB object is only supported on 7363 MX and 7367 8F/16F/48U SX (Spumante based IWF).
+
+            ALCATEL NOTE:
+              SUPPORT: YES
+              PERSIST: YES
+              INSRVMOD: YES
+              RANGE: NA
+              DEFVALUE: 0.0.0.0
+              UNITS: NA
+         "
+      ::= { asamSystemMIB 61 }
+      
+    asamDstRecurringConfTable OBJECT-TYPE
+      SYNTAX      SEQUENCE OF AsamDstRecurringConfEntry
+      ACCESS      not-accessible
+      STATUS      mandatory
+      DESCRIPTION
+        "The asamDstRecurringConfTable has an entry for each daylight saving time
+        zone information with the specified week and weekday repeatedly.
+        ALCATEL NOTE:
+            SUPPORT: YES   INSRVMOD: NA        RANGE: NA
+            PERSIST: YES   DEFVALUE: NA        UNITS: NA"
+    ::= { asamSystemMIB 62 }
+
+
+    asamDstRecurringConfEntry OBJECT-TYPE
+        SYNTAX      AsamDstRecurringConfEntry
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION
+            "Each row entry contains information about a daylight saving time
+            zone.
+            ALCATEL NOTE:
+                SUPPORT: YES   INSRVMOD: NA        RANGE: NA
+                PERSIST: YES   DEFVALUE: NA        UNITS: NA"
+        INDEX {asamDstRecurringZoneIndex}
+        ::= { asamDstRecurringConfTable 1 }
+
+    AsamDstRecurringConfEntry ::=
+        SEQUENCE {
+            asamDstRecurringZoneIndex           INTEGER,
+            asamDstConfStartWeekDay             INTEGER,
+            asamDstConfStartWeek                INTEGER,
+            asamDstConfStartMonth               INTEGER,
+            asamDstConfStartHour                INTEGER,
+            asamDstConfStartMinute              INTEGER,
+            asamDstConfEndWeekDay               INTEGER,
+            asamDstConfEndWeek                  INTEGER,
+            asamDstConfEndMonth                 INTEGER,
+            asamDstConfEndHour                  INTEGER,
+            asamDstConfEndMinute                INTEGER,
+            asamDstRecurringAdjustment          INTEGER,
+            asamDstRecurringIsAffectedSrc       TruthValue,
+            asamDstRecurringRowStatus           RowStatus
+        }
+
+    asamDstRecurringZoneIndex OBJECT-TYPE
+        SYNTAX      INTEGER (-780..840)
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION
+            "This represents a daylight saving time zone. This index must be unique
+            amongst the table entries.
+            Because snmp index can't recognise negative integer,so we shift the zone range to [0...1620] as a workaround
+            ALCATEL NOTE:
+                SUPPORT: YES   INSRVMOD: NA        RANGE: -780..840
+                PERSIST: YES   DEFVALUE: NA        UNITS: NA"
+            ::= { asamDstRecurringConfEntry 1 }
+
+    asamDstConfStartWeekDay OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        sunday(0),
+                        monday(1),
+                        tuesday(2),
+                        wednesday(3),
+                        thursday(4),
+                        friday(5),
+                        saturday(6)
+                    }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "The starting day of the week when the summer time will
+            take effect.
+            ALCATEL NOTE:
+                SUPPORT: YES   INSRVMOD: NA        RANGE: 0..6
+                PERSIST: YES   DEFVALUE: sunday(0) UNITS: NA"
+        DEFVAL { sunday }
+        ::= { asamDstRecurringConfEntry 2 }
+
+    asamDstConfStartWeek OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        first(0),
+                        second(1),
+                        third(2),
+                        fourth(3),
+                        last(4)
+                    }
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "The starting week of the month when the summer time will
+            take effect.
+            ALCATEL NOTE:
+                SUPPORT: YES   INSRVMOD: NA       RANGE: 0..4
+                PERSIST: YES   DEFVALUE: first(0) UNITS: NA"
+        DEFVAL { first }
+        ::= { asamDstRecurringConfEntry 3 }
+
+    asamDstConfStartMonth OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        january(0),
+                        february(1),
+                        march(2),
+                        april(3),
+                        may(4),
+                        june(5),
+                        july(6),
+                        august(7),
+                        september(8),
+                        october(9),
+                        november(10),
+                        december(11)
+                    }
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "The starting month of the year when the summer time will
+            take effect.
+            ALCATEL NOTE:
+                SUPPORT: YES   INSRVMOD: NA         RANGE: 0..11
+                PERSIST: YES   DEFVALUE: january(0) UNITS: NA"
+        DEFVAL { january }
+        ::= { asamDstRecurringConfEntry 4 }
+
+    asamDstConfStartHour  OBJECT-TYPE
+        SYNTAX      INTEGER (0..23)
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "The hour at which the summer time will take effect.
+             ALCATEL NOTE:
+                SUPPORT: YES   INSRVMOD: NA         RANGE: 0..23
+                PERSIST: YES   DEFVALUE: 0          UNITS: hours"
+        DEFVAL { 0 }
+        ::= { asamDstRecurringConfEntry 5 }
+
+    asamDstConfStartMinute  OBJECT-TYPE
+        SYNTAX      INTEGER (0..59)
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "The number of minutes after the hours defined by
+            asamDstConfStartHour when the summer time will
+            take effect.
+            ALCATEL NOTE:
+                SUPPORT: YES   INSRVMOD: NA         RANGE: 0..59
+                PERSIST: YES   DEFVALUE: 0          UNITS: minutes"
+        DEFVAL { 0 }
+        ::= { asamDstRecurringConfEntry 6 }
+
+    asamDstConfEndWeekDay OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        sunday(0),
+                        monday(1),
+                        tuesday(2),
+                        wednesday(3),
+                        thursday(4),
+                        friday(5),
+                        saturday(6)
+                    }
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "The day of the week when the summer time setting will
+            end.
+            ALCATEL NOTE:
+                SUPPORT: YES   INSRVMOD: NA        RANGE: 0..6
+                PERSIST: YES   DEFVALUE: sunday(0) UNITS: NA"
+        DEFVAL { sunday }
+        ::= { asamDstRecurringConfEntry 7 }
+
+    asamDstConfEndWeek OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        first(0),
+                        second(1),
+                        third(2),
+                        fourth(3),
+                        last(4)
+                    }
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "The week of the month when the summer time setting will
+            end.
+            ALCATEL NOTE:
+                SUPPORT: YES   INSRVMOD: NA       RANGE: 0..4
+                PERSIST: YES   DEFVALUE: first(0) UNITS: NA"
+        DEFVAL { first }
+        ::= { asamDstRecurringConfEntry 8 }
+
+    asamDstConfEndMonth OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        january(0),
+                        february(1),
+                        march(2),
+                        april(3),
+                        may(4),
+                        june(5),
+                        july(6),
+                        august(7),
+                        september(8),
+                        october(9),
+                        november(10),
+                        december(11)
+                    }
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "The month of the year when the summer time setting will
+            end.
+             ALCATEL NOTE:
+                SUPPORT: YES   INSRVMOD: NA         RANGE: 0..11
+                PERSIST: YES   DEFVALUE: january(0) UNITS: NA"
+        DEFVAL { january }
+        ::= { asamDstRecurringConfEntry 9 }
+
+    asamDstConfEndHour  OBJECT-TYPE
+        SYNTAX      INTEGER (0..23)
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "The hour at which the summer time will stop taking effect.
+             ALCATEL NOTE:
+                SUPPORT: YES   INSRVMOD: NA         RANGE: 0..23
+                PERSIST: YES   DEFVALUE: 0          UNITS: hours"
+        DEFVAL { 0 }
+        ::= { asamDstRecurringConfEntry 10 }
+
+    asamDstConfEndMinute  OBJECT-TYPE
+        SYNTAX      INTEGER (0..59)
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "The number of minutes after the hours defined by
+            asamDstConfEndHour when the summer time will
+            stop taking effect.
+             ALCATEL NOTE:
+                SUPPORT: YES   INSRVMOD: NA         RANGE: 0..59
+                PERSIST: YES   DEFVALUE: 0          UNITS: minutes"
+        DEFVAL { 0 }
+        ::= { asamDstRecurringConfEntry 11 }
+
+    asamDstRecurringAdjustment OBJECT-TYPE
+        SYNTAX      INTEGER (0..60)
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "The number of minutes that will be added to the time
+            when daylight saving time takes effect. The same number of minutes
+            will be subtracted from the time when the daylight saving time ends.
+            ALCATEL NOTE:
+                SUPPORT: YES   INSRVMOD: NA         RANGE: 0..60
+                PERSIST: YES   DEFVALUE: 60         UNITS: NA"
+        DEFVAL { 60 }
+        ::= { asamDstRecurringConfEntry 12 }
+ 
+    asamDstRecurringIsAffectedSrc   OBJECT-TYPE
+        SYNTAX   TruthValue
+        ACCESS   read-only
+        STATUS   mandatory
+        DESCRIPTION
+            "The value of asamDstRecurringIsAffectedSrc indicates whether this
+             configuration entry match the OLT timezone.
+             ALCATEL NOTE:
+                    SUPPORT: YES   INSRVMOD: NA         RANGE: 1..2 
+                    PERSIST: YES   DEFVALUE: 2          UNITS: NA"
+        DEFVAL { 2 }
+        ::= { asamDstRecurringConfEntry 13 }
+
+    asamDstRecurringRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "The row status used to create and delete rows in this table.
+             ALCATEL NOTE:
+                SUPPORT: YES   INSRVMOD: NA         RANGE: NA
+                PERSIST: YES   DEFVALUE: NA         UNITS: NA"
+        ::= { asamDstRecurringConfEntry 14 }
+    
+    asamDstDateConfTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF AsamDstDateConfEntry
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION
+            "The asamDstDateConfTable has an entry for each daylight saving time
+            zone information with the specified with the corresponding specified days some year.
+            ALCATEL NOTE:
+                 SUPPORT: YES   INSRVMOD: NA        RANGE: NA
+                 PERSIST: YES   DEFVALUE: NA        UNITS: NA"
+        ::= { asamSystemMIB 63 }
+
+    asamDstDateConfEntry OBJECT-TYPE
+        SYNTAX      AsamDstDateConfEntry
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION
+            "Each row entry contains information about a daylight saving time
+            zone.
+            ALCATEL NOTE:
+                SUPPORT: YES   INSRVMOD: NA        RANGE: NA
+                PERSIST: YES   DEFVALUE: NA        UNITS: NA"
+        INDEX {asamDstDateZoneIndex}
+        ::= { asamDstDateConfTable 1 }
+
+    AsamDstDateConfEntry ::=
+        SEQUENCE {
+            asamDstDateZoneIndex                INTEGER,
+            asamDstConfStartDate                Unsigned32,
+            asamDstConfEndDate                  Unsigned32,
+            asamDstDateAdjustment               INTEGER,
+            asamDstDateIsAffectedSrc            TruthValue,
+            asamDstDateRowStatus                RowStatus
+        }
+ 
+    asamDstDateZoneIndex OBJECT-TYPE
+        SYNTAX      INTEGER (-780..840)
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION
+            "This represents a daylight saving time zone. This index must be unique
+            amongst the table entries.
+            Because snmp index can't recognise negative integer,so we shift the zone range to [0...1620] as a workaround
+            ALCATEL NOTE:
+                SUPPORT: YES   INSRVMOD: NA        RANGE: -780~840
+                PERSIST: YES   DEFVALUE: NA        UNITS: minutes"
+        ::= { asamDstDateConfEntry 1 }
+ 
+    asamDstConfStartDate OBJECT-TYPE
+        SYNTAX      Unsigned32(1..4294967295)
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "The time when the daylight saving time will
+            take effect means the number of standard seconds since
+            0h on 1 January 1900.
+            ALCATEL NOTE:
+                SUPPORT: YES   INSRVMOD: NA        RANGE: 1..4294967295
+                PERSIST: YES   DEFVALUE: NA        UNITS: seconds"
+        ::= { asamDstDateConfEntry 2 }
+
+    asamDstConfEndDate OBJECT-TYPE
+        SYNTAX      Unsigned32(1..4294967295)
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "The time when daylight saving time will end means the 
+            number of standard seconds since0h on 1 January 1900.
+            ALCATEL NOTE:
+                SUPPORT: YES   INSRVMOD: NA        RANGE: 1..4294967295
+                PERSIST: YES   DEFVALUE: NA        UNITS: seconds"
+        ::= { asamDstDateConfEntry 3 }
+
+    asamDstDateAdjustment OBJECT-TYPE
+        SYNTAX      INTEGER (0..60)
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "The number of minutes that will be added to the time
+            when daylight saving time takes effect. The same number of minutes
+            will be subtracted from the time when the daylight saving time ends.
+            ALCATEL NOTE:
+                SUPPORT: YES   INSRVMOD: NA         RANGE: 0..60
+                PERSIST: YES   DEFVALUE: 60         UNITS: minutes"
+        DEFVAL { 60 }
+        ::= { asamDstDateConfEntry 4 }
+    
+    asamDstDateIsAffectedSrc   OBJECT-TYPE
+        SYNTAX   TruthValue
+        ACCESS   read-only
+        STATUS   mandatory
+        DESCRIPTION
+            "The value of asamDstDateIsAffectedSrc indicates whether this
+             configuration entry match the OLT timezone.
+             ALCATEL NOTE:
+                 SUPPORT: YES   INSRVMOD: NA         RANGE: 1..2 
+                 PERSIST: YES   DEFVALUE: 2          UNITS: NA"
+        ::= { asamDstDateConfEntry 5 }
+
+    asamDstDateRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "The row status used to create and delete rows in this table.
+             ALCATEL NOTE:
+                SUPPORT: YES   INSRVMOD: NA         RANGE: NA
+                PERSIST: YES   DEFVALUE: NA         UNITS: NA"
+        ::= { asamDstDateConfEntry 6 }
+
+    asamDstEnableDisable OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            enable(1),
+            disable(2)
+        }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "This node indicates the status of daylight saving time.
+            If the value of this node is enable, means that daylight saving time is
+            enabled.
+            If the value is disable, means that daylight saving time is disabled.
+            ALCATEL NOTE:
+                SUPPORT: YES   INSRVMOD: NA         RANGE: 1..2
+                PERSIST: YES   DEFVALUE: disable(2) UNITS: NA"
+        DEFVAL { disable }
+        ::= { asamSystemMIB 64 }
+
+    asamDstIsAffected OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            affected(1),
+            notAffected(2)
+        }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "This node indicates whether daylight saving time comes into effect or not.
+            ALCATEL NOTE:
+                SUPPORT: YES   INSRVMOD: NA             RANGE: 1..2
+                PERSIST: YES   DEFVALUE: notAffected(2) UNITS: NA"
+        DEFVAL { notAffected }
+        ::= { asamSystemMIB 65 }
+
+     asamSystemBSNAPState OBJECT-TYPE
+      SYNTAX  INTEGER
+              {
+                disabled (1),
+                enabled (2)
+              }
+     ACCESS  read-write
+     STATUS mandatory
+     DESCRIPTION
+       "BSNAP is a trace mechanism to keep binary snapshot trace of an sw error deteted, and this MIB object is used to enable of disable BSNAP
+
+        ALCATEL NOTE:
+          SUPPORT: YES
+          PERSIST: YES
+          INSRVMOD: NA
+          RANGE: 1..2
+          DEFVALUE: 1
+          UNITS: NA
+       "
+     DEFVAL  {disabled}
+     ::= { asamSystemMIB 66 }
+
+     asamSystemBSNAPServerIP OBJECT-TYPE
+      SYNTAX  IpAddress
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+       "BSNAP is a trace mechanism to keep binary snapshot trace of an sw error deteted, and this MIB object is used to set the BSNAP server IP
+
+        ALCATEL NOTE:
+          SUPPORT: YES
+          PERSIST: YES
+          INSRVMOD: NA
+          RANGE: NA
+          DEFVALUE: 0.0.0.0
+          UNITS: NA
+       "
+     ::= { asamSystemMIB 67 }
+
+     asamSystemBSNAPServerPort OBJECT-TYPE
+      SYNTAX  INTEGER (0..65535)
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+       "BSNAP is a trace mechanism to keep binary snapshot trace of an sw error deteted, and this MIB object is used to set the BSNAP server UDP port
+
+        ALCATEL NOTE:
+          SUPPORT: YES
+          PERSIST: YES
+          INSRVMOD: NA
+          RANGE: NA
+          DEFVALUE: NA
+          UNITS: NA
+       "
+     ::= { asamSystemMIB 68 }
+END

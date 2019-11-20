@@ -1,0 +1,1057 @@
+-- *****************************************************************
+-- DLINKSW-DAI-MIB: Dynamic ARP inspection MIB
+--
+--  Copyright (c) 2013 D-Link Corporation, all rights reserved.
+--
+-- *****************************************************************
+
+DLINKSW-DAI-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    Gauge32,
+    Integer32,
+    Unsigned32,
+    Counter64,
+    IpAddress,
+    OBJECT-TYPE
+        FROM SNMPv2-SMI
+
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+
+    TruthValue,
+    MacAddress,
+    DateAndTime,
+    RowStatus,
+    DisplayString,
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+
+    ifIndex,
+    InterfaceIndex
+        FROM IF-MIB
+
+    InetAddressIPv4
+        FROM INET-ADDRESS-MIB
+
+    VlanId,
+    VlanIdOrNone
+        FROM Q-BRIDGE-MIB
+       
+    Dlink2kVlanList                 
+        FROM DLINKSW-TC-MIB  
+
+    dlinkIndustrialCommon
+        FROM DLINK-ID-REC-MIB;
+
+dlinkSwDynamicArpInspectionMIB MODULE-IDENTITY
+    LAST-UPDATED "201307180000Z"
+    ORGANIZATION "D-Link Corp."
+    CONTACT-INFO
+        "        D-Link Corporation
+
+             Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                     Taipei City 114, Taiwan, R.O.C
+             Tel:     +886-2-66000123
+             E-mail: tsd@dlink.com.tw
+        "
+    DESCRIPTION
+        "This MIB module defines objects for Dynamic ARP Inspection."
+    REVISION    "201307180000Z"
+    DESCRIPTION
+         "This is the first version of the MIB file.
+         "
+    ::= { dlinkIndustrialCommon 130 }
+
+
+--
+--  Rule Type textual convention
+--
+    DaiRuleType ::= TEXTUAL-CONVENTION
+        STATUS         current
+        DESCRIPTION
+            "The action type when the packets match the access profile.
+
+             permit(1)- Indicates that packets that match the access profile are
+                        permitted to be forwarded by the switch.
+             deny(2)  - Indicates that packets that match the access profile
+                        are not permitted to be forwarded by the switch and will be filtered.
+            "
+        SYNTAX         INTEGER {
+            permit(1),
+            deny(2)         
+        }
+
+-- -----------------------------------------------------------------------------
+    dDaiNotifications    OBJECT IDENTIFIER ::= { dlinkSwDynamicArpInspectionMIB 0 }
+    dDaiObjects          OBJECT IDENTIFIER ::= { dlinkSwDynamicArpInspectionMIB 1 }
+    dDaiConformance      OBJECT IDENTIFIER ::= { dlinkSwDynamicArpInspectionMIB 2 }
+
+-- -----------------------------------------------------------------------------
+    dDaiGlobal      OBJECT IDENTIFIER ::= { dDaiObjects 1 }
+    dDaiVlan        OBJECT IDENTIFIER ::= { dDaiObjects 2 }
+    dDaiInterface   OBJECT IDENTIFIER ::= { dDaiObjects 3 }
+    dDaiStatistics  OBJECT IDENTIFIER ::= { dDaiObjects 4 }
+
+    dDaiAclCfg      OBJECT IDENTIFIER ::= { dDaiObjects 5 }
+
+
+-- -----------------------------------------------------------------------------
+    dDaiAddressValidate  OBJECT-TYPE
+        SYNTAX        BITS {
+            srcMacAddress(0),
+            dstMacAddress(1),
+            ip(2)
+        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object specifies address validation criteria
+            used by Dynamic ARP Inspection feature.
+
+            'srcMacAddress' - indicates that source MAC address in
+                ethernet header is checked against the sender MAC address
+                in ARP packet. When this bit is on, packets with different
+                MAC addresses are classified as invalid packets and are
+                dropped. This checking is done for both ARP request and
+                ARP response packet.
+
+            'dstMacAddress' indicates that the destination MAC address
+                in ethernet header is checked against the target MAC address
+                in ARP packet. When this bit is on, packets with different
+                addresses are classified as invalid packets and are dropped.
+                This checking is done for ARP response packet only.
+
+            'ip' indicates that the IP addresses in ARP packet are checked
+                for invalid or unexpected IP addresses. Addresses such as
+                0.0.0.0, 255.255.255.255 and all IP multicast addresses are
+                considered invalid. When this bit is on, both the sender
+                and target IP addresses in the ARP packet are checked. This
+                checking is done for both ARP request and response packet.
+            "
+        ::= { dDaiGlobal 1 }
+
+    dDaiLogBufferSize  OBJECT-TYPE
+        SYNTAX          Unsigned32
+        UNITS           "entries"
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "This object specifies the buffer entry number."
+        ::= { dDaiGlobal 2 }
+
+    dDaiClearLogBuffer OBJECT-TYPE
+        SYNTAX          INTEGER {
+            clear(1),
+            noOp(2)  
+        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object clears all entries in dDaiLoggingBufferTable
+            , when set to 'clear'. 
+            No action is taken if this object is set to 'noOp'.
+            When read, the value 'noOp' is returned."        
+        ::= { dDaiGlobal 3 }
+
+
+-- -----------------------------------------------------------------------------
+    dDaiLogBufferTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DDaiLogBufferEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A table provides the information of logged ARP flows
+            for system message generation."
+        ::= { dDaiGlobal 4 }
+
+    dDaiLogBufferEntry OBJECT-TYPE
+        SYNTAX          DDaiLogBufferEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry contains logged ARP flow data for system
+            message generation. Entries in the log are cleared once
+            system messages are generated on their behalf. 
+            A special entry will be populated for accounting drops of 
+            all flows that result in exceeding the number of entries 
+            of the log buffer. This special entry only contains packets
+            counter and timestamps information."
+       INDEX { dDaiLogBufferIndex }
+       ::= { dDaiLogBufferTable 1 }
+
+    DDaiLogBufferEntry ::= SEQUENCE {
+        dDaiLogBufferIndex              Unsigned32,
+        dDaiLogBufferInterface          InterfaceIndex,
+        dDaiLogBufferVlan               VlanIdOrNone,
+        dDaiLogBufferSenderMacAddress   MacAddress,
+        dDaiLogBufferSenderIpAddress    InetAddressIPv4,
+        dDaiLogBufferLastUpdate         DateAndTime,
+        dDaiLogBufferPacketsCount       Gauge32
+    }
+
+    dDaiLogBufferIndex OBJECT-TYPE
+        SYNTAX          Unsigned32 (1..65535)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object uniquely identifies a logged ARP flow in the buffer."
+        ::= { dDaiLogBufferEntry 1 }
+
+    dDaiLogBufferInterface OBJECT-TYPE
+        SYNTAX          InterfaceIndex
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the interface which sent the logged
+            ARP flow."
+        ::= { dDaiLogBufferEntry 2 }
+
+    dDaiLogBufferVlan OBJECT-TYPE
+        SYNTAX          VlanIdOrNone
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the VLAN ID which the logged
+            ARP flow belongs to."
+        ::= { dDaiLogBufferEntry 3 }
+
+    dDaiLogBufferSenderMacAddress OBJECT-TYPE
+        SYNTAX         MacAddress
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION
+            "This object indicates the sender MAC address of the logged
+            ARP flow. All zeros MAC address value indicates the
+            special entry."
+        ::= { dDaiLogBufferEntry 4 }
+
+    dDaiLogBufferSenderIpAddress OBJECT-TYPE
+        SYNTAX         InetAddressIPv4
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION
+            "This object indicates the sender Internet address
+            of the logged ARP flow. The type of this address is
+            determined by the value of dDaiLogBufferSenderAddressType
+            object. All zeros IP address value indicates the
+            special entry."
+        ::= { dDaiLogBufferEntry 5 }
+
+    dDaiLogBufferLastUpdate OBJECT-TYPE
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the timestamp when the last packet
+            of this flow was accounted by the system."
+        ::= { dDaiLogBufferEntry 6 }
+
+    dDaiLogBufferPacketsCount OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the number of packets of this ARP flow
+            was accounted by the system."
+        ::= { dDaiLogBufferEntry 7 }
+
+-- -----------------------------------------------------------------------------                       
+    dDaiVlanCrlFirst2K  OBJECT-TYPE
+        SYNTAX          Dlink2kVlanList
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object specifies the Dynamic ARP Inspection enabled VLAN in a 
+            string of octets containing one bit per VLAN for VLANs 1 to 2048. 
+            If the bit is set to '1', then the VLAN is enabled for Dynamic ARP
+            Inspection."         
+        ::= { dDaiVlan 1 }
+    
+    dDaiVlanCrlSecond2K OBJECT-TYPE
+        SYNTAX          Dlink2kVlanList
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+             "This object specifies the Dynamic ARP Inspection enabled VLAN in a 
+            string of octets containing one bit per VLAN for VLANs 2049 to 4094. 
+            If the bit is set to '1', then the VLAN is enabled for Dynamic ARP
+            Inspection."      
+        ::= { dDaiVlan 2 }
+
+-- -----------------------------------------------------------------------------
+    dDaiVlanCfgTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DDaiVlanCfgEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A table contains a list of configuration for Dynamic ARP
+            Inspection per VLAN. "
+        ::= { dDaiVlan 3 }
+
+    dDaiVlanCfgEntry OBJECT-TYPE
+        SYNTAX          DDaiVlanCfgEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A row instance contains the Dynamic ARP inspection
+            configuration for a specific VLAN in the device."
+        INDEX { dDaiVlanCfgId }
+        ::= { dDaiVlanCfgTable 1 }
+
+    DDaiVlanCfgEntry ::= SEQUENCE {
+        dDaiVlanCfgId                   VlanId,
+        dDaiVlanFilterArpAclName        DisplayString,
+        dDaiVlanFilterArpAclStatic      TruthValue,
+        dDaiVlanAclLogging              BITS,
+        dDaiVlanDhcpBindingLogging      BITS,
+        dDaiVlanCfgRowStatus            RowStatus
+    }
+
+    dDaiVlanCfgId OBJECT-TYPE
+        SYNTAX           VlanId
+        MAX-ACCESS       not-accessible
+        STATUS           current
+        DESCRIPTION
+            "This object indicates the VLAN ID of the entry."
+        ::= { dDaiVlanCfgEntry 1 }
+
+    dDaiVlanFilterArpAclName OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (0..32))
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object specifies an ARP ACL name that is used to check
+            the validity of the bindings information in ARP body.
+            An empty string indicates that the ARP ACL is not configured
+            on the VLAN."
+        DEFVAL { "" }
+        ::= { dDaiVlanCfgEntry 2 }
+
+    dDaiVlanFilterArpAclStatic OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates whether drop the packet if the 
+            IP-to-Ethernet MAC binding pair is not permitted by the arp ACL. 
+            This object does not take effect if value of 
+            dDaiVlanFilterArpAclName on the row is an empty string.
+
+            'true' indicates the implicit denied packet is dropped and ARP packet
+            is not compared against DHCP bindings information.
+
+            'false' indicates if ARP packet is not explicitly classified by ARP
+            ACL, it will be compared against DHCP bindings information."            
+        DEFVAL { false }
+        ::= { dDaiVlanCfgEntry 3 }
+
+    dDaiVlanAclLogging OBJECT-TYPE
+        SYNTAX          BITS { 
+            permit(0),
+            deny(1)
+        }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the logging criteria for packets that are
+            dropped or permitted based on ACL matches.
+            
+            'permit' - indicates that logging is performed when packets
+                is permitted by the configured ACL. 
+
+            'deny' - indicates that logging is performed when packets
+                is denied by the configured ACL.
+            "
+        DEFVAL { {deny} }
+        ::= { dDaiVlanCfgEntry 4 }
+
+    dDaiVlanDhcpBindingLogging OBJECT-TYPE
+        SYNTAX          BITS { 
+            permit(0),
+            deny(1)
+        }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object specifies the logging criteria when
+            ARP packets is compared against DHCP bindings information.
+
+            'permit' - indicates that logging is performed for packets that
+                are permitted as a result of comparing with DHCP bindings
+                information.
+
+            'deny' - indicates that logging is performed for packets that
+                are denied as a result of comparing with DHCP bindings
+                information.            
+            " 
+        DEFVAL { { deny } }
+        ::= { dDaiVlanCfgEntry 5 }
+
+    dDaiVlanCfgRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The status of this conceptual row entry. This object
+            is used to manage creation and deletion of rows in this
+            table."
+       ::= { dDaiVlanCfgEntry 99 }
+
+-- -----------------------------------------------------------------------------
+    dDaiIfConfigTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DDaiIfConfigEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A table provides the mechanism to configure the trust
+            state for Dynamic ARP Inspection purpose at each 
+            interface capable of this feature. 
+            "
+        ::= { dDaiInterface 1 }
+
+    dDaiIfConfigEntry OBJECT-TYPE
+        SYNTAX          DDaiIfConfigEntry
+        MAX-ACCESS      not-accessible
+        STATUS       current
+        DESCRIPTION
+            "A row instance contains the configuration to enable or
+            disable trust state for Dynamic ARP Inspection at each
+            interface capable of this feature."
+        INDEX { ifIndex }
+        ::= { dDaiIfConfigTable 1 }
+
+    DDaiIfConfigEntry ::= SEQUENCE {
+        dDaiIfTrustEnabled      TruthValue
+    }
+
+    dDaiIfTrustEnabled OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS      current
+        DESCRIPTION
+            "This object indicates whether the interface is trusted for
+             Dynamic ARP Inspection purpose.
+
+             If this object is set to 'true', the interface is trusted.
+             ARP packets coming to this interface will be forwarded
+             without Dynamic ARP inspection.
+
+             If this object is set to 'false', the interface is not
+             trusted. ARP packets coming to this interface will be
+             subjected to ARP inspection."
+        ::= { dDaiIfConfigEntry 1 }
+
+-- -----------------------------------------------------------------------------
+    dDaiIfRateLimitTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DDaiIfRateLimitEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A table provides the mechanism to configure the rate limit
+            for Dynamic ARP Inspection purpose at each interface
+            capable of this feature."
+        ::= { dDaiInterface 2 }
+
+    dDaiIfRateLimitEntry OBJECT-TYPE
+        SYNTAX          DDaiIfRateLimitEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A row instance contains the configuration of rate limit
+            Dynamic ARP Inspection at each interface capable
+            of this feature."
+        INDEX { ifIndex }
+        ::= { dDaiIfRateLimitTable 1 }
+
+    DDaiIfRateLimitEntry ::= SEQUENCE {
+        dDaiIfRateLimit         Unsigned32,
+        dDaiIfBurstInterval     Unsigned32
+    }
+
+    dDaiIfRateLimit OBJECT-TYPE
+        SYNTAX          Unsigned32
+        UNITS           "packet per second"
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates rate limit value for Dynamic ARP
+            Inspection purpose. If the incoming rate of ARP packets
+            exceeds the value of this object, ARP packets will be
+            dropped. "
+        ::= { dDaiIfRateLimitEntry 1 }
+
+    dDaiIfBurstInterval OBJECT-TYPE
+        SYNTAX          Unsigned32
+        UNITS           "second"
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the length of the burst duration
+            of the ARP packets that is allowed.
+            When the rate of ARP packet per second exceeds the limitation
+            and the condition sustain for the configured burst duration, 
+            the interface will be put in error disable state.
+            "
+        ::= { dDaiIfRateLimitEntry 2 }
+
+-- -----------------------------------------------------------------------------
+    dDaiVlanStatsTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DDaiVlanStatsEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION 
+            "A table lists the Dynamic Arp Inspection statistics per VLAN."
+        ::= { dDaiStatistics 1 }
+
+    dDaiVlanStatsEntry OBJECT-TYPE
+        SYNTAX          DDaiVlanStatsEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A row instance contains Dynamic ARP Inspection statistics
+            information for each VLAN."
+        INDEX { dDaiVlanStatsIndex }
+        ::= { dDaiVlanStatsTable 1 }
+
+    DDaiVlanStatsEntry ::= SEQUENCE {
+        dDaiVlanStatsIndex                  VlanId,
+        dDaiVlanForwarded                   Counter64,
+        dDaiVlanDropped                     Counter64,
+        dDaiVlanAclPermitted                Counter64,
+        dDaiVlanDhcpBindingsPermitted       Counter64,
+        dDaiVlanAclDenied                   Counter64,
+        dDaiVlanDhcpBindingDenied           Counter64,
+        dDaiVlanSrcMacValidationFailures    Counter64,
+        dDaiVlanDstMacValidationFailures    Counter64,
+        dDaiVlanIpValidationFailures        Counter64,
+        dDaiVlanStatsClear                  INTEGER
+    }
+
+    dDaiVlanStatsIndex OBJECT-TYPE
+        SYNTAX          VlanId
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the VLAN ID of the entry."
+        ::= { dDaiVlanStatsEntry 1 }
+
+    dDaiVlanForwarded OBJECT-TYPE
+        SYNTAX          Counter64
+        UNITS           "packets"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the number of ARP packets forwarded by
+            Dynamic Arp Inspection feature."
+        ::= { dDaiVlanStatsEntry 2 }
+
+    dDaiVlanDropped OBJECT-TYPE
+        SYNTAX          Counter64
+        UNITS           "packets"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the number of ARP packets dropped by
+            Dynamic ARP Inspection feature."
+        ::= { dDaiVlanStatsEntry 3 }
+
+    dDaiVlanAclPermitted OBJECT-TYPE
+        SYNTAX          Counter64
+        UNITS           "packets"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the number of ARP packets permitted by
+            the configured ACL."
+        ::= { dDaiVlanStatsEntry 4 }
+
+    dDaiVlanDhcpBindingsPermitted OBJECT-TYPE
+        SYNTAX          Counter64
+        UNITS           "packets"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the number of ARP packets that are permitted
+            by DHCP snooping binding database."
+        ::= { dDaiVlanStatsEntry 5 }
+
+    dDaiVlanAclDenied OBJECT-TYPE
+        SYNTAX          Counter64
+        UNITS           "packets"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the number of ARP packets denied by the
+            associating ACL."
+        ::= { dDaiVlanStatsEntry 6 }
+
+    dDaiVlanDhcpBindingDenied OBJECT-TYPE
+        SYNTAX          Counter64
+        UNITS           "packets"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the number of ARP packets that are dropped by
+            DHCP snooping binding database."
+        ::= { dDaiVlanStatsEntry 7 }
+
+    dDaiVlanSrcMacValidationFailures OBJECT-TYPE
+        SYNTAX          Counter64
+        UNITS           "packets"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the number of ARP packets that fail
+            source MAC address validation."
+        ::= { dDaiVlanStatsEntry 8 }
+
+    dDaiVlanDstMacValidationFailures OBJECT-TYPE
+        SYNTAX          Counter64
+        UNITS           "packets"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the number of ARP packets that fail
+            destination MAC address validation."
+        ::= { dDaiVlanStatsEntry 9 }
+
+    dDaiVlanIpValidationFailures OBJECT-TYPE
+        SYNTAX          Counter64
+        UNITS           "packets"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the number of ARP packets that fail
+            IP validation."
+        ::= { dDaiVlanStatsEntry 10 }
+
+    dDaiVlanStatsClear OBJECT-TYPE
+        SYNTAX          INTEGER {
+            clear(1),
+            noOp(2)  
+        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object clears the counters in the same row when set to
+            'clear'. 
+            No action is taken if this object is set to 'noOp'.
+            When read, the value 'noOp' is returned."        
+        ::= { dDaiVlanStatsEntry 99 }
+
+    dDaiVlanStatsClearAll OBJECT-TYPE
+        SYNTAX          INTEGER {
+            clear(1),
+            noOp(2)  
+        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object clears the counters of all entries in 
+            dDaiVlanStatsTable, when set to 'clear'. 
+            No action is taken if this object is set to 'noOp'.
+            When read, the value 'noOp' is returned."        
+        ::= { dDaiStatistics 2 }
+
+-- -----------------------------------------------------------------------------
+    dDaiArpAccessListNumber  OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the number of entries present in the ARP
+            access list table."
+        ::= { dDaiAclCfg 1 }
+
+    dDaiArpAccessListTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DDaiArpAccessListEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The table contains information about ARP access list."
+        ::= { dDaiAclCfg 2 }
+
+    dDaiArpAccessListEntry OBJECT-TYPE
+        SYNTAX          DDaiArpAccessListEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry defined in dDaiArpAccessListTable. An entry is 
+            created/removed when an ARP access list is created/deleted."
+        INDEX { dDaiArpAccessListName }
+        ::= { dDaiArpAccessListTable 1 }
+
+    DDaiArpAccessListEntry ::= SEQUENCE {
+        dDaiArpAccessListName           DisplayString,
+        dDaiArpAccessListRowStatus      RowStatus    
+    }
+
+    dDaiArpAccessListName OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (1..32))
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The name of the ARP access list."
+        ::= { dDaiArpAccessListEntry 1 }
+
+    dDaiArpAccessListRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object allows the dynamic creation and deletion of an ARP
+            access list."
+        ::= { dDaiArpAccessListEntry 99 }
+        
+    
+-- -----------------------------------------------------------------------------
+    dDaiArpAccessRuleTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DDaiArpAccessRuleEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A table consists of a list of rules for the ARP access list."
+        ::= { dDaiAclCfg 3 }
+
+    dDaiArpAccessRuleEntry OBJECT-TYPE
+        SYNTAX          DDaiArpAccessRuleEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry is defined dDaiArpAccessRuleTable. 
+            The first instance identifier index value identifies the 
+            dDaiArpAccessListEntry that a ARP access rule (dDaiArpAccessRuleEntry)
+            belongs to. An entry is removed from this table when its 
+            corresponding dDaiArpAccessListEntry is deleted."
+        INDEX { 
+            dDaiArpAccessListName, 
+            dDaiArpAccessRuleSn 
+        }
+        ::= { dDaiArpAccessRuleTable 1 }
+
+    DDaiArpAccessRuleEntry ::= SEQUENCE {
+        dDaiArpAccessRuleSn                 Integer32,
+        dDaiArpAccessRuleRowStatus          RowStatus,
+        dDaiArpAccessRuleAction             DaiRuleType,
+        dDaiArpAccessRuleSenderMacAddr      MacAddress,
+        dDaiArpAccessRuleSenderMacMask      MacAddress,
+        dDaiArpAccessRuleSenderAddr         IpAddress,
+        dDaiArpAccessRuleSenderAddrMask     IpAddress
+    }
+
+    dDaiArpAccessRuleSn  OBJECT-TYPE
+        SYNTAX          Integer32 (0..65535)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Specifies the sequence number of the rule. A lower number represents
+            a higher priority.
+            The special value of 0 means the priority will be automatically determined 
+            by the agent."
+        ::= { dDaiArpAccessRuleEntry 1 }
+
+    dDaiArpAccessRuleRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The row status variable, used according to installation
+             and removal conventions for conceptual rows."
+        ::= { dDaiArpAccessRuleEntry 2 }
+
+    dDaiArpAccessRuleAction OBJECT-TYPE
+        SYNTAX          DaiRuleType
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the result of the packet examination is to permit or deny.           
+            "
+        ::= { dDaiArpAccessRuleEntry 3 }
+
+    dDaiArpAccessRuleSenderMacAddr OBJECT-TYPE
+        SYNTAX          MacAddress
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the ARP sender MAC address of the entry."
+        ::= { dDaiArpAccessRuleEntry 4 }
+
+    dDaiArpAccessRuleSenderMacMask OBJECT-TYPE
+        SYNTAX          MacAddress
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object is a mask bitmap to specify a group of source
+            MAC addresses. The bit value 1 indicates the corresponding bit will
+            be checked. The bit value 0 indicates the corresponding bit will be
+            ignored. In other words, when the value of all '00'Hs indicates any ARP
+            sender MAC address is specified. When the value of all 'ff'Hs indicates
+            host ARP sender MAC address is specified."
+        ::= { dDaiArpAccessRuleEntry 5 }
+
+    dDaiArpAccessRuleSenderAddr OBJECT-TYPE
+        SYNTAX          IpAddress
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the ARP sender IP address of the entry."
+        ::= { dDaiArpAccessRuleEntry 6 }
+
+    dDaiArpAccessRuleSenderAddrMask OBJECT-TYPE
+        SYNTAX     IpAddress
+        MAX-ACCESS read-create
+        STATUS     current
+        DESCRIPTION           
+            "This object is a mask bitmap to specify a group of source IP
+            addresses. The bit value 1 indicates the corresponding bit will
+            be checked. The bit value 0 indicates the corresponding bit will be
+            ignored. In other words, when the value of all '00'Hs indicates any
+            ARP sender address is specified. When the value of all 'ff'Hs indicates
+            host ARP sender address is specified."
+        ::= { dDaiArpAccessRuleEntry 7 }      
+    
+
+-- Conformance
+
+dDaiMIBCompliances
+    OBJECT IDENTIFIER ::= { dDaiConformance 1 }
+
+dDaiMIBGroups
+    OBJECT IDENTIFIER ::= { dDaiConformance 2 }
+
+dDaiMIBCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "The compliance statement for DLINKSW-DAI-MIB"
+    MODULE
+    MANDATORY-GROUPS {           
+            dDaiIfConfigGroup
+    }
+
+    GROUP dDaiVlanCtrlGroup
+    DESCRIPTION
+        "This group is mandatory only for the platform which supports
+        enabling Dynamic ARP Inspection per VLAN."
+
+    GROUP dDaiVlanCfgGroup
+    DESCRIPTION
+        "This group is mandatory only for the platform which supports
+        enabling Dynamic ARP Inspection per VLAN."
+
+    GROUP dDaiLoggingConfigGroup
+    DESCRIPTION
+        "This group is mandatory only for the platform which supports
+         enabling Dynamic ARP Inspection logging at the device level."
+
+    GROUP dDaiIfRateLimitGroup
+    DESCRIPTION
+        "This group is mandatory only for the platform which supports
+         Dynamic ARP Inspection rate limit per interface."
+   
+    GROUP dDaiAddressValidationGroup
+    DESCRIPTION
+        "This group is mandatory only for the platform which supports
+         address validation configuration."
+
+    GROUP dDaiLogBufferGroup
+    DESCRIPTION
+        "This group is mandatory only for the platform which supports
+         log buffer information for Dynamic ARP Inspection feature."
+
+    GROUP dDaiVlanStatisticsGroup
+    DESCRIPTION
+        "This group is mandatory only for the platform which supports
+         Dynamic ARP Inspection statistics per VLAN."
+   
+    GROUP dDaiAclGroup
+    DESCRIPTION
+        "This group is mandatory only for the platform which supports
+         static ARP inspection configuration."
+
+    GROUP dDaiClearStatsGroup
+    DESCRIPTION
+        "This group is mandatory only for the platform which supports
+         clear ARP inspection statistics."
+  
+    OBJECT dDaiVlanFilterArpAclName
+    MIN-ACCESS read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT dDaiVlanFilterArpAclStatic
+    MIN-ACCESS read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT dDaiVlanCfgRowStatus
+    SYNTAX       INTEGER {
+                     active(1)
+                 }
+    WRITE-SYNTAX INTEGER {
+                     createAndGo(4),
+                     destroy(6)
+                 }
+    MIN-ACCESS read-only
+    DESCRIPTION
+        "Read-create access is not required."
+
+    OBJECT dDaiIfTrustEnabled
+    MIN-ACCESS read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT dDaiLogBufferSize
+    MIN-ACCESS read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT dDaiAddressValidate
+    MIN-ACCESS read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT dDaiClearLogBuffer
+    MIN-ACCESS read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    ::= { dDaiMIBCompliances 1 }
+
+-- Units of Conformance
+
+-- dDaiGlobalGroup
+
+dDaiVlanCtrlGroup OBJECT-GROUP
+    OBJECTS {
+        dDaiVlanCrlFirst2K,
+        dDaiVlanCrlSecond2K
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects providing configuration regarding the Dynamic
+        ARP Inspection feature per VLAN."
+    ::= { dDaiMIBGroups 1 }
+
+dDaiIfConfigGroup OBJECT-GROUP
+    OBJECTS {
+        dDaiIfTrustEnabled
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects which are used to configure as
+         well as show information regarding the interface trust
+         state for Dynamic ARP Inspection purpose."
+    ::= { dDaiMIBGroups 2 }
+
+dDaiIfRateLimitGroup OBJECT-GROUP
+    OBJECTS {
+        dDaiIfRateLimit,
+        dDaiIfBurstInterval
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects which are used to configure as
+         well as show information regarding the rate limit per
+         interface for Dynamic ARP Inspection purpose."
+    ::= { dDaiMIBGroups 3 }
+
+dDaiLoggingConfigGroup OBJECT-GROUP
+    OBJECTS {
+        dDaiLogBufferSize
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects providing logging configuration
+         for Dynamic ARP Inspection feature."
+    ::= { dDaiMIBGroups 4 }
+
+dDaiAddressValidationGroup OBJECT-GROUP
+    OBJECTS {
+        dDaiAddressValidate
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects providing address validation
+         configuration for Dynamic ARP Inspection feature."
+    ::= { dDaiMIBGroups 5 }
+
+dDaiVlanCfgGroup OBJECT-GROUP
+    OBJECTS {
+        dDaiVlanFilterArpAclName,
+        dDaiVlanFilterArpAclStatic,
+        dDaiVlanAclLogging,
+        dDaiVlanDhcpBindingLogging,
+        dDaiVlanCfgRowStatus
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects providing additional VLAN
+         configuration for Dynamic ARP Inspection feature."
+    ::= { dDaiMIBGroups 6 }
+
+dDaiVlanStatisticsGroup OBJECT-GROUP
+    OBJECTS {
+        dDaiVlanForwarded,
+        dDaiVlanDropped,
+        dDaiVlanAclPermitted,
+        dDaiVlanDhcpBindingsPermitted,
+        dDaiVlanAclDenied,
+        dDaiVlanDhcpBindingDenied,
+        dDaiVlanSrcMacValidationFailures,
+        dDaiVlanDstMacValidationFailures,
+        dDaiVlanIpValidationFailures
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects providing Dynamic ARP Inspection
+         statistics per VLAN."
+    ::= { dDaiMIBGroups 7 }
+
+dDaiLogBufferGroup OBJECT-GROUP
+    OBJECTS {
+        dDaiClearLogBuffer,
+        dDaiLogBufferInterface,
+        dDaiLogBufferVlan,
+        dDaiLogBufferSenderMacAddress,
+        dDaiLogBufferSenderIpAddress,
+        dDaiLogBufferLastUpdate,
+        dDaiLogBufferPacketsCount
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects providing logging information or control
+         for Dynamic ARP Inspection feature."
+    ::= { dDaiMIBGroups 8 }
+
+dDaiAclGroup OBJECT-GROUP
+    OBJECTS {
+        dDaiArpAccessListNumber, 
+        dDaiArpAccessListRowStatus,
+        dDaiArpAccessRuleRowStatus,
+        dDaiArpAccessRuleAction,
+        dDaiArpAccessRuleSenderMacAddr,
+        dDaiArpAccessRuleSenderMacMask,
+        dDaiArpAccessRuleSenderAddr,
+        dDaiArpAccessRuleSenderAddrMask
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects providing ARP access-list configuration."
+    ::= { dDaiMIBGroups 9 }
+
+dDaiClearStatsGroup OBJECT-GROUP
+    OBJECTS {
+        dDaiVlanStatsClear,
+        dDaiVlanStatsClearAll
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects providing clear the Dynamic Arp Inspection statistics."
+    ::= { dDaiMIBGroups 10 }
+
+END
+
+

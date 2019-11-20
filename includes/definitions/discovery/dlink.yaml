@@ -1,0 +1,59 @@
+mib: EQUIPMENT-MIB:DLINKSW-ENTITY-EXT-MIB
+modules:
+    processors:
+          data:
+              -
+                  oid: AGENT-GENERAL-MIB::agentCPUutilizationIn5sec
+                  value: agentCPUutilizationIn5sec
+                  num_oid: '.1.3.6.1.4.1.171.12.1.1.6.1.{{ $index }}'
+              -
+                  oid: DLINKSW-ENTITY-EXT-MIB::dEntityExtCpuUtilOneMinute
+                  value: dEntityExtCpuUtilOneMinute
+                  num_oid: '.1.3.6.1.4.1.171.14.5.1.7.1.4.{{ $index }}'
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: swTemperatureTable
+                    value: swTemperatureCurrent
+                    num_oid: '.1.3.6.1.4.1.171.12.11.1.8.1.2.{{ $index }}'
+                    descr: 'Current Sys Temp {{ $index }}'
+                    index: 'swTemperatureCurrent.{{ $index }}'
+                -
+                    oid: dEntityExtEnvTempTable
+                    value: dEntityExtEnvTempCurrent
+                    num_oid: '.1.3.6.1.4.1.171.14.5.1.1.1.1.4.{{ $index }}'
+                    descr: $dEntityExtEnvTempDescr
+                    index: 'dEntityExtEnvTempCurrent.{{ $index }}'
+                    low_limit: dEntityExtEnvTempThresholdLow
+                    high_limit: dEntityExtEnvTempThresholdHigh
+        state:
+            data:
+                -
+                    oid: dEntityExtEnvFanTable
+                    value: dEntityExtEnvFanStatus
+                    num_oid: '.1.3.6.1.4.1.171.14.5.1.1.2.1.4.{{ $index }}'
+                    descr: dEntityExtEnvFanDescr
+                    index: 'dEntityExtEnvFanStatus.{{ $index }}'
+                    states:
+                        - { descr: Ok, graph: 1, value: 1, generic: 0 }
+                        - { descr: Fault, graph: 1, value: 2, generic: 2 }
+                -
+                    oid: dEntityExtEnvPowerTable
+                    value: dEntityExtEnvPowerStatus
+                    num_oid: '.1.3.6.1.4.1.171.14.5.1.1.3.1.6.{{ $index }}'
+                    descr: dEntityExtEnvPowerDescr
+                    index: 'dEntityExtEnvPowerStatus.{{ $index }}'
+                    states:
+                        - { descr: In Operation, graph: 1, value: 1, generic: 0 }
+                        - { descr: Failed, graph: 1, value: 2, generic: 2 }
+                        - { descr: Empty, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: dEntityExtEnvTempTable
+                    value: dEntityExtEnvTempStatus
+                    num_oid: '.1.3.6.1.4.1.171.14.5.1.1.1.1.7.{{ $index }}'
+                    descr: dEntityExtEnvTempDescr
+                    index: 'dEntityExtEnvTempStatus.{{ $index }}'
+                    states:
+                        - { descr: Ok, graph: 1, value: 1, generic: 0 }
+                        - { descr: Abnormal, graph: 1, value: 2, generic: 2 }

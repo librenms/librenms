@@ -1,0 +1,834 @@
+-- **********************************************************
+-- Copyright 2008-2017 VMware, Inc.  All rights reserved.
+-- **********************************************************
+
+VMWARE-ENV-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    Counter32, Integer32, NOTIFICATION-TYPE, OBJECT-TYPE, TimeTicks,
+    MODULE-IDENTITY, OBJECT-IDENTITY
+    FROM SNMPv2-SMI
+    DisplayString, DateAndTime
+    FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+    FROM SNMPv2-CONF
+    vmwProductSpecific, vmwNotifications
+    FROM VMWARE-ROOT-MIB
+    vmwESX
+    FROM VMWARE-PRODUCTS-MIB
+    VmwLongSnmpAdminString, VmwCIMSeverity, VmwSubsystemStatus, VmwSubsystemTypes,
+    VmwCIMAlertTypes, VmwCIMAlertFormat, VmwCimName
+    FROM VMWARE-TC-MIB;
+
+    vmwEnvironmentalMIB MODULE-IDENTITY
+    LAST-UPDATED "201705300000Z"
+    ORGANIZATION "VMware, Inc"
+    CONTACT-INFO
+    "VMware, Inc
+    3401 Hillview Ave
+    Palo Alto, CA 94304
+    Tel: 1-877-486-9273 or 650-427-5000
+    Fax: 650-427-5001
+    Web: http://kb.vmware.com/kb/1013445
+    "
+DESCRIPTION
+     "This MIB module identifies hardware components of a machine as provided by IPMI.
+      The descriptions in this document will be marked with [1] to refer the IPMI specification here:
+      https://www.intel.com/content/dam/www/public/us/en/documents/product-briefs/ipmi-second-gen-interface-spec-v2-rev1-1.pdf
+      which provides a definition for IPMI System Event Log (SEL).
+     "
+
+REVISION   "201705300000Z"
+DESCRIPTION
+    "This revision deprecates the previous CIM based implementation. The vmwEnvTable now maps
+     directly to an IPMI System Event Log allowing for simpler identification and management.
+     vmwEnvSource.0 will now report ipmi(4) on agents implementing this mib module version."
+
+REVISION   "201005120000Z"
+DESCRIPTION
+    "This revision adds support for CIM OMC_IpmiAlertIndication as the source of events
+     instead of only IPMI sensors thus more areas of hardware can be reported on.
+     This required a new notification set to be defined replacing previous
+     notifications."
+
+REVISION   "200810300000Z"
+DESCRIPTION
+    "Introduce vmwESXNotification to match ESX 3.5 agent."
+
+REVISION      "200712270000Z"
+DESCRIPTION
+    "This is the first revision of this MIB module."
+::= { vmwEnv 10 }
+
+vmwEnv OBJECT IDENTIFIER
+    ::= { vmwProductSpecific 20 }
+
+vmwESXNotifications OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+    "Parent of all ESX specific notifications (traps, informs)."
+ ::= { vmwESX 0 }
+
+vmwEnvNumber OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Count of number of conceptual rows in vmwEnvTable."
+    ::= { vmwEnv 1 }
+
+vmwEnvLastChange OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sysUptime when a conceptual row was added
+         or deleted from this table."
+    ::= { vmwEnv 2 }
+
+vmwSELCapacity OBJECT-TYPE
+    SYNTAX      Integer32 (0..100)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The amount of free space left in the IPMI SEL for new entries."
+    ::= { vmwEnv 30 }
+
+vmwEnvTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VmwEnvEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table is populated from monitoring IPMI BMC device.
+         One conceptual row is maintained for each reporting component.
+         This table may be cleared by operational request to BMC and
+         normally is configured to stop adding new entries when full."
+    ::= { vmwEnv 3 }
+
+vmwEnvEntry OBJECT-TYPE
+    SYNTAX      VmwEnvEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "One entry for each physical component reporting its
+         status to ESX Operating System."
+    INDEX       { vmwEnvIndex }
+    ::= { vmwEnvTable 1 }
+
+VmwEnvEntry ::= SEQUENCE {
+    vmwEnvIndex             Integer32,
+    vmwSubsystemType        VmwSubsystemTypes,
+    vmwHardwareStatus       VmwSubsystemStatus,
+    vmwEventDescription     DisplayString,
+    vmwEnvHardwareTime      DateAndTime,
+    vmwEnvHrDeviceIndex     Integer32,
+    vmwEnvSelSensorNumber   Integer32
+}
+
+vmwEnvIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is the identifier as reported by the vendor hardware's BMC
+        as per Table 32 section 32.1 SEL Event Records [1].
+         On ESXi: the command: localcli hardware ipmi sel list
+         can provide the listing of IPMI SEL entries as well."
+    ::= { vmwEnvEntry 1 }
+
+vmwSubsystemType OBJECT-TYPE
+    SYNTAX      VmwSubsystemTypes
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Hardware component reporting environmental state"
+    ::= { vmwEnvEntry 2 }
+
+vmwHardwareStatus OBJECT-TYPE
+    SYNTAX      VmwSubsystemStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Last reported state of this component"
+    ::= { vmwEnvEntry 3 }
+
+vmwEventDescription OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Human readable description of this event"
+    ::= { vmwEnvEntry 4 }
+
+vmwEnvHardwareTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Timestamp as reported from BMC for the SEL entry.
+         See CLI: 'localcli hardware ipmi sel list' for same report.
+         Note that BMC maintains it own clock and may not be the same
+         as the time ESX itself reports. On ESX: the CLI command:
+            localcli hardware ipmi sel get
+         reports the BMC clock."
+    ::= { vmwEnvEntry 5 }
+
+vmwEnvHrDeviceIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0|1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Index into hrDeviceTable for the hardware related to this event.
+         Report 0 if this entry does not have a related entry in hrDeviceTable."
+    ::= { vmwEnvEntry 6 }
+
+vmwEnvSelSensorNumber OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is the BMC reported Sensor Number byte 12 from SEL Event record
+         as per Table 32 section 32.1 SEL Event Records [1].
+         IPMI Sensors are reported in hrDeviceTable and vmwEnvTable provides
+         the mapping to the specific entry there. Also from CLI on ESX the command:
+            localcli hardware ipmi sdr list
+         can provide the listing of IPMI Sensors that has entered this SEL record.
+         "
+    ::= { vmwEnvEntry 7 }
+
+vmwEnvSource OBJECT-TYPE
+    SYNTAX      INTEGER {unknown(1), sensors(2), indications(3), ipmi(4) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies which source being used to obtain hardware state. Sensors were
+        from host agent process, indications were from CIMOM/cim provider, and ipmi is
+        when snmpd reads SEL directly from IPMI to obtain hardware events "
+    ::= { vmwEnv 100 }
+
+vmwEnvIPMI OBJECT IDENTIFIER
+    ::= { vmwProductSpecific 25 }
+
+-- IPMI Based Notifications
+
+vmwEnvIpmiSelFull NOTIFICATION-TYPE
+    OBJECTS     { vmwSELCapacity }
+    STATUS      current
+    DESCRIPTION
+        "An IPMI System Event Log has fixed amount of entries (65535). This event is sent once when
+         the managed object vmwSELCapacity reaches 100% capacity at which point new entries
+         to the SEL will be dropped if overflow is not enabled (default) on most hardware systems.
+         This event will rearm any time vmwSELCapacity.0 drops below 80%."
+    REFERENCE  "[1] section 31 System Event Log (SEL) Commands"
+    ::= { vmwESXNotifications 390}
+
+vmwEnvIpmiSelMemoryRaised NOTIFICATION-TYPE
+    OBJECTS     { vmwEnvSelSensorNumber, vmwEnvHardwareTime, vmwEventDescription }
+    STATUS      current
+    DESCRIPTION
+        "A memory related IPMI SDR has updated IPMI SEL with record id of vmwEnvIndex with state asserted.
+         The vmwEnvTable will have an entry at vmwEnvIndex with additional details"
+    REFERENCE  "[1] section 32 byte 11"
+    ::= { vmwESXNotifications 400 }
+
+vmwEnvIpmiSelMemoryCleared NOTIFICATION-TYPE
+    OBJECTS     { vmwEnvSelSensorNumber, vmwEnvHardwareTime, vmwEventDescription }
+    STATUS      current
+    DESCRIPTION
+        "A memory related IPMI SDR has updated IPMI SEL with record id of vmwEnvIndex with state deasserted
+         The vmwEnvTable will have an entry at vmwEnvIndex with additional details"
+    REFERENCE  "[1] section 32 byte 11"
+    ::= { vmwESXNotifications 401 }
+
+
+vmwEnvIpmiSelPowerSupplyRaised NOTIFICATION-TYPE
+    OBJECTS     { vmwEnvSelSensorNumber, vmwEnvHardwareTime, vmwEventDescription }
+    STATUS      current
+    DESCRIPTION
+        "A power supply related IPMI SDR has updated IPMI SEL with record id of vmwEnvIndex with state asserted.
+         The vmwEnvTable will have an entry at vmwEnvIndex with additional details"
+    REFERENCE  "[1] section 32 byte 11"
+    ::= { vmwESXNotifications 410 }
+
+vmwEnvIpmiSelPowerSupplyCleared NOTIFICATION-TYPE
+    OBJECTS     { vmwEnvSelSensorNumber, vmwEnvHardwareTime, vmwEventDescription }
+    STATUS      current
+    DESCRIPTION
+        "A power supply related IPMI SDR has updated IPMI SEL with record id of vmwEnvIndex with state deasserted
+         The vmwEnvTable will have an entry at vmwEnvIndex with additional details"
+    REFERENCE  "[1] section 32 byte 11"
+    ::= { vmwESXNotifications 411 }
+
+vmwEnvIpmiSelFanRaised NOTIFICATION-TYPE
+    OBJECTS     { vmwEnvSelSensorNumber, vmwEnvHardwareTime, vmwEventDescription }
+    STATUS      current
+    DESCRIPTION
+        "A fan related IPMI SDR has updated IPMI SEL with record id of vmwEnvIndex with state asserted.
+         The vmwEnvTable will have an entry at vmwEnvIndex with additional details"
+    REFERENCE  "[1] section 32 byte 11"
+    ::= { vmwESXNotifications 420 }
+
+vmwEnvIpmiSelFanCleared NOTIFICATION-TYPE
+    OBJECTS     { vmwEnvSelSensorNumber, vmwEnvHardwareTime, vmwEventDescription }
+    STATUS      current
+    DESCRIPTION
+        "A fan related IPMI SDR has updated IPMI SEL with record id of vmwEnvIndex with state deasserted
+         The vmwEnvTable will have an entry at vmwEnvIndex with additional details"
+    REFERENCE  "[1] am/.../ipmi-second-gen-interface-spec-v2-rev1-1.pdf section 32 byte 11"
+    ::= { vmwESXNotifications 421 }
+
+
+vmwEnvIpmiSelCpuRaised NOTIFICATION-TYPE
+    OBJECTS     { vmwEnvSelSensorNumber, vmwEnvHardwareTime, vmwEventDescription }
+    STATUS      current
+    DESCRIPTION
+        "A CPU related IPMI SDR has updated IPMI SEL with record id of vmwEnvIndex with state asserted.
+         The vmwEnvTable will have an entry at vmwEnvIndex with additional details"
+    REFERENCE  "[1] section 32 byte 13"
+    ::= { vmwESXNotifications 430 }
+
+vmwEnvIpmiSelCpuCleared NOTIFICATION-TYPE
+    OBJECTS     { vmwEnvSelSensorNumber, vmwEnvHardwareTime, vmwEventDescription }
+    STATUS      current
+    DESCRIPTION
+        "A CPU related IPMI SDR has updated IPMI SEL with record id of vmwEnvIndex with state deasserted
+         The vmwEnvTable will have an entry at vmwEnvIndex with additional details"
+    REFERENCE  "[1] section 32 byte 13"
+    ::= { vmwESXNotifications 431 }
+
+
+-- CIM Indication to SNMP notification conversion
+
+vmwEnvInIndications OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of HTTP POST msgs containing CIM Indications in XML as received by agent."
+    ::= { vmwEnv 101 }
+
+vmwEnvLastIn OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "sysUptime when agent last received an indication."
+    ::= { vmwEnv 102 }
+
+vmwEnvOutNotifications OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of notifications (traps|informs) sent that originated as CIM indication."
+    ::= { vmwEnv 103 }
+
+vmwEnvInErrs OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of CIM Indications that agent did not complete receipt of."
+    ::= { vmwEnv 104 }
+
+vmwEnvIndOidErrs OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of CIM Indications having a MappingString qualifier for which the value was not a valid oid."
+    ::= { vmwEnv 105 }
+
+vmwEnvCvtValueErrs OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of CIM Indication properties having a MappingString qualifier
+        for which the cim value for the given cim type could not be converted."
+    ::= { vmwEnv 106 }
+
+vmwEnvCvtSyntaxErrs OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of CIM Indication properties having a MappingString qualifier
+        for which the cim type could not be converted to smi syntax."
+    ::= { vmwEnv 107 }
+
+vmwEnvCvtOidErrs OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of CIM Indication properties having a MappingString qualifier
+        for which the the oid was not valid."
+    ::= { vmwEnv 108 }
+
+vmwEnvGetClassErrs OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of CIM GetClass operations over a given cim indication class and namespace
+        could not be completed (timeout) or returned error."
+    ::= { vmwEnv 109 }
+
+vmwEnvPropertySkips OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of CIM indications having properties which do not have MappingString qualifier
+         in the class definition and were not converted, sent along with the notification."
+    ::= { vmwEnv 110 }
+
+vmwEnvIndicationSkips OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of CIM indications recieved for which GetClass reported no MappingStrings qualifier
+        and were not converted to a notification."
+    ::= { vmwEnv 111 }
+
+
+--- CIM Backed events ----
+
+
+vmwEnvHardwareEvent NOTIFICATION-TYPE
+    OBJECTS     { vmwSubsystemType, vmwHardwareStatus,
+                  vmwEventDescription, vmwEnvHardwareTime }
+    STATUS      deprecated
+    DESCRIPTION
+        "This notification, if the agent is so configured, may be sent when the
+         system has detected a material change in physical condition of the
+         hardware"
+    ::= { vmwNotifications 301 }
+
+vmwESXEnvHardwareEvent NOTIFICATION-TYPE
+    OBJECTS     { vmwSubsystemType, vmwHardwareStatus,
+                  vmwEventDescription, vmwEnvHardwareTime }
+    STATUS      deprecated
+    DESCRIPTION
+        "ESX Specific version of this notification,
+         if the agent is so configured, may be sent when
+         the ESX Operating System has detected a material change in
+         physical condition of the hardware"
+    ::= { vmwESXNotifications 301 }
+
+
+vmwEnvCIM OBJECT IDENTIFIER
+    ::= { vmwProductSpecific 30 }
+
+vmwEnvDescription OBJECT-TYPE
+    SYNTAX     VmwLongSnmpAdminString
+    MAX-ACCESS accessible-for-notify
+    STATUS     deprecated
+    DESCRIPTION
+      "A short description of the Indication."
+    REFERENCE
+      "http://www.dmtf.org/standards/cim/cim_schema_v2240 : file CIM_AlertIndication.mof : property Description"
+    ::= { vmwEnvCIM 1 }
+
+vmwEnvEventTime OBJECT-TYPE
+    SYNTAX     DateAndTime
+    MAX-ACCESS accessible-for-notify
+    STATUS     deprecated
+    DESCRIPTION
+      "The time and date the underlying event was first
+       detected. May be set to the time the SNMP agent recieved the notification
+       if in the incoming CIM indication the value is
+       NULL due to the creating entity not being capable of providing
+       this information. This value is based on the notion of
+       local date and time of the Managed System Element
+       generating the Indication."
+    REFERENCE
+      "http://www.dmtf.org/standards/cim/cim_schema_v2240 : file CIM_AlertIndication.mof : property EventTime"
+    ::= { vmwEnvCIM 2 }
+
+vmwEnvIndicationTime OBJECT-TYPE
+    SYNTAX     DateAndTime
+    MAX-ACCESS accessible-for-notify
+    STATUS     deprecated
+    DESCRIPTION
+      "The time and date of creation of the underlying Indication received by the snmp agent. The
+       property may be set to the time SNMP agent received the notification if the entity creating the
+       Indication is not capable of determining this
+       information and delivers a null IndicationTime property. Note that IndicationTime may be the same
+       for two Indications that are generated in rapid succession."
+    REFERENCE
+      "http://www.dmtf.org/standards/cim/cim_schema_v2240 : file CIM_AlertIndication.mof : property IndicationTime"
+    ::= { vmwEnvCIM 3 }
+
+vmwEnvPerceivedSeverity OBJECT-TYPE
+    SYNTAX     VmwCIMSeverity
+    MAX-ACCESS accessible-for-notify
+    STATUS     deprecated
+    DESCRIPTION
+      "An enumerated value that describes the severity of the
+       Alert Indication from the notifier's point of view."
+    REFERENCE
+      "http://www.dmtf.org/standards/cim/cim_schema_v2240 : file CIM_AlertIndication.mof : property PerceivedSeverity"
+    ::= { vmwEnvCIM 4 }
+
+vmwEnvAlertType OBJECT-TYPE
+    SYNTAX     VmwCIMAlertTypes
+    MAX-ACCESS accessible-for-notify
+    STATUS     deprecated
+    DESCRIPTION
+      "Primary classification of the Indication."
+    REFERENCE
+      "http://www.dmtf.org/standards/cim/cim_schema_v2240 : file CIM_AlertIndication.mof : property AlertType"
+    ::= { vmwEnvCIM 5 }
+
+vmwEnvSysCreationClassName OBJECT-TYPE
+    SYNTAX     VmwCimName
+    MAX-ACCESS accessible-for-notify
+    STATUS     deprecated
+    DESCRIPTION
+      "The scoping System's CreationClassName for the Provider
+       generating this Indication."
+    REFERENCE
+      "http://www.dmtf.org/standards/cim/cim_schema_v2240 : file CIM_AlertIndication.mof : property SystemCreationClassName"
+    ::= { vmwEnvCIM 6 }
+
+vmwEnvAlertingElement OBJECT-TYPE
+    SYNTAX     VmwCimName
+    MAX-ACCESS accessible-for-notify
+    STATUS     deprecated
+    DESCRIPTION
+      "The identifying information of the entity (ie, the
+       instance) for which this notification is generated. The
+       property contains the CIM path of an CIM object instance,
+       encoded as a string parameter - if the instance is modeled in the CIM
+       Schema. If not a CIM instance, the property contains
+       some identifying string that names the entity for which
+       the Alert is generated. The path or identifying string
+       is formatted per the AlertingElementFormat property."
+    REFERENCE
+      "http://www.dmtf.org/standards/cim/cim_schema_v2240 : file CIM_AlertIndication.mof : property AlertingManagedElement"
+    ::= { vmwEnvCIM 7 }
+
+vmwEnvAlertingFormat OBJECT-TYPE
+    SYNTAX     VmwCIMAlertFormat
+    MAX-ACCESS accessible-for-notify
+    STATUS     deprecated
+    DESCRIPTION
+      "The format of the AlertingManagedElement property is
+       interpretable based upon the value of this property."
+    REFERENCE
+      "http://www.dmtf.org/standards/cim/cim_schema_v2240 : file CIM_AlertIndication.mof : property AlertingElementFormat"
+    ::= { vmwEnvCIM 8 }
+
+vmwEnvSystemName OBJECT-TYPE
+    SYNTAX     VmwCimName
+    MAX-ACCESS accessible-for-notify
+    STATUS     deprecated
+    DESCRIPTION
+     "The scoping System's Name for the Provider generating this message."
+    REFERENCE
+      "http://www.dmtf.org/standards/cim/cim_schema_v2240 : file CIM_AlertIndication.mof : property SystemName"
+    ::= { vmwEnvCIM 9 }
+
+vmwEnvProviderName OBJECT-TYPE
+    SYNTAX     VmwCimName
+    MAX-ACCESS accessible-for-notify
+    STATUS     deprecated
+    DESCRIPTION
+      "The name of the CIM provider, a software module loaded into the CIM subsystem, generating this message."
+    REFERENCE
+      "http://www.dmtf.org/standards/cim/cim_schema_v2240 : file CIM_AlertIndication.mof : property ProviderName"
+    ::= { vmwEnvCIM 10 }
+
+
+vmwESXEnvHardwareAlert NOTIFICATION-TYPE
+    OBJECTS     {vmwEnvDescription, vmwEnvEventTime, vmwEnvIndicationTime, vmwEnvPerceivedSeverity,
+                 vmwEnvAlertType, vmwEnvSysCreationClassName, vmwEnvAlertingElement, vmwEnvAlertingFormat,
+                 vmwEnvSystemName, vmwEnvProviderName }
+    STATUS      deprecated
+    DESCRIPTION
+        "A hardware alert as received from the Common Infrastructure Management (CIM) subsystem on this system."
+    REFERENCE  "http://www.dmtf.org/standards/cim/cim_schema_v2240 : file CIM_AlertIndication.mof"
+    ::= { vmwESXNotifications 302 }
+
+vmwESXEnvBatteryAlert NOTIFICATION-TYPE
+    OBJECTS     {vmwEnvDescription, vmwEnvEventTime, vmwEnvIndicationTime, vmwEnvPerceivedSeverity,
+                 vmwEnvAlertType, vmwEnvSysCreationClassName, vmwEnvAlertingElement, vmwEnvAlertingFormat,
+                 vmwEnvSystemName, vmwEnvProviderName }
+    STATUS      deprecated
+    DESCRIPTION
+        "A battery alert as received from the Common Infrastructure Management (CIM) subsystem on this system."
+    REFERENCE  "http://www.dmtf.org/standards/cim/cim_schema_v2240 : file CIM_AlertIndication.mof"
+    ::= { vmwESXNotifications 303 }
+
+vmwESXEnvChassisAlert NOTIFICATION-TYPE
+    OBJECTS     {vmwEnvDescription, vmwEnvEventTime, vmwEnvIndicationTime, vmwEnvPerceivedSeverity,
+                 vmwEnvAlertType, vmwEnvSysCreationClassName, vmwEnvAlertingElement, vmwEnvAlertingFormat,
+                 vmwEnvSystemName, vmwEnvProviderName }
+    STATUS      deprecated
+    DESCRIPTION
+        "A chassis alert as received from the Common Infrastructure Management (CIM) subsystem on this system."
+    REFERENCE  "http://www.dmtf.org/standards/cim/cim_schema_v2240 : file CIM_AlertIndication.mof"
+    ::= { vmwESXNotifications 304 }
+
+
+vmwESXEnvThermalAlert NOTIFICATION-TYPE
+    OBJECTS     {vmwEnvDescription, vmwEnvEventTime, vmwEnvIndicationTime, vmwEnvPerceivedSeverity,
+                 vmwEnvAlertType, vmwEnvSysCreationClassName, vmwEnvAlertingElement, vmwEnvAlertingFormat,
+                 vmwEnvSystemName, vmwEnvProviderName }
+    STATUS      deprecated
+    DESCRIPTION
+        "A cooling/thermal alert as received from the Common Infrastructure Management (CIM) subsystem on this system."
+    REFERENCE  "http://www.dmtf.org/standards/cim/cim_schema_v2240 : file CIM_AlertIndication.mof"
+    ::= { vmwESXNotifications 305 }
+
+vmwESXEnvDiskAlert NOTIFICATION-TYPE
+    OBJECTS     {vmwEnvDescription, vmwEnvEventTime, vmwEnvIndicationTime, vmwEnvPerceivedSeverity,
+                 vmwEnvAlertType, vmwEnvSysCreationClassName, vmwEnvAlertingElement, vmwEnvAlertingFormat,
+                 vmwEnvSystemName, vmwEnvProviderName }
+    STATUS      deprecated
+    DESCRIPTION
+        "A disk drive alert as received from the Common Infrastructure Management (CIM) subsystem on this system."
+    REFERENCE  "http://www.dmtf.org/standards/cim/cim_schema_v2240 : file CIM_AlertIndication.mof"
+    ::= { vmwESXNotifications 306 }
+
+vmwESXEnvPowerAlert NOTIFICATION-TYPE
+    OBJECTS     {vmwEnvDescription, vmwEnvEventTime, vmwEnvIndicationTime, vmwEnvPerceivedSeverity,
+                 vmwEnvAlertType, vmwEnvSysCreationClassName, vmwEnvAlertingElement, vmwEnvAlertingFormat,
+                 vmwEnvSystemName, vmwEnvProviderName }
+    STATUS      deprecated
+    DESCRIPTION
+        "A power suppply alert as received from the Common Infrastructure Management (CIM) subsystem on this system."
+    REFERENCE  "http://www.dmtf.org/standards/cim/cim_schema_v2240 : file CIM_AlertIndication.mof"
+    ::= { vmwESXNotifications 307 }
+
+vmwESXEnvProcessorAlert NOTIFICATION-TYPE
+    OBJECTS     {vmwEnvDescription, vmwEnvEventTime, vmwEnvIndicationTime, vmwEnvPerceivedSeverity,
+                 vmwEnvAlertType, vmwEnvSysCreationClassName, vmwEnvAlertingElement, vmwEnvAlertingFormat,
+                 vmwEnvSystemName, vmwEnvProviderName }
+    STATUS      deprecated
+    DESCRIPTION
+        "A IPMI processor alert as received from the Common Infrastructure Management (CIM) subsystem on this system."
+    REFERENCE  "http://www.dmtf.org/standards/cim/cim_schema_v2240 : file CIM_AlertIndication.mof"
+    ::= { vmwESXNotifications 308 }
+
+vmwESXEnvMemoryAlert NOTIFICATION-TYPE
+    OBJECTS     {vmwEnvDescription, vmwEnvEventTime, vmwEnvIndicationTime, vmwEnvPerceivedSeverity,
+                 vmwEnvAlertType, vmwEnvSysCreationClassName, vmwEnvAlertingElement, vmwEnvAlertingFormat,
+                 vmwEnvSystemName, vmwEnvProviderName }
+    STATUS      deprecated
+    DESCRIPTION
+        "A IPMI memory alert as received from the Common Infrastructure Management (CIM) subsystem on this system."
+    REFERENCE  "http://www.dmtf.org/standards/cim/cim_schema_v2240 : file CIM_AlertIndication.mof"
+    ::= { vmwESXNotifications 309 }
+
+
+vmwESXEnvBIOSAlert NOTIFICATION-TYPE
+    OBJECTS     {vmwEnvDescription, vmwEnvEventTime, vmwEnvIndicationTime, vmwEnvPerceivedSeverity,
+                 vmwEnvAlertType, vmwEnvSysCreationClassName, vmwEnvAlertingElement, vmwEnvAlertingFormat,
+                 vmwEnvSystemName, vmwEnvProviderName }
+    STATUS      deprecated
+    DESCRIPTION
+        "BIOS System Event Log alert as received from the Common Infrastructure Management (CIM) subsystem on this system."
+    REFERENCE  "http://www.dmtf.org/standards/cim/cim_schema_v2240 : file CIM_AlertIndication.mof"
+    ::= { vmwESXNotifications 310 }
+
+-- conformance information
+vmwEnvironmentalMIBConformance
+OBJECT IDENTIFIER ::= { vmwEnvironmentalMIB 2 }
+vmwEnvironmentMIBCompliances
+OBJECT IDENTIFIER ::= { vmwEnvironmentalMIBConformance 1 }
+vmwEnvMIBGroups  OBJECT IDENTIFIER ::= { vmwEnvironmentalMIBConformance 2 }
+
+-- compliance statements
+
+vmwEnvMIBBasicCompliance4 MODULE-COMPLIANCE
+STATUS  current
+DESCRIPTION
+    "The compliance statement for entities which implement the
+    VMWARE-ENV-MIB."
+MODULE  -- this module
+MANDATORY-GROUPS { vmwEnvCIMToSNMP, vmwEnvironmentGroup2,
+                   vmwESXEnvNotificationGroup3}
+GROUP vmwESXEnvNotificationGroup3
+DESCRIPTION
+    "This group is mandatory for ESX based systems agents."
+::= { vmwEnvironmentMIBCompliances 5 }
+
+vmwEnvMIBBasicCompliance3 MODULE-COMPLIANCE
+STATUS  obsolete
+DESCRIPTION
+    "The compliance statement for entities which implement the
+    VMWARE-ENV-MIB."
+MODULE  -- this module
+MANDATORY-GROUPS { vmwEnvAlertGroup, vmwESXEnvNotificationGroup2 }
+GROUP  vmwESXEnvNotificationGroup2
+DESCRIPTION
+    "This group is mandatory for ESX based systems agents."
+::= { vmwEnvironmentMIBCompliances 4 }
+
+vmwEnvMIBBasicCompliance2 MODULE-COMPLIANCE
+STATUS  deprecated
+DESCRIPTION
+    "The compliance statement for entities which implement the
+    VMWARE-ENV-MIB."
+MODULE  -- this module
+MANDATORY-GROUPS { vmwEnvironmentGroup }
+
+
+GROUP  vmwESXEnvNotificationGroup
+DESCRIPTION
+    "This group is mandatory for ESX based systems agents."
+
+GROUP  vmwEnvNotificationGroup
+DESCRIPTION
+    "This group is mandatory for vmware based systems agents."
+::= { vmwEnvironmentMIBCompliances 3 }
+
+vmwEnvMIBBasicCompliance MODULE-COMPLIANCE
+STATUS  obsolete
+DESCRIPTION
+    "The compliance statement for entities which implement the
+    VMWARE-ENV-MIB."
+MODULE  -- this module
+MANDATORY-GROUPS { vmwEnvironmentGroup, vmwEnvNotificationGroup }
+::= { vmwEnvironmentMIBCompliances 2 }
+
+
+vmwEnvCIMToSNMP OBJECT-GROUP
+    OBJECTS {
+    vmwEnvSource,
+    vmwEnvInIndications,
+    vmwEnvLastIn,
+    vmwEnvOutNotifications,
+    vmwEnvInErrs,
+    vmwEnvIndOidErrs,
+    vmwEnvCvtValueErrs,
+    vmwEnvCvtSyntaxErrs,
+    vmwEnvCvtOidErrs,
+    vmwEnvGetClassErrs,
+    vmwEnvPropertySkips,
+    vmwEnvIndicationSkips
+    }
+    STATUS current
+    DESCRIPTION
+        "Only needed if protocol conversion between CIM-XML and SNMP is supported."
+    ::= { vmwEnvMIBGroups 20 }
+
+vmwEnvAlertGroup OBJECT-GROUP
+    OBJECTS {
+    vmwEnvSource,
+    vmwEnvInIndications,
+    vmwEnvLastIn,
+    vmwEnvOutNotifications,
+    vmwEnvInErrs,
+    vmwEnvIndOidErrs,
+    vmwEnvCvtValueErrs,
+    vmwEnvCvtSyntaxErrs,
+    vmwEnvCvtOidErrs,
+    vmwEnvGetClassErrs,
+    vmwEnvPropertySkips,
+    vmwEnvIndicationSkips,
+    vmwEnvDescription,
+    vmwEnvEventTime,
+    vmwEnvIndicationTime,
+    vmwEnvPerceivedSeverity,
+    vmwEnvAlertType,
+    vmwEnvSysCreationClassName,
+    vmwEnvAlertingElement,
+    vmwEnvAlertingFormat,
+    vmwEnvSystemName,
+    vmwEnvProviderName
+    }
+    STATUS obsolete
+    DESCRIPTION
+        "These objects provide physical hardware environmental details as reported by CIM subsystem."
+    ::= { vmwEnvMIBGroups 5 }
+
+vmwEnvironmentGroup OBJECT-GROUP
+    OBJECTS {
+    vmwEnvNumber,
+    vmwEnvLastChange,
+    vmwSubsystemType,
+    vmwHardwareStatus,
+    vmwEventDescription,
+    vmwEnvHardwareTime
+    }
+    STATUS  deprecated
+    DESCRIPTION
+        "These objects provide physical hardware environmental details."
+    ::= { vmwEnvMIBGroups 1 }
+
+vmwEnvNotificationGroup NOTIFICATION-GROUP
+       NOTIFICATIONS {
+       vmwEnvHardwareEvent
+       }
+       STATUS      deprecated
+       DESCRIPTION
+           "Notifications related to physical subsystems."
+       ::= { vmwEnvMIBGroups 2 }
+
+vmwESXEnvNotificationGroup NOTIFICATION-GROUP
+       NOTIFICATIONS {
+       vmwESXEnvHardwareEvent
+       }
+       STATUS      deprecated
+       DESCRIPTION
+           "ESX System specific notifications about physical subsystems."
+       ::= { vmwEnvMIBGroups 3 }
+
+vmwESXEnvNotificationGroup2 NOTIFICATION-GROUP
+       NOTIFICATIONS {
+       vmwESXEnvHardwareAlert,
+       vmwESXEnvBatteryAlert,
+       vmwESXEnvChassisAlert,
+       vmwESXEnvThermalAlert,
+       vmwESXEnvDiskAlert,
+       vmwESXEnvPowerAlert,
+       vmwESXEnvProcessorAlert,
+       vmwESXEnvMemoryAlert,
+       vmwESXEnvBIOSAlert
+       }
+       STATUS      deprecated
+       DESCRIPTION
+           "ESX System specific notifications about physical subsystems."
+       ::= { vmwEnvMIBGroups 4 }
+
+vmwESXEnvNotificationGroup3 NOTIFICATION-GROUP
+       NOTIFICATIONS {
+       vmwEnvIpmiSelFull,
+       vmwEnvIpmiSelMemoryRaised,
+       vmwEnvIpmiSelMemoryCleared,
+       vmwEnvIpmiSelPowerSupplyRaised,
+       vmwEnvIpmiSelPowerSupplyCleared,
+       vmwEnvIpmiSelFanRaised,
+       vmwEnvIpmiSelFanCleared,
+       vmwEnvIpmiSelCpuRaised,
+       vmwEnvIpmiSelCpuCleared
+       }
+       STATUS      current
+       DESCRIPTION
+           "IPMI System EventLog specific notifications about physical subsystems."
+       ::= { vmwEnvMIBGroups 10 }
+
+
+vmwEnvironmentGroup2 OBJECT-GROUP
+    OBJECTS {
+    vmwEnvNumber,
+    vmwEnvLastChange,
+    vmwSELCapacity,
+    vmwSubsystemType,
+    vmwHardwareStatus,
+    vmwEventDescription,
+    vmwEnvHardwareTime,
+    vmwEnvHrDeviceIndex,
+    vmwEnvSelSensorNumber
+    }
+    STATUS  current
+    DESCRIPTION
+        "These objects provide physical hardware IPMI System Event Log details."
+    ::= { vmwEnvMIBGroups 6 }
+
+END -- end of module VMWARE-ENV-MIB.

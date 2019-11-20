@@ -4,7 +4,7 @@ echo(" EXTREME-BASE-MIB ");
 
 // Fan Speed
 $oid = ".1.3.6.1.4.1.1916.1.1.1.9.1.4";
-$oids = snmpwalk_cache_multi_oid($device, $oid, array(), "EXTREME-BASE-MIB");
+$oids = snmpwalk_cache_multi_oid($device, $oid, [], "EXTREME-BASE-MIB");
 
 foreach ($oids as $index => $entry) {
     // fix index to a proper int

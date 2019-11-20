@@ -1,0 +1,155 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.253.8.62.1.35.2.3.1.1",
+                    "sysDescr": "Xerox AltaLink C8045; SS 100.002.057.09608, NC 100.002.09608, UI 100.002.09608, ME 063.022.000, CC 100.002.09608, DF 007.019.000, FI ------, FA 003.012.013, CCOS 100.007.09608, NCOS 100.007.09608, SC 013.014.002, SU 100.002.09608",
+                    "sysContact": null,
+                    "version": null,
+                    "hardware": "",
+                    "features": null,
+                    "location": null,
+                    "os": "xerox",
+                    "type": "printer",
+                    "serial": null,
+                    "icon": "xerox.svg"
+                }
+            ]
+        },
+        "poller": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.253.8.62.1.35.2.3.1.1",
+                    "sysDescr": "Xerox AltaLink C8045; SS 100.002.057.09608, NC 100.002.09608, UI 100.002.09608, ME 063.022.000, CC 100.002.09608, DF 007.019.000, FI ------, FA 003.012.013, CCOS 100.007.09608, NCOS 100.007.09608, SC 013.014.002, SU 100.002.09608",
+                    "sysContact": "<private>",
+                    "version": null,
+                    "hardware": "Xerox AltaLink C8045",
+                    "features": null,
+                    "location": "<private>",
+                    "os": "xerox",
+                    "type": "printer",
+                    "serial": null,
+                    "icon": "xerox.svg"
+                }
+            ]
+        }
+    },
+    "toner": {
+        "discovery": {
+            "toner": [
+                {
+                    "toner_index": 1,
+                    "toner_type": "markerSupply",
+                    "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.1",
+                    "toner_descr": "Black Toner",
+                    "toner_capacity": 5300,
+                    "toner_current": 20,
+                    "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.1"
+                },
+                {
+                    "toner_index": 10,
+                    "toner_type": "markerSupply",
+                    "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.10",
+                    "toner_descr": "Waste Toner Container",
+                    "toner_capacity": 100,
+                    "toner_current": 5,
+                    "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.10"
+                },
+                {
+                    "toner_index": 11,
+                    "toner_type": "markerSupply",
+                    "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.11",
+                    "toner_descr": "Transfer Belt Cleaner",
+                    "toner_capacity": 100,
+                    "toner_current": 65,
+                    "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.11"
+                },
+                {
+                    "toner_index": 12,
+                    "toner_type": "markerSupply",
+                    "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.12",
+                    "toner_descr": "Second Bias Transfer Roll",
+                    "toner_capacity": 100,
+                    "toner_current": 86,
+                    "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.12"
+                },
+                {
+                    "toner_index": 2,
+                    "toner_type": "markerSupply",
+                    "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.2",
+                    "toner_descr": "Cyan Toner",
+                    "toner_capacity": 3000,
+                    "toner_current": 66,
+                    "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.2"
+                },
+                {
+                    "toner_index": 3,
+                    "toner_type": "markerSupply",
+                    "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.3",
+                    "toner_descr": "Magenta Toner",
+                    "toner_capacity": 3000,
+                    "toner_current": 72,
+                    "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.3"
+                },
+                {
+                    "toner_index": 4,
+                    "toner_type": "markerSupply",
+                    "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.4",
+                    "toner_descr": "Yellow Toner",
+                    "toner_capacity": 3050,
+                    "toner_current": 60,
+                    "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.4"
+                },
+                {
+                    "toner_index": 5,
+                    "toner_type": "markerSupply",
+                    "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.5",
+                    "toner_descr": "Drum Cartridge (R1)",
+                    "toner_capacity": 100,
+                    "toner_current": 50,
+                    "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.5"
+                },
+                {
+                    "toner_index": 6,
+                    "toner_type": "markerSupply",
+                    "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.6",
+                    "toner_descr": "Drum Cartridge (R2)",
+                    "toner_capacity": 100,
+                    "toner_current": 92,
+                    "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.6"
+                },
+                {
+                    "toner_index": 7,
+                    "toner_type": "markerSupply",
+                    "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.7",
+                    "toner_descr": "Drum Cartridge (R3)",
+                    "toner_capacity": 100,
+                    "toner_current": 93,
+                    "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.7"
+                },
+                {
+                    "toner_index": 8,
+                    "toner_type": "markerSupply",
+                    "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.8",
+                    "toner_descr": "Drum Cartridge (R4)",
+                    "toner_capacity": 100,
+                    "toner_current": 93,
+                    "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.8"
+                },
+                {
+                    "toner_index": 9,
+                    "toner_type": "markerSupply",
+                    "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.9",
+                    "toner_descr": "Fuser",
+                    "toner_capacity": 100,
+                    "toner_current": 90,
+                    "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.9"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

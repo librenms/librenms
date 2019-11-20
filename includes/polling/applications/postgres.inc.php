@@ -6,15 +6,15 @@ use LibreNMS\RRD\RrdDefinition;
 
 echo "postgres";
 
-$options      = '-O qv';
+$options      = '-Oqv';
 $oid          = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.8.112.111.115.116.103.114.101.115';
 $postgres = snmp_walk($device, $oid, $options);
-update_application($app, $postgres);
 
 list($backends, $commits, $rollbacks, $read, $hit, $idxscan, $idxtupread, $idxtupfetch, $idxblksread,
     $idxblkshit, $seqscan, $seqtupread, $ret, $fetch, $ins, $upd, $del) = explode("\n", $postgres);
 
 $rrd_name = array('app', $name, $app_id);
+$metrics = array();
 
 $rrd_def = RrdDefinition::make()
     ->addDataset('backends', 'GAUGE', 0)
@@ -54,6 +54,7 @@ $fields = array(
     'upd' => $upd,
     'del' => $del
 );
+$metrics['none'] = $fields;
 
 $tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
 data_update($device, 'app', $tags, $fields);
@@ -91,11 +92,13 @@ while (isset($db_lines[$db_lines_int])) {
         'del' => $del
     );
 
+    $metrics[$dbname] = $fields;
     $tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
     data_update($device, 'app', $tags, $fields);
 
     $db_lines_int++;
 }
+update_application($app, $postgres, $metrics);
 
 //
 // component processing for postgres
@@ -124,6 +127,9 @@ if (empty($found_dbs)) {
     } else {
         $pgc = $component->createComponent($device_id, 'postgres');
     }
+
+    // Make sure we don't readd it, just in a different order.
+    sort($found_dbs);
 
     $id = $component->getFirstComponentID($pgc);
     $pgc[$id]['label'] = 'Postgres';

@@ -1,0 +1,112 @@
+    GBNServiceTACACS-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,
+        Integer32, IpAddress, 
+        NOTIFICATION-TYPE                       FROM SNMPv2-SMI
+        
+        DisplayString, MacAddress,
+        RowStatus, TruthValue                   FROM SNMPv2-TC
+        
+        MODULE-COMPLIANCE, OBJECT-GROUP         FROM SNMPv2-CONF
+        
+        gbnServiceAAA                           FROM ADMIN-MASTER-MIB
+        ;
+        
+
+    gbnTacacsMib MODULE-IDENTITY
+        LAST-UPDATED    "2009/05/27"  -- May 27, 2009
+        ORGANIZATION    "QTECH LLC"
+        CONTACT-INFO    "Basil Budko
+                         E-mail: budko@qtech.ru"
+
+        DESCRIPTION     "admin tacacs Enterprise MIB definition."
+
+        REVISION        "2009/05/27"  -- May 27, 2009
+        DESCRIPTION     "Initial MIB creation."
+
+        ::= { gbnServiceAAA 3 }
+
+
+------------------------------------------------------------------------------
+--  Textual Conventions (i.e., these do not affect object encoding):
+------------------------------------------------------------------------------
+    --
+    --  "DURABLE":
+    --    Objects that are saved across a system reset and/or power cycle
+    --    are noted as "DURABLE" for convenience in the DESCRIPTION
+    --    section of the object definition.  Code must be explicitly
+    --    written to implement these DURABLE objects.
+    --
+
+------------------------------------------------------------------------------
+--  define groups in gbn-TACACS-MIB
+        PriServerIP OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "ip address of primary tacacs+ server."
+        ::= { gbnTacacsMib 1 }
+
+        SecServerIP OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "ip address of secondary tacacs+ server."
+        ::= { gbnTacacsMib 2 }
+
+        PriServerKey OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "key of primary tacacs+ server."
+        ::= { gbnTacacsMib 3 }
+
+        SecServerKey OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "key of secondary tacacs+ server."
+        ::= { gbnTacacsMib 4 }
+
+        PriServerPort OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "tcp port of primary tacacs+ server, range is from 1 to 65535, default is 49."
+        ::= { gbnTacacsMib 5 }
+
+        SecServerPort OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "tcp port of secondary tacacs+ server, range is from 1 to 65535, default is 49."
+        ::= { gbnTacacsMib 6 }
+
+        PriServerTimeout OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "timeout of connection to primary tacacs+ server, range is from 1 to 70, default is 5 seconds."
+        ::= { gbnTacacsMib 7 }
+
+        SecServerTimeout OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "timeout of connection to secondary tacacs+ server, range is from 1 to 70, default is 5 seconds."
+        ::= { gbnTacacsMib 8 }
+--
+-- END of gbn-TACACS-MIB                
+--
+
+END
+

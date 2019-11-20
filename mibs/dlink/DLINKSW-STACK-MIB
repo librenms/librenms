@@ -1,0 +1,503 @@
+--  *****************************************************************
+--  DLINKSW-STACK-MIB.mib : Stack MIB
+--
+--  Copyright (c) 2013 D-Link Corporation, all rights reserved.
+--
+--  *****************************************************************
+DLINKSW-STACK-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+		MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,Integer32
+		    FROM SNMPv2-SMI
+		DisplayString,TruthValue,MacAddress
+		    FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+       		FROM SNMPv2-CONF
+	    dlinkIndustrialCommon		
+		    FROM DLINK-ID-REC-MIB;
+   
+    dlinkSwStackMIB	MODULE-IDENTITY
+		LAST-UPDATED "201603090000Z"
+		ORGANIZATION "D-Link Corp."
+        CONTACT-INFO
+            "        D-Link Corporation
+
+             Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                     Taipei City 114, Taiwan, R.O.C
+             Tel:     +886-2-66000123
+             E-mail: tsd@dlink.com.tw
+            "
+        DESCRIPTION
+            "This MIB module defines objects for stacking feature."
+                           
+        REVISION "201603090000Z"
+        DESCRIPTION
+            "Add new node dStackInfoStartPort and dStackInfoPortRange."
+
+        REVISION "201303050000Z"
+        DESCRIPTION
+            "This is the first version of the MIB file."
+      ::= { dlinkIndustrialCommon 9 } 
+
+-- 
+--	MIB OBJECTS     
+--      
+	dStackMIBNotifications 	OBJECT IDENTIFIER ::= { dlinkSwStackMIB 0 }
+	dStackMIBObjects 			OBJECT IDENTIFIER ::= { dlinkSwStackMIB 1 }
+    dStackMIBConformance		OBJECT IDENTIFIER ::= { dlinkSwStackMIB 2 }
+
+-- -----------------------------------------------------------------------------     
+    dStackMgmt			OBJECT IDENTIFIER ::= { dStackMIBObjects 1 }
+    
+    dStackTopology		OBJECT-TYPE
+	    SYNTAX			INTEGER {
+		    standAlone(1),
+			duplexChain(2),
+			duplexRing(3)
+		}
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the state of the stacking topology."
+    	::= {  dStackMgmt 1 }
+   
+    dStackMyBoxId 	OBJECT-TYPE
+	    SYNTAX          Integer32 (1..255)
+	    MAX-ACCESS      read-only
+	    STATUS          current
+	    DESCRIPTION
+		   "This object indicates the box ID of the device.
+           "  
+	    ::= { dStackMgmt 2 }
+                 	    
+    dStackNumOfDevices	OBJECT-TYPE
+	    SYNTAX          Integer32 (1..255)
+	    MAX-ACCESS      read-only
+	    STATUS          current
+	    DESCRIPTION		    
+            "This object indicates the current number of devices in the stacking
+            system."
+	    ::= {  dStackMgmt 3 }
+
+    dStackAdminEnabled		OBJECT-TYPE
+	    SYNTAX			TruthValue
+        MAX-ACCESS		read-write
+        STATUS			current
+        DESCRIPTION            
+            "This object indicates whether the administrative stacking mode has
+            been enabled or not.
+            The new setting will not take effect until the next reboot. 
+            "
+    	::= {  dStackMgmt 4 }
+            	 	
+    dStackPreempt		OBJECT-TYPE
+	    SYNTAX			TruthValue
+        MAX-ACCESS		read-write
+        STATUS			current
+        DESCRIPTION
+		    "This object indicates whether the preemption is enabled or not.
+            When preemption is enabled, the unit that play master role will
+            change as units with better priority are added to the stack.
+            "
+    	DEFVAL { true }
+    	::= {  dStackMgmt 5 }
+      
+    dStackTrapStateEnabled		OBJECT-TYPE
+	    SYNTAX			TruthValue
+        MAX-ACCESS		read-write
+        STATUS			current
+        DESCRIPTION
+		    "This object indicates whether the sending of stacking related traps
+            is enabled or not."
+    	DEFVAL { false }    	
+    	::= {  dStackMgmt 6 }
+
+    dStackBandwidth		OBJECT-TYPE
+	    SYNTAX			INTEGER {
+		    twoPorts(1),
+			fourPorts(2)
+		}
+	    MAX-ACCESS		read-write
+	    STATUS			current
+	    DESCRIPTION
+		    "This object indicates the stacking port bandwidth. 
+		    twoPorts -  two ports are used for stacking, each port works as a 
+                        SIO port
+		    fourPorts - four ports are used for stacking, each two ports are
+                        aggregated together and work as a SIO port.
+		    The stacking port bandwidth setting of a switch device must be set
+            before the switch unit can be chained with other switch devices.
+		    The setting will be saved on local switch unit if the user saves
+            the configuration.
+		    The change of stacking port bandwidth will not take effect until
+            the next reboot.
+            "
+    	DEFVAL { twoPorts }    	
+        ::= { dStackMgmt 7 }
+
+-- -----------------------------------------------------------------------------  	    
+    dStackUnitInfoTable   OBJECT-TYPE
+        SYNTAX         SEQUENCE OF DStackUnitInfoEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION
+           "This table displays the information of the devices in the stacking
+           system.
+           When stacking mode is not effectively enabled, there is no entry in
+           this table.
+           "
+        ::= { dStackMgmt 8 }
+   
+    dStackUnitInfoEntry OBJECT-TYPE
+        SYNTAX         DStackUnitInfoEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION
+            "An entry (conceptual row) in dStackUnitInfoTable." 
+        INDEX       { dStackInfoBoxId }
+        ::= { dStackUnitInfoTable 1}
+
+    DStackUnitInfoEntry ::=   SEQUENCE {
+        dStackInfoBoxId                   Integer32,
+        dStackInfoExist                   TruthValue,
+        dStackInfoRole                    INTEGER,
+        dStackInfoUserSetBoxId            Integer32,
+        dStackInfoModuleName              DisplayString,
+        dStackInfoPriority                Integer32,
+        dStackInfoMacAddr                 MacAddress,
+        dStackInfoPromVersion             DisplayString,
+        dStackInfoFirmwareVer             DisplayString,
+        dStackInfoHardwareVer             DisplayString,
+        dStackInfoAdminBandwidth          INTEGER,
+        dStackInfoSIO1ActiveBandwidth     INTEGER,
+        dStackInfoSIO2ActiveBandwidth     INTEGER,
+        dStackInfoStartPort               Integer32,
+        dStackInfoPortRange               Integer32
+    }
+
+    dStackInfoBoxId		OBJECT-TYPE
+	    SYNTAX			Integer32 (1..255)
+	    MAX-ACCESS		not-accessible
+	    STATUS			current
+	    DESCRIPTION
+		   "This object indicates box ID of the entry."
+        ::= { dStackUnitInfoEntry 1 }
+
+    dStackInfoExist		OBJECT-TYPE
+	    SYNTAX			TruthValue
+	    MAX-ACCESS		read-only
+	    STATUS			current
+	    DESCRIPTION
+		    "The state of existence of the unit."
+        ::= { dStackUnitInfoEntry 2 }
+
+    dStackInfoRole	OBJECT-TYPE
+	    SYNTAX		INTEGER {
+			standAlone(3),
+			master(4),
+			slave(5),
+			backupmaster(6)
+		}
+	    MAX-ACCESS	    read-only
+	    STATUS		    current
+	    DESCRIPTION
+		    "The stacking role of the unit."
+	   ::= { dStackUnitInfoEntry 3 }
+
+    dStackInfoUserSetBoxId	OBJECT-TYPE
+	    SYNTAX			Integer32 (0..255)
+	    MAX-ACCESS		read-write
+	    STATUS			current
+	    DESCRIPTION
+		    "The assigned box ID of the stacking unit.
+            The switch unit cannot be added to a switch stack if its box ID is conflict
+            with existing switch units in the stack. 
+		    When read, the value of 0 indicates the box ID of the device is automatically
+            assigned.   
+            Note: the newly changed (setting) box ID will take effect after the next boot.
+            "
+        ::= { dStackUnitInfoEntry 4 }
+
+    dStackInfoModuleName		OBJECT-TYPE
+	    SYNTAX			DisplayString (SIZE (0..32))
+	    MAX-ACCESS		read-only
+	    STATUS			current
+	    DESCRIPTION
+		    "This object indicates the module name of the device."
+        ::= { dStackUnitInfoEntry 5 }
+       	
+    dStackInfoPriority		OBJECT-TYPE
+        SYNTAX			Integer32 (0..63)
+        MAX-ACCESS		read-write
+        STATUS			current
+        DESCRIPTION
+            "The priority of the stacking device. 
+            When read, if preemption is disabled, the master use 0 (the highest
+            priority) to make sure the current master can hold off the challenges
+            from other devices.
+            The special value of 0 is not allowed for 'SET' operation.
+            "
+        ::= { dStackUnitInfoEntry 6 }
+
+    dStackInfoMacAddr		OBJECT-TYPE
+	    SYNTAX			MacAddress
+	    MAX-ACCESS		read-only
+	    STATUS			current
+	    DESCRIPTION
+		    "The MAC address of the device."
+        ::= { dStackUnitInfoEntry 7 }
+
+    dStackInfoPromVersion		OBJECT-TYPE
+	    SYNTAX			DisplayString (SIZE (0..255))
+	    MAX-ACCESS		read-only
+	    STATUS			current
+	    DESCRIPTION
+		    "A textual string containing the PROM version of the
+		    stacking device."
+        ::= { dStackUnitInfoEntry 8 }
+
+    dStackInfoFirmwareVer	OBJECT-TYPE
+	    SYNTAX			DisplayString (SIZE (0..255))
+	    MAX-ACCESS		read-only
+	    STATUS			current
+	    DESCRIPTION
+		    "A textual string containing the firmware version of the
+		stacking device."
+        ::= { dStackUnitInfoEntry 9 }
+
+    dStackInfoHardwareVer	OBJECT-TYPE
+	    SYNTAX			DisplayString (SIZE (0..255))
+	    MAX-ACCESS		read-only
+	    STATUS			current
+	    DESCRIPTION
+		    "A textual string containing the hardware version of the
+		    stacking device."
+        ::= { dStackUnitInfoEntry 10 }
+
+    dStackInfoAdminBandwidth	OBJECT-TYPE
+	    SYNTAX			INTEGER {
+			twoPorts(1),
+			fourPorts(2)
+		}
+	    MAX-ACCESS		read-only
+	    STATUS			current
+	    DESCRIPTION
+		    "This object indicates the administrative stacking port bandwidth
+            of the device."
+        ::= { dStackUnitInfoEntry 11 }
+
+    dStackInfoSIO1ActiveBandwidth	OBJECT-TYPE
+	    SYNTAX			INTEGER {
+		    onePort(1),
+			twoPorts(2),
+			linkDown(3)
+		}
+	    MAX-ACCESS		read-only
+	    STATUS			current
+	    DESCRIPTION
+		    "Indicates the current link bandwidth in the SIO1.
+		    onePort -  only one port is linked in the SIO1.
+		    twoPorts - two ports are linked in the SIO1. 
+		    linkDown - SIO1 is link down
+		    "
+        ::= { dStackUnitInfoEntry 12 }
+
+    dStackInfoSIO2ActiveBandwidth	OBJECT-TYPE
+	    SYNTAX			INTEGER {
+			onePort(1),
+			twoPorts(2),
+			linkDown(3)
+		}
+	    MAX-ACCESS		read-only
+	    STATUS			current
+	    DESCRIPTION
+		    "Indicates the current link bandwidth in the SIO2.
+		    onePort -  only one port is linked in the SIO2.
+		    twoPorts - two ports are linked in the SIO2. 
+		    linkDown - SIO2 is link down
+		    "
+        ::= { dStackUnitInfoEntry 13 }
+
+    dStackInfoStartPort		OBJECT-TYPE
+        SYNTAX			Integer32 (1..65535)
+        MAX-ACCESS		read-only
+        STATUS			current
+        DESCRIPTION
+            "This object indicates the starting port of this unit."
+        ::= { dStackUnitInfoEntry 14 }
+
+    dStackInfoPortRange		OBJECT-TYPE
+        SYNTAX			Integer32 (0..65535)
+        MAX-ACCESS		read-only
+        STATUS			current
+        DESCRIPTION
+            "This object indicates the total ports of this unit."
+        ::= { dStackUnitInfoEntry 15 }
+
+-- -----------------------------------------------------------------------------
+    dStackNotificationInfo	OBJECT IDENTIFIER ::= { dStackMIBObjects 2 }
+
+    dStackNotifyInfoBoxId OBJECT-TYPE       
+        SYNTAX			Integer32 (1..255)
+	    MAX-ACCESS		accessible-for-notify
+	    STATUS			current
+	    DESCRIPTION
+		   "This object indicates box ID of the notification."
+        ::= { dStackNotificationInfo 1 }
+
+    dStackNotifyInfoTopologyType OBJECT-TYPE       
+    	SYNTAX          INTEGER	{	
+			chain(1),
+			ring(2)
+		}
+	    MAX-ACCESS		accessible-for-notify
+	    STATUS			current
+	    DESCRIPTION
+		   "This object indicates the current stacking topology of the
+           notification."
+        ::= { dStackNotificationInfo 2 }
+
+    dStackNotifyInfoRoleChangeType  OBJECT-TYPE       
+    	SYNTAX  INTEGER {
+			backupToMaster(1),
+			slaveToMaster(2)
+    		}
+	    MAX-ACCESS		accessible-for-notify
+	    STATUS			current
+	    DESCRIPTION
+		   "This object indicates stacking role change of the notification."
+        ::= { dStackNotificationInfo 3 }
+      
+--  ***************************************************************************	
+--  Notifications
+--  ***************************************************************************        
+    dStackInsertNotification NOTIFICATION-TYPE
+	    OBJECTS			{
+		    dStackNotifyInfoBoxId,
+			dStackInfoMacAddr
+		}
+	    STATUS          current
+	    DESCRIPTION     "Device Hot Insert notification."
+	    ::= { dStackMIBNotifications 1 }	
+
+    dStackRemoveNotification NOTIFICATION-TYPE
+	    OBJECTS			{
+			dStackNotifyInfoBoxId,
+			dStackInfoMacAddr
+		}
+	    STATUS          current
+	    DESCRIPTION     "Device Hot Remove notification."
+	    ::= { dStackMIBNotifications 2 }	
+
+    dStackFailureNotification NOTIFICATION-TYPE
+	    OBJECTS			{
+			dStackNotifyInfoBoxId
+		}
+	    STATUS          current
+	    DESCRIPTION     "Device Failure notification."
+	    ::= { dStackMIBNotifications 3 }	
+
+    dStackTPChangeNotification NOTIFICATION-TYPE
+	    OBJECTS			{
+			dStackNotifyInfoTopologyType,
+			dStackNotifyInfoBoxId,
+			dStackInfoMacAddr
+		}
+	   STATUS          current
+	   DESCRIPTION     "The stacking topology change notification."
+	   ::= { dStackMIBNotifications 4 }	
+
+    dStackRoleChangeNotification NOTIFICATION-TYPE
+	    OBJECTS			{
+			dStackNotifyInfoRoleChangeType,
+			dStackNotifyInfoBoxId
+		}
+	    STATUS          current
+	    DESCRIPTION     "The stacking device role change notification."
+	    ::= { dStackMIBNotifications 5 }	
+
+-- -----------------------------------------------------------------------------
+-- MIB Conformance statements
+-- -----------------------------------------------------------------------------
+    dStackMIBCompliances  OBJECT IDENTIFIER    ::= { dStackMIBConformance 1 }
+
+    dStackMIBGroups  OBJECT IDENTIFIER         ::= { dStackMIBConformance 2 } 
+    
+    dStackCompliance MODULE-COMPLIANCE
+        STATUS          current
+        DESCRIPTION
+            "The compliance statement for entities which implement the 
+			DLINKSW-STACK-MIB."
+			
+        MODULE          -- this module
+        MANDATORY-GROUPS    { 
+            dStackBasicMgmtGroup,
+            dStackNotifGroup                 
+        }
+                      
+        GROUP dStackBandwidthMgmtGroup
+        DESCRIPTION
+            "This group is mandatory if configurable stacking port bandwidth 
+            is supported."                   
+                                   
+        ::= { dStackMIBCompliances 1 }
+
+-- Units of Conformance
+            
+     dStackBasicMgmtGroup OBJECT-GROUP
+		OBJECTS { 
+            dStackTopology,
+            dStackMyBoxId,            
+            dStackNumOfDevices,
+            dStackAdminEnabled,
+            dStackPreempt, 
+            dStackTrapStateEnabled,
+            dStackInfoExist,
+            dStackInfoRole,                
+            dStackInfoUserSetBoxId,        
+            dStackInfoModuleName,          
+            dStackInfoPriority,            
+            dStackInfoMacAddr,
+            dStackInfoPromVersion,
+            dStackInfoFirmwareVer,
+            dStackInfoHardwareVer,            
+            dStackNotifyInfoBoxId,
+            dStackNotifyInfoTopologyType,
+            dStackNotifyInfoRoleChangeType
+		}
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects provides basic management and information
+            for stacking feature."
+		::= { dStackMIBGroups 1 }
+		
+	dStackBandwidthMgmtGroup OBJECT-GROUP
+		OBJECTS { 
+		    dStackBandwidth,
+		    dStackInfoAdminBandwidth,
+            dStackInfoSIO1ActiveBandwidth,
+            dStackInfoSIO2ActiveBandwidth	
+		}
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects providing management and information for
+            stacking port bandwidth."
+		::= { dStackMIBGroups 2 }
+			       
+    dStackNotifGroup NOTIFICATION-GROUP
+        NOTIFICATIONS { 
+            dStackInsertNotification,
+            dStackRemoveNotification,
+            dStackFailureNotification,
+            dStackTPChangeNotification,
+            dStackRoleChangeNotification
+        }
+        STATUS  current
+        DESCRIPTION
+             "A collection of notifications for indicating the status change
+             of stacking."
+        ::= { dStackMIBGroups 3 }
+             
+        
+END
+

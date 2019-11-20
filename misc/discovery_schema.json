@@ -1,0 +1,466 @@
+{
+    "$schema": "http://json-schema.org/schema#",
+    "type": "object",
+    "properties": {
+        "mib": {
+            "type": "string"
+        },
+        "modules": {
+            "type": "object",
+            "properties": {
+                "processors": {
+                    "type": "object",
+                    "properties": {
+                        "data": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "oid": {
+                                        "type": "string"
+                                    },
+                                    "num_oid": {
+                                        "type": "string"
+                                    },
+                                    "index": {
+                                        "type": [
+                                            "integer",
+                                            "string"
+                                        ]
+                                    },
+                                    "descr": {
+                                        "type": "string"
+                                    },
+                                    "precision": {
+                                        "type": "integer"
+                                    },
+                                    "value": {
+                                        "type": "string"
+                                    },
+                                    "type": {
+                                        "type": "string"
+                                    },
+                                    "skip_values": {
+                                        "anyOf": [
+                                            {
+                                                "type": "integer"
+                                            },
+                                            {
+                                                "type": "array",
+                                                "items": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "integer"
+                                                        },
+                                                        {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "oid": {
+                                                                    "type": "string"
+                                                                },
+                                                                "op": {
+                                                                    "$ref": "#/definitions/comparison"
+                                                                },
+                                                                "value": {
+                                                                    "type": ["integer", "string"]
+                                                                }
+                                                            },
+                                                            "additionalProperties": false,
+                                                            "required": [
+                                                                "oid",
+                                                                "op",
+                                                                "value"
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        ]
+                                    },
+                                    "entPhysicalIndex": {
+                                        "type": "string"
+                                    },
+                                    "warn_percent": {
+                                        "type": "string"
+                                    },
+                                    "snmp_flags": {
+                                        "type": [
+                                            "string",
+                                            "array"
+                                        ]
+                                    }
+                                },
+                                "additionalProperties": false,
+                                "required": [
+                                    "num_oid",
+                                    "oid"
+                                ]
+                            }
+                        }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                        "data"
+                    ]
+                },
+                "sensors": {
+                    "type": "object",
+                    "properties": {
+                        "state": {
+                            "type": "object",
+                            "properties": {
+                                "data": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "oid": {
+                                                "type": "string"
+                                            },
+                                            "value": {
+                                                "type": "string"
+                                            },
+                                            "group": {
+                                                "type": "string"
+                                            },
+                                            "low_limit": {
+                                                "type": ["number", "string"]
+                                            },
+                                            "low_warn_limit": {
+                                                "type": ["number", "string"]
+                                            },
+                                            "warn_limit": {
+                                                "type": ["number", "string"]
+                                            },
+                                            "high_limit": {
+                                                "type": ["number", "string"]
+                                            },
+                                            "skip_value_lt": {
+                                                "type": "number"
+                                            },
+                                            "skip_value_gt": {
+                                                "type": "number"
+                                            },
+                                            "num_oid": {
+                                                "type": "string",
+                                                "pattern": "^(\\.\\d+)+(\\.?\\{\\{ \\$index \\}\\})?(\\.\\d+)*$"
+                                            },
+                                            "descr": {
+                                                "type": "string"
+                                            },
+                                            "index": {
+                                                "type": [
+                                                    "integer",
+                                                    "string"
+                                                ]
+                                            },
+                                            "states": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "value": {
+                                                            "type": "integer"
+                                                        },
+                                                        "descr": {
+                                                            "type": "string"
+                                                        },
+                                                        "graph": {
+                                                            "type": "integer"
+                                                        },
+                                                        "generic": {
+                                                            "type": "integer"
+                                                        }
+                                                    },
+                                                    "additionalProperties": false,
+                                                    "required": [
+                                                        "descr",
+                                                        "generic",
+                                                        "graph",
+                                                        "value"
+                                                    ]
+                                                }
+                                            },
+                                            "state_name": {
+                                                "type": "string"
+                                            },
+                                            "skip_values": {
+                                                "anyOf": [
+                                                    {
+                                                        "type": "integer"
+                                                    },
+                                                    {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "oid": {
+                                                                    "type": "string"
+                                                                },
+                                                                "op": {
+                                                                    "$ref": "#/definitions/comparison"
+                                                                },
+                                                                "value": {
+                                                                    "type": ["integer", "string"]
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "oid",
+                                                                "op",
+                                                                "value"
+                                                            ]
+                                                        }
+                                                    }
+                                                ]
+                                            },
+                                            "snmp_flags": {
+                                                "type": [
+                                                    "string",
+                                                    "array"
+                                                ]
+                                            },
+                                            "entPhysicalIndex": {
+                                                "type": ["integer", "string"]
+                                            },
+                                            "entPhysicalIndex_measured": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "additionalProperties": false,
+                                        "required": [
+                                            "descr",
+                                            "num_oid",
+                                            "oid",
+                                            "states"
+                                        ]
+                                    }
+                                },
+                                "options": {"$ref": "#/definitions/options"}
+                            },
+                            "required": [
+                                "data"
+                            ]
+                        },
+                        "voltage": {"$ref": "#/definitions/sensor"},
+                        "fanspeed": {"$ref": "#/definitions/sensor"},
+                        "temperature": {"$ref": "#/definitions/sensor"},
+                        "pre-cache": {
+                            "type": "object",
+                            "properties": {
+                                "data": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "oid": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "snmp_flags": {
+                                                "type": [
+                                                    "string",
+                                                    "array"
+                                                ]
+                                            }
+                                        },
+                                        "additionalProperties": false,
+                                        "required": [
+                                            "oid"
+                                        ]
+                                    }
+                                }
+                            },
+                            "additionalProperties": false,
+                            "required": [
+                                "data"
+                            ]
+                        },
+                        "humidity": {"$ref": "#/definitions/sensor"},
+                        "airflow": {"$ref": "#/definitions/sensor"},
+                        "current": {"$ref": "#/definitions/sensor"},
+                        "frequency": {"$ref": "#/definitions/sensor"},
+                        "power": {"$ref": "#/definitions/sensor"},
+                        "pressure": {"$ref": "#/definitions/sensor"},
+                        "cooling": {"$ref": "#/definitions/sensor"},
+                        "charge": {"$ref": "#/definitions/sensor"},
+                        "runtime": {"$ref": "#/definitions/sensor"},
+                        "dbm": {"$ref": "#/definitions/sensor"},
+                        "load": {"$ref": "#/definitions/sensor"},
+                        "chromatic_dispersion": {"$ref": "#/definitions/sensor"},
+                        "delay": {"$ref": "#/definitions/sensor"},
+                        "quality_factor": {"$ref": "#/definitions/sensor"},
+                        "snr": {"$ref": "#/definitions/sensor"},
+                        "waterflow": {"$ref": "#/definitions/sensor"},
+                        "eer": {"$ref": "#/definitions/sensor"}
+                    }
+                }
+            }
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+        "modules"
+    ],
+    "definitions": {
+        "sensor": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/data"
+                },
+                "options": {
+                    "$ref": "#/definitions/options"
+                }
+            },
+            "additionalProperties": false,
+            "required": [
+                "data"
+            ]
+        },
+        "data": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "oid": {
+                        "type": "string"
+                    },
+                    "num_oid": {
+                        "type": "string",
+                        "pattern": "^(\\.\\d+)+\\.?\\{\\{ \\$index \\}\\}(\\.\\d+)*$"
+                    },
+                    "index": {
+                        "type": ["integer", "string"]
+                    },
+                    "descr": {
+                        "type": "string"
+                    },
+                    "divisor": {
+                        "type": "integer"
+                    },
+                    "multiplier": {
+                        "type": "integer"
+                    },
+                    "value": {
+                        "type": "string"
+                    },
+                    "group": {
+                        "type": "string"
+                    },
+                    "low_limit": {
+                        "type": ["number", "string"]
+                    },
+                    "low_warn_limit": {
+                        "type": ["number", "string"]
+                    },
+                    "warn_limit": {
+                        "type": ["number", "string"]
+                    },
+                    "high_limit": {
+                        "type": ["number", "string"]
+                    },
+                    "skip_value_lt": {
+                        "type": "number"
+                    },
+                    "skip_value_gt": {
+                        "type": "number"
+                    },
+                    "skip_values": {
+                        "type": ["number", "array"],
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "oid": {
+                                    "type": "string"
+                                },
+                                "op": {
+                                    "$ref": "#/definitions/comparison"
+                                },
+                                "value": {
+                                    "type": ["integer", "string"]
+                                }
+                            },
+                            "additionalProperties": false,
+                            "required": [
+                                "oid",
+                                "op",
+                                "value"
+                            ]
+                        }
+                    },
+                    "snmp_flags": {
+                        "type": [
+                            "string",
+                            "array"
+                        ]
+                    },
+                    "entPhysicalIndex": {
+                        "type": ["integer", "string"]
+                    },
+                    "entPhysicalIndex_measured": {
+                        "type": "string"
+                    },
+                    "user_func": {
+                        "type": "string"
+                    }
+                },
+                "additionalProperties": false,
+                "required": [
+                    "descr",
+                    "num_oid",
+                    "oid"
+                ]
+            }
+        },
+        "options": {
+            "type": "object",
+            "properties": {
+                "divisor": {
+                    "type": "integer"
+                },
+                "skip_values": {
+                    "anyOf": [
+                        {
+                            "type": "integer"
+                        },
+                        {
+                            "type": "array",
+                            "items": {
+                                "type": "integer"
+                            }
+                        }
+                    ]
+                },
+                "skip_values_lt": {
+                    "type": "integer"
+                }
+            },
+            "additionalProperties": false
+        },
+        "comparison": {
+            "type": "string",
+            "enum": [
+                "=",
+                "!=",
+                "==",
+                "!==",
+                "<=",
+                ">=",
+                "<",
+                ">",
+                "starts",
+                "ends",
+                "contains",
+                "regex",
+                "not_starts",
+                "not_ends",
+                "not_contains",
+                "not_regex",
+                "in_array",
+                "not_in_array"
+            ]
+        }
+    }
+}

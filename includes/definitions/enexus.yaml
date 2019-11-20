@@ -1,0 +1,46 @@
+os: enexus
+text: 'Eltek Valere eNexus'
+type: power
+icon: eltek
+nobulk: true
+over:
+    - { graph: device_current, text: Current }
+    - { graph: device_runtime, text: Runtime }
+    - { graph: device_voltage, text: Voltage }
+
+mib_dir:
+    - eltek
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.12148.10
+    - snmpget:
+          oid: .1.3.6.1.4.1.12148.10.2.6.0
+          op: regex
+          value: '/Micropack System|Smartpack S/'
+poller_modules:
+    entity-physical: false
+    hr-mib: false
+    ipSystemStats: false
+    netstats: false
+    ospf: false
+    ucd-mib: false
+    ports: false
+    stp: false
+discovery_modules:
+    ports-stack: false
+    entity-physical: false
+    processors: false
+    mempools: false
+    cisco-vrf-lite: false
+    ipv4-addresses: false
+    ipv6-addresses: false
+    storage: false
+    hr-device: false
+    discovery-protocols: false
+    arp-table: false
+    bgp-peers: false
+    ucd-diskio: false
+    fdb-table: false
+    stp: false
+    vlans: false
+    ports: false

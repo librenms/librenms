@@ -1,0 +1,16 @@
+os: fs-switch
+text: 'Fiberstore Switch'
+type: network
+icon: fs
+group: fs
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'Processor Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+mib_dir:
+    - fs
+discovery:
+    - sysObjectID: 
+        - .1.3.6.1.4.1.51134
+        - .1.3.6.1.4.1.27975
+        - .1.3.6.1.4.1.12345

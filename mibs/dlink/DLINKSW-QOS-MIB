@@ -1,0 +1,1980 @@
+-- *****************************************************************
+-- DLINKSW-QOS-MIB.mib : D-Link QoS MIB
+--
+-- Copyright (c) 2013 D-Link Corporation, all rights reserved.
+--   
+-- *****************************************************************
+
+DLINKSW-QOS-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY,OBJECT-TYPE,Integer32,Unsigned32
+            FROM SNMPv2-SMI   
+        RowStatus, DisplayString,TruthValue,TEXTUAL-CONVENTION    
+            FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP
+		    FROM SNMPv2-CONF        
+        dot1dBasePort
+            FROM BRIDGE-MIB
+        dlinkIndustrialCommon	
+            FROM DLINK-ID-REC-MIB;
+		
+   	
+    dlinkSwQosMIB MODULE-IDENTITY
+        LAST-UPDATED "201307090000Z"
+        ORGANIZATION "D-Link Corp."
+        CONTACT-INFO
+            "         D-Link Corporation
+             Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                     Taipei City 114, Taiwan, R.O.C
+             Tel:    +886-2-66000123
+             E-mail: tsd@dlink.com.tw
+            "
+        DESCRIPTION
+		    "The Structure of QoS Infomation for the 
+		     proprietary enterprise."
+        REVISION "201302210000Z"
+        DESCRIPTION
+            "Initial version of this MIB module."   
+        REVISION "201305300000Z"
+        DESCRIPTION
+            "1.Add a new parameter, percent <value 1-100 >, to set the rate by percentage.
+			-- dQosBandwidthRxRateMode,dQosBandwidthTxRateMode,
+			-- dQosQueueBandwidthMinRateMode,dQosQueueBandwidthMinRateMode
+			 2.change the value range of 
+			-- dQosBandwidthRxRate,dQosBandwidthTxRate,
+			-- dQosQueueBandwidthMinRate,dQosQueueBandwidthMaxRate
+			"     
+ 	REVISION "201307090000Z"
+        DESCRIPTION
+            "1.Add police action: replaceCos,replaceAll
+		-- DlinkQosPoliceActionType
+		-- dQosAggPolicerEntry
+		   	-- dQosAggPolicerConformReplaceCos
+			-- dQosAggPolicerExceedReplaceCos
+			-- dQosAggPolicerViolateReplaceCos
+		-- dQosPoliceEntry
+			-- dQosPoliceConformReplaceCos
+			-- dQosPoliceExceedReplaceCos
+			-- dQosPoliceViolateReplaceCos
+		"
+        ::= { dlinkIndustrialCommon 61 }
+ 
+
+    DlinkQosPoliceActionType ::= TEXTUAL-CONVENTION
+        STATUS          current
+        DESCRIPTION
+            "A value represents a type of policing action.
+            notApplicable - The action is not specified or not applicable.
+            drop   - drop the packet.
+            permit - transmit the packet.
+            replaceDscp - Replace the DSCP value of packet with the configured value.
+                     The new DSCP value must be accompanied for use with 
+                     DlinkQosPoliceActionType.
+            replaceCos - Replace the COS value of packet with the configured value.
+                     The new COS value must be accompanied for use with
+                     DlinkQosPoliceActionType.
+            replaceAll - Replace both the DSCP and COS value of packet with the
+                     configured value.
+            "
+        SYNTAX          INTEGER {
+            notApplicable(0),
+            drop(1),
+            permit(2),
+            replaceDscp(3),
+	    replaceCos(4),
+	    replaceAll(5)		
+        }
+
+-- -----------------------------------------------------------------------------
+    dQosMIBNotifications	OBJECT IDENTIFIER ::= { dlinkSwQosMIB 0 }
+	dQosMIBObjects     		OBJECT IDENTIFIER ::= { dlinkSwQosMIB 1 }
+	dQosMIBConformance		OBJECT IDENTIFIER ::= { dlinkSwQosMIB 2 }
+
+-- -----------------------------------------------------------------------------
+	dQosClassMap        	 OBJECT IDENTIFIER ::= { dQosMIBObjects 1 }  
+	dQosPolicyMap  		     OBJECT IDENTIFIER ::= { dQosMIBObjects 2 }   
+   	dQosServicePolicy     	 OBJECT IDENTIFIER ::= { dQosMIBObjects 3 }
+	dQosScheduling   	     OBJECT IDENTIFIER ::= { dQosMIBObjects 4 }
+	dQosBandwidthCtrl        OBJECT IDENTIFIER ::= { dQosMIBObjects 5 }
+	dQosQueueBandwidthCtrl   OBJECT IDENTIFIER ::= { dQosMIBObjects 6 }
+
+	dQosQueuingCfg           OBJECT IDENTIFIER ::= { dQosMIBObjects 7 }	
+	dQosDscpMap      	     OBJECT IDENTIFIER ::= { dQosMIBObjects 8 }
+	dQosCosMap       	     OBJECT IDENTIFIER ::= { dQosMIBObjects 9 }
+		
+-- ----------------------------------------------------------------------------- 	
+   	dQosPolicyMapTable OBJECT-TYPE
+		SYNTAX          SEQUENCE OF DQosPolicyMapEntry
+		MAX-ACCESS      not-accessible
+		STATUS  current
+		DESCRIPTION
+		    "This table consists of a list of QoS policy maps."
+		::= { dQosPolicyMap 1 }
+    	   
+	dQosPolicyMapEntry OBJECT-TYPE
+		SYNTAX          DQosPolicyMapEntry
+		MAX-ACCESS      not-accessible
+		STATUS          current
+		DESCRIPTION
+		    "An entry defines a QoS policy map."
+		INDEX   { dQosPolicyMapName }
+		::= { dQosPolicyMapTable 1 }
+
+	DQosPolicyMapEntry ::= 		SEQUENCE {     
+		dQosPolicyMapName	      DisplayString,
+		dQosPolicyMapRowStatus    RowStatus
+    } 
+	
+	dQosPolicyMapName OBJECT-TYPE
+		SYNTAX          DisplayString (SIZE(1..32))
+		MAX-ACCESS      not-accessible		
+		STATUS          current  
+		DESCRIPTION
+		    "This object indicates name of the policy map." 
+		::= { dQosPolicyMapEntry 1 }	
+		
+	dQosPolicyMapRowStatus OBJECT-TYPE
+		SYNTAX          RowStatus
+		MAX-ACCESS      read-create
+		STATUS          current
+		DESCRIPTION
+		      "This object indicates the status of this entry."
+		::= { dQosPolicyMapEntry 2 }
+
+-- ----------------------------------------------------------------------------- 	
+   	dQosPolicyMapCfgTable OBJECT-TYPE
+		SYNTAX          SEQUENCE OF DQosPolicyMapCfgEntry
+		MAX-ACCESS      not-accessible
+		STATUS          current
+		DESCRIPTION
+		    "This table consists of a list of QoS policies for the class in a 
+            policy map."
+		::= { dQosPolicyMap 2 }
+    	   
+	dQosPolicyMapCfgEntry OBJECT-TYPE
+		SYNTAX  DQosPolicyMapCfgEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+		     "An entry consists QoS policies regarding setting the new precedence
+             field, DSCP field, and CoS field of the out-going packet. 
+             The first two index elements identify the policy map class to which
+             the setting policies belong.   
+             Multiple objects in a same row can be set for a class if they are not
+             conflicting. As an example of conflicting setting: precedence and DSCP
+             cannot be set at a same row.
+             "
+		INDEX   { 
+            dQosPolicyMapName,
+            dQosClassMapName 
+        }
+		::= { dQosPolicyMapCfgTable 1 }
+
+	DQosPolicyMapCfgEntry ::=		SEQUENCE {      		  
+	    dQosPolicyMapCfgSetCosQueue         Integer32,  
+		dQosPolicyMapCfgSetCos		        Integer32,                       
+		dQosPolicyMapCfgSetDscpOnlyIp       TruthValue,		         
+		dQosPolicyMapCfgSetDscp		        Integer32,       
+		dQosPolicyMapCfgSetPreceOnlyIp 	    TruthValue,  		  
+		dQosPolicyMapCfgSetPrecedence 	    Integer32,  
+		dQosPolicyMapCfgRowStatus    	    RowStatus
+    } 
+		
+   	dQosPolicyMapCfgSetCosQueue OBJECT-TYPE
+		SYNTAX          Integer32 (-1 | 0..7)
+		MAX-ACCESS      read-create
+		STATUS          current
+		DESCRIPTION
+		    "Indicates the new CoS queue.
+            The special value of -1 means the setting is un-configured."  
+		DEFVAL {-1} 
+		::= { dQosPolicyMapCfgEntry 1 }    
+	
+	dQosPolicyMapCfgSetCos OBJECT-TYPE
+		SYNTAX          Integer32 (-1 | 0..7 )
+		MAX-ACCESS      read-create
+		STATUS  current
+		DESCRIPTION
+		      "Indicates the new Cos.
+		      The special value of -1 means the setting is un-configured."     
+		DEFVAL {-1}
+		::= { dQosPolicyMapCfgEntry 2 }
+	
+    dQosPolicyMapCfgSetDscpOnlyIp OBJECT-TYPE
+		SYNTAX          TruthValue
+		MAX-ACCESS      read-create
+		STATUS          current
+		DESCRIPTION
+		    "This object indicates whether only remark IPv4 DSCP.
+            'true' - Only IPv4 DSCP will be marked.
+		    'false'- Both IPv4 and IPv6 DSCP will be marked.
+             This object is meaningful only when dQosPolicyMapCfgSetDscp is configured.
+            "  
+		DEFVAL { false }
+		::= { dQosPolicyMapCfgEntry 3 }
+
+	dQosPolicyMapCfgSetDscp OBJECT-TYPE
+		SYNTAX          Integer32 ( -1 | 0..63 )
+		MAX-ACCESS      read-create
+		STATUS          current
+		DESCRIPTION
+		      "Indicates the new DSCP.
+		      The special value of -1 means the setting is un-configured."   
+		DEFVAL {-1} 
+		::= { dQosPolicyMapCfgEntry 4 }
+    
+    dQosPolicyMapCfgSetPreceOnlyIp OBJECT-TYPE
+		SYNTAX          TruthValue
+		MAX-ACCESS      read-create
+		STATUS          current
+		DESCRIPTION
+		    "This object indicates whether only remark IPv4 precedence.
+		    'true' -  Ipv4 precedence will be marked.
+		    'false' - Both IPv4 and IPv6 precedence will be marked. For IPv6
+                packets, the precedence is most three significant bits of 
+                traffic class of IPv6 header.
+            This object is meaningful only when dQosPolicyMapCfgSetPrecedence is configured.
+            "  
+		DEFVAL { false }
+		::= { dQosPolicyMapCfgEntry 5 }
+
+	dQosPolicyMapCfgSetPrecedence OBJECT-TYPE
+		SYNTAX          Integer32 (-1 | 0..7 )
+		MAX-ACCESS      read-create
+		STATUS          current
+		DESCRIPTION
+		    "Indicates the new ip precedence.  
+		    The special value of -1 means the setting is un-configured."     
+		DEFVAL {-1} 
+		::= { dQosPolicyMapCfgEntry 6 }
+
+	dQosPolicyMapCfgRowStatus OBJECT-TYPE
+		SYNTAX          RowStatus
+		MAX-ACCESS      read-create
+		STATUS          current
+		DESCRIPTION
+		    "This object indicates the status of this entry."  
+		::= { dQosPolicyMapCfgEntry 7 }
+				    		 
+-- ----------------------------------------------------------------------------- 	
+   	dQosClassMapTable OBJECT-TYPE
+		SYNTAX          SEQUENCE OF DQosClassMapEntry
+		MAX-ACCESS      not-accessible
+		STATUS          current
+		DESCRIPTION
+		    "This table consists of a list of QoS type class map."
+		::= { dQosClassMap 1 }
+
+	dQosClassMapEntry OBJECT-TYPE
+		SYNTAX          DQosClassMapEntry
+		MAX-ACCESS      not-accessible
+		STATUS          current
+		DESCRIPTION
+		    "An entry defines a QoS class map."
+		INDEX   { dQosClassMapName }
+		::= { dQosClassMapTable 1 }
+
+	DQosClassMapEntry ::=  SEQUENCE {
+		dQosClassMapName 		  	  DisplayString,	
+		dQosClassMapType		  	  INTEGER,            
+		dQosClassMapRowStaus	  	  RowStatus
+	}
+
+   	dQosClassMapName OBJECT-TYPE
+		SYNTAX          DisplayString (SIZE(1..32))
+		MAX-ACCESS      not-accessible
+		STATUS          current  
+		DESCRIPTION
+		    "This object indicates the name of the class map." 
+		::= { dQosClassMapEntry 1 }
+
+    dQosClassMapType OBJECT-TYPE
+		SYNTAX  INTEGER {
+            matchAny(1),
+            matchAll(2)
+        }
+		MAX-ACCESS      read-create
+		STATUS          current
+		DESCRIPTION
+		    "This object indicates how to evaluate multiple match criteria.
+		    matchAny - statements in the class map will be evaluated based on
+                       the logical OR.
+		    matchAll - statements in the class map will be evaluated based on
+                       the logical AND."   
+		DEFVAL	{ matchAny }
+		::= { dQosClassMapEntry 2 }
+ 						
+	dQosClassMapRowStaus OBJECT-TYPE
+		SYNTAX          RowStatus
+		MAX-ACCESS      read-create
+		STATUS          current
+		DESCRIPTION
+		    "This object indicates the status of this entry."
+		::= { dQosClassMapEntry 3 }
+
+-- -----------------------------------------------------------------------------	
+   	dQosClassMapCfgTable OBJECT-TYPE
+		SYNTAX          SEQUENCE OF DQosClassMapCfgEntry
+		MAX-ACCESS      not-accessible
+		STATUS          current
+		DESCRIPTION
+		    "This table consists of a list of criteria for class maps."
+		::= { dQosClassMap 2 }
+
+	dQosClassMapCfgEntry OBJECT-TYPE
+		SYNTAX  DQosClassMapCfgEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+		    "An entry defines a match criterion for a class map. The first index element 
+            identifies the class map to which the criterion belongs.           
+            "
+		INDEX   { 
+            dQosClassMapName, 
+            dQosClassMapCfgMatchId 
+        }
+		::= { dQosClassMapCfgTable 1 }
+
+	DQosClassMapCfgEntry ::= SEQUENCE {  
+		dQosClassMapCfgMatchId		Integer32,
+		dQosClassMapCfgMatchType	INTEGER,	   
+		dQosClassMapCfgMatchValue	OCTET STRING,			
+		dQosClassMapCfgRowStaus	  	RowStatus
+	}     
+		
+    dQosClassMapCfgMatchId OBJECT-TYPE
+		SYNTAX          Integer32 (0..65535)		
+		MAX-ACCESS      not-accessible
+		STATUS          current
+		DESCRIPTION
+		    "This index is automatically assigned for the match criterion in a
+            class map.
+	        "
+		::= { dQosClassMapCfgEntry 1 }
+    
+    dQosClassMapCfgMatchType OBJECT-TYPE 
+		SYNTAX  INTEGER {
+		    accessList(1),
+			cos(2),
+			innerCos(3),
+			dscp(4),
+			ipDscp(5),
+			precedence(6),
+			ipPrecedence(7),                        
+			protocol(8),
+			vlan(9),
+			innerVlan(10)
+		}		
+		MAX-ACCESS   read-create
+		STATUS       current
+		DESCRIPTION
+		    "This object indicates the matching type of the entry. 
+            A QoS class map can contain multiple match statements.
+
+            The dQosClassMapMatchType determines the valid range 
+            and value of dQosClassMapMatchValue. 
+           
+		    accessList -  Uses an access-list as matching criterion.
+		    cos - matching IEEE 802.1Q CoS value
+		    innerCos - matching innermost CoS value of QinQ packets
+		    dscp - matching DSCP value and this criterion is applied for IPv4
+                 and IPv6 packets.
+		    ipDscp - matching DSCP of IPv4 packets only.
+		    precedence - matching precedence and this criterion is applied for IPv4
+                 and IPv6 packets.
+		    ipPrecedence - matching precedence of IPv4 packets only.            
+		    protocol - matching protocol.  
+			vlan - matching VLAN ID.
+		    innerVlan - matching innermost VLAN ID.
+		    "
+		::= { dQosClassMapCfgEntry 2 }
+	
+	dQosClassMapCfgMatchValue OBJECT-TYPE
+		SYNTAX          OCTET STRING (SIZE(1..32))
+		MAX-ACCESS      read-create
+		STATUS  current
+		DESCRIPTION
+		    "A dQosClassMapMatchValue is always interpreted within the context of
+            a dQosClassMapMatchType value.
+
+            The table below explains how to determine the values and ranges of 
+            dQosClassMapMatchValue.
+		       QoS class map match configuration table
+            ====================================================
+            Match Type                 Element Value
+            dQosClassMapMatchType     dQosClassMapMatchValue
+            =======================   ============================        
+            accessList                DisplayString (SIZE(1..32)) (Note #1)
+            cos                       OCTET STRING (SIZE(1)) (Note #2)
+            innerCos                  OCTET STRING (SIZE(1)) (Note #2)  
+            dscp                      OCTET STRING (SIZE(8)) (Note #3)
+            ipDscp                    OCTET STRING (SIZE(8)) (Note #3) 
+            precedence                OCTET STRING (SIZE(1)) (Note #4)
+            ipPrecedence              OCTET STRING (SIZE(1)) (Note #4)        
+            protocol                  DisplayString (Note #5)
+            vlan                      OCTET STRING (SIZE(2)) (Note #6)
+            innerVlan                 OCTET STRING (SIZE(2)) (Note #6)       
+            ===================================================================   
+            Note#1: This object indicates the name of the access-list to be matched.
+            Note#2: The one octet specifies eight CoSs. The most significant 
+                    bit represents CoS 0 and the least significant bit represents
+                    CoS 7.  If the corresponding bit is '1' indicates that CoS is
+                    included in the criterion; '0' means the CoS is not included.
+            Note#3: The eight octets specify 64 DSCPs. Each octet within this
+                    value specifies a set of eight DSCPs. The first octet specifies
+                    first 8 DSCPs: 0 - 7, the second octet specifies the next 8 DSCPs, 
+                    etc. Within each octet, the most significant bit represents the 
+                    lowest numbered DSCP, and the least significant bit represents the
+                    highest numbered DSCP. If the corresponding bit is '1' indicates
+                    that DSCP is included in the criterion; '0' means the DSCP is not
+                    included.
+            Note#4: The one octet specifies eight precedence values. The most significant
+                    bit represents precedence 0 and the least significant bit 
+                    represents precedence 7. If the corresponding bit is '1' 
+                    indicates that precedence is included in the criterion; '0' 
+                    means the precedence is not included.
+            Note#5: The element value needs choose the exact case-sensitive string.
+                    Supported Protocols that can be matched:
+                        arp		IP Address Resolution Protocol (ARP)
+						bgp		Border Gateway Protocol 
+						dhcp	Dynamic Host Configuration 
+						dns		Domain Name Server lookup 
+						egp		Exterior Gateway Protocol 
+						ftp		File Transfer Protocol 
+						ip  	(version 4) 
+						ipv6 	(version 6) 
+						netbios	NetBIOS 
+						nfs		Network File System 
+						ntp		Network Time Protocol 
+						ospf	Open Shortest Path First 
+						pppoe	Point-to-Point Protocol over Ethernet 
+						rip		Routing Information Protocol 
+						rtsp	Real-Time Streaming Protocol 
+						ssh		Secured shell 
+						telnet	Telnet 
+						tftp	Trivial File Transfer Protocol 		   
+            Note#6: The element value is VLAN ID to be matched. The first octet indicates
+                    the high byte of VLAN ID and the second octet indicates the low byte.
+                    For example, VLAN ID 1029 is encoded in '0405'H.
+            "
+		::= { dQosClassMapCfgEntry 3 }
+				
+	dQosClassMapCfgRowStaus OBJECT-TYPE
+		SYNTAX          RowStatus
+		MAX-ACCESS      read-create
+		STATUS  current
+		DESCRIPTION
+		    "This object indicates the status of this entry.                    
+            "
+		::= { dQosClassMapCfgEntry 5 }
+		   
+-- -----------------------------------------------------------------------------   	
+   	dQosServicePolicyTable OBJECT-TYPE
+		SYNTAX          SEQUENCE OF DQosServicePolicyEntry
+		MAX-ACCESS      not-accessible
+		STATUS          current
+		DESCRIPTION
+		    "This table consists of a list of interface-specific policy-map 
+            associations."
+		::= { dQosServicePolicy 1 }
+
+	dQosServicePolicyEntry OBJECT-TYPE
+		SYNTAX          DQosServicePolicyEntry
+		MAX-ACCESS      not-accessible
+		STATUS  current
+		DESCRIPTION
+		     "An entry defines a policy-map association on an interface."
+		INDEX   { 
+            dot1dBasePort,
+            dQosServicePolicyDirection
+        }
+		::= { dQosServicePolicyTable 1 }
+
+	DQosServicePolicyEntry ::=
+		SEQUENCE {		  		  
+		  dQosServicePolicyDirection	INTEGER,  
+          dQosServicePolicyName 	    DisplayString,
+		  dQosServicePolicyRowStaus     RowStatus   		  
+		}
+	
+    dQosServicePolicyDirection OBJECT-TYPE
+		SYNTAX  INTEGER {
+			input(1),
+			output(2)
+		}
+		MAX-ACCESS      read-create
+		STATUS          current
+		DESCRIPTION
+		    "This object indicates the direction of the policy map is applied:
+            input: for ingress flow
+            outout: for egress flow
+            "
+		::= { dQosServicePolicyEntry 1 }  
+	
+    dQosServicePolicyName OBJECT-TYPE
+		SYNTAX          DisplayString (SIZE(1..32))
+		MAX-ACCESS      read-create
+		STATUS          current
+		DESCRIPTION
+		    "Indicates the name of a service policy map to be attached."
+		::= { dQosServicePolicyEntry 2 }	
+
+	dQosServicePolicyRowStaus OBJECT-TYPE
+		SYNTAX	RowStatus
+		MAX-ACCESS  read-create
+		STATUS  current
+		DESCRIPTION
+		    "This object indicates the status of this entry."
+		::= { dQosServicePolicyEntry 3 }
+			
+-- -----------------------------------------------------------------------------		
+    dQosSchedulingModeTable OBJECT-TYPE
+		SYNTAX          SEQUENCE OF DQosSchedulingModeEntry
+		MAX-ACCESS      not-accessible
+		STATUS          current                                          		
+		DESCRIPTION
+		    "This table consists of a list of scheduling mechanism configurations
+            for ports."
+		::= { dQosScheduling 1 }
+
+	dQosSchedulingModeEntry OBJECT-TYPE
+		SYNTAX          DQosSchedulingModeEntry
+		MAX-ACCESS      not-accessible
+		STATUS          current
+		DESCRIPTION
+		      "An entry configures the scheduling mode on an interface."
+		INDEX   { dot1dBasePort }
+		::= { dQosSchedulingModeTable 1 }
+
+	DQosSchedulingModeEntry ::= 		SEQUENCE {		  
+		dQosSchedulingMode      INTEGER
+	}
+	    
+    dQosSchedulingMode OBJECT-TYPE
+		SYNTAX	INTEGER {
+            sp(1),
+            rr(2),
+            wrr(3),
+            wdrr(4)
+        }
+		MAX-ACCESS      read-write
+		STATUS          current
+		DESCRIPTION
+		   "This object indicates the mechanism of QoS scheduling on the interface.
+		   "
+		::= { dQosSchedulingModeEntry 2 }
+ 
+-- -----------------------------------------------------------------------------	
+    dQosScheduleWrrWeightTable OBJECT-TYPE
+		SYNTAX          SEQUENCE OF DQosScheduleWrrWeightEntry
+		MAX-ACCESS      not-accessible
+		STATUS          current
+		DESCRIPTION
+		    "This table consists of a list of configurations for WRR queue bandwidth
+            of queues.            
+            "
+		::= { dQosScheduling 2 }
+
+	dQosScheduleWrrWeightEntry OBJECT-TYPE
+		SYNTAX          DQosScheduleWrrWeightEntry
+		MAX-ACCESS      not-accessible
+		STATUS  current
+		DESCRIPTION
+		    "An entry defines WRR weight of a queue on an interface.
+            An entry exists for each queue if the WRR bandwidth is configurable
+            on the queue.
+            "
+		INDEX   { 
+            dot1dBasePort,
+            dQosScheduleWrrWeightQueueId
+        }
+		::= { dQosScheduleWrrWeightTable 1 }
+
+	DQosScheduleWrrWeightEntry ::= 		SEQUENCE {		
+        dQosScheduleWrrWeightQueueId        Unsigned32,    
+        dQosScheduleWrrWeightValue 	        Unsigned32
+	}
+	    
+   	dQosScheduleWrrWeightQueueId    OBJECT-TYPE
+		SYNTAX          Unsigned32 (0..127)
+		MAX-ACCESS      not-accessible
+		STATUS          current
+		DESCRIPTION
+		    "This object indicates the queue ID of the entry."
+		::= { dQosScheduleWrrWeightEntry 1 }
+
+    dQosScheduleWrrWeightValue  OBJECT-TYPE
+		SYNTAX          Unsigned32 ( 0 .. 127)
+		MAX-ACCESS      read-write
+		STATUS          current
+		DESCRIPTION
+		    "Specifies the weight in terms of frame count for the queue."
+		::= { dQosScheduleWrrWeightEntry 2 }	
+
+-- -----------------------------------------------------------------------------
+    dQosScheduleWdrrWeightTable OBJECT-TYPE
+		SYNTAX          SEQUENCE OF DQosScheduleWdrrWeightEntry
+		MAX-ACCESS      not-accessible
+		STATUS          current
+		DESCRIPTION
+		    "This table consists of a list of configurations for WDRR queue bandwidth
+            of queues.           
+            "
+		::= { dQosScheduling 3 }
+
+	dQosScheduleWdrrWeightEntry OBJECT-TYPE
+		SYNTAX          DQosScheduleWdrrWeightEntry
+		MAX-ACCESS      not-accessible
+		STATUS          current
+		DESCRIPTION
+		    "An entry defines WDRR weight of a queue on an interface.
+            An entry exists for each queue if the WDRR bandwidth is configurable
+            on the queue. 
+            "
+		INDEX   { 
+            dot1dBasePort,
+            dQosScheduleWdrrWeightQueueId 
+        }
+		::= { dQosScheduleWdrrWeightTable 1 }
+
+	DQosScheduleWdrrWeightEntry ::= 		SEQUENCE {		    
+		dQosScheduleWdrrWeightQueueId	Unsigned32,
+        dQosScheduleWdrrWeightValue	    Unsigned32
+	}
+	    
+   	dQosScheduleWdrrWeightQueueId OBJECT-TYPE
+		SYNTAX          Unsigned32 (0..127)
+		MAX-ACCESS      not-accessible
+		STATUS          current
+		DESCRIPTION
+		    "This object indicates the queue ID of the entry."
+		::= { dQosScheduleWdrrWeightEntry 1 }
+
+    dQosScheduleWdrrWeightValue  OBJECT-TYPE
+		SYNTAX          Unsigned32 (0..127)
+		MAX-ACCESS      read-write
+		STATUS          current
+		DESCRIPTION
+            "Specifies the weight in terms of frame length count for the queue."		    
+		::= { dQosScheduleWdrrWeightEntry 2 }  
+		
+-- -----------------------------------------------------------------------------
+	dQosBandwidthCtrlTable OBJECT-TYPE
+		SYNTAX          SEQUENCE OF DQosBandwidthCtrlEntry
+		MAX-ACCESS      not-accessible
+		STATUS  current
+		DESCRIPTION
+		    "A table consists of a list of configurations for bandwidth control 
+            on interfaces."
+		::= { dQosBandwidthCtrl 1 }
+	
+	dQosBandwidthCtrlEntry OBJECT-TYPE
+		SYNTAX          DQosBandwidthCtrlEntry
+		MAX-ACCESS      not-accessible
+		STATUS  current
+		DESCRIPTION
+		    "An entry configures the bandwidth on an interface.
+            An entry will exist for every applicable port.
+            "
+		INDEX   { dot1dBasePort }
+		::= { dQosBandwidthCtrlTable 1 }
+	
+	DQosBandwidthCtrlEntry ::=		SEQUENCE {		
+		  dQosBandwidthRxRate		  Integer32,   
+		  dQosBandwidthRxBurst	      Integer32,
+		  dQosBandwidthTxRate	      Integer32,
+		  dQosBandwidthTxBurst        Integer32,	
+		  dQosBandwidthRxRateMode	  INTEGER,
+		  dQosBandwidthTxRateMode	  INTEGER	     
+		}
+			
+	dQosBandwidthRxRate OBJECT-TYPE
+		SYNTAX          Integer32 (-1 | 1..10240000)
+		MAX-ACCESS      read-write
+		STATUS          current
+		DESCRIPTION
+		    "This object indicates Rx Rate of the specified port. 
+		    The special value of -1 indicates there is no bandwidth 
+		    limit for ingress packets.    
+		    It is based on the dQosBandwidthRxRateMode field and
+			if the dQosBandwidthRxRateMode selected as:
+			rate: means ingress rate limit(units:kbps) and the effective rangs are 8 ~ 10240000.
+			percent: means the percentage and the effective rangs are 1 ~ 100.
+            "
+		::= { dQosBandwidthCtrlEntry 2 }    
+		
+	dQosBandwidthRxBurst OBJECT-TYPE
+		SYNTAX          Integer32 ( -1 | 0..128000)  
+		UNITS           "kbyte"
+		MAX-ACCESS      read-write
+		STATUS          current
+		DESCRIPTION
+		    "This object indicates the limit for ingress burst traffic
+            in kilobytes.
+            The special value of -1 indicates the limit for 
+            ingress burst traffic is unspecified and the limit will follow
+            the setting of dQosBandwidthRxRate.
+            "
+		::= { dQosBandwidthCtrlEntry 3 }
+	
+	dQosBandwidthTxRate OBJECT-TYPE
+		SYNTAX          Integer32 (-1 | 1..10240000) 
+		MAX-ACCESS      read-write
+		STATUS          current
+		DESCRIPTION
+		    "This object indicates Tx Rate of the specified port. 
+		    The special value of -1 indicates there is no bandwidth 
+		    limit for egress packets.    
+		    It is based on the dQosBandwidthTxRateMode field and
+			if the dQosBandwidthTxRateMode selected as:
+			rate: means egress rate limit(units:kbps) and the effective rangs are 8 ~ 10240000.
+			percent: means the percentage and the effective rangs are 1 ~ 100.            
+	       	"
+		::= { dQosBandwidthCtrlEntry 4 }	      
+	
+	dQosBandwidthTxBurst OBJECT-TYPE
+		SYNTAX          Integer32 (-1 | 0..128000) 
+		UNITS           "kbyte"
+		MAX-ACCESS      read-write
+		STATUS          current
+		DESCRIPTION
+		    "This object indicates the limit for egress burst traffic
+            in kilobytes.
+            The special value of -1 indicates the limit for 
+            egress burst traffic is unspecified and the limit will follow
+            the setting of dQosBandwidthTxRate.
+            "
+		::= { dQosBandwidthCtrlEntry 5 }	
+    
+    dQosBandwidthRxRateMode OBJECT-TYPE
+		SYNTAX  INTEGER {
+						rate(1),
+						percent(2)
+						}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+		      "This object indicates Rx Rate Mode. 
+		       It will indicate the field:dQosBandwidthRxRate attribute.
+		       rate: means the rate limit.
+		       percent: means the percentage."         
+		::= { dQosBandwidthCtrlEntry 6 }    
+		
+	dQosBandwidthTxRateMode OBJECT-TYPE
+		SYNTAX  INTEGER {
+						rate(1),
+						percent(2)
+						}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+		      "Indicates Tx Rate Mode. 
+		       It will indicate the field:dQosBandwidthTxRate attribute.
+		       rate: means the rate limit.
+		       percent: means the percentage."         
+		::= { dQosBandwidthCtrlEntry 7 }
+
+-- -----------------------------------------------------------------------------
+   	dQosQueueBandwidthCtrlTable OBJECT-TYPE
+		SYNTAX          SEQUENCE OF DQosQueueBandwidthCtrlEntry
+		MAX-ACCESS      not-accessible
+		STATUS          current
+		DESCRIPTION
+		    "A table contains information about queue-specific bandwidth 
+            control of ports."
+		::= { dQosQueueBandwidthCtrl 1 }
+	
+	dQosQueueBandwidthCtrlEntry OBJECT-TYPE
+		SYNTAX          DQosQueueBandwidthCtrlEntry
+		MAX-ACCESS      not-accessible
+		STATUS          current
+		DESCRIPTION
+		      "An entry contains bandwidth control information of a queue on
+		      a port."
+		INDEX   { 
+            dot1dBasePort, 
+            dQosQueueBandwidthQueId 
+        }
+		::= { dQosQueueBandwidthCtrlTable 1 }
+	
+	DQosQueueBandwidthCtrlEntry ::= 		SEQUENCE {
+		  dQosQueueBandwidthQueId 	    Unsigned32,		 
+		  dQosQueueBandwidthMinRate		Integer32,      
+		  dQosQueueBandwidthMaxRate	    Integer32, 
+		  dQosQueueBandwidthMinRateMode	INTEGER,      
+		  dQosQueueBandwidthMaxRateMode	INTEGER
+		}
+	
+	dQosQueueBandwidthQueId OBJECT-TYPE
+		SYNTAX          Unsigned32 (0..127)
+		MAX-ACCESS      not-accessible
+		STATUS  current
+		DESCRIPTION
+		     "Indicates the queue ID of the entry."
+		::= { dQosQueueBandwidthCtrlEntry 1 }
+	
+	dQosQueueBandwidthMinRate OBJECT-TYPE
+		SYNTAX  Integer32 ( -1 | 1..10240000)
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION 
+		       "Indicates the minimum rate of the specified port and queue. 
+		       A special value of -1 means no limit.
+		       It is based on the dQosQueueBandwidthMinRateMode field and
+		       if the dQosQueueBandwidthMinRateMode selected as:
+		       rate: means egress Minimum Rate (units:kbps),range are 8 ~ 10240000.
+		       percent: means the percentage and the effective rangs are 1 ~ 100."
+		::= { dQosQueueBandwidthCtrlEntry 2 }				
+	
+	dQosQueueBandwidthMaxRate OBJECT-TYPE
+		SYNTAX          Integer32 ( -1 | 1..10240000) 
+		MAX-ACCESS      read-write
+		STATUS  current
+		DESCRIPTION
+		    "Indicates the maximum rate of the specified port and queue. 
+	       	A special value of -1 means no limit.
+	       	It is based on the dQosQueueBandwidthMaxRateMode field and
+	       	if the dQosQueueBandwidthMaxRateMode selected as:
+	       	rate: means egress Maximum Rate (units:kbps),range are 8 ~ 10240000.
+	       	percent: means the percentage and the effective rangs are 1 ~ 100."
+		::= { dQosQueueBandwidthCtrlEntry 3 }
+    
+    dQosQueueBandwidthMinRateMode OBJECT-TYPE
+		SYNTAX  INTEGER {
+						rate(1),
+						percent(2)
+						}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+		      "Indicates the Minimum Rate Mode. 
+		       It will indicate the field:dQosQueueBandwidthMinRate attribute.
+		       rate: means the Minimum Rate.
+		       percent: means the percentage."		
+		::= { dQosQueueBandwidthCtrlEntry 4 }
+
+	dQosQueueBandwidthMaxRateMode OBJECT-TYPE
+		SYNTAX  INTEGER {
+						rate(1),
+						percent(2)
+						}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+		      "Indicates the Maximum Rate Mode. 
+		       It will indicate the field:dQosQueueBandwidthMaxRate attribute.
+		       rate: means the Maximum Rate.
+		       percent: means the percentage."       		
+		::= { dQosQueueBandwidthCtrlEntry 5 }
+-- -----------------------------------------------------------------------------
+	dQosPortIfQueuingTable OBJECT-TYPE
+		SYNTAX          SEQUENCE OF DQosPortIfQueuingEntry
+		MAX-ACCESS      not-accessible
+		STATUS          current
+		DESCRIPTION
+		    "This table provides port-specific configuration for QoS queuing. 
+            "               
+		::= { dQosQueuingCfg 1 }
+	
+	dQosPortIfQueuingEntry OBJECT-TYPE
+		SYNTAX          DQosPortIfQueuingEntry
+		MAX-ACCESS      not-accessible
+		STATUS          current
+		DESCRIPTION
+		      "An entry consists of information for QoS queueing on a port."
+		INDEX   { dot1dBasePort }                
+		::= { dQosPortIfQueuingTable 1 }
+	
+	DQosPortIfQueuingEntry ::=		SEQUENCE { 		 
+		dQosPortIf8021pOverride         TruthValue,		  	  
+        dQosPortIfTrustMode             INTEGER  
+	} 
+		  			
+	dQosPortIf8021pOverride OBJECT-TYPE
+		SYNTAX          TruthValue
+		MAX-ACCESS      read-write
+		STATUS          current
+		DESCRIPTION
+		    "This object indicates whether override the CoS of the packets with
+            default CoS (dot1dPortDefaultUserPriority).
+            If this object is 'true', the default CoS will be applied to all
+            incoming packets, either tagged or untagged, received by the port."  
+        REFERENCE
+            "dot1dPortDefaultUserPriority is defined in P-BRIDGE-MIB."
+		::= { dQosPortIfQueuingEntry 1 }    
+	
+    dQosPortIfTrustMode OBJECT-TYPE
+		SYNTAX  INTEGER {
+			cos(1),
+			dscp(2)
+		}
+		MAX-ACCESS      read-write
+		STATUS          current
+		DESCRIPTION
+		    "This object indicates QoS trust mode of the port." 
+		::= { dQosPortIfQueuingEntry 2 }	   	         
+
+	
+-- -----------------------------------------------------------------------------
+    dQosDscpMutationMapTable  OBJECT-TYPE
+		SYNTAX          SEQUENCE OF DQosDscpMutationMapEntry
+		MAX-ACCESS      not-accessible
+		STATUS          current
+		DESCRIPTION
+		    "This table provides a mechanism to create/delete a DSCP mutation map."
+		::= { dQosDscpMap 1 }
+
+	dQosDscpMutationMapEntry OBJECT-TYPE
+		SYNTAX          DQosDscpMutationMapEntry
+		MAX-ACCESS      not-accessible
+		STATUS          current
+		DESCRIPTION
+		     "An entry (conceptual row) in the dQosDscpMutationMapTable."
+		INDEX   { dQosDscpMutationMapName }
+		::= { dQosDscpMutationMapTable 1 }
+
+	DQosDscpMutationMapEntry ::= 		SEQUENCE {
+        dQosDscpMutationMapName         DisplayString,
+        dQosDscpMutationMapRowStatus  	RowStatus
+    }           
+    
+    dQosDscpMutationMapName OBJECT-TYPE
+		SYNTAX          DisplayString(SIZE(1..32))
+		MAX-ACCESS      not-accessible
+		STATUS          current
+		DESCRIPTION
+		    "This object indicates the name of the DSCP mutation map."
+		::= { dQosDscpMutationMapEntry 1 }
+
+    dQosDscpMutationMapRowStatus OBJECT-TYPE
+		SYNTAX          RowStatus
+		MAX-ACCESS      read-create
+		STATUS          current
+		DESCRIPTION
+		      "This object indicates the status of this entry."
+		::= { dQosDscpMutationMapEntry 2 }
+
+-- -----------------------------------------------------------------------------
+    dQosDscpMutationMapCfgTable  OBJECT-TYPE
+		SYNTAX          SEQUENCE OF DQosDscpMutationMapCfgEntry
+		MAX-ACCESS      not-accessible
+		STATUS          current
+		DESCRIPTION
+		    "The table provides a list of the DSCP mapping of mutations maps.
+         	"
+		::= { dQosDscpMap 2 }
+
+	dQosDscpMutationMapCfgEntry OBJECT-TYPE
+		SYNTAX          DQosDscpMutationMapCfgEntry
+		MAX-ACCESS      not-accessible
+		STATUS          current
+		DESCRIPTION
+		    "Each row contains the mapping from old DSCP value to new
+        	DSCP value per specific mutation table.
+            The first index element identifies the mutation map 
+            (dQosDscpMutationMapEntry) that a DSCP mapping (dQosDscpMutationMapCfgEntry)
+            belongs to. 
+            When a mutation map is removed, the corresponding DSCP mapping 
+            configuration will be deleted.
+            "
+		INDEX   { 
+            dQosDscpMutationMapName, 
+            dQosDscpMutationOldDscp
+        }
+		::= { dQosDscpMutationMapCfgTable 1 }
+
+	DQosDscpMutationMapCfgEntry ::= 		SEQUENCE {
+        dQosDscpMutationOldDscp         Unsigned32,
+        dQosDscpMutationNewDscp         Unsigned32
+    }           
+    
+    dQosDscpMutationOldDscp OBJECT-TYPE
+		SYNTAX          Unsigned32 (0..63)
+		MAX-ACCESS      not-accessible
+		STATUS          current
+		DESCRIPTION
+		    "The old DSCP value."
+		::= { dQosDscpMutationMapCfgEntry 1 }
+
+    dQosDscpMutationNewDscp OBJECT-TYPE
+		SYNTAX          Unsigned32 (0..63)
+		MAX-ACCESS      read-write
+		STATUS          current
+		DESCRIPTION
+		    "This object indicates the new DSCP value which the old 
+            DSCP values maps to for a specific mutation map. 
+            The default mapping of old DSCP to new DSCP for mutation 
+            purpose is the identity function, i.e. dQosDscpMutationNewDscp 
+            equals to dQosDscpMutationOldDscp
+			"
+		::= { dQosDscpMutationMapCfgEntry 2 }
+
+-- ----------------------------------------------------------------------------- 
+	dQosDscpMutationMapAttachTable  OBJECT-TYPE
+		SYNTAX          SEQUENCE OF DQosDscpMutationMapAttachEntry
+		MAX-ACCESS      not-accessible
+		STATUS          current
+		DESCRIPTION
+		    "This table provides a mechanism to attach a DSCP mutation map to 
+            a port."
+		::= { dQosDscpMap 3 }
+
+	dQosDscpMutationMapAttachEntry OBJECT-TYPE
+		SYNTAX          DQosDscpMutationMapAttachEntry
+		MAX-ACCESS      not-accessible
+		STATUS          current
+		DESCRIPTION
+		      "An entry contains associating DSCP mutation map information."
+		INDEX   { dot1dBasePort }
+		::= { dQosDscpMutationMapAttachTable 1 }
+
+	DQosDscpMutationMapAttachEntry ::= SEQUENCE {			
+        dQosDscpMutationMapAttachName       DisplayString          
+    }
+                                   		     
+	dQosDscpMutationMapAttachName OBJECT-TYPE
+		SYNTAX  DisplayString (SIZE(0..32))
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+		    "This object indicates the name of the attached mutation map.
+            A zero length of string indicates no mutation map is attached.
+            "
+		::= { dQosDscpMutationMapAttachEntry 1 }
+      		
+-- -----------------------------------------------------------------------------
+	dQosDscpMapCtrlTable  OBJECT-TYPE
+		SYNTAX          SEQUENCE OF DQosDscpMapCtrlEntry
+		MAX-ACCESS      not-accessible
+		STATUS          current
+		DESCRIPTION
+		    "This table contains information about the mapping of DSCP to priority
+            and DSCP to color for mapping a packet's initial color."
+		::= { dQosDscpMap 4 }
+
+	dQosDscpMapCtrlEntry OBJECT-TYPE
+		SYNTAX          DQosDscpMapCtrlEntry
+		MAX-ACCESS      not-accessible
+		STATUS          current
+		DESCRIPTION
+		      "An entry contains DSCP mapping information."
+		INDEX   { 
+            dot1dBasePort, 
+            dQosDscpMapCtrlDscp 
+        }
+		::= { dQosDscpMapCtrlTable 1 }
+
+	DQosDscpMapCtrlEntry ::= 	SEQUENCE {		
+        dQosDscpMapCtrlDscp         Unsigned32,    
+        dQosDscpMapCtrlCos          Unsigned32,
+        dQosDscpMapCtrlColor        INTEGER
+    }      
+          		  		      					
+    dQosDscpMapCtrlDscp OBJECT-TYPE
+		SYNTAX          Unsigned32 (0..63)
+		MAX-ACCESS      not-accessible
+		STATUS          current
+		DESCRIPTION
+		    "This object indicates the DSCP of the entry."
+		::= { dQosDscpMapCtrlEntry 1 }
+				
+	dQosDscpMapCtrlCos OBJECT-TYPE
+		SYNTAX         Unsigned32 (0..7)
+		MAX-ACCESS     read-write
+		STATUS         current
+		DESCRIPTION
+		    "This object indicates the mapped CoS value.
+		      Default mapping is:
+		      DSCP 	 CoS
+		      0-7 	 0
+		      8-15	 1
+		      16-23	 2
+		      24-31	 3
+		      32-39	 4
+		      40-47	 5
+		      48-55	 6
+		      56-63	 7
+		    "
+		::= { dQosDscpMapCtrlEntry 2 }
+	
+	dQosDscpMapCtrlColor OBJECT-TYPE
+		SYNTAX          INTEGER {
+			green(1),
+			yellow(2),
+			red(3)
+		}
+		MAX-ACCESS      read-write
+		STATUS          current
+        DESCRIPTION
+		      "This object indicates the mapped color to determine a packet's
+              initial color."
+        DEFVAL { green }
+		::= { dQosDscpMapCtrlEntry 3 }
+
+-- -----------------------------------------------------------------------------	
+   	dQosCosToColorMapTable  OBJECT-TYPE
+		SYNTAX          SEQUENCE OF DQosCosToColorMapEntry
+		MAX-ACCESS      not-accessible
+		STATUS          current
+		DESCRIPTION
+		    "A table contains information about the mapping of CoS to color."
+		::= { dQosCosMap 1 }
+
+	dQosCosToColorMapEntry OBJECT-TYPE
+		SYNTAX          DQosCosToColorMapEntry
+		MAX-ACCESS      not-accessible
+		STATUS          current
+		DESCRIPTION
+		      "An entry contains a mapping between CoS to color."
+		INDEX   { 
+            dot1dBasePort, 
+            dQosCosMapCos
+        }
+		::= { dQosCosToColorMapTable 1 }
+	    
+    DQosCosToColorMapEntry ::= 		SEQUENCE { 			
+        dQosCosMapCos                Unsigned32,
+        dQosCosMapColor              INTEGER
+    } 
+          		  
+    dQosCosMapCos OBJECT-TYPE
+		SYNTAX          Unsigned32 (0..7)
+		MAX-ACCESS      not-accessible
+		STATUS          current
+		DESCRIPTION
+		    "This object indicates the CoS of the entry."
+		::= { dQosCosToColorMapEntry 1 }
+	
+	dQosCosMapColor OBJECT-TYPE
+		SYNTAX          INTEGER {
+			green(1),
+			yellow(2),
+			red(3)
+		}
+		MAX-ACCESS      read-write
+		STATUS          current
+		DESCRIPTION
+		    "This object indicates the mapped color to determine a packet's
+            initial color."
+		::= { dQosCosToColorMapEntry 2 }               
+
+-- -----------------------------------------------------------------------------	
+   	dQosCosToQueueMapTable  OBJECT-TYPE
+		SYNTAX          SEQUENCE OF DQosCosToQueueMapEntry
+		MAX-ACCESS      not-accessible
+		STATUS  current
+		DESCRIPTION
+		     "A table contains information about the mapping of CoS
+             to queue."
+		::= { dQosCosMap 2 }
+
+	dQosCosToQueueMapEntry OBJECT-TYPE
+		SYNTAX          DQosCosToQueueMapEntry
+		MAX-ACCESS      not-accessible
+		STATUS          current
+		DESCRIPTION
+		      "An entry contains a mapping between CoS to queue."
+		INDEX   { dQosCosToQueueCos }
+		::= { dQosCosToQueueMapTable 1 }
+	
+    
+    DQosCosToQueueMapEntry ::= 		SEQUENCE { 
+        dQosCosToQueueCos           Unsigned32,
+        dQosCosToQueueQID           Unsigned32
+    }    
+    
+    dQosCosToQueueCos OBJECT-TYPE
+		SYNTAX          Unsigned32 (0..7)
+		MAX-ACCESS      not-accessible
+		STATUS          current
+		DESCRIPTION
+		    "This object indicates the CoS of the entry."
+		::= { dQosCosToQueueMapEntry 1 }          
+				
+    dQosCosToQueueQID OBJECT-TYPE
+		SYNTAX          Unsigned32
+		MAX-ACCESS      read-write
+		STATUS          current
+		DESCRIPTION
+		    "This object indicates the queue ID that the corresponding CoS will
+            be queued."
+		::= { dQosCosToQueueMapEntry 2 }          
+
+-- -----------------------------------------------------------------------------       
+    dQosAggPolicerTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DQosAggPolicerEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table consists of a list of aggregate policers."
+        ::= { dQosPolicyMap 3 }     
+                
+    dQosAggPolicerEntry OBJECT-TYPE
+        SYNTAX          DQosAggPolicerEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This entry consists of information and configurations for an
+            aggregate policer."
+        INDEX { dQosAggPolicerName }
+        ::= { dQosAggPolicerTable 1 }
+        
+    DQosAggPolicerEntry ::=         	SEQUENCE {
+        dQosAggPolicerName    			    DisplayString,
+        dQosAggPolicerType             	    INTEGER,
+        dQosAggPolicerCir                   Unsigned32,
+        dQosAggPolicerCbs         	        Unsigned32,
+        dQosAggPolicerSrtcmEbs    	        Unsigned32,
+        dQosAggPolicerTrtcmPir              Unsigned32,
+        dQosAggPolicerTrtcmPbs              Unsigned32,
+        dQosAggPolicerConformAction    	    DlinkQosPoliceActionType,
+        dQosAggPolicerConformReplaceDscp    Unsigned32,
+        dQosAggPolicerExceedAction          DlinkQosPoliceActionType,
+        dQosAggPolicerExceedReplaceDscp    	Unsigned32,
+        dQosAggPolicerViolateAction        	DlinkQosPoliceActionType,
+        dQosAggPolicerViolateReplaceDscp   	Unsigned32,
+        dQosAggPolicerColorAware   	        TruthValue,               
+        dQosAggPolicerRowStatus           	RowStatus,
+        dQosAggPolicerConformReplaceCos    Unsigned32,
+        dQosAggPolicerExceedReplaceCos     Unsigned32,
+        dQosAggPolicerViolateReplaceCos    Unsigned32
+    }    
+     	
+    dQosAggPolicerName OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE(1..32))
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the name of the aggregate policer."
+        ::= { dQosAggPolicerEntry 1 }
+   	
+    dQosAggPolicerType OBJECT-TYPE
+        SYNTAX          INTEGER {  
+            trTcm(1),
+            singleRate(2)
+        }
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates how meters a packet stream and marks its packets.
+            This object determines which other objects in the same row are meaningful.
+            trTcm - two rate three color marker;
+            singleRate - There are two kinds of single rate policers:
+                a. single rate three color (srTcm) - if the violate action is specified 
+                b. single rate two color - if the violate action is not specified.  
+            "
+        ::= { dQosAggPolicerEntry 2 }
+        
+    dQosAggPolicerCir OBJECT-TYPE
+        SYNTAX          Unsigned32 (0..10240000)
+        UNITS           "kbps"
+        MAX-ACCESS      read-create
+        STATUS  current
+        DESCRIPTION 
+            "This object is interpreted within the context of dQosAggPolicerType.
+            The measurement unit is in kilobits per second.
+            dQosAggPolicerType  dQosAggPolicerCir
+            ==================  ===============================================
+            'trTcm'             The committed information rate for first token 
+                                bucket. 
+
+            'singleRate'        The rate-limit for two-color policier. 
+                                Or:
+                                The committed information rate for srTcm.                                
+            "                                       
+        ::= { dQosAggPolicerEntry 3 }
+            
+    dQosAggPolicerCbs OBJECT-TYPE
+        SYNTAX          Unsigned32 (0..16384)
+        UNITS	        "kbyte"
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION       
+            "This object is interpreted within the context of dQosAggPolicerType.
+           
+            dQosAggPolicerType  dQosAggPolicerCbs
+            ==================  ===============================================
+            'trTcm'             The burst size for the first token bucket.
+
+            'singleRate'        The burst size for two-color policier. 
+                                Or:
+                                The committed burst size for srTcm. 
+            The measurement unit is in kilobytes.
+            The special value of 0 is used to indicate this object is not specified
+            and the default value will be used. What's the default value is project-dependent.                               
+            "                  	
+        ::= { dQosAggPolicerEntry 4 }
+        
+    dQosAggPolicerSrtcmEbs OBJECT-TYPE
+        SYNTAX          Unsigned32 (0..16384)
+        UNITS	        "kbyte"
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the excess burst size for srTcm and is 
+            meaningless when dQosAggPolicerType is 'trTcm'.                 
+            The measurement unit is in kilobytes.     
+            The special value of 0 is used to indicate this object is not specified
+            and the default value will be used. What's the default value is project-dependent.                                                         
+            "                   
+        ::= { dQosAggPolicerEntry 5 }
+
+    dQosAggPolicerTrtcmPir OBJECT-TYPE
+        SYNTAX          Unsigned32 (0..10240000)
+        UNITS           "kbps"
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the peak information rate for the second
+            token bucket for the two-rate metering. This object is only 
+            meaningful when dQosAggPolicerType is 'trTcm'.
+            The measurement unit is in kilobits per second.
+            The special value of 0 is used to indicate this object is not specified
+            and the default value will be used. What's the default value is project-dependent.
+            "
+        ::= { dQosAggPolicerEntry 6 }
+
+    dQosAggPolicerTrtcmPbs OBJECT-TYPE
+        SYNTAX          Unsigned32 (0..16384)
+        UNITS	        "kbyte"
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the burst size for the second token bucket. 
+            This object is meaningful only when dQosAggPolicerType is 'trTcm'.
+            The measurement unit is in kilobytes.
+            The special value of 0 is used to indicate this object is not specified
+            and the default value will be used. What's the default value is project-dependent.
+            "               
+        ::= { dQosAggPolicerEntry 7 }
+
+    dQosAggPolicerConformAction OBJECT-TYPE
+        SYNTAX          DlinkQosPoliceActionType
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the action when the packet is in 'green color'.                         
+            "
+        ::= { dQosAggPolicerEntry 8 }
+    
+    dQosAggPolicerConformReplaceDscp OBJECT-TYPE
+        SYNTAX          Unsigned32 (0..63)
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the new DSCP value of the packet when packet
+            is in 'green color'.
+            This object is meaningful only when dQosAggPolicerConformAction is 'replaceDscp' or 'replaceAll'.
+            "
+        ::= { dQosAggPolicerEntry 9 }
+    
+    dQosAggPolicerExceedAction OBJECT-TYPE
+        SYNTAX          DlinkQosPoliceActionType
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION    
+            "This object is interpreted within the context of dQosAggPolicerType.
+            
+            dQosAggPolicerType  dQosAggPolExceedAction
+            ==================  ===============================================
+            'trTcm'             The action to take for those packets that conform
+                                to PIR but not to CIR.  
+
+            'singleRate'        The action to take on the packets exceed the rate 
+                                limit (or committed burst size).                           
+            "            
+         ::= { dQosAggPolicerEntry 10 }
+    
+    dQosAggPolicerExceedReplaceDscp OBJECT-TYPE
+        SYNTAX          Unsigned32 (0..63)
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the new DSCP value when dQosAggPolExceedAction
+            is 'replaceDscp'or 'replaceAll'.
+            "
+        ::= { dQosAggPolicerEntry 11 }
+    
+    dQosAggPolicerViolateAction OBJECT-TYPE
+        SYNTAX          DlinkQosPoliceActionType
+        MAX-ACCESS      read-create
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the action state when the packet is in 'red color'.           
+            "
+        ::= { dQosAggPolicerEntry 12 }
+
+    dQosAggPolicerViolateReplaceDscp OBJECT-TYPE
+        SYNTAX          Unsigned32 (0..63)
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the DSCP value of the packet when packet is in 'red color'.
+            This object is meaningful only when dQosAggPolicerViolateAction is 'replaceDscp' or 'replaceAll'.
+            "
+        ::= { dQosAggPolicerEntry 13 }
+
+    dQosAggPolicerColorAware OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates whether the policer is color aware or not.
+            "  
+        DEFVAL { false }
+        ::= { dQosAggPolicerEntry 14 }
+
+    dQosAggPolicerRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the status of this entry."
+        ::= { dQosAggPolicerEntry 24 }	
+
+    dQosAggPolicerConformReplaceCos OBJECT-TYPE
+        SYNTAX          Unsigned32 (0..7)
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the new COS value of the packet when packet
+            is in 'green color'.
+            This object is meaningful only when dQosAggPolicerConformAction is 'replaceCos' or 'replaceAll'.
+            "
+        ::= { dQosAggPolicerEntry 15 }	
+
+    dQosAggPolicerExceedReplaceCos OBJECT-TYPE
+        SYNTAX          Unsigned32 (0..7)
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the new COS value when dQosAggPolExceedAction
+            is 'replaceCos'or 'replaceAll'.
+            "
+        ::= { dQosAggPolicerEntry 16 }
+
+    dQosAggPolicerViolateReplaceCos OBJECT-TYPE
+        SYNTAX          Unsigned32 (0..7)
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the COS value of the packet when packet is in 'red color'.
+            This object is meaningful only when dQosAggPolicerViolateAction is 'replaceCos' or 'replaceAll'.
+            "
+        ::= { dQosAggPolicerEntry 17 }
+-- -----------------------------------------------------------------------------     
+    dQosPoliceTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DQosPoliceEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table is used to configure the metering function. 
+            Users may set the preferred bandwidth for this rule; once the 
+            bandwidth has been exceeded, overflow packets will be either dropped
+            or set for a drop precedence, depending on user configuration."
+        ::= { dQosPolicyMap 4 }
+
+    dQosPoliceEntry OBJECT-TYPE
+        SYNTAX          DQosPoliceEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This entry consists of configurations for the metering policing
+            for a traffic class in a policy map."
+        INDEX { 
+            dQosPolicyMapName, 
+            dQosClassMapName
+        }
+        ::= { dQosPoliceTable 1 }
+
+    DQosPoliceEntry ::=            SEQUENCE {
+        dQosPoliceType                  INTEGER,
+        dQosPoliceNamedAggPolicer 	    DisplayString,  
+        dQosPoliceCir                   Unsigned32,
+        dQosPoliceCbs                   Unsigned32,
+        dQosPoliceSrtcmEbs              Unsigned32, 
+        dQosPoliceTrtcmPir              Unsigned32,
+        dQosPoliceTrtcmPbs              Unsigned32,                
+        dQosPoliceConformAction         DlinkQosPoliceActionType,
+        dQosPoliceConformReplaceDscp    Unsigned32,
+        dQosPoliceExceedAction          DlinkQosPoliceActionType,
+        dQosPoliceExceedReplaceDscp     Unsigned32,
+        dQosPoliceViolateAction         DlinkQosPoliceActionType,
+        dQosPoliceViolateReplaceDscp    Unsigned32,        	
+        dQosPoliceColorAware            TruthValue,                     
+        dQosPoliceRowStatus             RowStatus,
+        dQosPoliceConformReplaceCos     Unsigned32,
+        dQosPoliceExceedReplaceCos      Unsigned32,
+        dQosPoliceViolateReplaceCos     Unsigned32
+    }
+        
+    dQosPoliceType OBJECT-TYPE
+        SYNTAX  INTEGER {  
+            trTcm(1),
+            singleRate(2),
+            aggregate(3)
+        }
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the type of policer used for a traffic class
+            in a policy map.
+            This object determines which other objects in the same row are meaningful.
+            trTcm - two rate three color marker;
+            singleRate - There are two kinds of single rate policers:
+                a. single rate three color (srTcm) - if the violate action is specified 
+                b. single rate two color - if the violate action is not specified.  
+            aggregate - uses a named aggregate policer as the policy. In this case, 
+                except index elements, dQosAggPolicer, and dQosPoliceRowStatus, other 
+                elements in the same row are not applicable.               
+            "
+            ::= { dQosPoliceEntry 1 }
+             
+    dQosPoliceNamedAggPolicer OBJECT-TYPE               
+        SYNTAX          DisplayString (SIZE(1..32))
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the name of the aggregate policer to be applied.
+            This object is meaningful only when dQosPoliceType is 'aggregate'.  
+            "
+        ::= { dQosPoliceEntry 2 }
+        
+    dQosPoliceCir OBJECT-TYPE
+        SYNTAX          Unsigned32 (0..10240000)
+        UNITS           "kbps"
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION 
+            "This object is interpreted within the context of dQosPoliceType.
+            The measurement unit is in kilobits per second.
+            dQosPoliceType      dQosPoliceCir
+            ==================  ===============================================
+            'trTcm'             The committed information rate for first token 
+                                bucket. 
+
+            'singleRate'        The rate-limit for two-color policier. 
+                                Or:
+                                The committed information rate for srTcm. 
+
+            'aggregate'         Not applicable
+            "                                                                          
+        ::= { dQosPoliceEntry 3 }
+            
+    dQosPoliceCbs OBJECT-TYPE
+        SYNTAX          Unsigned32 (0..16384)
+        UNITS	        "kbyte"
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION       
+            "This object is interpreted within the context of dQosPoliceType.            
+            dQosPoliceType      dQosPoliceCbs
+            ==================  ===============================================
+            'trTcm'             The burst size for the first token bucket.
+
+            'singleRate'        The burst size for two-color policier. 
+                                Or:
+                                The committed burst size for srTcm.     
+
+            'aggregate'         Not applicable        
+            The measurement unit is in kilobytes.
+            The special value of 0 is used to indicate this object is not specified
+            and the default value will be used. What's the default value is project-dependent.                   
+            "                
+        ::= { dQosPoliceEntry 4 }
+        
+    dQosPoliceSrtcmEbs OBJECT-TYPE
+        SYNTAX          Unsigned32 (0..16384)
+        UNITS	        "kbyte"
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the excess burst size for srTcm and is 
+            meaningless when dQosPoliceType is 'trTcm'.                 
+            The measurement unit is in kilobytes.     
+            The special value of 0 is used to indicate this object is not specified
+            and the default value will be used. What's the default value is project-dependent.                                                         
+            "  
+        ::= { dQosPoliceEntry 5 }
+    
+    dQosPoliceTrtcmPir OBJECT-TYPE
+        SYNTAX          Unsigned32 (0..10240000)
+        UNITS           "kbps"
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the peak information rate for the second
+            token bucket for the two-rate metering. This object is only 
+            meaningful when dQosPoliceType is 'trTcm'.
+            The measurement unit is in kilobits per second.
+            The special value of 0 is used to indicate this object is not specified
+            and the default value will be used. What's the default value is project-dependent. 
+            "
+        ::= { dQosPoliceEntry 6 }
+
+    dQosPoliceTrtcmPbs OBJECT-TYPE
+        SYNTAX          Unsigned32 (0..16384)
+        UNITS	        "kbyte"
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the burst size for the second token bucket. 
+            This object is meaningful only when dQosPoliceType is 'trTcm'.
+            The measurement unit is in kilobytes.
+            The special value of 0 is used to indicate this object is not specified
+            and the default value will be used. What's the default value is project-dependent. 
+            "  
+        ::= { dQosPoliceEntry 7 }
+   
+    dQosPoliceConformAction OBJECT-TYPE
+        SYNTAX          DlinkQosPoliceActionType
+        MAX-ACCESS      read-create
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the action when the packet is in 'green color'.                           
+            "
+        ::= { dQosPoliceEntry 8 }
+
+    dQosPoliceConformReplaceDscp OBJECT-TYPE
+        SYNTAX          Unsigned32 (0..63)
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the new DSCP value for dQosPoliceConformAction
+            is 'replaceDscp' or 'replaceAll'."
+        ::= { dQosPoliceEntry 9 }
+            
+    dQosPoliceExceedAction OBJECT-TYPE
+        SYNTAX          DlinkQosPoliceActionType
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION       
+            "This object is interpreted within the context of dQosPoliceType.
+            
+            dQosPoliceType      dQosPoliceExceedAction
+            ==================  ===============================================
+            'trTcm'             The action to take for those packets that conform
+                                to PIR but not to CIR.  
+
+            'singleRate'        The action to take on the packets exceed the rate 
+                                limit (or committed burst size). 
+            'aggregate'         Not applicable
+                       
+            "        
+        ::= { dQosPoliceEntry 10 }
+
+    dQosPoliceExceedReplaceDscp OBJECT-TYPE
+        SYNTAX          Unsigned32 (0..63)
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the new DSCP value when dQosPoliceExceedAction
+            is 'replaceDscp' or 'replaceAll'.
+            "
+        ::= { dQosPoliceEntry 11 }
+
+    dQosPoliceViolateAction OBJECT-TYPE
+        SYNTAX          DlinkQosPoliceActionType
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the action state when the packet is in 'red color'.           
+            "
+        ::= { dQosPoliceEntry 12 }
+
+    dQosPoliceViolateReplaceDscp OBJECT-TYPE
+        SYNTAX          Unsigned32 (0..63)
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the new DSCP value when dQosPoliceViolateAction
+            is 'replaceDscp' or 'replaceAll'.
+            "               
+        ::= { dQosPoliceEntry 13 }
+
+    dQosPoliceColorAware OBJECT-TYPE
+        SYNTAX          TruthValue           
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "This object indicates whether the policer is color aware or not.
+            This object is applied for dQosPoliceType is 'trTcm' or 'singleRate'. 
+            "
+        ::= { dQosPoliceEntry 14 }    
+    
+    dQosPoliceRowStatus OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the status of this entry."
+        ::= { dQosPoliceEntry 15 }	               
+
+    dQosPoliceConformReplaceCos OBJECT-TYPE
+        SYNTAX          Unsigned32 (0..7)
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the new COS value for dQosPoliceConformAction
+            is 'replaceCos' or 'replaceAll'.
+            "
+        ::= { dQosPoliceEntry 16 }	
+
+    dQosPoliceExceedReplaceCos OBJECT-TYPE
+        SYNTAX          Unsigned32 (0..7)
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the new COS value when dQosPoliceExceedAction
+            is 'replaceCos' or 'replaceAll'.
+            "
+        ::= { dQosPoliceEntry 17 }
+
+    dQosPoliceViolateReplaceCos OBJECT-TYPE
+        SYNTAX          Unsigned32 (0..7)
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the new COS value when dQosPoliceViolateAction
+            is 'replaceCos' or 'replaceAll'.
+            "
+        ::= { dQosPoliceEntry 18 }
+--  ***************************************************************************	
+--  Conformance
+--  ***************************************************************************			   		
+	dQosCompliances OBJECT IDENTIFIER ::= { dQosMIBConformance 1 }
+		
+	dQosCompliance MODULE-COMPLIANCE
+		STATUS current
+		DESCRIPTION 
+			"The compliance statement for entities which implement the 
+			DLINKSW-QOS-MIB."
+		MODULE -- this module
+		MANDATORY-GROUPS { 
+		    dQosPolicyGroup
+		}
+		
+		GROUP       dQosSchedulingGroup 
+           DESCRIPTION 
+              "This group is required only if QoS scheduling feature
+              is implemented by the agent."
+		
+        GROUP       dQosWrrGroup 
+           DESCRIPTION 
+              "This group is required only if the configuration for WRR scheduling 
+              is supported by the agent."
+
+        GROUP       dQosWdrrGroup 
+           DESCRIPTION 
+              "This group is required only if the configuration for WDRR scheduling 
+              is supported by the agent."
+
+		GROUP       dQosPortBandwidthCtrlGroup 
+           DESCRIPTION 
+              "This group is required only if port-specific bandwidth control feature is
+              implemented by the agent."
+				
+        GROUP       dQosQueueBandwidthCtrlGroup 
+           DESCRIPTION 
+              "This group is required only if queue-specific bandwidth control feature is
+              implemented by the agent."
+
+        GROUP       dQosAggregatePolicingGroup 
+           DESCRIPTION 
+              "This group is required only if QoS aggregated policing feature is 
+              implemented by the agent."
+
+		GROUP       dQosPolicingGroup 
+           DESCRIPTION 
+              "This group is required only if QoS policing feature is implemented
+              by the agent."
+
+        OBJECT  dQosPoliceType 
+        DESCRIPTION
+            "It is compliant to support only a subset of policier types."
+
+        GROUP  dQosColorAwarePolicingGroup 
+        DESCRIPTION
+            "This group is required only if color aware configuration is implemented
+            by the agent."
+
+
+        GROUP       dQosQueuingGroup 
+           DESCRIPTION 
+              "This group is required only if the configuration for queuing packets 
+              is supported by the agent."
+        
+        GROUP       dQosDscpMutationGroup 
+           DESCRIPTION 
+              "This group is required only if the configuration for DSCP mutation 
+              is supported by the agent."
+
+		::= { dQosCompliances 1 }
+		
+	dQosGroups OBJECT IDENTIFIER ::= { dQosMIBConformance 2 }
+	
+	dQosPolicyGroup OBJECT-GROUP
+		OBJECTS { 
+			dQosClassMapType,
+            dQosClassMapRowStaus,
+            dQosClassMapCfgMatchType,
+            dQosClassMapCfgMatchValue,
+            dQosClassMapCfgRowStaus,
+            dQosPolicyMapRowStatus,
+            dQosPolicyMapCfgSetCosQueue,        
+            dQosPolicyMapCfgSetCos,
+            dQosPolicyMapCfgSetDscpOnlyIp,
+            dQosPolicyMapCfgSetDscp,
+            dQosPolicyMapCfgSetPreceOnlyIp,
+            dQosPolicyMapCfgSetPrecedence,
+            dQosPolicyMapCfgRowStatus,
+            dQosServicePolicyDirection,
+            dQosServicePolicyName,
+            dQosServicePolicyRowStaus
+		}
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects providing QoS policy configuration."
+		::= { dQosGroups 1 }
+	
+	dQosSchedulingGroup OBJECT-GROUP
+		OBJECTS { 
+		   	dQosSchedulingMode
+		}
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects providing QoS scheduling configuration."
+		::= { dQosGroups 2 }
+
+    dQosWrrGroup OBJECT-GROUP
+		OBJECTS { 
+		   	dQosScheduleWrrWeightValue
+		}
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects providing QoS WRR scheduling configuration."
+		::= { dQosGroups 3 }
+ 
+    dQosWdrrGroup OBJECT-GROUP
+		OBJECTS { 
+		   	dQosScheduleWdrrWeightValue
+		}
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects providing QoS WDRR scheduling configuration."
+		::= { dQosGroups 4 }
+					
+	dQosPortBandwidthCtrlGroup OBJECT-GROUP
+		OBJECTS { 
+		    dQosBandwidthRxRate,
+            dQosBandwidthRxBurst,
+            dQosBandwidthTxRate,
+            dQosBandwidthTxBurst,
+            dQosBandwidthRxRateMode,
+            dQosBandwidthTxRateMode
+		}
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects providing bandwidth configuration for ports."
+		::= { dQosGroups 5 }
+
+    dQosQueueBandwidthCtrlGroup OBJECT-GROUP
+		OBJECTS { 
+		    dQosQueueBandwidthMinRate,	
+            dQosQueueBandwidthMaxRate,
+            dQosQueueBandwidthMinRateMode,
+            dQosQueueBandwidthMaxRateMode	
+		}
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects providing bandwidth configuration for queues."
+		::= { dQosGroups 6 }
+		
+	dQosAggregatePolicingGroup OBJECT-GROUP
+		OBJECTS { 		    
+		    dQosAggPolicerType,
+            dQosAggPolicerCir,
+            dQosAggPolicerCbs,
+            dQosAggPolicerSrtcmEbs,
+            dQosAggPolicerTrtcmPir,
+            dQosAggPolicerTrtcmPbs,
+            dQosAggPolicerConformAction,
+            dQosAggPolicerConformReplaceDscp,
+            dQosAggPolicerExceedAction,
+            dQosAggPolicerExceedReplaceDscp,
+            dQosAggPolicerViolateAction,
+            dQosAggPolicerViolateReplaceDscp,
+            dQosAggPolicerColorAware,
+            dQosAggPolicerRowStatus,
+            dQosPoliceNamedAggPolicer,
+            dQosAggPolicerConformReplaceCos,
+            dQosAggPolicerExceedReplaceCos,
+            dQosAggPolicerViolateReplaceCos
+		}
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects providing QoS named aggregated policing configuration."
+		::= { dQosGroups 7 } 
+
+    dQosPolicingGroup OBJECT-GROUP
+		OBJECTS { 		    
+		    dQosPoliceType,            
+            dQosPoliceCir,
+            dQosPoliceCbs,
+            dQosPoliceSrtcmEbs,
+            dQosPoliceTrtcmPir,
+            dQosPoliceTrtcmPbs,
+            dQosPoliceConformAction,
+            dQosPoliceConformReplaceDscp,
+            dQosPoliceExceedAction,
+            dQosPoliceExceedReplaceDscp,
+            dQosPoliceViolateAction,
+            dQosPoliceViolateReplaceDscp,
+            dQosPoliceRowStatus,
+            dQosDscpMapCtrlColor,
+            dQosPoliceConformReplaceCos,
+            dQosPoliceExceedReplaceCos,
+            dQosPoliceViolateReplaceCos
+		}
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects providing QoS policing configuration."
+		::= { dQosGroups 8 } 
+
+     dQosColorAwarePolicingGroup OBJECT-GROUP
+		OBJECTS { 		    
+		    dQosPoliceColorAware,
+            dQosDscpMapCtrlColor,
+            dQosCosMapColor            
+		}
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects providing QoS color aware configuration."
+		::= { dQosGroups 9 } 
+
+
+    dQosQueuingGroup OBJECT-GROUP
+		OBJECTS { 		    
+		   dQosPortIf8021pOverride,
+           dQosPortIfTrustMode,
+           dQosDscpMapCtrlCos,
+           dQosCosToQueueQID
+		}
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects providing configuration regarding how to
+            dispatch packets to queues."
+		::= { dQosGroups 10 } 
+
+    dQosDscpMutationGroup OBJECT-GROUP
+		OBJECTS { 		    
+           dQosDscpMutationMapRowStatus,
+           dQosDscpMutationNewDscp,
+           dQosDscpMutationMapAttachName
+		}
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects providing the configuration for DSCP mutation."
+		::= { dQosGroups 11 } 
+END

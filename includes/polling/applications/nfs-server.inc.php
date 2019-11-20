@@ -22,8 +22,6 @@ echo ' ' . $name;
 
 $nfsstats = snmp_get($device, $oid, '-Oqv');
 
-update_application($app, $nfsstats);
-
 $app_id = $app['app_id'];
 
 // rrd names
@@ -228,16 +226,17 @@ $keys_nfs_server = array(
                                                     'v4_reclaim_comp')
                         );
 
-                        
+
 // parse each output line, by the id
 // then 'map' the values to the arrays from $keys_nfs_server
 $lines     = explode("\n", $nfsstats);
 $default_fields = array();
+$metrics = array();
 
 foreach ($lines as $line) {
     $line_values     = explode(" ", $line);
     $line_id         = array_shift($line_values);
-        
+
     switch ($line_id) {
         case 'rc':
         case 'fh':
@@ -256,26 +255,29 @@ foreach ($lines as $line) {
             // note : proc2 is dropped for kernels 3.10.0+ (centos 7+)
             // note : proc4ops has changed a few times, and getting the keys is difficult
             // 		 I only use the version which reports 59 value's (centos 6)
-            
+
             // the first value of the proc* is the amount of fields that will follow;
             // we check this, and if its incorrect, do not polute the chart with wrong values
             $value_count = array_shift($line_values);
 
             if ($value_count == count($keys_nfs_server[$line_id])) {
                 $fields = array_combine($keys_nfs_server[$line_id], $line_values);
-            
+
                 // create or push data to rrd
                 $tags = array('name' => $name, 'app_id' => $app['app_id'], 'rrd_name' => $rrd_name[$line_id], 'rrd_def' => $rrd_def_array[$line_id]);
-            
+                $metrics[$line_id] = $fields;
                 data_update($device, 'app', $tags, $fields);
             }
             break;
     }
 }
+$metrics['none'] = $default_fields;
 
 // push the default nfs server data to rrd
 $tags = array('name' => $name, 'app_id' => $app['app_id'], 'rrd_name' => $rrd_name['default'], 'rrd_def' => $rrd_def_array['default']);
 data_update($device, 'app', $tags, $default_fields);
+update_application($app, $nfsstats, $metrics);
+
 
 // clean up scope
 unset($nfsstats, $rrd_name, $rrd_def_array, $default_fields, $fields, $tags);

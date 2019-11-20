@@ -1,0 +1,839 @@
+-- *********************************************************************
+-- **
+-- ** BATM Advanced Communications.
+-- **
+-- *********************************************************************
+-- ** Filename: prvt-interworking-os-mib.mib
+-- *********************************************************************
+-- (c) Copyright, 1998, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications and contains
+-- proprietary and confidential information. This file is made
+-- available to authorized BATM customers on the express
+-- condition that neither it, nor any of the information contained
+-- therein, shall be disclosed to third parties or be used for any
+-- purpose other than to replace, modify or upgrade firmware and/or
+-- software components of BATM manufactured equipment within the
+-- authorized customer's network, and that such transfer be
+-- completed in accordance with the instructions provided by
+-- BATM. Any other use is strictly prohibited.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SOFTWARE PROGRAMS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+--
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SOFTWARE CONTAINED IN THIS FILE.
+--
+-- ----------------------------------------------------------------------------
+--
+PRVT-INTERWORKING-OS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+MODULE-IDENTITY,
+OBJECT-TYPE,
+IpAddress,
+Integer32
+FROM SNMPv2-SMI
+
+DisplayString,
+TruthValue,
+MacAddress
+FROM SNMPv2-TC
+
+NOTIFICATION-TYPE
+FROM SNMPv2-SMI
+
+prvt-products
+FROM PRVT-SWITCH-MIB
+
+usmUserSecurityName
+FROM SNMP-USER-BASED-SM-MIB;
+
+prvtInterworkOsMib MODULE-IDENTITY
+LAST-UPDATED "200804090000Z"
+ORGANIZATION "BATM Advanced Communication"
+CONTACT-INFO
+"BATM/Telco Systems Support team
+Email:
+For North America: techsupport@telco.com
+For North Europe: support@batm.de, info@batm.de
+For the rest of the world: techsupport@telco.com"
+
+DESCRIPTION
+"The MIB enables display configuration of the device OS features."
+
+-- revision history
+REVISION "200804090000Z"
+DESCRIPTION
+"setExecutetrap varbind change" 
+REVISION "200803310000Z"
+DESCRIPTION
+"Removed configurationChanged, see PrvtConfigChange.mib." 
+
+REVISION "200801010000Z"
+DESCRIPTION
+"Removed redefined OIDs in private vendor extension definitions." 
+
+REVISION "200502160000Z"
+DESCRIPTION
+"Fixed spelling errors and changed the contact info." 
+
+REVISION "200412200000Z"
+DESCRIPTION
+"Added the configurationChanged and snmpSetExecuted notifications."
+
+REVISION "200403100000Z"
+DESCRIPTION
+"Modified the description of the managementLoadExecute object 
+to clarify that the startup-config is replaced at 
+configuration download."
+
+
+REVISION "200305080000Z"
+DESCRIPTION
+"Move to SMI-V2."
+
+REVISION "200212120000Z"
+DESCRIPTION
+"Add detection for CPU RAM size."
+
+REVISION "200211260000Z"
+DESCRIPTION
+"Add CPU group."
+
+
+REVISION "200211170000Z"
+DESCRIPTION
+"Enable loading VDSL E2 firmware. 
+Add support for reload."
+
+REVISION "200104190000Z"
+DESCRIPTION
+"Add management group."
+
+REVISION "200103190000Z"
+DESCRIPTION
+"Initial version."
+
+::= { software 1 }
+
+software OBJECT IDENTIFIER ::= { prvt-products 111 }
+
+prvtInterworkOsNotifications OBJECT IDENTIFIER ::= { prvtInterworkOsMib 0 }
+version OBJECT IDENTIFIER ::= {prvtInterworkOsMib 1}
+option OBJECT IDENTIFIER ::= {prvtInterworkOsMib 2}
+management OBJECT IDENTIFIER ::= {prvtInterworkOsMib 3}
+cpu OBJECT IDENTIFIER ::= {prvtInterworkOsMib 4}
+prvtInterworkOsConformance OBJECT IDENTIFIER ::= { prvtInterworkOsMib 5 }
+
+-- 
+-- version group
+-- 
+
+bootVersionNumber OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"This object identifies version number of the Boot program"
+::= { version 1 }
+
+bootVersionDate OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"This object identifies creation date/time of the Boot program"
+::= { version 2 }
+
+bootVersionString OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"This object contains text for the current version of the Boot program"
+::= { version 3 }
+
+oSversionNumber OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"This object identifies version number of the OS"
+::= { version 4 }
+
+oSversionDate OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"This object identifies creation date/time of the OS"
+::= { version 5 }
+
+oSversionString OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"This object contains text for the current version of the OS"
+::= { version 6 }
+
+appletVersionNumber OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"This object contains text for the current version of the embedded 
+applet"
+::= { version 7 }
+
+appletVersionDate OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"This object contains text for the creation date of the current embedded 
+applet version"
+::= { version 8 }
+-- 
+-- option group
+-- 
+
+optionInstalled OBJECT-TYPE
+SYNTAX OCTET STRING
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"This object identifies creation date/time of the OS"
+::= { option 1 }
+
+-- 
+-- management group
+-- 
+
+--
+-- Connectivity Information
+--
+-- This group is meant to be a collection of controls and data
+-- for connectivity.
+--
+managementConnectivity OBJECT IDENTIFIER ::= {management 1}
+
+managementConnectivityMACAddr OBJECT-TYPE
+SYNTAX MacAddress
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Get the agent MAC address."
+::= { managementConnectivity 1 }
+
+managementConnectivityIpAddress OBJECT-TYPE
+SYNTAX IpAddress
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Set IP Address for the device."
+::= { managementConnectivity 2 }
+
+managementConnectivityIPNetMask OBJECT-TYPE
+SYNTAX IpAddress
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Set IP NetMask for the device."
+::= { managementConnectivity 3 }
+
+managementIPGateAddress OBJECT-TYPE
+SYNTAX IpAddress
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Set Gateway Address for the device - only applies for devices without
+L3 capabilities."
+::= { managementConnectivity 4 }
+
+managementSerialBaud OBJECT-TYPE
+SYNTAX INTEGER {
+baud2400(1),
+baud9600(2),
+baud19200(3),
+baud38400(4)
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"The Serial port BAUD Rate. Attributes are 8 Start Bits,
+no parity, and 1 stop bits (8N1) and Hardware Flow Control.
+Valid values are 2400, 9600, 19200, and 38400."
+::= { managementConnectivity 5 }
+
+--
+-- managementLoad Group
+--
+-- This group is meant to be a collection of controls and data
+-- that determine the file download and upload configuration
+-- and mode.
+--
+
+managementLoad OBJECT IDENTIFIER ::= {management 2}
+
+managementLoadTftpServerAddress OBJECT-TYPE
+SYNTAX IpAddress
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Set IP Address for the TFTP server used for downloading
+and uploading files."
+::= { managementLoad 1 }
+
+managementLoadFileName OBJECT-TYPE
+SYNTAX OCTET STRING (SIZE (0..64))
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Set TFTP file path and name."
+::= { managementLoad 2 }
+
+managementLoadType OBJECT-TYPE
+SYNTAX INTEGER {
+application(1),
+boot(2),
+configuration(3),
+java(4),
+vdsl-E2(5)
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"The type of file to download or upload 
+upon a managementLoadExecute."
+::= { managementLoad 3 }
+
+managementLoadExecute OBJECT-TYPE
+SYNTAX INTEGER {
+noop(1), -- no operation
+download(2), -- Application, Boot, java or Configuration
+upload(3) -- Configuration only
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Execute file download or upload procedure. A SET of this
+object starts the load procedure. Note that the Application
+and Boot images can only be downloaded. The Configuration
+file can be uploaded and downloaded. When a Configuration file
+is downloaded, it replaces the startup-config file in NVRAM. 
+
+A GET of this object will return a noop (1). Also, when the user chooses to 
+upload the configuration, it is the startup-config that is copied to the remote host.
+Use managementLoadExecuteStatus to determine the status of the executed load."
+::= { managementLoad 4 }
+
+managementLoadExecuteStatus OBJECT-TYPE
+SYNTAX INTEGER {
+not-started(1),
+in-progress(2),
+success(3),
+error-connection(4),
+error-filename(5),
+error-fault(6)
+}
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Provides status on the execute file load procedure.
+The status return is given by one of the enumerated codes
+not-started (download has not yet started)
+in-progress (download has not yet finished)
+success (download has finished successfully)
+error-connection (download cannot connect)
+error-filename (download has bad image path/filename)
+error-fault (download has fault condition on device)."
+::= { managementLoad 5 }
+
+--
+-- Miscellaneous Information
+--
+-- This group is meant to be a collection of controls and data
+-- that do not require a group of their own, or fall into the
+-- category of "miscellaneous". 
+--
+
+managementMisc OBJECT IDENTIFIER ::= {management 3}
+
+managementMiscSaveToNvm OBJECT-TYPE
+SYNTAX INTEGER {
+noop(1), -- no operation
+save(2) -- save all configuration parameters to NVM
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"When set to save (2), all nonvolatile configuration
+parameters are saved to NVM (Nonvolatile Memory). NVM save
+operations may be slow (e.g., erasing/writing Flash device).
+Consequently, all (or many) updates should be made before
+saving to NVM. A get operation always returns noop (1)"
+::= { managementMisc 1 }
+
+managementMiscReset OBJECT-TYPE
+SYNTAX INTEGER {
+noop(1), 
+reset(2), 
+reset-to-defaults(3), 
+save-and-reset(4) -- save config and then reset the unit
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Physically performs a hardware reset of the unit.
+Use with care. A reset (2) resets the unit, the
+reset-to-defaults (3) resets the configuration file
+to factory defaults and then resets the unit, the value of
+save-and-reset (4) saves the config and then resets the unit and 
+noop (1) does nothing. 
+A value of noop (1) is always returned 
+for a GET operation."
+::= { managementMisc 2 }
+
+managementMiscReload OBJECT-TYPE
+SYNTAX INTEGER {
+noop(1), 
+save-and-reload(2) -- save config and then reload the software
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Reload the unit software, the unit hardware will not 
+be affected. A value of noop (1) is always returned for a 
+GET operation."
+::= { managementMisc 3 }
+
+managementMiscReloadInTime OBJECT-TYPE
+SYNTAX OCTET STRING (SIZE (4))
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION "Indicates time for scheduled reload without save in hour:min.
+octets contents range
+1 day 0x01..0x1f (1-31)
+2 month 0x01..0x0C (1..12)
+where january = 1 december = 12
+3 hour 0x01..0x17 (0..23)
+4 min 0x01..3B (0..59)
+For example: 0x01 0x01 0x01 0x01 means 1 January 01:01.
+To stop scheduled reload set it to 0x00 0x00 0x00 0x00"
+::= { managementMisc 4 }
+
+managementMiscReloadAtTime OBJECT-TYPE
+SYNTAX OCTET STRING (SIZE (4))
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION "Indicates time for scheduled reload without save at day:month:hour:min.
+octets contents range
+1 day 0x01..0x1f (1-31)
+2 month 0x01..0x0C (1..12)
+where january = 1 december = 12
+3 hour 0x01..0x17 (0..23)
+4 min 0x01..3B (0..59)
+For example: 0x01 0x01 0x01 0x01 means 1 January 01:01.
+To stop scheduled reload set it to 0x00 0x00 0x00 0x00"
+::= { managementMisc 5 }
+
+managementMiscReloadSaveInTime OBJECT-TYPE
+SYNTAX OCTET STRING (SIZE (4))
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION "Indicates time for scheduled reload with save in hour:min.
+octets contents range
+1 day 0x01..0x1f (1-31)
+2 month 0x01..0x0C (1..12)
+where january = 1 december = 12
+3 hour 0x01..0x17 (0..23)
+4 min 0x01..3B (0..59)
+For example: 0x01 0x01 0x01 0x01 means 1 January 01:01.
+To stop scheduled reload set it to 0x00 0x00 0x00 0x00"
+::= { managementMisc 6 }
+
+managementMiscReloadSaveAtTime OBJECT-TYPE
+SYNTAX OCTET STRING (SIZE (4))
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION "Indicates time for scheduled reload with save at day:month:hour:min.
+octets contents range
+1 day 0x01..0x1f (1-31)
+2 month 0x01..0x0C (1..12)
+where january = 1 december = 12
+3 hour 0x01..0x17 (0..23)
+4 min 0x01..3B (0..59)
+For example: 0x01 0x01 0x01 0x01 means 1 January 01:01.
+To stop scheduled reload set it to 0x00 0x00 0x00 0x00"
+::= { managementMisc 7 }
+
+managementLicense OBJECT IDENTIFIER ::= {management 4}
+
+managementOptionSupportStatus OBJECT-TYPE
+SYNTAX INTEGER { reserved0 (0), -- reserved
+reserved1 (1), -- reserved
+reserved2 (2), -- reserved
+reserved3 (3), -- reserved
+reserved4 (4), -- reserved
+reserved5 (5), -- reserved
+reserved6 (6), -- reserved
+reserved7 (7), -- reserved
+reserved8 (8), -- reserved
+reserved9 (9), -- reserved
+licNotSpecified(10), -- the device is without license
+licBasic(11), -- SWITCH license registered
+licML(12), -- ML license
+licAdvML(13), -- Adv-ML license
+reserved14 (14), -- reserved
+reserved15 (15), -- reserved
+reserved16 (16), -- reserved
+reserved17 (17), -- reserved
+reserved18 (18), -- reserved
+reserved19 (19), -- reserved
+reserved20 (20), -- reserved
+reserved21 (21), -- reserved
+reserved22 (22), -- reserved
+reserved23 (23), -- reserved
+reserved24 (24), -- reserved
+reserved25 (25), -- reserved
+reserved26 (26), -- reserved
+reserved27 (27), -- reserved
+reserved28 (28), -- reserved
+reserved29 (29), -- reserved
+reserved30 (30), -- reserved 
+reserved31 (31) -- reserved 
+}
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Indicates active software support options (license)."
+::= { managementLicense 1 }
+
+managementOptionSupportKey OBJECT-TYPE
+SYNTAX OCTET STRING (SIZE (0..32))
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Specify the software support option key (license). After set, device must be reloaded the new option to take affect."
+::= { managementLicense 2 }
+
+managementOptionSupportAddress OBJECT-TYPE 
+SYNTAX IpAddress
+MAX-ACCESS accessible-for-notify
+STATUS current
+DESCRIPTION
+"Shows the address of SNMP NMS that has configured last the option."
+::= { managementLicense 3 }
+
+managementOptionSupportL3Capable OBJECT-TYPE
+SYNTAX TruthValue
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Indicates if the swicth is capable for L3 features
+- true The switch is capable for L3 features 
+- false The switch is not capable for L3 features
+"
+DEFVAL { true }
+::= { managementLicense 4 }
+
+prvtBootConfigUpgrade OBJECT IDENTIFIER ::= {management 5}
+
+prvtBootUpgradeSrcURI OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"The object represents an address from where the application
+will be copied and used by the device. The address 
+must be given in a valid URI format. It will be used by all 
+booting mechnisms as a source from where to find the application.
+So it can point to either local folder or remote device. 
+
+Example:
+tftp://10.3.71.45/MyApps/Imagev1.5.Z
+local://Usr/Imagev1.5.Z 
+
+If there is no value set, the device will boot with local application
+given in prvtBootApplicationNameURI object"
+REFERENCE "See rfc3986"
+::= { prvtBootConfigUpgrade 1 }
+
+prvtBootApplicationNameURI OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"This object represents the name of the application to be used by 
+the network device to boot. The name of the application is given 
+in URI format to indicate the storage device. Every network device 
+can have few localy saved application files copied in different 
+storage devices: local file system, flash etc. The user can choose 
+one of them by setting the starage device and the application name.
+
+Example: 
+local://Imagev1.5.Z, 
+flash://Imagev1.5.Z 
+
+If this object is empty, the device will boot from the network using 
+the remote application given in prvtBootUpgradeSrcURI"
+REFERENCE "See rfc3986"
+::= { prvtBootConfigUpgrade 2 }
+
+prvtBootConfigURI OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"This object represents the configuration file's name of a network device. 
+The value must be set in URI format. It can point to either local or remote 
+configuration file.
+
+Example:
+local://Usr/my_startup.cfg, 
+ftp://myuser:mypass@netaddress/MyCfgs/startup.cfg
+
+This field is optional. If it is empty, the standart startup config will be used."
+REFERENCE "See rfc3986"
+::= { prvtBootConfigUpgrade 3 }
+
+prvtBootUpgradeCmd OBJECT-TYPE
+SYNTAX INTEGER {
+none(0), -- this will be invalid value 
+ready(1), -- the common return value on get and next requests
+apply(2),
+applyExec(3) 
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"This field is used to apply the configuration. When a get request is 
+executed, the returned value should be always ready. When apply(2)
+command is executed, the upgrade settings are applied. Alternative, 
+when applyExec(3) command is executed, the upgrade process is started.
+"
+DEFVAL { ready }
+::= { prvtBootConfigUpgrade 4 }
+
+prvtBootOperStatus OBJECT-TYPE
+SYNTAX INTEGER {
+unknown(0), -- invalid value
+ready(1),
+notReady(2),
+upgradeInProgress(3)
+}
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The object is used to show the current status of the upgrating process. The
+default value is ready(1), indicating that the process is idle. when the value 
+is set to notReady(2), the device upgrading mechanism is not correctly configured. 
+upgradeInProgress(3) indicates upgrading process have started and haven't finished
+yet."
+DEFVAL { ready }
+::= { prvtBootConfigUpgrade 5 }
+
+prvtBootErrorCondition OBJECT-TYPE
+SYNTAX INTEGER {
+noError(0),
+genericError(1),
+copyFailed(2),
+downloadFailed(3),
+freeSpaceError(4),
+validationFailed(5),
+backupFailed(6),
+inProgressError(7),
+consistencyError(8),
+fileSystemError(9),
+profileNameError(10),
+profileError(11),
+fileNameError(12),
+pathError(13),
+zFileError(14),
+cannotFindFile(15),
+defApplicationProfileError(16),
+configProfileError(17),
+bootDevProfileError(18),
+ftpServerProfileError(19),
+ftpUserProfileError(20),
+ftpPassProfileError(21)
+}
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The object can be used for feedback. How the upgrading process have finished"
+DEFVAL{ noError }
+::= { prvtBootConfigUpgrade 6 }
+
+
+-- 
+-- CPU group
+-- 
+
+cpuMonitoring OBJECT IDENTIFIER ::= {cpu 1}
+
+cpuMonitoringStatus OBJECT-TYPE
+SYNTAX INTEGER {
+enable(1),
+disable(2)
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"The object shows the status of the CPU monitor"
+::= { cpuMonitoring 1 }
+
+cpuMonitoringUtilization OBJECT-TYPE
+SYNTAX Integer32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The object shows the current CPU utilization"
+::= { cpuMonitoring 2 }
+
+cpuRedundancy OBJECT IDENTIFIER ::= {cpu 2}
+
+cpuHwRedundancySupport OBJECT-TYPE
+SYNTAX TruthValue
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"This object shows if the backplan of this unit support CPU redundancy."
+::= { cpuRedundancy 1 }
+
+cpuRedundancyTable OBJECT-TYPE
+SYNTAX SEQUENCE OF CpuRedundancyEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"This table contains the CPU redundancy information."
+::= { cpuRedundancy 2 }
+
+cpuRedundancyEntry OBJECT-TYPE
+SYNTAX CpuRedundancyEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"Information about one CPU"
+INDEX { cpuId }
+::= { cpuRedundancyTable 1 }
+
+CpuRedundancyEntry ::= SEQUENCE {
+cpuId Integer32,
+cpuName DisplayString,
+cpuStatus INTEGER,
+cpuRedundancySupport TruthValue,
+cpuSWVersionString DisplayString
+}
+
+cpuId OBJECT-TYPE
+SYNTAX Integer32 (0..256)
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"The ID of the CPU in the system"
+::= { cpuRedundancyEntry 1 }
+
+cpuName OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Textual representation of the CPU"
+::= { cpuRedundancyEntry 2 }
+
+cpuStatus OBJECT-TYPE
+SYNTAX INTEGER {
+active(1),
+standby(2)
+}
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The CPU status"
+::= { cpuRedundancyEntry 3 }
+
+cpuRedundancySupport OBJECT-TYPE
+SYNTAX TruthValue
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"This object shows if the CPU card supports redundancy."
+::= { cpuRedundancyEntry 4 }
+
+cpuSWVersionString OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The OS version currently running on the CPU"
+::= { cpuRedundancyEntry 5 }
+
+cpuHW OBJECT IDENTIFIER ::= {cpu 3}
+
+cpuRAMsize OBJECT-TYPE
+SYNTAX Integer32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"This object returns the CPU card RAM size"
+::= { cpuHW 1 }
+
+-- Notifications for use by prvtInterworkOsMib
+
+
+imageCrcCheckFailed NOTIFICATION-TYPE
+OBJECTS { managementLoadTftpServerAddress, managementLoadFileName}
+STATUS current
+DESCRIPTION
+"The imageCrcCheckFailed notification indicates that the 
+image loaded via TFTP has not passed the CRC check 
+and has been discarded."
+::= {prvtInterworkOsNotifications 1}
+
+configurationLoadFailed NOTIFICATION-TYPE
+OBJECTS { managementLoadTftpServerAddress, managementLoadFileName}
+STATUS current
+DESCRIPTION
+"The configurationLoadFailed notification indicates that
+the sending agent did not succeed to upload or download
+the configuration file."
+::= {prvtInterworkOsNotifications 2}
+
+unauthorizedAccessViaCLI NOTIFICATION-TYPE
+-- OBJECTS { }
+STATUS current
+DESCRIPTION
+"The unauthorizedAccessViaCLI notification indicates that 
+the last attempt to login to the device via CLI cannot 
+be authorized."
+::= {prvtInterworkOsNotifications 3}
+
+snmpSetExecuted NOTIFICATION-TYPE
+OBJECTS { usmUserSecurityName }
+STATUS current
+DESCRIPTION
+"This notification indicates that a successful set request has been performed."
+::= {prvtInterworkOsNotifications 4}
+
+managementOptionSupportChanged NOTIFICATION-TYPE 
+OBJECTS { managementOptionSupportStatus, managementOptionSupportAddress}
+STATUS current
+DESCRIPTION
+"This notification indicates that a management option license has been changed."
+::= {prvtInterworkOsNotifications 5}
+
+END
+

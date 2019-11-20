@@ -1,0 +1,516 @@
+ALCATEL-IND1-OSPF3-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32, Gauge32
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    routingIND1Ospf3
+        FROM ALCATEL-IND1-BASE
+    ospfv3AreaEntry, ospfv3IfEntry
+        FROM OSPFV3-MIB
+    Ipv6Address, Ipv6IfIndexOrZero
+        FROM IPV6-TC;
+
+
+alcatelIND1OSPF3MIB MODULE-IDENTITY
+
+    LAST-UPDATED  "201410060000Z"
+    ORGANIZATION  "Alcatel-Lucent"
+    CONTACT-INFO
+        "Please consult with Customer Service to ensure the most appropriate
+         version of this document is used with the products in question:
+
+                    Alcatel-Lucent, Enterprise Solutions Division
+                   (Formerly Alcatel Internetworking, Incorporated)
+                           26801 West Agoura Road
+                        Agoura Hills, CA  91301-5122
+                          United States Of America
+
+        Telephone:               North America  +1 800 995 2696
+                                 Latin America  +1 877 919 9526
+                                 Europe         +31 23 556 0100
+                                 Asia           +65 394 7933
+                                 All Other      +1 818 878 4507
+
+        Electronic Mail:         support@ind.alcatel.com
+        World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+        File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+    DESCRIPTION
+        "This module describes an authoritative enterprise-specific Simple
+         Network Management Protocol (SNMP) Management Information Base (MIB):
+
+             This proprietary MIB contains management information for
+             the configuration of OSPFv3 global configuration parameters.
+
+         The right to make changes in specification and other information
+         contained in this document without prior notice is reserved.
+
+         No liability shall be assumed for any incidental, indirect, special, o
+r
+         consequential damages whatsoever arising from or related to this
+         document or the information contained herein.
+
+         Vendors, end-users, and other interested parties are granted
+         non-exclusive license to use this specification in connection with
+         management of the products for which it is intended to be used.
+
+                     Copyright (C) 1995-2003 Alcatel-Lucent
+                         ALL RIGHTS RESERVED WORLDWIDE"
+
+    REVISION      "201410060000Z"
+    DESCRIPTION
+        "Added alaOspf3RouteTable."
+
+    REVISION      "200704030000Z"
+    DESCRIPTION
+        "The latest version of this MIB Module."
+
+    ::= { routingIND1Ospf3 1 }
+
+alcatelIND1OSPF3MIBObjects    OBJECT IDENTIFIER ::= { alcatelIND1OSPF3MIB 1 }
+alaProtocolOspf3    OBJECT IDENTIFIER ::= { alcatelIND1OSPF3MIBObjects 1 }
+
+alaOspf3OrigRouteTag    OBJECT-TYPE
+                SYNTAX                  Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "Route tag that is originated with ASEs"
+    DEFVAL     { 0 }
+    ::= {alaProtocolOspf3 1 }
+
+alaOspf3TimerSpfDelay   OBJECT-TYPE
+                SYNTAX                  Integer32 ( 0 .. 65535 )
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "Delay (in seconds) between topology change and SPF run"
+    DEFVAL     { 5 }
+    ::= {alaProtocolOspf3 2 }
+
+alaOspf3TimerSpfHold    OBJECT-TYPE
+                SYNTAX                  Integer32 ( 0 .. 65535 )
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "Delay (in seconds) between subsequent SPF executions"
+    DEFVAL     { 10 }
+    ::= {alaProtocolOspf3 3 }
+
+alaOspf3RestartHelperSupport    OBJECT-TYPE
+                SYNTAX                  INTEGER
+                                                                {
+                                                                        enable (1),
+                                                                        disable (2)
+                                                                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "This router can be a helper to another restarting router"
+    DEFVAL     { enable }
+    ::= {alaProtocolOspf3 4 }
+
+alaOspf3RestartStrictLsaChecking        OBJECT-TYPE
+                SYNTAX                  INTEGER
+                                                                {
+                                                                        enable (1),
+                                                                        disable (2)
+                                                                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "Will changed LSA result in restart termination"
+    DEFVAL     { enable }
+    ::= {alaProtocolOspf3 5 }
+
+alaOspf3RestartInitiate OBJECT-TYPE
+                SYNTAX                  INTEGER
+                                                                {
+                                                                        enable (1),
+                                                                        disable (2)
+                                                                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "Start a graceful restart"
+    ::= {alaProtocolOspf3 6 }
+
+alaOspf3MTUCheck        OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                  enable (1),
+                  disable (2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Verify the MTU of a neighbor matches our own."
+    ::= {alaProtocolOspf3 7 }
+
+-- Route Table
+
+alaOspf3RouteTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF AlaOspf3RouteEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+       "OSPF3 Routing table. This table contains
+       an entry for each valid OSPF unicast route that
+       can be used for packet forwarding determination.
+       It is for display purposes only."
+    ::= { alaProtocolOspf3 8 }
+
+alaOspf3RouteEntry OBJECT-TYPE
+    SYNTAX     AlaOspf3RouteEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+       "A routing entry."
+    INDEX {
+        alaOspf3RouteDest,
+        alaOspf3RoutePfxLength,
+        alaOspf3RouteNextHop,
+        alaOspf3RouteIfIndex
+        }
+    ::= { alaOspf3RouteTable 1 }
+
+AlaOspf3RouteEntry ::=
+    SEQUENCE {
+        alaOspf3RouteDest      Ipv6Address,
+        alaOspf3RoutePfxLength Integer32,
+        alaOspf3RouteNextHop   Ipv6Address,
+        alaOspf3RouteIfIndex   Ipv6IfIndexOrZero,
+        alaOspf3RouteType      INTEGER,
+        alaOspf3RoutePathType  INTEGER,
+        alaOspf3RouteMetric1   Unsigned32,
+        alaOspf3RouteMetric2   Unsigned32
+    }
+
+alaOspf3RouteDest OBJECT-TYPE
+    SYNTAX     Ipv6Address
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+       "The destination IPv6 address of this route."
+    ::= { alaOspf3RouteEntry 1 }
+
+alaOspf3RoutePfxLength OBJECT-TYPE
+    SYNTAX     Integer32(0..128)
+    UNITS      "bits"
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Indicates the prefix length of the destination
+        address."
+    ::= { alaOspf3RouteEntry 2 }
+
+alaOspf3RouteNextHop OBJECT-TYPE
+    SYNTAX     Ipv6Address
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "On remote routes, the address of the next
+        system en route;  otherwise, ::0
+        ('00000000000000000000000000000000'H in ASN.1
+        string representation)."
+    ::= { alaOspf3RouteEntry 3 }
+
+alaOspf3RouteIfIndex OBJECT-TYPE
+    SYNTAX     Ipv6IfIndexOrZero
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The index value which uniquely identifies the local
+        interface through which the next hop of this
+        route should be reached."
+    ::= { alaOspf3RouteEntry 4 }
+
+alaOspf3RouteType OBJECT-TYPE
+    SYNTAX     INTEGER
+               {
+                  host(1),          -- host route
+                  other(2)
+               }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The type of this route."
+    ::= { alaOspf3RouteEntry 5 }
+
+alaOspf3RoutePathType OBJECT-TYPE
+    SYNTAX     INTEGER
+               {
+                  intraArea(1),          -- intra area route
+                  interArea(2),          -- inter area route
+                  externalType1(3),      -- external type-1 route
+                  externalType2(4)       -- external type-2 route
+               }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The routing metric path type for this route."
+    ::= { alaOspf3RouteEntry 6 }
+
+alaOspf3RouteMetric1 OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The primary routing metric for this route."
+    ::= { alaOspf3RouteEntry 7 }
+
+alaOspf3RouteMetric2 OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "An alternate routing metric for this route. It's 0
+         for internal routes. For an external route, it's the metric
+         to reach the ASBR that announced the external route."
+    ::= { alaOspf3RouteEntry 8 }
+
+alaOspf3BfdStatus      OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+        enable(1),
+        disable(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+       "Enables or disables bfd  for OSPF protocol"
+    DEFVAL      { disable }
+    ::= { alaProtocolOspf3 9}
+
+alaOspf3BfdAllInterfaceStatus  OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+         enable(1),
+         disable(2)
+     }
+     MAX-ACCESS  read-write
+     STATUS  current
+     DESCRIPTION
+         "Enables or disables bfd for all OSPF interfaces"
+     DEFVAL      { disable }
+     ::= { alaProtocolOspf3 10}
+
+-- ************************************************************************
+-- Expansion of ospfv3IfTable
+-- ************************************************************************
+        alaOspf3IfAugTable OBJECT-TYPE
+                SYNTAX SEQUENCE OF AlaOspf3IfAugEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "Expansion for ospf3IfTable"
+                ::= { alaProtocolOspf3 11 }
+
+        alaOspf3IfAugEntry OBJECT-TYPE
+                SYNTAX   AlaOspf3IfAugEntry
+                MAX-ACCESS   not-accessible
+                STATUS   current
+                DESCRIPTION
+                        "An entry of alaOspf3IfAugTable"
+                AUGMENTS { ospfv3IfEntry }
+                ::= { alaOspf3IfAugTable 1 }
+
+        AlaOspf3IfAugEntry ::=
+                SEQUENCE {
+                        alaOspf3IfBfdStatus      INTEGER,
+                        alaOspf3IfBfdDrsOnly     INTEGER
+                }
+
+        alaOspf3IfBfdStatus OBJECT-TYPE
+                SYNTAX          INTEGER
+                {
+                        enable(1),
+                        disable(2)
+                }
+                MAX-ACCESS  read-create
+                STATUS  current
+                DESCRIPTION
+                        "Enables/Disables OSP3F for a BFD interface"
+                ::= { alaOspf3IfAugEntry 1}
+
+        alaOspf3IfBfdDrsOnly OBJECT-TYPE
+                SYNTAX          INTEGER
+                {
+                        enable(1),
+                        disable(2)
+                }
+                MAX-ACCESS  read-create
+                STATUS  current
+                DESCRIPTION
+                        "Enables/Disables Drs Only option for a BFD interface"
+                ::= { alaOspf3IfAugEntry 2}
+
+alaOspf3AreaAugTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AlaOspf3AreaAugEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+       "This table extends the ofpv3 area table and it is used to 
+        display very granular LSA Counts, Host and Interface counts"
+    ::= { alaProtocolOspf3 12 }
+
+alaOspf3AreaAugEntry OBJECT-TYPE
+    SYNTAX AlaOspf3AreaAugEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+       "An entry of alaOspf3AreaAugTable"
+    AUGMENTS { ospfv3AreaEntry }
+    ::= { alaOspf3AreaAugTable 1 }
+
+AlaOspf3AreaAugEntry ::= SEQUENCE {
+    alaOspf3AreaRouterLsaCount            Gauge32,
+    alaOspf3AreaNetworkLsaCount           Gauge32,
+    alaOspf3AreaIntraAreaPrefixLsaCount   Gauge32,        
+    alaOspf3AreaInterAreaPrefixLsaCount   Gauge32,
+    alaOspf3AreaInterAreaRouterLsaCount   Gauge32,
+    alaOspf3AreaHostCount                 Gauge32,
+    alaOspf3AreaInterfaceCount            Gauge32,
+    alaOspf3AreaSummarizationRangeCount   Gauge32				
+}
+
+alaOspf3AreaRouterLsaCount OBJECT-TYPE
+    SYNTAX          Gauge32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "This object indicates the Router LSA Count."
+    ::= { alaOspf3AreaAugEntry 1 }
+
+alaOspf3AreaNetworkLsaCount OBJECT-TYPE
+    SYNTAX          Gauge32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "This object indicates the Network LSA Count."
+    ::= { alaOspf3AreaAugEntry 2 }
+
+alaOspf3AreaIntraAreaPrefixLsaCount OBJECT-TYPE
+    SYNTAX          Gauge32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "This object indicates the Intra Area LSA Count."
+    ::= { alaOspf3AreaAugEntry 3 }
+
+alaOspf3AreaInterAreaPrefixLsaCount OBJECT-TYPE
+    SYNTAX          Gauge32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "This object indicates the Inter area LSA Count."
+    ::= { alaOspf3AreaAugEntry 4 }
+
+alaOspf3AreaInterAreaRouterLsaCount OBJECT-TYPE
+    SYNTAX          Gauge32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "This object indicates the inter area Router LSA Count."
+    ::= { alaOspf3AreaAugEntry 5 }
+
+alaOspf3AreaHostCount OBJECT-TYPE
+    SYNTAX          Gauge32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "This object indicates the host count."
+    ::= { alaOspf3AreaAugEntry 6 }
+
+alaOspf3AreaInterfaceCount OBJECT-TYPE
+    SYNTAX          Gauge32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "This object indicates the Interface count."
+    ::= { alaOspf3AreaAugEntry 7 }
+
+alaOspf3AreaSummarizationRangeCount OBJECT-TYPE
+    SYNTAX          Gauge32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+    "This object indicates the summarization range count."
+    ::= { alaOspf3AreaAugEntry 8 }
+
+
+-- conformance information
+
+alcatelIND1OSPF3MIBConformance OBJECT IDENTIFIER ::= { alcatelIND1OSPF3MIB 2 }
+alcatelIND1OSPF3MIBCompliances OBJECT IDENTIFIER ::=
+                                          { alcatelIND1OSPF3MIBConformance 1 }
+alcatelIND1OSPF3MIBGroups      OBJECT IDENTIFIER ::=
+                                          { alcatelIND1OSPF3MIBConformance 2 }
+
+-- compliance statements
+
+alcatelIND1OSPF3MIBCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for OSPFv3
+             and implementing the ALCATEL-IND1-OSPF3 MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS { alaOSPF3ConfigMIBGroup }
+
+    ::= { alcatelIND1OSPF3MIBCompliances 1 }
+
+-- units of conformance
+
+alaOSPF3ConfigMIBGroup OBJECT-GROUP
+    OBJECTS {
+                        alaOspf3OrigRouteTag,
+                        alaOspf3TimerSpfDelay,
+                        alaOspf3TimerSpfHold,
+                        alaOspf3RestartHelperSupport,
+                        alaOspf3RestartStrictLsaChecking,
+                        alaOspf3RestartInitiate,
+                        alaOspf3MTUCheck
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects to support management of OSPF3."
+    ::= { alcatelIND1OSPF3MIBGroups 1 }
+
+alaOspf3RouteGroup OBJECT-GROUP
+        OBJECTS
+        {
+            -- Network Route table
+            alaOspf3RouteType,
+            alaOspf3RoutePathType,
+            alaOspf3RouteMetric1,
+            alaOspf3RouteMetric2,
+            alaOspf3BfdStatus,
+            alaOspf3BfdAllInterfaceStatus,
+            alaOspf3IfBfdDrsOnly,
+            alaOspf3IfBfdStatus
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of objects for management of Network Route."
+        ::= { alcatelIND1OSPF3MIBGroups 2 }
+
+alaOspf3AreaGroup OBJECT-GROUP
+        OBJECTS
+        {
+            -- OSPF3 Area table
+            alaOspf3AreaRouterLsaCount,
+            alaOspf3AreaNetworkLsaCount,
+            alaOspf3AreaIntraAreaPrefixLsaCount,
+            alaOspf3AreaInterAreaPrefixLsaCount,
+            alaOspf3AreaInterAreaRouterLsaCount,
+            alaOspf3AreaHostCount,
+            alaOspf3AreaInterfaceCount,
+            alaOspf3AreaSummarizationRangeCount
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of objects for management of Router LSAs."
+        ::= { alcatelIND1OSPF3MIBGroups 3 }
+END

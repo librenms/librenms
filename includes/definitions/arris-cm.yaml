@@ -1,0 +1,12 @@
+os: arris-cm
+text: 'ARRIS DOCSIS'
+type: network
+icon: arris
+mib_dir:
+    - arris
+discovery:
+    -
+      sysObjectID:
+        - .1.3.6.1.4.1.4115
+      sysDescr:
+        - ARRIS DOCSIS

@@ -1,0 +1,10 @@
+os: himoinsa-gensets
+text: 'Himoinsa Generator Sets'
+type: power
+icon: himoinsa
+group: himoinsa
+over:
+    - { graph: device_uptime, text: 'Device Uptime' }
+discovery:
+    - sysDescr:
+        - 'C2LAN SNMP'

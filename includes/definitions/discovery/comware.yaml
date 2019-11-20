@@ -1,0 +1,41 @@
+mib: HH3C-LswDEVM-MIB:HH3C-ENTITY-EXT-MIB
+modules:
+    sensors:
+        pre-cache:
+            data:
+                - oid:
+                    - entPhysicalName
+        state:
+            data:
+                -
+                    oid: hh3cdevMFanStatusTable
+                    value: hh3cDevMFanStatus
+                    num_oid: '.1.3.6.1.4.1.25506.8.35.9.1.1.1.2.{{ $index }}'
+                    descr: 'Fan {{ $index }}'
+                    index: '{{ $index }}'
+                    states:
+                        - { value: 1, descr: active, graph: 1, generic: 0 }
+                        - { value: 2, descr: deactive, graph: 1, generic: 2 }
+                        - { value: 3, descr: not-install, graph: 1, generic: 3 }
+                        - { value: 4, descr: unsupport, graph: 1, generic: 1 }
+                -
+                    oid: hh3cdevMPowerStatusTable
+                    value: hh3cDevMPowerStatus
+                    num_oid: '.1.3.6.1.4.1.25506.8.35.9.1.2.1.2.{{ $index }}'
+                    descr: 'Power Supply {{ $index }}'
+                    index: '{{ $index }}'
+                    states:
+                        - { value: 1, descr: active, graph: 1, generic: 0 }
+                        - { value: 2, descr: deactive, graph: 1, generic: 2 }
+                        - { value: 3, descr: not-install, graph: 1, generic: 3 }
+                        - { value: 4, descr: unsupport, graph: 1, generic: 1 }
+        power:
+            data:
+                -
+                    oid: hh3cEntityExtPowerEntry
+                    value: hh3cEntityExtCurrentPower
+                    num_oid: '.1.3.6.1.4.1.25506.2.6.1.3.1.1.3.{{ $index }}'
+                    descr: '{{ $entPhysicalName }} Power Usage'
+                    index: 'hh3cEntityExtCurrentPower.{{ $index }}'
+                    divisor: 1000
+                    skip_values: 0

@@ -2,8 +2,6 @@
 
 use LibreNMS\RRD\RrdDefinition;
 
-$storage_cache = array();
-
 foreach (dbFetchRows('SELECT * FROM storage WHERE device_id = ?', array($device['device_id'])) as $storage) {
     $descr = $storage['storage_descr'];
     $mib = $storage['storage_mib'];
@@ -15,7 +13,7 @@ foreach (dbFetchRows('SELECT * FROM storage WHERE device_id = ?', array($device[
         ->addDataset('used', 'GAUGE', 0)
         ->addDataset('free', 'GAUGE', 0);
 
-    $file = $config['install_dir'].'/includes/polling/storage/'. $mib .'.inc.php';
+    $file = \LibreNMS\Config::get('install_dir') . '/includes/polling/storage/' . $mib . '.inc.php';
     if (is_file($file)) {
         include $file;
     }
@@ -38,7 +36,8 @@ foreach (dbFetchRows('SELECT * FROM storage WHERE device_id = ?', array($device[
     $tags = compact('mib', 'descr', 'rrd_name', 'rrd_def');
     data_update($device, 'storage', $tags, $fields);
 
-    $update = dbUpdate(array('storage_used' => $storage['used'], 'storage_free' => $storage['free'], 'storage_size' => $storage['size'], 'storage_units' => $storage['units'], 'storage_perc' => $percent), 'storage', '`storage_id` = ?', array($storage['storage_id']));
+    // NOTE: casting to string for mysqli bug (fixed by mysqlnd)
+    $update = dbUpdate(array('storage_used' => (string)$storage['used'], 'storage_free' => (string)$storage['free'], 'storage_size' => (string)$storage['size'], 'storage_units' => $storage['units'], 'storage_perc' => $percent), 'storage', '`storage_id` = ?', array($storage['storage_id']));
 
     echo "\n";
 }//end foreach

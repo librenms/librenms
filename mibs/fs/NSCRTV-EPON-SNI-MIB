@@ -1,0 +1,719 @@
+
+NSCRTV-EPON-SNI-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Counter32, Unsigned32, TimeTicks
+        FROM SNMPv2-SMI
+    DateAndTime, MacAddress, TimeStamp, RowStatus, TruthValue, DisplayString, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    EponDeviceIndex, EponCardIndex, EponPortIndex, EponAlarmCode, EponAlarmInstance, EponSeverityType,
+    AutoNegotiationTechAbility, TAddress, EponStats15MinRecordType, EponStats24HourRecordType, EponStatsThresholdType
+		FROM NSCRTV-EPONEOC-EPON-MIB
+    sniObjects
+        FROM NSCRTV-EPONEOC-EPON-MIB;
+        
+--------------------------------------------------------------------------------
+--  sniObjects [OLT上联端口属性管理项](1.3.6.1.4.1.17409.2.3.2)
+--------------------------------------------------------------------------------  
+       
+    sniAttributeTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF SniAttributeEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A list of sniAttributeTable entries. "
+        ::= {sniObjects 1 }
+        
+    sniAttributeEntry  OBJECT-TYPE
+        SYNTAX      SniAttributeEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION  
+            "The sniAttributeEntry Information"
+        INDEX       { sniAttributeDeviceIndex, sniAttributeCardIndex,sniAttributePortIndex }   
+        ::={sniAttributeTable 1 }   
+        
+    SniAttributeEntry ::= SEQUENCE {
+        sniAttributeDeviceIndex              INTEGER,  
+        sniAttributeCardIndex                EponCardIndex,
+        sniAttributePortIndex                EponPortIndex,         
+        sniPortName                 DisplayString,
+        sniAdminStatus              INTEGER,
+        sniOperationStatus          INTEGER,
+        sniMediaType                INTEGER,
+        sniAutoNegotiationStatus    INTEGER,
+        sniAutoNegotiationMode      INTEGER,
+        sniPerfStats15minuteEnable  TruthValue,
+        sniPerfStats24hourEnable    TruthValue,
+        sniLastStatusChangeTime     TimeTicks,
+        sniMacAddrLearnMaxNum       INTEGER,
+        sniIsolationEnable          TruthValue
+      } 
+
+    sniAttributeDeviceIndex  OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Device Index"
+        ::= {sniAttributeEntry 1 }      
+        
+    sniAttributeCardIndex  OBJECT-TYPE
+        SYNTAX      EponCardIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Card Index"
+        ::= {sniAttributeEntry 2 }  
+        
+    sniAttributePortIndex  OBJECT-TYPE
+        SYNTAX      EponPortIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Port Index"
+        ::= {sniAttributeEntry 3 }     
+
+    sniPortName  OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Port Name"
+        ::= {sniAttributeEntry 4 }
+        
+    sniAdminStatus  OBJECT-TYPE
+        SYNTAX      INTEGER {
+            up(1),    
+            down(2),
+            testing(3)
+            }      
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Admin Status"
+        ::= {sniAttributeEntry 5 }     
+
+    sniOperationStatus  OBJECT-TYPE
+        SYNTAX  INTEGER {
+            up(1), 
+            down(2),
+            testing(3)
+            }     
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Operation Status"
+        ::= {sniAttributeEntry 6 }    
+
+    sniMediaType  OBJECT-TYPE
+        SYNTAX      INTEGER {
+            twistedPair(1),
+            fiber(2),
+            other(3)
+            }             
+
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Media Type"
+        ::= {sniAttributeEntry 7 }     
+
+    sniAutoNegotiationStatus  OBJECT-TYPE
+        SYNTAX      INTEGER {
+            auto-negotiate(1),
+            half-10(2),
+            full-10(3), 
+            half-100(4),
+            full-100(5),
+            full-1000(6),            
+            full-10000(7),
+            unknown(8)
+            }             
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Auto Negotiation Status"
+        ::= {sniAttributeEntry 8 }
+        
+    sniAutoNegotiationMode  OBJECT-TYPE
+        SYNTAX      INTEGER {
+            auto-negotiate(1),
+            half-10(2),
+            full-10(3), 
+            half-100(4),
+            full-100(5),
+            full-1000(6),            
+            full-10000(7)
+            }   
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Auto Negotiation Mode"
+        ::= {sniAttributeEntry 9 }     
+
+    sniPerfStats15minuteEnable  OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "true(1) false(2)"
+        ::= {sniAttributeEntry 10 } 
+        
+    sniPerfStats24hourEnable  OBJECT-TYPE
+        SYNTAX      TruthValue      
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "true(1) false(2)"
+        ::= {sniAttributeEntry 11 }     
+
+    sniLastStatusChangeTime  OBJECT-TYPE
+        SYNTAX      TimeTicks
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Last Change Time"
+        ::= {sniAttributeEntry 12 }
+        
+    sniMacAddrLearnMaxNum  OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Number of MAC address limited on the SNI port.            
+            value 0 means no limit"
+        ::= {sniAttributeEntry 13 }     
+
+    sniIsolationEnable  OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Whether or not isolate the SNI port to other ports"
+        ::= {sniAttributeEntry 14 } 
+  
+  sniTrunkManagement  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION 
+      ""
+    ::= { sniObjects 2 }
+       
+    sniTrunkGroupConfigTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF SniTrunkGroupConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A list of sniTrunkGroupConfigTable entries."
+        ::= {sniTrunkManagement 1 }
+        
+    sniTrunkGroupConfigEntry  OBJECT-TYPE
+        SYNTAX      SniTrunkGroupConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION  
+            "The sniTrunk Group Config Entry Information"
+        INDEX       { sniTrunkGroupConfigIndex }    
+        ::={sniTrunkGroupConfigTable 1 }   
+        
+    SniTrunkGroupConfigEntry ::= SEQUENCE {
+        sniTrunkGroupConfigIndex      INTEGER,  
+        sniTrunkGroupConfigName       DisplayString,
+        sniTrunkGroupConfigMember     OCTET STRING,     
+        sniTrunkGroupConfigPolicy     INTEGER,
+        sniTrunkGroupConfigRowstatus  RowStatus
+      } 
+
+    sniTrunkGroupConfigIndex  OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Trunk Group Config Index"
+        ::= {sniTrunkGroupConfigEntry 1 } 
+            
+    sniTrunkGroupConfigName  OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Trunk Group Config Name"
+        ::= {sniTrunkGroupConfigEntry 2 }     
+        
+    sniTrunkGroupConfigMember  OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Trunk Group Config Member.            
+            It is presented by member port list. Each member port is identified
+            by 4-byte format, same as TC of EponDeviceIndex. The actual length of
+            this string depends of the number of member ports in the trunk group.
+            The relationship is:            
+            Length of the string = 4 * (NUM of member ports)              
+            For example, if device 1, port 1/2 and 2/3 is the member ports of the
+            trunk, then sniTrunkGroupConfigMember is presented as:
+            01 01 02 00 01 02 03 00
+            "
+        ::= {sniTrunkGroupConfigEntry 3 }
+    sniTrunkGroupConfigPolicy  OBJECT-TYPE
+        SYNTAX      INTEGER
+            {
+      srcMac(1),        
+      destMac(2),       
+      srcMacNDestMac(3),
+      srcIp(4),         
+      destIp(5),        
+      srcIpNDestIp(6)  
+             }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Trunk Group Config Policy"
+        ::= {sniTrunkGroupConfigEntry 4 }   
+
+    sniTrunkGroupConfigRowstatus  OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Trunk Group Config Rowstatus"
+        ::= {sniTrunkGroupConfigEntry 5 } 
+  
+    sniTrunkGroupTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF SniTrunkGroupEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "a list of sniTrunkGroupConfigTable entries. "
+        ::= {sniTrunkManagement 2 }
+        
+    sniTrunkGroupEntry  OBJECT-TYPE
+        SYNTAX      SniTrunkGroupEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION  
+            "Trunk Group Entry"
+        INDEX       { sniTrunkGroupIndex }    
+        ::={sniTrunkGroupTable 1 }   
+        
+    SniTrunkGroupEntry ::= SEQUENCE {
+        sniTrunkGroupIndex            INTEGER,  
+        sniTrunkGroupOperationStatus  INTEGER,
+        sniTrunkGroupActualSpeed      INTEGER,     
+        sniTrunkGroupAdminStatus      INTEGER
+      }
+
+    sniTrunkGroupIndex  OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Trunk Group Index "
+        ::= {sniTrunkGroupEntry 1 } 
+        
+    sniTrunkGroupOperationStatus  OBJECT-TYPE
+        SYNTAX  INTEGER {
+            up(1), 
+            down(2),
+            testing(3)
+            } 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Trunk Group Operation Status"
+        ::= {sniTrunkGroupEntry 2 }   
+
+    sniTrunkGroupActualSpeed  OBJECT-TYPE
+        SYNTAX      INTEGER
+        UNITS   "Mbps"
+        MAX-ACCESS  read-only
+        STATUS      current 
+        DESCRIPTION
+            "Trunk Group Actual Speed.            
+            The speed is the aggregated rates of all operational UP member
+            ports of the trunk.            
+            For example, 4 member ports of the trunk, two are UP, each is 1000M
+            then the SUN is 2000M. As a result, the return of the MIB shall be
+            2000Mbps"
+        ::= {sniTrunkGroupEntry 3 } 
+        
+    sniTrunkGroupAdminStatus  OBJECT-TYPE
+        SYNTAX      INTEGER {
+            up(1),       
+            down(2),
+            testing(3)  
+            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Trunk Group AdminStatus"
+        ::= {sniTrunkGroupEntry 4 }
+
+    sniMirrorTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF SniMirrorEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "a list of sniMirrorTable entries."
+        ::= {sniObjects 3 }
+        
+    sniMirrorEntry  OBJECT-TYPE
+        SYNTAX      SniMirrorEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION  
+            "The Mirror Information."
+        INDEX       { sniMirrorGroupIndex }
+        ::={sniMirrorTable 1 }   
+        
+    SniMirrorEntry ::= SEQUENCE {
+        sniMirrorGroupIndex           INTEGER,  
+        sniMirrorGroupName            DisplayString,
+        sniMirrorGroupDstPortList     OCTET STRING,         
+        sniMirrorGroupSrcInPortList   OCTET STRING,
+        sniMirrorGroupSrcOutPortList  OCTET STRING,
+        sniMirrorGroupRowstatus       RowStatus
+      } 
+
+    sniMirrorGroupIndex  OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Mirror Group Index"
+        ::= {sniMirrorEntry 1 } 
+
+    sniMirrorGroupName  OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Mirror Group Name"
+        ::= {sniMirrorEntry 2 } 
+
+    sniMirrorGroupDstPortList  OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Mirror Group Dst Port List.            
+            It is presented by destination port list. Each  port is identified
+            by 4-byte format, same as TC of EponDeviceIndex. The actual length of
+            this string depends of the number of destination ports in this mirror 
+            instance.            
+            The relationship is:            
+            Length of the string = 4 * (NUM of ports)              
+            For example, if device 1, port 2/3 is the destination port of the
+            mirror instance, then object will be presented as:
+            01 02 03 00
+            "
+        ::= {sniMirrorEntry 3 }
+
+    sniMirrorGroupSrcInPortList  OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Mirror Group Src In Port List.            
+            It will includes the PON ports.            
+            It is presented by source ingress port list. Each  port is identified
+            by 4-byte format, same as TC of EponDeviceIndex. The actual length of
+            this string depends of the number of source ingress ports in this mirror 
+            instance.            
+            The relationship is:            
+            Length of the string = 4 * (NUM of ports)              
+            For example, if device 1, port 2/3, device 6, port 7/8 is the source
+            ingress port of the mirror instance, then object will be presented as:
+            01 02 03 00 06 07 08 00            
+            "
+        ::= {sniMirrorEntry 4 }
+        
+    sniMirrorGroupSrcOutPortList  OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Mirror Group Src Out Port List.            
+            It will includes the PON ports.            
+            It is presented by source egress port list. Each  port is identified
+            by 4-byte format, same as TC of EponDeviceIndex. The actual length of
+            this string depends of the number of source egress ports in this mirror 
+            instance.            
+            The relationship is:            
+            Length of the string = 4 * (NUM of ports)              
+            For example, if device 1, port 2/3, device 6, port 7/8 is the source
+            egress port of the mirror instance, then object will be presented as:
+            01 02 03 00 06 07 08 00
+            "  
+        ::= {sniMirrorEntry 5 }
+        
+    sniMirrorGroupRowstatus  OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Mirror Group Rowstatus"
+        ::= {sniMirrorEntry 6 } 
+
+  sniMacAddressManagement OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION 
+      ""
+    ::= { sniObjects 4 }
+
+    sniMacAddressManagementTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF SniMacAddressManagementEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION  
+            " A list of MacAddressManagement entries. "
+        ::= { sniMacAddressManagement 1 }
+
+    sniMacAddressManagementEntry  OBJECT-TYPE
+        SYNTAX      SniMacAddressManagementEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION  
+            "The Mac Address Management Information"
+        INDEX   { sniMacAddressManagementDeviceIndex }
+        ::= { sniMacAddressManagementTable 1 }
+
+    SniMacAddressManagementEntry ::=  SEQUENCE {
+        sniMacAddressManagementDeviceIndex            INTEGER,
+        sniMacAddrTableAgingTime  INTEGER,
+        sniMacAddrTableClear      INTEGER           
+        }
+     
+    sniMacAddressManagementDeviceIndex  OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION  
+            "device Index"
+        ::= { sniMacAddressManagementEntry 1 }
+          
+    sniMacAddrTableAgingTime   OBJECT-TYPE
+        SYNTAX      INTEGER 
+        UNITS   "Seconds"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Mac Address Table Aging Time"
+        ::= { sniMacAddressManagementEntry 2 }
+
+    sniMacAddrTableClear OBJECT-TYPE
+        SYNTAX      INTEGER { allDynamic(1) }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Mac Address Table Clear"
+        ::= { sniMacAddressManagementEntry 3 }
+
+    sniMacAddressTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF SniMacAddressEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A list of MacAddress entries."
+        ::= { sniMacAddressManagement 2 }
+
+    sniMacAddressEntry OBJECT-TYPE
+        SYNTAX      SniMacAddressEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The Mac Address Information"
+        INDEX   { sniMacAddrIndex,  sniMacAddrVlanIdIndex }
+        ::= { sniMacAddressTable 1 }
+
+    SniMacAddressEntry ::= SEQUENCE {
+        sniMacAddrIndex        MacAddress,
+        sniMacAddrVlanIdIndex  INTEGER,
+        sniMacAddrType         INTEGER,      
+        sniMacAddrPortId       EponDeviceIndex,
+        sniMacAddrRowStatus    RowStatus
+        }
+
+    sniMacAddrIndex OBJECT-TYPE
+        SYNTAX      MacAddress
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Mac Address Index"
+        ::= { sniMacAddressEntry 1 } 
+
+    sniMacAddrVlanIdIndex   OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Mac Address Vlan Id Index"
+        ::= { sniMacAddressEntry 2 } 
+
+    sniMacAddrType  OBJECT-TYPE
+        SYNTAX  INTEGER { 
+            static(1),
+            dynamic(2),
+            other(3)}
+        MAX-ACCESS  read-create
+        STATUS    current
+        DESCRIPTION
+            "Mac Address Type"
+        ::= { sniMacAddressEntry 3}
+
+    sniMacAddrPortId OBJECT-TYPE 
+        SYNTAX       EponDeviceIndex
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION     
+            "Mac Address Port Id"
+        ::=  {  sniMacAddressEntry 4 }
+
+    sniMacAddrRowStatus  OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "delete,create,Update"
+        ::= { sniMacAddressEntry 5 }
+
+    sniBroadcastStormSuppressionTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF SniBroadcastStormSuppressionEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A list of BroadcastStormSuppression entries."
+        ::= { sniObjects 5 }
+
+    sniBroadcastStormSuppressionEntry OBJECT-TYPE
+        SYNTAX      SniBroadcastStormSuppressionEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The Broadcast Storm Suppression Information"
+        INDEX   { sniBroadcastStormSuppressionDeviceIndex,  sniBroadcastStormSuppressionCardIndex,  sniBroadcastStormSuppressionPortIndex  }
+        ::= { sniBroadcastStormSuppressionTable 1 }
+
+    SniBroadcastStormSuppressionEntry ::=
+        SEQUENCE {
+            sniBroadcastStormSuppressionDeviceIndex                  INTEGER,
+            sniBroadcastStormSuppressionCardIndex                    EponCardIndex,
+            sniBroadcastStormSuppressionPortIndex                    EponPortIndex,
+            sniUnicastStormEnable               TruthValue,
+            sniUnicastStormInPacketRate        INTEGER,
+            sniUnicastStormOutPacketRate       INTEGER,      
+            sniMulticastStormEnable         TruthValue,
+            sniMulticastStormInPacketRate   INTEGER,
+            sniMulticastStormOutPacketRate  INTEGER,
+            sniBroadcastStormEnable         TruthValue,
+            sniBroadcastStormInPacketRate   INTEGER,
+            sniBroadcastStormOutPacketRate  INTEGER
+        }
+
+    sniBroadcastStormSuppressionDeviceIndex OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "device Index"
+        ::= { sniBroadcastStormSuppressionEntry 1 }
+
+    sniBroadcastStormSuppressionCardIndex OBJECT-TYPE
+        SYNTAX      EponCardIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "card Index"
+        ::= { sniBroadcastStormSuppressionEntry 2 }   
+
+    sniBroadcastStormSuppressionPortIndex  OBJECT-TYPE
+        SYNTAX      EponPortIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "port Index"
+        ::= { sniBroadcastStormSuppressionEntry 3 }
+
+    sniUnicastStormEnable  OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Cast Storm Enable"
+        ::= { sniBroadcastStormSuppressionEntry 4 }
+    sniUnicastStormInPacketRate  OBJECT-TYPE
+        SYNTAX      INTEGER
+        UNITS   "pps"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Cast Storm In Packet Rate"
+        ::= { sniBroadcastStormSuppressionEntry 5 }
+
+    sniUnicastStormOutPacketRate  OBJECT-TYPE
+        SYNTAX      INTEGER
+        UNITS   "pps"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Cast Storm Out Packet Rate"
+        ::= { sniBroadcastStormSuppressionEntry 6 }
+
+    sniMulticastStormEnable  OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "true(1) false(2)"
+        ::= { sniBroadcastStormSuppressionEntry 7 }
+
+    sniMulticastStormInPacketRate  OBJECT-TYPE
+        SYNTAX      INTEGER
+        UNITS   "pps"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Multicast Storm In Packet Rate"
+        ::= { sniBroadcastStormSuppressionEntry 8 }
+
+    sniMulticastStormOutPacketRate  OBJECT-TYPE
+        SYNTAX      INTEGER
+        UNITS   "pps"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Multicast Storm Out Packet Rate"
+        ::= { sniBroadcastStormSuppressionEntry 9 }
+
+    sniBroadcastStormEnable  OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "true(1) false(2)"
+        ::= { sniBroadcastStormSuppressionEntry 10 }
+
+    sniBroadcastStormInPacketRate  OBJECT-TYPE
+        SYNTAX      INTEGER
+        UNITS   "pps"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Broadcast Storm In Packet Rate"
+        ::= { sniBroadcastStormSuppressionEntry 11 }
+
+    sniBroadcastStormOutPacketRate  OBJECT-TYPE
+        SYNTAX      INTEGER
+        UNITS   "pps"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Broadcast Storm Out Packet Rate"
+        ::= { sniBroadcastStormSuppressionEntry 12 }
+
+--
+-- END of NSCRTV-EPON-SNI-MIB
+--
+
+END

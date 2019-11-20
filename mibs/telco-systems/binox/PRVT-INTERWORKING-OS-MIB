@@ -1,0 +1,620 @@
+-- *********************************************************************
+-- **
+-- ** BATM Advanced Communications.
+-- **
+-- *********************************************************************
+-- ** Filename: PRVT-INTERWORKING-OS-MIB.mib
+-- ** Project: T-Metro Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2009, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications and contains
+-- proprietary and confidential information. This file is made
+-- available to authorized BATM customers on the express
+-- condition that neither it, nor any of the information contained
+-- therein, shall be disclosed to third parties or be used for any
+-- purpose other than to replace, modify or upgrade firmware and/or
+-- software components of BATM manufactured equipment within the
+-- authorized customer's network, and that such transfer be
+-- completed in accordance with the instructions provided by
+-- BATM. Any other use is strictly prohibited.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SOFTWARE PROGRAMS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+--
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SOFTWARE CONTAINED IN THIS FILE.
+--
+-- ----------------------------------------------------------------------------
+
+PRVT-INTERWORKING-OS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    InetAddress, InetAddressType, InetPortNumber
+        FROM INET-ADDRESS-MIB
+    software
+        FROM PRVT-SWITCH-MIB
+    Integer32, MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    DateAndTime, DisplayString, TEXTUAL-CONVENTION, TestAndIncr
+        FROM SNMPv2-TC;
+
+prvtInterworkingOSMIB MODULE-IDENTITY
+    LAST-UPDATED "201105120000Z"
+    ORGANIZATION 
+        "BATM Advanced Communication"
+    CONTACT-INFO 
+        "BATM/Telco Systems Support team
+         Email:
+         For North America: techsupport@telco.com
+         For North Europe: support@batm.de, info@batm.de
+         For the rest of the world: techsupport@telco.com"
+    DESCRIPTION 
+        "The MIB enables display configuration of the device OS features."
+    REVISION    "201105120000Z"
+    DESCRIPTION 
+        "Clarified behavior of prvtBootConfigUpgrade objects."
+    REVISION    "201010140000Z"
+    DESCRIPTION 
+        "Added prvtConfigFiles."
+    REVISION    "200908060000Z"
+    DESCRIPTION 
+        "Initial version."
+    ::= { software 1 }
+
+
+PrvtFileLocationType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "A value that represents a type of a file location interface.
+         fileSystem(1)    -- The local file system.
+         runningBinary(2) -- The running configuration on RAM, as a binary file interface
+         runningScript(3) -- The running configuration on RAM, as a CLI-script file interface
+         techSupport(4)   -- The CLI show command output
+         tftp(5)          -- A remote file system reached by the TFTP protocol
+         ftp(6)           -- A remote file system reached by the FTP protocol."
+    SYNTAX      INTEGER { fileSystem(1), runningBinary(2), 
+                    runningScript(3), techSupport(4), tftp(5), ftp(6) }
+
+prvtInterworkingOSMIBObjects OBJECT IDENTIFIER
+    ::= { prvtInterworkingOSMIB 1 }
+
+version OBJECT IDENTIFIER
+    ::= { prvtInterworkingOSMIBObjects 1 }
+
+oSversionNumber OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This object identifies version number of the OS"
+    ::= { version 1 }
+
+oSversionDate OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This object identifies version date of the OS"
+    ::= { version 2 }
+
+bootVersionDate OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This object identifies boot version date of the OS"
+    ::= { version 3 }
+
+management OBJECT IDENTIFIER
+    ::= { prvtInterworkingOSMIBObjects 2 }
+
+managementMisc OBJECT IDENTIFIER
+    ::= { management 1 }
+
+managementMiscReset OBJECT-TYPE
+    SYNTAX      INTEGER { noop(1), reset(2), resetToDefaults(3), 
+                    saveAndReset(4) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Physically performs a hardware reset of the unit.
+         Use with care. A reset (2) resets the unit, the
+         resetToDefaults (3) resets the configuration file
+         to factory defaults and then resets the unit, the value of
+         saveAndReset (4) saves the config and then resets the unit and
+         noop (1) does nothing.
+         A value of noop (1) is always returned
+         for a GET operation."
+    ::= { managementMisc 1 }
+
+managementMiscReload OBJECT-TYPE
+    SYNTAX      INTEGER { noop(1), saveAndReload(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Reload the unit software, the unit hardware will not
+         be affected. A value of noop (1) is always returned for a
+         GET operation."
+    ::= { managementMisc 2 }
+
+managementMiscReloadInTime OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(4))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Indicates time for scheduled reload without save in hour:min.
+         octets contents range
+         1 day 0x01..0x1f (1-31)
+         2 month 0x01..0x0C (1..12)
+         where january = 1 december = 12
+         3 hour 0x01..0x17 (0..23)
+         4 min 0x01..3B (0..59)
+         For example: 0x01 0x01 0x01 0x01 means 1 January 01:01.
+         To stop scheduled reload set it to 0x00 0x00 0x00 0x00"
+    ::= { managementMisc 3 }
+
+managementMiscReloadAtTime OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(4))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Indicates time for scheduled reload without save at day:month:hour:min.
+         octets contents range
+         1 day 0x01..0x1f (1-31)
+         2 month 0x01..0x0C (1..12)
+         where january = 1 december = 12
+         3 hour 0x01..0x17 (0..23)
+         4 min 0x01..3B (0..59)
+         For example: 0x01 0x01 0x01 0x01 means 1 January 01:01.
+         To stop scheduled reload set it to 0x00 0x00 0x00 0x00"
+    ::= { managementMisc 4 }
+
+prvtBootConfigUpgrade OBJECT IDENTIFIER
+    ::= { management 2 }
+
+prvtBootUpgradeSrcURI OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The object represents an address from where the application
+         will be copied during an upgrade process initiated using the
+         object prvtBootUpgradeCmd.
+         The address must be given in a valid URI format.
+         
+         Examples:
+         ftp://myuser:mypass@netaddress/MyApps/Imagev1.5.Z
+         tftp://netaddress/MyApps/Imagev1.5.Z"
+    REFERENCE   
+        "See rfc3986"
+    ::= { prvtBootConfigUpgrade 1 }
+
+prvtBootApplicationName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This object contains the file name of the application that will
+         be loaded upon the next restart.
+         Sets to this object must be the file name of an existing OS image.
+         A list of existing OS images can be obtained by performing a walk
+         of prvtFileSystemFileName.osImage.
+         Sets with the name of a non-existing OS image will result in an
+         error response.
+         Note that no validation of the image is performed when a new image
+         is selected by writing to this object."
+    ::= { prvtBootConfigUpgrade 2 }
+
+prvtBootUpgradeCmd OBJECT-TYPE
+    SYNTAX      INTEGER { none(0), ready(1), apply(2), applyExec(3) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This field is used to initiate an upgrade process.
+         The object prvtBootUpgradeSrcURI is to contain the source URI of where
+         to obtain the new image.
+         When a get request is executed, the returned value will be always ready.
+         When a set with the value applyExec is made to this object, the upgrade
+         process is started."
+    ::= { prvtBootConfigUpgrade 4 }
+
+prvtBootOperStatus OBJECT-TYPE
+    SYNTAX      INTEGER { unknown(0), ready(1), notReady(2), 
+                    upgradeInProgress(3) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The object is used to show the current status of the upgrading process. The
+         default value is ready(1), indicating that the process is idle.
+         upgradeInProgress(3) indicates an upgrade process has started and has not finished
+         yet."
+    ::= { prvtBootConfigUpgrade 5 }
+
+prvtBootErrorCondition OBJECT-TYPE
+    SYNTAX      INTEGER { noError(0), genericError(1), copyFailed(2), 
+                    downloadFailed(3), freeSpaceError(4), 
+                    validationFailed(5), backupFailed(6), 
+                    inProgressError(7), consistencyError(8), 
+                    fileSystemError(9), profileNameError(10), 
+                    profileError(11), fileNameError(12), pathError(13), 
+                    zFileError(14), cannotFindFile(15), 
+                    defApplicationProfileError(16), 
+                    configProfileError(17), bootDevProfileError(18), 
+                    ftpServerProfileError(19), ftpUserProfileError(20), 
+                    ftpPassProfileError(21) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This object gives the error condition of the most recent upgrade process initiated
+         using the object prvtBootUpgradeCmd."
+    ::= { prvtBootConfigUpgrade 6 }
+
+prvtConfigFiles OBJECT IDENTIFIER
+    ::= { management 3 }
+
+prvtConfigFileAction OBJECT IDENTIFIER
+    ::= { prvtConfigFiles 1 }
+
+prvtConfigFileSource OBJECT IDENTIFIER
+    ::= { prvtConfigFileAction 1 }
+
+prvtConfigSourceType OBJECT-TYPE
+    SYNTAX      PrvtFileLocationType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The type of the location of the source file used by prvtConfigAction."
+    ::= { prvtConfigFileSource 1 }
+
+prvtConfigSourceFileName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The name of the file intended to be copied if prvtConfigAction='copy';
+         or the file whose name is to be changed if prvtConfigFileAction='rename';
+         or the file to be merged to running configuration if prvtConfigAction='merge'.
+         Otherwise, has no significance."
+    ::= { prvtConfigFileSource 2 }
+
+prvtConfigFileTarget OBJECT IDENTIFIER
+    ::= { prvtConfigFileAction 2 }
+
+prvtConfigTargetType OBJECT-TYPE
+    SYNTAX      PrvtFileLocationType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The type of the location of the destination file used by prvtConfigAction."
+    ::= { prvtConfigFileTarget 1 }
+
+prvtConfigTargetFileName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The name of the file intended to be copied to if prvtConfigAction='copy';
+         or the new file name if prvtConfigFileAction='rename'. Otherwise, has no significance."
+    ::= { prvtConfigFileTarget 2 }
+
+prvtConfigFileRemote OBJECT IDENTIFIER
+    ::= { prvtConfigFileAction 3 }
+
+prvtConfigRemoteAddressType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The address type of prvtConfigRemoteAddress.
+         Note that prvtConfigAction currently only support actions that use IPv4 address types."
+    REFERENCE   
+        "prvtConfigAction"
+    ::= { prvtConfigFileRemote 1 }
+
+prvtConfigRemoteAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The IP address of the remote file server to use for the upload or download request."
+    REFERENCE   
+        "prvtConfigAction"
+    ::= { prvtConfigFileRemote 2 }
+
+prvtConfigRemotePort OBJECT-TYPE
+    SYNTAX      InetPortNumber
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The transport protocol port to use for the upload or download request.
+         The value '0' indicates to use the IANA default port number for the selected protocol."
+    REFERENCE   
+        "prvtConfigAction"
+    ::= { prvtConfigFileRemote 3 }
+
+prvtConfigRemoteUser OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The user name to use for the upload or download request."
+    REFERENCE   
+        "prvtConfigAction"
+    ::= { prvtConfigFileRemote 4 }
+
+prvtConfigRemotePassword OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The user password to use for the upload or download request."
+    REFERENCE   
+        "prvtConfigAction"
+    ::= { prvtConfigFileRemote 5 }
+
+prvtConfigActionSpinLock OBJECT-TYPE
+    SYNTAX      TestAndIncr
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This object is used to facilitate prvtConfigAction
+         sets by multiple managers, specifically sets that transitions
+         prvtConfigAction from 'idle' to 'prepare'.
+         
+         The procedure for performing this transition is as follows:
+           1. Retrieve the value of prvtConfigAction. If value is not 'idle',
+              then wait until prvtConfigAction returns to 'idle'.
+           2. Retrieve the value of prvtConfigActionSpinLock.
+           3. Within a single set request packet, set the value of prvtConfigActionSpinLock
+              to the retrieved value, and the value of prvtConfigAction to 'prepare'.
+              If the set fails for the prvtConfigActionSpinLock object, go back to step 1.
+         
+         Note that the use of the prvtConfigActionSpinLock object is optional
+         (prvtConfigAction can be set without using prvtConfigActionSpinLock)."
+    ::= { prvtConfigFileAction 4 }
+
+prvtConfigAction OBJECT-TYPE
+    SYNTAX      INTEGER { idle(1), prepare(2), copy(3), rename(4), 
+                    merge(5) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Represents a file action request to be committed immediately (with set request) or that
+         is being commited (with get request).
+         
+         idle = there is no action being performed or prepared
+         prepare = parameters of an action are being edited. This is used by the manager to
+           willingly avoid editing parameters while another manager does so.
+         copy = copy a file from source to target, where source and target have a broad meaning
+          (local/remote file system or running configuration). See details below.
+         rename = rename a local file (see details below)
+         merge = merge a local file to running configuration
+         
+         Allowed Transitions:
+         * idle to prepare
+         * prepare to any other
+         
+         Automatic Transitions:
+         * copy to idle, when action is done
+         * rename to idle, when action is done
+         * merge to idle, when action is done
+         
+         ******************************
+         *       Action = copy        *
+         ******************************
+         The following table gives the corresponding CLI command for each combination of source and target type.
+         
+         +--------------+----------------------+----------------------+---------------+----------------------+
+         |      \ Target|fileSystem            |runningBinary         |runningScript  |ftp                   |
+         |Source \      |                      |                      |               |                      |
+         +--------------+----------------------+----------------------+---------------+----------------------+
+         |fileSystem    |file cp from          |file restore          |file replace   |file cp from          |
+         |              |SRC                   |binary-running-config |SRC            |SRC                   |
+         |              |TRG                   |flash                 |               |FTP_TRG               |
+         +--------------+----------------------+----------------------+---------------+----------------------+
+         |techSupport   |file cp               |-- not legal --       |-- not legal --|file cp               |
+         |              |technical-support     |                      |               |technical-support     |
+         |              |TRG                   |                      |               |FTP_TRG               |
+         +--------------+----------------------+----------------------+---------------+----------------------+
+         |runningBinary |file backup           |-- not legal --       |-- not legal --|file backup           |
+         |              |binary-running-config |                      |               |binary-running-config |
+         |              |flash                 |                      |               |FTP_TRG               |
+         +--------------+----------------------+----------------------+---------------+----------------------+
+         |runningScript |file cp               |-- not legal --       |-- not legal --|file cp               |
+         |              |running-configuration |                      |               |running-configuration |
+         |              |TRG                   |                      |               |FTP_TRG               |
+         +--------------+----------------------+----------------------+---------------+----------------------+
+         |ftp           |file cp from          |file restore          |-- not legal --|-- not legal --       |
+         |              |FTP_SRC               |binary-running-config |               |                      |
+         |              |TRG                   |FTP_SRC               |               |                      |
+         +--------------+----------------------+----------------------+---------------+----------------------+
+         Comments:
+         (a) FTP_SRC denotes ftp://[USER[:PSW]@]ADR[:PORT]/SRC
+            FTP_TRG denotes ftp://[USER[:PSW]@]ADR[:PORT]/TRG
+         (b) SRC, TRG, USER, PSW, ADR and PORT are respectively the values of prvtConfigSourceFileName,
+            prvtConfigTargetFileName, prvtConfigRemoteUser, prvtConfigRemotePassword,
+            prvtConfigRemoteAddress and prvtConfigRemotePort.
+            When any of these are not mentioned in the command, then the value is not relevant.
+         (c) tftp is the same as ftp, except that USER, PSW are not used
+         (d) the error 'inconsistentValue' is returned for any combination marked 'not legal'
+         (e) a successful execution of a copy action when target type is 'runningBinary' (equivalent CLI
+            command is 'file restore binary-running config ...') results in a system reload
+         (f) The above comments are also applicable to the other actions explained below.
+         
+         ******************************
+         *       Action = rename      *
+         ******************************
+         equivalent to CLI command: file mv SRC TRG
+         prvtConfigTargetType and prvtConfigSourceType must equal to 'fileSystem'
+         
+         ******************************
+         *       Action = merge       *
+         ******************************
+         equivalent to CLI command: file merge SRC
+         prvtConfigSourceType must equal 'fileSystem'
+         prvtConfigTargetType must equal 'runningScript'
+         
+         ******************************
+         *       Examples             *
+         ******************************
+         [1] To save the binary of the running configuration to a remote ftp server, with default username,
+            default password, default port, IP = 10.2.144.20, and target file name 'example.bin', the
+            procedure would be (assuming that prvtConfigAction is initially in 'idle' state):
+         set prvtConfigAction <- 'prepare'
+         set prvtConfigSourceType <- 'runningBinary'
+         set prvtConfigTargetType <- 'ftp'
+         set prvtConfigTargetFileName <- 'example.bin'
+         set prvtConfigRemoteAddress  <- '10.2.144.20'
+         set prvtConfigAction <- 'copy'
+         
+         [2] To rename a file named 'first.txt' to 'second.txt', the procedure would be
+            (assuming that prvtConfigAction is initially in 'idle' state):
+         set prvtConfigAction <- 'prepare'
+         set prvtConfigSourceType <- 'fileSystem'
+         set prvtConfigTargetType <- 'fileSystem'
+         set prvtConfigSourceFileName <- 'first.txt'
+         set prvtConfigTargetFileName <- 'second.txt'
+         set prvtConfigAction <- 'rename'"
+    ::= { prvtConfigFileAction 5 }
+
+prvtFileSystem OBJECT IDENTIFIER
+    ::= { management 4 }
+
+prvtFileSystemSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The size of the file system flash."
+    ::= { prvtFileSystem 1 }
+
+prvtFileSystemUsedSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The size of the currently used part of the file system flash."
+    ::= { prvtFileSystem 2 }
+
+prvtFileSystemFreeSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The size of the currently free to use part of the file system flash."
+    ::= { prvtFileSystem 3 }
+
+prvtFileSystemFileTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtFileSystemFileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A table of files existing in the device's file system."
+    ::= { prvtFileSystem 4 }
+
+prvtFileSystemFileEntry OBJECT-TYPE
+    SYNTAX      PrvtFileSystemFileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry of prvtFileSystemFileTable."
+    INDEX       { prvtFileSystemFileType, prvtFileSystemFileIndex }
+    ::= { prvtFileSystemFileTable 1 }
+
+PrvtFileSystemFileEntry ::= SEQUENCE {
+    prvtFileSystemFileType      INTEGER,
+    prvtFileSystemFileIndex     Unsigned32,
+    prvtFileSystemFileCreated   DateAndTime,
+    prvtFileSystemFileSize      Unsigned32,
+    prvtFileSystemFileName      DisplayString,
+    prvtFileSystemFileDelete    DisplayString
+}
+
+prvtFileSystemFileType OBJECT-TYPE
+    SYNTAX      INTEGER { other(1), osImage(2) }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The file type.
+         The value 'osImage' signals that this file is a software image
+         file for possible use by the device."
+    ::= { prvtFileSystemFileEntry 1 }
+
+prvtFileSystemFileIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An index uniquely identifying a file.
+         This value does not change through-out the lifetime of a file,
+         but may change after system restarts.
+         Note that after a file has been deleted, this value may be re-used
+         by a newly created file with the same or a different file name."
+    ::= { prvtFileSystemFileEntry 2 }
+
+prvtFileSystemFileCreated OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Represents the date and time this file was created."
+    ::= { prvtFileSystemFileEntry 3 }
+
+prvtFileSystemFileSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Represents the size of this file."
+    ::= { prvtFileSystemFileEntry 4 }
+
+prvtFileSystemFileName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Represents the name of this file."
+    ::= { prvtFileSystemFileEntry 5 }
+
+prvtFileSystemFileDelete OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "May be used to delete a file.
+         To delete a file, this object must be set equal to the value of
+         prvtFileSystemFileName of the same row.
+         Note that some files are protected from being deleted.
+         Reads of this object always return a zero-length string."
+    ::= { prvtFileSystemFileEntry 6 }
+
+cpu OBJECT IDENTIFIER
+    ::= { prvtInterworkingOSMIBObjects 3 }
+
+cpuMonitoring OBJECT IDENTIFIER
+    ::= { cpu 1 }
+
+cpuMonitoringUtilization OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The object shows the current CPU utilization"
+    ::= { cpuMonitoring 1 }
+
+END -- end of module PRVT-INTERWORKING-OS-MIB.

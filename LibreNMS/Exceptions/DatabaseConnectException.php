@@ -19,13 +19,51 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2017 Tony Murray
+ * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace LibreNMS\Exceptions;
 
-class DatabaseConnectException extends \Exception
-{
+use Illuminate\Database\QueryException;
+use LibreNMS\Interfaces\Exceptions\UpgradeableException;
 
+class DatabaseConnectException extends \Exception implements UpgradeableException
+{
+    /**
+     * Try to convert the given Exception to a DatabaseConnectException
+     *
+     * @param \Exception $exception
+     * @return static|null
+     */
+    public static function upgrade($exception)
+    {
+        // connect exception, convert to our standard connection exception
+        return $exception instanceof QueryException && in_array($exception->getCode(), [1044, 1045, 2002]) ?
+            new static(
+                config('app.debug') ? $exception->getMessage() : $exception->getPrevious()->getMessage(),
+                $exception->getCode(),
+                $exception
+            ) :
+            null;
+    }
+
+    /**
+     * Render the exception into an HTTP or JSON response.
+     *
+     * @param  \Illuminate\Http\Request
+     * @return \Illuminate\Http\Response
+     */
+    public function render(\Illuminate\Http\Request $request)
+    {
+        $title = __('Error connecting to database');
+
+        return $request->wantsJson() ? response()->json([
+            'status' => 'error',
+            'message' => "$title: " . $this->getMessage(),
+        ]) : response()->view('errors.generic', [
+            'title' => $title,
+            'content' => $this->getMessage(),
+        ]);
+    }
 }

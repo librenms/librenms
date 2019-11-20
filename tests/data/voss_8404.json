@@ -1,0 +1,20 @@
+{
+    "processors": {
+        "discovery": {
+            "processors": [
+                {
+                    "entPhysicalIndex": "0",
+                    "hrDeviceIndex": "0",
+                    "processor_oid": ".1.3.6.1.4.1.2272.1.85.10.1.1.3.1",
+                    "processor_index": "1",
+                    "processor_type": "voss",
+                    "processor_usage": "88",
+                    "processor_descr": "VOSS Processor",
+                    "processor_precision": "1",
+                    "processor_perc_warn": "75"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

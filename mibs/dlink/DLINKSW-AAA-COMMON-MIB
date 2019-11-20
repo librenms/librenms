@@ -1,0 +1,192 @@
+-- *****************************************************************
+-- DLINKSW-AAA-COMMON-MIB:  D-Link AAA Common MIB
+--
+--  Copyright (c) 2013 D-Link Corporation, all rights reserved.
+--
+-- *****************************************************************
+
+DLINKSW-AAA-COMMON-MIB DEFINITIONS ::= BEGIN
+
+
+    IMPORTS
+	    MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE,
+	    Integer32
+		    FROM SNMPv2-SMI
+	    MODULE-COMPLIANCE,	OBJECT-GROUP
+		    FROM SNMPv2-CONF		
+		TEXTUAL-CONVENTION, TruthValue
+	        FROM SNMPv2-TC
+	    dlinkIndustrialCommon
+		    FROM DLINK-ID-REC-MIB;
+
+
+    dlinkSwAAACommonMIB MODULE-IDENTITY
+	    LAST-UPDATED	"201301170000Z"
+	    ORGANIZATION	"D-Link Corp."
+	    CONTACT-INFO
+		    "        D-Link Corporation
+
+                Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                        Taipei City 114, Taiwan, R.O.C
+                Tel:     +886-2-66000123
+                E-mail: tsd@dlink.com.tw
+            "
+	DESCRIPTION
+		"The MIB module	for configuring AAA common feature.
+		 This MIB module also provides Textual Conventions 
+         and OBJECT-IDENTITY Objects to be used AAA services.
+		"
+	REVISION	 "201301170000Z"
+	DESCRIPTION
+		"This is the first version of the MIB file."  
+	::= { dlinkIndustrialCommon 150 }
+
+
+
+--
+-- Textual Conventions
+--
+
+    DAaaSessionType ::= TEXTUAL-CONVENTION
+        STATUS          current
+        DESCRIPTION
+            "Represents a session type.
+
+            telnet(1) - indicates telnet session.
+
+            console(2) - indicates console session.
+
+            ssh(3) - indicates ssh session.
+
+            http(4) - indicates http session.
+            " 
+        SYNTAX    INTEGER {
+            telnet(1),
+            console(2),
+            ssh(3),
+            http(4)
+        }
+
+
+    DAaaPrivilegeLevel ::= TEXTUAL-CONVENTION
+        STATUS          current
+        DESCRIPTION
+            "Represents privilege level.
+            "
+        SYNTAX          Integer32  (1..15)
+
+
+
+    DAaaMethodListName ::= TEXTUAL-CONVENTION
+        STATUS          current
+        DESCRIPTION
+            "Represents the name of a method list.
+
+            The following name are reserved and cannot be used as the name of 
+            method list:
+            enable, none, local, tacacs, xtacacs, tacacs+, radius             
+            "
+        SYNTAX          OCTET STRING (SIZE (1..32))
+
+
+    DAaaMethodPriority ::= TEXTUAL-CONVENTION
+        STATUS       current
+        DESCRIPTION
+            "Represents the priority of a method. Lower numbers indicate
+            higher priority.
+            "
+        SYNTAX          Integer32  (1..4)
+
+
+    DAaaMethodName ::= TEXTUAL-CONVENTION
+        STATUS          current
+        DESCRIPTION
+            "Represents method name.
+
+            The following name are reserved and cannot be used as method name:
+            enable, local, tacacs, and xtacacs
+       
+            The following name are reserved method name which can be applied but cannot
+            be manually created:
+            none, tacacs+ and radius.
+            
+            none - Do not perform accounting or authentication.
+            radius - Use the servers defined at dasServerConfigTable (the value of dasServerProtocol
+                    is 'radius').
+            tacacs+ - Use the servers defined at dasServerConfigTable (the value of dasServerProtocol
+                    is 'tacacsplus').             
+            The name of dasGroupName - Uses the servers which are grouped into the specified group
+                    in dasGroupTable.
+            "
+        SYNTAX        OCTET STRING (SIZE(1..32))
+               
+-- -----------------------------------------------------------------------------
+    dAaaCommonMIBNotifications 	OBJECT IDENTIFIER ::= { dlinkSwAAACommonMIB 0 }
+               
+    dAaaMIBObjects    OBJECT-IDENTITY 
+        STATUS          current
+        DESCRIPTION
+            "This object provides OBJECT-IDENTITY for other AAA MIB modules.                     
+            "
+        ::= { dlinkSwAAACommonMIB 1 }
+
+    dAaaCommonMIBConformance	OBJECT IDENTIFIER ::= { dlinkSwAAACommonMIB 2 }
+    
+-- ----------------------------------------------------------------------------- 
+    dAaaCommonObjects    OBJECT-IDENTITY 
+        STATUS          current
+        DESCRIPTION
+            "Group of objects that are related to the common AAA feature.                          
+            "
+     ::= { dAaaMIBObjects 1 }
+    
+    dAaaNewModelEnabled OBJECT-TYPE
+	    SYNTAX	        TruthValue                   
+	    MAX-ACCESS      read-write
+	    STATUS	        current
+	    DESCRIPTION
+	        "Set this object to 'true' to enable AAA global state, then the
+	        authentication and  accounting via the AAA method lists will 
+	        take effect.
+	        Set this object to 'false' to globally disable AAA.
+	        "
+        DEFVAL { false }
+	    ::= { dAaaCommonObjects	1 }
+
+
+-- ******************************************************************
+-- Conformance and Compliance
+-- ******************************************************************
+
+    dAaaCommonMIBCompliances  OBJECT IDENTIFIER ::= { dAaaCommonMIBConformance 1 }
+    
+
+
+    daaaMIBCompliance MODULE-COMPLIANCE
+	    STATUS	    current
+	    DESCRIPTION
+	        "The compliance statement for entities which implement the 
+	        DLINKSW-AAA-COMMON-MIB.
+	        "
+	    MODULE	    -- this module
+	    MANDATORY-GROUPS
+	    {
+	      daaaGlobalCtrlGroup
+	    }
+   	    ::= { dAaaCommonMIBCompliances	1 }
+
+
+-- units of conformance
+    dAaaCommonMIBGroups	      OBJECT IDENTIFIER ::= { dAaaCommonMIBConformance 2 }
+    daaaGlobalCtrlGroup OBJECT-GROUP
+        OBJECTS {
+            dAaaNewModelEnabled
+        }
+        STATUS      current
+        DESCRIPTION
+            "Objects for globally configuring AAA feature.
+	        "
+        ::= { dAaaCommonMIBGroups 1 }
+
+END
+

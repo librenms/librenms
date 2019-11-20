@@ -1,0 +1,262 @@
+--  Title:    DPS_CG.MIB
+--  Version:  v1.0 for SNMPv2c
+--
+--  Copyright @ 2013 DPS Inc. All Rights Reserved
+--
+--  This MIB defines objects to support Cellguard Battery System Monitoring on DPS Products.
+--
+--
+
+DPS-MIB-CG-V1 DEFINITIONS ::= BEGIN
+
+IMPORTS
+	DisplayString
+		FROM SNMPv2-TC
+	enterprises
+		FROM RFC1155-SMI
+	MODULE-IDENTITY,
+	NOTIFICATION-TYPE,	
+	OBJECT-TYPE,
+	Integer32
+		FROM SNMPv2-SMI;
+		
+dpsCellguard	MODULE-IDENTITY
+	LAST-UPDATED	"201310181200Z"  --October 18th, 2013 12:00 PDT
+	ORGANIZATION	"DPS Telecom"
+	CONTACT-INFO	"DPS Support Team 
+			Web 	http://dpstele.com/support
+			E-Mail 	support@dpstele.com
+			Phone	(559)454-1600"
+	DESCRIPTION	"MIB for Cellguard BSM support on DPS Products"
+
+	REVISION	"201310181200Z"  --October 18th, 2013 12:00 PDT
+	DESCRIPTION	"First Revision (CTS)"
+
+	::= { dpsInc 2 }
+
+	dpsInc OBJECT IDENTIFIER ::= {enterprises  2682}
+	
+--Table for accessing string measurement values
+
+cgStringChannels OBJECT-TYPE
+	SYNTAX  SEQUENCE OF CgStringEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION "Holds information on Cellguard battery strings."
+	::= {dpsCellguard 1}
+
+cgStringEntry OBJECT-TYPE
+	SYNTAX  CgStringEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION "Information about a particular string."
+	INDEX   {cgStrNumber}
+	::= {cgStringChannels 1}
+	
+CgStringEntry ::= SEQUENCE	{	cgStrNumber	Integer32,
+					cgStrEnabled	INTEGER,
+					cgStrStatus	DisplayString,
+					cgStrVoltage		DisplayString,
+					cgStrCurrent	DisplayString,
+					cgStrTempA DisplayString,
+					cgStrTempB DisplayString,
+					cgStrConductance DisplayString,
+					cgStrLife DisplayString
+				}
+
+cgStrNumber OBJECT-TYPE
+	SYNTAX  Integer32 (1..6)
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "String number (1-6)"
+	::= {cgStringEntry 1}	
+
+cgStrEnabled OBJECT-TYPE
+	SYNTAX  INTEGER	{	disabled	(0),
+				enabled		(1)
+			}		
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "Enable status of string"
+	::= {cgStringEntry 2}	
+	
+cgStrStatus OBJECT-TYPE
+	SYNTAX  DisplayString 
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "The alarm status of the string."
+	::= {cgStringEntry 3}	
+	
+cgStrVoltage OBJECT-TYPE
+	SYNTAX  DisplayString 
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "The voltage measurement of the string."
+	::= {cgStringEntry 4}	
+	
+cgStrCurrent OBJECT-TYPE
+	SYNTAX  DisplayString 
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "The current measurement of the string."
+	::= {cgStringEntry 5}
+
+cgStrTempA OBJECT-TYPE
+	SYNTAX  DisplayString 
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "Temperature sensor A measurement."
+	::= {cgStringEntry 6}	
+
+cgStrTempB OBJECT-TYPE
+	SYNTAX  DisplayString 
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "Temperature sensor B measurement."
+	::= {cgStringEntry 7}		
+	
+cgStrConductance OBJECT-TYPE
+	SYNTAX  DisplayString 
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "The average conductance measurement of the string."
+	::= {cgStringEntry 8}
+
+cgStrLife OBJECT-TYPE
+	SYNTAX  DisplayString 
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "The average battery capacity of the string."
+	::= {cgStringEntry 9}		
+
+	
+--Table for accessing battery measurement values
+
+cgBatteryChannels OBJECT-TYPE
+	SYNTAX  SEQUENCE OF CgBatteryEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION "Holds information on batteries."
+	::= {dpsCellguard 2}
+
+cgBatteryEntry OBJECT-TYPE
+	SYNTAX  CgBatteryEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION "Information about a particular battery."
+	INDEX   {cgStringNumber, cgBatteryNumber}
+	::= {cgBatteryChannels 1}
+	
+CgBatteryEntry ::= SEQUENCE	{	cgStringNumber INTEGER,
+					cgBatteryNumber	INTEGER,
+					cgStatus	DisplayString,
+					cgVoltage		DisplayString,
+					cgTemperature DisplayString,
+					cgStrapResist DisplayString,
+					cgConductance DisplayString,
+					cgBatteryLife DisplayString
+				}
+
+cgStringNumber OBJECT-TYPE
+	SYNTAX  INTEGER (1..6)
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "String number (1-6)"
+	::= {cgBatteryEntry 1}	
+	
+cgBatteryNumber OBJECT-TYPE
+	SYNTAX  INTEGER (1..240)
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "Battery number (1-240)"
+	::= {cgBatteryEntry 2}					
+
+cgStatus OBJECT-TYPE
+	SYNTAX  DisplayString 
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "The alarm status of the battery."
+	::= {cgBatteryEntry 3}	
+
+cgVoltage OBJECT-TYPE
+	SYNTAX  DisplayString 
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "The voltage measurement of the battery."
+	::= {cgBatteryEntry 4}	
+	
+cgTemperature OBJECT-TYPE
+	SYNTAX  DisplayString 
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "The temperature measurement of the battery."
+	::= {cgBatteryEntry 5}		
+
+cgStrapResist OBJECT-TYPE
+	SYNTAX  DisplayString 
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "The strap resistance measurement."
+	::= {cgBatteryEntry 6}	
+	
+cgConductance OBJECT-TYPE
+	SYNTAX  DisplayString 
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "The conductance measurement of the battery."
+	::= {cgBatteryEntry 7}	
+	
+cgBatteryLife OBJECT-TYPE
+	SYNTAX  DisplayString 
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION "The capacity of the battery."
+	::= {cgBatteryEntry 8}	
+	
+-- TRAP definitions
+		
+cellguardTrap OBJECT IDENTIFIER ::= {dpsCellguard 8000}
+
+cgAlarmTrap NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "Alarm info from Cellguard system."
+    ::= { cellguardTrap 1 }
+	
+cgTrapType OBJECT-TYPE
+	SYNTAX INTEGER {	unknown	(0),
+				voltage (1),
+				current (2),
+				temperature (3),
+				strapResistance (4),
+				life (5),
+				conductance (6)
+			}	
+	MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "Trap threshold type."
+    ::= { cellguardTrap 2 }
+	
+cgTrapStatus OBJECT-TYPE
+	SYNTAX INTEGER {	noAlarm	(0),
+				minorUnder		(1),
+				minorOver (2),
+				majorUnder (3),
+				majorOver (4),
+				notDetected (5)
+			}		
+	MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "Trap threshold status."
+    ::= { cellguardTrap 3 }
+	
+cgTrapValue OBJECT-TYPE
+	SYNTAX  DisplayString 
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION "Trap most recent measurement reading."
+	::= {cellguardTrap 4}	
+	
+END

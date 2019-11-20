@@ -1,0 +1,1001 @@
+NBS-SIGCOND-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    Unsigned32, OBJECT-TYPE, NOTIFICATION-TYPE,
+    MODULE-IDENTITY, OBJECT-IDENTITY
+        FROM SNMPv2-SMI
+
+    InterfaceIndex, ifAlias
+        FROM IF-MIB
+
+    nbs, NbsTcMilliDb, NbsTcMHz
+        FROM NBS-MIB;
+
+
+nbsSigCondMib  MODULE-IDENTITY
+    LAST-UPDATED "201707270000Z"  -- July 27, 2017
+    ORGANIZATION "NBS"
+    CONTACT-INFO
+      "For technical support, please contact your service channel"
+
+    DESCRIPTION
+      "Signal Conditioning mib"
+    ::= { nbs 227 }
+
+-- *******************************************************************
+-- NBS-SIGCOND-MIB local defines
+-- *******************************************************************
+
+nbsSigCondVoaPortGrp  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+      "Variable Optical Attenuation at the port level."
+    ::= { nbsSigCondMib 1 }
+
+nbsSigCondVoaChannelGrp  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+      "Variable Optical Attenuation at the channel level."
+    ::= { nbsSigCondMib 2}
+
+nbsSigCondRamanGrp  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+      "Raman amplifier information for the port."
+    ::= { nbsSigCondMib 3 }
+
+nbsSigCondEqualizeGrp  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+      "Management info for equalizing power levels among channels
+       within a WDM port"
+    ::= { nbsSigCondMib 20 }
+
+nbsSigCondRedundGrp   OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+      "Management info for power level based redundancy"
+    ::= { nbsSigCondMib 30 }
+
+nbsSigCondPortGrp  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+      "Power readings from the port."
+    ::= { nbsSigCondMib 40 }
+
+nbsSigCondChannelGrp   OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+      "Signal info for WDM channels within a WDM port"
+    ::= { nbsSigCondMib 50 }
+
+nbsSigCondVodPortGrp  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+      "Dispersion compensation at the port level."
+    ::= { nbsSigCondMib 60 }
+
+
+nbsSigCondTraps  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION "SNMP Traps or Notifications"
+    ::= { nbsSigCondMib 200 }
+
+nbsSigCondEvent OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION "SNMP Traps or Notifications"
+    ::= { nbsSigCondTraps 0 }
+
+
+-- *******************************************************************
+--
+-- the nbsSigCondVoaPortTable
+--
+-- *******************************************************************
+
+nbsSigCondVoaPortTableSize OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The number of ports supporting variable optical attenuation
+           at the port level."
+        ::= { nbsSigCondVoaPortGrp 1 }
+
+nbsSigCondVoaPortTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF NbsSigCondVoaPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "List of ports supporting variable optical attenuation at the
+           port level."
+        ::= { nbsSigCondVoaPortGrp 2 }
+
+NbsSigCondVoaPortEntry ::= SEQUENCE {
+        nbsSigCondVoaPortIfIndex        InterfaceIndex,
+        nbsSigCondVoaPortRxAttenuAdmin  INTEGER,
+        nbsSigCondVoaPortRxAttenuOper   INTEGER,
+        nbsSigCondVoaPortTxAttenuAdmin  INTEGER,
+        nbsSigCondVoaPortTxAttenuOper   INTEGER
+}
+
+nbsSigCondVoaPortEntry      OBJECT-TYPE
+        SYNTAX      NbsSigCondVoaPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          ""
+        INDEX { nbsSigCondVoaPortIfIndex }
+        ::= { nbsSigCondVoaPortTable 1 }
+
+nbsSigCondVoaPortIfIndex   OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "The Mib2 ifIndex of the attenuable port."
+        ::= { nbsSigCondVoaPortEntry 1 }
+
+nbsSigCondVoaPortRxAttenuAdmin OBJECT-TYPE
+        SYNTAX      INTEGER (-100000..100000)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "Persistent and immediately updated.  User-requested
+           attenuation to be applied to received signal, expressed in
+           millidecibels (mdB).
+           Not supported value: -200000"
+        DEFVAL { 0 }
+        ::= { nbsSigCondVoaPortEntry 2 }
+
+nbsSigCondVoaPortRxAttenuOper OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Attenuation actually being applied to received signal, in
+           millidecibels (mdB).
+           Not supported value: -200000"
+        DEFVAL { 0 }
+        ::= { nbsSigCondVoaPortEntry 3 }
+
+nbsSigCondVoaPortTxAttenuAdmin OBJECT-TYPE
+        SYNTAX      INTEGER (-100000..100000)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "Persistent and immediately updated.  User-requested
+           attenuation to be applied before transmitting signal,
+           expressed in millidecibels (mdB).
+           Not supported value: -200000"
+        DEFVAL { 0 }
+        ::= { nbsSigCondVoaPortEntry 4 }
+
+nbsSigCondVoaPortTxAttenuOper OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Attenuation actually being applied before transmitting
+           signal, in millidecibels (mdB).
+           Not supported value: -200000"
+        DEFVAL { 0 }
+        ::= { nbsSigCondVoaPortEntry 5}
+
+
+
+-- *******************************************************************
+--
+-- the nbsSigCondVoaChannelTbl
+--
+-- *******************************************************************
+
+nbsSigCondVoaChannelRangeTableSize OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The number of mux ports supporting variable optical
+           attenuation at the channel level."
+        ::= { nbsSigCondVoaChannelGrp 1 }
+
+nbsSigCondVoaChannelRangeTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF NbsSigCondVoaChannelRangeEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "The channel attenuation values supported on this port."
+        ::= { nbsSigCondVoaChannelGrp 2 }
+
+NbsSigCondVoaChannelRangeEntry ::= SEQUENCE {
+        nbsSigCondVoaChannelRangeIfIndex InterfaceIndex,
+        nbsSigCondVoaChannelRangeMin     NbsTcMilliDb,
+        nbsSigCondVoaChannelRangeMax     NbsTcMilliDb,
+        nbsSigCondVoaChannelRangeIncr    NbsTcMilliDb
+}
+
+nbsSigCondVoaChannelRangeEntry      OBJECT-TYPE
+        SYNTAX      NbsSigCondVoaChannelRangeEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          ""
+        INDEX { nbsSigCondVoaChannelRangeIfIndex }
+        ::= { nbsSigCondVoaChannelRangeTable 1 }
+
+nbsSigCondVoaChannelRangeIfIndex   OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "The Mib2 ifIndex of the mux port."
+        ::= { nbsSigCondVoaChannelRangeEntry 1 }
+
+nbsSigCondVoaChannelRangeMin     OBJECT-TYPE
+        SYNTAX      NbsTcMilliDb
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The lowest channel attenuation value supported by this mux
+           port, expressed in millidecibels (mdB).
+
+           This is the smallest attenuation supported."
+        DEFVAL { 0 }
+        ::= { nbsSigCondVoaChannelRangeEntry 2 }
+
+nbsSigCondVoaChannelRangeMax     OBJECT-TYPE
+        SYNTAX      NbsTcMilliDb
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The greatest channel attenuation value supported by this mux
+           port, expressed in millidecibels (mdB).
+
+           This is the largest attenuation supported."
+        DEFVAL { 0 }
+        ::= { nbsSigCondVoaChannelRangeEntry 3 }
+
+
+nbsSigCondVoaChannelRangeIncr     OBJECT-TYPE
+        SYNTAX      NbsTcMilliDb
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The precision of the VOA, expressed in
+           millidecibels (mdB).
+
+           The minimum difference between attenuation values."
+        DEFVAL { 0 }
+        ::= { nbsSigCondVoaChannelRangeEntry 4 }
+
+-- *******************************************************************
+--
+-- the nbsSigCondRamanTable
+--
+-- *******************************************************************
+
+nbsSigCondRamanTableSize OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The number of raman ports in this system."
+        ::= { nbsSigCondRamanGrp 1 }
+
+nbsSigCondRamanTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF NbsSigCondRamanEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "Table of Raman readings."
+        ::= { nbsSigCondRamanGrp 2 }
+
+NbsSigCondRamanEntry ::= SEQUENCE {
+        nbsSigCondRamanIfIndex      InterfaceIndex,
+        nbsSigCondRamanPumpPwrAdmin INTEGER,
+        nbsSigCondRamanPumpPwrOper  INTEGER
+}
+
+nbsSigCondRamanEntry      OBJECT-TYPE
+        SYNTAX      NbsSigCondRamanEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "Raman readings on an individual port."
+        INDEX { nbsSigCondRamanIfIndex }
+        ::= { nbsSigCondRamanTable 1 }
+
+nbsSigCondRamanIfIndex   OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "The Mib2 ifIndex of the Raman port"
+        ::= { nbsSigCondRamanEntry 1 }
+
+nbsSigCondRamanPumpPwrAdmin OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "Persistent and immediately updated.  User-requested pump
+           power,  in microwatts (uW).
+           User interfaces should show this in millWatts (mW).
+           Not supported value:  -1"
+        ::= { nbsSigCondRamanEntry 2 }
+
+nbsSigCondRamanPumpPwrOper OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Agent reported pump power, in microwatts (uW).
+           User interfaces should show this in millWatts (mW).
+           Not supported value:  -1"
+        ::= { nbsSigCondRamanEntry 3 }
+
+
+-- *******************************************************************
+--
+-- the nbsSigCondEqualizeTable
+--
+-- *******************************************************************
+
+nbsSigCondEqualizeTableSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The number of entries in nbsSigCondEqualizeTable."
+    ::= { nbsSigCondEqualizeGrp 1 }
+
+nbsSigCondEqualizeTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NbsSigCondEqualizeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "List of WDM ports supporting power level equalization."
+    ::= { nbsSigCondEqualizeGrp 2 }
+
+NbsSigCondEqualizeEntry ::= SEQUENCE {
+    nbsSigCondEqualizeIfIndex       InterfaceIndex,
+    nbsSigCondEqualizeState         INTEGER,
+    nbsSigCondEqualizeLimitMin      NbsTcMilliDb,
+    nbsSigCondEqualizeLimitMax      NbsTcMilliDb,
+    nbsSigCondEqualizeDesiredMin    NbsTcMilliDb,
+    nbsSigCondEqualizeDesiredMax    NbsTcMilliDb,
+    nbsSigCondEqualizeDesiredVal    NbsTcMilliDb
+}
+
+nbsSigCondEqualizeEntry      OBJECT-TYPE
+    SYNTAX      NbsSigCondEqualizeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Equalization parameters and settings"
+    INDEX { nbsSigCondEqualizeIfIndex }
+    ::= { nbsSigCondEqualizeTable 1 }
+
+nbsSigCondEqualizeIfIndex   OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The Mib2 ifIndex of this channel's WDM port"
+    ::= { nbsSigCondEqualizeEntry 1 }
+
+nbsSigCondEqualizeState  OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notSupported (1),
+        disabled     (2),
+        enabled      (3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Used to enable or disable channel equalization on this port.
+
+        The value disabled(2) disables the feature.  No attempt to
+        equalize power levels will be made, and no equalization events
+        will be triggered.
+
+        The value enabled(3) enables the feature.  A best-effort
+        attempt to keep the port signal within the
+        nbsSigCondEqualizeDesired range will be made.  Equalization
+        events will be triggered if the power cannot be kept within
+        the nbsSigCondEqualizeDesired range.
+
+        If this port does not support equalization, this object will
+        report notSupported (1), and any SET requests to this object
+        will be rejected."
+    DEFVAL { disabled }
+    ::= { nbsSigCondEqualizeEntry 10 }
+
+nbsSigCondEqualizeLimitMin OBJECT-TYPE
+    SYNTAX      NbsTcMilliDb
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The lowest channel TxPower setting the equalizer supports"
+    ::= { nbsSigCondEqualizeEntry 11 }
+
+nbsSigCondEqualizeLimitMax OBJECT-TYPE
+    SYNTAX      NbsTcMilliDb
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The highest channel TxPower setting the equalizer supports"
+    ::= { nbsSigCondEqualizeEntry 12 }
+
+nbsSigCondEqualizeDesiredMin OBJECT-TYPE
+    SYNTAX      NbsTcMilliDb
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "The user-settable minimum channel TxPower level.
+
+        Allowed values are from nbsSigCondEqualizeLimitMin to
+        nbsSigCondEqualizeLimitMax, inclusive.
+
+        Equalizer must attempt to maintain the channels' signal at or
+        above this level.  The event nbsSigCondEventEqualizeTooLow
+        indicates that it was unable to meet the desired minimum
+        signal strength for a given channel."
+        DEFVAL { -50000 }
+    ::= { nbsSigCondEqualizeEntry 21 }
+
+nbsSigCondEqualizeDesiredMax OBJECT-TYPE
+    SYNTAX      NbsTcMilliDb
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "The user-settable maximum channel TxPower level.
+
+        Allowed values are from nbsSigCondEqualizeLimitMin to
+        nbsSigCondEqualizeLimitMax, inclusive.
+
+        Equalizer must attempt to maintain the channels' signal at or
+        below this level.  The event nbsSigCondEventEqualizeTooHigh
+        indicates that it was unable to meet the desired maximum
+        signal strength for a given channel."
+        DEFVAL { 0 }
+    ::= { nbsSigCondEqualizeEntry 22 }
+
+nbsSigCondEqualizeDesiredVal OBJECT-TYPE
+    SYNTAX      NbsTcMilliDb
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Equalizer must attempt to maintain the channels' signal at
+        this level.
+
+        Allowed values are from nbsSigCondEqualizeLimitMin to
+        nbsSigCondEqualizeLimitMax, inclusive."
+        DEFVAL { -25000 }
+    ::= { nbsSigCondEqualizeEntry 23 }
+
+
+
+ -- *******************************************************************
+ --
+-- the nbsSigCondRedundTable
+--
+-- *******************************************************************
+
+nbsSigCondRedundTableSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The number of entries in nbsSigCondRedund."
+    ::= { nbsSigCondRedundGrp 1 }
+
+nbsSigCondRedundTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NbsSigCondRedundEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "List of ports supporting power level redundancy."
+    ::= { nbsSigCondRedundGrp 2 }
+
+NbsSigCondRedundEntry ::= SEQUENCE {
+    nbsSigCondRedundIfIndex       InterfaceIndex,
+    nbsSigCondRedundLimitMin      NbsTcMilliDb,
+    nbsSigCondRedundLimitMax      NbsTcMilliDb,
+    nbsSigCondRedundDesiredMin    NbsTcMilliDb,
+    nbsSigCondRedundDesiredMax    NbsTcMilliDb
+}
+
+nbsSigCondRedundEntry      OBJECT-TYPE
+    SYNTAX      NbsSigCondRedundEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Redundancy  settings"
+    INDEX { nbsSigCondRedundIfIndex }
+    ::= { nbsSigCondRedundTable 1 }
+
+nbsSigCondRedundIfIndex   OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The Mib2 ifIndex of this channel's Redundancy port"
+    ::= { nbsSigCondRedundEntry 1 }
+
+nbsSigCondRedundLimitMin OBJECT-TYPE
+    SYNTAX      NbsTcMilliDb
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The lowest channel Power setting"
+    ::= { nbsSigCondRedundEntry 5 }
+
+nbsSigCondRedundLimitMax OBJECT-TYPE
+    SYNTAX      NbsTcMilliDb
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The highest channel Power setting"
+    ::= { nbsSigCondRedundEntry 8 }
+
+nbsSigCondRedundDesiredMin OBJECT-TYPE
+    SYNTAX      NbsTcMilliDb
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "The lowest channel Power setting before the redundancy kicks in"
+    ::= { nbsSigCondRedundEntry 10 }
+
+nbsSigCondRedundDesiredMax OBJECT-TYPE
+    SYNTAX      NbsTcMilliDb
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "The highest channel Power setting before the redundancy kicks in"
+    ::= { nbsSigCondRedundEntry 15 }
+
+
+
+-- *******************************************************************
+--
+-- the nbsSigCondPortTable
+--
+-- *******************************************************************
+
+nbsSigCondPortTableSize OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The number of entries in nbsSigCondPortTable."
+        ::= { nbsSigCondPortGrp 1 }
+
+nbsSigCondPortTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF NbsSigCondPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "Table of VOA and VGA ports."
+        ::= { nbsSigCondPortGrp 2 }
+
+NbsSigCondPortEntry ::= SEQUENCE {
+        nbsSigCondPortIfIndex      InterfaceIndex,
+        nbsSigCondPortRxPower      INTEGER,
+        nbsSigCondPortTxPower      INTEGER,
+        nbsSigCondPortReflection   INTEGER,
+        nbsSigCondPortRxPowerMin   INTEGER,
+        nbsSigCondPortRxPowerMax   INTEGER,
+        nbsSigCondPortNoiseFigure  INTEGER
+}
+
+nbsSigCondPortEntry      OBJECT-TYPE
+        SYNTAX      NbsSigCondPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          ""
+        INDEX { nbsSigCondPortIfIndex }
+        ::= { nbsSigCondPortTable 1 }
+
+nbsSigCondPortIfIndex   OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "The Mib2 ifIndex of the port"
+        ::= { nbsSigCondPortEntry 1 }
+
+nbsSigCondPortRxPower OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Measured receiver power, in millidecibels (mdBm).
+           User interfaces should show this in decibels (dBm).
+           Not supported value:  -100000"
+        ::= { nbsSigCondPortEntry 2 }
+
+nbsSigCondPortTxPower OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Measured transmitter power, in millidecibels (mdBm).
+           User interfaces should show this in decibels (dBm).
+           Not supported value:  -100000"
+        ::= { nbsSigCondPortEntry 3 }
+
+nbsSigCondPortReflection OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Measured back reflection power, in millidecibels (mdBm).
+           User interfaces should show this in decibels (dBm).
+           Not supported value:  -100000"
+        ::= { nbsSigCondPortEntry 4}
+
+nbsSigCondPortRxPowerMin OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Measured minimum receiver power, in millidecibels (mdBm).
+           User interfaces should show this in decibels (dBm).
+           Not supported value:  -100000"
+        ::= { nbsSigCondPortEntry 5 }
+
+nbsSigCondPortRxPowerMax OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Measured maximum receiver power, in millidecibels (mdBm).
+           User interfaces should show this in decibels (dBm).
+           Not supported value:  -100000"
+        ::= { nbsSigCondPortEntry 6 }
+
+nbsSigCondPortNoiseFigure OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Measured Noise Figure value, in millidecibels (mdB).
+           User interfaces should show this in decibels (dB).
+           Not supported value: -100000"
+        ::= { nbsSigCondPortEntry 7 }
+
+
+
+-- *******************************************************************
+--
+-- the nbsSigCondChannelGrp
+--
+-- *******************************************************************
+
+nbsSigCondChannelTableSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The number of entries in nbsSigCondChannelTable."
+    ::= { nbsSigCondChannelGrp 1 }
+
+nbsSigCondChannelTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NbsSigCondChannelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "WDM channels within a mux port"
+        ::= { nbsSigCondChannelGrp 2 }
+
+nbsSigCondChannelEntry      OBJECT-TYPE
+    SYNTAX      NbsSigCondChannelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       ""
+    INDEX { nbsSigCondChannelIfIndex, nbsSigCondChannelCenterline }
+    ::= { nbsSigCondChannelTable 1 }
+
+NbsSigCondChannelEntry ::= SEQUENCE {
+    nbsSigCondChannelIfIndex      InterfaceIndex,
+    nbsSigCondChannelCenterline   NbsTcMHz,
+    nbsSigCondChannelRxPower      NbsTcMilliDb,
+    nbsSigCondChannelTxPower      NbsTcMilliDb,
+    nbsSigCondChannelTxAttenu     NbsTcMilliDb,
+    nbsSigCondChannelRxAttenu     NbsTcMilliDb
+}
+
+nbsSigCondChannelIfIndex   OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The Mib2 ifIndex of this channel's mux port"
+    ::= { nbsSigCondChannelEntry 1 }
+
+nbsSigCondChannelCenterline   OBJECT-TYPE
+    SYNTAX      NbsTcMHz
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The center frequency of this channel, in MHz"
+    ::= { nbsSigCondChannelEntry 2 }
+
+nbsSigCondChannelRxPower   OBJECT-TYPE
+    SYNTAX      NbsTcMilliDb
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The dynamically measured or calculated receive signal strength"
+    ::= { nbsSigCondChannelEntry 11 }
+
+nbsSigCondChannelTxPower   OBJECT-TYPE
+    SYNTAX      NbsTcMilliDb
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The dynamically measured or calculated transmit signal
+        strength"
+    ::= { nbsSigCondChannelEntry 12 }
+
+nbsSigCondChannelTxAttenu   OBJECT-TYPE
+    SYNTAX      NbsTcMilliDb
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The actual attenuation applied to this channel, possibly
+        representing changes made by the equalization process if
+        nbsSigCondEqualizeState is enabled for this IfIndex."
+    ::= { nbsSigCondChannelEntry 14 }
+
+nbsSigCondChannelRxAttenu   OBJECT-TYPE
+    SYNTAX      NbsTcMilliDb
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The actual attenuation applied to this channel, possibly
+        representing changes made by the equalization process if
+        nbsSigCondEqualizeState is enabled for this IfIndex."
+    ::= { nbsSigCondChannelEntry 15 }
+
+-- *******************************************************************
+--
+-- the nbsSigCondVodPortTable
+--
+-- *******************************************************************
+
+nbsSigCondVodPortTableSize OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The number of ports supporting variable optical dispersion
+           at the port level."
+        ::= { nbsSigCondVodPortGrp 1 }
+
+nbsSigCondVodPortTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF NbsSigCondVodPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "List of ports supporting variable optical attenuation at the
+           port level."
+        ::= { nbsSigCondVodPortGrp 2 }
+
+NbsSigCondVodPortEntry ::= SEQUENCE {
+        nbsSigCondVodPortIfIndex                      InterfaceIndex,
+        nbsSigCondVodPortDispersionMin                INTEGER,
+        nbsSigCondVodPortDispersionMax                INTEGER,
+        nbsSigCondVodPortDispersionAdmin              INTEGER,
+        nbsSigCondVodPortDispersionOper               INTEGER,
+        nbsSigCondVodPortDispersionGridOffsetCenter   INTEGER,
+        nbsSigCondVodPortDispersionGridOffsetMin      INTEGER,
+        nbsSigCondVodPortDispersionGridOffsetMax      INTEGER,
+        nbsSigCondVodPortDispersionGridOffsetStep     INTEGER,
+        nbsSigCondVodPortDispersionGridOffsetExponent INTEGER,
+        nbsSigCondVodPortDispersionGridOffsetAdmin    INTEGER,
+        nbsSigCondVodPortDispersionGridOffsetOper     INTEGER
+}
+
+nbsSigCondVodPortEntry      OBJECT-TYPE
+        SYNTAX      NbsSigCondVodPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          ""
+        INDEX { nbsSigCondVodPortIfIndex }
+        ::= { nbsSigCondVodPortTable 1 }
+
+nbsSigCondVodPortIfIndex   OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "The Mib2 ifIndex of the dispersion compensation port."
+        ::= { nbsSigCondVodPortEntry 1 }
+
+nbsSigCondVodPortDispersionMin OBJECT-TYPE
+        SYNTAX      INTEGER (-100000..100000)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Minimum allowed dispersion compensation in ps/nm.
+
+           Not supported value: 0x80000000"
+
+        DEFVAL { 0 }
+        ::= { nbsSigCondVodPortEntry 2 }
+
+nbsSigCondVodPortDispersionMax OBJECT-TYPE
+        SYNTAX      INTEGER (-100000..100000)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Maximum allowed dispersion compensation in ps/nm.
+
+           Not supported value: 0x80000000"
+
+        DEFVAL { 0 }
+        ::= { nbsSigCondVodPortEntry 3 }
+
+nbsSigCondVodPortDispersionAdmin OBJECT-TYPE
+        SYNTAX      INTEGER (-100000..100000)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "Desired dispersion compensation in ps/nm.
+
+           Not supported value: 0x80000000"
+
+        DEFVAL { 0 }
+        ::= { nbsSigCondVodPortEntry 4 }
+
+nbsSigCondVodPortDispersionOper OBJECT-TYPE
+        SYNTAX      INTEGER (-100000..100000)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Actual dispersion in ps/nm
+
+           Not supported value: 0x80000000"
+
+        DEFVAL { 0 }
+        ::= { nbsSigCondVodPortEntry 5}
+
+nbsSigCondVodPortDispersionGridOffsetCenter OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The center frequency of the offset, in GigaHertz
+           (GHz), unless FreqExponent != 9.
+
+           Not supported value: 0"
+
+        ::= { nbsSigCondVodPortEntry 10 }
+
+nbsSigCondVodPortDispersionGridOffsetMin OBJECT-TYPE
+        SYNTAX      INTEGER (-100000..100000)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "In GigaHertz (GHz), unless FreqExponent != 9.
+
+           Not supported value: 0x80000000"
+
+        DEFVAL { -100 }
+        ::= { nbsSigCondVodPortEntry 11 }
+
+nbsSigCondVodPortDispersionGridOffsetMax OBJECT-TYPE
+        SYNTAX      INTEGER (-100000..100000)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "In GigaHertz (GHz), unless FreqExponent != 9.
+
+           Not supported value: 0x80000000"
+
+        DEFVAL { 100 }
+        ::= { nbsSigCondVodPortEntry 12 }
+
+nbsSigCondVodPortDispersionGridOffsetStep OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The spacing of the allowable grid offsets that this port
+           supports, in GigaHertz (GHz), unless FreqExponent != 9.
+
+           Not supported value: 0"
+
+        DEFVAL { 1 }
+        ::= { nbsSigCondVodPortEntry 13 }
+
+nbsSigCondVodPortDispersionGridOffsetExponent OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The exponent of all the GridOffset values (including
+           GridOffsetStep).
+
+           9 (the default) indicates all units are in GigaHertz (GHz)."
+
+        DEFVAL { 9 }
+        ::= { nbsSigCondVodPortEntry 14 }
+
+nbsSigCondVodPortDispersionGridOffsetAdmin OBJECT-TYPE
+        SYNTAX      INTEGER (-100000..100000)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "In GigaHertz (GHz), unless FreqExponent != 9.
+
+           Not supported value: 0x80000000"
+
+        ::= { nbsSigCondVodPortEntry 15 }
+
+nbsSigCondVodPortDispersionGridOffsetOper OBJECT-TYPE
+        SYNTAX      INTEGER (-100000..100000)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "In GigaHertz (GHz), unless FreqExponent != 9.
+
+           Not supported value: 0x80000000"
+
+        ::= { nbsSigCondVodPortEntry 16 }
+
+
+-- *******************************************************************
+--
+-- the nbsSigCondEvent group
+--
+-- *******************************************************************
+
+nbsSigCondEventEqualizeOk  NOTIFICATION-TYPE
+    OBJECTS  { nbsSigCondEqualizeIfIndex, ifAlias,
+        nbsSigCondChannelCenterline, nbsSigCondChannelTxPower,
+        nbsSigCondEqualizeDesiredMin, nbsSigCondEqualizeDesiredMax }
+    STATUS      current
+    DESCRIPTION
+       "Sent when equalizer becomes able to maintain TxPower within the
+        user-specified nbsSigCondEqualizeDesired range.
+
+        This Notification is of severity ERROR, which means it should
+        be emitted unless disabled or nbsCmmcSysTrapTblEntLevel is set
+        to a severity worse than error(3)."
+    ::= { nbsSigCondEvent 20 }
+
+nbsSigCondEventEqualizeTooLow  NOTIFICATION-TYPE
+    OBJECTS  { nbsSigCondEqualizeIfIndex, ifAlias,
+        nbsSigCondChannelCenterline, nbsSigCondChannelTxPower,
+        nbsSigCondEqualizeDesiredMin }
+    STATUS      current
+    DESCRIPTION
+       "Sent when equalizer becomes unable to maintain TxPower at or
+        above nbsSigCondEqualizeDesiredMin.
+
+        This Notification is of severity ERROR, which means it should
+        be emitted unless disabled or nbsCmmcSysTrapTblEntLevel is set
+        to a severity worse than error(3)."
+    ::= { nbsSigCondEvent 21}
+
+nbsSigCondEventEqualizeTooHigh  NOTIFICATION-TYPE
+    OBJECTS  { nbsSigCondEqualizeIfIndex, ifAlias,
+        nbsSigCondChannelCenterline, nbsSigCondChannelTxPower,
+        nbsSigCondEqualizeDesiredMax }
+    STATUS      current
+    DESCRIPTION
+       "Sent when equalizer becomes unable to maintain TxPower at or
+        below nbsSigCondEqualizeDesiredMax.
+
+        This Notification is of severity ERROR, which means it should
+        be emitted unless disabled or nbsCmmcSysTrapTblEntLevel is set
+        to a severity worse than error(3)."
+    ::= { nbsSigCondEvent 22 }
+
+END

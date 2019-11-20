@@ -1,0 +1,1119 @@
+-- ==================================================================
+-- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description: HUAWEI ALARM MIB
+-- Reference:
+-- Version: V2.14
+-- History: 
+--  V1.0      2009-03-20   publish
+-- ==================================================================
+
+    HUAWEI-ALARM-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            hwDatacomm            
+                FROM HUAWEI-MIB            
+            OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP            
+                FROM SNMPv2-CONF            
+            Integer32, Unsigned32, Counter64, OBJECT-TYPE, MODULE-IDENTITY, 
+            NOTIFICATION-TYPE            
+                FROM SNMPv2-SMI            
+            RowStatus, DateAndTime            
+                FROM SNMPv2-TC;
+    
+    
+        hwAlarmMIB MODULE-IDENTITY 
+            LAST-UPDATED "201707141136Z"        -- July 14, 2017 at 11:36 GMT
+            ORGANIZATION "Huawei Technologies Co.,Ltd."
+            CONTACT-INFO 
+                "Huawei Industrial Base
+                  Bantian, Longgang
+                   Shenzhen 518129
+                   People's Republic of China
+                   Website: http://www.huawei.com
+                   Email: support@huawei.com"
+            DESCRIPTION 
+                "The MIB module for creating and deleting bulk files of
+                SNMP data for file transfer."
+            REVISION "201707141136Z"        -- July 14, 2017 at 11:36 GMT
+            DESCRIPTION
+                "Revert to the revision 2.10."
+            REVISION "201702160943Z"        -- February 16, 2017 at 9:43 GMT
+            DESCRIPTION
+                "Revert to the revision 2.10."
+            REVISION "201310280943Z"        -- October 28, 2013 at 9:43 GMT
+            DESCRIPTION
+                "Revert to the revision 2.10."
+            REVISION "201310181643Z"        -- October 18, 2013 at 16:43 GMT
+            DESCRIPTION
+                "Add history alarm MIB."
+            REVISION "200912051150Z"        -- December 05, 2009 at 11:50 GMT
+            DESCRIPTION
+                "The initial revision of this MIB module ."
+            ::= { hwDatacomm 180 }  
+    
+--
+-- Node definitions
+--
+        hwAlarmObjects OBJECT IDENTIFIER ::= { hwAlarmMIB 1 }
+        
+        hwSnmpTargetAddrExtTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwSnmpTargetAddrExtEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Define snmp target Address extend table."
+            ::= { hwAlarmObjects 1 }
+        
+        hwSnmpTargetAddrExtEntry OBJECT-TYPE
+            SYNTAX HwSnmpTargetAddrExtEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The entry of the extended snmp target address table."
+            INDEX { IMPLIED hwSnmpTargetAddrExtIndex }
+            ::= { hwSnmpTargetAddrExtTable 1 }
+        
+        HwSnmpTargetAddrExtEntry ::=
+            SEQUENCE { 
+                hwSnmpTargetAddrExtIndex
+                    OCTET STRING,
+                hwSnmpTargetSlaveAddressList
+                    OCTET STRING,
+                hwSnmpTargetAddrReliability
+                    INTEGER,
+                hwSnmpTargetAddrAlarmReliability
+                    INTEGER,
+                hwSnmpTargetAddrEventReliability
+                    INTEGER,
+                hwSnmpTargetAddrExtRowStatus 
+                    RowStatus
+             }
+
+        hwSnmpTargetAddrExtIndex OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "the extended target address table index."
+            ::= { hwSnmpTargetAddrExtEntry 1 }
+        
+        hwSnmpTargetSlaveAddressList OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..255))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Address of slave target host."
+            ::= { hwSnmpTargetAddrExtEntry 2 }
+        
+        hwSnmpTargetAddrReliability OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enable(1),
+                disable(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "If enable, then the extend VBs will be added to the alarm parameters. "
+            DEFVAL { enable }
+            ::= { hwSnmpTargetAddrExtEntry 3 }
+        
+        hwSnmpTargetAddrAlarmReliability OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enable(1),
+                disable(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Alarm reliability function enable flag."
+            DEFVAL { enable }
+            ::= { hwSnmpTargetAddrExtEntry 4 }
+        
+        hwSnmpTargetAddrEventReliability OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enable(1),
+                disable(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Event reliability function enable flag. "
+            DEFVAL { enable }
+            ::= { hwSnmpTargetAddrExtEntry 5 }
+            
+        hwSnmpTargetAddrExtRowStatus OBJECT-TYPE
+           SYNTAX RowStatus
+           MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The row status of the target extend table."
+            ::= { hwSnmpTargetAddrExtEntry 6 }
+            
+        hwMinAlarmSyncIndex OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The minimal index value for alarm synchronization."
+            ::= { hwAlarmObjects 2 }
+        
+        hwMaxAlarmSyncIndex OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The maximal index value for alarm synchronization. "
+            ::= { hwAlarmObjects 3 }
+        hwAlarmSyncTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwAlarmSyncEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Alarm synchronization table. "
+            ::= { hwAlarmObjects 4 }
+        
+        hwAlarmSyncEntry OBJECT-TYPE
+            SYNTAX HwAlarmSyncEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Alarm synchronization table entry."
+            INDEX { hwSnmpTargetAddrExtIndex, hwAlarmSyncIndex }
+            ::= { hwAlarmSyncTable 1 }
+        
+        HwAlarmSyncEntry ::=
+            SEQUENCE { 
+                hwAlarmSyncIndex
+                    Unsigned32,
+                hwAlarmSyncId
+                    Counter64,
+                hwAlarmSyncPara
+                    OCTET STRING
+             }
+
+        hwAlarmSyncIndex OBJECT-TYPE
+            SYNTAX Unsigned32 (1..2147483647)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Alarm synchronization index."
+            ::= { hwAlarmSyncEntry 1 }
+        
+        hwAlarmSyncId OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Alarm id "
+            ::= { hwAlarmSyncEntry 2 }
+        
+        hwAlarmSyncPara OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..4096))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the information contained 
+                in the binding variable list of the alarm message."
+            ::= { hwAlarmSyncEntry 3 }
+        
+        hwMinEventSyncIndex OBJECT-TYPE
+            SYNTAX Unsigned32 (1..2147483647)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The minimal index value for event synchronization."
+            ::= { hwAlarmObjects 5 }
+        
+        hwMaxEventSyncIndex OBJECT-TYPE
+            SYNTAX Unsigned32 (1..2147483647)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The maximal index value for event synchronization. "
+            ::= { hwAlarmObjects 6 }
+        
+        hwEventSyncTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwEventSyncEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The event synchronization table."
+            ::= { hwAlarmObjects 7 }
+        
+        hwEventSyncEntry OBJECT-TYPE
+            SYNTAX HwEventSyncEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The event synchronization table entry."
+            INDEX { hwSnmpTargetAddrExtIndex, hwEventSyncIndex }
+            ::= { hwEventSyncTable 1 }
+        
+        HwEventSyncEntry ::=
+            SEQUENCE { 
+                hwEventSyncIndex
+                    Unsigned32,
+                hwEventSyncId
+                    Counter64,
+                hwEventSyncPara
+                    OCTET STRING
+             }
+
+        hwEventSyncIndex OBJECT-TYPE
+            SYNTAX Unsigned32 (1..2147483647)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The event synchronization index value."
+            ::= { hwEventSyncEntry 1 }
+        
+        hwEventSyncId OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The event id."
+            ::= { hwEventSyncEntry 2 }
+        
+        hwEventSyncPara OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..4096))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the information contained 
+                in the binding variable list of an event."
+            ::= { hwEventSyncEntry 3 }
+        
+        hwAlarmActiveTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwAlarmActiveEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The active alarm table."
+            ::= { hwAlarmObjects 8 }
+        
+        hwAlarmActiveEntry OBJECT-TYPE
+            SYNTAX HwAlarmActiveEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Entries appear in this table when alarms are raised.  They
+                are removed when the alarm is cleared."
+            INDEX { hwSnmpTargetAddrExtIndex, hwActiveAlarmIndex }
+            ::= { hwAlarmActiveTable 1 }
+        
+        HwAlarmActiveEntry ::=
+            SEQUENCE { 
+                hwActiveAlarmIndex
+                    Unsigned32,
+                hwActiveAlarmId
+                    Counter64,
+                hwActiveAlarmPara
+                    OCTET STRING,
+                hwActiveAlarmRowStatus
+                    RowStatus
+             }
+
+        hwActiveAlarmIndex OBJECT-TYPE
+            SYNTAX Unsigned32 (1..2147483647)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A strictly monotonically increasing integer which acts as the index of all alarms and events. 
+                It wraps back to 1 after it reaches its maximum value."
+            ::= { hwAlarmActiveEntry 1 }
+        
+        hwActiveAlarmId OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The id of an alarm."
+            ::= { hwAlarmActiveEntry 2 }
+        
+        hwActiveAlarmPara OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..4096))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the parameters of an active alarm."
+            ::= { hwAlarmActiveEntry 3 }
+        
+        hwActiveAlarmRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the row status."
+            ::= { hwAlarmActiveEntry 4 }
+        
+        hwEventTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwEventEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The event table. "
+            ::= { hwAlarmObjects 9 }
+        
+        hwEventEntry OBJECT-TYPE
+            SYNTAX HwEventEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Entries appear in this table when events are raised."
+            INDEX { hwSnmpTargetAddrExtIndex, hwEventIndex }
+            ::= { hwEventTable 1 }
+        
+        HwEventEntry ::=
+            SEQUENCE { 
+                hwEventIndex
+                    Unsigned32,
+                hwEventId
+                    Counter64,
+                hwEventPara
+                    OCTET STRING,
+                hwEventRowStatus
+                    RowStatus
+             }
+
+        hwEventIndex OBJECT-TYPE
+            SYNTAX Unsigned32 (1..2147483647)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A strictly monotonically increasing integer 
+                which acts as the index of all alarms and events. 
+                It wraps back to 1 after it reaches its maximum value."
+            ::= { hwEventEntry 1 }
+        
+        hwEventId OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the OID of an event."
+            ::= { hwEventEntry 2 }
+        
+        hwEventPara OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..4096))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the parameter information of an event."
+            ::= { hwEventEntry 3 }
+        
+        hwEventRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the row status."
+            ::= { hwEventEntry 4 }
+        
+        hwAlarmDateAndTime OBJECT-TYPE
+            SYNTAX DateAndTime
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the time when an alarm is generated or cleared."
+            ::= { hwAlarmObjects 18 }
+        
+        hwAlarmOrEventFlag OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                alarm(1),
+                event(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Indicates the type of alarm messages.
+                1: Alarm
+                2: Event
+                "
+            ::= { hwAlarmObjects 19 }
+        
+        hwAlarmReasonInfo OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..255))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The reason for the alarm."
+            ::= { hwAlarmObjects 20 }
+        
+        hwAlarmSeverity OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                critical(1),
+                major(2),
+                minor(3),
+                warning(4),
+                indeterminate(5),
+                cleared(6)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Alarm severity."
+            ::= { hwAlarmObjects 25 }        
+               
+        hwSnmpTargetSyncIndexTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwSnmpTargetSyncIndexEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The synchronization index of snmp targets table."
+            ::= { hwAlarmObjects 28 }
+        
+        hwSnmpTargetSyncIndexEntry OBJECT-TYPE
+            SYNTAX HwSnmpTargetSyncIndexEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The entry of the synchronization index table."
+            INDEX { hwSnmpTargetAddrExtIndex }
+            ::= { hwSnmpTargetSyncIndexTable 1 }
+        
+        HwSnmpTargetSyncIndexEntry ::=
+            SEQUENCE { 
+                hwMinAlmSyncIndex
+                    Unsigned32,
+                hwMaxAlmSyncIndex
+                    Unsigned32,
+                hwMinEvtSyncIndex
+                    Unsigned32,
+                hwMaxEvtSyncIndex
+                    Unsigned32
+             }
+
+        hwMinAlmSyncIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The minimal index value for alarm synchronization."
+            ::= { hwSnmpTargetSyncIndexEntry 1 }
+        
+        hwMaxAlmSyncIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The maximal index value for alarm synchronization. "
+            ::= { hwSnmpTargetSyncIndexEntry 2 }
+        
+        hwMinEvtSyncIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The minimal index value for event synchronization."
+            ::= { hwSnmpTargetSyncIndexEntry 3 }
+        
+        hwMaxEvtSyncIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The maximal index value for event synchronization. "
+            ::= { hwSnmpTargetSyncIndexEntry 4 }
+        
+        hwAlarmActiveVsTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwAlarmActiveVsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The active alarm management table for LSVS support version. "
+            ::= { hwAlarmObjects 31 }
+        
+        hwAlarmActiveVsEntry OBJECT-TYPE
+            SYNTAX HwAlarmActiveVsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The active alarm table for VS support version. "
+            AUGMENTS { hwAlarmActiveEntry }
+            ::= { hwAlarmActiveVsTable 1 }
+        
+        HwAlarmActiveVsEntry ::=
+            SEQUENCE { 
+                hwAlarmActiveVsId
+                    Unsigned32
+             }
+
+        hwAlarmActiveVsId OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The VS id of the alarm. "
+            ::= { hwAlarmActiveVsEntry 9 }
+        
+        hwEventVsTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwEventVsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The event table for LSVS support version. "
+            ::= { hwAlarmObjects 33 }
+        
+        hwEventVsEntry OBJECT-TYPE
+            SYNTAX HwEventVsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The event entry."
+            AUGMENTS { hwEventEntry }
+            ::= { hwEventVsTable 1 }
+        
+        HwEventVsEntry ::=
+            SEQUENCE { 
+                hwEventVsId
+                    Unsigned32
+             }
+
+        hwEventVsId OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The VS id of the event. "
+            ::= { hwEventVsEntry 9 }
+        
+        hwAlarmSyncVsTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwAlarmSyncVsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Alarm synchronization table. "
+            ::= { hwAlarmObjects 36 }
+        
+        hwAlarmSyncVsEntry OBJECT-TYPE
+            SYNTAX HwAlarmSyncVsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Alarm synchronization table entry."
+            AUGMENTS { hwAlarmSyncEntry }
+            ::= { hwAlarmSyncVsTable 1 }
+        
+        HwAlarmSyncVsEntry ::=
+            SEQUENCE { 
+                hwAlarmSyncVsId
+                    Unsigned32
+             }
+
+        hwAlarmSyncVsId OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Alarm VS id."
+            ::= { hwAlarmSyncVsEntry 3 }
+        
+        hwEventSyncVsTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwEventSyncVsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The event synchronization table."
+            ::= { hwAlarmObjects 39 }
+        
+        hwEventSyncVsEntry OBJECT-TYPE
+            SYNTAX HwEventSyncVsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The event synchronization table entry."
+            AUGMENTS { hwEventSyncEntry }
+            ::= { hwEventSyncVsTable 1 }
+        
+        HwEventSyncVsEntry ::=
+            SEQUENCE { 
+                hwEvevtSyncVsId
+                    Unsigned32
+             }
+
+        hwEvevtSyncVsId OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The VS id of the event."
+            ::= { hwEventSyncVsEntry 3 }
+                
+        hwAlarmNotifications OBJECT IDENTIFIER ::= { hwAlarmMIB 2 }
+        
+        hwAlarmTargetHostDel NOTIFICATION-TYPE
+            OBJECTS { hwSnmpTargetAddrExtIndex }
+            STATUS current
+            DESCRIPTION 
+                "The notification for the deletion of the target host. "
+            ::= { hwAlarmNotifications 1 }
+        
+        hwAlarmStorm NOTIFICATION-TYPE
+            STATUS current
+            DESCRIPTION 
+                "The alarm storm notification."
+            ::= { hwAlarmNotifications 2 }
+        hwAlarmConformance OBJECT IDENTIFIER ::= { hwAlarmMIB 3 }
+        
+        hwAlarmCompliances OBJECT IDENTIFIER ::= { hwAlarmConformance 1 }
+        
+        hwAlarmCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "The compliance statement for entities which 
+                implement the Huawei Alarm mib."
+            MODULE -- this module
+                MANDATORY-GROUPS { hwAlarmReliabilityGroup }
+            ::= { hwAlarmCompliances 1 }
+        
+        hwAlarmGroups OBJECT IDENTIFIER ::= { hwAlarmConformance 2 }
+        
+        hwAlarmReliabilityGroup OBJECT-GROUP
+            OBJECTS { hwSnmpTargetSlaveAddressList, hwSnmpTargetAddrEventReliability, hwSnmpTargetAddrAlarmReliability, hwSnmpTargetAddrReliability, hwSnmpTargetAddrExtRowStatus
+                 }
+            STATUS current
+            DESCRIPTION 
+                "The objects for alarm reliability and snmp target address list."
+            ::= { hwAlarmGroups 1 }
+        
+        hwActiveInfoGroup OBJECT-GROUP
+            OBJECTS { hwActiveAlarmId, hwActiveAlarmPara, hwEventRowStatus, hwActiveAlarmRowStatus, hwEventId, 
+                hwEventPara }
+            STATUS current
+            DESCRIPTION 
+                "The nodes for querying the  active alarm information."
+            ::= { hwAlarmGroups 7 }
+        
+        hwTrapInfoSyncGroup OBJECT-GROUP
+            OBJECTS { hwMinAlarmSyncIndex, hwMaxAlarmSyncIndex, hwAlarmSyncId, hwAlarmSyncPara, hwMinEventSyncIndex, 
+                hwMaxEventSyncIndex, hwEventSyncId, hwEventSyncPara, hwAlarmDateAndTime, hwAlarmCorrAnalyzeSuppressionRootCauseIndication,
+                hwAlarmCorrAnalyzeSuppressionParentSequence, hwAlarmReasonInfo, hwAlarmSeverity, hwAlarmOrEventFlag }
+            STATUS current
+            DESCRIPTION 
+                "All information of trap synchronization."
+            ::= { hwAlarmGroups 8 }
+        
+        hwActiveInfoVsGroup OBJECT-GROUP
+            OBJECTS { hwAlarmActiveVsId, hwEventVsId }
+            STATUS current
+            DESCRIPTION 
+                "The VS id of the active alarm or event."
+            ::= { hwAlarmGroups 9 }
+        
+        hwTrapSyncVsGroup OBJECT-GROUP
+            OBJECTS { hwAlarmSyncVsId, hwEvevtSyncVsId, hwMinAlmSyncIndex, hwMaxAlmSyncIndex, hwMinEvtSyncIndex, 
+                hwMaxEvtSyncIndex }
+            STATUS current
+            DESCRIPTION 
+                "The VS id and the synchronization sequence number nodes."
+            ::= { hwAlarmGroups 10 }
+        
+        hwAlarmTrapInfoGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwAlarmTargetHostDel, hwAlarmStorm }
+            STATUS current
+            DESCRIPTION 
+                "Alarm trap nodes."
+            ::= { hwAlarmGroups 11 }
+            
+        hwTrapSuppressionGroup OBJECT-GROUP
+            OBJECTS { hwAlarmDelaySuppressionEnable, hwAlarmDelaySuppressionCausePersistPeriod, hwAlarmDelaySuppressionClearPersistPeriod,
+            hwAlarmCorrAnalyzeSuppressionEnable, hwAlarmCorrAnalyzeSuppressionStatus, hwEventDelaySuppressionEnable, hwEventDelaySuppressionCausePersistPeriod }
+            STATUS current
+            DESCRIPTION 
+                "The trap suppression nodes."
+            ::= { hwAlarmGroups 12 }
+        
+        hwTrapInfoGroup OBJECT-GROUP
+            OBJECTS { hwAlarmAttrSeverity, hwEventAttrSeverity }
+            STATUS current
+            DESCRIPTION 
+                "The basal information of trap nodes."
+            ::= { hwAlarmGroups 13 }
+        
+        hwAlarmConfig OBJECT IDENTIFIER ::= { hwAlarmMIB 5 }
+        
+        hwAlarmAttr OBJECT IDENTIFIER ::= { hwAlarmConfig 1 }
+        
+        hwAlarmAttrTable OBJECT-TYPE
+          SYNTAX SEQUENCE OF HwAlarmAttrEntry
+          MAX-ACCESS not-accessible
+          STATUS current
+          DESCRIPTION
+              "This table contains attribute of alarms."
+          ::= {hwAlarmAttr 1}
+
+        hwAlarmAttrEntry OBJECT-TYPE
+          SYNTAX HwAlarmAttrEntry
+          MAX-ACCESS not-accessible
+          STATUS current
+          DESCRIPTION
+              "Entry of hwAlarmAttrTable."
+          INDEX {hwAlarmName}
+          ::= {hwAlarmAttrTable 1}
+
+        HwAlarmAttrEntry::=
+          SEQUENCE {                  
+                  hwAlarmName  
+                  OCTET STRING,
+                  hwAlarmAttrSeverity  
+                  INTEGER
+               }  
+          
+        hwAlarmName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..64))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The name of registered alarms."
+            ::= { hwAlarmAttrEntry 1 }  
+      
+        hwAlarmAttrSeverity OBJECT-TYPE
+            SYNTAX INTEGER
+                     { 
+                      critical(1),
+                      major(2),
+                      minor(3),
+                      warning(4),
+                      indeterminate(5),
+                      cleared(6)
+                     } 
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The severity of alarms."
+            ::= { hwAlarmAttrEntry 2 }
+            
+            
+        hwAlarmMask  OBJECT IDENTIFIER ::= { hwAlarmConfig 3 }
+        
+        hwAlarmMaskBasedOnIfnameTable OBJECT-TYPE
+          SYNTAX SEQUENCE OF HwAlarmMaskBasedOnIfnameEntry
+          MAX-ACCESS not-accessible
+          STATUS current
+          DESCRIPTION
+              "Define alarm mask table, which is based on interface."
+          ::= {hwAlarmMask 1}
+
+        hwAlarmMaskBasedOnIfnameEntry OBJECT-TYPE
+          SYNTAX HwAlarmMaskBasedOnIfnameEntry
+          MAX-ACCESS not-accessible
+          STATUS current
+          DESCRIPTION
+              "Entry of hwAlarmMaskBasedOnIfnameTable."
+          INDEX {hwAlarmMaskIfName}
+          ::= {hwAlarmMaskBasedOnIfnameTable 1}
+          
+        HwAlarmMaskBasedOnIfnameEntry::=        
+            SEQUENCE {   
+                     hwAlarmMaskIfName  
+                           OCTET STRING,
+                     hwAlarmMaskBasedOnIfnameRowStatus  
+                           RowStatus
+                  }
+                  
+        hwAlarmMaskIfName OBJECT-TYPE
+            SYNTAX OCTET STRING  
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The interface name for alarm mask."
+            ::= { hwAlarmMaskBasedOnIfnameEntry 1 }
+          
+        hwAlarmMaskBasedOnIfnameRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The row status of the alarm mask based on interface table."
+            ::= { hwAlarmMaskBasedOnIfnameEntry 51 } 
+        
+        hwAlarmMaskBasedOnEntityTable OBJECT-TYPE
+          SYNTAX SEQUENCE OF HwAlarmMaskBasedOnEntityEntry
+          MAX-ACCESS not-accessible
+          STATUS current
+          DESCRIPTION
+              "Define alarm mask table, which is based on entity index."
+          ::= {hwAlarmMask 2}
+
+        hwAlarmMaskBasedOnEntityEntry OBJECT-TYPE
+          SYNTAX HwAlarmMaskBasedOnEntityEntry
+          MAX-ACCESS not-accessible
+          STATUS current
+          DESCRIPTION
+              "Entry of hwAlarmMaskBasedOnEntityTable."
+          INDEX {hwAlarmMaskEntPhysicalIndex}
+          ::= {hwAlarmMaskBasedOnEntityTable 1}
+          
+        HwAlarmMaskBasedOnEntityEntry::=        
+            SEQUENCE {   
+                     hwAlarmMaskEntPhysicalIndex  
+                           Integer32,
+                     hwAlarmMaskEntPhysicalName  
+                           OCTET STRING,
+                     hwAlarmMaskBasedOnEntityRowStatus  
+                           RowStatus
+                  }
+                  
+        hwAlarmMaskEntPhysicalIndex OBJECT-TYPE
+            SYNTAX Integer32  
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The physical index of entity for alarm mask."
+            ::= { hwAlarmMaskBasedOnEntityEntry 1 }
+            
+        hwAlarmMaskEntPhysicalName OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The physical name of entity for alarm mask."
+            ::= { hwAlarmMaskBasedOnEntityEntry 2 }
+          
+        hwAlarmMaskBasedOnEntityRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The row status of the alarm mask based on entity table."
+            ::= { hwAlarmMaskBasedOnEntityEntry 51 }  
+               
+        hwAlarmDelay OBJECT IDENTIFIER ::= { hwAlarmConfig 4 } 
+        
+        hwAlarmDelaySuppressionEnable OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                enable(1),
+                disable(2)
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The switch of alarm delay suppression."
+            DEFVAL { enable }
+            ::= { hwAlarmDelay 1 }
+
+        
+        hwAlarmDelaySuppressionTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwAlarmDelaySuppressionEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Define alarm delay suppression table."
+            ::= { hwAlarmDelay 2 }
+        
+        hwAlarmDelaySuppressionEntry OBJECT-TYPE
+            SYNTAX HwAlarmDelaySuppressionEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The entry of the alarm delay suppression table."
+            INDEX { hwAlarmName }
+            ::= { hwAlarmDelaySuppressionTable 1 }   
+        
+        HwAlarmDelaySuppressionEntry::=
+            SEQUENCE {                  
+                  hwAlarmDelaySuppressionCausePersistPeriod
+                  Integer32,   
+                  hwAlarmDelaySuppressionClearPersistPeriod
+                  Integer32
+               }  
+            
+        hwAlarmDelaySuppressionCausePersistPeriod OBJECT-TYPE
+            SYNTAX Integer32 (0..600)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The cause persist period of alarm delay suppression."
+            ::= { hwAlarmDelaySuppressionEntry 1 }
+        
+        hwAlarmDelaySuppressionClearPersistPeriod OBJECT-TYPE
+            SYNTAX Integer32 (0..600)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The clear persist period of alarm delay suppression."
+            ::= { hwAlarmDelaySuppressionEntry 2 }        
+        
+        hwAlarmCorrAnalyze OBJECT IDENTIFIER ::= { hwAlarmConfig 5 } 
+        
+        hwAlarmCorrAnalyzeSuppressionEnable OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                enable(1),
+                disable(2)
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The switch of alarm correlation analyze suppression."
+            DEFVAL { disable }
+            ::= { hwAlarmCorrAnalyze 1 }
+        
+         
+         hwAlarmCorrAnalyzeSuppressionRootCauseIndication OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                    independent(0),
+                    rootcause(1),
+                    nonrootcause(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "If alarm has passed correaltion analysis, this indication is 
+                 rootcause or nonrootcause, default is independent."
+            ::= { hwAlarmCorrAnalyze 2 }
+        
+        hwAlarmCorrAnalyzeSuppressionParentSequence OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The parent sequence of alarm, whose indication is nonrootcause."
+            ::= { hwAlarmCorrAnalyze 3 }
+       
+        hwAlarmCorrAnalyzeSuppressionTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwAlarmCorrAnalyzeSuppressionEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Define alarm correlation analyze suppression table."
+            ::= { hwAlarmCorrAnalyze 4 }
+        
+        hwAlarmCorrAnalyzeSuppressionEntry OBJECT-TYPE
+            SYNTAX HwAlarmCorrAnalyzeSuppressionEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The entry of alarm correlation analyze suppression table."
+            INDEX { hwSnmpTargetAddrExtIndex }
+            ::= { hwAlarmCorrAnalyzeSuppressionTable 1 }           
+            
+        HwAlarmCorrAnalyzeSuppressionEntry ::=
+            SEQUENCE { 
+                hwAlarmCorrAnalyzeSuppressionStatus  
+                INTEGER                                     
+                     }   
+            
+        hwAlarmCorrAnalyzeSuppressionStatus OBJECT-TYPE
+            SYNTAX INTEGER 
+              {               
+                  enable(1),
+                  disable(2)
+              } 
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The status of alarm correlation suppression for each target host."
+            ::= { hwAlarmCorrAnalyzeSuppressionEntry 1 }  
+        
+        hwEventConfig OBJECT IDENTIFIER ::= { hwAlarmMIB 6 }
+        
+        hwEventAttr OBJECT IDENTIFIER ::= { hwEventConfig 1 }
+        
+        hwEventAttrTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwEventAttrEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+            "This table contains attribute of events."
+            ::= {hwEventAttr 1}
+    
+        hwEventAttrEntry OBJECT-TYPE
+            SYNTAX HwEventAttrEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Entry of hwEventAttrTable."
+            INDEX {hwEventName}
+            ::= {hwEventAttrTable 1}
+
+        HwEventAttrEntry::=
+            SEQUENCE {                  
+                  hwEventName  OCTET STRING,   
+                  hwEventAttrSeverity INTEGER
+               }  
+          
+        hwEventName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..64))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The name of registered events."
+            ::= { hwEventAttrEntry 1 }  
+                 
+        hwEventAttrSeverity OBJECT-TYPE
+            SYNTAX INTEGER
+                     {
+                      critical(1),
+                      major(2),
+                      minor(3),
+                      warning(4),
+                      indeterminate(5),
+                      cleared(6)
+                     } 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The severity of evens."
+            ::= { hwEventAttrEntry 2 }
+                
+        hwEventDelay OBJECT IDENTIFIER ::= { hwEventConfig 4 }  
+        
+        hwEventDelaySuppressionEnable OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                enable(1),
+                disable(2)
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The switch of event delay suppression."
+            DEFVAL { enable }
+            ::= { hwEventDelay 1 }
+        
+        
+        hwEventDelaySuppressionTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwEventDelaySuppressionEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Define event delay suppression table."
+            ::= { hwEventDelay 2 }
+        
+        hwEventDelaySuppressionEntry OBJECT-TYPE
+            SYNTAX HwEventDelaySuppressionEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The entry of event delay suppression table."
+            INDEX { hwEventName }
+            ::= { hwEventDelaySuppressionTable 1 }
+            
+        HwEventDelaySuppressionEntry::=
+            SEQUENCE {                  
+                         hwEventDelaySuppressionCausePersistPeriod 
+                         Integer32  
+                     }  
+            
+        hwEventDelaySuppressionCausePersistPeriod OBJECT-TYPE
+            SYNTAX Integer32 (0..600)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The cause persist period of event delay suppression."
+            ::= { hwEventDelaySuppressionEntry 1 }
+    END
+
+--
+-- HUAWEI-ALARM-MIB.mib
+--

@@ -17,7 +17,7 @@ foreach ($modelinfo as $line) {
 
 $hardware = ($dell_laser['MDL'] != '' ? $dell_laser['MDL'] : $dell_laser['MODEL']);
 
-list(,$version) = explode('Engine ', $poll_device['sysDescr']);
+list(,$version) = explode('Engine ', $device['sysDescr']);
 
 if ($version) {
     $version = 'Engine '.trim($version, ')');

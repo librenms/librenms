@@ -1,0 +1,1282 @@
+
+-- ============================================================================
+-- AT-SYSINFO.MIB, Allied Telesis enterprise MIB:
+-- Objects for system information
+-- Copyright (c) 2006 by Allied Telesis, Inc.
+-- All rights reserved.
+--
+-- ============================================================================
+
+    AT-SYSINFO-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            atRouter, DisplayStringUnsized
+                FROM AT-SMI-MIB
+            InterfaceIndex
+                FROM IF-MIB
+            OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE, Unsigned32
+                FROM SNMPv2-SMI
+            DisplayString
+                FROM SNMPv2-TC;
+
+
+        sysinfo MODULE-IDENTITY
+            LAST-UPDATED "201612140000Z"
+            ORGANIZATION
+                "Allied Telesis, Inc."
+            CONTACT-INFO
+                "  http://www.alliedtelesis.com"
+            DESCRIPTION
+                "Subtree beneath which system inforamtion ids are assigned.
+                It contains generic system information, as follows:
+                { sysinfo 1 } fanAndPs
+                { sysinfo 2 } restartGroup
+                { sysinfo 3 } cpu
+                { sysinfo 4 } sysTemperature
+                { sysinfo 5 } atrContactDetails
+                { sysinfo 6 } bbrNvs
+                { sysinfo 9 } hostId
+                { sysinfo 10 } envMon
+                { sysinfo 11 } xem
+                { sysinfo 12 } awpEnvMon
+                { sysinfo 13 } awpStack
+                { sysinfo 14 } atPortInfo"
+
+            REVISION "201612140000Z"
+            DESCRIPTION
+                "Added QSFP28-SR to atPortInfoTransceiverEntry"
+            REVISION "201612120000Z"
+            DESCRIPTION
+                "Added 10GBASE-ZR SFP+ to atPortInfoTransceiverEntry"
+            REVISION "201605050000Z"
+            DESCRIPTION
+                "Added 40GBASE-ER4 and 10GBBASE-T SFP+ to atPortInfoTransceiverEntry"
+            REVISION "201503160000Z"
+            DESCRIPTION
+                "Added 40GBASE-SR4 and 40GBASE-LR4 to atPortInfoTransceiverEntry"
+            REVISION "201406090000Z"
+            DESCRIPTION
+                "Added 4 x Cu Passive QSFP description to atPortInfoTransceiverEntry."
+            REVISION "201404300000Z"
+            DESCRIPTION
+                "Updated decriptions to refer to chassisMappingTable"
+            REVISION "201404160000Z"
+            DESCRIPTION
+                "Added more descriptions to cpuUtilisationStackId for VCStack Plus"
+            REVISION "201209210000Z"
+            DESCRIPTION
+                "Added chassis switch (e.g. SBx8100) descriptions to stack-related MIB objects"
+            REVISION "201103140000Z"
+            DESCRIPTION
+                "Added CX4 description to atPortInfoTransceiverEntry."
+            REVISION "201009180000Z"
+            DESCRIPTION
+                "Updated CPU Utilization to be per stack member."
+            REVISION "201009070000Z"
+            DESCRIPTION
+                "Generic syntax tidy up"
+            REVISION "201008310031Z"
+            DESCRIPTION
+                "Added Infinband descriptions to atPortInfoTransceiverEntry."
+            REVISION "201008160016Z"
+            DESCRIPTION
+                "Added SFP Plus descriptions to atPortInfoTransceiverEntry."
+            REVISION "201006150015Z"
+            DESCRIPTION
+                "MIB revision history dates in descriptions updated."
+            REVISION "201006040000Z"
+            DESCRIPTION
+                "Added new object atPortRenumberEvents."
+            REVISION "200802260000Z"
+            DESCRIPTION
+                "Changed top DESCRIPTION section."
+            REVISION "200606140000Z"
+            DESCRIPTION
+                "Initial version of this MIB module."
+            ::= { atRouter 3 }
+
+
+--
+-- Node definitions
+--
+
+--  fanAndPs traps - traps exist for changes to power supply status, fan status
+--  and temperature status.
+
+        fanAndPs OBJECT IDENTIFIER ::= { sysinfo 1 }
+
+
+        fanAndPsTrap OBJECT IDENTIFIER ::= { fanAndPs 0 }
+
+
+        fanAndPsRpsConnectionTrap NOTIFICATION-TYPE
+            OBJECTS { fanAndPsRpsConnectionStatus }
+            STATUS current
+            DESCRIPTION
+                "Generated when the RPS connection status changes."
+            ::= { fanAndPsTrap 1 }
+
+
+        fanAndPsMainPSUStatusTrap NOTIFICATION-TYPE
+            OBJECTS { fanAndPsMainPSUStatus }
+            STATUS current
+            DESCRIPTION
+                "Generated when the main power supply status changes."
+            ::= { fanAndPsTrap 2 }
+
+
+        fanAndPsRedundantPSUStatusTrap NOTIFICATION-TYPE
+            OBJECTS { fanAndPsRedundantPSUStatus }
+            STATUS current
+            DESCRIPTION
+                "Generated when the RPS status changes."
+            ::= { fanAndPsTrap 3 }
+
+
+        fanAndPsMainFanStatusTrap NOTIFICATION-TYPE
+            OBJECTS { fanAndPsMainFanStatus }
+            STATUS current
+            DESCRIPTION
+                "Generated when the main fan changes status."
+            ::= { fanAndPsTrap 4 }
+
+
+        fanAndPsRedundantFanStatusTrap NOTIFICATION-TYPE
+            OBJECTS { fanAndPsRedundantFanStatus }
+            STATUS current
+            DESCRIPTION
+                "Generated when the redundant fan changes status."
+            ::= { fanAndPsTrap 5 }
+
+
+        fanAndPsTemperatureStatusTrap NOTIFICATION-TYPE
+            OBJECTS { fanAndPsTemperatureStatus }
+            STATUS current
+            DESCRIPTION
+                "Generated when the temperature changes status."
+            ::= { fanAndPsTrap 6 }
+
+
+        fanAndPsFanTrayPresentTrap NOTIFICATION-TYPE
+            OBJECTS { fanAndPsFanTrayPresent }
+            STATUS current
+            DESCRIPTION
+                "Generated when the fan tray presence status changes."
+            ::= { fanAndPsTrap 7 }
+
+
+        fanAndPsFanTrayStatusTrap NOTIFICATION-TYPE
+            OBJECTS { fanAndPsFanTrayStatus }
+            STATUS current
+            DESCRIPTION
+                "Generated when the fan tray status changes."
+            ::= { fanAndPsTrap 8 }
+
+
+        fanAndPsMainMonitoringStatusTrap NOTIFICATION-TYPE
+            OBJECTS { fanAndPsMainMonitoringStatus }
+            STATUS current
+            DESCRIPTION
+                "Generated when the main power supply monitoring status changes."
+            ::= { fanAndPsTrap 9 }
+
+
+        fanAndPsAccelFanStatusTrap NOTIFICATION-TYPE
+            OBJECTS { fanAndPsAccelFanStatus }
+            STATUS current
+            DESCRIPTION
+                "Generated when the accelerator fans' status changes."
+            ::= { fanAndPsTrap 10 }
+
+
+        fanAndPsRpsConnectionStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                notSupported(0),
+                connected(1),
+                notConnected(2),
+                notMonitoring(3)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The status of the Redundant Power Supply (RPS) connection,
+                ie, whether an RPS is actually connected or not, regardless
+                of whether the RPS is on or not. notSupported means that an
+                RPS is not supported in this hardware platform, connected
+                means that the RPS is connected, notConnected means that the
+                RPS is not connected, and notMonitoring means that the status
+                of the RPS is not being monitored presently. RPS monitoring can
+                be turned on via the variable fanAndPsRpsMonitoringStatus, or
+                by the command SET SYSTEM RPSMONITOR=ON."
+            ::= { fanAndPs 1 }
+
+
+        fanAndPsMainPSUStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                on(1),
+                off(2),
+                faulty(3)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The status of the main Power Supply. on means that the power supply is present
+                and fully operational. off means that the power supply is totally off (and
+                obviously only applies to systems with a redundant power supply). faulty means
+                that the main power supply is delivering power but that a component of the
+                power supply is faulty. This applies to systems like SwitchBlade which have 3
+                power supplies but do not provide individual power supply monitoring. Also,
+                in the case of SwitchBlade, power supply status includes the status of the fans
+                in the power supply."
+            ::= { fanAndPs 2 }
+
+
+        fanAndPsRedundantPSUStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                notSupported(0),
+                on(1),
+                off(2),
+                notMonitoring(3)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The status of the redundant Power Supply. notSupported means
+                this device does not support redundant power supplies, on
+                means that the redundant power supply is connected and able
+                to supply system power if required, off means that the
+                redundant power supply is either not connected or is connected
+                and is not able to supply system power if required, and
+                notMonitoring means that the status of the RPS is not being
+                monitored presently. RPS monitoring can be turned on via the
+                variable fanAndPsRpsMonitoringStatus, or by the command
+                SET SYSTEM RPSMONITOR=ON."
+            ::= { fanAndPs 3 }
+
+
+        fanAndPsRpsMonitoringStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                notSupported(0),
+                on(1),
+                off(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The current status of redundant power supply monitoring. The
+                monitoring of the redundant power supply and its fan must be
+                enabled by command or by setting this variable to on. The value
+                notSupported means that this device does not support redundant
+                power supplies. Only the values on or off may be written to this
+                variable. If this variables reads as notSupported, an attempt to
+                write to this variable will result in a bad value error."
+            ::= { fanAndPs 4 }
+
+
+        fanAndPsMainFanStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                notSupported(0),
+                ok(1),
+                notOk(2),
+                warning(3)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The status of the main Power Supply fan. notSupported means that this
+                device does not support monitoring on the main power supply fan, or that
+                there is no main power supply fan. The warning means the fan's speed is
+                outside 30% of the expected speed."
+            ::= { fanAndPs 5 }
+
+
+        fanAndPsRedundantFanStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                notSupported(0),
+                ok(1),
+                notOk(2),
+                notMonitoring(3)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The status of the redundant Power Supply Fan. notSupported means
+                this device does not support redundant power supplies, ok
+                means that the redundant power supply fan is running, notOk means
+                that the redundant power supply fan is not running, and
+                notMonitoring means that the status of the RPS is not being
+                monitored presently. RPS monitoring can be turned on via the
+                variable fanAndPsRpsMonitoringStatus, or by the command
+                SET SYSTEM RPSMONITOR=ON."
+            ::= { fanAndPs 6 }
+
+
+        fanAndPsTemperatureStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                ok(1),
+                notOk(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The status of temperature in this device. ok means that the
+                device is not capable of monitoring temperature or that the
+                temperature is OK, notOk means that the temperature is being
+                monitored and is currently out of the range 0C - 45C."
+            ::= { fanAndPs 7 }
+
+
+        fanAndPsFanTrayPresent OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                notSupported(0),
+                present(1),
+                notPresent(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The status of the presence of the fan tray in this system. Systems
+                which do not support a fan tray return the value notSupported. Upon
+                removal of the fan tray there is a short period (20s) before the value of
+                this variable is changed to notPresent. This is to allow for scheduled
+                replacement and/or cleaning of the fan tray."
+            ::= { fanAndPs 8 }
+
+
+        fanAndPsFanTrayStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                notSupported(0),
+                ok(1),
+                notOk(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The status of the fan tray in this system. Systems which do not support
+                a fan tray return the value notSupported. The value ok is returned if all fans
+                in the fan tray are running at full speed. The value notOk is returned if
+                one of more of the fan tray fans is running slow or has stalled."
+            ::= { fanAndPs 9 }
+
+
+        fanAndPsMainMonitoringStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                notSupported(0),
+                ok(1),
+                notOk(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The current status of main power supply monitoring. The
+                monitoring of the main power supply and its fan is always
+                enabled by those systems that support it. Systems which do
+                not support main power supply or fan monitoring report a
+                value of notSupported. The value ok is returned for those
+                systems that do support main power supply and fan monitoring,
+                and where the monitoring operation is reporting valid information (refer
+                to fanAndPsMainFanStatus for the current status of the system).
+                When main power supply and fan monitoring is failing, the value
+                notOk is returned."
+            ::= { fanAndPs 10 }
+
+--  fanAndPsPsuStatusTable - AT8948 specific power supply monitoring.
+
+        fanAndPsPsuStatusTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF FanAndPsPsuStatusEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The table of AT8948 fanAndPsPsuStatusTable. Each entry in the table
+                represents the status of one of the power supplies in AT8948 system.
+                Each power supply has its own board ID."
+            ::= { fanAndPs 11 }
+
+
+        fanAndPsPsuStatusEntry OBJECT-TYPE
+            SYNTAX FanAndPsPsuStatusEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A single entry of AT8948 fanAndPsPsuStatusTable, indexed by
+                fanAndPsPsuNumber field."
+            INDEX { fanAndPsPsuNumber }
+            ::= { fanAndPsPsuStatusTable 1 }
+
+
+        FanAndPsPsuStatusEntry ::=
+            SEQUENCE {
+                fanAndPsPsuNumber
+                    INTEGER,
+                fanAndPsPsuPresent
+                    INTEGER,
+                fanAndPsPsuType
+                    INTEGER,
+                fanAndPsPsuFan
+                    INTEGER,
+                fanAndPsPsuTemperature
+                    INTEGER,
+                fanAndPsPsuPower
+                    INTEGER
+             }
+
+        fanAndPsPsuNumber OBJECT-TYPE
+            SYNTAX INTEGER (1..2147483647)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The PSU board identity for which this entry holds. If the system
+                consists only of a single PSU board, only one entry will appear
+                in the table, whose index is 1."
+            ::= { fanAndPsPsuStatusEntry 1 }
+
+
+        fanAndPsPsuPresent OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                yes(0),
+                no(1)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The PSU present state, displayed as 'yes' if present, or 'no' if absent."
+            ::= { fanAndPsPsuStatusEntry 2 }
+
+
+        fanAndPsPsuType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                ac(0),
+                dc(1),
+                fan(2),
+                notPresent(3),
+                notSupported(4)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The PSU type, displayed as AC, or DC, or FAN, or NOT PRESENT."
+            ::= { fanAndPsPsuStatusEntry 3 }
+
+
+        fanAndPsPsuFan OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                ok(0),
+                fail(1),
+                notPresent(2),
+                notSupported(3)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The PSU fan status, displayed as OK, or FAIL, or NOT PRESENT."
+            ::= { fanAndPsPsuStatusEntry 4 }
+
+
+        fanAndPsPsuTemperature OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                good(0),
+                high(1),
+                notPresent(2),
+                notSupported(3)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The PSU temperature, displayed as GOOD, or HIGH, or NOT PRESENT,
+                or NOT SUPPORTED."
+            ::= { fanAndPsPsuStatusEntry 5 }
+
+
+        fanAndPsPsuPower OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                good(0),
+                bad(1),
+                notPresent(2),
+                notSupported(3)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The PSU power status, displayed as GOOD, or BAD, or NOT PRESENT
+                or NOT SUPPORTED."
+            ::= { fanAndPsPsuStatusEntry 6 }
+
+
+        fanAndPsAccelFanStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                notSupported(0),
+                ok(1),
+                notOk(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The status of the accelerator card fans. Non-supported means this
+                device does not support monitoring of the accelerator card fans."
+            ::= { fanAndPs 12 }
+
+
+        restartGroup OBJECT IDENTIFIER ::= { sysinfo 2 }
+
+
+        restart OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                restartNone(0),
+                restartWarm(1),
+                restartCold(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "A router/switch restart request.
+
+                A management station can remotely instruct an ATI router/switch
+                to action a warm or cold restart.
+
+                Once all the appropriate internal checks have been made, the
+                router/switch will acknowledge the request via normal SNMP channels.
+                The restart instruction will be actioned after waiting for a period
+                of 5 seconds, this is because the SNMP acknowledgement packet needs
+                time to reach the management station.
+
+                Once the request has been actioned, it can not be cancelled and
+                communication with the router/switch will be lost during system
+                initialisation."
+            ::= { restartGroup 1 }
+
+
+        restartCause OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                unknown(0),
+                hardwareReset(1),
+                hardwareWatchdog(2),
+                softwareRequest(3),
+                softwareException(4),
+                softwareInvalidImage(5),
+                softwareLicenceCheckFailure(6),
+                powerOnSelfTestfailure(7)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The reason for last time restart."
+            ::= { restartGroup 2 }
+
+
+        restartLog OBJECT-TYPE
+            SYNTAX DisplayStringUnsized (SIZE (0..500))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The restart logging details."
+            ::= { restartGroup 3 }
+
+
+        restartNotification NOTIFICATION-TYPE
+            OBJECTS { restartCause }
+            STATUS current
+            DESCRIPTION
+                "A restart notification is a trap sent to tell snmp managers
+                the reason of restarting"
+            ::= { restartGroup 11 }
+
+
+--  cpu - this group contains information about the cpu utilisation over different
+--  periods of time.
+        cpu OBJECT IDENTIFIER ::= { sysinfo 3 }
+
+
+        cpuUtilisationMax OBJECT-TYPE
+            SYNTAX INTEGER (0..100)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Maximum CPU utilisation since the router was last restarted.
+                Expressed as a percentage."
+            ::= { cpu 1 }
+
+
+        cpuUtilisationAvg OBJECT-TYPE
+            SYNTAX INTEGER (0..100)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Average CPU utilisation since the router was last restarted.
+                Expressed as a percentage."
+            ::= { cpu 2 }
+
+
+        cpuUtilisationAvgLastMinute OBJECT-TYPE
+            SYNTAX INTEGER (0..100)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Average CPU utilisation over the past minute.
+                Expressed as a percentage."
+            ::= { cpu 3 }
+
+
+        cpuUtilisationAvgLast10Seconds OBJECT-TYPE
+            SYNTAX INTEGER (0..100)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Average CPU utilisation over the past ten seconds.
+                Expressed as a percentage."
+            ::= { cpu 4 }
+
+
+        cpuUtilisationAvgLastSecond OBJECT-TYPE
+            SYNTAX INTEGER (0..100)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Average CPU utilisation over the past second.
+                Expressed as a percentage."
+            ::= { cpu 5 }
+
+
+        cpuUtilisationMaxLast5Minutes OBJECT-TYPE
+            SYNTAX INTEGER (0..100)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Maximum CPU utilisation over the last 5 minutes.
+                Expressed as a percentage."
+            ::= { cpu 6 }
+
+
+        cpuUtilisationAvgLast5Minutes OBJECT-TYPE
+            SYNTAX INTEGER (0..100)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Average CPU utilisation over the past 5 minutes.
+                Expressed as a percentage."
+            ::= { cpu 7 }
+
+        cpuUtilisationStackTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF CpuUtilisationStackEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A list of stack members. For a chassis switch, this is a list
+                of cards."
+            ::= { cpu 8 }
+
+        cpuUtilisationStackEntry OBJECT-TYPE
+           SYNTAX CpuUtilisationStackEntry
+           MAX-ACCESS not-accessible
+           STATUS current
+           DESCRIPTION
+               "A set of parameters that describe the CPU utilisation of a
+                stack member. For a chassis switch, it corresponds to the CPU
+                utilisation of a card."
+           INDEX { cpuUtilisationStackId }
+           ::= { cpuUtilisationStackTable 1 }
+
+        CpuUtilisationStackEntry ::= SEQUENCE {
+           cpuUtilisationStackId
+                Unsigned32,
+           cpuUtilisationStackMax
+                INTEGER,
+           cpuUtilisationStackAvg
+                INTEGER,
+           cpuUtilisationStackAvgLastMinute
+                INTEGER,
+           cpuUtilisationStackAvgLast10Seconds
+                INTEGER,
+           cpuUtilisationStackAvgLastSecond
+                INTEGER,
+           cpuUtilisationStackMaxLast5Minutes
+                INTEGER,
+           cpuUtilisationStackAvgLast5Minutes
+                INTEGER
+           }
+
+        cpuUtilisationStackId OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Stack member ID. For a chassis switch, it corresponds to the
+                card ID. For VCStack Plus, 1-12 refers to the cards on VCS stack
+                member 1 and 13-24 refers to the cards on VCS stack member 2.
+                Refer to chassisMappingTable for more details."
+            ::= { cpuUtilisationStackEntry 1 }
+
+        cpuUtilisationStackMax OBJECT-TYPE
+            SYNTAX  INTEGER  (0..100)
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "Maximum CPU utilisation since the router was last restarted.
+                Expressed as a percentage."
+            ::= { cpuUtilisationStackEntry 2 }
+
+        cpuUtilisationStackAvg OBJECT-TYPE
+            SYNTAX  INTEGER  (0..100) 
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "Average CPU utilisation since the router was last restarted.
+                 Expressed as a percentage."
+            ::= { cpuUtilisationStackEntry 3 }  
+
+        cpuUtilisationStackAvgLastMinute OBJECT-TYPE
+            SYNTAX  INTEGER  (0..100) 
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "Average CPU utilisation over the past minute.
+                 Expressed as a percentage."
+            ::= { cpuUtilisationStackEntry 4 }
+          
+        cpuUtilisationStackAvgLast10Seconds OBJECT-TYPE
+            SYNTAX  INTEGER  (0..100) 
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "Average CPU utilisation over the past ten seconds.
+                 Expressed as a percentage."
+           ::= { cpuUtilisationStackEntry 5 }
+
+        cpuUtilisationStackAvgLastSecond OBJECT-TYPE
+            SYNTAX  INTEGER  (0..100) 
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "Average CPU utilisation over the past second.
+                 Expressed as a percentage."
+           ::= { cpuUtilisationStackEntry 6 }
+
+        cpuUtilisationStackMaxLast5Minutes OBJECT-TYPE
+            SYNTAX  INTEGER  (0..100)
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "Maximum CPU utilisation over the last 5 minutes.
+                 Expressed as a percentage."
+           ::= { cpuUtilisationStackEntry 7 }
+
+        cpuUtilisationStackAvgLast5Minutes OBJECT-TYPE
+            SYNTAX  INTEGER  (0..100) 
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "Average CPU utilisation over the past 5 minutes.
+                 Expressed as a percentage."
+           ::= { cpuUtilisationStackEntry 8 }
+
+   
+   
+
+--  sysTemperature - this group contains information about the temperature monitoring
+--  in the system. under this group is a general group, containing generic temperature
+--  monitoring variables, and one or more specific groups, which contain variables specific
+--  to particular products.
+
+        sysTemperature OBJECT IDENTIFIER ::= { sysinfo 4 }
+
+--  This group displays generic system temperature information - the actual
+--  temperature, the  fixed temperature threshold and an indication the
+--  temperature has fallen below the threshold. A particular product may support
+--  this information or not. If not the product may have a specific entry for
+--  its particular temperature information. A product may also support the
+--  generic information and additional specific information.
+
+        generalTemperature OBJECT IDENTIFIER ::= { sysTemperature 1 }
+
+
+        generalTemperatureTrap OBJECT IDENTIFIER ::= { generalTemperature 0 }
+
+--  generalTemperature trap - a trap monitoring changes in the temperature status.
+
+        generalTemperatureStatusTrap NOTIFICATION-TYPE
+            OBJECTS { generalTemperatureStatus, generalTemperatureActualTemp, generalTemperatureThreshold }
+            STATUS current
+            DESCRIPTION
+                "Generated when the temperature status of the device changes."
+            ::= { generalTemperatureTrap 1 }
+
+
+        generalTemperatureSupported OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                notSupported(0),
+                supported(1)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The value supported indicates general temperature is displayed by the
+                device. The value notSupported indicates the device displays specific
+                temperature information or none at all."
+            ::= { generalTemperature 1 }
+
+
+        generalTemperatureActualTemp OBJECT-TYPE
+            SYNTAX INTEGER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The current temperature of product's base board, in degrees Celsius. A device
+                which doesn't support this group will return the value 0 for this variable."
+            ::= { generalTemperature 2 }
+
+
+        generalTemperatureStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                ok(1),
+                notOk(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The status of temperature in this device. ok indicates the
+                temperature is below the threshold temperature or the device
+                is not capable of monitoring temperature. notOk indicates the
+                temperature is being monitored and is currently above the
+                threshold temperature (displayed in generalTemperatureThreshold)."
+            ::= { generalTemperature 3 }
+
+
+        generalTemperatureThreshold OBJECT-TYPE
+            SYNTAX INTEGER
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The temperature threshold for the device. If the
+                temperature of the device rises above this threshold
+                generalTemeratureStatus will indicate a notOk status."
+            ::= { generalTemperature 4 }
+
+
+--  sbTemperature - SwitchBlade specific temperature monitoring.
+
+        sbTemperature OBJECT IDENTIFIER ::= { sysTemperature 2 }
+
+
+        sbTemperatureTrap OBJECT IDENTIFIER ::= { sbTemperature 0 }
+
+
+        sbTempFixedThresholdTrap NOTIFICATION-TYPE
+            OBJECTS { sbTempFixedThresholdStatus, sbTempActualTemperature, sbTempFixedThreshold }
+            STATUS current
+            DESCRIPTION
+                "Trap occurs when fixed threshold status changes. The actual temperature
+                and the fixed threshold are also given."
+            ::= { sbTemperatureTrap 1 }
+
+
+        sbTempSettableThresholdTrap NOTIFICATION-TYPE
+            OBJECTS { sbTempSettableThresholdStatus, sbTempActualTemperature, sbTempSettableThreshold }
+            STATUS current
+            DESCRIPTION
+                "Trap occurs when settable threshold status changes. The actual temperature
+                and the settable threshold are also given."
+            ::= { sbTemperatureTrap 2 }
+
+
+        sbTempTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF SbTempEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The table of SwitchBlade sysTemperature. Each entry in the table
+                represents temperature monitoring from one of the CPU cards which
+                may be present in the SwitchBlade system."
+            ::= { sbTemperature 1 }
+
+
+        sbTempEntry OBJECT-TYPE
+            SYNTAX SbTempEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A single entry of SwitchBlade sysTemperature"
+            INDEX { sbTempIndex }
+            ::= { sbTempTable 1 }
+
+
+        SbTempEntry ::=
+            SEQUENCE {
+                sbTempIndex
+                    INTEGER,
+                sbTempActualTemperature
+                    INTEGER,
+                sbTempFixedThresholdStatus
+                    INTEGER,
+                sbTempSettableThresholdStatus
+                    INTEGER,
+                sbTempSettableThreshold
+                    INTEGER
+             }
+
+        sbTempIndex OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                master(1),
+                slave(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The board for which this temperature entry holds. If the system
+                consists only of a single CPU board, only one entry will appear
+                in the table, whose index is master(1)."
+            ::= { sbTempEntry 1 }
+
+
+        sbTempActualTemperature OBJECT-TYPE
+            SYNTAX INTEGER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The actual SwitchBlade temperature. This temperature is measured
+                within the SwitchBlade CPU, and is sampled at 1 second intervals."
+            ::= { sbTempEntry 2 }
+
+
+        sbTempFixedThresholdStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                normal(1),
+                crossover(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The temperature status with regard to the fixed temperature
+                threshold. The value of the fixed temperature threshold is set at
+                90 degrees C. This variable represents whether the actual temperature
+                is above the threshold (value is crossover(2)) or below the threshold
+                (value is normal(1)). If the temperature is exactly the same as the
+                fixed temperature threshold, the value of this variable reads as
+                normal(1)."
+            ::= { sbTempEntry 3 }
+
+
+        sbTempSettableThresholdStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                normal(1),
+                crossover(2),
+                undefined(3)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The temperature status with regard to the settable temperature
+                threshold. The value of the settable temperature threshold is set by
+                management intervention. This variable represents whether the actual
+                temperature is above the threshold (value is crossover(2)) or below
+                the threshold (value is normal(1)). When the value of this variable is
+                undefined(3), no settable threshold has been specified and the value
+                of sbTempSettableThreshold is not used."
+            ::= { sbTempEntry 4 }
+
+
+        sbTempSettableThreshold OBJECT-TYPE
+            SYNTAX INTEGER (30..100)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The value of the settable temperature threshold. This can be set
+                independently for each temperature entry. The value of this threshold
+                is only valid when sbTempSettableThresholdStatus is not set to
+                undefined(3)."
+            ::= { sbTempEntry 5 }
+
+
+        sbTempFixedThreshold OBJECT-TYPE
+            SYNTAX INTEGER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The value of the fixed temperature threshold. This value is fixed for
+                both CPU cards, and cannot be set."
+            ::= { sbTemperature 2 }
+
+
+--  acceleratorTemperature - Accelerator card specific temperature monitoring.
+
+        acceleratorTemperature OBJECT IDENTIFIER ::= { sysTemperature 3 }
+
+
+        acceleratorTemperatureTrap OBJECT IDENTIFIER ::= { acceleratorTemperature 0 }
+
+
+        acceleratorTemperatureStatusTrap NOTIFICATION-TYPE
+            OBJECTS { acceleratorTemperatureStatus }
+            STATUS current
+            DESCRIPTION
+                "Generated when the temperature status of the device changes."
+            ::= { acceleratorTemperatureTrap 1 }
+
+
+        acceleratorTemperatureSupported OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                notSupported(0),
+                supported(1)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The value supported indicates whether accelerator card temperature
+                is displayed by the device. The value notSupported indicates the
+                device does not display specific accelerator card temperature
+                information."
+            ::= { acceleratorTemperature 1 }
+
+
+        acceleratorTemperatureActualTemp OBJECT-TYPE
+            SYNTAX INTEGER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The current temperature of product's base board, in degrees Celsius. A device
+                which doesn't support this group will return the value 0 for this variable."
+            ::= { acceleratorTemperature 2 }
+
+
+        acceleratorTemperatureStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                ok(1),
+                notOk(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The status of temperature in this device. ok indicates the
+                temperature is below the threshold temperature or the device
+                is not capable of monitoring temperature. notOk indicates the
+                temperature is being monitored and is currently above the
+                threshold temperature (displayed in generalTemperatureThreshold)."
+            ::= { acceleratorTemperature 3 }
+
+
+        acceleratorTemperatureThreshold OBJECT-TYPE
+            SYNTAX INTEGER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The temperature threshold for the device. If the
+                temperature of the device rises above this threshold
+                generalTemeratureStatus will indicate a notOk status."
+            ::= { acceleratorTemperature 4 }
+
+--  acceleratorTemperature trap - a trap monitoring changes in the temperature status.
+
+        atContactDetails OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The contact details for Allied Telesis inc."
+            ::= { sysinfo 5 }
+
+--  bbrNvs - this group contains information about the battery backed RAM non-volatile storage
+--  in the router.
+
+        bbrNvs OBJECT IDENTIFIER ::= { sysinfo 6 }
+
+
+        bbrNvsTrap OBJECT IDENTIFIER ::= { bbrNvs 0 }
+
+
+        bbrNvsReinitialiseTrap NOTIFICATION-TYPE
+            STATUS current
+            DESCRIPTION
+                "Generated at boot when the device detects that the BBR has been
+                corrupted and reinitialised. This can happen if the device's BBR
+                battery has run down, and the device has been powered off, then on."
+            ::= { bbrNvsTrap 1 }
+
+
+--  memory - this group contains information about the current memory status
+--  of the router.
+        memory OBJECT IDENTIFIER ::= { sysinfo 7 }
+
+
+        freeMemory OBJECT-TYPE
+            SYNTAX INTEGER (0..100)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Percentage of free memory still available on device"
+            ::= { memory 1 }
+
+
+        totalBuffers OBJECT-TYPE
+            SYNTAX INTEGER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Total number of buffers available on device"
+            ::= { memory 2 }
+
+
+        lowMemoryTrap NOTIFICATION-TYPE
+            OBJECTS { freeMemory, totalBuffers }
+            STATUS current
+            DESCRIPTION
+                "A low memory trap is generated when a router's memory
+                has gone below a certain level."
+            ::= { memory 11 }
+
+
+        realTimeClockStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                invalid(0),
+                normal(1)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Shows the status of the real time clock"
+            ::= { sysinfo 8 }
+
+
+        hostId OBJECT-TYPE
+            SYNTAX INTEGER (0..32)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Host Identifier of this device"
+            ::= { sysinfo 9 }
+
+
+        atPortInfo OBJECT IDENTIFIER ::= { sysinfo 14 }
+
+
+        atPortInfoTransceiverTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF AtPortInfoTransceiverEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of information about the transceiver of a interface."
+            ::= { atPortInfo 1 }
+
+
+        atPortInfoTransceiverEntry OBJECT-TYPE
+            SYNTAX AtPortInfoTransceiverEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The description, the transceiver type of a interface."
+            INDEX { atPortInfoTransceiverifIndex }
+            ::= { atPortInfoTransceiverTable 1 }
+
+
+        AtPortInfoTransceiverEntry ::=
+            SEQUENCE {
+                atPortInfoTransceiverifIndex
+                    InterfaceIndex,
+                atPortInfoTransceiverType
+                    INTEGER
+             }
+
+        atPortInfoTransceiverifIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The ifIndex for the interface represented
+                by this entry of the interfaces table."
+            ::= { atPortInfoTransceiverEntry 1 }
+
+
+        atPortInfoTransceiverType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                rj45(1),
+                sfp-px(2),
+                sfp-bx10(3),
+                sfp-fx(4),
+                sfp-100base-lx(5),
+                sfp-t(6),
+                sfp-cx(7),
+                sfp-zx-cwdm(8),
+                sfp-lx(9),
+                sfp-sx(10),
+                sfp-oc3-lr(11),
+                sfp-oc3-ir(12),
+                sfp-oc3-mm(13),
+                xfp-srsw(14),
+                xfp-lrlw(15),
+                xfp-erew(16),
+                xfp-sr(17),
+                xfp-lr(18),
+                xfp-er(19),
+                xfp-lrm(20),
+                xfp-sw(21),
+                xfp-lw(22),
+                xfp-ew(23),
+                unknown(24),
+                empty(25),
+                sfpp-sr(26),
+                sfpp-lr(27),
+                sfpp-er(28),
+                sfpp-lrm(29),
+                inf-1-x-copper-pasv(30),
+                inf-1-x-copper-actv(31),
+                inf-1-x-lx(32),
+                inf-1-x-sx(33),
+                cx4(34),
+                inf-4-x-copper-pasv(35),
+                qsfp-sr(36),
+                qsfp-lr(37),
+                qsfp-er(38),
+                sfpp-t(39),
+                sfpp-zr(40),
+                qsfp28-sr(41)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the type of transceiver on a interface."
+            ::= { atPortInfoTransceiverEntry 2 }
+
+
+        atPortRenumberEvents OBJECT-TYPE
+            SYNTAX INTEGER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of times that port number values (represented by the
+                dot1dBasePort object in BRIDGE-MIB), have been re-assigned due to
+                stack member leave/join events or XEM hot-swap events, since the
+                system was initialised."
+            ::= { atPortInfo 2 }
+
+
+
+    END
+
+--
+-- at-sysinfo.mib
+--
+

@@ -1,7 +1,7 @@
 <?php
 
-list($version) = explode(',', $poll_device['sysDescr']);
+list($version) = explode(',', $device['sysDescr']);
 
-preg_match('/Version V(\S+) (.+) Software,/', $poll_device['sysDescr'], $matches);
+preg_match('/Version V(\S+) (.+) Software,/', $device['sysDescr'], $matches);
 
 $hardware = $matches[2];

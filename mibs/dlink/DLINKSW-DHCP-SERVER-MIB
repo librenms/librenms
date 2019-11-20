@@ -1,0 +1,1351 @@
+--  *****************************************************************
+--  DLINKSW-DHCP-SERVER-MIB.mib : DHCP Server MIB
+-- 
+--  Copyright (c) 2013 D-Link Corporation, all rights reserved.
+--   
+--  *****************************************************************
+    DLINKSW-DHCP-SERVER-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY,OBJECT-TYPE,IpAddress,Unsigned32,Counter64     
+            FROM SNMPv2-SMI
+        RowStatus,MacAddress,TruthValue,DateAndTime,DisplayString            
+            FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF        
+        dlinkIndustrialCommon                     
+            FROM DLINK-ID-REC-MIB;
+     
+     
+    dlinkSwDhcpServerMIB MODULE-IDENTITY
+        LAST-UPDATED "201309030000Z"
+        ORGANIZATION "D-Link Corp."
+        CONTACT-INFO
+            "        D-Link Corporation
+
+             Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                     Taipei City 114, Taiwan, R.O.C
+             Tel:     +886-2-66000123
+             E-mail: tsd@dlink.com.tw
+            "
+        DESCRIPTION
+            "The MIB module for managing DHCP Server."
+            
+        REVISION  "201309030000Z"
+        DESCRIPTION
+            "Initial version of this MIB."
+        ::= { dlinkIndustrialCommon 39 }
+
+-- -----------------------------------------------------------------------------
+    dDhcpServerMIBNotifications OBJECT IDENTIFIER ::= { dlinkSwDhcpServerMIB 0 }
+    dDhcpServerMIBObjects       OBJECT IDENTIFIER ::= { dlinkSwDhcpServerMIB 1 }
+    dDhcpServerMIBConformance   OBJECT IDENTIFIER ::= { dlinkSwDhcpServerMIB 2 }
+             
+-- -----------------------------------------------------------------------------
+    dDhcpServerGblCfg              OBJECT IDENTIFIER ::= { dDhcpServerMIBObjects 1}
+
+    dDhcpServiceEnabled OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object enables/disables the DHCP server and relay service on 
+            the device."
+        DEFVAL          { false }    
+        ::= { dDhcpServerGblCfg 1 }
+
+    dDhcpServerPingPktNumber OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-write
+        STATUS  current
+        DESCRIPTION
+            "This object specifies the number of PING packets the DHCP server 
+            sends to an IP address before assigning this address to a requesting
+            client. 
+            Setting this object to 0 will disable the PING operation."
+        DEFVAL          { 2 }    
+        ::= { dDhcpServerGblCfg 2 }
+
+    dDhcpServerPingTimeOut OBJECT-TYPE
+        SYNTAX          Unsigned32 
+        UNITS           "milliseconds"
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object specifies the amount of time in millisecond the
+            DHCP server must wait before timing out a ping packet.
+            The specified value should be multiple of 100."
+        DEFVAL          { 500 }    
+        ::= { dDhcpServerGblCfg 3 }
+       
+    dDhcpSExcludedAddressTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DDhcpSExcludedAddressEntry
+        MAX-ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A list of configurations about a range of IP addresses that
+            the DHCP server should not assign to DHCP client."
+        ::= { dDhcpServerGblCfg 4 }
+
+    dDhcpSExcludedAddressEntry OBJECT-TYPE
+        SYNTAX          DDhcpSExcludedAddressEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry contaning information about an IP address range
+            that the DHCP server should not assign to DHCP client."
+        INDEX { 
+            dDhcpSExcludedAddressVrfName,
+            dDhcpSExcludedAddressBeginAddr, 
+            dDhcpSExcludedAddressEndAddr 
+        }
+    ::= { dDhcpSExcludedAddressTable 1 }
+
+    DDhcpSExcludedAddressEntry ::=      SEQUENCE {
+        dDhcpSExcludedAddressVrfName            DisplayString,
+        dDhcpSExcludedAddressBeginAddr          IpAddress,
+        dDhcpSExcludedAddressEndAddr            IpAddress,
+        dDhcpSExcludedAddressRowStatus          RowStatus
+    }
+
+    dDhcpSExcludedAddressVrfName OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE(0..32))
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The name of virtual routing and forwarding (VRF). When the VRF is
+            not specified (zero length string), the corresponding configuration 
+            is used for global address space."
+        DEFVAL          { "" }    
+        ::= { dDhcpSExcludedAddressEntry 1 }
+
+    dDhcpSExcludedAddressBeginAddr OBJECT-TYPE
+        SYNTAX          IpAddress
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The first address of this address range."
+        ::= { dDhcpSExcludedAddressEntry 2 }
+
+    dDhcpSExcludedAddressEndAddr OBJECT-TYPE
+        SYNTAX          IpAddress
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The last address of this address range."
+        ::= { dDhcpSExcludedAddressEntry 3 }
+
+    dDhcpSExcludedAddressRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The status of this conceptual row."
+        ::= { dDhcpSExcludedAddressEntry 99 }
+          
+-- -----------------------------------------------------------------------------
+    dDhcpServerClass      OBJECT IDENTIFIER ::= { dDhcpServerMIBObjects 2 }
+    
+    dDhcpServerUseClassEnabled OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object enables/disables the DHCP server to use DHCP classes
+            during address allocation or use DHCP classes option to locate the addresses."
+        ::= { dDhcpServerClass 1 }
+    
+    dDhcpSClassTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF DDhcpSClassEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A list of classes for DHCP server. This table is used to create and
+            delete DHCP class."
+        ::= { dDhcpServerClass 2 }
+    
+    dDhcpSClassEntry OBJECT-TYPE
+        SYNTAX          DDhcpSClassEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry in DHCP class table contaning objects for creating
+            or deleting a class for the DHCP server or relay."
+        INDEX { dDhcpSClassName }
+        ::= { dDhcpSClassTable 1 }
+    
+    DDhcpSClassEntry ::=
+        SEQUENCE { 
+            dDhcpSClassName             DisplayString,
+            dDhcpSClassRowStatus        RowStatus
+         }
+
+    dDhcpSClassName OBJECT-TYPE
+        SYNTAX          DisplayString 
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the class name of the corresponding
+            entry."
+        ::= { dDhcpSClassEntry 1 }
+    
+    dDhcpSClassRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS current
+        DESCRIPTION
+            "This object is used to create new rows in this
+            table and to delete existing rows."                        
+        ::= { dDhcpSClassEntry 99 }
+
+-- -----------------------------------------------------------------------------
+    dDhcpSClassOptionTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DDhcpSClassOptionEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A list of DHCP option configuratoins for DHCP Relay and Server classes."
+        ::= { dDhcpServerClass 3 }
+
+    dDhcpSClassOptionEntry OBJECT-TYPE
+        SYNTAX          DDhcpSClassOptionEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry contains a DHCP option configuration of a DHCP class."
+        INDEX  { 
+            dDhcpSClassName, 
+            dDhcpSClassOptionCode,
+            dDhcpSClassOptionPatternValue,
+            dDhcpSClassOptionWildcardMatch,
+            dDhcpSClassOptionMaskValue
+        }
+        ::= { dDhcpSClassOptionTable 1 }
+
+    DDhcpSClassOptionEntry ::= 	SEQUENCE {
+        dDhcpSClassOptionCode           INTEGER,
+        dDhcpSClassOptionPatternValue   OCTET STRING,
+        dDhcpSClassOptionWildcardMatch  TruthValue,
+        dDhcpSClassOptionMaskValue      OCTET STRING,
+        dDhcpSClassOptionRowStatus      RowStatus
+    }
+    
+    dDhcpSClassOptionCode OBJECT-TYPE
+        SYNTAX          INTEGER (1..254)
+        MAX-ACCESS      not-accessible
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the DHCP option code. The list of supported
+            option code is project dependent.
+            The following are some common used option codes:
+            60: vendor class identifier;
+            61: Client identifier;
+            77: user class;
+            82: Relay agent information option;
+            124: vendor-identifying vendor class; 
+            125: vendor-identifying vendor-specific information."
+        ::= { dDhcpSClassOptionEntry 1 }
+
+    dDhcpSClassOptionPatternValue OBJECT-TYPE
+        SYNTAX          OCTET STRING
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the pattern of the corresponding DHCP 
+            option. Multiple option patterns can be specified for a DHCP
+            class."
+        ::= { dDhcpSClassOptionEntry 2 }
+  
+    dDhcpSClassOptionWildcardMatch OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates whether matching the remaining bits of the
+            option.  A value of 'false' means the bit length of 
+            dDhcpSClassOptionPatternValue should be the same as bit length of
+            the option."
+        ::= { dDhcpSClassOptionEntry 3 }
+
+    dDhcpSClassOptionMaskValue OBJECT-TYPE
+        SYNTAX          OCTET STRING
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+           "This object indicates the hex bit mask for masking of the 
+            dDhcpSClassOptionPatternValue. The masked pattern bits will be 
+            matched. 
+            The masked pattern of every octet only supports: 
+            '00'H - indicates the corresponding octet will not be checked. 
+            'FF'H - indicates the corresponding input octet must be same as
+                    the value of dDhcpSClassOptionPatternValue.
+           If this object is a zero length string means the mask is not 
+           specified, all octets specified by dDhcpSClassOptionPatternValue 
+           will be checked. 
+           "    
+        ::= { dDhcpSClassOptionEntry 4 }
+        
+    dDhcpSClassOptionRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS  read-create
+        STATUS current
+        DESCRIPTION
+           "The status of this conceptual row."
+        ::= { dDhcpSClassOptionEntry 99 }
+
+-- -----------------------------------------------------------------------------   
+    dDhcpServerPoolMgmt        OBJECT IDENTIFIER ::= { dDhcpServerMIBObjects 3 }
+    
+    dDhcpSPoolTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF DDhcpSPoolEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table is used to create and delete DHCP pool."
+        ::= { dDhcpServerPoolMgmt 1 }
+    
+    dDhcpSPoolEntry OBJECT-TYPE
+        SYNTAX          DDhcpSPoolEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry in DHCP Pool table contaning objects for creating
+            or deleting a global pool for the DHCP server or relay."
+        INDEX { dDhcpSPoolName }
+        ::= { dDhcpSPoolTable 1 }
+    
+    DDhcpSPoolEntry ::=     SEQUENCE { 
+        dDhcpSPoolName             DisplayString,
+        dDhcpSPoolRowStatus        RowStatus
+    }
+
+    dDhcpSPoolName OBJECT-TYPE
+        SYNTAX          DisplayString 
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the DHCP pool name of the corresponding
+            entry."
+        ::= { dDhcpSPoolEntry 1 }
+    
+    dDhcpSPoolRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS current
+        DESCRIPTION
+            "This object is used to create new rows in this table and to delete
+            existing rows."                        
+        ::= { dDhcpSPoolEntry 99 }
+        
+-- -----------------------------------------------------------------------------               
+    dDhcpSPoolCfgTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DDhcpSPoolCfgEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A list of DHCP server pool informations."
+        ::= { dDhcpServerPoolMgmt 2 }
+
+    dDhcpSPoolCfgEntry OBJECT-TYPE
+        SYNTAX          DDhcpSPoolCfgEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION            
+            "An entry contaning DHCP server pool information."
+        INDEX { dDhcpSPoolName }
+        ::= { dDhcpSPoolCfgTable 1 }
+
+    DDhcpSPoolCfgEntry ::=   SEQUENCE {                        
+        dDhcpSPoolCfgDomainName         DisplayString,
+        dDhcpSPoolCfgNetBIOSNodeType    INTEGER,
+        dDhcpSPoolCfgLeaseState         INTEGER,
+        dDhcpSPoolCfgLeaseDay           INTEGER,
+        dDhcpSPoolCfgLeaseHour          INTEGER,
+        dDhcpSPoolCfgLeaseMinute        INTEGER,         
+        dDhcpSPoolCfgBootFile           DisplayString,
+        dDhcpSPoolCfgNextServer         IpAddress,                      
+        dDhcpSPoolCfgVrfName            DisplayString
+    }
+    
+    dDhcpSPoolCfgDomainName OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE(0..64))
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The domain name for the client if the server allocates
+            the address for the client from this pool."
+        DEFVAL          { "" }
+        ::= { dDhcpSPoolCfgEntry 1 }
+                      
+    dDhcpSPoolCfgNetBIOSNodeType OBJECT-TYPE
+        SYNTAX      INTEGER {
+            notSpecified(0),
+            broadcast(1),
+            peertopeer(2),
+            mixed(3),
+            hybid(4)
+        }
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The NetBIOS node type for a Microsoft DHCP client.
+            The value 'notSpecified' indicates NetBIOS node type is not 
+            configured for the corresponding entry."
+        DEFVAL          { notSpecified }
+        ::= { dDhcpSPoolCfgEntry 2 }
+        
+    dDhcpSPoolCfgLeaseState OBJECT-TYPE
+        SYNTAX      INTEGER{
+            predefined(1),
+            infinite(2)
+        }
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The pool lease state. When configured to 'infinite', the following
+            objects: dDhcpSPoolCfgLeaseDay, dDhcpSPoolCfgLeaseHour
+            and dDhcpSPoolCfgLeaseMinute will be reverted to default value
+            and not be used for lease time."
+        DEFVAL          { predefined }     
+    ::= { dDhcpSPoolCfgEntry 3 }    
+    
+    dDhcpSPoolCfgLeaseDay OBJECT-TYPE
+       SYNTAX           INTEGER(0..365)
+       MAX-ACCESS       read-create
+       STATUS           current
+       DESCRIPTION
+            "This object indicates the number of days for the duration of
+            lease."
+       DEFVAL          { 1 }  
+       ::= { dDhcpSPoolCfgEntry 4 }
+
+    dDhcpSPoolCfgLeaseHour OBJECT-TYPE
+        SYNTAX          INTEGER(0..23)
+        MAX-ACCESS      read-create
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the number of hours for the duration of
+            lease."
+        DEFVAL          { 0 }    
+        ::= { dDhcpSPoolCfgEntry 5 }
+
+    dDhcpSPoolCfgLeaseMinute OBJECT-TYPE
+        SYNTAX          INTEGER(0..59)
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the number of minutes for the duration of
+            lease."
+        DEFVAL          { 0 }     
+        ::= { dDhcpSPoolCfgEntry 6 }
+        
+    dDhcpSPoolCfgBootFile OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE(0..64)) 
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the name of the file that is used as a boot
+            image."
+        DEFVAL          { "" }
+        ::= { dDhcpSPoolCfgEntry 7 }
+
+    dDhcpSPoolCfgNextServer OBJECT-TYPE
+        SYNTAX          IpAddress
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the next server to be used in the DHCP
+            client boot process. The server is typically a TFTP server.
+            A length of zero indicates the next server is unspecified."
+        DEFVAL          { ''H }
+        ::= { dDhcpSPoolCfgEntry 8 }
+              
+    dDhcpSPoolCfgVrfName OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE(0..32))
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object is used to configure the VRF for DHCP pool. The 
+            zero length string means the VRF name is not specified."
+        DEFVAL          { "" }    
+        ::= { dDhcpSPoolCfgEntry 9 }
+        
+-- -----------------------------------------------------------------------------
+    dDhcpSPoolAddrAllocTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DDhcpSPoolAddrAllocEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A list of information indicates the address allocation for DHCP
+            server."    
+        ::= { dDhcpServerPoolMgmt 3 }
+
+    dDhcpSPoolAddrAllocEntry OBJECT-TYPE
+        SYNTAX          DDhcpSPoolAddrAllocEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry contaning the network configuration for DHCP pool."
+        INDEX  { 
+            dDhcpSPoolName,
+            dDhcpSPoolAddrAllocNetwork
+        }
+        ::= { dDhcpSPoolAddrAllocTable 1 }
+      
+    DDhcpSPoolAddrAllocEntry ::=  SEQUENCE {         
+        dDhcpSPoolAddrAllocNetwork          IpAddress,
+        dDhcpSPoolAddrAllocNetworkMask      IpAddress,       
+        dDhcpSPoolAddrAllocRowStatus        RowStatus
+    }
+    
+    dDhcpSPoolAddrAllocNetwork OBJECT-TYPE
+        SYNTAX          IpAddress
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+             "The network address of the corresponding entry. The number of
+             network configuration can be supported in a pool is project
+             dependent."
+    ::= { dDhcpSPoolAddrAllocEntry 1 }
+
+    dDhcpSPoolAddrAllocNetworkMask OBJECT-TYPE
+        SYNTAX          IpAddress
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+             "The network address mask of the corresponding entry."
+    ::= { dDhcpSPoolAddrAllocEntry 2 }                
+    
+    dDhcpSPoolAddrAllocRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The status of this conceptual row." 
+        ::= { dDhcpSPoolAddrAllocEntry 99}
+        
+-- ----------------------------------------------------------------------------- 
+    dDhcpSPoolManualBindTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DDhcpSPoolManualBindEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A list of information indicates the manual binding information for
+            DHCP pool."   
+        ::= { dDhcpServerPoolMgmt 4 }
+
+    dDhcpSPoolManualBindEntry OBJECT-TYPE
+        SYNTAX          DDhcpSPoolManualBindEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry contaning the manual binding information for
+            DHCP pool."
+        INDEX           { dDhcpSPoolName }
+        ::= { dDhcpSPoolManualBindTable 1 }
+
+    DDhcpSPoolManualBindEntry ::=  SEQUENCE {                
+        dDhcpSPoolManualBindHostIp          IpAddress,
+        dDhcpSPoolManualBindHostIpMask      IpAddress,
+        dDhcpSPoolManualBindHAddr           MacAddress,
+        dDhcpSPoolManualBindClientId        OCTET STRING,     
+        dDhcpSPoolManualBindRowStatus       RowStatus
+    }
+                  
+    dDhcpSPoolManualBindHostIp OBJECT-TYPE
+        SYNTAX          IpAddress
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the IP address of the manual binding entry
+            in a DHCP address pool. The user cannot configure the manual
+            binding entry in the address pool that has been configured with network."
+    ::= { dDhcpSPoolManualBindEntry 1 }
+    
+    dDhcpSPoolManualBindHostIpMask OBJECT-TYPE
+        SYNTAX          IpAddress
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the mask the network part of the host address."
+        ::= { dDhcpSPoolManualBindEntry 2 }
+    
+    dDhcpSPoolManualBindHAddr OBJECT-TYPE
+        SYNTAX          MacAddress
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the hardware address of the manual binding 
+            entry in a DHCP address pool."
+        ::= { dDhcpSPoolManualBindEntry 3 }
+
+    dDhcpSPoolManualBindClientId OBJECT-TYPE
+        SYNTAX          OCTET STRING 
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+        "This object indicates DHCP client ID of the manual binding entry
+         in a DHCP address pool."
+        ::= { dDhcpSPoolManualBindEntry 4 } 
+    
+    dDhcpSPoolManualBindRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The status of this conceptual row." 
+        ::= { dDhcpSPoolManualBindEntry 99}   
+             
+-- -----------------------------------------------------------------------------         
+    dDhcpSPoolClassAddrTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF DDhcpSPoolClassAddrEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A table contains address range configuration of a DHCP pool class."
+        ::= { dDhcpServerPoolMgmt 5 }
+
+    dDhcpSPoolClassAddrEntry OBJECT-TYPE
+        SYNTAX      DDhcpSPoolClassAddrEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "By using DHCP class, DHCP server using option configuration to
+            further determine which IP addresses to allocate to clients.
+            The first two index elements identify the pool class to which this
+            address range belongs.
+            "
+       INDEX { 
+            dDhcpSPoolName, 
+            dDhcpSClassName,
+            dDhcpSPoolClassAddrBeginAddr,
+            dDhcpSPoolClassAddrEndAddr
+       }
+       ::= { dDhcpSPoolClassAddrTable 1 }
+
+    DDhcpSPoolClassAddrEntry ::=     SEQUENCE {       
+        dDhcpSPoolClassAddrBeginAddr    IpAddress,
+        dDhcpSPoolClassAddrEndAddr      IpAddress,
+        dDhcpSPoolClassAddrRowStatus    RowStatus
+    }
+      
+    dDhcpSPoolClassAddrBeginAddr OBJECT-TYPE
+        SYNTAX          IpAddress
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The start address of this class address range.
+            A special address 0.0.0.0 indicates there is no address range 
+            is configured for this pool class. When a valid address range
+            is configured, the entry of 0.0.0.0 will be removed.             
+            "
+        ::= { dDhcpSPoolClassAddrEntry 1 }
+
+    dDhcpSPoolClassAddrEndAddr OBJECT-TYPE
+        SYNTAX          IpAddress
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The end address of this class address range."
+        ::= { dDhcpSPoolClassAddrEntry 2 }
+
+    dDhcpSPoolClassAddrRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The status of this conceptual row." 
+        ::= { dDhcpSPoolClassAddrEntry 99}
+
+-- -----------------------------------------------------------------------------        
+    dDhcpSPoolOptionTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DDhcpSPoolOptionEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A list of option configurations for DHCP pools."
+        ::= { dDhcpServerPoolMgmt 6 }
+
+    dDhcpSPoolOptionEntry OBJECT-TYPE
+        SYNTAX          DDhcpSPoolOptionEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+           "An entry contaning a DHCP option configuration of a DHCP class."
+        INDEX  { 
+            dDhcpSPoolName, 
+            dDhcpSPoolOptionCode   
+        }
+        ::= { dDhcpSPoolOptionTable 1 }
+
+    DDhcpSPoolOptionEntry ::=   SEQUENCE {
+        dDhcpSPoolOptionCode            INTEGER,
+        dDhcpSPoolOptionType            INTEGER,
+        dDhcpSPoolOptionValue           DisplayString,
+        dDhcpSPoolOptionRowStatus       RowStatus
+    }
+       
+    dDhcpSPoolOptionCode OBJECT-TYPE
+        SYNTAX          INTEGER (2..254)
+        MAX-ACCESS      not-accessible
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the code of DHCP option. Some options can be
+            configured by other objects (e.g. option 1 which is used to
+            configure Subnet Mask can be configured by dDhcpSPoolAddrAllocEntry
+            and then should not be configured by this object."
+        ::= { dDhcpSPoolOptionEntry 1 }
+
+    dDhcpSPoolOptionType OBJECT-TYPE
+        SYNTAX  INTEGER {
+            string(1),
+            hex(2),
+            ip(3)
+        }
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the type of dDhcpSPoolOptionValue.
+            string(1): The type of option value is character string.               
+            hex(2)   : The type of option value is hexadecimal string.  
+            ip(3)    : The type of option value is IP list."
+    ::= { dDhcpSPoolOptionEntry 2 }
+    
+    dDhcpSPoolOptionValue OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the value of the corresponding DHCP 
+            option."   
+        ::= { dDhcpSPoolOptionEntry 3 }  
+       
+    dDhcpSPoolOptionRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+           "The status of this conceptual row."
+        ::= { dDhcpSPoolOptionEntry 99 }        
+    
+-- -----------------------------------------------------------------------------       
+    dDhcpSPoolDefaultRouterTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DDhcpSPoolDefaultRouterEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A list of default router IP configuration for DHCP client."             
+        ::= { dDhcpServerPoolMgmt 7 }
+
+    dDhcpSPoolDefaultRouterEntry OBJECT-TYPE
+        SYNTAX          DDhcpSPoolDefaultRouterEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry contaning default router configuration."
+        INDEX { 
+            dDhcpSPoolName, 
+            dDhcpSPoolDefaultRouterIndex
+        }
+        ::= { dDhcpSPoolDefaultRouterTable 1 }
+
+    DDhcpSPoolDefaultRouterEntry ::=    SEQUENCE {
+        dDhcpSPoolDefaultRouterIndex        Unsigned32,
+        dDhcpSPoolDefaultRouterAddr         IpAddress,
+        dDhcpSPoolDefaultRouterRowStatus    RowStatus
+    }
+   
+    dDhcpSPoolDefaultRouterIndex OBJECT-TYPE
+        SYNTAX          Unsigned32 (1..8)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The default router index."
+        ::= { dDhcpSPoolDefaultRouterEntry 1 }
+
+    dDhcpSPoolDefaultRouterAddr OBJECT-TYPE
+        SYNTAX         IpAddress
+        MAX-ACCESS     read-create
+        STATUS  current
+        DESCRIPTION
+           "The address of the default router."
+        ::= { dDhcpSPoolDefaultRouterEntry 2 }
+
+    dDhcpSPoolDefaultRouterRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The status of this conceptual row." 
+        ::= { dDhcpSPoolDefaultRouterEntry 99}
+
+-- -----------------------------------------------------------------------------       
+    dDhcpSPoolDnsServerTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DDhcpSPoolDnsServerEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A list of DNS server configurations."             
+        ::= { dDhcpServerPoolMgmt 8 }
+
+    dDhcpSPoolDnsServerEntry OBJECT-TYPE
+        SYNTAX          DDhcpSPoolDnsServerEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry containing DNS server configuration for DHCP pool."
+        INDEX { 
+            dDhcpSPoolName, 
+            dDhcpSPoolDnsServerIndex
+        }
+    ::= { dDhcpSPoolDnsServerTable 1 }
+
+    DDhcpSPoolDnsServerEntry ::=    SEQUENCE {
+        dDhcpSPoolDnsServerIndex        Unsigned32,
+        dDhcpSPoolDnsServerAddr         IpAddress,
+        dDhcpSPoolDnsServerRowStatus    RowStatus
+    }
+  
+    dDhcpSPoolDnsServerIndex OBJECT-TYPE
+        SYNTAX          Unsigned32 (1..8)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The DNS server index."
+        ::= { dDhcpSPoolDnsServerEntry 1 }
+
+    dDhcpSPoolDnsServerAddr OBJECT-TYPE
+        SYNTAX         IpAddress
+        MAX-ACCESS     read-create
+        STATUS  current
+        DESCRIPTION
+           "The address of the DNS server."
+        ::= { dDhcpSPoolDnsServerEntry 2 }
+
+    dDhcpSPoolDnsServerRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The status of this conceptual row." 
+        ::= { dDhcpSPoolDnsServerEntry 99}              
+
+-- -----------------------------------------------------------------------------       
+    dDhcpSPoolWinsServerTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DDhcpSPoolWinsServerEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A list of WINS (Windows Internet Name Service) server
+            configurations."             
+        ::= { dDhcpServerPoolMgmt 9 }
+
+    dDhcpSPoolWinsServerEntry OBJECT-TYPE
+        SYNTAX          DDhcpSPoolWinsServerEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry containing WINS server configuration."
+        INDEX { 
+            dDhcpSPoolName, 
+            dDhcpSPoolWinsServerIndex
+        }
+        ::= { dDhcpSPoolWinsServerTable 1 }
+
+    DDhcpSPoolWinsServerEntry ::=    SEQUENCE {    
+        dDhcpSPoolWinsServerIndex       Unsigned32,
+        dDhcpSPoolWinsServerAddr        IpAddress,
+        dDhcpSPoolWinsServerRowStatus   RowStatus
+    }  
+
+    dDhcpSPoolWinsServerIndex OBJECT-TYPE
+        SYNTAX          Unsigned32 (1..8)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The index of this WINS server."
+        ::= { dDhcpSPoolWinsServerEntry 1 }
+
+    dDhcpSPoolWinsServerAddr OBJECT-TYPE
+        SYNTAX          IpAddress
+        MAX-ACCESS      read-create
+        STATUS  current
+        DESCRIPTION
+           "The address of the WINS server."
+        ::= { dDhcpSPoolWinsServerEntry 2 }
+
+    dDhcpSPoolWinsServerRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The status of this conceptual row." 
+        ::= { dDhcpSPoolWinsServerEntry 99}              
+   
+-- -----------------------------------------------------------------------------
+    dDhcpServerInfo             OBJECT IDENTIFIER ::= { dDhcpServerMIBObjects 4} 
+
+    dDhcpServerPktStatistics    OBJECT IDENTIFIER ::= { dDhcpServerInfo 1 }
+        
+    dDhcpServerClearStatistics  OBJECT-TYPE
+        SYNTAX      INTEGER{   
+            clear(1),
+            noOp(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS current
+        DESCRIPTION
+           "This object is used to reset all DHCP server counters when
+            set to 'clear'.
+            No action is taken if this object is set to 'noOp'.
+            When read, the value 'noOp' is returned."
+        DEFVAL      { noOp }
+        ::= { dDhcpServerPktStatistics 1 }
+
+    dDhcpServerRecvBootRequest OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The total number of received BootRequest packets."
+        ::= { dDhcpServerPktStatistics 2 }
+    
+    dDhcpServerRecvMalformedPkt OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The total number of received malformed packets."
+        ::= { dDhcpServerPktStatistics 3 }
+    
+    dDhcpServerRecvRenewPkt OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The total number of received packets used to extend leases."
+        ::= { dDhcpServerPktStatistics 4 }
+    
+    dDhcpServerRecvDiscover OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The total number of received DHCPDISCOVER packets."
+        ::= { dDhcpServerPktStatistics 5 }
+    
+    dDhcpServerRecvRequest OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The total number of received DHCPREQUEST packets."
+        ::= { dDhcpServerPktStatistics 6 }
+    
+    dDhcpServerRecvDecline OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The total number of received DHCPDECLINE packets."
+        ::= { dDhcpServerPktStatistics 7 }
+    
+    dDhcpServerRecvRelease OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The total number of received DHCPRELEASE packets."
+        ::= { dDhcpServerPktStatistics 8 }
+    
+    dDhcpServerRecvInform OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The total number of received DHCPRINFORM packets."
+        ::= { dDhcpServerPktStatistics 9 }
+    
+    dDhcpServerSendBootReply OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The total number of sent BootReply packets."
+        ::= { dDhcpServerPktStatistics 10 }
+    
+    dDhcpServerSendOffer OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The total number of sent DHCPOFFER packets."
+        ::= { dDhcpServerPktStatistics 11 }
+    
+    dDhcpServerSendAck OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The total number of sent DHCPACK packets."
+        ::= { dDhcpServerPktStatistics 12 }
+    
+    dDhcpServerSendNak OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The total number of sent DHCPNAK packets."
+        ::= { dDhcpServerPktStatistics 13 }
+
+-- -----------------------------------------------------------------------------           
+    dDhcpServerBindingTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DDhcpServerBindingEntry
+        MAX-ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A list of information regarding binding information of a pool of
+            IP addresses."
+        ::= { dDhcpServerInfo 2 }
+
+    dDhcpServerBindingEntry OBJECT-TYPE
+        SYNTAX          DDhcpServerBindingEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An address binding entry."
+        INDEX { 
+            dDhcpSPoolName, 
+            dDhcpServerBindingVrfName,
+            dDhcpServerBindingIpAddress
+        }
+        ::= { dDhcpServerBindingTable 1 }
+
+    DDhcpServerBindingEntry ::=        SEQUENCE {        
+        dDhcpServerBindingVrfName               DisplayString,
+        dDhcpServerBindingIpAddress             IpAddress,
+        dDhcpSBindingHwAddrOrClientId           OCTET STRING,       
+        dDhcpServerBindingState                 INTEGER,
+        dDhcpServerBindingLeaseExpire           DateAndTime,       
+        dDhcpServerBindingClear                 INTEGER
+    }
+    
+    dDhcpServerBindingVrfName OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE(0..32))
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The name of virtual routing and forwarding(VRF).  
+            If this object is a zero length string, the corresponding entry is
+            for global routing and forwarding space."
+        ::= { dDhcpServerBindingEntry 1 }
+        
+    dDhcpServerBindingIpAddress OBJECT-TYPE
+        SYNTAX          IpAddress
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+             "This object indicates the IP address which has been assigned to a
+             specified client."
+        ::= { dDhcpServerBindingEntry 2 }
+   
+    dDhcpSBindingHwAddrOrClientId OBJECT-TYPE  
+        SYNTAX          OCTET STRING 
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the hardware address or client identifier
+			of the DHCP client. The first octet of this object contains the 
+			hardware type of the DHCP client. The remaining octets contain the
+			hardware address of the client.
+			If the first octet is 0 (zero) indicates the remaining octets
+			contain other than a hardware address. For more information about the
+			client identifier, please see RFC 2132, DHCP Options and BOOTP
+			Vendor Extensions, section 9.14." 
+        ::= { dDhcpServerBindingEntry 3 }
+
+    dDhcpServerBindingState OBJECT-TYPE
+        SYNTAX  INTEGER {
+            manual(1),
+            automatic(2),
+            offering(3),
+            bootp(4)
+        }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+           "The state of this binding."
+        ::= { dDhcpServerBindingEntry 4 }
+
+    dDhcpServerBindingLeaseExpire OBJECT-TYPE
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the expiration of the lease expiration time
+            of the binding entry.
+            The special value of all '00'Hs indicates that the lease will never
+            be expired (infinite)."
+        ::= { dDhcpServerBindingEntry 5 }
+
+    dDhcpServerBindingClear OBJECT-TYPE
+        SYNTAX  INTEGER {
+            noOp(1),
+            clear(2)
+        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "This object is used to clear this entry.
+            No action is taken if this object is set to 'noOp'.
+            The value of this object when read is always 'noOp'."
+    ::= { dDhcpServerBindingEntry 6 }
+
+-- -----------------------------------------------------------------------------
+    dDhcpSConflictIpTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF DDhcpSConflictIpEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A list of conflict IP addresses while DHCP Server attempts to assign
+            the IP address to client."
+        ::= { dDhcpServerInfo 3 }
+
+    dDhcpSConflictIpEntry OBJECT-TYPE
+        SYNTAX          DDhcpSConflictIpEntry
+        MAX-ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A DHCP address conflict means a duplication of use
+            of the same IP address by two hosts."
+        INDEX { 
+            dDhcpSPoolName,
+            dDhcpSConflictIpVrfName,
+            dDhcpSConflictIpAddr
+        }
+        ::= { dDhcpSConflictIpTable 1 }
+
+    DDhcpSConflictIpEntry ::=    SEQUENCE {
+        dDhcpSConflictIpVrfName         DisplayString,
+        dDhcpSConflictIpAddr            IpAddress,
+        dDhcpSConflictIpDetectMethod    INTEGER,
+        dDhcpSConflictIpDetectTime      DateAndTime,
+        dDhcpSConflictIpClear           INTEGER
+    }
+
+    dDhcpSConflictIpVrfName OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE(0..32))
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The name of virtual routing and forwarding (VRF).  
+            If this object is zero length string, the corresponding entry is
+            for global routing and forwarding space."
+        ::= { dDhcpSConflictIpEntry 1 }
+        
+    dDhcpSConflictIpAddr OBJECT-TYPE
+        SYNTAX          IpAddress
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the IP address which is duplicated and used
+            by more than one host."
+        ::= { dDhcpSConflictIpEntry 2 }
+
+    dDhcpSConflictIpDetectMethod OBJECT-TYPE
+        SYNTAX          INTEGER {
+            ping(1),
+            gratuitousArp(2)
+        }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The server detects conflicts using ping. The client detects
+            conflicts using gratuitous Address Resolution Protocol (ARP)."
+        ::= { dDhcpSConflictIpEntry 3 }
+
+    dDhcpSConflictIpDetectTime OBJECT-TYPE
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The time at which a DHCP address conflict detected."
+        ::= { dDhcpSConflictIpEntry 4 }
+
+    dDhcpSConflictIpClear OBJECT-TYPE
+        SYNTAX  INTEGER {
+            noOp(1),
+            clear(2)
+        }
+        MAX-ACCESS      read-write
+        STATUS  current
+        DESCRIPTION
+           "This object is used to clear this entry.
+            No action is taken if this object is set to 'noOp'.
+            The value of this object when read is always 'noOp'."
+        ::= { dDhcpSConflictIpEntry 5 }
+    
+--  ***************************************************************************
+--  Conformance
+--  ***************************************************************************
+    dDhcpServerCompliances OBJECT IDENTIFIER ::= { dDhcpServerMIBConformance 1 }
+
+    dDhcpServerCompliance MODULE-COMPLIANCE
+        STATUS current
+        DESCRIPTION 
+            "The compliance statement for entities which implement the 
+             DLINKSW-DHCP-SERVER-MIB."
+        MODULE -- this module
+        MANDATORY-GROUPS { 
+             dDhcpSGblCfgGroup, 
+             dDhcpSClassGroup, 
+             dDhcpSClassCfgGroup,
+             dDhcpSPoolGroup,
+             dDhcpSPoolCfgGroup,
+             dDhcpSPoolNetworkCfgGroup,
+             dDhcpSPoolManualBindingGroup,
+             dDhcpSStatisticsGroup,
+             dDhcpSGeneralInfoGroup
+        }
+ 
+        OBJECT          dDhcpSPoolCfgVrfName
+        MIN-ACCESS      read-only
+        DESCRIPTION
+           "Create/Write access is required only if the agent supports virtual
+            routing and forwarding(VRF)."
+        ::= { dDhcpServerCompliances 1 }
+ 
+    dDhcpServerGroups OBJECT IDENTIFIER ::= { dDhcpServerMIBConformance 2 }
+ 
+    dDhcpSGblCfgGroup OBJECT-GROUP
+        OBJECTS { 
+            dDhcpServiceEnabled, 
+            dDhcpServerPingTimeOut, 
+            dDhcpServerPingPktNumber,
+            dDhcpSExcludedAddressRowStatus 
+        }
+        STATUS current
+        DESCRIPTION 
+           "A collection of objects providing global configuration about DHCP
+           server."
+        ::= { dDhcpServerGroups 1 }
+ 
+    dDhcpSClassGroup OBJECT-GROUP
+        OBJECTS { 
+            dDhcpServerUseClassEnabled, 
+            dDhcpSClassRowStatus 
+        }
+        STATUS current
+        DESCRIPTION 
+           "A collection of objects providing DHCP class configuration."
+        ::= { dDhcpServerGroups 2 }
+
+ 
+    dDhcpSClassCfgGroup OBJECT-GROUP
+        OBJECTS {
+            dDhcpSClassOptionRowStatus,
+            dDhcpSPoolClassAddrRowStatus
+        }
+        STATUS current
+        DESCRIPTION 
+            "A collection of objects providing DHCP relay agent configuration 
+            of a class or address range of a class under a DHCP pool."
+        ::= { dDhcpServerGroups 3 }
+ 
+    dDhcpSPoolGroup OBJECT-GROUP
+        OBJECTS        { dDhcpSPoolRowStatus }
+        STATUS          current
+        DESCRIPTION 
+            "This group is used to create/delete DHCP pools."
+        ::= { dDhcpServerGroups 4 }
+ 
+    dDhcpSPoolCfgGroup OBJECT-GROUP
+        OBJECTS { 
+            dDhcpSPoolCfgDomainName, 
+            dDhcpSPoolCfgNetBIOSNodeType, 
+            dDhcpSPoolCfgLeaseState, 
+            dDhcpSPoolCfgLeaseDay, 
+            dDhcpSPoolCfgLeaseHour, 
+            dDhcpSPoolCfgLeaseMinute, 
+            dDhcpSPoolCfgBootFile, 
+            dDhcpSPoolCfgNextServer,
+            dDhcpSPoolCfgVrfName,
+            dDhcpSPoolOptionType, 
+            dDhcpSPoolOptionValue, 
+            dDhcpSPoolOptionRowStatus, 
+            dDhcpSPoolDefaultRouterAddr, 
+            dDhcpSPoolDefaultRouterRowStatus, 
+            dDhcpSPoolDnsServerAddr, 
+            dDhcpSPoolDnsServerRowStatus, 
+            dDhcpSPoolWinsServerAddr, 
+            dDhcpSPoolWinsServerRowStatus 
+        }
+        STATUS current
+        DESCRIPTION 
+           "A collection of objects providing DHCP pool configuration."
+        ::= { dDhcpServerGroups 5 }
+ 
+    dDhcpSPoolNetworkCfgGroup OBJECT-GROUP
+        OBJECTS { 
+            dDhcpSPoolAddrAllocNetworkMask, 
+            dDhcpSPoolAddrAllocRowStatus 
+        }
+        STATUS current
+        DESCRIPTION 
+            "A collection of objects providing network configuration for DHCP
+            pools."
+        ::= { dDhcpServerGroups 6 }
+ 
+    dDhcpSPoolManualBindingGroup OBJECT-GROUP
+        OBJECTS { 
+            dDhcpSPoolManualBindHostIp, 
+            dDhcpSPoolManualBindHostIpMask, 
+            dDhcpSPoolManualBindHAddr, 
+            dDhcpSPoolManualBindClientId, 
+            dDhcpSPoolManualBindRowStatus
+        }
+        STATUS current
+        DESCRIPTION 
+             "A collection of objects providing manual binding configuration for DHCP
+             pools."
+        ::= { dDhcpServerGroups 7 }
+
+    dDhcpSStatisticsGroup OBJECT-GROUP
+        OBJECTS { 
+            dDhcpServerClearStatistics, 
+            dDhcpServerRecvBootRequest, 
+            dDhcpServerRecvMalformedPkt, 
+            dDhcpServerRecvRenewPkt, 
+            dDhcpServerRecvDiscover, 
+            dDhcpServerRecvRequest, 
+            dDhcpServerRecvDecline, 
+            dDhcpServerRecvRelease, 
+            dDhcpServerRecvInform, 
+            dDhcpServerSendBootReply, 
+            dDhcpServerSendOffer, 
+            dDhcpServerSendAck, 
+            dDhcpServerSendNak 
+        }
+        STATUS current
+        DESCRIPTION 
+             "A collection of objects for management of DHCP statistics."
+        ::= { dDhcpServerGroups 8 }
+
+    dDhcpSGeneralInfoGroup OBJECT-GROUP
+        OBJECTS { 
+            dDhcpSBindingHwAddrOrClientId, 
+            dDhcpServerBindingState, 
+            dDhcpServerBindingLeaseExpire, 
+            dDhcpServerBindingClear, 
+            dDhcpSConflictIpDetectMethod, 
+            dDhcpSConflictIpDetectTime, 
+            dDhcpSConflictIpClear 
+        }
+        STATUS current
+        DESCRIPTION 
+            "A collection of objects providing general DHCP information, e.g
+             binding database, conflict IP address."
+        ::= { dDhcpServerGroups 9 }
+
+
+END

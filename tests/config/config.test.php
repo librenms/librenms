@@ -7,7 +7,6 @@ $config['db_host'] = '127.0.0.1';
 $config['db_user'] = 'root';
 $config['db_pass'] = '';
 $config['db_name'] = 'librenms_phpunit_78hunjuybybh';
-$config['db']['extension'] = 'mysqli';// mysql or mysqli
 
 // This is the user LibreNMS will run as
 //Please ensure this user is created and has the correct permissions to your install

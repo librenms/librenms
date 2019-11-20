@@ -1,0 +1,585 @@
+-- MIB created 5/06/99 21:06:00, by
+--   SMIC (the next generation) version 1.6.29, November 22, 1994.
+
+IBMIROCAUTH-MIB DEFINITIONS ::= BEGIN
+
+-- From file: "ibmauth.mi2"
+-- Compile options "G A T M"
+
+IMPORTS
+    Counter32, Gauge32, Integer32, TimeTicks, IpAddress
+            FROM SNMPv2-SMI-v1
+    OBJECT-TYPE
+            FROM RFC-1212
+    TRAP-TYPE
+            FROM RFC-1215
+    DisplayString, PhysAddress, TruthValue, RowStatus, 
+    AutonomousType, TestAndIncr
+            FROM SNMPv2-TC-v1
+    enterprises
+            FROM RFC1155-SMI;
+
+ibmIROCconfigAuth OBJECT IDENTIFIER ::= { ibmIROCconfig 2 }
+-- MODULE-IDENTITY
+--  LastUpdated
+--    9808050900Z
+--  OrgName
+--    IBM
+--  ContactInfo
+--    David D. Chen
+--     Joe B. Kerr
+--     IBM Corporation
+--     800 Park, Highway 54
+--     Research Triangle Park, NC 27709-9990
+--     Tel:    1 919 254 6182
+--     E-mail: ddchen@us.ibm.com
+--  Descr
+--    IBM Authenication.
+--  RevDate
+--    9808050900Z
+--  RevDescr
+--    Added the virtual connection configuration parameters,
+--     and define Enabled textual convention.
+--  RevDate
+--    9805050900Z
+--  RevDescr
+--    The initial version of this MIB module.
+
+ibm             OBJECT IDENTIFIER ::= { enterprises 2 }
+ibmProd         OBJECT IDENTIFIER ::= { ibm 6 }
+ibm2210         OBJECT IDENTIFIER ::= { ibmProd 72 }
+ibmIROC         OBJECT IDENTIFIER ::= { ibmProd 119 }
+ibmIROCconfig   OBJECT IDENTIFIER ::= { ibmIROC 7 }
+ibmAuthTraps    OBJECT IDENTIFIER ::= { ibmIROCconfigAuth 0 }
+ibmAuthMIB      OBJECT IDENTIFIER ::= { ibmIROCconfigAuth 1 }
+ibmAuthDomains  OBJECT IDENTIFIER ::= { ibmIROCconfigAuth 2 }
+ibmAuthConformance OBJECT IDENTIFIER ::= { ibmIROCconfigAuth 3 }
+ibmAuthGeneral  OBJECT IDENTIFIER ::= { ibmAuthMIB 1 }
+authCompliances OBJECT IDENTIFIER ::= { ibmAuthConformance 1 }
+authGroups      OBJECT IDENTIFIER ::= { ibmAuthConformance 2 }
+
+RowDefinition ::= INTEGER {
+        active(1),
+        notReady(3),
+        createAndGo(4),
+        createAndWait(5),
+        destroy(6)
+        }
+-- TEXTUAL-CONVENTION
+--  Status
+--    mandatory
+--  Descr
+--    This textual convention is used to describe a slight variation on
+--     the RowStatus textual convention, defined in SNMPv2-TC.  An
+--     object with the syntax of RowDefinition behaves as defined in
+--     RowStatus, with the following exceptions:
+--     - Upon receipt of an SNMP SET request containing rowDefinition=active,
+--       transition from 'notReady' to 'active' occurs
+--     - the state of notInService does not exist. In this environment,
+--       either the act of row creation is complete and therefore
+--       the row is in 'active' state, or the act of row creation
+--       is not complete, and therefore the row is in 'notReady' state.
+
+Enabled ::= INTEGER {
+        disabled(0),
+        enabled(1)
+        }
+-- TEXTUAL-CONVENTION
+--  Status
+--    mandatory
+--  Descr
+--    This textual convention is used to indicate if a function is
+--     enabled or disabled.
+
+DateAndTime2 ::= OCTET STRING(SIZE(0..11))
+-- TEXTUAL-CONVENTION
+--  Status
+--    mandatory
+--  Descr
+--     A date-time specification that follows the convention
+--     defined in SNMPv2-TC for DateAndTime, except allowing
+--     for a zero-length string if the date is unknown or not set.
+
+SecureOctetString ::= OCTET STRING(SIZE(0..65535))
+-- TEXTUAL-CONVENTION
+--  Status
+--    mandatory
+--  Descr
+--    This syntax describes an octet string to which a security
+--     mechanism may be applied. The description of the security
+--     mechanism is provided by a single octet security descriptor
+--     field that preceeds the secured data. The level of security
+--     on the data and the security mechanism used to protect the
+--     data may vary according to the security descriptor field.
+--    
+--     The security descriptor field consists of the first
+--     octet of the octet string data field. The data to be secured
+--     follows according to the security method as shown below:
+--         1 octet                        0 or more octets
+--     =================================================================
+--     | security descriptor | data field according to security method |
+--     =================================================================
+--    
+--     The following values are assigned to the security descriptor
+--     field and the corresponding security algorithm.
+--     (1) 0x00 (data value not accessible)
+--         The appropriate key information has not been provided or setup.
+--         The octet string consists only of the security mechanism
+--         descriptor field. No data field is provided.
+--     (2) 0x01 (no authentication, no encryption)
+--         The data field octets flow as clear-text immediately after the
+--         security descriptor octet.
+--     (3) 0x02 (DES/CBC and SHA-1: encryption and authentication)
+--         The data field octets flow according to the algorithym
+--         below immediately after the security descriptor octet.
+--         The data field octets are treated in the following manner:
+--    
+--         FIELD         OCTET NUMBER     DESCRIPTION          SECURITY
+--         ===========================================================
+--         0x02               1          security descriptor    clear
+--         +DES seed          2..9       initialization vector  clear
+--         +DESEncryptedData  10..10+n   secured data           encrypted
+--         +SHA-1 digest      10+n+1+20  secured data           digest
+--         where:
+--           + denotes concatenation
+--           the number in parentheses denotes the length of the field
+--           DES IV seed (Initialization Vector) = 8 byte non-reoccurring value
+--           DES IV (Initialization Vector) = SysUpTime(4) + SeqNo(4)
+--           DESEncryptedData = ASN1_Tag(1)+Length(2)+Data+padding
+--              ASN1_Tag = ASN1 tag, e.g., INTEGER(0x02), OCTETSTRING(0x04)
+--              Length   = the length of the data to be encrypted
+--              Data     = the data to be encrypted
+--              padding  = the DESEncryptedData is on 8-octet boundary
+--           SHA-1digest : SHA-1 digest consisting of:
+--              (0x02(1) + DESseed(8) + DESEncryptedData(*8) + OID)
+--           OID :
+--              the Object Identifier represented as a concatenation of 4 byte
+--              arrays for each level of the naming tree used in the OID.
+
+SecureDisplayString ::= OCTET STRING(SIZE(0..65535))
+-- TEXTUAL-CONVENTION
+--  Status
+--    mandatory
+--  Descr
+--    Same as SecureOctetString, with DisplayString content.
+
+SecureRowDefinition ::= OCTET STRING(SIZE(0..65535))
+-- TEXTUAL-CONVENTION
+--  Status
+--    mandatory
+--  Descr
+--    Same as SecureOctetString, with RowDefinition content.
+
+authUserProfileTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AuthUserProfileEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Table of named profiles. Used to collect information
+         about tunnel profiles and user, e.g., PPP, related
+         information."
+    ::= { ibmAuthMIB 2 }
+
+authUserProfileEntry OBJECT-TYPE
+    SYNTAX AuthUserProfileEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Each entry is a separate profile with associated attributes."
+    INDEX { IMPLIED authUserProfileName }
+    ::= { authUserProfileTable 1 }
+
+AuthUserProfileEntry ::= SEQUENCE {
+    authUserProfileName DisplayString,
+    authUserProfileRowDefinition SecureRowDefinition,
+    authUserProfilePassword SecureDisplayString,
+    authUserProfileType OCTET STRING,
+    authUserProfileMaxConnectTime INTEGER,
+    authUserProfileCallbackType INTEGER,
+    authUserProfileCallbackNum DisplayString,
+    authUserProfileDialout Enabled,
+    authUserProfileEncryptionKey SecureOctetString,
+    authUserProfileStatus INTEGER,
+    authUserProfileExpirationDate DateAndTime2,
+    authUserProfileGLoginAllowed INTEGER,
+    authUserProfileGLoginsAttempts INTEGER,
+    authUserProfileLoginAttempts INTEGER,
+    authUserProfileLoginFails INTEGER,
+    authUserProfileLoginLock INTEGER,
+    authUserProfileIpType INTEGER,
+    authUserProfileIpAddr IpAddress,
+    authUserProfileIpMask IpAddress,
+    authUserProfileHostName DisplayString,
+    authUserProfileSharedSecurity SecureDisplayString,
+    authUserProfileTunneled Enabled,
+    authUserProfileTunnelType INTEGER,
+    authUserProfileTunnelMediumType INTEGER,
+    authUserProfileTunnelServer DisplayString,
+    authUserProfileVcEnabled Enabled,
+    authUserProfileVcMaxSuspendTime INTEGER,
+    authUserProfileVcIdleTime INTEGER
+    }
+
+authUserProfileName OBJECT-TYPE
+    SYNTAX DisplayString(SIZE(1..64))
+--    Rsyntax OCTET STRING(SIZE(1..64))
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "For ppp user, it is the name of the user.  For tunnel
+         connection definition, it is the host name of the remote
+         tunnel end point."
+    ::= { authUserProfileEntry 1 }
+
+authUserProfileRowDefinition OBJECT-TYPE
+    SYNTAX SecureRowDefinition
+--    Rsyntax OCTET STRING(SIZE(0..65535))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The status of the row."
+    ::= { authUserProfileEntry 2 }
+
+authUserProfilePassword OBJECT-TYPE
+    SYNTAX SecureDisplayString
+--    Rsyntax OCTET STRING(SIZE(0..65535))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The password for this user. It is used for PPP and SNMP
+         users but not tunnel profiles."
+    ::= { authUserProfileEntry 3 }
+
+authUserProfileType OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE(1))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The profile type.  '80'H represents login.  '40'H
+         represents tunnel, and '20'H represents ppp, '10'H
+         represents snmp.  It is implementation choice to
+         restrict to one type per entry (i.e., can't be
+         combination of these types) or not support certain
+         types of users."
+    DEFVAL { '20'h }
+    ::= { authUserProfileEntry 4 }
+
+authUserProfileMaxConnectTime OBJECT-TYPE
+    SYNTAX INTEGER(-1..2147483647)
+--  Units
+--    seconds
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The max connection allowed per connection.  A value of
+         zero is using the interface default, and negative one (-1)
+         indicates no limits."
+    DEFVAL { 0 }
+    ::= { authUserProfileEntry 5 }
+
+authUserProfileCallbackType OBJECT-TYPE
+    SYNTAX INTEGER {
+        disabled(0),
+        roaming(1),
+        required(2)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The type of callback."
+    DEFVAL { disabled }
+    ::= { authUserProfileEntry 6 }
+
+authUserProfileCallbackNum OBJECT-TYPE
+    SYNTAX DisplayString(SIZE(0..30))
+--    Rsyntax OCTET STRING(SIZE(0..30))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The dial back phone number when callback type is
+         required.  An octet string of length zero indicates
+         the dial back phone number is not set."
+    DEFVAL { "" }
+    ::= { authUserProfileEntry 7 }
+
+authUserProfileDialout OBJECT-TYPE
+    SYNTAX Enabled
+--    Rsyntax INTEGER {
+--        disabled(0),
+--        enabled(1)
+--        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "A user on the network may be requesting permission
+         to use dialout function.  This flag attached to the
+         user profile determines whether the user is able to
+         dialout."
+    DEFVAL { disabled }
+    ::= { authUserProfileEntry 8 }
+
+authUserProfileEncryptionKey OBJECT-TYPE
+    SYNTAX SecureOctetString
+--    Rsyntax OCTET STRING(SIZE(0..65535))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The encryption key.  An octet string of length zero indicates
+         the encryption key is not set.  The key is used when ECP
+         is negotiated for this user."
+    DEFVAL { ''h }
+    ::= { authUserProfileEntry 9 }
+
+authUserProfileStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+        enabled(1),
+        disabled(2),
+        locked(3)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The status of the user profile entry.  By setting the
+         value to 'enabled' from a non-enabled status will reset
+         the following statistics: authUserProfileGLoginsAttempts,
+         authUserProfileLoginAttempts, authUserProfileLoginFails,
+         authUserProfileLoginLock."
+    DEFVAL { enabled }
+    ::= { authUserProfileEntry 10 }
+
+authUserProfileExpirationDate OBJECT-TYPE
+    SYNTAX DateAndTime2
+--    Rsyntax OCTET STRING(SIZE(0..11))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The date and time when the password will be expired.  That is,
+         the user will no longer be allowed to dial in after this time.
+         A value of zero length indicates no expiration."
+    DEFVAL { ''h }
+    ::= { authUserProfileEntry 11 }
+
+authUserProfileGLoginAllowed OBJECT-TYPE
+    SYNTAX INTEGER(0..2147483647)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Number of grace logins is allowed after expiration
+         Some local maximum may apply."
+    DEFVAL { 0 }
+    ::= { authUserProfileEntry 12 }
+
+authUserProfileGLoginsAttempts OBJECT-TYPE
+    SYNTAX INTEGER(0..2147483647)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Number of grace login attempted is attempted after the
+         expiration of this user profile.  Some local maximum may apply."
+    ::= { authUserProfileEntry 13 }
+
+authUserProfileLoginAttempts OBJECT-TYPE
+    SYNTAX INTEGER(0..2147483647)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Total number of login attempted, sucessfully or not."
+    ::= { authUserProfileEntry 14 }
+
+authUserProfileLoginFails OBJECT-TYPE
+    SYNTAX INTEGER(0..2147483647)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Total number of login failed."
+    ::= { authUserProfileEntry 15 }
+
+authUserProfileLoginLock OBJECT-TYPE
+    SYNTAX INTEGER(0..2147483647)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Number of consecutive failed logins attempted.  The number
+         is reset to zero after a successful login."
+    ::= { authUserProfileEntry 16 }
+
+authUserProfileIpType OBJECT-TYPE
+    SYNTAX INTEGER {
+        disabled(0),
+        single(1),
+        networkDials(3),
+        singleDials(4)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The Ip network type of Dials."
+    DEFVAL { single }
+    ::= { authUserProfileEntry 17 }
+
+authUserProfileIpAddr OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "IP address for this user."
+    DEFVAL { 0.0.0.0 }
+    ::= { authUserProfileEntry 18 }
+
+authUserProfileIpMask OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "IP mask for this user."
+    DEFVAL { 255.255.255.255 }
+    ::= { authUserProfileEntry 19 }
+
+authUserProfileHostName OBJECT-TYPE
+    SYNTAX DisplayString(SIZE(0..16))
+--    Rsyntax OCTET STRING(SIZE(0..16))
+--  Units
+--    hundredths of a second
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The host name for this user."
+    DEFVAL { "" }
+    ::= { authUserProfileEntry 20 }
+
+authUserProfileSharedSecurity OBJECT-TYPE
+    SYNTAX SecureDisplayString
+--    Rsyntax OCTET STRING(SIZE(0..65535))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The shared security between two L2TP Peers."
+    ::= { authUserProfileEntry 21 }
+
+authUserProfileTunneled OBJECT-TYPE
+    SYNTAX Enabled
+--    Rsyntax INTEGER {
+--        disabled(0),
+--        enabled(1)
+--        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The value of enabled means this PPP user profile
+         is a tunneled user."
+    DEFVAL { disabled }
+    ::= { authUserProfileEntry 22 }
+
+authUserProfileTunnelType OBJECT-TYPE
+    SYNTAX INTEGER {
+        l2tp(3)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Tunneling Protocol."
+    DEFVAL { l2tp }
+    ::= { authUserProfileEntry 23 }
+
+authUserProfileTunnelMediumType OBJECT-TYPE
+    SYNTAX INTEGER {
+        ip(1)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Tunneling Medium."
+    DEFVAL { ip }
+    ::= { authUserProfileEntry 24 }
+
+authUserProfileTunnelServer OBJECT-TYPE
+    SYNTAX DisplayString(SIZE(0..15))
+--    Rsyntax OCTET STRING(SIZE(0..15))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Tunnel-Server endpoint address.  For IP protocol, it
+         is the server IP address in dotted notation."
+    DEFVAL { "" }
+    ::= { authUserProfileEntry 25 }
+
+authUserProfileVcEnabled OBJECT-TYPE
+    SYNTAX Enabled
+--    Rsyntax INTEGER {
+--        disabled(0),
+--        enabled(1)
+--        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The value of enabled means this PPP user profile
+         is a virtual connection user."
+    DEFVAL { disabled }
+    ::= { authUserProfileEntry 26 }
+
+authUserProfileVcMaxSuspendTime OBJECT-TYPE
+    SYNTAX INTEGER(-1..2147483647)
+--  Units
+--    hours
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The maximum amount of time (in hours) that the device will
+         allow a virtual connection in suspend mode.  After that, the
+         device will remove the all states of the virtual connection.
+         A value of -1 means use the box default value, 0 means no limits.
+         It is device choice to provide reasonable minimum and maximum
+         suspend time values."
+    DEFVAL { -1 }
+    ::= { authUserProfileEntry 27 }
+
+authUserProfileVcIdleTime OBJECT-TYPE
+    SYNTAX INTEGER(-1..2147483647)
+--  Units
+--    seconds
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The device will instruct the dial-in station to suspend the
+         real connection after the inactivity for this amount of time.
+         A value of -1 means use the box default value, 0 means no limits.
+         It is device choice to support 0, and provide reasonable
+         minimum and maximum idle time values."
+    DEFVAL { -1 }
+    ::= { authUserProfileEntry 28 }
+
+authUserProfileGroup OBJECT IDENTIFIER ::= { authGroups 1 }
+-- OBJECT-GROUP
+--  Status
+--    mandatory
+--  Descr
+--    Conformance group for authentication user profile.
+--  objects
+--    authUserProfileName, authUserProfilePassword, 
+--    authUserProfileType, authUserProfileMaxConnectTime, 
+--    authUserProfileCallbackType, authUserProfileCallbackNum, 
+--    authUserProfileDialout, authUserProfileEncryptionKey, 
+--    authUserProfileStatus, authUserProfileExpirationDate, 
+--    authUserProfileGLoginAllowed, authUserProfileGLoginsAttempts, 
+--    authUserProfileLoginAttempts, authUserProfileLoginFails, 
+--    authUserProfileLoginLock, authUserProfileIpType, 
+--    authUserProfileIpAddr, authUserProfileIpMask, 
+--    authUserProfileHostName, authUserProfileTunneled, 
+--    authUserProfileTunnelType, authUserProfileTunnelMediumType, 
+--    authUserProfileTunnelServer, authUserProfileVcEnabled, 
+--    authUserProfileVcMaxSuspendTime, authUserProfileVcIdleTime
+
+authUserProfileCompliance OBJECT IDENTIFIER ::= { authCompliances 1 }
+-- MODULE-COMPLIANCE
+--  Status
+--    mandatory
+--  Descr
+--    The core compliance statement for all authentication.
+--  Module
+--    >>current<<
+--   MandGroup
+--    authUserProfileGroup
+
+
+END
+

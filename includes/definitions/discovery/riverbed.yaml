@@ -1,0 +1,52 @@
+mib: STEELHEAD-MIB:RBT-MIB
+modules:
+    processors:
+          data:
+              -
+                  oid: cpuUtil1
+                  num_oid: '.1.3.6.1.4.1.17163.1.1.5.1.4.{{ $index }}'
+                  precision: 1
+                  type: riverbed-cpu
+
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: systemTemperature
+                    value: systemTemperature
+                    num_oid: '.1.3.6.1.4.1.17163.1.1.2.9.{{ $index }}'
+                    snmp_flags: '-OQUs'
+                    index: 0
+                    descr: 'System Temperature'
+                    high_limit: 65
+        state:
+            data:
+                -
+                    oid: systemHealth
+                    value: systemHealth
+                    num_oid: '.1.3.6.1.4.1.17163.1.1.2.7.{{ $index }}'
+                    descr: 'System Health'
+                    index: 0
+                    state_name: systemHealth
+                    states:
+                        - { descr: healthy, graph: 1, value: 10000, generic: 0 }
+                        - { descr: degraded, graph: 1, value: 30000, generic: 1 }
+                        - { descr: admissionControl, graph: 1, value: 31000, generic: 1 }
+                        - { descr: critical, graph: 1, value: 50000, generic: 2 }
+                -
+                    oid: optServiceStatus
+                    value: optServiceStatus
+                    num_oid: '.1.3.6.1.4.1.17163.1.1.2.8.{{ $index }}'
+                    descr: 'Optimization Service Status'
+                    index: 0
+                    state_name: optServiceStatus
+                    states:
+                        - { descr: none, graph: 1, value: 0, generic: 3 }
+                        - { descr: unmanaged, graph: 1, value: 1, generic: 3 }
+                        - { descr: running, graph: 1, value: 2, generic: 0 }
+                        - { descr: sentCom1, graph: 1, value: 3, generic: 1 }
+                        - { descr: sentTerm1, graph: 1, value: 4, generic: 1 }
+                        - { descr: sentTerm2, graph: 1, value: 5, generic: 1 }
+                        - { descr: sentTerm3, graph: 1, value: 6, generic: 1 }
+                        - { descr: pending, graph: 1, value: 7, generic: 1 }
+                        - { descr: stopped, graph: 1, value: 8, generic: 2 }

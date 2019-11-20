@@ -1,0 +1,12 @@
+os: acos
+text: 'A10 Networks'
+type: network
+icon: a10
+group: a10
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.22610.1.3

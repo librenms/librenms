@@ -1,0 +1,396 @@
+-- *********************************************************************
+-- **
+-- ** BATM Advanced Communications.
+-- **
+-- *********************************************************************
+-- ** Filename: PRVT-L2TUNNELING-MIB.mib
+-- ** Project: T-Metro Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2009, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications and contains
+-- proprietary and confidential information. This file is made
+-- available to authorized BATM customers on the express
+-- condition that neither it, nor any of the information contained
+-- therein, shall be disclosed to third parties or be used for any
+-- purpose other than to replace, modify or upgrade firmware and/or
+-- software components of BATM manufactured equipment within the
+-- authorized customer's network, and that such transfer be
+-- completed in accordance with the instructions provided by
+-- BATM. Any other use is strictly prohibited.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SOFTWARE PROGRAMS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+--
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SOFTWARE CONTAINED IN THIS FILE.
+--
+-- ----------------------------------------------------------------------------
+
+PRVT-L2TUNNELING-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    sapEntry, sdpEntry
+        FROM PRVT-SERV-MIB
+    serviceAccessSwitch
+        FROM PRVT-SWITCH-MIB
+    Counter32, MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    DisplayString, RowStatus, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC;
+
+prvtL2TunnelingMIB MODULE-IDENTITY
+    LAST-UPDATED "201001290000Z"
+    ORGANIZATION 
+        "BATM Advanced Communication"
+    CONTACT-INFO 
+        "BATM/Telco Systems Support team
+         Email:
+         For North America: techsupport@telco.com
+         For North Europe: support@batm.de, info@batm.de
+         For the rest of the world: techsupport@telco.com"
+    DESCRIPTION 
+        "This document is the SNMP MIB module to manage the
+         layer two tunneling feature, designed for service providers."
+    REVISION    "201001290000Z"
+    DESCRIPTION 
+        "Initial version."
+    ::= { serviceAccessSwitch 3 }
+
+
+PrvtL2TunnelProfileNameTC ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "32a"
+    STATUS      current
+    DESCRIPTION 
+        "The name of a tunneling profile."
+    SYNTAX      OCTET STRING (SIZE(1..32))
+
+PrvtL2TunnelProfileNameOrNoneTC ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "32a"
+    STATUS      current
+    DESCRIPTION 
+        "Same as PrvtL2TunnelProfileNameTC except that a zero
+         length octet string represents no profile has been assigned."
+    SYNTAX      OCTET STRING (SIZE(0..32))
+
+prvtL2TunnelingMIBObjects OBJECT IDENTIFIER
+    ::= { prvtL2TunnelingMIB 1 }
+
+prvtL2TunnEnable OBJECT-TYPE
+    SYNTAX      INTEGER { enable(1), disable(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Enable/Disable L2 Tunneling feature"
+    ::= { prvtL2TunnelingMIBObjects 1 }
+
+prvtL2TunnProfileTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtL2TunnProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A table that contains all predefined and defined profiles."
+    ::= { prvtL2TunnelingMIBObjects 2 }
+
+prvtL2TunnProfileEntry OBJECT-TYPE
+    SYNTAX      PrvtL2TunnProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry in this table contains a TLS tunneling profile"
+    INDEX       { prvtL2TunnProfileName }
+    ::= { prvtL2TunnProfileTable 1 }
+
+PrvtL2TunnProfileEntry ::= SEQUENCE {
+    prvtL2TunnProfileName       PrvtL2TunnelProfileNameTC,
+    prvtL2TunnProfileRowStatus  RowStatus
+}
+
+prvtL2TunnProfileName OBJECT-TYPE
+    SYNTAX      PrvtL2TunnelProfileNameTC
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "TLS profile name.
+         There are three predefined profiles:
+         - discard-all
+         - tunnel-bdpu
+         - tunnel-all"
+    ::= { prvtL2TunnProfileEntry 1 }
+
+prvtL2TunnProfileRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "TLS profile rowStatus. It is not possible to
+         modify the predefined profiles."
+    ::= { prvtL2TunnProfileEntry 2 }
+
+prvtL2ProtocolsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtL2ProtocolsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A table that contains all predefined and
+         custom defined L2 Protocols"
+    ::= { prvtL2TunnelingMIBObjects 3 }
+
+prvtL2ProtocolsEntry OBJECT-TYPE
+    SYNTAX      PrvtL2ProtocolsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry in prvtL2ProtocolsTable."
+    INDEX       { prvtL2ProtocolName }
+    ::= { prvtL2ProtocolsTable 1 }
+
+PrvtL2ProtocolsEntry ::= SEQUENCE {
+    prvtL2ProtocolName          OCTET STRING,
+    prvtL2ProtocolRowStatus     RowStatus,
+    prvtL2ProtocolEthertype     OCTET STRING,
+    prvtL2ProtocolMAC           OCTET STRING,
+    prvtL2ReplaceMAC            OCTET STRING
+}
+
+prvtL2ProtocolName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1..16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "L2 Protocol Name.
+         The following protocol names are pre-defined:
+         - stp
+         - lacp
+         - efm-oam
+         - dot1x
+         - e-lmi
+         - lldp
+         - other   (All other bridge block of protocols)
+         - all-brs (All Bridges)
+         - garp    (GARP Block of Protocols)
+         - pb-stp  (Provider Bridge STP)
+         - pvst    (Per-VLAN STP)"
+    ::= { prvtL2ProtocolsEntry 1 }
+
+prvtL2ProtocolRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "RowStatus used to create/delete custom protocols.
+         It is not possible to modify the predefined protocols."
+    ::= { prvtL2ProtocolsEntry 2 }
+
+prvtL2ProtocolEthertype OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The protocol Ethertype."
+    ::= { prvtL2ProtocolsEntry 3 }
+
+prvtL2ProtocolMAC OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The protocol multicast MAC address
+         used for PDU distribution."
+    ::= { prvtL2ProtocolsEntry 4 }
+
+prvtL2ReplaceMAC OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The replacement multicast MAC address."
+    ::= { prvtL2ProtocolsEntry 5 }
+
+prvtL2TunnProfMapProtoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtL2TunnProfMapProtoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A table that contain actions configured
+         for each L2 protocol per TLS tunneling profile."
+    ::= { prvtL2TunnelingMIBObjects 4 }
+
+prvtL2TunnProfMapProtoEntry OBJECT-TYPE
+    SYNTAX      PrvtL2TunnProfMapProtoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry in this table contains the
+         action for the specified profile and L2 protocol"
+    INDEX       { prvtL2TunnProfileName, prvtL2ProtocolName }
+    ::= { prvtL2TunnProfMapProtoTable 1 }
+
+PrvtL2TunnProfMapProtoEntry ::= SEQUENCE {
+    prvtL2TunnProfMapProtoRowStatus     RowStatus,
+    prvtL2TunnProfMapProtoAction        INTEGER
+}
+
+prvtL2TunnProfMapProtoRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Create/delete rows"
+    ::= { prvtL2TunnProfMapProtoEntry 1 }
+
+prvtL2TunnProfMapProtoAction OBJECT-TYPE
+    SYNTAX      INTEGER { tunnel(1), discard(2), peer(3), peerAndPass(4) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The action for this TLS tunneled protocol"
+    ::= { prvtL2TunnProfMapProtoEntry 2 }
+
+prvtL2TunnSapTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtL2TunnSapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A table that contains assignments of profiles to SAPs."
+    ::= { prvtL2TunnelingMIBObjects 5 }
+
+prvtL2TunnSapEntry OBJECT-TYPE
+    SYNTAX      PrvtL2TunnSapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry in this table contains information
+         about the mapping between SAP and L2 Tunneling profiles."
+    AUGMENTS    { sapEntry }
+    ::= { prvtL2TunnSapTable 1 }
+
+PrvtL2TunnSapEntry ::= SEQUENCE {
+    prvtL2TunnSapProfile    PrvtL2TunnelProfileNameOrNoneTC
+}
+
+prvtL2TunnSapProfile OBJECT-TYPE
+    SYNTAX      PrvtL2TunnelProfileNameOrNoneTC
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The profile associated with a SAP point.
+         Setting this object with an empty string
+         will remove a profile from the SAP."
+    ::= { prvtL2TunnSapEntry 1 }
+
+prvtL2TunnSdpTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtL2TunnSdpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A table that contains assignments of profiles to SDPs."
+    ::= { prvtL2TunnelingMIBObjects 6 }
+
+prvtL2TunnSdpEntry OBJECT-TYPE
+    SYNTAX      PrvtL2TunnSdpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry in this table contains information
+         about the mapping between SDP and L2 Tunneling profiles."
+    AUGMENTS    { sdpEntry }
+    ::= { prvtL2TunnSdpTable 1 }
+
+PrvtL2TunnSdpEntry ::= SEQUENCE {
+    prvtL2TunnSdpProfile    PrvtL2TunnelProfileNameOrNoneTC
+}
+
+prvtL2TunnSdpProfile OBJECT-TYPE
+    SYNTAX      PrvtL2TunnelProfileNameOrNoneTC
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The profile associated with an SDP point.
+         Setting this object with an empty string
+         will remove a profile from the SDP."
+    ::= { prvtL2TunnSdpEntry 1 }
+
+prvtL2TunnStatisticsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtL2TunnStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A Table that provide statistics for each
+         tunneling point per protocol."
+    ::= { prvtL2TunnelingMIBObjects 8 }
+
+prvtL2TunnStatisticsEntry OBJECT-TYPE
+    SYNTAX      PrvtL2TunnStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry in this table contain the number of
+         tunneling RX and TX packets ."
+    INDEX       { prvtL2TunnInterfaceName, prvtL2TunnProtocolName }
+    ::= { prvtL2TunnStatisticsTable 1 }
+
+PrvtL2TunnStatisticsEntry ::= SEQUENCE {
+    prvtL2TunnInterfaceName     DisplayString,
+    prvtL2TunnProtocolName      DisplayString,
+    prvtL2TunnRxPackets         Counter32,
+    prvtL2TunnTxPackets         Counter32
+}
+
+prvtL2TunnInterfaceName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(4..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The interface name.
+         It is held in a string that is represented as follows:
+         SAP  - (U/S/P|ag1-14|ies)[:VlanId[:VlanID]][:igmp]
+         SDP  - (U/S/P:VlanId)|(ServiceId:A.B.C.D)
+         
+         e.g.:	 
+         SAP/SDP  -  1/1/1:22:, 10.1.1.1:10"
+    ::= { prvtL2TunnStatisticsEntry 1 }
+
+prvtL2TunnProtocolName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "L2 Protocol Name"
+    ::= { prvtL2TunnStatisticsEntry 2 }
+
+prvtL2TunnRxPackets OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of Rx L2Tunneling packets"
+    ::= { prvtL2TunnStatisticsEntry 3 }
+
+prvtL2TunnTxPackets OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of Tx L2Tunneling packets"
+    ::= { prvtL2TunnStatisticsEntry 4 }
+
+prvtL2TunnClearStatistics OBJECT-TYPE
+    SYNTAX      INTEGER { none(0), clear(1) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Clear L2Tunneling statistics for each tunneling point"
+    ::= { prvtL2TunnelingMIBObjects 9 }
+
+END -- end of module PRVT-L2TUNNELING-MIB.

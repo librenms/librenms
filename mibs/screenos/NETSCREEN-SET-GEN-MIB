@@ -1,0 +1,130 @@
+-- This module defines enterprise MIBs for Configuration monitoring
+-- 
+-- Copyright (c) 1999-2004, Juniper Networks, Inc.
+-- All rights reserved.
+
+NETSCREEN-SET-GEN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    netscreenSetting, netscreenSettingMibModule
+        FROM NETSCREEN-SMI
+    IpAddress, MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    ;
+
+netscreenSetGenMibModule MODULE-IDENTITY
+    LAST-UPDATED  "200405032022Z" -- May 03, 2004
+    ORGANIZATION
+        "Juniper Networks, Inc."
+    CONTACT-INFO
+        "Customer Support
+
+         1194 North Mathilda Avenue 
+         Sunnyvale, California 94089-1206
+         USA
+
+         Tel: 1-800-638-8296
+         E-mail: customerservice@juniper.net
+         HTTP://www.juniper.net"
+    DESCRIPTION
+         "obsolete nsSetGenSysIp"
+    REVISION      "200508120000Z" -- Aug 12, 2005
+    DESCRIPTION
+        "This module defines the object that are used to monitor all
+         the configuration info"
+    REVISION      "200405030000Z" -- May 03, 2004
+    DESCRIPTION
+        "Modified copyright and contact information"
+    REVISION      "200403030000Z" -- March 03, 2004
+    DESCRIPTION
+        "Converted to SMIv2 by Longview Software"
+    REVISION      "200311100000Z" -- November 10, 2003
+    DESCRIPTION
+        "Correct spelling mistake"
+    REVISION      "200109280000Z" -- September 28, 2001
+    DESCRIPTION
+        "No Comment"
+    REVISION      "200105270000Z" -- May 27, 2001
+    DESCRIPTION
+        "Creation Date"
+    ::= { netscreenSettingMibModule 1 }
+
+nsSetGeneral OBJECT IDENTIFIER ::= { netscreenSetting 1 }
+
+nsSetGenSysIp OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-only
+    STATUS        obsolete
+    DESCRIPTION
+        "System Ip address"
+    ::= { nsSetGeneral 1 }
+
+nsSetGenHostName OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Host name of NetScreen device."
+    ::= { nsSetGeneral 2 }
+
+nsSetGenDomain OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Domain name of NetScreen device."
+    ::= { nsSetGeneral 3 }
+
+nsSetGenOpMode OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "NetScreen device can work in one of the tree mode:
+         transparent, NAT  and route. This attribute indicates which
+         operation mode it use."
+    ::= { nsSetGeneral 4 }
+
+nsSetGenSwVer OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..128))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "NetSceen OS version."
+    ::= { nsSetGeneral 5 }
+
+nsSetGenLicInfo OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..255))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "NetScreen OS license information."
+    ::= { nsSetGeneral 6 }
+
+nsSetGenSCSAdminEnable OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "enable Command Security Shell"
+    ::= { nsSetGeneral 7 }
+
+nsSetGenDropSelfLogPac OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Log Packets to Self that are dropped"
+    ::= { nsSetGeneral 8 }
+
+END
+
+

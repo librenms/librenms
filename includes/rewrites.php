@@ -1,13 +1,12 @@
 <?php
 
+use LibreNMS\Config;
+use LibreNMS\Util\Rewrite;
 
 function rewrite_location($location)
 {
-    // FIXME -- also check the database for rewrites?
-    global $config, $debug;
-
-    if (is_array($config['location_map_regex'])) {
-        foreach ($config['location_map_regex'] as $reg => $val) {
+    if (is_array(Config::get('location_map_regex'))) {
+        foreach (Config::get('location_map_regex') as $reg => $val) {
             if (preg_match($reg, $location)) {
                 $location = $val;
                 break;
@@ -15,8 +14,8 @@ function rewrite_location($location)
         }
     }
 
-    if (is_array($config['location_map_regex_sub'])) {
-        foreach ($config['location_map_regex_sub'] as $reg => $val) {
+    if (is_array(Config::get('location_map_regex_sub'))) {
+        foreach (Config::get('location_map_regex_sub') as $reg => $val) {
             if (preg_match($reg, $location)) {
                 $location = preg_replace($reg, $val, $location);
                 break;
@@ -24,8 +23,8 @@ function rewrite_location($location)
         }
     }
 
-    if (isset($config['location_map'][$location])) {
-        $location = $config['location_map'][$location];
+    if (Config::has("location_map.$location")) {
+        $location = Config::get("location_map.$location");
     }
 
     return $location;
@@ -34,9 +33,7 @@ function rewrite_location($location)
 
 function formatMac($mac)
 {
-    $mac = preg_replace('/(..)(..)(..)(..)(..)(..)/', '\\1:\\2:\\3:\\4:\\5:\\6', $mac);
-
-    return $mac;
+    return \LibreNMS\Util\Rewrite::readableMac($mac);
 }
 
 
@@ -58,6 +55,7 @@ function rewrite_entity_descr($descr)
     $descr = str_replace('Power Supply Module', 'PSU ', $descr);
     $descr = str_replace('/Voltage Sensor/', 'Voltage', $descr);
     $descr = str_replace('Sensor', '', $descr);
+    $descr = str_replace('PMOD', 'PSU', $descr);
     $descr = preg_replace('/^temperatures /', '', $descr);
     $descr = preg_replace('/^voltages /', '', $descr);
 
@@ -75,8 +73,6 @@ function rewrite_entity_descr($descr)
  */
 function cleanPort($interface, $device = null)
 {
-    global $config;
-
     $interface['ifAlias'] = display($interface['ifAlias']);
     $interface['ifName']  = display($interface['ifName']);
     $interface['ifDescr'] = display($interface['ifDescr']);
@@ -87,17 +83,17 @@ function cleanPort($interface, $device = null)
 
     $os = strtolower($device['os']);
 
-    if (isset($config['os'][$os]['ifname'])) {
+    if (Config::get("os.$os.ifname")) {
         $interface['label'] = $interface['ifName'];
 
         if ($interface['ifName'] == '') {
             $interface['label'] = $interface['ifDescr'];
         }
-    } elseif (isset($config['os'][$os]['ifalias'])) {
+    } elseif (Config::get("os.$os.ifalias")) {
         $interface['label'] = $interface['ifAlias'];
     } else {
         $interface['label'] = $interface['ifDescr'];
-        if (isset($config['os'][$os]['ifindex'])) {
+        if (Config::get("os.$os.ifindex")) {
             $interface['label'] = $interface['label'].' '.$interface['ifIndex'];
         }
     }
@@ -106,16 +102,16 @@ function cleanPort($interface, $device = null)
         list($interface['label']) = explode('thomson', $interface['label']);
     }
 
-    if (is_array($config['rewrite_if'])) {
-        foreach ($config['rewrite_if'] as $src => $val) {
+    if (is_array(Config::get('rewrite_if'))) {
+        foreach (Config::get('rewrite_if') as $src => $val) {
             if (stristr($interface['label'], $src)) {
                 $interface['label'] = $val;
             }
         }
     }
 
-    if (is_array($config['rewrite_if_regexp'])) {
-        foreach ($config['rewrite_if_regexp'] as $reg => $val) {
+    if (is_array(Config::get('rewrite_if_regexp'))) {
+        foreach (Config::get('rewrite_if_regexp') as $reg => $val) {
             if (preg_match($reg.'i', $interface['label'])) {
                 $interface['label'] = preg_replace($reg.'i', $val, $interface['label']);
             }
@@ -166,22 +162,24 @@ function translate_ifAdminStatus($ifAdminStatus)
 function makeshortif($if)
 {
     $rewrite_shortif = array(
-        'tengigabitethernet' => 'Te',
-        'tengige'            => 'Te',
-        'gigabitethernet'    => 'Gi',
-        'fastethernet'       => 'Fa',
-        'ethernet'           => 'Et',
-        'serial'             => 'Se',
-        'pos'                => 'Pos',
-        'port-channel'       => 'Po',
-        'atm'                => 'Atm',
-        'null'               => 'Null',
-        'loopback'           => 'Lo',
-        'dialer'             => 'Di',
-        'vlan'               => 'Vlan',
-        'tunnel'             => 'Tunnel',
-        'serviceinstance'    => 'SI',
-        'dwdm'               => 'DWDM',
+        'tengigabitethernet'  => 'Te',
+        'ten-gigabitethernet' => 'Te',
+        'tengige'             => 'Te',
+        'gigabitethernet'     => 'Gi',
+        'fastethernet'        => 'Fa',
+        'ethernet'            => 'Et',
+        'serial'              => 'Se',
+        'pos'                 => 'Pos',
+        'port-channel'        => 'Po',
+        'atm'                 => 'Atm',
+        'null'                => 'Null',
+        'loopback'            => 'Lo',
+        'dialer'              => 'Di',
+        'vlan'                => 'Vlan',
+        'tunnel'              => 'Tunnel',
+        'serviceinstance'     => 'SI',
+        'dwdm'                => 'DWDM',
+        'bundle-ether'        => 'BE',
     );
 
     $if = fixifName($if);
@@ -297,12 +295,29 @@ function rewrite_fortinet_hardware($hardware)
         '.1.3.6.1.4.1.12356.101.1.800'   => 'FortiGate 80C',
         '.1.3.6.1.4.1.12356.1688'        => 'FortiMail 2000A',
         '.1.3.6.1.4.1.12356.103.1.1000'  => 'FortiManager 100',
-        '.1.3.6.1.4.1.12356.103.1.20000' => 'FortiManager 2000XL',
+        '.1.3.6.1.4.1.12356.103.1.1001'  => 'FortiManager VM',
+        '.1.3.6.1.4.1.12356.103.1.1003'  => 'FortiManager 100C',
+        '.1.3.6.1.4.1.12356.103.1.2004'  => 'FortiManager 200D',
+        '.1.3.6.1.4.1.12356.103.1.2005'  => 'FortiManager 200E',
         '.1.3.6.1.4.1.12356.103.1.3004'  => 'FortiManager 300D',
-        '.1.3.6.1.4.1.12356.103.1.30000' => 'FortiManager 3000',
-        '.1.3.6.1.4.1.12356.103.1.30002' => 'FortiManager 3000B',
+        '.1.3.6.1.4.1.12356.103.1.3005'  => 'FortiManager 300E',
         '.1.3.6.1.4.1.12356.103.1.4000'  => 'FortiManager 400',
         '.1.3.6.1.4.1.12356.103.1.4001'  => 'FortiManager 400A',
+        '.1.3.6.1.4.1.12356.103.1.4002'  => 'FortiManager 400B',
+        '.1.3.6.1.4.1.12356.103.1.4003'  => 'FortiManager 400C',
+        '.1.3.6.1.4.1.12356.103.1.4005'  => 'FortiManager 400E',
+        '.1.3.6.1.4.1.12356.103.1.10003'  => 'FortiManager 1000C',
+        '.1.3.6.1.4.1.12356.103.1.10004'  => 'FortiManager 1000D',
+        '.1.3.6.1.4.1.12356.103.1.20005'  => 'FortiManager 2000E',
+        '.1.3.6.1.4.1.12356.103.1.20000'  => 'FortiManager 2000XL',
+        '.1.3.6.1.4.1.12356.103.1.30000'  => 'FortiManager 3000',
+        '.1.3.6.1.4.1.12356.103.1.30002'  => 'FortiManager 3000B',
+        '.1.3.6.1.4.1.12356.103.1.30003'  => 'FortiManager 3000C',
+        '.1.3.6.1.4.1.12356.103.1.30006'  => 'FortiManager 3000F',
+        '.1.3.6.1.4.1.12356.103.1.39005'  => 'FortiManager 3900E',
+        '.1.3.6.1.4.1.12356.103.1.40004'  => 'FortiManager 4000D',
+        '.1.3.6.1.4.1.12356.103.1.40005'  => 'FortiManager 4000E',
+        '.1.3.6.1.4.1.12356.103.1.50011'  => 'FortiManager 5001A',
         '.1.3.6.1.4.1.12356.106.1.50030' => 'FortiSwitch 5003A',
         '.1.3.6.1.4.1.12356.101.1.510'   => 'FortiWiFi 50B',
         '.1.3.6.1.4.1.12356.101.1.610'   => 'FortiWiFi 60',
@@ -321,77 +336,81 @@ function rewrite_fortinet_hardware($hardware)
 function rewrite_extreme_hardware($hardware)
 {
     $rewrite_extreme_hardware = array(
-        '.1.3.6.1.4.1.1916.2.26'  => 'Alpine 3802',
-        '.1.3.6.1.4.1.1916.2.20'  => 'Alpine 3804',
-        '.1.3.6.1.4.1.1916.2.17'  => 'Alpine 3808',
-        '.1.3.6.1.4.1.1916.2.86'  => 'Altitude 300',
-        '.1.3.6.1.4.1.1916.2.75'  => 'Altitude 350',
-        '.1.3.6.1.4.1.1916.2.56'  => 'BlackDiamond 10808',
-        '.1.3.6.1.4.1.1916.2.85'  => 'BlackDiamond 12802',
-        '.1.3.6.1.4.1.1916.2.77'  => 'BlackDiamond 12804',
-        '.1.3.6.1.4.1.1916.2.8'   => 'BlackDiamond 6800',
-        '.1.3.6.1.4.1.1916.2.27'  => 'BlackDiamond 6804',
-        '.1.3.6.1.4.1.1916.2.11'  => 'BlackDiamond 6808',
-        '.1.3.6.1.4.1.1916.2.24'  => 'BlackDiamond 6816',
-        '.1.3.6.1.4.1.1916.2.74'  => 'BlackDiamond 8806',
-        '.1.3.6.1.4.1.1916.2.62'  => 'BlackDiamond 8810',
-        '.1.3.6.1.4.1.1916.2.23'  => 'EnetSwitch 24Port',
-        '.1.3.6.1.4.1.1916.2.83'  => 'Sentriant CE150',
-        '.1.3.6.1.4.1.1916.2.58'  => 'Summit 400-48t',
-        '.1.3.6.1.4.1.1916.2.71'  => 'Summit X450a-24t',
-        '.1.3.6.1.4.1.1916.2.81'  => 'Summit X450a-24t',
         '.1.3.6.1.4.1.1916.2.1'   => 'Summit 1',
-        '.1.3.6.1.4.1.1916.2.19'  => 'Summit 1iSX',
-        '.1.3.6.1.4.1.1916.2.14'  => 'Summit 1iTX',
         '.1.3.6.1.4.1.1916.2.2'   => 'Summit 2',
-        '.1.3.6.1.4.1.1916.2.53'  => 'Summit 200-24',
-        '.1.3.6.1.4.1.1916.2.70'  => 'Summit 200-24fx',
-        '.1.3.6.1.4.1.1916.2.54'  => 'Summit 200-48',
-        '.1.3.6.1.4.1.1916.2.7'   => 'Summit 24',
-        '.1.3.6.1.4.1.1916.2.41'  => 'Summit 24e2SX',
-        '.1.3.6.1.4.1.1916.2.40'  => 'Summit 24e2TX',
-        '.1.3.6.1.4.1.1916.2.25'  => 'Summit 24e3',
         '.1.3.6.1.4.1.1916.2.3'   => 'Summit 3',
-        '.1.3.6.1.4.1.1916.2.61'  => 'Summit 300-24',
-        '.1.3.6.1.4.1.1916.2.55'  => 'Summit 300-48',
         '.1.3.6.1.4.1.1916.2.4'   => 'Summit 4',
-        '.1.3.6.1.4.1.1916.2.64'  => 'Summit 400-24p',
-        '.1.3.6.1.4.1.1916.2.63'  => 'Summit 400-24t',
-        '.1.3.6.1.4.1.1916.2.59'  => 'Summit 400-24x',
-        '.1.3.6.1.4.1.1916.2.6'   => 'Summit 48',
-        '.1.3.6.1.4.1.1916.2.16'  => 'Summit 48i',
-        '.1.3.6.1.4.1.1916.2.28'  => 'Summit 48i1u',
         '.1.3.6.1.4.1.1916.2.5'   => 'Summit 4FX',
-        '.1.3.6.1.4.1.1916.2.15'  => 'Summit 5i',
-        '.1.3.6.1.4.1.1916.2.21'  => 'Summit 5iLX',
-        '.1.3.6.1.4.1.1916.2.22'  => 'Summit 5iTX',
+        '.1.3.6.1.4.1.1916.2.6'   => 'Summit 48',
+        '.1.3.6.1.4.1.1916.2.7'   => 'Summit 24',
+        '.1.3.6.1.4.1.1916.2.8'   => 'BlackDiamond 6800',
+        '.1.3.6.1.4.1.1916.2.11'  => 'BlackDiamond 6808',
         '.1.3.6.1.4.1.1916.2.12'  => 'Summit 7iSX',
         '.1.3.6.1.4.1.1916.2.13'  => 'Summit 7iTX',
+        '.1.3.6.1.4.1.1916.2.14'  => 'Summit 1iTX',
+        '.1.3.6.1.4.1.1916.2.15'  => 'Summit 5i',
+        '.1.3.6.1.4.1.1916.2.16'  => 'Summit 48i',
+        '.1.3.6.1.4.1.1916.2.17'  => 'Alpine 3808',
+        '.1.3.6.1.4.1.1916.2.19'  => 'Summit 1iSX',
+        '.1.3.6.1.4.1.1916.2.20'  => 'Alpine 3804',
+        '.1.3.6.1.4.1.1916.2.21'  => 'Summit 5iLX',
+        '.1.3.6.1.4.1.1916.2.22'  => 'Summit 5iTX',
+        '.1.3.6.1.4.1.1916.2.23'  => 'EnetSwitch 24Port',
+        '.1.3.6.1.4.1.1916.2.24'  => 'BlackDiamond 6816',
+        '.1.3.6.1.4.1.1916.2.25'  => 'Summit 24e3',
+        '.1.3.6.1.4.1.1916.2.26'  => 'Alpine 3802',
+        '.1.3.6.1.4.1.1916.2.27'  => 'BlackDiamond 6804',
+        '.1.3.6.1.4.1.1916.2.28'  => 'Summit 48i1u',
         '.1.3.6.1.4.1.1916.2.30'  => 'Summit Px1',
+        '.1.3.6.1.4.1.1916.2.40'  => 'Summit 24e2TX',
+        '.1.3.6.1.4.1.1916.2.41'  => 'Summit 24e2SX',
+        '.1.3.6.1.4.1.1916.2.53'  => 'Summit 200-24',
+        '.1.3.6.1.4.1.1916.2.54'  => 'Summit 200-48',
+        '.1.3.6.1.4.1.1916.2.55'  => 'Summit 300-48',
+        '.1.3.6.1.4.1.1916.2.56'  => 'BlackDiamond 10808',
+        '.1.3.6.1.4.1.1916.2.58'  => 'Summit 400-48t',
+        '.1.3.6.1.4.1.1916.2.59'  => 'Summit 400-24x',
+        '.1.3.6.1.4.1.1916.2.61'  => 'Summit 300-24',
+        '.1.3.6.1.4.1.1916.2.62'  => 'BlackDiamond 8810',
+        '.1.3.6.1.4.1.1916.2.63'  => 'Summit 400-24t',
+        '.1.3.6.1.4.1.1916.2.64'  => 'Summit 400-24p',
+        '.1.3.6.1.4.1.1916.2.65'  => 'Summit X450-24x',
+        '.1.3.6.1.4.1.1916.2.66'  => 'Summit X450-24t',
         '.1.3.6.1.4.1.1916.2.67'  => 'SummitStack',
-        '.1.3.6.1.4.1.1916.2.93'  => 'Summit Ver2Stack',
         '.1.3.6.1.4.1.1916.2.68'  => 'SummitWM 100',
         '.1.3.6.1.4.1.1916.2.69'  => 'SummitWM 1000',
+        '.1.3.6.1.4.1.1916.2.70'  => 'Summit 200-24fx',
+        '.1.3.6.1.4.1.1916.2.71'  => 'Summit X450a-24t',
+        '.1.3.6.1.4.1.1916.2.72'  => 'Summit X450e-24p',
+        '.1.3.6.1.4.1.1916.2.74'  => 'BlackDiamond 8806',
+        '.1.3.6.1.4.1.1916.2.75'  => 'Altitude 350',
+        '.1.3.6.1.4.1.1916.2.76'  => 'Summit X450a-48t',
+        '.1.3.6.1.4.1.1916.2.77'  => 'BlackDiamond 12804',
+        '.1.3.6.1.4.1.1916.2.79'  => 'Summit X450e-48p',
+        '.1.3.6.1.4.1.1916.2.80'  => 'Summit X450a-24tDC',
+        '.1.3.6.1.4.1.1916.2.81'  => 'Summit X450a-24t',
+        '.1.3.6.1.4.1.1916.2.82'  => 'Summit X450a-24xDC',
+        '.1.3.6.1.4.1.1916.2.83'  => 'Sentriant CE150',
+        '.1.3.6.1.4.1.1916.2.84'  => 'Summit X450a-24x',
+        '.1.3.6.1.4.1.1916.2.85'  => 'BlackDiamond 12802',
+        '.1.3.6.1.4.1.1916.2.86'  => 'Altitude 300',
+        '.1.3.6.1.4.1.1916.2.87'  => 'Summit X450a-48tDC',
+        '.1.3.6.1.4.1.1916.2.88'  => 'Summit X250-24t',
+        '.1.3.6.1.4.1.1916.2.89'  => 'Summit X250-24p',
+        '.1.3.6.1.4.1.1916.2.90'  => 'Summit X250-24x',
+        '.1.3.6.1.4.1.1916.2.91'  => 'Summit X250-48t',
+        '.1.3.6.1.4.1.1916.2.92'  => 'Summit X250-48p',
+        '.1.3.6.1.4.1.1916.2.93'  => 'Summit Ver2Stack',
         '.1.3.6.1.4.1.1916.2.94'  => 'SummitWM 200',
         '.1.3.6.1.4.1.1916.2.95'  => 'SummitWM 2000',
-        '.1.3.6.1.4.1.1916.2.89'  => 'Summit X250-24p',
-        '.1.3.6.1.4.1.1916.2.88'  => 'Summit X250-24t',
-        '.1.3.6.1.4.1.1916.2.90'  => 'Summit X250-24x',
-        '.1.3.6.1.4.1.1916.2.92'  => 'Summit X250-48p',
-        '.1.3.6.1.4.1.1916.2.91'  => 'Summit X250-48t',
-        '.1.3.6.1.4.1.1916.2.66'  => 'Summit X450-24t',
-        '.1.3.6.1.4.1.1916.2.65'  => 'Summit X450-24x',
-        '.1.3.6.1.4.1.1916.2.80'  => 'Summit X450a-24tDC',
-        '.1.3.6.1.4.1.1916.2.84'  => 'Summit X450a-24x',
-        '.1.3.6.1.4.1.1916.2.82'  => 'Summit X450a-24xDC',
-        '.1.3.6.1.4.1.1916.2.76'  => 'Summit X450a-48t',
-        '.1.3.6.1.4.1.1916.2.87'  => 'Summit X450a-48tDC',
-        '.1.3.6.1.4.1.1916.2.72'  => 'Summit X450e-24p',
-        '.1.3.6.1.4.1.1916.2.79'  => 'Summit X450e-48p',
         '.1.3.6.1.4.1.1916.2.100' => 'Summit x150-24t',
         '.1.3.6.1.4.1.1916.2.114' => 'Summit x650-24x',
+        '.1.3.6.1.4.1.1916.2.118' => 'Summit X650-24x(SSns)',
+        '.1.3.6.1.4.1.1916.2.120' => 'Summit x650-24x(SS)',
         '.1.3.6.1.4.1.1916.2.129' => 'NWI-e450a',
         '.1.3.6.1.4.1.1916.2.133' => 'Summit x480-48t',
+        '.1.3.6.1.4.1.1916.2.137' => 'Summit X480-24x',
+        '.1.3.6.1.4.1.1916.2.139' => 'Summit X480-24x(10G4X)',
         '.1.3.6.1.4.1.1916.2.141' => 'Summit x480-48x',
         '.1.3.6.1.4.1.1916.2.167' => 'Summit x670-48x',
         '.1.3.6.1.4.1.1916.2.168' => 'Summit x670v-48x',
@@ -835,6 +854,27 @@ function rewrite_ironware_hardware($hardware)
         'snCer2048FX'                            => 'NetIron CER 2048F + 2x10G',
         'snCer2048CX'                            => 'NetIron CER 2048C + 2x10G',
         'snTI2X24Router'                         => 'Stackable TurboIron-X24',
+        'snBrocadeMLXe4Router'                   => 'NetIron MLXe-4',
+        'snBrocadeMLXe8Router'                   => 'NetIron MLXe-8',
+        'snBrocadeMLXe16Router'                  => 'NetIron MLXe-16',
+        'snBrocadeMLXe32Router'                  => 'NetIron MLXe-32',
+        'snICX643024Switch'                      => 'Brocade ICX 6430 24-port Switch',
+        'snICX643048Switch'                      => 'Brocade ICX 6430 48-port Switch',
+        'snICX645024Switch'                      => 'Brocade ICX 6450 24-port Switch',
+        'snICX645048Switch'                      => 'Brocade ICX 6450 48-port Switch',
+        'snICX661024Switch'                      => 'Brocade ICX 6610 24-port Switch',
+        'snICX661048Switch'                      => 'Brocade ICX 6610 48-port Switch',
+        'snICX665064Switch'                      => 'Brocade ICX 6650 64-port Switch',
+        'snICX725024Switch'                      => 'Brocade ICX 7250 24-port Switch',
+        'snICX725048Switch'                      => 'Brocade ICX 7250 48-port Switch',
+        'snICX745024Switch'                      => 'Brocade ICX 7450 24-port Switch',
+        'snICX745048Switch'                      => 'Brocade ICX 7450 48-port Switch',
+        'snFastIronStackICX6430Switch'           => 'Brocade ICX 6430 Switch stack',
+        'snFastIronStackICX6450Switch'           => 'Brocade ICX 6450 Switch stack',
+        'snFastIronStackICX6610Switch'           => 'Brocade ICX 6610 Switch stack',
+        'snFastIronStackICX7250Switch'           => 'Brocade ICX 7250 Switch stack',
+        'snFastIronStackICX7450Switch'           => 'Brocade ICX 7450 Switch stack',
+        'snFastIronStackICX7750Switch'           => 'Brocade ICX 7750 Switch stack',
     );
 
     $hardware = array_str_replace($rewrite_ironware_hardware, $hardware);
@@ -868,75 +908,315 @@ function rewrite_junose_hardware($hardware)
 function rewrite_junos_hardware($hardware)
 {
     $rewrite_junos_hardware = array(
-        'jnxProductNameM40'            => 'M40',
-        'jnxProductNameM20'            => 'M20',
-        'jnxProductNameM160'           => 'M160',
-        'jnxProductNameM10'            => 'M10',
-        'jnxProductNameM5'             => 'M5',
-        'jnxProductNameT640'           => 'T640',
-        'jnxProductNameT320'           => 'T320',
-        'jnxProductNameM40e'           => 'M40e',
-        'jnxProductNameM320'           => 'M320',
-        'jnxProductNameM7i'            => 'M7i',
-        'jnxProductNameM10i'           => 'M10i',
-        'jnxProductNameJ2300'          => 'J2300',
-        'jnxProductNameJ4300'          => 'J4300',
-        'jnxProductNameJ6300'          => 'J6300',
-        'jnxProductNameIRM'            => 'IRM',
-        'jnxProductNameTX'             => 'TX',
-        'jnxProductNameM120'           => 'M120',
-        'jnxProductNameJ4350'          => 'J4350',
-        'jnxProductNameJ6350'          => 'J6350',
-        'jnxProductNameMX960'          => 'MX960',
-        'jnxProductNameJ4320'          => 'J4320',
-        'jnxProductNameJ2320'          => 'J2320',
-        'jnxProductNameJ2350'          => 'J2350',
-        'jnxProductNameMX480'          => 'MX480',
-        'jnxProductNameSRX5800'        => 'SRX5800',
-        'jnxProductNameT1600'          => 'T1600',
-        'jnxProductNameSRX5600'        => 'SRX5600',
-        'jnxProductNameMX240'          => 'MX240',
-        'jnxProductNameEX3200'         => 'EX3200',
-        'jnxProductNameEX3300'         => 'EX3300',
-        'jnxProductNameEX4200'         => 'EX4200',
-        'jnxProductNameEX8208'         => 'EX8208',
-        'jnxProductNameEX8216'         => 'EX8216',
-        'jnxProductNameSRX3600'        => 'SRX3600',
-        'jnxProductNameSRX3400'        => 'SRX3400',
-        'jnxProductNameSRX210'         => 'SRX210',
-        'jnxProductNameTXP'            => 'TXP',
-        'jnxProductNameJCS'            => 'JCS',
-        'jnxProductNameSRX240'         => 'SRX240',
-        'jnxProductNameSRX650'         => 'SRX650',
-        'jnxProductNameSRX100'         => 'SRX100',
-        'jnxProductNameESR1000V'       => 'ESR1000V',
-        'jnxProductNameEX2200'         => 'EX2200',
-        'jnxProductNameEX4500'         => 'EX4500',
-        'jnxProductNameFXSeries'       => 'FX Series',
-        'jnxProductNameIBM4274M02J02M' => 'IBM4274M02J02M',
-        // ?
-        'jnxProductNameIBM4274M06J06M' => 'IBM4274M06J06M',
-        // ?
-        'jnxProductNameIBM4274M11J11M' => 'IBM4274M11J11M',
-        // ?
-        'jnxProductNameSRX1400'        => 'SRX1400',
-        'jnxProductNameIBM4274S58J58S' => 'IBM4274S58J58S',
-        // ?
-        'jnxProductNameIBM4274S56J56S' => 'IBM4274S56J56S',
-        // ?
-        'jnxProductNameIBM4274S36J36S' => 'IBM4274S36J36S',
-        // ?
-        'jnxProductNameIBM4274S34J34S' => 'IBM4274S34J34S',
-        // ?
-        'jnxProductNameIBM427348EJ48E' => 'IBM427348EJ48E',
-        // ?
-        'jnxProductNameIBM4274E08J08E' => 'IBM4274E08J08E',
-        // ?
-        'jnxProductNameIBM4274E16J16E' => 'IBM4274E16J16E',
-        // ?
-        'jnxProductNameMX80'           => 'MX80',
-        'jnxProductName'               => '',
-        'jnxProductQFX510048S6Q'       => 'QFX5100-48S6Q',
+        'jnxProductACX1000'                 => 'ACX1000',
+        'jnxProductACX1100'                 => 'ACX1100',
+        'jnxProductACX2000'                 => 'ACX2000',
+        'jnxProductACX2100'                 => 'ACX2100',
+        'jnxProductACX2200'                 => 'ACX2200',
+        'jnxProductACX4000'                 => 'ACX4000',
+        'jnxProductACX500AC'                => 'ACX500AC',
+        'jnxProductACX500DC'                => 'ACX500DC',
+        'jnxProductACX500IAC'               => 'ACX500IAC',
+        'jnxProductACX500IDC'               => 'ACX500IDC',
+        'jnxProductACX500OAC'               => 'ACX500OAC',
+        'jnxProductACX500ODC'               => 'ACX500ODC',
+        'jnxProductACX500OPOEAC'            => 'ACX500OPOEAC',
+        'jnxProductACX500OPOEDC'            => 'ACX500OPOEDC',
+        'jnxProductACX5048'                 => 'ACX5048',
+        'jnxProductACX5096'                 => 'ACX5096',
+        'jnxProductACX5448'                 => 'ACX5448',
+        'jnxProductEX2200Cport12P'          => 'EX2200C-12P',
+        'jnxProductEX2200Cport12T'          => 'EX2200C-12T',
+        'jnxProductEX2200port24P'           => 'EX2200-24P',
+        'jnxProductEX2200port24T'           => 'EX2200-24T',
+        'jnxProductEX2200port24TDC'         =>  'EX2200-24TDC',
+        'jnxProductEX2200port48P'           => 'EX2200-48P',
+        'jnxProductEX2200port48T'           => 'EX2200-48T',
+        'jnxProductEX2300Cport12P'          => 'EX2300C-12P',
+        'jnxProductEX2300Cport12T'          => 'EX2300C-12T',
+        'jnxProductEX2300port24MP'          => 'EX2300-24MP',
+        'jnxProductEX2300port24P'           => 'EX2300-24P',
+        'jnxProductEX2300port24T'           => 'EX2300-24T',
+        'jnxProductEX2300port48MP'          => 'EX2300-48MP',
+        'jnxProductEX2300port48P'           => 'EX2300-48P',
+        'jnxProductEX2300port48T'           => 'EX2300-48T',
+        'jnxProductEX3200port24P'           => 'EX3200-24P',
+        'jnxProductEX3200port24T'           => 'EX3200-24T',
+        'jnxProductEX3200port48P'           => 'EX3200-48P',
+        'jnxProductEX3200port48T'           => 'EX3200-48T',
+        'jnxProductEX3300port24P'           => 'EX3300-24P',
+        'jnxProductEX3300port24T'           => 'EX3300-24T',
+        'jnxProductEX3300port24TDC'         => 'EX3300-24TDC',
+        'jnxProductEX3300port48P'           => 'EX3300-48P',
+        'jnxProductEX3300port48T'           => 'EX3300-48T',
+        'jnxProductEX3300port48TBF'         => 'EX3300-48TBF',
+        'jnxProductEX3400port24P'           => 'EX3400-24P',
+        'jnxProductEX3400port24T'           => 'EX3400-24T',
+        'jnxProductEX3400port48P'           => 'EX3400-48P',
+        'jnxProductEX3400port48T'           => 'EX3400-48T',
+        'jnxProductEX4200port24F'           => 'EX4200-24F',
+        'jnxProductEX4200port24P'           => 'EX4200-24P',
+        'jnxProductEX4200port24PX'          => 'EX4200-24PX',
+        'jnxProductEX4200port24T'           => 'EX4200-24T',
+        'jnxProductEX4200port48P'           => 'EX4200-48P',
+        'jnxProductEX4200port48PX'          => 'EX4200-48PX',
+        'jnxProductEX4200port48T'           => 'EX4200-48T',
+        'jnxProductEX4300port24P'           => 'EX4300-24P',
+        'jnxProductEX4300port24T'           => 'EX4300-24T',
+        'jnxProductEX4300port32F'           => 'EX4300-32F',
+        'jnxProductEX4300port48MP'          => 'EX4300-48MP',
+        'jnxProductEX4300port48P'           => 'EX4300-48P',
+        'jnxProductEX4300port48T'           => 'EX4300-48T',
+        'jnxProductEX4300port48TBF'         => 'EX4300-48TBF',
+        'jnxProductEX4300port48TDC'         => 'EX4300-48TDC',
+        'jnxProductEX4300port48TDCBF'       => 'EX4300-48TDCBF',
+        'jnxProductEX4500port20F'           => 'EX4500-20F',
+        'jnxProductEX4500port40F'           => 'EX4500-40F',
+        'jnxProductEX4550port32F'           => 'EX4550-32F',
+        'jnxProductEX4550port32T'           => 'EX4550-32T',
+        'jnxProductEX4600'                  => 'EX4600',
+        'jnxProductEX465048Y8C'             => 'EX465048Y8C',
+        'jnxProductEXXRE'                   => 'EXXRE',
+        'jnxProductFX1600port'              => 'FX1600',
+        'jnxProductFX2160port'              => 'FX2160',
+        'jnxProductIBM0719J45Eport20F'      => 'IBM0719J45E-20F',
+        'jnxProductIBM0719J45Eport40F'      => 'IBM0719J45E-40F',
+        'jnxProductIBM2409F52J52F'          => 'IBM2409F52J52F',
+        'jnxProductIBM2413F08J08F'          => 'IBM2413F08J08F',
+        'jnxProductIBM427348EJ48Eport24F'   => 'IBM427348EJ48E-24F',
+        'jnxProductIBM427348EJ48Eport24P'   => 'IBM427348EJ48E-24P',
+        'jnxProductIBM427348EJ48Eport24T'   => 'IBM427348EJ48E-24T',
+        'jnxProductIBM427348EJ48Eport48P'   => 'IBM427348EJ48E-48P',
+        'jnxProductIBM427348EJ48Eport48T'   => 'IBM427348EJ48E-48T',
+        'jnxProductIBM8729HC1J52F'          => 'IBM8729HC1J52F',
+        'jnxProductMX10'                    => 'MX10',
+        'jnxProductMX104'                   => 'MX104',
+        'jnxProductMX40'                    => 'MX40',
+        'jnxProductMX5'                     => 'MX5',
+        'jnxProductMX80'                    => 'MX80',
+        'jnxProductMX80-48T'                => 'MX80-48T',
+        'jnxProductMX80-P'                  => 'MX80-P',
+        'jnxProductMX80-T'                  => 'MX80-T',
+        'jnxProductMXTSR80'                 => 'MXTSR80',
+        'jnxProductNFX150CS1'               => 'NFX150CS1',
+        'jnxProductNFX150CS1AA'             => 'NFX150CS1AA',
+        'jnxProductNFX150CS1AE'             => 'NFX150CS1AE',
+        'jnxProductNFX150CS1EAA'            => 'NFX150CS1EAA',
+        'jnxProductNFX150CS1EAE'            => 'NFX150CS1EAE',
+        'jnxProductNFX150S1'                => 'NFX150S1',
+        'jnxProductNFX150S1E'               => 'NFX150S1E',
+        'jnxProductNFX250ATTLS1'            => 'NFX250ATTLS1',
+        'jnxProductNFX250ATTS1'             => 'NFX250ATTS1',
+        'jnxProductNFX250ATTS2'             => 'NFX250ATTS2',
+        'jnxProductNFX250LS1'               => 'NFX250LS1',
+        'jnxProductNFX250S1'                => 'NFX250S1',
+        'jnxProductNFX250S1E'               => 'NFX250S1E',
+        'jnxProductNFX250S2'                => 'NFX250S2',
+        'jnxProductNFX350S1'                => 'NFX350S1',
+        'jnxProductNFX350S2'                => 'NFX350S2',
+        'jnxProductNFX350S3'                => 'NFX350S3',
+        'jnxProductNFXOPAL'                 => 'NFXOPAL',
+        'jnxProductNFXVirtual'              => 'NFXVirtual',
+        'jnxProductNFXWhiteBox1'            => 'NFXWhiteBox1',
+        'jnxProductName'                    => '',
+        'jnxProductNameACX'                 => 'ACX',
+        'jnxProductNameACX1000'             => 'ACX1000',
+        'jnxProductNameACX1100'             => 'ACX1100',
+        'jnxProductNameACX2000'             => 'ACX2000',
+        'jnxProductNameACX2100'             => 'ACX2100',
+        'jnxProductNameACX2200'             => 'ACX2200',
+        'jnxProductNameACX4000'             => 'ACX4000',
+        'jnxProductNameACX500AC'            => 'ACX500AC',
+        'jnxProductNameACX500DC'            => 'ACX500DC',
+        'jnxProductNameACX500OAC'           => 'ACX500OAC',
+        'jnxProductNameACX500ODC'           => 'ACX500ODC',
+        'jnxProductNameACX500OPOEAC'        => 'ACX500OPOEAC',
+        'jnxProductNameACX500OPOEDC'        => 'ACX500OPOEDC',
+        'jnxProductNameACX5048'             => 'ACX5048',
+        'jnxProductNameACX5096'             => 'ACX5096',
+        'jnxProductNameACX5448'             => 'ACX5448',
+        'jnxProductNameACX6360OR'           => 'ACX6360OR',
+        'jnxProductNameACX6360OX'           => 'ACX6360OX',
+        'jnxProductNameDELLJSRX1400'        => 'DELLJSRX1400',
+        'jnxProductNameDELLJSRX3400'        => 'DELLJSRX3400',
+        'jnxProductNameDELLJSRX3600'        => 'DELLJSRX3600',
+        'jnxProductNameDELLJSRX5400'        => 'DELLJSRX5400',
+        'jnxProductNameDELLJSRX5600'        => 'DELLJSRX5600',
+        'jnxProductNameDELLJSRX5800'        => 'DELLJSRX5800',
+        'jnxProductNameDellJFX3500'         => 'DellJFX3500',
+        'jnxProductNameESR1000V'            => 'ESR1000V',
+        'jnxProductNameEX2200'              => 'EX2200',
+        'jnxProductNameEX2300'              => 'EX2300',
+        'jnxProductNameEX3200'              => 'EX3200',
+        'jnxProductNameEX3300'              => 'EX3300',
+        'jnxProductNameEX3400'              => 'EX3400',
+        'jnxProductNameEX4200'              => 'EX4200',
+        'jnxProductNameEX4300'              => 'EX4300',
+        'jnxProductNameEX4500'              => 'EX4500',
+        'jnxProductNameEX4550'              => 'EX4550',
+        'jnxProductNameEX4600'              => 'EX4600',
+        'jnxProductNameEX4650'              => 'EX4650',
+        'jnxProductNameEX6210'              => 'EX6210',
+        'jnxProductNameEX8208'              => 'EX8208',
+        'jnxProductNameEX8216'              => 'EX8216',
+        'jnxProductNameEX9204'              => 'EX9204',
+        'jnxProductNameEX9208'              => 'EX9208',
+        'jnxProductNameEX9214'              => 'EX9214',
+        'jnxProductNameEX9251'              => 'EX9251',
+        'jnxProductNameEX9253'              => 'EX9253',
+        'jnxProductNameEXXRE'               => 'EXXRE',
+        'jnxProductNameFXSeries'            => 'FXSeries',
+        'jnxProductNameFireflyPerimeter'    => 'FireflyPerimeter',
+        'jnxProductNameIBM0719J45E'         => 'IBM0719J45E',
+        'jnxProductNameIBM427348EJ48E'      => 'IBM427348EJ48E',
+        'jnxProductNameIBM4274E08J08E'      => 'IBM4274E08J08E',
+        'jnxProductNameIBM4274E16J16E'      => 'IBM4274E16J16E',
+        'jnxProductNameIBM4274M02J02M'      => 'IBM4274M02J02M',
+        'jnxProductNameIBM4274M06J06M'      => 'IBM4274M06J06M',
+        'jnxProductNameIBM4274M11J11M'      => 'IBM4274M11J11M',
+        'jnxProductNameIBM4274S34J34S'      => 'IBM4274S34J34S',
+        'jnxProductNameIBM4274S36J36S'      => 'IBM4274S36J36S',
+        'jnxProductNameIBM4274S54J54S'      => 'IBM4274S54J54S',
+        'jnxProductNameIBM4274S56J56S'      => 'IBM4274S56J56S',
+        'jnxProductNameIBM4274S58J58S'      => 'IBM4274S58J58S',
+        'jnxProductNameIBMJ08F'             => 'IBMJ08F',
+        'jnxProductNameIBMJ52F'             => 'IBMJ52F',
+        'jnxProductNameIRM'                 => 'IRM',
+        'jnxProductNameJ2300'               => 'J2300',
+        'jnxProductNameJ2320'               => 'J2320',
+        'jnxProductNameJ2350'               => 'J2350',
+        'jnxProductNameJ4300'               => 'J4300',
+        'jnxProductNameJ4320'               => 'J4320',
+        'jnxProductNameJ4350'               => 'J4350',
+        'jnxProductNameJ6300'               => 'J6300',
+        'jnxProductNameJ6350'               => 'J6350',
+        'jnxProductNameJCS'                 => 'JCS',
+        'jnxProductNameJNP10001'            => 'JNP10001',
+        'jnxProductNameJNP10003'            => 'JNP10003',
+        'jnxProductNameJNP204'              => 'JNP204',
+        'jnxProductNameJRR200'              => 'JRR200',
+        'jnxProductNameLN1000CC'            => 'LN1000CC',
+        'jnxProductNameLN1000V'             => 'LN1000V',
+        'jnxProductNameLN2600'              => 'LN2600',
+        'jnxProductNameLN2800'              => 'LN2800',
+        'jnxProductNameM10'                 => 'M10',
+        'jnxProductNameM10i'                => 'M10i',
+        'jnxProductNameM120'                => 'M120',
+        'jnxProductNameM160'                => 'M160',
+        'jnxProductNameM20'                 => 'M20',
+        'jnxProductNameM320'                => 'M320',
+        'jnxProductNameM40'                 => 'M40',
+        'jnxProductNameM40e'                => 'M40e',
+        'jnxProductNameM5'                  => 'M5',
+        'jnxProductNameM7i'                 => 'M7i',
+        'jnxProductNameMAG6610'             => 'MAG6610',
+        'jnxProductNameMAG6611'             => 'MAG6611',
+        'jnxProductNameMAG8600'             => 'MAG8600',
+        'jnxProductNameMX10'                => 'MX10',
+        'jnxProductNameMX10008'             => 'MX10008',
+        'jnxProductNameMX10016'             => 'MX10016',
+        'jnxProductNameMX104'               => 'MX104',
+        'jnxProductNameMX10440G'            => 'MX10440G',
+        'jnxProductNameMX150'               => 'MX150',
+        'jnxProductNameMX2008'              => 'MX2008',
+        'jnxProductNameMX2010'              => 'MX2010',
+        'jnxProductNameMX2020'              => 'MX2020',
+        'jnxProductNameMX240'               => 'MX240',
+        'jnxProductNameMX40'                => 'MX40',
+        'jnxProductNameMX480'               => 'MX480',
+        'jnxProductNameMX5'                 => 'MX5',
+        'jnxProductNameMX80'                => 'MX80',
+        'jnxProductNameMX960'               => 'MX960',
+        'jnxProductNameMXTSR80'             => 'MXTSR80',
+        'jnxProductNameNFX'                 => 'NFX',
+        'jnxProductNameOCPAcc'              => 'OCPAcc',
+        'jnxProductNamePTX1000'             => 'PTX1000',
+        'jnxProductNamePTX1000260C'         => 'PTX10002-60C',
+        'jnxProductNamePTX10008'            => 'PTX10008',
+        'jnxProductNamePTX10016'            => 'PTX10016',
+        'jnxProductNamePTX3000'             => 'PTX3000',
+        'jnxProductNamePTX5000'             => 'PTX5000',
+        'jnxProductNameQFX1000260C'         => 'QFX10002-60C',
+        'jnxProductNameQFX3000'             => 'QFX3000',
+        'jnxProductNameQFX3100'             => 'QFX3100',
+        'jnxProductNameQFX5000'             => 'QFX5000',
+        'jnxProductNameQFXInterconnect'     => 'QFXInterconnect',
+        'jnxProductNameQFXJVRE'             => 'QFXJVRE',
+        'jnxProductNameQFXMInterconnect'    => 'QFXMInterconnect',
+        'jnxProductNameQFXNode'             => 'QFXNode',
+        'jnxProductNameQFXSwitch'           => 'QFXSwitch',
+        'jnxProductNameSRX100'              => 'SRX100',
+        'jnxProductNameSRX110'              => 'SRX110',
+        'jnxProductNameSRX120'              => 'SRX120',
+        'jnxProductNameSRX1400'             => 'SRX1400',
+        'jnxProductNameSRX1500'             => 'SRX1500',
+        'jnxProductNameSRX210'              => 'SRX210',
+        'jnxProductNameSRX220'              => 'SRX220',
+        'jnxProductNameSRX240'              => 'SRX240',
+        'jnxProductNameSRX300'              => 'SRX300',
+        'jnxProductNameSRX320'              => 'SRX320',
+        'jnxProductNameSRX340'              => 'SRX340',
+        'jnxProductNameSRX3400'             => 'SRX3400',
+        'jnxProductNameSRX345'              => 'SRX345',
+        'jnxProductNameSRX3600'             => 'SRX3600',
+        'jnxProductNameSRX4100'             => 'SRX4100',
+        'jnxProductNameSRX4200'             => 'SRX4200',
+        'jnxProductNameSRX4600'             => 'SRX4600',
+        'jnxProductNameSRX4800'             => 'SRX4800',
+        'jnxProductNameSRX5400'             => 'SRX5400',
+        'jnxProductNameSRX550'              => 'SRX550',
+        'jnxProductNameSRX5600'             => 'SRX5600',
+        'jnxProductNameSRX5800'             => 'SRX5800',
+        'jnxProductNameSRX650'              => 'SRX650',
+        'jnxProductNameSatelliteDevice'     => 'SatelliteDevice',
+        'jnxProductNameT1600'               => 'T1600',
+        'jnxProductNameT320'                => 'T320',
+        'jnxProductNameT4000'               => 'T4000',
+        'jnxProductNameT640'                => 'T640',
+        'jnxProductNameTX'                  => 'TX',
+        'jnxProductNameTXP'                 => 'TXP',
+        'jnxProductNameVMX'                 => 'VMX',
+        'jnxProductNameVRR'                 => 'VRR',
+        'jnxProductNameVSRX'                => 'VSRX',
+        'jnxProductNameVseries'             => 'Vseries',
+        'jnxProductOCP48S'                  => 'OCP48S',
+        'jnxProductOCP48T'                  => 'OCP48T',
+        'jnxProductQFX1000236Q'             => 'QFX10002-36Q',
+        'jnxProductQFX1000272Q'             => 'QFX10002-72Q',
+        'jnxProductQFX10004'                => 'QFX10004',
+        'jnxProductQFX10008'                => 'QFX10008',
+        'jnxProductQFX10016'                => 'QFX10016',
+        'jnxProductQFX3000-G'               => 'QFX3000-G',
+        'jnxProductQFX3000-M'               => 'QFX3000-M',
+        'jnxProductQFX3008'                 => 'QFX3008',
+        'jnxProductQFX3008I'                => 'QFX3008I',
+        'jnxProductQFX3500'                 => 'QFX3500',
+        'jnxProductQFX350048T4Q'            => 'QFX3500-48T4Q',
+        'jnxProductQFX350048T4QS'           => 'QFX3500-48T4QS',
+        'jnxProductQFX3500s'                => 'QFX3500s',
+        'jnxProductQFX360016Q'              => 'QFX3600-16Q',
+        'jnxProductQFX360016QS'             => 'QFX3600-16QS',
+        'jnxProductQFX3600I'                => 'QFX3600I',
+        'jnxProductQFX510024Q'              => 'QFX5100-24Q',
+        'jnxProductQFX510024QF'             => 'QFX5100-24QF',
+        'jnxProductQFX510024QHP'            => 'QFX5100-24QHP',
+        'jnxProductQFX510024QI'             => 'QFX5100-24QI',
+        'jnxProductQFX510048C6Q'            => 'QFX5100-48C6Q',
+        'jnxProductQFX510048C6QF'           => 'QFX5100-48C6QF',
+        'jnxProductQFX510048S6Q'            => 'QFX5100-48S6Q',
+        'jnxProductQFX510048S6QF'           => 'QFX5100-48S6QF',
+        'jnxProductQFX510048T6Q'            => 'QFX5100-48T6Q',
+        'jnxProductQFX510096S6QF'           => 'QFX5100-96S6QF',
+        'jnxProductQFX510096S8Q'            => 'QFX5100-96S8Q',
+        'jnxProductQFX511032Q'              => 'QFX5110-32Q',
+        'jnxProductQFX511048S4C'            => 'QFX5110-48S4C',
+        'jnxProductQFX512048Y8C'            => 'QFX5120-48Y8C',
+        'jnxProductQFX520032C32Q'           => 'QFX5200-32C-32Q',
+        'jnxProductQFX520032C64Q'           => 'QFX5200-32C-64Q',
+        'jnxProductQFX520048Y'              => 'QFX5200-48Y',
+        'jnxProductQFX521064C'              => 'QFX5210-64C',
+        'jnxProductQFX5500'                 => 'QFX5500',
+        'jnxProductQFXC083008'              => 'QFXC083008',
     );
 
 
@@ -957,58 +1237,13 @@ function rewrite_generic_hardware($hardware)
 
 function fixiftype($type)
 {
-    $rewrite_iftype = array(
-        '/^frameRelay$/'             => 'Frame Relay',
-        '/^ethernetCsmacd$/'         => 'Ethernet',
-        '/^softwareLoopback$/'       => 'Loopback',
-        '/^tunnel$/'                 => 'Tunnel',
-        '/^propVirtual$/'            => 'Virtual Int',
-        '/^ppp$/'                    => 'PPP',
-        '/^ds1$/'                    => 'DS1',
-        '/^pos$/'                    => 'POS',
-        '/^sonet$/'                  => 'SONET',
-        '/^slip$/'                   => 'SLIP',
-        '/^mpls$/'                   => 'MPLS Layer',
-        '/^l2vlan$/'                 => 'VLAN Subif',
-        '/^atm$/'                    => 'ATM',
-        '/^aal5$/'                   => 'ATM AAL5',
-        '/^atmSubInterface$/'        => 'ATM Subif',
-        '/^propPointToPointSerial$/' => 'PtP Serial',
-    );
-
-    $type = array_preg_replace($rewrite_iftype, $type);
-
-    return ($type);
+    return Rewrite::normalizeIfType($type);
 }
 
 
 function fixifName($inf)
 {
-    $rewrite_ifname = array(
-        'ether'                                          => 'Ether',
-        'gig'                                            => 'Gig',
-        'fast'                                           => 'Fast',
-        'ten'                                            => 'Ten',
-        '-802.1q vlan subif'                             => '',
-        '-802.1q'                                        => '',
-        'bvi'                                            => 'BVI',
-        'vlan'                                           => 'Vlan',
-        'tunnel'                                         => 'Tunnel',
-        'serial'                                         => 'Serial',
-        '-aal5 layer'                                    => ' aal5',
-        'null'                                           => 'Null',
-        'atm'                                            => 'ATM',
-        'port-channel'                                   => 'Port-Channel',
-        'dial'                                           => 'Dial',
-        'hp procurve switch software loopback interface' => 'Loopback Interface',
-        'control plane interface'                        => 'Control Plane',
-        'loop'                                           => 'Loop',
-    );
-
-    $inf = strtolower($inf);
-    $inf = array_str_replace($rewrite_ifname, $inf);
-
-    return $inf;
+    return Rewrite::normalizeIfName($inf);
 }
 
 
@@ -1291,6 +1526,12 @@ function rewrite_brocade_fc_switches($descr)
         case "148":
             $hardware = "Brocade 7840 Switch";
             break;
+        case "162":
+            $hardware = "Brocade G620 Switch";
+            break;
+        case "170":
+            $hardware = "Brocade G610 Switch";
+            break;
         default:
             $hardware = "Unknown Brocade FC Switch";
     }
@@ -1415,4 +1656,71 @@ function apc_relay_state($state)
             return 2;
             break;
     }
+}
+
+/**
+ * @param $value
+ * @return mixed
+ */
+function return_number($value)
+{
+    preg_match('/[\d\.\-]+/', $value, $temp_response);
+    if (!empty($temp_response[0])) {
+        $value = $temp_response[0];
+    }
+    return $value;
+}
+
+function parse_entity_state($state, $value)
+{
+    $data = array(
+        'entStateOper' => array(
+            1 => array('text' => 'unavailable', 'color' => 'default'),
+            2 => array('text' => 'disabled', 'color' => 'danger'),
+            3 => array('text' => 'enabled', 'color' => 'success'),
+            4 => array('text' => 'testing', 'color' => 'warning'),
+        ),
+        'entStateUsage' => array(
+            1 => array('text' => 'unavailable', 'color' => 'default'),
+            2 => array('text' => 'idle', 'color' => 'info'),
+            3 => array('text' => 'active', 'color' => 'success'),
+            4 => array('text' => 'busy', 'color' => 'success'),
+        ),
+        'entStateStandby' => array(
+            1 => array('text' => 'unavailable', 'color' => 'default'),
+            2 => array('text' => 'hotStandby', 'color' => 'info'),
+            3 => array('text' => 'coldStandby', 'color' => 'info'),
+            4 => array('text' => 'providingService', 'color' => 'success'),
+        ),
+        'entStateAdmin' => array(
+            1 => array('text' => 'unknown', 'color' => 'default'),
+            2 => array('text' => 'locked', 'color' => 'info'),
+            3 => array('text' => 'shuttingDown', 'color' => 'warning'),
+            4 => array('text' => 'unlocked', 'color' => 'success'),
+        ),
+    );
+
+    if (isset($data[$state][$value])) {
+        return $data[$state][$value];
+    }
+
+    return array('text'=>'na', 'color'=>'default');
+}
+
+function parse_entity_state_alarm($bits)
+{
+    // not sure if this is correct
+    $data = array(
+        0 => array('text' => 'unavailable', 'color' => 'default'),
+        1 => array('text' => 'underRepair', 'color' => 'warning'),
+        2 => array('text' => 'critical', 'color' => 'danger'),
+        3 => array('text' => 'major', 'color' => 'danger'),
+        4 => array('text' => 'minor', 'color' => 'info'),
+        5 => array('text' => 'warning', 'color' => 'warning'),
+        6 => array('text' => 'indeterminate', 'color' => 'default'),
+    );
+
+    $alarms = str_split(base_convert($bits, 16, 2));
+    $active_alarms = array_filter($alarms);
+    return array_intersect_key($data, $active_alarms);
 }

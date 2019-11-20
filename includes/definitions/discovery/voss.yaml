@@ -1,0 +1,8 @@
+mib: RAPID-CITY
+modules:
+    processors:
+          data:
+              -
+                  oid: rcKhiSlotCpu5MinAve
+                  num_oid: '.1.3.6.1.4.1.2272.1.85.10.1.1.3.{{ $index }}'
+                  descr: VOSS Processor

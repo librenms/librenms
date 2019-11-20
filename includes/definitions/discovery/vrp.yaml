@@ -1,0 +1,205 @@
+mib: HUAWEI-ENTITY-EXTENT-MIB:HUAWEI-ENERGYMNGT-MIB:HUAWEI-STACK-MIB
+modules:
+    processors:
+          data:
+              -
+                  oid: hwEntityStateEntry
+                  value: hwEntityCpuUsage
+                  num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.1.1.5.{{ $index }}'
+                  descr: '{{ $entPhysicalName }} Processor'
+                  skip_values:
+                        -
+                            oid: hwEntityOperStatus
+                            op: '!='
+                            value: 3
+                        -
+                            oid: hwEntityCpuUsageThreshold
+                            op: '='
+                            value: 0
+    sensors:
+        pre-cache:
+            data:
+                - oid:
+                    - entPhysicalName
+                    - hwEntityAdminStatus
+                    - hwStackPortTable
+        temperature:
+            data:
+                -
+                    oid: hwOpticalModuleInfoTable
+                    value: hwEntityOpticalTemperature
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.3.1.5.{{ $index }}'
+                    descr: '{{ $entPhysicalName }}'
+                    index: '{{ $index }}'
+                    skip_values: 
+                        - 
+                            oid: hwEntityOpticalMode
+                            op: '='
+                            value: '1'
+                        - 
+                            oid: hwEntityOpticalTemperature
+                            op: '<'
+                            value: '-50'
+                -
+                    oid: hwEntityStateTable
+                    value: hwEntityTemperature
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.1.1.11.{{ $index }}'
+                    descr: '{{ $entPhysicalName }}'
+                    index: '{{ $index }}'
+                    skip_values: 0
+        dbm:
+            data:
+                -
+                    oid: hwOpticalModuleInfoTable
+                    value: hwEntityOpticalRxPower
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.3.1.8.{{ $index }}'
+                    descr: '{{ $entPhysicalName }} Rx'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    index: 'rx-{{ $index }}'
+                    user_func: 'uw_to_dbm'
+                    group: '{{ $entPhysicalName }}'
+                    skip_values: 
+                        -
+                            oid: hwEntityOpticalRxPower
+                            op: '<='
+                            value: 0
+                        -
+                            oid: hwEntityAdminStatus
+                            op: '='
+                            value: 12
+                -
+                    oid: hwOpticalModuleInfoTable
+                    value: hwEntityOpticalTxPower
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.3.1.9.{{ $index }}'
+                    descr: '{{ $entPhysicalName }} Tx'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    index: 'tx-{{ $index }}'
+                    user_func: 'uw_to_dbm'
+                    group: '{{ $entPhysicalName }}'
+                    skip_values:
+                        -
+                            oid: hwEntityOpticalTxPower
+                            op: '<='
+                            value: 0
+                        -
+                            oid: hwEntityAdminStatus
+                            op: '='
+                            value: 12
+                -
+                    oid: hwOpticalModuleInfoTable
+                    value: hwEntityOpticalLaneRxPower
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.3.1.32.{{ $index }}'
+                    descr: '{{ $entPhysicalName }} Rx'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    index: 'lane-rx-{{ $index }}'
+                    divisor: 100
+                    group: '{{ $entPhysicalName }}'
+                    high_limit: hwEntityOpticalRxHighThreshold
+                    low_limit: hwEntityOpticalRxLowThreshold
+                    skip_values:
+                        -
+                            oid: hwEntityOpticalRxPower
+                            op: '>'
+                            value: 0
+                        -
+                            oid: hwEntityAdminStatus
+                            op: '='
+                            value: 12
+                -
+                    oid: hwOpticalModuleInfoTable
+                    value: hwEntityOpticalLaneTxPower
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.3.1.33.{{ $index }}'
+                    descr: '{{ $entPhysicalName }} Tx'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    index: 'lane-tx-{{ $index }}'
+                    group: '{{ $entPhysicalName }}'
+                    high_limit: hwEntityOpticalTxHighThreshold
+                    low_limit: hwEntityOpticalTxLowThreshold
+                    skip_values:
+                        -
+                            oid: hwEntityOpticalTxPower
+                            op: '>'
+                            value: 0
+                        -
+                            oid: hwEntityAdminStatus
+                            op: '='
+                            value: 12
+                    divisor: 100
+        voltage:
+            data:
+                -
+                    oid: hwOpticalModuleInfoTable
+                    value: hwEntityOpticalVoltage
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.3.1.6.{{ $index }}'
+                    descr: '{{ $entPhysicalName }}'
+                    index: '{{ $index }}'
+                    divisor: 1000
+                    skip_values:
+                        -
+                            oid: hwEntityOpticalVoltage
+                            op: '='
+                            value: '-1'
+                        - 
+                            oid: hwEntityOpticalMode
+                            op: '='
+                            value: '1'
+        current:
+            data:
+                -
+                    oid: hwOpticalModuleInfoTable
+                    value: hwEntityOpticalBiasCurrent
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.3.1.7.{{ $index }}'
+                    descr: '{{ $entPhysicalName }}'
+                    index: '{{ $index }}'
+                    divisor: 1000000
+                    skip_values:
+                        -
+                            oid: hwEntityOpticalBiasCurrent
+                            op: '='
+                            value: '-1' 
+                        - 
+                            oid: hwEntityOpticalMode
+                            op: '='
+                            value: '1'
+        power:
+            data:
+                -
+                    oid: hwAveragePower
+                    num_oid: '.1.3.6.1.4.1.2011.6.157.1.3.{{ $index }}'
+                    descr: 'Average Power Consumption'
+                    index: 0
+                    divisor: 1000
+                -
+                    oid: hwCurrentPower
+                    num_oid: '.1.3.6.1.4.1.2011.6.157.1.6.{{ $index }}'
+                    descr: 'Current Power Consumption'
+                    index: 1
+                    divisor: 1000
+        state:
+             data:
+                -
+                     oid: hwFanStatusTable
+                     value: hwEntityFanState
+                     num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.10.1.7.{{ $index }}'
+                     descr: 'Slot {{ $subindex0 }} Fan {{ $subindex1 }} Status'
+                     group: Fans
+                     state_name: hwEntityFanState
+                     states:
+                         - { descr: Normal, graph: 1, value: 1, generic: 0 }
+                         - { descr: Abnormal, graph: 1, value: 2, generic: 2 }
+                -
+                    oid: hwStackMemberInfoTable
+                    value: hwMemberStackRole
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.183.1.20.1.3.{{ $index }}'
+                    descr: 'Unit {{ $index }} {{ $hwMemberStackDeviceType }} Status'
+                    group: Stack
+                    state_name: hwMemberStackRole
+                    states:
+                         - { descr: Master, graph: 1, value: 1, generic: 0 }
+                         - { descr: Standby, graph: 1, value: 2, generic: 0 }
+                         - { descr: Slave, graph: 1, value: 3, generic: 0 }
+

@@ -16,7 +16,7 @@ $serial = trim(snmp_get($device, '.1.3.6.1.4.1.8741.2.1.1.2.0', '-OQv', '', ''),
 $fwversion = trim(snmp_get($device, '.1.3.6.1.4.1.8741.2.1.1.3.0', '-OQv', '', ''), '" ');
 $romversion = trim(snmp_get($device, '.1.3.6.1.4.1.8741.2.1.1.4.0', '-OQv', '', ''), '" ');
 $version = "(Firmware $fwversion / ROM $romversion)";
-$oids = 'sonicCurrentConnCacheEntries.0 sonicMaxConnCacheEntries.0';
+$oids = ['sonicCurrentConnCacheEntries.0', 'sonicMaxConnCacheEntries.0'];
 $data = snmp_get_multi($device, $oids, '-OQUs', 'SONICWALL-FIREWALL-IP-STATISTICS-MIB');
 
 if (is_numeric($data)) {

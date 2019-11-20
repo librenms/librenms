@@ -1,0 +1,66 @@
+mib: CHECKPOINT-MIB
+modules:
+    sensors:
+        pre-cache:
+            data:
+                - oid:
+                    - tempertureSensorName
+                    - fanSpeedSensorName
+                    - voltageSensorName
+        state:
+            data:
+                -
+                    oid: tempertureSensorStatus
+                    value: tempertureSensorStatus
+                    num_oid: '.1.3.6.1.4.1.2620.1.6.7.8.1.1.6.{{ $index }}'
+                    descr: '{{ $tempertureSensorName }}, Temperature Out Of Range'
+                    index: 'tempertureSensorStatus.{{ $index }}'
+                    states:
+                        - { value: 0, descr: 'false', graph: 1, generic: 0 }
+                        - { value: 1, descr: 'true', graph: 1, generic: 2 }
+                        - { value: 2, descr: 'reading error', graph: 1, generic: 3 }
+                -
+                    oid: fanSpeedSensorStatus
+                    value: fanSpeedSensorStatus
+                    num_oid: '.1.3.6.1.4.1.2620.1.6.7.8.2.1.6.{{ $index }}'
+                    descr: '{{ $fanSpeedSensorName }}, Fanspeed Out Of Range'
+                    index: 'fanSpeedSensorStatus.{{ $index }}'
+                    states:
+                        - { value: 0, descr: 'false', graph: 1, generic: 0 }
+                        - { value: 1, descr: 'true', graph: 1, generic: 2 }
+                        - { value: 2, descr: 'reading error', graph: 1, generic: 3 }
+                -
+                    oid: voltageSensorStatus
+                    value: voltageSensorStatus
+                    num_oid: '.1.3.6.1.4.1.2620.1.6.7.8.3.1.6.{{ $index }}'
+                    descr: '{{ $voltageSensorName }}, Voltage Out Of Range'
+                    index: 'voltageSensorStatus.{{ $index }}'
+                    states:
+                        - { value: 0, descr: 'false', graph: 1, generic: 0 }
+                        - { value: 1, descr: 'true', graph: 1, generic: 2 }
+                        - { value: 2, descr: 'reading error', graph: 1, generic: 3 }
+        temperature:
+            data:
+                -
+                    oid: tempertureSensorValue
+                    value: tempertureSensorValue
+                    num_oid: '.1.3.6.1.4.1.2620.1.6.7.8.1.1.3.{{ $index }}'
+                    descr: tempertureSensorName
+                    index: 'tempertureSensorValue.{{ $index }}'
+
+        fanspeed:
+            data:
+                -
+                    oid: fanSpeedSensorValue
+                    value: fanSpeedSensorValue
+                    num_oid: '.1.3.6.1.4.1.2620.1.6.7.8.2.1.3.{{ $index }}'
+                    descr: fanSpeedSensorName
+                    index: 'fanSpeedSensorValue.{{ $index }}'
+        voltage:
+            data:
+                -
+                    oid: voltageSensorValue
+                    value: voltageSensorValue
+                    num_oid: '.1.3.6.1.4.1.2620.1.6.7.8.3.1.3.{{ $index }}'
+                    descr: voltageSensorName
+                    index: 'voltageSensorValue.{{ $index }}'

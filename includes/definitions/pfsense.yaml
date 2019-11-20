@@ -2,7 +2,8 @@ os: pfsense
 type: firewall
 group: unix
 text: pfSense
-processor_stacked: 1
+processor_stacked: true
+config_highlighting: xml
 over:
     - { graph: device_processor, text: 'Processor Usage' }
     - { graph: device_ucd_memory, text: 'Memory Usage' }

@@ -40,6 +40,7 @@ try:
     import sys
     import threading
     import time
+    from optparse import OptionParser
 
 except:
     print "ERROR: missing one or more of the following python modules:"
@@ -85,32 +86,32 @@ except:
     sys.exit(2)
 
 discovery_path = config['install_dir'] + '/discovery.php'
+log_dir = config['log_dir']
 db_username = config['db_user']
 db_password = config['db_pass']
 db_port = int(config['db_port'])
 
-if config['db_host'][:5].lower() == 'unix:':
+if config['db_socket']:
     db_server = config['db_host']
-    db_port = 0
-elif config['db_socket']:
-    db_server = config['db_socket']
-    db_port = 0
+    db_socket = config['db_socket']
 else:
     db_server = config['db_host']
+    db_socket = None
 
 db_dbname = config['db_name']
 
 
 def db_open():
     try:
-        if db_port == 0:
-            db = MySQLdb.connect(host=db_server, user=db_username, passwd=db_password, db=db_dbname)
+        if db_socket:
+            db = MySQLdb.connect(host=db_server, unix_socket=db_socket, user=db_username, passwd=db_password, db=db_dbname)
         else:
             db = MySQLdb.connect(host=db_server, port=db_port, user=db_username, passwd=db_password, db=db_dbname)
         return db
     except:
         print "ERROR: Could not connect to MySQL database!"
         sys.exit(2)
+
 
 # (c) 2015, GPLv3, Daniel Preussker <f0o@devilcode.org> <<<EOC1
 if 'distributed_poller_group' in config:
@@ -156,8 +157,8 @@ if ('distributed_poller' in config and
         if memc_alive():
             if memc.get("discovery.master") is None:
                 print "Registered as Master"
-                memc.set("discovery.master", config['distributed_poller_name'], 10)
-                memc.set("discovery.nodes", 0, 300)
+                memc.set("discovery.master", config['distributed_poller_name'], 30)
+                memc.set("discovery.nodes", 0, 3600)
                 IsNode = False
             else:
                 print "Registered as Node joining Master %s" % memc.get("discovery.master")
@@ -187,14 +188,19 @@ discovered_devices = 0
 
 """
     Take the amount of threads we want to run in parallel from the commandline
-    if None are given or the argument was garbage, fall back to default of 16
+    if None are given or the argument was garbage, fall back to default of 1
 """
+usage = "usage: %prog [options] <workers> (Default: 1 Do not set too high)"
+description = "Spawn multiple discovery.php processes in parallel."
+parser = OptionParser(usage=usage, description=description)
+parser.add_option('-d', '--debug', action='store_true', default=False,
+                  help="Enable debug output. WARNING: Leaving this enabled will consume a lot of disk space.")
+(options, args) = parser.parse_args()
+
+debug = options.debug
 try:
-    amount_of_workers = int(sys.argv[1])
-    if amount_of_workers == 0:
-        print "ERROR: 0 threads is not a valid value"
-        sys.exit(2)
-except:
+    amount_of_workers = int(args[0])
+except (IndexError, ValueError):
     amount_of_workers = 1
 
 devices_list = []
@@ -246,7 +252,7 @@ def printworker():
         global distdisco
         if distdisco:
             if not IsNode:
-                memc_touch('discovery.master', 10)
+                memc_touch('discovery.master', 30)
                 nodes = memc.get('discovery.nodes')
                 if nodes is None and not memc_alive():
                     print "WARNING: Lost Memcached. Taking over all devices. Nodes will quit shortly."
@@ -256,7 +262,7 @@ def printworker():
                     print "INFO: %s Node(s) Total" % (nodes)
                     nodeso = nodes
             else:
-                memc_touch('discovery.nodes', 10)
+                memc_touch('discovery.nodes', 30)
             try:
                 worker_id, device_id, elapsed_time = print_queue.get(False)
             except:
@@ -305,8 +311,11 @@ def poll_worker():
 # EOC5
             try:
                 start_time = time.time()
-                command = "/usr/bin/env php %s -h %s >> /dev/null 2>&1" % (discovery_path, device_id)
+
+                output = "-d >> %s/discover_device_%s.log" % (log_dir, device_id) if debug else ">> /dev/null"
+                command = "/usr/bin/env php %s -h %s %s 2>&1" % (discovery_path, device_id, output)
                 subprocess.check_call(command, shell=True)
+
                 elapsed_time = int(time.time() - start_time)
                 print_queue.put([threading.current_thread().name, device_id, elapsed_time])
             except (KeyboardInterrupt, SystemExit):

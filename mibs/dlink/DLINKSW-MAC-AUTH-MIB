@@ -1,0 +1,237 @@
+--  *****************************************************************
+--  DLINKSW-MAC-AUTH-MIB.mib : MAC Authentication MIB
+-- 
+--  Copyright (c) 2013 D-Link Corporation, all rights reserved.
+--   
+--  *****************************************************************
+
+    DLINKSW-MAC-AUTH-MIB DEFINITIONS ::= BEGIN
+ 
+    IMPORTS
+
+        MODULE-IDENTITY,
+        OBJECT-TYPE
+            FROM SNMPv2-SMI
+        MODULE-COMPLIANCE,
+        OBJECT-GROUP,
+        NOTIFICATION-GROUP
+            FROM SNMPv2-CONF
+        TruthValue, 
+        DisplayString
+            FROM SNMPv2-TC 
+        ifIndex 
+            FROM IF-MIB
+        dnaSessionClientMacAddress,
+        dnaSessionAuthVlan
+            FROM DLINKSW-NETWORK-ACCESS-MIB
+        dlinkIndustrialCommon
+            FROM DLINK-ID-REC-MIB;
+
+    dlinkSwMacAuthMIB MODULE-IDENTITY
+        LAST-UPDATED "201308020000Z"
+        ORGANIZATION "D-Link Corp."
+        CONTACT-INFO
+            "        D-Link Corporation
+
+             Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                     Taipei City 114, Taiwan, R.O.C
+             Tel:     +886-2-66000123
+             E-mail: tsd@dlink.com.tw
+            "
+        DESCRIPTION
+           "This MIB contains managed objects for the MAC authentication  
+           application of the device."
+        REVISION        "201308020000Z"
+        DESCRIPTION
+            "Initial version of this MIB module."
+        ::= { dlinkIndustrialCommon 153 }
+
+-- ***************************************************************************
+-- Node definitions
+-- ***************************************************************************
+    dMacAuthNotifications    OBJECT IDENTIFIER ::= { dlinkSwMacAuthMIB 0 }
+    dMacAuthMIBObjects       OBJECT IDENTIFIER ::= { dlinkSwMacAuthMIB 1 }
+    dMacAuthMIBConformance   OBJECT IDENTIFIER ::= { dlinkSwMacAuthMIB 2 }
+        
+-- -----------------------------------------------------------------------------
+    dMacAuthGlobalCtrl    OBJECT IDENTIFIER ::= { dMacAuthMIBObjects 1 }
+
+   
+    dMacAuthNotifEnabled  OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION   
+            "Set to 'true' to enable global SNMP notification for MAC 
+            authentication feature.  
+            Setting the object to 'false' will disable SNMP notifications."
+        DEFVAL      { false }              
+        ::= { dMacAuthGlobalCtrl 1}
+
+    dMacAuthEnabled OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object enables ('true') or disables ('false')
+            the MAC authentication globally."
+        DEFVAL     { false }
+        ::= { dMacAuthGlobalCtrl 2 }
+                       
+    dMacAuthPWD  OBJECT-TYPE
+        SYNTAX          DisplayString(SIZE(0..16))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object is used to set the password of authentication for local
+            and radius authentication.
+            When use client's MAC address as the password, a zero length string 
+            will be returned. or the string '******' will be returned."             
+        ::= { dMacAuthGlobalCtrl 3 }
+
+    dMacAuthUserName  OBJECT-TYPE
+        SYNTAX  DisplayString(SIZE(0..16))
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the username of local and radius authentication. 
+            When use client's MAC address as the username, a zero length string will be returned."             
+        ::= { dMacAuthGlobalCtrl 4 }
+
+-- -----------------------------------------------------------------------------           
+    dMacAuthIfTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DMacAuthIfEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The table is used to configure the interface-specific settings of
+            MAC authentication."
+        ::= { dMacAuthMIBObjects 2 }
+
+    dMacAuthIfEntry OBJECT-TYPE
+        SYNTAX          DMacAuthIfEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION            
+            "An entry contains MAC authentication information for a particular interface."
+        INDEX   { ifIndex }
+        ::= { dMacAuthIfTable 1 }
+
+    DMacAuthIfEntry ::= SEQUENCE {       
+        dMacAuthIfEnabled            TruthValue               
+    }
+
+    dMacAuthIfEnabled OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object enables ('true') or disables ('false') the 
+            authentication state for a particular interface."
+        DEFVAL     {false}
+        ::= { dMacAuthIfEntry 1 }
+
+--  ***************************************************************************
+--  Notifications
+--  ***************************************************************************
+    
+    dMacAuthLoggedSuccess NOTIFICATION-TYPE
+        OBJECTS  { 
+            ifIndex, 
+            dnaSessionClientMacAddress, 
+            dnaSessionAuthVlan 
+        }
+        STATUS  current
+        DESCRIPTION
+            "The trap is sent when a host has successfully logged in (passed 
+            MAC-based Access Control)."
+        ::= { dMacAuthNotifications 1 }
+
+    dMacAuthLoggedFail NOTIFICATION-TYPE
+        OBJECTS  { 
+            ifIndex, 
+            dnaSessionClientMacAddress, 
+            dnaSessionAuthVlan 
+        }
+        STATUS  current
+        DESCRIPTION
+            "The trap is sent when a host failed to pass MAC-based Access Control
+            (login failed)."
+        ::= { dMacAuthNotifications 2 }
+
+    dMacAuthLoggedAgesOut NOTIFICATION-TYPE
+        OBJECTS  { 
+            ifIndex, 
+            dnaSessionClientMacAddress, 
+            dnaSessionAuthVlan 
+        }
+        STATUS  current
+        DESCRIPTION
+            "The trap is sent when a MAC-based Access Control host aged out."
+        ::= { dMacAuthNotifications 3 }
+
+--  ***************************************************************************	
+--  Conformance
+--  ***************************************************************************
+    dMacAuthMIBCompliances 
+        OBJECT IDENTIFIER ::= { dMacAuthMIBConformance 1 }
+    dMacAuthMIBGroups
+        OBJECT IDENTIFIER ::= { dMacAuthMIBConformance 2 }
+
+    dMacAuthMIBCompliance MODULE-COMPLIANCE
+        STATUS  current   
+        DESCRIPTION
+            "The compliance statement for entities which implement the 
+            DLINKSW-MAC-AUTH-MIB."
+        MODULE -- this module
+        MANDATORY-GROUPS { 
+            dMacAuthGlobalCfgGroup,   
+            dMacAuthIfCfgGroup         
+        }
+        ::= { dMacAuthMIBCompliances 1 }
+
+    dMacAuthGlobalCfgGroup OBJECT-GROUP
+        OBJECTS {   
+            dMacAuthEnabled,
+            dMacAuthPWD,
+            dMacAuthUserName
+        }
+        STATUS current
+        DESCRIPTION 
+            "A collection of objects provides the configuration or information
+            about MAC authentication."
+        ::= { dMacAuthMIBGroups 1 }
+        
+    dMacAuthIfCfgGroup OBJECT-GROUP
+        OBJECTS {   
+            dMacAuthIfEnabled
+        }
+        STATUS current
+        DESCRIPTION 
+            "A collection of objects provides the configuration or information
+            about MAC authentication on a per-interface basis."
+        ::= { dMacAuthMIBGroups 2 }
+   
+    dMacAuthNotifyCfgGroup OBJECT-GROUP
+        OBJECTS {   
+            dMacAuthNotifEnabled
+        }
+        STATUS current
+        DESCRIPTION 
+            "A collection of objects provides the configuration for notification 
+            of MAC authentication."
+        ::= { dMacAuthMIBGroups 3 }
+
+    dMacAuthNotificationGroup NOTIFICATION-GROUP
+        NOTIFICATIONS { 
+            dMacAuthLoggedSuccess,
+            dMacAuthLoggedFail,
+            dMacAuthLoggedAgesOut
+     	}
+        STATUS current
+        DESCRIPTION
+           "The collection of notifications	used for monitoring the hosts under the 
+           control of MAC authentication."
+        ::= { dMacAuthMIBGroups 4	}
+END
+
