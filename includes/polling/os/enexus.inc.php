@@ -23,6 +23,7 @@
  * @author     BArry O'Donovan <barry@lightnet.ie>
  */
 
+$location = snmp_get($device, 'powerSystemSite.0', '-Ovqa', 'SP2-MIB');
 $hardware = snmp_get($device, 'powerSystemModel.0', '-Ovqa', 'SP2-MIB');
 $sw_version1 = snmp_get($device, 'controlUnitSwVersion.1', '-Ovqa', 'SP2-MIB');
 $sw_version2 = snmp_get($device, 'controlUnitSwVersion.2', '-Ovqa', 'SP2-MIB');
