@@ -775,7 +775,11 @@ function data_flatten($array, $prefix = '', $joiner = '_')
     return $return;
 }
 
-//TODO: fx documentation
+/**
+ * @param string $sysLocation location override (instead of sysLocation.0)
+ * @param &$device
+ * @param &$update_array
+ */
 function set_device_location($sysLocation, &$device, &$update_array)
 {
     $sysLocation = str_replace('"', '', $sysLocation);
