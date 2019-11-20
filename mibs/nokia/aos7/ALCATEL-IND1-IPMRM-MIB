@@ -1,7 +1,8 @@
 ALCATEL-IND1-IPMRM-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
-	MODULE-IDENTITY, OBJECT-TYPE
+	MODULE-IDENTITY, OBJECT-TYPE,
+	Integer32
 		FROM SNMPv2-SMI
     MODULE-COMPLIANCE, OBJECT-GROUP
     	FROM SNMPv2-CONF
@@ -10,7 +11,7 @@ IMPORTS
 
 alcatelIND1IPMRMMIB MODULE-IDENTITY
 
-    LAST-UPDATED  "201204030000Z"
+    LAST-UPDATED  "201412040000Z"
     ORGANIZATION  "Alcatel-Lucent"
     CONTACT-INFO
         "Please consult with Customer Service to ensure the most appropriate
@@ -57,6 +58,9 @@ alcatelIND1IPMRMMIB MODULE-IDENTITY
     REVISION      "201204030000Z"
     DESCRIPTION
         "The latest version of this MIB Module."
+    REVISION      "201412040000Z"
+    DESCRIPTION
+        "Add failover holddown object.."
 
     ::= { routingIND1Ipmrm 1 }
 
@@ -97,6 +101,36 @@ alaIpmrmMbrProtocolApps  OBJECT-TYPE
                      bit 1 - PIM "
     ::= {alaIpmrmGlobalConfig 2}
 
+alaIpmrmFailoverHolddown    OBJECT-TYPE
+    SYNTAX     Integer32 (0..65535)
+    UNITS      "seconds"
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "This is the period (in seconds) during a failover
+                in which the multicast routing tables will be kept in
+                holddown (or frozen) to allow for the unicast and multicast 
+                routing protocols to converge before updating the 
+                forwarding tables.
+
+                A value of 0 indicates that multicast routing will not
+                not be frozen during a failover."
+    DEFVAL     { 80 }
+    ::= { alaIpmrmGlobalConfig 3 }
+
+alaIpmrmExtendedBoundaryStatus     OBJECT-TYPE
+     SYNTAX     INTEGER {
+                    enable(1),
+                    disable(2)
+               }
+     MAX-ACCESS read-write
+     STATUS     current
+     DESCRIPTION
+                "Administratively enables/disables the Multicast
+                 Route Boundary Expand functionality on this router."
+     DEFVAL     { disable }
+     ::= {alaIpmrmGlobalConfig 4}
+
 -- conformance information
 
 alcatelIND1IPMRMMIBConformance OBJECT IDENTIFIER ::= { alcatelIND1IPMRMMIB 2 }
@@ -121,7 +155,7 @@ alaIpmrmCompliance MODULE-COMPLIANCE
 -- units of conformance
 
 alaIpmrmConfigMIBGroup OBJECT-GROUP
-    OBJECTS { alaIpmrmMbrStatus, alaIpmrmMbrProtocolApps
+    OBJECTS { alaIpmrmMbrStatus, alaIpmrmMbrProtocolApps, alaIpmrmFailoverHolddown, alaIpmrmExtendedBoundaryStatus
             }
     STATUS  current
     DESCRIPTION

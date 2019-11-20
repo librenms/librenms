@@ -176,7 +176,7 @@ mirrorMirroredIfindex  OBJECT-TYPE
 mirrorMirroringIfindex  OBJECT-TYPE
         SYNTAX  InterfaceIndex
         MAX-ACCESS  read-create
-        STATUS  current
+        STATUS  deprecated
         DESCRIPTION
                 " The physical identification number for this mirroring port instance (mirroring port)."
             ::= { mirrorEntry 3 }
@@ -347,6 +347,85 @@ mirrorSrcOperStatus  OBJECT-TYPE
             DEFVAL  { on }
             ::= { mirrorSrcEntry 5 }
 
+--xxxxxxxxxxxxxxxxxxxx
+-- Mirror Destination table
+--xxxxxxxxxxxxxxxxxxxx
+
+mirrorDstTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF MirrorDstEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                "A list of port mirroring instances."
+            ::= { mirmonMirroring 3 }
+
+
+mirrorDstEntry  OBJECT-TYPE
+        SYNTAX  MirrorDstEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "A port  mirroring entry."
+        INDEX { mirrorSessionNumber, mirrorDstMirroringIf }
+            ::= { mirrorDstTable 1 }
+
+
+MirrorDstEntry ::= SEQUENCE {
+        mirrorDstMirroringIf
+                InterfaceIndex,
+        mirrorDstOperStatus
+                INTEGER,
+        mirrorDstAdminStatus
+                INTEGER,
+        mirrorDstRowStatus
+                RowStatus
+        }
+
+mirrorDstMirroringIf  OBJECT-TYPE
+        SYNTAX  InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "The physical identification number for this mirroring port instance (mirrorred port)."
+        ::= { mirrorDstEntry 1 }
+
+mirrorDstOperStatus  OBJECT-TYPE
+        SYNTAX  INTEGER {
+                off (1),
+                on (2)
+        }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                 "The mirroring operational status of this mirrored Destination. "
+            DEFVAL  { on }
+            ::= { mirrorDstEntry 2 }
+
+mirrorDstAdminStatus  OBJECT-TYPE
+        SYNTAX  INTEGER {
+                enable (1),
+                disable (2)
+        }
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+                 "The mirroring admin status of mirrored destination. "
+            DEFVAL  { disable }
+            ::= { mirrorDstEntry 3 }
+
+mirrorDstRowStatus OBJECT-TYPE
+                SYNTAX  RowStatus
+                MAX-ACCESS  read-create
+                STATUS  current
+                DESCRIPTION
+                        "The status of this table entry.Row Status to control creation,
+                        modification and deletion of this entry. "
+           ::= { mirrorDstEntry 4 }
+
+-- End of Mirror Destination Table
+
+
+
 
 
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -419,7 +498,7 @@ monitorTable OBJECT-TYPE
        monitorIfindex  OBJECT-TYPE
                SYNTAX  InterfaceIndex
                MAX-ACCESS  read-create
-               STATUS  current
+               STATUS deprecated 
                DESCRIPTION
                        "The physical identification number for this monitoring port instance."
                    DEFVAL  { 1 }
@@ -475,7 +554,6 @@ monitorTable OBJECT-TYPE
                    DEFVAL  { 24 }
                    ::= { monitorEntry 7 }
 
-
        monitorTrafficType OBJECT-TYPE
                SYNTAX  INTEGER {
                        all         (1),
@@ -526,7 +604,7 @@ monitorTable OBJECT-TYPE
                                 bidirectional (3)
                        }
                        MAX-ACCESS  read-create
-                       STATUS  current
+                       STATUS  deprecated
                        DESCRIPTION
                                 "Direction of monitoring."
                            DEFVAL  { bidirectional }
@@ -566,6 +644,96 @@ monitorTable OBJECT-TYPE
        "The number of bytes per packet allowed to capture .(brief: 64 bytes, full: Entire packet)."
                    DEFVAL  {brief}
                    ::= {  monitorEntry 14 }
+
+
+
+--xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+--Source Monitoring Table----
+--xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+monitorSrcTable OBJECT-TYPE
+               SYNTAX  SEQUENCE OF MonitorSrcEntry
+               MAX-ACCESS  not-accessible
+               STATUS  current
+               DESCRIPTION
+                       "A list of port monitoring instances."
+                   ::= { mirmonMonitoring 2 }
+
+       monitorSrcEntry  OBJECT-TYPE
+               SYNTAX  MonitorSrcEntry
+               MAX-ACCESS  not-accessible
+               STATUS  current
+               DESCRIPTION
+                       "A port  monitoring entry."
+                   INDEX { monitorSessionNumber, monitorSrcIfindex }
+                   ::= { monitorSrcTable 1 }
+
+       MonitorSrcEntry ::= SEQUENCE {
+               monitorSrcIfindex
+                       InterfaceIndex,
+               monitorSrcStatus
+                       INTEGER,
+               monitorSrcDirection
+                         INTEGER,
+               monitorSrcRowStatus
+                       RowStatus
+
+               }
+
+
+       monitorSrcIfindex  OBJECT-TYPE
+               SYNTAX  InterfaceIndex
+               MAX-ACCESS  not-accessible
+               STATUS  current
+               DESCRIPTION
+                       "The physical identification number for this monitoring port instance."
+                   ::= { monitorSrcEntry 1 }
+
+       monitorSrcStatus OBJECT-TYPE
+               SYNTAX  INTEGER {
+                       off (1),
+                       on  (2)
+               }
+               MAX-ACCESS  read-create
+               STATUS  current
+               DESCRIPTION
+                       "The status of the port monitoring instance"
+               DEFVAL  { off }
+               ::= { monitorSrcEntry 2 }
+
+
+       monitorSrcDirection  OBJECT-TYPE
+               SYNTAX  INTEGER {
+                        inport (1),
+                        outport (2),
+                        bidirectional (3)
+                       }
+               MAX-ACCESS  read-create
+               STATUS  current
+               DESCRIPTION
+               "Direction of monitoring."
+               DEFVAL  { bidirectional }
+
+               ::= { monitorSrcEntry 3 }
+
+
+        monitorSrcRowStatus OBJECT-TYPE
+               SYNTAX  RowStatus
+               MAX-ACCESS  read-create
+               STATUS  current
+               DESCRIPTION
+               "The status of this table entry.
+                                Create,Delete and Modify."
+               ::= { monitorSrcEntry 4 }
+
+
+--xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+--End of SrcMonitoringTable--------
+--xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+
+
+
 
  -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
@@ -853,11 +1021,16 @@ mirrorUnlikeNi  NOTIFICATION-TYPE
                         mirrorRowStatus,
                         mirrorDirection,
                         mirrorSessOperStatus,
-                        mirrorSrcMirroredIf, -- port mirroring source interfaces table
+                        mirrorSrcMirroredIf,
                         mirrorSrcStatus,
                         mirrorSrcDirection,
                         mirrorSrcRowStatus,
-                        mirrorSrcOperStatus
+                        mirrorSrcOperStatus,
+                        mirrorDstOperStatus,
+                        mirrorDstAdminStatus,
+                        mirrorDstRowStatus
+
+
         }
         STATUS  current
         DESCRIPTION
@@ -880,9 +1053,13 @@ mirrorUnlikeNi  NOTIFICATION-TYPE
                         monitorDirection ,
                         monitorTimeout ,
                         monitorRowStatus,
-                        monitorCaptureType
-        }
-        STATUS  current
+                        monitorCaptureType,
+                        monitorSrcStatus,   
+                        monitorSrcDirection,    
+                        monitorSrcRowStatus    
+
+        }                  
+        STATUS  current    
         DESCRIPTION
             "Collection of objects for management of Port Monitoring."
         ::= { alcatelIND1PortMirMonMIBGroups 2 }

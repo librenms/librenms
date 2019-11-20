@@ -171,6 +171,8 @@ alcatelIND1HAVlanMIB MODULE-IDENTITY
             alaHAVlanClusterMcmStatusFlag
                 INTEGER,
             alaHAVlanClusterVflStatus
+                INTEGER,
+            alaHAVlanClusterLoopback
                 INTEGER
 	}
 
@@ -354,7 +356,7 @@ alcatelIND1HAVlanMIB MODULE-IDENTITY
 				outofSync(2)
 			  }
 	    MAX-ACCESS  read-only
-	    STATUS  current
+	    STATUS  deprecated
 	    DESCRIPTION
 	        "Multi-chassis status of a cluster"
 	    ::= { alaHAVlanClusterEntry 16 }
@@ -379,7 +381,7 @@ alcatelIND1HAVlanMIB MODULE-IDENTITY
                   }
 
 	    MAX-ACCESS  read-only
-	    STATUS  current
+	    STATUS  deprecated
 	    DESCRIPTION
 	        "Multi-chassis status flag describing reason of the cluster 
                Multi-chassis status."
@@ -392,10 +394,24 @@ alcatelIND1HAVlanMIB MODULE-IDENTITY
 				disable(2)
 			  }
 	    MAX-ACCESS  read-only
-	    STATUS  current
+	    STATUS  deprecated
 	    DESCRIPTION
 	        "VFL status of a cluster"
 	    ::= { alaHAVlanClusterEntry 18 }
+
+    alaHAVlanClusterLoopback OBJECT-TYPE
+        SYNTAX   INTEGER
+              {
+                enable(1),
+                disable(2)
+              }
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "Admin control to enable/disable LOOPBACK for a cluster"
+             DEFVAL      { disable }
+
+        ::= { alaHAVlanClusterEntry 19 }
 
 -- High Availability Vlan CLuster Port Table
 
@@ -556,22 +572,23 @@ alcatelIND1HAVlanMIB MODULE-IDENTITY
         {
                   alaHAVlanClusterId,
                   alaHAVlanClusterName,
-	          alaHAVlanClusterAdminStatus,
+                  alaHAVlanClusterAdminStatus,
                   alaHAVlanClusterOperStatus,
                   alaHAVlanClusterOperStatusFlag,
                   alaHAVlanClusterMode,
                   alaHAVlanClusterVlan,
                   alaHAVlanClusterMacAddressType,
-	    	  alaHAVlanClusterMacAddress,
+                  alaHAVlanClusterMacAddress,
                   alaHAVlanClusterInetAddressType,
-		  alaHAVlanClusterInetAddress,
+                  alaHAVlanClusterInetAddress,
                   alaHAVlanClusterMulticastStatus,
                   alaHAVlanClusterMulticastInetAddressType,
-	    	  alaHAVlanClusterMulticastInetAddress,
-		  alaHAVlanClusterRowStatus,
-          alaHAVlanClusterMcmStatus,
-          alaHAVlanClusterMcmStatusFlag,
-          alaHAVlanClusterVflStatus
+                  alaHAVlanClusterMulticastInetAddress,
+                  alaHAVlanClusterRowStatus,
+                  alaHAVlanClusterMcmStatus,
+                  alaHAVlanClusterMcmStatusFlag,
+                  alaHAVlanClusterVflStatus,
+                  alaHAVlanClusterLoopback
         }
         STATUS  current
         DESCRIPTION

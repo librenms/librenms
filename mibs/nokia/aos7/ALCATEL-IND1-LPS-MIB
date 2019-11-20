@@ -11,7 +11,7 @@ IMPORTS
      RowStatus                FROM SNMPv2-TC
      SnmpAdminString
                               FROM SNMP-FRAMEWORK-MIB
-     ifIndex                  FROM IF-MIB
+     ifIndex, InterfaceIndex  FROM IF-MIB
      systemServicesDate,
      systemServicesTime       FROM ALCATEL-IND1-SYSTEM-MIB
  MODULE-COMPLIANCE,
@@ -222,7 +222,8 @@ lpsOperStatus OBJECT-TYPE
     SYNTAX INTEGER {
     up(1),
     down(2),
-    securityViolated(3)
+    securityViolated(3),
+    locked(4)
     }
     MAX-ACCESS read-only
     STATUS current
@@ -349,6 +350,27 @@ lpsLearningWindowTimeRemaining OBJECT-TYPE
     "Amount of time (in seconds) remaining until the learning window expires."
     ::= { learnedPortSecurityGlobalGroup 6 }
 
+lpsLearningWindowLearnAsStatic OBJECT-TYPE
+     SYNTAX  INTEGER {
+        enable(1),
+        disable(2)
+        }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    "If it is enabled, all mac-address learnt on the port would be directly converted to static."
+    ::= { learnedPortSecurityGlobalGroup 7 }
+
+lpsLearningWindowPseudoMacMove OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enable(1),
+        disable(2)
+        }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    "If it is enabled, pseudo-static MACs will be subject to MAC move."
+    ::= { learnedPortSecurityGlobalGroup 8 }
 
 --- Learned Port Security L2 Mac Address MIB Table
 
@@ -421,6 +443,76 @@ lpsL2MacAddressRowStatus OBJECT-TYPE
     "The RowStatus for this table."
     ::= { learnedPortSecurityL2MacAddressEntry 4 }
 
+learnedPortSecurityAgL2MacAddressTable OBJECT-TYPE
+    SYNTAX    SEQUENCE OF LearnedPortSecurityAgL2MacAddressEntry
+    MAX-ACCESS    not-accessible
+    STATUS   current
+    DESCRIPTION
+        "A table contains Learned Port Security L2 Mac addresses."
+    ::= { alcatelIND1LearnedPortSecurityMIBObjects 6 }
+
+
+learnedPortSecurityAgL2MacAddressEntry  OBJECT-TYPE
+    SYNTAX   LearnedPortSecurityAgL2MacAddressEntry
+    MAX-ACCESS   not-accessible
+    STATUS   current
+    DESCRIPTION
+    "Definition of the Learned Port Security port security mac-address table entries."
+    INDEX { ifIndex , lpsAgL2MacAddress, lpsAgL2VlanId }
+    ::= { learnedPortSecurityAgL2MacAddressTable 1 }
+
+
+LearnedPortSecurityAgL2MacAddressEntry ::=
+    SEQUENCE {
+ lpsAgL2MacAddress
+  MacAddress,
+ lpsAgL2VlanId
+  Integer32,
+ lpsAgL2MacAddressLearnType
+  INTEGER,
+ lpsAgL2MacAddressRowStatus
+  RowStatus
+}
+
+
+lpsAgL2MacAddress OBJECT-TYPE
+    SYNTAX   MacAddress
+    MAX-ACCESS   not-accessible
+    STATUS   current
+    DESCRIPTION
+    "The MacAddress that is either configured or dynamically learnt on the LPS port."
+    ::= { learnedPortSecurityAgL2MacAddressEntry 1 }
+
+lpsAgL2VlanId OBJECT-TYPE
+    SYNTAX   Integer32 (1..4094)
+    MAX-ACCESS   not-accessible
+    STATUS   current
+    DESCRIPTION
+    "The Vlan Id assigned to the packet."
+    ::= { learnedPortSecurityAgL2MacAddressEntry 2 }
+
+lpsAgL2MacAddressLearnType OBJECT-TYPE
+    SYNTAX   INTEGER {
+    configured (1),
+    dynamic (2),
+    filtered (3),
+    quarantined (4),
+    configuredFiltered (5),
+    pseudoStatic (6)
+    }
+    MAX-ACCESS   read-only
+    STATUS   current
+    DESCRIPTION
+    "Learned L2 MAC address type."
+    ::= { learnedPortSecurityAgL2MacAddressEntry 3 }
+
+lpsAgL2MacAddressRowStatus OBJECT-TYPE
+    SYNTAX   RowStatus
+    MAX-ACCESS   read-create
+    STATUS   current
+    DESCRIPTION
+    "The RowStatus for this table."
+    ::= { learnedPortSecurityAgL2MacAddressEntry 4 }
 
 
 --
@@ -438,13 +530,14 @@ lpsViolationTrap       NOTIFICATION-TYPE
     OBJECTS {
       lpsTrapSwitchName,
       lpsTrapSwitchIpAddr,
-      lpsTrapSwitchSlice,
-      lpsTrapSwitchPort,
+      lpsTrapSwitchSlice,  --deprecated
+      lpsTrapSwitchPort,   --deprecated
       lpsTrapViolatingMac,
       lpsTrapViolationType,
       lpsTrapSwitchVlan,
       systemServicesDate,
-      systemServicesTime
+      systemServicesTime,
+      lpsTrapIfIndex
 
     }
     STATUS  current
@@ -455,8 +548,8 @@ lpsViolationTrap       NOTIFICATION-TYPE
 lpsPortUpAfterLearningWindowExpiredTrap  NOTIFICATION-TYPE
     OBJECTS {
       lpsTrapSwitchName,
-      lpsTrapSwitchSlice,
-      lpsTrapSwitchPort,
+      lpsTrapSwitchSlice,  --deprecated
+      lpsTrapSwitchPort,   --deprecated
       systemServicesDate,
       systemServicesTime
     }
@@ -470,17 +563,19 @@ lpsPortUpAfterLearningWindowExpiredTrap  NOTIFICATION-TYPE
 lpsLearnMac  NOTIFICATION-TYPE
     OBJECTS {
       lpsTrapSwitchName,
-      lpsTrapSwitchSlice,
-      lpsTrapSwitchPort,
+      lpsTrapSwitchSlice, --deprecated
+      lpsTrapSwitchPort,  --deprecated
       lpsTrapSwitchVlan,
       lpsTrapBridgeMac,
       systemServicesDate,
-      systemServicesTime
+      systemServicesTime,
+      lpsTrapIfIndex
 
     }
     STATUS  current
     DESCRIPTION
-        "When an LPS port learns a bridged MAC, this trap will be generated."
+        "When the number of bridged MACs learned goes over the configured threshold value,
+        a trap will  be generated for every additional MAC that is learned."
     ::= { alcatelIND1LearnedPortSecurityMIBNotifications 3 }
 
 --
@@ -507,7 +602,7 @@ lpsTrapSwitchIpAddr       OBJECT-TYPE
 lpsTrapSwitchSlice      OBJECT-TYPE
         SYNTAX          Integer32
         MAX-ACCESS      read-only
-        STATUS          current
+        STATUS          deprecated
         DESCRIPTION     "The physical slice number for the LPS port on which
                          violation occured. "
     ::= { lpsTrapsObj 3 }
@@ -516,7 +611,7 @@ lpsTrapSwitchSlice      OBJECT-TYPE
 lpsTrapSwitchPort       OBJECT-TYPE
         SYNTAX          Integer32
         MAX-ACCESS      read-only
-        STATUS          current
+        STATUS          deprecated
         DESCRIPTION     "The physical port number on which
                          violation occured. "
     ::= { lpsTrapsObj 4 }
@@ -559,6 +654,14 @@ lpsTrapBridgeMac       OBJECT-TYPE
                          when learn trap threshold exceeds."
     ::= { lpsTrapsObj 8 }
 
+-- Switch Port IfIndex
+lpsTrapIfIndex          OBJECT-TYPE
+        SYNTAX          InterfaceIndex
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The ifIndex of the physical port on which
+                         violation occured. "
+    ::= { lpsTrapsObj 9 }
 
 
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -613,7 +716,9 @@ learnedPortSecurityGlobGroup OBJECT-GROUP
       lpsConvertToStatic,
       lpsLearningWindowNoAging,
       lpsLearningWindowBootupStatus,
-      lpsLearningWindowTimeRemaining
+      lpsLearningWindowTimeRemaining,
+      lpsLearningWindowLearnAsStatic,  
+      lpsLearningWindowPseudoMacMove
    }
    STATUS  current
    DESCRIPTION
@@ -636,7 +741,9 @@ learnedPortSecurityL2MacAddressGroup OBJECT-GROUP
    OBJECTS
    {
       lpsL2MacAddressLearnType,
-      lpsL2MacAddressRowStatus
+      lpsAgL2MacAddressLearnType,
+      lpsL2MacAddressRowStatus,
+      lpsAgL2MacAddressRowStatus
    }
    STATUS  current
    DESCRIPTION
@@ -649,12 +756,13 @@ learnedPortSecurityTrapsObjGroup OBJECT-GROUP
    {
       lpsTrapSwitchName,
       lpsTrapSwitchIpAddr,
-      lpsTrapSwitchSlice,
-      lpsTrapSwitchPort,
+      lpsTrapSwitchSlice,  --deprecated
+      lpsTrapSwitchPort,   --deprecated
       lpsTrapViolatingMac,
       lpsTrapViolationType,
       lpsTrapSwitchVlan,
-      lpsTrapBridgeMac
+      lpsTrapBridgeMac,
+      lpsTrapIfIndex
 
    }
    STATUS  current

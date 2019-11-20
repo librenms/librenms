@@ -1993,7 +1993,7 @@ alaFcVsanNpivStatsRxLsAccs  OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS  current
     DESCRIPTION
-        "Number of LS_ACCs for Fabric Logins (FLOGI) Packets on this Vsan"
+        "Number of LS_ACC Packets on this Vsan"
     ::= { alaFcVsanNpivStatsEntry 4 }
 
 alaFcVsanNpivStatsRxFlogos  OBJECT-TYPE
@@ -4054,7 +4054,8 @@ AlaFcIntfEtunnelStatsEntry ::= SEQUENCE {
     alaFcIntfEtunnelStatsRxSwRjts   Counter32,
     alaFcIntfEtunnelStatsTxElpReqs  Counter32,
     alaFcIntfEtunnelStatsTxSwAccs   Counter32,
-    alaFcIntfEtunnelStatsTxSwRjts   Counter32
+    alaFcIntfEtunnelStatsTxSwRjts   Counter32,
+    alaFcIntfEtunnelStatsClear      INTEGER
 }
 
 alaFcIntfEtunnelStatsIfIndex OBJECT-TYPE
@@ -4120,6 +4121,19 @@ alaFcIntfEtunnelStatsTxSwRjts  OBJECT-TYPE
     DESCRIPTION
         "Number of SW Reject Tx Packets on this port."
     ::= { alaFcIntfEtunnelStatsEntry 8 }
+
+alaFcIntfEtunnelStatsClear  OBJECT-TYPE
+    SYNTAX  INTEGER {
+        clear(1),
+        none(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Clear ETunnel statistics on  this Intf"
+        DEFVAL { none }
+    ::= { alaFcIntfEtunnelStatsEntry 9 }
+
 
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 -- COMPLIANCE
@@ -4811,7 +4825,8 @@ alaFcIntfEtunnelStatsTxSwRjts  OBJECT-TYPE
 		alaFcIntfEtunnelStatsRxSwRjts,
 		alaFcIntfEtunnelStatsTxElpReqs,
 		alaFcIntfEtunnelStatsTxSwAccs,
-		alaFcIntfEtunnelStatsTxSwRjts
+		alaFcIntfEtunnelStatsTxSwRjts,
+		alaFcIntfEtunnelStatsClear
         }
         STATUS  current
         DESCRIPTION
