@@ -10,4 +10,5 @@
  */
 
 // Include the standard IOS polling file, as most of the IOSXE is identical
-include 'librenms/includes/polling/os/ios.inc.php';
+include 'includes/polling/os/ios.inc.php';
+
