@@ -22,18 +22,42 @@ if (!Auth::user()->hasGlobalAdmin()) {
 }
 
 // FIXME: Make this part of the API instead of a standalone function
-if (!is_numeric($_POST['device_id'])) {
-    $status  = 'error';
-    $message = 'Invalid device id';
-} else {
-    $update = dbUpdate(array('last_discovered' => array('NULL')), 'devices', '`device_id` = ?', array($_POST['device_id']));
-    if (!empty($update) || $update == '0') {
-        $status  = 'ok';
-        $message = 'Device will be rediscovered';
+if (isset($_POST['device_id'])) {
+    if (!is_numeric($_POST['device_id'])) {
+        $status  = 'error';
+        $message = 'Invalid device id ' . $_POST['device_id'];
     } else {
-         $status  = 'error';
-         $message = 'Error rediscovering device';
+        $update = dbUpdate(array('last_discovered' => array('NULL')), 'devices', '`device_id` = ?', array($_POST['device_id']));
+        if (!empty($update) || $update == '0') {
+            $status  = 'ok';
+            $message = 'Device ' . $_POST['device_id'] . ' will be rediscovered';
+        } else {
+             $status  = 'error';
+             $message = 'Error rediscovering device ' . $_POST['device_id'];
+        }
     }
+} elseif (isset($_POST['device_group_id'])) {
+    if (!is_numeric($_POST['device_group_id'])) {
+        $status  = 'error';
+        $message = 'Invalid device group id ' . $_POST['device_group_id'];
+    } else {
+        $device_ids = dbFetchColumn("SELECT `device_id` FROM `device_group_device` WHERE `device_group_id`=" . $_POST['device_group_id']);
+        $update = 0;
+        foreach ($device_ids as $device_id) {
+            $update += dbUpdate(array('last_discovered' => array('NULL')), 'devices', '`device_id` = ?', array($device_id));
+        }
+
+        if (!empty($update) || $update == '0') {
+            $status  = 'ok';
+            $message = 'Devices of group ' . $_POST['device_group_id'] . ' will be rediscovered';
+        } else {
+            $status  = 'error';
+            $message = 'Error rediscovering devices of group ' . $_POST['device_group_id'];
+        }
+    }
+} else {
+    $status  = 'Error';
+    $message = 'Undefined POST keys received';
 }
 
 $output = array(
