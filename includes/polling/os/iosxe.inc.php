@@ -6,9 +6,12 @@
  *
  * @package    LibreNMS
  * @subpackage polling
- * @copyright  (C) 2016 Librenms
+ * @copyright  (C) 2019 Librenms
  */
 
-// Include the standard IOS polling file, as most of the IOSXE is identical
-include 'includes/polling/os/ios.inc.php';
+///////////////////////////////////////////////////
+// Include the standard IOS polling file. 
+// Most of the IOSXE os polling code is identical
+///////////////////////////////////////////////////
 
+include 'includes/polling/os/ios.inc.php';
