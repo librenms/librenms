@@ -252,3 +252,9 @@ file content:
 ```
 git cat-file -p <object id>
 ```
+
+# Remove disabled/removed device
+
+```
+git rm --cached <object id>
+```
