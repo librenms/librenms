@@ -80,6 +80,7 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
     // restricted by access
     Route::group(['prefix' => 'devices'], function () {
         Route::get('{hostname}', 'LegacyApiController@get_device')->name('get_device');
+        Route::get('{hostname}/discover', 'LegacyApiController@trigger_device_discovery')->name('trigger_device_discovery');
         Route::get('{hostname}/graphs/health/{type}/{sensor_id?}', 'LegacyApiController@get_graph_generic_by_hostname')->name('get_health_graph');
         Route::get('{hostname}/graphs/wireless/{type}/{sensor_id?}', 'LegacyApiController@get_graph_generic_by_hostname')->name('get_wireless_graph');
         Route::get('{hostname}/vlans', 'LegacyApiController@get_vlans')->name('get_vlans');
