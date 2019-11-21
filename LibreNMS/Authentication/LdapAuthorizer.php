@@ -12,6 +12,9 @@ class LdapAuthorizer extends AuthorizerBase
 
     public function authenticate($credentials)
     {
+        if (Config::get('auth_ldap_debug')) {
+            ldap_set_option(null, LDAP_OPT_DEBUG_LEVEL, 7);
+        }
         $connection = $this->getLdapConnection(true);
 
         if (!empty($credentials['username'])) {
