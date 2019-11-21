@@ -3,8 +3,7 @@
 use LibreNMS\RRD\RrdDefinition;
 
 
-// changed by joovoo
-$oids = snmp_get_multi($device, ['panChassisType.0', 'panSysSwVersion.0', 'panSysSerialNumber.0', 'panSessionActive.0', 'panSessionActiveTcp.0', 'panSessionActiveUdp.0', 'panSessionActiveICMP.0', 'panSessionActiveSslProxy.0', 'panSessionSslProxyUtilization.0', 'panGPGWUtilizationActiveTunnels.0','panVsysActiveTcpCps.0','panVsysActiveUdpCps.0','panVsysActiveOtherIpCps.0' ], '-OQUs', 'PAN-COMMON-MIB');
+$oids = snmp_get_multi($device, ['panChassisType.0', 'panSysSwVersion.0', 'panSysSerialNumber.0', 'panSessionActive.0', 'panSessionActiveTcp.0', 'panSessionActiveUdp.0', 'panSessionActiveICMP.0', 'panSessionActiveSslProxy.0', 'panSessionSslProxyUtilization.0', 'panGPGWUtilizationActiveTunnels.0','panVsysActiveTcpCps.1','panVsysActiveUdpCps.1','panVsysActiveOtherIpCps.1' ], '-OQUs', 'PAN-COMMON-MIB');
 
 
 $hardware = $oids[0]['panChassisType'];
@@ -17,9 +16,9 @@ $sessions_icmp = $oids[0]['panSessionActiveICMP'];
 $sessions_ssl = $oids[0]['panSessionActiveSslProxy'];
 $sessions_sslutil = $oids[0]['panSessionSslProxyUtilization'];
 $activetunnels = $oids[0]['panGPGWUtilizationActiveTunnels'];
-$vsys_active_tcp_cps = $oids[0] ['panVsysActiveTcpCps'];
-$vsys_activeudp_cps = $oids[0] ['panVsysActiveUdpCps'];
-$vsys_active_other_ip_cps = $oids[0] ['panVsysActiveOtherIpCps'];
+$vsys_active_tcp_cps = $oids[1] ['panVsysActiveTcpCps'];
+$vsys_active_udp_cps = $oids[1] ['panVsysActiveUdpCps'];
+$vsys_active_other_ip_cps = $oids[1] ['panVsysActiveOtherIpCps'];
 
 
 
@@ -128,7 +127,7 @@ if (is_numeric($vsys_active_tcp_cps)) {
     $graphs['panos_vsys_active_tcp_cps'] = true;
 }
 
-if (is_numeric($panVsysActiveUdpCps)) {
+if (is_numeric($vsys_active_udp_cps)) {
     $rrd_def = RrdDefinition::make()->addDataset('vsys_active_udp_cps', 'GAUGE', 0, 3000000);
 
     $fields = array(

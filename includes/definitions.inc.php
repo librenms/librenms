@@ -247,6 +247,19 @@ $config['graph_types']['device']['panos_sessions_ssl']['descr']         = 'Activ
 $config['graph_types']['device']['panos_sessions_sslutil']['section']   = 'firewall';
 $config['graph_types']['device']['panos_sessions_sslutil']['order']     = '0';
 $config['graph_types']['device']['panos_sessions_sslutil']['descr']     = 'Active SSL Proxy Utilization';
+
+$config['graph_types']['device']['panos_vsys_active_udp_cps']['section']  = 'firewall';
+$config['graph_types']['device']['panos_vsys_active_udp_cps']['order']    = '0';
+$config['graph_types']['device']['panos_vsys_active_udp_cps']['descr']    = 'UDP Connections per Second';
+
+$config['graph_types']['device']['panos_vsys_active_tcp_cps']['section']  = 'firewall';
+$config['graph_types']['device']['panos_vsys_active_tcp_cps']['order']    = '0';
+$config['graph_types']['device']['panos_vsys_active_tcp_cps']['descr']    = 'TCP Connections per Second';
+
+$config['graph_types']['device']['panos_vsys_active_other_ip_cps']['section']  = 'firewall';
+$config['graph_types']['device']['panos_vsys_active_other_ip_cps']['order']    = '0';
+$config['graph_types']['device']['panos_vsys_active_other_ip_cps']['descr']    = 'Other Connections per Second';
+
 $config['graph_types']['device']['panos_activetunnels'] = ['section' => 'firewall', 'order' => 0, 'descr' => 'Active GlobalProtect Tunnels'];
 
 //PF Graphs

@@ -5,7 +5,7 @@ $rrd_filename = rrd_name($device['hostname'], 'panos-sessions');
 $ds = 'sessions';
 
 $colour_area = '9999cc';
-$colour_line = '0000cc';
+$colour_line = '4444cc';
 
 $colour_area_max = '9999cc';
 
