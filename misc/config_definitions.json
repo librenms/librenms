@@ -2003,6 +2003,31 @@
                 "descr": "Active UDP Sessions"
             }
         },
+
+ 	"graph_types.device.panos_vsys_active_udp_cps": {
+            "default": {
+                "section": "firewall",
+                "order": 0,
+                "descr": "UDP connections p/s"
+            }
+	},
+
+ 	"graph_types.device.panos_vsys_active_tcp_cps": {
+            "default": {
+                "section": "firewall",
+                "order": 0,
+                "descr": "TCP connections p/s"
+            }
+	},
+
+ 	"graph_types.device.panos_vsys_active_other_ip_cps": {
+            "default": {
+                "section": "firewall",
+                "order": 0,
+                "descr": "Other connections p/s"
+            }
+	},
+
         "graph_types.device.pf_badoffset": {
             "default": {
                 "section": "firewall",
