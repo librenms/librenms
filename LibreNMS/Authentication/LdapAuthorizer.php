@@ -19,6 +19,11 @@ class LdapAuthorizer extends AuthorizerBase
             $username = $credentials['username'];
             $this->userloginname = $username;
             if (!empty($credentials['password']) && ldap_bind($connection, $this->getFullDn($username), $credentials['password'])) {
+                // ldap_bind has done a bind with the user credentials. If binduser is configured, rebind with the auth_ldap_binduser
+                // normal user has restricted right to search in ldap. auth_ldap_binduser has full search rights
+                if ((Config::has('auth_ldap_binduser') || Config::has('auth_ldap_binddn')) && Config::has('auth_ldap_bindpassword')) {
+                    $this->bind();
+                }
                 $ldap_groups = $this->getGroupList();
                 if (empty($ldap_groups)) {
                     // no groups, don't check membership
@@ -202,12 +207,12 @@ class LdapAuthorizer extends AuthorizerBase
     {
         $connection = $this->getLdapConnection();
 
-        $filter = '(' . Config::get('auth_ldap_prefix') . '*)';
+        $filter = '(' . Config::get('auth_ldap_prefix') . $this->userloginname . ')';
         if (Config::get('auth_ldap_userlist_filter') != null) {
             $filter = '(' . Config::get('auth_ldap_userlist_filter') . ')';
         }
         
-        $search = ldap_search($connection, $this->getFullDn($this->userloginname), $filter);
+        $search = ldap_search($connection, trim(Config::get('auth_ldap_suffix'), ','), $filter);
         $entries = ldap_get_entries($connection, $search);
         foreach ($entries as $entry) {
             $user = $this->ldapToUser($entry);
