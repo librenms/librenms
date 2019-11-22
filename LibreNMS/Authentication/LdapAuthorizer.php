@@ -16,6 +16,10 @@ class LdapAuthorizer extends AuthorizerBase
 
         if (!empty($credentials['username'])) {
             $username = $credentials['username'];
+            if (Config::get('auth_ldap_wildcard_ou', false)) {
+                $this->setAuthLdapSuffixOu($username);
+            }
+
             if (!empty($credentials['password']) && ldap_bind($connection, $this->getFullDn($username), $credentials['password'])) {
                 $ldap_groups = $this->getGroupList();
                 if (empty($ldap_groups)) {
@@ -255,6 +259,32 @@ class LdapAuthorizer extends AuthorizerBase
     protected function getFullDn($username)
     {
         return Config::get('auth_ldap_prefix', '') . $username . Config::get('auth_ldap_suffix', '');
+    }
+
+    /**
+     * Set auth_ldap_suffix ou according to $username dn
+     * useful if Config::get('auth_ldap_wildcard_ou) is set
+     * @internal
+     *
+     * @return false|true
+     */
+    protected function setAuthLdapSuffixOu($username)
+    {
+        $connection = $this->getLdapConnection();
+        $filter = '(' . Config::get('auth_ldap_attr.uid') . '=' . $username . ')';
+        $base_dn = preg_replace("/,ou=[^,]+,/", ",", Config::get('auth_ldap_suffix'));
+        $base_dn = trim($base_dn, ',');
+        $search = ldap_search($connection, $base_dn, $filter);
+        foreach (ldap_get_entries($connection, $search) as $entry) {
+            if ($entry['uid'][0] == $username) {
+                preg_match('~,ou=([^,]+),~', $entry['dn'], $matches);
+                $user_ou = $matches[1];
+                $new_auth_ldap_suffix = preg_replace("/,ou=[^,]+,/", ",ou=" . $user_ou . ",", Config::get('auth_ldap_suffix'));
+                Config::set('auth_ldap_suffix', $new_auth_ldap_suffix);
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
