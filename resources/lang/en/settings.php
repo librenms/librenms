@@ -284,7 +284,7 @@ return [
         ],
         'auth_ldap_wildcard_ou' => [
             'description' => 'Wildcard user OU',
-            'help' => "Search for user matching user name independently of OU set in user suffix. Useful if your users are in different OU"
+            'help' => "Search for user matching user name independently of OU set in user suffix. Useful if your users are in different OU. Bind username, if set, still user suffix"
         ],
         'auth_ldap_version' => [
             'description' => 'LDAP version',
