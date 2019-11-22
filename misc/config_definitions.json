@@ -455,6 +455,13 @@
             "order": 5,
             "type": "boolean"
         },
+        "auth_ldap_wildcard_ou": {
+            "default": false,
+            "group": "auth",
+            "section": "ldap",
+            "order": 5,
+            "type": "boolean"
+        },
         "auth_ldap_version": {
             "default": 3,
             "group": "auth",
