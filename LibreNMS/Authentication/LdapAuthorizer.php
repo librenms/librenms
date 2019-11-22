@@ -367,7 +367,10 @@ class LdapAuthorizer extends AuthorizerBase
         $password = $credentials['password'] ?? null;
 
         if ((Config::has('auth_ldap_binduser') || Config::has('auth_ldap_binddn')) && Config::has('auth_ldap_bindpassword')) {
-            $username = Config::get('auth_ldap_binddn', $this->getFullDn(Config::get('auth_ldap_binduser')));
+            if (Config::get('auth_ldap_binddn') == null) {
+                Config::set('auth_ldap_binddn', $this->getFullDn(Config::get('auth_ldap_binduser'));
+            }
+            $username = Config::get('auth_ldap_binddn');
             $password = Config::get('auth_ldap_bindpassword');
         } elseif (!empty($credentials['username'])) {
             $username = $this->getFullDn($credentials['username']);
