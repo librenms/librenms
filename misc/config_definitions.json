@@ -3548,6 +3548,13 @@
         "page_title_suffix": {
             "type": "text"
         },
+        "password.min_length": {
+            "default": 8,
+            "type": "integer",
+            "group": "auth",
+            "section": "general",
+            "order": 5
+        },
         "peering_descr": {
             "default": [
                 "peering"
@@ -3861,7 +3868,7 @@
             "default": false,
             "group": "auth",
             "section": "general",
-            "order": 5,
+            "order": 6,
             "type": "boolean"
         },
         "rancid_ignorecomments": {
