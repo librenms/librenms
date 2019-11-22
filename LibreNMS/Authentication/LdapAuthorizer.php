@@ -17,11 +17,11 @@ class LdapAuthorizer extends AuthorizerBase
 
         if (!empty($credentials['username'])) {
             $username = $credentials['username'];
+            $this->userloginname = $username;
             if (Config::get('auth_ldap_wildcard_ou', false)) {
                 $this->setAuthLdapSuffixOu($username);
             }
 
-            $this->userloginname = $username;
             if (!empty($credentials['password']) && ldap_bind($connection, $this->getFullDn($username), $credentials['password'])) {
                 // ldap_bind has done a bind with the user credentials. If binduser is configured, rebind with the auth_ldap_binduser
                 // normal user has restricted right to search in ldap. auth_ldap_binduser has full search rights
@@ -387,7 +387,7 @@ class LdapAuthorizer extends AuthorizerBase
 
         if ((Config::has('auth_ldap_binduser') || Config::has('auth_ldap_binddn')) && Config::has('auth_ldap_bindpassword')) {
             if (Config::get('auth_ldap_binddn') == null) {
-                Config::set('auth_ldap_binddn', $this->getFullDn(Config::get('auth_ldap_binduser'));
+                Config::set('auth_ldap_binddn', $this->getFullDn(Config::get('auth_ldap_binduser')));
             }
             $username = Config::get('auth_ldap_binddn');
             $password = Config::get('auth_ldap_bindpassword');
