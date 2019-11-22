@@ -15,9 +15,12 @@ if (preg_match('/^Cisco IOS Software, .+? Software \([^\-]+-([^\-]+)-\w\),.+?Ver
 } elseif (preg_match('/Cisco Internetwork Operating System Software\s+IOS \(tm\) [^ ]+ Software \([^\-]+-([^\-]+)-\w\),.+?Version ([^, ]+)/', $device['sysDescr'], $regexp_result)) {
     $features = $regexp_result[1];
     $version  = $regexp_result[2];
+} elseif (preg_match('/^Cisco IOS Software \[([^\]]+)\],.+Software \(([^\)]+)\), Version ([^, ]+)/', $device['sysDescr'], $regexp_result)) {
+    $features = $regexp_result[1];
+    $version  = $regexp_result[2] . " " . $regexp_result[3];
 }
 
-$oids = ['entPhysicalModelName.1', 'entPhysicalContainedIn.1', 'entPhysicalName.1', 'entPhysicalSoftwareRev.1', 'entPhysicalModelName.1001', 'entPhysicalContainedIn.1001', 'cardDescr.1', 'cardSlotNumber.1'];
+$oids = ['entPhysicalModelName.1', 'entPhysicalContainedIn.1', 'entPhysicalName.1', 'entPhysicalSoftwareRev.1', 'entPhysicalModelName.1000', 'entPhysicalModelName.1001', 'entPhysicalContainedIn.1000', 'entPhysicalContainedIn.1001', 'cardDescr.1', 'cardSlotNumber.1'];
 
 $data = snmp_get_multi($device, $oids, '-OQUs', 'ENTITY-MIB:OLD-CISCO-CHASSIS-MIB');
 
