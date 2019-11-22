@@ -151,4 +151,3 @@ if (is_numeric($vsys_active_other_ip_cps)) {
 
     $graphs['panos_vsys_active_other_ip_cps'] = true;
 }
-
