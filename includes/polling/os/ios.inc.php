@@ -28,23 +28,21 @@ if ($data[1]['entPhysicalContainedIn'] == '0') {
     if (!empty($data[1]['entPhysicalSoftwareRev'])) {
         $version = $data[1]['entPhysicalSoftwareRev'];
     }
-
     if (!empty($data[1]['entPhysicalName'])) {
         $hardware = $data[1]['entPhysicalName'];
     }
-
     if (!empty($data[1]['entPhysicalModelName'])) {
         $hardware = $data[1]['entPhysicalModelName'];
     }
 }
 
-if (!empty($data[1000]['entPhysicalModelName'])) {
+if (empty($hardware) && !empty($data[1000]['entPhysicalModelName'])) {
     $hardware = $data[1000]['entPhysicalModelName'];
-} elseif (!empty($data[1000]['entPhysicalContainedIn'])) {
+} elseif (empty($hardware) && !empty($data[1000]['entPhysicalContainedIn'])) {
     $hardware = $data[$data[1000]['entPhysicalContainedIn']]['entPhysicalName'];
-} elseif (!empty($data[1001]['entPhysicalModelName'])) {
+} elseif (empty($hardware) && !empty($data[1001]['entPhysicalModelName'])) {
     $hardware = $data[1001]['entPhysicalModelName'];
-} elseif (!empty($data[1001]['entPhysicalContainedIn'])) {
+} elseif (empty($hardware) && !empty($data[1001]['entPhysicalContainedIn'])) {
     $hardware = $data[$data[1001]['entPhysicalContainedIn']]['entPhysicalName'];
 }
 
