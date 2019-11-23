@@ -40,7 +40,7 @@ if (empty($hardware) && !empty($data[1000]['entPhysicalModelName'])) {
     $hardware = $data[1000]['entPhysicalModelName'];
 } elseif (empty($hardware) && !empty($data[1000]['entPhysicalContainedIn'])) {
     $hardware = $data[$data[1000]['entPhysicalContainedIn']]['entPhysicalName'];
-} elseif (empty($hardware) && !empty($data[1001]['entPhysicalModelName'])) {
+} elseif ((preg_match('/stack/i', $hardware) || empty($hardware)) && !empty($data[1001]['entPhysicalModelName'])) {
     $hardware = $data[1001]['entPhysicalModelName'];
 } elseif (empty($hardware) && !empty($data[1001]['entPhysicalContainedIn'])) {
     $hardware = $data[$data[1001]['entPhysicalContainedIn']]['entPhysicalName'];
