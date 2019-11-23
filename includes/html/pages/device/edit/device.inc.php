@@ -258,8 +258,7 @@ print_optionbar_end();
 echo("<small>");
 echo("Last polled: <b>" . $device['last_polled'] . "</b>");
 if ($device['last_discovered']) {
-    echo("<br>");
-    echo("Last discovered: <b>" . $device['last_discovered'] . "</b>");
+    echo("<br>Last discovered: <b>" . $device['last_discovered'] . "</b>");
 }
 echo("</small>");
 ?>
