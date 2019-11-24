@@ -26,7 +26,7 @@ echo '<script src="js/L.Control.Locate.min.js"></script>';
 $uptime = (Time::formatInterval($device['status'] ? $device['uptime'] : time() - strtotime($device['last_polled'])));
 $uptime_text = ($device['status'] ? 'Uptime' : 'Downtime');
 
-if ($device['os'] == 'ios') {
+if ($device['os'] == 'ios' || $device['os'] == 'iosxe') {
     formatCiscoHardware($device);
 }
 
