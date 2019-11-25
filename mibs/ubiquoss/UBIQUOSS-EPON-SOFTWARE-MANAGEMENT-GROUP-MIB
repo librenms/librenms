@@ -1,0 +1,590 @@
+-- *****************************************************************
+-- UBIQUOSS-EPON-SOFTWARE-MANAGEMENT-GROUP-MIB.my
+--
+-- Jun 2008, Hyungeun Park   
+--
+-- Copyright (c) 2006 by Ubiquoss, Corp.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+	UBIQUOSS-EPON-SOFTWARE-MANAGEMENT-GROUP-MIB DEFINITIONS ::= BEGIN
+ 
+		IMPORTS
+			ifIndex			
+				FROM RFC1213-MIB						
+			IpAddress, Integer32, OBJECT-TYPE, MODULE-IDENTITY			
+				FROM SNMPv2-SMI			                                                    
+			MacAddress, DisplayString			
+				FROM SNMPv2-TC
+			ubiEponGroupMIB		
+				FROM UBQS-SMI 			
+			ubiPortIndex
+				FROM UBQS-INTERFACE-MIB;
+	
+	
+		ubiSoftwareMIB MODULE-IDENTITY 
+			LAST-UPDATED "200806201636Z"		
+			ORGANIZATION 
+				"Ubiquoss Corp."
+			CONTACT-INFO 
+				"Chair		: Hyungeun Park
+							  Ubiquoss Corp.
+				 Postal:	: 24F Milennium B/D,
+				 			  467-12, Dogok-Dong,
+							  GangNam-Gu, Seoul 135-270
+							  Korea
+				 EMail: 	: phe618@ubiquoss.com
+				 Phone		: +82-2-2190-3166"
+			DESCRIPTION 
+				"This MIB module defines epon software management information"
+   			::= { ubiEponGroupMIB 6 }
+
+	
+	
+--
+-- Node definitions
+--                      
+	   ubiSoftwareMIBObjects	OBJECT IDENTIFIER ::= { ubiSoftwareMIB 1 } 
+
+-- ***********************************************************
+-- oltSoftwareInfoTable
+-- ***********************************************************    
+		oltSoftwareInfoTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF OltSoftwareInfoEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"software e"
+			::= { ubiSoftwareMIBObjects 1 }  
+			
+		oltSoftwareInfoEntry OBJECT-TYPE
+			SYNTAX OltSoftwareInfoEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { ubiPortIndex }
+			::= { oltSoftwareInfoTable 1 }
+		
+		OltSoftwareInfoEntry ::=
+			SEQUENCE { 
+				oltSwVersion
+					DisplayString,
+				oltHwVersion
+					DisplayString  
+			 }
+
+		oltSwVersion OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..20))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Olt software version number (xx.xx.xx)"
+			::= { oltSoftwareInfoEntry 1 }
+		
+	
+		oltHwVersion OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..20))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Olt Hardware version number"
+			::= { oltSoftwareInfoEntry 2 }                
+			
+-- ***********************************************************
+-- onuSoftwareInfoTable
+-- ***********************************************************   			
+		onuSoftwareInfoTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF OnuSoftwareInfoEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				""
+			::= { ubiSoftwareMIBObjects 2 } 
+						               
+		onuSoftwareInfoEntry OBJECT-TYPE
+			SYNTAX OnuSoftwareInfoEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { ubiPortIndex, onuId }
+			::= { onuSoftwareInfoTable 1 }
+		
+		OnuSoftwareInfoEntry ::=
+			SEQUENCE { 
+				onuSwVersion
+					DisplayString,
+				onuHwVersion
+					DisplayString
+			 }
+				
+		onuSwVersion OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..20))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Onu software version number (xx.xx.xx)"
+			::= { onuSoftwareInfoEntry 1 }
+		
+	
+		onuHwVersion OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..20))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Onu Hardware version number"
+			::= { onuSoftwareInfoEntry 2 }  
+			                                       
+-- ***********************************************************
+-- SoftwareDownloadTable
+-- ***********************************************************   			                                       
+ 	softwareDownload OBJECT IDENTIFIER ::= { ubiSoftwareMIBObjects 9 }
+       
+	softwareDownloadOltId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Olt ID"
+			::= { softwareDownload 1 }     
+	
+	softwareDownloadOnuId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Onu ID"
+			::= { softwareDownload 2 }
+ 
+ 	softwareDownloadHostIp OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"file server IP address (xxx.xxx.xxx.xxx)"
+			::= { softwareDownload 3 }
+
+	softwareDownloadFileName OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..80))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"software image file name to be downloaded"
+			::= { softwareDownload 4 }
+ 
+	softwareDownloadOption OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				forced(1),
+				checkVersion(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"software image file name to be downloaded"
+			::= { softwareDownload 5 }       
+			
+	softwareDownloadOp OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				normal(1),
+				operate(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				""
+			::= { softwareDownload 6 }
+
+-- ***********************************************************
+-- onuAutoDownloadGroup
+-- ***********************************************************
+	onuAutoDownload OBJECT IDENTIFIER ::= { ubiSoftwareMIBObjects 10 }
+ 
+    onuSoftwareTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF OnuSoftwareEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"ONU firmware image table"
+			::= { onuAutoDownload 1 }           
+
+	onuSoftwareEntry OBJECT-TYPE
+			SYNTAX OnuSoftwareEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { onuSoftwareId }
+			::= { onuSoftwareTable 1 }
+			
+	OnuSoftwareEntry ::=
+			SEQUENCE { 
+				onuSoftwareId
+					INTEGER,
+				onuSoftwareFileName
+					DisplayString
+			 }
+
+	onuSoftwareId OBJECT-TYPE
+		SYNTAX INTEGER
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"ONU software image file number"
+		::= { onuSoftwareEntry 1 }
+		
+	onuSoftwareFileName OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..80))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"ONU software image file name"
+		::= { onuSoftwareEntry 2 }
+                                         
+	onuDownload OBJECT IDENTIFIER ::= { onuAutoDownload 2 }
+	
+	onuDownloadHostIp OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"file server IP address (xxx.xxx.xxx.xxx)"
+			::= { onuDownload 1 }
+		
+	onuDownloadFileName OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (0..80))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"software image file name to be downloaded"
+			::= { onuDownload 2 }		
+		
+	onuDownloadAction OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				noAction(0),
+				add(1),
+				remove(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"To set value with run(1) will start download"
+			::= { onuDownload 3 }   
+	
+	
+	onuDownloadActionOp OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				normal(0),
+				operate(1),
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				""
+			::= { onuDownload 4 }
+		                                          
+		                                          
+	onuDownloadStatusTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF OnuDownloadStatusEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"ONU firmware image table"
+			::= { onuAutoDownload 3 }
+		
+		
+		onuDownloadStatusEntry OBJECT-TYPE
+			SYNTAX OnuDownloadStatusEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { ifIndex }
+			::= { onuDownloadStatusTable 1 }
+		
+		OnuDownloadStatusEntry ::=
+			SEQUENCE { 
+				onuDownloadStatusMask
+					OCTET STRING
+			 }
+
+		
+		onuDownloadStatusMask OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..32))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"ONU download status bitmask.
+				 32 of ONUs x 8 bit for each ONU = 256 bits (32 bytes)
+
+				 0x00~0x7F : 'onuSoftwareId' on download complete
+				 0x80 : wait to download
+				 0x81 : unavailable entity
+				 0x82 : fail to download
+				 0x83 : no image
+                 0x84 : already up-to-date version
+				"
+			::= { onuDownloadStatusEntry 1 }
+
+--		onuVersionComparison OBJECT-TYPE
+--			SYNTAX INTEGER
+--				{
+--				disable(0),
+--				enable(1)
+--				}
+--			MAX-ACCESS read-write
+--			STATUS current
+--			DESCRIPTION
+--				"set auto-download version-comparison flag"
+--			::= { onuAutoDownload 4 }		
+		
+		onuResetOption OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				automatic(1),
+				manual(2),
+				automatic_with_time(3)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"ONU reset method after auto-download
+				Auto-reset with time(3) : Set Only"
+			::= { onuAutoDownload 4 }
+
+		
+		onuAutoDownloadStatus OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				start(1),
+				stop(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"ONU auto-download status"
+			::= { onuAutoDownload 5 }
+			
+			
+		onuAutoDownloadResetTime OBJECT-TYPE
+			SYNTAX Integer32 (0..23)  
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"ONU auto-download auto-reset time 
+				Unit : time of day
+				255 : Auto-reset immediately, 
+					  manual-reset,  
+					  or auto-download stopped."
+			::= { onuAutoDownload 6}
+
+-- ***********************************************************
+-- softwareGroup
+-- ***********************************************************
+		resetOltId OBJECT-TYPE
+			SYNTAX Integer32 
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"reset Olt Id"
+			::= { ubiSoftwareMIBObjects 3 }      
+			
+		resetOnuId OBJECT-TYPE
+			SYNTAX Integer32 (0..64)  
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION                                  
+				"reset Onu Id"
+			::= { ubiSoftwareMIBObjects 4 }  
+		          
+		resetOp OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+					normal(0),
+					reset(1),
+					resetWithInit(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"reset Operation"
+			::= { ubiSoftwareMIBObjects 5 }
+			
+		resetMacAddr OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"reset Mac addr"
+			::= { ubiSoftwareMIBObjects 6 }
+			
+		resetMacOltId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"reset Mac addr"
+			::= { ubiSoftwareMIBObjects 7 } 
+		
+  		resetMacOp OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+					normal(0),
+					reset(1),
+					resetWithInit(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"reset Mac Operation"
+			::= { ubiSoftwareMIBObjects 8 }
+			
+		resetBoard OBJECT-TYPE
+			SYNTAX		Integer32(1..12)
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+				"board-reset
+				 1~12 : Slot Id"
+			::= {  ubiSoftwareMIBObjects 11 }
+
+                     
+-- ***********************************************************
+--  ubiSoftwareMIBNotificationPrefix
+-- ***********************************************************
+-- the following two OBJECT IDENTIFIERS are used to define SNMPv2 Notifications
+-- that are backward compatible with SNMPv1 Traps.           
+
+	ubiSoftwareMIBNotificationPrefix OBJECT IDENTIFIER ::= { ubiSoftwareMIB 2 }
+	ubiSoftwareMIBNotifications OBJECT IDENTIFIER ::= { ubiSoftwareMIBNotificationPrefix 0 }
+    
+    ubiEponOltImageUpgradeNotification NOTIFICATION-TYPE
+       OBJECTS       {
+                     	ubiAlarmIndex,
+						ubiAlarmId,
+						ubiAlarmType,
+						ubiAlarmSeverity,
+						ubiAlarmPhysicalLoc,
+						ubiAlarmLogicalLoc,
+						ubiAlarmCurStatus,
+						ubiAlarmAuxinfo,
+						ubiAlarmDateTime,
+						ubiAlarmStatus
+                     }
+       STATUS        current
+       DESCRIPTION
+           "olt upgrade notification"
+       ::= { ubiSoftwareMIBNotifications 1 }
+       
+     ubiEponOltImageUpgradeFailNotification NOTIFICATION-TYPE
+       OBJECTS       {
+                     	ubiAlarmIndex,
+						ubiAlarmId,
+						ubiAlarmType,
+						ubiAlarmSeverity,
+						ubiAlarmPhysicalLoc,
+						ubiAlarmLogicalLoc,
+						ubiAlarmCurStatus,
+						ubiAlarmAuxinfo,
+						ubiAlarmDateTime,
+						ubiAlarmStatus
+                     }
+       STATUS        current
+       DESCRIPTION
+           "olt upgrade notification"
+       ::= { ubiSoftwareMIBNotifications 2 }
+                                       
+    ubiEponOnuImageUpgradeNotification NOTIFICATION-TYPE
+       OBJECTS       {
+                     	ubiAlarmIndex,
+						ubiAlarmId,
+						ubiAlarmType,
+						ubiAlarmSeverity,
+						ubiAlarmPhysicalLoc,
+						ubiAlarmLogicalLoc,
+						ubiAlarmCurStatus,
+						ubiAlarmAuxinfo,
+						ubiAlarmDateTime,
+						ubiAlarmStatus
+                     }
+       STATUS        current
+       DESCRIPTION
+           "onu upgrade notification"
+       ::= { ubiSoftwareMIBNotifications 3 }
+       
+     ubiEponOnuImageUpgradeFailNotification NOTIFICATION-TYPE
+       OBJECTS       {
+                     	ubiAlarmIndex,
+						ubiAlarmId,
+						ubiAlarmType,
+						ubiAlarmSeverity,
+						ubiAlarmPhysicalLoc,
+						ubiAlarmLogicalLoc,
+						ubiAlarmCurStatus,
+						ubiAlarmAuxinfo,
+						ubiAlarmDateTime,
+						ubiAlarmStatus
+                     }
+       STATUS        current
+       DESCRIPTION
+           "onu upgrade notification"
+       ::= { ubiSoftwareMIBNotifications 4 }        
+    
+-- ***********************************************************
+-- ubiSoftwareMIBConformance
+-- ***********************************************************
+-- conformance information
+	ubiSoftwareMIBConformance OBJECT IDENTIFIER ::= { ubiSoftwareMIB 3 }
+	ubiSoftwareMIBCompliances OBJECT IDENTIFIER ::= { ubiSoftwareMIBConformance 1 }
+	ubiSoftwareMIBGroups      OBJECT IDENTIFIER ::= { ubiSoftwareMIBConformance 2 }
+  
+-- compliance statements
+    ubiSoftwareMIBCompliance MODULE-COMPLIANCE
+		STATUS  current
+        DESCRIPTION
+		    "Description"
+		MODULE  -- this module
+        MANDATORY-GROUPS { ubiSoftwareMIBGroup,
+                		   ubiSoftwareMIBNotificationGroup	
+                         }
+	   GROUP  ubiSoftwareMIBGroup
+	   DESCRIPTION  
+            "Description"
+       GROUP ubiSoftwareMIBNotificationGroup   
+       DESCRIPTION
+            "Description"
+
+       ::= { ubiSoftwareMIBCompliances 1 }
+	                            
+-- compliance statements
+   	ubiSoftwareMIBGroup  OBJECT-GROUP
+		OBJECTS {     
+			ubiEponOltImageUpgradeNotification,
+			ubiEponOltImageUpgradeFailNotification,
+			ubiEponOnuImageUpgradeNotification,
+			ubiEponOnuImageUpgradeFailNotification 
+               }
+        STATUS  current
+        DESCRIPTION
+                "ubiquoss software information MIB"
+        ::= { ubiSoftwareMIBGroups 1 }
+     
+     ubiSoftwareMIBNotificationGroup    OBJECT-GROUP
+      	OBJECTS {     
+			-- TODO 
+               }
+        STATUS  current
+        DESCRIPTION
+                "ubiquoss software information Notifications"
+        ::= { ubiSoftwareMIBGroups 2 }
+	 	
+	END
+
+--
+-- UBIQUOSS-EPON-SOFTWARE-MANAGEMENT-MIB.my
+--

@@ -1,0 +1,1015 @@
+-- *****************************************************************
+-- UBQS-MULTICAST-MIB: Ubiquoss Multicast MIB      
+--
+-- May 2011,   jisookim
+--   
+-- Copyright (c) 2011 by Ubiquoss, Corp.
+-- All rights reserved.
+-- *****************************************************************
+--   
+
+UBQS-MULTICAST-MIB	DEFINITIONS ::= BEGIN
+	IMPORTS
+		MODULE-IDENTITY, OBJECT-TYPE, IpAddress, Integer32,Counter32
+		FROM SNMPv2-SMI     
+		
+		DisplayString 			
+		FROM RFC1213-MIB   
+		
+		RowStatus, MacAddress, TruthValue
+		FROM SNMPv2-TC
+
+    	VlanIndex
+    	FROM Q-BRIDGE-MIB
+
+    	InetAddress
+    	FROM INET-ADDRESS-MIB
+
+        InterfaceIndex                   
+        FROM IF-MIB
+        		
+		ubiMgmtv2
+		FROM UBQS-SMI  
+		
+		InetAddressIPv6
+		FROM INET-ADDRESS-MIB;
+			    
+
+ubiMulticastMIB MODULE-IDENTITY
+        LAST-UPDATED    "201105302000Z"
+        ORGANIZATION 	"Ubiquoss Corp."
+	    CONTACT-INFO
+		"	Ubiquoss
+			Customer Service
+
+		 Postal: 24F Milennium B/D,
+		 	467-12, Dogok-Dong,
+			GangNam-Gu, Seoul 135-270
+			Korea
+
+		   Tel: 82-2-2190-3100"   
+    DESCRIPTION
+        "This MIB module defines multicast information"          
+        
+     ::= { ubiMgmtv2 21 }
+     
+     
+
+-- *****************************************************************
+-- Textual Conventions
+-- *****************************************************************
+
+
+-- *****************************************************************
+-- ubiMulticastMIB
+-- *****************************************************************
+     
+ubiMulticastMIBNotificationPrefix  		OBJECT IDENTIFIER ::= { ubiMulticastMIB  0 }     
+ubiIgmpSnoopingMIBObjects				OBJECT IDENTIFIER ::= { ubiMulticastMIB  1 }   
+ubiMvrMIBObjects						OBJECT IDENTIFIER ::= { ubiMulticastMIB  2 }
+ubiIgmpStatsMIBObjects					OBJECT IDENTIFIER ::= { ubiMulticastMIB  3 }
+ubiMldSnoopingMIBObjects				OBJECT IDENTIFIER ::= { ubiMulticastMIB  4 }   
+ubiIgmpProxyRoutingMIBObjects			OBJECT IDENTIFIER ::= { ubiMulticastMIB  5 }   
+ubiMulticastMIBConformance 				OBJECT IDENTIFIER ::= { ubiMulticastMIB  10 }    
+		
+-- ***********************************************************
+-- ubiMulticastMIBNotificationPrefix
+-- **********************************************************
+
+	ubiIgmpSnoopVlanNotification NOTIFICATION-TYPE
+    	OBJECTS         {
+    						ubiIgmpSnoopVlanIndex,
+    						ubiIgmpSnoopVlanEnabled 
+    	}
+    	STATUS          current
+    	DESCRIPTION
+        	""
+   	::= { ubiMulticastMIBNotificationPrefix  1 }
+
+			                                                        
+-- ***********************************************************
+-- ubiIGMPSnoopVlanConfigTable(1)
+-- ***********************************************************  
+
+	ubiIgmpSnoopVlanConfigTable OBJECT-TYPE
+		SYNTAX		SEQUENCE OF UbiIgmpSnoopVlanConfigEntry  
+		MAX-ACCESS  not-accessible
+		STATUS		current
+		DESCRIPTION
+		"Table contains VLAN based configuration information
+         for IGMP Snooping."
+		::= { ubiIgmpSnoopingMIBObjects 1 }
+		
+	ubiIgmpSnoopVlanConfigEntry OBJECT-TYPE
+		SYNTAX		UbiIgmpSnoopVlanConfigEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+		"An entry is created for each active VLAN in the device 
+         and deleted when the VLAN becomes inactive."
+		INDEX { ubiIgmpSnoopVlanIndex} 
+		::= { ubiIgmpSnoopVlanConfigTable 1 }
+		
+	UbiIgmpSnoopVlanConfigEntry ::= SEQUENCE {
+		ubiIgmpSnoopVlanIndex						VlanIndex,
+		ubiIgmpSnoopVlanEnabled						TruthValue,
+		ubiIgmpSnoopVlanFastLeaveEnabled			TruthValue,
+		ubiIgmpSnoopVlanReportSuppressionEnabled	TruthValue,
+		ubiIgmpSnoopVlanForcedSourceIP				IpAddress,
+		ubiIgmpSnoopVlanRowStatus					RowStatus,
+		ubiIgmpSnoopVlanSnoopingQuerier				TruthValue, 
+		ubiIgmpSnoopVlanLastMemberQuery    			TruthValue,
+  		ubiIgmpSnoopVlanVlantagCos                  Integer32
+	}
+	
+	ubiIgmpSnoopVlanIndex	OBJECT-TYPE
+		SYNTAX		VlanIndex
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+		"This object indicates the VLAN in which IGMP Snooping
+         is configured."
+		::= { ubiIgmpSnoopVlanConfigEntry 1 }
+		
+	ubiIgmpSnoopVlanEnabled		OBJECT-TYPE
+		SYNTAX		TruthValue
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"When this object is set to 'true' IGMP Snooping
+        is enabled on this VLAN else disabled."
+		::= { ubiIgmpSnoopVlanConfigEntry 2 }
+		
+	ubiIgmpSnoopVlanFastLeaveEnabled	OBJECT-TYPE
+		SYNTAX		TruthValue
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+		"This object specifies whether Fast-Leave mechanism 
+         (also known as Immediate-Leave) is to be performed by IGMP
+         Snooping or not.  When enabled, IGMP Snooping will remove
+         the interface from the group mentioned in the IGMP Leave
+         message received on that interface without waiting for the
+         IGMP Group-Specific Query to timeout to determine whether 
+         there are any more hosts on that interface for that group."
+		::= { ubiIgmpSnoopVlanConfigEntry 3 }
+		
+	ubiIgmpSnoopVlanReportSuppressionEnabled	OBJECT-TYPE
+		SYNTAX		TruthValue
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+		"When this object is set to 'true', IGMP Snooping will 
+         suppress duplicate IGMP Reports.  When this object is set 
+         to 'false', all IGMP Reports are forwarded to all multicast
+         routers in the VLAN."
+		::= { ubiIgmpSnoopVlanConfigEntry 4 }
+
+	ubiIgmpSnoopVlanForcedSourceIP	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+		""
+		::= { ubiIgmpSnoopVlanConfigEntry 5 }
+		
+	ubiIgmpSnoopVlanRowStatus		OBJECT-TYPE
+		SYNTAX		RowStatus
+		MAX-ACCESS	read-create
+		STATUS		current
+		DESCRIPTION
+		"create or remove IGMP-snooping vlan entry"
+		::= { ubiIgmpSnoopVlanConfigEntry 6 } 
+
+	ubiIgmpSnoopVlanSnoopingQuerier	OBJECT-TYPE	
+		SYNTAX		TruthValue
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+		"When this object is set to 'true',
+		 IGMP snooping will send general query.
+		 When this object is set to 'false',
+		 IGMP snooping will not send general query."
+	 	::= { ubiIgmpSnoopVlanConfigEntry 7 }  
+	 	
+ 	 ubiIgmpSnoopVlanLastMemberQuery OBJECT-TYPE 
+		  SYNTAX  TruthValue
+		  MAX-ACCESS read-write
+		  STATUS  current
+		  DESCRIPTION
+		  "When this object is set to 'true',
+		   IGMP snooping will send group query only to last member.
+		   When this object is set to 'false',
+		   IGMP snooping will send group query to all members."
+		   ::= { ubiIgmpSnoopVlanConfigEntry 8 }
+		
+	 ubiIgmpSnoopVlanVlantagCos  OBJECT-TYPE 
+		  SYNTAX  Integer32 (0..8)
+		  MAX-ACCESS read-write
+		  STATUS  current
+		  DESCRIPTION
+		  "This object specifies whether VLAN tag COS in Ethernet 
+          Header of IGMP Messages is to be filled to the configured
+          value or keeped by received IGMP Messages. When this 
+          object is set to <0~7>, VLAN tag COS of forwarding or 
+          sending IGMP Messages will be filled to configured value.
+          When this object is set to <8>, VLAN tag COS of received
+          IGMP Messages will be keeped and sended."		   
+    ::= { ubiIgmpSnoopVlanConfigEntry 9 }   
+
+ 
+		                                               
+		                                               
+		                                               
+-- ***********************************************************
+-- ubiIGMPSnoopMrouterTable(2)
+-- ***********************************************************
+	ubiIgmpSnoopMrouterTable OBJECT-TYPE
+		SYNTAX		SEQUENCE OF UbiIgmpSnoopMrouterEntry  
+		MAX-ACCESS  not-accessible
+		STATUS		current
+		DESCRIPTION
+		"Table contains VLAN based configuration information
+         for IGMP Snooping."
+		::= { ubiIgmpSnoopingMIBObjects 2 }
+
+	ubiIgmpSnoopMrouterEntry OBJECT-TYPE
+		SYNTAX		UbiIgmpSnoopMrouterEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+		"An entry is created for each active VLAN in the device 
+         and deleted when the VLAN becomes inactive."
+		INDEX { ubiIgmpSnoopMrouterVlanIndex, ubiIgmpSnoopMrouterIfIndex } 
+		::= { ubiIgmpSnoopMrouterTable 1 }   
+		
+	UbiIgmpSnoopMrouterEntry ::= SEQUENCE {
+		ubiIgmpSnoopMrouterVlanIndex				VlanIndex,  
+		ubiIgmpSnoopMrouterIfIndex					Integer32,
+		ubiIgmpSnoopMrouterSVlanID					VlanIndex,   
+		ubiIgmpSnoopMrouterRowStatus				RowStatus
+	}  
+
+	ubiIgmpSnoopMrouterVlanIndex	OBJECT-TYPE
+		SYNTAX		VlanIndex
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+		"This object indicates the VLAN in which IGMP Snooping
+         is configured."
+		::= { ubiIgmpSnoopMrouterEntry 1 }
+	
+	ubiIgmpSnoopMrouterIfIndex	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+		"This object indicates interface index is configured."
+		::= { ubiIgmpSnoopMrouterEntry 2 }
+
+	ubiIgmpSnoopMrouterSVlanID	OBJECT-TYPE
+		SYNTAX		VlanIndex
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+		"This object indicates the VLAN in which IGMP Snooping
+         is configured."
+		::= { ubiIgmpSnoopMrouterEntry 3 }      
+		
+	ubiIgmpSnoopMrouterRowStatus		OBJECT-TYPE
+		SYNTAX		RowStatus
+		MAX-ACCESS	read-create
+		STATUS		current
+		DESCRIPTION
+		"create or remove IGMP-snooping vlan entry"
+		::= { ubiIgmpSnoopMrouterEntry 4 }
+
+-- ***********************************************************
+-- ubiIGMPSnoopStaticGroupTable(3)
+-- ***********************************************************
+	ubiIgmpSnoopStaticGroupTable OBJECT-TYPE
+		SYNTAX		SEQUENCE OF UbiIgmpSnoopStaticGroupEntry  
+		MAX-ACCESS  not-accessible
+		STATUS		current
+		DESCRIPTION
+		"Table contains VLAN based configuration information
+         for IGMP Snooping."
+		::= { ubiIgmpSnoopingMIBObjects 3 }
+
+	ubiIgmpSnoopStaticGroupEntry OBJECT-TYPE
+		SYNTAX		UbiIgmpSnoopStaticGroupEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+		"An entry is created for each active VLAN in the device 
+         and deleted when the VLAN becomes inactive."
+		INDEX { ubiIgmpSnoopStaticGroupVlanIndex, 
+				ubiIgmpSnoopStaticGroupIfIndex, 
+				ubiIgmpSnoopStaticGroupAddress} 
+		::= { ubiIgmpSnoopStaticGroupTable 1 }   
+		
+	UbiIgmpSnoopStaticGroupEntry ::= SEQUENCE {
+		ubiIgmpSnoopStaticGroupVlanIndex			VlanIndex,  
+		ubiIgmpSnoopStaticGroupIfIndex				Integer32,
+		ubiIgmpSnoopStaticGroupAddress				IpAddress,   
+		ubiIgmpSnoopStaticGroupRowStatus			RowStatus
+	}  
+
+	ubiIgmpSnoopStaticGroupVlanIndex	OBJECT-TYPE
+		SYNTAX		VlanIndex
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+		"This object indicates the VLAN in which IGMP Snooping
+         is configured."
+		::= { ubiIgmpSnoopStaticGroupEntry 1 }
+	
+	ubiIgmpSnoopStaticGroupIfIndex	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+		"This object indicates port's index 
+         is configured."
+		::= { ubiIgmpSnoopStaticGroupEntry 2 }
+
+	ubiIgmpSnoopStaticGroupAddress	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"This object indicates the VLAN in which IGMP Snooping
+         is configured."
+		::= { ubiIgmpSnoopStaticGroupEntry 3 }      
+		
+	ubiIgmpSnoopStaticGroupRowStatus		OBJECT-TYPE
+		SYNTAX		RowStatus
+		MAX-ACCESS	read-create
+		STATUS		current
+		DESCRIPTION
+		"create or remove IGMP-snooping vlan entry"
+		::= { ubiIgmpSnoopStaticGroupEntry 4 }    
+		
+		
+-- ***********************************************************
+-- ubiIGMPSnoopPortConfigTable(4)
+-- ***********************************************************
+	ubiIgmpSnoopPortConfigAclTable OBJECT-TYPE
+		SYNTAX		SEQUENCE OF UbiIgmpSnoopPortConfigAclEntry  
+		MAX-ACCESS  not-accessible
+		STATUS		current
+		DESCRIPTION
+		"Table contains VLAN based configuration information
+         for IGMP Snooping."
+		::= { ubiIgmpSnoopingMIBObjects 4 }
+
+	ubiIgmpSnoopPortConfigAclEntry OBJECT-TYPE
+		SYNTAX		UbiIgmpSnoopPortConfigAclEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+		"An entry is created for each active VLAN in the device 
+         and deleted when the VLAN becomes inactive."
+		INDEX { ubiIgmpSnoopPortConfigAclIfIndex,
+				ubiIgmpSnoopPortConfigAclVlanID
+			  } 
+		::= { ubiIgmpSnoopPortConfigAclTable 1 }   
+		
+	UbiIgmpSnoopPortConfigAclEntry ::= SEQUENCE {
+		ubiIgmpSnoopPortConfigAclIfIndex	Integer32,  
+		ubiIgmpSnoopPortConfigAclVlanID		VlanIndex,   
+		ubiIgmpSnoopPortConfigAclName		DisplayString,
+		ubiIgmpSnoopPortConfigAclRowStatus	RowStatus
+	}  
+                              
+	ubiIgmpSnoopPortConfigAclIfIndex	OBJECT-TYPE
+		SYNTAX		Integer32		
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+		"This object indicates the VLAN in which IGMP Snooping
+         is configured."
+		::= { ubiIgmpSnoopPortConfigAclEntry 1 }
+
+	ubiIgmpSnoopPortConfigAclVlanID	OBJECT-TYPE
+		SYNTAX		VlanIndex
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+		"This object indicates the VLAN in which IGMP Snooping
+         is configured."
+		::= { ubiIgmpSnoopPortConfigAclEntry 2 }      
+	
+	ubiIgmpSnoopPortConfigAclName	OBJECT-TYPE
+		SYNTAX		DisplayString(SIZE(1..256))
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+		"This object indicates port's index 
+         is configured."
+		::= { ubiIgmpSnoopPortConfigAclEntry 3 }
+		
+	ubiIgmpSnoopPortConfigAclRowStatus		OBJECT-TYPE
+		SYNTAX		RowStatus
+		MAX-ACCESS	read-create
+		STATUS		current
+		DESCRIPTION
+		"create or remove IGMP-snooping vlan entry"
+		::= { ubiIgmpSnoopPortConfigAclEntry 4 }
+
+  
+-- ***********************************************************
+-- ubiIGMPSnoopReporterTable(5)
+-- ***********************************************************
+	ubiIgmpSnoopReporterTable OBJECT-TYPE
+		SYNTAX		SEQUENCE OF UbiIgmpSnoopReporterEntry  
+		MAX-ACCESS  not-accessible
+		STATUS		current
+		DESCRIPTION
+		""
+		::= { ubiIgmpSnoopingMIBObjects 5 }
+
+	ubiIgmpSnoopReporterEntry OBJECT-TYPE
+		SYNTAX		UbiIgmpSnoopReporterEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+		""
+		INDEX { ubiIgmpSnoopVlanIndex,
+				ubiIgmpSnoopReporterIfIndex, 
+			    ubiIgmpSnoopReporterGroupAddress,
+			    ubiIgmpSnoopReporterAddress } 
+		::= { ubiIgmpSnoopReporterTable 1 }   
+		
+	UbiIgmpSnoopReporterEntry ::= SEQUENCE {
+		ubiIgmpSnoopReporterIfIndex					Integer32,  
+		ubiIgmpSnoopReporterGroupAddress			IpAddress,
+		ubiIgmpSnoopReporterAddress					IpAddress,
+		ubiIgmpSnoopReporterUptime					TimeTicks,        
+		ubiIgmpSnoopReporterExpireTime				TimeTicks
+	}  
+                              
+	ubiIgmpSnoopReporterIfIndex	OBJECT-TYPE
+		SYNTAX		Integer32		
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+		""
+		::= { ubiIgmpSnoopReporterEntry 1 }
+	
+	ubiIgmpSnoopReporterGroupAddress	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+		""
+		::= { ubiIgmpSnoopReporterEntry 2 }
+
+	ubiIgmpSnoopReporterAddress	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+		""
+		::= { ubiIgmpSnoopReporterEntry 3 }
+
+	ubiIgmpSnoopReporterUptime	OBJECT-TYPE
+		SYNTAX		TimeTicks
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		""
+		::= { ubiIgmpSnoopReporterEntry 4 }      
+		
+	ubiIgmpSnoopReporterExpireTime		OBJECT-TYPE
+		SYNTAX		TimeTicks
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		""
+		::= { ubiIgmpSnoopReporterEntry 5 }
+ 
+-- ***********************************************************
+-- ubiIGMPSnoopCacheTable(6)
+-- ***********************************************************
+
+ubiIgmpSnoopCacheTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF UbiIgmpSnoopCacheEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The (conceptual) table listing the IP multicast groups for
+             which the host is a member on a particular interface."
+
+    ::= { ubiIgmpSnoopingMIBObjects 6 }
+
+ubiIgmpSnoopCacheEntry OBJECT-TYPE
+    SYNTAX     UbiIgmpSnoopCacheEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the ubiIgmpSnoopCacheTable."
+    INDEX      { ubiIgmpSnoopCacheVlanIndex, ubiIgmpSnoopCacheIfIndex,
+                 ubiIgmpSnoopCacheAddress }
+
+    ::= { ubiIgmpSnoopCacheTable 1 }
+
+UbiIgmpSnoopCacheEntry ::= SEQUENCE {
+    ubiIgmpSnoopCacheVlanIndex          InterfaceIndex,
+    ubiIgmpSnoopCacheIfIndex            InterfaceIndex,   
+    ubiIgmpSnoopCacheAddress            InetAddress ,
+    ubiIgmpSnoopCacheUpTime             TimeTicks,
+    ubiIgmpSnoopCacheExpireTime         TimeTicks,
+    ubiIgmpSnoopCacheLastReporter       InetAddress
+}
+
+ubiIgmpSnoopCacheVlanIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The vlan interface for which this entry contains information
+            for an IP multicast group address."
+
+    ::= { ubiIgmpSnoopCacheEntry 1 }
+
+
+ubiIgmpSnoopCacheIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The interface for which this entry contains information
+            for an IP multicast group address."
+
+    ::= { ubiIgmpSnoopCacheEntry 2 }
+
+ubiIgmpSnoopCacheAddress OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE(4|16))
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The IP multicast group address for which this entry
+            contains information.  The InetAddressType, e.g., IPv4 or
+            IPv6, is identified by the ubiIgmpSnoopCacheAddressType variable
+            in the ubiIgmpSnoopCache table."
+
+    ::= { ubiIgmpSnoopCacheEntry 3 }
+
+ubiIgmpSnoopCacheUpTime OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The time elapsed since this entry was created."
+
+    ::= { ubiIgmpSnoopCacheEntry 4 }
+
+ubiIgmpSnoopCacheExpireTime OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            ""
+
+    ::= { ubiIgmpSnoopCacheEntry 5 }
+
+ubiIgmpSnoopCacheLastReporter OBJECT-TYPE
+    SYNTAX     InetAddress (SIZE(4|16))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The IP address of the source of the last membership report
+            received for this IP multicast group address on this
+            interface.  If no membership report has been received, this
+            object has a value of 0.  The InetAddressType, e.g., IPv4 or
+            IPv6, is identified by the ubiIgmpSnoopCacheAddressType variable
+            in the ubiIgmpSnoopCache table."
+
+    ::= { ubiIgmpSnoopCacheEntry 6 }
+  
+
+-- ***********************************************************
+-- ubiMvrMIBObjects
+-- ***********************************************************  
+
+	ubiMvrGlobalConfigEnable OBJECT-TYPE
+        SYNTAX	INTEGER 
+        {          
+        	enable(1),
+			disable(2)
+		}
+        MAX-ACCESS	read-write
+        STATUS		current
+        DESCRIPTION	
+        	"The enabled status of MVR function on this system.
+        	This table is used to activate entries in the ubiMvrPortConfigTable."  
+		::= { ubiMvrMIBObjects 1 }
+	
+	ubiMvrPortConfigTable OBJECT-TYPE
+	    SYNTAX     SEQUENCE OF UbiMvrPortConfigEntry
+	    MAX-ACCESS not-accessible
+	    STATUS     current
+	    DESCRIPTION
+	        "Table contains PORT based configuration information for MVR."     
+	    ::= { ubiMvrMIBObjects 2 }   
+
+	ubiMvrPortConfigEntry OBJECT-TYPE
+	    SYNTAX     UbiMvrPortConfigEntry
+	    MAX-ACCESS not-accessible
+	    STATUS     current
+	    DESCRIPTION
+	         "A logical row in the ubiMvrPortConfigTable."
+	    INDEX      
+	    { 
+	    	 IfIndex,
+	         ubiMvrPortConfigVlanid,
+		     ubiMvrPortConfigGroupaddress,
+			 ubiMvrPortConfigGroupCount
+		}
+	    ::= { ubiMvrPortConfigTable 1 }
+	
+	UbiMvrPortConfigEntry ::= SEQUENCE {
+	    ubiMvrPortConfigVlanid			Integer32,
+	    ubiMvrPortConfigGroupaddress	IpAddress,
+	    ubiMvrPortConfigGroupCount		Integer32,
+	    ubiMvrPortConfigRowStatus		RowStatus
+	}
+	
+	ubiMvrPortConfigVlanid OBJECT-TYPE
+	    SYNTAX     Integer32
+	    MAX-ACCESS read-only
+	    STATUS     current
+	    DESCRIPTION
+	            "This object indicates vlan ID is configured."
+	    ::= { ubiMvrPortConfigEntry 1 }
+	    
+	ubiMvrPortConfigGroupaddress OBJECT-TYPE
+	    SYNTAX     IpAddress
+	    MAX-ACCESS read-only
+	    STATUS     current
+	    DESCRIPTION
+	            "This object indicates multicast group address is configured."
+	    ::= { ubiMvrPortConfigEntry 2 }
+	    
+	ubiMvrPortConfigGroupCount OBJECT-TYPE
+	    SYNTAX     Integer32 (1..256)
+	    MAX-ACCESS read-only
+	    STATUS     current
+	    DESCRIPTION
+	            "This object indicates multicast group count is configured."
+	    ::= { ubiMvrPortConfigEntry 3 }
+	    
+	ubiMvrPortConfigRowStatus OBJECT-TYPE
+	    SYNTAX     RowStatus
+	    MAX-ACCESS read-create
+	    STATUS     current
+	    DESCRIPTION
+	            "create or remove entries in the ubiMvrPortConfigEntry."
+	    ::= { ubiMvrPortConfigEntry 4 }	 
+
+-- ***********************************************************
+--	ubiIgmpStatsMIBObjects
+-- ***********************************************************
+	ubiIgmpClearStatistics OBJECT-TYPE
+        SYNTAX	INTEGER 
+        {          
+        	clear(1)
+		}
+        MAX-ACCESS	read-write
+        STATUS		current
+        DESCRIPTION	
+        	""  
+		::= { ubiIgmpStatsMIBObjects 1 }
+	
+	ubiIgmpVlanStatsTable OBJECT-TYPE
+	    SYNTAX     SEQUENCE OF UbiIgmpVlanStatsEntry
+	    MAX-ACCESS not-accessible
+	    STATUS     current
+	    DESCRIPTION
+	        ""     
+	    ::= { ubiIgmpStatsMIBObjects 2 }   
+
+	ubiIgmpVlanStatsEntry OBJECT-TYPE
+	    SYNTAX     UbiIgmpVlanStatsEntry
+	    MAX-ACCESS not-accessible
+	    STATUS     current
+	    DESCRIPTION
+	         ""
+	    INDEX      
+	    { 
+	    	 ubiVlanIfIndex
+		}
+	    ::= { ubiIgmpVlanStatsTable 1 }
+	
+	UbiIgmpVlanStatsEntry ::= SEQUENCE {
+	    ubiIgmpVlanStatsEntryCount						Counter64,
+	    ubiIgmpVlanStatsReportTxTotal					Counter64,
+	    ubiIgmpVlanStatsReportRxTotal					Counter64,
+	    ubiIgmpVlanStatsReportRxSuccess					Counter64,
+	    ubiIgmpVlanStatsReportRxUnsuccess				Counter64,
+	    ubiIgmpVlanStatsLeaveTxTotal           			Counter64,
+	    ubiIgmpVlanStatsLeaveRxTotal           			Counter64,
+	    ubiIgmpVlanStatsGeneralQueryTxTotal             Counter64,
+	    ubiIgmpVlanStatsGeneralQueryRxTotal             Counter64,
+	    ubiIgmpVlanStatsGroupSpecificQueryTxTotal       Counter64,
+	    ubiIgmpVlanStatsGroupSpecificQueryRxTotal       Counter64,
+	    ubiIgmpVlanStatsInvalidMessageRxTotal           Counter64
+	}
+	
+    ubiIgmpVlanStatsEntryCount OBJECT-TYPE
+	    SYNTAX     Counter64
+	    MAX-ACCESS read-only
+	    STATUS     current
+	    DESCRIPTION
+	            ""
+	    ::= { ubiIgmpVlanStatsEntry 1 } 
+	      
+    ubiIgmpVlanStatsReportTxTotal OBJECT-TYPE
+	    SYNTAX     Counter64
+	    MAX-ACCESS read-only
+	    STATUS     current
+	    DESCRIPTION
+	            ""
+	    ::= { ubiIgmpVlanStatsEntry 2 }
+    ubiIgmpVlanStatsReportRxTotal OBJECT-TYPE
+	    SYNTAX     Counter64
+	    MAX-ACCESS read-only
+	    STATUS     current
+	    DESCRIPTION
+	            ""
+	    ::= { ubiIgmpVlanStatsEntry 3 }
+	    
+    ubiIgmpVlanStatsReportRxSuccess OBJECT-TYPE
+	    SYNTAX     Counter64
+	    MAX-ACCESS read-only
+	    STATUS     current
+	    DESCRIPTION
+	            ""
+	    ::= { ubiIgmpVlanStatsEntry 4 }      
+	    
+    ubiIgmpVlanStatsReportRxUnsuccess OBJECT-TYPE
+	    SYNTAX     Counter64
+	    MAX-ACCESS read-only
+	    STATUS     current
+	    DESCRIPTION
+	            ""
+	    ::= { ubiIgmpVlanStatsEntry 5 }        
+	    
+    ubiIgmpVlanStatsLeaveTxTotal OBJECT-TYPE
+	    SYNTAX     Counter64
+	    MAX-ACCESS read-only
+	    STATUS     current
+	    DESCRIPTION
+	            ""
+	    ::= { ubiIgmpVlanStatsEntry 6 }       
+	    
+    ubiIgmpVlanStatsLeaveRxTotal OBJECT-TYPE
+	    SYNTAX     Counter64
+	    MAX-ACCESS read-only
+	    STATUS     current
+	    DESCRIPTION
+	            ""
+	    ::= { ubiIgmpVlanStatsEntry 7 }     
+	    
+    ubiIgmpVlanStatsGeneralQueryTxTotal OBJECT-TYPE
+	    SYNTAX     Counter64
+	    MAX-ACCESS read-only
+	    STATUS     current
+	    DESCRIPTION
+	            ""
+	    ::= { ubiIgmpVlanStatsEntry 8 }   
+	    
+    ubiIgmpVlanStatsGeneralQueryRxTotal OBJECT-TYPE
+	    SYNTAX     Counter64
+	    MAX-ACCESS read-only
+	    STATUS     current
+	    DESCRIPTION
+	            ""
+	    ::= { ubiIgmpVlanStatsEntry 9 }           
+	    
+    ubiIgmpVlanStatsGroupSpecificQueryTxTotal OBJECT-TYPE
+	    SYNTAX     Counter64
+	    MAX-ACCESS read-only
+	    STATUS     current
+	    DESCRIPTION
+	            ""
+	    ::= { ubiIgmpVlanStatsEntry 10 }     
+	    
+    ubiIgmpVlanStatsGroupSpecificQueryRxTotal OBJECT-TYPE
+	    SYNTAX     Counter64
+	    MAX-ACCESS read-only
+	    STATUS     current
+	    DESCRIPTION
+	            ""
+	    ::= { ubiIgmpVlanStatsEntry 11 } 
+	    
+    ubiIgmpVlanStatsInvalidMessageRxTotal OBJECT-TYPE
+	    SYNTAX     Counter64
+	    MAX-ACCESS read-only
+	    STATUS     current
+	    DESCRIPTION
+	            ""
+	    ::= { ubiIgmpVlanStatsEntry 12 }
+
+-- ***********************************************************
+--	ubiIgmpStatsMIBObjects(3)
+-- ***********************************************************  
+	ubiIgmpSnoopMembershipCountTable OBJECT-TYPE
+	    SYNTAX     SEQUENCE OF UbiIgmpSnoopMembershipEntry
+	    MAX-ACCESS not-accessible
+	    STATUS     current
+	    DESCRIPTION
+	        ""     
+	    ::= { ubiIgmpStatsMIBObjects 3 }     
+	    
+	ubiIgmpSnoopMembershipCountEntry OBJECT-TYPE
+	    SYNTAX     UbiIgmpSnoopMembershipEntry
+	    MAX-ACCESS not-accessible
+	    STATUS     current
+	    DESCRIPTION
+	         ""
+	    INDEX      
+	    { 
+	    	 ubiVlanIfIndex,
+	    	 ubiIgmpSnoopCacheAddress
+		}
+	    ::= { ubiIgmpSnoopMembershipCountTable 1 }
+	
+	UbiIgmpSnoopMembershipEntry ::= SEQUENCE {
+	    ubiIgmpSnoopMembershipCount		Counter64
+	}
+    
+    ubiIgmpSnoopMembershipCount OBJECT-TYPE
+	    SYNTAX     Counter64
+	    MAX-ACCESS read-only
+	    STATUS     current
+	    DESCRIPTION
+	            ""
+	    ::= { ubiIgmpSnoopMembershipCountEntry 1 }
+
+			                                                        
+-- ***********************************************************
+-- ubiIgmpProxyRoutingMIBObjects
+-- ***********************************************************
+
+    ubiIgmpProxyRoutingIfMRouteCountTable OBJECT-TYPE
+        SYNTAX	SEQUENCE OF ProxyRoutingIfMRouteCountEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION	"Multicast mroute count table for interface (IGMPRT)"
+    ::= { ubiIgmpProxyRoutingMIBObjects 1 }
+
+    ubiIgmpProxyRoutingIfMRouteCountEntry OBJECT-TYPE
+        SYNTAX  ProxyRoutingIfMRouteCountEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION	"Multicast mroute count entry for interface (IGMPRT)"
+        INDEX   { IfIndex }
+    ::= { ubiIgmpProxyRoutingIfMRouteCountTable 1 }
+
+    ProxyRoutingIfMRouteCountEntry ::= SEQUENCE {
+         ubiIgmpProxyRoutingIfMRouteCountInterface		OCTET STRING
+        ,ubiIgmpProxyRoutingOutIfMRouteCount         	Counter
+    }
+
+    ubiIgmpProxyRoutingIfMRouteCountInterface OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      mandatory
+        DESCRIPTION	"Interface name for interface (IGMPRT)"
+    ::= { ubiIgmpProxyRoutingIfMRouteCountEntry 1 }
+
+    ubiIgmpProxyRoutingOutIfMRouteCount OBJECT-TYPE
+        SYNTAX      Counter
+        MAX-ACCESS  read-only
+        STATUS      mandatory
+        DESCRIPTION	"Multicast mroute count for interface (IGMPRT)"
+    ::= { ubiIgmpProxyRoutingIfMRouteCountEntry 2 }
+
+	ubiIgmpProxyRoutingOutIfMRouteTable OBJECT-TYPE
+        SYNTAX	SEQUENCE OF ProxyRoutingOutIfMRouteEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION	"Multicast mroute table for interface (IGMPRT)"
+    ::= { ubiIgmpProxyRoutingMIBObjects 2 }
+
+    ubiIgmpProxyRoutingOutIfMRouteEntry OBJECT-TYPE
+        SYNTAX  ProxyRoutingOutIfMRouteEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION	"Multicast mroute entry for interface (IGMPRT)"
+        INDEX   { IfIndex, ubiIgmpProxyRoutingOutIfMRouteGroup, ubiIgmpProxyRoutingOutIfMRouteSource }
+    ::= { ubiIgmpProxyRoutingOutIfMRouteTable 1 }
+
+    ProxyRoutingOutIfMRouteEntry ::= SEQUENCE {
+         ubiIgmpProxyRoutingOutIfMRouteInterface       OCTET STRING
+        ,ubiIgmpProxyRoutingOutIfMRouteGroup         IpAddress
+        ,ubiIgmpProxyRoutingOutIfMRouteSource        IpAddress
+    }
+
+    ubiIgmpProxyRoutingOutIfMRouteInterface OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      mandatory
+        DESCRIPTION	"Interface name of mroute entry for interface (IGMPRT)"
+    ::= { ubiIgmpProxyRoutingOutIfMRouteEntry 1 }
+
+    ubiIgmpProxyRoutingOutIfMRouteGroup OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      mandatory
+        DESCRIPTION	"Group IP address of mroute entry for interface (IGMPRT)"
+    ::= { ubiIgmpProxyRoutingOutIfMRouteEntry 2 }
+
+    ubiIgmpProxyRoutingOutIfMRouteSource OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      mandatory
+        DESCRIPTION	"Source IP address of mroute entry for interface (IGMPRT)"
+    ::= { ubiIgmpProxyRoutingOutIfMRouteEntry 3 }
+			                                                        
+-- *****************************************************************   
+-- ubiMulticastMIBConformance
+-- *****************************************************************
+	
+-- 
+-- conformance information         
+--
+ubiMulticastMIBCompliances 	OBJECT IDENTIFIER ::= { ubiMulticastMIBConformance 1 }
+ubiMulticastMIBGroups      	OBJECT IDENTIFIER ::= { ubiMulticastMIBConformance 2 }      
+
+
+
+-- compliance statements
+
+	ubiMulticastMIBCompliance MODULE-COMPLIANCE
+        STATUS  current     
+        DESCRIPTION
+                "The compliance statement for entities which implement
+                the Ubiquoss Multicast MIB."
+        MODULE  
+                MANDATORY-GROUPS {  ubiIgmpSnoopConfigGroup,
+                					ubiIgmpSnoopInfoGroup
+                				 }
+
+       GROUP    ubiIgmpSnoopConfigGroup
+       DESCRIPTION  
+       	         ""        
+       GROUP    ubiIgmpSnoopInfoGroup
+       DESCRIPTION  
+       	         ""     
+      	::= { ubiMulticastMIBCompliances 1 }
+
+
+ 
+-- units of conformance
+
+	ubiIgmpSnoopConfigGroup OBJECT-GROUP
+        OBJECTS {     
+	 		ubiIgmpSnoopVlanIndex,
+			ubiIgmpSnoopVlanEnabled,
+			ubiIgmpSnoopVlanFastLeaveEnabled,
+			ubiIgmpSnoopVlanReportSuppressionEnabled,
+			ubiIgmpSnoopVlanForcedSourceIP,
+			ubiIgmpSnoopVlanRowStatus,
+	
+	 		ubiIgmpSnoopMrouterVlanIndex,  
+			ubiIgmpSnoopMrouterIfIndex,
+			ubiIgmpSnoopMrouterSVlanID,   
+			ubiIgmpSnoopMrouterRowStatus,
+	
+			ubiIgmpSnoopStaticGroupVlanIndex,  
+			ubiIgmpSnoopStaticGroupIfIndex,
+			ubiIgmpSnoopStaticGroupIpAddress,   
+			ubiIgmpSnoopStaticGroupRowStatus,
+	
+			ubiIgmpSnoopPortConfigAclIfIndex,  
+			ubiIgmpSnoopPortConfigAclID,
+			ubiIgmpSnoopPortConfigAclVlanID,   
+			ubiIgmpSnoopPortConfigAclRowStatus
+     	         
+        }
+    	STATUS          current
+    	DESCRIPTION
+        	"The collection of objects which are used to 
+        	 configure the mp snooping."
+    	::= { ubiMulticastMIBGroups 1 }
+
+
+	ubiIgmpSnoopInfoGroup OBJECT-GROUP
+        OBJECTS {     
+	  		ubiIgmpSnoopReporterIfIndex,  
+			ubiIgmpSnoopReporterGroupAddress,
+			ubiIgmpSnoopReporterUptime,        
+			ubiIgmpSnoopReporterExpireTime, 		
+			ubiIgmpSnoopReporterLastAddress
+        }
+    	STATUS          current
+    	DESCRIPTION
+        	"The collection of objects which are used to manager the
+        	information related to igmp snooping."
+    	::= { ubiMulticastMIBGroups 2 }
+	
+END      
+
