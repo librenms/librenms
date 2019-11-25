@@ -9,9 +9,9 @@ if (!empty($agent_data['app']['memcached'])) {
 } else {
     $oid     = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.9.109.101.109.99.97.99.104.101.100';
     $result  = snmp_get($device, $oid, '-Oqv');
-    $result  = trim($result, '"');
-    $result  = unserialize(stripslashes(str_replace("<<<app-memcached>>>\n", '', $result)));
-    $data    = reset($result);
+    $data    = trim($result, '"');
+    $data    = unserialize(stripslashes(str_replace("<<<app-memcached>>>\n", '', $data)));
+    $data    = reset($data);
 }
 
 echo ' memcached('.$app['app_instance'].')';
@@ -60,4 +60,4 @@ $fields = array(
 
 $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);
-update_application($app, json_encode($data), $fields);
+update_application($app, $result, $fields);
