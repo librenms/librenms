@@ -1,29 +1,11 @@
 {
-    "processors": {
-        "discovery": {
-            "processors": [
-                {
-                    "entPhysicalIndex": 0,
-                    "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.890.1.15.3.2.7.0",
-                    "processor_index": "0",
-                    "processor_type": "zynos",
-                    "processor_usage": 19,
-                    "processor_descr": "Processor",
-                    "processor_precision": 1,
-                    "processor_perc_warn": 75
-                }
-            ]
-        },
-        "poller": "matches discovery"
-    },
     "os": {
         "discovery": {
             "devices": [
                 {
                     "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.890.1.15",
-                    "sysDescr": "GS1900-8",
+                    "sysObjectID": ".1.3.6.1.4.1.890.1.5.8.20",
+                    "sysDescr": "GS-4012F",
                     "sysContact": null,
                     "version": null,
                     "hardware": null,
@@ -40,19 +22,37 @@
             "devices": [
                 {
                     "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.890.1.15",
-                    "sysDescr": "GS1900-8",
+                    "sysObjectID": ".1.3.6.1.4.1.890.1.5.8.20",
+                    "sysDescr": "GS-4012F",
                     "sysContact": "<private>",
                     "version": null,
-                    "hardware": "GS1900-8",
+                    "hardware": "GS-4012F",
                     "features": null,
                     "os": "zynos",
                     "type": "network",
-                    "serial": null,
+                    "serial": "0Z0724031894",
                     "icon": "zyxel.svg",
                     "location": "<private>"
                 }
             ]
         }
+    },
+    "processors": {
+        "discovery": {
+            "processors": [
+                {
+                    "entPhysicalIndex": 0,
+                    "hrDeviceIndex": 0,
+                    "processor_oid": ".1.3.6.1.4.1.890.1.5.8.20.12.7.0",
+                    "processor_index": "0",
+                    "processor_type": "zynos",
+                    "processor_usage": 30,
+                    "processor_descr": "Processor",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }
