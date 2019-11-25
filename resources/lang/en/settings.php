@@ -576,6 +576,12 @@ return [
                 'help' => 'Oxidized API url (For example: http://127.0.0.1:8888)'
             ]
         ],
+        'password' => [
+            'min_length' => [
+                'description' => 'Minimum password length',
+                'help' => 'Passwords shorter than the given length will be rejected'
+            ]
+        ],
         'peeringdb' => [
             'enabled' => [
                 'description' => 'Enable PeeringDB lookup',
