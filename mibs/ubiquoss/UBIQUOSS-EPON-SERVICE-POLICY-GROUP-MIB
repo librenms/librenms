@@ -1,0 +1,374 @@
+-- *****************************************************************
+-- UBIQUOSS-EPON-SERVICE-POLICY-GROUP-MIB.my
+--
+-- Jun 2008, Hyungeun Park   
+--
+-- Copyright (c) 2006 by Ubiquoss, Corp.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+	UBIQUOSS-EPON-SERVICE-POLICY-GROUP-MIB DEFINITIONS ::= BEGIN
+ 
+		IMPORTS
+			entPhysicalIndex			
+				FROM ENTITY-MIB			
+			ifIndex			
+				FROM RFC1213-MIB			
+			Integer32, OBJECT-TYPE, MODULE-IDENTITY			
+				FROM SNMPv2-SMI			
+			DisplayString			
+				FROM SNMPv2-TC
+			ubiEponGroupMIB		                 
+				FROM UBQS-SMI 			
+			ubiPortIndex
+				FROM UBQS-INTERFACE-MIB;  
+
+	
+	
+		ubiServicePolicyMIB MODULE-IDENTITY 
+			LAST-UPDATED "200806171703Z"		-- Jun 17, 2008 at 17:03 GMT
+			ORGANIZATION 
+				"Ubiquoss Corp."
+			CONTACT-INFO 
+				"Chair		: Hyungeun Park
+							  Ubiquoss Corp.
+				 Postal:	: 24F Milennium B/D,
+				 			  467-12, Dogok-Dong,
+							  GangNam-Gu, Seoul 135-270
+							  Korea
+				 EMail: 	: phe618@ubiquoss.com
+				 Phone		: +82-2-2190-3166"
+			DESCRIPTION 
+				"This MIB module defines epon service policy information"
+			::= { ubiEponGroupMIB  4 }      		
+	
+	
+--
+-- Node definitions
+--                 
+
+	   ubiServicePolicyMIBObjects	OBJECT IDENTIFIER ::= { ubiServicePolicyMIB 1 } 
+
+-- ***********************************************************
+-- ponServicePolicy
+-- ***********************************************************	
+		ubiPonServicePolicy OBJECT IDENTIFIER ::= { ubiServicePolicyMIBObjects 1 } 
+		
+-- ***********************************************************
+--  oltServicePolicyTable
+-- **********************************************************		
+		oltServicePolicyTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF OltServicePolicyEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiPonServicePolicy 1 }
+		
+		oltServicePolicyEntry OBJECT-TYPE
+			SYNTAX OltServicePolicyEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { ubiPortIndex }
+			::= { oltServicePolicyTable 1 }
+		
+		OltServicePolicyEntry ::=
+			SEQUENCE { 
+				servicePolicyServiceMapName
+					DisplayString
+			 }
+ 
+		servicePolicyServiceMapName OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (1..64))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { oltServicePolicyEntry 1 }       
+			
+-- ***********************************************************
+-- onuServicePolicyTable
+-- ***********************************************************			
+		onuServicePolicyTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF OnuServicePolicyEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiPonServicePolicy 2 }
+		
+		onuServicePolicyEntry OBJECT-TYPE
+			SYNTAX OnuServicePolicyEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { ubiPortIndex, onuId }
+			::= { onuServicePolicyTable 1 }
+		
+		OnuServicePolicyEntry ::=
+			SEQUENCE { 
+				servicePolicySlaMapName
+					DisplayString,
+				servicePolicyBridgeMapName
+					DisplayString,
+				servicePolicyIgmpMapName
+					DisplayString
+			 }
+
+		servicePolicySlaMapName OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (1..64))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onuServicePolicyEntry 1 }
+		
+		servicePolicyBridgeMapName OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (1..64))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onuServicePolicyEntry 2 }
+		
+		servicePolicyIgmpMapName OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (1..64))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onuServicePolicyEntry 3 }             
+			
+-- ***********************************************************
+-- defaultServicePolicy
+-- ***********************************************************		
+		defaultServicePolicy OBJECT IDENTIFIER ::= { ubiPonServicePolicy 3 }   
+		
+		defaultServicePolicySlaMapName OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (1..64))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { defaultServicePolicy 1 }
+		
+		defaultServicePolicyBridgeMapName OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (1..64))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { defaultServicePolicy 2 }
+		
+		defaultServicePolicyIgmpMapName OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (1..64))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { defaultServicePolicy 3 }    
+			
+		defaultHybridServicePolicySlaMapName OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (1..64))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { defaultServicePolicy 4 }
+		
+		defaultHybridServicePolicyBridgeMapName OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (1..64))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { defaultServicePolicy 5 }
+		
+		defaultHybridServicePolicyIgmpMapName OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (1..64))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { defaultServicePolicy 6 } 
+			
+		defaultGigaOntServicePolicySlaMapName OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (1..64))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { defaultServicePolicy 7 }
+		
+		defaultGigaOntServicePolicyBridgeMapName OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (1..64))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { defaultServicePolicy 8 }
+		
+		defaultGigaOntServicePolicyIgmpMapName OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (1..64))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { defaultServicePolicy 9 }  
+			
+-- ***********************************************************
+-- onuSwitchServicePolicyTable
+-- **********************************************************		
+		onuSwitchServicePolicyTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF OnuSwitchServicePolicyEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiServicePolicyMIBObjects 2 }
+		                                               
+		onuSwitchServicePolicyEntry OBJECT-TYPE
+			SYNTAX OnuSwitchServicePolicyEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { portIndex, onuId }
+			::= { onuSwitchServicePolicyTable 1 }
+		
+		OnuSwitchServicePolicyEntry ::=
+			SEQUENCE { 
+				onuSwitchServicePolicyClassMapName
+					DisplayString,
+				onuSwitchServicePolicyMapName
+					DisplayString,
+				onuSwitchServicePolicyStatus
+					INTEGER
+			 }
+
+		onuSwitchServicePolicyClassMapName OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (1..32))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onuSwitchServicePolicyEntry 1 }
+		
+		onuSwitchServicePolicyMapName OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (1..32))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onuSwitchServicePolicyEntry 2 }
+		
+		onuSwitchServicePolicyStatus OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				set(1),
+				unset(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onuSwitchServicePolicyEntry 3 }               
+			
+-- ***********************************************************
+-- oltSwitchServicePolicy
+-- ***********************************************************			
+		oltSwitchServicePolicy OBJECT IDENTIFIER ::= { ubiServicePolicyMIBObjects 3 }
+		
+		oltSwitchServicePolicyAttach OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"If you attach policy, set the name of policy.
+				if you detach policy, set zero-length string."
+			::= { oltSwitchServicePolicy 1 }
+		
+		servicePolicyOutputShapingControl OBJECT-TYPE
+			SYNTAX Integer32 (0..31)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"default : 0
+				Unit : Bytes"
+			::= { oltSwitchServicePolicy 2 }
+		
+		servicePolicyInputShapingControl OBJECT-TYPE
+			SYNTAX Integer32 (0..31)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"default : 0
+				Unit : Bytes"
+			::= { oltSwitchServicePolicy 3 }
+  
+		
+-- ***********************************************************
+--  ubiServicePolicyMIBNotificationPrefix
+-- ***********************************************************
+-- the following two OBJECT IDENTIFIERS are used to define SNMPv2 Notifications
+-- that are backward compatible with SNMPv1 Traps.
+	ubiServicePolicyMIBNotificationPrefix OBJECT IDENTIFIER ::= { ubiServicePolicyMIB 2 }
+	ubiServicePolicyMIBNotifications OBJECT IDENTIFIER ::= { ubiServicePolicyMIBNotificationPrefix 0 }
+                                    
+    -- TODO        
+    
+-- ***********************************************************
+--  ubiServicePolicyMIBConformance
+-- ***********************************************************
+-- conformance information
+	ubiServicePolicyMIBConformance OBJECT IDENTIFIER ::= { ubiServicePolicyMIB 3 }
+	ubiServicePolicyMIBCompliances OBJECT IDENTIFIER ::= { ubiServicePolicyMIBConformance 1 }
+	ubiServicePolicyMIBGroups      OBJECT IDENTIFIER ::= { ubiServicePolicyMIBConformance 2 }
+  
+-- compliance statements
+    ubiServicePolicyMIBCompliance MODULE-COMPLIANCE
+		STATUS  current
+        DESCRIPTION
+		    "Description"
+		MODULE  -- this module
+        MANDATORY-GROUPS { ubiServicePolicyMIBGroup,
+                		   ubiServicePolicyMIBNotificationGroup	
+                         }
+	   GROUP  ubiServicePolicyMIBGroup
+	   DESCRIPTION  
+            "Description"
+       GROUP ubiServicePolicyMIBNotificationGroup   
+       DESCRIPTION
+            "Description"
+
+       ::= { ubiServicePolicyMIBCompliances 1 }
+	                            
+-- compliance statements
+   	ubiServicePolicyMIBGroup  OBJECT-GROUP
+		OBJECTS {     
+			-- TODO 
+               }
+        STATUS  current
+        DESCRIPTION
+                "ubiquoss service policy information MIB"
+        ::= { ubiServicePolicyMIBGroups 1 }
+     
+     ubiServicePolicyMIBNotificationGroup    OBJECT-GROUP
+      	OBJECTS {     
+			-- TODO 
+               }
+        STATUS  current
+        DESCRIPTION
+                "ubiquoss service policy information Notifications"
+        ::= { ubiServicePolicyMIBGroups 2 }
+		
+	
+	END
+
+--
+-- UBIQUOSS-EPON-SERVICE-POLICY-MIB.my
+--
