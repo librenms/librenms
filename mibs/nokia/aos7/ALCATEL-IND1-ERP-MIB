@@ -11,7 +11,9 @@ ALCATEL-IND1-ERP-MIB DEFINITIONS ::= BEGIN
                                         FROM SNMPv2-CONF
                 TimeStamp, RowStatus, TEXTUAL-CONVENTION, TruthValue
                                         FROM SNMPv2-TC
-                softentIND1Erp          FROM ALCATEL-IND1-BASE;
+                softentIND1Erp          FROM ALCATEL-IND1-BASE
+                SnmpAdminString         FROM SNMP-FRAMEWORK-MIB;
+
 
 
         alcatelIND1ERPMIB MODULE-IDENTITY
@@ -212,7 +214,8 @@ AlaErpRingEntry ::= SEQUENCE {
       alaErpRingRevertive               INTEGER,
       alaErpRingClearAction             INTEGER,
       alaErpRingActiveVersion		Unsigned32,
-      alaErpRingResetVersionFallback	INTEGER
+      alaErpRingResetVersionFallback	INTEGER,
+      alaErpRingLastStateChangeStr      SnmpAdminString
     }
 
 alaErpRingId OBJECT-TYPE
@@ -361,7 +364,8 @@ alaErpRingLastStateChange OBJECT-TYPE
     STATUS      current
     DESCRIPTION
        "The time (SysUpTime) at which the ethernet ring last
-        entered new state."
+        entered new state. : This object has been deprecated Please refer
+        alaErpRingLastStateChangeStr. "
     ::= { alaErpRingEntry 11 }
 
 alaErpRingTimeToRevert OBJECT-TYPE
@@ -445,6 +449,18 @@ alaErpRingResetVersionFallback OBJECT-TYPE
        "Resets ERP running protocol"
     DEFVAL  { default }
     ::= { alaErpRingEntry 18 }
+
+
+alaErpRingLastStateChangeStr OBJECT-TYPE
+    SYNTAX     SnmpAdminString (SIZE (0..255)) 
+         MAX-ACCESS  read-only
+            STATUS      current
+                DESCRIPTION
+                    "The time (SysUpTime) at which the ethernet ring last
+                    entered new state."
+                    ::= { alaErpRingEntry 19 }
+
+
 
 
 -- ******************************************************************

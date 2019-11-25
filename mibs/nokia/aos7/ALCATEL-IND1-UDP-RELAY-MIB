@@ -1,15 +1,16 @@
 ALCATEL-IND1-UDP-RELAY-MIB DEFINITIONS ::= BEGIN
-         IMPORTS
+        IMPORTS
 
-                  IpAddress,
-                  MODULE-IDENTITY,
-                  OBJECT-TYPE,
-                  OBJECT-IDENTITY,
-                  Integer32, Unsigned32,
-                  NOTIFICATION-TYPE, 
-                  Counter32  FROM SNMPv2-SMI
-
-                  MacAddress, RowStatus,
+            IpAddress,
+            MODULE-IDENTITY,
+            OBJECT-TYPE,
+            OBJECT-IDENTITY,
+            Integer32, Unsigned32,
+            NOTIFICATION-TYPE, 
+            Counter32  FROM SNMPv2-SMI
+           InetAddress, InetAddressType
+               FROM INET-ADDRESS-MIB
+            MacAddress, DisplayString, RowStatus,
                   TEXTUAL-CONVENTION     FROM SNMPv2-TC
                   SnmpAdminString        FROM SNMP-FRAMEWORK-MIB
 
@@ -21,7 +22,7 @@ ALCATEL-IND1-UDP-RELAY-MIB DEFINITIONS ::= BEGIN
 
 
              alcatelIND1UDPRelayMIB MODULE-IDENTITY
-                LAST-UPDATED "200704030000Z"
+                LAST-UPDATED "201307150000Z"
                 ORGANIZATION  "Alcatel -Architects Of An Internet World "
                 CONTACT-INFO
                 "Please consult with Customer Service to ensure the most appropriate
@@ -46,7 +47,7 @@ ALCATEL-IND1-UDP-RELAY-MIB DEFINITIONS ::= BEGIN
 
 
                 DESCRIPTION
-                              "This module describes an authoritative enterprise-specific Simple
+             "This module describes an authoritative enterprise-specific Simple
              Network Management Protocol (SNMP) Management Information Base (MIB):
 
              For the Birds Of Prey Product Line
@@ -63,10 +64,10 @@ ALCATEL-IND1-UDP-RELAY-MIB DEFINITIONS ::= BEGIN
              non-exclusive license to use this specification in connection with
              management of the products for which it is intended to be used.
 
-                         Copyright (C) 1995-2007 Alcatel-Lucent
+                         Copyright (C) 1995-2013 Alcatel-Lucent
                              ALL RIGHTS RESERVED WORLDWIDE"
 
-                REVISION      "200704030000Z"
+             REVISION      "201307150000Z"
              DESCRIPTION
             "The latest version of this MIB Module."
                       ::= {routingIND1UdpRelay 1}
@@ -101,7 +102,6 @@ ALCATEL-IND1-UDP-RELAY-MIB DEFINITIONS ::= BEGIN
              Subsystem Units Of Conformance."
         ::= { alcatelIND1UDPRelayMIBConformance 1 }
 
-
         alcatelIND1UDPRelayMIBCompliances OBJECT-IDENTITY
         STATUS current
         DESCRIPTION
@@ -114,7 +114,7 @@ ALCATEL-IND1-UDP-RELAY-MIB DEFINITIONS ::= BEGIN
        DESCRIPTION
             "Ip helper Option 82 Format ASCII field type"
             SYNTAX  INTEGER {
-		none(0),
+                none(0),
                 macAddress(1),
                 systemName(2),
                 userString(3),
@@ -123,11 +123,34 @@ ALCATEL-IND1-UDP-RELAY-MIB DEFINITIONS ::= BEGIN
                 interface(6)
             }
 
+       DhcpSnoopingOption82ASCIIFieldType ::= TEXTUAL-CONVENTION
+       STATUS        current
+       DESCRIPTION
+            "DHCP Snooping Option 82 Format ASCII field type"
+            SYNTAX  INTEGER {
+                none(0),
+                macAddress(1),
+                systemName(2),
+                userString(3),
+                interfaceAlias(4),
+                vlan(5),
+                interface(6)
+            }
+
+        DhcpSnoopingOption82CircuitOrRemoteId ::= TEXTUAL-CONVENTION
+            STATUS        current
+            DESCRIPTION
+            "Circuit Id or Remote Id for Option 82 Format ASCII field."
+            SYNTAX  INTEGER {
+                circuitid(1),
+                remoteid(2)
+            }
 
    iphelperMIB OBJECT IDENTIFIER ::= { alcatelIND1UDPRelayMIBObjects 1 }
    genericUdpServiceMIB OBJECT IDENTIFIER ::= { alcatelIND1UDPRelayMIBObjects 2 }
    alaDhcpClientTrapsObj OBJECT IDENTIFIER ::= { alcatelIND1UDPRelayMIBObjects 3 }
-
+   dhcpSnoopingMIB OBJECT IDENTIFIER ::= { alcatelIND1UDPRelayMIBObjects 4 }
+   dhcpOption82MIB OBJECT IDENTIFIER ::= { alcatelIND1UDPRelayMIBObjects 5 }
 
    iphelperTable OBJECT-TYPE
       SYNTAX SEQUENCE OF IphelperEntry
@@ -384,7 +407,7 @@ iphelperBootupOption OBJECT-TYPE
                   disable(2)
                 }
         MAX-ACCESS read-write
-        STATUS current
+        STATUS deprecated
         DESCRIPTION
                 "This object allows the user to enable or disable the
                  functionality of the relay to get an IP address at the
@@ -404,7 +427,7 @@ iphelperBootupPacketOption OBJECT-TYPE
                   dhcp(2)
                 }
         MAX-ACCESS read-write
-        STATUS current
+        STATUS deprecated
         DESCRIPTION
                 "This object is used in conjunction with iphelperBootupOption.
                  This specify the packet format with the choices of BOOTP or DHCP
@@ -462,31 +485,31 @@ iphelperPXESupport OBJECT-TYPE
 ::= { iphelperMIB 16 }
 
     iphelperDhcpOption82FormatType OBJECT-TYPE
-	    SYNTAX  INTEGER {
-		macAddress(1),
-		systemName(2),
-		userString(3),
-		interfaceAlias(4),
-		autoInterfaceAlias(5),
-		ascii(6)
-	    }
-	    MAX-ACCESS  read-write
-	    STATUS  current
-	    DESCRIPTION
-		"DHCP option-82 defines the type of information carried in circuit id 
-		 and remote id sub option fields. If the type selected is string the actual
-		 value of the string can be found in iphelperDhcpOption82StringValue.
-		 Format type ASCII will insert the configured fields in ASCII format."
-	    DEFVAL { macAddress }
+        SYNTAX  INTEGER {
+        macAddress(1),
+        systemName(2),
+        userString(3),
+        interfaceAlias(4),
+        autoInterfaceAlias(5),
+        ascii(6)
+        }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "DHCP option-82 defines the type of information carried in circuit id 
+        and remote id sub option fields. If the type selected is string the actual
+        value of the string can be found in iphelperDhcpOption82StringValue.
+        Format type ASCII will insert the configured fields in ASCII format."
+        DEFVAL { macAddress }
      ::= { iphelperMIB 17 }
 
     iphelperDhcpOption82StringValue OBJECT-TYPE
-	    SYNTAX	SnmpAdminString (SIZE (0..63))
-	    MAX-ACCESS read-write
-	    STATUS current
-	    DESCRIPTION
-		"The value of the string that will be used in the circuit id and remote id
-		 sub options."
+        SYNTAX    SnmpAdminString (SIZE (0..63))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "The value of the string that will be used in the circuit id and remote id
+        sub options."
      ::= { iphelperMIB 18 }
 
     iphelperDhcpOption82FormatASCIIField1 OBJECT-TYPE
@@ -496,7 +519,7 @@ iphelperPXESupport OBJECT-TYPE
             DESCRIPTION
                 "The type of the first field in the Option 82 string in ASCII format,
                  which will be copied to Option-82 circuit id of the DHCP packet.
-		 This Field is applicable only, if the option 82 format type is ASCII"
+            This Field is applicable only, if the option 82 format type is ASCII"
             DEFVAL { none }
      ::= { iphelperMIB 19 }
 
@@ -519,7 +542,7 @@ iphelperPXESupport OBJECT-TYPE
             DESCRIPTION
                 "The type of the second field in the Option 82 string in ASCII format,
                  which will be copied to Option-82 circuit id of the DHCP packet.
-		 This Field is applicable only, if the option 82 format type is ASCII"
+            This Field is applicable only, if the option 82 format type is ASCII"
             DEFVAL { none }
      ::= { iphelperMIB 21 }
 
@@ -542,7 +565,7 @@ iphelperPXESupport OBJECT-TYPE
             DESCRIPTION
                 "The type of the third field in the Option 82 string in ASCII format,
                  which will be copied to Option-82 circuit id of the DHCP packet.
-		 This Field is applicable only, if the option 82 format type is ASCII"
+            This Field is applicable only, if the option 82 format type is ASCII"
             DEFVAL { none }
      ::= { iphelperMIB 23 }
 
@@ -566,7 +589,7 @@ iphelperPXESupport OBJECT-TYPE
             DESCRIPTION
                 "The type of the fourth field in the Option 82 string in ASCII format,
                  which will be copied to Option-82 circuit id of the DHCP packet.
-		 This Field is applicable only, if the option 82 format type is ASCII"
+            This Field is applicable only, if the option 82 format type is ASCII"
             DEFVAL { none }
      ::= { iphelperMIB 25 }
 
@@ -590,7 +613,7 @@ iphelperPXESupport OBJECT-TYPE
             DESCRIPTION
                 "The type of the fifth field in the Option 82 string in ASCII format,
                  which will be copied to Option-82 circuit id of the DHCP packet.
-		 This Field is applicable only, if the option 82 format type is ASCII"
+            This Field is applicable only, if the option 82 format type is ASCII"
             DEFVAL { none }
      ::= { iphelperMIB 27 }
 
@@ -608,14 +631,14 @@ iphelperPXESupport OBJECT-TYPE
 
 
     iphelperDhcpOption82FormatASCIIDelimiter OBJECT-TYPE
-	    SYNTAX      SnmpAdminString (SIZE (0..63))
+            SYNTAX      SnmpAdminString (SIZE (0..63))
             MAX-ACCESS read-write
             STATUS current 
             DESCRIPTION
                 "The value of the delimiter that is inserted between the fields in the  
                  Option 82 string in ASCII format, which will be copied to Option-82 
-		 circuit id of the DHCP packet. This value is applicable only, if the  
-		 option 82 format type is ASCII"
+            circuit id of the DHCP packet. This value is applicable only, if the  
+            option 82 format type is ASCII"
      ::= { iphelperMIB 29 }
 
   iphelperResetAllOpt82ErrStats  OBJECT-TYPE
@@ -709,8 +732,757 @@ iphelperPXESupport OBJECT-TYPE
         DESCRIPTION
             "This parameter resets the ip helper Option 82 error statistics
              on this interface and vlan.  When the reset operation is done, 
-             subsystem will change the value to zero (0).  Subsystem will always return zero (0)."
+             subsystem will change the value to zero (0).  Subsystem will always return
+             zero (0)."
   ::= { iphelperOption82ErrStatsEntry 5 }
+
+    dhcpSnoopingVlanTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF DhcpSnoopingVlanEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A list of vlans that have DHCP Snooping enabled."
+        ::= { dhcpSnoopingMIB 1 }
+
+    dhcpSnoopingVlanEntry  OBJECT-TYPE
+        SYNTAX  DhcpSnoopingVlanEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A DHCP Snooping VLAN entry."
+        INDEX { dhcpSnoopingVlanNumber }
+        ::= { dhcpSnoopingVlanTable 1 }
+
+    DhcpSnoopingVlanEntry ::= SEQUENCE {
+        dhcpSnoopingVlanNumber                    Integer32,
+        dhcpSnoopingVlanOpt82DataInsertionStatus  INTEGER,
+        dhcpSnoopingVlanMacAddrVerificationStatus INTEGER,
+        dhcpSnoopingVlanStatus                    RowStatus
+    }
+
+    dhcpSnoopingVlanNumber  OBJECT-TYPE
+        SYNTAX  Integer32 (1..4094)
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "The VLAN number identifying this instance. Valid
+            range from 1 to 4094."
+        ::= { dhcpSnoopingVlanEntry 1 }
+
+    dhcpSnoopingVlanOpt82DataInsertionStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+            enabled(1),
+            disabled(2)
+        }
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "The DHCP Option-82 data insertion status. Default value is enabled,
+            which means once the VLAN is enabled for DHCP snooping, the
+            Option-82 field will be inserted in the DHCP packets between the
+            Relay Agent and the DHCP Server, on all the ports belong to the
+            VLAN."
+        DEFVAL { enabled }
+        ::= { dhcpSnoopingVlanEntry 2 }
+
+    dhcpSnoopingVlanMacAddrVerificationStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+            enabled(1),
+            disabled(2)
+        }
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "The DHCP Snooping MAC Address verification status. Default value is
+            enabled. Once enabled, for all the incoming DHCP traffic to those
+            DHCP Snooping enabled vlan port, it compares the source MAC address
+            and the client Hardware Address in the DHCP packet. If mismatch, the
+            packet will be dropped."
+        DEFVAL { enabled }
+        ::= { dhcpSnoopingVlanEntry 3 }
+
+    dhcpSnoopingVlanStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Row Status for creating/deleting"
+        ::= { dhcpSnoopingVlanEntry 4 }
+
+    dhcpSnoopingPortTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF DhcpSnoopingPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A list of ports that have DHCP Snooping trust status."
+        ::= { dhcpSnoopingMIB 2 }
+
+    dhcpSnoopingPortEntry  OBJECT-TYPE
+        SYNTAX  DhcpSnoopingPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A DHCP Snooping Port entry."
+        INDEX { dhcpSnoopingPortIfIndex }
+        ::= { dhcpSnoopingPortTable 1 }
+
+    DhcpSnoopingPortEntry ::= SEQUENCE {
+        dhcpSnoopingPortIfIndex             InterfaceIndex,
+        dhcpSnoopingPortTrustMode           INTEGER,
+        dhcpSnoopingPortMacAddrViolation    Counter32,
+        dhcpSnoopingPortDhcpServerViolation Counter32,
+        dhcpSnoopingPortOption82Violation   Counter32,
+        dhcpSnoopingPortRelayAgentViolation Counter32,
+        dhcpSnoopingPortBindingViolation    Counter32,
+        dhcpSnoopingPortIpSourceFiltering   INTEGER
+    }
+
+    dhcpSnoopingPortIfIndex  OBJECT-TYPE
+        SYNTAX  InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "The ifIndex subindex identifying this instance."
+        ::= { dhcpSnoopingPortEntry 1 }
+
+    dhcpSnoopingPortTrustMode OBJECT-TYPE
+        SYNTAX  INTEGER {
+            blocked(1),
+            clientOnly(2),
+            trusted(3)
+        }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The DHCP Snooping's VLAN port's trust mode. Default value
+            is client-only, which means once the VLAN is enabled for DHCP
+            snooping, the vlan ports only allow DHCP client packets. Blocked
+            means all DHCP traffic is block on the port. Trusted means all
+            DHCP traffic is allowed on the port"
+        DEFVAL { clientOnly }
+        ::= { dhcpSnoopingPortEntry 2 }
+
+    dhcpSnoopingPortMacAddrViolation  OBJECT-TYPE
+        SYNTAX    Counter32
+        MAX-ACCESS    read-only
+        STATUS current
+        DESCRIPTION
+            "This keeps track of the number of packets dropped due to DHCPi
+            packet with the source MAC Address not equal the client DHCP
+            Hardware address in the DHCP packet."
+        ::= { dhcpSnoopingPortEntry 3 }
+
+    dhcpSnoopingPortDhcpServerViolation  OBJECT-TYPE
+        SYNTAX    Counter32
+        MAX-ACCESS    read-only
+        STATUS current
+        DESCRIPTION
+            "This keeps track of the number of packets dropped due to receiving
+            an DHCP server packet on a DHCP Snooping enabled port."
+        ::= { dhcpSnoopingPortEntry 4 }
+
+    dhcpSnoopingPortOption82Violation  OBJECT-TYPE
+        SYNTAX    Counter32
+        MAX-ACCESS    read-only
+        STATUS current
+        DESCRIPTION
+            "This keeps track of the number of packets dropped due to a relay
+            agent forards a packet that includes option 82 info to an untrusted
+            port."
+        ::= { dhcpSnoopingPortEntry 5 }
+
+    dhcpSnoopingPortRelayAgentViolation  OBJECT-TYPE
+        SYNTAX    Counter32
+        MAX-ACCESS    read-only
+        STATUS current
+        DESCRIPTION
+            "This keeps track of the number of packets dropped due to an DHCP
+            relay agent forwards a DHCP packate includes an relay agent ip
+            address that is not 0.0.0.0."
+        ::= { dhcpSnoopingPortEntry 6 }
+
+    dhcpSnoopingPortBindingViolation  OBJECT-TYPE
+        SYNTAX    Counter32
+        MAX-ACCESS    read-only
+        STATUS current
+        DESCRIPTION
+            "This keeps track of the number of packets dropped due to receiving
+            an DHCP Relase or DHCP Decline message that contains a MAC address
+            in the DHCP snooping binding table, but the interface information in
+            the binding table does not match the interface on which the message
+            was received."
+        ::= { dhcpSnoopingPortEntry 7 }
+
+    dhcpSnoopingPortIpSourceFiltering OBJECT-TYPE
+        SYNTAX  INTEGER {
+            enabled(1),
+            disabled(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The DHCP Snooping IP Source filtering  status. Default value
+            is disabled. Once enabled, only the incoming traffic with the proper
+            client IP address, MAC address and port will be allowed."
+        DEFVAL { disabled }
+        ::= { dhcpSnoopingPortEntry 8 }
+
+
+    dhcpSnoopingBindingTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF DhcpSnoopingBindingEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "DHCP Snooping binding table."
+        ::= { dhcpSnoopingMIB 3 }
+
+
+    dhcpSnoopingBindingEntry  OBJECT-TYPE
+        SYNTAX  DhcpSnoopingBindingEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A DHCP Snooping binding entry."
+        INDEX { dhcpSnoopingBindingMacAddress, dhcpSnoopingBindingIfIndex }
+        ::= { dhcpSnoopingBindingTable 1 }
+
+
+    DhcpSnoopingBindingEntry ::= SEQUENCE {
+        dhcpSnoopingBindingMacAddress MacAddress,
+        dhcpSnoopingBindingIfIndex    InterfaceIndex,
+        dhcpSnoopingBindingIpAddress  IpAddress,
+        dhcpSnoopingBindingVlan       Unsigned32,
+        dhcpSnoopingBindingLeaseTime  Unsigned32,
+        dhcpSnoopingBindingType       INTEGER,
+        dhcpSnoopingBindingRowStatus  RowStatus
+    }
+
+    dhcpSnoopingBindingMacAddress  OBJECT-TYPE
+        SYNTAX  MacAddress
+        MAX-ACCESS  accessible-for-notify
+        STATUS  current
+        DESCRIPTION
+            "The MAC Address subindex identifying this instance."
+        ::= { dhcpSnoopingBindingEntry 1 }
+
+    dhcpSnoopingBindingIfIndex OBJECT-TYPE
+        SYNTAX  InterfaceIndex
+        MAX-ACCESS  accessible-for-notify
+        STATUS  current
+        DESCRIPTION
+            "The IfIndex subindex identifying this instance. It is the
+            the interface where the DHCP request is coming in from."
+        ::= { dhcpSnoopingBindingEntry 2 }
+
+
+    dhcpSnoopingBindingIpAddress  OBJECT-TYPE
+        SYNTAX    IpAddress
+        MAX-ACCESS    read-create
+        STATUS current
+        DESCRIPTION
+            "The Ip Address offered by the DHCP Server to the Client."
+        ::= { dhcpSnoopingBindingEntry 3 }
+
+
+    dhcpSnoopingBindingVlan OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "It is the VLAN Id where the DHCP client belongs to."
+        ::= { dhcpSnoopingBindingEntry 4 }
+
+
+    dhcpSnoopingBindingLeaseTime  OBJECT-TYPE
+        SYNTAX    Unsigned32
+        MAX-ACCESS    read-only
+        STATUS current
+        DESCRIPTION
+            "The lease time of the client's IP Address."
+        ::= { dhcpSnoopingBindingEntry 5 }
+
+    dhcpSnoopingBindingType  OBJECT-TYPE
+        SYNTAX  INTEGER {
+            dynamic(1),
+            static(2)
+        }
+        MAX-ACCESS    read-create
+        STATUS current
+        DESCRIPTION
+            "The learning/configuration nature of the binding entry.
+            Normally, the entries are learned dynamically, while it
+            also can be statically/manually configured."
+        DEFVAL { dynamic }
+        ::= { dhcpSnoopingBindingEntry 6 }
+
+
+    dhcpSnoopingBindingRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Row Status for creating/deleting"
+        ::= { dhcpSnoopingBindingEntry 7 }
+
+    dhcpSnoopingMode OBJECT-TYPE
+        SYNTAX INTEGER {
+            switchLevel(1),
+            disabled(2),
+            vlanLevel(3)   -- read-only state
+        }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Enabling DHCP Snooping at the switch level. For the vlan level,
+            it is enabled implicitly when an individual vlan's DHCP Snooping
+            is enabled; and, mode is implicitly disabled until all vlan's 
+            DHCP Snooping are disabled. If mode is set to vlan level, the
+            operation will be of no effect."
+        ::= {dhcpSnoopingMIB 4 }
+
+
+    dhcpSnoopingOpt82DataInsertionStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+            enabled(1),
+            disabled(2)
+        }
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "The DHCP Option-82 data insertion status at switch level.  Default
+            value is enabled, the Option-82 field will be inserted in the DHCP
+            packets between the Relay Agent and the DHCP Server, on all the
+            ports belong to the switch."
+        DEFVAL { enabled }
+        ::= { dhcpSnoopingMIB 5 }
+
+    dhcpSnoopingMacAddrVerificationStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+            enabled(1),
+            disabled(2)
+        }
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "The DHCP Snooping MAC Address verification status at switch level.
+            Default value is enabled. Once enabled, for all the incoming DHCP
+            traffic to the port, it compares the source MAC address and the
+            client Hardware Address in the DHCP packet. If mismatch, the packet
+            will be dropped."
+        DEFVAL { enabled }
+        ::= { dhcpSnoopingMIB 6 }
+
+
+    dhcpSnoopingBindingStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+            enabled(1),
+            disabled(2)
+        }
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "This object specifies if the capability of building the DHCP
+            Snooping Binding Table/Database is enable or not. By default, it is
+            enabled.  It is applicable for both switch-level or vlan-level DHCP
+            Snooping."
+        DEFVAL { enabled }
+        ::= { dhcpSnoopingMIB 7 }
+
+    dhcpSnoopingBindingDatabaseSyncTimeout OBJECT-TYPE
+        SYNTAX    Unsigned32 (60..600)
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "The DHCP Snooping Binding Database synchronization timeout value.
+            It is used to specify the synchronization frequency, in seconds,
+            between the binding table in memory and the binding file in flash."
+        DEFVAL { 300 }
+        ::= { dhcpSnoopingMIB 8 }
+
+    dhcpSnoopingBindingDatabaseLastSyncTime OBJECT-TYPE
+        SYNTAX    DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The time stamp of the last successuful DHCP Snooping Binding
+            Database synchronization."
+        ::= { dhcpSnoopingMIB 9 }
+
+    dhcpSnoopingBindingDatabaseAction OBJECT-TYPE
+        SYNTAX INTEGER {
+            noaction(0),
+            purge(1),
+            renew(2)
+        }
+        MAX-ACCESS    read-create
+        STATUS    current
+        DESCRIPTION
+            "This object identifies the action to be performed. Purge:
+            means to clear the binding table entries in the memory.
+            Renew: means to populate the binding table entries from the
+            flash file."
+        ::= { dhcpSnoopingMIB 10 }
+
+
+    dhcpSnoopingBypassOpt82CheckStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+            enabled(1),
+            disabled(2)
+        }
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "DHCP bypass option-82 check status. By default, it is disabled.
+            Once enabled, it will no longer enforce the check of option-82 field
+            in the incoming DHCP Packets on those untrusted ports."
+        DEFVAL { disabled }
+        ::= { dhcpSnoopingMIB 11 }
+
+    dhcpSnoopingBindingPersistencyStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+            enabled(1),
+            disabled(2)
+        }
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "DHCP Snooping binding table persistency check status. By default,
+            it is disabled.  Once enabled, the binding entries expiry will be
+            solely depend on Lease time"
+        DEFVAL { disabled }
+        ::= { dhcpSnoopingMIB 12 }
+
+    dhcpSnoopingSourceFilterVlanTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF DhcpSnoopingSourceFilterVlanEntry
+        MAX-ACCESS not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A list of vlans that have ip-source-filtering enabled."
+        ::= { dhcpSnoopingMIB 13 }
+
+    dhcpSnoopingSourceFilterVlanEntry  OBJECT-TYPE
+        SYNTAX  DhcpSnoopingSourceFilterVlanEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A Source Filtering enabled VLAN entry."
+        INDEX { dhcpSnoopingSourceFilterVlanNumber }
+        ::= { dhcpSnoopingSourceFilterVlanTable 1 }
+
+    DhcpSnoopingSourceFilterVlanEntry ::= SEQUENCE {
+        dhcpSnoopingSourceFilterVlanNumber
+            Integer32,
+        dhcpSnoopingSourceFilterVlanFilteringStatus
+            RowStatus
+        }
+
+    dhcpSnoopingSourceFilterVlanNumber  OBJECT-TYPE
+        SYNTAX  Integer32 (1..4094)
+        MAX-ACCESS not-accessible
+        STATUS  current
+        DESCRIPTION
+            "The VLAN number identifying this instance. Valid
+            range from 1 to 4094."
+        ::= { dhcpSnoopingSourceFilterVlanEntry 1 }
+
+    dhcpSnoopingSourceFilterVlanFilteringStatus OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "The DHCP Snooping IP Source filtering row status. Default value
+            is disabled. Once enabled, only the incoming traffic with the proper
+            client IP address, MAC address , port and vlan will be allowed."
+        ::= { dhcpSnoopingSourceFilterVlanEntry 2 }
+
+    dhcpSnoopingOption82FormatType OBJECT-TYPE
+            SYNTAX  INTEGER {
+                macAddress(1),
+                systemName(2),
+                userString(3),
+                interfaceAlias(4),
+                autoInterfaceAlias(5),
+                ascii(6)
+            }
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                "DHCP option-82 defines the type of information carried in circuit id
+                 and remote id sub option fields. If the type selected is string the actual
+                 value of the string can be found in iphelperDhcpOption82StringValue.
+                 Format type ASCII will insert the configured fields in ASCII format."
+            DEFVAL { macAddress }
+     ::= { iphelperMIB 45 }
+
+    dhcpSnoopingOption82StringValue OBJECT-TYPE
+            SYNTAX      SnmpAdminString (SIZE (0..63))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The value of the string that will be used in the circuit id and remote id
+                 sub options."
+     ::= { iphelperMIB 46 }
+
+    dhcpSnoopingOption82FormatASCIIConfigurableTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF DhcpSnoopingOption82FormatASCIIConfigurableEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A list of ascii fields used for Circuit ID or Remote ID."
+        ::= { iphelperMIB 47 }
+
+    dhcpSnoopingOption82FormatASCIIConfigurableEntry OBJECT-TYPE
+        SYNTAX    DhcpSnoopingOption82FormatASCIIConfigurableEntry
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+            "An ascii field entry for Circuit ID or Remote ID."
+        INDEX { dhcpSnoopingOption82FormatASCIIConfigurableIndex }
+        ::= { dhcpSnoopingOption82FormatASCIIConfigurableTable 1 }
+
+        DhcpSnoopingOption82FormatASCIIConfigurableEntry ::= SEQUENCE {
+            dhcpSnoopingOption82FormatASCIIConfigurableIndex
+                DhcpSnoopingOption82CircuitOrRemoteId,
+            dhcpSnoopingOption82FormatASCIIConfigurableField1
+                DhcpSnoopingOption82ASCIIFieldType,
+            dhcpSnoopingOption82FormatASCIIConfigurableField1StrVal
+                SnmpAdminString,
+            dhcpSnoopingOption82FormatASCIIConfigurableField2
+                DhcpSnoopingOption82ASCIIFieldType,
+            dhcpSnoopingOption82FormatASCIIConfigurableField2StrVal
+                SnmpAdminString,
+            dhcpSnoopingOption82FormatASCIIConfigurableField3
+                DhcpSnoopingOption82ASCIIFieldType,
+            dhcpSnoopingOption82FormatASCIIConfigurableField3StrVal
+                SnmpAdminString,
+            dhcpSnoopingOption82FormatASCIIConfigurableField4
+                DhcpSnoopingOption82ASCIIFieldType,
+            dhcpSnoopingOption82FormatASCIIConfigurableField4StrVal
+                SnmpAdminString,
+            dhcpSnoopingOption82FormatASCIIConfigurableField5
+                DhcpSnoopingOption82ASCIIFieldType,
+            dhcpSnoopingOption82FormatASCIIConfigurableField5StrVal
+                SnmpAdminString,
+            dhcpSnoopingOption82FormatASCIIConfigurableDelimiter
+                SnmpAdminString,
+            dhcpSnoopingOption82FormatASCIIConfigurableStatus
+                RowStatus
+        }
+
+    dhcpSnoopingOption82FormatASCIIConfigurableIndex OBJECT-TYPE
+        SYNTAX DhcpSnoopingOption82CircuitOrRemoteId
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+            "This object specifies the either circuit id or remote id for option82."
+        ::= { dhcpSnoopingOption82FormatASCIIConfigurableEntry 1 }
+
+    dhcpSnoopingOption82FormatASCIIConfigurableField1 OBJECT-TYPE
+        SYNTAX        DhcpSnoopingOption82ASCIIFieldType
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "The type of the first field in the Option 82 string in ASCII
+            format, which will be copied to Option-82 circuit id or remote id of
+            the DHCP packet.  This Field is applicable only, if the option 82
+            format type is ASCII."
+        ::= { dhcpSnoopingOption82FormatASCIIConfigurableEntry 2 }
+
+    dhcpSnoopingOption82FormatASCIIConfigurableField1StrVal OBJECT-TYPE
+        SYNTAX  SnmpAdminString (SIZE (0..63))
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "The string value of the first field in the Option 82 string in
+            ASCII format, which will be copied to Option-82 circuit id or remote
+            id of the DHCP packet.  This Field is applicable only, if the option
+            82 format type is ASCII"
+        DEFVAL { " - " }
+        ::= { dhcpSnoopingOption82FormatASCIIConfigurableEntry 3 }
+
+    dhcpSnoopingOption82FormatASCIIConfigurableField2 OBJECT-TYPE
+        SYNTAX        DhcpSnoopingOption82ASCIIFieldType
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "The type of the second field in the Option 82 string in ASCII
+            format, which will be copied to Option-82 circuit id or remote id of
+            the DHCP packet.  This Field is applicable only, if the option 82
+            format type is ASCII"
+        DEFVAL { none }
+        ::= { dhcpSnoopingOption82FormatASCIIConfigurableEntry 4 }
+
+    dhcpSnoopingOption82FormatASCIIConfigurableField2StrVal OBJECT-TYPE
+        SYNTAX        SnmpAdminString (SIZE (0..63))
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The string value of the second field in the Option 82 string in
+            ASCII format, which will be copied to Option-82 circuit id or remote
+            id of the DHCP packet.  This Field is applicable only, if the option
+            82 format type is ASCII"
+        DEFVAL { " - " }
+        ::= { dhcpSnoopingOption82FormatASCIIConfigurableEntry 5 }
+
+    dhcpSnoopingOption82FormatASCIIConfigurableField3 OBJECT-TYPE
+        SYNTAX        DhcpSnoopingOption82ASCIIFieldType
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "The type of the third field in the Option 82 string in ASCII
+            format, which will be copied to Option-82 circuit id or remote id of
+            the DHCP packet.  This Field is applicable only, if the option 82
+            format type is ASCII"
+        DEFVAL { none }
+        ::= { dhcpSnoopingOption82FormatASCIIConfigurableEntry 6 }
+
+    dhcpSnoopingOption82FormatASCIIConfigurableField3StrVal OBJECT-TYPE
+        SYNTAX        SnmpAdminString (SIZE (0..63))
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The string value of the third field in the Option 82 string in
+            ASCII format, which will be copied to Option-82 circuit id or remote
+            id of the DHCP packet.  This Field is applicable only, if the option
+            82 format type is ASCII"
+        DEFVAL { " - " }
+        ::= { dhcpSnoopingOption82FormatASCIIConfigurableEntry 7 }
+
+    dhcpSnoopingOption82FormatASCIIConfigurableField4 OBJECT-TYPE
+        SYNTAX        DhcpSnoopingOption82ASCIIFieldType
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "The type of the fourth  field in the Option 82 string in ASCII
+            format, which will be copied to Option-82 circuit id or remote id of
+            the DHCP packet.  This Field is applicable only, if the option 82
+            format type is ASCII"
+        DEFVAL { none }
+        ::= { dhcpSnoopingOption82FormatASCIIConfigurableEntry 8 }
+
+    dhcpSnoopingOption82FormatASCIIConfigurableField4StrVal OBJECT-TYPE
+        SYNTAX  SnmpAdminString (SIZE (0..63))
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The string value of the fourth field in the Option 82 string in
+            ASCII format, which will be copied to Option-82 circuit id or remote
+            id of the DHCP packet.  This Field is applicable only, if the option
+            82 format type is ASCII"
+        DEFVAL { " - " }
+    ::= { dhcpSnoopingOption82FormatASCIIConfigurableEntry 9 }
+
+    dhcpSnoopingOption82FormatASCIIConfigurableField5 OBJECT-TYPE
+        SYNTAX        DhcpSnoopingOption82ASCIIFieldType
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "The type of the fifth field in the Option 82 string in ASCII
+            format, which will be copied to Option-82 circuit id or remote id of
+            the DHCP packet.  This Field is applicable only, if the option 82
+            format type is ASCII"
+        DEFVAL { none }
+        ::= { dhcpSnoopingOption82FormatASCIIConfigurableEntry 10 }
+
+    dhcpSnoopingOption82FormatASCIIConfigurableField5StrVal OBJECT-TYPE
+        SYNTAX        SnmpAdminString (SIZE (0..63))
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The string value of the fifth field in the Option 82 string in
+            ASCII format, which will be copied to Option-82 circuit id or remote
+            id of the DHCP packet.  This Field is applicable only, if the option
+            82 format type is ASCII"
+        DEFVAL { " - " }
+        ::= { dhcpSnoopingOption82FormatASCIIConfigurableEntry 11 }
+
+    dhcpSnoopingOption82FormatASCIIConfigurableDelimiter OBJECT-TYPE
+        SYNTAX      SnmpAdminString (SIZE (0..63))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The value of the delimiter that is inserted between the fields in
+            the Option 82 string in ASCII format, which will be copied to
+            Option-82 circuit id or remote id of the DHCP packet. This value is
+            applicable only, if the option 82 format type is ASCII"
+        DEFVAL { "" }
+        ::= { dhcpSnoopingOption82FormatASCIIConfigurableEntry 12 }
+
+    dhcpSnoopingOption82FormatASCIIConfigurableStatus OBJECT-TYPE
+        SYNTAX        RowStatus
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "This object specifies the status of the entry."
+        ::= { dhcpSnoopingOption82FormatASCIIConfigurableEntry 13 }
+
+-- MDNS Relay --
+			                      
+    alaMdnsAdminStatus OBJECT-TYPE
+        SYNTAX 		INTEGER {
+            			enable(1),
+            			disable(2)
+			}
+        MAX-ACCESS 	read-write
+        STATUS 		current
+	DESCRIPTION
+	    "MDNS global admin status."
+	DEFVAL { disable }
+	::= { iphelperMIB 48 }
+
+    alaMdnsGreTunnelName OBJECT-TYPE
+        SYNTAX 		SnmpAdminString(SIZE (0..32))
+        MAX-ACCESS 	read-write
+	STATUS 		current
+	DESCRIPTION
+	    "Specifies the tunnel name for the MDNS feature."
+	::= { iphelperMIB 49 }
+
+    alaMdnsOperStatus OBJECT-TYPE
+        SYNTAX 		INTEGER {
+            			up(1),
+            			down(2)
+			}
+        MAX-ACCESS 	read-only
+        STATUS 		current
+	DESCRIPTION
+	    "MDNS operational status"
+	DEFVAL { down }
+	::= { iphelperMIB 50 }
+-- SSDP Relay --
+               
+alaSsdpGreTunnelName OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+               "Specifies the GRE tunnel IP interface name associated with the SSDP Relay feature."
+   ::= { iphelperMIB 51 }
+                
+alaSsdpAdminStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+            enabled(1),
+          disabled(2)
+            }
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION
+                 "SSDP Relay global status"
+     DEFVAL { disabled }
+     ::= { iphelperMIB 52 }
+                
+
+alaSsdpOperStatus OBJECT-TYPE
+      SYNTAX INTEGER {
+                   up(1),
+                   down(2)
+                   }
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION
+         "SSDP operational status"
+      DEFVAL { down }
+      ::= { iphelperMIB 53 }
 
   genericUdpServiceTable OBJECT-TYPE
       SYNTAX SEQUENCE OF GenericUdpServiceEntry
@@ -854,6 +1626,87 @@ iphelperPXESupport OBJECT-TYPE
              statistics.  Subsystem always returns zero (0)."
   ::= { genericUdpServiceMIB 3 }
 
+  alaGenericUdpServiceDstIpTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF GenericUdpServiceDstIpEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+                "This table defines the destination IP for the
+                 Generic UDP Relay Service.  UDP packet with destination port
+                 alaGenericUdpServiceDstUdpPort are forwarded to IP defined in
+                 alaGenericUdpServiceDstIpAddress."
+      ::= { genericUdpServiceMIB 4 }
+
+  alaGenericUdpServiceDstIpEntry  OBJECT-TYPE
+      SYNTAX      GenericUdpServiceDstIpEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "An entry in Generic UDP Relay destination Ip table."
+      INDEX {
+         alaGenericUdpServiceDstUdpPort,
+         alaGenericUdpServiceDstIpType,
+         alaGenericUdpServiceDstIpAddress
+      }
+      ::= { alaGenericUdpServiceDstIpTable 1 }
+
+  GenericUdpServiceDstIpEntry ::= SEQUENCE {
+      alaGenericUdpServiceDstUdpPort
+                Unsigned32,
+      alaGenericUdpServiceDstIpType
+                InetAddressType,
+      alaGenericUdpServiceDstIpAddress
+                InetAddress,
+      alaGenericUdpServiceDstStatTxToIp
+                Counter32,
+      alaGenericUdpServiceDstIpRowStatus
+                RowStatus
+  }
+
+  alaGenericUdpServiceDstUdpPort OBJECT-TYPE
+      SYNTAX Unsigned32 (0..65535)
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+          "UDP port for the service."
+      ::= { alaGenericUdpServiceDstIpEntry 1 }
+
+  alaGenericUdpServiceDstIpType OBJECT-TYPE
+      SYNTAX InetAddressType { ipv4(1), ipv6(2) }
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+          "This specifies the IP Address type of the
+           UDP Relay Server to forward the UDP packet."
+      ::= { alaGenericUdpServiceDstIpEntry 2 }
+
+  alaGenericUdpServiceDstIpAddress OBJECT-TYPE
+      SYNTAX InetAddress (SIZE(4|16))
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+          "This specifies the IP Address of the
+           UDP Relay Server to forward the UDP packet."
+      ::= { alaGenericUdpServiceDstIpEntry 3 }
+
+  alaGenericUdpServiceDstStatTxToIp  OBJECT-TYPE
+      SYNTAX  Counter32
+      MAX-ACCESS      read-only
+      STATUS current
+      DESCRIPTION
+          "This keeps track of the number of packets transmitted to the
+           destination IP with UDP destination port matching
+           alaGenericUdpServiceDstUdpPort."
+      ::= { alaGenericUdpServiceDstIpEntry  4}
+
+  alaGenericUdpServiceDstIpRowStatus OBJECT-TYPE
+      SYNTAX RowStatus
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+          "Row Status for creating/deleting the Generic Service Destination IP Table"
+      ::= { alaGenericUdpServiceDstIpEntry 5 }
+
 -- --------------------------------------------------------------
 -- Trap Description
 -- --------------------------------------------------------------
@@ -891,6 +1744,21 @@ iphelperPXESupport OBJECT-TYPE
                 IP address and new IP address is assigned to the DHCP client."
      ::= { alcatelIND1UDPRelayNotificationObjects 3 }
 
+     alaDhcpBindingDuplicateEntry NOTIFICATION-TYPE
+     OBJECTS {
+                dhcpSnoopingBindingMacAddress,
+                dhcpSnoopingBindingVlan,
+                dhcpSnoopingBindingIfIndex,
+                dhcpSnoopingBindingIfIndex
+             }
+     STATUS   current
+     DESCRIPTION
+                "Trap to notify MAC Movement in DHCP-Binding Table
+                 Mac Address, Vlan, Previous ifIndex, Current ifIndex"
+
+      ::= { alcatelIND1UDPRelayNotificationObjects 4 }
+
+
 -- Notification Objects
 
      alaDhcpClientAddress OBJECT-TYPE
@@ -926,7 +1794,10 @@ iphelperPXESupport OBJECT-TYPE
                     genericUdpServiceGroup,
                     genericUdpServiceDstGroup,
                     genericUdpServiceMiscGroup,
-		    alaDhcpClientTrapsGroup
+		    alaDhcpClientTrapsGroup,
+		    dhcpSnoopingGroup,
+		    dhcpSnoopingGroup2,
+                    alaGenericUdpServiceDstIpGroup
                 }
 
             ::={ alcatelIND1UDPRelayMIBCompliances 1}
@@ -986,7 +1857,13 @@ iphelperPXESupport OBJECT-TYPE
             iphelperDhcpOption82FormatASCIIField5 ,
             iphelperDhcpOption82FormatASCIIField5StringValue,
             iphelperDhcpOption82FormatASCIIDelimiter,
-            iphelperResetAllOpt82ErrStats
+            iphelperResetAllOpt82ErrStats,
+	    alaMdnsAdminStatus,
+	    alaMdnsGreTunnelName,
+	    alaMdnsOperStatus,
+	    alaSsdpGreTunnelName,
+	    alaSsdpAdminStatus,
+	    alaSsdpOperStatus
         }
         STATUS current
         DESCRIPTION
@@ -1031,7 +1908,8 @@ iphelperPXESupport OBJECT-TYPE
 	{
 		alaDhcpClientAddressAddTrap,
 		alaDhcpClientAddressExpiryTrap,
-		alaDhcpClientAddressModifyTrap
+		alaDhcpClientAddressModifyTrap,
+                alaDhcpBindingDuplicateEntry
 	}
 	STATUS current
 	DESCRIPTION
@@ -1061,7 +1939,75 @@ iphelperPXESupport OBJECT-TYPE
              " Collection of objects for Option 82 error statistics."
         ::= {  alcatelIND1UDPRelayMIBGroups 9}
 
+    dhcpSnoopingGroup  OBJECT-GROUP
+        OBJECTS
+        {
+	    dhcpSnoopingBindingDatabaseAction,
+	    dhcpSnoopingBindingDatabaseLastSyncTime, 
+	    dhcpSnoopingBindingDatabaseSyncTimeout,
+	    dhcpSnoopingBindingIfIndex,
+	    dhcpSnoopingBindingIpAddress,
+	    dhcpSnoopingBindingLeaseTime,
+	    dhcpSnoopingBindingMacAddress,
+	    dhcpSnoopingBindingPersistencyStatus,
+	    dhcpSnoopingBindingRowStatus,
+	    dhcpSnoopingBindingStatus,
+	    dhcpSnoopingBindingType,
+	    dhcpSnoopingBindingVlan,
+	    dhcpSnoopingBypassOpt82CheckStatus,
+	    dhcpSnoopingMacAddrVerificationStatus,
+	    dhcpSnoopingMode,
+	    dhcpSnoopingOpt82DataInsertionStatus,
+	    dhcpSnoopingOption82FormatASCIIConfigurableDelimiter,
+	    dhcpSnoopingOption82FormatASCIIConfigurableField1,
+	    dhcpSnoopingOption82FormatASCIIConfigurableField1StrVal,
+	    dhcpSnoopingOption82FormatASCIIConfigurableField2,
+	    dhcpSnoopingOption82FormatASCIIConfigurableField2StrVal,
+	    dhcpSnoopingOption82FormatASCIIConfigurableField3,
+	    dhcpSnoopingOption82FormatASCIIConfigurableField3StrVal,
+	    dhcpSnoopingOption82FormatASCIIConfigurableField4,
+	    dhcpSnoopingOption82FormatASCIIConfigurableField4StrVal,
+	    dhcpSnoopingOption82FormatASCIIConfigurableField5,
+	    dhcpSnoopingOption82FormatASCIIConfigurableField5StrVal,
+	    dhcpSnoopingOption82FormatASCIIConfigurableStatus,
+	    dhcpSnoopingOption82FormatType,
+	    dhcpSnoopingPortIpSourceFiltering,
+	    dhcpSnoopingPortMacAddrViolation,
+            dhcpSnoopingOption82StringValue
+        }
+        STATUS current
+        DESCRIPTION
+             " Collection of objects for DHCP Snooping."
+        ::= {  alcatelIND1UDPRelayMIBGroups 10}
+
+    dhcpSnoopingGroup2  OBJECT-GROUP
+        OBJECTS
+        {
+             dhcpSnoopingPortBindingViolation,
+             dhcpSnoopingPortOption82Violation,
+             dhcpSnoopingPortRelayAgentViolation,
+             dhcpSnoopingPortTrustMode,
+             dhcpSnoopingSourceFilterVlanFilteringStatus,
+             dhcpSnoopingVlanMacAddrVerificationStatus, 
+             dhcpSnoopingPortDhcpServerViolation,
+             dhcpSnoopingVlanOpt82DataInsertionStatus,
+             dhcpSnoopingVlanStatus
+        }
+        STATUS current
+        DESCRIPTION
+             " Collection of objects for DHCP Snooping."
+        ::= {  alcatelIND1UDPRelayMIBGroups 11}
+
+     alaGenericUdpServiceDstIpGroup   OBJECT-GROUP
+        OBJECTS
+        {
+            alaGenericUdpServiceDstStatTxToIp,
+            alaGenericUdpServiceDstIpRowStatus
+        }
+        STATUS current
+        DESCRIPTION
+                "Objects for Generic UDP Service Destination IP table"
+        ::= {  alcatelIND1UDPRelayMIBGroups 12}
+
 END
-
-
 

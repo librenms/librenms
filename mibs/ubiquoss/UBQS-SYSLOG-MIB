@@ -1,0 +1,345 @@
+-- *****************************************************************
+-- UBQS-SYSLOG-MIB.mib:  Ubiquoss syslog MIB file
+--
+-- June 2010, Hyung Eun Park
+--
+-- Copyright (c) 2010 by Ubiquoss, Corp.
+-- All rights reserved.    
+--
+-- *****************************************************************
+--
+
+UBQS-SYSLOG-MIB	DEFINITIONS ::= BEGIN
+
+IMPORTS
+	OBJECT-TYPE
+		FROM SNMPv2-SMI     
+	RowStatus, TruthValue
+	    FROM SNMPv2-TC
+	DisplayString			
+		FROM RFC1213-MIB    
+    InetAddress, InetAddressType,
+    InetAddressPrefixLength,      
+    	FROM INET-ADDRESS-MIB   		
+	ubiMgmtv2
+		FROM UBQS-SMI;
+		
+
+ubiSyslogMIB  MODULE-IDENTITY
+    LAST-UPDATED    "201012170000Z"
+    ORGANIZATION 	"Ubiquoss Corp."
+	CONTACT-INFO
+		"	Ubiquoss
+			Customer Service
+
+		 Postal: 24F Milennium B/D,
+		 	467-12, Dogok-Dong,
+			GangNam-Gu, Seoul 135-270
+			Korea
+
+		   Tel: 82-2-2190-3100"     
+    DESCRIPTION
+        "The UBQS-SYSLOG-MIB is used to get 
+        the syslog information."   
+      	::= { ubiMgmtv2  15 }
+   				
+
+-- ***********************************************************
+-- Textual Conventions
+-- *********************************************************** 
+
+UbiSyslogSeverity ::= TEXTUAL-CONVENTION
+       STATUS  current
+       DESCRIPTION
+               "The severity of a syslog message.  The enumeration
+                values are equal to the values that syslog uses + 1.
+                For example, with syslog, emergency=0.
+
+                 'emergency' : system is unusable
+                 'alert'     : action must be taken immediately
+                 'critical'  : critical conditions
+                 'error'     : error conditions
+                 'warning'   : warning conditions
+                 'notice'    : normal but significant condition
+                 'informational': informational messages 
+                 'debug'        : debug-level messages."
+       REFERENCE
+           "RFC 3164, Section 4.1 - syslog Message Parts"
+       SYNTAX  INTEGER {    
+       						none(0),
+       						emergency(1),
+                            alert(2),
+                            critical(3),
+                            error(4),
+                            warning(5),
+                            notice(6),
+                            info(7),
+                            debug(8)
+                }
+
+
+
+-- ***************************************************************
+-- ubiSyslogMIB
+-- *************************************************************** 
+ubiSyslogMIBNotificationPrefix 	OBJECT IDENTIFIER 	::= { ubiSyslogMIB 0 }
+ubiSyslogMIBObjects				OBJECT IDENTIFIER 	::= { ubiSyslogMIB 1 }
+ubiSyslogMIBConformance    		OBJECT IDENTIFIER 	::= { ubiSyslogMIB 2 }
+	                              
+ubiSyslogConfiguration          OBJECT IDENTIFIER 	::= { ubiSyslogMIBObjects 1 } 
+ubiSyslogServers				OBJECT IDENTIFIER 	::= { ubiSyslogMIBObjects 2 }        
+
+
+-- ***********************************************************
+-- ubiSyslogConfiguration 
+-- ***********************************************************
+       
+     ubiSyslogConsoleEnable   OBJECT-TYPE
+         SYNTAX  TruthValue
+         MAX-ACCESS read-write
+         STATUS     current
+         DESCRIPTION
+         "Indicates whether the system writes the syslog 
+          at colsole."
+         ::= { ubiSyslogConfiguration 1 }     	
+       
+     ubiSyslogConsoleSeverity OBJECT-TYPE
+         SYNTAX  UbiSyslogSeverity
+         MAX-ACCESS read-write
+         STATUS     current
+         DESCRIPTION
+         "Indicates which syslog severity levels will be processed.       
+               0  'none		  
+               1  'emergency' : system is unusable
+               2  'alert'     : action must be taken immediately
+               3  'critical'  : critical conditions
+               4  'error'     : error conditions
+               5  'warning'   : warning conditions
+               6  'notice'    : normal but significant condition
+               7  'informational': informational messages 
+               8  'debug'        : debug-level messages.
+         "
+         ::= { ubiSyslogConfiguration 2 }
+	         
+
+     ubiSyslogTerminalEnable   OBJECT-TYPE
+         SYNTAX  TruthValue
+         MAX-ACCESS read-write
+         STATUS     current
+         DESCRIPTION
+         "Indicates whether the system writes the syslog 
+          at terminal."
+         ::= { ubiSyslogConfiguration 3 }  
+	         
+     ubiSyslogTerminalSeverity OBJECT-TYPE
+         SYNTAX  UbiSyslogSeverity
+         MAX-ACCESS read-write
+         STATUS     current
+         DESCRIPTION
+         "Indicates which syslog severity levels will be processed.          
+               0  'none	
+               1  'emergency' : system is unusable
+               2  'alert'     : action must be taken immediately
+               3  'critical'  : critical conditions
+               4  'error'     : error conditions
+               5  'warning'   : warning conditions
+               6  'notice'    : normal but significant condition
+               7  'informational': informational messages 
+               8  'debug'        : debug-level messages.
+         "
+         ::= { ubiSyslogConfiguration 4 }
+
+     ubiSyslogBufferdEnable   OBJECT-TYPE
+         SYNTAX  TruthValue
+         MAX-ACCESS read-write
+         STATUS     current
+         DESCRIPTION
+         "Indicates whether the system writes the syslog 
+          at buffer."
+         ::= { ubiSyslogConfiguration 5 }  
+
+     ubiSyslogBuffredSeverity OBJECT-TYPE
+         SYNTAX  UbiSyslogSeverity
+         MAX-ACCESS read-write
+         STATUS     current
+         DESCRIPTION
+         "Indicates which syslog severity levels will be processed.          
+               0  'none	
+               1  'emergency' : system is unusable
+               2  'alert'     : action must be taken immediately
+               3  'critical'  : critical conditions
+               4  'error'     : error conditions
+               5  'warning'   : warning conditions
+               6  'notice'    : normal but significant condition
+               7  'informational': informational messages 
+               8  'debug'        : debug-level messages.
+         "
+         ::= { ubiSyslogConfiguration 6 }
+
+     ubiSyslogTrapEnable   OBJECT-TYPE
+         SYNTAX  TruthValue
+         MAX-ACCESS read-write
+         STATUS     current
+         DESCRIPTION
+         "Indicates whether the system writes the syslog 
+          for trap."
+         ::= { ubiSyslogConfiguration 7 }  
+
+     ubiSyslogTrapSeverity OBJECT-TYPE
+         SYNTAX  UbiSyslogSeverity
+         MAX-ACCESS read-write
+         STATUS     current
+         DESCRIPTION
+         "Indicates which syslog severity levels will be processed.          
+               0  'none	
+               1  'emergency' : system is unusable
+               2  'alert'     : action must be taken immediately
+               3  'critical'  : critical conditions
+               4  'error'     : error conditions
+               5  'warning'   : warning conditions
+               6  'notice'    : normal but significant condition
+               7  'informational': informational messages 
+               8  'debug'        : debug-level messages.
+         "
+         ::= { ubiSyslogConfiguration 8 }
+
+     ubiSyslogBufferSize OBJECT-TYPE
+         SYNTAX  Integer32(4096..16777216)
+         MAX-ACCESS read-write
+         STATUS     current
+         DESCRIPTION
+         "Specifies the syslog buffer size."
+         ::= { ubiSyslogConfiguration 9 }
+
+     ubiSyslogFacility OBJECT-TYPE
+         SYNTAX  INTEGER 
+         {         
+         	none(0),
+         	auth(1),
+         	cron(2),
+         	daemon(3),
+         	kernel(4),            
+         	local0(5),
+         	local1(6),
+         	local2(7),
+         	local3(8),
+         	local4(9),
+         	local5(10),
+         	local6(11),
+         	local7(12),
+         	lpr(13),
+         	mail(14),
+         	news(15),
+         	syslog(16),
+         	user(17),
+         	uucp(18)
+         }
+         MAX-ACCESS read-write
+         STATUS     current
+         DESCRIPTION
+         "Indicates the syslog facility."
+         ::= { ubiSyslogConfiguration 10 }
+
+
+-- ***********************************************************
+-- ubiSyslogServerTable 
+-- ***********************************************************
+	ubiSyslogServerTable OBJECT-TYPE
+            SYNTAX  SEQUENCE OF UbiSyslogServerEntry
+            MAX-ACCESS  not-accessible
+            STATUS     current
+            DESCRIPTION
+    		"This table contains entries that allow application
+			to configure syslog servers for the system."
+            ::= { ubiSyslogServers 1 }
+
+     ubiSyslogServerEntry OBJECT-TYPE
+         SYNTAX  UbiSyslogServerEntry
+         MAX-ACCESS  not-accessible
+         STATUS     current
+         DESCRIPTION
+         "An entry containing information about syslog servers
+		  configured for the system."
+         INDEX   {  ubiSyslogServerAddrType, ubiSyslogServerAddr  }
+         ::= { ubiSyslogServerTable 1 }
+
+     UbiSyslogServerEntry ::=
+         SEQUENCE {        
+         	 ubiSyslogServerAddrType   	InetAddressType,
+          	 ubiSyslogServerAddr		InetAddress,
+             ubiSyslogServerRowStatus	RowStatus
+         }
+
+     ubiSyslogServerAddrType OBJECT-TYPE
+         SYNTAX  InetAddressType
+         MAX-ACCESS not-accessible
+         STATUS     current
+         DESCRIPTION
+         "The type of server address.  
+         ipv4(1)     An IPv4 address as defined by the
+                     InetAddressIPv4 textual convention.
+
+         ipv6(2)     An IPv6 address as defined by the
+                     InetAddressIPv6 textual convention.
+         "
+         ::= { ubiSyslogServerEntry 1 }
+
+     ubiSyslogServerAddr OBJECT-TYPE
+         SYNTAX  InetAddress
+         MAX-ACCESS read-only
+         STATUS     current
+         DESCRIPTION
+                 "The address of this syslog server."
+         ::= { ubiSyslogServerEntry 2 }
+	
+	ubiSyslogServerRowStatus OBJECT-TYPE
+       SYNTAX       RowStatus
+       MAX-ACCESS   read-create
+       STATUS       current
+       DESCRIPTION
+          "The row status of this syslog server."
+          ::= { ubiSyslogServerEntry 3 }
+
+
+
+-- *****************************************************************   
+-- ubiSyslogMIBConformance
+-- *****************************************************************
+        
+ubiSyslogMIBCompliances 	OBJECT IDENTIFIER ::= { ubiSyslogMIBConformance 1 }
+ubiSyslogMIBGroups      	OBJECT IDENTIFIER ::= { ubiSyslogMIBConformance 2 }      
+
+
+
+-- compliance statements
+
+	ubiSyslogMIBCompliance MODULE-COMPLIANCE
+        STATUS  current     
+        DESCRIPTION
+                "The compliance statement for entities which implement
+                the Ubiquoss system MIB."
+        MODULE  
+                MANDATORY-GROUPS {  
+                	syslogMIBGroup
+                }
+
+       GROUP    syslogMIBGroup
+       DESCRIPTION  
+       	         "The syslogMIBGroup is applicable for mplementations 
+       	         which need to get the information of syslog. "     
+             
+        ::= { ubiSyslogMIBCompliances 1 }
+
+
+ 
+-- units of conformance
+	syslogMIBGroup OBJECT-GROUP
+        OBJECTS {      
+        	-- TODO  
+           		}
+    	STATUS          current
+    	DESCRIPTION
+        	"A collection of objects providing the syslog MIB."
+    	::= { ubiSyslogMIBGroups 1 }     
+        
+END

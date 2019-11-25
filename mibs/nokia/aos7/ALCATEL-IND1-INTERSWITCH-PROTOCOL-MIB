@@ -134,6 +134,19 @@ aipLLDPConfigManAddrTlvTxEnable OBJECT-TYPE
     DEFVAL  { false }
     ::= { aipLLDPConfigManAddrEntry 2 }
 
+aipLLDPConfigNearestEdgeEnable OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+            " This global object specifies, whether or not NearestEdge
+              is enabled. The value true(1) means that it is enabled;
+              the value false(2) means that they are not.The default value
+              for this object is false(2). "
+
+    DEFVAL  { false }
+    ::= { aipLLDPConfig 2 }
+
 
 -- AIP Conformance
 
@@ -145,7 +158,8 @@ alcatelIND1InterswitchProtocolMIBCompliances OBJECT IDENTIFIER ::=
 
 aipLLDPConfGroup OBJECT-GROUP
     OBJECTS {
-        aipLLDPConfigManAddrTlvTxEnable
+        aipLLDPConfigManAddrTlvTxEnable,
+        aipLLDPConfigNearestEdgeEnable
     }
     STATUS      current
     DESCRIPTION

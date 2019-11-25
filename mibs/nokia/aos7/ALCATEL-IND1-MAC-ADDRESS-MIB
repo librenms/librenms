@@ -390,7 +390,8 @@ AlaSlMacAddressGlobalEntry ::= SEQUENCE
     slMacAddressGblRowStatus     RowStatus,
     slMacAddressGblProtocol      MacAddressProtocolType,
     slMacAddressGblGroupField    Unsigned32,
-    slSvcISID                    Integer32
+    slSvcISID                    Integer32,
+    slVxLanVnID                  Unsigned32
 }
 
 slMacDomain OBJECT-TYPE
@@ -399,13 +400,15 @@ slMacDomain OBJECT-TYPE
             vlan(1),
             vpls(2),
             spbm(3),
-            evb(4)
+            evb(4),
+            local(5),
+            vxlan(6)
                     }
     MAX-ACCESS  not-accessible
     STATUS  current
     DESCRIPTION
         "* This object indicates whether this MAC is learned on Vlan, VPLS,
-           SPBM, EVB domain.
+           SPBM, VxLan,Local,EVB domain.
 
          * To flush a MAC or MACs, this field may or may not be specified.  If this 
            field is not specified, then the default -all(0)- value will be expected;
@@ -537,7 +540,8 @@ slMacAddressGblDisposition OBJECT-TYPE
                     filtering(2),
                     quarantined(3),
                     hostIntegrity(4),
-                    userNetworkProf(5)
+                    userNetworkProf(5),
+                    servicing(6)
                     }
     MAX-ACCESS  read-create
     STATUS  current
@@ -548,6 +552,7 @@ slMacAddressGblDisposition OBJECT-TYPE
         quarantined(3) - this entry is currently in use for quarantined mac.
                 hostIntegritycheck(4) - the entry is currently under host integrity checking.
                 userNetworkProf(5) - the entry is currently under user network profile Qos.
+                servicing(6) - the entry is currently in use in service domain.
         "
     DEFVAL      { bridging }
 
@@ -593,6 +598,18 @@ slSvcISID OBJECT-TYPE
               If this field is specified, then the values must be within the
               range (256..16777214)" 
       ::= {alaSlMacAddressGlobalEntry 12 }
+
+slVxLanVnID OBJECT-TYPE 
+   SYNTAX  Unsigned32 (0 | 1..16777215) 
+      MAX-ACCESS  read-create 
+      STATUS  current 
+      DESCRIPTION 
+        " * This field is used in VXLAN domain only.  This field is  
+              VNID of VXLAN domain service;
+ 
+            * To flush a MAC or MACs, this field may or may not be specified.  If this
+            field is not specified, then value `-1` will be expected;"
+      ::= {alaSlMacAddressGlobalEntry 13 }
 
 -- ------------------------------------------------------------------------
 -- Following table provides number of MAC addresses count for
@@ -672,7 +689,8 @@ slMacAddressGroup OBJECT-GROUP
 	slMacAddressGblRowStatus,     
 	slMacAddressGblProtocol,     
         slMacAddressGblGroupField,
-        slSvcISID
+        slSvcISID,
+        slVxLanVnID
    }
    STATUS  current
    DESCRIPTION

@@ -88,6 +88,7 @@ by following the steps under the `SNMP Extend` heading.
 1. [Apache](#apache) - SNMP extend, Agent
 1. [Asterisk](#asterisk) - SNMP extend
 1. [BIND9/named](#bind9-aka-named) - SNMP extend, Agent
+1. [Certificate](#certificate) - Certificate extend
 1. [C.H.I.P.](#chip) - SNMP extend
 1. [DHCP Stats](#dhcp-stats) - SNMP extend
 1. [Entropy](#entropy) - SNMP extend
@@ -335,12 +336,47 @@ via `wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/
 
 3: Set the variable 'agent' to '1' in the config.
 
+# Certificate
+
+A small python3 script that checks age and remaining validity of certificates
+
+This script needs following packages on Debian/Ubuntu Systems:
+* python3
+* python3-openssl
+
+Content of an example /etc/snmp/certificate.json . Please edit with your own settings.
+```
+{"domains": [
+    {"fqdn": "www.mydomain.com"},
+    {"fqdn": "some.otherdomain.org",
+     "port": 8443},
+    {"fqdn": "personal.domain.net"}
+]
+}
+```
+Key 'domains' contains a list of domains to check.
+Optional you can define a port. By default it checks on port 443.
+
+## SNMP Extend
+1. Copy the shell script to the desired host.
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/certificate.py -O /etc/snmp/certificate.py
+```
+
+2. Run `chmod +x /etc/snmp/certificate.py`
+
+3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+```
+extend certificate /etc/snmp/certificate.py
+```
+4. Restart snmpd on your host
+
+The application should be auto-discovered as described at the top of the page. If it is not, please follow the steps set out under `SNMP Extend` heading top of page.
+
 # C.H.I.P
 
 C.H.I.P. is a $9 R8 based tiny computer ideal for small projects.
 Further details: <https://getchip.com/pages/chip>
-
-## SNMP Extend
 
 1: Copy the shell script to the desired host.
 

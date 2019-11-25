@@ -924,6 +924,21 @@ alaEServiceNniSvlanVpaType  OBJECT-TYPE
         DEFVAL  { stp }
         ::= { alaEServiceNniSvlanEntry 4 }
 
+alaEServiceGlobals OBJECT IDENTIFIER ::= { alaEService 10 }
+
+alaEServiceGlobalTransBridging  OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+                enable (1),
+                disable (2)
+        }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+        "The global transparent bridging status."
+        DEFVAL { disable }
+        ::= { alaEServiceGlobals 1 }
+
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 -- COMPLIANCE
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -942,7 +957,8 @@ alcatelIND1EServiceMIBCompliance MODULE-COMPLIANCE
                 alaEServiceSapCvlanGroup,
                 alaEServicePortGroup,
                 alaEServiceNniSvlanGroup,
-                alaEServiceInfoGroup
+                alaEServiceInfoGroup,
+                alaEServiceGlobalGroup
                 }
         ::= { alcatelIND1EServiceMIBCompliances 1 }
 
@@ -1079,5 +1095,16 @@ alaEServiceInfoGroup OBJECT-GROUP
         Binding."
         ::= { alcatelIND1EServiceMIBGroups 9 }
 
+alaEServiceGlobalGroup OBJECT-GROUP
+        OBJECTS
+        {
+                alaEServiceGlobalTransBridging
+
+        }
+        STATUS  current
+        DESCRIPTION
+        "Collection of objects for management of E-Service global
+        configuration."
+        ::= { alcatelIND1EServiceMIBGroups 10 }
 END
 

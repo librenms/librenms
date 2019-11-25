@@ -286,9 +286,13 @@ foreach ($list as $items) {
     $device_id1 = $items['local_device_id'].':'.$items['remote_device_id'];
     $device_id2 = $items['remote_device_id'].':'.$items['local_device_id'];
 
-    // Ensure only one link exists between any two ports.
+    // If mac is choosen to graph, ensure only one link exists between any two ports, or any two devices.
+    // else ensure only one link exists between any two ports
     if (!array_key_exists($link_id1, $link_assoc_seen) &&
-        !array_key_exists($link_id2, $link_assoc_seen)) {
+        !array_key_exists($link_id2, $link_assoc_seen) &&
+        (!in_array('mac', Config::get('network_map_items')) ||
+        (!array_key_exists($device_id1, $device_assoc_seen) &&
+        !array_key_exists($device_id2, $device_assoc_seen)))) {
         $local_port = cleanPort($local_port);
         $remote_port = cleanPort($remote_port);
         $links[] = array_merge(

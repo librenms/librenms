@@ -53,3 +53,7 @@ if (token) {
 //     cluster: process.env.MIX_PUSHER_APP_CLUSTER,
 //     encrypted: true
 // });
+
+// Polyfills
+
+require('es6-object-assign/auto');

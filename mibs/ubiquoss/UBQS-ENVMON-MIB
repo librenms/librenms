@@ -1,0 +1,666 @@
+-- *****************************************************************
+-- UBQS-ENVMON-MIB:  Ubiquoss Environmental Monitor MIB file
+--
+-- June 2009 by Hyung Eun Park          
+--
+-- Copyright (c) 2009 by Ubiquoss, Corp.
+-- All rights reserved.    
+-- *****************************************************************
+--       
+
+UBQS-ENVMON-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+        Gauge32,
+        Integer32
+                FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION,
+        DisplayString,
+        TruthValue
+                FROM SNMPv2-TC
+        MODULE-COMPLIANCE,
+        OBJECT-GROUP,
+        NOTIFICATION-GROUP
+                FROM SNMPv2-CONF
+        ubiMgmtv2
+                FROM UBQS-SMI;
+
+
+ubiEnvMonMIB MODULE-IDENTITY
+        LAST-UPDATED    "200906250000Z"
+        ORGANIZATION    "Ubiquoss Corp."
+        CONTACT-INFO
+		"	Ubiquoss
+			Customer Service
+
+		 Postal: 24F Milennium B/D,
+		 	467-12, Dogok-Dong,
+			GangNam-Gu, Seoul 135-270
+			Korea
+
+		   Tel: 82-2-2190-3100"          
+		DESCRIPTION
+        "The UBQS-ENVMON-MIB is used for getting 
+        the environment information of the system."
+        ::= { ubiMgmtv2 2 }
+               
+     
+-- *****************************************************************
+-- Type Convention
+-- *****************************************************************
+UbiEnvMonState ::= TEXTUAL-CONVENTION
+        STATUS  current
+        DESCRIPTION
+                "Represents the state of a device being monitored.
+                 Valid values are:
+
+                 normal(1):         the environment is good, such as low
+                                    temperature.
+
+                 warning(2):        the environment is bad, such as temperature
+                                    above normal operation range but not too
+                                    high.
+
+                 critical(3):       the environment is very bad, such as
+                                    temperature much higher than normal
+                                    operation limit.
+
+                 shutdown(4):       the environment is the worst, the system
+                                    should be shutdown immediately.
+
+                 notPresent(5):     the environmental monitor is not present,
+                                    such as temperature sensors do not exist.
+
+                 notFunctioning(6): the environmental monitor does not 
+                                    function properly.
+                "
+        SYNTAX  INTEGER {
+                        normal(1),
+                        warning(2),
+                        critical(3),
+                        shutdown(4),
+                        notPresent(5),
+                        notFunctioning(6)
+                }
+
+-- *****************************************************************
+-- ubiEnvMonMIB
+-- *****************************************************************
+
+ubiEnvMonObjects 				OBJECT IDENTIFIER ::= { ubiEnvMonMIB 1 }
+ubiEnvMonMIBNotificationEnables OBJECT IDENTIFIER ::= { ubiEnvMonMIB 2 }
+ubiEnvMonMIBNotificationPrefix 	OBJECT IDENTIFIER ::= { ubiEnvMonMIB 3 } 
+ubiEnvMonMIBConformance 		OBJECT IDENTIFIER ::= { ubiEnvMonMIB 4 }
+
+                   
+                   
+-- *****************************************************************
+-- ubiEnvMonTemperatureTable
+-- *****************************************************************
+
+	ubiEnvMonTemperatureTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF UbiEnvMonTemperatureEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "The table of ambient temperature status maintained by the
+                environmental monitor."
+        ::= { ubiEnvMonObjects 1 }
+
+	ubiEnvMonTemperatureEntry OBJECT-TYPE
+        SYNTAX     UbiEnvMonTemperatureEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "An entry in the ambient temperature status table, representing
+                the status of the associated testpoint maintained by the
+                environmental monitor."
+        INDEX      { ubiEnvMonTemperatureIndex }
+        ::= { ubiEnvMonTemperatureTable 1 }
+
+	UbiEnvMonTemperatureEntry ::=
+        SEQUENCE {
+                ubiEnvMonTemperatureIndex       		Integer32,
+                ubiEnvMonTemperatureDescr       		DisplayString,
+                ubiEnvMonTemperatureValue       		Gauge32,
+                ubiEnvMonTemperatureHighThreshold     	Integer32,       
+                ubiEnvMonTemperatureLowThreshold      	Integer32,
+         --       ubiEnvMonTemperatureLastShutdown    	Integer32,
+                ubiEnvMonTemperatureState             	UbiEnvMonState
+        }
+
+
+	ubiEnvMonTemperatureIndex OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Unique index for the testpoint being instrumented.
+                This index is for SNMP purposes only, and has no
+                intrinsic meaning."
+        ::= { ubiEnvMonTemperatureEntry 1 }
+
+	ubiEnvMonTemperatureDescr OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (0..255))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Textual description of the testpoint 
+                 being instrumented."
+        ::= { ubiEnvMonTemperatureEntry 2 }
+
+	ubiEnvMonTemperatureValue OBJECT-TYPE
+        SYNTAX     Gauge32
+        UNITS      "degrees Celsius"
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The current measurement of the testpoint 
+                 being instrumented."
+        ::= { ubiEnvMonTemperatureEntry 3 }
+
+	ubiEnvMonTemperatureHighThreshold OBJECT-TYPE
+        SYNTAX     Integer32
+        UNITS      "degrees Celsius"
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "A high threshold for the temperature. 
+                 If a particular value isn't set, this object 
+                 displays the default value."
+        ::= { ubiEnvMonTemperatureEntry 4 }
+   
+	ubiEnvMonTemperatureLowThreshold OBJECT-TYPE
+        SYNTAX     Integer32
+        UNITS      "degrees Celsius"
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "A low threshold for the temperature.
+                If a particular value isn't set, this object 
+                displays the default value."
+        ::= { ubiEnvMonTemperatureEntry 5 }
+   
+--	ubiEnvMonTemperatureLastShutdown OBJECT-TYPE
+ --       SYNTAX     Integer32
+ --       UNITS      "degrees Celsius"
+ --      MAX-ACCESS read-only
+ --       STATUS     current
+ --       DESCRIPTION
+ --               "The value of the associated instance of the object
+ --               ubiEnvMonTemperatureStatusValue at the time an emergency
+ --               shutdown of the managed device was last initiated. "
+ --       ::= { ubiEnvMonTemperatureEntry 5 }
+
+	ubiEnvMonTemperatureState OBJECT-TYPE
+        SYNTAX     UbiEnvMonState
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The current state of the testpoint being instrumented.              
+                 Represents the temperature state of a device being monitored.
+                 Valid values are:
+
+                 normal(1):         the environment is good, such as low
+                                    temperature.
+
+                 warning(2):        the environment is bad, such as temperature
+                                    above normal operation range but not too
+                                    high.
+
+                 critical(3):       the environment is very bad, such as
+                                    temperature much higher than normal
+                                    operation limit.
+
+                 notPresent(5):     the environmental monitor is not present,
+                                    such as temperature sensors do not exist.
+               "
+        ::= { ubiEnvMonTemperatureEntry 6 }
+
+   
+-- *****************************************************************
+-- ubiEnvMonFanTable
+-- ****************************************************************
+
+	ubiEnvMonFanTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF UbiEnvMonFanEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "The table of fan status maintained by the environmental
+                monitor."
+        ::= { ubiEnvMonObjects 2 }
+
+	ubiEnvMonFanEntry OBJECT-TYPE
+        SYNTAX     UbiEnvMonFanEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "An entry in the fan status table, representing the status of
+                the associated fan maintained by the environmental monitor."
+        INDEX   { ubiEnvMonFanIndex }
+        ::= { ubiEnvMonFanTable 1 }
+
+	UbiEnvMonFanEntry ::=
+        SEQUENCE {
+                ubiEnvMonFanIndex       		Integer32,
+                ubiEnvMonFanDescr       		DisplayString,
+                ubiEnvMonFanState             	UbiEnvMonState
+        }
+
+	ubiEnvMonFanIndex OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Unique index for the fan being instrumented.
+                This index is for SNMP purposes only, and has no
+                intrinsic meaning."
+        ::= { ubiEnvMonFanEntry 1 }
+
+	ubiEnvMonFanDescr OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (0..255))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Textual description of the fan being instrumented."
+        ::= { ubiEnvMonFanEntry 2 }
+
+	ubiEnvMonFanState OBJECT-TYPE
+        SYNTAX     UbiEnvMonState
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The current state of the fan being instrumented.
+                 Represents the fan state of a device being monitored.
+                 Valid values are:
+
+                 normal(1):         the environment is good, such as low
+                                    temperature.         
+                                    
+                 notPresent(5):     the environmental monitor is not present,
+                                    such as temperature sensors do not exist.  
+                                     
+                 notFunctioning(6): the environmental monitor does not 
+                                    function properly.
+               "
+
+        ::= { ubiEnvMonFanEntry 3 }
+
+
+
+-- *****************************************************************
+-- ubiEnvMonSupplyTable
+-- ****************************************************************
+
+	ubiEnvMonSupplyTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF UbiEnvMonSupplyEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "The table of power supply status maintained by the
+                environmental monitor card."
+        ::= { ubiEnvMonObjects 3 }
+
+	ubiEnvMonSupplyEntry OBJECT-TYPE
+        SYNTAX     UbiEnvMonSupplyEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "An entry in the power supply status table, representing the
+                status of the associated power supply maintained by the
+                environmental monitor card."
+        INDEX   { ubiEnvMonSupplyIndex }
+        ::= { ubiEnvMonSupplyTable 1  }
+
+	UbiEnvMonSupplyEntry ::=
+        SEQUENCE {
+                ubiEnvMonSupplyIndex    		Integer32,
+                ubiEnvMonSupplyDescr    		DisplayString,
+                ubiEnvMonSupplyState          	UbiEnvMonState,
+                ubiEnvMonSupplySource         	INTEGER,
+                ubiEnvMonExternalAlarmAc        INTEGER,
+                ubiEnvMonExternalAlarmUnit      INTEGER
+         }
+
+	ubiEnvMonSupplyIndex OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Unique index for the power supply being instrumented.
+                This index is for SNMP purposes only, and has no
+                intrinsic meaning."
+        ::= { ubiEnvMonSupplyEntry 1 }
+
+	ubiEnvMonSupplyDescr OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (0..255))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Textual description of the power supply 
+                being instrumented."
+        ::= { ubiEnvMonSupplyEntry 2 }
+
+	ubiEnvMonSupplyState OBJECT-TYPE
+        SYNTAX     UbiEnvMonState
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The current state of the power supply 
+                 being instrumented.  
+                 Represents the power state of a device being monitored.
+                 Valid values are:
+
+                 normal(1):         the environment is good, such as low
+                                    temperature.         
+                                    
+                 notPresent(5):     the environmental monitor is not present,
+                                    such as temperature sensors do not exist.  
+                                     
+                 notFunctioning(6): the environmental monitor does not 
+                                    function properly.
+                "
+        ::= { ubiEnvMonSupplyEntry 3 }
+
+	ubiEnvMonSupplySource OBJECT-TYPE
+        SYNTAX INTEGER {           
+        				none(0),
+                        ac(1),
+                        dc(2)
+        }
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The power supply source.
+                 ac      - AC power supply
+                 dc      - DC power supply"
+        ::= { ubiEnvMonSupplyEntry 4 }  
+        
+    ubiEnvMonExternalAlarmAc OBJECT-TYPE
+        SYNTAX INTEGER {
+					normal(1),
+					fail(2)
+		}        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The power supply convertor AC.
+                 nomal (1)       
+                 fail  (2)"      
+        ::= { ubiEnvMonSupplyEntry 5 }
+
+	ubiEnvMonExternalAlarmUnit OBJECT-TYPE
+        SYNTAX INTEGER {
+					normal(1),
+					fail(2)
+		}
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The power supply convertor unit.
+                 nomal (1)       
+                 fail  (2)"      
+        ::= { ubiEnvMonSupplyEntry 6 }
+
+    
+-- *****************************************************************
+-- ubiEnvMonSupplyChannelTable
+-- ****************************************************************
+
+	ubiEnvMonSupplyChannelTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF UbiEnvMonSupplyChannelEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "The table represents the extension status 
+                for DC power supply."
+        ::= { ubiEnvMonObjects 4 }
+
+	ubiEnvMonSupplyChannelEntry OBJECT-TYPE
+        SYNTAX     UbiEnvMonSupplyChannelEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "An entry in this table, representing the extended status of 
+                the associated DC power supply maintained by 
+                the environmental monitor card."
+        INDEX   { ubiEnvMonSupplyIndex, ubiEnvMonSupplyChannelType }
+        ::= { ubiEnvMonSupplyChannelTable 1  }
+
+	UbiEnvMonSupplyChannelEntry ::=
+        SEQUENCE {
+                ubiEnvMonSupplyChannelType  			INTEGER,
+                ubiEnvMonSupplyChannelState      		UbiEnvMonState
+        }
+
+	ubiEnvMonSupplyChannelType OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+        	dc_48v_a(1),
+        	dc_48v_b(2)
+    	}  
+    	MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Unique index for the DC power supply channel."
+        ::= { ubiEnvMonSupplyChannelEntry 1 }
+
+
+	ubiEnvMonSupplyChannelState OBJECT-TYPE
+        SYNTAX     UbiEnvMonState
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The current state of the DC power supply channel 
+                being instrumented.
+                Represents the power state of a device being monitored.
+                 Valid values are:
+
+                 normal(1):         the environment is good, such as low
+                                    temperature.         
+                                    
+                 notPresent(5):     the environmental monitor is not present,
+                                    such as temperature sensors do not exist.  
+                                     
+                 notFunctioning(6): the environmental monitor does not 
+                                    function properly.
+                "
+        ::= { ubiEnvMonSupplyChannelEntry 2 }
+
+
+
+
+-- *****************************************************************
+-- ubiEnvMonMIBNotificationEnables
+-- ****************************************************************   
+	ubiEnvMonEnableTempStatusChange OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+               "This variable  indicates  whether  the  system
+                produces the ubiEnvMonTempStatusChangeNotif.
+                A false value prevents temperature notifications 
+                from being sent by  this entity."
+        DEFVAL { false }
+        ::= { ubiEnvMonMIBNotificationEnables 1 }
+
+	ubiEnvMonEnableFanStatusChange OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+               "This variable  indicates  whether  the  system
+                produces the ubiEnvMonFanStatusChangeNotif.
+                A false value prevents fan notifications 
+                from being sent by  this entity."
+        DEFVAL { false }
+        ::= { ubiEnvMonMIBNotificationEnables 2 }
+
+	ubiEnvMonEnableSupplyStatusChange OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+               "This variable  indicates  whether  the  system
+                produces the ubiEnvMonSuppStatusChangeNotif. 
+                A false value prevents redundant supply notifications
+                from being generated by this system."
+        DEFVAL { false }
+        ::= { ubiEnvMonMIBNotificationEnables 3 }
+
+	ubiEnvMonEnableSupplyChannelStatusChange OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+               "This variable  indicates  whether  the  system
+                produces the ubiEnvMonSuppExtStatusChangeNotif. 
+                A false value prevents redundant supply notifications
+                from being generated by this system."
+        DEFVAL { false }
+        ::= { ubiEnvMonMIBNotificationEnables 4 }
+
+-- *****************************************************************
+-- ubiEnvMonMIBNotificationPrefix
+-- ****************************************************************   
+ 
+
+-- the following two OBJECT IDENTIFIERS are used to define SNMPv2 Notifications
+-- that are backward compatible with SNMPv1 Traps.   
+ubiEnvMonMIBNotifications OBJECT IDENTIFIER ::= { ubiEnvMonMIBNotificationPrefix 0 }
+
+ 
+	ubiEnvMonTempStatusChange NOTIFICATION-TYPE
+        OBJECTS {
+                ubiEnvMonTemperatureDescr,
+                ubiEnvMonTemperatureValue,
+                ubiEnvMonTemperatureState
+                }
+        STATUS  current
+        DESCRIPTION
+                "A ubiEnvMonTempStatusChangeNotif is sent if there 
+                 is change in the state of a device being monitored
+                 by ubiEnvMonTemperatureState."
+        ::= { ubiEnvMonMIBNotifications 1 }
+
+	ubiEnvMonFanStatusChange NOTIFICATION-TYPE
+        OBJECTS {
+                ubiEnvMonFanDescr,
+                ubiEnvMonFanState
+                }
+        STATUS  current
+        DESCRIPTION
+                "A ubiEnvMonFanStatusChangeNotif is sent if there 
+                 is change in the state of a device being monitored
+                 by ubiEnvMonFanState."
+        ::= { ubiEnvMonMIBNotifications 2 }
+
+	ubiEnvMonSupplyStatusChange NOTIFICATION-TYPE
+        OBJECTS {
+                ubiEnvMonSupplyDescr,
+                ubiEnvMonSupplyState
+                }
+        STATUS  current
+        DESCRIPTION
+                "A ubiEnvMonSupplyStatChangeNotif is sent if there 
+                 is change in the state of a device being monitored
+                 by ubiEnvMonSupplyState."
+        ::= { ubiEnvMonMIBNotifications 3 }
+ 
+	ubiEnvMonSupplyChannelStatusChange NOTIFICATION-TYPE
+        OBJECTS {
+                ubiEnvMonSupplyDescr,   
+                ubiEnvMonSupplyChannelType,
+                ubiEnvMonSupplyChannelState
+                }
+        STATUS  current
+        DESCRIPTION
+                "A ubiEnvMonSuppExtStatusChangeNotif is sent if there 
+                 is change in the state of a device being monitored
+                 by ubiEnvMonSupplyExtChannelStatus."
+        ::= { ubiEnvMonMIBNotifications 4 }
+ 
+ 
+-- *****************************************************************
+-- ubiEnvMonMIBConformance
+-- ****************************************************************  
+ 
+-- conformance information
+ubiEnvMonMIBCompliances OBJECT IDENTIFIER ::= { ubiEnvMonMIBConformance 1 }
+ubiEnvMonMIBGroups      OBJECT IDENTIFIER ::= { ubiEnvMonMIBConformance 2 }
+
+
+-- compliance statements
+
+	ubiEnvMonMIBCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+                "The compliance statement for entities which implement
+                the Ubiquoss Environmental Monitor MIB."
+        MODULE  -- this module
+                MANDATORY-GROUPS { 
+                		ubiEnvMonMIBGroup,
+                		ubiEnvMonMIBNotifGroup
+                }   
+        GROUP ubiEnvMonMIBGroup
+        DESCRIPTION
+          	"The ubiEnvMonMIBGroup is applicable for implementations which
+ 			need to get the system environment information."           
+
+        GROUP ubiEnvMonMIBNotifGroup
+        DESCRIPTION
+          	"The ubiEnvMonMIBNotifGroup must be
+ 			implemented for system environment that have notification."       
+        ::= { ubiEnvMonMIBCompliances 1 }
+
+-- units of conformance
+
+	ubiEnvMonMIBGroup OBJECT-GROUP
+        OBJECTS {
+                ubiEnvMonTemperatureDescr,
+                ubiEnvMonTemperatureValue,
+                ubiEnvMonTemperatureHighThreshold,    
+                ubiEnvMonTemperatureLowThreshold,
+                ubiEnvMonTemperatureLastShutdown,
+                ubiEnvMonTemperatureState,
+
+                ubiEnvMonFanDescr,
+                ubiEnvMonFanState,
+
+                ubiEnvMonSupplyDescr,
+                ubiEnvMonSupplyState,
+                ubiEnvMonSupplySource,    
+                
+                ubiEnvMonSupplyExtChannel,
+                ubiEnvMonSupplyExtChannelState,
+
+                ubiEnvMonEnableTempStatusChangeNotif,
+                ubiEnvMonEnableFanStatusChangeNotif,
+                ubiEnvMonEnableSuppStatusChangeNotif,
+                ubiEnvMonEnableSuppExtStatusChangeNotif
+
+        }
+        STATUS  current
+        DESCRIPTION
+                "A collection of objects providing environmental 
+                monitoring capability to a ubi chassis."
+        ::= { ubiEnvMonMIBGroups 1 }
+
+	ubiEnvMonMIBNotifGroup NOTIFICATION-GROUP
+        NOTIFICATIONS  {
+                 ubiEnvMonTempStatusChangeNotif,
+                 ubiEnvMonFanStatusChangeNotif,
+                 ubiEnvMonSuppStatusChangeNotif,
+                 ubiEnvMonSuppExtStatusChangeNotif
+        }
+        STATUS current
+        DESCRIPTION
+                "A notification group providing notification
+                 for environmental monitoring. "
+        ::= { ubiEnvMonMIBGroups 2 }    
+        
+END

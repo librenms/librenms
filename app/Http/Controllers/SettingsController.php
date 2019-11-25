@@ -5,22 +5,29 @@ namespace App\Http\Controllers;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use LibreNMS\Util\DynamicConfig;
+use LibreNMS\Util\DynamicConfigItem;
 
 class SettingsController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
+     * @param DynamicConfig $dynamicConfig
      * @param string $tab
      * @param string $section
      * @return \Illuminate\Http\Response
      */
-    public function index($tab = 'global', $section = '')
+    public function index(DynamicConfig $dynamicConfig, $tab = 'global', $section = '')
     {
         $data = [
             'active_tab' => $tab,
             'active_section' => $section,
+            'groups' => $dynamicConfig->getGroups()->reduce(function ($groups, $group) {
+                /** @var Collection $groups */
+                return $groups->put($group, []);
+            }, new Collection())->forget('global'),
         ];
 
         return view('settings.index', $data);

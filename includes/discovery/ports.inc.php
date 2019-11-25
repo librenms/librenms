@@ -39,6 +39,10 @@ foreach ($ports_mapped['maps']['ifIndex'] as $ifIndex => $port_id) {
     }
 }
 
+// Fill ifAlias for fibrechannel ports
+if ($device['os'] == 'fabos') {
+            require_once 'ports/brocade.inc.php';
+}
 
 // New interface detection
 foreach ($port_stats as $ifIndex => $snmp_data) {

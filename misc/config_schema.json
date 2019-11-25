@@ -8,30 +8,14 @@
         "config": {
             "type": "object",
             "propertyNames": {
-                "pattern": "^[a-z0-9_.\\-]+$"
+                "pattern": "^[a-zA-Z0-9_.\\-]+$"
             },
             "additionalProperties": {
                 "type": "object",
                 "properties": {
                     "default": {},
                     "type": {
-                        "type": "string",
-                        "enum": [
-                            "integer",
-                            "text",
-                            "boolean",
-                            "select",
-                            "array",
-                            "password",
-                            "email",
-                            "color",
-                            "float",
-                            "graph",
-                            "dashboard-select",
-                            "snmp3auth",
-                            "ldap-groups",
-                            "ad-groups"
-                        ]
+                        "type": "string"
                     },
                     "section": {
                         "type": "string"
@@ -51,7 +35,7 @@
                     },
                     "validate": {
                         "propertyNames": {
-                            "pattern": "^value$",
+                            "pattern": "^value",
                             "type": "string"
                         }
                     },
@@ -80,9 +64,44 @@
                     }
                 },
                 "required": ["type"],
-                "additionalProperties": false
+                "additionalProperties": false,
+                "anyOf": [
+                    {
+                        "properties": { "type": {"const": "select"} },
+                        "required": ["options"]
+                    },
+                    {
+                        "properties": {
+                            "type": {
+                                "type": "string",
+                                "enum": [
+                                    "integer",
+                                    "text",
+                                    "boolean",
+                                    "array",
+                                    "password",
+                                    "email",
+                                    "color",
+                                    "float",
+                                    "graph",
+                                    "dashboard-select",
+                                    "snmp3auth",
+                                    "ldap-groups",
+                                    "ad-groups"
+                                ]
+                            }
+                        },
+                        "not": { "required": ["options"]}
+                    }
+                ],
+                "dependencies": {
+                    "group": { "required": ["order", "section"] },
+                    "order": { "required": ["group", "section"] },
+                    "section": { "required": ["group", "order"] }
+                }
             }
         }
     },
-    "required": ["Warning!", "config"]
+    "required": ["Warning!", "config"],
+    "additionalProperties": false
 }

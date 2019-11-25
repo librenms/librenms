@@ -191,7 +191,8 @@ ALCATEL-IND1-BFD-MIB DEFINITIONS ::= BEGIN
                       bgp(3),
                       isis(4),
                       pim(5),
-                      dvmrp(6)
+                      dvmrp(6),
+                      ospf3(7)
                      }
          MAX-ACCESS    read-only
 		 STATUS        current
@@ -199,13 +200,14 @@ ALCATEL-IND1-BFD-MIB DEFINITIONS ::= BEGIN
          "Bit map object to reflect BFD applications currently registered to
          request BFD session state notifications. Bits 0 - 6 are currently in use, and
          if set, indicate that the respective application is registered with BFD:
-		     	bit 0 - VRRP
-		        bit 1 - STATIC ROUTING (i.e. IP Route Manager)
-		        bit 2 - OSPF
+		    bit 0 - VRRP
+		    bit 1 - STATIC ROUTING (i.e. IP Route Manager)
+		    bit 2 - OSPF
           	    bit 3 - BGP 
           	    bit 4 - ISIS
           	    bit 5 - PIM
-          	    bit 6 - DVMRP "
+          	    bit 6 - DVMRP
+                    bit 7 - OSPF3 "
          ::= { alaBfdGlobalObjects 7}
        	
 
@@ -561,10 +563,11 @@ ALCATEL-IND1-BFD-MIB DEFINITIONS ::= BEGIN
                        vrrp(0),
       	               staticRtg(1),
       	               ospf(2),
-		               bgp(3),
-		               isis(4),
-		               pim(5),
-		               dvmrp(6)
+                       bgp(3),
+                       isis(4),
+                       pim(5),
+                       dvmrp(6),
+                       ospf3(7)
       	             }
       	 MAX-ACCESS    read-only
       	 STATUS        current
@@ -573,13 +576,14 @@ ALCATEL-IND1-BFD-MIB DEFINITIONS ::= BEGIN
          this session's remote address. Bits 0 - 6 are currently in use, and if set,
          indicate that the respective application has requested BFD session state event
          notifications:
-		     	bit 0 - VRRP
-		        bit 1 - STATIC ROUTING (i.e. IP Route Manager)
-		        bit 2 - OSPF
-          	    bit 3 - BGP 
-          	    bit 4 - ISIS
-          	    bit 5 - PIM
-          	    bit 6 - DVMRP "
+                    bit 0 - VRRP
+                    bit 1 - STATIC ROUTING (i.e. IP Route Manager)
+                    bit 2 - OSPF
+                    bit 3 - BGP 
+                    bit 4 - ISIS
+                    bit 5 - PIM
+                    bit 6 - DVMRP
+                    bit 7 - OSPF3 "
          ::= { alaBfdSessEntry 16}
 
 

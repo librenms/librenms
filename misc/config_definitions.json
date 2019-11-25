@@ -145,7 +145,10 @@
         },
         "allow_duplicate_sysName": {
             "default": false,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "discovery",
+            "section": "general",
+            "order": 0
         },
         "allow_entity_sensor.amperes": {
             "default": true,
@@ -190,7 +193,7 @@
             "default": [],
             "group": "webui",
             "section": "graph",
-            "order": 5,
+            "order": 6,
             "type": "array"
         },
         "api.cors.allowheaders": {
@@ -285,6 +288,24 @@
             "order": 0,
             "type": "text"
         },
+        "auth_ad_binddn": {
+            "group": "auth",
+            "section": "ad",
+            "order": 9,
+            "type": "text"
+        },
+        "auth_ad_bindpassword": {
+            "group": "auth",
+            "section": "ad",
+            "order": 8,
+            "type": "password"
+        },
+        "auth_ad_binduser": {
+            "group": "auth",
+            "section": "ad",
+            "order": 10,
+            "type": "text"
+        },
         "auth_ldap_attr.uid": {
             "default": "uid",
             "group": "auth",
@@ -305,24 +326,6 @@
             "type": "password"
         },
         "auth_ldap_binduser": {
-            "group": "auth",
-            "section": "ldap",
-            "order": 10,
-            "type": "text"
-        },
-        "auth_ad_binddn": {
-            "group": "auth",
-            "section": "ldap",
-            "order": 9,
-            "type": "text"
-        },
-        "auth_ad_bindpassword": {
-            "group": "auth",
-            "section": "ldap",
-            "order": 8,
-            "type": "password"
-        },
-        "auth_ad_binduser": {
             "group": "auth",
             "section": "ldap",
             "order": 10,
@@ -452,6 +455,13 @@
             "order": 5,
             "type": "boolean"
         },
+        "auth_ldap_wildcard_ou": {
+            "default": false,
+            "group": "auth",
+            "section": "ldap",
+            "order": 5,
+            "type": "boolean"
+        },
         "auth_ldap_version": {
             "default": 3,
             "group": "auth",
@@ -485,7 +495,7 @@
             "units": "days",
             "group": "auth",
             "section": "general",
-            "order": 1,
+            "order": 3,
             "type": "integer"
         },
         "authlog_purge": {
@@ -589,6 +599,12 @@
                 "shdsl",
                 "mpls"
             ]
+        },
+        "base_url": {
+            "group": "system",
+            "section": "server",
+            "order": 5,
+            "type": "text"
         },
         "billing.base": {
             "default": 1000,
@@ -1000,11 +1016,7 @@
             "group": "alerting",
             "section": "email",
             "order": 10,
-            "type": "select",
-            "options": {
-                "true": "Yes",
-                "false": "No"
-            },
+            "type": "boolean",
             "when": {
                 "setting": "email_backend",
                 "operator": "equals",
@@ -1083,9 +1095,18 @@
             "order": 13,
             "type": "password",
             "when": {
-                "setting": "email_backend",
-                "operator": "equals",
-                "value": "smtp"
+                "and" : [
+                    {
+                        "setting": "email_backend",
+                        "operator": "equals",
+                        "value": "smtp"
+                    },
+                    {
+                        "setting": "email_smtp_auth",
+                        "operator": "equals",
+                        "value": true
+                    }
+                ]
             }
         },
         "email_smtp_port": {
@@ -1101,7 +1122,7 @@
             }
         },
         "email_smtp_secure": {
-            "default": false,
+            "default": "",
             "group": "alerting",
             "section": "email",
             "order": 9,
@@ -1136,9 +1157,18 @@
             "order": 12,
             "type": "text",
             "when": {
-                "setting": "email_backend",
-                "operator": "equals",
-                "value": "smtp"
+                "and": [
+                    {
+                        "setting": "email_backend",
+                        "operator": "equals",
+                        "value": "smtp"
+                    },
+                    {
+                        "setting": "email_smtp_auth",
+                        "operator": "equals",
+                        "value": true
+                    }
+                ]
             }
         },
         "email_user": {
@@ -2834,6 +2864,91 @@
             },
             "type": "array"
         },
+        "graylog.base_uri": {
+            "type": "text",
+            "group": "external",
+            "section": "graylog",
+            "order": 3,
+            "when": {
+                "setting": "graylog.version",
+                "operator": "equals",
+                "value": "other"
+            }
+        },
+        "graylog.device-page.loglevel": {
+            "default": 7,
+            "type": "select",
+            "group": "external",
+            "section": "graylog",
+            "order": 8,
+            "options": {
+                "0": "0",
+                "1": "1",
+                "2": "2",
+                "3": "3",
+                "4": "4",
+                "5": "5",
+                "6": "6",
+                "7": "7"
+            }
+        },
+        "graylog.device-page.rowCount": {
+            "default": 10,
+            "type": "integer",
+            "group": "external",
+            "section": "graylog",
+            "order": 9
+        },
+        "graylog.password": {
+            "type": "password",
+            "group": "external",
+            "section": "graylog",
+            "order": 5
+        },
+        "graylog.port": {
+            "type": "integer",
+            "group": "external",
+            "section": "graylog",
+            "order": 1,
+            "validate": {
+                "value": "int|nullable|between:1,65535"
+            }
+        },
+        "graylog.server": {
+            "type": "text",
+            "group": "external",
+            "section": "graylog",
+            "order": 0,
+            "validate": {
+                "value": "nullable|url"
+            }
+        },
+        "graylog.timezone": {
+            "type": "text",
+            "group": "external",
+            "section": "graylog",
+            "order": 6,
+            "validate": {
+                "value": "nullable|timezone"
+            }
+        },
+        "graylog.username": {
+            "type": "text",
+            "group": "external",
+            "section": "graylog",
+            "order": 4
+        },
+        "graylog.version": {
+            "type": "select",
+            "group": "external",
+            "section": "graylog",
+            "order": 2,
+            "options": {
+                "2.0": "Less than 2.1",
+                "2.1": "2.1 or newer",
+                "other": "Other"
+            }
+        },
         "gui.network-map.style": {
             "default": "new",
             "type": "select",
@@ -3035,6 +3150,10 @@
             "default": 2,
             "type": "integer"
         },
+        "leaflet.group_radius": {
+            "default": 10,
+            "type": "integer"
+        },
         "leaflet.tile_url": {
             "default": "{s}.tile.openstreetmap.org",
             "type": "text"
@@ -3084,7 +3203,7 @@
             "default": "Unauthorised access or use shall render the user liable to criminal and/or civil prosecution.",
             "group": "auth",
             "section": "general",
-            "order": 3,
+            "order": 4,
             "type": "text"
         },
         "map.engine": {
@@ -3112,6 +3231,17 @@
             "section": "binaries",
             "order": 4,
             "type": "text"
+        },
+        "mydomain": {
+            "type": "text",
+            "group": "discovery",
+            "section": "general",
+            "order": 3,
+            "validate": {
+                "value": [
+                    "regex:/^((?!-)(xn--|_)?[a-z0-9-]{0,61}[a-z0-9]\\.)*(xn--)?([a-z0-9][a-z0-9\\-]{0,60}|[a-z0-9-]{1,30}\\.[a-z]{2,})$/"
+                ]
+            }
         },
         "nagios_plugins": {
             "default": "/usr/lib/nagios/plugins",
@@ -3398,13 +3528,12 @@
             "type": "boolean"
         },
         "oxidized.url": {
-            "default": false,
             "group": "external",
             "section": "oxidized",
             "order": 1,
             "type": "text",
             "validate": {
-                "value": "regex:/^[a-zA-Z0-9]{1,5}://.*$/"
+                "value": "url"
             }
         },
         "page_refresh": {
@@ -3418,6 +3547,13 @@
         },
         "page_title_suffix": {
             "type": "text"
+        },
+        "password.min_length": {
+            "default": 8,
+            "type": "integer",
+            "group": "auth",
+            "section": "general",
+            "order": 5
         },
         "peering_descr": {
             "default": [
@@ -3468,7 +3604,6 @@
         "poller_modules.ipmi": {
             "default": true,
             "type": "boolean"
-
         },
         "poller_modules.sensors": {
             "default": true,
@@ -3702,6 +3837,13 @@
                 "fdb": "FDB"
             }
         },
+        "ports_purge": {
+            "group": "system",
+            "section": "cleanup",
+            "order": 9,
+            "default": false,
+            "type": "boolean"
+        },
         "project_home": {
             "default": "http://www.librenms.org/",
             "type": "text"
@@ -3726,7 +3868,7 @@
             "default": false,
             "group": "auth",
             "section": "general",
-            "order": 4,
+            "order": 6,
             "type": "boolean"
         },
         "rancid_ignorecomments": {
@@ -3741,9 +3883,28 @@
                 "git": "Git"
             }
         },
-        "rewrite_if_regexp./^cpu interface/": {
-            "default": "Mgmt",
-            "type": "text"
+        "rewrite_if": {
+            "type": "array"
+        },
+        "rewrite_if_regexp": {
+            "default": {
+                "/^cpu interface/": "Mgmt"
+            },
+            "type": "array"
+        },
+        "routes_max_number": {
+            "default": 1000,
+            "group": "discovery",
+            "section": "route",
+            "order": 3,
+            "type": "integer"
+        },
+        "route_purge": {
+            "default": 10,
+            "group": "system",
+            "section": "cleanup",
+            "order": 2,
+            "type": "integer"
         },
         "rrd.heartbeat": {
             "default": 600,
@@ -3764,6 +3925,13 @@
             "section": "rrdtool",
             "order": 6,
             "type": "text"
+        },
+        "rrd_purge": {
+            "group": "system",
+            "section": "cleanup",
+            "order": 8,
+            "default": 0,
+            "type": "integer"
         },
         "rrd_rra": {
             "default": " RRA:AVERAGE:0.5:1:2016 RRA:AVERAGE:0.5:6:1440 RRA:AVERAGE:0.5:24:1440 RRA:AVERAGE:0.5:288:1440  RRA:MIN:0.5:1:720 RRA:MIN:0.5:6:1440     RRA:MIN:0.5:24:775     RRA:MIN:0.5:288:797  RRA:MAX:0.5:1:720 RRA:MAX:0.5:6:1440     RRA:MAX:0.5:24:775     RRA:MAX:0.5:288:797  RRA:LAST:0.5:1:1440 ",
@@ -3804,9 +3972,6 @@
             "order": 1,
             "type": "boolean"
         },
-        "secure_cookies": {
-            "type": "boolean"
-        },
         "sensors.guess_limits": {
             "default": true,
             "type": "boolean"
@@ -3817,6 +3982,13 @@
             "section": "binaries",
             "order": 7,
             "type": "text"
+        },
+        "shorthost_target_length": {
+            "group": "webui",
+            "section": "graph",
+            "order": 5,
+            "default": 12,
+            "type": "integer"
         },
         "show_locations": {
             "default": true,
@@ -4090,7 +4262,12 @@
             "type": "integer"
         },
         "temp_dir": {
-            "default": "/tmp",
+            "type": "text"
+        },
+        "title_image": {
+            "group": "webui",
+            "section": "style",
+            "order": 3,
             "type": "text"
         },
         "top_devices": {
@@ -4118,6 +4295,12 @@
         "transit_descr": {
             "default": ["transit"],
             "type": "array"
+        },
+        "twofactor": {
+            "type": "boolean",
+            "group": "auth",
+            "section": "general",
+            "order": 1
         },
         "unix-agent-connection-time-out": {
             "default": 10,
@@ -4152,12 +4335,14 @@
             "default": 1,
             "group": "system",
             "section": "updates",
+            "order": 0,
             "type": "boolean"
         },
         "update_channel": {
             "default": "master",
             "group": "system",
             "section": "updates",
+            "order": 1,
             "type": "select",
             "options": {
                 "master": "master",

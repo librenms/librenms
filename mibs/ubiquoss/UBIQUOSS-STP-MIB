@@ -1,0 +1,1000 @@
+-- *****************************************************************
+-- UBIQUOSS-STP-MIB.mib:  
+-- Ubiquoss Enterprise Filter Structure of Management Information
+--
+-- July 2006, Jisoo Kim
+--
+-- Copyright (c) 2006 by Ubiquoss, Corp.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+--
+
+UBIQUOSS-STP-MIB	DEFINITIONS ::= BEGIN
+	IMPORTS
+		ubiSysIndex
+        FROM UBIQUOSS-SYSINFO-MIB
+
+		DisplayString 
+		FROM RFC1213-MIB
+
+        BridgeId, Timeout			
+		FROM BRIDGE-MIB	  
+		
+		RowStatus
+		FROM SNMPv2-TC
+                    
+        ubiPortIndex
+        FROM UBIQUOSS-INTERFACE-MIB   
+        
+        ubiVlanId         
+        FROM UBIQUOSS-SWITCH-INTERFACE-MIB            
+                
+		ubiMgmt
+		FROM UBQS-SMI;     
+
+ubiStpMIB  MODULE-IDENTITY
+	LAST-UPDATED "0607130000Z"
+    ORGANIZATION "Ubiquoss Corp."
+    CONTACT-INFO
+        "Chair    :  Hyungeun Park
+                     Ubiquoss Corp.
+         Postal:     24F Milennium B/D,
+		 	         467-12, Dogok-Dong,
+					 GangNam-Gu, Seoul 135-270
+					 Korea
+         EMail:      jisoo@ubiquoss.com
+         Phone:      +82-2-2190-3100
+
+         Postal:     24F Milennium B/D,
+		 	         467-12, Dogok-Dong,
+					 GangNam-Gu, Seoul 135-270
+					 Korea
+         EMail:      paul@ubiquoss.com
+         Phone:      +82-2-2190-3166"
+    DESCRIPTION
+        "This MIB module defines STP information" 
+   	::= { ubiMgmt  21 }
+   				
+	ubiStpMIBObjects	OBJECT IDENTIFIER ::= { ubiStpMIB  1 }
+
+-- ***********************************************************
+-- uniStpTable
+-- ***********************************************************	       
+        
+		ubiStpTable OBJECT IDENTIFIER ::= { ubiStpMIBObjects 1 }      
+		
+		stpInfoTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF StpInfoEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiStpTable 1 }        
+			
+		stpInfoEntry OBJECT-TYPE
+			SYNTAX StpInfoEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { ubiSysIndex  }
+			::= { stpInfoTable 1 }
+		
+		StpInfoEntry ::=
+			SEQUENCE { 
+				stpModeConfig	INTEGER
+			 }
+
+		stpModeConfig OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				disabled(0),
+				stp(1),
+				rstp(2),
+				mstp(3),
+				pvstp(4)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { stpInfoEntry 1 }
+
+-- ***********************************************************
+-- stpExtPortConfigTable
+-- ***********************************************************	 		
+		stpExtPortConfigTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF StpExtPortConfigEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiStpTable 2 }
+		
+		stpExtPortConfigEntry OBJECT-TYPE
+			SYNTAX StpExtPortConfigEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX {  ubiSysIndex, ubiPortIndex  }
+			::= { stpExtPortConfigTable 1 }
+		
+		StpExtPortConfigEntry ::=
+			SEQUENCE { 
+				stpPortForceVersion
+					INTEGER
+			 }
+
+		stpPortForceVersion OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				stp(0),
+				rstp(2),
+				mstp(3)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { stpExtPortConfigEntry 1 }    
+			
+-- ***********************************************************
+-- mstp
+-- ***********************************************************			
+		mstp OBJECT IDENTIFIER ::= { ubiStpTable 3 }
+		
+		mstpInfoTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF MstpInfoEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { mstp 1 }
+		
+		mstpInfoEntry OBJECT-TYPE
+			SYNTAX MstpInfoEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX {  ubiSysIndex  }
+			::= { mstpInfoTable 1 }
+		
+		MstpInfoEntry ::=
+			SEQUENCE { 
+				mstRegionName	    DisplayString,
+				mstRevisionLevel    INTEGER,
+				mstDigest           OCTET STRING,
+				mstBridgeMaxHops	Integer32	
+		   }
+		
+		mstRegionName OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (1..32))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { mstpInfoEntry 1 }
+		
+		mstRevisionLevel OBJECT-TYPE
+			SYNTAX INTEGER (0..255)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { mstpInfoEntry 2 }
+		
+		mstDigest OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..16))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { mstpInfoEntry 3 }    
+			
+		mstBridgeMaxHops OBJECT-TYPE
+			SYNTAX Integer32 (1..40)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { mstpInfoEntry 4 }
+    
+			
+-- ***********************************************************
+-- mstConfigTable
+-- ***********************************************************			
+		mstConfigTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF MstConfigEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { mstp 2 }
+		
+		mstConfigEntry OBJECT-TYPE
+			SYNTAX MstConfigEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX {  ubiSysIndex, mstConfigInstanceId, mstConfigVlanIndex }
+			::= { mstConfigTable 1 }
+		
+		MstConfigEntry ::=
+			SEQUENCE { 
+				mstConfigInstanceId
+					INTEGER,
+				mstConfigVlanIndex
+					INTEGER,
+				mstConfigRowStatus
+					RowStatus
+			 }
+
+		mstConfigInstanceId OBJECT-TYPE
+			SYNTAX INTEGER (1..15)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { mstConfigEntry 1 }
+		
+		mstConfigVlanIndex OBJECT-TYPE
+			SYNTAX INTEGER (1..4094)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { mstConfigEntry 2 }
+		
+	
+		mstConfigRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { mstConfigEntry 3 }        
+			
+-- ***********************************************************
+-- mstiTable
+-- ***********************************************************			
+		mstiTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF MstiEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { mstp 3 }
+		
+		mstiEntry OBJECT-TYPE
+			SYNTAX MstiEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX {  ubiSysIndex, mstConfigInstanceId }
+			::= { mstiTable 1 }
+		
+		MstiEntry ::=
+			SEQUENCE { 
+				mstiPriority
+					INTEGER,
+				mstiRootCost
+					Integer32,
+				mstiRootPort
+					Integer32,
+				mstiRoot
+					BridgeId,
+				mstiBridge
+					BridgeId
+			 }
+
+		mstiPriority OBJECT-TYPE
+			SYNTAX INTEGER (0..61440)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"A value which multiple of 4096 is only valid. "
+			::= { mstiEntry 1 }
+
+		mstiRootCost OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { mstiEntry 2 }
+		
+		mstiRootPort OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { mstiEntry 3 }
+		
+		mstiRoot OBJECT-TYPE
+			SYNTAX BridgeId
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { mstiEntry 4 }
+		
+		mstiBridge OBJECT-TYPE
+			SYNTAX BridgeId
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { mstiEntry 5 }       
+			
+-- ***********************************************************
+-- mstiPortTable
+-- ***********************************************************		
+		mstiPortTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF MstiPortEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { mstp 4 }
+		
+		mstiPortEntry OBJECT-TYPE
+			SYNTAX MstiPortEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { ubiSysIndex, mstConfigInstanceId, ubiPortIndex }
+			::= { mstiPortTable 1 }
+		
+		MstiPortEntry ::=
+			SEQUENCE { 
+				mstiPortId
+					OCTET STRING,
+				mstiPortPathCost
+					Integer32,
+				mstiPortPriority
+					INTEGER,
+				mstiPortRole
+					INTEGER,
+				mstiPortState
+					INTEGER,
+				mstiPortDesignatedPathCost
+					Integer32,
+				mstiPortDesignatedPort
+					OCTET STRING,
+				mstiPortDesignatedRoot
+					BridgeId,
+				mstiPortDesignatedBridge
+					BridgeId,
+				mstiPortConfigRowStatus
+					RowStatus
+			 }
+
+		mstiPortId OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (2))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { mstiPortEntry 1 }
+		
+		mstiPortPathCost OBJECT-TYPE
+			SYNTAX Integer32 (1..200000000)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { mstiPortEntry 2 }
+		
+		mstiPortPriority OBJECT-TYPE
+			SYNTAX INTEGER (0..240)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"A value which multiple of 16 is valid."
+			::= { mstiPortEntry 3 }
+		
+		mstiPortRole OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				masterport(1),
+				alternate(2),
+				rootport(3),
+				designated(4),
+				disabled(5),
+				backup(6)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { mstiPortEntry 4 }
+		
+		mstiPortState OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				disabled(1),
+				blocking(2),
+				listening(3),
+				learning(4),
+				forwarding(5),
+				broken(6)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { mstiPortEntry 5 }
+
+		mstiPortDesignatedPathCost OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { mstiPortEntry 6 }
+		
+		mstiPortDesignatedPort OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..2))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { mstiPortEntry 7 }
+		
+		mstiPortDesignatedRoot OBJECT-TYPE
+			SYNTAX BridgeId
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { mstiPortEntry 8 }
+		
+		mstiPortDesignatedBridge OBJECT-TYPE
+			SYNTAX BridgeId
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { mstiPortEntry 9 }
+		
+		mstiPortConfigRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { mstiPortEntry 10 }
+		
+-- ***********************************************************
+-- pvstp
+-- ***********************************************************
+		pvstp OBJECT IDENTIFIER ::= { ubiStpTable 4 }
+
+		pvStpTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF PvStpEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { pvstp 1 }
+		
+		pvStpEntry OBJECT-TYPE
+			SYNTAX PvStpEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX {  ubiSysIndex, ubiVlanId }
+			::= { pvStpTable 1 }
+		
+		PvStpEntry ::=
+			SEQUENCE { 
+				pvStpPriority
+					INTEGER,
+				pvStpTimeSinceTopologyChange
+					TimeTicks,
+				pvStpTopChanges
+					Counter32,
+				pvStpDesignatedRoot
+					BridgeId,
+				pvStpRootCost
+					Integer32,
+				pvStpRootPort
+					Integer32,
+				pvStpMaxAge
+					Timeout,
+				pvStpHelloTime
+					Timeout,
+				pvStpHoldTime
+					Integer32,
+				pvStpForwardDelay
+					Timeout,
+				pvStpBridgeMaxAge
+					Timeout,
+				pvStpBridgeHelloTime
+					Timeout,
+				pvStpBridgeForwardDelay
+					Timeout,
+				pvStpBridgeRowStatus
+					RowStatus
+			 }
+		
+		pvStpPriority OBJECT-TYPE
+			SYNTAX INTEGER (0..61440)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"A value which multiple of 4096 is only valid."
+			::= { pvStpEntry 1 }
+		
+		pvStpTimeSinceTopologyChange OBJECT-TYPE
+			SYNTAX TimeTicks
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { pvStpEntry 2 }
+		
+		pvStpTopChanges OBJECT-TYPE
+			SYNTAX Counter32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { pvStpEntry 3 }
+		
+		pvStpDesignatedRoot OBJECT-TYPE
+			SYNTAX BridgeId
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { pvStpEntry 4 }
+		
+		pvStpRootCost OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { pvStpEntry 5 }
+		
+		pvStpRootPort OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { pvStpEntry 6 }
+		
+		pvStpMaxAge OBJECT-TYPE
+			SYNTAX Timeout
+			UNITS "centi-seconds"
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { pvStpEntry 7 }
+		
+		pvStpHelloTime OBJECT-TYPE
+			SYNTAX Timeout
+			UNITS "centi-seconds"
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { pvStpEntry 8 }
+		
+		pvStpHoldTime OBJECT-TYPE
+			SYNTAX Integer32
+			UNITS "centi-seconds"
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { pvStpEntry 9 }
+		
+
+		pvStpForwardDelay OBJECT-TYPE
+			SYNTAX Timeout
+			UNITS "centi-seconds"
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { pvStpEntry 10 }
+		
+		pvStpBridgeMaxAge OBJECT-TYPE
+			SYNTAX Timeout (600..4000)
+			UNITS "centi-seconds"
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { pvStpEntry 11 }
+		
+		pvStpBridgeHelloTime OBJECT-TYPE
+			SYNTAX Timeout (100..1000)
+			UNITS "centi-seconds"
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { pvStpEntry 12 }
+		
+		pvStpBridgeForwardDelay OBJECT-TYPE
+			SYNTAX Timeout (400..3000)
+			UNITS "centi-seconds"
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { pvStpEntry 13 }
+
+		pvStpBridgeRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { pvStpEntry 14 }
+
+
+-- ***********************************************************
+-- pvStpPortTable 
+-- ***********************************************************
+		
+		pvStpPortTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF PvStpPortEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { pvstp 2 }
+		
+		pvStpPortEntry OBJECT-TYPE
+			SYNTAX PvStpPortEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX {  ubiSysIndex, pvStpVlanId, ubiPortIndex, 
+					  pvStpPortPriority, pvStpPortPathCost }
+			::= { pvStpPortTable 1 }
+		
+		PvStpPortEntry ::=
+			SEQUENCE {    
+				pvStpVlanId
+					Integer32,
+				pvStpPortPriority
+					INTEGER,
+				pvStpPortState
+					INTEGER,
+				pvStpPortEnable
+					INTEGER,
+				pvStpPortPathCost
+					Integer32,
+				pvStpPortDesignatedRoot
+					BridgeId,
+				pvStpPortDesignatedCost
+					Integer32,
+				pvStpPortDesignatedBridge
+					BridgeId,
+				pvStpPortDesignatedPort
+					OCTET STRING,
+				pvStpPortForwardTransitions
+					Counter32,
+				pvStpPortRowStatus
+					INTEGER
+			 }    
+
+
+		pvStpVlanId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { pvStpPortEntry 1 }
+
+
+		pvStpPortPriority OBJECT-TYPE
+			SYNTAX INTEGER (0..240)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"A value which multiple of 16 is valid."
+			::= { pvStpPortEntry 2 }
+		
+		pvStpPortState OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				disabled(1),
+				blocking(2),
+				listening(3),
+				learning(4),
+				forwarding(5),
+				broken(6)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { pvStpPortEntry 3 }
+		
+		pvStpPortEnable OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				enabled(1),
+				disabled(2)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { pvStpPortEntry 4 }
+		
+		pvStpPortPathCost OBJECT-TYPE
+			SYNTAX Integer32 (1..200000000)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { pvStpPortEntry 5 }
+		
+		pvStpPortDesignatedRoot OBJECT-TYPE
+			SYNTAX BridgeId
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { pvStpPortEntry 6 }
+		
+		pvStpPortDesignatedCost OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { pvStpPortEntry 7 }
+		
+		pvStpPortDesignatedBridge OBJECT-TYPE
+			SYNTAX BridgeId
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { pvStpPortEntry 8 }
+
+		pvStpPortDesignatedPort OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (2))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { pvStpPortEntry 9 }
+		
+		pvStpPortForwardTransitions OBJECT-TYPE
+			SYNTAX Counter32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { pvStpPortEntry 10 }       
+
+
+		pvStpPortRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { pvStpPortEntry 11 }
+
+		
+-- ***********************************************************
+-- pvStpConfigTable 
+-- ***********************************************************
+
+		pvStpConfigTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF PvStpConfigEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { pvstp 3 }
+		
+		pvStpConfigEntry OBJECT-TYPE
+			SYNTAX PvStpConfigEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX {  ubiSysIndex, pvStpConfigVlanIndex }
+			::= { pvStpConfigTable 1 }
+		
+		PvStpConfigEntry ::=
+			SEQUENCE { 
+				pvStpConfigVlanIndex
+					INTEGER,
+				pvStpConfigInstanceId
+					INTEGER,
+				pvStpConfigRowStatus
+					RowStatus
+			 }
+
+		pvStpConfigVlanIndex OBJECT-TYPE
+			SYNTAX INTEGER (2..4093)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { pvStpConfigEntry 1 }
+		
+		pvStpConfigInstanceId OBJECT-TYPE
+			SYNTAX INTEGER (2..200)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { pvStpConfigEntry 2 }
+		
+		pvStpConfigRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { pvStpConfigEntry 3 }   
+			                             
+-- ***********************************************************
+-- ubiSldPortTable (Self-Loop-Detection)
+-- ***********************************************************
+	ubiSldTable OBJECT IDENTIFIER ::= { ubiStpMIBObjects 2 }   
+
+	ubiSldPortTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF UbiSldPortEntry
+		ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"Self-loop-detection Table"
+		::= { ubiSldTable 1 }
+              
+	ubiSldPortEntry OBJECT-TYPE
+		SYNTAX  UbiSldPortEntry
+		ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"Self-loop-detection Table"
+		INDEX   { ubiSysIndex, ubiPortIndex }
+		::= { ubiSldPortTable 1 }
+
+	UbiSldPortEntry  ::=
+		SEQUENCE {         
+			ubiSldPortEnable
+				INTEGER
+		}
+		
+		
+	ubiSldPortEnable OBJECT-TYPE
+	SYNTAX INTEGER  
+	{
+		disable (0),
+		enable (1)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Enable or Disable self-loop-detection for interface index"
+	::= { ubiSldPortEntry 1 }  
+                 
+-- ***********************************************************
+-- ubiSldPortTable (Self-Loop-Detection)
+-- ***********************************************************
+	ubiSldVlanTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF UbiSldVlanEntry
+		ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"Self-loop-detection Table"
+		::= { ubiSldTable 2 }
+              
+	ubiSldVlanEntry OBJECT-TYPE
+		SYNTAX  UbiSldVlanEntry
+		ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"Self-loop-detection Table"
+		INDEX   { ubiSysIndex, ubiVlanId }
+		::= { ubiSldVlanTable 1 }
+
+	UbiSldVlanEntry  ::=
+		SEQUENCE {         
+			ubiSldVlanEnable
+				INTEGER
+		}
+
+	ubiSldVlanEnable OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			disable (0),
+			enable (1)
+		}
+	
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Enable or Disable self-loop-detection for vlan"
+		::= { ubiSldVlanEntry 1 }              
+					                        
+			                             
+-- ***********************************************************
+-- 
+-- ***********************************************************	
+-- the following two OBJECT IDENTIFIERS are used to define SNMPv2 Notifications
+-- that are backward compatible with SNMPv1 Traps.
+ubiStpMIBNotificationPrefix OBJECT IDENTIFIER ::= { ubiStpMIBObjects 3 }
+ubiStpMIBNotifications OBJECT IDENTIFIER ::= { ubiStpMIBNotificationPrefix 0 }
+                         
+-- conformance information
+
+ubiStpMIBConformance OBJECT IDENTIFIER ::= { ubiStpMIBObjects 4 }
+ubiStpMIBCompliances OBJECT IDENTIFIER ::= { ubiStpMIBConformance 1 }
+ubiStpMIBGroups      OBJECT IDENTIFIER ::= { ubiStpMIBConformance 2 }
+ubiSldMIBGroups      OBJECT IDENTIFIER ::= { ubiStpMIBConformance 3 }
+
+
+-- compliance statements
+ubiStpMIBCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+                "The compliance statement for entities which implement
+                the ubiquoss port MIB."
+        MODULE  -- this module
+                MANDATORY-GROUPS { 
+                	ubiStpMIBGroup,
+                	ubiSldMIBGroup	
+                                  }
+
+        GROUP   ubiStpMIBGroup
+        DESCRIPTION
+                "This group is applicable for implementations which
+                 need information for stp protocol."   
+        GROUP   ubiSldMIBGroup
+        DESCRIPTION
+                "This group is applicable for implementations which
+                 need information for self-loop-detection"         
+                                 
+        ::= { ubiStpMIBCompliances 1 }
+
+-- ports of conformance
+ubiStpMIBGroup OBJECT-GROUP
+        OBJECTS {
+        	stpModeConfig,
+        	stpPortForceVersion
+        }
+        STATUS  current
+        DESCRIPTION
+                ""
+        ::= { ubiStpMIBGroups 1 }
+-- ports of conformance
+ubiSldMIBGroup OBJECT-GROUP
+        OBJECTS {
+        	stpModeConfig,
+        	stpPortForceVersion
+        }
+        STATUS  current
+        DESCRIPTION
+                ""
+        ::= { ubiSldMIBGroups 1 }
+        
+ 
+
+END

@@ -1323,6 +1323,14 @@ function convert_delay($delay)
     return($delay_sec);
 }
 
+function normalize_snmp_ip_address($data)
+{
+    // $data is received from snmpwalk, can be ipv4 xxx.xxx.xxx.xxx or ipv6 xx:xx:...:xx (16 chunks)
+    // ipv4 is returned unchanged, ipv6 is returned with one ':' removed out of two, like
+    //  xxxx:xxxx:...:xxxx (8 chuncks)
+    return (preg_replace('/([0-9a-fA-F]{2}):([0-9a-fA-F]{2})/', '\1\2', explode('%', $data, 2)[0]));
+}
+
 function guidv4($data)
 {
     // http://stackoverflow.com/questions/2040240/php-function-to-generate-v4-uuid#15875555
@@ -2470,8 +2478,8 @@ function get_db_schema()
 function get_device_oid_limit($device)
 {
     // device takes priority
-    if ($device['snmp_max_oid'] > 0) {
-        return $device['snmp_max_oid'];
+    if ($device['attribs']['snmp_max_oid'] > 0) {
+        return $device['attribs']['snmp_max_oid'];
     }
 
     // then os
@@ -2524,6 +2532,36 @@ function lock_and_purge($table, $sql)
         echo $e->getMessage() . PHP_EOL;
         return -1;
     }
+}
+
+/**
+ * If Distributed, create a lock, then purge the mysql table according to the sql query
+ *
+ * @param string $table
+ * @param string $sql
+ * @param string $msg
+ * @return int exit code
+ */
+function lock_and_purge_query($table, $sql, $msg)
+{
+    $purge_name = $table . '_purge';
+
+    if (Config::get('distributed_poller')) {
+        MemcacheLock::lock($purge_name, 0, 86000);
+    }
+    $purge_duration = Config::get($purge_name);
+    if (!(is_numeric($purge_duration) && $purge_duration > 0)) {
+        return -2;
+    }
+    try {
+        if (dbQuery($sql, array($purge_duration))) {
+            printf($msg, $purge_duration);
+        }
+    } catch (LockException $e) {
+        echo $e->getMessage() . PHP_EOL;
+        return -1;
+    }
+    return 0;
 }
 
 /**

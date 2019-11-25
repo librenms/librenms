@@ -1552,18 +1552,25 @@ pseudowires:
     PRIMARY: { Name: PRIMARY, Columns: [pseudowire_id], Unique: true, Type: BTREE }
 route:
   Columns:
+    - { Field: route_id, Type: 'int(10) unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: created_at, Type: timestamp, 'Null': true, Extra: '' }
+    - { Field: updated_at, Type: timestamp, 'Null': true, Extra: '' }
     - { Field: device_id, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
-    - { Field: context_name, Type: varchar(128), 'Null': false, Extra: '' }
-    - { Field: ipRouteDest, Type: varchar(39), 'Null': false, Extra: '' }
-    - { Field: ipRouteIfIndex, Type: varchar(256), 'Null': true, Extra: '' }
-    - { Field: ipRouteMetric, Type: varchar(256), 'Null': false, Extra: '' }
-    - { Field: ipRouteNextHop, Type: varchar(39), 'Null': false, Extra: '' }
-    - { Field: ipRouteType, Type: varchar(256), 'Null': false, Extra: '' }
-    - { Field: ipRouteProto, Type: varchar(256), 'Null': false, Extra: '' }
-    - { Field: discoveredAt, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
-    - { Field: ipRouteMask, Type: varchar(256), 'Null': false, Extra: '' }
+    - { Field: port_id, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: context_name, Type: varchar(255), 'Null': true, Extra: '' }
+    - { Field: inetCidrRouteIfIndex, Type: bigint(20), 'Null': false, Extra: '' }
+    - { Field: inetCidrRouteType, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: inetCidrRouteProto, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: inetCidrRouteNextHopAS, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: inetCidrRouteMetric1, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: inetCidrRouteDestType, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: inetCidrRouteDest, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: inetCidrRouteNextHopType, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: inetCidrRouteNextHop, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: inetCidrRoutePolicy, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: inetCidrRoutePfxLen, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
   Indexes:
-    device: { Name: device, Columns: [device_id, context_name, ipRouteDest, ipRouteNextHop], Unique: false, Type: BTREE }
+    PRIMARY: { Name: PRIMARY, Columns: [route_id], Unique: true, Type: BTREE }
 sensors:
   Columns:
     - { Field: sensor_id, Type: 'int(10) unsigned', 'Null': false, Extra: auto_increment }
@@ -1788,6 +1795,7 @@ users:
     - { Field: created_at, Type: timestamp, 'Null': false, Extra: '', Default: '1970-01-02 00:00:01' }
     - { Field: updated_at, Type: timestamp, 'Null': false, Extra: '', Default: CURRENT_TIMESTAMP }
     - { Field: remember_token, Type: varchar(100), 'Null': true, Extra: '' }
+    - { Field: enabled, Type: tinyint(1), 'Null': false, Extra: '', Default: '1' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [user_id], Unique: true, Type: BTREE }
     username: { Name: username, Columns: [auth_type, username], Unique: true, Type: BTREE }

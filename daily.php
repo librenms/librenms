@@ -70,21 +70,24 @@ if ($options['f'] === 'syslog') {
 
         if (is_numeric($syslog_purge)) {
             $rows = (int)dbFetchCell('SELECT MIN(seq) FROM syslog');
+            $initial_rows = $rows;
             while (true) {
-                $limit = dbFetchRow('SELECT seq FROM syslog WHERE seq >= ? ORDER BY seq LIMIT 1000,1', array($rows));
+                $limit = dbFetchCell('SELECT seq FROM syslog WHERE seq >= ? ORDER BY seq LIMIT 1000,1', array($rows));
                 if (empty($limit)) {
                     break;
                 }
 
+                # Deletes are done in blocks of 1000 to avoid a single very large operation.
                 if (dbDelete('syslog', 'seq >= ? AND seq < ? AND timestamp < DATE_SUB(NOW(), INTERVAL ? DAY)', array($rows, $limit, $syslog_purge)) > 0) {
                     $rows = $limit;
-                    echo "Syslog cleared for entries over $syslog_purge days 1000 limit\n";
                 } else {
                     break;
                 }
             }
 
             dbDelete('syslog', 'seq >= ? AND timestamp < DATE_SUB(NOW(), INTERVAL ? DAY)', array($rows, $syslog_purge));
+            $final_rows = $rows - $initial_rows;
+            echo "Syslog cleared for entries over $syslog_purge days (about $final_rows rows)\n";
         }
     } catch (LockException $e) {
         echo $e->getMessage() . PHP_EOL;
@@ -96,7 +99,10 @@ if ($options['f'] === 'ports_fdb') {
     $ret = lock_and_purge('ports_fdb', 'updated_at < DATE_SUB(NOW(), INTERVAL ? DAY)');
     exit($ret);
 }
-
+if ($options['f'] === 'route') {
+    $ret = lock_and_purge('route', 'updated_at < DATE_SUB(NOW(), INTERVAL ? DAY)');
+    exit($ret);
+}
 if ($options['f'] === 'eventlog') {
     $ret = lock_and_purge('eventlog', 'datetime < DATE_SUB(NOW(), INTERVAL ? DAY)');
     exit($ret);
@@ -204,38 +210,64 @@ if ($options['f'] === 'notifications') {
 }
 
 if ($options['f'] === 'bill_data') {
-    try {
-        if (Config::get('distributed_poller')) {
-            MemcacheLock::lock('syslog_purge', 0, 86000);
-        }
-        $billing_data_purge = Config::get('billing_data_purge');
-        if (is_numeric($billing_data_purge) && $billing_data_purge > 0) {
-            # Deletes data older than XX months before the start of the last complete billing period
-            echo "Deleting billing data more than $billing_data_purge month before the last completed billing cycle\n";
-            $sql = "DELETE bill_data
-                    FROM bill_data
-                        INNER JOIN (SELECT bill_id, 
-                            SUBDATE(
-                                SUBDATE(
-                                    ADDDATE(
-                                        subdate(curdate(), (day(curdate())-1)),             # Start of this month
-                                        bill_day - 1),                                      # Billing anniversary
-                                    INTERVAL IF(bill_day > DAY(curdate()), 1, 0) MONTH),    # Deal with anniversary not yet happened this month
-                                INTERVAL ? MONTH) AS threshold                              # Adjust based on config threshold
-                    FROM bills) q
-                    ON bill_data.bill_id = q.bill_id AND bill_data.timestamp < q.threshold;";
-            dbQuery($sql, array($billing_data_purge));
-        }
-    } catch (LockException $e) {
-        echo $e->getMessage() . PHP_EOL;
-        exit(-1);
-    }
+    # Deletes data older than XX months before the start of the last complete billing period
+    $msg = "Deleting billing data more than %d month before the last completed billing cycle\n";
+    $table = 'bill_data';
+    $sql = "DELETE bill_data
+            FROM bill_data
+                INNER JOIN (SELECT bill_id, 
+                    SUBDATE(
+                        SUBDATE(
+                            ADDDATE(
+                                subdate(curdate(), (day(curdate())-1)),             # Start of this month
+                                bill_day - 1),                                      # Billing anniversary
+                            INTERVAL IF(bill_day > DAY(curdate()), 1, 0) MONTH),    # Deal with anniversary not yet happened this month
+                        INTERVAL ? MONTH) AS threshold                              # Adjust based on config threshold
+            FROM bills) q
+            ON bill_data.bill_id = q.bill_id AND bill_data.timestamp < q.threshold;";
+    lock_and_purge_query($table, $sql, $msg);
 }
 
 if ($options['f'] === 'alert_log') {
-    $ret = lock_and_purge('alert_log', 'time_logged < DATE_SUB(NOW(),INTERVAL ? DAY)');
-    exit($ret);
+    $msg = "Deleting alert_logs more than %d days that are not active\n";
+    $table = 'alert_log';
+    $sql = "DELETE alert_log
+                FROM alert_log
+                INNER JOIN alerts
+                ON alerts.device_id=alert_log.device_id AND alerts.rule_id=alert_log.rule_id
+                WHERE alerts.state=0 AND alert_log.time_logged < DATE_SUB(NOW(),INTERVAL ? DAY)
+                ";
+    lock_and_purge_query($table, $sql, $msg);
+    
+    # alert_log older than $config['alert_log_purge'] days match now only the alert_log of active alerts
+    # in case of flapping of an alert, many entries are kept in alert_log
+    # we want only to keep the last alert_log that contains the alert details
+
+    $msg = "Deleting history of active alert_logs more than %d days\n";
+    $sql = "DELETE
+                    FROM alert_log
+                    WHERE id IN(
+                        SELECT id FROM(
+                            SELECT id
+                            FROM alert_log a1
+                            WHERE
+                                time_logged < DATE_SUB(NOW(),INTERVAL ? DAY)
+                                AND (device_id, rule_id, time_logged) NOT IN (
+                                    SELECT device_id, rule_id, max(time_logged)
+                                    FROM alert_log a2 WHERE a1.device_id = a2.device_id AND a1.rule_id = a2.rule_id
+                                    AND a2.time_logged < DATE_SUB(NOW(),INTERVAL ? DAY)
+                                )
+                        ) as c
+                    )
+                ";
+    $purge_duration = Config::get('alert_log_purge');
+    if (!(is_numeric($purge_duration) && $purge_duration > 0)) {
+        return -2;
+    }
+    $sql = str_replace("?", strval($purge_duration), $sql);
+    lock_and_purge_query($table, $sql, $msg);
 }
+
 
 if ($options['f'] === 'purgeusers') {
     try {

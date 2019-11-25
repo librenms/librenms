@@ -33,6 +33,7 @@ use App\Models\Location;
 use App\Models\Notification;
 use App\Models\Package;
 use App\Models\User;
+use App\Models\UserPref;
 use App\Models\Vminfo;
 use App\Models\WirelessSensor;
 use Auth;
@@ -53,11 +54,12 @@ class MenuComposer
         $vars = [];
         /** @var User $user */
         $user = Auth::user();
+        $site_style = Config::get('applied_site_style');
 
-        $vars['navbar'] = in_array(Config::get('site_style'), ['mono', 'dark']) ? 'navbar-inverse' : '';
+        //TODO: should be handled via CSS Themes
+        $vars['navbar'] = in_array($site_style, ['mono', 'dark']) ? 'navbar-inverse' : '';
 
         $vars['project_name'] = Config::get('project_name', 'LibreNMS');
-        $site_style = Config::get('site_style', 'light');
         $vars['title_image'] = Config::get('title_image', "images/librenms_logo_$site_style.svg");
 
         // Device menu

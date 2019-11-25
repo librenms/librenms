@@ -55,9 +55,9 @@ $disable_notify             = get_dev_attrib($device, 'disable_notify');
     <?php echo csrf_field() ?>
   <input type="hidden" name="editing" value="yes">
   <div class="form-group">
-    <label for="override_sysContact" class="col-sm-3 control-label">Override sysContact:</label>
+    <label for="override_sysContact" class="col-sm-3 control-label">Override sysContact</label>
     <div class="col-sm-6">
-      <input onclick="edit.sysContact.disabled=!edit.override_sysContact.checked" type="checkbox" id="override_sysContact" name="override_sysContact"
+      <input onChange="edit.sysContact.disabled=!edit.override_sysContact.checked" type="checkbox" id="override_sysContact" name="override_sysContact" data-size="small"
 <?php
 if ($override_sysContact_bool) {
     echo ' checked="1"';
@@ -80,9 +80,9 @@ if (!$override_sysContact_bool) {
     </div>
   </div>
   <div class="form-group">
-    <label for="disable_notify" class="col-sm-3 control-label">Disable all alerting for this host: </label>
+    <label for="disable_notify" class="col-sm-3 control-label">Disable all alerting for this host</label>
     <div class="col-sm-6">
-      <input id="disable_notify" type="checkbox" name="disable_notify"
+      <input id="disable_notify" type="checkbox" name="disable_notify" data-size="small"
 <?php
 if ($disable_notify) {
     echo ' checked="1"';
@@ -107,3 +107,6 @@ require_once 'includes/html/modal/new_alert_rule.inc.php';
         <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#create-alert" data-device_id="<?php echo $device['device_id']; ?>"><i class="fa fa-plus"></i> Create new alert rule</button>
     </div>
 </div>
+<script>
+$('[type="checkbox"]').bootstrapSwitch();
+</script>
