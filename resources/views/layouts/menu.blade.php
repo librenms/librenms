@@ -27,7 +27,7 @@
                     <ul class="dropdown-menu multi-level" role="menu">
                         <li><a href="{{ url('overview') }}"><i class="fa fa-tv fa-fw fa-lg"
                                                                aria-hidden="true"></i> @lang('Dashboard')</a></li>
-                        <li class="dropdown-submenu">F
+                        <li class="dropdown-submenu">
                             <a><i class="fa fa-map fa-fw fa-lg"
                                                                aria-hidden="true"></i> @lang('Maps')</a>
                             <ul class="dropdown-menu">
