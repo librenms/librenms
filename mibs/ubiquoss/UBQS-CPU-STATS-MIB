@@ -1,0 +1,107 @@
+-- *****************************************************************
+-- UBQS-CPU-STATS-MIB : Ubiquoss CPU queue Statistic information 
+--   
+-- Sep 2015,  Choi Jang Hee
+--
+-- Copyright (c) 2015 by Ubiquoss, Corp.
+--   
+-- All rights reserved.
+-- ***************************************************************
+
+UBQS-CPU-STATS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    IpAddress
+    FROM RFC1155-SMI  
+    OBJECT-TYPE
+    FROM RFC-1212
+    DisplayString, PhysAddress
+    FROM SNMPv2-TC
+    ubiMgmtv2
+    FROM UBQS-SMI;
+
+ubiCpuStatsMIB MODULE-IDENTITY
+    LAST-UPDATED    "201512230000Z"
+    ORGANIZATION    "Ubiquoss Corp."
+    CONTACT-INFO
+    "   Ubiquoss
+        Customer Service"
+
+    DESCRIPTION
+        "The UBQS-CPU-STATS-MIB is used to get 
+        the CPU queue statistic information."      
+    REVISION    "201512230000Z"
+    DESCRIPTION
+        "Add system clock table"
+
+    ::= { ubiMgmtv2 36 }
+
+-- ***********************************************************
+-- Textual Conventions
+-- *********************************************************** 
+
+-- ***************************************************************
+-- ubiCpuStatsMIB
+-- ***************************************************************
+ubiCpuStatsMIBNotificationPrefix  OBJECT IDENTIFIER   ::= { ubiCpuStatsMIB 1 }   
+ubiCpuStatsMIBObjects             OBJECT IDENTIFIER   ::= { ubiCpuStatsMIB 2 }   
+ubiCpuStatsMIBConformance         OBJECT IDENTIFIER   ::= { ubiCpuStatsMIB 3 } 
+
+-- ***************************************************************
+-- ubiCpuStatsTable
+-- ***************************************************************
+ 
+
+    ubiCpuStatsTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF UbiCpuStatsEntry
+        ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION
+        "The table of CPU queue counter"
+    ::= { ubiCpuStatsMIBObjects 1 }    
+
+    ubiCpuStatsEntry OBJECT-TYPE 
+        SYNTAX      UbiCpuStatsEntry
+        ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION
+        "An entry in the CPU queue counter table, representing
+         1. CPU Rx packet couner
+         2. CPU drop packet counter"
+        INDEX   {ubiCpuStatsIndex}
+    ::= { ubiCpuStatsTable 1 }
+
+    UbiCpuStatsEntry ::= SEQUENCE {
+        ubiCpuStatsIndex                       INTEGER,
+        ubiCpuStatsInPkts             		   Counter64, 
+        ubiCpuStatsDropPkts      			   Counter64
+    }
+
+    ubiCpuStatsIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "Index of CPU queue counter table"
+    ::= {ubiCpuStatsEntry 1}
+
+    ubiCpuStatsInPkts OBJECT-TYPE
+        SYNTAX Counter64
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "received packet counter of CPU queue"
+    ::= {ubiCpuStatsEntry 2}    
+    
+    ubiCpuStatsDropPkts OBJECT-TYPE
+        SYNTAX Counter64
+        ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "dropped packet counter of CPU queue"
+    ::= {ubiCpuStatsEntry 3}
+
+END     
+
+
+

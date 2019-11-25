@@ -1,0 +1,611 @@
+-- *****************************************************************
+-- UBQS-SNMP-MIB
+--
+-- Mar 2011,  Park Hyung Eun
+--
+-- Copyright (c) 2011 by Ubiquoss, Corp.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+--
+
+UBQS-SNMP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS	
+	DisplayString 
+		FROM RFC1213-MIB  
+	IANAifType                               
+		FROM IANAifType-MIB   
+    RowStatus
+        FROM SNMPv2-TC   
+    InetAddress, InetAddressType,
+    InetAddressPrefixLength,
+    	FROM INET-ADDRESS-MIB        
+    ubiMgmtv2
+        FROM UBQS-SMI;		          
+        
+ubiSnmpMIB  MODULE-IDENTITY
+	LAST-UPDATED "201103280000Z"
+    ORGANIZATION "Ubiquoss Corp."
+    CONTACT-INFO
+		"	Ubiquoss
+			Customer Service
+
+		 Postal: 24F Milennium B/D,
+		 	467-12, Dogok-Dong,
+			GangNam-Gu, Seoul 135-270
+			Korea
+
+		   Tel: 82-2-2190-3100" 
+    DESCRIPTION
+        "This MIB module defines MIB objects which provide
+         mechanisms to remotely configure the parameters
+         used by an SNMP entity for the generation of
+         notifications."
+	::= { ubiMgmtv2  19 }	
+                                  
+
+-- ***********************************************************
+-- Textual Conventions
+-- ***********************************************************   
+SnmpVersion   ::= TEXTUAL-CONVENTION
+	STATUS          current
+    DESCRIPTION
+        "The version of the SNMP."   
+    SYNTAX          INTEGER  {    
+               none(0), -- none of the following
+               v1(1),
+               v2(2),
+               v3(3),
+               inform(4)
+        }
+          
+-- ***************************************************************
+--   ubiInterfaceMIB
+-- ***************************************************************
+ubiSnmpMIBNotificationPrefix  	OBJECT IDENTIFIER		::= { ubiSnmpMIB 0 } 
+ubiSnmpMIBObjects  				OBJECT IDENTIFIER		::= { ubiSnmpMIB 1 }     
+ubiSnmpMIBConformance  			OBJECT IDENTIFIER		::= { ubiSnmpMIB 2 }
+                                  
+                                  
+  
+-- ***********************************************************
+-- ubiSnmpCommunityTable
+-- ***********************************************************
+
+    ubiSnmpCommunityTable  OBJECT-TYPE
+       SYNTAX      SEQUENCE OF UbiSnmpCommunityEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+          "This table contains objects which provide
+          the information about the community configuration of SNMP."
+		::= { ubiSnmpMIBObjects 1 }
+
+    ubiSnmpCommunityEntry  OBJECT-TYPE
+       SYNTAX      UbiSnmpCommunityEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+          "An entry containing information about 
+           the SNMP community."
+       INDEX       { ubiSnmpCommunity }
+       ::= { ubiSnmpCommunityTable 1 }
+
+    UbiSnmpCommunityEntry ::= SEQUENCE {
+       ubiSnmpCommunity					DisplayString,
+       ubiSnmpCommunityType				INTEGER,  
+       ubiSnmpCommunityAclName			DisplayString,
+       ubiSnmpCommunityView				DisplayString,
+       ubiSnmpCommunityRowStatus		RowStatus
+    }
+                             
+    ubiSnmpCommunity  OBJECT-TYPE
+       SYNTAX      DisplayString 
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           "A textual string containing information 
+           about the SNMP community."
+       ::= { ubiSnmpCommunityEntry 1 }
+       
+    ubiSnmpCommunityType  OBJECT-TYPE
+       SYNTAX		INTEGER {
+       		read-only(1),
+       		read-write(2) 
+       } 
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+           "The access type of SNMP community."
+       ::= { ubiSnmpCommunityEntry 2 }            
+
+    ubiSnmpCommunityAclName  OBJECT-TYPE
+       SYNTAX		DisplayString
+       MAX-ACCESS  	read-write
+       STATUS      	current
+       DESCRIPTION
+           "The access id for SNMP community."
+       ::= { ubiSnmpCommunityEntry 3 }      
+
+    ubiSnmpCommunityView  OBJECT-TYPE
+       SYNTAX		DisplayString
+       MAX-ACCESS  	read-write
+       STATUS      	current
+       DESCRIPTION
+           "The view string for SNMP community."
+       ::= { ubiSnmpCommunityEntry 4 } 
+
+	ubiSnmpCommunityRowStatus OBJECT-TYPE
+        SYNTAX       RowStatus
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+            "This object is used to create a new row or modify or
+            delete an existing row in this table."
+        ::= { ubiSnmpCommunityEntry 5 }
+                      		                      
+
+-- ***********************************************************
+-- ubiSnmpUserTable
+-- ***********************************************************
+
+    ubiSnmpUserTable  OBJECT-TYPE
+       SYNTAX      SEQUENCE OF UbiSnmpUserEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+          "This table contains objects which provide
+          the information about the user configuration of SNMP."
+		::= { ubiSnmpMIBObjects 2 }
+                      		                      
+    ubiSnmpUserEntry   OBJECT-TYPE
+        SYNTAX          UbiSnmpUserEntry
+        ACCESS      	not-accessible
+        STATUS          current 
+        DESCRIPTION
+                "An entry containing information about 
+           		the SNMP user."
+        INDEX           { ubiSnmpUserVersion, ubiSnmpUserName }
+        ::=  { ubiSnmpUserTable 1 }
+
+    UbiSnmpUserEntry  ::=  SEQUENCE {     
+		   ubiSnmpUserVersion				SnmpVersion,    
+		   ubiSnmpUserName		     		DisplayString,
+		   ubiSnmpUserGroup			 		DisplayString,   
+		   ubiSnmpUserAuthType				INTEGER,     
+		   ubiSnmpUserAuthPasswd			DisplayString, 
+		   ubiSnmpUserPrivacyType			INTEGER,     
+		   ubiSnmpUserPrivacyPasswd			DisplayString, 
+		   ubiSnmpUserAclName				DisplayString,
+		   ubiSnmpUserRowStatus				RowStatus
+    }
+
+    ubiSnmpUserVersion  OBJECT-TYPE
+       SYNTAX      SnmpVersion
+       ACCESS      read-only
+       STATUS      current 
+       DESCRIPTION
+          "The version of SNMP user."
+       ::= { ubiSnmpUserEntry 1 }
+
+    ubiSnmpUserName  OBJECT-TYPE
+       SYNTAX      DisplayString
+       ACCESS      read-only
+       STATUS      current 
+       DESCRIPTION
+          "A textual string containing information about 
+           the SNMP user."
+       ::= { ubiSnmpUserEntry 2 }
+
+    ubiSnmpUserGroup  OBJECT-TYPE
+       SYNTAX      DisplayString
+       ACCESS      read-write
+       STATUS      current 
+       DESCRIPTION
+          "A textual string containing information about 
+           the group belong to SNMP user."
+       ::= { ubiSnmpUserEntry 3 }
+
+    ubiSnmpUserAuthType  OBJECT-TYPE
+       SYNTAX      INTEGER  {
+       		none(0),
+       		md5(1),
+       		sha(2)
+       }
+       ACCESS      read-write
+       STATUS      current 
+       DESCRIPTION
+          "This object indicates the authentication parameters 
+          for SNMPv3 user. 
+          SNMPv1 and SNMPv2c is always none(0). Because only SNMPv3 user 
+          can support the authentication and(or) Privacy."
+       ::= { ubiSnmpUserEntry 4 }
+
+    ubiSnmpUserAuthPasswd  OBJECT-TYPE
+       SYNTAX      DisplayString
+       ACCESS      read-write
+       STATUS      current 
+       DESCRIPTION
+          "A textual string containing authentication password 
+          for SNMPv3 user. 
+          SNMPv1 and SNMPv2c is always ''(null string). Because only 
+          SNMPv3 user can support the authentication and(or) Privacy."
+       ::= { ubiSnmpUserEntry 5 }
+
+    ubiSnmpUserPrivacyType  OBJECT-TYPE
+       SYNTAX      INTEGER  {
+       		none(0),
+       		aes(1),
+       		des(2)
+       }
+       ACCESS      read-write
+       STATUS      current 
+       DESCRIPTION
+          "This object indicates the encryption parameters 
+          for SNMPv3 user.  
+          SNMPv1 and SNMPv2c is always none(0). Because only SNMPv3 user 
+          can support the authentication and(or) Privacy."
+       ::= { ubiSnmpUserEntry 6 }
+
+    ubiSnmpUserPrivacyPasswd  OBJECT-TYPE
+       SYNTAX      DisplayString
+       ACCESS      read-write
+       STATUS      current 
+       DESCRIPTION
+          "A textual string containing encryption password 
+          for SNMPv3 user. 
+          SNMPv1 and SNMPv2c is always ''(null string). Because only 
+          SNMPv3 user can support the authentication and(or) Privacy."
+       ::= { ubiSnmpUserEntry 7 }
+
+    ubiSnmpUserAclName  OBJECT-TYPE
+       SYNTAX      DisplayString
+       ACCESS      read-write
+       STATUS      current 
+       DESCRIPTION
+          "The access ID for SNMP user."
+       ::= { ubiSnmpUserEntry 8 }
+                                       
+                                       
+	ubiSnmpUserRowStatus OBJECT-TYPE
+        SYNTAX       RowStatus
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+            "This object is used to create a new row or modify or
+            delete an existing row in this table."
+        ::= { ubiSnmpUserEntry 9 }
+                
+                      
+-- ***********************************************************
+-- ubiSnmpGroupTable
+-- ***********************************************************
+
+    ubiSnmpGroupTable  OBJECT-TYPE
+       SYNTAX      SEQUENCE OF UbiSnmpGroupEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+          "This table contains objects which provide
+          the information about the group configuration of SNMP."
+		::= { ubiSnmpMIBObjects 3 }
+                      		                      
+    ubiSnmpGroupEntry   OBJECT-TYPE
+        SYNTAX          UbiSnmpGroupEntry
+        ACCESS      	not-accessible
+        STATUS          current 
+        DESCRIPTION
+                "An entry containing information about 
+           		the SNMP group."
+        INDEX           { ubiSnmpGroupVersion, ubiSnmpGroupName }
+        ::=  { ubiSnmpGroupTable 1 }
+
+    UbiSnmpGroupEntry  ::=  SEQUENCE {     
+		   ubiSnmpGroupVersion				SnmpVersion,    
+		   ubiSnmpGroupName		     		DisplayString,
+		   ubiSnmpGroupSecLevel				INTEGER,  
+		   ubiSnmpGroupReadView				DisplayString,
+		   ubiSnmpGroupWriteView            DisplayString,
+		   ubiSnmpGroupNotifyView			DisplayString, 
+		   ubiSnmpGroupRowStatus			RowStatus
+    }
+
+    ubiSnmpGroupVersion  OBJECT-TYPE
+       SYNTAX      SnmpVersion
+       ACCESS      read-only
+       STATUS      current 
+       DESCRIPTION
+          "The version of SNMP group."
+       ::= { ubiSnmpGroupEntry 1 }
+
+    ubiSnmpGroupName  OBJECT-TYPE
+       SYNTAX      DisplayString
+       ACCESS      read-only
+       STATUS      current 
+       DESCRIPTION
+          "A textual string containing information about 
+           the SNMP group."
+       ::= { ubiSnmpGroupEntry 2 }
+
+    ubiSnmpGroupSecLevel  OBJECT-TYPE
+       SYNTAX      INTEGER  {
+       		none(0),
+       		noAuthen(1),
+       		authen(2),
+       		privacy(3)
+       }
+       ACCESS      read-write
+       STATUS      current 
+       DESCRIPTION
+          ""
+       ::= { ubiSnmpGroupEntry 3 }
+
+
+    ubiSnmpGroupReadView  OBJECT-TYPE
+       SYNTAX      DisplayString
+       ACCESS      read-write
+       STATUS      current 
+       DESCRIPTION
+          ""
+       ::= { ubiSnmpGroupEntry 4 }
+
+
+    ubiSnmpGroupWriteView  OBJECT-TYPE
+       SYNTAX      DisplayString
+       ACCESS      read-write
+       STATUS      current 
+       DESCRIPTION
+          ""
+       ::= { ubiSnmpGroupEntry 5 }
+
+    ubiSnmpGroupNotifyView  OBJECT-TYPE
+       SYNTAX      DisplayString
+       ACCESS      read-write
+       STATUS      current 
+       DESCRIPTION
+          ""
+       ::= { ubiSnmpGroupEntry 6 }
+
+	ubiSnmpGroupRowStatus OBJECT-TYPE
+        SYNTAX       RowStatus
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+            "This object is used to create a new row or modify or
+            delete an existing row in this table."
+        ::= { ubiSnmpGroupEntry 7 }
+                      
+
+                      
+-- ***********************************************************
+-- ubiSnmpViewTable
+-- ***********************************************************
+
+    ubiSnmpViewTable  OBJECT-TYPE
+       SYNTAX      SEQUENCE OF UbiSnmpViewEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+          "This table contains objects which provide
+          the information about the group configuration of SNMP."
+		::= { ubiSnmpMIBObjects 4 }
+                      		                      
+    ubiSnmpViewEntry   OBJECT-TYPE
+        SYNTAX          UbiSnmpViewEntry
+        ACCESS      	not-accessible
+        STATUS          current 
+        DESCRIPTION
+                "An entry containing information about 
+           		the SNMP group."
+        INDEX           { ubiSnmpViewName, ubiSnmpViewVariable } -- TODO !!! 
+        ::=  { ubiSnmpViewTable 1 }
+
+    UbiSnmpViewEntry  ::=  SEQUENCE {     
+		   ubiSnmpViewName		     		DisplayString,
+		   ubiSnmpViewVariable				DisplayString,  
+		   ubiSnmpViewType					INTEGER,
+		   ubiSnmpViewRowStatus				RowStatus
+    }
+
+    ubiSnmpViewName  OBJECT-TYPE
+       SYNTAX      DisplayString
+       ACCESS      read-only
+       STATUS      current 
+       DESCRIPTION
+          "A textual string containing information about 
+           the SNMP view."
+       ::= { ubiSnmpViewEntry 1 }
+
+    ubiSnmpViewVariable  OBJECT-TYPE
+       SYNTAX      DisplayString
+       ACCESS      read-only
+       STATUS      current 
+       DESCRIPTION
+          ""
+       ::= { ubiSnmpViewEntry 2 }
+
+    ubiSnmpViewType  OBJECT-TYPE
+       SYNTAX      INTEGER {
+       		none(0),
+       		excluded(1),
+       		included(2)
+       }
+       ACCESS      read-write
+       STATUS      current 
+       DESCRIPTION
+          ""
+       ::= { ubiSnmpViewEntry 3 }
+
+	ubiSnmpViewRowStatus OBJECT-TYPE
+        SYNTAX       RowStatus
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+            "This object is used to create a new row or modify or
+            delete an existing row in this table."
+        ::= { ubiSnmpViewEntry 4 }
+                      
+
+                  
+-- ***********************************************************
+-- ubiSnmpTrapHostTable
+-- ***********************************************************
+    ubiSnmpTrapHostTable   OBJECT-TYPE
+        SYNTAX          SEQUENCE  OF  UbiSnmpTrapHostEntry
+        ACCESS          not-accessible
+        STATUS          current 
+        DESCRIPTION
+               "This table contains objects which provide
+         		the information about the trap host configuration of SNMP."
+        ::=  { ubiSnmpMIBObjects 5 }
+
+    ubiSnmpTrapHostEntry   OBJECT-TYPE
+        SYNTAX          UbiSnmpTrapHostEntry
+        ACCESS      	not-accessible
+        STATUS          current 
+        DESCRIPTION
+                "An entry containing information about 
+           		the SNMP trap host."
+        INDEX           { ubiSnmpTrapHostType, UbiSnmpTrapHostVersion, UbiSnmpTrapHostAddrType, 
+        				   UbiSnmpTrapHostAddress, ubiSnmpTrapHostCommunity }
+        ::=  { ubiSnmpTrapHostTable 1 }
+
+    UbiSnmpTrapHostEntry  ::=  SEQUENCE {          
+    	ubiSnmpTrapHostType				INTEGER,
+        ubiSnmpTrapHostVersion			SnmpVersion,      
+    	ubiSnmpTrapHostAddrType			InetAddressType,
+        ubiSnmpTrapHostAddress			InetAddress,
+        ubiSnmpTrapHostCommunity		DisplayString,
+        ubiSnmpTrapHostSecLevel			INTEGER,  
+        ubiSnmpTrapHostPort				Integer32,
+        ubiSnmpTrapHostRowStatus		RowStatus 		
+   }
+    
+      
+    ubiSnmpTrapHostType  OBJECT-TYPE
+       SYNTAX      INTEGER {      
+       		trap(1),
+       		inform(2)
+       }
+       ACCESS      read-only
+       STATUS      current 
+       DESCRIPTION
+          "This object indicates the trap type."
+       ::= { ubiSnmpTrapHostEntry 1 }
+      
+    ubiSnmpTrapHostVersion  OBJECT-TYPE
+       SYNTAX      SnmpVersion
+       ACCESS      read-only
+       STATUS      current 
+       DESCRIPTION
+          "This object indicates the trap version. 
+           A system configuring the trap host can send 
+           a notification depending on trap version."
+       ::= { ubiSnmpTrapHostEntry 2 }
+
+    ubiSnmpTrapHostAddrType  OBJECT-TYPE
+       SYNTAX      InetAddressType 
+       ACCESS      read-only
+       STATUS      current 
+       DESCRIPTION
+          "The type of the UbiSnmpTrapHostAddress, as defined 
+           in the InetAddress MIB. (e.g. ipv4, ipv6..)"
+       ::= { ubiSnmpTrapHostEntry 3 }
+
+    ubiSnmpTrapHostAddress  OBJECT-TYPE
+       SYNTAX      InetAddress 
+       ACCESS      read-only
+       STATUS      current 
+       DESCRIPTION
+          "The trap host IP address. The type of this address is
+          determined by the value of the ubiSnmpTrapHostAddrType object."
+       ::= { ubiSnmpTrapHostEntry 4 }
+ 
+	ubiSnmpTrapHostCommunity  OBJECT-TYPE
+       SYNTAX      DisplayString
+       ACCESS      read-only
+       STATUS      current 
+       DESCRIPTION
+          "A textual string containing information about 
+          the community(or SNMPv3 user) for trap host configuration."
+       ::= { ubiSnmpTrapHostEntry 5 }
+ 
+	ubiSnmpTrapHostSecLevel  OBJECT-TYPE
+       SYNTAX      INTEGER  {
+       		none(0),
+       		noAuthen(1),
+       		authen(2),
+       		privacy(3)
+       }
+       ACCESS      read-write
+       STATUS      current 
+       DESCRIPTION
+          "The security type for SNMPv3 trap host."
+       ::= { ubiSnmpTrapHostEntry 6 }
+         
+ 	ubiSnmpTrapHostPort  OBJECT-TYPE
+       SYNTAX      Integer32 (0..65535)
+       ACCESS      read-write
+       STATUS      current  
+       DESCRIPTION
+          "The port number of SNMP trap host. "     
+       DEFVAL	   { 161 }	
+       ::= { ubiSnmpTrapHostEntry 7 }
+        
+	ubiSnmpTrapHostRowStatus OBJECT-TYPE
+        SYNTAX       RowStatus
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+            "This object is used to create a new row or modify or
+            delete an existing row in this table."
+        ::= { ubiSnmpTrapHostEntry 8 }
+                      
+                      
+-- ***********************************************************
+-- ubiSnmpMIBConformance
+-- ***********************************************************
+ubiSnmpMIBCompliances OBJECT IDENTIFIER ::= { ubiSnmpMIBConformance 1 }
+ubiSnmpMIBGroups      OBJECT IDENTIFIER ::= { ubiSnmpMIBConformance 2 }
+
+
+-- compliance statements
+ubiSnmpMIBCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+                "The compliance statement for entities which implement
+                the ubiquoss snmp configuration MIB."
+        MODULE  -- this module
+                MANDATORY-GROUPS { ubiSnmpConfigGroup }
+
+        GROUP   ubiSnmpConfigGroup
+        DESCRIPTION
+                "This group is applicable for implementations which
+                 need information for snmp configuration."
+                        
+        ::= { ubiSnmpMIBCompliances 1 }
+                          
+                          
+                          
+-- units of conformance
+ubiSnmpConfigGroup OBJECT-GROUP
+        OBJECTS {       
+	       ubiSnmpCommunity,
+	       ubiSnmpCommunityType,
+	       ubiSnmpCommunityRowStatus,
+	        
+	       ubiSnmpTrapHostVersion,      
+	       ubiSnmpTrapHostAddrType,
+	       ubiSnmpTrapHostAddress,
+	       ubiSnmpTrapHostCommunity,     
+	       ubiSnmpTrapHostRowStatus 
+    	}
+        STATUS  current
+        DESCRIPTION
+                "A collection of objects containing
+        		 information about IP adderss configuration."
+        ::= { ubiSnmpMIBGroups 1 }
+          
+ END
+ 

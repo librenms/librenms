@@ -1,0 +1,340 @@
+-- *****************************************************************
+-- UBQS-OSPF-MIB : Ubiquoss OSPF Router Information MIB
+--   
+-- Jun 2011,  Park Hyung Eun
+--
+-- Copyright (c) 2011 by Ubiquoss, Corp.
+--   
+-- All rights reserved.
+-- ***************************************************************
+
+UBQS-OSPF-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,            
+    Unsigned32,
+    Integer32,
+    NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP,
+    NOTIFICATION-GROUP
+        FROM SNMPv2-CONF         
+    IpAddress,
+    RowStatus,
+    TimeStamp,
+    DisplayString,    
+    TruthValue,       
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC     
+    InetAddress, 
+    InetAddressType,
+    InetAddressPrefixLength,    
+    InetAddressPrefixLength
+    	FROM INET-ADDRESS-MIB      
+    InterfaceIndex                     
+    	FROM IF-MIB
+    ubiMgmtv2
+        FROM UBQS-SMI;
+
+
+ubiOspfMIB MODULE-IDENTITY
+        LAST-UPDATED    "201106210000Z"
+        ORGANIZATION 	"Ubiquoss Corp."
+	    CONTACT-INFO
+		"	Ubiquoss
+			Customer Service
+
+		 Postal: 24F Milennium B/D,
+		 	467-12, Dogok-Dong,
+			GangNam-Gu, Seoul 135-270
+			Korea
+
+		   Tel: 82-2-2190-3100"   
+    DESCRIPTION
+        "This MIB module defines the OSPF Version 2 Protocol"
+     ::= { ubiMgmtv2 23 }
+
+
+
+-- ***********************************************************
+-- Textual Conventions
+-- ***********************************************************          
+UbiOspfAreaIdType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A value that represents a type of areaID type.
+
+         unknown(0)  An unknown type.  
+         
+         decimal(1)  An area ID is numeric type.
+
+         ipv4(2)     An area ID is defined by ipv4 address.  
+		"
+    SYNTAX       INTEGER {
+                     unknown(0),
+                     decimal(1),
+                     ipv4(2)   
+               	  }
+
+UbiOspfAreaId ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Represents an IPv4 network address:  
+         (1d.1d.1d.1d)
+
+           Octets   Contents         Encoding
+            1-4     IPv4 address     network-byte order
+
+         The corresponding UbiOspfAreaIdType value is ipv4(2)    
+         
+         Represents an decimal value: 
+         (4d)
+            Octets   Contents    
+            1-4      Decimal    
+         
+         The corresponding UbiOspfAreaIdType value is decimal(1).
+         "
+    SYNTAX       OCTET STRING (SIZE (0..4))
+                                
+                                
+-- ***************************************************************
+--   ubiOspfMIB
+-- ***************************************************************
+ubiOspfMIBNotificationPrefix  	OBJECT IDENTIFIER		::= { ubiOspfMIB 0 } 
+ubiOspfMIBObjects  				OBJECT IDENTIFIER		::= { ubiOspfMIB 1 }     
+ubiOspfMIBConformance  			OBJECT IDENTIFIER		::= { ubiOspfMIB 2 }
+        
+            
+                         
+                         
+ -- ***************************************************************
+--   ubiOspfMIBNotificationPrefix
+-- ***************************************************************
+                                           
+-- ***********************************************************
+-- ubiOspfInstanceTable
+-- ***********************************************************
+	ubiOspfInstanceTable OBJECT-TYPE
+    	SYNTAX          SEQUENCE OF UbiOspfInstanceEntry 
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	""
+    	::= { ubiOspfMIBObjects 1 }
+
+	ubiOspfInstanceEntry OBJECT-TYPE
+    	SYNTAX          UbiOspfInstanceEntry
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	""
+    	INDEX  { ubiOspfInstId } 
+    	::= { ubiOspfInstanceTable 1 }
+
+	UbiOspfInstanceEntry ::= SEQUENCE {         
+			ubiOspfInstId						Integer32,  
+			ubiOspfInstRouterId					IpAddress,  
+            ubiOspfInstMplsTeRouterId			InterfaceIndex,    
+            ubiOspfInstRowStatus				RowStatus
+	}
+  
+ 	ubiOspfInstId OBJECT-TYPE
+    	SYNTAX          Integer32
+    	MAX-ACCESS      not-accessible
+    	STATUS          current    
+    	DESCRIPTION
+        	"OSPF Instance(Process) ID."
+	   	::= { ubiOspfInstanceEntry 1 }   
+    
+ 	ubiOspfInstRouterId OBJECT-TYPE
+    	SYNTAX          IpAddress
+    	MAX-ACCESS      read-write
+    	STATUS          current    
+    	DESCRIPTION
+        	"OSPF Router ID."               
+	   	::= { ubiOspfInstanceEntry 2 } 
+
+   	ubiOspfInstMplsTeRouterId OBJECT-TYPE
+        SYNTAX			InterfaceIndex
+        MAX-ACCESS      read-write
+    	STATUS          current
+   		DESCRIPTION
+        	"OSPF MPLS TE Rotuer ID."
+       	::= { ubiOspfInstanceEntry 3 }     	
+          
+  	ubiOspfInstRowStatus OBJECT-TYPE
+    	SYNTAX          RowStatus
+    	MAX-ACCESS      read-create
+    	STATUS          current
+    	DESCRIPTION
+        	"" 
+    	::= { ubiOspfInstanceEntry 4 }    
+   
+                                        
+                                      
+-- ***********************************************************
+-- ubiOspfNetworkTable
+-- ***********************************************************   
+	ubiOspfNetworkTable OBJECT-TYPE
+    	SYNTAX          SEQUENCE OF UbiOspfNetworkEntry 
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	""
+    	::= { ubiOspfMIBObjects 2 }
+
+	ubiOspfNetworkEntry OBJECT-TYPE
+    	SYNTAX          UbiOspfNetworkEntry
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	""
+    	INDEX  { ubiOspfInstId, ubiOspfNetworkAddr, ubiOspfNetworkPrefixLen  } 
+    	::= { ubiOspfNetworkTable 1 }
+
+	UbiOspfNetworkEntry ::= SEQUENCE {         
+			ubiOspfNetworkAddr					IpAddress,  
+			ubiOspfNetworkPrefixLen				InetAddressPrefixLength,     
+			ubiOspfNetworkAreaIdType			UbiOspfAreaIdType,
+            ubiOspfNetworkAreaId				DisplayString,    
+            ubiOspfNetworkRowStatus				RowStatus
+	}
+  
+ 	ubiOspfNetworkAddr OBJECT-TYPE
+    	SYNTAX          IpAddress
+    	MAX-ACCESS      read-only
+    	STATUS          current    
+    	DESCRIPTION
+        	"OSPF Network Prefix."
+	   	::= { ubiOspfNetworkEntry 1 }   
+    
+ 	ubiOspfNetworkPrefixLen OBJECT-TYPE
+    	SYNTAX          InetAddressPrefixLength
+    	MAX-ACCESS      read-only
+    	STATUS          current    
+    	DESCRIPTION
+        	"OSPF Netwrok Prefix Length."      
+		::= { ubiOspfNetworkEntry 2 } 
+ 
+   	ubiOspfNetworkAreaIdType OBJECT-TYPE
+        SYNTAX			UbiOspfAreaIdType
+        MAX-ACCESS      read-create
+    	STATUS          current
+   		DESCRIPTION
+        	" OSPF Netwrok ID type
+        	         unknown(0),
+                     decimal(1),
+                     ipv4(2)     
+            "
+		::= { ubiOspfNetworkEntry 3 }
+ 
+   	ubiOspfNetworkAreaId OBJECT-TYPE
+        SYNTAX			DisplayString
+        MAX-ACCESS      read-create
+    	STATUS          current
+   		DESCRIPTION
+        	"OSPF Netwrok ID. "
+   		::= { ubiOspfNetworkEntry 4 }
+                                  	   	   
+                                  	   	    
+  	ubiOspfNetworkRowStatus OBJECT-TYPE
+    	SYNTAX          RowStatus
+    	MAX-ACCESS      read-create
+    	STATUS          current
+   		DESCRIPTION
+        	""      
+       	::= { ubiOspfNetworkEntry 5 }              	
+                           
+    
+                                           
+-- ***********************************************************
+-- ubiOspfMplsTeAreaIdTable
+-- ***********************************************************
+	ubiOspfMplsTeAreaIdTable  OBJECT-TYPE
+    	SYNTAX          SEQUENCE OF UbiOspfMplsTeAreaIdEntry 
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	""
+    	::= { ubiOspfMIBObjects 3 }
+
+	ubiOspfMplsTeAreaIdEntry OBJECT-TYPE
+    	SYNTAX          UbiOspfMplsTeAreaIdEntry
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	""
+    	INDEX  { ubiOspfInstId, ubiOspfMplsTeAreaIdType, ubiOspfMplsTeAreaIdAddr } 
+    	::= { ubiOspfMplsTeAreaIdTable  1 }
+
+	UbiOspfMplsTeAreaIdEntry ::= SEQUENCE {          
+			ubiOspfMplsTeAreaIdType					UbiOspfAreaIdType, 
+			ubiOspfMplsTeAreaId						UbiOspfAreaId, 
+            ubiOspfMplsTeAreaIdRowStatus			RowStatus
+	}
+
+ 	ubiOspfMplsTeAreaIdType OBJECT-TYPE
+    	SYNTAX          UbiOspfAreaIdType
+    	MAX-ACCESS      not-accessible
+    	STATUS          current    
+    	DESCRIPTION
+        	" OSPF MPLS TE Area Type      
+        	         unknown(0),
+                     decimal(1),
+                     ipv4(2)     
+            "   
+       	::= { ubiOspfMplsTeAreaIdEntry 1 } 
+
+ 	ubiOspfMplsTeAreaId OBJECT-TYPE
+    	SYNTAX          UbiOspfAreaId
+    	MAX-ACCESS      not-accessible
+    	STATUS          current    
+    	DESCRIPTION
+        	"OSPF MPLS TE Area."      
+       	::= { ubiOspfMplsTeAreaIdEntry 2 } 
+         
+  	ubiOspfMplsTeAreaIdRowStatus OBJECT-TYPE
+    	SYNTAX          RowStatus
+    	MAX-ACCESS      read-create
+    	STATUS          current
+    	DESCRIPTION
+        	"" 
+    	::= { ubiOspfMplsTeAreaIdEntry 3 }    
+ 
+                          
+-- ***********************************************************
+-- ubiOspfMIBConformance
+-- ***********************************************************
+ubiOspfMIBCompliances  	OBJECT IDENTIFIER		::= { ubiOspfMIBConformance 1 }
+ubiOspfMIBGroups  	 	OBJECT IDENTIFIER		::= { ubiOspfMIBConformance 2 }
+-- Compliance
+
+	ubiOspfMIBCompliance MODULE-COMPLIANCE
+    	STATUS          current
+    	DESCRIPTION
+        	"The compliance statement for entities which
+        	implement the UBQS-OSPF-MIB"
+   	 	MODULE          -- this module
+    	MANDATORY-GROUPS {  
+    			ubiOspfMIBGroup
+        }  
+        GROUP    ubiOspfMIBGroup
+        DESCRIPTION 
+        	"The ubiOspfGroup is applicable for implementations which
+ 			need to get the OSPf information of the system."    
+     	::= { ubiOspfMIBCompliances 1 }
+
+
+	ubiOspfMIBGroup OBJECT-GROUP
+    	OBJECTS         {     
+    	}   
+    	STATUS          current
+    	DESCRIPTION
+        	"A collection of objects containing
+        	information about the OSPF information of system."
+    	::= { ubiOspfMIBGroups 1 }
+    	                               
+    	                               
+END

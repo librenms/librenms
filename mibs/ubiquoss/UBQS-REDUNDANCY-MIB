@@ -1,0 +1,722 @@
+-- *****************************************************************
+-- UBQS-REDUNDANCY-MIB  : Ubiquoss Redundancy MIB file
+--
+-- June 2013, Doyle Son
+--
+-- Copyright (c) 2013 by Ubiquoss, Corp.
+-- All rights reserved.    
+--
+-- *****************************************************************
+--
+
+UBQS-REDUNDANCY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    NOTIFICATION-TYPE,
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION,
+    DisplayString,
+    TimeStamp,
+    TruthValue,
+    PhysAddress
+        FROM SNMPv2-TC
+    ubiMgmtv2
+        FROM UBQS-SMI
+    InetAddress, 
+    InetAddressType,
+    InetAddressPrefixLength, 
+    	FROM INET-ADDRESS-MIB
+    InterfaceIndex,
+    InterfaceIndexOrZero
+        FROM IF-MIB;
+  
+  
+ubiRedundancyMIB MODULE-IDENTITY
+    LAST-UPDATED    "201306180000Z"
+    ORGANIZATION 	"Ubiquoss Corp."
+	CONTACT-INFO
+		"	Ubiquoss
+			Customer Service
+
+		 Postal: 24F Milennium B/D,
+		 	467-12, Dogok-Dong,
+			GangNam-Gu, Seoul 135-270
+			Korea
+
+		   Tel: 82-2-2190-3100"     
+    DESCRIPTION
+        "The UBQS-REDUNDANCY-MIB is used to monitor
+        and configure the redundancy appliances."
+    ::= { ubiMgmtv2 29 }
+
+
+-- ***********************************************************   
+-- TEXTUAL-CONVENTION
+-- Define the composed syntax 
+-- ***********************************************************
+
+RedundancyState ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "Role states for redundancy.  Valid values are :
+        	notConfigured      (1)   The appliance is not configured for redundancy.
+        	active             (2)   The appliance is the active appliance.
+        	standby            (3)   The appliance is warm standby mode         
+        	activeLostStandby  (4)   The active appliance is not getting any 
+									response from the standby appliance.
+        "            
+    SYNTAX          INTEGER  {      
+    					notConfigured(1),
+                        active (2),
+                        standby (3),
+                        activeLostStandby(4)
+    }
+              
+FlashPath ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Represents 'copy <source> peer'."
+    SYNTAX       INTEGER
+    {
+    	os1(0),
+    	os2(1),
+    	config(2)
+    }
+
+SwitchOverReason ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "Role states for redundancy.  Valid values are :       
+        	none				(0)    none of the following
+        	lossConnWithActive  (1)    lost connection with active
+        	forcedSwitchOver    (2)    Switchover occurs by force          
+        	unknown             (3)    Switchover occurs by unknown reason
+        "            
+    SYNTAX          INTEGER  {                   
+    					none(0),
+                        lossConnWithActive (1),
+                        forcedSwitchOver (2),
+                        unknown (3)
+     }
+
+-- ***********************************************************
+-- ubiRedundancyMIB
+-- *********************************************************** 
+
+ubiRedundancyMIBNotificationPrefix		OBJECT IDENTIFIER		::= { ubiRedundancyMIB 0 }
+ubiRedundancyObjects					OBJECT IDENTIFIER		::= { ubiRedundancyMIB 1 }
+ubiRedundancyPeerObjects				OBJECT IDENTIFIER		::= { ubiRedundancyMIB 2 }
+ubiSwitchoverObjects					OBJECT IDENTIFIER		::= { ubiRedundancyMIB 3 }
+ubiRedundancyMIBConformance				OBJECT IDENTIFIER	 	::= { ubiRedundancyMIB 4 }
+
+-- ***********************************************************
+-- ubiEntityAlarmMIBNotifications
+-- ***********************************************************  
+	ubiSwitchOverNotification NOTIFICATION-TYPE
+    	OBJECTS    { 
+    					ubiLastSwitchOverTime,
+    					ubiLastSwitchOverReason,
+    					ubiSwitchOverRedundancySyncState
+    	}
+    	STATUS          current
+    	DESCRIPTION
+        	"The agent generates this trap
+        	 when a switchover occurs."
+   		::= { ubiRedundancyMIBNotificationPrefix 1 }
+                                                          
+                                                          
+	ubiRedundancyConnectionStateNotification NOTIFICATION-TYPE
+    	OBJECTS     { 
+    					ubiRedundancyConnectionState,
+    	}
+    	STATUS          current
+    	DESCRIPTION
+        	"The agent generates this trap
+        	 when the connection state of standby appliance device is changed."
+   		::= { ubiRedundancyMIBNotificationPrefix 2 }
+   	
+   	ubiRedundancySyncNotification NOTIFICATION-TYPE
+    	OBJECTS     { 
+    					ubiRedundancySyncState,
+    	}
+    	STATUS          current
+    	DESCRIPTION
+        	"The agent generates this trap
+        	 when the synchronization process with standby SCU is done.
+        	 This notification occurs after standby is connected."
+   		::= { ubiRedundancyMIBNotificationPrefix 3 }
+   		
+	ubiRedundancySyncStateChangeNotification NOTIFICATION-TYPE
+    	OBJECTS     { 
+    					ubiRedundancySyncState,
+    	}
+    	STATUS          current
+    	DESCRIPTION
+        	"The agent generates this trap
+        	 when the synchronization state has been changed."
+   		::= { ubiRedundancyMIBNotificationPrefix 4 }
+                                                          
+-- ***********************************************************
+-- ubiRedundancyObjects
+-- *********************************************************** 
+
+ubiRedundancy					OBJECT IDENTIFIER		::= { ubiRedundancyObjects 1 }
+
+	ubiRedundancyReload OBJECT-TYPE
+    	SYNTAX          INTEGER    	   
+    	{   
+    			both(1),
+				peer(2)
+    	}
+    	MAX-ACCESS      read-write
+    	STATUS          current
+    	DESCRIPTION
+        	"Reload Active/Standby or Peer device."
+    	::= { ubiRedundancy 1 }     
+   
+   ubiRedundancyMyRedundancyState OBJECT-TYPE
+    	SYNTAX          RedundancyState
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"The HA redundancy state of this appliance device."
+      	::= { ubiRedundancy 2 }
+
+    	
+   ubiRedundancyConnStateNotificationEnabled OBJECT-TYPE
+    	SYNTAX          TruthValue
+    	MAX-ACCESS      read-write
+    	STATUS          current
+    	DESCRIPTION
+        	"Enable or disable redundancy connection state notification via SNMP."
+    	::= { ubiRedundancy 4 }
+
+    	
+-- ***********************************************************
+-- ubiRedundancyTable
+-- *********************************************************** 
+    	
+	ubiRedundancyTable OBJECT-TYPE
+    	SYNTAX          SEQUENCE OF UbiRedundancyEntry 
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"This table keeps the current configuration of the redundancy 
+        	 information of the active and standby units."
+    	::= { ubiRedundancy 3 }
+
+
+	ubiRedundancyEntry OBJECT-TYPE
+    	SYNTAX          UbiRedundancyEntry
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"An entry containing redundancy information of the active and standby units"
+    	INDEX           { ubiRedundancyIsActivePreferred  } 
+    	::= { ubiRedundancyTable 1 }
+
+	UbiRedundancyEntry ::= SEQUENCE {        
+		ubiRedundancyIsActivePreferred				TruthValue,          
+		ubiRedundancyState							RedundancyState,
+		ubiRedundancyConnectionState				INTEGER, 
+       }
+
+ 	ubiRedundancyIsActivePreferred OBJECT-TYPE
+    	SYNTAX          TruthValue  
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"This status indicates whether
+        	 this appliance device is preferred to active or not.
+        	 Commonly upper(or left) device has this value as True(1)
+        	 and low(or right) device has this value as False(0). " 
+    	::= { ubiRedundancyEntry 1 }
+     
+	ubiRedundancyState OBJECT-TYPE
+    	SYNTAX          RedundancyState
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"The HA redundancy state of the appliance device.
+        	Role states for redundancy.  Valid values are :        
+        	notConfigured      (1)   The appliance is not configured for redundancy.
+        	active             (2)   The appliance is the active appliance.
+        	standby            (3)   The appliance is warm standby mode         
+        	activeLostStandby  (4)   The active appliance is not getting any 
+									response from the standby appliance.
+			"
+    	::= { ubiRedundancyEntry 2 }   
+
+     
+	ubiRedundancyConnectionState OBJECT-TYPE
+    	SYNTAX          INTEGER    
+    	{
+    		disconnect(1),
+    		connect(2)
+    	}
+    	MAX-ACCESS      accessible-for-notify
+    	STATUS          current
+    	DESCRIPTION
+        	"The HA redundancy connection state of standby appliance device."
+    	::= { ubiRedundancyEntry 3 }   
+    	
+-- ***********************************************************
+-- ubiRedundancySyncTable
+-- *********************************************************** 
+    	
+	ubiRedundancySyncTable OBJECT-TYPE
+    	SYNTAX          SEQUENCE OF UbiRedundancySyncEntry
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"This table keeps the information of the redundancy sync state
+        	 of the active and standby units."
+    	::= { ubiRedundancy 5 }
+    	
+    ubiRedundancySyncEntry OBJECT-TYPE
+    	SYNTAX          UbiRedundancySyncEntry
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"An entry containing redundancy sync information of the active and standby units"
+    	INDEX           { ubiRedundancyIsActivePreferred  } 
+    	::= { ubiRedundancySyncTable 1 }
+
+	UbiRedundancySyncEntry ::= SEQUENCE {        
+		ubiRedundancySyncState					INTEGER,
+		ubiRedundancySyncNotificationEnabled	TruthValue,
+		ubiRedundancySyncStateChangeNotificationEnabled	TruthValue,
+		}
+	
+	ubiRedundancySyncState OBJECT-TYPE
+    	SYNTAX          INTEGER    
+    	{
+    		sync(1),
+    		notSync(2)
+    	}
+    	MAX-ACCESS      accessible-for-notify
+    	STATUS          current
+    	DESCRIPTION
+        	"The redundancy sync state of active appliance device for standby.
+        	 This sync state is related with 'redundancy-check' function.
+        	 ACTIVE periodically checks sync state with STANDBY using this function.
+        	 Valid values are :
+        	  sync      (1) synchronized with standby.
+        	  notSync   (2) some mismatch occurs with standby."
+    	::= { ubiRedundancySyncEntry 1 }
+    	
+	ubiRedundancySyncNotificationEnabled OBJECT-TYPE
+    	SYNTAX          TruthValue
+    	MAX-ACCESS      read-write
+    	STATUS          current
+    	DESCRIPTION
+        	"Enable or disable redundancy sync notification via SNMP."
+    	::= { ubiRedundancySyncEntry 2 }
+
+	ubiRedundancySyncStateChangeNotificationEnabled OBJECT-TYPE
+    	SYNTAX          TruthValue
+    	MAX-ACCESS      read-write
+    	STATUS          current
+    	DESCRIPTION
+        	"Enable or disable redundancy sync state change notification via SNMP."
+    	::= { ubiRedundancySyncEntry 3 }
+
+-- ***********************************************************
+-- ubiRedundancyAddrTable
+-- *********************************************************** 
+
+	ubiRedundancyAddrTable OBJECT-TYPE
+    	SYNTAX          SEQUENCE OF UbiRedundancyAddrEntry 
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"This table keeps the current configuration of the address 
+        	 information of the active and standby appliances. There is an
+        	 entry in this table corresponding to each network interface
+        	 that is configured for redundancy. Thus, the number of 
+        	 entries in this table corresponds to the number of interfaces
+        	 configured for redundancy."
+    	::= { ubiRedundancyObjects 2 }
+
+
+	ubiRedundancyAddrEntry OBJECT-TYPE
+    	SYNTAX          UbiRedundancyAddrEntry
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"An entry containing address information for redundancy configuration
+        	 on a network interface."
+    	INDEX           { ubiRedundancyAddrIfIndex, ubiRedundancyAddrMyAddressType } 
+    	::= { ubiRedundancyAddrTable 1 }
+
+	UbiRedundancyAddrEntry ::= SEQUENCE {
+		ubiRedundancyAddrIfIndex						InterfaceIndex,
+		ubiRedundancyAddrMyAddressType					InetAddressType,
+        ubiRedundancyAddrMyAddress						InetAddress,
+        ubiRedundancyAddrPeerAddressType				InetAddressType,
+        ubiRedundancyAddrPeerAddress					InetAddress
+       }
+
+   	ubiRedundancyAddrIfIndex OBJECT-TYPE
+    	SYNTAX          InterfaceIndex
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"The index value which uniquely identifies the interface
+        	to which this entry is applicable."
+    	::= { ubiRedundancyAddrEntry 1 }
+
+  	ubiRedundancyAddrMyAddressType OBJECT-TYPE
+    	SYNTAX          InetAddressType
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"The type of address stored in ubiMyAddressType." 
+    	::= { ubiRedundancyAddrEntry 2 }
+
+	ubiRedundancyAddrMyAddress     OBJECT-TYPE
+    	SYNTAX          InetAddress
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"The IP address of the interface configured for this HA 
+        	 configuration in this appliance. The type of this mib variable
+        	 is defined in ubiMyAddressType.
+        	 " 
+    	::= { ubiRedundancyAddrEntry 3 }
+  
+	ubiRedundancyAddrPeerAddressType OBJECT-TYPE
+    	SYNTAX          InetAddressType
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+       		"The type of address stored in ubiPeerAddressType" 
+    	::= { ubiRedundancyAddrEntry 4 }     
+    	
+ 	ubiRedundancyAddrPeerAddress   OBJECT-TYPE
+        SYNTAX          InetAddress
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION   
+        	"The IP address of the interface configured for this HA 
+        	 configuration in the peer appliance. The type of this mib 
+        	 variable is defined in ubiPeerAddressType. 
+        	 "
+        ::= { ubiRedundancyAddrEntry 5 }
+
+-- ***********************************************************
+-- ubiRedundancyPeerObjects
+-- *********************************************************** 
+
+ubiPeerSysInfo						OBJECT IDENTIFIER		::= { ubiRedundancyPeerObjects 1 }
+ubiPeerResource						OBJECT IDENTIFIER		::= { ubiRedundancyPeerObjects 2 }
+ubiPeerEnvironment					OBJECT IDENTIFIER		::= { ubiRedundancyPeerObjects 3 }
+ubiPeerBootInfo						OBJECT IDENTIFIER		::= { ubiRedundancyPeerObjects 4 }
+
+-- ***********************************************************
+-- ubiPeerSysInfo
+-- ***********************************************************
+    
+    ubiPeerSWVersion OBJECT-TYPE
+    	SYNTAX          DisplayString
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"Software version of the peer HA system"
+    	::= { ubiPeerSysInfo 1 }
+    
+    ubiPeerSerialNumber OBJECT-TYPE
+    	SYNTAX          DisplayString
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"Serial Number of the peer HA system"
+    	::= { ubiPeerSysInfo 2 }
+    
+    ubiPeerPhysicalAddress OBJECT-TYPE
+    	SYNTAX          PhysAddress
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"Peer's physical address."
+    	::= { ubiPeerSysInfo 3 }
+
+-- ***********************************************************
+-- ubiPeerResource 
+-- ***********************************************************
+
+   	ubiPeerCpuFiveSec OBJECT-TYPE
+    	SYNTAX          Counter32
+    	UNITS        	"%"
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"CPU busy percentage in the last 5 second period."
+    	::= { ubiPeerResource 1 }
+ 
+  	ubiPeerCpuOneMin OBJECT-TYPE
+    	SYNTAX          Counter32
+    	UNITS        	"%"
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"CPU busy percentage in the last 1 minute period." 
+    	::= { ubiPeerResource 2 }
+
+	ubiPeerCpuFiveMin     OBJECT-TYPE
+    	SYNTAX          Counter32
+    	UNITS        	"%"
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"CPU busy percentage in the last 5 minute period." 
+    	::= { ubiPeerResource 3 }
+
+   	ubiPeerMemoryAlloc OBJECT-TYPE
+    	SYNTAX          Counter32
+    	UNITS        	"kbyte"
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"Memory allocation usage."
+    	::= { ubiPeerResource 4 }
+ 
+  	ubiPeerMemoryFree OBJECT-TYPE
+    	SYNTAX          Counter32
+    	UNITS        	"kbyte"
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"Memory free usage." 
+    	::= { ubiPeerResource 5 }
+
+	ubiPeerMemoryTotal     OBJECT-TYPE
+    	SYNTAX          Counter32
+    	UNITS        	"kbyte"
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"CPU busy percentage in the last 5 minute period." 
+    	::= { ubiPeerResource 6 }
+    
+    ubiPeerMemoryFreePercentage     OBJECT-TYPE
+    	SYNTAX          Counter32
+    	UNITS        	"%"
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"It indicates available memory allocation space in percentage."
+    	::= { ubiPeerResource 7 }
+    	
+-- ***********************************************************
+-- ubiPeerEnvironment
+-- ***********************************************************
+
+   	ubiPeerTemperature	OBJECT-TYPE
+    	SYNTAX          Gauge32
+    	UNITS        	"'C"
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"peer's current temperature."
+    	::= { ubiPeerEnvironment 1 }
+
+-- ***********************************************************
+-- ubiPeerBootInfo
+-- ***********************************************************
+    ubiPeerNextBootImage	OBJECT-TYPE
+    	SYNTAX			DisplayString
+    	MAX-ACCESS      read-write
+    	STATUS          current
+    	DESCRIPTION
+        	"Booting OS Image's name for peer unit
+        	when setting this object, It should be specified the file name with path under /flash directory
+        	and Peer's next booting mode will be Flash booting.
+        	
+        	Valid paths under /flash directory are :
+        	 - os1/
+        	 - os2/
+        	
+        	e.g) os1/BootImageName.Z
+        	"
+    	::= { ubiPeerBootInfo 1 }
+
+ubiPeerImageModify							OBJECT IDENTIFIER		::= { ubiPeerBootInfo 2 }
+
+-- ***********************************************************
+-- ubiPeerImageCopyOrErase
+-- ***********************************************************
+    
+    ubiPeerImagePath OBJECT-TYPE
+    	SYNTAX			INTEGER    	   
+    	{   
+    		os1(1),   
+    		os2(2)
+    	}
+    	MAX-ACCESS      read-write
+    	STATUS          current
+    	DESCRIPTION
+        	"warning :  It operates for only Active unit, not Standby Unit.
+        	
+        	Path of the file that you want to copy or erase.
+        	Represents 'copy (os1:|os2:) peer <FILENAME>' or
+        	           'erase (os1:|os2:) peer <FILENAME>' CLIs.
+        	for copy operation, path of Active unit and
+        	for erase operation, path of Standby unit.
+        	"
+    	::= { ubiPeerImageModify 1 }
+    
+   	ubiPeerImageFileName OBJECT-TYPE
+    	SYNTAX          DisplayString
+    	MAX-ACCESS      read-write
+    	STATUS          current
+    	DESCRIPTION
+        	"warning :  It operates for only Active unit, not Standby Unit.
+        	
+        	Name of the file that you want to copy or erase.
+        	for copy operation, file name at Active unit and
+        	for erase operation, file anme at Standby unit.
+        	"
+    	::= { ubiPeerImageModify 2 }
+
+   	ubiPeerImageModifyOperate OBJECT-TYPE
+    	SYNTAX			INTEGER    	   
+    	{   
+    		copy(1),      
+    		erase(2)
+    	}
+    	MAX-ACCESS      write-only
+    	STATUS          current
+    	DESCRIPTION
+        	"execute to copy or erase configurations."
+    	::= { ubiPeerImageModify 3 }
+
+-- ***********************************************************
+-- ubiSwitchoverObjects
+-- *********************************************************** 
+
+ubiSwitchover						OBJECT IDENTIFIER		::= { ubiSwitchoverObjects 1 }
+
+-- ***********************************************************
+-- ubiSwitchoverInfo
+-- *********************************************************** 
+
+	ubiLastSwitchOverReason OBJECT-TYPE
+    	SYNTAX          SwitchOverReason
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"Reason for the most recent switchover.
+        	Valid values are :     
+        	nont				(0)    none of the following
+        	lossConnWithActive  (1)    lost connection with active
+        	forcedSwitchOver    (2)    Switchover occurs by force
+        	unknown             (3)    Switchover occurs by unknown reason"
+    	::= { ubiSwitchover 1 }   
+                 
+
+ 	ubiLastSwitchOverTime OBJECT-TYPE
+    	SYNTAX          DisplayString
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"The local date and time when the last switchover event 
+        	 occurred and was logged to the system. " 
+    	::= { ubiSwitchover 2 }
+
+    ubiSwitchoverNotificationEnabled OBJECT-TYPE
+    	SYNTAX          TruthValue
+    	MAX-ACCESS      read-write
+    	STATUS          current
+    	DESCRIPTION
+        	"Enable or disable switchover notification via SNMP."
+    	::= { ubiSwitchover 3 }
+    
+    ubiSwitchOverRedundancySyncState OBJECT-TYPE
+    	SYNTAX			INTEGER    	   
+    	{   
+    		sync(1),
+    		notSync(2)
+    	}
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"The HA redundancy sync state of the appliance device after switchover.
+        	Valid values are :
+        	  sync      (1) SCU synchronization is done                      .
+        	  notSync   (2) SCU synchronization is fail or still in progress.
+        	  "
+    	::= { ubiSwitchover 4 }
+
+
+-- ***********************************************************
+-- ubiRedundancyMIBConformance
+-- ***********************************************************  
+
+-- conformance information
+
+ubiRedundancyMIBCompliance  OBJECT IDENTIFIER		::= { ubiRedundancyMIBConformance 1 }
+ubiRedundancyMIBGroups  OBJECT IDENTIFIER			::= { ubiRedundancyMIBConformance 2 }
+
+
+--
+-- compliance statements
+--
+	ubiRedundancyMIBCompliances MODULE-COMPLIANCE
+    	STATUS          current
+    	DESCRIPTION
+        	"An Redundancy-MIB implementation can implement this group to
+        	provide Redundancy properties."
+   	 	MODULE          -- this module
+    	MANDATORY-GROUPS {
+    					ubiRedundancyMIBRedundancyGroup,
+    					ubiRedundancyMIBSwitchoverGroup,
+    					ubiRedundancyMIBNotificationGroup
+                        }
+
+    	GROUP           ubiRedundancyMIBRedundancyGroup
+    	DESCRIPTION
+        	"The ubiRedundancyMIBRedundancyGroup must be implemented for
+        	redundancy properties"
+        GROUP           ubiRedundancyMIBSwitchoverGroup
+    	DESCRIPTION
+        	"The ubiRedundancyMIBSwitchoverGroup must be implemented for
+        	switchover information"
+    	GROUP           ubiRedundancyMIBNotificationGroup
+    	DESCRIPTION
+        	"The ubiRedundancyMIBNotificationGroup must be
+        	implemented for redundancy and switchover that have notification"
+    	::= { ubiRedundancyMIBCompliance 1 }
+
+-- units of conformance
+
+	ubiRedundancyMIBRedundancyGroup OBJECT-GROUP
+    	OBJECTS         {
+                    	}
+    	STATUS          current
+    	DESCRIPTION
+        	"The collection of objects which are used to get the
+        	operational state and redundancy state of the modules"
+    	::= { ubiRedundancyMIBGroups 1 }
+    	
+    ubiRedundancyMIBSwitchoverGroup OBJECT-GROUP
+    	OBJECTS         {
+                    	}
+    	STATUS          current
+    	DESCRIPTION
+        	"The collection of objects which are used to get the
+        	operational state and redundancy state of the modules"
+    	::= { ubiRedundancyMIBGroups 2 }
+
+	ubiRedundancyMIBNotificationGroup OBJECT-GROUP
+    	OBJECTS         {
+                    	}
+        STATUS          current
+    	DESCRIPTION
+        	"The collection of objects which are 
+        	used to send a notification."
+    	::= { ubiRedundancyMIBGroups 3 }    
+
+END
