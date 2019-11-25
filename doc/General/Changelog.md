@@ -1,3 +1,1077 @@
+## 1.58
+*(2019-11-24)*
+
+A big thank you to the following 32 contributors this last month:
+
+  - PipoCanaja (19)
+  - murrant (18)
+  - SourceDoctor (15)
+  - louis-oui (9)
+  - Jellyfrog (4)
+  - vitalisator (3)
+  - rj-taylor (3)
+  - jasoncheng7115 (2)
+  - gdepeyrot (2)
+  - joseUPV (2)
+  - GramThanos (1)
+  - opalivan (1)
+  - BrianSidebotham (1)
+  - arrmo (1)
+  - dlesel (1)
+  - seros1521 (1)
+  - jozefrebjak (1)
+  - mendoza-conicet (1)
+  - willhseitz (1)
+  - MattWSL (1)
+  - evheros (1)
+  - kadecole (1)
+  - joretapoo (1)
+  - laf (1)
+  - Cormoran96 (1)
+  - nomyownnet (1)
+  - thecityofguanyu (1)
+  - isarandi (1)
+  - erotel (1)
+  - corsoblaster (1)
+  - andreasmalta (1)
+  - hanserasmus (1)
+
+#### Feature
+* Trigger Device Rediscovery for a device group ([#10832](https://github.com/librenms/librenms/pull/10832)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Allow user activation/deactivation (MySQL auth) ([#10511](https://github.com/librenms/librenms/pull/10511)) - [SourceDoctor](https://github.com/SourceDoctor)
+
+#### Security
+* Fix restricted application access for normal user ([#10802](https://github.com/librenms/librenms/pull/10802)) - [SourceDoctor](https://github.com/SourceDoctor)
+
+#### Device
+* Added basic Ubiquoss PON support ([#10828](https://github.com/librenms/librenms/pull/10828)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Added basic Zyxel GS-4012F support ([#10829](https://github.com/librenms/librenms/pull/10829)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Extend Dell Laser printer support for S5830dn and similar ([#10878](https://github.com/librenms/librenms/pull/10878)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Fixed Cisco Catalyst9x00 support ([#10862](https://github.com/librenms/librenms/pull/10862)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Extend discovery of Konica printers ([#10806](https://github.com/librenms/librenms/pull/10806)) - [andreasmalta](https://github.com/andreasmalta)
+* Add support for ZyXEL IES4206/5206/5212/6217 MSANs ([#10789](https://github.com/librenms/librenms/pull/10789)) - [vitalisator](https://github.com/vitalisator)
+* Update Alcatel mibs to v8 ([#10857](https://github.com/librenms/librenms/pull/10857)) - [joseUPV](https://github.com/joseUPV)
+* Added support EdgeCore ECS2100-10T ([#10843](https://github.com/librenms/librenms/pull/10843)) - [erotel](https://github.com/erotel)
+* Added hardware and software version for ASR9906 ([#10826](https://github.com/librenms/librenms/pull/10826)) - [nomyownnet](https://github.com/nomyownnet)
+* Add support for ZyXEL IES-5005 and IES-5106 DSLAMs ([#10804](https://github.com/librenms/librenms/pull/10804)) - [vitalisator](https://github.com/vitalisator)
+* Brocade switches - Added names on fiberchannel ports ([#10737](https://github.com/librenms/librenms/pull/10737)) - [evheros](https://github.com/evheros)
+* Added support for Mikrotik LTE Modem ([#10805](https://github.com/librenms/librenms/pull/10805)) - [jozefrebjak](https://github.com/jozefrebjak)
+* Added AIX file system, prefer over hrstorage for AIX ([#10588](https://github.com/librenms/librenms/pull/10588)) - [dlesel](https://github.com/dlesel)
+* Add support for HP PDU Management Module ([#10784](https://github.com/librenms/librenms/pull/10784)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Added device support for Chatsworth-PDU ([#10769](https://github.com/librenms/librenms/pull/10769)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Added device support for Zyxel AnyOS ([#10770](https://github.com/librenms/librenms/pull/10770)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Added basic device support for Infinera PON 7090 platform ([#10771](https://github.com/librenms/librenms/pull/10771)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Added support for Nexans Switches ([#10772](https://github.com/librenms/librenms/pull/10772)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Allow all models of Asentria SiteBoss ([#10746](https://github.com/librenms/librenms/pull/10746)) - [willhseitz](https://github.com/willhseitz)
+* Fixed Tomato (router firmware OS), 'no bulk' enabled ([#10775](https://github.com/librenms/librenms/pull/10775)) - [arrmo](https://github.com/arrmo)
+* Better detection of old 3Com StackSwitches ([#10736](https://github.com/librenms/librenms/pull/10736)) - [joseUPV](https://github.com/joseUPV)
+* Avoid state collisions between 'dell' and 'drac' OSes ([#10539](https://github.com/librenms/librenms/pull/10539)) - [PipoCanaja](https://github.com/PipoCanaja)
+
+#### Webui
+* Add minimum password length setting ([#10867](https://github.com/librenms/librenms/pull/10867)) - [murrant](https://github.com/murrant)
+* Graphical alerts update (text/icon alignment) ([#10856](https://github.com/librenms/librenms/pull/10856)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Fix webui settings - AD bind at wrong place ([#10874](https://github.com/librenms/librenms/pull/10874)) - [louis-oui](https://github.com/louis-oui)
+* Fix static device group updated message ([#10841](https://github.com/librenms/librenms/pull/10841)) - [murrant](https://github.com/murrant)
+* Deactivate 'Delete' button in Device Dependencies page when necessary ([#10852](https://github.com/librenms/librenms/pull/10852)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Custom favicon issue ([#10847](https://github.com/librenms/librenms/pull/10847)) - [corsoblaster](https://github.com/corsoblaster)
+* Added support for routing table collection in discovery ([#10182](https://github.com/librenms/librenms/pull/10182)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Allow user specific themes ([#10799](https://github.com/librenms/librenms/pull/10799)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Fix some IE issues with settings page ([#10819](https://github.com/librenms/librenms/pull/10819)) - [murrant](https://github.com/murrant)
+* Alphabetic order of app overview ([#10825](https://github.com/librenms/librenms/pull/10825)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Fix maps display only one link if multiple links are present between … ([#10818](https://github.com/librenms/librenms/pull/10818)) - [louis-oui](https://github.com/louis-oui)
+* Clarify wording of disable/alert device settings and dependency between the two settings ([#10809](https://github.com/librenms/librenms/pull/10809)) - [gdepeyrot](https://github.com/gdepeyrot)
+* Show logged in user in title menu ([#10800](https://github.com/librenms/librenms/pull/10800)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Device List: add metrics icons tooltip ([#10811](https://github.com/librenms/librenms/pull/10811)) - [kadecole](https://github.com/kadecole)
+* UI bug fix - Scroll disabled on "new rule from collection" modal ([#10796](https://github.com/librenms/librenms/pull/10796)) - [GramThanos](https://github.com/GramThanos)
+* Prevent sessions from expiring ([#10798](https://github.com/librenms/librenms/pull/10798)) - [murrant](https://github.com/murrant)
+* Comparison fix in slas.inc.php ([#10812](https://github.com/librenms/librenms/pull/10812)) - [seros1521](https://github.com/seros1521)
+* Unbundle javascript language files ([#10788](https://github.com/librenms/librenms/pull/10788)) - [murrant](https://github.com/murrant)
+* Fix email_auto_tls toggle ([#10785](https://github.com/librenms/librenms/pull/10785)) - [murrant](https://github.com/murrant)
+* Fix missing values for recurring alert state ([#10793](https://github.com/librenms/librenms/pull/10793)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Bootstrapping checkboxes, cont. ([#10782](https://github.com/librenms/librenms/pull/10782)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Add a deprecated warning to the front pages ([#10783](https://github.com/librenms/librenms/pull/10783)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Fix oxidized url setting validator ([#10766](https://github.com/librenms/librenms/pull/10766)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Fix settings search ([#10777](https://github.com/librenms/librenms/pull/10777)) - [murrant](https://github.com/murrant)
+* Bootstrap checkboxes ([#10749](https://github.com/librenms/librenms/pull/10749)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Replaced WorldMap zoom with text field to enable more fine grained zooming by steps of 0.1 ([#10753](https://github.com/librenms/librenms/pull/10753)) - [gdepeyrot](https://github.com/gdepeyrot)
+* Fix asset urls on settings page ([#10765](https://github.com/librenms/librenms/pull/10765)) - [murrant](https://github.com/murrant)
+* Settings.php key fix ([#10774](https://github.com/librenms/librenms/pull/10774)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Adding more default values to config_definitions ([#10756](https://github.com/librenms/librenms/pull/10756)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Fix broken relationship of local Service ID with SDP Service ID ([#10713](https://github.com/librenms/librenms/pull/10713)) - [vitalisator](https://github.com/vitalisator)
+* Fix mydomain setting regex ([#10762](https://github.com/librenms/librenms/pull/10762)) - [murrant](https://github.com/murrant)
+
+#### Authentication
+* LDAP Add option to authenticate user independtly of OU ([#10873](https://github.com/librenms/librenms/pull/10873)) - [louis-oui](https://github.com/louis-oui)
+* Fix LDAP slow login and unable to login ([#10872](https://github.com/librenms/librenms/pull/10872)) - [louis-oui](https://github.com/louis-oui)
+* Fix auth_test script does not do ldap bind ([#10865](https://github.com/librenms/librenms/pull/10865)) - [louis-oui](https://github.com/louis-oui)
+
+#### Applications
+* Added certificate file validity check for services (#10354) ([#10354](https://github.com/librenms/librenms/pull/10354)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Fix mdadm sync speed title description ([#10773](https://github.com/librenms/librenms/pull/10773)) - [SourceDoctor](https://github.com/SourceDoctor)
+
+#### Api
+* Add interval extra var on API add_rule and edit_rule ([#10814](https://github.com/librenms/librenms/pull/10814)) - [joretapoo](https://github.com/joretapoo)
+* Removal of IP address validation for ip field in add_service_for_host API call ([#10810](https://github.com/librenms/librenms/pull/10810)) - [MattWSL](https://github.com/MattWSL)
+* List_arp search by MAC ([#10803](https://github.com/librenms/librenms/pull/10803)) - [murrant](https://github.com/murrant)
+* Create device groups via API ([#10791](https://github.com/librenms/librenms/pull/10791)) - [BrianSidebotham](https://github.com/BrianSidebotham)
+* Fix API arp cidr search ([#10780](https://github.com/librenms/librenms/pull/10780)) - [murrant](https://github.com/murrant)
+
+#### Alerting
+* Do not purge alert_log table entries that have a matching active alert in alerts table ([#10744](https://github.com/librenms/librenms/pull/10744)) - [louis-oui](https://github.com/louis-oui)
+* Add Headers and body to API Transports ([#10614](https://github.com/librenms/librenms/pull/10614)) - [mendoza-conicet](https://github.com/mendoza-conicet)
+
+#### Polling
+* Perf optimisation for xDSL mib polling ([#10815](https://github.com/librenms/librenms/pull/10815)) - [PipoCanaja](https://github.com/PipoCanaja)
+
+#### Bug
+* Fix syslog prune when dbFetchRow() returns array ([#10850](https://github.com/librenms/librenms/pull/10850)) - [rj-taylor](https://github.com/rj-taylor)
+* Fixes Zyxel MIB product definition ([#10824](https://github.com/librenms/librenms/pull/10824)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Fix snmp v3 when set via ui ([#10797](https://github.com/librenms/librenms/pull/10797)) - [murrant](https://github.com/murrant)
+* Fix invalid check for device-\>isUnderMaintenance() in worldmap ([#10778](https://github.com/librenms/librenms/pull/10778)) - [Jellyfrog](https://github.com/Jellyfrog)
+
+#### Refactor
+* Update device cache ([#10795](https://github.com/librenms/librenms/pull/10795)) - [murrant](https://github.com/murrant)
+
+#### Cleanup
+* Prevent syslog table purge from spamming daily.log ([#10851](https://github.com/librenms/librenms/pull/10851)) - [rj-taylor](https://github.com/rj-taylor)
+
+#### Documentation
+* Documentation link fixes ([#10848](https://github.com/librenms/librenms/pull/10848)) - [rj-taylor](https://github.com/rj-taylor)
+* Deleted yum package listed twice ([#10758](https://github.com/librenms/librenms/pull/10758)) - [hanserasmus](https://github.com/hanserasmus)
+
+#### Translation
+* German translation for settings page ([#10764](https://github.com/librenms/librenms/pull/10764)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Translation correction ([#10821](https://github.com/librenms/librenms/pull/10821)) - [Cormoran96](https://github.com/Cormoran96)
+* Update zh-TW Translate settings strings ([#10816](https://github.com/librenms/librenms/pull/10816)) - [jasoncheng7115](https://github.com/jasoncheng7115)
+* Translation generation command ([#10794](https://github.com/librenms/librenms/pull/10794)) - [murrant](https://github.com/murrant)
+* Translate settings strings to zh-TW ([#10716](https://github.com/librenms/librenms/pull/10716)) - [jasoncheng7115](https://github.com/jasoncheng7115)
+* Translation of settings in French ([#10763](https://github.com/librenms/librenms/pull/10763)) - [PipoCanaja](https://github.com/PipoCanaja)
+
+#### Misc
+* Update dependencies ([#10830](https://github.com/librenms/librenms/pull/10830)) - [murrant](https://github.com/murrant)
+* Add check_oracle service include file and make 'packet_loss_' macro alerts not use radio buttons ([#10807](https://github.com/librenms/librenms/pull/10807)) - [thecityofguanyu](https://github.com/thecityofguanyu)
+
+
+## 1.58
+*(2019-11-24)*
+
+A big thank you to the following 32 contributors this last month:
+
+  - PipoCanaja (18)
+  - murrant (17)
+  - SourceDoctor (15)
+  - louis-oui (9)
+  - Jellyfrog (4)
+  - vitalisator (3)
+  - rj-taylor (3)
+  - jasoncheng7115 (2)
+  - gdepeyrot (2)
+  - joseUPV (2)
+  - GramThanos (1)
+  - opalivan (1)
+  - BrianSidebotham (1)
+  - arrmo (1)
+  - dlesel (1)
+  - seros1521 (1)
+  - jozefrebjak (1)
+  - mendoza-conicet (1)
+  - willhseitz (1)
+  - MattWSL (1)
+  - evheros (1)
+  - kadecole (1)
+  - joretapoo (1)
+  - laf (1)
+  - Cormoran96 (1)
+  - nomyownnet (1)
+  - thecityofguanyu (1)
+  - isarandi (1)
+  - erotel (1)
+  - corsoblaster (1)
+  - andreasmalta (1)
+  - hanserasmus (1)
+
+#### Feature
+* Trigger Device Rediscovery for a device group ([#10832](https://github.com/librenms/librenms/pull/10832)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Allow user activation/deactivation (MySQL auth) ([#10511](https://github.com/librenms/librenms/pull/10511)) - [SourceDoctor](https://github.com/SourceDoctor)
+
+#### Security
+* Fix restricted application access for normal user ([#10802](https://github.com/librenms/librenms/pull/10802)) - [SourceDoctor](https://github.com/SourceDoctor)
+
+#### Device
+* Added basic Ubiquoss PON support ([#10828](https://github.com/librenms/librenms/pull/10828)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Added basic Zyxel GS-4012F support ([#10829](https://github.com/librenms/librenms/pull/10829)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Extend Dell Laser printer support for S5830dn and similar ([#10878](https://github.com/librenms/librenms/pull/10878)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Fixed Cisco Catalyst9x00 support ([#10862](https://github.com/librenms/librenms/pull/10862)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Extend discovery of Konica printers ([#10806](https://github.com/librenms/librenms/pull/10806)) - [andreasmalta](https://github.com/andreasmalta)
+* Add support for ZyXEL IES4206/5206/5212/6217 MSANs ([#10789](https://github.com/librenms/librenms/pull/10789)) - [vitalisator](https://github.com/vitalisator)
+* Update Alcatel mibs to v8 ([#10857](https://github.com/librenms/librenms/pull/10857)) - [joseUPV](https://github.com/joseUPV)
+* Added support EdgeCore ECS2100-10T ([#10843](https://github.com/librenms/librenms/pull/10843)) - [erotel](https://github.com/erotel)
+* Added hardware and software version for ASR9906 ([#10826](https://github.com/librenms/librenms/pull/10826)) - [nomyownnet](https://github.com/nomyownnet)
+* Add support for ZyXEL IES-5005 and IES-5106 DSLAMs ([#10804](https://github.com/librenms/librenms/pull/10804)) - [vitalisator](https://github.com/vitalisator)
+* Brocade switches - Added names on fiberchannel ports ([#10737](https://github.com/librenms/librenms/pull/10737)) - [evheros](https://github.com/evheros)
+* Added support for Mikrotik LTE Modem ([#10805](https://github.com/librenms/librenms/pull/10805)) - [jozefrebjak](https://github.com/jozefrebjak)
+* Added AIX file system, prefer over hrstorage for AIX ([#10588](https://github.com/librenms/librenms/pull/10588)) - [dlesel](https://github.com/dlesel)
+* Add support for HP PDU Management Module ([#10784](https://github.com/librenms/librenms/pull/10784)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Added device support for Chatsworth-PDU ([#10769](https://github.com/librenms/librenms/pull/10769)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Added device support for Zyxel AnyOS ([#10770](https://github.com/librenms/librenms/pull/10770)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Added basic device support for Infinera PON 7090 platform ([#10771](https://github.com/librenms/librenms/pull/10771)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Added support for Nexans Switches ([#10772](https://github.com/librenms/librenms/pull/10772)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Allow all models of Asentria SiteBoss ([#10746](https://github.com/librenms/librenms/pull/10746)) - [willhseitz](https://github.com/willhseitz)
+* Fixed Tomato (router firmware OS), 'no bulk' enabled ([#10775](https://github.com/librenms/librenms/pull/10775)) - [arrmo](https://github.com/arrmo)
+* Better detection of old 3Com StackSwitches ([#10736](https://github.com/librenms/librenms/pull/10736)) - [joseUPV](https://github.com/joseUPV)
+* Avoid state collisions between 'dell' and 'drac' OSes ([#10539](https://github.com/librenms/librenms/pull/10539)) - [PipoCanaja](https://github.com/PipoCanaja)
+
+#### Webui
+* Fix webui settings - AD bind at wrong place ([#10874](https://github.com/librenms/librenms/pull/10874)) - [louis-oui](https://github.com/louis-oui)
+* Fix static device group updated message ([#10841](https://github.com/librenms/librenms/pull/10841)) - [murrant](https://github.com/murrant)
+* Deactivate 'Delete' button in Device Dependencies page when necessary ([#10852](https://github.com/librenms/librenms/pull/10852)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Custom favicon issue ([#10847](https://github.com/librenms/librenms/pull/10847)) - [corsoblaster](https://github.com/corsoblaster)
+* Added support for routing table collection in discovery ([#10182](https://github.com/librenms/librenms/pull/10182)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Allow user specific themes ([#10799](https://github.com/librenms/librenms/pull/10799)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Fix some IE issues with settings page ([#10819](https://github.com/librenms/librenms/pull/10819)) - [murrant](https://github.com/murrant)
+* Alphabetic order of app overview ([#10825](https://github.com/librenms/librenms/pull/10825)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Fix maps display only one link if multiple links are present between … ([#10818](https://github.com/librenms/librenms/pull/10818)) - [louis-oui](https://github.com/louis-oui)
+* Clarify wording of disable/alert device settings and dependency between the two settings ([#10809](https://github.com/librenms/librenms/pull/10809)) - [gdepeyrot](https://github.com/gdepeyrot)
+* Show logged in user in title menu ([#10800](https://github.com/librenms/librenms/pull/10800)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Device List: add metrics icons tooltip ([#10811](https://github.com/librenms/librenms/pull/10811)) - [kadecole](https://github.com/kadecole)
+* UI bug fix - Scroll disabled on "new rule from collection" modal ([#10796](https://github.com/librenms/librenms/pull/10796)) - [GramThanos](https://github.com/GramThanos)
+* Prevent sessions from expiring ([#10798](https://github.com/librenms/librenms/pull/10798)) - [murrant](https://github.com/murrant)
+* Comparison fix in slas.inc.php ([#10812](https://github.com/librenms/librenms/pull/10812)) - [seros1521](https://github.com/seros1521)
+* Unbundle javascript language files ([#10788](https://github.com/librenms/librenms/pull/10788)) - [murrant](https://github.com/murrant)
+* Fix email_auto_tls toggle ([#10785](https://github.com/librenms/librenms/pull/10785)) - [murrant](https://github.com/murrant)
+* Fix missing values for recurring alert state ([#10793](https://github.com/librenms/librenms/pull/10793)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Bootstrapping checkboxes, cont. ([#10782](https://github.com/librenms/librenms/pull/10782)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Add a deprecated warning to the front pages ([#10783](https://github.com/librenms/librenms/pull/10783)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Fix oxidized url setting validator ([#10766](https://github.com/librenms/librenms/pull/10766)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Fix settings search ([#10777](https://github.com/librenms/librenms/pull/10777)) - [murrant](https://github.com/murrant)
+* Bootstrap checkboxes ([#10749](https://github.com/librenms/librenms/pull/10749)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Replaced WorldMap zoom with text field to enable more fine grained zooming by steps of 0.1 ([#10753](https://github.com/librenms/librenms/pull/10753)) - [gdepeyrot](https://github.com/gdepeyrot)
+* Fix asset urls on settings page ([#10765](https://github.com/librenms/librenms/pull/10765)) - [murrant](https://github.com/murrant)
+* Settings.php key fix ([#10774](https://github.com/librenms/librenms/pull/10774)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Adding more default values to config_definitions ([#10756](https://github.com/librenms/librenms/pull/10756)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Fix broken relationship of local Service ID with SDP Service ID ([#10713](https://github.com/librenms/librenms/pull/10713)) - [vitalisator](https://github.com/vitalisator)
+* Fix mydomain setting regex ([#10762](https://github.com/librenms/librenms/pull/10762)) - [murrant](https://github.com/murrant)
+
+#### Authentication
+* LDAP Add option to authenticate user independtly of OU ([#10873](https://github.com/librenms/librenms/pull/10873)) - [louis-oui](https://github.com/louis-oui)
+* Fix LDAP slow login and unable to login ([#10872](https://github.com/librenms/librenms/pull/10872)) - [louis-oui](https://github.com/louis-oui)
+* Fix auth_test script does not do ldap bind ([#10865](https://github.com/librenms/librenms/pull/10865)) - [louis-oui](https://github.com/louis-oui)
+
+#### Applications
+* Added certificate file validity check for services (#10354) ([#10354](https://github.com/librenms/librenms/pull/10354)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Fix mdadm sync speed title description ([#10773](https://github.com/librenms/librenms/pull/10773)) - [SourceDoctor](https://github.com/SourceDoctor)
+
+#### Api
+* Add interval extra var on API add_rule and edit_rule ([#10814](https://github.com/librenms/librenms/pull/10814)) - [joretapoo](https://github.com/joretapoo)
+* Removal of IP address validation for ip field in add_service_for_host API call ([#10810](https://github.com/librenms/librenms/pull/10810)) - [MattWSL](https://github.com/MattWSL)
+* List_arp search by MAC ([#10803](https://github.com/librenms/librenms/pull/10803)) - [murrant](https://github.com/murrant)
+* Create device groups via API ([#10791](https://github.com/librenms/librenms/pull/10791)) - [BrianSidebotham](https://github.com/BrianSidebotham)
+* Fix API arp cidr search ([#10780](https://github.com/librenms/librenms/pull/10780)) - [murrant](https://github.com/murrant)
+
+#### Alerting
+* Do not purge alert_log table entries that have a matching active alert in alerts table ([#10744](https://github.com/librenms/librenms/pull/10744)) - [louis-oui](https://github.com/louis-oui)
+* Add Headers and body to API Transports ([#10614](https://github.com/librenms/librenms/pull/10614)) - [mendoza-conicet](https://github.com/mendoza-conicet)
+
+#### Polling
+* Perf optimisation for xDSL mib polling ([#10815](https://github.com/librenms/librenms/pull/10815)) - [PipoCanaja](https://github.com/PipoCanaja)
+
+#### Bug
+* Fix syslog prune when dbFetchRow() returns array ([#10850](https://github.com/librenms/librenms/pull/10850)) - [rj-taylor](https://github.com/rj-taylor)
+* Fixes Zyxel MIB product definition ([#10824](https://github.com/librenms/librenms/pull/10824)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Fix snmp v3 when set via ui ([#10797](https://github.com/librenms/librenms/pull/10797)) - [murrant](https://github.com/murrant)
+* Fix invalid check for device-\>isUnderMaintenance() in worldmap ([#10778](https://github.com/librenms/librenms/pull/10778)) - [Jellyfrog](https://github.com/Jellyfrog)
+
+#### Refactor
+* Update device cache ([#10795](https://github.com/librenms/librenms/pull/10795)) - [murrant](https://github.com/murrant)
+
+#### Cleanup
+* Prevent syslog table purge from spamming daily.log ([#10851](https://github.com/librenms/librenms/pull/10851)) - [rj-taylor](https://github.com/rj-taylor)
+
+#### Documentation
+* Documentation link fixes ([#10848](https://github.com/librenms/librenms/pull/10848)) - [rj-taylor](https://github.com/rj-taylor)
+* Deleted yum package listed twice ([#10758](https://github.com/librenms/librenms/pull/10758)) - [hanserasmus](https://github.com/hanserasmus)
+
+#### Translation
+* German translation for settings page ([#10764](https://github.com/librenms/librenms/pull/10764)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Translation correction ([#10821](https://github.com/librenms/librenms/pull/10821)) - [Cormoran96](https://github.com/Cormoran96)
+* Update zh-TW Translate settings strings ([#10816](https://github.com/librenms/librenms/pull/10816)) - [jasoncheng7115](https://github.com/jasoncheng7115)
+* Translation generation command ([#10794](https://github.com/librenms/librenms/pull/10794)) - [murrant](https://github.com/murrant)
+* Translate settings strings to zh-TW ([#10716](https://github.com/librenms/librenms/pull/10716)) - [jasoncheng7115](https://github.com/jasoncheng7115)
+* Translation of settings in French ([#10763](https://github.com/librenms/librenms/pull/10763)) - [PipoCanaja](https://github.com/PipoCanaja)
+
+#### Misc
+* Update dependencies ([#10830](https://github.com/librenms/librenms/pull/10830)) - [murrant](https://github.com/murrant)
+* Add check_oracle service include file and make 'packet_loss_' macro alerts not use radio buttons ([#10807](https://github.com/librenms/librenms/pull/10807)) - [thecityofguanyu](https://github.com/thecityofguanyu)
+
+
+## 1.58
+*(2019-11-24)*
+
+A big thank you to the following 32 contributors this last month:
+
+  - PipoCanaja (18)
+  - murrant (17)
+  - SourceDoctor (15)
+  - louis-oui (9)
+  - Jellyfrog (4)
+  - vitalisator (3)
+  - rj-taylor (3)
+  - jasoncheng7115 (2)
+  - gdepeyrot (2)
+  - joseUPV (2)
+  - GramThanos (1)
+  - opalivan (1)
+  - BrianSidebotham (1)
+  - arrmo (1)
+  - dlesel (1)
+  - seros1521 (1)
+  - jozefrebjak (1)
+  - mendoza-conicet (1)
+  - willhseitz (1)
+  - MattWSL (1)
+  - evheros (1)
+  - kadecole (1)
+  - joretapoo (1)
+  - laf (1)
+  - Cormoran96 (1)
+  - nomyownnet (1)
+  - thecityofguanyu (1)
+  - isarandi (1)
+  - erotel (1)
+  - corsoblaster (1)
+  - andreasmalta (1)
+  - hanserasmus (1)
+
+#### Feature
+* Trigger Device Rediscovery for a device group ([#10832](https://github.com/librenms/librenms/pull/10832)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Allow user activation/deactivation (MySQL auth) ([#10511](https://github.com/librenms/librenms/pull/10511)) - [SourceDoctor](https://github.com/SourceDoctor)
+
+#### Security
+* Fix restricted application access for normal user ([#10802](https://github.com/librenms/librenms/pull/10802)) - [SourceDoctor](https://github.com/SourceDoctor)
+
+#### Device
+* Added basic Ubiquoss PON support ([#10828](https://github.com/librenms/librenms/pull/10828)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Added basic Zyxel GS-4012F support ([#10829](https://github.com/librenms/librenms/pull/10829)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Extend Dell Laser printer support for S5830dn and similar ([#10878](https://github.com/librenms/librenms/pull/10878)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Fixed Cisco Catalyst9x00 support ([#10862](https://github.com/librenms/librenms/pull/10862)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Extend discovery of Konica printers ([#10806](https://github.com/librenms/librenms/pull/10806)) - [andreasmalta](https://github.com/andreasmalta)
+* Add support for ZyXEL IES4206/5206/5212/6217 MSANs ([#10789](https://github.com/librenms/librenms/pull/10789)) - [vitalisator](https://github.com/vitalisator)
+* Update Alcatel mibs to v8 ([#10857](https://github.com/librenms/librenms/pull/10857)) - [joseUPV](https://github.com/joseUPV)
+* Added support EdgeCore ECS2100-10T ([#10843](https://github.com/librenms/librenms/pull/10843)) - [erotel](https://github.com/erotel)
+* Added hardware and software version for ASR9906 ([#10826](https://github.com/librenms/librenms/pull/10826)) - [nomyownnet](https://github.com/nomyownnet)
+* Add support for ZyXEL IES-5005 and IES-5106 DSLAMs ([#10804](https://github.com/librenms/librenms/pull/10804)) - [vitalisator](https://github.com/vitalisator)
+* Brocade switches - Added names on fiberchannel ports ([#10737](https://github.com/librenms/librenms/pull/10737)) - [evheros](https://github.com/evheros)
+* Added support for Mikrotik LTE Modem ([#10805](https://github.com/librenms/librenms/pull/10805)) - [jozefrebjak](https://github.com/jozefrebjak)
+* Added AIX file system, prefer over hrstorage for AIX ([#10588](https://github.com/librenms/librenms/pull/10588)) - [dlesel](https://github.com/dlesel)
+* Add support for HP PDU Management Module ([#10784](https://github.com/librenms/librenms/pull/10784)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Added device support for Chatsworth-PDU ([#10769](https://github.com/librenms/librenms/pull/10769)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Added device support for Zyxel AnyOS ([#10770](https://github.com/librenms/librenms/pull/10770)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Added basic device support for Infinera PON 7090 platform ([#10771](https://github.com/librenms/librenms/pull/10771)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Added support for Nexans Switches ([#10772](https://github.com/librenms/librenms/pull/10772)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Allow all models of Asentria SiteBoss ([#10746](https://github.com/librenms/librenms/pull/10746)) - [willhseitz](https://github.com/willhseitz)
+* Fixed Tomato (router firmware OS), 'no bulk' enabled ([#10775](https://github.com/librenms/librenms/pull/10775)) - [arrmo](https://github.com/arrmo)
+* Better detection of old 3Com StackSwitches ([#10736](https://github.com/librenms/librenms/pull/10736)) - [joseUPV](https://github.com/joseUPV)
+* Avoid state collisions between 'dell' and 'drac' OSes ([#10539](https://github.com/librenms/librenms/pull/10539)) - [PipoCanaja](https://github.com/PipoCanaja)
+
+#### Webui
+* Fix webui settings - AD bind at wrong place ([#10874](https://github.com/librenms/librenms/pull/10874)) - [louis-oui](https://github.com/louis-oui)
+* Fix static device group updated message ([#10841](https://github.com/librenms/librenms/pull/10841)) - [murrant](https://github.com/murrant)
+* Deactivate 'Delete' button in Device Dependencies page when necessary ([#10852](https://github.com/librenms/librenms/pull/10852)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Custom favicon issue ([#10847](https://github.com/librenms/librenms/pull/10847)) - [corsoblaster](https://github.com/corsoblaster)
+* Added support for routing table collection in discovery ([#10182](https://github.com/librenms/librenms/pull/10182)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Allow user specific themes ([#10799](https://github.com/librenms/librenms/pull/10799)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Fix some IE issues with settings page ([#10819](https://github.com/librenms/librenms/pull/10819)) - [murrant](https://github.com/murrant)
+* Alphabetic order of app overview ([#10825](https://github.com/librenms/librenms/pull/10825)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Fix maps display only one link if multiple links are present between … ([#10818](https://github.com/librenms/librenms/pull/10818)) - [louis-oui](https://github.com/louis-oui)
+* Clarify wording of disable/alert device settings and dependency between the two settings ([#10809](https://github.com/librenms/librenms/pull/10809)) - [gdepeyrot](https://github.com/gdepeyrot)
+* Show logged in user in title menu ([#10800](https://github.com/librenms/librenms/pull/10800)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Device List: add metrics icons tooltip ([#10811](https://github.com/librenms/librenms/pull/10811)) - [kadecole](https://github.com/kadecole)
+* UI bug fix - Scroll disabled on "new rule from collection" modal ([#10796](https://github.com/librenms/librenms/pull/10796)) - [GramThanos](https://github.com/GramThanos)
+* Prevent sessions from expiring ([#10798](https://github.com/librenms/librenms/pull/10798)) - [murrant](https://github.com/murrant)
+* Comparison fix in slas.inc.php ([#10812](https://github.com/librenms/librenms/pull/10812)) - [seros1521](https://github.com/seros1521)
+* Unbundle javascript language files ([#10788](https://github.com/librenms/librenms/pull/10788)) - [murrant](https://github.com/murrant)
+* Fix email_auto_tls toggle ([#10785](https://github.com/librenms/librenms/pull/10785)) - [murrant](https://github.com/murrant)
+* Fix missing values for recurring alert state ([#10793](https://github.com/librenms/librenms/pull/10793)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Bootstrapping checkboxes, cont. ([#10782](https://github.com/librenms/librenms/pull/10782)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Add a deprecated warning to the front pages ([#10783](https://github.com/librenms/librenms/pull/10783)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Fix oxidized url setting validator ([#10766](https://github.com/librenms/librenms/pull/10766)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Fix settings search ([#10777](https://github.com/librenms/librenms/pull/10777)) - [murrant](https://github.com/murrant)
+* Bootstrap checkboxes ([#10749](https://github.com/librenms/librenms/pull/10749)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Replaced WorldMap zoom with text field to enable more fine grained zooming by steps of 0.1 ([#10753](https://github.com/librenms/librenms/pull/10753)) - [gdepeyrot](https://github.com/gdepeyrot)
+* Fix asset urls on settings page ([#10765](https://github.com/librenms/librenms/pull/10765)) - [murrant](https://github.com/murrant)
+* Settings.php key fix ([#10774](https://github.com/librenms/librenms/pull/10774)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Adding more default values to config_definitions ([#10756](https://github.com/librenms/librenms/pull/10756)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Fix broken relationship of local Service ID with SDP Service ID ([#10713](https://github.com/librenms/librenms/pull/10713)) - [vitalisator](https://github.com/vitalisator)
+* Fix mydomain setting regex ([#10762](https://github.com/librenms/librenms/pull/10762)) - [murrant](https://github.com/murrant)
+
+#### Authentication
+* LDAP Add option to authenticate user independtly of OU ([#10873](https://github.com/librenms/librenms/pull/10873)) - [louis-oui](https://github.com/louis-oui)
+* Fix LDAP slow login and unable to login ([#10872](https://github.com/librenms/librenms/pull/10872)) - [louis-oui](https://github.com/louis-oui)
+* Fix auth_test script does not do ldap bind ([#10865](https://github.com/librenms/librenms/pull/10865)) - [louis-oui](https://github.com/louis-oui)
+* Fix LDAP slow login ([#10760](https://github.com/librenms/librenms/pull/10760)) - [louis-oui](https://github.com/louis-oui)
+* Revert "Fix LDAP slow login" ([#10855](https://github.com/librenms/librenms/pull/10855)) - [louis-oui](https://github.com/louis-oui)
+
+#### Applications
+* Added certificate file validity check for services (#10354) ([#10354](https://github.com/librenms/librenms/pull/10354)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Fix mdadm sync speed title description ([#10773](https://github.com/librenms/librenms/pull/10773)) - [SourceDoctor](https://github.com/SourceDoctor)
+
+#### Api
+* Add interval extra var on API add_rule and edit_rule ([#10814](https://github.com/librenms/librenms/pull/10814)) - [joretapoo](https://github.com/joretapoo)
+* Removal of IP address validation for ip field in add_service_for_host API call ([#10810](https://github.com/librenms/librenms/pull/10810)) - [MattWSL](https://github.com/MattWSL)
+* List_arp search by MAC ([#10803](https://github.com/librenms/librenms/pull/10803)) - [murrant](https://github.com/murrant)
+* Create device groups via API ([#10791](https://github.com/librenms/librenms/pull/10791)) - [BrianSidebotham](https://github.com/BrianSidebotham)
+* Fix API arp cidr search ([#10780](https://github.com/librenms/librenms/pull/10780)) - [murrant](https://github.com/murrant)
+
+#### Alerting
+* Do not purge alert_log table entries that have a matching active alert in alerts table ([#10744](https://github.com/librenms/librenms/pull/10744)) - [louis-oui](https://github.com/louis-oui)
+* Add Headers and body to API Transports ([#10614](https://github.com/librenms/librenms/pull/10614)) - [mendoza-conicet](https://github.com/mendoza-conicet)
+
+#### Polling
+* Perf optimisation for xDSL mib polling ([#10815](https://github.com/librenms/librenms/pull/10815)) - [PipoCanaja](https://github.com/PipoCanaja)
+
+#### Bug
+* Fix syslog prune when dbFetchRow() returns array ([#10850](https://github.com/librenms/librenms/pull/10850)) - [rj-taylor](https://github.com/rj-taylor)
+* Fixes Zyxel MIB product definition ([#10824](https://github.com/librenms/librenms/pull/10824)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Fix snmp v3 when set via ui ([#10797](https://github.com/librenms/librenms/pull/10797)) - [murrant](https://github.com/murrant)
+* Fix invalid check for device-\>isUnderMaintenance() in worldmap ([#10778](https://github.com/librenms/librenms/pull/10778)) - [Jellyfrog](https://github.com/Jellyfrog)
+
+#### Refactor
+* Update device cache ([#10795](https://github.com/librenms/librenms/pull/10795)) - [murrant](https://github.com/murrant)
+
+#### Cleanup
+* Prevent syslog table purge from spamming daily.log ([#10851](https://github.com/librenms/librenms/pull/10851)) - [rj-taylor](https://github.com/rj-taylor)
+
+#### Documentation
+* Documentation link fixes ([#10848](https://github.com/librenms/librenms/pull/10848)) - [rj-taylor](https://github.com/rj-taylor)
+* Deleted yum package listed twice ([#10758](https://github.com/librenms/librenms/pull/10758)) - [hanserasmus](https://github.com/hanserasmus)
+
+#### Translation
+* German translation for settings page ([#10764](https://github.com/librenms/librenms/pull/10764)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Translation correction ([#10821](https://github.com/librenms/librenms/pull/10821)) - [Cormoran96](https://github.com/Cormoran96)
+* Update zh-TW Translate settings strings ([#10816](https://github.com/librenms/librenms/pull/10816)) - [jasoncheng7115](https://github.com/jasoncheng7115)
+* Translation generation command ([#10794](https://github.com/librenms/librenms/pull/10794)) - [murrant](https://github.com/murrant)
+* Translate settings strings to zh-TW ([#10716](https://github.com/librenms/librenms/pull/10716)) - [jasoncheng7115](https://github.com/jasoncheng7115)
+* Translation of settings in French ([#10763](https://github.com/librenms/librenms/pull/10763)) - [PipoCanaja](https://github.com/PipoCanaja)
+
+#### Misc
+* Update dependencies ([#10830](https://github.com/librenms/librenms/pull/10830)) - [murrant](https://github.com/murrant)
+* Add check_oracle service include file and make 'packet_loss_' macro alerts not use radio buttons ([#10807](https://github.com/librenms/librenms/pull/10807)) - [thecityofguanyu](https://github.com/thecityofguanyu)
+
+
+## 1.58
+*(2019-11-24)*
+
+A big thank you to the following 32 contributors this last month:
+
+  - PipoCanaja (18)
+  - murrant (17)
+  - SourceDoctor (15)
+  - louis-oui (9)
+  - Jellyfrog (4)
+  - vitalisator (3)
+  - rj-taylor (3)
+  - jasoncheng7115 (2)
+  - gdepeyrot (2)
+  - joseUPV (2)
+  - GramThanos (1)
+  - opalivan (1)
+  - BrianSidebotham (1)
+  - arrmo (1)
+  - dlesel (1)
+  - seros1521 (1)
+  - jozefrebjak (1)
+  - mendoza-conicet (1)
+  - willhseitz (1)
+  - MattWSL (1)
+  - evheros (1)
+  - kadecole (1)
+  - joretapoo (1)
+  - laf (1)
+  - Cormoran96 (1)
+  - nomyownnet (1)
+  - thecityofguanyu (1)
+  - isarandi (1)
+  - erotel (1)
+  - corsoblaster (1)
+  - andreasmalta (1)
+  - hanserasmus (1)
+
+#### Feature
+* Trigger Device Rediscovery for a device group ([#10832](https://github.com/librenms/librenms/pull/10832)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Allow user activation/deactivation (MySQL auth) ([#10511](https://github.com/librenms/librenms/pull/10511)) - [SourceDoctor](https://github.com/SourceDoctor)
+
+#### Security
+* Fix restricted application access for normal user ([#10802](https://github.com/librenms/librenms/pull/10802)) - [SourceDoctor](https://github.com/SourceDoctor)
+
+#### Device
+* Added basic Ubiquoss PON support ([#10828](https://github.com/librenms/librenms/pull/10828)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Added basic Zyxel GS-4012F support ([#10829](https://github.com/librenms/librenms/pull/10829)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Extend Dell Laser printer support for S5830dn and similar ([#10878](https://github.com/librenms/librenms/pull/10878)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Fixed Cisco Catalyst9x00 support ([#10862](https://github.com/librenms/librenms/pull/10862)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Extend discovery of Konica printers ([#10806](https://github.com/librenms/librenms/pull/10806)) - [andreasmalta](https://github.com/andreasmalta)
+* Add support for ZyXEL IES4206/5206/5212/6217 MSANs ([#10789](https://github.com/librenms/librenms/pull/10789)) - [vitalisator](https://github.com/vitalisator)
+* Update Alcatel mibs to v8 ([#10857](https://github.com/librenms/librenms/pull/10857)) - [joseUPV](https://github.com/joseUPV)
+* Added support EdgeCore ECS2100-10T ([#10843](https://github.com/librenms/librenms/pull/10843)) - [erotel](https://github.com/erotel)
+* Added hardware and software version for ASR9906 ([#10826](https://github.com/librenms/librenms/pull/10826)) - [nomyownnet](https://github.com/nomyownnet)
+* Add support for ZyXEL IES-5005 and IES-5106 DSLAMs ([#10804](https://github.com/librenms/librenms/pull/10804)) - [vitalisator](https://github.com/vitalisator)
+* Brocade switches - Added names on fiberchannel ports ([#10737](https://github.com/librenms/librenms/pull/10737)) - [evheros](https://github.com/evheros)
+* Added support for Mikrotik LTE Modem ([#10805](https://github.com/librenms/librenms/pull/10805)) - [jozefrebjak](https://github.com/jozefrebjak)
+* Added AIX file system, prefer over hrstorage for AIX ([#10588](https://github.com/librenms/librenms/pull/10588)) - [dlesel](https://github.com/dlesel)
+* Add support for HP PDU Management Module ([#10784](https://github.com/librenms/librenms/pull/10784)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Added device support for Chatsworth-PDU ([#10769](https://github.com/librenms/librenms/pull/10769)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Added device support for Zyxel AnyOS ([#10770](https://github.com/librenms/librenms/pull/10770)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Added basic device support for Infinera PON 7090 platform ([#10771](https://github.com/librenms/librenms/pull/10771)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Added support for Nexans Switches ([#10772](https://github.com/librenms/librenms/pull/10772)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Allow all models of Asentria SiteBoss ([#10746](https://github.com/librenms/librenms/pull/10746)) - [willhseitz](https://github.com/willhseitz)
+* Fixed Tomato (router firmware OS), 'no bulk' enabled ([#10775](https://github.com/librenms/librenms/pull/10775)) - [arrmo](https://github.com/arrmo)
+* Better detection of old 3Com StackSwitches ([#10736](https://github.com/librenms/librenms/pull/10736)) - [joseUPV](https://github.com/joseUPV)
+* Avoid state collisions between 'dell' and 'drac' OSes ([#10539](https://github.com/librenms/librenms/pull/10539)) - [PipoCanaja](https://github.com/PipoCanaja)
+
+#### Webui
+* Fix webui settings - AD bind at wrong place ([#10874](https://github.com/librenms/librenms/pull/10874)) - [louis-oui](https://github.com/louis-oui)
+* Fix static device group updated message ([#10841](https://github.com/librenms/librenms/pull/10841)) - [murrant](https://github.com/murrant)
+* Deactivate 'Delete' button in Device Dependencies page when necessary ([#10852](https://github.com/librenms/librenms/pull/10852)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Custom favicon issue ([#10847](https://github.com/librenms/librenms/pull/10847)) - [corsoblaster](https://github.com/corsoblaster)
+* Added support for routing table collection in discovery ([#10182](https://github.com/librenms/librenms/pull/10182)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Allow user specific themes ([#10799](https://github.com/librenms/librenms/pull/10799)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Fix some IE issues with settings page ([#10819](https://github.com/librenms/librenms/pull/10819)) - [murrant](https://github.com/murrant)
+* Alphabetic order of app overview ([#10825](https://github.com/librenms/librenms/pull/10825)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Translation correction ([#10821](https://github.com/librenms/librenms/pull/10821)) - [Cormoran96](https://github.com/Cormoran96)
+* Fix maps display only one link if multiple links are present between … ([#10818](https://github.com/librenms/librenms/pull/10818)) - [louis-oui](https://github.com/louis-oui)
+* Clarify wording of disable/alert device settings and dependency between the two settings ([#10809](https://github.com/librenms/librenms/pull/10809)) - [gdepeyrot](https://github.com/gdepeyrot)
+* Show logged in user in title menu ([#10800](https://github.com/librenms/librenms/pull/10800)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Device List: add metrics icons tooltip ([#10811](https://github.com/librenms/librenms/pull/10811)) - [kadecole](https://github.com/kadecole)
+* UI bug fix - Scroll disabled on "new rule from collection" modal ([#10796](https://github.com/librenms/librenms/pull/10796)) - [GramThanos](https://github.com/GramThanos)
+* Prevent sessions from expiring ([#10798](https://github.com/librenms/librenms/pull/10798)) - [murrant](https://github.com/murrant)
+* Comparison fix in slas.inc.php ([#10812](https://github.com/librenms/librenms/pull/10812)) - [seros1521](https://github.com/seros1521)
+* Unbundle javascript language files ([#10788](https://github.com/librenms/librenms/pull/10788)) - [murrant](https://github.com/murrant)
+* Fix email_auto_tls toggle ([#10785](https://github.com/librenms/librenms/pull/10785)) - [murrant](https://github.com/murrant)
+* Fix missing values for recurring alert state ([#10793](https://github.com/librenms/librenms/pull/10793)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Bootstrapping checkboxes, cont. ([#10782](https://github.com/librenms/librenms/pull/10782)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Add a deprecated warning to the front pages ([#10783](https://github.com/librenms/librenms/pull/10783)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Fix oxidized url setting validator ([#10766](https://github.com/librenms/librenms/pull/10766)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Fix settings search ([#10777](https://github.com/librenms/librenms/pull/10777)) - [murrant](https://github.com/murrant)
+* Bootstrap checkboxes ([#10749](https://github.com/librenms/librenms/pull/10749)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Replaced WorldMap zoom with text field to enable more fine grained zooming by steps of 0.1 ([#10753](https://github.com/librenms/librenms/pull/10753)) - [gdepeyrot](https://github.com/gdepeyrot)
+* Fix asset urls on settings page ([#10765](https://github.com/librenms/librenms/pull/10765)) - [murrant](https://github.com/murrant)
+* Settings.php key fix ([#10774](https://github.com/librenms/librenms/pull/10774)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Adding more default values to config_definitions ([#10756](https://github.com/librenms/librenms/pull/10756)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Fix broken relationship of local Service ID with SDP Service ID ([#10713](https://github.com/librenms/librenms/pull/10713)) - [vitalisator](https://github.com/vitalisator)
+* Fix mydomain setting regex ([#10762](https://github.com/librenms/librenms/pull/10762)) - [murrant](https://github.com/murrant)
+
+#### Authentication
+* LDAP Add option to authenticate user independtly of OU ([#10873](https://github.com/librenms/librenms/pull/10873)) - [louis-oui](https://github.com/louis-oui)
+* Fix LDAP slow login and unable to login ([#10872](https://github.com/librenms/librenms/pull/10872)) - [louis-oui](https://github.com/louis-oui)
+* Fix auth_test script does not do ldap bind ([#10865](https://github.com/librenms/librenms/pull/10865)) - [louis-oui](https://github.com/louis-oui)
+* Fix LDAP slow login ([#10760](https://github.com/librenms/librenms/pull/10760)) - [louis-oui](https://github.com/louis-oui)
+* Revert "Fix LDAP slow login" ([#10855](https://github.com/librenms/librenms/pull/10855)) - [louis-oui](https://github.com/louis-oui)
+
+#### Applications
+* Added certificate file validity check for services (#10354) ([#10354](https://github.com/librenms/librenms/pull/10354)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Fix mdadm sync speed title description ([#10773](https://github.com/librenms/librenms/pull/10773)) - [SourceDoctor](https://github.com/SourceDoctor)
+
+#### Api
+* Add interval extra var on API add_rule and edit_rule ([#10814](https://github.com/librenms/librenms/pull/10814)) - [joretapoo](https://github.com/joretapoo)
+* Removal of IP address validation for ip field in add_service_for_host API call ([#10810](https://github.com/librenms/librenms/pull/10810)) - [MattWSL](https://github.com/MattWSL)
+* List_arp search by MAC ([#10803](https://github.com/librenms/librenms/pull/10803)) - [murrant](https://github.com/murrant)
+* Create device groups via API ([#10791](https://github.com/librenms/librenms/pull/10791)) - [BrianSidebotham](https://github.com/BrianSidebotham)
+* Fix API arp cidr search ([#10780](https://github.com/librenms/librenms/pull/10780)) - [murrant](https://github.com/murrant)
+
+#### Alerting
+* Do not purge alert_log table entries that have a matching active alert in alerts table ([#10744](https://github.com/librenms/librenms/pull/10744)) - [louis-oui](https://github.com/louis-oui)
+* Add Headers and body to API Transports ([#10614](https://github.com/librenms/librenms/pull/10614)) - [mendoza-conicet](https://github.com/mendoza-conicet)
+
+#### Polling
+* Perf optimisation for xDSL mib polling ([#10815](https://github.com/librenms/librenms/pull/10815)) - [PipoCanaja](https://github.com/PipoCanaja)
+
+#### Bug
+* Fix syslog prune when dbFetchRow() returns array ([#10850](https://github.com/librenms/librenms/pull/10850)) - [rj-taylor](https://github.com/rj-taylor)
+* Fixes Zyxel MIB product definition ([#10824](https://github.com/librenms/librenms/pull/10824)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Fix snmp v3 when set via ui ([#10797](https://github.com/librenms/librenms/pull/10797)) - [murrant](https://github.com/murrant)
+* Fix invalid check for device-\>isUnderMaintenance() in worldmap ([#10778](https://github.com/librenms/librenms/pull/10778)) - [Jellyfrog](https://github.com/Jellyfrog)
+
+#### Refactor
+* Update device cache ([#10795](https://github.com/librenms/librenms/pull/10795)) - [murrant](https://github.com/murrant)
+
+#### Cleanup
+* Prevent syslog table purge from spamming daily.log ([#10851](https://github.com/librenms/librenms/pull/10851)) - [rj-taylor](https://github.com/rj-taylor)
+
+#### Documentation
+* Documentation link fixes ([#10848](https://github.com/librenms/librenms/pull/10848)) - [rj-taylor](https://github.com/rj-taylor)
+* Deleted yum package listed twice ([#10758](https://github.com/librenms/librenms/pull/10758)) - [hanserasmus](https://github.com/hanserasmus)
+
+#### Translation
+* German translation for settings page ([#10764](https://github.com/librenms/librenms/pull/10764)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Update zh-TW Translate settings strings ([#10816](https://github.com/librenms/librenms/pull/10816)) - [jasoncheng7115](https://github.com/jasoncheng7115)
+* Translation generation command ([#10794](https://github.com/librenms/librenms/pull/10794)) - [murrant](https://github.com/murrant)
+* Translate settings strings to zh-TW ([#10716](https://github.com/librenms/librenms/pull/10716)) - [jasoncheng7115](https://github.com/jasoncheng7115)
+* Translation of settings in French ([#10763](https://github.com/librenms/librenms/pull/10763)) - [PipoCanaja](https://github.com/PipoCanaja)
+
+#### Misc
+* Update dependencies ([#10830](https://github.com/librenms/librenms/pull/10830)) - [murrant](https://github.com/murrant)
+* Add check_oracle service include file and make 'packet_loss_' macro alerts not use radio buttons ([#10807](https://github.com/librenms/librenms/pull/10807)) - [thecityofguanyu](https://github.com/thecityofguanyu)
+
+
+## 1.58
+*(2019-11-24)*
+
+A big thank you to the following 32 contributors this last month:
+
+  - PipoCanaja (18)
+  - murrant (17)
+  - SourceDoctor (15)
+  - louis-oui (9)
+  - Jellyfrog (4)
+  - vitalisator (3)
+  - rj-taylor (3)
+  - jasoncheng7115 (2)
+  - gdepeyrot (2)
+  - joseUPV (2)
+  - GramThanos (1)
+  - opalivan (1)
+  - BrianSidebotham (1)
+  - arrmo (1)
+  - dlesel (1)
+  - seros1521 (1)
+  - jozefrebjak (1)
+  - mendoza-conicet (1)
+  - willhseitz (1)
+  - MattWSL (1)
+  - evheros (1)
+  - kadecole (1)
+  - joretapoo (1)
+  - laf (1)
+  - Cormoran96 (1)
+  - nomyownnet (1)
+  - thecityofguanyu (1)
+  - isarandi (1)
+  - erotel (1)
+  - corsoblaster (1)
+  - andreasmalta (1)
+  - hanserasmus (1)
+
+#### Feature
+* Trigger Device Rediscovery for a device group ([#10832](https://github.com/librenms/librenms/pull/10832)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Allow user activation/deactivation (MySQL auth) ([#10511](https://github.com/librenms/librenms/pull/10511)) - [SourceDoctor](https://github.com/SourceDoctor)
+
+#### Security
+* Fix restricted application access for normal user ([#10802](https://github.com/librenms/librenms/pull/10802)) - [SourceDoctor](https://github.com/SourceDoctor)
+
+#### Device
+* Added basic Ubiquoss PON support ([#10828](https://github.com/librenms/librenms/pull/10828)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Added basic Zyxel GS-4012F support ([#10829](https://github.com/librenms/librenms/pull/10829)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Extend Dell Laser printer support for S5830dn and similar ([#10878](https://github.com/librenms/librenms/pull/10878)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Fixed Cisco Catalyst9x00 support ([#10862](https://github.com/librenms/librenms/pull/10862)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Extend discovery of Konica printers ([#10806](https://github.com/librenms/librenms/pull/10806)) - [andreasmalta](https://github.com/andreasmalta)
+* Add support for ZyXEL IES4206/5206/5212/6217 MSANs ([#10789](https://github.com/librenms/librenms/pull/10789)) - [vitalisator](https://github.com/vitalisator)
+* Added support EdgeCore ECS2100-10T ([#10843](https://github.com/librenms/librenms/pull/10843)) - [erotel](https://github.com/erotel)
+* Added hardware and software version for ASR9906 ([#10826](https://github.com/librenms/librenms/pull/10826)) - [nomyownnet](https://github.com/nomyownnet)
+* Add support for ZyXEL IES-5005 and IES-5106 DSLAMs ([#10804](https://github.com/librenms/librenms/pull/10804)) - [vitalisator](https://github.com/vitalisator)
+* Brocade switches - Added names on fiberchannel ports ([#10737](https://github.com/librenms/librenms/pull/10737)) - [evheros](https://github.com/evheros)
+* Added support for Mikrotik LTE Modem ([#10805](https://github.com/librenms/librenms/pull/10805)) - [jozefrebjak](https://github.com/jozefrebjak)
+* Added AIX file system, prefer over hrstorage for AIX ([#10588](https://github.com/librenms/librenms/pull/10588)) - [dlesel](https://github.com/dlesel)
+* Add support for HP PDU Management Module ([#10784](https://github.com/librenms/librenms/pull/10784)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Added device support for Chatsworth-PDU ([#10769](https://github.com/librenms/librenms/pull/10769)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Added device support for Zyxel AnyOS ([#10770](https://github.com/librenms/librenms/pull/10770)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Added basic device support for Infinera PON 7090 platform ([#10771](https://github.com/librenms/librenms/pull/10771)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Added support for Nexans Switches ([#10772](https://github.com/librenms/librenms/pull/10772)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Allow all models of Asentria SiteBoss ([#10746](https://github.com/librenms/librenms/pull/10746)) - [willhseitz](https://github.com/willhseitz)
+* Fixed Tomato (router firmware OS), 'no bulk' enabled ([#10775](https://github.com/librenms/librenms/pull/10775)) - [arrmo](https://github.com/arrmo)
+* Better detection of old 3Com StackSwitches ([#10736](https://github.com/librenms/librenms/pull/10736)) - [joseUPV](https://github.com/joseUPV)
+* Avoid state collisions between 'dell' and 'drac' OSes ([#10539](https://github.com/librenms/librenms/pull/10539)) - [PipoCanaja](https://github.com/PipoCanaja)
+
+#### Webui
+* Fix webui settings - AD bind at wrong place ([#10874](https://github.com/librenms/librenms/pull/10874)) - [louis-oui](https://github.com/louis-oui)
+* Fix static device group updated message ([#10841](https://github.com/librenms/librenms/pull/10841)) - [murrant](https://github.com/murrant)
+* Deactivate 'Delete' button in Device Dependencies page when necessary ([#10852](https://github.com/librenms/librenms/pull/10852)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Custom favicon issue ([#10847](https://github.com/librenms/librenms/pull/10847)) - [corsoblaster](https://github.com/corsoblaster)
+* Added support for routing table collection in discovery ([#10182](https://github.com/librenms/librenms/pull/10182)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Allow user specific themes ([#10799](https://github.com/librenms/librenms/pull/10799)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Fix some IE issues with settings page ([#10819](https://github.com/librenms/librenms/pull/10819)) - [murrant](https://github.com/murrant)
+* Alphabetic order of app overview ([#10825](https://github.com/librenms/librenms/pull/10825)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Translation correction ([#10821](https://github.com/librenms/librenms/pull/10821)) - [Cormoran96](https://github.com/Cormoran96)
+* Fix maps display only one link if multiple links are present between … ([#10818](https://github.com/librenms/librenms/pull/10818)) - [louis-oui](https://github.com/louis-oui)
+* Clarify wording of disable/alert device settings and dependency between the two settings ([#10809](https://github.com/librenms/librenms/pull/10809)) - [gdepeyrot](https://github.com/gdepeyrot)
+* Show logged in user in title menu ([#10800](https://github.com/librenms/librenms/pull/10800)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Device List: add metrics icons tooltip ([#10811](https://github.com/librenms/librenms/pull/10811)) - [kadecole](https://github.com/kadecole)
+* UI bug fix - Scroll disabled on "new rule from collection" modal ([#10796](https://github.com/librenms/librenms/pull/10796)) - [GramThanos](https://github.com/GramThanos)
+* Prevent sessions from expiring ([#10798](https://github.com/librenms/librenms/pull/10798)) - [murrant](https://github.com/murrant)
+* Comparison fix in slas.inc.php ([#10812](https://github.com/librenms/librenms/pull/10812)) - [seros1521](https://github.com/seros1521)
+* Unbundle javascript language files ([#10788](https://github.com/librenms/librenms/pull/10788)) - [murrant](https://github.com/murrant)
+* Fix email_auto_tls toggle ([#10785](https://github.com/librenms/librenms/pull/10785)) - [murrant](https://github.com/murrant)
+* Fix missing values for recurring alert state ([#10793](https://github.com/librenms/librenms/pull/10793)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Bootstrapping checkboxes, cont. ([#10782](https://github.com/librenms/librenms/pull/10782)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Add a deprecated warning to the front pages ([#10783](https://github.com/librenms/librenms/pull/10783)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Fix oxidized url setting validator ([#10766](https://github.com/librenms/librenms/pull/10766)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Fix settings search ([#10777](https://github.com/librenms/librenms/pull/10777)) - [murrant](https://github.com/murrant)
+* Bootstrap checkboxes ([#10749](https://github.com/librenms/librenms/pull/10749)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Replaced WorldMap zoom with text field to enable more fine grained zooming by steps of 0.1 ([#10753](https://github.com/librenms/librenms/pull/10753)) - [gdepeyrot](https://github.com/gdepeyrot)
+* Fix asset urls on settings page ([#10765](https://github.com/librenms/librenms/pull/10765)) - [murrant](https://github.com/murrant)
+* Settings.php key fix ([#10774](https://github.com/librenms/librenms/pull/10774)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Adding more default values to config_definitions ([#10756](https://github.com/librenms/librenms/pull/10756)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Fix broken relationship of local Service ID with SDP Service ID ([#10713](https://github.com/librenms/librenms/pull/10713)) - [vitalisator](https://github.com/vitalisator)
+* Fix mydomain setting regex ([#10762](https://github.com/librenms/librenms/pull/10762)) - [murrant](https://github.com/murrant)
+
+#### Authentication
+* LDAP Add option to authenticate user independtly of OU ([#10873](https://github.com/librenms/librenms/pull/10873)) - [louis-oui](https://github.com/louis-oui)
+* Fix LDAP slow login and unable to login ([#10872](https://github.com/librenms/librenms/pull/10872)) - [louis-oui](https://github.com/louis-oui)
+* Fix auth_test script does not do ldap bind ([#10865](https://github.com/librenms/librenms/pull/10865)) - [louis-oui](https://github.com/louis-oui)
+* Fix LDAP slow login ([#10760](https://github.com/librenms/librenms/pull/10760)) - [louis-oui](https://github.com/louis-oui)
+* Revert "Fix LDAP slow login" ([#10855](https://github.com/librenms/librenms/pull/10855)) - [louis-oui](https://github.com/louis-oui)
+
+#### Applications
+* Added certificate file validity check for services (#10354) ([#10354](https://github.com/librenms/librenms/pull/10354)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Fix mdadm sync speed title description ([#10773](https://github.com/librenms/librenms/pull/10773)) - [SourceDoctor](https://github.com/SourceDoctor)
+
+#### Api
+* Add interval extra var on API add_rule and edit_rule ([#10814](https://github.com/librenms/librenms/pull/10814)) - [joretapoo](https://github.com/joretapoo)
+* Removal of IP address validation for ip field in add_service_for_host API call ([#10810](https://github.com/librenms/librenms/pull/10810)) - [MattWSL](https://github.com/MattWSL)
+* List_arp search by MAC ([#10803](https://github.com/librenms/librenms/pull/10803)) - [murrant](https://github.com/murrant)
+* Create device groups via API ([#10791](https://github.com/librenms/librenms/pull/10791)) - [BrianSidebotham](https://github.com/BrianSidebotham)
+* Fix API arp cidr search ([#10780](https://github.com/librenms/librenms/pull/10780)) - [murrant](https://github.com/murrant)
+
+#### Alerting
+* Do not purge alert_log table entries that have a matching active alert in alerts table ([#10744](https://github.com/librenms/librenms/pull/10744)) - [louis-oui](https://github.com/louis-oui)
+* Add Headers and body to API Transports ([#10614](https://github.com/librenms/librenms/pull/10614)) - [mendoza-conicet](https://github.com/mendoza-conicet)
+
+#### Polling
+* Perf optimisation for xDSL mib polling ([#10815](https://github.com/librenms/librenms/pull/10815)) - [PipoCanaja](https://github.com/PipoCanaja)
+
+#### Bug
+* Fix syslog prune when dbFetchRow() returns array ([#10850](https://github.com/librenms/librenms/pull/10850)) - [rj-taylor](https://github.com/rj-taylor)
+* Fixes Zyxel MIB product definition ([#10824](https://github.com/librenms/librenms/pull/10824)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Fix snmp v3 when set via ui ([#10797](https://github.com/librenms/librenms/pull/10797)) - [murrant](https://github.com/murrant)
+* Fix invalid check for device-\>isUnderMaintenance() in worldmap ([#10778](https://github.com/librenms/librenms/pull/10778)) - [Jellyfrog](https://github.com/Jellyfrog)
+
+#### Refactor
+* Update device cache ([#10795](https://github.com/librenms/librenms/pull/10795)) - [murrant](https://github.com/murrant)
+
+#### Cleanup
+* Prevent syslog table purge from spamming daily.log ([#10851](https://github.com/librenms/librenms/pull/10851)) - [rj-taylor](https://github.com/rj-taylor)
+
+#### Documentation
+* Documentation link fixes ([#10848](https://github.com/librenms/librenms/pull/10848)) - [rj-taylor](https://github.com/rj-taylor)
+* Deleted yum package listed twice ([#10758](https://github.com/librenms/librenms/pull/10758)) - [hanserasmus](https://github.com/hanserasmus)
+
+#### Translation
+* German translation for settings page ([#10764](https://github.com/librenms/librenms/pull/10764)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Update zh-TW Translate settings strings ([#10816](https://github.com/librenms/librenms/pull/10816)) - [jasoncheng7115](https://github.com/jasoncheng7115)
+* Translation generation command ([#10794](https://github.com/librenms/librenms/pull/10794)) - [murrant](https://github.com/murrant)
+* Translate settings strings to zh-TW ([#10716](https://github.com/librenms/librenms/pull/10716)) - [jasoncheng7115](https://github.com/jasoncheng7115)
+* Translation of settings in French ([#10763](https://github.com/librenms/librenms/pull/10763)) - [PipoCanaja](https://github.com/PipoCanaja)
+
+#### Misc
+* Update dependencies ([#10830](https://github.com/librenms/librenms/pull/10830)) - [murrant](https://github.com/murrant)
+* Update Alcatel mibs to v8 ([#10857](https://github.com/librenms/librenms/pull/10857)) - [joseUPV](https://github.com/joseUPV)
+* Add check_oracle service include file and make 'packet_loss_' macro alerts not use radio buttons ([#10807](https://github.com/librenms/librenms/pull/10807)) - [thecityofguanyu](https://github.com/thecityofguanyu)
+
+
+## 1.58
+*(2019-11-24)*
+
+A big thank you to the following 32 contributors this last month:
+
+  - PipoCanaja (18)
+  - murrant (17)
+  - SourceDoctor (15)
+  - louis-oui (9)
+  - Jellyfrog (4)
+  - vitalisator (3)
+  - rj-taylor (3)
+  - jasoncheng7115 (2)
+  - gdepeyrot (2)
+  - joseUPV (2)
+  - GramThanos (1)
+  - opalivan (1)
+  - BrianSidebotham (1)
+  - arrmo (1)
+  - dlesel (1)
+  - seros1521 (1)
+  - jozefrebjak (1)
+  - mendoza-conicet (1)
+  - willhseitz (1)
+  - MattWSL (1)
+  - evheros (1)
+  - kadecole (1)
+  - joretapoo (1)
+  - laf (1)
+  - Cormoran96 (1)
+  - nomyownnet (1)
+  - thecityofguanyu (1)
+  - isarandi (1)
+  - erotel (1)
+  - corsoblaster (1)
+  - andreasmalta (1)
+  - hanserasmus (1)
+
+#### Feature
+* Trigger Device Rediscovery for a device group ([#10832](https://github.com/librenms/librenms/pull/10832)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Allow user activation/deactivation (MySQL auth) ([#10511](https://github.com/librenms/librenms/pull/10511)) - [SourceDoctor](https://github.com/SourceDoctor)
+
+#### Security
+* Fix restricted application access for normal user ([#10802](https://github.com/librenms/librenms/pull/10802)) - [SourceDoctor](https://github.com/SourceDoctor)
+
+#### Device
+* Added basic Ubiquoss PON support ([#10828](https://github.com/librenms/librenms/pull/10828)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Added basic Zyxel GS-4012F support ([#10829](https://github.com/librenms/librenms/pull/10829)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Extend Dell Laser printer support for S5830dn and similar ([#10878](https://github.com/librenms/librenms/pull/10878)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Fixed Cisco Catalyst9x00 support ([#10862](https://github.com/librenms/librenms/pull/10862)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Extend discovery of Konica printers ([#10806](https://github.com/librenms/librenms/pull/10806)) - [andreasmalta](https://github.com/andreasmalta)
+* Add support for ZyXEL IES4206/5206/5212/6217 MSANs ([#10789](https://github.com/librenms/librenms/pull/10789)) - [vitalisator](https://github.com/vitalisator)
+* Added support EdgeCore ECS2100-10T ([#10843](https://github.com/librenms/librenms/pull/10843)) - [erotel](https://github.com/erotel)
+* Added hardware and software version for ASR9906 ([#10826](https://github.com/librenms/librenms/pull/10826)) - [nomyownnet](https://github.com/nomyownnet)
+* Add support for ZyXEL IES-5005 and IES-5106 DSLAMs ([#10804](https://github.com/librenms/librenms/pull/10804)) - [vitalisator](https://github.com/vitalisator)
+* Brocade switches - Added names on fiberchannel ports ([#10737](https://github.com/librenms/librenms/pull/10737)) - [evheros](https://github.com/evheros)
+* Added support for Mikrotik LTE Modem ([#10805](https://github.com/librenms/librenms/pull/10805)) - [jozefrebjak](https://github.com/jozefrebjak)
+* Added AIX file system, prefer over hrstorage for AIX ([#10588](https://github.com/librenms/librenms/pull/10588)) - [dlesel](https://github.com/dlesel)
+* Add support for HP PDU Management Module ([#10784](https://github.com/librenms/librenms/pull/10784)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Added device support for Chatsworth-PDU ([#10769](https://github.com/librenms/librenms/pull/10769)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Added device support for Zyxel AnyOS ([#10770](https://github.com/librenms/librenms/pull/10770)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Added basic device support for Infinera PON 7090 platform ([#10771](https://github.com/librenms/librenms/pull/10771)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Added support for Nexans Switches ([#10772](https://github.com/librenms/librenms/pull/10772)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Allow all models of Asentria SiteBoss ([#10746](https://github.com/librenms/librenms/pull/10746)) - [willhseitz](https://github.com/willhseitz)
+* Better detection of old 3Com StackSwitches ([#10736](https://github.com/librenms/librenms/pull/10736)) - [joseUPV](https://github.com/joseUPV)
+* Avoid state collisions between 'dell' and 'drac' OSes ([#10539](https://github.com/librenms/librenms/pull/10539)) - [PipoCanaja](https://github.com/PipoCanaja)
+
+#### Webui
+* Fix webui settings - AD bind at wrong place ([#10874](https://github.com/librenms/librenms/pull/10874)) - [louis-oui](https://github.com/louis-oui)
+* Fix static device group updated message ([#10841](https://github.com/librenms/librenms/pull/10841)) - [murrant](https://github.com/murrant)
+* Deactivate 'Delete' button in Device Dependencies page when necessary ([#10852](https://github.com/librenms/librenms/pull/10852)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Custom favicon issue ([#10847](https://github.com/librenms/librenms/pull/10847)) - [corsoblaster](https://github.com/corsoblaster)
+* Added support for routing table collection in discovery ([#10182](https://github.com/librenms/librenms/pull/10182)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Allow user specific themes ([#10799](https://github.com/librenms/librenms/pull/10799)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Fix some IE issues with settings page ([#10819](https://github.com/librenms/librenms/pull/10819)) - [murrant](https://github.com/murrant)
+* Alphabetic order of app overview ([#10825](https://github.com/librenms/librenms/pull/10825)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Translation correction ([#10821](https://github.com/librenms/librenms/pull/10821)) - [Cormoran96](https://github.com/Cormoran96)
+* Fix maps display only one link if multiple links are present between … ([#10818](https://github.com/librenms/librenms/pull/10818)) - [louis-oui](https://github.com/louis-oui)
+* Clarify wording of disable/alert device settings and dependency between the two settings ([#10809](https://github.com/librenms/librenms/pull/10809)) - [gdepeyrot](https://github.com/gdepeyrot)
+* Show logged in user in title menu ([#10800](https://github.com/librenms/librenms/pull/10800)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Device List: add metrics icons tooltip ([#10811](https://github.com/librenms/librenms/pull/10811)) - [kadecole](https://github.com/kadecole)
+* UI bug fix - Scroll disabled on "new rule from collection" modal ([#10796](https://github.com/librenms/librenms/pull/10796)) - [GramThanos](https://github.com/GramThanos)
+* Prevent sessions from expiring ([#10798](https://github.com/librenms/librenms/pull/10798)) - [murrant](https://github.com/murrant)
+* Comparison fix in slas.inc.php ([#10812](https://github.com/librenms/librenms/pull/10812)) - [seros1521](https://github.com/seros1521)
+* Unbundle javascript language files ([#10788](https://github.com/librenms/librenms/pull/10788)) - [murrant](https://github.com/murrant)
+* Fix email_auto_tls toggle ([#10785](https://github.com/librenms/librenms/pull/10785)) - [murrant](https://github.com/murrant)
+* Fix missing values for recurring alert state ([#10793](https://github.com/librenms/librenms/pull/10793)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Bootstrapping checkboxes, cont. ([#10782](https://github.com/librenms/librenms/pull/10782)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Add a deprecated warning to the front pages ([#10783](https://github.com/librenms/librenms/pull/10783)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Fix oxidized url setting validator ([#10766](https://github.com/librenms/librenms/pull/10766)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Fix settings search ([#10777](https://github.com/librenms/librenms/pull/10777)) - [murrant](https://github.com/murrant)
+* Bootstrap checkboxes ([#10749](https://github.com/librenms/librenms/pull/10749)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Replaced WorldMap zoom with text field to enable more fine grained zooming by steps of 0.1 ([#10753](https://github.com/librenms/librenms/pull/10753)) - [gdepeyrot](https://github.com/gdepeyrot)
+* Fix asset urls on settings page ([#10765](https://github.com/librenms/librenms/pull/10765)) - [murrant](https://github.com/murrant)
+* Settings.php key fix ([#10774](https://github.com/librenms/librenms/pull/10774)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Adding more default values to config_definitions ([#10756](https://github.com/librenms/librenms/pull/10756)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Fix broken relationship of local Service ID with SDP Service ID ([#10713](https://github.com/librenms/librenms/pull/10713)) - [vitalisator](https://github.com/vitalisator)
+* Fix mydomain setting regex ([#10762](https://github.com/librenms/librenms/pull/10762)) - [murrant](https://github.com/murrant)
+
+#### Authentication
+* LDAP Add option to authenticate user independtly of OU ([#10873](https://github.com/librenms/librenms/pull/10873)) - [louis-oui](https://github.com/louis-oui)
+* Fix LDAP slow login and unable to login ([#10872](https://github.com/librenms/librenms/pull/10872)) - [louis-oui](https://github.com/louis-oui)
+* Fix auth_test script does not do ldap bind ([#10865](https://github.com/librenms/librenms/pull/10865)) - [louis-oui](https://github.com/louis-oui)
+* Fix LDAP slow login ([#10760](https://github.com/librenms/librenms/pull/10760)) - [louis-oui](https://github.com/louis-oui)
+* Revert "Fix LDAP slow login" ([#10855](https://github.com/librenms/librenms/pull/10855)) - [louis-oui](https://github.com/louis-oui)
+
+#### Applications
+* Added certificate file validity check for services (#10354) ([#10354](https://github.com/librenms/librenms/pull/10354)) - [SourceDoctor](https://github.com/SourceDoctor)
+
+#### Api
+* Add interval extra var on API add_rule and edit_rule ([#10814](https://github.com/librenms/librenms/pull/10814)) - [joretapoo](https://github.com/joretapoo)
+* Removal of IP address validation for ip field in add_service_for_host API call ([#10810](https://github.com/librenms/librenms/pull/10810)) - [MattWSL](https://github.com/MattWSL)
+* List_arp search by MAC ([#10803](https://github.com/librenms/librenms/pull/10803)) - [murrant](https://github.com/murrant)
+* Create device groups via API ([#10791](https://github.com/librenms/librenms/pull/10791)) - [BrianSidebotham](https://github.com/BrianSidebotham)
+* Fix API arp cidr search ([#10780](https://github.com/librenms/librenms/pull/10780)) - [murrant](https://github.com/murrant)
+
+#### Alerting
+* Do not purge alert_log table entries that have a matching active alert in alerts table ([#10744](https://github.com/librenms/librenms/pull/10744)) - [louis-oui](https://github.com/louis-oui)
+* Add Headers and body to API Transports ([#10614](https://github.com/librenms/librenms/pull/10614)) - [mendoza-conicet](https://github.com/mendoza-conicet)
+
+#### Polling
+* Perf optimisation for xDSL mib polling ([#10815](https://github.com/librenms/librenms/pull/10815)) - [PipoCanaja](https://github.com/PipoCanaja)
+
+#### Bug
+* Fix syslog prune when dbFetchRow() returns array ([#10850](https://github.com/librenms/librenms/pull/10850)) - [rj-taylor](https://github.com/rj-taylor)
+* Fixes Zyxel MIB product definition ([#10824](https://github.com/librenms/librenms/pull/10824)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Fix snmp v3 when set via ui ([#10797](https://github.com/librenms/librenms/pull/10797)) - [murrant](https://github.com/murrant)
+* Fix invalid check for device-\>isUnderMaintenance() in worldmap ([#10778](https://github.com/librenms/librenms/pull/10778)) - [Jellyfrog](https://github.com/Jellyfrog)
+
+#### Refactor
+* Update device cache ([#10795](https://github.com/librenms/librenms/pull/10795)) - [murrant](https://github.com/murrant)
+
+#### Cleanup
+* Prevent syslog table purge from spamming daily.log ([#10851](https://github.com/librenms/librenms/pull/10851)) - [rj-taylor](https://github.com/rj-taylor)
+
+#### Documentation
+* Documentation link fixes ([#10848](https://github.com/librenms/librenms/pull/10848)) - [rj-taylor](https://github.com/rj-taylor)
+* Deleted yum package listed twice ([#10758](https://github.com/librenms/librenms/pull/10758)) - [hanserasmus](https://github.com/hanserasmus)
+
+#### Translation
+* German translation for settings page ([#10764](https://github.com/librenms/librenms/pull/10764)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Update zh-TW Translate settings strings ([#10816](https://github.com/librenms/librenms/pull/10816)) - [jasoncheng7115](https://github.com/jasoncheng7115)
+* Translation generation command ([#10794](https://github.com/librenms/librenms/pull/10794)) - [murrant](https://github.com/murrant)
+* Translate settings strings to zh-TW ([#10716](https://github.com/librenms/librenms/pull/10716)) - [jasoncheng7115](https://github.com/jasoncheng7115)
+* Translation of settings in French ([#10763](https://github.com/librenms/librenms/pull/10763)) - [PipoCanaja](https://github.com/PipoCanaja)
+
+#### Misc
+* Update dependencies ([#10830](https://github.com/librenms/librenms/pull/10830)) - [murrant](https://github.com/murrant)
+* Update Alcatel mibs to v8 ([#10857](https://github.com/librenms/librenms/pull/10857)) - [joseUPV](https://github.com/joseUPV)
+* Add check_oracle service include file and make 'packet_loss_' macro alerts not use radio buttons ([#10807](https://github.com/librenms/librenms/pull/10807)) - [thecityofguanyu](https://github.com/thecityofguanyu)
+* Fixed Tomato (router firmware OS), 'no bulk' enabled ([#10775](https://github.com/librenms/librenms/pull/10775)) - [arrmo](https://github.com/arrmo)
+* Fix mdadm sync speed title description ([#10773](https://github.com/librenms/librenms/pull/10773)) - [SourceDoctor](https://github.com/SourceDoctor)
+
+
+## 1.58
+*(2019-11-24)*
+
+A big thank you to the following 32 contributors this last month:
+
+  - PipoCanaja (18)
+  - murrant (17)
+  - SourceDoctor (15)
+  - louis-oui (9)
+  - Jellyfrog (4)
+  - vitalisator (3)
+  - rj-taylor (3)
+  - jasoncheng7115 (2)
+  - gdepeyrot (2)
+  - joseUPV (2)
+  - GramThanos (1)
+  - opalivan (1)
+  - BrianSidebotham (1)
+  - arrmo (1)
+  - dlesel (1)
+  - seros1521 (1)
+  - jozefrebjak (1)
+  - mendoza-conicet (1)
+  - willhseitz (1)
+  - MattWSL (1)
+  - evheros (1)
+  - kadecole (1)
+  - joretapoo (1)
+  - laf (1)
+  - Cormoran96 (1)
+  - nomyownnet (1)
+  - thecityofguanyu (1)
+  - isarandi (1)
+  - erotel (1)
+  - corsoblaster (1)
+  - andreasmalta (1)
+  - hanserasmus (1)
+
+#### Feature
+* Trigger Device Rediscovery for a device group ([#10832](https://github.com/librenms/librenms/pull/10832)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Allow user activation/deactivation (MySQL auth) ([#10511](https://github.com/librenms/librenms/pull/10511)) - [SourceDoctor](https://github.com/SourceDoctor)
+
+#### Security
+* Fix restricted application access for normal user ([#10802](https://github.com/librenms/librenms/pull/10802)) - [SourceDoctor](https://github.com/SourceDoctor)
+
+#### Device
+* Added basic Ubiquoss PON support ([#10828](https://github.com/librenms/librenms/pull/10828)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Added basic Zyxel GS-4012F support ([#10829](https://github.com/librenms/librenms/pull/10829)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Extend Dell Laser printer support for S5830dn and similar ([#10878](https://github.com/librenms/librenms/pull/10878)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Fixed Cisco Catalyst9x00 support ([#10862](https://github.com/librenms/librenms/pull/10862)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Extend discovery of Konica printers ([#10806](https://github.com/librenms/librenms/pull/10806)) - [andreasmalta](https://github.com/andreasmalta)
+* Add support for ZyXEL IES4206/5206/5212/6217 MSANs ([#10789](https://github.com/librenms/librenms/pull/10789)) - [vitalisator](https://github.com/vitalisator)
+* Added support EdgeCore ECS2100-10T ([#10843](https://github.com/librenms/librenms/pull/10843)) - [erotel](https://github.com/erotel)
+* Added hardware and software version for ASR9906 ([#10826](https://github.com/librenms/librenms/pull/10826)) - [nomyownnet](https://github.com/nomyownnet)
+* Add support for ZyXEL IES-5005 and IES-5106 DSLAMs ([#10804](https://github.com/librenms/librenms/pull/10804)) - [vitalisator](https://github.com/vitalisator)
+* Brocade switches - Added names on fiberchannel ports ([#10737](https://github.com/librenms/librenms/pull/10737)) - [evheros](https://github.com/evheros)
+* Added support for Mikrotik LTE Modem ([#10805](https://github.com/librenms/librenms/pull/10805)) - [jozefrebjak](https://github.com/jozefrebjak)
+* Added AIX file system, prefer over hrstorage for AIX ([#10588](https://github.com/librenms/librenms/pull/10588)) - [dlesel](https://github.com/dlesel)
+* Add support for HP PDU Management Module ([#10784](https://github.com/librenms/librenms/pull/10784)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Added device support for Chatsworth-PDU ([#10769](https://github.com/librenms/librenms/pull/10769)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Added device support for Zyxel AnyOS ([#10770](https://github.com/librenms/librenms/pull/10770)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Added basic device support for Infinera PON 7090 platform ([#10771](https://github.com/librenms/librenms/pull/10771)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Added support for Nexans Switches ([#10772](https://github.com/librenms/librenms/pull/10772)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Allow all models of Asentria SiteBoss ([#10746](https://github.com/librenms/librenms/pull/10746)) - [willhseitz](https://github.com/willhseitz)
+* Better detection of old 3Com StackSwitches ([#10736](https://github.com/librenms/librenms/pull/10736)) - [joseUPV](https://github.com/joseUPV)
+* Avoid state collisions between 'dell' and 'drac' OSes ([#10539](https://github.com/librenms/librenms/pull/10539)) - [PipoCanaja](https://github.com/PipoCanaja)
+
+#### Webui
+* Fix webui settings - AD bind at wrong place ([#10874](https://github.com/librenms/librenms/pull/10874)) - [louis-oui](https://github.com/louis-oui)
+* Fix static device group updated message ([#10841](https://github.com/librenms/librenms/pull/10841)) - [murrant](https://github.com/murrant)
+* Deactivate 'Delete' button in Device Dependencies page when necessary ([#10852](https://github.com/librenms/librenms/pull/10852)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Custom favicon issue ([#10847](https://github.com/librenms/librenms/pull/10847)) - [corsoblaster](https://github.com/corsoblaster)
+* Added support for routing table collection in discovery ([#10182](https://github.com/librenms/librenms/pull/10182)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Allow user specific themes ([#10799](https://github.com/librenms/librenms/pull/10799)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Fix some IE issues with settings page ([#10819](https://github.com/librenms/librenms/pull/10819)) - [murrant](https://github.com/murrant)
+* Alphabetic order of app overview ([#10825](https://github.com/librenms/librenms/pull/10825)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Translation correction ([#10821](https://github.com/librenms/librenms/pull/10821)) - [Cormoran96](https://github.com/Cormoran96)
+* Fix maps display only one link if multiple links are present between … ([#10818](https://github.com/librenms/librenms/pull/10818)) - [louis-oui](https://github.com/louis-oui)
+* Clarify wording of disable/alert device settings and dependency between the two settings ([#10809](https://github.com/librenms/librenms/pull/10809)) - [gdepeyrot](https://github.com/gdepeyrot)
+* Show logged in user in title menu ([#10800](https://github.com/librenms/librenms/pull/10800)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Device List: add metrics icons tooltip ([#10811](https://github.com/librenms/librenms/pull/10811)) - [kadecole](https://github.com/kadecole)
+* UI bug fix - Scroll disabled on "new rule from collection" modal ([#10796](https://github.com/librenms/librenms/pull/10796)) - [GramThanos](https://github.com/GramThanos)
+* Prevent sessions from expiring ([#10798](https://github.com/librenms/librenms/pull/10798)) - [murrant](https://github.com/murrant)
+* Comparison fix in slas.inc.php ([#10812](https://github.com/librenms/librenms/pull/10812)) - [seros1521](https://github.com/seros1521)
+* Unbundle javascript language files ([#10788](https://github.com/librenms/librenms/pull/10788)) - [murrant](https://github.com/murrant)
+* Fix email_auto_tls toggle ([#10785](https://github.com/librenms/librenms/pull/10785)) - [murrant](https://github.com/murrant)
+* Fix missing values for recurring alert state ([#10793](https://github.com/librenms/librenms/pull/10793)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Bootstrapping checkboxes, cont. ([#10782](https://github.com/librenms/librenms/pull/10782)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Add a deprecated warning to the front pages ([#10783](https://github.com/librenms/librenms/pull/10783)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Fix oxidized url setting validator ([#10766](https://github.com/librenms/librenms/pull/10766)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Fix settings search ([#10777](https://github.com/librenms/librenms/pull/10777)) - [murrant](https://github.com/murrant)
+* Bootstrap checkboxes ([#10749](https://github.com/librenms/librenms/pull/10749)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Replaced WorldMap zoom with text field to enable more fine grained zooming by steps of 0.1 ([#10753](https://github.com/librenms/librenms/pull/10753)) - [gdepeyrot](https://github.com/gdepeyrot)
+* Fix asset urls on settings page ([#10765](https://github.com/librenms/librenms/pull/10765)) - [murrant](https://github.com/murrant)
+* Settings.php key fix ([#10774](https://github.com/librenms/librenms/pull/10774)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Adding more default values to config_definitions ([#10756](https://github.com/librenms/librenms/pull/10756)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Fix broken relationship of local Service ID with SDP Service ID ([#10713](https://github.com/librenms/librenms/pull/10713)) - [vitalisator](https://github.com/vitalisator)
+* Fix mydomain setting regex ([#10762](https://github.com/librenms/librenms/pull/10762)) - [murrant](https://github.com/murrant)
+
+#### Applications
+* Added certificate file validity check for services (#10354) ([#10354](https://github.com/librenms/librenms/pull/10354)) - [SourceDoctor](https://github.com/SourceDoctor)
+
+#### Api
+* Add interval extra var on API add_rule and edit_rule ([#10814](https://github.com/librenms/librenms/pull/10814)) - [joretapoo](https://github.com/joretapoo)
+* Removal of IP address validation for ip field in add_service_for_host API call ([#10810](https://github.com/librenms/librenms/pull/10810)) - [MattWSL](https://github.com/MattWSL)
+* List_arp search by MAC ([#10803](https://github.com/librenms/librenms/pull/10803)) - [murrant](https://github.com/murrant)
+* Create device groups via API ([#10791](https://github.com/librenms/librenms/pull/10791)) - [BrianSidebotham](https://github.com/BrianSidebotham)
+* Fix API arp cidr search ([#10780](https://github.com/librenms/librenms/pull/10780)) - [murrant](https://github.com/murrant)
+
+#### Alerting
+* Do not purge alert_log table entries that have a matching active alert in alerts table ([#10744](https://github.com/librenms/librenms/pull/10744)) - [louis-oui](https://github.com/louis-oui)
+* Add Headers and body to API Transports ([#10614](https://github.com/librenms/librenms/pull/10614)) - [mendoza-conicet](https://github.com/mendoza-conicet)
+
+#### Polling
+* Perf optimisation for xDSL mib polling ([#10815](https://github.com/librenms/librenms/pull/10815)) - [PipoCanaja](https://github.com/PipoCanaja)
+
+#### Bug
+* Revert "Fix LDAP slow login" ([#10855](https://github.com/librenms/librenms/pull/10855)) - [louis-oui](https://github.com/louis-oui)
+* Fix syslog prune when dbFetchRow() returns array ([#10850](https://github.com/librenms/librenms/pull/10850)) - [rj-taylor](https://github.com/rj-taylor)
+* Fixes Zyxel MIB product definition ([#10824](https://github.com/librenms/librenms/pull/10824)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Fix snmp v3 when set via ui ([#10797](https://github.com/librenms/librenms/pull/10797)) - [murrant](https://github.com/murrant)
+* Fix invalid check for device-\>isUnderMaintenance() in worldmap ([#10778](https://github.com/librenms/librenms/pull/10778)) - [Jellyfrog](https://github.com/Jellyfrog)
+
+#### Refactor
+* Update device cache ([#10795](https://github.com/librenms/librenms/pull/10795)) - [murrant](https://github.com/murrant)
+
+#### Cleanup
+* Fix LDAP slow login ([#10760](https://github.com/librenms/librenms/pull/10760)) - [louis-oui](https://github.com/louis-oui)
+* Prevent syslog table purge from spamming daily.log ([#10851](https://github.com/librenms/librenms/pull/10851)) - [rj-taylor](https://github.com/rj-taylor)
+
+#### Documentation
+* Documentation link fixes ([#10848](https://github.com/librenms/librenms/pull/10848)) - [rj-taylor](https://github.com/rj-taylor)
+* Deleted yum package listed twice ([#10758](https://github.com/librenms/librenms/pull/10758)) - [hanserasmus](https://github.com/hanserasmus)
+
+#### Translation
+* German translation for settings page ([#10764](https://github.com/librenms/librenms/pull/10764)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Update zh-TW Translate settings strings ([#10816](https://github.com/librenms/librenms/pull/10816)) - [jasoncheng7115](https://github.com/jasoncheng7115)
+* Translation generation command ([#10794](https://github.com/librenms/librenms/pull/10794)) - [murrant](https://github.com/murrant)
+* Translate settings strings to zh-TW ([#10716](https://github.com/librenms/librenms/pull/10716)) - [jasoncheng7115](https://github.com/jasoncheng7115)
+* Translation of settings in French ([#10763](https://github.com/librenms/librenms/pull/10763)) - [PipoCanaja](https://github.com/PipoCanaja)
+
+#### Misc
+* LDAP Add option to authenticate user independtly of OU ([#10873](https://github.com/librenms/librenms/pull/10873)) - [louis-oui](https://github.com/louis-oui)
+* Fix LDAP slow login and unable to login ([#10872](https://github.com/librenms/librenms/pull/10872)) - [louis-oui](https://github.com/louis-oui)
+* Update dependencies ([#10830](https://github.com/librenms/librenms/pull/10830)) - [murrant](https://github.com/murrant)
+* Fix auth_test script does not do ldap bind ([#10865](https://github.com/librenms/librenms/pull/10865)) - [louis-oui](https://github.com/louis-oui)
+* Update Alcatel mibs to v8 ([#10857](https://github.com/librenms/librenms/pull/10857)) - [joseUPV](https://github.com/joseUPV)
+* Add check_oracle service include file and make 'packet_loss_' macro alerts not use radio buttons ([#10807](https://github.com/librenms/librenms/pull/10807)) - [thecityofguanyu](https://github.com/thecityofguanyu)
+* Fixed Tomato (router firmware OS), 'no bulk' enabled ([#10775](https://github.com/librenms/librenms/pull/10775)) - [arrmo](https://github.com/arrmo)
+* Fix mdadm sync speed title description ([#10773](https://github.com/librenms/librenms/pull/10773)) - [SourceDoctor](https://github.com/SourceDoctor)
+
+
 ## 1.57
 *(2019-10-28)*
 
