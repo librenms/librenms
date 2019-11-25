@@ -1817,10 +1817,11 @@ label {
 .badge-navbar-user {
    border-radius: 40%;
    font-size: 65%;
-   padding: 5px;
+   padding: 4px;
    position: relative;
    top: -10px;
-   left: -5px;
+   left: -11px;
+   margin-right: -14px;
 }
 .badge-default {
   background-color: #777;
