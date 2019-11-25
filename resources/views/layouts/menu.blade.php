@@ -27,7 +27,7 @@
                     <ul class="dropdown-menu multi-level" role="menu">
                         <li><a href="{{ url('overview') }}"><i class="fa fa-tv fa-fw fa-lg"
                                                                aria-hidden="true"></i> @lang('Dashboard')</a></li>
-                        <li class="dropdown-submenu">
+                        <li class="dropdown-submenu">F
                             <a><i class="fa fa-map fa-fw fa-lg"
                                                                aria-hidden="true"></i> @lang('Maps')</a>
                             <ul class="dropdown-menu">
@@ -472,7 +472,7 @@
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown">
                         <i class="fa fa-user fa-fw fa-lg fa-nav-icons" aria-hidden="true"></i>
-                        <span class="badge badge-navbar-user count-notif {{ $notification_count ? 'badge-danger' : 'badge-default' }}">{{ $notification_count ? $notification_count : '' }}</span>
+                        <span class="badge badge-navbar-user count-notif {{ $notification_count ? 'badge-danger' : 'badge-default' }}">{{ $notification_count ?: '' }}</span>
                         <span class="hidden-sm"><small>{{ Auth::user()->username }}</small></span>
                         <span class="visible-xs-inline-block">@lang('User')</span>
                     </a>
