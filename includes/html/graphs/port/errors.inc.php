@@ -18,7 +18,7 @@ $rrd_list[4]['colour_area_out'] = 'c0a060';
 
 $units       = '';
 $units_descr = 'Packets/sec';
-$total_units = 'B';
+$total_units = 'pps';
 $colours_in  = 'greens';
 $multiplier  = '1';
 $colours_out = 'blues';
