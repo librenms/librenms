@@ -288,6 +288,24 @@
             "order": 0,
             "type": "text"
         },
+        "auth_ad_binddn": {
+            "group": "auth",
+            "section": "ad",
+            "order": 9,
+            "type": "text"
+        },
+        "auth_ad_bindpassword": {
+            "group": "auth",
+            "section": "ad",
+            "order": 8,
+            "type": "password"
+        },
+        "auth_ad_binduser": {
+            "group": "auth",
+            "section": "ad",
+            "order": 10,
+            "type": "text"
+        },
         "auth_ldap_attr.uid": {
             "default": "uid",
             "group": "auth",
@@ -308,24 +326,6 @@
             "type": "password"
         },
         "auth_ldap_binduser": {
-            "group": "auth",
-            "section": "ldap",
-            "order": 10,
-            "type": "text"
-        },
-        "auth_ad_binddn": {
-            "group": "auth",
-            "section": "ldap",
-            "order": 9,
-            "type": "text"
-        },
-        "auth_ad_bindpassword": {
-            "group": "auth",
-            "section": "ldap",
-            "order": 8,
-            "type": "password"
-        },
-        "auth_ad_binduser": {
             "group": "auth",
             "section": "ldap",
             "order": 10,
@@ -449,6 +449,13 @@
             "type": "text"
         },
         "auth_ldap_userdn": {
+            "default": false,
+            "group": "auth",
+            "section": "ldap",
+            "order": 5,
+            "type": "boolean"
+        },
+        "auth_ldap_wildcard_ou": {
             "default": false,
             "group": "auth",
             "section": "ldap",
@@ -3541,6 +3548,13 @@
         "page_title_suffix": {
             "type": "text"
         },
+        "password.min_length": {
+            "default": 8,
+            "type": "integer",
+            "group": "auth",
+            "section": "general",
+            "order": 5
+        },
         "peering_descr": {
             "default": [
                 "peering"
@@ -3854,7 +3868,7 @@
             "default": false,
             "group": "auth",
             "section": "general",
-            "order": 5,
+            "order": 6,
             "type": "boolean"
         },
         "rancid_ignorecomments": {

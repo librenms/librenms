@@ -3,7 +3,7 @@
 
         IMPORTS
         MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE,
-        NOTIFICATION-TYPE, Counter32, Integer32, TimeTicks
+        NOTIFICATION-TYPE, Counter32, Counter64, Integer32, TimeTicks
                         FROM SNMPv2-SMI
                 MacAddress, TEXTUAL-CONVENTION, RowStatus
                         FROM SNMPv2-TC
@@ -1704,6 +1704,423 @@
 
 
 
+        ----------------------------------------------------------------                                                    
+        -- Table for LAS  data for this aggregate                                                        
+        ---------------------------------------------------------------                                                     
+                                                                                                                            
+        alclnkaggAggIdAccountTable OBJECT-TYPE                                                                              
+                SYNTAX SEQUENCE OF AlclnkaggAggIdAccountEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+
+                DESCRIPTION
+                        "Rows in this table represents account statistics of one aggregation."             
+
+                REFERENCE
+                        "specific to Alcatel"                                                                               
+                ::= { alclnkaggAgg 4 }                                                                                      
+         alclnkaggAggIdAccountEntry OBJECT-TYPE                                                                              
+                SYNTAX AlclnkaggAggIdAccountEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "Link Aggregate statistics."                             
+                INDEX { alclnkaggAggIndex }                                                                                  
+                ::= { alclnkaggAggIdAccountTable 1 }                                                                        
+        AlclnkaggAggIdAccountEntry ::=                                                                                      
+                SEQUENCE {
+                alcRxUndersize
+                        Counter64,
+		alcTxUndersize	
+                        Counter64,
+		alcRxOversize
+                        Counter64,
+		alcTxOversize
+                        Counter64,
+		alcRxPackets64
+                        Counter64,
+		alcRxPackets127
+                        Counter64,
+		alcRxPackets255
+                        Counter64,
+		alcRxPackets511
+                        Counter64,
+		alcRxPackets1023
+                        Counter64,
+		alcRxPackets1518
+                        Counter64,
+		alcRxPackets4095
+                        Counter64,
+		alcRxPackets9216
+                        Counter64,
+		alcRxJabberFrames
+                        Counter64
+                }
+
+     	alcRxUndersize OBJECT-TYPE
+		SYNTAX  Counter64                                                                          
+                MAX-ACCESS  read-only
+                STATUS current                                                                                              
+                DESCRIPTION
+                        "Undersize packet received"                                                                
+                ::= { alclnkaggAggIdAccountEntry 1 }                                                                                                                          
+
+     	alcTxUndersize OBJECT-TYPE
+		SYNTAX  Counter64                                                                          
+                MAX-ACCESS  read-only
+                STATUS current                                                                                              
+                DESCRIPTION
+                        "Undersize packet sent"                                                                
+                ::= { alclnkaggAggIdAccountEntry 2 }                                                                                                                          
+
+     	alcRxOversize OBJECT-TYPE
+		SYNTAX  Counter64                                                                          
+                MAX-ACCESS  read-only
+                STATUS current                                                                                              
+                DESCRIPTION
+                        "oversize packet received"                                                                
+                ::= { alclnkaggAggIdAccountEntry 3 }                                                                                                                          
+
+     	alcTxOversize OBJECT-TYPE
+		SYNTAX  Counter64                                                                          
+                MAX-ACCESS  read-only
+                STATUS current                                                                                              
+                DESCRIPTION
+                        "oversize packet sent"                                                                
+                ::= { alclnkaggAggIdAccountEntry 4 }                                                                                                                          
+
+     	alcRxPackets64 OBJECT-TYPE
+		SYNTAX  Counter64                                                                          
+                MAX-ACCESS  read-only
+                STATUS current                                                                                              
+                DESCRIPTION
+                        "packet size 64 received"                                                                
+                ::= { alclnkaggAggIdAccountEntry 5 }                                                                                                                          
+
+     	alcRxPackets127 OBJECT-TYPE
+		SYNTAX  Counter64                                                                          
+                MAX-ACCESS  read-only
+                STATUS current                                                                                              
+                DESCRIPTION
+                        "packet size 64-127 received"                                                                
+                ::= { alclnkaggAggIdAccountEntry 6 }                                                                                                                          
+
+     	alcRxPackets255 OBJECT-TYPE
+		SYNTAX  Counter64                                                                          
+                MAX-ACCESS  read-only
+                STATUS current                                                                                              
+                DESCRIPTION
+                        "packet size 128-255 received"                                                                
+                ::= { alclnkaggAggIdAccountEntry 7 }                                                                                                                          
+
+     	alcRxPackets511 OBJECT-TYPE
+		SYNTAX  Counter64                                                                          
+                MAX-ACCESS  read-only
+                STATUS current                                                                                              
+                DESCRIPTION
+                        "packet size 256-511 received"                                                                
+                ::= { alclnkaggAggIdAccountEntry 8 }                                                                                                                          
+
+     	alcRxPackets1023 OBJECT-TYPE
+		SYNTAX  Counter64                                                                          
+                MAX-ACCESS  read-only
+                STATUS current                                                                                              
+                DESCRIPTION
+                        "packet size 512-1023 received"                                                                
+                ::= { alclnkaggAggIdAccountEntry 9 }                                                                                                                          
+
+	alcRxPackets1518 OBJECT-TYPE
+                SYNTAX  Counter64
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "packet size 1024-1518 received"
+                ::= { alclnkaggAggIdAccountEntry 10 } 
+
+        alcRxPackets4095 OBJECT-TYPE
+                SYNTAX  Counter64
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "packet size 1518-4095 received"
+                ::= { alclnkaggAggIdAccountEntry 11 }   
+
+        alcRxPackets9216 OBJECT-TYPE
+                SYNTAX  Counter64
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "packet size 4096-Max received"
+                ::= { alclnkaggAggIdAccountEntry 12 }  
+
+        alcRxJabberFrames OBJECT-TYPE
+                SYNTAX  Counter64
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "Jabber frames received"
+                ::= { alclnkaggAggIdAccountEntry 13 }  
+
+
+	alclnkaggAggIdCounterTable OBJECT-TYPE
+                SYNTAX SEQUENCE OF AlclnkaggAggIdCounterEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                             
+                DESCRIPTION 
+                        "Rows in this table represents counter statistics of one aggregation."
+                                                                
+                REFERENCE
+                        "specific to Alcatel"
+                ::= { alclnkaggAgg 5 }                                                                                                                                                                                                              
+         alclnkaggAggIdCounterEntry OBJECT-TYPE
+		SYNTAX AlclnkaggAggIdCounterEntry
+		MAX-ACCESS not-accessible      
+                STATUS current
+		DESCRIPTION
+                        "Link Aggregate statistics."                                                                      
+                INDEX { alclnkaggAggIndex }
+                ::= { alclnkaggAggIdCounterTable 1 }
+
+	AlclnkaggAggIdCounterEntry ::=
+                SEQUENCE {
+                alcInOctets
+                        Counter64,
+                alcOutOctets
+                        Counter64,
+                alcInUcastPkts
+                        Counter64,
+                alcOutUcastPkts
+                        Counter64,
+                alcInMcastPkts
+                        Counter64,
+                alcOutMcastPkts
+                        Counter64,
+                alcInBcastPkts
+                        Counter64,
+                alcOutBcastPkts
+                        Counter64,
+                alcInPauseFrames
+                        Counter64,
+                alcOutPauseFrames
+                        Counter64
+
+		}
+
+
+	alcInOctets OBJECT-TYPE 
+                SYNTAX  Counter64
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "Octets received" 
+                ::= { alclnkaggAggIdCounterEntry 1 }        
+
+	alcOutOctets OBJECT-TYPE 
+                SYNTAX  Counter64
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "Octets sent" 
+                ::= { alclnkaggAggIdCounterEntry 2 }        
+
+	alcInUcastPkts OBJECT-TYPE 
+                SYNTAX  Counter64
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "unicast packet received" 
+                ::= { alclnkaggAggIdCounterEntry 3 }        
+
+	alcOutUcastPkts OBJECT-TYPE 
+                SYNTAX  Counter64
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "unicast packet sent" 
+                ::= { alclnkaggAggIdCounterEntry 4 }        
+
+	alcInMcastPkts OBJECT-TYPE 
+                SYNTAX  Counter64
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "multicast packet received" 
+                ::= { alclnkaggAggIdCounterEntry 5 }        
+
+
+	alcOutMcastPkts OBJECT-TYPE 
+                SYNTAX  Counter64
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "multicast packet sent" 
+                ::= { alclnkaggAggIdCounterEntry 6 }        
+
+	alcInBcastPkts OBJECT-TYPE 
+                SYNTAX  Counter64
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "broadcast packet received" 
+                ::= { alclnkaggAggIdCounterEntry 7 }        
+
+	alcOutBcastPkts OBJECT-TYPE 
+                SYNTAX  Counter64
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "broadcast packet sent" 
+                ::= { alclnkaggAggIdCounterEntry 8 }        
+
+	alcInPauseFrames OBJECT-TYPE 
+                SYNTAX  Counter64
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "pause frames received" 
+                ::= { alclnkaggAggIdCounterEntry 9 }        
+
+	alcOutPauseFrames OBJECT-TYPE 
+                SYNTAX  Counter64
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "pause frames sent" 
+                ::= { alclnkaggAggIdCounterEntry 10 }        
+
+
+	alclnkaggAggIdCounterErrTable OBJECT-TYPE
+                SYNTAX SEQUENCE OF AlclnkaggAggIdCounterErrEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                             
+                DESCRIPTION
+                        "Rows in this table represents counter error statistics of one aggregation."
+                                                
+                REFERENCE
+                        "specific to Alcatel"
+                ::= { alclnkaggAgg 6 }                                                                                                                                                                                                                
+         alclnkaggAggIdCounterErrEntry OBJECT-TYPE
+		SYNTAX AlclnkaggAggIdCounterErrEntry 
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "Link Aggregate statistics."
+                INDEX { alclnkaggAggIndex }
+                ::= { alclnkaggAggIdCounterErrTable 1 }
+                                                                                                                           
+        AlclnkaggAggIdCounterErrEntry ::=
+                SEQUENCE {
+                alcAlignmentsErrors
+                        Counter64,
+		alcFCSErrors
+                        Counter64,
+		alcIfInErrors
+                        Counter64,
+		alcIfOutErrors
+                        Counter64
+		}
+
+	alcAlignmentsErrors OBJECT-TYPE
+                SYNTAX  Counter64
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "Alignments error"
+                ::= { alclnkaggAggIdCounterErrEntry 1 }     
+
+
+	alcFCSErrors OBJECT-TYPE
+                SYNTAX  Counter64
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "Alignments error"
+                ::= { alclnkaggAggIdCounterErrEntry 2 }     
+
+
+	alcIfInErrors OBJECT-TYPE
+                SYNTAX  Counter64
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "interface rceive error"
+                ::= { alclnkaggAggIdCounterErrEntry 3 }     
+
+	alcIfOutErrors OBJECT-TYPE
+                SYNTAX  Counter64
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "interface send error"
+                ::= { alclnkaggAggIdCounterErrEntry 4 }     
+
+
+	alclnkaggAggIdTrafficTable OBJECT-TYPE                                                                          
+                SYNTAX SEQUENCE OF AlclnkaggAggIdTrafficEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                           
+                DESCRIPTION
+                        "Rows in this table represents traffic count statistics of one aggregation."
+                          
+                REFERENCE
+                        "specific to Alcatel"
+                ::= { alclnkaggAgg 7 }
+
+         alclnkaggAggIdTrafficEntry OBJECT-TYPE
+		SYNTAX AlclnkaggAggIdTrafficEntry 
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                        "Link Aggregate statistics."
+                INDEX { alclnkaggAggIndex }
+                ::= { alclnkaggAggIdTrafficTable 1 }
+                                 
+        AlclnkaggAggIdTrafficEntry ::=
+		SEQUENCE {
+                alcInputPackets
+                        Counter64,
+                alcInputBytes
+                        Counter64,
+                alcOutputPackets
+                        Counter64,
+                alcOutputBytes
+                        Counter64
+                }                                                                                                          
+
+        alcInputPackets OBJECT-TYPE
+                SYNTAX  Counter64
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "InputPacket "                                                                                 
+                ::= { alclnkaggAggIdTrafficEntry 1 }	
+
+        alcInputBytes OBJECT-TYPE
+                SYNTAX  Counter64
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "Input bytes "                                                                                 
+                ::= { alclnkaggAggIdTrafficEntry 2 }	
+
+        alcOutputPackets OBJECT-TYPE
+                SYNTAX  Counter64
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "InputPacket "                                                                                 
+                ::= { alclnkaggAggIdTrafficEntry 3 }	
+
+        alcOutputBytes OBJECT-TYPE
+                SYNTAX  Counter64
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "output bytes "                                                                                 
+                ::= { alclnkaggAggIdTrafficEntry 4 }	
 
 
         -- -------------------------------------------------------------
@@ -1913,6 +2330,21 @@
                         DESCRIPTION
                                 "This group is optional."
 
+                        GROUP alclnkaggAggIdAccountGroup
+                        DESCRIPTION
+                                "This group is optional."
+
+                        GROUP alclnkaggAggIdCounterGroup
+                        DESCRIPTION
+                                "This group is optional."
+
+                        GROUP alclnkaggAggIdCounterErrGroup
+                        DESCRIPTION
+                                "This group is optional."
+
+                        GROUP alclnkaggAggIdTrafficGroup
+                        DESCRIPTION
+                                "This group is optional."
 
                 ::= { alcatelIND1LAGMIBCompliances 1 }
 
@@ -2031,7 +2463,7 @@ lnkaggPortRemove NOTIFICATION-TYPE
                 traplnkaggAggId,
                 traplnkaggPortIfIndex
                 }
-        STATUS current
+        STATUS deprecated
         DESCRIPTION
                 "The Link Aggregation port removed from the aggregate  .
                 This trap is sent when given  port of the link aggregation
@@ -2234,6 +2666,76 @@ lnkaggPortRemove NOTIFICATION-TYPE
                         "A collection of objects providing information about ranges
                         allowed aggregate number values."
                 ::= { alcatelIND1LAGMIBGroups 9 }
+
+
+         alclnkaggAggIdAccountGroup  OBJECT-GROUP
+                OBJECTS {
+                        alcRxUndersize,
+			alcTxUndersize,
+			alcRxOversize,
+			alcTxOversize,
+			alcRxPackets64,
+			alcRxPackets127,
+			alcRxPackets255,
+			alcRxPackets511,
+			alcRxPackets1023,
+			alcRxPackets1518,
+			alcRxPackets4095,
+			alcRxPackets9216,
+			alcRxJabberFrames
+		}                                                                                                              
+                STATUS current                                                                                                 
+                DESCRIPTION                                                                                                    
+                        "A collection of objects providing information about aggregate account info"
+
+                ::= { alcatelIND1LAGMIBGroups 10 }
+
+
+	  alclnkaggAggIdCounterGroup  OBJECT-GROUP                                                                        
+                OBJECTS {                                                                                                
+			alcInOctets,
+			alcOutOctets,
+			alcInUcastPkts,
+			alcOutUcastPkts,
+			alcInMcastPkts,
+			alcOutMcastPkts,
+			alcInBcastPkts,
+			alcOutBcastPkts,
+			alcInPauseFrames,
+			alcOutPauseFrames
+                }
+                STATUS current 
+                DESCRIPTION
+                        "A collection of objects providing information about aggregate counter info"
+                                                                                                                         
+                ::= { alcatelIND1LAGMIBGroups 11 }
+
+	   alclnkaggAggIdCounterErrGroup  OBJECT-GROUP                                                                                                                                                                                                
+                OBJECTS {                                                                                                
+			alcAlignmentsErrors,
+			alcFCSErrors,
+			alcIfInErrors,
+			alcIfOutErrors
+                }                                                                                                        
+                STATUS current                                                                                           
+                DESCRIPTION                                                                                              
+                        "A collection of objects providing information about aggregate counter error info"                     
+                                                                                                                         
+                ::= { alcatelIND1LAGMIBGroups 12 } 
+
+
+	   alclnkaggAggIdTrafficGroup  OBJECT-GROUP
+                OBJECTS {     
+			alcInputPackets,
+			alcInputBytes,
+			alcOutputPackets,
+			alcOutputBytes	
+                }                                                                                                        
+                STATUS current                                                                                           
+                DESCRIPTION                                                                                              
+                        "A collection of objects providing information about aggregate traffic info"                                                                                                                                        
+                                                                                                                         
+                ::= { alcatelIND1LAGMIBGroups 13 }
 
 
 

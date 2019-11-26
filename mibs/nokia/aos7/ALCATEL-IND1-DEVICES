@@ -57,6 +57,9 @@ alcatelIND1DevicesMIB MODULE-IDENTITY
                      Copyright (C) 1995-2010 Alcatel-Lucent
                          ALL RIGHTS RESERVED WORLDWIDE"
 
+    REVISION      "201504240000Z"
+    DESCRIPTION
+      "Added OS10K, OS6900 and OS6860 SFP definitions."
     REVISION      "201108040000Z"
     DESCRIPTION
       "Added OS10K Power Supply, Fan Tray and Fabric Object Indentifier definitions"
@@ -262,6 +265,192 @@ gniOmniSwitch10000Q4 OBJECT-IDENTITY
         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.9.4.2.3.2"
     ::= { niOmniSwitch10000QNI 2 }
 
+niOmniSwitch10000IC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 10000 Series Network Interface Module Interface Cards (IC)."
+    ::= { modulesOmniSwitch10000NI 4 }
+
+icOmniSwitch10000GIC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 10000 Series 1000BaseX Interface Cards (IC)."
+    ::= { niOmniSwitch10000IC 1 }
+
+gicOmniSwitch10000LH OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 10000 Series Single Mode Fiber 1000Base-LH Interface Card.
+        Model Name: SFP-GIG-LH
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.9.4.2.4.1.1"
+    ::= { icOmniSwitch10000GIC 1 }
+
+gicOmniSwitch10000LX OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 10000 Series Single Mode Fiber 1000Base-LX Interface Card.
+        Model Name: SFP-GIG-LX
+        Assembly:   903436-90
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.9.4.2.4.1.2"
+   ::= { icOmniSwitch10000GIC 2 }
+
+gicOmniSwitch10000SX OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 10000 Series Multi Mode Fiber 1000Base-SX Interface Card.
+        Model Name: SFP-GIG-SX
+        Assembly:   903442-90
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.9.4.2.4.1.3"
+    ::= { icOmniSwitch10000GIC 3 }
+
+gicOmniSwitch10000FX OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 10000 Series Multi Mode Fibre 100Base-FX Interface Card.
+        Model Name: SFP-100-LC
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.9.4.2.4.1.4"
+    ::= { icOmniSwitch10000GIC 4 }
+
+gicOmniSwitch10000GBX OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 10000 Series Single Mode Fiber 1000Base-BX Interface Card.
+        Model Name: SFP-GIG-BX
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.9.4.2.4.1.5"
+    ::= { icOmniSwitch10000GIC 5 }
+
+gicOmniSwitch10000BX OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 10000 Series Single Mode Fiber 100Base-BX Interface Card.
+        Model Name: SFP-100-BX
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.9.4.2.4.1.6"
+    ::= { icOmniSwitch10000GIC 6 }
+
+gicOmniSwitch10000CT OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 10000 Series Copper 10/100/1000Base-T Interface Card.
+        Model Name: SFP-GIG-T
+        Assembly:   902753-90
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.9.4.2.4.1.7"
+    ::= { icOmniSwitch10000GIC 7 }
+
+icOmniSwitch10000TenGIC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 10000 Series 10 GIG Interface Cards (IC)."
+    ::= { niOmniSwitch10000IC 2 }
+
+mgicOmniSwitch10000SR OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 10000 Series Multi Mode Fiber 10GBase-SR Interface Card.
+        Model Name: SFP-10G-SR
+        Assembly:   903437-90
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.9.4.2.4.2.1"
+    ::= { icOmniSwitch10000TenGIC 1 }
+
+mgicOmniSwitch10000LR OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 10000 Series Single Mode Fiber 10GBase-LR Interface Card.
+        Model Name: SFP-10G-LR
+        Assembly:   903432-90
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.9.4.2.4.2.2"
+    ::= { icOmniSwitch10000TenGIC 2 }
+
+mgicOmniSwitch10000ER OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 10000 Series Single Mode Fiber 10GBase-ER Interface Card.
+        Model Name: SFP-10G-ER
+        Assembly:   903439-90
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.9.4.2.4.2.3"
+    ::= { icOmniSwitch10000TenGIC 3 }
+
+mgicOmniSwitch10000LRM OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 10000 Series Multi Mode Fiber 10GBase-LRM Interface Card.
+        Model Name: SFP-10G-LRM
+        Assembly:   903441-90
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.9.4.2.4.2.4"
+    ::= { icOmniSwitch10000TenGIC 4 }
+
+mgicOmniSwitch10000ZR OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 10000 Series Single Mode Fiber 10GBase-ZR Interface Card.
+        Model Name: SFP-10G-24DWD80
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.9.4.2.4.2.5"
+    ::= { icOmniSwitch10000TenGIC 5 }
+
+mgicOmniSwitch10000C OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 10000 1,10G Eth 2,4,8G Fiber Channel Direct Attach Copper Interface Cable.
+        Model Name: SFP-10G-C
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.9.4.2.4.2.6"
+    ::= { icOmniSwitch10000TenGIC 6 }
+
+mgicOmniSwitch10000DualSR OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 10000 Series Multi Mode Fiber Dual Mode 10GBase-SR/SW,1000Base-SX Interface Card.
+        Model Name: SFP-10G-GIG-SR
+        Assembly:   903178-90
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.9.4.2.4.2.7"
+    ::= { icOmniSwitch10000TenGIC 7 }
+
+icOmniSwitch10000FortyGIC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 10000 Series 40 GIG Interface Cards (IC)."
+    ::= { niOmniSwitch10000IC 3 }
+
+qgicOmniSwitch10000QLR OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 10000 Series Single Mode Fiber 40GBase-LR4 Interface Card.
+        Model Name: QSFP-40G-LR
+        Assembly:   903433-90
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.9.4.2.4.3.1"
+    ::= { icOmniSwitch10000FortyGIC 1 }
+
+qgicOmniSwitch10000QSR OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 10000 Series Multi Mode Fiber 40GBase-SR4 Interface Card.
+        Model Name: QSFP-40G-SR
+        Assembly:   903435-90
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.9.4.2.4.3.2"
+    ::= { icOmniSwitch10000FortyGIC 2 }
+
+qgicOmniSwitch10000QCR OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 10000 Series 40GBase-CR4 Copper Interface Card.
+        Model Name: QSFP-40G-CR
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.9.4.2.4.3.3"
+    ::= { icOmniSwitch10000FortyGIC 3 }
+
+qgicOmniSwitch10000QC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 10000 Series 40G Direct Attached Copper Interface Cable.
+        Model Name: QSFP-40G-C
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.9.4.2.4.3.4"
+    ::= { icOmniSwitch10000FortyGIC 4 }
+
 cfmOmniSwitch10000 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
@@ -298,7 +487,7 @@ chassisOmniSwitch6900 OBJECT-IDENTITY
         "Branch For OmniSwitch 6900 1-Slot Chassis.
         Model Name: OS6900
         Assembly:
-	sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.10.1"
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.10.1"
     ::= { familyOmniSwitch6900 1 }
 
 deviceOmniSwitch6900X20 OBJECT-IDENTITY
@@ -337,6 +526,23 @@ deviceOmniSwitch6900T40 OBJECT-IDENTITY
         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.10.1.4"
     ::= { chassisOmniSwitch6900 4 }
 
+deviceOmniSwitch6900Q32 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6900 Series .
+        Model Name: OS6900-Q32
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.10.1.5"
+    ::= { chassisOmniSwitch6900 5 }
+
+deviceOmniSwitch6900X72 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6900 Series .
+        Model Name: OS6900-X72
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.10.1.6"
+    ::= { chassisOmniSwitch6900 6 }
 
 fansOmniSwitch6900 OBJECT-IDENTITY
     STATUS current
@@ -444,6 +650,221 @@ daughterBoardOmniSwitch6900XNI-T8 OBJECT-IDENTITY
         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.10.5.5"
     ::= { daughterBoardOmniSwitch6900 5 }
 
+icOmniSwitch6900GIC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6900 Series 1000BaseX Interface Cards (IC)."
+    ::= { modulesOmniSwitch6900 1 }
+
+gicOmniSwitch6900LH OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6900 Series Single Mode Fiber 1000Base-LH Interface Card.
+        Model Name: SFP-GIG-LH
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.10.4.1.1"
+    ::= { icOmniSwitch6900GIC 1 }
+
+gicOmniSwitch16900LX OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6900 Series Single Mode Fiber 1000Base-LX Interface Card.
+        Model Name: SFP-GIG-LX
+        Assembly:   903436-90
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.10.4.1.2"
+   ::= { icOmniSwitch6900GIC 2 }
+
+gicOmniSwitch6900SX OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6900 Series Multi Mode Fiber 1000Base-SX Interface Card.
+        Model Name: SFP-GIG-SX
+        Assembly:   903442-90
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.10.4.1.3"
+    ::= { icOmniSwitch6900GIC 3 }
+
+gicOmniSwitch6900FX OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6900 Series Multi Mode Fiber 100Base-FX Interface Card.
+        Model Name: SFP-100-FX
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.10.4.1.4"
+    ::= { icOmniSwitch6900GIC 4 }
+
+gicOmniSwitch6900GBX OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6900 Series Single Mode Fiber 1000Base-BX Interface Card.
+        Model Name: SFP-GIG-BX
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.10.4.1.5"
+    ::= { icOmniSwitch6900GIC 5 }
+
+gicOmniSwitch6900BX OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6900 Series Single Mode Fiber 100Base-BX Interface Card.
+        Model Name: SFP-100-BX
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.10.4.1.6"
+    ::= { icOmniSwitch6900GIC 6 }
+
+gicOmniSwitch6900CT OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6900 Series Copper 10/100/1000Base-T Interface Card.
+        Model Name: SFP-GIG-T
+        Assembly:   902753-90
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.10.4.1.7"
+    ::= { icOmniSwitch6900GIC 7 }
+
+gicOmniSwitch6900FC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6900 2/4/8G Multi Mode Fiber Channel Interface Card.
+        Model Name: SFP-FC-SR
+        Assembly:   903440-90
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.10.4.1.8"
+    ::= { icOmniSwitch6900GIC 8 }
+
+icOmniSwitch6900TenGIC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6900 Series 10 GIG Interface Cards (IC)."
+    ::= { modulesOmniSwitch6900 2 }
+
+mgicOmniSwitch6900SR OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6900 Series Multi Mode Fiber 10-Gigabit SR Interface Card.
+        Model Name: SFP-10G-SR
+        Assembly:   903437-90
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.10.4.2.1"
+    ::= { icOmniSwitch6900TenGIC 1 }
+
+mgicOmniSwitch6900LR OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6900 Series Single Mode Fiber 10GBase-LR Interface Card.
+        Model Name: SFP-10G-LR
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.10.4.2.2"
+    ::= { icOmniSwitch6900TenGIC 2 }
+
+mgicOmniSwitch6900ER OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6900 Series Single Mode Fiber 10GBase-ER Interface Card.
+        Model Name: SFP-10G-ER
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.10.4.2.3"
+    ::= { icOmniSwitch6900TenGIC 3 }
+
+mgicOmniSwitch6900LRM OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6900 Series Multi Mode Fiber 10GBase-LRM Interface Card.
+        Model Name: SFP-10G-LRM
+        Assembly:   903441-90
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.10.4.2.4"
+    ::= { icOmniSwitch6900TenGIC 4 }
+
+mgicOmniSwitch6000ZR OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6900 Series Single Mode Fiber 10GBase-ZR Interface Card.
+        Model Name: SFP-10G-24DWD80
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.10.4.2.5"
+    ::= { icOmniSwitch6900TenGIC 5 }
+
+mgicOmniSwitch6900C OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6900 1,10G Eth 2,4,8G Fiber Channel Direct Attach Copper Interface Cable.
+        Model Name: SFP-10G-C
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.10.4.2.6"
+    ::= { icOmniSwitch6900TenGIC 6 }
+
+mgicOmniSwitch6900DualSR OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6900 Series Multi Mode Fiber Dual Mode 10GBase-SR/SW,1000Base-SX Interface Card.
+        Model Name: SFP-10G-GIG-SR
+        Assembly:   903178-90
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.10.4.2.7"
+    ::= { icOmniSwitch6900TenGIC 7 }
+
+icOmniSwitch6900FortyGIC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6900 Series 40 GIG Interface Cards (IC)."
+    ::= { modulesOmniSwitch6900 3 }
+
+qgicOmniSwitch6900QLR OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6900 Series Single Mode Fiber 40GBase-LR4 Interface Card.
+        Model Name: QSFP-40G-LR
+        Assembly:   903433-90
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.10.4.3.1"
+    ::= { icOmniSwitch6900FortyGIC 1 }
+
+qgicOmniSwitch6900QSR OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6900 Series Multi Mode Fiber 40GBase-SR4 Interface Card.
+        Model Name: QSFP-40G-SR
+        Assembly:   903435-90
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.10.4.3.2"
+    ::= { icOmniSwitch6900FortyGIC 2 }
+
+qgicOmniSwitch6900QCR OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6900 Series 40GBase-CR4 Copper Interface Card.
+        Model Name: QSFP-40G-CR
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.10.4.3.3"
+    ::= { icOmniSwitch6900FortyGIC 3 }
+
+qgicOmniSwitch6900QC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6900 Series 40G Direct Attached Copper Interface Cable.
+        Model Name: QSFP-40G-C
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.10.4.3.4"
+    ::= { icOmniSwitch6900FortyGIC 4 }
+
+qgicOmniSwitch6900Q4X10GC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6900 Series 4X10G Copper Splitter Interface Cable.
+        Model Name: QSFP-4X10G-C
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.10.4.3.5"
+    ::= { icOmniSwitch6900FortyGIC 5 }
+
+qgicOmniSwitch6900Q4X10GSR OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6900 Series MPO 40G or 4X10G Splitter SR Interface Cable.
+        Model Name: QSFP-4X10G-SR
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.10.4.3.6"
+    ::= { icOmniSwitch6900FortyGIC 6 }
+
+qgicOmniSwitch6900Q4X10GLR OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6900 Series MPO 40G or 4X10G Splitter LR Interface Cable.
+        Model Name: QSFP-4X10G-LR
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.10.4.3.7"
+    ::= { icOmniSwitch6900FortyGIC 7 }
 
 
 familyOmniSwitch6860 OBJECT-IDENTITY
@@ -542,11 +963,11 @@ deviceOmniSwitch6860E-P48 OBJECT-IDENTITY
     ::= { chassisOmniSwitch6860 8 }
 
 
-deviceOmniSwitch6860U-28 OBJECT-IDENTITY
+deviceOmniSwitch6860E-U28 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "OmniSwitch 6860 Series .
-        Model Name: OS6860U-28
+        Model Name: OS6860E-U28
         Assembly:
         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.11.1.9"
     ::= { chassisOmniSwitch6860 9 }
@@ -612,7 +1033,167 @@ modulesOmniSwitch6860 OBJECT-IDENTITY
         "Branch For OmniSwitch 6860 Series Modules."
     ::= { familyOmniSwitch6860 4 }
 
+icOmniSwitch6860GIC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6860 Series 1000BaseX Interface Cards (IC)."
+    ::= { modulesOmniSwitch6860 1 }
 
+gicOmniSwitch6860LH OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6860 Series Single Mode Fiber 1000Base-LH Interface Card.
+        Model Name: SFP-GIG-LH
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.11.4.1.1"
+    ::= { icOmniSwitch6860GIC 1 }
+
+gicOmniSwitch16860LX OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6860 Series Single Mode Fiber 1000Base-LX Interface Card.
+        Model Name: SPF-GIG-LX
+        Assembly:   903436-90
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.11.4.1.2"
+   ::= { icOmniSwitch6860GIC 2 }
+
+gicOmniSwitch6860SX OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6860 Series Multi Mode Fiber 1000Base-SX Interface Card.
+        Model Name: SPF-GIG-SX
+        Assembly:   903442-90
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.11.4.1.3"
+    ::= { icOmniSwitch6860GIC 3 }
+
+gicOmniSwitch6860FX OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6860 Series Multi Mode Fiber 100Base-FX Interface Card.
+        Model Name: SFP-100-FX
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.11.4.1.4"
+    ::= { icOmniSwitch6860GIC 4 }
+
+gicOmniSwitch6860GBX OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6860 Series Fiber 1000Base-BX Interface Card.
+        Model Name: SFP-GIG-BX
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.11.4.1.5"
+    ::= { icOmniSwitch6860GIC 5 }
+
+gicOmniSwitch6860BX OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6860 Series Fiber 100Base-BX Interface Card.
+        Model Name: SFP-100-BX
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.11.4.1.6"
+    ::= { icOmniSwitch6860GIC 6 }
+
+gicOmniSwitch6860CT OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6860 Series Copper 10/100/1000Base-T Interface Card.
+        Model Name: SFP-GIG-T
+        Assembly:   902753-90
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.11.4.1.7"
+    ::= { icOmniSwitch6860GIC 7 }
+
+icOmniSwitch6860TenGIC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6860 Series 10 GIG Interface Cards (IC)."
+    ::= { modulesOmniSwitch6860 2 }
+
+mgicOmniSwitch6860SR OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6860 Series Multi Mode Fiber 10-Gigabit SR Interface Card.
+        Model Name: SFP-10G-SR
+        Assembly:   902343-10
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.11.4.2.1"
+    ::= { icOmniSwitch6860TenGIC 1 }
+
+mgicOmniSwitch6860LR OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6860 Series Single Mode Fiber 10GBase-LR Interface Card.
+        Model Name: SFP-10G-LR
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.11.4.2.2"
+    ::= { icOmniSwitch6860TenGIC 2 }
+
+mgicOmniSwitch6860ER OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6860 Series Single Mode Fiber 10GBase-ER Interface Card.
+        Model Name: SFP-10G-ER
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.11.4.2.3"
+    ::= { icOmniSwitch6860TenGIC 3 }
+
+mgicOmniSwitch6860LRM OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6860 Series Multi Mode Fiber 10GBase-LRM Interface Card.
+        Model Name: SFP-10G-LRM
+        Assembly:   903441-90
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.11.4.2.4"
+    ::= { icOmniSwitch6860TenGIC 4 }
+
+mgicOmniSwitch6860C OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6860 1,10G Eth 2,4,8G Fiber Channel Direct Attach Copper Interface Cable.
+        Model Name: SFP-10G-C
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.11.4.2.5"
+    ::= { icOmniSwitch6860TenGIC 5 }
+
+mgicOmniSwitch6860DualSR OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6860 Series Multi Mode Fiber Dual Mode 10GBase-SR/SW,1000Base-SX Interface Card.
+        Model Name: SFP-10G-GIG-SR
+        Assembly:   903178-90
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.11.4.2.6"
+    ::= { icOmniSwitch6860TenGIC 6 }
+
+icOmniSwitch6860FortyGIC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6860 Series 40 GIG Interface Cards (IC)."
+    ::= { modulesOmniSwitch6860 3 }
+
+qgicOmniSwitch6860QSR OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6860 Series Multi Mode Fiber 40GBase-SR4 (20G VFL Stacking) Interface Card.
+        Model Name: QSFP-40G-SR
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.11.4.3.1"
+    ::= { icOmniSwitch6860FortyGIC 1 }
+
+qgicOmniSwitch6860QCBL OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6860 Series 40G Copper (20G VFL Stacking) Direct Attach Cable.
+        Model Name: 6860-CBL
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.11.4.3.2"
+    ::= { icOmniSwitch6860FortyGIC 2 }
+
+qgicOmniSwitch6860QAOC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6860 Series 40G AOC 20M (20G VFL Stacking) Direct Attach Cable.
+        Model Name: 6860-AOC
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.11.4.3.3"
+    ::= { icOmniSwitch6860FortyGIC 3 }
 
 externBoardOmniSwitch6860 OBJECT-IDENTITY
     STATUS current
@@ -630,5 +1211,428 @@ externBoardOmniSwitch6860CPU OBJECT-IDENTITY
         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.11.5.1"
     ::= { externBoardOmniSwitch6860 1 }
 
+familyOmniSwitch9900 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 9900 Series Product Family."
+    ::= { alcatelIND1DevicesMIB 12 }
+
+chassisOmniSwitch9900 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 9900 Series Chassis."
+    ::= { familyOmniSwitch9900 1 }
+
+deviceOmniSwitch9907 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 7-Slot Chassis.
+        Model Name: OS9907
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.12.1.1"
+    ::= { chassisOmniSwitch9900 1 }
+
+fansOmniSwitch9900 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 9900 Series Fan Trays."
+    ::= { familyOmniSwitch9900 2 }
+
+fansOmniSwitch9900FT OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9907 Series Fan Tray.
+         Model Name: OS99-FAN-TRAY
+         Assembly:
+         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.12.2.1"
+    ::= { fansOmniSwitch9900 1 }
+
+powersOmniSwitch9900 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 9900 Series Power Supplies."
+    ::= { familyOmniSwitch9900 3 }
+
+powersOmniSwitch9900AC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series AC power supply.
+         Model Name: OS99-PS-A
+         Assembly:
+         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.12.3.1"
+    ::= { powersOmniSwitch9900 1 }
+
+powersOmniSwitch9900DC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series DC power supply.
+         Model Name: OS99-PS-D
+         Assembly:
+         sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.12.3.2"
+    ::= { powersOmniSwitch9900 2 }
+
+modulesOmniSwitch9900 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 9900 Series Modules."
+    ::= { familyOmniSwitch9900 4 }
+
+modulesOmniSwitch9900CM OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 9900 Series Chassis Management (CM) Modules."
+    ::= { modulesOmniSwitch9900 1 }
+
+cmmOmniSwitch9900 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series Chassis Management Module.
+        Model Name: OS99-CMM
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.12.4.1.1"
+    ::= { modulesOmniSwitch9900CM 1 }
+
+cmmOmniSwitch9900PROC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series Chassis Management Module Processor.
+        Model Name: OS99-CMM Processor
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.12.4.1.1.1"
+    ::= { cmmOmniSwitch9900 1 }
+
+modulesOmniSwitch9900NI OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series Network Interface (NI) Modules."
+    ::= { modulesOmniSwitch9900 2 }
+
+niOmniSwitch9900GNI OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series 1000BaseX Ethernet Network Interface (GNI) Modules."
+    ::= { modulesOmniSwitch9900NI 1 }
+
+gniOmniSwitch9900C48 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series 48 port Ethernet Network Interface (GNI) Module.
+        Model Name: OS99-GNI-C48
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.12.4.2.1.1"
+    ::= { niOmniSwitch9900GNI 1 }
+
+gniOmniSwitch9900P48 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series 48 port Ethernet Network Interface (GNI)
+        with Power over Ethernet Module.
+        Model Name: OS99-GNI-P48
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.12.4.2.1.2"
+    ::= { niOmniSwitch9900GNI 2 }
+
+gniOmniSwitch9900U48 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series 48 port Ethernet Network Interface (GNI)
+        with fiber optic SFPs.  
+        Model Name: OS99-GNI-U48
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.12.4.2.1.3"
+    ::= { niOmniSwitch9900GNI 3 }
+
+
+niOmniSwitch9900XNI OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series 10 GIG Ethernet Network Interface (XNI) Modules."
+    ::= { modulesOmniSwitch9900NI 2 }
+
+gniOmniSwitch9900XU48 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series 48 port 10 GIG Ethernet Network Interface (XNI) Module.
+        Model Name: OS99-XNI-U48
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.12.4.2.2.1"
+    ::= { niOmniSwitch9900XNI 1 }
+
+gniOmniSwitch9900XT48 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series 48 port 10 GIG Twisted Pair Ethernet Network Interface (XNI) Module.
+        Model Name: OS99-XNI-48
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.12.4.2.2.2"
+    ::= { niOmniSwitch9900XNI 2 }
+
+gniOmniSwitch9900XP48 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series 48 port 10 GIG Twisted Pair Ethernet Network Interface (XNI)
+        with Power over Ethernet Module.
+        Model Name: OS99-XNI-P48
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.12.4.2.2.3"
+    ::= { niOmniSwitch9900XNI 3 }
+
+niOmniSwitch9900QNI OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series 40 GIG Ethernet Network Interface (QNI) Modules."
+    ::= { modulesOmniSwitch9900NI 3 }
+
+niOmniSwitch9900IC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series Network Interface Module Interface Cards (IC)."
+    ::= { modulesOmniSwitch9900NI 4 }
+
+icOmniSwitch9900GIC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series 1000BaseX Interface Cards (IC)."
+    ::= { niOmniSwitch9900IC 1 }
+
+gicOmniSwitch9900LH OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series Single Mode Fiber 1000Base-LH Interface Card.
+        Model Name: SFP-GIG-LH
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.12.4.2.4.1.1"
+    ::= { icOmniSwitch9900GIC 1 }
+
+gicOmniSwitch9900LX OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series Single Mode Fiber 1000Base-LX Interface Card.
+        Model Name: SFP-GIG-LX
+        Assembly:   903436-90
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.12.4.2.4.1.2"
+   ::= { icOmniSwitch9900GIC 2 }
+
+gicOmniSwitch9900SX OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series Multi Mode Fiber 1000Base-SX Interface Card.
+        Model Name: SFP-GIG-SX
+        Assembly:   903442-90
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.12.4.2.4.1.3"
+    ::= { icOmniSwitch9900GIC 3 }
+
+gicOmniSwitch9900FX OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series Multi Mode Fibre 100Base-FX Interface Card.
+        Model Name: SFP-100-LC
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.12.4.2.4.1.4"
+    ::= { icOmniSwitch9900GIC 4 }
+
+gicOmniSwitch9900GBX OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series Single Mode Fiber 1000Base-BX Interface Card.
+        Model Name: SFP-GIG-BX
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.12.4.2.4.1.5"
+    ::= { icOmniSwitch9900GIC 5 }
+
+gicOmniSwitch9900BX OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series Single Mode Fiber 100Base-BX Interface Card.
+        Model Name: SFP-100-BX
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.12.4.2.4.1.6"
+    ::= { icOmniSwitch9900GIC 6 }
+
+gicOmniSwitch9900CT OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series Copper 10/100/1000Base-T Interface Card.
+        Model Name: SFP-GIG-T
+        Assembly:   902753-90
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.12.4.2.4.1.7"
+    ::= { icOmniSwitch9900GIC 7 }
+
+gicOmniSwitch9900FC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 2/4/8G Multi Mode Fiber Channel Interface Card.
+        Model Name: SFP-FC-SR
+        Assembly:   903440-90
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.12.4.2.4.1.8"
+    ::= { icOmniSwitch9900GIC 8 }
+
+icOmniSwitch9900TenGIC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series 10 GIG Interface Cards (IC)."
+    ::= { niOmniSwitch9900IC 2 }
+
+mgicOmniSwitch9900SR OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series Multi Mode Fiber 10GBase-SR Interface Card.
+        Model Name: SFP-10G-SR
+        Assembly:   903437-90
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.12.4.2.4.2.1"
+    ::= { icOmniSwitch9900TenGIC 1 }
+
+mgicOmniSwitch9900LR OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series Single Mode Fiber 10GBase-LR Interface Card.
+        Model Name: SFP-10G-LR
+        Assembly:   903432-90
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.12.4.2.4.2.2"
+    ::= { icOmniSwitch9900TenGIC 2 }
+
+mgicOmniSwitch9900ER OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series Single Mode Fiber 10GBase-ER Interface Card.
+        Model Name: SFP-10G-ER
+        Assembly:   903439-90
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.12.4.2.4.2.3"
+    ::= { icOmniSwitch9900TenGIC 3 }
+
+mgicOmniSwitch9900LRM OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series Multi Mode Fiber 10GBase-LRM Interface Card.
+        Model Name: SFP-10G-LRM
+        Assembly:   903441-90
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.12.4.2.4.2.4"
+    ::= { icOmniSwitch9900TenGIC 4 }
+
+mgicOmniSwitch9900ZR OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series Single Mode Fiber 10GBase-ZR Interface Card.
+        Model Name: SFP-10G-24DWD80
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.12.4.2.4.2.5"
+    ::= { icOmniSwitch9900TenGIC 5 }
+
+mgicOmniSwitch9900C OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 1,10G Eth 2,4,8G Fiber Channel Direct Attach Copper Interface Cable.
+        Model Name: SFP-10G-C
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.12.4.2.4.2.6"
+    ::= { icOmniSwitch9900TenGIC 6 }
+
+mgicOmniSwitch9900DualSR OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series Multi Mode Fiber Dual Mode 10GBase-SR/SW,1000Base-SX Interface Card.
+        Model Name: SFP-10G-GIG-SR
+        Assembly:   903178-90
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.12.4.2.4.2.7"
+    ::= { icOmniSwitch9900TenGIC 7 }
+
+icOmniSwitch9900FortyGIC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series 40 GIG Interface Cards (IC)."
+    ::= { niOmniSwitch9900IC 3 }
+
+qgicOmniSwitch9900QLR OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series Single Mode Fiber 40GBase-LR4 Interface Card.
+        Model Name: QSFP-40G-LR
+        Assembly:   903433-90
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.12.4.2.4.3.1"
+    ::= { icOmniSwitch9900FortyGIC 1 }
+
+qgicOmniSwitch9900QSR OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series Multi Mode Fiber 40GBase-SR4 Interface Card.
+        Model Name: QSFP-40G-SR
+        Assembly:   903435-90
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.12.4.2.4.3.2"
+    ::= { icOmniSwitch9900FortyGIC 2 }
+
+qgicOmniSwitch9900QCR OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series 40GBase-CR4 Copper Interface Card.
+        Model Name: QSFP-40G-CR
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.12.4.2.4.3.3"
+    ::= { icOmniSwitch9900FortyGIC 3 }
+
+qgicOmniSwitch9900QC OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series 40G Direct Attached Copper Interface Cable.
+        Model Name: QSFP-40G-C
+        Assembly:
+        sysObjectID:  1.3.6.1.4.1.6486.801.1.1.2.1.12.4.2.4.3.4"
+    ::= { icOmniSwitch9900FortyGIC 4 }
+
+cfmOmniSwitch9900 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series Fabric Modules."
+    ::= { modulesOmniSwitch9900 3 }
+
+cfmOmniSwitch9900CFM OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 9900 Series Chassis Management Module Fabric.
+        Model Name: OS9900-CFM
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.12.4.3.1"
+    ::= { cfmOmniSwitch9900 1 }
+
+familyOmniSwitch6865 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 6865 Series Product Family."
+    ::= { alcatelIND1DevicesMIB 13 }
+
+chassisOmniSwitch6865 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For OmniSwitch 6865 1-Slot Chassis.
+        Model Name: OS6865
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.13.1"
+    ::= { familyOmniSwitch6865 1 }
+
+deviceOmniSwitch6865P16X OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6865 Series.
+        Model Name: OS6865-P16X
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.13.1.1"
+    ::= { chassisOmniSwitch6865 1 }
+
+deviceOmniSwitch6865U12X OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6865 Series.
+        Model Name: OS6865-U12X
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.13.1.2"
+    ::= { chassisOmniSwitch6865 2 }
+
+deviceOmniSwitch6865U28X OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniSwitch 6865 Series .
+        Model Name: OS6865-U28X
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.801.1.1.2.1.13.1.3"
+    ::= { chassisOmniSwitch6865 3 }
 
 END

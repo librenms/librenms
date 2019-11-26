@@ -15,9 +15,12 @@ if (preg_match('/^Cisco IOS Software, .+? Software \([^\-]+-([^\-]+)-\w\),.+?Ver
 } elseif (preg_match('/Cisco Internetwork Operating System Software\s+IOS \(tm\) [^ ]+ Software \([^\-]+-([^\-]+)-\w\),.+?Version ([^, ]+)/', $device['sysDescr'], $regexp_result)) {
     $features = $regexp_result[1];
     $version  = $regexp_result[2];
+} elseif (preg_match('/^Cisco IOS Software \[([^\]]+)\],.+Software \(([^\)]+)\), Version ([^, ]+)/', $device['sysDescr'], $regexp_result)) {
+    $features = $regexp_result[1];
+    $version  = $regexp_result[2] . " " . $regexp_result[3];
 }
 
-$oids = ['entPhysicalModelName.1', 'entPhysicalContainedIn.1', 'entPhysicalName.1', 'entPhysicalSoftwareRev.1', 'entPhysicalModelName.1001', 'entPhysicalContainedIn.1001', 'cardDescr.1', 'cardSlotNumber.1'];
+$oids = ['entPhysicalModelName.1', 'entPhysicalContainedIn.1', 'entPhysicalName.1', 'entPhysicalSoftwareRev.1', 'entPhysicalModelName.1000', 'entPhysicalModelName.1001', 'entPhysicalContainedIn.1000', 'entPhysicalContainedIn.1001', 'cardDescr.1', 'cardSlotNumber.1'];
 
 $data = snmp_get_multi($device, $oids, '-OQUs', 'ENTITY-MIB:OLD-CISCO-CHASSIS-MIB');
 
@@ -25,23 +28,21 @@ if ($data[1]['entPhysicalContainedIn'] == '0') {
     if (!empty($data[1]['entPhysicalSoftwareRev'])) {
         $version = $data[1]['entPhysicalSoftwareRev'];
     }
-
     if (!empty($data[1]['entPhysicalName'])) {
         $hardware = $data[1]['entPhysicalName'];
     }
-
     if (!empty($data[1]['entPhysicalModelName'])) {
         $hardware = $data[1]['entPhysicalModelName'];
     }
 }
 
-if (!empty($data[1000]['entPhysicalModelName'])) {
+if (empty($hardware) && !empty($data[1000]['entPhysicalModelName'])) {
     $hardware = $data[1000]['entPhysicalModelName'];
-} elseif (!empty($data[1000]['entPhysicalContainedIn'])) {
+} elseif (empty($hardware) && !empty($data[1000]['entPhysicalContainedIn'])) {
     $hardware = $data[$data[1000]['entPhysicalContainedIn']]['entPhysicalName'];
-} elseif (!empty($data[1001]['entPhysicalModelName'])) {
+} elseif ((preg_match('/stack/i', $hardware) || empty($hardware)) && !empty($data[1001]['entPhysicalModelName'])) {
     $hardware = $data[1001]['entPhysicalModelName'];
-} elseif (!empty($data[1001]['entPhysicalContainedIn'])) {
+} elseif (empty($hardware) && !empty($data[1001]['entPhysicalContainedIn'])) {
     $hardware = $data[$data[1001]['entPhysicalContainedIn']]['entPhysicalName'];
 }
 

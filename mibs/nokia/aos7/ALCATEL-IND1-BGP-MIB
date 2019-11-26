@@ -541,6 +541,18 @@ alcatelIND1BGPMIBCompliances OBJECT-IDENTITY
                 DEFVAL { asplain }
                 ::= { alaBgpGlobal 42 }
 
+        alaBgpClearAllNeighborStats OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        clear(1)
+                        }
+                MAX-ACCESS  read-create
+                STATUS  current
+                DESCRIPTION
+                "Setting a value of clear into this variable will clear the
+                 per peer statistics for all peers."
+                DEFVAL { clear }
+                ::= { alaBgpGlobal 43 }
+
 ---
 --- BGP IPv4 Peer Table
 ---
@@ -631,7 +643,8 @@ alcatelIND1BGPMIBCompliances OBJECT-IDENTITY
                     alaBgpPeerActivateIpv6          INTEGER,
                     alaBgpPeerBfdStatus             INTEGER,
                     alaBgpPeerPrefix6ListOut        SnmpAdminString,
-                    alaBgpPeerPrefix6ListIn         SnmpAdminString
+                    alaBgpPeerPrefix6ListIn         SnmpAdminString,
+                    alaBgpPeerActivateIpv4          INTEGER
 
                 }
 
@@ -1387,6 +1400,19 @@ alcatelIND1BGPMIBCompliances OBJECT-IDENTITY
                  received from this peer. This is same as alaBgpPrefix6MatchListId."
                 DEFVAL { "" }
                 ::= { alaBgpPeerEntry 67 }
+
+         alaBgpPeerActivateIpv4 OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        enabled(1),
+                        disabled(2)
+                        }
+                MAX-ACCESS  read-create
+                STATUS current
+                DESCRIPTION
+                "If enabled, the Multiprotocol IPv4 Unicast capability is advertised to
+                 this peer. If disabled, the capability is not advertised in the OPEN message."
+                DEFVAL { enabled }
+                ::= { alaBgpPeerEntry 68 }
 
 --
 -- Bgp Aggregate configuration table
@@ -2291,7 +2317,11 @@ alcatelIND1BGPMIBCompliances OBJECT-IDENTITY
                     alaBgpRouteMapMatchCommunity            SnmpAdminString,
                     alaBgpRouteMapWeight                    Integer32,
                     alaBgpRouteMapAction                    INTEGER,
-                    alaBgpRouteMapRowStatus                 RowStatus
+                    alaBgpRouteMapRowStatus                 RowStatus,
+                    alaBgpRouteMapPrefix6MatchListId        SnmpAdminString,
+                    alaBgpRouteMapMatchPrefix6              Ipv6Address,
+                    alaBgpRouteMapMatchMaskLength6          Integer32,
+                    alaBgpRouteMapCommunityStrip            SnmpAdminString
                 }
 
          alaBgpRouteMapName OBJECT-TYPE
@@ -2515,6 +2545,45 @@ alcatelIND1BGPMIBCompliances OBJECT-IDENTITY
                 DESCRIPTION "Row status variable"
                 DEFVAL { notInService }
                 ::= { alaBgpRouteMapEntry 20 }
+
+         alaBgpRouteMapPrefix6MatchListId OBJECT-TYPE
+                SYNTAX  SnmpAdminString(SIZE(0..70))
+                MAX-ACCESS  read-create
+                STATUS  current
+                DESCRIPTION
+                "This is same as alaBgpPrefix6MatchListId.  It identifies the
+                 matching criteria list of IPv6 prefixes. Empty quotes indicate no
+                 prefix matching criteria is to be applied."
+                DEFVAL { "" }
+                ::= { alaBgpRouteMapEntry 21 }
+
+         alaBgpRouteMapMatchPrefix6 OBJECT-TYPE
+                SYNTAX  Ipv6Address
+                MAX-ACCESS      read-create
+                STATUS  current
+                DESCRIPTION
+                "IPv6 Prefix match primitive. A value of 0 indicates default route prefix."
+                DEFVAL { '00000000000000000000000000000000'H }
+                ::= { alaBgpRouteMapEntry 22 }
+
+         alaBgpRouteMapMatchMaskLength6 OBJECT-TYPE
+                SYNTAX  Integer32 (0..128)
+                MAX-ACCESS      read-create
+                STATUS  current
+                DESCRIPTION
+                "The length in bits of the IPv6 prefix being matched.  A value of 0 
+                 indicates default route prefix."
+                DEFVAL { 0 }
+                ::= { alaBgpRouteMapEntry 23 }
+
+         alaBgpRouteMapCommunityStrip OBJECT-TYPE
+                SYNTAX  SnmpAdminString(SIZE(1..70))
+                MAX-ACCESS  read-create
+                STATUS  current
+                DESCRIPTION
+                "Community strip primitive"
+                ::= { alaBgpRouteMapEntry 24 }
+
 
 
 --- Policy AspathList
@@ -3785,7 +3854,9 @@ alcatelIND1BGPMIBCompliances OBJECT-IDENTITY
                    alaBgpPeer6ActivateIpv6                      INTEGER,
                    alaBgpPeer6MinRouteAdvertisementInterval     Integer32,
                    alaBgpPeer6Prefix6ListOut                    SnmpAdminString,
-                   alaBgpPeer6Prefix6ListIn                     SnmpAdminString
+                   alaBgpPeer6Prefix6ListIn                     SnmpAdminString,
+                   alaBgpPeer6ActivateIpv4                      INTEGER,
+                   alaBgpPeer6BfdStatus                         INTEGER
                 }
 
          alaBgpPeer6Addr OBJECT-TYPE
@@ -4646,6 +4717,30 @@ alcatelIND1BGPMIBCompliances OBJECT-IDENTITY
                 DEFVAL { "" }
                 ::= { alaBgpPeer6Entry 75 }
 
+         alaBgpPeer6ActivateIpv4 OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        enabled(1),
+                        disabled(2)
+                        }
+                MAX-ACCESS  read-create
+                STATUS current
+                DESCRIPTION
+                "If enabled, the Multiprotocol IPv4 Unicast capability is advertised to
+                 this peer. If disabled, the capability is not advertised in the OPEN message."
+                DEFVAL { enabled }
+                ::= { alaBgpPeer6Entry 76 }
+
+         alaBgpPeer6BfdStatus OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        enabled(1),
+                        disabled(2)
+                        }
+                MAX-ACCESS  read-create
+                STATUS current
+                DESCRIPTION
+                "Enables/Disables BFd for a particular Peer."
+                ::= { alaBgpPeer6Entry 77 }
+
 
 -- compliance statements
 
@@ -4720,7 +4815,8 @@ alcatelIND1BGPMIBCompliances OBJECT-IDENTITY
                         alaBgpGracefulRestart,
                         alaBgpRestartInterval,
                         alaBgpRestartStatus,
-                        alaBgpAsnFormat
+                        alaBgpAsnFormat,
+                        alaBgpClearAllNeighborStats
                         }
                 STATUS  current
                 DESCRIPTION
@@ -4788,7 +4884,8 @@ alcatelIND1BGPMIBCompliances OBJECT-IDENTITY
                         alaBgpPeerActivateIpv6,
                         alaBgpPeerBfdStatus,
                         alaBgpPeerPrefix6ListOut,
-                        alaBgpPeerPrefix6ListIn
+                        alaBgpPeerPrefix6ListIn,
+                        alaBgpPeerActivateIpv4
                         }
                 STATUS  current
                 DESCRIPTION
@@ -4921,7 +5018,11 @@ alcatelIND1BGPMIBCompliances OBJECT-IDENTITY
                         alaBgpRouteMapMatchCommunity,
                         alaBgpRouteMapWeight,
                         alaBgpRouteMapAction,
-                        alaBgpRouteMapRowStatus
+                        alaBgpRouteMapRowStatus,
+                        alaBgpRouteMapPrefix6MatchListId,
+                        alaBgpRouteMapMatchPrefix6,
+                        alaBgpRouteMapMatchMaskLength6,
+                        alaBgpRouteMapCommunityStrip
                         }
                 STATUS  current
                 DESCRIPTION
@@ -5162,7 +5263,9 @@ alcatelIND1BGPMIBCompliances OBJECT-IDENTITY
                         alaBgpPeerActivateIpv6 ,
                         alaBgpPeerBfdStatus ,
                         alaBgpPeerPrefix6ListOut ,
-                        alaBgpPeerPrefix6ListIn
+                        alaBgpPeerPrefix6ListIn,
+                        alaBgpPeer6ActivateIpv4,
+                        alaBgpPeer6BfdStatus
                         }
                 STATUS  current
                 DESCRIPTION

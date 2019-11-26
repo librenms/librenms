@@ -1,0 +1,1313 @@
+-- *****************************************************************
+-- UBIQUOSS-EPON-LINE-MIB.mib:  
+-- Ubiquoss Enterprise E-PON Line Structure of Management Information
+--
+-- Jan 2007, SangJun Song
+--
+-- Copyright (c) 2007 by Ubiquoss, Corp.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+--
+
+UBIQUOSS-EPON-MIB	DEFINITIONS ::= BEGIN
+	IMPORTS
+		
+		DisplayString 
+		FROM RFC1213-MIB
+		
+		IANAifType                               
+		FROM IANAifType-MIB
+		
+		Counter64
+		FROM SNMPv2-SMI
+		
+		RowStatus, PhysAddress
+		FROM SNMPv2-TC           -- [RFC2579]
+        
+        ubiSysIndex
+        FROM UBQS-INTERFACE-MIB
+        
+        HCPerfIntervalThreshold
+        FROM  HC-PerfHist-TC-MIB   -- [RFC3705]
+
+		ubiMgmt
+		FROM UBQS-SMI;     
+
+ubiEponMIB  MODULE-IDENTITY
+	LAST-UPDATED "0607130000Z"
+    ORGANIZATION "Ubiquoss Corp."
+    CONTACT-INFO
+        "Chair    :  jisoo Kim
+                     Ubiquoss Corp.
+         Postal:     24F Milennium B/D,
+		 	         467-12, Dogok-Dong,
+					 GangNam-Gu, Seoul 135-270
+					 Korea
+         EMail:      jisoo@ubiquoss.com
+         Phone:      +82-2-2190-3100
+
+         Co-editor:  Paul 
+                     Ubiquoss Corp.
+         Postal:     24F Milennium B/D,
+		 	         467-12, Dogok-Dong,
+					 GangNam-Gu, Seoul 135-270
+					 Korea
+         EMail:      paul@ubiquoss.com
+         Phone:      +82-2-2190-3100"
+    DESCRIPTION
+        "This MIB module defines epon line information" 
+   	::= { ubiMgmt  400 }
+   				
+	ubiEponMIBObjects	OBJECT IDENTIFIER ::= { ubiEponMIB  1 }	    
+
+-- ***********************************************************
+-- ubiEponOltTable
+-- ***********************************************************
+	
+	ubiEponOltTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF UbiEponOltEntry 
+		ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"information of port"
+		::= { ubiEponMIBObjects 1 }
+
+	ubiEponOltEntry  OBJECT-TYPE
+		SYNTAX  UbiEponOltEntry
+		ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"information of port"
+		INDEX  { ubiSysIndex, ubiPortIndex }
+		::= { ubiEponOltTable 1 } 
+    
+	UbiEponOltEntry  ::=
+		SEQUENCE {
+			ubiEponOltMacAddress						PhysAddress,
+			ubiEponOltOperStatus						INTEGER,
+			ubiEponOltAdminStatus						INTEGER,			
+			ubiEponOltHwVersion 						DisplayString,
+			ubiEponOltFwVersion 						DisplayString,
+			ubiEponOltSwVersion 						DisplayString,
+			ubiEponOltAutoProfileName					DisplayString,
+			ubiEponOltRegisterMode						INTEGER,
+			ubiEponOltControl							INTEGER
+		}			
+    
+    ubiEponOltMacAddress OBJECT-TYPE
+		SYNTAX PhysAddress
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"OLT Hardware address"
+		::= { ubiEponOltEntry 1 }
+		
+    ubiEponOltOperStatus OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				enable(1),
+				disable(2)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"OLT operational status "
+			::= { ubiEponOltEntry 2 }
+	
+	ubiEponOltAdminStatus OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				enable(1),
+				disable(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"OLT administrative status "
+			::= { ubiEponOltEntry 3 }	
+		
+	ubiEponOltHwVersion	 OBJECT-TYPE
+		SYNTAX  DisplayString 
+		ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"epon olt hardware version"
+		::= { ubiEponOltEntry  4 }
+		
+	ubiEponOltFwVersion	 OBJECT-TYPE
+		SYNTAX  DisplayString 
+		ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"epon olt firmware version"
+		::= { ubiEponOltEntry  5 }
+	
+	ubiEponOltSwVersion	 OBJECT-TYPE
+		SYNTAX  DisplayString 
+		ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"epon olt software version"
+		::= { ubiEponOltEntry  6 }
+							
+    ubiEponOltAutoProfileName	 OBJECT-TYPE
+		SYNTAX  DisplayString 
+		ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"conf profile name"
+		::= { ubiEponOltEntry  7 }
+    
+    ubiEponOltRegisterMode OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				auto(1),
+				manual(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"OLT port registeraton Mode {auto(1), manual(2)}"
+			DEFVAL { auto }
+			::= { ubiEponOltEntry 8 }
+				
+    ubiEponOltControl OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				none(0),
+				reset(1)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"OLT control"
+			::= { ubiEponOltEntry 9 }
+
+-- ***********************************************************
+-- ubiEponOltConfTable
+-- ***********************************************************	
+	ubiEponOltConfTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF UbiEponOltConfEntry 
+		ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"information of port"
+		::= { ubiEponMIBObjects 2 }
+
+	ubiEponOltConfEntry  OBJECT-TYPE
+		SYNTAX  UbiEponOltConfEntry
+		ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"information of port"
+		INDEX  { ubiSysIndex, ubiPortIndex }
+		::= { ubiEponOltConfTable 1 } 
+    
+	UbiEponOltConfEntry  ::=
+		SEQUENCE {			
+			ubiEponOltEncryptionMode					INTEGER,
+			ubiEponOltP2pAccessControl					INTEGER,
+			ubiEponOltDbaInternal						INTEGER,
+			ubiEponOltDbaCycle							INTEGER,
+			ubiEponOltDbaDiscoveryFrequency				INTEGER,
+			ubiEponOltDbaDiscoveryLength				INTEGER
+		}
+				
+	ubiEponOltEncryptionMode OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				disable(0),
+				down(1),
+				both(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"OLT port encryption policy"
+			DEFVAL { both }
+			::= { ubiEponOltConfEntry 1 }
+
+	ubiEponOltP2pAccessControl OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				enable(1),
+				disable(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"OLT port p2p access Control "
+			DEFVAL { disable }
+			::= { ubiEponOltConfEntry 2 }
+
+	ubiEponOltDbaInternal OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				internal(1),
+				external(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"OLT port DBA internal "
+			DEFVAL { disable }
+			::= { ubiEponOltConfEntry 3 }
+
+	ubiEponOltDbaCycle OBJECT-TYPE
+			SYNTAX INTEGER (0 | 200..16777215)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"OLT port DBA cycle "
+			::= { ubiEponOltConfEntry 4 }
+
+	ubiEponOltDbaDiscoveryFrequency OBJECT-TYPE
+			SYNTAX INTEGER (0 | 1..65535)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"OLT port DBA Discovery Frequency"
+			::= { ubiEponOltConfEntry 5 }
+
+	ubiEponOltDbaDiscoveryLength OBJECT-TYPE
+			SYNTAX INTEGER (0 | 1..65535)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"OLT port DBA Discovery Length"
+			::= { ubiEponOltConfEntry 6 }
+
+-- ***********************************************************
+-- ubiEponOnuTable
+-- ***********************************************************
+	
+	ubiEponOnuTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF UbiEponOnuEntry 
+		ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"information of epon onu"
+		::= { ubiEponMIBObjects 3 }
+
+	ubiEponOnuEntry  OBJECT-TYPE
+		SYNTAX  UbiEponOnuEntry
+		ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"information of epon onu"
+		INDEX  { ubiSysIndex, ubiPortIndex, ubiEponOnuIndex }
+		::= { ubiEponOnuTable 1 } 
+
+	UbiEponOnuEntry  ::=
+		SEQUENCE {
+			ubiEponOnuIndex			INTEGER,
+			ubiEponOnuMacAddress	PhysAddress,
+			ubiEponOnuLlid			INTEGER,
+			ubiEponOnuDescription	DisplayString,
+			ubiEponOnuType			INTEGER,			
+			ubiEponOnuRegMode		INTEGER,
+			ubiEponOnuOperStatus	INTEGER,
+			ubiEponOnuAdminStatus	INTEGER,
+			ubiEponOnuBlockStatus	INTEGER,
+			ubiEponOnuProfileName	DisplayString,
+			ubiEponOnuDistance		Integer32,
+			ubiEponOnuDownloadImage	DisplayString,			
+			ubiEponOnuControl		INTEGER
+		}   
+			
+    ubiEponOnuIndex OBJECT-TYPE
+		SYNTAX  INTEGER (1..32)
+		ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"ONU ID"
+		::= { ubiEponOnuEntry  1 }
+    
+    ubiEponOnuMacAddress OBJECT-TYPE
+		SYNTAX PhysAddress
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"ONU mac address"
+		::= { ubiEponOnuEntry 2 }
+		
+	ubiEponOnuLlid OBJECT-TYPE
+		SYNTAX INTEGER (1..32)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"ONU LLID"
+		::= { ubiEponOnuEntry  3 }
+    
+    ubiEponOnuDescription OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"epon onu descritpon"
+		::= { ubiEponOnuEntry  4 }
+
+	ubiEponOnuType OBJECT-TYPE
+		SYNTAX  INTEGER
+				{
+					unknown(0),
+					onu(1),
+					ont(2)
+				}
+		ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"epon onu type"
+		::= { ubiEponOnuEntry  5 }		
+	
+	ubiEponOnuRegMode OBJECT-TYPE
+		SYNTAX INTEGER
+			{
+			auto(1),
+			manual(2)
+			}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"ONU registeration mode "
+		::= { ubiEponOnuEntry 6 }
+						
+    ubiEponOnuOperStatus OBJECT-TYPE
+		SYNTAX INTEGER
+			{
+			enable(1),
+			disable(2)
+			}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"ONU operational status "
+		::= { ubiEponOnuEntry 7 }
+	
+	ubiEponOnuAdminStatus OBJECT-TYPE
+		SYNTAX INTEGER
+			{
+			enable(1),
+			disable(2)
+			}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"ONU admin status "
+		::= { ubiEponOnuEntry 8 }	
+	
+	ubiEponOnuBlockStatus OBJECT-TYPE
+		SYNTAX  INTEGER {				
+			unblock(1),
+			block(2)
+		}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"ONU block status "
+		::= { ubiEponOnuEntry 9 }					
+						
+    ubiEponOnuProfileName	 OBJECT-TYPE
+		SYNTAX  DisplayString 
+		ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"onu configuration profile name"
+		::= { ubiEponOnuEntry  10 }    
+	
+	ubiEponOnuDistance OBJECT-TYPE
+		SYNTAX  Integer32
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"onu distance"
+		::= { ubiEponOnuEntry 11 }
+	
+	ubiEponOnuDownloadImage OBJECT-TYPE
+		SYNTAX  DisplayString
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"onu download image"
+		::= { ubiEponOnuEntry 12 }
+									
+	ubiEponOnuControl	 OBJECT-TYPE
+		SYNTAX  INTEGER {
+			none(0), 
+			reset(1), 
+			download-image(2) 
+        }
+		ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"epon onu control"
+		::= { ubiEponOnuEntry  13 }
+		
+-- ***********************************************************
+-- ubiEponOnuInfoTable
+-- ***********************************************************
+	
+	ubiEponOnuInfoTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF UbiEponOnuInfoEntry 
+		ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"information of epon cpe"
+		::= { ubiEponMIBObjects 4 }
+
+	ubiEponOnuInfoEntry  OBJECT-TYPE
+		SYNTAX  UbiEponOnuInfoEntry
+		ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"information of epon cpe"
+		INDEX  { ubiSysIndex, ubiPortIndex, ubiEponOnuIndex }
+		::= { ubiEponOnuInfoTable 1 } 
+
+	UbiEponOnuInfoEntry  ::=
+		SEQUENCE {			
+			ubiEponOnuVendorId		DisplayString,
+			ubiEponOnuManuID	    DisplayString,
+			ubiEponOnuModelName		DisplayString,
+			ubiEponOnuSerialNumber	DisplayString,			
+			ubiEponOnuHwVersion 	DisplayString,
+			ubiEponOnuFwVersion 	DisplayString,
+			ubiEponOnuSwVersion 	DisplayString,
+			ubiEponOnuActiveTime	TimeTicks
+		}
+											
+	ubiEponOnuVendorId OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"epon vendor id"
+		::= { ubiEponOnuInfoEntry  1 }   
+		
+	ubiEponOnuManuID	 OBJECT-TYPE
+		SYNTAX  DisplayString 
+		ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"epon manufacturer ID"
+		::= { ubiEponOnuInfoEntry  2 }
+		
+	ubiEponOnuModelName	 OBJECT-TYPE
+		SYNTAX  DisplayString 
+		ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"epon cpe model name "
+		::= { ubiEponOnuInfoEntry  3 }
+	
+	ubiEponOnuSerialNumber	 OBJECT-TYPE
+		SYNTAX  DisplayString 
+		ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"epon cpe serial number"
+		::= { ubiEponOnuInfoEntry  4 }
+	
+	ubiEponOnuHwVersion	 OBJECT-TYPE
+		SYNTAX  DisplayString 
+		ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"epon onu hardware version"
+		::= { ubiEponOnuInfoEntry  5 }
+		
+	ubiEponOnuFwVersion	 OBJECT-TYPE
+		SYNTAX  DisplayString 
+		ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"epon onu firmware version"
+		::= { ubiEponOnuInfoEntry  6 }
+	
+	ubiEponOnuSwVersion	 OBJECT-TYPE
+		SYNTAX  DisplayString 
+		ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"epon onu software version"
+		::= { ubiEponOnuInfoEntry  7 }
+		
+	ubiEponOnuActiveTime OBJECT-TYPE
+		SYNTAX  TimeTicks 
+		ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			""
+		::= { ubiEponOnuInfoEntry  8 }  
+     
+-- ***********************************************************
+-- ubiEponOnuPortTable
+-- ***********************************************************
+	
+	ubiEponOnuPortTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF UbiEponOnuPortEntry 
+		ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"information of epon onu port"
+		::= { ubiEponMIBObjects 5 }
+
+	ubiEponOnuPortEntry  OBJECT-TYPE
+		SYNTAX  UbiEponOnuPortEntry
+		ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"information of epon cpe"
+		INDEX  { ubiSysIndex, ubiPortIndex, ubiOnuIndex, ubiEponOnuPortIndex}
+		::= { ubiEponOnuPortTable 1 } 
+
+	UbiEponOnuPortEntry  ::=
+		SEQUENCE {
+			ubiEponOnuPortIndex				INTEGER,
+			ubiEponOnuPortOperState			INTEGER,
+			ubiEponOnuPortSpeedNego			INTEGER,
+			ubiEponOnuPortSpeedConfig		INTEGER,
+			ubiEponOnuPortDuplexConfig		INTEGER,
+			ubiEponOnuPortSpeedCurrent		INTEGER,
+			ubiEponOnuPortDuplexCurrent		INTEGER,			
+			ubiEponOnuPortControl			INTEGER
+		}			
+
+	ubiEponOnuPortIndex OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"index of CPE ehternet port"
+		::= { ubiEponOnuPortEntry  1 }   
+	
+	ubiEponOnuPortOperState	 OBJECT-TYPE
+		SYNTAX  INTEGER {
+			enable(1), 
+			disable(2)
+		} 
+		ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Specifies port operational status of CPE port"
+		::= { ubiEponOnuPortEntry  2 }
+	
+	ubiEponOnuPortSpeedNego	 OBJECT-TYPE  
+		SYNTAX  INTEGER {
+				manual(1),
+				auto(2)
+		}
+		ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			""
+		::= { ubiEponOnuPortEntry  3 }
+	         
+	ubiEponOnuPortSpeedConfig	 OBJECT-TYPE  
+		SYNTAX  INTEGER {  
+				speed10(1),
+				speed100(2),
+				speed1000(3),
+				auto(4)
+		}
+		ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			""
+		::= { ubiEponOnuPortEntry  4 }
+	         
+	ubiEponOnuPortDuplexConfig	 OBJECT-TYPE  
+		SYNTAX  INTEGER {  
+				half(1),
+				full(2),
+				auto(3)
+		}
+		ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			""
+		::= { ubiEponOnuPortEntry  5 }
+					
+	ubiEponOnuPortSpeedCurrent	 OBJECT-TYPE
+		SYNTAX  INTEGER {  
+				speed10(1),
+				speed100(2),
+				speed1000(3)
+		}
+		ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Specifies current speed of port"
+		::= { ubiEponOnuPortEntry  6 }
+		
+	ubiEponOnuPortDuplexCurrent	 OBJECT-TYPE
+		SYNTAX  INTEGER {
+				half(1),
+				full(2)
+				} 
+		ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Specifies current duplex mode of port"
+		::= { ubiEponOnuPortEntry  7 }	
+		
+	ubiEponOnuPortControl	 OBJECT-TYPE
+		SYNTAX  INTEGER {
+			none(0),
+			reset(1)
+		} 
+		ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			""
+		::= { ubiEponOnuPortEntry  8 } 
+																	 	                 	
+-- ***********************************************************
+-- ubiEponOnuConfProfileTable
+-- ***********************************************************	
+	ubiEponOnuConfProfileTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF UbiEponOnuConfProfileEntry
+		ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"information of port"
+		::= { ubiEponMIBObjects 6 }
+
+	ubiEponOnuConfProfileEntry OBJECT-TYPE
+		SYNTAX  UbiEponOnuConfProfileEntry
+		ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"information of port"
+		INDEX  { ubiSysIndex, ubiEponOnuConfProfileName }
+		::= { ubiEponOnuConfProfileTable 1 } 
+
+	UbiEponOnuConfProfileEntry  ::=
+		SEQUENCE {
+			ubiEponOnuConfProfileName							DisplayString,
+			ubiEponOnuDsPolicyMode            					INTEGER,
+			ubiEponOnuDsMaximumBandwidth            			INTEGER,
+			ubiEponOnuDsMaximumBurstSize            			INTEGER,
+			ubiEponOnuP2pPolicyMode            					INTEGER,
+			ubiEponOnuP2pMaximumBandwidth           			INTEGER,
+			ubiEponOnuP2pMaximumBurstSize           			INTEGER,
+			ubiEponOnuInternalDbaMinimumBandwidth				INTEGER,
+			ubiEponOnuInternalDbaMaximumBandwidth				INTEGER,
+			ubiEponOnuPlatoDbaClass								INTEGER,
+			ubiEponOnuPlatoDbaguaranteedBandwidth				INTEGER,
+			ubiEponOnuPlatoDbaguaranteedBandwidthFine			INTEGER,
+			ubiEponOnuPlatoDbaBestEffortBandwidth				INTEGER,
+			ubiEponOnuPlatoDbaBestEffortBandwidthFine			INTEGER,
+			ubiEponOnuPlatoDbaDelay								INTEGER,			
+			ubiEponOnuEncryptionMode							INTEGER,
+			ubiEponOnuMaxLimit									INTEGER,			
+			ubiEponOnuConfRowStatus          					RowStatus
+		}			
+   		
+	ubiEponOnuConfProfileName	 OBJECT-TYPE
+		SYNTAX  DisplayString(SIZE (1..32)) 
+		ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"profile name"
+		::= { ubiEponOnuConfProfileEntry  1 }
+	
+	ubiEponOnuDsPolicyMode OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				enable(1),
+				disable(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"ONU downstream policy Control "
+			DEFVAL { disable }
+			::= { ubiEponOnuConfProfileEntry 2 }
+			
+	ubiEponOnuDsMaximumBandwidth OBJECT-TYPE
+		SYNTAX INTEGER (0 | 1..1000000)
+		UNITS "Kbps"
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Download policy Downstream Max Bandwidth "
+		::= { ubiEponOnuConfProfileEntry 3 }
+	
+	ubiEponOnuDsMaximumBurstSize OBJECT-TYPE
+		SYNTAX INTEGER (0 | 128..8388479)
+		UNITS "byte"
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Download policy Downstream Max Burst size "
+		::= { ubiEponOnuConfProfileEntry 4 }
+	
+	ubiEponOnuP2pPolicyMode OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				enable(1),
+				disable(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"ONU port p2p access Control "
+			DEFVAL { disable }
+			::= { ubiEponOnuConfProfileEntry 5 }
+			
+	ubiEponOnuP2pMaximumBandwidth OBJECT-TYPE
+		SYNTAX INTEGER (0 | 1..1000000)
+		UNITS "Kbps"
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"p2p Max Bandwidth "
+		::= { ubiEponOnuConfProfileEntry 6 }
+	
+	ubiEponOnuP2pMaximumBurstSize OBJECT-TYPE
+		SYNTAX INTEGER (0 | 128..8388479)
+		UNITS "byte"
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"p2p Max Burst size "
+		::= { ubiEponOnuConfProfileEntry 7 }
+	
+	ubiEponOnuInternalDbaMinimumBandwidth OBJECT-TYPE
+		SYNTAX INTEGER (0 | 43..65535)
+		UNITS "Kbps"
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Internal Max Bandwidth "
+		::= { ubiEponOnuConfProfileEntry 8 }
+	
+	ubiEponOnuInternalDbaMaximumBandwidth OBJECT-TYPE
+		SYNTAX INTEGER (0 | 43..65535)
+		UNITS "Kbps"
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Internal Min Bandwidth"
+		::= { ubiEponOnuConfProfileEntry 9 }
+	
+	ubiEponOnuPlatoDbaClass OBJECT-TYPE
+		SYNTAX INTEGER (1..1000)
+		UNITS "Mbps"
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"plato dba class"
+		::= { ubiEponOnuConfProfileEntry 10 }
+		
+	ubiEponOnuPlatoDbaguaranteedBandwidth OBJECT-TYPE
+		SYNTAX INTEGER (1..1000)
+		UNITS "Mbps"
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"plato guaranteed Bandwidth"
+		::= { ubiEponOnuConfProfileEntry 11 }
+	
+	ubiEponOnuPlatoDbaguaranteedBandwidthFine OBJECT-TYPE
+		SYNTAX INTEGER (0..1024)
+		UNITS "Kbps"
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"plato detail guaranteed Bandwidth"
+		::= { ubiEponOnuConfProfileEntry 12 }
+	
+	ubiEponOnuPlatoDbaBestEffortBandwidth OBJECT-TYPE
+		SYNTAX INTEGER (1..1000)
+		UNITS "Mbps"
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"plato best-effort Bandwidth"
+		::= { ubiEponOnuConfProfileEntry 13 }
+	
+	ubiEponOnuPlatoDbaBestEffortBandwidthFine OBJECT-TYPE
+		SYNTAX INTEGER (0..1024)
+		UNITS "Kbps"
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"plato detail best-effort Bandwidth"
+		::= { ubiEponOnuConfProfileEntry 14 }
+	
+	ubiEponOnuPlatoDbaDelay OBJECT-TYPE
+		SYNTAX INTEGER (1..2)
+		UNITS "Kbps"
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"plato dba delay "
+		::= { ubiEponOnuConfProfileEntry 15 }
+	
+	ubiEponOnuEncryptionMode OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				disable(0),
+				down(1),
+				both(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"ONU encryption policy"
+			DEFVAL { both }
+			::= { ubiEponOnuConfProfileEntry 16 }
+	
+	ubiEponOnuMaxLimit OBJECT-TYPE
+		SYNTAX INTEGER (0..64)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"onu mac limit"
+		::= { ubiEponOnuConfProfileEntry 17 }
+																				
+	ubiEponOnuConfRowStatus OBJECT-TYPE
+       SYNTAX       RowStatus
+       ACCESS   	read-create
+       STATUS       current
+       DESCRIPTION
+           "This object is used to create a new row or modify or
+           delete an existing row in this table.
+
+           A profile activated by setting this object to 'active'.
+           When 'active' is set, the system will validate the profile.
+
+           Before a profile can be deleted or taken out of service
+           (by setting this object to 'destroy' or 'outOfService'),
+           it must be first unreferenced from all associated lines.
+
+           An 'active' profile may be modified at any time.  Note
+           that some changes may require that any referenced lines be
+           restarted (e.g., eponLineConfLineType)."
+       ::= { ubiEponOnuConfProfileEntry 18 }
+
+-- ***********************************************************
+-- ubiEponOnuUpQueueTable
+-- ***********************************************************   
+	ubiEponOnuUpQueueTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF UbiEponOnuUpQueueEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Description."
+		::= { ubiEponMIBObjects 7 }
+
+	ubiEponOnuUpQueueEntry OBJECT-TYPE
+		SYNTAX UbiEponOnuUpQueueEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Description."
+		INDEX { ubiEponOnuConfProfileName, ubiEponOnuUpQueueIndex }
+		::= { ubiEponOnuUpQueueTable 1 }
+	
+	UbiEponOnuUpQueueEntry ::=
+		SEQUENCE {
+			ubiEponOnuUpQueueIndex				INTEGER,
+			ubiEponOnuUpQueueMaxBandwidth		INTEGER,
+			ubiEponOnuUpQueueMaxBurstSize		INTEGER
+		 }
+
+	ubiEponOnuUpQueueIndex OBJECT-TYPE
+		SYNTAX INTEGER (1..8)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Profile Queue index "
+		::= { ubiEponOnuUpQueueEntry 1 }
+
+	ubiEponOnuUpQueueMaxBandwidth OBJECT-TYPE
+		SYNTAX INTEGER (0 | 100..1000000)
+		UNITS "kbps"
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Upstream queue max bandwidth"
+		::= { ubiEponOnuUpQueueEntry 2 }
+
+	ubiEponOnuUpQueueMaxBurstSize OBJECT-TYPE
+		SYNTAX INTEGER (0 | 2..16777214)
+		UNITS "byte"
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Upstream queue max burst size"
+		::= { ubiEponOnuUpQueueEntry 3 }
+
+-- ***********************************************************
+-- ubiEponOnuDownQueueTable
+-- ***********************************************************   
+	ubiEponOnuDownQueueTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF UbiEponOnuDownQueueEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Description."
+		::= { ubiEponMIBObjects 8 }
+
+	ubiEponOnuDownQueueEntry OBJECT-TYPE
+		SYNTAX UbiEponOnuDownQueueEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Description."
+		INDEX { ubiEponOnuConfProfileName, ubiEponOnuDownQueueIndex }
+		::= { ubiEponOnuDownQueueTable 1 }
+	
+	UbiEponOnuDownQueueEntry ::=
+		SEQUENCE {
+			ubiEponOnuDownQueueIndex				INTEGER,
+			ubiEponOnuDownQueueMaxBandwidth		INTEGER,
+			ubiEponOnuDownQueueMaxBurstSize		INTEGER
+		 }
+
+	ubiEponOnuDownQueueIndex OBJECT-TYPE
+		SYNTAX INTEGER (1..8)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Profile Queue index "
+		::= { ubiEponOnuDownQueueEntry 1 }
+
+	ubiEponOnuDownQueueMaxBandwidth OBJECT-TYPE
+		SYNTAX INTEGER (0 | 100..1000000)
+		UNITS "kbps"
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Downstream queue max bandwidth"
+		::= { ubiEponOnuDownQueueEntry 2 }
+
+	ubiEponOnuDownQueueMaxBurstSize OBJECT-TYPE
+		SYNTAX INTEGER (0 | 2..16777214)
+		UNITS "byte"
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Downstream queue max burst size"
+		::= { ubiEponOnuDownQueueEntry 3 }		
+			       													              
+-- the following two OBJECT IDENTIFIERS are used to define SNMPv2 Notifications
+-- that are backward compatible with SNMPv1 Traps.
+ubiEponMIBNotificationPrefix OBJECT IDENTIFIER ::= { ubiEponMIB 2 }
+ubiEponMIBNotifications OBJECT IDENTIFIER ::= { ubiEponMIBNotificationPrefix 0 }
+	ubiEponOltAlarmNotification NOTIFICATION-TYPE
+       OBJECTS       {
+                     	ubiAlarmIndex,
+						ubiAlarmId,
+						ubiAlarmType,
+						ubiAlarmSeverity,
+						ubiAlarmPhysicalLoc,
+						ubiAlarmLogicalLoc,
+						ubiAlarmCurStatus,
+						ubiAlarmAuxinfo,
+						ubiAlarmDateTime,
+						ubiAlarmStatus
+                     }
+       STATUS        current
+       DESCRIPTION
+           "olt alarm notification"
+       ::= { ubiEponMIBNotifications 1 }
+    
+    ubiEponOltOperStatusChangeNotification NOTIFICATION-TYPE
+       OBJECTS       {
+                     	ubiAlarmIndex,
+						ubiAlarmId,
+						ubiAlarmType,
+						ubiAlarmSeverity,
+						ubiAlarmPhysicalLoc,
+						ubiAlarmLogicalLoc,
+						ubiAlarmCurStatus,
+						ubiAlarmAuxinfo,
+						ubiAlarmDateTime,
+						ubiAlarmStatus
+                     }
+       STATUS        current
+       DESCRIPTION
+           "olt oper notification"
+       ::= { ubiEponMIBNotifications 2 }
+    
+    ubiEponOltAdminStatusChangeNotification NOTIFICATION-TYPE
+       OBJECTS       {
+                     	ubiAlarmIndex,
+						ubiAlarmId,
+						ubiAlarmType,
+						ubiAlarmSeverity,
+						ubiAlarmPhysicalLoc,
+						ubiAlarmLogicalLoc,
+						ubiAlarmCurStatus,
+						ubiAlarmAuxinfo,
+						ubiAlarmDateTime,
+						ubiAlarmStatus
+                     }
+       STATUS        current
+       DESCRIPTION
+           "olt admin notification"
+       ::= { ubiEponMIBNotifications 3 }
+       
+	ubiEponOnuAlarmNotification NOTIFICATION-TYPE
+       OBJECTS       {
+                     	ubiAlarmIndex,
+						ubiAlarmId,
+						ubiAlarmType,
+						ubiAlarmSeverity,
+						ubiAlarmPhysicalLoc,
+						ubiAlarmLogicalLoc,
+						ubiAlarmCurStatus,
+						ubiAlarmAuxinfo,
+						ubiAlarmDateTime,
+						ubiAlarmStatus
+                     }
+       STATUS        current
+       DESCRIPTION
+           "onu upgrade notification"
+       ::= { ubiEponMIBNotifications 4 }
+    
+    ubiEponOnuOperStatusChangeNotification NOTIFICATION-TYPE
+       OBJECTS       {
+                     	ubiAlarmIndex,
+						ubiAlarmId,
+						ubiAlarmType,
+						ubiAlarmSeverity,
+						ubiAlarmPhysicalLoc,
+						ubiAlarmLogicalLoc,
+						ubiAlarmCurStatus,
+						ubiAlarmAuxinfo,
+						ubiAlarmDateTime,
+						ubiAlarmStatus
+                     }
+       STATUS        current
+       DESCRIPTION
+           "onu upgrade notification"
+       ::= { ubiEponMIBNotifications 5 }
+    
+    ubiEponOnuAdminStatusChangeNotification NOTIFICATION-TYPE
+       OBJECTS       {
+                     	ubiAlarmIndex,
+						ubiAlarmId,
+						ubiAlarmType,
+						ubiAlarmSeverity,
+						ubiAlarmPhysicalLoc,
+						ubiAlarmLogicalLoc,
+						ubiAlarmCurStatus,
+						ubiAlarmAuxinfo,
+						ubiAlarmDateTime,
+						ubiAlarmStatus
+                     }
+       STATUS        current
+       DESCRIPTION
+           "onu upgrade notification"
+       ::= { ubiEponMIBNotifications 6 }
+    
+    ubiEponOamLinkDisconnectNotification NOTIFICATION-TYPE
+       OBJECTS       {
+                     	ubiAlarmIndex,
+						ubiAlarmId,
+						ubiAlarmType,
+						ubiAlarmSeverity,
+						ubiAlarmPhysicalLoc,
+						ubiAlarmLogicalLoc,
+						ubiAlarmCurStatus,
+						ubiAlarmAuxinfo,
+						ubiAlarmDateTime,
+						ubiAlarmStatus
+                     }
+       STATUS        current
+       DESCRIPTION
+           "oam link disconnect notification"
+       ::= { ubiEponMIBNotifications 7 }
+    
+    ubiEponOnuRegistrationErrorNotification NOTIFICATION-TYPE
+       OBJECTS       {
+                     	ubiAlarmIndex,
+						ubiAlarmId,
+						ubiAlarmType,
+						ubiAlarmSeverity,
+						ubiAlarmPhysicalLoc,
+						ubiAlarmLogicalLoc,
+						ubiAlarmCurStatus,
+						ubiAlarmAuxinfo,
+						ubiAlarmDateTime,
+						ubiAlarmStatus
+                     }
+       STATUS        current
+       DESCRIPTION
+           "Onu registration error notification"
+       ::= { ubiEponMIBNotifications 8 }
+    
+    ubiEponOnuRegistrationOverloadNotification NOTIFICATION-TYPE
+       OBJECTS       {
+                     	ubiAlarmIndex,
+						ubiAlarmId,
+						ubiAlarmType,
+						ubiAlarmSeverity,
+						ubiAlarmPhysicalLoc,
+						ubiAlarmLogicalLoc,
+						ubiAlarmCurStatus,
+						ubiAlarmAuxinfo,
+						ubiAlarmDateTime,
+						ubiAlarmStatus
+                     }
+       STATUS        current
+       DESCRIPTION
+           "Onu registration too much notification"
+       ::= { ubiEponMIBNotifications 9 }
+    
+    ubiEponSoftwareErrorNotification NOTIFICATION-TYPE
+       OBJECTS       {
+                     	ubiAlarmIndex,
+						ubiAlarmId,
+						ubiAlarmType,
+						ubiAlarmSeverity,
+						ubiAlarmPhysicalLoc,
+						ubiAlarmLogicalLoc,
+						ubiAlarmCurStatus,
+						ubiAlarmAuxinfo,
+						ubiAlarmDateTime,
+						ubiAlarmStatus
+                     }
+       STATUS        current
+       DESCRIPTION
+           "Onu registration too much notification"
+       ::= { ubiEponMIBNotifications 10 }
+    
+    ubiEponBadEncriptionKeyNotification NOTIFICATION-TYPE
+       OBJECTS       {
+                     	ubiAlarmIndex,
+						ubiAlarmId,
+						ubiAlarmType,
+						ubiAlarmSeverity,
+						ubiAlarmPhysicalLoc,
+						ubiAlarmLogicalLoc,
+						ubiAlarmCurStatus,
+						ubiAlarmAuxinfo,
+						ubiAlarmDateTime,
+						ubiAlarmStatus
+                     }
+       STATUS        current
+       DESCRIPTION
+           "Onu registration too much notification"
+       ::= { ubiEponMIBNotifications 11 }
+                                
+    ubiEponOnuImageUpgradeNotification NOTIFICATION-TYPE
+       OBJECTS       {
+                     	ubiAlarmIndex,
+						ubiAlarmId,
+						ubiAlarmType,
+						ubiAlarmSeverity,
+						ubiAlarmPhysicalLoc,
+						ubiAlarmLogicalLoc,
+						ubiAlarmCurStatus,
+						ubiAlarmAuxinfo,
+						ubiAlarmDateTime,
+						ubiAlarmStatus
+                     }
+       STATUS        current
+       DESCRIPTION
+           "onu upgrade notification"
+       ::= { ubiEponMIBNotifications 12 }
+       
+     ubiEponOnuImageUpgradeFailNotification NOTIFICATION-TYPE
+       OBJECTS       {
+                     	ubiAlarmIndex,
+						ubiAlarmId,
+						ubiAlarmType,
+						ubiAlarmSeverity,
+						ubiAlarmPhysicalLoc,
+						ubiAlarmLogicalLoc,
+						ubiAlarmCurStatus,
+						ubiAlarmAuxinfo,
+						ubiAlarmDateTime,
+						ubiAlarmStatus
+                     }
+       STATUS        current
+       DESCRIPTION
+           "onu upgrade notification"
+       ::= { ubiEponMIBNotifications 13 }
+       
+       ubiEponOntDyingGaspNotification NOTIFICATION-TYPE
+       OBJECTS       {
+                     	ubiAlarmIndex,
+						ubiAlarmId,
+						ubiAlarmType,
+						ubiAlarmSeverity,
+						ubiAlarmPhysicalLoc,
+						ubiAlarmLogicalLoc,
+						ubiAlarmCurStatus,
+						ubiAlarmAuxinfo,
+						ubiAlarmDateTime,
+						ubiAlarmStatus
+                     }
+       STATUS        current
+       DESCRIPTION
+           "onu upgrade notification"
+       ::= { ubiEponMIBNotifications 14 }                       
+-- conformance information
+
+ubiEponMIBConformance OBJECT IDENTIFIER ::= { ubiEponMIB 3 }
+ubiEponMIBCompliances OBJECT IDENTIFIER ::= { ubiEponMIBConformance 1 }
+ubiEponMIBGroups      OBJECT IDENTIFIER ::= { ubiEponMIBConformance 2 }
+
+
+-- compliance statements
+ubiEponMIBCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+                "The compliance statement for entities which implement
+                the ubiquoss port MIB."
+        MODULE  -- this module
+                MANDATORY-GROUPS { ubiEponMIBGroup,
+                				   ubiEponMIBNotifGroup	
+                                  }
+
+        GROUP   ubiEponMIBGroup
+        DESCRIPTION
+                "This group is applicable for implementations which
+                 need information for port."
+                 
+        GROUP   ubiEponMIBNotifGroup
+        DESCRIPTION
+                "This group is applicable for implementations which
+                 need notification for rate limit."
+                                          
+        ::= { ubiEponMIBCompliances 1 }
+
+-- ports of conformance
+ubiEponMIBGroup OBJECT-GROUP
+        OBJECTS {						   
+        }
+        STATUS  current
+        DESCRIPTION
+                "ubiquoss epon line."
+        ::= { ubiEponMIBGroups 1 }
+
+ubiEponMIBNotifGroup NOTIFICATION-GROUP
+        NOTIFICATIONS {
+        	ubiEponOltAlarmNotification,
+        	ubiEponOltOperStatusChangeNotification,
+        	ubiEponOltAdminStatusChangeNotification,
+        	ubiEponOnuAlarmNotification,
+        	ubiEponOnuOperStatusChangeNotification,
+        	ubiEponOnuAdminStatusChangeNotification,
+        	ubiEponOamLinkStatusChangeNotification,
+        	ubiEponOnuRegistrationErrorNotification,
+        	ubiEponOnuRegistrationOverloadNotification,
+        	ubiEponSoftwareErrorNotification,
+        	ubiEponBadEncriptionKeyNotification,
+        	ubiEponOnuImageUpgradeNotification,
+        	ubiEponOnuImageUpgradeFailNotification
+        }
+        STATUS   current
+        DESCRIPTION
+                 "A collection of notifications providing the 
+                 notification for unit."
+        ::= { ubiEponMIBGroups 2 }        
+END

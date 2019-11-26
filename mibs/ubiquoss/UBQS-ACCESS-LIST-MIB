@@ -1,0 +1,1215 @@
+-- *****************************************************************
+-- UBQS-ACCESS-LIST-MIB: Ubiquoss Access list MIB      
+--
+-- Nov 2010,   bkkim
+--   
+-- Copyright (c) 2010 by Ubiquoss, Corp.
+-- All rights reserved.
+-- *****************************************************************
+--   
+
+UBQS-ACCESS-LIST-MIB	DEFINITIONS ::= BEGIN
+	IMPORTS       
+		ubiMgmtv2
+			FROM UBQS-SMI   
+		MODULE-IDENTITY, OBJECT-TYPE, IpAddress, Integer32,Counter32
+			FROM SNMPv2-SMI     
+		DisplayString 			
+			FROM RFC1213-MIB   
+		RowStatus, MacAddress
+			FROM SNMPv2-TC
+		InetAddress
+			FROM INET-ADDRESS-MIB;
+			    
+
+ubiAclMIB MODULE-IDENTITY
+        LAST-UPDATED    "201011052000Z"
+        ORGANIZATION 	"Ubiquoss Corp."
+	    CONTACT-INFO
+		"	Ubiquoss
+			Customer Service
+
+		 Postal: 24F Milennium B/D,
+		 	467-12, Dogok-Dong,
+			GangNam-Gu, Seoul 135-270
+			Korea
+
+		   Tel: 82-2-2190-3100"   
+    DESCRIPTION
+        "This MIB module defines access list information"          
+        
+     ::= { ubiMgmtv2 13 }
+     
+     
+
+-- *****************************************************************
+-- Textual Conventions
+-- *****************************************************************
+
+-- *****************************************************************
+-- ubiACLMIB
+-- *****************************************************************
+     
+ubiAclMIBNotificationPrefix  		OBJECT IDENTIFIER ::= { ubiAclMIB  0 }     
+ubiAclMIBObjects  					OBJECT IDENTIFIER ::= { ubiAclMIB  1 }
+ubiAclMIBConformance  				OBJECT IDENTIFIER ::= { ubiAclMIB  2 }   
+		    
+		
+			                                                        
+-- ***********************************************************
+-- ubiAclTable(1)
+-- ***********************************************************  
+
+	ubiAclTable OBJECT-TYPE
+		SYNTAX		SEQUENCE OF UbiAclEntry  
+		MAX-ACCESS  not-accessible
+		STATUS		current
+		DESCRIPTION
+		"This table contains objects which provide
+         more information about access-list."
+		::= { ubiAclMIBObjects 1 }
+		
+	ubiAclEntry OBJECT-TYPE
+		SYNTAX		UbiAclEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+		"An entry containing management information 
+         for particular access-list."
+		INDEX { ubiAclName, ubiAclType, ubiAclSourceAddr, ubiAclsourceAddrMask } 
+		::= { ubiAclTable 1 }
+		
+	UbiAclEntry ::= SEQUENCE {
+		ubiAclName				DisplayString,
+		ubiAclType				INTEGER,
+		ubiAclSourceAddr		IpAddress,
+		ubiAclsourceAddrMask	IpAddress,
+		ubiAclRowStatus			RowStatus
+	}
+	
+	ubiAclName	OBJECT-TYPE
+		SYNTAX		DisplayString(SIZE(1..256))
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"Access-list name.
+		 Available name values below:
+		 
+		 <1-99>|<1300-1999>|WORD"
+		::= { ubiAclEntry 1 }
+		
+	ubiAclType		OBJECT-TYPE
+		SYNTAX		INTEGER
+		{
+			deny(0),
+			permit(1),
+			remark(2)
+		}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"Access-list type"
+		::= { ubiAclEntry 2 }
+		
+	ubiAclSourceAddr	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"Access-list source address."
+		::= { ubiAclEntry 3 }
+		
+	ubiAclsourceAddrMask	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"Access-list source address mask"
+		::= { ubiAclEntry 4 }
+		
+	ubiAclRowStatus		OBJECT-TYPE
+		SYNTAX		RowStatus
+		MAX-ACCESS	read-create
+		STATUS		current
+		DESCRIPTION
+		"Create or remove access-list entry"
+		::= { ubiAclEntry 5 }    
+	                       
+
+-- ***********************************************************
+-- ubiAclExtTable(2)
+-- ***********************************************************  
+					
+	ubiAclExtTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE OF UbiAclExtEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+		"This table contains objects which provide
+         more information about extended access-list."
+		::= { ubiAclMIBObjects 2 }
+		
+	ubiAclExtEntry	OBJECT-TYPE
+		SYNTAX		UbiAclExtEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+		"An entry containing management information 
+         for particular extention access-list."
+		INDEX { ubiAclExtName, ubiAclExtType,
+				ubiAclExtSrcAddr, ubiAclExtSrcAddrMask,
+				ubiAclExtDstAddr, ubiAclExtDstAddrMask,
+				ubiAclExtProtocol, ubiAclExtIcmpType, ubiAclExtIgmpType,
+				ubiAclExtSrcEqual, ubiAclExtSport, ubiAclExtDestEqual, 
+				ubiAclExtDport, ubiAclExtPrecedence,
+				ubiAclExtTos }
+		::= { ubiAclExtTable 1 }
+		
+	UbiAclExtEntry ::= SEQUENCE {  
+		ubiAclExtName			DisplayString,
+		ubiAclExtType			INTEGER,	
+		ubiAclExtSrcAddr		IpAddress,
+		ubiAclExtSrcAddrMask	IpAddress,
+		ubiAclExtDstAddr		IpAddress,
+		ubiAclExtDstAddrMask	IpAddress,
+		ubiAclExtProtocol		INTEGER,
+		ubiAclExtIcmpType		INTEGER,
+		ubiAclExtIgmpType		INTEGER,
+		ubiAclExtSrcEqual		INTEGER,
+		ubiAclExtSport			Integer32,
+		ubiAclExtDestEqual		INTEGER,
+		ubiAclExtDport			Integer32,
+		ubiAclExtPrecedence		Integer32,
+		ubiAclExtTos			Integer32,
+		ubiAclExtRowStatus		RowStatus
+	}          
+
+	ubiAclExtName	OBJECT-TYPE
+		SYNTAX		DisplayString(SIZE(1..256))
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"Extended access-list name.
+		 Available name values below:
+		
+		 <100-199>|<2000-2699>|WORD"
+		::= { ubiAclExtEntry 1 }
+		
+	ubiAclExtType		OBJECT-TYPE
+		SYNTAX		INTEGER
+		{
+			deny(0),
+			permit(1)
+		}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"Extended access-list type"
+		::= { ubiAclExtEntry 2 }
+	
+	ubiAclExtSrcAddr	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"Extended access-list source address"
+		::= { ubiAclExtEntry 3 }
+		
+	ubiAclExtSrcAddrMask	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"Extended access-list source address mask"
+		::= { ubiAclExtEntry 4 }
+		
+	ubiAclExtDstAddr	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"Extended access-list destination address"
+		::= { ubiAclExtEntry 5 }
+		
+	ubiAclExtDstAddrMask	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"Extended access-list destination address mask"
+		::= { ubiAclExtEntry 6 }
+		
+	ubiAclExtProtocol	OBJECT-TYPE
+		SYNTAX		INTEGER
+		{
+			ip(0),
+			icmp(1),
+			igmp(2),
+			tcp(6),
+			udp(17),
+			rsvp(46),
+			gre(47),
+			--esp(50),
+			--ahp(51),
+			ospf(89),
+			pim(103),
+			ipcomp(108),
+			vrrp(112),
+			any(256)
+		}(0..255)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"Extended access-list protocol type.
+		 Protocol 'any' could be set at string access-list only"
+		::= { ubiAclExtEntry 7 }  
+		
+	ubiAclExtIcmpType	OBJECT-TYPE
+		SYNTAX		INTEGER
+		{
+			echoReply(0),
+			destinationUnreachable(3),
+			sourceQuench(4),
+			redirect(5),
+			echoRequest(8),
+			timeExceed(11),
+			parameterProblem(12),
+			timestampRequest(13),
+			timestampReply(14),
+			informationRequest(15),
+			informationReply(16),
+			addressMaskRequest(17),
+			addressMaskReply(18),
+			none(256)
+		}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"Extended access-list ICMP message type.
+		 Available ICMP message type below:
+		 
+		 0       Echo Reply
+		 3       Destination Unreachable
+		 4       Source Quench
+		 5       Redirect (change route)
+		 8       Echo Request
+		 11      Time Exceeded
+		 12      Parameter Problem
+		 13      Timestamp Request
+		 14      Timestamp Reply
+		 15      Information Request
+		 16      Information Reply
+		 17      Address Mask Request
+		 18      Address Mask Reply"
+		::= { ubiAclExtEntry 8 }
+		
+	ubiAclExtIgmpType	OBJECT-TYPE
+		SYNTAX		INTEGER  
+		{
+			igmpMembershipQuery(17),
+		 	igmpV1MembershipReport(18),
+		 	igmpDvmrp(19),
+		 	igmpPimVer1(20),
+		 	igmpCiscoTraceMsg(21),
+		 	igmpV2MembershipReport(22),
+		 	igmpV2LeaveGroup(23),
+		 	igmpMcastTrResponse(30),
+		 	igmpMcastTr(31),
+		 	igmpV3MembershipReport(34),
+		 	igmpMcastRoutrAd(48),
+		 	igmpMcastRoutrSol(49),
+		 	igmpMcastRoutrRerm(50),
+            
+            igmpReserved0XF0(240),
+		 	igmpReserved0XF1(241),
+		 	igmpReserved0XF2(242),
+		 	igmpReserved0XF3(243),
+		 	igmpReserved0XF4(244),
+		 	igmpReserved0XF5(245),
+		 	igmpReserved0XF6(246),
+		 	igmpReserved0XF7(247),
+		 	igmpReserved0XF8(248),
+		 	igmpReserved0XF9(249),
+		 	igmpReserved0XFA(250),
+		 	igmpReserved0XFB(251),
+		 	igmpReserved0XFC(252),
+		 	igmpReserved0XFD(253),
+		 	igmpReserved0XFE(254),
+		 	igmpReserved0XFF(255),
+		 	none(256)
+		}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"Extended access-list IGMP message type.
+		 Available IGMP message type below:
+		
+		 IGMP_MEMBERSHIP_QUERY      0x11
+		 IGMP_V1_MEMBERSHIP_REPORT  0x12
+		 IGMP_DVMRP                 0x13
+		 IGMP_PIM_VER1              0x14
+		 IGMP_CISCO_TRACE_MSG       0x15
+		 IGMP_V2_MEMBERSHIP_REPORT  0x16
+		 IGMP_V2_LEAVE_GROUP        0x17
+		 IGMP_MCAST_TR_RESPONSE     0x1E
+		 IGMP_MCAST_TR              0x1F
+		 IGMP_V3_MEMBERSHIP_REPORT  0x22
+		 IGMP_MCAST_ROUTR_AD        0x30
+		 IGMP_MCAST_ROUTR_SOL       0x31
+		 IGMP_MCAST_ROUTR_RERM      0x32
+                  
+		 IGMP_RESERVED_0XF0         0xF0           
+		 IGMP_RESERVED_0XF1         0xF1
+		 IGMP_RESERVED_0XF2         0xF2
+		 IGMP_RESERVED_0XF3         0xF3
+		 IGMP_RESERVED_0XF4         0xF4
+		 IGMP_RESERVED_0XF5         0xF5
+		 IGMP_RESERVED_0XF6         0xF6
+		 IGMP_RESERVED_0XF7         0xF7
+		 IGMP_RESERVED_0XF8         0xF8
+		 IGMP_RESERVED_0XF9         0xF9
+		 IGMP_RESERVED_0XFA         0xFA
+		 IGMP_RESERVED_0XFB         0xFB
+		 IGMP_RESERVED_0XFC         0xFC
+		 IGMP_RESERVED_0XFD         0xFD
+		 IGMP_RESERVED_0XFE         0xFE
+		 IGMP_RESERVED_0XFF         0xFF"
+		::= { ubiAclExtEntry 9 }
+
+	ubiAclExtSrcEqual		OBJECT-TYPE
+		SYNTAX		INTEGER
+		{
+			noOper(0),
+			equal(1)
+		}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"Extended access-list source port equal.
+		 If value is 1, 
+		 compare 'ubiAclExtSport' with a source port in packet."
+		::= { ubiAclExtEntry 10 }
+		
+	ubiAclExtSport			OBJECT-TYPE
+		SYNTAX		Integer32(0..65535)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"Extended access-list source port"
+		::= { ubiAclExtEntry 11 }
+		
+	ubiAclExtDestEqual		OBJECT-TYPE
+		SYNTAX		INTEGER
+		{
+			noOper(0),
+			equal(1)
+		}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"Extended access-list destination port equal.
+		 If value is 1, 
+		 compare 'ubiAclExtDport' with a destination port in packet."
+		::= { ubiAclExtEntry 12 }
+		
+	ubiAclExtDport			OBJECT-TYPE
+		SYNTAX		Integer32(0..65535)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"Extended access-list destination port"
+		::= { ubiAclExtEntry 13 }
+
+	ubiAclExtPrecedence	OBJECT-TYPE
+		SYNTAX		Integer32{
+			none(256)
+		}(0..256)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"Extended access-list precedence"
+		::= { ubiAclExtEntry 14 }	         
+
+	ubiAclExtTos	OBJECT-TYPE
+		SYNTAX		Integer32{
+			none(256)
+		}(0..256)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"Extended access-list Type Of Service value"
+		::= { ubiAclExtEntry 15 }	
+			
+	ubiAclExtRowStatus	OBJECT-TYPE
+		SYNTAX		RowStatus
+		MAX-ACCESS	read-create
+		STATUS		current
+		DESCRIPTION
+		"Create or remove extended access-list entry"
+		::= { ubiAclExtEntry 16 }				
+
+
+ 
+-- ***********************************************************
+-- ubiAclIfTable
+-- ***********************************************************  
+					
+	ubiAclIfTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE OF UbiAclIfEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+		"This table contains objects which provide
+         more information about interface of access-list."
+		::= { ubiAclMIBObjects 3 }
+		
+	ubiAclIfEntry	OBJECT-TYPE
+		SYNTAX		UbiAclIfEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+		"An entry containing management information 
+         for interface of access-list."
+		INDEX { ifIndex, ubiAclIfDirection, ubiAclIfAclName }
+		::= { ubiAclIfTable 1 }
+		
+	UbiAclIfEntry ::= SEQUENCE {  
+		ubiAclIfAclName			DisplayString,
+		ubiAclIfDirection		INTEGER,	
+		ubiAclIfRowStatus		RowStatus
+	}          
+
+	ubiAclIfAclName	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"Access-list name on interface"
+		::= { ubiAclIfEntry 1 }
+		
+	ubiAclIfDirection		OBJECT-TYPE
+		SYNTAX		INTEGER 
+		{
+			input(1),
+			output(2)
+		}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"The direction that applies access-list on interface"
+		::= { ubiAclIfEntry 2 }
+	
+	ubiAclIfRowStatus	OBJECT-TYPE
+		SYNTAX		RowStatus
+		MAX-ACCESS	read-create
+		STATUS		current
+		DESCRIPTION
+		"Create and remove access-list configuration on interface"
+		::= { ubiAclIfEntry 3 }
+ 
+
+
+-- ***********************************************************
+-- ubiAclMacTable
+-- ***********************************************************  
+					
+	ubiAclMacTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE OF UbiAclMacEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+		"This table contains objects which provide
+         more information about MAC access-list."
+		::= { ubiAclMIBObjects 4 }
+		
+	ubiAclMacEntry	OBJECT-TYPE
+		SYNTAX		UbiAclMacEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+		"An entry containing management information 
+         for MAC access-list."
+		INDEX { ubiAclMacName, ubiAclMacType, ubiAclMacSrcAddress, 
+				ubiAclMacSrcMask, ubiAclMacDstAddress, ubiAclMacDstMask }
+		::= { ubiAclMacTable 1 }
+		
+	UbiAclMacEntry ::= SEQUENCE {  
+		ubiAclMacName			DisplayString,
+		ubiAclMacType			INTEGER,	
+		ubiAclMacSrcAddress		MacAddress,
+		ubiAclMacSrcMask    	MacAddress,
+		ubiAclMacDstAddress		MacAddress,
+		ubiAclMacDstMask		MacAddress,
+		ubiAclMacRowStatus		RowStatus	
+	}          
+
+	ubiAclMacName	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"Access-list name for MAC acl configuration."
+		::= { ubiAclMacEntry 1 }
+ 
+	ubiAclMacType	OBJECT-TYPE
+		SYNTAX		INTEGER 
+		{          
+			deny(0),
+			permit(1)
+		}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"MAC type"
+		::= { ubiAclMacEntry 2 }
+ 
+	ubiAclMacSrcAddress	OBJECT-TYPE
+		SYNTAX		MacAddress 
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"Source address for MAC access-list"
+		::= { ubiAclMacEntry 3 }
+ 
+	ubiAclMacSrcMask	OBJECT-TYPE
+		SYNTAX		MacAddress
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"Source address mask for MAC access-list"
+		::= { ubiAclMacEntry 4 }
+
+	ubiAclMacDstAddress	OBJECT-TYPE
+		SYNTAX		MacAddress
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"Destination address for MAC access-list"
+		::= { ubiAclMacEntry 5 }
+ 
+	ubiAclMacDstMask	OBJECT-TYPE
+		SYNTAX		MacAddress
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"Destination address mask for MAC access-list"
+		::= { ubiAclMacEntry 6 }
+ 
+	ubiAclMacRowStatus	OBJECT-TYPE
+		SYNTAX		RowStatus
+		MAX-ACCESS	read-create
+		STATUS		current
+		DESCRIPTION
+		"Create and remove MAC access-list configuration"
+		::= { ubiAclMacEntry 7 }
+ 
+ -- ***********************************************************
+-- ubiAclUserTable
+-- *********************************************************** 
+
+	ubiAclUserTable		OBJECT-TYPE
+		SYNTAX		SEQUENCE OF UbiAclUserEntry
+		ACCESS		not-accessible
+		STATUS		current
+		DESCRIPTION
+			"This table contains objects which provide
+         more information about user access-list."
+		::= { ubiAclMIBObjects 5 }
+		
+	ubiAclUserEntry		OBJECT-TYPE
+		SYNTAX		UbiAclUserEntry    
+		ACCESS		not-accessible
+		STATUS		current
+		DESCRIPTION
+			"An entry containing management information 
+         for user access-list."
+		INDEX	{ ubiUserAclUsername }
+		::= { ubiAclUserTable 1 }
+		
+	UbiAclUserEntry	::= SEQUENCE {
+		ubiUserAclUsername		DisplayString,
+		ubiUserAclAcessList		Integer32,
+		ubiUserAclRowStatus		RowStatus
+	}
+	
+	ubiUserAclUsername	OBJECT-TYPE 
+		SYNTAX		DisplayString
+		ACCESS		read-only 
+		STATUS		current
+		DESCRIPTION
+			"User name for applying access-list"
+		::= { ubiAclUserEntry 1 }
+		
+	ubiUserAclAcessList	OBJECT-TYPE
+		SYNTAX		Integer32(1..99)
+		ACCESS		read-create
+		STATUS		current
+		DESCRIPTION
+			"The access list name for user access-list"
+		::= { ubiAclUserEntry 2 }
+		
+	ubiUserAclRowStatus	OBJECT-TYPE
+		SYNTAX		RowStatus
+		ACCESS		read-create
+		STATUS		current
+		DESCRIPTION
+			"Create and remove user access-list configuration"
+		::= { ubiAclUserEntry 3 }
+
+-- ***********************************************************
+-- ubiAclSnmpTable
+-- ***********************************************************		
+
+	ubiAclSnmpTable		OBJECT-TYPE
+		SYNTAX		SEQUENCE OF UbiAclSnmpEntry
+		ACCESS		not-accessible
+		STATUS		current
+		DESCRIPTION
+			"This table contains objects which provide
+         more information about SNMP access-list."
+		::= { ubiAclMIBObjects 6 }
+		
+	ubiAclSnmpEntry		OBJECT-TYPE
+		SYNTAX		UbiAclSnmpEntry
+		ACCESS		not-accessible
+		STATUS		current
+		DESCRIPTION
+			"An entry containing management information 
+         for SNMP access-list."
+		INDEX	{ ubiAclSnmpCommunityName } 
+		::= { ubiAclSnmpTable 1 }
+		
+	UbiAclSnmpEntry ::= SEQUENCE {
+		ubiAclSnmpCommunityName		DisplayString,		
+		ubiAclSnmpAccessLevel		INTEGER,
+		ubiAclSnmpAccessList		Integer32,
+		ubiAclSnmpRowStatus			RowStatus
+	}
+	
+	ubiAclSnmpCommunityName		OBJECT-TYPE
+		SYNTAX		DisplayString
+		ACCESS		read-only
+		STATUS		current
+		DESCRIPTION
+			"SNMP community for applying access-list"
+		::= { ubiAclSnmpEntry 1 }
+
+	ubiAclSnmpAccessLevel		OBJECT-TYPE
+		SYNTAX		INTEGER
+		{
+			ro(1),
+			rw(2)
+		}
+		ACCESS		read-create
+		STATUS		current
+		DESCRIPTION
+			"The access type of community"
+		::= { ubiAclSnmpEntry 2 }
+				
+	ubiAclSnmpAccessList		OBJECT-TYPE
+		SYNTAX		Integer32(1..99)
+		ACCESS		read-create
+		STATUS		current
+		DESCRIPTION
+			"The access list number for SNMP access-list"
+		::= { ubiAclSnmpEntry 3 }
+		
+	ubiAclSnmpRowStatus			OBJECT-TYPE
+		SYNTAX		RowStatus
+		ACCESS		read-create
+		STATUS		current
+		DESCRIPTION
+			"Create and remove SNMP access-list configuration"
+		::= { ubiAclSnmpEntry 4 }
+
+-- ***********************************************************
+-- ubiAclProtocolTable
+-- ***********************************************************		
+
+	ubiAclProtocolTable		OBJECT-TYPE
+		SYNTAX		SEQUENCE OF UbiAclProtocolEntry
+		ACCESS		not-accessible
+		STATUS		current
+		DESCRIPTION
+			"This table contains objects which provide
+         more information about access-list for telnet/ftp protocol."
+		::= { ubiAclMIBObjects 7 }
+		
+	ubiAclProtocolEntry		OBJECT-TYPE
+		SYNTAX		UbiAclProtocolEntry
+		ACCESS		not-accessible
+		STATUS		current
+		DESCRIPTION
+			"An entry containing management information 
+         for telnet/ftp protocol access-list."
+		INDEX	{ ubiAclProtocolType } 
+		::= { ubiAclProtocolTable 1 }
+		
+	UbiAclProtocolEntry ::= SEQUENCE {
+		ubiAclProtocolType					INTEGER,  
+    	ubiAclProtocolAclName				DisplayString,		
+		ubiAclProtocolRowStatus				RowStatus
+	}
+	
+	ubiAclProtocolType		OBJECT-TYPE
+		SYNTAX		INTEGER { 
+			none(0),  
+			ftp(1),
+			telnet(2)
+		}
+		ACCESS		read-only
+		STATUS		current
+		DESCRIPTION
+			"The type of protocol"
+		::= { ubiAclProtocolEntry 1 }
+				
+	ubiAclProtocolAclName		OBJECT-TYPE
+		SYNTAX		DisplayString
+		ACCESS		read-create
+		STATUS		current
+		DESCRIPTION
+			"The access list name for telnet/ftp protocol"
+		::= { ubiAclProtocolEntry 2 }
+		
+	ubiAclProtocolRowStatus			OBJECT-TYPE
+		SYNTAX		RowStatus
+		ACCESS		read-create
+		STATUS		current
+		DESCRIPTION
+			"Create and remove telnet/ftn protocol
+			 access-list configuration"
+		::= { ubiAclProtocolEntry 3 }
+		
+-- ***********************************************************
+-- ubiIpv6AclTable
+-- ***********************************************************
+
+	ubiIpv6AclTable OBJECT-TYPE
+		SYNTAX		SEQUENCE OF UbiIpv6AclEntry  
+		MAX-ACCESS  not-accessible
+		STATUS		current
+		DESCRIPTION
+		"This table contains objects which provide
+         more information about IPv6 access-list."
+		::= { ubiAclMIBObjects 8 }
+		
+	ubiIpv6AclEntry OBJECT-TYPE
+		SYNTAX		UbiIpv6AclEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+		"An entry containing management information 
+         for particular IPv6 access-list."
+		INDEX { ubiIpv6AclName, ubiIpv6AclType, ubiIpv6AclSourceAddr, ubiIpv6AclSourceAddrPfxLen, ubiIpv6AclExactMatch } 
+		::= { ubiIpv6AclTable 1 }
+		
+	UbiIpv6AclEntry ::= SEQUENCE {
+		ubiIpv6AclName					DisplayString,
+		ubiIpv6AclType					Integer32,
+		ubiIpv6AclSourceAddr			InetAddress,
+		ubiIpv6AclSourceAddrPfxLen		Integer32,
+		ubiIpv6AclExactMatch			Integer32,
+		ubiIpv6AclRowStatus				RowStatus
+	}
+	
+	ubiIpv6AclName	OBJECT-TYPE
+		SYNTAX		DisplayString(SIZE(1..256))
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"IPv6 Access-list name.
+		 Available name value below:
+		 
+		 WORD"
+		::= { ubiIpv6AclEntry 1 }
+		
+	ubiIpv6AclType		OBJECT-TYPE
+		SYNTAX		Integer32
+		{
+			deny(0),
+			permit(1)
+		}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"IPv6 Access-list type"
+		::= { ubiIpv6AclEntry 2 }
+		
+	ubiIpv6AclSourceAddr	OBJECT-TYPE
+		SYNTAX		InetAddress
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"IPv6 Access-list source address."
+		::= { ubiIpv6AclEntry 3 }
+		
+	ubiIpv6AclSourceAddrPfxLen	OBJECT-TYPE
+		SYNTAX		Integer32(0..128)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"IPv6 Access-list source address prefix length."
+		::= { ubiIpv6AclEntry 4 }
+		
+	ubiIpv6AclExactMatch	OBJECT-TYPE
+		SYNTAX		Integer32(0..128)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"IPv6 Access-list exact match of the prefixes."
+		::= { ubiIpv6AclEntry 5 }
+
+		
+	ubiIpv6AclRowStatus		OBJECT-TYPE
+		SYNTAX		RowStatus
+		MAX-ACCESS	read-create
+		STATUS		current
+		DESCRIPTION
+		"Create or remove IPv6 access-list entry"
+		::= { ubiIpv6AclEntry 6 }
+
+
+
+
+
+-- ***********************************************************
+-- ubiIpv6AclExtTable
+-- ***********************************************************
+					
+	ubiIpv6AclExtTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE OF UbiIpv6AclExtEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+		"This table contains objects which provide
+         more information about extended access-list."
+		::= { ubiAclMIBObjects 9 }
+		
+	ubiIpv6AclExtEntry	OBJECT-TYPE
+		SYNTAX		UbiIpv6AclExtEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+		"An entry containing management information 
+         for particular extention access-list."
+		INDEX { ubiIpv6AclExtName, ubiIpv6AclExtType,
+				ubiIpv6AclExtSrcAddr, ubiIpv6AclExtSrcAddrPfxLen,
+				ubiIpv6AclExtDstAddr, ubiIpv6AclExtDstAddrPfxLen,
+				ubiIpv6AclExtProtocol, ubiIpv6AclExtIcmpType, ubiIpv6AclExtSrcEqual,
+				ubiIpv6AclExtSport, ubiIpv6AclExtDestEqual, ubiIpv6AclExtDport,
+				ubiIpv6AclExtLog, ubiIpv6AclExtPrecedence, ubiIpv6AclExtTos }
+		::= { ubiIpv6AclExtTable 1 }
+		
+	UbiIpv6AclExtEntry ::= SEQUENCE {  
+		ubiIpv6AclExtName				DisplayString,
+		ubiIpv6AclExtType				Integer32,	
+		ubiIpv6AclExtSrcAddr			InetAddress,
+		ubiIpv6AclExtSrcAddrPfxLen		Integer32,
+		ubiIpv6AclExtDstAddr			InetAddress,
+		ubiIpv6AclExtDstAddrPfxLen		Integer32,
+		ubiIpv6AclExtProtocol			Integer32,
+		ubiIpv6AclExtIcmpType			Integer32,
+		ubiIpv6AclExtSrcEqual			Integer32,
+		ubiIpv6AclExtSport				Integer32,
+		ubiIpv6AclExtDestEqual			Integer32,
+		ubiIpv6AclExtDport				Integer32,
+		ubiIpv6AclExtLog				Integer32,
+		ubiIpv6AclExtPrecedence			Integer32,
+		ubiIpv6AclExtTos				Integer32,
+		ubiIpv6AclExtRowStatus			RowStatus
+	}          
+
+	ubiIpv6AclExtName	OBJECT-TYPE
+		SYNTAX		DisplayString(SIZE(1..256))
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"Extended IPv6 access-list name.
+		 Available name value below:
+		
+		 WORD"
+		::= { ubiIpv6AclExtEntry 1 }
+		
+	ubiIpv6AclExtType		OBJECT-TYPE
+		SYNTAX		Integer32
+		{
+			deny(0),
+			permit(1)
+		}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"Extended IPv6 access-list type"
+		::= { ubiIpv6AclExtEntry 2 }
+	
+	ubiIpv6AclExtSrcAddr	OBJECT-TYPE
+		SYNTAX		InetAddress
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"Extended IPv6 access-list source address"
+		::= { ubiIpv6AclExtEntry 3 }
+		
+	ubiIpv6AclExtSrcAddrPfxLen	OBJECT-TYPE
+		SYNTAX		Integer32(0..128)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"Extended IPv6 access-list source address prefix length"
+		::= { ubiIpv6AclExtEntry 4 }
+		
+	ubiIpv6AclExtDstAddr	OBJECT-TYPE
+		SYNTAX		InetAddress
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"Extended IPv6 access-list destination address"
+		::= { ubiIpv6AclExtEntry 5 }
+		
+	ubiIpv6AclExtDstAddrPfxLen	OBJECT-TYPE
+		SYNTAX		Integer32(0..128)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"Extended IPv6 access-list destination address prefix length"
+		::= { ubiIpv6AclExtEntry 6 }
+		
+	ubiIpv6AclExtProtocol	OBJECT-TYPE
+		SYNTAX		Integer32
+		{
+			ipv6(0),	
+			tcp(6),
+			udp(17),
+			rsvp(46),
+			gre(47),
+			esp(50),
+			ahp(51),
+			icmpv6(58),
+			ipcomp(108),
+			vrrp(112),
+			sctp(132),
+			any(256)
+		}(0..255)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"Extended IPv6 access-list protocol type.
+		 Protocol 'any' could be set at string access-list only"
+		::= { ubiIpv6AclExtEntry 7 }  
+		
+	ubiIpv6AclExtIcmpType	OBJECT-TYPE
+		SYNTAX		Integer32
+		{
+			echoReply(0),
+			destinationUnreachable(3),
+			sourceQuench(4),
+			redirect(5),
+			echoRequest(8),
+			routerAdvertisement(9),
+			routerSolicitation(10),
+			timeExceed(11),
+			parameterProblem(12),
+			timestampRequest(13),
+			timestampReply(14),
+			informationRequest(15),
+			informationReply(16),
+			addressMaskRequest(17),
+			addressMaskReply(18),
+			none(256)
+		}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"Extended IPv6 access-list ICMP message type.
+		 Available ICMP message type below:
+		 
+		 0       Echo Reply
+		 3       Destination Unreachable
+		 4       Source Quench
+		 5       Redirect (change route)
+		 8       Echo Request
+		 9       Router Advertisement
+		 10      Router Solicitation
+		 11      Time Exceeded
+		 12      Parameter Problem
+		 13      Timestamp Request
+		 14      Timestamp Reply
+		 15      Information Request
+		 16      Information Reply
+		 17      Address Mask Request
+		 18      Address Mask Reply"
+		::= { ubiIpv6AclExtEntry 8 }
+
+	ubiIpv6AclExtSrcEqual		OBJECT-TYPE
+		SYNTAX		Integer32
+		{
+			noOper(0),
+			equal(1)
+		}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"Extended IPv6 access-list source port equal.
+		 If value is 1, 
+		 compare 'ubiIpv6AclExtSport' with a source port in packet."
+		::= { ubiIpv6AclExtEntry 9 }
+		
+	ubiIpv6AclExtSport			OBJECT-TYPE   ------- 
+		SYNTAX		Integer32(0..65535)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"Extended IPv6 access-list source port"
+		::= { ubiIpv6AclExtEntry 10 }
+		
+	ubiIpv6AclExtDestEqual		OBJECT-TYPE
+		SYNTAX		Integer32
+		{
+			noOper(0),
+			equal(1)
+		}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"Extended IPv6 access-list destination port equal.
+		 If value is 1, 
+		 compare 'ubiIpv6AclExtDport' with a destination port in packet."
+		::= { ubiIpv6AclExtEntry 11 }
+		
+	ubiIpv6AclExtDport			OBJECT-TYPE
+		SYNTAX		Integer32(0..65535)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"Extended IPv6 access-list destination port"
+		::= { ubiIpv6AclExtEntry 12 }
+		
+	ubiIpv6AclExtLog			OBJECT-TYPE
+		SYNTAX		Integer32
+		{
+			disble(0),
+			enable(1)
+		}
+		MAX-ACCESS	read-create
+		STATUS		current
+		DESCRIPTION
+		"Extended IPv6 access-list log the results"
+		::= { ubiIpv6AclExtEntry 13 }	 
+
+	ubiIpv6AclExtPrecedence		OBJECT-TYPE
+		SYNTAX		Integer32{
+			none(256)
+		}(0..256)
+		MAX-ACCESS	read-create
+		STATUS		current
+		DESCRIPTION
+		"Extended IPv6 access-list precedence"
+		::= { ubiIpv6AclExtEntry 14 }	         
+
+	ubiIpv6AclExtTos			OBJECT-TYPE
+		SYNTAX		Integer32{
+			none(256)
+		}(0..256)
+		MAX-ACCESS	read-create
+		STATUS		current
+		DESCRIPTION
+		"Extended IPv6 access-list Type Of Service value"
+		::= { ubiIpv6AclExtEntry 15 }	
+			
+	ubiIpv6AclExtRowStatus	OBJECT-TYPE
+		SYNTAX		RowStatus
+		MAX-ACCESS	read-create
+		STATUS		current
+		DESCRIPTION
+		"Create or remove extended IPv6 access-list entry"
+		::= { ubiIpv6AclExtEntry 16 }				
+
+
+ 
+
+
+
+ 
+ 
+-- ***********************************************************
+-- ubiAclMIBConformance
+-- ***********************************************************
+ubiAclMIBCompliances  	OBJECT IDENTIFIER		::= { ubiAclMIBConformance 1 }
+ubiAclMIBGroups  	 	OBJECT IDENTIFIER		::= { ubiAclMIBConformance 2 }
+-- Compliance
+
+	ubiAclMIBCompliance MODULE-COMPLIANCE
+    	STATUS          current
+    	DESCRIPTION
+        	"The compliance statement for entities which
+        	implement the UBQS-ACCESS-LIST-MIB"
+   	 	MODULE          -- this module
+    	MANDATORY-GROUPS {              
+                        ubiAclGroup, 
+                        ubiAclExtGroup,
+                        ubiAclProtocolGroup
+                     }               
+        GROUP ubiAclGroup
+        DESCRIPTION
+        	""
+        GROUP ubiAclExtGroup
+        DESCRIPTION
+        	""            
+        GROUP ubiAclProtocolGroup
+        DESCRIPTION
+        	""
+    	::= { ubiAclMIBCompliances 1 }
+
+
+	ubiAclGroup OBJECT-GROUP
+    	OBJECTS         {    
+    			ubiAclName,
+    			ubiAclType,
+    			ubiAclSourceAddr,
+    			ubiAclsourceAddrMask,
+    			ubiAclRowStatus			
+        }   
+    	STATUS          current
+    	DESCRIPTION
+        	"A collection of objects containing
+        	information about access-list."
+    	::= { ubiAclMIBGroups 1 }
+
+	ubiAclExtGroup OBJECT-GROUP
+    	OBJECTS         {  
+				ubiAclExtName,
+				ubiAclExtType,
+				ubiAclExtSrcAddr,
+				ubiAclExtSrcAddrMask,
+				ubiAclExtDstAddr,
+				ubiAclExtDstAddrMask,
+				ubiAclExtProtocol,
+				ubiAclExtIcmpType,
+				ubiAclExtIgmpType,
+				ubiAclExtSrcEqual ,
+				ubiAclExtSport,
+				ubiAclExtDestEqual,
+				ubiAclExtDport,
+				ubiAclExtPrecedence,
+				ubiAclExtTos,
+				ubiAclExtRowStatus 	  
+        }   
+    	STATUS          current
+    	DESCRIPTION
+        	"A collection of objects containing
+        	information about access-list."
+    	::= { ubiAclMIBGroups 2 }        
+
+	ubiAclProtocolGroup OBJECT-GROUP
+    	OBJECTS         {   
+    			  ubiAclProtocolType,
+    			  ubiAclProtocolAclName,
+    			  ubiAclProtocolRowStatus 
+        }   
+    	STATUS          current
+    	DESCRIPTION
+        	"A collection of objects containing
+        	information about access restriction by protocol."
+    	::= { ubiAclMIBGroups 3 }
+
+END

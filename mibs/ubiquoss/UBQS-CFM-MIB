@@ -1,0 +1,2560 @@
+-- *****************************************************************
+-- UBQS-CFM-MIB: Ubiquoss CFM MIB      
+--
+-- Nov 2010,   Park Hyung Eun
+--   
+-- Copyright (c) 2010 by Ubiquoss, Corp.
+-- All rights reserved.
+-- *****************************************************************
+--   
+
+UBQS-CFM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    NOTIFICATION-TYPE,                                                                      
+    Counter32,
+    IpAddress,
+    Gauge32,
+    Integer32,
+    Unsigned32,
+        FROM SNMPv2-SMI 
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP,
+    NOTIFICATION-GROUP,
+        FROM SNMPv2-CONF
+    TEXTUAL-CONVENTION,
+    RowStatus,
+    DisplayString,
+    TruthValue,
+    MacAddress,   
+        FROM SNMPv2-TC
+    ubiAggId,
+    	FROM UBQS-LAG-MIB    
+    ifIndex,
+        FROM IF-MIB    
+    ubiMgmtv2
+        FROM UBQS-SMI;
+
+
+ubiCFMMIB MODULE-IDENTITY
+    LAST-UPDATED    "201011250000Z"
+    ORGANIZATION 	"Ubiquoss Corp."
+	CONTACT-INFO
+		"	Ubiquoss
+			Customer Service
+
+		 Postal: 24F Milennium B/D,
+		 	467-12, Dogok-Dong,
+			GangNam-Gu, Seoul 135-270
+			Korea
+
+		   Tel: 82-2-2190-3100"     
+	DESCRIPTION
+        "Connectivity Fault Management module for managing IEEE 802.1ag"      
+        
+    ::= { ubiMgmtv2 10 }
+
+ 
+-- *****************************************************************
+-- Textual Conventions
+-- *****************************************************************
+ 
+VlanIndex ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "The VLAN-id of a VLAN on ISL or 802.1q trunks.
+
+        Modification of default parameters is allowed.
+        Implementations are allowed to restrict
+        the range of VLANs.
+
+        For entities support up to 1024 VLANS.
+        VLANs above 1000 are reserved for default VLANs and
+        future use. Modification of default parameters is
+        allowed. Creation or deletion of VLANs above 1000 is not
+        allowed.
+
+        For a new object which needs the vlan-id of a VLAN as
+        its SYNTAX, it is suggested to import VlanIndex from
+        Q-BRIDGE-MIB instead of importing this TC here in 
+        ubi-VTP-MIB."
+    SYNTAX          Integer32 (0..4095)
+
+Dot1agCfmMaintDomainNameType2 ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "A value that represents a type (and thereby the format)
+        of a Dot1agCfmMaintDomainName.  The value can be one of
+        the following:
+
+
+        ieeeReserved(0)   Reserved for definition by IEEE 802.1
+                          recommend to not use zero unless
+                          absolutely needed.
+        none(1)           No format specified, usually because
+                          there is not (yet) a Maintenance
+                          Domain Name. In this case, a zero
+                          length OCTET STRING for the Domain
+                          Name field is acceptable.
+        dnsLikeName(2)    Domain Name like string, globally unique
+                          text string derived from a DNS name.
+        macAddrAndUint(3) MAC address + 2-octet (unsigned) integer.
+        charString(4)     RFC2579 DisplayString, except that the
+                          character codes 0-31 (decimal) are not
+                          used.
+        ieeeReserved(xx)  Reserved for definition by IEEE 802.1
+                          xx values can be [5..31] and [64..255]
+        ituReserved(xx)   Reserved for definition by  ITU-T Y.1731
+                          xx values range from [32..63]
+
+        To support future extensions, the Dot1agCfmMaintDomainNameType
+        textual convention SHOULD NOT be sub-typed in object type
+        definitions.  It MAY be sub-typed in compliance statements in
+        order to require only a subset of these address types for a
+        compliant implementation.
+
+        Implementations MUST ensure that Dot1agCfmMaintDomainNameType
+        objects and any dependent objects (e.g.,
+        Dot1agCfmMaintDomainName objects) are consistent.  An
+        inconsistentValue error MUST be generated if an attempt to
+        change an Dot1agCfmMaintDomainNameType object would, for
+        example, lead to an undefined Dot1agCfmMaintDomainName value.
+        In particular,
+        Dot1agCfmMaintDomainNameType/Dot1agCfmMaintDomainName pairs
+        MUST be changed together if the nameType changes.
+       "
+    REFERENCE
+       "21.6.5, Table 21-19"
+    SYNTAX      INTEGER {
+                  none              (1),       -- no md name
+                  dnsLikeName       (2),       -- dns name
+                  macAddressAndUint (3),       -- mac addr
+                  charString        (4),        -- string  
+                  itu_t				(32)	   -- itu-t					
+                }
+
+Dot1agCfmMaintDomainName ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Denotes a generic Maintenance Domain Name.
+
+        A Dot1agCfmMaintDomainName value is always interpreted within
+        the context of a Dot1agCfmMaintDomainNameType value.  Every
+        usage of the Dot1agCfmMaintDomainName textual convention is
+        required to specify the Dot1agCfmMaintDomainNameType object
+        that provides the context.  It is suggested that the
+        Dot1agCfmMaintDomainNameType object be logically registered
+        before the object(s) that use the Dot1agCfmMaintDomainName
+        textual convention, if they appear in the same logical row.
+
+        The value of a Dot1agCfmMaintDomainName object MUST always
+        be consistent with the value of the associated
+        Dot1agCfmMaintDomainNameType object. Attempts to set
+        an Dot1agCfmMaintDomainName object to a value inconsistent
+        with the associated Dot1agCfmMaintDomainNameType MUST fail
+        with an inconsistentValue error.
+
+        When this textual convention is used as the syntax of an
+        index object, there may be issues with the limit of 128
+        sub-identifiers specified in SMIv2, IETF STD 58.  In this
+        case, the object definition MUST include a 'SIZE' clause
+        to limit the number of potential instance sub-identifiers;
+        otherwise the applicable constraints MUST be stated in
+        the appropriate conceptual row DESCRIPTION clauses, or
+        in the surrounding documentation if there is no single
+        DESCRIPTION clause that is appropriate.
+
+        A value of none(1) in the associated
+        Dot1agCfmMaintDomainNameType object means that no Maintenance
+        Domain name is present, and the contents of the
+        Dot1agCfmMaintDomainName object are meaningless.
+
+        See the DESCRIPTION of the Dot1agCfmMaintAssocNameType
+        TEXTUAL-CONVENTION for a discussion of the length limits on
+        the Maintenance Domain name and Maintenance Association name.
+       "
+    REFERENCE
+         "21.6.5"
+    SYNTAX      OCTET STRING (SIZE(1..256))
+
+Dot1agCfmMaintAssocNameType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "A value that represents a type (and thereby the format)
+        of a Dot1agCfmMaintAssocName.  The value can be one of
+        the following:
+
+        ieeeReserved(0)   Reserved for definition by IEEE 802.1
+                          recommend to not use zero unless
+                          absolutely needed.
+        primaryVid(1)     Primary VLAN ID.
+                          12 bits represented in a 2-octet integer:
+                          - 4 least significant bits of the first
+                            byte contains the 4 most significant 
+                            bits of the 12 bits primary VID
+                          - second byte contains the 8 least
+                            significant bits of the primary VID
+
+                                 0 1 2 3 4 5 6 7 8
+                                 +-+-+-+-+-+-+-+-+
+                                 |0 0 0 0| (MSB) |
+                                 +-+-+-+-+-+-+-+-+
+                                 |  VID   LSB    |
+                                 +-+-+-+-+-+-+-+-+
+
+        charString(2)     RFC2579 DisplayString, except that the
+                          character codes 0-31 (decimal) are not
+                          used. (1..45) octets
+        unsignedInt16 (3) 2-octet integer/big endian
+        rfc2865VpnId(4)   RFC 2685 VPN ID
+                          3 octet VPN authority Organizationally
+                          Unique Identifier followed by 4 octet VPN
+                          index identifying VPN according to the OUI:
+
+                                 0 1 2 3 4 5 6 7 8
+                                 +-+-+-+-+-+-+-+-+
+                                 | VPN OUI (MSB) |
+                                 +-+-+-+-+-+-+-+-+
+                                 |   VPN OUI     |
+                                 +-+-+-+-+-+-+-+-+
+                                 | VPN OUI (LSB) |
+                                 +-+-+-+-+-+-+-+-+
+                                 |VPN Index (MSB)|
+                                 +-+-+-+-+-+-+-+-+
+                                 |  VPN Index    |
+                                 +-+-+-+-+-+-+-+-+
+                                 |  VPN Index    |
+                                 +-+-+-+-+-+-+-+-+
+                                 |VPN Index (LSB)|
+                                 +-+-+-+-+-+-+-+-+
+
+        ieeeReserved(xx)  Reserved for definition by IEEE 802.1
+                          xx values can be [5..31] and [64..255]
+        ituReserved(xx)   Reserved for definition by  ITU-T Y.1731
+                          xx values range from [32..63]
+
+        To support future extensions, the Dot1agCfmMaintAssocNameType
+        textual convention SHOULD NOT be sub-typed in object type
+        definitions.  It MAY be sub-typed in compliance statements in
+        order to require only a subset of these address types for a
+        compliant implementation.
+
+        Implementations MUST ensure that Dot1agCfmMaintAssocNameType
+        objects and any dependent objects (e.g.,
+        Dot1agCfmMaintAssocName objects) are consistent.  An
+        inconsistentValue error MUST be generated if an attempt to
+        change an Dot1agCfmMaintAssocNameType object would, for
+        example, lead to an undefined Dot1agCfmMaintAssocName value.
+        In particular,
+        Dot1agCfmMaintAssocNameType/Dot1agCfmMaintAssocName pairs
+        MUST be changed together if the nameType changes.
+
+        The Maintenance Domain name and Maintenance Association name,
+        when put together into the CCM PDU, MUST total 48 octets or
+        less.  If the Dot1agCfmMaintDomainNameType object contains
+        none(1), then the Dot1agCfmMaintAssocName object MUST be
+        45 octets or less in length.  Otherwise, the length of
+        the Dot1agCfmMaintDomainName object plus the length of the
+        Dot1agCfmMaintAssocName object, added together, MUST total
+        less than or equal to 44 octets.
+       " 
+    REFERENCE
+       "21.6.5.4, Table 21-20"
+    SYNTAX      INTEGER {
+                  primaryVid        (1),
+                  charString        (2),    
+                  unsignedInt16     (3),   
+                  rfc2865VpnId      (4)
+                }
+
+Dot1agCfmMaintAssocName ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Denotes a generic Maintenance Association Name. It is the
+        part of the Maintenance Association Identifier which is
+        unique within the Maintenance Domain Name and is appended
+        to the Maintenance Domain Name to form the Maintenance
+        Association Identifier (MAID).
+
+        A Dot1agCfmMaintAssocName value is always interpreted within
+        the context of a Dot1agCfmMaintAssocNameType value.  Every
+        usage of the Dot1agCfmMaintAssocName textual convention is
+        required to specify the Dot1agCfmMaintAssocNameType object
+        that provides the context.  It is suggested that the
+        Dot1agCfmMaintAssocNameType object be logically registered
+        before the object(s) that use the Dot1agCfmMaintAssocName
+        textual convention, if they appear in the same logical row.
+
+        The value of a Dot1agCfmMaintAssocName object MUST 
+        always be consistent with the value of the associated
+        Dot1agCfmMaintAssocNameType object. Attempts to set
+        an Dot1agCfmMaintAssocName object to a value inconsistent
+        with the associated Dot1agCfmMaintAssocNameType MUST fail
+        with an inconsistentValue error.
+
+        When this textual convention is used as the syntax of an
+        index object, there may be issues with the limit of 128
+        sub-identifiers specified in SMIv2, IETF STD 58.  In this
+        case, the object definition MUST include a 'SIZE' clause
+        to limit the number of potential instance sub-identifiers;
+        otherwise the applicable constraints MUST be stated in
+        the appropriate conceptual row DESCRIPTION clauses, or
+        in the surrounding documentation if there is no single
+        DESCRIPTION clause that is appropriate.
+       "
+    REFERENCE
+       "802.1ag clauses 21.6.5.4, 21.6.5.5, 21.6.5.6"
+    SYNTAX      OCTET STRING (SIZE(1..256))
+
+
+Dot1agCfmMDLevel ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+       "Integer identifying the Maintenance Domain Level (MD Level).
+        Higher numbers correspond to higher Maintenance Domains,
+        those with the greatest physical reach, with the highest
+        values for customers' CFM PDUs.  Lower numbers correspond
+        to lower Maintenance Domains, those with more limited
+        physical reach, with the lowest values for CFM PDUs
+        protecting single bridges or physical links.
+       "
+    REFERENCE
+       "802.1ag clauses 18.3, 21.4.1"
+    SYNTAX      Integer32 (0..7)
+
+Dot1agCfmMDLevelOrNone ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+       "Integer identifying the Maintenance Domain Level (MD Level).
+        Higher numbers correspond to higher Maintenance Domains,
+        those with the greatest physical reach, with the highest
+        values for customers' CFM packets.  Lower numbers correspond
+        to lower Maintenance Domains, those with more limited
+        physical reach, with the lowest values for CFM PDUs
+        protecting single bridges or physical links.
+
+        The value (-1) is reserved to indicate that no MA Level has
+        been assigned.
+       "
+    REFERENCE
+       "802.1ag clauses 18.3, 12.14.3.1.3:c"
+    SYNTAX      Integer32 (-1 | 0..7)
+
+Dot1agCfmMpDirection ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Indicates the direction in which the Maintenance
+        association (MEP or MIP) faces on the bridge port:
+
+        down(1)    Sends Continuity Check Messages away from the
+                   MAC Relay Entity.
+        up(2)      Sends Continuity Check Messages towards the
+                   MAC Relay Entity.
+       "
+    REFERENCE
+       "802.1ag clauses 12.14.6.3.2:c"
+    SYNTAX      INTEGER {
+                  down  (1),
+                  up    (2)
+                }
+
+Dot1agCfmPortStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "An enumerated value from he Port Status TLV from the last CCM
+        received from the last MEP. It indicates the ability of the
+        Bridge Port on which the transmitting MEP resides to pass
+        ordinary data, regardless of the status of the MAC
+        (Table 21-10).
+
+        psNoPortStateTLV(0) Indicates either that no CCM has been
+                            received or that no port status TLV was
+                            present in the last CCM received.
+
+        psBlocked(1)        Ordinary data cannot pass freely through
+                            the port on which the remote MEP resides.
+                            Value of enableRmepDefect is equal to
+                            false.
+
+        psUp(2):            Ordinary data can pass freely through
+                            the port on which the remote MEP resides.
+                            Value of enableRmepDefect is equal to
+                            true.
+
+        NOTE: A 0 value is used for psNoPortStateTLV, so that
+              additional code points can be added in a manner
+              consistent with the Dot1agCfmInterfaceStatus textual
+              convention.
+       "
+    REFERENCE
+       "12.14.7.6.3:f, 20.19.3 and 21.5.4"
+    SYNTAX      INTEGER {
+                  psNoPortStateTLV  (0),
+                  psBlocked         (1),
+                  psUp              (2)
+                }
+
+Dot1agCfmInterfaceStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "An enumerated value from the Interface Status TLV from the 
+        last CCM received from the last MEP. It indicates the status
+        of the Interface within which the MEP transmitting the CCM
+        is configured, or the next lower Interface in the Interface
+        Stack, if the MEP is not configured within an Interface.
+
+    isNoInterfaceStatusTLV(0)  Indicates either that no CCM has been
+                          received or that no interface status TLV
+                          was present in the last CCM received.
+
+    isUp(1)               The interface is ready to pass packets.
+
+    isDown(2)             The interface cannot pass packets
+
+    isTesting(3)          The interface is in some test mode.
+   
+    isUnknown(4)          The interface status cannot be determined
+                          for some reason.
+
+    isDormant(5)          The interface is not in a state to pass
+                          packets but is in a pending state, waiting
+                          for some external event.
+    
+    isNotPresent(6)       Some component of the interface is missing
+    
+    isLowerLayerDown(7)   The interface is down due to state of the
+                          lower layer interfaces
+
+        NOTE: A 0 value is used for isNoInterfaceStatusTLV, so that
+              these code points can be kept consistent with new code
+              points added to ifOperStatus in the IF-MIB.
+
+       "
+    REFERENCE
+       "12.14.7.6.3:g, 20.19.4 and 21.5.5"
+    SYNTAX      INTEGER {
+                  isNoInterfaceStatusTLV  (0),
+                  isUp                    (1),
+                  isDown                  (2),
+                  isTesting               (3),
+                  isUnknown               (4),
+                  isDormant               (5),
+                  isNotPresent            (6),
+                  isLowerLayerDown        (7)
+                }
+
+Dot1agCfmHighestDefectPri ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "An enumerated value, equal to the contents of the variable
+        highestDefect (20.33.9 and Table 20-1), indicating the
+        highest-priority defect that has been present since the MEP
+        Fault Notification Generator State Machine was last in the 
+        FNG_RESET state, either:
+
+        none(0)           no defects since FNG_RESET
+        defRDICCM(1)      DefRDICCM
+        defMACstatus(2)   DefMACstatus
+        defRemoteCCM(3)   DefRemoteCCM
+        defErrorCCM(4)    DefErrorCCM
+        defXconCCM(5)     DefXconCCM
+
+        The value 0 is used for no defects so that additional higher
+        priority values can be added, if needed, at a later time, and
+        so that these values correspond with those in
+        Dot1agCfmLowestAlarmPri.
+       "
+    REFERENCE
+       "20.1.2, 12.14.7.7.2:c and 20.33.9"
+    SYNTAX      INTEGER {
+                  none              (0),
+                  defRDICCM         (1),
+                  defMACstatus      (2),
+                  defRemoteCCM      (3),
+                  defErrorCCM       (4),
+                  defXconCCM        (5)
+                }
+
+Dot1agCfmLowestAlarmPri ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "An integer value specifying the lowest priority defect
+        that is allowed to generate a Fault Alarm (20.9.5), either:
+
+        allDef(1)           DefRDICCM, DefMACstatus, DefRemoteCCM,
+                            DefErrorCCM, and DefXconCCM;
+        macRemErrXcon(2)    Only DefMACstatus, DefRemoteCCM,
+                            DefErrorCCM, and DefXconCCM (default);
+        remErrXcon(3)       Only DefRemoteCCM, DefErrorCCM,
+                            and DefXconCCM;
+        errXcon(4)          Only DefErrorCCM and DefXconCCM;
+        xcon(5)             Only DefXconCCM; or
+        noXcon(6)           No defects DefXcon or lower are to be
+                            reported;
+       "
+    REFERENCE
+       "12.14.7.1.3:k and 20.9.5"
+    SYNTAX      INTEGER {
+                  allDef            (1),
+                  macRemErrXcon     (2),
+                  remErrXcon        (3),
+                  errXcon           (4),
+                  xcon              (5),
+                  noXcon            (6)
+                }
+
+Dot1agCfmMepId ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+       "Maintenance association End Point Identifier (MEPID): A small
+        integer, unique over a given Maintenance Association,
+        identifying a specific MEP.
+       "
+    REFERENCE
+       "802.1ag clauses 3.19 and 19.2.1"
+    SYNTAX      Unsigned32 (1..8191)
+
+Dot1agCfmMepIdOrZero ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS       current
+    DESCRIPTION
+       "Maintenance association End Point Identifier (MEPID): A small
+        integer, unique over a given Maintenance Association,
+        identifying a specific MEP.
+ 
+        The special value 0 is allowed to indicate special cases, for
+        example that no MEPID is configured.
+
+        Whenever an object is defined with this SYNTAX, then the
+        DESCRIPTION clause of such an object MUST specify what the
+        special value of 0 means.
+       "
+    REFERENCE
+       "19.2.1"
+    SYNTAX      Unsigned32 (0 | 1..8191)
+
+Dot1agCfmMhfCreation ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Indicates if the Management Entity can create MHFs.
+        The valid values are:
+
+        defMHFnone(1)      No MHFs can be created for this VID.
+        defMHFdefault(2)   MHFs can be created on this VID on any
+                           Bridge port through which this VID can
+                           pass.
+        defMHFexplicit(3)  MHFs can be created for this VID only on
+                           Bridge ports through which this VID can
+                           pass, and only if a MEP is created at some
+                           lower MD Level.
+        defMHFdefer(4)     The creation of MHFs is determined by the
+                           corresponding Maintenance Domain variable
+                           (dot1agCfmMaCompMhfCreation).
+       "
+    REFERENCE
+       "12.14.5.1.3:c and 22.2.3"
+    SYNTAX      INTEGER {
+                  defMHFnone     (1),
+                  defMHFdefault  (2),
+                  defMHFexplicit (3),
+                  defMHFdefer    (4)
+                }
+
+Dot1agCfmIdPermission ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Indicates what, if anything, is to be included in the Sender
+        ID TLV transmitted in CCMs, LBMs, LTMs, and LTRs.  The valid
+        values are:
+
+        sendIdNone(1)      The Sender ID TLV is not to be sent.
+        sendIdChassis(2)   The Chassis ID Length, Chassis ID
+                           Subtype, and Chassis ID fields of  the
+                           Sender ID TLV are to be sent.
+        sendIdManage(3)    The Management Address Length and
+                           Management Address of the Sender ID TLV
+                           are to be sent.
+        sendIdChassisManage(4) The Chassis ID Length, Chassis ID
+                           Subtype, Chassis ID, Management Address
+                           Length and Management Address fields are
+                           all to be sent.
+        sendIdDefer(5)     The contents of the Sender ID TLV are
+                           determined by the corresponding
+                           Maintenance Domain variable
+                           (dot1agCfmMaCompIdPermission).
+       "
+    REFERENCE
+       "12.14.6.1.3:d and 21.5.3"
+    SYNTAX      INTEGER {
+                  sendIdNone          (1),
+                  sendIdChassis       (2),
+                  sendIdManage        (3),
+                  sendIdChassisManage (4),
+                  sendIdDefer         (5)
+                }
+
+Dot1agCfmCcmInterval ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Indicates the interval at which CCMs are sent by a MEP.
+        The possible values are:
+        intervalInvalid(0) No CCMs are sent (disabled).
+        interval300Hz(1)   CCMs are sent every 3 1/3 milliseconds
+                           (300Hz).
+        interval10ms(2)    CCMs are sent every 10 milliseconds.
+        interval100ms(3)   CCMs are sent every 100 milliseconds.
+        interval1s(4)      CCMs are sent every 1 second.
+        interval10s(5)     CCMs are sent every 10 seconds.
+        interval1min(6)    CCMs are sent every minute.
+        interval10min(7)   CCMs are sent every 10 minutes.
+
+        Note: enumerations start at zero to match the 'CCM Interval
+              field' protocol field.
+       "
+    REFERENCE
+       "802.1ag clauses 12.14.6.1.3:e, 20.8.1 and 21.6.1.3"
+    SYNTAX      INTEGER {
+                  intervalInvalid   (0),
+                  interval300Hz     (1),
+                  interval10ms      (2),
+                  interval100ms     (3),
+                  interval1s        (4),
+                  interval10s       (5),
+                  interval1min      (6),
+                  interval10min     (7)
+                }
+
+Dot1agCfmFngState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Indicates the diferent states of the MEP Fault Notification
+        Generator State Machine.
+
+        fngReset(1)            No defect has been present since the
+                               dot1agCfmMepFngResetTime timer
+                               expired, or since the state machine
+                               was last reset.
+
+        fngDefect(2)           A defect is present, but not for a
+                               long enough time to be reported 
+                               (dot1agCfmMepFngAlarmTime).
+
+        fngReportDefect(3)     A momentary state during which the
+                               defect is reported by sending a
+                               dot1agCfmFaultAlarm notification,
+                               if that action is enabled.
+
+        fngDefectReported(4)   A defect is present, and some defect
+                               has been reported.
+
+        fngDefectClearing(5)   No defect is present, but the
+                               dot1agCfmMepFngResetTime timer has
+                               not yet expired.
+       "
+    REFERENCE
+       "12.14.7.1.3:f and 20.35"
+    SYNTAX      INTEGER {
+                  fngReset          (1),
+                  fngDefect         (2),
+                  fngReportDefect   (3),
+                  fngDefectReported (4),
+                  fngDefectClearing (5)
+                }
+
+Dot1agCfmRelayActionFieldValue ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Possible values the Relay action field can take."
+    REFERENCE
+       "802.1ag clauses 12.14.7.5.3:g, 20.36.2.5, 21.9.5, and
+        Table 21-27"
+    SYNTAX      INTEGER {
+                  rlyHit     (1),
+                  rlyFdb     (2),
+                  rlyMpdb    (3)
+                }
+               
+Dot1agCfmIngressActionFieldValue ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Possible values returned in the ingress action field."
+    REFERENCE
+       "802.1ag clauses 12.14.7.5.3:g, 20.36.2.6, 21.9.8.1, and
+        Table 21-30
+       "
+    SYNTAX      INTEGER {
+                  ingNoTlv    (0),
+                  ingOk       (1),
+                  ingDown     (2),
+                  ingBlocked  (3),
+                  ingVid      (4)
+                }
+
+Dot1agCfmEgressActionFieldValue ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Possible values returned in the egress action field"
+    REFERENCE
+       "802.1ag clauses 12.14.7.5.3:o, 20.36.2.10, 21.9.9.1, and
+        Table 21-32"
+    SYNTAX      INTEGER {
+                  egrNoTlv    (0),
+                  egrOK       (1),
+                  egrDown     (2),
+                  egrBlocked  (3),
+                  egrVid      (4)
+                }
+
+Dot1agCfmRemoteMepState::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Operational state of the remote MEP state machine.  This
+        state machine monitors the reception of valid CCMs from a
+        remote MEP with a specific MEPID.  It uses a timer that
+        expires in 3.5 times the length of time indicated by the
+        dot1agCfmMaNetCcmInterval object.
+
+        rMepIdle(1)            Momentary state during reset.
+
+        rMepStart(2)           The timer has not expired since the
+                               state machine was reset, and no valid
+                               CCM has yet been received.
+
+        rMepFailed(3)          The timer has expired, both since the
+                               state machine was reset, and since a
+                               valid CCM was received.
+
+        rMepOk(4)              The timer has not expired since a
+                               valid CCM was received.
+"
+    REFERENCE
+       "802.1ag clauses 12.14.7.6.3:b, 20.22"
+    SYNTAX      INTEGER {
+                  rMepIdle    (1),
+                  rMepStart   (2),
+                  rMepFailed  (3),
+                  rMepOk      (4)
+                }
+
+Dot1afCfmIndexIntegerNextFree ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+      "An integer which may be used as a new Index in a table.
+
+       The special value of 0 indicates that no more new entries can
+       be created in the relevant table.
+
+       When a MIB is used for configuration, an object with this
+       SYNTAX always contains a legal value (if non-zero) for an
+       index that is not currently used in the relevant table. The
+       Command Generator (Network Management Application) reads this
+       variable and uses the (non-zero) value read when creating a
+       new row with an SNMP SET.  When the SET is performed, the
+       Command Responder (agent) MUST determine whether the value is
+       indeed still unused; Two Network Management Applications may
+       attempt to create a row (configuration entry) simultaneously
+       and use the same value. If it is currently unused, the SET
+       succeeds and the Command Responder (agent) changes the value
+       of this object, according to an implementation-specific
+       algorithm.  If the value is in use, however, the SET fails.
+       The Network Management Application MUST then re-read this
+       variable to obtain a new usable value.
+
+       An OBJECT-TYPE definition using this SYNTAX MUST specify the
+       relevant table for which the object is providing this
+       functionality.
+      "
+    SYNTAX      Unsigned32 (0..4294967295)
+
+Dot1agCfmMepDefects ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "A MEP can detect and report a number of defects, and multiple
+        defects can be present at the same time. These defects are:
+
+        bDefRDICCM(0) A remote MEP is reported the RDI bit in its
+                     last CCM.
+        bDefMACstatus(1) Either some remote MEP is reporting its
+                     Interface Status TLV as not isUp, or all remote
+                     MEPs are reporting a Port Status TLV that
+                     contains some value other than psUp.
+        bDefRemoteCCM(2) The MEP is not receiving valid CCMs from at
+                     least one of the remote MEPs.
+        bDefErrorCCM(3) The MEP has received at least one invalid CCM
+                     whose CCM Interval has not yet timed out.
+        bDefXconCCM(4) The MEP has received at least one CCM from
+                     either another MAID or a lower MD Level whose
+                     CCM Interval has not yet timed out.
+       "
+    REFERENCE
+       "802.1ag clauses 12.14.7.1.3:o, 12.14.7.1.3:p, 12.14.7.1.3:q,
+        12.14.7.1.3:r, and 12.14.7.1.3:s."
+    SYNTAX BITS {
+                bDefRDICCM(0),
+                bDefMACstatus(1),
+                bDefRemoteCCM(2),
+                bDefErrorCCM(3),
+                bDefXconCCM(4)
+               }
+
+Dot1agCfmConfigErrors ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "While making the MIP creation evaluation described in 802.1ag
+        clause 22.2.3, the management entity can encounter errors in
+        the configuration. These are possible errors that can be
+        encountered:
+
+        CFMleak(0)   MA x is associated with a specific VID list,
+                     one or more of the VIDs in MA x can pass through
+                     the Bridge Port, no Down MEP is configured on
+                     any Bridge Port for MA x, and some other MA y,
+                     at a higher MD Level than MA x, and associated
+                     with at least one of the VID(s) also in MA x,
+                     does have a MEP configured on the Bridge Port.
+
+        conflictingVids(1)  MA x is associated with a specific VID
+                     list, an Up MEP is configured on MA x on the
+                     Bridge Port, and some other MA y, associated
+                     with at least one of the VID(s) also in MA x,
+                     also has an Up MEP configured on some Bridge
+                     Port.
+
+        ExcessiveLevels(2)  The number of different MD Levels at
+                     which MIPs are to be created on this port
+                     exceeds the Bridge's capabilities (see
+                     subclause 22.3).
+
+        OverlappedLevels(3) A MEP is created for one VID at one MD
+                     Level, but a MEP is configured on another
+                     VID at that MD Level or higher, exceeding
+                     the Bridge's capabilities.
+       "
+    REFERENCE
+       "12.14.4.1.3:b and clauses 22.2.3 and 22.2.4"
+    SYNTAX BITS {
+                cfmLeak(0),
+                conflictingVids(1),
+                excessiveLevels(2),
+                overlappedLevels(3)
+                }
+
+Dot1agCfmPbbComponentIdentifier
+::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+       "A Provider Backbone Bridge (PBB) can comprise a number of
+        components, each of which can be managed in a manner
+        essentially equivalent to an 802.1Q bridge.  In order to access
+        these components easily, an index is used in a number of
+        tables.  If any two tables are indexed by
+        Dot1agCfmPbbComponentIdentifier, then entries in those tables
+        indexed by the same value of Dot1agCfmPbbComponentIdentifier
+        correspond to the same component.
+       "
+    REFERENCE
+       "12.3 l)"
+    SYNTAX      Unsigned32 (1..4294967295)
+
+          
+Dot1agCfmAisDefectType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Kind of defect. It is reason why alram cuase."
+   SYNTAX      INTEGER {
+                  none       	(0),
+                  all        	(1),
+                  loc      	 	(2),
+                  merge	    	(3),
+                  unExpMep      (4),
+                  unExpMegLvl	(5),
+                  unExpPeriod	(6)
+                }
+
+          
+          
+-- *****************************************************************
+-- ubiCFMMIB
+-- *****************************************************************
+ubiCFMMIBNotificationPrefix  	OBJECT IDENTIFIER		::= { ubiCFMMIB 0 }   
+ubiCFMMIBObjects  				OBJECT IDENTIFIER		::= { ubiCFMMIB 1 }   
+ubiCFMMIBConformance  			OBJECT IDENTIFIER		::= { ubiCFMMIB 2 }   
+                 
+                 
+   
+ubiCfmMd   	 				OBJECT IDENTIFIER		::= { ubiCFMMIBObjects 1 }   
+ubiCfmMa   	 				OBJECT IDENTIFIER		::= { ubiCFMMIBObjects 2 }         
+ubiCfmRmep    				OBJECT IDENTIFIER		::= { ubiCFMMIBObjects 3 } 
+ubiCfmMep    				OBJECT IDENTIFIER		::= { ubiCFMMIBObjects 4 } 
+ubiCfmServerMep    			OBJECT IDENTIFIER		::= { ubiCFMMIBObjects 5 }        
+ubiCfmNotificationEnables	OBJECT IDENTIFIER		::= { ubiCFMMIBObjects 6 }  
+ubiCfmTrack	  				OBJECT IDENTIFIER		::= { ubiCFMMIBObjects 7 }  
+ 
+ubiCfmMepOamSend			OBJECT IDENTIFIER		::= { ubiCfmMep 4 }   		
+ubiCfmMepOamResult			OBJECT IDENTIFIER		::= { ubiCfmMep 5 }
+
+-- *****************************************************************
+-- ubiCfmNotifications
+-- *****************************************************************
+ubiCfmNotifications  OBJECT IDENTIFIER				::= { ubiCFMMIBNotificationPrefix 0 }
+
+	ubiCfmRemoteMepStatusChange NOTIFICATION-TYPE         
+    	OBJECTS         { 
+    					  ifIndex,        
+    					  ubiCfmMdName,
+    					  ubiCfmMaName, 
+    					  ubiCfmMepId,    
+    					  ubiCfmRmepId,
+    					  ubiCfmRmepRemoteMacAddr,      
+    					  ubiCfmRmepStatus,
+     					 }
+    	STATUS          current
+    	DESCRIPTION    
+    		"Remote MEP state(CC state) change Notification"
+     	::= { ubiCfmNotifications 1 }
+ 
+	ubiCfmAggPortRemoteMepStatusChange NOTIFICATION-TYPE         
+    	OBJECTS         { 
+    					  ubiAggId,    
+    					  ifIndex,    
+    					  ubiCfmMdName,
+    					  ubiCfmMaName, 
+    					  ubiCfmMepId,    
+    					  ubiCfmRmepId,
+    					  ubiCfmRmepRemoteMacAddr,      
+    					  ubiCfmRmepStatus,
+     					 }
+    	STATUS          current
+    	DESCRIPTION
+      		"Notification that Remote MEP state(CC state) on port-gruop change"
+   	::= { ubiCfmNotifications 2 }
+ 
+	ubiCfmPmFrameDelayEvent NOTIFICATION-TYPE         
+    	OBJECTS         {  
+    					ubiCfmMepId,
+    					ubiCfmMepIfname,        
+    					--ubiCfmMepPmCurrentValue, 
+    					ubiCfmMepPmDelayMin,
+    					ubiCfmMepPmDelayMax,
+    					ubiCfmMepPmDelayAvg,
+        				ubiCfmMaPmDelayThreshold,    
+    					ubiCfmMepPmDelayState,	
+    	 }
+    	STATUS          current
+    	DESCRIPTION
+        	"To generate notification when ubiCfmMepPmCurrentValue is bigger than 
+        	ubiCfmMaPmDelayThreshold"
+   	::= { ubiCfmNotifications 3 }
+
+	ubiCfmPmFrameLossEvent NOTIFICATION-TYPE         
+    	OBJECTS         {  
+    					ubiCfmMepId,
+    					ubiCfmMepIfname,      
+    				--	ubiCfmMepPmCurrentValue,     
+    					uniCfmMepPmLossNearEndTot,
+    					uniCfmMepPmLossFarEndTot,
+        				ubiCfmMaPmLossThreshold,     
+     					ubiCfmMepPmLossState,
+	   	 }
+    	STATUS          current
+    	DESCRIPTION
+        	"To generate notification when ubiCfmMepPmCurrentValue is bigger than 
+        	ubiCfmMaPmLossThreshold"
+   	::= { ubiCfmNotifications 4 }
+        
+
+
+	ubiCfmMepEtherPingSendResult NOTIFICATION-TYPE         
+    	OBJECTS         {  
+    					ubiCfmMepOamSendBridgeId,
+    					ubiCfmMepOamSendMdIndex,  
+    					ubiCfmMepOamSendMaIndex,
+    					ubiCfmMepOamSendMepId,
+    					ubiCfmMepOamResultEtherPing,
+    					ubiCfmMepOamResultEtherPingSndCount,
+    					ubiCfmMepOamResultEtherPingRcvCount,
+    					ubiCfmMepOamResultEtherPingRttMin,
+    					ubiCfmMepOamResultEtherPingRttMax,
+    					ubiCfmMepOamResultEtherPingRttAvg
+    	}
+    	STATUS          current
+    	DESCRIPTION
+        	"Indicates the result of the operation:
+
+       		 - ok       The Loopback Message(s)reply received
+          	 - fail     The Loopback Message(s)reply don't recieved
+      		 - already active   Another LBM is being transmitted 
+      		 - Not ready 	Do not initator state machine for LBM sending    		"
+
+   	::= { ubiCfmNotifications 5 }
+        
+	ubiCfmMepLinkTraceSendResult NOTIFICATION-TYPE         
+    	OBJECTS         {           
+    					ubiCfmMepOamSendBridgeId,
+    					ubiCfmMepOamSendMdIndex,
+    					ubiCfmMepOamSendMaIndex,
+    					ubiCfmMepOamSendMepId,
+						ubiCfmMepOamResultLinkTraceSrcMacAddr,
+						ubiCfmMepOamResultLinkTraceRcvIfIndex,
+						ubiCfmMepOamResultLinkTraceRelayAction,
+						ubiCfmMepOamResultLinkTraceHopCount
+	   	 }
+    	STATUS          current
+    	DESCRIPTION
+        	"A LTR information about LTMs transmitted"
+   	::= { ubiCfmNotifications 6 }
+   	
+   	ubiCfmCCConfigDefectAlarm NOTIFICATION-TYPE         
+    	OBJECTS         {           
+    					ubiBridgeId,
+    					ubiCfmMdName,
+    					ubiCfmMaName,
+    					ubiCfmMepId,
+    					ubiCfmMepCCConfigDefect,
+    					ubiCfmMepCCConfigDefectState
+	   	 }
+    	STATUS          current
+    	DESCRIPTION
+        	"The CCM defect about Config error"
+   	::= { ubiCfmNotifications 7 }
+        
+        
+           
+-- *****************************************************************
+-- ubiCfmMdTable
+-- *****************************************************************          
+
+	ubiCfmMdTable OBJECT-TYPE
+		SYNTAX          SEQUENCE OF UbiCfmMdEntry 
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"The Maintenance Domain table. Each row in the table
+        	represents a different Maintenance Domain.
+
+        	A Maintenance Domain is described in 802.1ag (3.22) as the
+        	network or the part of the network for which faults in
+        	connectivity are to be managed. The boundary of a Maintenance
+        	Domain is defined by a set of DSAPs, each of which can become
+        	a point of connectivity to a service instance"
+    	::= { ubiCfmMd 1 }
+
+  	ubiCfmMdEntry OBJECT-TYPE
+    	SYNTAX          UbiCfmMdEntry
+    	MAX-ACCESS      not-accessible
+    	STATUS          current    
+    	DESCRIPTION
+        	"The Maintenance Domain table entry. 
+        	INDEX { ubiBridgeId, ubiCfmMdIndex }"
+    	INDEX           { ubiBridgeId, ubiCfmMdIndex }         	
+    	::= { ubiCfmMdTable 1 }
+  	
+  	UbiCfmMdEntry ::= SEQUENCE {        
+	       	ubiCfmMdIndex				Unsigned32, 
+        	ubiCfmMdName				Dot1agCfmMaintDomainName, 
+        	ubiCfmMdNameType			Dot1agCfmMaintDomainNameType2, 
+        	ubiCfmMdLevel			   	Dot1agCfmMDLevel, 
+	       	ubiCfmMdMipCreation			Dot1agCfmMhfCreation,
+        	ubiCfmMdRowStatus       	RowStatus           
+        }
+
+  	ubiCfmMdIndex OBJECT-TYPE
+    	SYNTAX          Unsigned32
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"The index to the Maintenance Domain table." 
+    	::= { ubiCfmMdEntry 1 }
+
+	ubiCfmMdName OBJECT-TYPE
+    	SYNTAX      Dot1agCfmMaintDomainName
+    	MAX-ACCESS  read-create
+   	 	STATUS      current
+    	DESCRIPTION
+      	 	"The Maintenance Domain name.       		
+      	 	Each Maintenance Domain has unique name amongst all those
+        	used or available to a service provider or operator.  It
+        	facilitates easy identification of administrative
+        	responsibility for each Maintenance Domain."
+    	::= { ubiCfmMdEntry 2 }
+  
+	ubiCfmMdNameType OBJECT-TYPE
+    	SYNTAX      Dot1agCfmMaintDomainNameType2
+    	MAX-ACCESS  read-create
+    	STATUS      current
+    	DESCRIPTION
+       		"The type (and thereby format) of the Maintenance Domain Name.
+       		There are two types. IEEE802.1ag type(string, address...etc)
+       		and ITU-T Y.1731 type (itu-t)"
+        ::= { ubiCfmMdEntry 3 }
+  
+	ubiCfmMdLevel OBJECT-TYPE
+  		SYNTAX      Dot1agCfmMDLevel
+		MAX-ACCESS  read-create
+  	  	STATUS      current
+    	DESCRIPTION
+       		"The Maintenance Domain Level. (0 ~ 7 level)"
+    	::= { ubiCfmMdEntry 4 }
+                            
+	ubiCfmMdMipCreation OBJECT-TYPE
+    	SYNTAX      Dot1agCfmMhfCreation {
+                  defMHFnone     (1),
+                  defMHFdefault  (2),
+                  defMHFexplicit (3)              
+                }
+    	MAX-ACCESS  read-create
+    	STATUS      current
+    	DESCRIPTION
+       		"Enumerated value indicating whether the management entity can
+        	create MHFs (MIP Half Function) for this Maintenance Domain.
+        	Since, in this variable, there is no encompassing Maintenance
+        	Domain, the value defMHFdefer is not allowed."
+    	::= { ubiCfmMdEntry 5 }
+                             
+	ubiCfmMdRowStatus OBJECT-TYPE
+    	SYNTAX      RowStatus
+    	MAX-ACCESS  read-create
+    	STATUS      current
+    	DESCRIPTION
+       		"The status of the row."
+    	::= { ubiCfmMdEntry 6 }
+ 
+ 
+-- *****************************************************************
+-- ubiCfmDefaultMdTable
+-- *****************************************************************          
+
+	ubiCfmDefaultMdTable OBJECT-TYPE
+		SYNTAX          SEQUENCE OF UbiCfmDefaultMdEntry
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+	       "For each bridge component, the Default MD Level Managed Object
+	        controls MHF creation for VIDs that are not attached to a
+	        specific Maintenance Association Managed Object, and Sender ID
+	        TLV transmission by those MHFs.
+	
+	        For each Bridge Port, and for each VLAN ID whose data can
+	        pass through that Bridge Port, an entry in this table is
+	        used by the algorithm in subclause 22.2.3 only if there is no
+	        entry in the Maintenance Association table defining an MA
+	        for the same VLAN ID and MD Level as this table's entry, and
+	        on which MA an Up MEP is defined.  If there exists such an
+	        MA, that MA's objects are used by the algorithm in
+	        subclause 22.2.3 in place of this table entry's objects.  The
+	        agent maintains the value of ubiCfmDefaultMdRowStatus to
+	        indicate whether this entry is overridden by an MA.
+	
+	        When first initialized, the agent creates this table
+	        automatically with entries for all VLAN IDs,
+	        with the default values specified for each object."
+    	::= { ubiCfmMd 2 }
+
+  	ubiCfmDefaultMdEntry OBJECT-TYPE
+    	SYNTAX          UbiCfmDefaultMdEntry
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"The Default MD Level table entry."
+    	INDEX           { UbiBridgeId, ubiCfmDefaultMdVlanId } 
+    	::= { ubiCfmDefaultMdTable 1 }
+
+  	
+  	UbiCfmDefaultMdEntry ::= SEQUENCE {        
+	       	ubiCfmDefaultMdVlanId			VlanIndex, 
+        	ubiCfmDefaultMdLevel			Dot1agCfmMDLevel, 
+        	ubiCfmDefaultMdMipCreation		Dot1agCfmMhfCreation, 
+	       	ubiCfmDefaultMdRowStatus       	RowStatus           
+        }
+
+  	ubiCfmDefaultMdVlanId OBJECT-TYPE
+    	SYNTAX          VlanIndex
+   		MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"The Primary VID of the VLAN to which this entry's objects
+        	apply." 
+    	::= { ubiCfmDefaultMdEntry 1 }
+
+	ubiCfmDefaultMdLevel OBJECT-TYPE
+    	SYNTAX      Dot1agCfmMDLevel
+    	MAX-ACCESS  read-create
+   	 	STATUS      current
+    	DESCRIPTION
+      	 	"A value indicating the MD Level at which MHFs are to be
+	        created, and Sender ID TLV transmission by those MHFs is to
+	        be controlled, for the VLAN to which this entry's objects
+	        apply.  If this object has the value -1, the MD Level for MHF
+	        creation for this VLAN is controlled by
+	        ubiCfmDefaultMdLevel."
+    	::= { ubiCfmDefaultMdEntry 2 }
+                              
+	ubiCfmDefaultMdMipCreation OBJECT-TYPE
+    	SYNTAX      Dot1agCfmMhfCreation {
+                  defMHFnone     (1),
+                  defMHFdefault  (2),
+                  defMHFexplicit (3),   
+                  defMHFdefer(4)                 
+                }
+    	MAX-ACCESS  read-create
+    	STATUS      current
+    	DESCRIPTION
+       		 "A value indicating if the Management entity can create MHFs
+	        (MIP Half Function) for this VID at this MD Level.  If this
+	        object has the value defMHFdefer, MHF creation for this VLAN
+	        is controlled by dot1agCfmDefaultMdDefMhfCreation.
+	
+	        The value of this variable is meaningless if the values of
+	        ubiCfmDefaultMdMipCreation is false."
+    	::= { ubiCfmDefaultMdEntry 3 }
+                             
+	ubiCfmDefaultMdRowStatus OBJECT-TYPE
+    	SYNTAX      RowStatus
+    	MAX-ACCESS  read-create
+    	STATUS      current
+    	DESCRIPTION
+       		"The status of the row."
+    	::= { ubiCfmDefaultMdEntry 4 }
+         
+
+-- *****************************************************************
+-- ubiCfmMaTable
+-- *****************************************************************          
+
+	ubiCfmMaTable OBJECT-TYPE
+		SYNTAX          SEQUENCE OF UbiCfmMaEntry 
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"The Maintenance Association table.  Each row in the table
+	        represents an MA.  An MA is a set of MEPs, each configured
+	        with a single service instance."
+    	::= { ubiCfmMa 1 }
+
+  	ubiCfmMaEntry OBJECT-TYPE
+    	SYNTAX          UbiCfmMaEntry
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"The MA table entry."
+    	INDEX           { ubiBridgeId, ubiCfmMdIndex, ubiCfmMaIndex } 
+    	::= { ubiCfmMaTable 1 }
+
+  	
+  	UbiCfmMaEntry ::= SEQUENCE {        
+	       	ubiCfmMaIndex				Unsigned32, 
+        	ubiCfmMaName				Dot1agCfmMaintAssocName, 
+        	ubiCfmMaNameType			Dot1agCfmMaintAssocNameType, 
+        	ubiCfmMaVlanId				VlanIndex,       
+        	ubiCfmMaMipCreation			Dot1agCfmMhfCreation,
+        	ubiCfmMaRowStatus       	RowStatus           
+        }
+
+  	ubiCfmMaIndex OBJECT-TYPE
+    	SYNTAX          Unsigned32
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"The index to the Maintenance Association table." 
+    	::= { ubiCfmMaEntry 1 }
+
+	ubiCfmMaName OBJECT-TYPE
+    	SYNTAX      Dot1agCfmMaintAssocName
+    	MAX-ACCESS  read-create
+   	 	STATUS      current
+    	DESCRIPTION
+      	 	"The Short Maintenance Association name. This name MUST be unique within
+        	a maintenance domain."
+    	::= { ubiCfmMaEntry 2 }
+  
+	ubiCfmMaNameType OBJECT-TYPE
+    	SYNTAX      Dot1agCfmMaintAssocNameType
+    	MAX-ACCESS  read-create
+    	STATUS      current
+    	DESCRIPTION
+       		"The type (and thereby format) of the Maintenance Association Name."
+        ::= { ubiCfmMaEntry 3 }
+ 
+   	ubiCfmMaVlanId OBJECT-TYPE
+    	SYNTAX          VlanIndex
+    	MAX-ACCESS      read-create
+    	STATUS          current
+    	DESCRIPTION
+        	"The Primary VLAN ID with which the Maintenance Association is
+        	associated, or 0 if the MA is not attached to any VID. " 
+    	::= { ubiCfmMaEntry 4 } 
+                            
+	ubiCfmMaMipCreation OBJECT-TYPE
+    	SYNTAX      Dot1agCfmMhfCreation {
+                  defMHFnone     (1),
+                  defMHFdefault  (2),
+                  defMHFexplicit (3),
+                  defMHFdefer(4)
+                }
+    	MAX-ACCESS  read-create
+    	STATUS      current
+    	DESCRIPTION
+       		"Indicates if the Management entity can create MHFs (MIP Half
+        	Function) for this MA."
+    	::= { ubiCfmMaEntry 5 }
+                             
+  	ubiCfmMaRowStatus OBJECT-TYPE
+    	SYNTAX      RowStatus
+    	MAX-ACCESS  read-create
+    	STATUS      current
+    	DESCRIPTION
+       		"The status of the row."
+    	::= { ubiCfmMaEntry 6 }
+
+-- *****************************************************************
+-- ubiCfmMaTable
+-- *****************************************************************          
+
+	ubiCfmMaAttrTable OBJECT-TYPE
+		SYNTAX          SEQUENCE OF UbiCfmMaAttrEntry 
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"An Attribute table for each MA(Maintenance Association).
+        	Such as, CCM transmission interval."
+    	::= { ubiCfmMa 2 }
+
+  	ubiCfmMaAttrEntry OBJECT-TYPE
+    	SYNTAX          UbiCfmMaAttrEntry
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"An attribute entry"
+    	INDEX           { ubiBridgeId, ubiCfmMdIndex, ubiCfmMaIndex } 
+    	::= { ubiCfmMaAttrTable 1 }
+
+  	UbiCfmMaAttrEntry ::= SEQUENCE {        
+	       	ubiCfmMaAttrCCInterval			Integer32        
+    }
+
+  	ubiCfmMaAttrCCInterval OBJECT-TYPE
+    	SYNTAX          Integer32 
+    	MAX-ACCESS      read-write
+    	STATUS          current
+    	DESCRIPTION
+        	"Interval between CCM transmissions to be used by all MEPs
+        	in the MA. 
+		        interval3ms(1)     CCMs are sent every 3 1/3 milliseconds.
+		        interval10ms(2)    CCMs are sent every 10 milliseconds.
+		        interval100ms(3)   CCMs are sent every 100 milliseconds.
+		        interval1s(4)      CCMs are sent every 1 second.
+		        interval10s(5)     CCMs are sent every 10 seconds.
+		        interval1min(6)    CCMs are sent every minute.
+		        interval10min(7)   CCMs are sent every 10 minutes."
+ 
+    	::= { ubiCfmMaAttrEntry 1 }     
+  
+
+-- *****************************************************************
+-- ubiCfmMaPmTable
+-- *****************************************************************          
+
+	ubiCfmMaPmTable OBJECT-TYPE
+		SYNTAX          SEQUENCE OF UbiCfmMaPmEntry 
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"An attribute for Performance Monitoring"
+    	::= { ubiCfmMa 3 }
+
+  	ubiCfmMaPmEntry OBJECT-TYPE
+    	SYNTAX          UbiCfmMaPmEntry
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"Performance Monitoring Entry"
+
+    	INDEX           { ubiBridgeId, ubiCfmMdIndex, ubiCfmMaIndex } 
+    	::= { ubiCfmMaPmTable 1 }
+
+  	UbiCfmMaPmEntry ::= SEQUENCE {         
+        	ubiCfmMaPmDelayInterval			Integer32,  
+        	ubiCfmMaPmLossInterval			Integer32,
+        	ubiCfmMaPmDelayThreshold		Integer32,   
+        	ubiCfmMaPmLossThreshold			Integer32,  
+    }
+
+   	ubiCfmMaPmDelayInterval OBJECT-TYPE
+    	SYNTAX          Integer32 
+    	MAX-ACCESS      read-write
+    	STATUS          current
+    	DESCRIPTION
+        	"Interval to trasmit DM(delay measurement)message" 
+    	::= { ubiCfmMaPmEntry 1 }   
+     	
+  	ubiCfmMaPmLossInterval OBJECT-TYPE
+    	SYNTAX          Integer32 
+    	MAX-ACCESS      read-write
+    	STATUS          current
+    	DESCRIPTION
+        	"Interval to trasmit LM(loss measurement)message" 
+
+    	::= { ubiCfmMaPmEntry 2 }   
+ 
+  	ubiCfmMaPmDelayThreshold OBJECT-TYPE
+    	SYNTAX          Integer32 
+    	MAX-ACCESS      read-write
+    	STATUS          current
+    	DESCRIPTION
+        	"Treshold to limit for delay" 
+    	::= { ubiCfmMaPmEntry 3 }           
+  
+ 
+  	ubiCfmMaPmLossThreshold OBJECT-TYPE
+    	SYNTAX          Integer32 
+    	MAX-ACCESS      read-write
+    	STATUS          current
+    	DESCRIPTION
+        	"Treshold to limit for loss" 
+       ::= { ubiCfmMaPmEntry 4 }   
+
+              
+-- *****************************************************************
+-- ubiCfmRmepTable
+-- *****************************************************************          
+
+	ubiCfmRmepTable OBJECT-TYPE
+		SYNTAX          SEQUENCE OF UbiCfmRmepEntry
+		MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"Information of Remote Mep table"
+    	::= { ubiCfmRmep 1 }
+
+  	ubiCfmRmepEntry OBJECT-TYPE
+    	SYNTAX          UbiCfmRmepEntry
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"Information of Remote Mep entry"
+    	INDEX           { ubiBridgeId, ubiCfmMdIndex, ubiCfmRmepId } 
+    	::= { ubiCfmRmepTable 1 }
+
+  	
+  	UbiCfmRmepEntry ::= SEQUENCE {        
+	       	ubiCfmRmepId					Dot1agCfmMepId, 
+        --	ubiCfmRmepMdLevel				Dot1agCfmMDLevel, 
+        	ubiCfmRmepVlanId				VlanIndex, 
+        	ubiCfmRmepRemoteMacAddr			MacAddress,   
+         	ubiCfmRmepCrossCheckType		INTEGER,           	     
+        	ubiCfmRmepStatus				INTEGER,
+        	ubiCfmRmepRowStatus       		RowStatus,     
+        }
+  
+  	ubiCfmRmepId OBJECT-TYPE
+    	SYNTAX          Dot1agCfmMepId
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"Maintenance association End Point Identifier of a remote MEP"
+
+    	::= { ubiCfmRmepEntry 1 }
+
+--	ubiCfmRmepMdLevel OBJECT-TYPE
+--    	SYNTAX      Dot1agCfmMDLevel
+--    	MAX-ACCESS  read-write
+--   	 	STATUS      current
+--    	DESCRIPTION
+--      	 	""
+--    	::= { ubiCfmRmepEntry 2 }
+  
+	ubiCfmRmepVlanId OBJECT-TYPE
+    	SYNTAX      VlanIndex
+    	MAX-ACCESS  read-write
+    	STATUS      current
+    	DESCRIPTION
+       		"VLAN Identifier of a remote MEP. Same value of local MEP(MA's VID)"
+        ::= { ubiCfmRmepEntry 2 }
+ 
+   	ubiCfmRmepRemoteMacAddr OBJECT-TYPE
+    	SYNTAX          MacAddress
+    	MAX-ACCESS      read-write
+    	STATUS          current
+    	DESCRIPTION
+        	"The MAC address of the remote MEP." 
+    	::= { ubiCfmRmepEntry 3 }            
+ 
+   	ubiCfmRmepCrossCheckType OBJECT-TYPE
+    	SYNTAX      INTEGER {
+    	 	unicast(1),
+    	 	multicast(2)
+    	}
+    	MAX-ACCESS      read-write
+    	STATUS          current
+    	DESCRIPTION
+        	"CrossCheck Type (uicast or multicast)." 
+    	::= { ubiCfmRmepEntry 4 }     	
+                            
+	ubiCfmRmepStatus OBJECT-TYPE
+    	SYNTAX      INTEGER {
+    	 	connect(1),
+    	 	disconnect(2)
+    	}
+    	MAX-ACCESS  read-only
+    	STATUS      current
+    	DESCRIPTION
+       		"Continuity Status to local MEP from remote MEP.
+       		Remote MEP state machine last entered either the RMEP_FAILED 
+       		or RMEP_OK state"
+    	::= { ubiCfmRmepEntry 5 }
+                             
+  	ubiCfmRmepRowStatus OBJECT-TYPE
+    	SYNTAX      RowStatus
+    	MAX-ACCESS  read-create
+    	STATUS      current
+    	DESCRIPTION
+       		"The status of the row."
+    	::= { ubiCfmRmepEntry 6 }       
+                                      
+-- *****************************************************************
+-- ubiCfmMepTable
+-- *****************************************************************          
+
+	ubiCfmMepTable OBJECT-TYPE
+		SYNTAX          SEQUENCE OF UbiCfmMepEntry
+		MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"The Maintenance Association End Point (MEP) table."
+    	::= { ubiCfmMep 1 }
+
+  	ubiCfmMepEntry OBJECT-TYPE
+    	SYNTAX          UbiCfmMepEntry
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"The known MEPS table entry."
+    	INDEX           { ubiBridgeId, ubiCfmMdIndex, 
+    					  ubiCfmMaIndex, ubiCfmMepId, ifIndex } 
+    	::= { ubiCfmMepTable 1 }
+
+  	
+  	UbiCfmMepEntry ::= SEQUENCE {        
+	       	ubiCfmMepId						Dot1agCfmMepId, 
+        	ubiCfmMepMdLevel				Dot1agCfmMDLevel,   
+          	ubiCfmMepVlanId					VlanIndex,          
+          	ubiCfmMepActive					TruthValue,
+        	ubiCfmMepDirection				INTEGER,
+           	ubiCfmMepMdName					Dot1agCfmMaintDomainName,
+      		ubiCfmMepUniMep					INTEGER,
+      		ubiCfmMepRmepId					Dot1agCfmMepId,          			
+  			ubiCfmMepIfname					DisplayString,				
+   			ubiCfmMepIfMacAddr				MacAddress,						
+   			ubiCfmMepRdi					TruthValue,
+   			ubiCfmMepCCType					INTEGER,      
+   			ubiCfmMepCCEnable				INTEGER,
+        	ubiCfmMepRowStatus       		RowStatus,
+        	ubiCfmMepMissingTime			Integer32,
+        	ubiCfmMepExpiredTime			Integer32,
+        	ubiCfmMepForceEgressTag			INTEGER				           
+        }
+
+  	ubiCfmMepId OBJECT-TYPE
+    	SYNTAX          Dot1agCfmMepId
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"Integer that is unique among all the MEPs in the same MA.
+	        Other definition is: 
+	        A small integer, unique over a given
+	        Maintenance Association, identifying a specific Maintenance
+	        association End Point (3.19).
+	
+	        MEP Identifier is also known as the MEPID." 
+    	::= { ubiCfmMepEntry 1 }
+
+	ubiCfmMepMdLevel OBJECT-TYPE
+    	SYNTAX      Dot1agCfmMDLevel
+    	MAX-ACCESS  read-write
+   	 	STATUS      current
+    	DESCRIPTION
+      	 	"MD level that belong to this MD"
+    	::= { ubiCfmMepEntry 2 }
+  
+	ubiCfmMepVlanId OBJECT-TYPE
+    	SYNTAX      VlanIndex
+    	MAX-ACCESS  read-write
+    	STATUS      current
+    	DESCRIPTION
+       		"An integer indicating the Primary VID of the MEP, always
+        	one of the VIDs assigned to the MEP's MA.  The value 0
+	        indicates that either the Primary VID is that of the
+	        MEP's MA, or that the MEP's MA is associated with no VID."
+        ::= { ubiCfmMepEntry 3 }
+   
+  	ubiCfmMepActive OBJECT-TYPE
+    	SYNTAX          TruthValue
+    	MAX-ACCESS      read-write
+    	STATUS          current
+    	DESCRIPTION
+			 "Administrative state of the MEP. A Boolean indicating the 
+			 administrative state of the MEP.
+	         True indicates that the MEP is to function normally, and
+	         false that it is to cease functioning." 
+    	::= { ubiCfmMepEntry 4 } 
+   
+   
+   	ubiCfmMepDirection OBJECT-TYPE
+    	SYNTAX          INTEGER {
+    	 		down(1),
+    	 		up(2)
+    	}
+    	MAX-ACCESS      read-write
+    	STATUS          current
+    	DESCRIPTION
+        	"The direction in which the MEP faces on the Bridge port." 
+    	::= { ubiCfmMepEntry 5 } 
+
+	ubiCfmMepMdName OBJECT-TYPE
+    	SYNTAX      Dot1agCfmMaintDomainName
+    	MAX-ACCESS  read-write
+    	STATUS      current
+    	DESCRIPTION
+       		"MD name that belong to this MD"
+    	::= { ubiCfmMepEntry 6 }           
+    	
+  	ubiCfmMepUniMep OBJECT-TYPE
+    	SYNTAX      INTEGER {
+    	 		enable(1),
+    	 		disable(2)
+    	}
+    	MAX-ACCESS  read-write
+    	STATUS      current
+    	DESCRIPTION
+       		"The flag to configure UNI-MEP"
+    	::= { ubiCfmMepEntry 7 }
+  
+ 
+  	ubiCfmMepRmepId OBJECT-TYPE
+    	SYNTAX          Dot1agCfmMepId
+    	MAX-ACCESS      read-write
+    	STATUS          current
+    	DESCRIPTION
+        	"The specified RmepID that is RMEP configured" 
+    	::= { ubiCfmMepEntry 8 } 
+  	
+	ubiCfmMepIfname OBJECT-TYPE
+    	SYNTAX      DisplayString
+    	MAX-ACCESS  read-only
+    	STATUS      current
+    	DESCRIPTION
+       		"This object is the IfIndex of the interface 
+       		where MEP configure."
+    	::= { ubiCfmMepEntry 9 }  
+    	
+	ubiCfmMepIfMacAddr OBJECT-TYPE
+    	SYNTAX      MacAddress
+    	MAX-ACCESS  read-only
+    	STATUS      current
+    	DESCRIPTION
+       		"Thsi object is the MAC address of the interface 
+       		where MEP configure."
+
+    	::= { ubiCfmMepEntry 10 }
+
+	ubiCfmMepRdi OBJECT-TYPE
+    	SYNTAX      TruthValue
+    	MAX-ACCESS  read-only
+    	STATUS      current
+    	DESCRIPTION
+       		"State of the RDI bit in the sending CCM (true for
+        	RDI=1), or false."
+    	::= { ubiCfmMepEntry 11 }
+ 
+	ubiCfmMepCCType OBJECT-TYPE
+    	SYNTAX      INTEGER {
+    		unicast(1),
+    		multicast(2)
+    	}
+    	MAX-ACCESS  read-write
+    	STATUS      current
+    	DESCRIPTION
+       		"The type of CCM message."
+    	::= { ubiCfmMepEntry 12 }      
+    	
+  	ubiCfmMepCCEnable OBJECT-TYPE
+    	SYNTAX      INTEGER {
+    		enable(1),
+    		disable(2),
+    		passive(3)
+    	}
+    	MAX-ACCESS  read-write
+    	STATUS      current
+    	DESCRIPTION
+       		"If set to true, the MEP will generate CCM messages."
+
+    	::= { ubiCfmMepEntry 13 }  	
+ 
+   	ubiCfmMepRowStatus OBJECT-TYPE
+    	SYNTAX      RowStatus
+    	MAX-ACCESS  read-create
+    	STATUS      current
+    	DESCRIPTION
+       		"The status of the row."
+    	::= { ubiCfmMepEntry 14 }
+ 
+   	ubiCfmMepMissingTime OBJECT-TYPE
+    	SYNTAX      Integer32
+    	MAX-ACCESS  read-only
+    	STATUS      current
+    	DESCRIPTION
+       		"The pass time after received last CCM"
+    	::= { ubiCfmMepEntry 15 }
+
+   	ubiCfmMepExpiredTime OBJECT-TYPE
+    	SYNTAX      Integer32
+    	MAX-ACCESS  read-only
+    	STATUS      current
+    	DESCRIPTION
+       		"The remain time till Expired RMEP status"
+    	::= { ubiCfmMepEntry 16 }
+    	
+   	ubiCfmMepForceEgressTag OBJECT-TYPE
+    	SYNTAX      INTEGER {
+    	    egress-default(0),
+    		egress-tagged(1),
+    		egress-untagged(2)
+    	}
+    	MAX-ACCESS  read-write
+    	STATUS      current
+    	DESCRIPTION
+       		"UNI-MEP send CCM with VID information(tagged) 
+       		or send CCM without VID information (untagged).
+       		If set none-value, tag information is depend on
+       		egress interface policy"
+    	::= { ubiCfmMepEntry 17 }
+
+  
+ 
+-- *****************************************************************
+-- ubiCfmMepPmDelayTable
+-- *****************************************************************          
+
+	ubiCfmMepPmDelayTable OBJECT-TYPE
+		SYNTAX          SEQUENCE OF UbiCfmMepPmDelayEntry
+		MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"Performance Monitoring Table"
+    	::= { ubiCfmMep 2 }
+
+  	ubiCfmMepPmDelayEntry OBJECT-TYPE
+    	SYNTAX          UbiCfmMepPmDelayEntry
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"Performance Monitoring Entry"
+    	INDEX           { ubiBridgeId, ubiCfmMdIndex, 
+    					  ubiCfmMaIndex, ubiCfmMepId, ifIndex } 
+    	::= { ubiCfmMepPmDelayTable 1 }
+
+  	
+  	UbiCfmMepPmDelayEntry ::= SEQUENCE {    
+	       	ubiCfmMepPmDelayRmep			INTEGER, 
+        	ubiCfmMepPmDelayFrameType		INTEGER,    
+        	ubiCfmMepPmDelayCurrentValue	Unsigned32,
+          	ubiCfmMepPmDelayTxInterval		INTEGER,   
+          	ubiCfmMepPmDelayState			INTEGER,         
+          	ubiCfmMepPmDelayRowStatus		RowStatus,
+          	ubiCfmMepPmDelayMin				Integer32,
+           	ubiCfmMepPmDelayMax				Integer32,
+          	ubiCfmMepPmDelayAvg				Integer32        	  
+     }
+
+  	ubiCfmMepPmDelayRmep OBJECT-TYPE
+    	SYNTAX          INTEGER
+    	MAX-ACCESS      read-create
+    	STATUS          current
+    	DESCRIPTION
+        	"Remote MEP ID to measure performance " 
+    	::= { ubiCfmMepPmDelayEntry 1 }
+
+  	ubiCfmMepPmDelayFrameType OBJECT-TYPE
+    	SYNTAX          INTEGER {        
+    		unicast(1),
+    		multicast(2)
+    	}
+    	MAX-ACCESS      read-create
+    	STATUS          current
+    	DESCRIPTION
+        	"The type of frame that is to measure" 
+    	::= { ubiCfmMepPmDelayEntry 2 }       
+    	
+  	ubiCfmMepPmDelayCurrentValue OBJECT-TYPE
+    	SYNTAX          Unsigned32
+    	MAX-ACCESS      read-only
+    	STATUS          deprecated
+    	DESCRIPTION
+        	"Result value of measurement"   
+    	::= { ubiCfmMepPmDelayEntry 3 }                        
+               
+  	ubiCfmMepPmDelayTxInterval OBJECT-TYPE
+    	SYNTAX          INTEGER {     
+    		tx_100m(1),
+    		tx_1s(2),
+    		tx_10s(3)
+    	}
+    	MAX-ACCESS      read-create
+    	STATUS          current
+    	DESCRIPTION
+        	"Period that operate performance monitoring" 
+    	::= { ubiCfmMepPmDelayEntry 4 }
+
+  	ubiCfmMepPmDelayState OBJECT-TYPE
+    	SYNTAX          INTEGER {     
+	        ok(1),
+			fail(2)			
+	    }
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"Result state of measurement.
+        	If ubiCfmMepPmCurrentValue is lower than threshold, 
+        	ubiCfmMepPmState is OK. If ubiCfmMepPmCurrentValue is 
+        	over the configured threshold, ubiCfmMepPmState is FAIL." 
+    	::= { ubiCfmMepPmDelayEntry 5 }
+
+
+  	ubiCfmMepPmDelayRowStatus OBJECT-TYPE
+    	SYNTAX          RowStatus
+    	MAX-ACCESS      read-create
+    	STATUS          current
+    	DESCRIPTION
+        	"The status of the row." 
+    	::= { ubiCfmMepPmDelayEntry 6 }
+          
+  	ubiCfmMepPmDelayMin OBJECT-TYPE
+    	SYNTAX          Integer32       
+    	UNITS			"milliseconds"
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"Minimum delay measured by performance monitoring" 
+    	::= { ubiCfmMepPmDelayEntry 7 }
+          
+  	ubiCfmMepPmDelayMax OBJECT-TYPE
+    	SYNTAX          Integer32       
+    	UNITS			"milliseconds"
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"Maximum delay measured by performance monitoring" 
+    	::= { ubiCfmMepPmDelayEntry 8 }
+
+  	ubiCfmMepPmDelayAvg OBJECT-TYPE
+    	SYNTAX          Integer32       
+    	UNITS			"milliseconds"
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"Average of delay measured by performance monitoring" 
+    	::= { ubiCfmMepPmDelayEntry 9 }
+
+
+  
+-- *****************************************************************
+-- ubiCfmMepPmLossTable
+-- *****************************************************************          
+
+	ubiCfmMepPmLossTable OBJECT-TYPE
+		SYNTAX          SEQUENCE OF UbiCfmMepPmLossEntry
+		MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"Performance Monitoring Table"
+    	::= { ubiCfmMep 3 }
+
+  	ubiCfmMepPmLossEntry OBJECT-TYPE
+    	SYNTAX          UbiCfmMepPmLossEntry
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"Performance Monitoring Entry"
+    	INDEX           { ubiBridgeId, ubiCfmMdIndex, 
+    					  ubiCfmMaIndex, ubiCfmMepId, ifIndex } 
+    	::= { ubiCfmMepPmLossTable 1 }
+
+  	
+  	UbiCfmMepPmLossEntry ::= SEQUENCE {    
+	       	ubiCfmMepPmLossRmep					INTEGER, 
+        	ubiCfmMepPmLossFrameType			INTEGER,    
+        	ubiCfmMepPmLossCurrentValue			Unsigned32,
+          	ubiCfmMepPmLossTxInterval			INTEGER,   
+          	ubiCfmMepPmLossState				INTEGER,         
+          	ubiCfmMepPmLossRowStatus			RowStatus,
+          	ubiCfmMepPmLossRttMin				Integer32,
+           	ubiCfmMepPmLossRttMax				Integer32,
+          	ubiCfmMepPmLossRttAvg				Integer32,      
+           	uniCfmMepPmLossNearEndTot			Integer32,
+          	uniCfmMepPmLossFarEndTot			Integer32,
+        }
+
+
+  	ubiCfmMepPmLossRmep OBJECT-TYPE
+    	SYNTAX          INTEGER
+    	MAX-ACCESS      read-create
+    	STATUS          current
+    	DESCRIPTION
+        	"Remote MEP ID to measure performance " 
+    	::= { ubiCfmMepPmLossEntry 1 }
+
+  	ubiCfmMepPmLossFrameType OBJECT-TYPE
+    	SYNTAX          INTEGER {        
+    		unicast(1),
+    		multicast(2)
+    	}
+    	MAX-ACCESS      read-create
+    	STATUS          current
+    	DESCRIPTION
+        	"The type of frame that is to measure" 
+    	::= { ubiCfmMepPmLossEntry 2 }       
+    	
+  	ubiCfmMepPmLossCurrentValue OBJECT-TYPE
+    	SYNTAX          Unsigned32
+    	MAX-ACCESS      read-only
+    	STATUS          deprecated
+    	DESCRIPTION
+        	"Result value of measurement"   
+    	::= { ubiCfmMepPmLossEntry 3 }                        
+               
+  	ubiCfmMepPmLossTxInterval OBJECT-TYPE
+    	SYNTAX          INTEGER {     
+    		tx_100m(1),
+    		tx_1s(2),
+    		tx_10s(3)
+    	}
+    	MAX-ACCESS      read-create
+    	STATUS          current
+    	DESCRIPTION
+        	"Period that operate performance monitoring" 
+    	::= { ubiCfmMepPmLossEntry 4 }
+
+  	ubiCfmMepPmLossState OBJECT-TYPE
+    	SYNTAX          INTEGER {     
+	        ok(1),
+			fail(2)			
+	    }
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"Result state of measurement.
+        	If ubiCfmMepPmCurrentValue is lower than threshold, 
+        	ubiCfmMepPmState is OK. If ubiCfmMepPmCurrentValue is 
+        	over the configured threshold, ubiCfmMepPmState is FAIL." 
+    	::= { ubiCfmMepPmLossEntry 5 }
+
+
+  	ubiCfmMepPmLossRowStatus OBJECT-TYPE
+    	SYNTAX          RowStatus
+    	MAX-ACCESS      read-create
+    	STATUS          current
+    	DESCRIPTION
+        	"The status of the row." 
+    	::= { ubiCfmMepPmLossEntry 6 }
+          
+ 
+  	uniCfmMepPmLossNearEndTot OBJECT-TYPE
+    	SYNTAX          Integer32       
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"Frame loss of near end measured by performance monitoring" 
+    	::= { ubiCfmMepPmLossEntry 7 }
+
+  	uniCfmMepPmLossFarEndTot OBJECT-TYPE
+    	SYNTAX          Integer32       
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"Frame loss of far end measured by performance monitoring" 
+    	::= { ubiCfmMepPmLossEntry 8 }
+          
+
+ 	ubiCfmMepPmLossRttMin OBJECT-TYPE
+    	SYNTAX          Integer32       
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"Minimum route-trip time between MEPs" 
+    	::= { ubiCfmMepPmLossEntry 9 }
+          
+  	ubiCfmMepPmLossRttMax OBJECT-TYPE
+    	SYNTAX          Integer32       
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"Maximum route-trip time between MEPs" 
+    	::= { ubiCfmMepPmLossEntry 10 }
+
+  	ubiCfmMepPmLossRttAvg OBJECT-TYPE
+    	SYNTAX          Integer32       
+	   	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"Average of route-trip time between MEPs" 
+    	::= { ubiCfmMepPmLossEntry 11 }
+
+
+  
+-- *****************************************************************
+-- ubiCfmMep Ping/Trace Send
+-- *****************************************************************          
+
+  	ubiCfmMepOamSendBridgeId OBJECT-TYPE
+    	SYNTAX          Integer32
+    	MAX-ACCESS      read-write
+    	STATUS          current
+    	DESCRIPTION
+        	"Bridge ID to send Ping or Linktrace" 
+    	::= { ubiCfmMepOamSend 1 }
+
+  	ubiCfmMepOamSendMdIndex OBJECT-TYPE
+    	SYNTAX          Unsigned32    
+       	MAX-ACCESS      read-write
+    	STATUS          current
+    	DESCRIPTION
+        	"Maintenance Domain ID to send Ping or Linktrace" 
+    	::= { ubiCfmMepOamSend 2 }       
+    	
+  	ubiCfmMepOamSendMaIndex OBJECT-TYPE
+    	SYNTAX          Unsigned32
+    	MAX-ACCESS      read-write
+    	STATUS          current
+    	DESCRIPTION
+        	"Maintenance Association ID to send Ping or Linktrace"   
+    	::= { ubiCfmMepOamSend 3 } 
+               
+  	ubiCfmMepOamSendMepId OBJECT-TYPE
+    	SYNTAX          Unsigned32
+     	MAX-ACCESS      read-write
+    	STATUS          current
+    	DESCRIPTION
+        	"MEP ID to send Ping or Linktrace" 
+    	::= { ubiCfmMepOamSend 4 }
+
+  	ubiCfmMepOamSendDstMac OBJECT-TYPE
+    	SYNTAX          MacAddress
+    	MAX-ACCESS      read-write
+    	STATUS          current
+    	DESCRIPTION
+        	"Destination MAC address" 
+    	::= { ubiCfmMepOamSend 5 }
+ 
+   	ubiCfmMepOamSendLoopbackFrameType OBJECT-TYPE
+    	SYNTAX          INTEGER  {   
+    			none(0),           
+    			unicast(1),
+    			multicast(2)
+    	}
+    	MAX-ACCESS      read-write
+    	STATUS          current
+    	DESCRIPTION
+        	"Type of CFM loopback Frame (ETH-LB)" 
+    	::= { ubiCfmMepOamSend 6 }
+
+   	ubiCfmMepOamSendLoopbackFrameCount OBJECT-TYPE
+    	SYNTAX          Counter32
+    	MAX-ACCESS      read-write
+    	STATUS          current
+    	DESCRIPTION
+        	"Counter to transmit CFM loopback frame" 
+    	::= { ubiCfmMepOamSend 7 }
+
+  	ubiCfmMepOamSendExecute OBJECT-TYPE
+    	SYNTAX      INTEGER	
+    	{
+    		none(0),
+    		etherPing(1),
+    		linkTrace(2)
+      	}
+    	MAX-ACCESS  read-write
+    	STATUS      current
+    	DESCRIPTION
+       		"Send ping/linktrace messages"
+    	::= { ubiCfmMepOamSend 8 }           	
+
+-- *****************************************************************
+-- ubiCfmMep Ping/Trace Send  Result
+-- *****************************************************************    
+ 	ubiCfmMepOamResultEtherPing OBJECT-TYPE
+    	SYNTAX      INTEGER {       
+    		other(0),    
+    		ok(1),
+    		fail(2),
+    		already_activated(3),
+    		not_ready(4)
+    	}	
+    	MAX-ACCESS  accessible-for-notify
+    	STATUS      current
+    	DESCRIPTION
+       		"The result of Loopback message sent.
+       		If already Loopback function activate, send trap
+       		result value on already_activated. if CC not connected or
+       		unicast RMEP crosscheck type, send trap result value on not_ready."  
+       		
+    	::= { ubiCfmMepOamResult 1 }            
+    	
+ 	ubiCfmMepOamResultEtherPingSndCount OBJECT-TYPE
+    	SYNTAX      Counter32
+    	MAX-ACCESS  accessible-for-notify
+    	STATUS      current
+    	DESCRIPTION
+       		"Counter of CFM loopback frame to send"  
+    	::= { ubiCfmMepOamResult 2 }    
+
+ 	ubiCfmMepOamResultEtherPingRcvCount OBJECT-TYPE
+    	SYNTAX      Counter32
+    	MAX-ACCESS  accessible-for-notify
+    	STATUS      current
+    	DESCRIPTION
+       		"Received counter of CFM lopback reply"  
+    	::= { ubiCfmMepOamResult 3 }   
+
+ 	ubiCfmMepOamResultEtherPingRttMin OBJECT-TYPE
+    	SYNTAX      Integer32
+    	MAX-ACCESS  accessible-for-notify
+    	STATUS      current
+    	DESCRIPTION
+       		"Minimum round-trip time measured by CFM loopback frame"  
+    	::= { ubiCfmMepOamResult 4 }    
+
+ 	ubiCfmMepOamResultEtherPingRttMax OBJECT-TYPE
+    	SYNTAX      Integer32
+    	MAX-ACCESS  accessible-for-notify
+    	STATUS      current
+    	DESCRIPTION
+       		"Maximum round-trip time measured by CFM loopback frame"  
+    	::= { ubiCfmMepOamResult 5 }   
+
+ 	ubiCfmMepOamResultEtherPingRttAvg OBJECT-TYPE
+    	SYNTAX      Integer32
+    	MAX-ACCESS  accessible-for-notify
+    	STATUS      current
+    	DESCRIPTION
+       		"Average of round-trip time measured by CFM loopback frame"  
+    	::= { ubiCfmMepOamResult 6 }  
+                                     
+ 	ubiCfmMepOamResultLinkTraceSrcMacAddr OBJECT-TYPE
+    	SYNTAX      MacAddress	
+    	MAX-ACCESS  accessible-for-notify
+    	STATUS      current
+    	DESCRIPTION
+       		"MAC address returned in the ingress MAC address field."
+    	::= { ubiCfmMepOamResult 7 }                                        
+
+
+ 	ubiCfmMepOamResultLinkTraceRcvIfIndex OBJECT-TYPE
+    	SYNTAX      Integer32	
+    	MAX-ACCESS  accessible-for-notify
+    	STATUS      current
+    	DESCRIPTION
+       		"The index of local interface of received LTR"   
+       	::= { ubiCfmMepOamResult 8 }                                        
+                                      
+ 	ubiCfmMepOamResultLinkTraceRelayAction OBJECT-TYPE
+    	SYNTAX      INTEGER { 
+    		other(0),
+    		relay_hit(1),
+    		relay_fdb(2),
+    		already_activated(3),
+    		not_ready(4)
+    	}	
+    	MAX-ACCESS  accessible-for-notify
+    	STATUS      current
+    	DESCRIPTION
+       		"Indicates if a LTM was forwarded by the responding MP, as
+        	returned in the 'relay-hit' or 'relay-fdb' flag of the 
+        	flags field. If other LT function already activate, 
+        	on already_activated value. else if CC is not OK state, 
+        	on not_ready value"
+   
+       	::= { ubiCfmMepOamResult 9 }            
+
+
+ 	ubiCfmMepOamResultLinkTraceHopCount OBJECT-TYPE
+    	SYNTAX      Integer32
+    	MAX-ACCESS  accessible-for-notify
+    	STATUS      current
+    	DESCRIPTION
+       		"hop count for a returned LTR."   
+       	::= { ubiCfmMepOamResult 10 }                              
+
+-- *****************************************************************
+-- ubiCfmCCConfigDefectTable
+-- *****************************************************************  
+
+	ubiCfmCCConfigDefectTable OBJECT-TYPE
+		SYNTAX          SEQUENCE OF UbiCfmCCConfigDefectEntry
+		MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"The CCM config defect table"
+    	::= { ubiCfmMep 6 }
+
+  	ubiCfmCCConfigDefectEntry OBJECT-TYPE
+    	SYNTAX          UbiCfmCCConfigDefectEntry
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"The CCM config defect entry"
+    	INDEX           { ubiBridgeId, ubiCfmMdIndex, 
+    					  ubiCfmMaIndex, ubiCfmMepId, ifIndex } 
+    	::= { ubiCfmCCConfigDefectTable 1 }
+    	
+  	UbiCfmCCConfigDefectEntry ::= SEQUENCE {
+  	          	ubiCfmMepCCConfigDefect				INTEGER,
+  	          	ubiCfmMepCCConfigDefectState		INTEGER
+  	    }
+  	
+ 	ubiCfmMepCCConfigDefect OBJECT-TYPE
+    	SYNTAX      INTEGER{ 
+    		none(0),
+    		unexpected_mep_id(1),
+    		unexpected_tx_interval(2),
+    		existed_mep_id (3)
+
+    	}	
+    	MAX-ACCESS  read-only
+    	STATUS      current
+    	DESCRIPTION
+       		"Number of Defect
+       		 0: None
+       		 1: Unexpected MEP ID
+       		 2: Unexpected Tx interval
+       		 3: Already Existed MEP"   
+       	::= { ubiCfmCCConfigDefectEntry 1 }
+       	
+    
+    ubiCfmMepCCConfigDefectState OBJECT-TYPE
+    	SYNTAX      INTEGER{
+    		defectcondition_exit(0),
+    		defectcondition_entry(1)
+    	}    	
+    	MAX-ACCESS  read-only
+    	STATUS      current
+    	DESCRIPTION
+       		"State of defect condition
+       		 0: DefectConditionExit
+       		 1: DefectConditionEntry"   
+       	::= { ubiCfmCCConfigDefectEntry 2 }
+  	
+    
+-- *****************************************************************
+-- ubiCfmAisTable
+-- *****************************************************************          
+
+--	ubiCfmAisTable OBJECT-TYPE
+--		SYNTAX          SEQUENCE OF UbiCfmAisEntry
+--		MAX-ACCESS      not-accessible
+--    	STATUS          current
+--    	DESCRIPTION
+--        	""
+--    	::= { ubiCfmAis 1 }
+
+-- 	ubiCfmAisEntry OBJECT-TYPE
+--    	SYNTAX          UbiCfmAisEntry
+--    	MAX-ACCESS      not-accessible
+--    	STATUS          current
+--    	DESCRIPTION
+--        	""
+--    	INDEX           { ubiBridgeId, ifIndex, ubiCfmMdIndex, ubiCfmMaIndex, ubiCfmMepId } 
+--    	::= { ubiCfmAisTable 1 }
+
+  	
+--  	UbiCfmAisEntry ::= SEQUENCE {        
+--   			ubiCfmAisDestLevel			Integer32,                
+--  			ubiCfmAisDefectType			Dot1agCfmAisDefectType,	
+--   			ubiCfmAisType				INTEGER,
+--			ubiCfmAisMacAddr			MacAddress,  
+--			ubiCfmAisRowStatus			RowStatus
+--     }
+ 
+--	ubiCfmAisDestLevel OBJECT-TYPE
+--    	SYNTAX      Integer32 
+--    	MAX-ACCESS  read-write
+--    	STATUS      current
+--    	DESCRIPTION
+--       		"       		"
+--    	::= { ubiCfmAisEntry 1 }
+   
+ --	ubiCfmAisTxInterval OBJECT-TYPE
+  --  	SYNTAX      INTEGER    (1 | 60)
+  --  	MAX-ACCESS  read-write
+  --  	STATUS      current
+  --  	DESCRIPTION
+  --     		"       		"
+  --  	::= { ubiCfmAisEntry 2 } 
+
+--	ubiCfmAisDefectType OBJECT-TYPE
+--    	SYNTAX      Dot1agCfmAisDefectType
+--    	MAX-ACCESS  read-write
+--    	STATUS      current
+--    	DESCRIPTION
+--       		"       		"
+--    	::= { ubiCfmAisEntry 2 } 
+
+--	ubiCfmAisType OBJECT-TYPE
+--    	SYNTAX      INTEGER   {            
+--    		unicast(1),
+ --   		multicast(2)
+ --   	}
+ --   	MAX-ACCESS  read-write
+ --   	STATUS      current
+  --  	DESCRIPTION
+ --      		"       		"
+ --   	::= { ubiCfmAisEntry 3 } 
+    
+--	ubiCfmAisMacAddr OBJECT-TYPE
+ --   	SYNTAX      MacAddress
+ --   	MAX-ACCESS  read-write
+ --   	STATUS      current
+ --   	DESCRIPTION
+--       		"       		"
+--    	::= { ubiCfmAisEntry 4 } 
+
+ --  	ubiCfmAisRowStatus OBJECT-TYPE
+ --   	SYNTAX      RowStatus
+ --   	MAX-ACCESS  read-create
+ -- --  	STATUS      current
+ --   	DESCRIPTION
+ --      		"The status of the row."
+ --   	::= { ubiCfmAisEntry 5 }
+                             
+          
+-- *****************************************************************
+-- ubiCfmServerMepTable
+-- *****************************************************************          
+
+	ubiCfmServerMepTable OBJECT-TYPE
+		SYNTAX          SEQUENCE OF UbiCfmServerMepEntry
+		MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"A Server MEP represents the compound function of the 
+        	Server layer termination function and Server/ETH adaptation 
+        	function which is used to notify the ETH layer MEPs upon 
+        	failure detection by the Server layer termination function or 
+        	Server/ETH adaptation function, where the Server layer 
+        	termination function is expected to run OAM mechanisms specific 
+        	to the Server layer. 
+        	        	
+        	A Server MEP needs to support ETH-AIS function, as described 
+        	in clause 7.4, where the Server/ETH adaptation function is 
+        	required to issue frames with ETH-AIS information upon detection of
+			defect at the Server layer by the Server layer termination 
+			and/or adaptation function.
+			(ITU-T Y.1731 5.3.1)"
+    	::= { ubiCfmServerMep 1 }
+
+  	ubiCfmServerMepEntry OBJECT-TYPE
+    	SYNTAX          UbiCfmServerMepEntry
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"Server MEP entry"
+    	INDEX           { ubiBridgeId, ifindex }
+    	::= { ubiCfmServerMepTable 1 }
+
+  	
+  	UbiCfmServerMepEntry ::= SEQUENCE {        
+	       	ubiCfmServerMepTxInterval		INTEGER, 
+        	ubiCfmServerMepAisLevel			Dot1agCfmMDLevel,    
+        	ubiCfmServerMepRowStatus       	RowStatus           
+        }
+
+  	ubiCfmServerMepTxInterval OBJECT-TYPE
+    	SYNTAX          INTEGER  (1 | 60)
+    	MAX-ACCESS      read-write
+    	STATUS          current
+    	DESCRIPTION
+        	"Periodic Interval of AIS Transmission" 
+    	::= { ubiCfmServerMepEntry 1 }
+
+	ubiCfmServerMepAisLevel OBJECT-TYPE
+    	SYNTAX      Dot1agCfmMDLevel
+    	MAX-ACCESS  read-write
+   	 	STATUS      current
+    	DESCRIPTION
+      	 	"Destinaction Maintenance Domain Level of AIS"
+    	::= { ubiCfmServerMepEntry 2 }
+  
+  	ubiCfmServerMepRowStatus OBJECT-TYPE
+    	SYNTAX      RowStatus
+    	MAX-ACCESS  read-create
+    	STATUS      current
+    	DESCRIPTION
+       		"The status of the row."
+    	::= { ubiCfmServerMepEntry 3 }
+
+
+-- *****************************************************************
+-- ubiCfmNotificationEnables
+-- *****************************************************************  
+  
+	ubiCfmRemoteMepStateChangeEnabled OBJECT-TYPE
+    	SYNTAX          TruthValue
+    	MAX-ACCESS      read-write
+    	STATUS          current
+    	DESCRIPTION
+        	"Remote MEP state(CC state) change Notification"         
+  	 	DEFVAL          { false } 
+    	::= { ubiCfmNotificationEnables 1 }  
+  
+	ubiCfmPmEventEnabled OBJECT-TYPE
+    	SYNTAX          TruthValue
+    	MAX-ACCESS      read-write
+    	STATUS          current
+    	DESCRIPTION
+        	"ubiCfmMepPmState change Notification"         
+  	 	DEFVAL          { false } 
+    	::= { ubiCfmNotificationEnables 2 } 
+    	
+    ubiCfmCCConfigDefectAlarmEnabled OBJECT-TYPE
+    	SYNTAX          TruthValue
+    	MAX-ACCESS      read-write
+    	STATUS          current
+    	DESCRIPTION
+        	"Detect CCM config Defect notification"         
+  	 	DEFVAL          { false } 
+    	::= { ubiCfmNotificationEnables 3 }
+
+                         
+--	ubiCfmRemoteMepStatusChangeEnabled OBJECT-TYPE
+--    	SYNTAX          TruthValue
+--    	MAX-ACCESS      read-write
+--    	STATUS          current
+--    	DESCRIPTION
+--        	""         
+--  	 	DEFVAL          { false } 
+--    	::= { ubiCfmNotificationEnables 1 }
+
+--	ubiCfmAggPortRemoteMepStatusChangeEnabled OBJECT-TYPE
+--    	SYNTAX          TruthValue
+--    	MAX-ACCESS      read-write
+--    	STATUS          current
+--    	DESCRIPTION
+--        	""         
+--  	 	DEFVAL          { false } 
+--    	::= { ubiCfmNotificationEnables 2 }
+                         
+--	ubiCfmPmFrameDelayEventEnabled OBJECT-TYPE
+--    	SYNTAX          TruthValue
+--    	MAX-ACCESS      read-write
+--    	STATUS          current
+--    	DESCRIPTION
+--        	""         
+--  	 	DEFVAL          { false } 
+--    	::= { ubiCfmNotificationEnables 3 }
+
+--	ubiCfmPmFrameLossEventEnabled OBJECT-TYPE
+--    	SYNTAX          TruthValue
+--    	MAX-ACCESS      read-write
+--    	STATUS          current
+--    	DESCRIPTION
+--        	""         
+--  	 	DEFVAL          { false } 
+--    	::= { ubiCfmNotificationEnables 4 }
+
+           
+
+-- *****************************************************************
+-- ubiCfmTrack
+-- *****************************************************************  
+  
+	ubiCfmTrackEnable OBJECT-TYPE
+    	SYNTAX          BITS {       
+    		rdi(0),
+    		link-down(1)
+    	}
+    	MAX-ACCESS      read-write
+    	STATUS          current
+    	DESCRIPTION
+        	"Not use"         
+	   	::= { ubiCfmTrack 1 }  
+  
+
+	ubiCfmTrackTargetTable OBJECT-TYPE
+		SYNTAX          SEQUENCE OF UbiCfmTrackTargetEntry
+		MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"Not use"
+    	::= { ubiCfmTrack 2 }
+
+  	ubiCfmTrackTargetEntry OBJECT-TYPE
+    	SYNTAX          UbiCfmTrackTargetEntry
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"Not use"
+    	INDEX   { ifindex }
+    	::= { ubiCfmTrackTargetTable 1 }
+
+  	
+  	UbiCfmTrackTargetEntry ::= SEQUENCE {        
+	       	ubiCfmTrackTargetSet 	INTEGER        
+        }
+
+  	ubiCfmTrackTargetSet OBJECT-TYPE
+    	SYNTAX          INTEGER  {      
+    		enable(1),
+    		disable(2)
+    	}
+    	MAX-ACCESS      read-write
+    	STATUS          current
+    	DESCRIPTION
+        	"Not use" 
+    	::= { ubiCfmTrackTargetEntry 1 }
+    
+    
+    
+    
+
+        
+-- *****************************************************************
+-- ubiCfmMIBConformance
+-- *****************************************************************
+
+-- Conformance Information
+ubiCfmMIBCompliances  	OBJECT IDENTIFIER		::= { ubiCFMMIBConformance 1 }
+ubiCfmMIBGroups  		OBJECT IDENTIFIER		::= { ubiCFMMIBConformance 2 }
+
+
+-- compliance statements
+
+	ubiVlanMIBCompliance MODULE-COMPLIANCE
+    	STATUS          current
+    	DESCRIPTION
+        	"The compliance statement for VTP implementations."
+    	MODULE          -- this module
+    	MANDATORY-GROUPS {   
+    					ubiCfmMaGroup          
+        }
+    	::= { ubiCfmMIBCompliances 1 }
+
+-- units of conformance
+
+	ubiCfmMaGroup OBJECT-GROUP
+    	OBJECTS         {   
+        }
+    	STATUS          current
+    	DESCRIPTION
+        	""
+    	::= { ubiCfmMIBGroups 1 }
+END
+
+
+
+
