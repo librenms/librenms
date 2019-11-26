@@ -46,12 +46,16 @@ class Url
      */
     public static function deviceLink($device, $text = null, $vars = [], $start = 0, $end = 0, $escape_text = 1, $overlib = 1)
     {
+        if (is_null($device)) {
+            return '';
+        }
+
         if (!$device->canAccess(Auth::user())) {
             return $device->displayName();
         }
 
         if (!$start) {
-            $start = Carbon::now()->subDay(1)->timestamp;
+            $start = Carbon::now()->subDay()->timestamp;
         }
 
         if (!$end) {
