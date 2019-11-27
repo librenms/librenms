@@ -45,9 +45,9 @@ if (!empty($insert)) {
                     DB::table('ports_fdb')
                         ->where('ports_fdb_id', $port_fdb_id)
                         ->update([
-                        'port_id' => $new_port,
-                        'updated_at' => $now,
-                    ]);
+                            'port_id' => $new_port,
+                            'updated_at' => $now,
+                        ]);
                     echo 'U';
                 } else {
                     $update_time_only[] = $port_fdb_id;
