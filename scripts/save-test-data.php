@@ -27,7 +27,7 @@ $options = getopt(
 $init_modules = array('discovery', 'polling');
 require $install_dir . '/includes/init.php';
 
-\config(['database.default' => 'testing']); // use testing db (which falls back to the primary db)
+// \config(['database.default' => 'testing']); // use testing db (which falls back to the primary db)
 
 $debug = (isset($options['d']) || isset($options['debug']));
 $vdebug = $debug;
