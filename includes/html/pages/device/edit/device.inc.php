@@ -34,6 +34,16 @@ if ($_POST['editing']) {
         $device_model->disabled = (int)isset($_POST['disabled']);
         $device_model->type = $_POST['type'];
 
+        if (isset($_POST['overwrite_ip'])) {
+            if ((empty($_POST['overwrite_ip'])) ||
+                (filter_var($_POST['overwrite_ip'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) ||
+                (filter_var($_POST['overwrite_ip'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6))) {
+                $device_model->overwrite_ip = $_POST['overwrite_ip'];
+            } else {
+                Toastr::error(__('Invalid IP Adresse'));
+            }
+        }
+
         if ($device_model->isDirty('type')) {
             set_dev_attrib($device, 'override_device_type', true);
         }
@@ -100,6 +110,12 @@ if ($_POST['editing']) {
         </div>
         <div class="col-sm-2">
             <button name="hostname-edit-button" id="hostname-edit-button" class="btn btn-danger"> <i class="fa fa-pencil"></i> </button>
+        </div>
+    </div>
+    <div class="form-group" data-toggle="tooltip" data-container="body" data-placement="bottom" title="IP Adresse to be used instead of name resolution" >
+        <label for="overwrite_ip" class="col-sm-2 control-label" >IP Adresse:</label>
+        <div class="col-sm-6">
+            <input type="text" id="overwrite_ip" name="overwrite_ip" class="form-control" value="<?php echo(display($device_model->overwrite_ip)); ?>" />
         </div>
     </div>
      <div class="form-group">

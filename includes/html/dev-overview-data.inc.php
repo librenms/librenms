@@ -42,7 +42,7 @@ echo '<div class="row">
       </div>';
 
 if (!empty($device['ip'])) {
-     echo "<div class='row'><div class='col-sm-4'>Resolved IP</div><div class='col-sm-8'>{$device['ip']}</div></div>";
+     echo "<div class='row'><div class='col-sm-4'>". ($device['overwrite_ip']?"Configured IP":"Resolved IP") ."</div><div class='col-sm-8'>{$device['ip']}</div></div>";
 } elseif (Config::get('force_ip_to_sysname') === true) {
     try {
         $ip = IP::parse($device['hostname']);

@@ -26,6 +26,13 @@ if (!empty($_POST['hostname'])) {
         print_error("Invalid hostname or IP: $hostname");
     }
 
+    if (!empty($_POST['overwrite_ip'])) {
+        if ((! filter_var($_POST['overwrite_ip'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) ||
+            (! filter_var($_POST['overwrite_ip'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6))) {
+                print_error("Invalid IP Addresse: " . $_POST['overwrite_ip'] . ". Fix or remove it");
+        }
+    }
+
     if (Auth::user()->hasGlobalRead()) {
         // Settings common to SNMPv2 & v3
         if ($_POST['port']) {
@@ -79,6 +86,9 @@ if (!empty($_POST['hostname'])) {
         $force_add    = ($_POST['force_add'] == 'on');
 
         $port_assoc_mode = clean($_POST['port_assoc_mode']);
+
+        $additional['overwrite_ip'] = $_POST['overwrite_ip'];
+
         try {
             $device_id = addHost($hostname, $snmpver, $port, $transport, $poller_group, $force_add, $port_assoc_mode, $additional);
             $link = generate_device_url(array('device_id' => $device_id));
@@ -117,6 +127,12 @@ $pagetitle[] = 'Add host';
           <label for="hostname" class="col-sm-3 control-label">Hostname</label>
           <div class="col-sm-9">
               <input type="text" id="hostname" name="hostname" class="form-control input-sm" placeholder="Hostname">
+          </div>
+      </div>
+      <div class="form-group" title="IP Adresse to be used instead of name resolution">
+          <label for="overwrite_ip" class="col-sm-3 control-label">IP Addresse</label>
+          <div class="col-sm-9">
+              <input type="text" id="overwrite_ip" name="overwrite_ip" class="form-control input-sm" placeholder="optional IP Addresse">
           </div>
       </div>
       <div class='form-group'>

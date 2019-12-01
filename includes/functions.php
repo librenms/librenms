@@ -759,6 +759,7 @@ function createHost(
         'status_reason' => '',
         'port_association_mode' => $port_assoc_mode,
         'snmp_disable' => $additional['snmp_disable'] ? $additional['snmp_disable'] : 0,
+        'overwrite_ip' => $additional['overwrite_ip'],
     );
 
     $device = array_merge($device, $v3);  // merge v3 settings
