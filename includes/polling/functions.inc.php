@@ -240,10 +240,15 @@ function poll_device($device, $force_module = false)
     unset($array);
 
     // Start counting device poll time
-    echo 'Hostname:    ' . $device['hostname'] . PHP_EOL;
-    echo 'Device ID:   ' . $device['device_id'] . PHP_EOL;
-    echo 'OS:          ' . $device['os'] . PHP_EOL;
-    $ip = dnslookup($device);
+    echo 'Hostname:        ' . $device['hostname'] . PHP_EOL;
+    echo 'Device ID:       ' . $device['device_id'] . PHP_EOL;
+    echo 'OS:              ' . $device['os'] . PHP_EOL;
+    if (empty($device['overwrite_ip'])) {
+        $ip = dnslookup($device);
+    } else {
+        echo 'OVERWRITE IP:    ' . $device['overwrite_ip'] . PHP_EOL;
+        $ip = $device['overwrite_ip'];
+    }
 
     $db_ip = null;
     if (!empty($ip)) {
