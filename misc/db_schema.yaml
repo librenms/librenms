@@ -474,6 +474,7 @@ devices:
     - { Field: notes, Type: text, 'Null': true, Extra: '' }
     - { Field: port_association_mode, Type: int(11), 'Null': false, Extra: '', Default: '1' }
     - { Field: max_depth, Type: int(11), 'Null': false, Extra: '', Default: '0' }
+    - { Field: overwrite_ip, Type: varchar(40), 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [device_id], Unique: true, Type: BTREE }
     hostname: { Name: hostname, Columns: [hostname], Unique: false, Type: BTREE }

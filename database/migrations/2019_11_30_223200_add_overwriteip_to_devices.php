@@ -14,7 +14,7 @@ class AddOverwriteIpToDevices extends Migration
     public function up()
     {
         Schema::table('devices', function (Blueprint $table) {
-            $table->string('overwrite_ip', 100)->nullable();
+            $table->string('overwrite_ip', 40)->nullable();
         });
     }
 
