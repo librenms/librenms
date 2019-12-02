@@ -6,6 +6,8 @@ modules:
                 - oid:
                     - outletTable
         temperature:
+            options:
+                skip_values: [999, 99999]
             data:
                 -
                     oid: temperature1
@@ -13,19 +15,12 @@ modules:
                     num_oid: '.1.3.6.1.4.1.1418.6.6.5.{{ $index }}'
                     index: 'temp1.{{ $index }}'
                     descr: 'Temperature 1'
-                    skip_values: 
-                        - 999
-                        - 99999
                 -
                     oid: temperature2
                     value: temperature2
                     num_oid: '.1.3.6.1.4.1.1418.6.6.6.{{ $index }}'
                     index: 'temp2.{{ $index }}'
                     descr: 'Temperature 2'
-                    divisor: 100
-                    skip_values: 
-                        - 999
-                        - 99999
         current:
             data:
                 -
