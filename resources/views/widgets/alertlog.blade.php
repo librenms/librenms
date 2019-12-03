@@ -17,7 +17,7 @@
     </table>
 </div>
 <script>
-    var alerts_grid = $("#alertlog_{{ $id }}").bootgrid({
+    var grid = $("#alertlog_{{ $id }}").bootgrid({
         ajax: true,
         rowCount: [50, 100, 250, -1],
         post: function () {
@@ -57,24 +57,5 @@
                 }
             });
         });
-    });
-
-    $("#device_id").select2({
-        allowClear: true,
-        placeholder: "All Devices",
-        ajax: {
-            url: 'ajax_list.php',
-            delay: 250,
-            data: function (params) {
-                return {
-                    type: 'devices',
-                    search: params.term,
-                    limit: 8,
-                    page: params.page || 1
-                };
-            }
-        }
-    }).on('select2:select', function (e) {
-        $('#hostname').val(e.params.data.text);
     });
 </script>
