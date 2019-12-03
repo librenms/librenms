@@ -44,6 +44,6 @@ class AlertlogController extends WidgetController
 
     public function getSettingsView(Request $request)
     {
-        return view('widgets.settings.alerlog', $data);
+        return view('widgets.settings.alertlog', $this->getSettings());
     }
 }

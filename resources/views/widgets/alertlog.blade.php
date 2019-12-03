@@ -24,7 +24,7 @@
             return {
                 id: "alertlog",
                 device_id: "",
-                state: '1',
+                state: '{{ $state }}',
             };
         },
         url: "ajax_table.php"
