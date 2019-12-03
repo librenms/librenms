@@ -13,15 +13,10 @@ and the other for polling:
 
 ```php
 <?php
-
-if ($device['os'] === 'pulse') {
-    echo 'PULSE-MEMORY-POOL: ';
-
-    $usage = str_replace('"', "", snmp_get($device, 'iveMemoryUtil.0', '-OvQ', 'PULSESECURE-PSG-MIB'));
-
-    if (is_numeric($usage)) {
-        discover_mempool($valid_mempool, $device, 0, 'pulse-mem', 'Main Memory', '100', null, null);
-    }
+echo 'PULSE-MEMORY-POOL: ';
+$usage = str_replace('"', "", snmp_get($device, 'iveMemoryUtil.0', '-OvQ', 'PULSESECURE-PSG-MIB'));
+if (is_numeric($usage)) {
+    discover_mempool($valid_mempool, $device, 0, 'pulse-mem', 'Main Memory', '100', null, null);
 }
 ```
 
@@ -29,11 +24,8 @@ if ($device['os'] === 'pulse') {
 
 ```php
 <?php
-
 echo 'Pulse Secure MemPool\n';
-
 $perc = str_replace('"', "", snmp_get($device, "iveMemoryUtil.0", '-OvQ', 'PULSESECURE-PSG-MIB'));
-
 if (is_numeric($perc)) {
     $memory_available = str_replace('"', "", snmp_get($device, "memTotalReal.0", '-OvQ', 'UCD-SNMP-MIB'));
     $mempool['total'] = $memory_available;
