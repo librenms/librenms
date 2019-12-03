@@ -145,7 +145,7 @@
     "name": "Syslog, received Emergency Priority Message"
   },
   {
-    "rule": "syslog.timestamp = `macros.past_5m` && syslog.msg ~ \"@arp table is full@\"",
+    "rule": "syslog.timestamp >= `macros.past_5m` && syslog.msg ~ \"@arp table is full@\"",
     "name": "Syslog, ARP table is full check on device "
   },
   {
