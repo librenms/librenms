@@ -117,7 +117,7 @@
     "name": "Interface Errors Rate greater than 100"
   },
   {
-    "rule": "eventlog.type = \"discovery\" && eventlog.message ~ \"@autodiscovered@\" && eventlog.datetime >= macros.past_60m",
+    "rule": "eventlog.type = \"discovery\" && eventlog.message ~ \"@autodiscovered@\" && eventlog.datetime >= `macros.past_60m`",
     "name": "Device discovered within the last 60 minutes"
   },
   {
@@ -125,7 +125,7 @@
     "name": "Too many wireless clients"
   },
   {
-    "rule": "syslog.timestamp >= macros.past_5m && syslog.msg ~ \"@authentication failure@\"",
+    "rule": "syslog.timestamp >= `macros.past_5m` && syslog.msg ~ \"@authentication failure@\"",
     "name": "Syslog, Authentication failure on Device"
   },
   {
@@ -137,15 +137,15 @@
     "name": "Service critical"
   },
   {
-    "rule": "syslog.timestamp >= macros.past_5m && syslog.priority ~ \"alert\"",
+    "rule": "syslog.timestamp >= `macros.past_5m` && syslog.priority ~ \"alert\"",
     "name": "Syslog, received Alert Priority Message"
   },
   {
-    "rule": "syslog.timestamp >= macros.past_5m && syslog.priority ~ \"emergency\"",
+    "rule": "syslog.timestamp >= `macros.past_5m` && syslog.priority ~ \"emergency\"",
     "name": "Syslog, received Emergency Priority Message"
   },
   {
-    "rule": "syslog.timestamp = macros.past_5m && syslog.msg ~ \"@arp table is full@\"",
+    "rule": "syslog.timestamp >= `macros.past_5m` && syslog.msg ~ \"@arp table is full@\"",
     "name": "Syslog, ARP table is full check on device "
   },
   {
