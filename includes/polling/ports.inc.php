@@ -542,7 +542,7 @@ $device_global_ports = [
     'poll_period' => ($polled - $port['poll_time']),
 ];
 
-$port_ids = array();
+$globally_updated_port_ids = array();
 
 // Loop ports in the DB and update where necessary
 foreach ($ports as $port) {
@@ -586,14 +586,6 @@ foreach ($ports as $port) {
 
         if ($port_association_mode != "ifIndex") {
             $port['update']['ifIndex'] = $ifIndex;
-        }
-        
-        // set $port['update'] times if different from $device_global_ports
-        // if $port['update'] times not set and $port['update'] is void, value would be replaced by $device_global_ports
-        if ($device_global_ports["poll_prev"] != $port['poll_time']) {
-            $port['update']['poll_time'] = $polled;
-            $port['update']['poll_prev'] = $port['poll_time'];
-            $port['update']['poll_period'] = $polled_period;
         }
 
         if ($device['os'] === 'airos-af' && $port['ifAlias'] === 'eth0') {
@@ -952,23 +944,21 @@ foreach ($ports as $port) {
             }
         }
 
-        // Update Database
-        if (count($port['update'])) {
-            if (!empty($port['update'])) {
-                $port['update']['poll_time'] = $polled;
-                $port['update']['poll_prev'] = $port['poll_time'];
-                $port['update']['poll_period'] = $polled_period;
-                $updated = dbUpdate($port['update'], 'ports', '`port_id` = ?', array($port_id));
-            } else {
-                $port_ids[] =  $port_id;
-            }
-            // do we want to do something else with this?
+        // Update Database if $port['update'] is not empty
+        // or if previous poll time $port['poll_time'] is different from device globally previous port time $device_global_ports["poll_prev"]
+        // This could happen if disabled port was enabled since last polling
+        if (!empty($port['update']) || $device_global_ports["poll_prev"] != $port['poll_time']) {
+            $port['update']['poll_time'] = $polled;
+            $port['update']['poll_prev'] = $port['poll_time'];
+            $port['update']['poll_period'] = $polled_period;
+            $updated = dbUpdate($port['update'], 'ports', '`port_id` = ?', array($port_id));
+
             if (!empty($port['update_extended'])) {
                 $updated += dbUpdate($port['update_extended'], 'ports_statistics', '`port_id` = ?', array($port_id));
             }
             d_echo("$updated updated");
         } else {
-            $port_ids[] =  $port_id;
+            $globally_updated_port_ids[] =  $port_id;
         }
         // End Update Database
     }
@@ -980,8 +970,9 @@ foreach ($ports as $port) {
 } //end port update
 
 // Update the poll_time, poll_prev and poll_period of all ports in an unique request
-$updated = dbUpdate($device_global_ports, 'ports', '`port_id` IN ('.implode(',', $port_ids).')', array($device['device_id'], $device_global_ports['poll_prev']));
-d_echo("$updated updated");
+$updated = DB::table('ports')->whereIn('port_id', $globally_updated_port_ids)->update($device_global_ports);
+
+d_echo("$updated updated\n");
 
 // Clear Variables Here
 unset($port_stats, $ports_found, $data_oids, $stat_oids, $stat_oids_db, $stat_oids_db_extended, $cisco_oids, $pagp_oids, $ifmib_oids, $hc_test, $ports_mapped, $ports, $_stat_oids, $rrd_def);
