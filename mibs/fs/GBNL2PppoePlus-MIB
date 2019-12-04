@@ -12,14 +12,14 @@
            
         
     gbnL2PppoePlus MODULE-IDENTITY
-        LAST-UPDATED    "0711220000Z"  -- November 22,2007 
+        LAST-UPDATED    "200711220000Z"  -- November 22,2007 
         ORGANIZATION    "admin Systems, Inc."
         CONTACT-INFO    "admin Systems, Inc.
                          E-mail: support@admin.com.cn"
 
         DESCRIPTION     "ADMIN Enterprise MIB definition."
 
-        REVISION        "07110220000Z"  -- November 22,2007
+        REVISION        "200711220000Z"  -- November 22,2007
         DESCRIPTION     "Initial MIB creation."
 
         ::= { gbnL2 6 }

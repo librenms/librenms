@@ -15,14 +15,14 @@
         
 
     gbnTacacsMib MODULE-IDENTITY
-        LAST-UPDATED    "2009/05/27"  -- May 27, 2009
+        LAST-UPDATED    "200905270000Z"  -- May 27, 2009
         ORGANIZATION    "QTECH LLC"
         CONTACT-INFO    "Basil Budko
                          E-mail: budko@qtech.ru"
 
         DESCRIPTION     "admin tacacs Enterprise MIB definition."
 
-        REVISION        "2009/05/27"  -- May 27, 2009
+        REVISION        "200905270000Z"  -- May 27, 2009
         DESCRIPTION     "Initial MIB creation."
 
         ::= { gbnServiceAAA 3 }

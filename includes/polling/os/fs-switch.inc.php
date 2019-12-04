@@ -31,6 +31,7 @@ foreach ($verOidList as $oid) {
 //List of OIDs for SN, add any potential device SN OID here
 $snOidList = [
     '.1.3.6.1.4.1.27975.37.1.5.1.10.1.1',
+    '.1.3.6.1.4.1.52642.2.1.45.1.1.3.1.10.1',
 ];
 foreach ($snOidList as $oid) {
     $serial_tmp = snmp_get($device, $oid, '-OQv');

@@ -16696,8 +16696,8 @@ dhcpSnoopInformationOptionRID     OBJECT-TYPE
                         ipAscii(4),
                         string(5),
                         tr101IP(6),
-                        tr101Sysname(7)
-			string_plus_port_description(8)
+                        tr101Sysname(7),
+			            stringPlusPortDescription(8)
                     }
         MAX-ACCESS  read-write
         STATUS      current
@@ -16705,7 +16705,7 @@ dhcpSnoopInformationOptionRID     OBJECT-TYPE
                      information remote ID sub-option. A value of tr101IP(6)
 		     means that the RID format is '<IP> eth <BOARD ID>/<SID>/<PORT>[:<VLAN>]'.
 		     A value of tr101Sysname(7) means that the RID format is 'eth <BOARD ID>/<SID>/<PORT>[:<VLAN>][SYSNAME]'. 
-		     A value of string_plus_port_description(8) means that the RID is 
+		     A value of stringPlusPortDescription(8) means that the RID is 
 		     made up of 'string' and 'port description'."
         ::= { dhcpSnoopGlobal 7 }
 
