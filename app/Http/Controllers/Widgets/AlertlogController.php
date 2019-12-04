@@ -33,7 +33,8 @@ class AlertlogController extends WidgetController
     protected $defaults = [
         'title' => null,
         'device_id' => '',
-        'state' => -1
+        'state' => -1,
+        'min_severity' => null
     ];
 
     public function getView(Request $request)
@@ -44,6 +45,16 @@ class AlertlogController extends WidgetController
 
     public function getSettingsView(Request $request)
     {
-        return view('widgets.settings.alertlog', $this->getSettings());
+        $data = $this->getSettings(true);
+        $data['severities'] = [
+            // alert_rules.status is enum('ok','warning','critical')
+            'ok' => 1,
+            'warning' => 2,
+            'critical' => 3,
+            'ok only' => 4,
+            'warning only' => 5,
+            'critical only' => 6,
+        ];
+        return view('widgets.settings.alertlog', $data);
     }
 }

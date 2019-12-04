@@ -13,4 +13,13 @@
             <option value="1" @if($state === '0') selected @endif>@lang('Alert')</option>
         </select>
     </div>
+    <div class="form-group row">
+        <label for="min_severity-{{ $id }}" class="control-label">@lang('Displayed severity'):</label>
+        <select class="form-control" name="min_severity" id="min_severity-{{ $id }}">
+            <option value="">@lang('any severity')</option>
+            @foreach($severities as $name => $val)
+                <option value="{{ $val }}" @if($min_severity == $val) selected @endif>{{ $name }}{{$val > 3 ? '' : ' ' . __('or higher')}}</option>
+            @endforeach
+        </select>
+    </div>
 @endsection

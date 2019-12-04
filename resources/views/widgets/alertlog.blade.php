@@ -25,6 +25,7 @@
                 id: "alertlog",
                 device_id: "",
                 state: '{{ $state }}',
+                min_severity: '{{ $min_severity }}',
             };
         },
         url: "ajax_table.php"
