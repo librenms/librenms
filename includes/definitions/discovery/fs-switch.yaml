@@ -1,0 +1,32 @@
+mib: FS-MIB
+modules:
+    processors:
+          data:
+              -
+                  oid: cpuCurrentUti
+                  value: cpuCurrentUti
+                  num_oid: '..1.3.6.1.4.1.52642.2.1.45.1.39.2.1.{{ $index }}'
+                  descr: 'Processor'
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: switchThermalTempValue
+                    value: switchThermalTempValue
+                    num_oid: '.1.3.6.1.4.1.52642.2.1.45.1.1.11.1.3.{{ $index }}'
+                    index: 'temp1.{{ $index }}'
+                    descr: 'Temperature Unit {{ $subindex0 }} sensor {{ $subindex1 }}'
+        state:
+            data:
+                -
+                    oid: switchOperState
+                    value: switchOperState
+                    num_oid: '.1.3.6.1.4.1.52642.2.1.45.1.1.4.{{ $index }}'
+                    descr: 'Oper State'
+                    states:
+                        - { value: 1, generic: 3, descr: other, graph: 0 }
+                        - { value: 2, generic: 3, descr: unknown, graph: 0 }
+                        - { value: 3, generic: 0, descr: ok, graph: 0 }
+                        - { value: 4, generic: 1, descr: noncritical, graph: 0 }
+                        - { value: 5, generic: 2, descr: critical, graph: 0 }
+                        - { value: 6, generic: 2, descr: unrecoverable, graph: 0 }
