@@ -122,6 +122,7 @@ by following the steps under the `SNMP Extend` heading.
 1. [Proxmox](#proxmox) - SNMP extend
 1. [Raspberry PI](#raspberry-pi) - SNMP extend
 1. [SDFS info](#sdfs-info) - SNMP extend
+1. [Seafile](#seafile) - SNMP extend
 1. [SMART](#smart) - SNMP extend
 1. [Squid](#squid) - SNMP proxy
 1. [TinyDNS/djbdns](#tinydns-aka-djbdns) - Agent
@@ -1470,6 +1471,8 @@ the user snmpd is using with `ps aux | grep snmpd`
 
 # Seafile
 
+SNMP extend script to monitor your Seafile Server
+
 ## SNMP Extend
 
 1: Copy the Python script, seafile.py, to the desired host. `wget
@@ -1508,12 +1511,13 @@ username = Login to Seafile Server.
            It is important that used Login has admin privileges.
            Otherwise most API calls will be denied.
 password = Password to the configured login.
-        the device name. 1 is the default. 0 will use the device name.
-account_identifier = Defines how accounts are listed.
+account_identifier = Defines how user accounts are listed in RRD Graph.
                      Options are: name, email
 hide_monitoring_account = With this Boolean you can hide the Account which you
                           use to access Seafile API
 ```
+
+**Note:**It is recommended to use a dedicated Administrator account for monitoring.
 
 # SMART
 
