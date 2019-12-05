@@ -248,7 +248,7 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
                 $oper_down = $port['ifOperStatus_prev'] === 'down' && $port_stats[$ifIndex]['ifOperStatus'] === 'down';
                 $ll_down = $port['ifOperStatus_prev'] === 'lowerLayerDown' && $port_stats[$ifIndex]['ifOperStatus'] === 'lowerLayerDown';
 
-                if ($admin_down || $oper_downi || $ll_down) {
+                if ($admin_down || $oper_down || $ll_down) {
                     if ($admin_down) {
                         d_echo(" port $ifIndex is still admin down\n");
                     } else {
