@@ -25,7 +25,7 @@
                     "sysObjectID": ".1.3.6.1.4.1.52642.2.1.45.101",
                     "sysDescr": "S3900-24T4S",
                     "sysContact": "<private>",
-                    "version": "1.4",
+                    "version": "1.6.9R2",
                     "hardware": "S3900-24T4S",
                     "features": null,
                     "os": "fs-switch",

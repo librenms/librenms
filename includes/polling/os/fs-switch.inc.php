@@ -20,7 +20,7 @@ foreach ($hwOidList as $oid) {
 // As the mib is really buggy, let's use numeric OID for now
 $verOidList = [
     '.1.3.6.1.4.1.27975.1.3.5.0', //SWITCH::version.0
-    'FS-MIB::swLoaderVer.1',
+    'FS-MIB::swOpCodeVer.1',
 ];
 foreach ($verOidList as $oid) {
     $version_tmp = snmp_get($device, $oid, '-OQv');
