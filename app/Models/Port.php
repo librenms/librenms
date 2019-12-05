@@ -144,7 +144,7 @@ class Port extends DeviceRelatedModel
             ['deleted', '=', 0],
             ['ignore', '=', 0],
             ['disabled', '=', 0],
-            ['ifOperStatus', '=', 'down'],
+            ['ifOperStatus', '!=', 'up'],
             ['ifAdminStatus', '=', 'up'],
         ]);
     }
