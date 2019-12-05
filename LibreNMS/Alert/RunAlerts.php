@@ -344,7 +344,7 @@ class RunAlerts
                         'rule_id' => $alert['rule_id'],
                         'details' => gzcompress(json_encode($alert['details']), 9)
                     ), 'alert_log')) {
-                        dbUpdate(array('state' => $state, 'open' => 1, 'alerted' => 1), 'alerts', 'rule_id = ? && device_id = ?', array($alert['rule_id'], $alert['device_id']));
+                        dbUpdate(array('state' => $state, 'open' => 1, 'alerted' => 1, 'timestamp' => $alert['timestamp']), 'alerts', 'rule_id = ? && device_id = ?', array($alert['rule_id'], $alert['device_id']));
                     }
 
                     echo $ret . ' (' . $o . '/' . $n . ")\r\n";
@@ -356,11 +356,13 @@ class RunAlerts
     public function loadAlerts($where)
     {
         $alerts = [];
-        foreach (dbFetchRows("SELECT alerts.id, alerts.device_id, alerts.rule_id, alerts.state, alerts.note, alerts.info FROM alerts WHERE $where") as $alert_status) {
+        foreach (dbFetchRows("SELECT alerts.id, alerts.device_id, alerts.rule_id, alerts.state, alerts.note, alerts.timestamp, alerts.info FROM alerts WHERE $where") as $alert_status) {
             $alert = dbFetchRow(
                 'SELECT alert_log.id,alert_log.rule_id,alert_log.device_id,alert_log.state,alert_log.details,alert_log.time_logged,alert_rules.rule,alert_rules.severity,alert_rules.extra,alert_rules.name,alert_rules.query,alert_rules.builder,alert_rules.proc FROM alert_log,alert_rules WHERE alert_log.rule_id = alert_rules.id && alert_log.device_id = ? && alert_log.rule_id = ? && alert_rules.disabled = 0 ORDER BY alert_log.id DESC LIMIT 1',
                 array($alert_status['device_id'], $alert_status['rule_id'])
             );
+
+            $alert['timestamp'] = $alert_status['timestamp'];
 
             if (empty($alert['rule_id']) || !$this->isRuleValid($alert_status['device_id'], $alert_status['rule_id'])) {
                 echo 'Stale-Rule: #' . $alert_status['rule_id'] . '/' . $alert_status['device_id'] . "\r\n";
@@ -479,11 +481,11 @@ class RunAlerts
 
             if (!$noiss) {
                 $this->issueAlert($alert);
-                dbUpdate(array('alerted' => $alert['state']), 'alerts', 'rule_id = ? && device_id = ?', array($alert['rule_id'], $alert['device_id']));
+                dbUpdate(array('alerted' => $alert['state'], 'timestamp' => $alert['timestamp']), 'alerts', 'rule_id = ? && device_id = ?', array($alert['rule_id'], $alert['device_id']));
             }
 
             if (!$noacc) {
-                dbUpdate(array('open' => 0), 'alerts', 'rule_id = ? && device_id = ?', array($alert['rule_id'], $alert['device_id']));
+                dbUpdate(array('open' => 0, 'timestamp' => $alert['timestamp']), 'alerts', 'rule_id = ? && device_id = ?', array($alert['rule_id'], $alert['device_id']));
             }
         }
     }
