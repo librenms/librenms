@@ -246,8 +246,9 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
                 // if admin down or operator down since the last poll, skip polling this port
                 $admin_down = $port['ifAdminStatus_prev'] === 'down' && $port_stats[$ifIndex]['ifAdminStatus'] === 'down';
                 $oper_down = $port['ifOperStatus_prev'] === 'down' && $port_stats[$ifIndex]['ifOperStatus'] === 'down';
+                $ll_down = $port['ifOperStatus_prev'] === 'lowerLayerDown' && $port_stats[$ifIndex]['ifOperStatus'] === 'lowerLayerDown';
 
-                if ($admin_down || $oper_down) {
+                if ($admin_down || $oper_downi || $ll_down) {
                     if ($admin_down) {
                         d_echo(" port $ifIndex is still admin down\n");
                     } else {
