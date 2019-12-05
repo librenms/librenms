@@ -362,7 +362,7 @@ class Url
             return "interface-admindown";
         }
 
-        if ($port->ifAdminStatus == "up" && $port->ifOperStatus == "down") {
+        if ($port->ifAdminStatus == "up" && $port->ifOperStatus != "up") {
             return "interface-updown";
         }
 
