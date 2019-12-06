@@ -27,7 +27,27 @@ class Msteams extends Transport
     public function contactMsteams($obj, $opts)
     {
         $url   = $opts['url'];
-        $color = ($obj['state'] == 0 ? '#00FF00' : '#FF0000');
+        
+        switch ($obj['state']) {
+            case 0: // OK - green
+                $color = '#00FF00';
+                break;
+            case 1: // Bad - red
+                $color = '#FF0000';
+                break;
+            case 2: // Acknowledged - blue
+                $color = '#337AB7';
+                break;
+            case 3: // Worse - red
+                $color = '#FF0000';
+                break;
+            case 4: // Better - yellow
+                $color = '#F0AD4E';
+                break;
+            default: // Anything else - blue
+                $color = '#337AB7';
+        }
+        
         $data  = array(
             'title' => $obj['title'],
             'themeColor' => $color,
