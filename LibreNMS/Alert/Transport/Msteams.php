@@ -24,7 +24,7 @@ class Msteams extends Transport
         return $this->contactMsteams($obj, $opts);
     }
 
-    public function contactMsteams($obj, $opts) 
+    public function contactMsteams($obj, $opts)
     {
         $url   = $opts['url'];
         
@@ -59,7 +59,7 @@ class Msteams extends Transport
      */
     public static function getColorForState($state)
     {
-        $colors = array( 
+        $colors = array(
             0 => '#00FF00', // OK - green
             1 => '#FF0000', // Bad - red
             2 => '#337AB7', // Acknowledged - blue
