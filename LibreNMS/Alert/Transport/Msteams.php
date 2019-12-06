@@ -24,33 +24,13 @@ class Msteams extends Transport
         return $this->contactMsteams($obj, $opts);
     }
 
-    public function contactMsteams($obj, $opts)
+    public function contactMsteams($obj, $opts) 
     {
         $url   = $opts['url'];
         
-        switch ($obj['state']) {
-            case 0: // OK - green
-                $color = '#00FF00';
-                break;
-            case 1: // Bad - red
-                $color = '#FF0000';
-                break;
-            case 2: // Acknowledged - blue
-                $color = '#337AB7';
-                break;
-            case 3: // Worse - red
-                $color = '#FF0000';
-                break;
-            case 4: // Better - yellow
-                $color = '#F0AD4E';
-                break;
-            default: // Anything else - blue
-                $color = '#337AB7';
-        }
-        
         $data  = array(
             'title' => $obj['title'],
-            'themeColor' => $color,
+            'themeColor' => self::getColorForState($obj['state']),
             'text' => strip_tags($obj['msg'], '<strong><em><h1><h2><h3><strike><ul><ol><li><pre><blockquote><a><img><p>')
         );
         $curl  = curl_init();
@@ -70,6 +50,24 @@ class Msteams extends Transport
             return false;
         }
         return true;
+    }
+    
+    /**
+     * Get the hex color string for a particular state
+     * @param integer $state State code from alert
+     * @return string Hex color, default to #337AB7 blue if state unrecognised
+     */
+    public static function getColorForState($state)
+    {
+        $colors = array( 
+            0 => '#00FF00', // OK - green
+            1 => '#FF0000', // Bad - red
+            2 => '#337AB7', // Acknowledged - blue
+            3 => '#FF0000', // Worse - red
+            4 => '#F0AD4E', // Better - yellow
+        );
+        
+        return isset($colors[$state]) ? $colors[$state] : '#337AB7';
     }
 
     public static function configTemplate()
