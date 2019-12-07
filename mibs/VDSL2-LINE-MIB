@@ -72,7 +72,8 @@ IMPORTS
    Xdsl2LineTxRefVnUs,
    Xdsl2BitsAlloc,
    Xdsl2MrefPsdDs,
-   Xdsl2MrefPsdUs,
+   Xdsl2MrefPsdUs
+   
           FROM   VDSL2-LINE-TC-MIB       -- [This document]
 
    MODULE-COMPLIANCE,
