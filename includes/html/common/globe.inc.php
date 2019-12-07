@@ -59,7 +59,7 @@ foreach (getlocations() as $location_row) {
         } elseif (\LibreNMS\Config::get('frontpage_globe.markers') == 'ports') {
             foreach (dbFetchRows("SELECT ifName,ifOperStatus,ifAdminStatus FROM ports WHERE ports.device_id = ? && ports.ignore = 0 && ports.disabled = 0 && ports.deleted = 0", array($device['device_id'])) as $port) {
                 $count++;
-                if ($port['ifOperStatus'] == 'down' && $port['ifAdminStatus'] == 'up') {
+                if ($port['ifOperStatus'] != 'up' && $port['ifAdminStatus'] == 'up') {
                     $down++;
                     $devices_down[] = $device['hostname']."/".$port['ifName']." DOWN";
                 } else {

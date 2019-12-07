@@ -78,7 +78,7 @@ Description: Only select ports that are down.
 
 Implies: macros.port
 
-Source: `(ports.ifOperStatus = "down" AND ports.ifAdminStatus != "down" AND macros.port)`
+Source: `(ports.ifOperStatus != "up" AND ports.ifAdminStatus != "down" AND macros.port)`
 
 ### Port-Usage in Percent (Decimal)
 
