@@ -12,5 +12,5 @@ modules:
                     skip_values:
                         -
                             oid: extErrFix
-                            op: 'i!='
+                            op: '!='
                             value: '0'
