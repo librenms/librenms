@@ -19,8 +19,8 @@ IMPORTS
    SnmpAdminString
       FROM SNMP-FRAMEWORK-MIB
 	  
-	noDefect, allowTransitionsToIdle, allowTransitionsToLowPower
-		FROM ADSL2-LINE-TC-MIB
+   Adsl2LConfProfPmMode
+      FROM ADSL2-LINE-TC-MIB
 
    HCPerfIntervalThreshold,
    HCPerfTimeElapsed
