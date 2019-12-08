@@ -74,6 +74,7 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
         Route::delete('rules/{id}', 'LegacyApiController@delete_rule')->name('delete_rule');
         Route::post('services/{hostname}', 'LegacyApiController@add_service_for_host')->name('add_service_for_host');
         Route::get('oxidized/config/search/{searchstring}', 'LegacyApiController@search_oxidized')->name('search_oxidized');
+        Route::get('oxidized/config/{device_name}', 'LegacyApiController@get_oxidized_config')->name('get_oxidized_config');
         Route::post('devicegroups', 'LegacyApiController@add_device_group')->name('add_device_group');
     });
 

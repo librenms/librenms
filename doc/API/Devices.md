@@ -1191,7 +1191,7 @@ Input:
 
 Example:
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/oxidized/configsearch/vlan10
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/oxidized/config/search/vlan10
 ```
 
 Output:
@@ -1209,5 +1209,30 @@ Output:
         }
     ],
     "count": 2
+}
+```
+
+### `get_oxidized_config`
+
+Returns a specific device's config from oxidized.
+
+Route: `api/v0/oxidized/config/:device_name`
+
+  - device_name is the full dns name of the device used when adding the device to librenms.
+  
+Input:
+
+-
+
+Example:
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/oxidized/config/router.corp.com
+```
+
+Output:
+```json
+{
+    "status": "ok",
+    "config": "DEVICE CONFIG HERE"
 }
 ```
