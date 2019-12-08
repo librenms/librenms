@@ -1,0 +1,44 @@
+mib: FOUNDRY-SN-AGENT-MIB:FOUNDRY-SN-SWITCH-GROUP-MIB
+modules:
+    sensors:
+        pre-cache:
+            data:
+                - oid:
+                    - ifDescr
+        dbm:
+            data:
+                -
+                    oid: snIfOpticalMonitoringInfoTable
+                    value: snIfOpticalMonitoringRxPower
+                    num_oid: '.1.3.6.1.4.1.1991.1.1.3.3.6.1.3.{{ $index }}'
+                    descr: '{{ $ifDescr }} Rx Power'
+                    index: 'snIfOpticalMonitoringRxPower.{{ $index }}'
+                -
+                    oid: snIfOpticalMonitoringInfoTable
+                    value: snIfOpticalMonitoringTxPower
+                    num_oid: '.1.3.6.1.4.1.1991.1.1.3.3.6.1.2.{{ $index }}'
+                    descr: '{{ $ifDescr }} Tx Power'
+                    index: 'snIfOpticalMonitoringTxPower.{{ $index }}'
+        temperature:
+            options:
+                divisor: 2
+            data:
+                -
+                    oid: snAgentTempTable
+                    value: snAgentTempValue
+                    num_oid: '.1.3.6.1.4.1.1991.1.1.2.13.1.1.4.{{ $index }}'
+                    descr: snAgentTempSensorDescr
+                    index: '{{ $index }}'
+        state:
+            data:
+                -
+                    oid: snChasPwrSupplyTable
+                    value: snChasPwrSupplyOperStatus
+                    num_oid: '.1.3.6.1.4.1.1991.1.1.1.2.1.1.3.{{ $index }}'
+                    descr: 'Power Supply {{ $index }}'
+                    index: '{{ $index }}'
+                    state_name: snChasPwrSupplyOperStatus
+                    states:
+                        - { value: 1, descr: other, graph: 0, generic: 3 }
+                        - { value: 2, descr: normal, graph: 1, generic: 0 }
+                        - { value: 3, descr: failure, graph: 0, generic: 2 }
