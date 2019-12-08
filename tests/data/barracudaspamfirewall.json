@@ -8,13 +8,13 @@
                     "sysDescr": "Barracuda Spam Firewall",
                     "sysContact": null,
                     "version": null,
-                    "hardware": "",
+                    "hardware": null,
                     "features": null,
-                    "location": null,
                     "os": "barracudaspamfirewall",
                     "type": "firewall",
                     "serial": null,
-                    "icon": "barracuda.svg"
+                    "icon": "barracuda.svg",
+                    "location": null
                 }
             ]
         },
@@ -26,13 +26,13 @@
                     "sysDescr": "Barracuda Spam Firewall",
                     "sysContact": "<private>",
                     "version": null,
-                    "hardware": "",
+                    "hardware": null,
                     "features": null,
-                    "location": "<private>",
                     "os": "barracudaspamfirewall",
                     "type": "firewall",
                     "serial": null,
-                    "icon": "barracuda.svg"
+                    "icon": "barracuda.svg",
+                    "location": "<private>"
                 }
             ]
         }
@@ -471,17 +471,121 @@
         "discovery": {
             "processors": [
                 {
-                    "entPhysicalIndex": "0",
-                    "hrDeviceIndex": "0",
+                    "entPhysicalIndex": 0,
+                    "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.2021.11.11.0",
                     "processor_index": "0",
                     "processor_type": "ucd-old",
-                    "processor_usage": "4",
+                    "processor_usage": 4,
                     "processor_descr": "CPU",
-                    "processor_precision": "-1",
-                    "processor_perc_warn": "75"
+                    "processor_precision": -1,
+                    "processor_perc_warn": 75
                 }
             ]
+        },
+        "poller": "matches discovery"
+    },
+    "sensors": {
+        "discovery": {
+            "sensors": [
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "count",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.2021.8.1.100.1",
+                    "sensor_index": "ucd1",
+                    "sensor_type": "barracudaspamfirewall",
+                    "sensor_descr": "InMailQueue",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 4,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "count",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.2021.8.1.100.2",
+                    "sensor_index": "ucd2",
+                    "sensor_type": "barracudaspamfirewall",
+                    "sensor_descr": "OutMailQueue",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 64,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "count",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.2021.8.1.100.3",
+                    "sensor_index": "ucd3",
+                    "sensor_type": "barracudaspamfirewall",
+                    "sensor_descr": "BounceMailQueue",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "count",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.2021.8.1.100.4",
+                    "sensor_index": "ucd4",
+                    "sensor_type": "barracudaspamfirewall",
+                    "sensor_descr": "RAIDStatus",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                }
+            ],
+            "state_indexes": []
         },
         "poller": "matches discovery"
     }
