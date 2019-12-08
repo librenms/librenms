@@ -717,6 +717,23 @@ function get_graphs(\Illuminate\Http\Request $request)
     });
 }
 
+function trigger_device_discovery(\Illuminate\Http\Request $request)
+{
+    // return details of a single device
+    $hostname = $request->route('hostname');
+
+    // use hostname as device_id if it's all digits
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    // find device matching the id
+    $device = device_by_id_cache($device_id);
+    if (!$device) {
+        return api_error(404, "Device $hostname does not exist");
+    }
+
+    $ret = device_discovery_trigger($device_id);
+    return api_success($ret, 'result');
+}
+
 function list_available_health_graphs(\Illuminate\Http\Request $request)
 {
     $hostname = $request->route('hostname');
