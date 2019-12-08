@@ -21,20 +21,18 @@ if (!Auth::user()->hasGlobalAdmin()) {
     exit;
 }
 
-// FIXME: Make this part of the API instead of a standalone function
 if (isset($_POST['device_id'])) {
     if (!is_numeric($_POST['device_id'])) {
         $status  = 'error';
         $message = 'Invalid device id ' . $_POST['device_id'];
     } else {
-        $update = dbUpdate(array('last_discovered' => array('NULL')), 'devices', '`device_id` = ?', array($_POST['device_id']));
-        if (!empty($update) || $update == '0') {
-            $status  = 'ok';
-            $message = 'Device ' . $_POST['device_id'] . ' will be rediscovered';
+        $result = device_discovery_trigger($_POST['device_id']);
+        if (!empty($result['status']) || $result['status'] == '0') {
+            $status = 'ok';
         } else {
-             $status  = 'error';
-             $message = 'Error rediscovering device ' . $_POST['device_id'];
+            $status = 'error';
         }
+        $message = $result['message'];
     }
 } elseif (isset($_POST['device_group_id'])) {
     if (!is_numeric($_POST['device_group_id'])) {
@@ -44,7 +42,8 @@ if (isset($_POST['device_id'])) {
         $device_ids = dbFetchColumn("SELECT `device_id` FROM `device_group_device` WHERE `device_group_id`=" . $_POST['device_group_id']);
         $update = 0;
         foreach ($device_ids as $device_id) {
-            $update += dbUpdate(array('last_discovered' => array('NULL')), 'devices', '`device_id` = ?', array($device_id));
+            $result = device_discovery_trigger($device_id);
+            $update += $result['status'];
         }
 
         if (!empty($update) || $update == '0') {
