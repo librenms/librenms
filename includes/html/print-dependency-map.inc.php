@@ -34,21 +34,6 @@ $node_down_style = array(
         'background' => Config::get('network_map_legend.dn.node'),
     ),
 );
-$edge_disabled_style = array(
-    'dashes' => array(8,12),
-    'color' => array(
-        'color' => Config::get('network_map_legend.di.edge'),
-        'highlight' => Config::get('network_map_legend.di.edge'),
-    ),
-);
-$edge_down_style = array(
-    'dashes' => array(8,12),
-    'color' => array(
-        'border' => Config::get('network_map_legend.dn.border'),
-        'highlight' => Config::get('network_map_legend.dn.edge'),
-        'color' => Config::get('network_map_legend.dn.edge'),
-    ),
-);
 
 // List all devices
 foreach ($devices as $items) {
