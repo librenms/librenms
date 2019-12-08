@@ -24,7 +24,7 @@ timetraTCMIBModule               MODULE-IDENTITY
         "This document is the SNMP MIB module for the SNMP Textual Conventions
          (TCs) used in the Nokia SROS manageability instrumentation.
 
-         Copyright 2003-2017 Nokia. All rights reserved. Reproduction of this
+         Copyright 2003-2018 Nokia. All rights reserved. Reproduction of this
          document is authorized on the condition that the foregoing copyright
          notice is included.
 
@@ -123,6 +123,22 @@ timetraTCMIBModule               MODULE-IDENTITY
          First version of the TIMETRA-TC-MIB."
 
     ::= { timetraModules 2 }
+
+TmnxFPNumber                     ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The unique value that identifies the forwarding plane within a
+         specific IOM card in the system."
+    SYNTAX      Unsigned32 (1..8)
+
+TmnxFPNumberOrZero               ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The unique value that identifies the forwarding plane within a
+         specific IOM card in the system.
+
+         Value 0 means this value is not applicable."
+    SYNTAX      Unsigned32 (0 | 1..8)
 
 InterfaceIndex                   ::= TEXTUAL-CONVENTION
     DISPLAY-HINT "d"
@@ -488,7 +504,7 @@ TmnxTimeInterval                 ::= TEXTUAL-CONVENTION
          TimeInterval TEXTUAL-CONVENTION can be used when an object requires
          longer intervals than 248 days.
 
-         A period of time, measured in units of 0.01 seconds."
+         A period of time, measured in units of centiseconds."
     SYNTAX      Unsigned32
 
 TNamedItem                       ::= TEXTUAL-CONVENTION
@@ -568,7 +584,7 @@ TItemLongDescription             ::= TEXTUAL-CONVENTION
     DESCRIPTION
         "Longer description for an item.  Note, use only NVT ASCII displayable
          characters here, no control characters, no UTF-8, etc."
-    SYNTAX      DisplayString (SIZE (0..160))
+    SYNTAX      DisplayString
 
 TRegularExpression               ::= TEXTUAL-CONVENTION
     STATUS      current
@@ -740,7 +756,7 @@ TmnxServId                       ::= TEXTUAL-CONVENTION
     DESCRIPTION
         "A number used to identify a Service. This ID must be unique within the
          Service Domain. The value 0 is used as the null ID."
-    SYNTAX      Unsigned32 (0 | 1..2147483647 | 2147483648 | 2147483649 | 2147483650 | 2147483651..2147483690 | 2147483691..2148007980 | 2148007981..2148012076 | 2148012077..2148016172 | 2148016173..2148278316 | 2148278317 | 2148278318..2148278381)
+    SYNTAX      Unsigned32 (0 | 1..2147483647 | 2147483648 | 2147483649 | 2147483650 | 2147483651..2147483690 | 2147483691..2148007980 | 2148007981..2148012076 | 2148012077..2148016172 | 2148016173..2148278316 | 2148278317 | 2148278318..2148278381 | 2148278382 | 2148278382..2148278386)
 
 TmnxExtServId                    ::= TEXTUAL-CONVENTION
     STATUS      current
@@ -808,7 +824,7 @@ TTmplPolicyID                    ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
         "The identification number of a policy for template objects."
-    SYNTAX      Unsigned32 (1..65535)
+    SYNTAX      Unsigned32 (0..65535)
 
 TQosIngressPolicyID              ::= TEXTUAL-CONVENTION
     STATUS      current
@@ -912,7 +928,11 @@ TmnxCreateOrigin                 ::= TEXTUAL-CONVENTION
         evpnIsa        (17),
         greBridged     (18),
         tli            (19),
-        pdn            (20)
+        pdn            (20),
+        ipsec          (23),
+        reserved24     (24),
+        reserved25     (25),
+        manual-mci     (26)
     }
 
 TmnxBsxTransitIpPolicyId         ::= TEXTUAL-CONVENTION
@@ -1277,6 +1297,13 @@ TmnxVcIdOrNone                   ::= TEXTUAL-CONVENTION
          0 indicates no VC ID is configured or available."
     SYNTAX      Unsigned32 (0 | 1..4294967295)
 
+DateAndTimeOrEmpty               ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "An object of type DateAndTimeOrEmpty data type contains a date-time
+         specification as in SNMPv2-TC::DateAndTime, or is empty"
+    SYNTAX      OCTET STRING (SIZE (0 | 8 | 11))
+
 Dot1PPriority                    ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
@@ -1289,6 +1316,12 @@ Dot1PPriorityMask                ::= TEXTUAL-CONVENTION
     DESCRIPTION
         "IEEE 802.1p priority mask.  zero is lowest, seven is highest."
     SYNTAX      Integer32 (0..7)
+
+Dot1PPriorityNonZeroMask         ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "IEEE 802.1p priority mask."
+    SYNTAX      Integer32 (1..7)
 
 ServiceAccessPoint               ::= TEXTUAL-CONVENTION
     STATUS      current
@@ -1709,6 +1742,18 @@ TPortSchedulerCIR                ::= TEXTUAL-CONVENTION
          value -1 means maximum rate."
     SYNTAX      Integer32 (-1 | 0..800000000)
 
+TPortQosPIRRate                  ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The Peak Information Rate (PIR) rate to be used in kbps."
+    SYNTAX      Unsigned32 (1..10000)
+
+TPortQosCIRRate                  ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The Committed Information Rate (CIR) rate to be used in kbps."
+    SYNTAX      Unsigned32 (0..10000)
+
 TWeight                          ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
@@ -1868,8 +1913,8 @@ THPolCIRRateOverride             ::= TEXTUAL-CONVENTION
 TCIRPercentOverride              ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
-        "The CIR percentage rate specified in hundredths of a percent. A value
-         of -2 specifies no override."
+        "The CIR percentage rate specified in centipercent. A value of -2
+         specifies no override."
     SYNTAX      Integer32 (-2 | 0..10000)
 
 THsmdaCIRKRate                   ::= TEXTUAL-CONVENTION
@@ -1982,8 +2027,8 @@ THPolPIRRateOverride             ::= TEXTUAL-CONVENTION
 TPIRPercentOverride              ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
-        "The PIR percentage rate specified in hundredths of a percent. A value
-         of -2 specifies no override."
+        "The PIR percentage rate specified in centipercent. A value of -2
+         specifies no override."
     SYNTAX      Integer32 (-2 | 1..10000)
 
 TPIRRateOrZero                   ::= TEXTUAL-CONVENTION
@@ -2041,6 +2086,21 @@ TmnxDHCP6MsgType                 ::= TEXTUAL-CONVENTION
         dhcp6MsgTypeRelayReply      (13),
         dhcp6MsgTypeLeasequery      (14),
         dhcp6MsgTypeLeasequeryReply (15)
+    }
+
+TmnxDhcpClientState              ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The state of a DHCP client."
+    SYNTAX      INTEGER {
+        init        (0),
+        init-reboot (1),
+        rebooting   (2),
+        selecting   (3),
+        requesting  (4),
+        rebinding   (5),
+        bound       (6),
+        renewing    (7)
     }
 
 TmnxIgpInstance                  ::= TEXTUAL-CONVENTION
@@ -2108,7 +2168,9 @@ TmnxBGPFamilyType                ::= TEXTUAL-CONVENTION
         ipv6Flow       (18),
         evpn           (19),
         bgpLs          (20),
-        mcastVpnIpv6   (21)
+        mcastVpnIpv6   (21),
+        srplcyIpv4     (22),
+        srplcyIpv6     (23)
     }
 
 TmnxIgmpGroupFilterMode          ::= TEXTUAL-CONVENTION
@@ -2137,6 +2199,17 @@ TmnxIgmpGroupType                ::= TEXTUAL-CONVENTION
     SYNTAX      INTEGER {
         static  (1),
         dynamic (2)
+    }
+
+TmnxIgmpSnpgGroupType            ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxIgmpSnpgGroupType describes how a multicast  group
+         is learned."
+    SYNTAX      INTEGER {
+        static   (1),
+        dynamic  (2),
+        bgp-smet (3)
     }
 
 TmnxIgmpVersion                  ::= TEXTUAL-CONVENTION
@@ -2219,18 +2292,22 @@ TmnxTunnelTypeExt                ::= TEXTUAL-CONVENTION
     DESCRIPTION
         "The type of this tunnel entity."
     SYNTAX      INTEGER {
-        invalid (1),
-        sdp     (2),
-        rsvp    (3),
-        ldp     (4),
-        ospf    (5),
-        isis    (6),
-        bypass  (7),
-        gre     (8),
-        bgp     (9),
-        srTe    (10),
-        fpe     (11),
-        udp     (12)
+        invalid       (1),
+        sdp           (2),
+        rsvp          (3),
+        ldp           (4),
+        ospf          (5),
+        isis          (6),
+        bypass        (7),
+        gre           (8),
+        bgp           (9),
+        srTe          (10),
+        fpe           (11),
+        udp           (12),
+        ospfV3        (13),
+        mplsFwdPolicy (14),
+        srPolicy      (15),
+        ribApi        (16)
     }
 
 TmnxIgpSCFamilyType              ::= TEXTUAL-CONVENTION
@@ -2293,6 +2370,19 @@ TmnxNatIsaGrpIdOrZero            ::= TEXTUAL-CONVENTION
          The value zero means that no NAT ISA Group is defined."
     SYNTAX      Unsigned32 (0..4)
 
+TmnxNatL2AwAccessMode            ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "TmnxNatL2AwAccessMode is an enumerated integer that specifies the
+         Layer-2-Aware NAT access mode.
+
+         The value 'auto' means that the system automatically derives the
+         access mode from the configuration (of the access SAP)."
+    SYNTAX      INTEGER {
+        auto    (1),
+        bridged (2)
+    }
+
 TmnxNatSubscriberType            ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
@@ -2329,6 +2419,15 @@ TmnxNatSubscriberTypeOrNone      ::= TEXTUAL-CONVENTION
         dsliteLsnSub  (3),
         nat64LsnSub   (4)
     }
+
+TmnxNatWaterMark                 ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The TmnxNatWaterMark data type contains an unsigned number that marks
+         a usage level in percent.
+
+         The value zero means that no watermark is defined."
+    SYNTAX      Unsigned32 (0..100)
 
 TmnxAuthPassword                 ::= TEXTUAL-CONVENTION
     STATUS      current
@@ -2478,6 +2577,19 @@ TmnxSubAcctSessionId             ::= TEXTUAL-CONVENTION
          subscriber for the purposes of accounting."
     SYNTAX      DisplayString (SIZE (0..22))
 
+TmnxSubHostGrouping              ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The TmnxSubHostGrouping data type is an enumerated integer that
+         indicates the way hosts associated with a given subscriber and SAP are
+         grouped together to share an SLA profile instance."
+    SYNTAX      INTEGER {
+        perSap         (1),
+        perGroup       (2),
+        perSessionPpp  (3),
+        perSessionIpoe (4)
+    }
+
 TmnxSubIdentString               ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
@@ -2492,6 +2604,13 @@ TmnxSubIdentStringOrEmpty        ::= TEXTUAL-CONVENTION
          identification string. The empty string denotes the absence of a
          subscriber identification string."
     SYNTAX      DisplayString (SIZE (0..32))
+
+TmnxSubIdentShortString          ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxSubIdentShortString denotes the short subscriber
+         identification string."
+    SYNTAX      DisplayString (SIZE (1..32))
 
 TmnxSubRadServAlgorithm          ::= TEXTUAL-CONVENTION
     STATUS      current
@@ -2512,6 +2631,33 @@ TmnxSubRadServAlgorithm          ::= TEXTUAL-CONVENTION
         direct     (1),
         roundRobin (2),
         hashBased  (3)
+    }
+
+TmnxSubRadIsaServAlgorithm       ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The TmnxSubRadIsaServAlgorithm data type is an enumerated integer that
+         indicates the algorithm used to access the list of configured RADIUS
+         servers:
+         - direct         (1): The first server will be used as primary server for
+                                all requests, the second as secondary and so on.
+         - roundRobin     (2): The first server will be used as primary server for
+                                the first request, the second server as primary for
+                                the second request, and so on. If the router gets
+                                to the end of the list, it starts again with the
+                                first server.
+         - hashBased      (3): The server will be selected based on a specified
+                                hash value.
+         - directPriority (4): The first server will be used as primary server for
+                                all requests, the second as secondary and so on.
+                                Higher priority servers that are operationally down
+                                will be probed and put back into service upon a
+                                response."
+    SYNTAX      INTEGER {
+        direct         (1),
+        roundRobin     (2),
+        hashBased      (3),
+        directPriority (4)
     }
 
 TmnxSubRadiusAttrType            ::= TEXTUAL-CONVENTION
@@ -2654,6 +2800,26 @@ TmnxSubShcvSrcIpOrigin           ::= TEXTUAL-CONVENTION
         vrrp      (2)
     }
 
+TmnxSubSpiGroupId                ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The TmnxSubSpiGroupId data type is an integer that specifies  the SLA
+         profile instance group identifier.
+
+         A value of minus one means that there is no group identifier
+         configured."
+    SYNTAX      Integer32 (-1..65535)
+
+TmnxSubOperSpiGroupId            ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The TmnxSubOperSpiGroupId data type is an integer that indicates  the
+         SLA profile instance group identifier specified by the AAA server.
+
+         A value of minus one indicates that the AAA server  did not specify
+         such a group identifier."
+    SYNTAX      Integer32
+
 TmnxReferenceBandwidth           ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
@@ -2667,12 +2833,18 @@ TmnxReferenceBandwidth           ::= TEXTUAL-CONVENTION
          The value zero specifies that no reference-bandwidth is configured."
     SYNTAX      Unsigned32 (0..4000000000)
 
+TmnxSubPoolName                  ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The name of a pool"
+    SYNTAX      TLNamedItem
+
 TmnxSubProfileString             ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
         "The data type TmnxSubProfileString denotes the subscriber profile
          string."
-    SYNTAX      DisplayString (SIZE (1..16))
+    SYNTAX      DisplayString (SIZE (1..32))
 
 TmnxSubProfileStringOrEmpty      ::= TEXTUAL-CONVENTION
     STATUS      current
@@ -2680,20 +2852,20 @@ TmnxSubProfileStringOrEmpty      ::= TEXTUAL-CONVENTION
         "The data type TmnxSubProfileStringOrEmpty denotes the subscriber
          profile string. The empty string denotes the absence of a subscriber
          profile."
-    SYNTAX      DisplayString (SIZE (0..16))
+    SYNTAX      DisplayString (SIZE (0..32))
 
 TmnxSlaProfileString             ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
         "The data type TmnxSlaProfileString denotes the SLA profile string."
-    SYNTAX      DisplayString (SIZE (1..16))
+    SYNTAX      DisplayString (SIZE (1..32))
 
 TmnxSlaProfileStringOrEmpty      ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
         "The data type TmnxSlaProfileStringOrEmpty denotes the SLA profile
          string. The empty string denotes the absence of a SLA profile."
-    SYNTAX      DisplayString (SIZE (0..16))
+    SYNTAX      DisplayString (SIZE (0..32))
 
 TmnxAppProfileString             ::= TEXTUAL-CONVENTION
     STATUS      current
@@ -2989,6 +3161,20 @@ TmnxSubAleOffset                 ::= TEXTUAL-CONVENTION
         ipoeTagged           (24)
     }
 
+TmnxDataFormat                   ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxDataFormat represents how the input data
+         is specified:
+         - 'ascii (2)': the data contains seven-bit ASCII characters
+         - 'hex   (3)': the data contains octets. It must be displayed in
+                        hexadecimal format because it contains non-printable
+                        characters."
+    SYNTAX      INTEGER {
+        ascii (2),
+        hex   (3)
+    }
+
 TmnxDhcpOptionType               ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
@@ -3008,6 +3194,24 @@ TmnxDhcpOptionType               ::= TEXTUAL-CONVENTION
         hex    (3),
         ipv6   (4),
         domain (5)
+    }
+
+TmnxDhcpOptionDisplay            ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxDhcpOptionDisplay represents a hint of
+         how the value of a DHCP option can be displayed:
+         - 'default (1)'             : display the option according to the type;
+         - 'hexDuration (2)'         : display the hex option as a duration;
+         - 'hexNetbiosNodeType (3)'  : display the hex option as a Netbios node type.;
+         - 'hexIpv4Address (4)'      : display the hex option as a list of IPv4 addresses.;
+         - 'hexIpv6Address (5)'      : display the hex option as a list of IPv6 addresses."
+    SYNTAX      INTEGER {
+        default            (1),
+        hexDuration        (2),
+        hexNetbiosNodeType (3),
+        hexIpv4Address     (4),
+        hexIpv6Address     (5)
     }
 
 TmnxDhcpServerDUIDTypeCode       ::= TEXTUAL-CONVENTION
@@ -3078,7 +3282,7 @@ TmnxPppoePadoDelay               ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
         "The data type TmnxPppoePadoDelay specifies the delay timeout in
-         deci-seconds before sending a PADO (PPPoE Active Discovery Offer)."
+         deciseconds before sending a PADO (PPPoE Active Discovery Offer)."
     SYNTAX      Unsigned32 (0 | 1..30)
 
 TmnxPppoeSessionInfoOrigin       ::= TEXTUAL-CONVENTION
@@ -3345,6 +3549,15 @@ TRemarkType                      ::= TEXTUAL-CONVENTION
         none       (1),
         dscp       (2),
         precedence (3)
+    }
+
+TIngClassRemarkType              ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The remarking to be used."
+    SYNTAX      INTEGER {
+        any      (1),
+        dot1pExp (2)
     }
 
 TPrecValue                       ::= TEXTUAL-CONVENTION
@@ -3739,6 +3952,104 @@ TmnxAccPlcyQECounters            ::= TEXTUAL-CONVENTION
         ood (7)
     }
 
+TmnxAccPlcyPolicerICounters      ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This data type describes a set of ingress counters for which
+         accounting data can be collected associated with a given policer.
+
+         ipo : In-profile Packets Offered
+         ipd : In-profile Packets Discarded
+         opo : Out-profile Packets Offered
+         opd : Out-profile Packets Discarded
+         ioo : In-profile Octets Offered
+         iod : In-profile Octets Discarded
+         ooo : Out-profile Octets Offered
+         ood : Out-profile Octets Discarded
+         ucp : Uncoloured Packets Offered
+         uco : Uncoloured Octets Offered
+         ipf : In-profile Packets Forwarded
+         iof : In-profile Octets Forwarded
+         opf : Out-profile Packets Forwarded
+         oof : Out-profile Octets Forwarded."
+    SYNTAX      BITS {
+        ipo (0),
+        ipd (1),
+        opo (2),
+        opd (3),
+        ioo (4),
+        iod (5),
+        ooo (6),
+        ood (7),
+        ucp (8),
+        uco (9),
+        ipf (10),
+        iof (11),
+        opf (12),
+        oof (13)
+    }
+
+TmnxAccPlcyPolicerECounters      ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This data type describes a set of egress counters for which accounting
+         data can be collected associated with a given policer.
+
+          ipo  : In-profile Packets Offered
+          ipd  : In-profile Packets Discarded
+          opo  : Out-profile Packets Offered
+          opd  : Out-profile Packets Discarded
+          ioo  : In-profile Octets Offered
+          iod  : In-profile Octets Discarded
+          ooo  : Out-profile Octets Offered
+          ood  : Out-profile Octets Discarded
+          ucp  : Uncoloured Packets Offered
+          uco  : Uncoloured Octets Offered
+          ipf  : In-profile Packets Forwarded
+          iof  : In-profile Octets Forwarded
+          opf  : Out-Profile Packets Forwarded
+          oof  : Out-Profile Octets Forwarded
+          xpo  : Exceed-profile Packets Offered;
+          xpd  : Exceed-profile Packets Discarded;
+          xpf  : Exceed-profile Packets Forwarded;
+          xoo  : Exceed-profile Octets Offered;
+          xod  : Exceed-profile Octets Discarded;
+          xof  : Exceed-profile Octets Forwarded;
+          ppo  : In-plus-profile Packets Offered;
+          ppd  : In-plus-profile Packets Discarded;
+          ppf  : In-plus-profile Packets Forwarded;
+          poo  : In-plus-profile Octets Offered;
+          pod  : In-plus-profile Octets Discarded;
+          pof  : In-plus-profile Octets Forwarded;"
+    SYNTAX      BITS {
+        ipo (0),
+        ipd (1),
+        opo (2),
+        opd (3),
+        ioo (4),
+        iod (5),
+        ooo (6),
+        ood (7),
+        ucp (8),
+        uco (9),
+        ipf (10),
+        iof (11),
+        opf (12),
+        oof (13),
+        xpo (14),
+        xpd (15),
+        xpf (16),
+        xoo (17),
+        xod (18),
+        xof (19),
+        ppo (20),
+        ppd (21),
+        ppf (22),
+        poo (23),
+        pod (24),
+        pof (25)
+    }
+
 TmnxAccPlcyOICounters            ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
@@ -3866,6 +4177,22 @@ TmnxIsaBbGrpId                   ::= TEXTUAL-CONVENTION
 
          The value zero means that no ISA-BB Group is defined."
     SYNTAX      Unsigned32 (0..4)
+
+TmnxIsaScalingProfile            ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "TmnxIsaScalingProfile is an enumerated integer that specifies the ISA
+         scaling profile.
+
+         The meaning of each profile is explained in the customer
+         documentation.
+
+         ISA scaling profiles are only used in a virtual machine
+         implementation."
+    SYNTAX      INTEGER {
+        profile1 (1),
+        profile2 (2)
+    }
 
 TmnxVdoGrpIdIndex                ::= TEXTUAL-CONVENTION
     STATUS      current
@@ -4053,6 +4380,20 @@ TIngPolicerId                    ::= TEXTUAL-CONVENTION
          side."
     SYNTAX      Integer32 (1..32)
 
+TNetIngPolicerId                 ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type describes the QoS control policer identifier on network
+         ingress side."
+    SYNTAX      Integer32 (1..16)
+
+TNetIngPolicerIdOrNone           ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type describes the QoS control policer identifier on network
+         ingress side or zero when not specified."
+    SYNTAX      Integer32 (0 | 1..16)
+
 TIngPolicerIdOrNone              ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
@@ -4155,6 +4496,14 @@ TClassBurstLimit                 ::= TEXTUAL-CONVENTION
          value."
     SYNTAX      Integer32 (-1 | 1..327680)
 
+TNetIngPlcrBurstSizeBytes        ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The amount of buffer space (in bytes) assigned to a queue by policer.
+         The value -1 means that the actual value is derived from the
+         corresponding buffer policy's default value."
+    SYNTAX      Integer32 (-1 | 128..4161536)
+
 TPlcrBurstSizeBytes              ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
@@ -4216,7 +4565,8 @@ TmnxBfdSessionProtocols          ::= TEXTUAL-CONVENTION
         ldpLsp      (20),
         bgpLsp      (21),
         rip         (22),
-        ripng       (23)
+        ripng       (23),
+        mplsLsp     (24)
     }
 
 TmnxBfdSessOperState             ::= TEXTUAL-CONVENTION
@@ -4247,7 +4597,8 @@ TmnxBfdOnLspSessFecType          ::= TEXTUAL-CONVENTION
     SYNTAX      INTEGER {
         rsvp (1),
         ldp  (2),
-        bgp  (3)
+        bgp  (3),
+        srTe (4)
     }
 
 TmnxIngPolicerStatMode           ::= TEXTUAL-CONVENTION
@@ -4266,6 +4617,36 @@ TmnxIngPolicerStatMode           ::= TEXTUAL-CONVENTION
         offeredLimitedProfileCIR (7),
         offeredProfileCappedCIR  (8),
         offeredLimitedCappedCIR  (9)
+    }
+
+TmnxSapIngPolicerStatMode        ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "TmnxSapIngPolicerStatMode specifies the mode of statistics collected
+         by this sap ingress policer."
+    SYNTAX      INTEGER {
+        noStats                    (0),
+        minimal                    (1),
+        offeredProfileNoCIR        (2),
+        offeredTotalCIR            (3),
+        offeredPriorityNoCIR       (4),
+        offeredProfileCIR          (5),
+        offeredPriorityCIR         (6),
+        offeredLimitedProfileCIR   (7),
+        offeredProfileCappedCIR    (8),
+        offeredLimitedCappedCIR    (9),
+        offeredProfileWithDiscards (10),
+        reserved11                 (11)
+    }
+
+TmnxNetIngPlcyPolicerStatMode    ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "TmnxIngPolicerStatMode specifies the mode of statistics collected by
+         this network ingress policer."
+    SYNTAX      INTEGER {
+        noStats                    (0),
+        offeredProfileWithDiscards (10)
     }
 
 TmnxIngPolicerStatModeOverride   ::= TEXTUAL-CONVENTION
@@ -4455,8 +4836,10 @@ TmnxSvcOperGrpCreationOrigin     ::= TEXTUAL-CONVENTION
         "A number used to identify creation origin for the service operational
          group."
     SYNTAX      INTEGER {
-        manual (1),
-        mvrp   (2)
+        manual    (1),
+        mvrp      (2),
+        dynScript (7),
+        vsd       (12)
     }
 
 TmnxOperGrpHoldUpTime            ::= TEXTUAL-CONVENTION
@@ -4727,7 +5110,7 @@ TmnxDistCpuProtPacketRateLimit   ::= TEXTUAL-CONVENTION
 TmnxDistCpuProtRate              ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
-        "A kbps limiting rate in kilobits-per-second for Distributed CPU
+        "A kbps limiting rate in kilobits per second for Distributed CPU
          Protection Policy parameters. The value -1 means max rate."
     SYNTAX      Integer32 (-1 | 1..20000000)
 
@@ -5154,6 +5537,24 @@ TmnxSvcEvi                       ::= TEXTUAL-CONVENTION
         "The TmnxSvcEvi specifies an ethernet EVPN identifier value."
     SYNTAX      Integer32 (1..65535)
 
+TmnxSecRadiusServAlgorithm       ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The TmnxSecRadiusServAlgorithm data type is an enumerated integer that
+         indicates the algorithm used to access the list of configured RADIUS
+         servers:
+         - direct      (1): The first server will be used as primary server for
+                            all requests, the second as secondary and so on.
+         - round-robin (2): The first server will be used as primary server for
+                            the first request, the second server as primary for
+                            the second request, and so on. If the router gets
+                            to the end of the list, it starts again with the
+                            first server."
+    SYNTAX      INTEGER {
+        direct      (1),
+        round-robin (2)
+    }
+
 TmnxSvcEviOrZero                 ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
@@ -5215,6 +5616,31 @@ TmnxCBFClasses                   ::= TEXTUAL-CONVENTION
         h1         (6),
         nc         (7),
         defaultLsp (8)
+    }
+
+TmnxUrpfCheckMode                ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The TmnxUrpfCheckMode is the mode of operation of Unicast Reverse Path
+         Forwarding (uRPF).
+
+         A value of 'strict' means that uRPF checks if the incoming packet has
+         a source address that matches a prefix in the routing table, and if
+         the interface expects to receive a packet with this source address
+         prefix.
+
+         A value of 'loose' means that the uRPF checks if the incoming packet
+         has a source address with a corresponding prefix in the routing table,
+         but not if the interface expects to receive a packet with a specific
+         source address prefix.
+
+         A value of 'strictNoEcmp' means that the uRPF drops a packet with a
+         source address that matches an ECMP route and otherwise behaves the
+         same as in 'strict' mode."
+    SYNTAX      INTEGER {
+        strict       (1),
+        loose        (2),
+        strictNoEcmp (3)
     }
 
 TmnxUserPassword                 ::= TEXTUAL-CONVENTION
@@ -5726,16 +6152,20 @@ TmnxSvcEvpnMplsTransportType     ::= TEXTUAL-CONVENTION
     DESCRIPTION
         "The type of this transport entity."
     SYNTAX      INTEGER {
-        invalid (0),
-        local   (1),
-        static  (2),
-        rsvp    (3),
-        ldp     (4),
-        ospf    (5),
-        isis    (6),
-        bgp     (7),
-        srTe    (8),
-        udp     (9)
+        invalid       (0),
+        local         (1),
+        static        (2),
+        rsvp          (3),
+        ldp           (4),
+        ospf          (5),
+        isis          (6),
+        bgp           (7),
+        srTe          (8),
+        udp           (9),
+        srPolicy      (10),
+        mplsFwdPolicy (11),
+        ribApi        (12),
+        srOspf3       (13)
     }
 
 TmnxMplsLabel                    ::= TEXTUAL-CONVENTION
@@ -5751,10 +6181,175 @@ TmnxMplsLabelOrZero              ::= TEXTUAL-CONVENTION
          value 0 indicates that no MPLS label is specified."
     SYNTAX      Unsigned32 (0 | 32..1048575)
 
+TmnxMplsLspBandwidth             ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The TmnxMplsLspBandwidth data type indicates maximum bandwidth range."
+    SYNTAX      Unsigned32 (0..6400000)
+
 TmnxVni                          ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
         "The TmnxVni data type indicates range for VNI."
     SYNTAX      Unsigned32 (1..16777215)
+
+TmnxVniOrZero                    ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The TmnxVni data type indicates range for VNI."
+    SYNTAX      Unsigned32 (0..16777215)
+
+PwPortIdOrZero                   ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "PwPortIdOrZero indicates the range for pw port id's with 0 as the
+         default value."
+    SYNTAX      Unsigned32 (0 | 1..32767)
+
+TmnxCliEngine                    ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The value of TmnxCliEngine specifies the CLI engine type.
+         Values:
+           classicCli    (1) - Classic CLI engine.
+           mdCli         (2) - Model-Driven CLI engine.
+           systemDerived (3) - Default value. CLI engine derived from system configuration-mode."
+    SYNTAX      INTEGER {
+        classicCli    (1),
+        mdCli         (2),
+        systemDerived (3)
+    }
+
+TmnxRsvpSessionNameString        ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The TmnxRsvpSessionNameString type indicates the RSVP session name
+         which has extended from 80 to 160 characters."
+    SYNTAX      DisplayString (SIZE (0..160))
+
+TmnxQosMdAutoPolicyID            ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The identification number of a policy for Qos objects. This ID must be
+         unique within the Qos Domain. The value 0 is used as the null ID."
+    SYNTAX      Unsigned32 (0 | 2..65535)
+
+TmnxQosMdAutoIDCount             ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This data type describes the count of policy IDs that has already been
+         assigned for Qos objects."
+    SYNTAX      Unsigned32 (0..65535)
+
+TmnxNhgDownReason                ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The reason for next-hop group being operationally down."
+    SYNTAX      INTEGER {
+        notApplicable      (0),
+        nextHopNotResolved (1),
+        nextHopIsLocal     (3),
+        nextHopIsMcast     (4),
+        resTypeMismatch    (5)
+    }
+
+TmnxQosRateHigh32                ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The upper 32 bits of a 64 bit rate value."
+    SYNTAX      TmnxHigh32 (0 | 1 | 4294967295)
+
+TmnxQosRateLow32                 ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The lower 32 bits of a 64 bit rate value."
+    SYNTAX      TmnxLow32 (0..4294967295)
+
+AluNgeKeygroupIdOrZero           ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A number used to identify an entry in the aluNgeKeygroupTable or zero."
+    SYNTAX      Unsigned32 (0..127)
+
+TmnxEsaNum                       ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The TmnxEsaNum data type contains an identification number for an
+         Extended Service Appliance. The value '0' indicates an invalid
+         reference."
+    SYNTAX      Unsigned32 (0 | 1..16)
+
+TmnxEsaVappNum                   ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The TmnxEsaVappNum type contains an identification number for the
+         Virtual Application on an Extended Service Appliance. The value '0'
+         indicates an invalid reference."
+    SYNTAX      Unsigned32 (0 | 1..4)
+
+TPolRateTypeRefOrLocalLimit      ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The type of the PIR/CIR percent rate. The value 'kbps' means the rate
+         is specified in kbps. The value 'percentLocalLimit' means the rate is
+         specified in percentage of local limit. The value
+         'percentReferPortLimit' means the rate is specified in percentage of
+         reference port limit."
+    SYNTAX      INTEGER {
+        kbps              (1),
+        percentLocalLimit (2),
+        reserved3         (3)
+    }
+
+TPolicerRateTypeWithRefLimit     ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The type of the PIR/CIR percent rate. The value 'kbps' means the rate
+         is specified in kbps. The value 'percentPortLimit' means the rate is
+         specified in percentage of port limit. The value 'percentLocalLimit'
+         means the rate is specified in percentage of local limit. The value
+         'percentReferPortLimit' means the rate is specified in percentage of
+         reference port limit."
+    SYNTAX      INTEGER {
+        kbps              (1),
+        percentPortLimit  (2),
+        percentLocalLimit (3),
+        reserved4         (4)
+    }
+
+TWredSlopeProfile                ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The profile marking of a packet. Value of 'in' specifies in-profile
+         marking. Value of 'out' specifies out-profile marking. Value of 'none'
+         specifies the profile marking of the packet will be inherited from the
+         existing enqueuing priority derived from earlier matches in the
+         classification hierarchy."
+    SYNTAX      INTEGER {
+        in        (1),
+        out       (2),
+        reserved4 (4),
+        reserved5 (5)
+    }
+
+TDEWredSlopeProfile              ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This textual convention specifies the profile marking of a packet.
+
+         Value of 'in' specifies the in-profile marking.
+
+         Value of 'out' specifies the out-profile marking.
+
+         Value of 'de' specifies that the profile marking will be based on the DE
+         (Drop-Eligible) bit.  DE bit-value of '0' specifies in-profile and DE
+         bit value of '1' specifies out-profile marking."
+    SYNTAX      INTEGER {
+        in        (1),
+        out       (2),
+        de        (3),
+        reserved4 (4),
+        reserved5 (5)
+    }
 
 END

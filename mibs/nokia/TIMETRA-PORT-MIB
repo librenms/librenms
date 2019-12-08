@@ -47,7 +47,8 @@ IMPORTS
     THsmdaWeightOverride,
     THsmdaWrrWeightOverride,
     TIngressQueueId, TItemDescription,
-    TItemLongDescription, TMcFrQoSProfileId,
+    TItemLongDescription,
+    TLNamedItemOrEmpty, TMcFrQoSProfileId,
     TMlpppQoSProfileId, TNamedItem,
     TNamedItemOrEmpty, TPIRPercentOverride,
     TPortSchedulerAggRateLimitPIR,
@@ -59,8 +60,9 @@ IMPORTS
     TWeightOverride, TmnxActionType,
     TmnxAdminStateTruthValue,
     TmnxEgrPolicerStatMode,
-    TmnxEnabledDisabled, TmnxHigh32,
-    TmnxLow32, TmnxOperState, TmnxPortID,
+    TmnxEnabledDisabled, TmnxFPNumberOrZero,
+    TmnxOperState, TmnxPortID,
+    TmnxQosRateHigh32, TmnxQosRateLow32,
     TmnxSubIdentStringOrEmpty,
     TmnxSubMgtIntDestId,
     TmnxSubMgtOrgStrOrZero
@@ -77,7 +79,7 @@ tmnxPortMIBModule                MODULE-IDENTITY
         "This document is the SNMP MIB module to manage and provision the
          hardware components of the Nokia SROS device.
 
-         Copyright 2003-2017 Nokia.  All rights reserved.
+         Copyright 2003-2018 Nokia.  All rights reserved.
          Reproduction of this document is authorized on the condition that
          the foregoing copyright notice is included.
 
@@ -325,23 +327,25 @@ TmnxPortClass                    ::= TEXTUAL-CONVENTION
          the values used to identify the class of interface provided by this
          port."
     SYNTAX      INTEGER {
-        none      (1),
-        faste     (2),
-        gige      (3),
-        xgige     (4),
-        sonet     (5),
-        vport     (6),
-        xcme      (8),
-        tdm       (9),
-        xlgige    (10),
-        cgige     (11),
-        vsme      (12),
-        vspeede   (14),
-        serial    (17),
-        wireless  (18),
-        connector (19),
-        xxvgige   (20),
-        cdgige    (21)
+        none       (1),
+        faste      (2),
+        gige       (3),
+        xgige      (4),
+        sonet      (5),
+        vport      (6),
+        xcme       (8),
+        tdm        (9),
+        xlgige     (10),
+        cgige      (11),
+        vsme       (12),
+        vspeede    (14),
+        serial     (17),
+        wireless   (18),
+        connector  (19),
+        xxvgige    (20),
+        cdgige     (21),
+        reserved22 (22),
+        reserved23 (23)
     }
 
 TmnxPortConnectorType            ::= TEXTUAL-CONVENTION
@@ -471,7 +475,8 @@ TmnxPortEncapType                ::= TEXTUAL-CONVENTION
         cemEncap       (13),
         reserved14     (14),
         rawEncap       (15),
-        cellularEncap  (16)
+        cellularEncap  (16),
+        wlanEncap      (17)
     }
 
 TmnxDs0ChannelList               ::= TEXTUAL-CONVENTION
@@ -1202,13 +1207,16 @@ TmnxPortCompatMode               ::= TEXTUAL-CONVENTION
                       - 80km reach
              interop  - interface will operate in the third party interop mode
              interop2 - interface will operate in the third party interop mode
-                        with alternate differential encoding"
+                        with alternate differential encoding
+             interop3 - interface will operate in the CFP2-DCO Rev A0 Staircase
+                        FEC interop mode"
     SYNTAX      INTEGER {
         longHaul (0),
         metro    (1),
         access   (2),
         interop  (3),
-        interop2 (4)
+        interop2 (4),
+        interop3 (5)
     }
 
 TmnxSFFStatus                    ::= TEXTUAL-CONVENTION
@@ -1288,6 +1296,27 @@ TmnxPortConnectorBreakoutType    ::= TEXTUAL-CONVENTION
          tmnxPortConnBreakoutTypeTable used to identify a specific type of
          connector breakout."
     SYNTAX      Unsigned32
+
+TmnxCrcPolynomial                ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "TmnxCrcPolynomial is enumerated integer type of polynomial options
+         used in load balancing algorithm for distribution of packet flows
+         under ECMP and LAG.
+                poly1(1) - CRC16_0x8003
+                poly2(2) - CRC16_0x8011
+                poly3(3) - CRC16_0x8423
+                poly4(4) - CRC16_0x8101
+                poly5(5) - CRC16_0x84a1
+                poly6(6) - CRC16_0x9019."
+    SYNTAX      INTEGER {
+        poly1 (1),
+        poly2 (2),
+        poly3 (3),
+        poly4 (4),
+        poly5 (5),
+        poly6 (6)
+    }
 
 tmnxPortConformance              OBJECT IDENTIFIER ::= { tmnxHwConformance 2 }
 
@@ -2367,20 +2396,44 @@ tmnxPortComplianceV15v0          MODULE-COMPLIANCE
             tmnxPwPortEthTypeV15v0Group,
             tmnxRS232PortGroup,
             tmnxRS232PortNotifyGroup,
-            tmnxPortVsrGroup
+            tmnxPortVsrGroup,
+            tmnxPortTransceiverGroupV15v0
         }
     ::= { tmnxPortCompliances 12 }
 
-tmnxPortComplianceV15v1          MODULE-COMPLIANCE
+tmnxPortComplianceV16v0          MODULE-COMPLIANCE
     STATUS      current
     DESCRIPTION
-        "The compliance statement for revision 15.1 of TIMETRA-PORT-MIB on the
+        "The compliance statement for revision 16.0 of TIMETRA-PORT-MIB on the
          Nokia SROS series systems."
     MODULE
         MANDATORY-GROUPS {
-            tmnxPortFPMacObjectGroup
+            tmnxPortQosMWModAwareV16v0Group,
+            tmnxPortQosMWModAwV16v0NotifyGrp,
+            tmnxPortFPMacObjectGroup,
+            tmnxPortLicensingGroup,
+            tmnxPortLoadBalGroupV16v0
         }
     ::= { tmnxPortCompliances 13 }
+
+tmnxPortComplianceV19v0          MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for revision 19.0 of TIMETRA-PORT-MIB on the
+         Nokia SROS series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxRsFecConnectorGroup,
+            tmnxRsFecModeGroup,
+            tmnxPortBWGroup,
+            tmnxPortEgrQosPortQosPlcyGroup,
+            tmnxPortLoadBalGroupV19v5,
+            tmnxPortEtherLoopbackGroup,
+            tmnxPortTDMGroupV19v0,
+            tmnxPortNotificationV19v0Group,
+            tmnxPortEtherPhysStatsV19v0Group
+        }
+    ::= { tmnxPortCompliances 14 }
 
 tmnxPortGroups                   OBJECT IDENTIFIER ::= { tmnxPortConformance 2 }
 
@@ -6284,6 +6337,18 @@ tmnxPortVsrGroup                 OBJECT-GROUP
          series systems."
     ::= { tmnxPortV15v0Groups 17 }
 
+tmnxPortTransceiverGroupV15v0    OBJECT-GROUP
+    OBJECTS     {
+        tmnxPortTransceiverTblLastChgd,
+        tmnxPortTransLastChanged,
+        tmnxPortTransDco
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting port transceiver information on Nokia
+         SROS series systems introduced in release 15.0."
+    ::= { tmnxPortV15v0Groups 18 }
+
 tmnxPortGnssGroups               OBJECT IDENTIFIER ::= { tmnxPortGroups 141 }
 
 tmnxPortSerialGroups             OBJECT IDENTIFIER ::= { tmnxPortGroups 142 }
@@ -6421,6 +6486,29 @@ tmnxPortObsoleteNotifV15v1Group  NOTIFICATION-GROUP
 
 tmnxPortV16v0Groups              OBJECT IDENTIFIER ::= { tmnxPortGroups 144 }
 
+tmnxPortQosMWModAwareV16v0Group  OBJECT-GROUP
+    OBJECTS     {
+        tmnxPortEtherEthBnEgrRateChanges,
+        tmnxPortEtherEthBnEgressRate,
+        tmnxPortEtherOperEgressRate
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting the management of QoS Microwave
+         Adaptive Modulation Aware configuration for release 16.0 on Nokia SROS
+         series systems."
+    ::= { tmnxPortV16v0Groups 1 }
+
+tmnxPortQosMWModAwV16v0NotifyGrp NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tmnxEqPortEtherEgressRateChange
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of NOTIFICATION objects supporting the state of Qos
+         Microwave Modulation Aware on Nokia SROS series systems."
+    ::= { tmnxPortV16v0Groups 2 }
+
 tmnxPortFPMacObjectGroup         OBJECT-GROUP
     OBJECTS     {
         tmnxPortStateFPNumber,
@@ -6431,6 +6519,134 @@ tmnxPortFPMacObjectGroup         OBJECT-GROUP
         "The group of objects supporting output of the FP and MAC on the port
          on Nokia SROS series systems."
     ::= { tmnxPortV16v0Groups 3 }
+
+tmnxPortLicensingGroup           OBJECT-GROUP
+    OBJECTS     {
+        tmnxPortStateLicensed
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects for management of port licensing on Nokia SROS
+         series systems."
+    ::= { tmnxPortV16v0Groups 4 }
+
+tmnxPortLoadBalGroupV16v0        OBJECT-GROUP
+    OBJECTS     {
+        tmnxL2tpLoadBalancing
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of additional objects supporting load balancing in Nokia
+         SROS release 16.0 systems."
+    ::= { tmnxPortV16v0Groups 5 }
+
+tmnxPortV19v0Groups              OBJECT IDENTIFIER ::= { tmnxPortGroups 145 }
+
+tmnxRsFecConnectorGroup          OBJECT-GROUP
+    OBJECTS     {
+        tmnxPortConnectorRsFecMode
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting the management of rs-fec-mode on
+         connector ports in release 19.0 on Nokia SROS series systems."
+    ::= { tmnxPortV19v0Groups 1 }
+
+tmnxRsFecModeGroup               OBJECT-GROUP
+    OBJECTS     {
+        tmnxPortRsFecOperMode
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting the management of rs-fec-mode on ports
+         in release 19.0 on Nokia SROS series systems."
+    ::= { tmnxPortV19v0Groups 2 }
+
+tmnxPortBWGroup                  OBJECT-GROUP
+    OBJECTS     {
+        tmnxPortEtherAccessBandwidthHi
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting the management of rs-fec-mode on ports
+         in release 19.0 on Nokia SROS series systems."
+    ::= { tmnxPortV19v0Groups 3 }
+
+tmnxPortEgrQosPortQosPlcyGroup   OBJECT-GROUP
+    OBJECTS     {
+        tmnxPortEtherEgrQosPortQosPlcy,
+        tmnxPortNetEgressUCFwdPkts,
+        tmnxPortNetEgressUCFwdOcts,
+        tmnxPortNetEgressUCDroPkts,
+        tmnxPortNetEgressUCDroOcts,
+        tmnxPortNetEgressMCFwdPkts,
+        tmnxPortNetEgressMCFwdOcts,
+        tmnxPortNetEgressMCDroPkts,
+        tmnxPortNetEgressMCDroOcts
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting the management of port qos policy on
+         ports in release 19.0 on Nokia SROS series systems."
+    ::= { tmnxPortV19v0Groups 4 }
+
+tmnxPortLoadBalGroupV19v5        OBJECT-GROUP
+    OBJECTS     {
+        tmnxLoadBalancingHashEcmpPoly,
+        tmnxLoadBalancingHashLagPoly
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of additional objects supporting load balancing in release
+         19.0 on Nokia SROS series systems."
+    ::= { tmnxPortV19v0Groups 5 }
+
+tmnxPortEtherLoopbackGroup       OBJECT-GROUP
+    OBJECTS     {
+        tmnxPortEtherLoopback,
+        tmnxPortEtherLoopbackSwapMac
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting the management of loopbacks on
+         Ethernet ports in release 19.0 of Nokia SROS series systems."
+    ::= { tmnxPortV19v0Groups 6 }
+
+tmnxPortTDMGroupV19v0            OBJECT-GROUP
+    OBJECTS     {
+        tmnxDS1PortLineImpedance,
+        tmnxDS1PortLineEncoding,
+        tmnxDS1HoldTimeUp,
+        tmnxDS1HoldTimeDown
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting the management of TDM type ports in
+         release 19.0 of Nokia SROS series systems."
+    ::= { tmnxPortV19v0Groups 7 }
+
+tmnxPortNotificationV19v0Group   NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tmnxPortEtherLoopbackStarted,
+        tmnxPortEtherLoopbackStopped
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notifications extending port capabilities for revision
+         19.0 on Nokia SROS series systems."
+    ::= { tmnxPortV19v0Groups 8 }
+
+tmnxPortEtherPhysStatsV19v0Group OBJECT-GROUP
+    OBJECTS     {
+        tmnxPortEtherAccessAcctPolicyId,
+        tmnxPortEtherAccessCollectStats
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting the Physical Layer Ethernet access
+         port queue statistics collection in release 19.0 of Nokia SROS series
+         systems."
+    ::= { tmnxPortV19v0Groups 10 }
 
 tmnxPortDCCompliances            OBJECT IDENTIFIER ::= { tmnxPortConformance 3 }
 
@@ -6914,8 +7130,8 @@ tmnxEqPortSFPStatusFailure       NOTIFICATION-TYPE
          obsoleted tmnxEqPortSFPCorrupted for revision 6.0 on Nokia SROS series
          systems.
 
-         [EFFECT] The SFF device is not operational and the associated port can
-         not be used. The SFF and port will not recover without operator
+         [EFFECT] The SFF device is not operational and the associated port
+         cannot be used. The SFF and port will not recover without operator
          intervention.
 
          [RECOVERY] Remove and re-insert the SFF device. If the problem
@@ -7341,6 +7557,52 @@ tmnxRS232SquelchResetIssued      NOTIFICATION-TYPE
          indicates the existing squelch status."
     ::= { tmnxPortNotification 61 }
 
+tmnxEqPortEtherEgressRateChange  NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxPortNotifyPortId,
+        tmnxPortEtherOperEgressRate
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEqPortEtherEgressRateChange notification is generated when the
+         port's operational egress rate changes, due to the reception of ETH-BN
+         (Ethernet Bandwidth Notification) messages, or from a configuration
+         change."
+    ::= { tmnxPortNotification 62 }
+
+tmnxPortEtherLoopbackStarted     NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxPortEtherLoopback
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The tmnxPortEtherLoopbackStarted notification is generated
+         when tmnxPortEtherLoopback is modified to set the Ethernet port to a
+         loopback mode.
+
+         [EFFECT] Setting the port in loopback mode impacts the normal flow of
+         traffic across the port.
+
+         [RECOVERY] Remove loopback on the port to restore normal traffic flow."
+    ::= { tmnxPortNotification 63 }
+
+tmnxPortEtherLoopbackStopped     NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxPortEtherLoopback
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The tmnxPortEtherLoopbackStopped notification is generated
+         when a loopback is removed on an Ethernet port.  The value of
+         tmnxPortEtherLoopback specifies the type of loopback that was
+         configured and has now been removed.
+
+         [EFFECT] The loopback has been removed and normal traffic flow may
+         resume.
+
+         [RECOVERY] No recovery is required."
+    ::= { tmnxPortNotification 64 }
+
 tmnxPortObjs                     OBJECT IDENTIFIER ::= { tmnxHwObjs 4 }
 
 tmnxPortTableLastChange          OBJECT-TYPE
@@ -7496,7 +7758,7 @@ tmnxPortClass                    OBJECT-TYPE
     ::= { tmnxPortEntry 4 }
 
 tmnxPortDescription              OBJECT-TYPE
-    SYNTAX      TItemLongDescription
+    SYNTAX      TItemLongDescription (SIZE (0..160))
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -7758,7 +8020,8 @@ tmnxPortTransceiverType          OBJECT-TYPE
         cfp8Transceiver                      (21),
         cdfp3Transceiver                     (22),
         microQsfpTransceiver                 (23),
-        qsfpDdTransceiver                    (24)
+        qsfpDdTransceiver                    (24),
+        cfp2DcoTransceiver                   (25)
     }
     MAX-ACCESS  read-only
     STATUS      current
@@ -7860,6 +8123,7 @@ tmnxPortSFPConnectorCode         OBJECT-TYPE
         hssdcII                             (32),
         copperPigtail                       (33),
         rj45                                (34),
+        cs                                  (37),
         opticalTransceiver                  (51),
         copperGigE                          (128),
         rjp5                                (129)
@@ -8582,8 +8846,8 @@ tmnxPortPhysStateChangeCount     OBJECT-TYPE
          'linkDown (3)'.  The count does not include transitions between
          'linkUp (4)' and 'up (5)'.
 
-         This counter is applicable to physical Ethernet ports only. All other
-         ports maintain a count of 0.
+         This counter is applicable to physical Ethernet and Cellular ports
+         only. All other ports maintain a count of 0.
 
          This object is automatically reset to zero, once the port enters the
          'ghost (2)' state.  To reset this object manually, one may use the
@@ -8872,11 +9136,20 @@ TmnxPortEtherEntry               ::= SEQUENCE
     tmnxPortEtherUtilStatsInterval   Unsigned32,
     tmnxPortEtherUtilStatsInput      Unsigned32,
     tmnxPortEtherUtilStatsOutput     Unsigned32,
-    tmnxPortEtherRsFecMode           INTEGER
+    tmnxPortEtherRsFecMode           INTEGER,
+    tmnxPortEtherEthBnEgrRateChanges TruthValue,
+    tmnxPortEtherEthBnEgressRate     Integer32,
+    tmnxPortEtherOperEgressRate      Integer32,
+    tmnxPortEtherAccessBandwidthHi   Unsigned32,
+    tmnxPortEtherEgrQosPortQosPlcy   TLNamedItemOrEmpty,
+    tmnxPortEtherLoopback            INTEGER,
+    tmnxPortEtherLoopbackSwapMac     TruthValue,
+    tmnxPortEtherAccessAcctPolicyId  Unsigned32,
+    tmnxPortEtherAccessCollectStats  TruthValue
 }
 
 tmnxPortEtherMTU                 OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 | 512..9212)
+    SYNTAX      Unsigned32 (0 | 512..9800)
     UNITS       "bytes"
     MAX-ACCESS  read-write
     STATUS      current
@@ -8985,7 +9258,7 @@ tmnxPortEtherOperDuplex          OBJECT-TYPE
 
 tmnxPortEtherOperSpeed           OBJECT-TYPE
     SYNTAX      Unsigned32
-    UNITS       "megabits per second"
+    UNITS       "megabps"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -9059,8 +9332,8 @@ tmnxPortEtherXGigMode            OBJECT-TYPE
     ::= { tmnxPortEtherEntry 10 }
 
 tmnxPortEtherEgressRate          OBJECT-TYPE
-    SYNTAX      Integer32 (-1 | 1..100000000)
-    UNITS       "kilobits per second"
+    SYNTAX      Integer32 (-1 | 1..400000000)
+    UNITS       "kilobps"
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -9093,8 +9366,8 @@ tmnxPortEtherQinqEtype           OBJECT-TYPE
     ::= { tmnxPortEtherEntry 13 }
 
 tmnxPortEtherIngressRate         OBJECT-TYPE
-    SYNTAX      Integer32 (-1 | 1..100000)
-    UNITS       "megabits per second"
+    SYNTAX      Integer32 (-1 | 1..400000)
+    UNITS       "megabps"
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -9486,7 +9759,7 @@ tmnxPortEtherDownOnInternalError OBJECT-TYPE
 
 tmnxPortEtherMinFrameLength      OBJECT-TYPE
     SYNTAX      Unsigned32 (64 | 68)
-    UNITS       "Bytes"
+    UNITS       "bytes"
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -9560,8 +9833,8 @@ tmnxPortEtherDwnOnIntlErrTxDisbl OBJECT-TYPE
     ::= { tmnxPortEtherEntry 46 }
 
 tmnxPortEtherAccessBandwidth     OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 | 1..3200000000)
-    UNITS       "kilobits per second"
+    SYNTAX      Unsigned32
+    UNITS       "kilobps"
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -9586,7 +9859,7 @@ tmnxPortEtherAccessBookingFactor OBJECT-TYPE
 
 tmnxPortEtherAccessAvailableBW   OBJECT-TYPE
     SYNTAX      Counter64
-    UNITS       "kilobits per second"
+    UNITS       "kilobps"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -9596,7 +9869,7 @@ tmnxPortEtherAccessAvailableBW   OBJECT-TYPE
 
 tmnxPortEtherAccessBookedBW      OBJECT-TYPE
     SYNTAX      Counter64
-    UNITS       "kilobits per second"
+    UNITS       "kilobps"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -9644,7 +9917,7 @@ tmnxPortEtherUtilStatsInput      OBJECT-TYPE
 
 tmnxPortEtherUtilStatsOutput     OBJECT-TYPE
     SYNTAX      Unsigned32 (0..10000)
-    UNITS       "hundredths of a percent"
+    UNITS       "centipercent"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -9657,7 +9930,9 @@ tmnxPortEtherUtilStatsOutput     OBJECT-TYPE
 tmnxPortEtherRsFecMode           OBJECT-TYPE
     SYNTAX      INTEGER {
         none         (0),
-        cl91-514-528 (1)
+        cl91-514-528 (1),
+        cl74         (2),
+        cl108        (3)
     }
     MAX-ACCESS  read-write
     STATUS      current
@@ -9666,15 +9941,154 @@ tmnxPortEtherRsFecMode           OBJECT-TYPE
          Forward Error Correction (RS-FEC) to be used by this ethernet port.
 
          When the value of tmnxPortEtherRsFecMode is set to 'none', the port
-         will transmit and receive using standard 64B/66B encoding.
-
-         When the value of tmnxPortEtherRsFecMode is set to 'cl91-514-528', the
-         port will transmit and receive using RS-FEC 514/528 encoding."
+         will transmit and receive using standard 64B/66B encoding."
     REFERENCE
         "IEEE 802.3ba, Clause 82, Standard 64B/66B encoding
-         IEEE 802.3bm, Clause 91, RS-FEC 514/528 encoding"
+         IEEE 802.3bm, Clause 91, RS-FEC 514/528 encoding
+         IEEE 802.3, Clause 74
+         IEEE 802.3, Clause 108"
     DEFVAL      { none }
     ::= { tmnxPortEtherEntry 55 }
+
+tmnxPortEtherEthBnEgrRateChanges OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPortEtherEthBnEgrRateChanges specifies whether or not
+         the changes received in Eth-BN messages on a port based MEP are
+         allowed to update the egress rate used on the port.
+
+         The value 'true (1)' specifies that the egress rate on the port is
+         allowed to be updated."
+    DEFVAL      { false }
+    ::= { tmnxPortEtherEntry 56 }
+
+tmnxPortEtherEthBnEgressRate     OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "kilobps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPortEtherEthBnEgressRate indicates the ETH-BN
+         (Ethernet Bandwidth Notification) egress rate received from the
+         ETH-CFM (Ethernet Connectivity Fault Management) subsystem.
+
+         A value of '-1' indicates that the rate value is not available."
+    ::= { tmnxPortEtherEntry 57 }
+
+tmnxPortEtherOperEgressRate      OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "kilobps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPortEtherOperEgressRate indicates the operational
+         egress bandwidth (in kilobits per second) that the Ethernet interface
+         can generate. The value is the minimum of the admin egress rate
+         tmnxPortEtherEgressRate, the ETH-BN egress rate
+         tmnxPortEtherEthBnEgressRate, and the port's maximum rate.
+
+         A value of '-1' means that the limit is the actual physical limit."
+    ::= { tmnxPortEtherEntry 58 }
+
+tmnxPortEtherAccessBandwidthHi   OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..1)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The tmnxPortEtherAccessBandwidthHi specifies the high 32-bit value of
+         administrative bandwidth assigned to this port. Lower 32-bit value of
+         administrative bandwidth is assigned using
+         tmnxPortEtherAccessBandwidth.
+
+         An 'inconsistentValue' error is returned when value of this object is
+         changed to non-default and tmnxPortEtherAccessBandwidth is not set in
+         the same request.
+
+
+         The administrative bandwidth can be over or under booked using the
+         value of tmnxPortEtherAccessBookingFactor."
+    DEFVAL      { 0 }
+    ::= { tmnxPortEtherEntry 59 }
+
+tmnxPortEtherEgrQosPortQosPlcy   OBJECT-TYPE
+    SYNTAX      TLNamedItemOrEmpty
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPortEtherEgrQosPortQosPlcy specifies the name to
+         associate with this port."
+    DEFVAL      { "default" }
+    ::= { tmnxPortEtherEntry 60 }
+
+tmnxPortEtherLoopback            OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none     (0),
+        line     (1),
+        internal (2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPortEtherLoopback specifies the loopback mode of the
+         port.
+
+         none(0)     - Loopback is disabled.
+         line(1)     - Loopback loops frames received on this port back to the remote system.
+         internal(2) - Loopback loops frames from the local system back at the framer."
+    DEFVAL      { none }
+    ::= { tmnxPortEtherEntry 61 }
+
+tmnxPortEtherLoopbackSwapMac     OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPortEtherLoopbackSwapMac specifies if the source and
+         destination MAC addresses in the packets are to be interchanged before
+         being loopbacked to the sender. Setting tmnxPortEtherLoopbackSwapMac
+         must be accompanied by setting tmnxPortEtherLoopback for the same
+         port."
+    DEFVAL      { false }
+    ::= { tmnxPortEtherEntry 62 }
+
+tmnxPortEtherAccessAcctPolicyId  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 1..99)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPortEtherAccessAcctPolicyId specifies the
+         TIMETRA-LOG-MIB::tmnxLogApPolicyId that identifies the policy entry in
+         TIMETRA-LOG-MIB::tmnxLogApTable which is associated with this ethernet
+         access port queue for the purpose of collecting physical layer
+         ethernet access port queue statistics.
+
+         A zero value indicates that there is no accounting policy associated
+         with this ethernet access port."
+    DEFVAL      { 0 }
+    ::= { tmnxPortEtherEntry 63 }
+
+tmnxPortEtherAccessCollectStats  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPortEtherAccessCollectStats specifies whether or not
+         the collection of physical layer ethernet accounting and statistical
+         data for the ethernet access port queue is enabled.
+
+         When a non-zero value is specified for tmnxPortEtherAccessAcctPolicyId
+         and tmnxPortEtherAccessCollectStats is set to true, data will be
+         collected in the appropriate records and written to the designated
+         billing file.
+
+         When a non-zero value is specified for tmnxPortEtherAccessAcctPolicyId
+         and tmnxPortEtherAccessCollectStats is set to false, the statistics
+         are still accumulated by the IOM cards; however, the CPM will not
+         obtain the results and write them to the billing file."
+    DEFVAL      { false }
+    ::= { tmnxPortEtherEntry 64 }
 
 tmnxSonetTable                   OBJECT-TYPE
     SYNTAX      SEQUENCE OF TmnxSonetEntry
@@ -10101,7 +10515,7 @@ tmnxSonetSingleFiber             OBJECT-TYPE
 
 tmnxSonetHoldTimeUp              OBJECT-TYPE
     SYNTAX      TmnxHoldTime (0..100)
-    UNITS       "100s of milliseconds"
+    UNITS       "deciseconds"
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -10115,7 +10529,7 @@ tmnxSonetHoldTimeUp              OBJECT-TYPE
 
 tmnxSonetHoldTimeDown            OBJECT-TYPE
     SYNTAX      TmnxHoldTime (0..100)
-    UNITS       "100s of milliseconds"
+    UNITS       "deciseconds"
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -10960,7 +11374,7 @@ tmnxDS3Type                      OBJECT-TYPE
 
 tmnxDS3HoldTimeUp                OBJECT-TYPE
     SYNTAX      TmnxHoldTime (0..100)
-    UNITS       "100s of milliseconds"
+    UNITS       "deciseconds"
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -10974,7 +11388,7 @@ tmnxDS3HoldTimeUp                OBJECT-TYPE
 
 tmnxDS3HoldTimeDown              OBJECT-TYPE
     SYNTAX      TmnxHoldTime (0..100)
-    UNITS       "100s of milliseconds"
+    UNITS       "deciseconds"
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -11633,7 +12047,9 @@ TmnxDS1Entry                     ::= SEQUENCE
     tmnxDS1ClockMasterPortId         TmnxPortID,
     tmnxDS1BerSdThreshold            Unsigned32,
     tmnxDS1BerSfThreshold            Unsigned32,
-    tmnxDS1NationalUseBits           BITS
+    tmnxDS1NationalUseBits           BITS,
+    tmnxDS1HoldTimeUp                TmnxHoldTime,
+    tmnxDS1HoldTimeDown              TmnxHoldTime
 }
 
 tmnxDS1RowStatus                 OBJECT-TYPE
@@ -12006,6 +12422,34 @@ tmnxDS1NationalUseBits           OBJECT-TYPE
          or g704 (4)."
     DEFVAL      { {} }
     ::= { tmnxDS1Entry 26 }
+
+tmnxDS1HoldTimeUp                OBJECT-TYPE
+    SYNTAX      TmnxHoldTime (0..100)
+    UNITS       "deciseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDS1HoldTimeUp specifies the hold-timer for link up
+         event dampening.
+
+         A value of zero (0) indicates that an up transition is reported
+         immediately."
+    DEFVAL      { 0 }
+    ::= { tmnxDS1Entry 27 }
+
+tmnxDS1HoldTimeDown              OBJECT-TYPE
+    SYNTAX      TmnxHoldTime (0..100)
+    UNITS       "deciseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDS1HoldTimeDown specifies the hold-timer for link
+         down event dampening.
+
+         A value of zero (0) indicates that a down transition is reported
+         immediately."
+    DEFVAL      { 0 }
+    ::= { tmnxDS1Entry 28 }
 
 tmnxDS0ChanGroupTable            OBJECT-TYPE
     SYNTAX      SEQUENCE OF TmnxDS0ChanGroupEntry
@@ -13402,6 +13846,40 @@ tmnxServiceIdLagHashing          OBJECT-TYPE
     DEFVAL      { false }
     ::= { tmnxPortScalarObjs 5 }
 
+tmnxL2tpLoadBalancing            OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxL2tpLoadBalancing specifies if the L2TP header is
+         taken into account for the load-balancing hash."
+    DEFVAL      { false }
+    ::= { tmnxPortScalarObjs 6 }
+
+tmnxLoadBalancingHashEcmpPoly    OBJECT-TYPE
+    SYNTAX      TmnxCrcPolynomial
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLoadBalancingHashEcmpPoly specifies the CRC polynomial
+         used in the ECMP hashing.  This is the global system setting that would
+         affect system wide ECMP hashing.  The same polynomial value cannot be used
+         by both tmnxLoadBalancingHashEcmpPoly and tmnxLoadBalancingHashLagPoly."
+    DEFVAL      { poly1 }
+    ::= { tmnxPortScalarObjs 7 }
+
+tmnxLoadBalancingHashLagPoly     OBJECT-TYPE
+    SYNTAX      TmnxCrcPolynomial
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLoadBalancingHashLagPoly specifies the CRC polynomial
+         used in the LAG hashing.  This is the global system setting that
+         affects system wide LAG hashing.  The same polynomial value cannot be used
+         by both tmnxLoadBalancingHashEcmpPoly and tmnxLoadBalancingHashLagPoly."
+    DEFVAL      { poly2 }
+    ::= { tmnxPortScalarObjs 8 }
+
 tmnxCiscoHDLCTable               OBJECT-TYPE
     SYNTAX      SEQUENCE OF TmnxCiscoHDLCEntry
     MAX-ACCESS  not-accessible
@@ -14244,7 +14722,9 @@ TmnxDS1PortEntry                 ::= SEQUENCE
     tmnxDS1PortType                  INTEGER,
     tmnxDS1PortLineLength            INTEGER,
     tmnxDS1PortLbo                   INTEGER,
-    tmnxDS1PortDbGain                Integer32
+    tmnxDS1PortDbGain                Integer32,
+    tmnxDS1PortLineImpedance         Unsigned32,
+    tmnxDS1PortLineEncoding          INTEGER
 }
 
 tmnxDS1PortBuildout              OBJECT-TYPE
@@ -14351,6 +14831,41 @@ tmnxDS1PortDbGain                OBJECT-TYPE
          the received signal is increased to compensate for loss."
     ::= { tmnxDS1PortEntry 6 }
 
+tmnxDS1PortLineImpedance         OBJECT-TYPE
+    SYNTAX      Unsigned32 (75 | 100 | 120)
+    UNITS       "Ohms"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDS1PortLineImpedance specifies the line  impedance
+         set on the physical DS1/E1 port.
+
+         A DS1 port can only be set to 100 Ohms. An E1 port can only be set to
+         75 Ohms or 120 Ohms. The default is 120 Ohms."
+    ::= { tmnxDS1PortEntry 7 }
+
+tmnxDS1PortLineEncoding          OBJECT-TYPE
+    SYNTAX      INTEGER {
+        b8zs (1),
+        ami  (2),
+        hdb3 (3)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDS1PortLineEncoding specifies the line encoding
+         standard set on the physical DS1/E1 port.
+
+         The possible values are:
+             b8zs (1) -  Bipolar (or Binary) with 8-Zero Substitution.
+                         Only applies to a DS1 port.
+             ami  (2) -  Alternate Mark Inversion.  Only applies to a DS1 port.
+             hdb3 (3) -  High Density Bipolar (or Binary) 3.
+                         Only applies to an E1 port.
+         The default for DS1 ports is 'b8zs (1)', and the default for
+         E1 ports is 'hdb3 (3)'."
+    ::= { tmnxDS1PortEntry 8 }
+
 tmnxPortSchedOverrideTable       OBJECT-TYPE
     SYNTAX      SEQUENCE OF TmnxPortSchedOverrideEntry
     MAX-ACCESS  not-accessible
@@ -14413,40 +14928,40 @@ TmnxPortSchedOverrideEntry       ::= SEQUENCE
     tmnxPortSchedOvrLvl7CIRPercent   Unsigned32,
     tmnxPortSchedOvrLvl8PIRPercent   Unsigned32,
     tmnxPortSchedOvrLvl8CIRPercent   Unsigned32,
-    tmnxPortSchedOvrMaxRateHi        TmnxHigh32,
-    tmnxPortSchedOvrMaxRate          TmnxLow32,
-    tmnxPortSchedOvrLvl1PIRHi        TmnxHigh32,
-    tmnxPortSchedOvrLvl1PIR          TmnxLow32,
-    tmnxPortSchedOvrLvl1CIRHi        TmnxHigh32,
-    tmnxPortSchedOvrLvl1CIR          TmnxLow32,
-    tmnxPortSchedOvrLvl2PIRHi        TmnxHigh32,
-    tmnxPortSchedOvrLvl2PIR          TmnxLow32,
-    tmnxPortSchedOvrLvl2CIRHi        TmnxHigh32,
-    tmnxPortSchedOvrLvl2CIR          TmnxLow32,
-    tmnxPortSchedOvrLvl3PIRHi        TmnxHigh32,
-    tmnxPortSchedOvrLvl3PIR          TmnxLow32,
-    tmnxPortSchedOvrLvl3CIRHi        TmnxHigh32,
-    tmnxPortSchedOvrLvl3CIR          TmnxLow32,
-    tmnxPortSchedOvrLvl4PIRHi        TmnxHigh32,
-    tmnxPortSchedOvrLvl4PIR          TmnxLow32,
-    tmnxPortSchedOvrLvl4CIRHi        TmnxHigh32,
-    tmnxPortSchedOvrLvl4CIR          TmnxLow32,
-    tmnxPortSchedOvrLvl5PIRHi        TmnxHigh32,
-    tmnxPortSchedOvrLvl5PIR          TmnxLow32,
-    tmnxPortSchedOvrLvl5CIRHi        TmnxHigh32,
-    tmnxPortSchedOvrLvl5CIR          TmnxLow32,
-    tmnxPortSchedOvrLvl6PIRHi        TmnxHigh32,
-    tmnxPortSchedOvrLvl6PIR          TmnxLow32,
-    tmnxPortSchedOvrLvl6CIRHi        TmnxHigh32,
-    tmnxPortSchedOvrLvl6CIR          TmnxLow32,
-    tmnxPortSchedOvrLvl7PIRHi        TmnxHigh32,
-    tmnxPortSchedOvrLvl7PIR          TmnxLow32,
-    tmnxPortSchedOvrLvl7CIRHi        TmnxHigh32,
-    tmnxPortSchedOvrLvl7CIR          TmnxLow32,
-    tmnxPortSchedOvrLvl8PIRHi        TmnxHigh32,
-    tmnxPortSchedOvrLvl8PIR          TmnxLow32,
-    tmnxPortSchedOvrLvl8CIRHi        TmnxHigh32,
-    tmnxPortSchedOvrLvl8CIR          TmnxLow32
+    tmnxPortSchedOvrMaxRateHi        TmnxQosRateHigh32,
+    tmnxPortSchedOvrMaxRate          TmnxQosRateLow32,
+    tmnxPortSchedOvrLvl1PIRHi        TmnxQosRateHigh32,
+    tmnxPortSchedOvrLvl1PIR          TmnxQosRateLow32,
+    tmnxPortSchedOvrLvl1CIRHi        TmnxQosRateHigh32,
+    tmnxPortSchedOvrLvl1CIR          TmnxQosRateLow32,
+    tmnxPortSchedOvrLvl2PIRHi        TmnxQosRateHigh32,
+    tmnxPortSchedOvrLvl2PIR          TmnxQosRateLow32,
+    tmnxPortSchedOvrLvl2CIRHi        TmnxQosRateHigh32,
+    tmnxPortSchedOvrLvl2CIR          TmnxQosRateLow32,
+    tmnxPortSchedOvrLvl3PIRHi        TmnxQosRateHigh32,
+    tmnxPortSchedOvrLvl3PIR          TmnxQosRateLow32,
+    tmnxPortSchedOvrLvl3CIRHi        TmnxQosRateHigh32,
+    tmnxPortSchedOvrLvl3CIR          TmnxQosRateLow32,
+    tmnxPortSchedOvrLvl4PIRHi        TmnxQosRateHigh32,
+    tmnxPortSchedOvrLvl4PIR          TmnxQosRateLow32,
+    tmnxPortSchedOvrLvl4CIRHi        TmnxQosRateHigh32,
+    tmnxPortSchedOvrLvl4CIR          TmnxQosRateLow32,
+    tmnxPortSchedOvrLvl5PIRHi        TmnxQosRateHigh32,
+    tmnxPortSchedOvrLvl5PIR          TmnxQosRateLow32,
+    tmnxPortSchedOvrLvl5CIRHi        TmnxQosRateHigh32,
+    tmnxPortSchedOvrLvl5CIR          TmnxQosRateLow32,
+    tmnxPortSchedOvrLvl6PIRHi        TmnxQosRateHigh32,
+    tmnxPortSchedOvrLvl6PIR          TmnxQosRateLow32,
+    tmnxPortSchedOvrLvl6CIRHi        TmnxQosRateHigh32,
+    tmnxPortSchedOvrLvl6CIR          TmnxQosRateLow32,
+    tmnxPortSchedOvrLvl7PIRHi        TmnxQosRateHigh32,
+    tmnxPortSchedOvrLvl7PIR          TmnxQosRateLow32,
+    tmnxPortSchedOvrLvl7CIRHi        TmnxQosRateHigh32,
+    tmnxPortSchedOvrLvl7CIR          TmnxQosRateLow32,
+    tmnxPortSchedOvrLvl8PIRHi        TmnxQosRateHigh32,
+    tmnxPortSchedOvrLvl8PIR          TmnxQosRateLow32,
+    tmnxPortSchedOvrLvl8CIRHi        TmnxQosRateHigh32,
+    tmnxPortSchedOvrLvl8CIR          TmnxQosRateLow32
 }
 
 tmnxPortSchedOverrideRowStatus   OBJECT-TYPE
@@ -14481,7 +14996,7 @@ tmnxPortSchedOverrideLastChanged OBJECT-TYPE
 
 tmnxPortSchedOverrideMaxRate     OBJECT-TYPE
     SYNTAX      TPortSchedulerPIRRate
-    UNITS       "kbps"
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      obsolete
     DESCRIPTION
@@ -14496,7 +15011,7 @@ tmnxPortSchedOverrideMaxRate     OBJECT-TYPE
 
 tmnxPortSchedOverrideLvl1PIR     OBJECT-TYPE
     SYNTAX      TPortSchedulerPIRRate
-    UNITS       "kbps"
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      obsolete
     DESCRIPTION
@@ -14511,7 +15026,7 @@ tmnxPortSchedOverrideLvl1PIR     OBJECT-TYPE
 
 tmnxPortSchedOverrideLvl1CIR     OBJECT-TYPE
     SYNTAX      TPortSchedulerCIR
-    UNITS       "kbps"
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      obsolete
     DESCRIPTION
@@ -14526,7 +15041,7 @@ tmnxPortSchedOverrideLvl1CIR     OBJECT-TYPE
 
 tmnxPortSchedOverrideLvl2PIR     OBJECT-TYPE
     SYNTAX      TPortSchedulerPIRRate
-    UNITS       "kbps"
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      obsolete
     DESCRIPTION
@@ -14541,7 +15056,7 @@ tmnxPortSchedOverrideLvl2PIR     OBJECT-TYPE
 
 tmnxPortSchedOverrideLvl2CIR     OBJECT-TYPE
     SYNTAX      TPortSchedulerCIR
-    UNITS       "kbps"
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      obsolete
     DESCRIPTION
@@ -14556,7 +15071,7 @@ tmnxPortSchedOverrideLvl2CIR     OBJECT-TYPE
 
 tmnxPortSchedOverrideLvl3PIR     OBJECT-TYPE
     SYNTAX      TPortSchedulerPIRRate
-    UNITS       "kbps"
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      obsolete
     DESCRIPTION
@@ -14571,7 +15086,7 @@ tmnxPortSchedOverrideLvl3PIR     OBJECT-TYPE
 
 tmnxPortSchedOverrideLvl3CIR     OBJECT-TYPE
     SYNTAX      TPortSchedulerCIR
-    UNITS       "kbps"
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      obsolete
     DESCRIPTION
@@ -14586,7 +15101,7 @@ tmnxPortSchedOverrideLvl3CIR     OBJECT-TYPE
 
 tmnxPortSchedOverrideLvl4PIR     OBJECT-TYPE
     SYNTAX      TPortSchedulerPIRRate
-    UNITS       "kbps"
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      obsolete
     DESCRIPTION
@@ -14601,7 +15116,7 @@ tmnxPortSchedOverrideLvl4PIR     OBJECT-TYPE
 
 tmnxPortSchedOverrideLvl4CIR     OBJECT-TYPE
     SYNTAX      TPortSchedulerCIR
-    UNITS       "kbps"
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      obsolete
     DESCRIPTION
@@ -14616,7 +15131,7 @@ tmnxPortSchedOverrideLvl4CIR     OBJECT-TYPE
 
 tmnxPortSchedOverrideLvl5PIR     OBJECT-TYPE
     SYNTAX      TPortSchedulerPIRRate
-    UNITS       "kbps"
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      obsolete
     DESCRIPTION
@@ -14631,7 +15146,7 @@ tmnxPortSchedOverrideLvl5PIR     OBJECT-TYPE
 
 tmnxPortSchedOverrideLvl5CIR     OBJECT-TYPE
     SYNTAX      TPortSchedulerCIR
-    UNITS       "kbps"
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      obsolete
     DESCRIPTION
@@ -14646,7 +15161,7 @@ tmnxPortSchedOverrideLvl5CIR     OBJECT-TYPE
 
 tmnxPortSchedOverrideLvl6PIR     OBJECT-TYPE
     SYNTAX      TPortSchedulerPIRRate
-    UNITS       "kbps"
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      obsolete
     DESCRIPTION
@@ -14661,7 +15176,7 @@ tmnxPortSchedOverrideLvl6PIR     OBJECT-TYPE
 
 tmnxPortSchedOverrideLvl6CIR     OBJECT-TYPE
     SYNTAX      TPortSchedulerCIR
-    UNITS       "kbps"
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      obsolete
     DESCRIPTION
@@ -14676,7 +15191,7 @@ tmnxPortSchedOverrideLvl6CIR     OBJECT-TYPE
 
 tmnxPortSchedOverrideLvl7PIR     OBJECT-TYPE
     SYNTAX      TPortSchedulerPIRRate
-    UNITS       "kbps"
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      obsolete
     DESCRIPTION
@@ -14691,7 +15206,7 @@ tmnxPortSchedOverrideLvl7PIR     OBJECT-TYPE
 
 tmnxPortSchedOverrideLvl7CIR     OBJECT-TYPE
     SYNTAX      TPortSchedulerCIR
-    UNITS       "kbps"
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      obsolete
     DESCRIPTION
@@ -14706,7 +15221,7 @@ tmnxPortSchedOverrideLvl7CIR     OBJECT-TYPE
 
 tmnxPortSchedOverrideLvl8PIR     OBJECT-TYPE
     SYNTAX      TPortSchedulerPIRRate
-    UNITS       "kbps"
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      obsolete
     DESCRIPTION
@@ -14721,7 +15236,7 @@ tmnxPortSchedOverrideLvl8PIR     OBJECT-TYPE
 
 tmnxPortSchedOverrideLvl8CIR     OBJECT-TYPE
     SYNTAX      TPortSchedulerCIR
-    UNITS       "kbps"
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      obsolete
     DESCRIPTION
@@ -14783,7 +15298,7 @@ tmnxPortSchedOverrideFlags       OBJECT-TYPE
 
 tmnxPortSchedOvrMaxRatePercent   OBJECT-TYPE
     SYNTAX      Unsigned32 (1..10000)
-    UNITS       "hundredths of a percent"
+    UNITS       "centipercent"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -14795,7 +15310,7 @@ tmnxPortSchedOvrMaxRatePercent   OBJECT-TYPE
 
 tmnxPortSchedOvrLvl1PIRPercent   OBJECT-TYPE
     SYNTAX      Unsigned32 (1..10000)
-    UNITS       "hundredths of a percent"
+    UNITS       "centipercent"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -14807,7 +15322,7 @@ tmnxPortSchedOvrLvl1PIRPercent   OBJECT-TYPE
 
 tmnxPortSchedOvrLvl1CIRPercent   OBJECT-TYPE
     SYNTAX      Unsigned32 (0..10000)
-    UNITS       "hundredths of a percent"
+    UNITS       "centipercent"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -14819,7 +15334,7 @@ tmnxPortSchedOvrLvl1CIRPercent   OBJECT-TYPE
 
 tmnxPortSchedOvrLvl2PIRPercent   OBJECT-TYPE
     SYNTAX      Unsigned32 (1..10000)
-    UNITS       "hundredths of a percent"
+    UNITS       "centipercent"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -14831,7 +15346,7 @@ tmnxPortSchedOvrLvl2PIRPercent   OBJECT-TYPE
 
 tmnxPortSchedOvrLvl2CIRPercent   OBJECT-TYPE
     SYNTAX      Unsigned32 (0..10000)
-    UNITS       "hundredths of a percent"
+    UNITS       "centipercent"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -14843,7 +15358,7 @@ tmnxPortSchedOvrLvl2CIRPercent   OBJECT-TYPE
 
 tmnxPortSchedOvrLvl3PIRPercent   OBJECT-TYPE
     SYNTAX      Unsigned32 (1..10000)
-    UNITS       "hundredths of a percent"
+    UNITS       "centipercent"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -14855,7 +15370,7 @@ tmnxPortSchedOvrLvl3PIRPercent   OBJECT-TYPE
 
 tmnxPortSchedOvrLvl3CIRPercent   OBJECT-TYPE
     SYNTAX      Unsigned32 (0..10000)
-    UNITS       "hundredths of a percent"
+    UNITS       "centipercent"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -14867,7 +15382,7 @@ tmnxPortSchedOvrLvl3CIRPercent   OBJECT-TYPE
 
 tmnxPortSchedOvrLvl4PIRPercent   OBJECT-TYPE
     SYNTAX      Unsigned32 (1..10000)
-    UNITS       "hundredths of a percent"
+    UNITS       "centipercent"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -14879,7 +15394,7 @@ tmnxPortSchedOvrLvl4PIRPercent   OBJECT-TYPE
 
 tmnxPortSchedOvrLvl4CIRPercent   OBJECT-TYPE
     SYNTAX      Unsigned32 (0..10000)
-    UNITS       "hundredths of a percent"
+    UNITS       "centipercent"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -14891,7 +15406,7 @@ tmnxPortSchedOvrLvl4CIRPercent   OBJECT-TYPE
 
 tmnxPortSchedOvrLvl5PIRPercent   OBJECT-TYPE
     SYNTAX      Unsigned32 (1..10000)
-    UNITS       "hundredths of a percent"
+    UNITS       "centipercent"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -14903,7 +15418,7 @@ tmnxPortSchedOvrLvl5PIRPercent   OBJECT-TYPE
 
 tmnxPortSchedOvrLvl5CIRPercent   OBJECT-TYPE
     SYNTAX      Unsigned32 (0..10000)
-    UNITS       "hundredths of a percent"
+    UNITS       "centipercent"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -14915,7 +15430,7 @@ tmnxPortSchedOvrLvl5CIRPercent   OBJECT-TYPE
 
 tmnxPortSchedOvrLvl6PIRPercent   OBJECT-TYPE
     SYNTAX      Unsigned32 (1..10000)
-    UNITS       "hundredths of a percent"
+    UNITS       "centipercent"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -14927,7 +15442,7 @@ tmnxPortSchedOvrLvl6PIRPercent   OBJECT-TYPE
 
 tmnxPortSchedOvrLvl6CIRPercent   OBJECT-TYPE
     SYNTAX      Unsigned32 (0..10000)
-    UNITS       "hundredths of a percent"
+    UNITS       "centipercent"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -14939,7 +15454,7 @@ tmnxPortSchedOvrLvl6CIRPercent   OBJECT-TYPE
 
 tmnxPortSchedOvrLvl7PIRPercent   OBJECT-TYPE
     SYNTAX      Unsigned32 (1..10000)
-    UNITS       "hundredths of a percent"
+    UNITS       "centipercent"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -14951,7 +15466,7 @@ tmnxPortSchedOvrLvl7PIRPercent   OBJECT-TYPE
 
 tmnxPortSchedOvrLvl7CIRPercent   OBJECT-TYPE
     SYNTAX      Unsigned32 (0..10000)
-    UNITS       "hundredths of a percent"
+    UNITS       "centipercent"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -14963,7 +15478,7 @@ tmnxPortSchedOvrLvl7CIRPercent   OBJECT-TYPE
 
 tmnxPortSchedOvrLvl8PIRPercent   OBJECT-TYPE
     SYNTAX      Unsigned32 (1..10000)
-    UNITS       "hundredths of a percent"
+    UNITS       "centipercent"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -14975,7 +15490,7 @@ tmnxPortSchedOvrLvl8PIRPercent   OBJECT-TYPE
 
 tmnxPortSchedOvrLvl8CIRPercent   OBJECT-TYPE
     SYNTAX      Unsigned32 (0..10000)
-    UNITS       "hundredths of a percent"
+    UNITS       "centipercent"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -14986,8 +15501,8 @@ tmnxPortSchedOvrLvl8CIRPercent   OBJECT-TYPE
     ::= { tmnxPortSchedOverrideEntry 38 }
 
 tmnxPortSchedOvrMaxRateHi        OBJECT-TYPE
-    SYNTAX      TmnxHigh32 (0 | 4294967295)
-    UNITS       "kbps"
+    SYNTAX      TmnxQosRateHigh32
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -15005,8 +15520,8 @@ tmnxPortSchedOvrMaxRateHi        OBJECT-TYPE
     ::= { tmnxPortSchedOverrideEntry 39 }
 
 tmnxPortSchedOvrMaxRate          OBJECT-TYPE
-    SYNTAX      TmnxLow32 (1..3200000000 | 4294967295)
-    UNITS       "kbps"
+    SYNTAX      TmnxQosRateLow32
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -15023,8 +15538,8 @@ tmnxPortSchedOvrMaxRate          OBJECT-TYPE
     ::= { tmnxPortSchedOverrideEntry 40 }
 
 tmnxPortSchedOvrLvl1PIRHi        OBJECT-TYPE
-    SYNTAX      TmnxHigh32 (0 | 4294967295)
-    UNITS       "kbps"
+    SYNTAX      TmnxQosRateHigh32
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -15043,8 +15558,8 @@ tmnxPortSchedOvrLvl1PIRHi        OBJECT-TYPE
     ::= { tmnxPortSchedOverrideEntry 41 }
 
 tmnxPortSchedOvrLvl1PIR          OBJECT-TYPE
-    SYNTAX      TmnxLow32 (1..3200000000 | 4294967295)
-    UNITS       "kbps"
+    SYNTAX      TmnxQosRateLow32
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -15062,8 +15577,8 @@ tmnxPortSchedOvrLvl1PIR          OBJECT-TYPE
     ::= { tmnxPortSchedOverrideEntry 42 }
 
 tmnxPortSchedOvrLvl1CIRHi        OBJECT-TYPE
-    SYNTAX      TmnxHigh32 (0 | 4294967295)
-    UNITS       "kbps"
+    SYNTAX      TmnxQosRateHigh32
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -15082,8 +15597,8 @@ tmnxPortSchedOvrLvl1CIRHi        OBJECT-TYPE
     ::= { tmnxPortSchedOverrideEntry 43 }
 
 tmnxPortSchedOvrLvl1CIR          OBJECT-TYPE
-    SYNTAX      TmnxLow32 (0..3200000000 | 4294967295)
-    UNITS       "kbps"
+    SYNTAX      TmnxQosRateLow32
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -15101,8 +15616,8 @@ tmnxPortSchedOvrLvl1CIR          OBJECT-TYPE
     ::= { tmnxPortSchedOverrideEntry 44 }
 
 tmnxPortSchedOvrLvl2PIRHi        OBJECT-TYPE
-    SYNTAX      TmnxHigh32 (0 | 4294967295)
-    UNITS       "kbps"
+    SYNTAX      TmnxQosRateHigh32
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -15121,8 +15636,8 @@ tmnxPortSchedOvrLvl2PIRHi        OBJECT-TYPE
     ::= { tmnxPortSchedOverrideEntry 45 }
 
 tmnxPortSchedOvrLvl2PIR          OBJECT-TYPE
-    SYNTAX      TmnxLow32 (1..3200000000 | 4294967295)
-    UNITS       "kbps"
+    SYNTAX      TmnxQosRateLow32
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -15140,8 +15655,8 @@ tmnxPortSchedOvrLvl2PIR          OBJECT-TYPE
     ::= { tmnxPortSchedOverrideEntry 46 }
 
 tmnxPortSchedOvrLvl2CIRHi        OBJECT-TYPE
-    SYNTAX      TmnxHigh32 (0 | 4294967295)
-    UNITS       "kbps"
+    SYNTAX      TmnxQosRateHigh32
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -15160,8 +15675,8 @@ tmnxPortSchedOvrLvl2CIRHi        OBJECT-TYPE
     ::= { tmnxPortSchedOverrideEntry 47 }
 
 tmnxPortSchedOvrLvl2CIR          OBJECT-TYPE
-    SYNTAX      TmnxLow32 (0..3200000000 | 4294967295)
-    UNITS       "kbps"
+    SYNTAX      TmnxQosRateLow32
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -15179,8 +15694,8 @@ tmnxPortSchedOvrLvl2CIR          OBJECT-TYPE
     ::= { tmnxPortSchedOverrideEntry 48 }
 
 tmnxPortSchedOvrLvl3PIRHi        OBJECT-TYPE
-    SYNTAX      TmnxHigh32 (0 | 4294967295)
-    UNITS       "kbps"
+    SYNTAX      TmnxQosRateHigh32
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -15199,8 +15714,8 @@ tmnxPortSchedOvrLvl3PIRHi        OBJECT-TYPE
     ::= { tmnxPortSchedOverrideEntry 49 }
 
 tmnxPortSchedOvrLvl3PIR          OBJECT-TYPE
-    SYNTAX      TmnxLow32 (1..3200000000 | 4294967295)
-    UNITS       "kbps"
+    SYNTAX      TmnxQosRateLow32
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -15218,8 +15733,8 @@ tmnxPortSchedOvrLvl3PIR          OBJECT-TYPE
     ::= { tmnxPortSchedOverrideEntry 50 }
 
 tmnxPortSchedOvrLvl3CIRHi        OBJECT-TYPE
-    SYNTAX      TmnxHigh32 (0 | 4294967295)
-    UNITS       "kbps"
+    SYNTAX      TmnxQosRateHigh32
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -15238,8 +15753,8 @@ tmnxPortSchedOvrLvl3CIRHi        OBJECT-TYPE
     ::= { tmnxPortSchedOverrideEntry 51 }
 
 tmnxPortSchedOvrLvl3CIR          OBJECT-TYPE
-    SYNTAX      TmnxLow32 (0..3200000000 | 4294967295)
-    UNITS       "kbps"
+    SYNTAX      TmnxQosRateLow32
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -15257,8 +15772,8 @@ tmnxPortSchedOvrLvl3CIR          OBJECT-TYPE
     ::= { tmnxPortSchedOverrideEntry 52 }
 
 tmnxPortSchedOvrLvl4PIRHi        OBJECT-TYPE
-    SYNTAX      TmnxHigh32 (0 | 4294967295)
-    UNITS       "kbps"
+    SYNTAX      TmnxQosRateHigh32
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -15277,8 +15792,8 @@ tmnxPortSchedOvrLvl4PIRHi        OBJECT-TYPE
     ::= { tmnxPortSchedOverrideEntry 53 }
 
 tmnxPortSchedOvrLvl4PIR          OBJECT-TYPE
-    SYNTAX      TmnxLow32 (1..3200000000 | 4294967295)
-    UNITS       "kbps"
+    SYNTAX      TmnxQosRateLow32
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -15296,8 +15811,8 @@ tmnxPortSchedOvrLvl4PIR          OBJECT-TYPE
     ::= { tmnxPortSchedOverrideEntry 54 }
 
 tmnxPortSchedOvrLvl4CIRHi        OBJECT-TYPE
-    SYNTAX      TmnxHigh32 (0 | 4294967295)
-    UNITS       "kbps"
+    SYNTAX      TmnxQosRateHigh32
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -15316,8 +15831,8 @@ tmnxPortSchedOvrLvl4CIRHi        OBJECT-TYPE
     ::= { tmnxPortSchedOverrideEntry 55 }
 
 tmnxPortSchedOvrLvl4CIR          OBJECT-TYPE
-    SYNTAX      TmnxLow32 (0..3200000000 | 4294967295)
-    UNITS       "kbps"
+    SYNTAX      TmnxQosRateLow32
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -15335,8 +15850,8 @@ tmnxPortSchedOvrLvl4CIR          OBJECT-TYPE
     ::= { tmnxPortSchedOverrideEntry 56 }
 
 tmnxPortSchedOvrLvl5PIRHi        OBJECT-TYPE
-    SYNTAX      TmnxHigh32 (0 | 4294967295)
-    UNITS       "kbps"
+    SYNTAX      TmnxQosRateHigh32
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -15355,8 +15870,8 @@ tmnxPortSchedOvrLvl5PIRHi        OBJECT-TYPE
     ::= { tmnxPortSchedOverrideEntry 57 }
 
 tmnxPortSchedOvrLvl5PIR          OBJECT-TYPE
-    SYNTAX      TmnxLow32 (1..3200000000 | 4294967295)
-    UNITS       "kbps"
+    SYNTAX      TmnxQosRateLow32
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -15374,8 +15889,8 @@ tmnxPortSchedOvrLvl5PIR          OBJECT-TYPE
     ::= { tmnxPortSchedOverrideEntry 58 }
 
 tmnxPortSchedOvrLvl5CIRHi        OBJECT-TYPE
-    SYNTAX      TmnxHigh32 (0 | 4294967295)
-    UNITS       "kbps"
+    SYNTAX      TmnxQosRateHigh32
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -15394,8 +15909,8 @@ tmnxPortSchedOvrLvl5CIRHi        OBJECT-TYPE
     ::= { tmnxPortSchedOverrideEntry 59 }
 
 tmnxPortSchedOvrLvl5CIR          OBJECT-TYPE
-    SYNTAX      TmnxLow32 (0..3200000000 | 4294967295)
-    UNITS       "kbps"
+    SYNTAX      TmnxQosRateLow32
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -15413,8 +15928,8 @@ tmnxPortSchedOvrLvl5CIR          OBJECT-TYPE
     ::= { tmnxPortSchedOverrideEntry 60 }
 
 tmnxPortSchedOvrLvl6PIRHi        OBJECT-TYPE
-    SYNTAX      TmnxHigh32 (0 | 4294967295)
-    UNITS       "kbps"
+    SYNTAX      TmnxQosRateHigh32
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -15433,8 +15948,8 @@ tmnxPortSchedOvrLvl6PIRHi        OBJECT-TYPE
     ::= { tmnxPortSchedOverrideEntry 61 }
 
 tmnxPortSchedOvrLvl6PIR          OBJECT-TYPE
-    SYNTAX      TmnxLow32 (1..3200000000 | 4294967295)
-    UNITS       "kbps"
+    SYNTAX      TmnxQosRateLow32
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -15452,8 +15967,8 @@ tmnxPortSchedOvrLvl6PIR          OBJECT-TYPE
     ::= { tmnxPortSchedOverrideEntry 62 }
 
 tmnxPortSchedOvrLvl6CIRHi        OBJECT-TYPE
-    SYNTAX      TmnxHigh32 (0 | 4294967295)
-    UNITS       "kbps"
+    SYNTAX      TmnxQosRateHigh32
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -15472,8 +15987,8 @@ tmnxPortSchedOvrLvl6CIRHi        OBJECT-TYPE
     ::= { tmnxPortSchedOverrideEntry 63 }
 
 tmnxPortSchedOvrLvl6CIR          OBJECT-TYPE
-    SYNTAX      TmnxLow32 (0..3200000000 | 4294967295)
-    UNITS       "kbps"
+    SYNTAX      TmnxQosRateLow32
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -15491,8 +16006,8 @@ tmnxPortSchedOvrLvl6CIR          OBJECT-TYPE
     ::= { tmnxPortSchedOverrideEntry 64 }
 
 tmnxPortSchedOvrLvl7PIRHi        OBJECT-TYPE
-    SYNTAX      TmnxHigh32 (0 | 4294967295)
-    UNITS       "kbps"
+    SYNTAX      TmnxQosRateHigh32
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -15511,8 +16026,8 @@ tmnxPortSchedOvrLvl7PIRHi        OBJECT-TYPE
     ::= { tmnxPortSchedOverrideEntry 65 }
 
 tmnxPortSchedOvrLvl7PIR          OBJECT-TYPE
-    SYNTAX      TmnxLow32 (1..3200000000 | 4294967295)
-    UNITS       "kbps"
+    SYNTAX      TmnxQosRateLow32
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -15530,8 +16045,8 @@ tmnxPortSchedOvrLvl7PIR          OBJECT-TYPE
     ::= { tmnxPortSchedOverrideEntry 66 }
 
 tmnxPortSchedOvrLvl7CIRHi        OBJECT-TYPE
-    SYNTAX      TmnxHigh32 (0 | 4294967295)
-    UNITS       "kbps"
+    SYNTAX      TmnxQosRateHigh32
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -15550,8 +16065,8 @@ tmnxPortSchedOvrLvl7CIRHi        OBJECT-TYPE
     ::= { tmnxPortSchedOverrideEntry 67 }
 
 tmnxPortSchedOvrLvl7CIR          OBJECT-TYPE
-    SYNTAX      TmnxLow32 (0..3200000000 | 4294967295)
-    UNITS       "kbps"
+    SYNTAX      TmnxQosRateLow32
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -15569,8 +16084,8 @@ tmnxPortSchedOvrLvl7CIR          OBJECT-TYPE
     ::= { tmnxPortSchedOverrideEntry 68 }
 
 tmnxPortSchedOvrLvl8PIRHi        OBJECT-TYPE
-    SYNTAX      TmnxHigh32 (0 | 4294967295)
-    UNITS       "kbps"
+    SYNTAX      TmnxQosRateHigh32
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -15589,8 +16104,8 @@ tmnxPortSchedOvrLvl8PIRHi        OBJECT-TYPE
     ::= { tmnxPortSchedOverrideEntry 69 }
 
 tmnxPortSchedOvrLvl8PIR          OBJECT-TYPE
-    SYNTAX      TmnxLow32 (1..3200000000 | 4294967295)
-    UNITS       "kbps"
+    SYNTAX      TmnxQosRateLow32
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -15608,8 +16123,8 @@ tmnxPortSchedOvrLvl8PIR          OBJECT-TYPE
     ::= { tmnxPortSchedOverrideEntry 70 }
 
 tmnxPortSchedOvrLvl8CIRHi        OBJECT-TYPE
-    SYNTAX      TmnxHigh32 (0 | 4294967295)
-    UNITS       "kbps"
+    SYNTAX      TmnxQosRateHigh32
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -15628,8 +16143,8 @@ tmnxPortSchedOvrLvl8CIRHi        OBJECT-TYPE
     ::= { tmnxPortSchedOverrideEntry 71 }
 
 tmnxPortSchedOvrLvl8CIR          OBJECT-TYPE
-    SYNTAX      TmnxLow32 (0..3200000000 | 4294967295)
-    UNITS       "kbps"
+    SYNTAX      TmnxQosRateLow32
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -15957,7 +16472,7 @@ tmnxHsmdaPortSchOvrLastChanged   OBJECT-TYPE
 
 tmnxHsmdaPortSchOvrMaxRate       OBJECT-TYPE
     SYNTAX      THsmdaPIRMRateOverride
-    UNITS       "Mbps"
+    UNITS       "megabps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -15972,7 +16487,7 @@ tmnxHsmdaPortSchOvrMaxRate       OBJECT-TYPE
 
 tmnxHsmdaPortSchOvrGrp1Rate      OBJECT-TYPE
     SYNTAX      THsmdaPIRMRateOverride
-    UNITS       "Mbps"
+    UNITS       "megabps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -15988,7 +16503,7 @@ tmnxHsmdaPortSchOvrGrp1Rate      OBJECT-TYPE
 
 tmnxHsmdaPortSchOvrGrp2Rate      OBJECT-TYPE
     SYNTAX      THsmdaPIRMRateOverride
-    UNITS       "Mbps"
+    UNITS       "megabps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -16004,7 +16519,7 @@ tmnxHsmdaPortSchOvrGrp2Rate      OBJECT-TYPE
 
 tmnxHsmdaPortSchOvrClass1Rate    OBJECT-TYPE
     SYNTAX      THsmdaPIRMRateOverride
-    UNITS       "Mbps"
+    UNITS       "megabps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -16040,7 +16555,7 @@ tmnxHsmdaPortSchOvrClass1WtInGp  OBJECT-TYPE
 
 tmnxHsmdaPortSchOvrClass2Rate    OBJECT-TYPE
     SYNTAX      THsmdaPIRMRateOverride
-    UNITS       "Mbps"
+    UNITS       "megabps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -16076,7 +16591,7 @@ tmnxHsmdaPortSchOvrClass2WtInGp  OBJECT-TYPE
 
 tmnxHsmdaPortSchOvrClass3Rate    OBJECT-TYPE
     SYNTAX      THsmdaPIRMRateOverride
-    UNITS       "Mbps"
+    UNITS       "megabps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -16112,7 +16627,7 @@ tmnxHsmdaPortSchOvrClass3WtInGp  OBJECT-TYPE
 
 tmnxHsmdaPortSchOvrClass4Rate    OBJECT-TYPE
     SYNTAX      THsmdaPIRMRateOverride
-    UNITS       "Mbps"
+    UNITS       "megabps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -16148,7 +16663,7 @@ tmnxHsmdaPortSchOvrClass4WtInGp  OBJECT-TYPE
 
 tmnxHsmdaPortSchOvrClass5Rate    OBJECT-TYPE
     SYNTAX      THsmdaPIRMRateOverride
-    UNITS       "Mbps"
+    UNITS       "megabps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -16184,7 +16699,7 @@ tmnxHsmdaPortSchOvrClass5WtInGp  OBJECT-TYPE
 
 tmnxHsmdaPortSchOvrClass6Rate    OBJECT-TYPE
     SYNTAX      THsmdaPIRMRateOverride
-    UNITS       "Mbps"
+    UNITS       "megabps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -16220,7 +16735,7 @@ tmnxHsmdaPortSchOvrClass6WtInGp  OBJECT-TYPE
 
 tmnxHsmdaPortSchOvrClass7Rate    OBJECT-TYPE
     SYNTAX      THsmdaPIRMRateOverride
-    UNITS       "Mbps"
+    UNITS       "megabps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -16256,7 +16771,7 @@ tmnxHsmdaPortSchOvrClass7WtInGp  OBJECT-TYPE
 
 tmnxHsmdaPortSchOvrClass8Rate    OBJECT-TYPE
     SYNTAX      THsmdaPIRMRateOverride
-    UNITS       "Mbps"
+    UNITS       "megabps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -16370,7 +16885,7 @@ tmnxPortEgrShaperLastChanged     OBJECT-TYPE
 
 tmnxPortEgrShaperRate            OBJECT-TYPE
     SYNTAX      TSecondaryShaper10GPIRRate
-    UNITS       "Mbps"
+    UNITS       "megabps"
     MAX-ACCESS  read-create
     STATUS      obsolete
     DESCRIPTION
@@ -17424,7 +17939,7 @@ tPortAccIngQOverHiPrioOnly       OBJECT-TYPE
 
 tPortAccIngQOverAdminPIR         OBJECT-TYPE
     SYNTAX      TQosQueuePIRRateOverride
-    UNITS       "kbps"
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -17435,7 +17950,7 @@ tPortAccIngQOverAdminPIR         OBJECT-TYPE
 
 tPortAccIngQOverAdminCIR         OBJECT-TYPE
     SYNTAX      TQosQueueCIRRateOverride
-    UNITS       "kbps"
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -17605,7 +18120,7 @@ tPortAccEgrQGrpSchedPol          OBJECT-TYPE
 
 tPortAccEgrQGrpAggRateLimit      OBJECT-TYPE
     SYNTAX      TPortSchedulerAggRateLimitPIR
-    UNITS       "kbps"
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      obsolete
     DESCRIPTION
@@ -17738,7 +18253,7 @@ tPortAccEgrQGrpAggRateLUB        OBJECT-TYPE
 
 tPortAccEgrQGrpAggRateLmt        OBJECT-TYPE
     SYNTAX      Unsigned32 (1..3200000000 | 4294967295)
-    UNITS       "kbps"
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -17890,7 +18405,7 @@ tPortAccEgrQOverHiPrioOnly       OBJECT-TYPE
 
 tPortAccEgrQOverAdminPIR         OBJECT-TYPE
     SYNTAX      TQosQueuePIRRateOverride
-    UNITS       "kbps"
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -17905,7 +18420,7 @@ tPortAccEgrQOverAdminPIR         OBJECT-TYPE
 
 tPortAccEgrQOverAdminCIR         OBJECT-TYPE
     SYNTAX      TQosQueueCIRRateOverride
-    UNITS       "kbps"
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -17955,12 +18470,12 @@ tPortAccEgrQOverMBSBytes         OBJECT-TYPE
 
 tPortAccEgrQOverAdminPIRPercent  OBJECT-TYPE
     SYNTAX      TPIRPercentOverride
-    UNITS       "hundredths of a percent"
+    UNITS       "centipercent"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
         "The value of tPortAccEgrQOverAdminPIRPercent specifies the
-         administrative PIR percentage, in hundredths of a percent.
+         administrative PIR percentage, in centipercent.
 
          An 'inconsistentValue' error is returned if
          tPortAccEgrQOverAdminPIRPercent is set to non-default value when the
@@ -17970,12 +18485,12 @@ tPortAccEgrQOverAdminPIRPercent  OBJECT-TYPE
 
 tPortAccEgrQOverAdminCIRPercent  OBJECT-TYPE
     SYNTAX      TCIRPercentOverride
-    UNITS       "hundredths of a percent"
+    UNITS       "centipercent"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
         "The value of tPortAccEgrQOverAdminCIRPercent specifies the
-         administrative CIR percentage, in hundredths of a percent.
+         administrative CIR percentage, in centipercent.
 
          An 'inconsistentValue' error is returned if
          tPortAccEgrQOverAdminCIRPercent is set to non-default value when the
@@ -18162,7 +18677,7 @@ tPortNetEgrQGrpSchedPol          OBJECT-TYPE
 
 tPortNetEgrQGrpAggRateLimit      OBJECT-TYPE
     SYNTAX      TPortSchedulerAggRateLimitPIR
-    UNITS       "kbps"
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      obsolete
     DESCRIPTION
@@ -18265,7 +18780,7 @@ tPortNetEgrQGrpAggRateLUB        OBJECT-TYPE
 
 tPortNetEgrQGrpAggRateLmt        OBJECT-TYPE
     SYNTAX      Unsigned32 (1..3200000000 | 4294967295)
-    UNITS       "kbps"
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -18414,7 +18929,7 @@ tPortNetEgrQOverHiPrioOnly       OBJECT-TYPE
 
 tPortNetEgrQOverAdminPIR         OBJECT-TYPE
     SYNTAX      TQosQueuePIRRateOverride
-    UNITS       "kbps"
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -18429,7 +18944,7 @@ tPortNetEgrQOverAdminPIR         OBJECT-TYPE
 
 tPortNetEgrQOverAdminCIR         OBJECT-TYPE
     SYNTAX      TQosQueueCIRRateOverride
-    UNITS       "kbps"
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -18479,12 +18994,12 @@ tPortNetEgrQOverMBSBytes         OBJECT-TYPE
 
 tPortNetEgrQOverAdminPIRPercent  OBJECT-TYPE
     SYNTAX      TPIRPercentOverride
-    UNITS       "hundredths of a percent"
+    UNITS       "centipercent"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
         "The value of tPortNetEgrQOverAdminPIRPercent specifies the
-         administrative PIR percentage, in hundredths of a percent.
+         administrative PIR percentage, in centipercent.
 
          An 'inconsistentValue' error is returned if
          tPortNetEgrQOverAdminPIRPercent  is set to non-default value
@@ -18494,12 +19009,12 @@ tPortNetEgrQOverAdminPIRPercent  OBJECT-TYPE
 
 tPortNetEgrQOverAdminCIRPercent  OBJECT-TYPE
     SYNTAX      TCIRPercentOverride
-    UNITS       "hundredths of a percent"
+    UNITS       "centipercent"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
         "The value of tPortNetEgrQOverAdminCIRPercent specifies the
-         administrative CIR percentage, in hundredths of a percent.
+         administrative CIR percentage, in centipercent.
 
          An 'inconsistentValue' error is returned if
          tQosEgrQueueAdminCIRPercent is set to non-default value when the
@@ -19102,7 +19617,7 @@ tmnxWaveTrackerInUse             OBJECT-TYPE
 
 tmnxWaveTrackerTargetPower       OBJECT-TYPE
     SYNTAX      Integer32 (-2200..300)
-    UNITS       "mBm"
+    UNITS       "millibels per milliwatt"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -19285,7 +19800,7 @@ tmnxWaveTrackerAlarmState        OBJECT-TYPE
 
 tmnxWaveTrackerMeasuredPower     OBJECT-TYPE
     SYNTAX      Integer32
-    UNITS       "mBm"
+    UNITS       "millibels per milliwatt"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -19299,7 +19814,7 @@ tmnxWaveTrackerMeasuredPower     OBJECT-TYPE
 
 tmnxWaveTrackerMaxAttainablePwr  OBJECT-TYPE
     SYNTAX      Integer32
-    UNITS       "mBm"
+    UNITS       "millibels per milliwatt"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -19313,7 +19828,7 @@ tmnxWaveTrackerMaxAttainablePwr  OBJECT-TYPE
 
 tmnxWaveTrackerMinAttainablePwr  OBJECT-TYPE
     SYNTAX      Integer32
-    UNITS       "mBm"
+    UNITS       "millibels per milliwatt"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -19868,8 +20383,8 @@ TPortEgrVPortEntry               ::= SEQUENCE
     tPortEgrVPortEgrRateModifyDelta  Integer32,
     tPortEgrVPortQosSchedPolicy      TNamedItemOrEmpty,
     tPortEgrVPortAggRateLUB          TruthValue,
-    tPortEgrVPortAggRateLmtHi        TmnxHigh32,
-    tPortEgrVPortAggRateLmt          TmnxLow32,
+    tPortEgrVPortAggRateLmtHi        TmnxQosRateHigh32,
+    tPortEgrVPortAggRateLmt          TmnxQosRateLow32,
     tPortEgrVPortMonitorPortSched    TmnxEnabledDisabled
 }
 
@@ -19922,7 +20437,7 @@ tPortEgrVPortSchedPol            OBJECT-TYPE
 
 tPortEgrVPortAggRateLimit        OBJECT-TYPE
     SYNTAX      TPortSchedulerAggRateLimitPIR
-    UNITS       "kbps"
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      obsolete
     DESCRIPTION
@@ -19954,7 +20469,7 @@ tPortEgrVPortEgrRateModify       OBJECT-TYPE
 
 tPortEgrVPortEgrRateModifyDelta  OBJECT-TYPE
     SYNTAX      Integer32
-    UNITS       "kbps"
+    UNITS       "kilobps"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -19992,8 +20507,8 @@ tPortEgrVPortAggRateLUB          OBJECT-TYPE
     ::= { tPortEgrVPortEntry 15 }
 
 tPortEgrVPortAggRateLmtHi        OBJECT-TYPE
-    SYNTAX      TmnxHigh32 (0 | 4294967295)
-    UNITS       "kbps"
+    SYNTAX      TmnxQosRateHigh32
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -20007,8 +20522,8 @@ tPortEgrVPortAggRateLmtHi        OBJECT-TYPE
     ::= { tPortEgrVPortEntry 17 }
 
 tPortEgrVPortAggRateLmt          OBJECT-TYPE
-    SYNTAX      TmnxLow32 (1..3200000000 | 4294967295)
-    UNITS       "kbps"
+    SYNTAX      TmnxQosRateLow32
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -20370,7 +20885,7 @@ tmnxOpticalPortHasRxTdcm         OBJECT-TYPE
 
 tmnxOpticalPortAmpPowerIn        OBJECT-TYPE
     SYNTAX      Integer32
-    UNITS       "mBm"
+    UNITS       "millibels per milliwatt"
     MAX-ACCESS  read-only
     STATUS      obsolete
     DESCRIPTION
@@ -20405,7 +20920,7 @@ tmnxOpticalPortAmpGain           OBJECT-TYPE
 
 tmnxOpticalPortAmpPowerOut       OBJECT-TYPE
     SYNTAX      Integer32
-    UNITS       "mBm"
+    UNITS       "millibels per milliwatt"
     MAX-ACCESS  read-only
     STATUS      obsolete
     DESCRIPTION
@@ -20423,7 +20938,7 @@ tmnxOpticalPortAmpPowerOut       OBJECT-TYPE
 
 tmnxOpticalPortAmpPumpTemp       OBJECT-TYPE
     SYNTAX      Integer32
-    UNITS       "millidegrees Celsius"
+    UNITS       "millidegrees celsius"
     MAX-ACCESS  read-only
     STATUS      obsolete
     DESCRIPTION
@@ -20436,7 +20951,7 @@ tmnxOpticalPortAmpPumpTemp       OBJECT-TYPE
 
 tmnxOpticalPortAmpModuleTemp     OBJECT-TYPE
     SYNTAX      Integer32
-    UNITS       "millidegrees Celsius"
+    UNITS       "millidegrees celsius"
     MAX-ACCESS  read-only
     STATUS      obsolete
     DESCRIPTION
@@ -20508,7 +21023,7 @@ tmnxOpticalPortAmpCtrlState      OBJECT-TYPE
 
 tmnxOpticalPortTdcmPowerIn       OBJECT-TYPE
     SYNTAX      Integer32
-    UNITS       "mBm"
+    UNITS       "millibels per milliwatt"
     MAX-ACCESS  read-only
     STATUS      obsolete
     DESCRIPTION
@@ -20543,7 +21058,7 @@ tmnxOpticalPortTdcmLoss          OBJECT-TYPE
 
 tmnxOpticalPortTdcmPowerOut      OBJECT-TYPE
     SYNTAX      Integer32
-    UNITS       "mBm"
+    UNITS       "millibels per milliwatt"
     MAX-ACCESS  read-only
     STATUS      obsolete
     DESCRIPTION
@@ -20561,7 +21076,7 @@ tmnxOpticalPortTdcmPowerOut      OBJECT-TYPE
 
 tmnxOpticalPortTdcmRtd1Temp      OBJECT-TYPE
     SYNTAX      Integer32
-    UNITS       "millidegrees Celsius"
+    UNITS       "millidegrees celsius"
     MAX-ACCESS  read-only
     STATUS      obsolete
     DESCRIPTION
@@ -20576,7 +21091,7 @@ tmnxOpticalPortTdcmRtd1Temp      OBJECT-TYPE
 
 tmnxOpticalPortTdcmRtd2Temp      OBJECT-TYPE
     SYNTAX      Integer32
-    UNITS       "millidegrees Celsius"
+    UNITS       "millidegrees celsius"
     MAX-ACCESS  read-only
     STATUS      obsolete
     DESCRIPTION
@@ -20591,7 +21106,7 @@ tmnxOpticalPortTdcmRtd2Temp      OBJECT-TYPE
 
 tmnxOpticalPortTdcmRtd3Temp      OBJECT-TYPE
     SYNTAX      Integer32
-    UNITS       "millidegrees Celsius"
+    UNITS       "millidegrees celsius"
     MAX-ACCESS  read-only
     STATUS      obsolete
     DESCRIPTION
@@ -20606,7 +21121,7 @@ tmnxOpticalPortTdcmRtd3Temp      OBJECT-TYPE
 
 tmnxOpticalPortTdcmRtd4Temp      OBJECT-TYPE
     SYNTAX      Integer32
-    UNITS       "millidegrees Celsius"
+    UNITS       "millidegrees celsius"
     MAX-ACCESS  read-only
     STATUS      obsolete
     DESCRIPTION
@@ -20621,7 +21136,7 @@ tmnxOpticalPortTdcmRtd4Temp      OBJECT-TYPE
 
 tmnxOpticalPortTdcmModuleTemp    OBJECT-TYPE
     SYNTAX      Integer32
-    UNITS       "millidegrees Celsius"
+    UNITS       "millidegrees celsius"
     MAX-ACCESS  read-only
     STATUS      obsolete
     DESCRIPTION
@@ -20868,7 +21383,7 @@ tmnxPortEgrExpShaperRowStatus    OBJECT-TYPE
 
 tmnxPortEgrExpShaperRate         OBJECT-TYPE
     SYNTAX      TExpSecondaryShaperPIRRate
-    UNITS       "Kbps"
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -20880,7 +21395,7 @@ tmnxPortEgrExpShaperRate         OBJECT-TYPE
 
 tmnxPortEgrExpShaperClass1Rate   OBJECT-TYPE
     SYNTAX      TExpSecondaryShaperClassRate
-    UNITS       "Kbps"
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -20892,7 +21407,7 @@ tmnxPortEgrExpShaperClass1Rate   OBJECT-TYPE
 
 tmnxPortEgrExpShaperClass2Rate   OBJECT-TYPE
     SYNTAX      TExpSecondaryShaperClassRate
-    UNITS       "Kbps"
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -20904,7 +21419,7 @@ tmnxPortEgrExpShaperClass2Rate   OBJECT-TYPE
 
 tmnxPortEgrExpShaperClass3Rate   OBJECT-TYPE
     SYNTAX      TExpSecondaryShaperClassRate
-    UNITS       "Kbps"
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -20916,7 +21431,7 @@ tmnxPortEgrExpShaperClass3Rate   OBJECT-TYPE
 
 tmnxPortEgrExpShaperClass4Rate   OBJECT-TYPE
     SYNTAX      TExpSecondaryShaperClassRate
-    UNITS       "Kbps"
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -20928,7 +21443,7 @@ tmnxPortEgrExpShaperClass4Rate   OBJECT-TYPE
 
 tmnxPortEgrExpShaperClass5Rate   OBJECT-TYPE
     SYNTAX      TExpSecondaryShaperClassRate
-    UNITS       "Kbps"
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -20940,7 +21455,7 @@ tmnxPortEgrExpShaperClass5Rate   OBJECT-TYPE
 
 tmnxPortEgrExpShaperClass6Rate   OBJECT-TYPE
     SYNTAX      TExpSecondaryShaperClassRate
-    UNITS       "Kbps"
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -20952,7 +21467,7 @@ tmnxPortEgrExpShaperClass6Rate   OBJECT-TYPE
 
 tmnxPortEgrExpShaperClass7Rate   OBJECT-TYPE
     SYNTAX      TExpSecondaryShaperClassRate
-    UNITS       "Kbps"
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -20964,7 +21479,7 @@ tmnxPortEgrExpShaperClass7Rate   OBJECT-TYPE
 
 tmnxPortEgrExpShaperClass8Rate   OBJECT-TYPE
     SYNTAX      TExpSecondaryShaperClassRate
-    UNITS       "Kbps"
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -23051,7 +23566,7 @@ tmnxCohOptPortDispSwpEnd         OBJECT-TYPE
 
 tmnxCohOptPortCfgTxPower         OBJECT-TYPE
     SYNTAX      Integer32 (-2000..300)
-    UNITS       "mBm"
+    UNITS       "millibels per milliwatt"
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -23084,7 +23599,7 @@ tmnxCohOptPortCfgCprWinSize      OBJECT-TYPE
 
 tmnxCohOptPortCfgRxLosThresh     OBJECT-TYPE
     SYNTAX      Integer32 (-2400..-1300)
-    UNITS       "mBm"
+    UNITS       "millibels per milliwatt"
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -24082,7 +24597,7 @@ tPortAccEgrHsmdaQOverLastChanged OBJECT-TYPE
 
 tPortAccEgrHsmdaQOverAdminPIR    OBJECT-TYPE
     SYNTAX      THsmdaPIRKRateOverride
-    UNITS       "kbps"
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -24534,7 +25049,7 @@ TPortAccIngQGrpQDepthInfoEntry   ::= SEQUENCE
 
 tPortAccIngQGrpQDepthPollPrcnt1  OBJECT-TYPE
     SYNTAX      Unsigned32 (0..10000)
-    UNITS       "hundredths of a percent"
+    UNITS       "centipercent"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -24545,7 +25060,7 @@ tPortAccIngQGrpQDepthPollPrcnt1  OBJECT-TYPE
 
 tPortAccIngQGrpQDepthPollPrcnt2  OBJECT-TYPE
     SYNTAX      Unsigned32 (0..10000)
-    UNITS       "hundredths of a percent"
+    UNITS       "centipercent"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -24556,7 +25071,7 @@ tPortAccIngQGrpQDepthPollPrcnt2  OBJECT-TYPE
 
 tPortAccIngQGrpQDepthPollPrcnt3  OBJECT-TYPE
     SYNTAX      Unsigned32 (0..10000)
-    UNITS       "hundredths of a percent"
+    UNITS       "centipercent"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -24567,7 +25082,7 @@ tPortAccIngQGrpQDepthPollPrcnt3  OBJECT-TYPE
 
 tPortAccIngQGrpQDepthPollPrcnt4  OBJECT-TYPE
     SYNTAX      Unsigned32 (0..10000)
-    UNITS       "hundredths of a percent"
+    UNITS       "centipercent"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -24578,7 +25093,7 @@ tPortAccIngQGrpQDepthPollPrcnt4  OBJECT-TYPE
 
 tPortAccIngQGrpQDepthPollPrcnt5  OBJECT-TYPE
     SYNTAX      Unsigned32 (0..10000)
-    UNITS       "hundredths of a percent"
+    UNITS       "centipercent"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -24589,7 +25104,7 @@ tPortAccIngQGrpQDepthPollPrcnt5  OBJECT-TYPE
 
 tPortAccIngQGrpQDepthPollPrcnt6  OBJECT-TYPE
     SYNTAX      Unsigned32 (0..10000)
-    UNITS       "hundredths of a percent"
+    UNITS       "centipercent"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -24600,7 +25115,7 @@ tPortAccIngQGrpQDepthPollPrcnt6  OBJECT-TYPE
 
 tPortAccIngQGrpQDepthPollPrcnt7  OBJECT-TYPE
     SYNTAX      Unsigned32 (0..10000)
-    UNITS       "hundredths of a percent"
+    UNITS       "centipercent"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -24611,7 +25126,7 @@ tPortAccIngQGrpQDepthPollPrcnt7  OBJECT-TYPE
 
 tPortAccIngQGrpQDepthPollPrcnt8  OBJECT-TYPE
     SYNTAX      Unsigned32 (0..10000)
-    UNITS       "hundredths of a percent"
+    UNITS       "centipercent"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -24622,7 +25137,7 @@ tPortAccIngQGrpQDepthPollPrcnt8  OBJECT-TYPE
 
 tPortAccIngQGrpQDepthPollPrcnt9  OBJECT-TYPE
     SYNTAX      Unsigned32 (0..10000)
-    UNITS       "hundredths of a percent"
+    UNITS       "centipercent"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -24633,7 +25148,7 @@ tPortAccIngQGrpQDepthPollPrcnt9  OBJECT-TYPE
 
 tPortAccIngQGrpQDepthPollPrcnt10 OBJECT-TYPE
     SYNTAX      Unsigned32 (0..10000)
-    UNITS       "hundredths of a percent"
+    UNITS       "centipercent"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -24708,7 +25223,7 @@ TPortAccEgrQGrpQDepthInfoEntry   ::= SEQUENCE
 
 tPortAccEgrQGrpQDepthPollPrcnt1  OBJECT-TYPE
     SYNTAX      Unsigned32 (0..10000)
-    UNITS       "hundredths of a percent"
+    UNITS       "centipercent"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -24719,7 +25234,7 @@ tPortAccEgrQGrpQDepthPollPrcnt1  OBJECT-TYPE
 
 tPortAccEgrQGrpQDepthPollPrcnt2  OBJECT-TYPE
     SYNTAX      Unsigned32 (0..10000)
-    UNITS       "hundredths of a percent"
+    UNITS       "centipercent"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -24730,7 +25245,7 @@ tPortAccEgrQGrpQDepthPollPrcnt2  OBJECT-TYPE
 
 tPortAccEgrQGrpQDepthPollPrcnt3  OBJECT-TYPE
     SYNTAX      Unsigned32 (0..10000)
-    UNITS       "hundredths of a percent"
+    UNITS       "centipercent"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -24741,7 +25256,7 @@ tPortAccEgrQGrpQDepthPollPrcnt3  OBJECT-TYPE
 
 tPortAccEgrQGrpQDepthPollPrcnt4  OBJECT-TYPE
     SYNTAX      Unsigned32 (0..10000)
-    UNITS       "hundredths of a percent"
+    UNITS       "centipercent"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -24752,7 +25267,7 @@ tPortAccEgrQGrpQDepthPollPrcnt4  OBJECT-TYPE
 
 tPortAccEgrQGrpQDepthPollPrcnt5  OBJECT-TYPE
     SYNTAX      Unsigned32 (0..10000)
-    UNITS       "hundredths of a percent"
+    UNITS       "centipercent"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -24763,7 +25278,7 @@ tPortAccEgrQGrpQDepthPollPrcnt5  OBJECT-TYPE
 
 tPortAccEgrQGrpQDepthPollPrcnt6  OBJECT-TYPE
     SYNTAX      Unsigned32 (0..10000)
-    UNITS       "hundredths of a percent"
+    UNITS       "centipercent"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -24774,7 +25289,7 @@ tPortAccEgrQGrpQDepthPollPrcnt6  OBJECT-TYPE
 
 tPortAccEgrQGrpQDepthPollPrcnt7  OBJECT-TYPE
     SYNTAX      Unsigned32 (0..10000)
-    UNITS       "hundredths of a percent"
+    UNITS       "centipercent"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -24785,7 +25300,7 @@ tPortAccEgrQGrpQDepthPollPrcnt7  OBJECT-TYPE
 
 tPortAccEgrQGrpQDepthPollPrcnt8  OBJECT-TYPE
     SYNTAX      Unsigned32 (0..10000)
-    UNITS       "hundredths of a percent"
+    UNITS       "centipercent"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -24796,7 +25311,7 @@ tPortAccEgrQGrpQDepthPollPrcnt8  OBJECT-TYPE
 
 tPortAccEgrQGrpQDepthPollPrcnt9  OBJECT-TYPE
     SYNTAX      Unsigned32 (0..10000)
-    UNITS       "hundredths of a percent"
+    UNITS       "centipercent"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -24807,7 +25322,7 @@ tPortAccEgrQGrpQDepthPollPrcnt9  OBJECT-TYPE
 
 tPortAccEgrQGrpQDepthPollPrcnt10 OBJECT-TYPE
     SYNTAX      Unsigned32 (0..10000)
-    UNITS       "hundredths of a percent"
+    UNITS       "centipercent"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -24882,7 +25397,7 @@ TPortNetEgrQGrpQDepthInfoEntry   ::= SEQUENCE
 
 tPortNetEgrQGrpQDepthPollPrcnt1  OBJECT-TYPE
     SYNTAX      Unsigned32 (0..10000)
-    UNITS       "hundredths of a percent"
+    UNITS       "centipercent"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -24893,7 +25408,7 @@ tPortNetEgrQGrpQDepthPollPrcnt1  OBJECT-TYPE
 
 tPortNetEgrQGrpQDepthPollPrcnt2  OBJECT-TYPE
     SYNTAX      Unsigned32 (0..10000)
-    UNITS       "hundredths of a percent"
+    UNITS       "centipercent"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -24904,7 +25419,7 @@ tPortNetEgrQGrpQDepthPollPrcnt2  OBJECT-TYPE
 
 tPortNetEgrQGrpQDepthPollPrcnt3  OBJECT-TYPE
     SYNTAX      Unsigned32 (0..10000)
-    UNITS       "hundredths of a percent"
+    UNITS       "centipercent"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -24915,7 +25430,7 @@ tPortNetEgrQGrpQDepthPollPrcnt3  OBJECT-TYPE
 
 tPortNetEgrQGrpQDepthPollPrcnt4  OBJECT-TYPE
     SYNTAX      Unsigned32 (0..10000)
-    UNITS       "hundredths of a percent"
+    UNITS       "centipercent"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -24926,7 +25441,7 @@ tPortNetEgrQGrpQDepthPollPrcnt4  OBJECT-TYPE
 
 tPortNetEgrQGrpQDepthPollPrcnt5  OBJECT-TYPE
     SYNTAX      Unsigned32 (0..10000)
-    UNITS       "hundredths of a percent"
+    UNITS       "centipercent"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -24937,7 +25452,7 @@ tPortNetEgrQGrpQDepthPollPrcnt5  OBJECT-TYPE
 
 tPortNetEgrQGrpQDepthPollPrcnt6  OBJECT-TYPE
     SYNTAX      Unsigned32 (0..10000)
-    UNITS       "hundredths of a percent"
+    UNITS       "centipercent"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -24948,7 +25463,7 @@ tPortNetEgrQGrpQDepthPollPrcnt6  OBJECT-TYPE
 
 tPortNetEgrQGrpQDepthPollPrcnt7  OBJECT-TYPE
     SYNTAX      Unsigned32 (0..10000)
-    UNITS       "hundredths of a percent"
+    UNITS       "centipercent"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -24959,7 +25474,7 @@ tPortNetEgrQGrpQDepthPollPrcnt7  OBJECT-TYPE
 
 tPortNetEgrQGrpQDepthPollPrcnt8  OBJECT-TYPE
     SYNTAX      Unsigned32 (0..10000)
-    UNITS       "hundredths of a percent"
+    UNITS       "centipercent"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -24970,7 +25485,7 @@ tPortNetEgrQGrpQDepthPollPrcnt8  OBJECT-TYPE
 
 tPortNetEgrQGrpQDepthPollPrcnt9  OBJECT-TYPE
     SYNTAX      Unsigned32 (0..10000)
-    UNITS       "hundredths of a percent"
+    UNITS       "centipercent"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -25702,7 +26217,7 @@ tPortEgrHsSchOvrLastChanged      OBJECT-TYPE
 
 tPortEgrHsSchOvrMaxRate          OBJECT-TYPE
     SYNTAX      THsPirRateOverride
-    UNITS       "Mbps"
+    UNITS       "megabps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -25786,7 +26301,7 @@ tPortEgrHsSchOvrSchClassLastChgd OBJECT-TYPE
 
 tPortEgrHsSchOvrSchClassRate     OBJECT-TYPE
     SYNTAX      THsPirRateOverride
-    UNITS       "Mbps"
+    UNITS       "megabps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -25884,7 +26399,7 @@ tPortEgrHsSchOvrGroupLastChgd    OBJECT-TYPE
 
 tPortEgrHsSchOvrGroupRate        OBJECT-TYPE
     SYNTAX      THsPirRateOverride
-    UNITS       "Mbps"
+    UNITS       "megabps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -25978,7 +26493,7 @@ tPortHsSecShapDescription        OBJECT-TYPE
 
 tPortHsSecShapRate               OBJECT-TYPE
     SYNTAX      Unsigned32 (1..100000000 | 4294967295)
-    UNITS       "kbps"
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -26065,7 +26580,7 @@ tPortHsSecShapClassLastChanged   OBJECT-TYPE
 
 tPortHsSecShapClassRate          OBJECT-TYPE
     SYNTAX      Unsigned32 (1..100000000 | 4294967295)
-    UNITS       "kbps"
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -26275,10 +26790,10 @@ TPortAccIngSchedOvrInfoEntry     ::= SEQUENCE
     tPortAccIngSchedOvrSName         TNamedItem,
     tPortAccIngSchedOvrSRowStatus    RowStatus,
     tPortAccIngSchedOvrSLastMgmtChng TimeStamp,
-    tPortAccIngSchedOvrSPIRHi        TmnxHigh32,
-    tPortAccIngSchedOvrSPIRLo        TmnxLow32,
-    tPortAccIngSchedOvrSCIRHi        TmnxHigh32,
-    tPortAccIngSchedOvrSCIRLo        TmnxLow32,
+    tPortAccIngSchedOvrSPIRHi        TmnxQosRateHigh32,
+    tPortAccIngSchedOvrSPIRLo        TmnxQosRateLow32,
+    tPortAccIngSchedOvrSCIRHi        TmnxQosRateHigh32,
+    tPortAccIngSchedOvrSCIRLo        TmnxQosRateLow32,
     tPortAccIngSchedOvrSParentWeight TWeightOverride,
     tPortAccIngSchdOvrSParentCIRWght TWeightOverride
 }
@@ -26312,8 +26827,8 @@ tPortAccIngSchedOvrSLastMgmtChng OBJECT-TYPE
     ::= { tPortAccIngSchedOvrInfoEntry 3 }
 
 tPortAccIngSchedOvrSPIRHi        OBJECT-TYPE
-    SYNTAX      TmnxHigh32 (0 | 4294967295)
-    UNITS       "kbps"
+    SYNTAX      TmnxQosRateHigh32
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -26334,8 +26849,8 @@ tPortAccIngSchedOvrSPIRHi        OBJECT-TYPE
     ::= { tPortAccIngSchedOvrInfoEntry 4 }
 
 tPortAccIngSchedOvrSPIRLo        OBJECT-TYPE
-    SYNTAX      TmnxLow32 (1..3200000000 | 4294967294 | 4294967295)
-    UNITS       "kbps"
+    SYNTAX      TmnxQosRateLow32
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -26357,8 +26872,8 @@ tPortAccIngSchedOvrSPIRLo        OBJECT-TYPE
     ::= { tPortAccIngSchedOvrInfoEntry 5 }
 
 tPortAccIngSchedOvrSCIRHi        OBJECT-TYPE
-    SYNTAX      TmnxHigh32 (0 | 4294967295)
-    UNITS       "kbps"
+    SYNTAX      TmnxQosRateHigh32
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -26385,8 +26900,8 @@ tPortAccIngSchedOvrSCIRHi        OBJECT-TYPE
     ::= { tPortAccIngSchedOvrInfoEntry 6 }
 
 tPortAccIngSchedOvrSCIRLo        OBJECT-TYPE
-    SYNTAX      TmnxLow32 (0..3200000000 | 4294967293 | 4294967294 | 4294967295)
-    UNITS       "kbps"
+    SYNTAX      TmnxQosRateLow32
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -26464,10 +26979,10 @@ TPortAccEgrSchedOvrInfoEntry     ::= SEQUENCE
     tPortAccEgrSchedOvrSName         TNamedItem,
     tPortAccEgrSchedOvrSRowStatus    RowStatus,
     tPortAccEgrSchedOvrSLastMgmtChng TimeStamp,
-    tPortAccEgrSchedOvrSPIRHi        TmnxHigh32,
-    tPortAccEgrSchedOvrSPIRLo        TmnxLow32,
-    tPortAccEgrSchedOvrSCIRHi        TmnxHigh32,
-    tPortAccEgrSchedOvrSCIRLo        TmnxLow32,
+    tPortAccEgrSchedOvrSPIRHi        TmnxQosRateHigh32,
+    tPortAccEgrSchedOvrSPIRLo        TmnxQosRateLow32,
+    tPortAccEgrSchedOvrSCIRHi        TmnxQosRateHigh32,
+    tPortAccEgrSchedOvrSCIRLo        TmnxQosRateLow32,
     tPortAccEgrSchedOvrSParentWeight TWeightOverride,
     tPortAccEgrSchdOvrSParentCIRWght TWeightOverride
 }
@@ -26501,8 +27016,8 @@ tPortAccEgrSchedOvrSLastMgmtChng OBJECT-TYPE
     ::= { tPortAccEgrSchedOvrInfoEntry 3 }
 
 tPortAccEgrSchedOvrSPIRHi        OBJECT-TYPE
-    SYNTAX      TmnxHigh32 (0 | 4294967295)
-    UNITS       "kbps"
+    SYNTAX      TmnxQosRateHigh32
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -26523,8 +27038,8 @@ tPortAccEgrSchedOvrSPIRHi        OBJECT-TYPE
     ::= { tPortAccEgrSchedOvrInfoEntry 4 }
 
 tPortAccEgrSchedOvrSPIRLo        OBJECT-TYPE
-    SYNTAX      TmnxLow32 (1..3200000000 | 4294967294 | 4294967295)
-    UNITS       "kbps"
+    SYNTAX      TmnxQosRateLow32
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -26546,8 +27061,8 @@ tPortAccEgrSchedOvrSPIRLo        OBJECT-TYPE
     ::= { tPortAccEgrSchedOvrInfoEntry 5 }
 
 tPortAccEgrSchedOvrSCIRHi        OBJECT-TYPE
-    SYNTAX      TmnxHigh32 (0 | 4294967295)
-    UNITS       "kbps"
+    SYNTAX      TmnxQosRateHigh32
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -26574,8 +27089,8 @@ tPortAccEgrSchedOvrSCIRHi        OBJECT-TYPE
     ::= { tPortAccEgrSchedOvrInfoEntry 6 }
 
 tPortAccEgrSchedOvrSCIRLo        OBJECT-TYPE
-    SYNTAX      TmnxLow32 (0..3200000000 | 4294967293 | 4294967294 | 4294967295)
-    UNITS       "kbps"
+    SYNTAX      TmnxQosRateLow32
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -26819,7 +27334,8 @@ tmnxPortConnectorEntry           OBJECT-TYPE
 TmnxPortConnectorEntry           ::= SEQUENCE
 {
     tmnxPortConnectorLastChanged     TimeStamp,
-    tmnxPortConnectorBreakoutType    TmnxPortConnectorBreakoutType
+    tmnxPortConnectorBreakoutType    TmnxPortConnectorBreakoutType,
+    tmnxPortConnectorRsFecMode       INTEGER
 }
 
 tmnxPortConnectorLastChanged     OBJECT-TYPE
@@ -26842,6 +27358,28 @@ tmnxPortConnectorBreakoutType    OBJECT-TYPE
          will cause the system to create ports accessible under the connector."
     DEFVAL      { 1 }
     ::= { tmnxPortConnectorEntry 2 }
+
+tmnxPortConnectorRsFecMode       OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none       (0),
+        cl91514528 (1),
+        cl91514544 (2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPortConnectorRsFecMode specifies the mode of
+         Reed-Solomon Forward Error Correction (RS-FEC) to be used by this
+         connector port.
+
+         When the value of tmnxPortConnectorRsFecMode is set to 'none', the
+         port will transmit and receive using standard 64B/66B encoding."
+    REFERENCE
+        "IEEE 802.3ba, Clause 82, Standard 64B/66B encoding
+         IEEE 802.3bm, Clause 91, RS-FEC 514/528 encoding
+         IEEE 802.3bm, Clause 91, RS-FEC 514/544 encoding"
+    DEFVAL      { none }
+    ::= { tmnxPortConnectorEntry 3 }
 
 tmnxRS232TableLastChanged        OBJECT-TYPE
     SYNTAX      TimeStamp
@@ -27112,7 +27650,7 @@ tmnxRS232ControlLeadState        OBJECT-TYPE
 
 tmnxRS232HoldTimeUp              OBJECT-TYPE
     SYNTAX      Unsigned32 (0..100)
-    UNITS       "deci-seconds"
+    UNITS       "deciseconds"
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -27127,7 +27665,7 @@ tmnxRS232HoldTimeUp              OBJECT-TYPE
 
 tmnxRS232HoldTimeDown            OBJECT-TYPE
     SYNTAX      Unsigned32 (0..100)
-    UNITS       "deci-seconds"
+    UNITS       "deciseconds"
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -27631,7 +28169,7 @@ tmnxPortVsrStatsVirtualDriver    OBJECT-TYPE
 
 tmnxPortVsrStatsTheoreticMxSpeed OBJECT-TYPE
     SYNTAX      Unsigned32
-    UNITS       "Gbps"
+    UNITS       "gigabps"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -27691,12 +28229,14 @@ tmnxPortStateEntry               OBJECT-TYPE
 
 TmnxPortStateEntry               ::= SEQUENCE
 {
-    tmnxPortStateFPNumber            Unsigned32,
-    tmnxPortStateMacChipNumber       Unsigned32
+    tmnxPortStateFPNumber            TmnxFPNumberOrZero,
+    tmnxPortStateMacChipNumber       Unsigned32,
+    tmnxPortStateLicensed            TruthValue,
+    tmnxPortRsFecOperMode            INTEGER
 }
 
 tmnxPortStateFPNumber            OBJECT-TYPE
-    SYNTAX      Unsigned32
+    SYNTAX      TmnxFPNumberOrZero
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -27712,6 +28252,109 @@ tmnxPortStateMacChipNumber       OBJECT-TYPE
         "The value of tmnxPortStateMacChipNumber indicates the MAC chip number
          for this port."
     ::= { tmnxPortStateEntry 2 }
+
+tmnxPortStateLicensed            OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPortStateLicensed indicates whether this port is
+         licensed for the current licensed level of the assigned MDA.
+
+         A value of 'true' indicates this port is licensed and can be used in
+         service configuration. A value of 'false' indicates that the port is
+         unlicensed and may not be used."
+    ::= { tmnxPortStateEntry 3 }
+
+tmnxPortRsFecOperMode            OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none       (0),
+        cl91514528 (1),
+        cl91514544 (2),
+        cl74       (3),
+        cl108      (4),
+        cl119      (5)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPortRsFecOperMode indicates the mode of Reed-Solomon
+         Forward Error Correction (RS-FEC) in use on this port.
+
+         When the value of tmnxPortRsFecOperMode is set to 'none', the port is
+         transmiting and receiving using standard 64B/66B encoding."
+    REFERENCE
+        "IEEE 802.3ba, Clause 82, Standard 64B/66B encoding
+         IEEE 802.3bm, Clause 91, RS-FEC 514/528 encoding
+         IEEE 802.3bm, Clause 91, RS-FEC 514/544 encoding
+         IEEE 802.3, Clause 74
+         IEEE 802.3, Clause 108
+         IEEE 802.3, Clause 119."
+    ::= { tmnxPortStateEntry 4 }
+
+tmnxPortTransceiverTblLastChgd   OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPortTransceiverTblLastChgd indicate the time, since
+         system startup, when tmnxPortTransceiverTable last changed
+         configuration.
+
+         If no changes were made to the table since the last re-initialization
+         of the local network management subsystem, then this object contains a
+         zero value."
+    ::= { tmnxPortObjs 119 }
+
+tmnxPortTransceiverTable         OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxPortTransceiverEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxPortTransceiverTable contains configuration information for
+         port transceivers."
+    ::= { tmnxPortObjs 120 }
+
+tmnxPortTransceiverEntry         OBJECT-TYPE
+    SYNTAX      TmnxPortTransceiverEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each tmnxPortTransceiverEntry row represents a port transceiver in the
+         system and contains configuration information.
+
+         Entries in this table are created automatically by the system and
+         cannot be created or destroyed via SNMP SET operations."
+    INDEX       {
+        tmnxChassisIndex,
+        tmnxPortPortID
+    }
+    ::= { tmnxPortTransceiverTable 1 }
+
+TmnxPortTransceiverEntry         ::= SEQUENCE
+{
+    tmnxPortTransLastChanged         TimeStamp,
+    tmnxPortTransDco                 TmnxEnabledDisabled
+}
+
+tmnxPortTransLastChanged         OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPortTransLastChanged indicates the value of sysUpTime
+         at the time of the most recent management change to this row."
+    ::= { tmnxPortTransceiverEntry 1 }
+
+tmnxPortTransDco                 OBJECT-TYPE
+    SYNTAX      TmnxEnabledDisabled
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPortTransDco specifies whether or not Digital
+         Coherent Optics (DCO) is enabled on the transceiver."
+    DEFVAL      { disabled }
+    ::= { tmnxPortTransceiverEntry 2 }
 
 tmnxPortNotificationObjects      OBJECT IDENTIFIER ::= { tmnxHwObjs 7 }
 
@@ -28012,7 +28655,8 @@ tmnxObjType                      OBJECT-TYPE
         mda    (1),
         port   (2),
         unused (3),
-        bundle (4)
+        bundle (4),
+        fp     (5)
     }
     MAX-ACCESS  accessible-for-notify
     STATUS      current
@@ -28500,7 +29144,7 @@ tmnxQosPoolAppEntry              OBJECT-TYPE
 TmnxQosPoolAppEntry              ::= SEQUENCE
 {
     tmnxObjectType                   INTEGER,
-    tmnxObjectId                     TmnxPortID,
+    tmnxObjectId                     Unsigned32,
     tmnxObjectAppType                INTEGER,
     tmnxObjectAppPool                TNamedItem,
     tmnxObjectAppPoolRowStatus       RowStatus,
@@ -28518,7 +29162,8 @@ tmnxObjectType                   OBJECT-TYPE
         mda    (1),
         port   (2),
         unused (3),
-        bundle (4)
+        bundle (4),
+        fp     (5)
     }
     MAX-ACCESS  not-accessible
     STATUS      current
@@ -28528,14 +29173,22 @@ tmnxObjectType                   OBJECT-TYPE
     ::= { tmnxQosPoolAppEntry 1 }
 
 tmnxObjectId                     OBJECT-TYPE
-    SYNTAX      TmnxPortID
+    SYNTAX      Unsigned32
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "tmnxObjectId is used to identify the specific object. If
-         tmnxObjectType is 'mda', then the tmnxObjectId is encoded as a
-         physical port with the port being '0'. For all other types the
-         encoding is done as per the description of TmnxPortID."
+        "The value of tmnxObjectId specifies the object specified for this
+         buffer pool. The encoding of this value is determined based on
+         the value of tmnxObjectType.
+         Encoding is defined as follows:
+         'mda'    : defined as a TmnxPortID with the physical port set to '0'.
+         'port'   : defined as a TmnxPortID.
+         'bundle' : defined as a TmnxPortID of type 'bundle'.
+         'fp'     : defined as the following encoding:
+         32                17|16      9|8     1|
+         +---------+-------------------+-------+
+         |       zeros       | Slot    | FP ID |
+         +---------+-------------------+-------+"
     ::= { tmnxQosPoolAppEntry 2 }
 
 tmnxObjectAppType                OBJECT-TYPE
@@ -29031,7 +29684,15 @@ TmnxPortNetEgressStatsEntry      ::= SEQUENCE
     tmnxPortNetEgressDroInProfPkts   Counter64,
     tmnxPortNetEgressDroOutProfPkts  Counter64,
     tmnxPortNetEgressDroInProfOcts   Counter64,
-    tmnxPortNetEgressDroOutProfOcts  Counter64
+    tmnxPortNetEgressDroOutProfOcts  Counter64,
+    tmnxPortNetEgressUCFwdPkts       Counter64,
+    tmnxPortNetEgressUCFwdOcts       Counter64,
+    tmnxPortNetEgressUCDroPkts       Counter64,
+    tmnxPortNetEgressUCDroOcts       Counter64,
+    tmnxPortNetEgressMCFwdPkts       Counter64,
+    tmnxPortNetEgressMCFwdOcts       Counter64,
+    tmnxPortNetEgressMCDroPkts       Counter64,
+    tmnxPortNetEgressMCDroOcts       Counter64
 }
 
 tmnxPortNetEgressQueueIndex      OBJECT-TYPE
@@ -29116,6 +29777,78 @@ tmnxPortNetEgressDroOutProfOcts  OBJECT-TYPE
         "tmnxPortNetEgressDroOutProfOcts indicates the number of exceeding
          network egress octets dropped on this port using this queue."
     ::= { tmnxPortNetEgressStatsEntry 9 }
+
+tmnxPortNetEgressUCFwdPkts       OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "tmnxPortNetEgressUCFwdPkts indicates the number of unicast packets
+         forwarded on this port using this queue."
+    ::= { tmnxPortNetEgressStatsEntry 10 }
+
+tmnxPortNetEgressUCFwdOcts       OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "tmnxPortNetEgressUCFwdOcts indicates the number of unicast octets
+         forwarded on this port using this queue."
+    ::= { tmnxPortNetEgressStatsEntry 11 }
+
+tmnxPortNetEgressUCDroPkts       OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "tmnxPortNetEgressUCDroPkts indicates the number of unicast packets
+         dropped on this port using this queue."
+    ::= { tmnxPortNetEgressStatsEntry 12 }
+
+tmnxPortNetEgressUCDroOcts       OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "tmnxPortNetEgressUCDroOcts indicates the number of unicast octets
+         dropped on this port using this queue."
+    ::= { tmnxPortNetEgressStatsEntry 13 }
+
+tmnxPortNetEgressMCFwdPkts       OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "tmnxPortNetEgressMCFwdPkts indicates the number of multicast packets
+         forwarded on this port using this queue."
+    ::= { tmnxPortNetEgressStatsEntry 14 }
+
+tmnxPortNetEgressMCFwdOcts       OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "tmnxPortNetEgressMCFwdOcts indicates the number of multicast octets
+         forwarded on this port using this queue."
+    ::= { tmnxPortNetEgressStatsEntry 15 }
+
+tmnxPortNetEgressMCDroPkts       OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "tmnxPortNetEgressMCDroPkts indicates the number of multicast packets
+         dropped on this port using this queue."
+    ::= { tmnxPortNetEgressStatsEntry 16 }
+
+tmnxPortNetEgressMCDroOcts       OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "tmnxPortNetEgressMCDroOcts indicates the number of multicast octets
+         dropped on this port using this queue."
+    ::= { tmnxPortNetEgressStatsEntry 17 }
 
 tmnxCiscoHDLCStatsTable          OBJECT-TYPE
     SYNTAX      SEQUENCE OF TmnxCiscoHDLCStatsEntry
@@ -30597,7 +31330,7 @@ tmnxCohOptPortRxQMax             OBJECT-TYPE
 
 tmnxCohOptPortRxPower            OBJECT-TYPE
     SYNTAX      Integer32
-    UNITS       "mBm"
+    UNITS       "millibels per milliwatt"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -30607,7 +31340,7 @@ tmnxCohOptPortRxPower            OBJECT-TYPE
 
 tmnxCohOptPortRxPowerAvg         OBJECT-TYPE
     SYNTAX      Integer32
-    UNITS       "mBm"
+    UNITS       "millibels per milliwatt"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -30617,7 +31350,7 @@ tmnxCohOptPortRxPowerAvg         OBJECT-TYPE
 
 tmnxCohOptPortRxPowerMin         OBJECT-TYPE
     SYNTAX      Integer32
-    UNITS       "mBm"
+    UNITS       "millibels per milliwatt"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -30627,7 +31360,7 @@ tmnxCohOptPortRxPowerMin         OBJECT-TYPE
 
 tmnxCohOptPortRxPowerMax         OBJECT-TYPE
     SYNTAX      Integer32
-    UNITS       "mBm"
+    UNITS       "millibels per milliwatt"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -30637,7 +31370,7 @@ tmnxCohOptPortRxPowerMax         OBJECT-TYPE
 
 tmnxCohOptPortTxPower            OBJECT-TYPE
     SYNTAX      Integer32
-    UNITS       "mBm"
+    UNITS       "millibels per milliwatt"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -30647,7 +31380,7 @@ tmnxCohOptPortTxPower            OBJECT-TYPE
 
 tmnxCohOptPortTxPowerAvg         OBJECT-TYPE
     SYNTAX      Integer32
-    UNITS       "mBm"
+    UNITS       "millibels per milliwatt"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -30657,7 +31390,7 @@ tmnxCohOptPortTxPowerAvg         OBJECT-TYPE
 
 tmnxCohOptPortTxPowerMin         OBJECT-TYPE
     SYNTAX      Integer32
-    UNITS       "mBm"
+    UNITS       "millibels per milliwatt"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -30667,7 +31400,7 @@ tmnxCohOptPortTxPowerMin         OBJECT-TYPE
 
 tmnxCohOptPortTxPowerMax         OBJECT-TYPE
     SYNTAX      Integer32
-    UNITS       "mBm"
+    UNITS       "millibels per milliwatt"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION

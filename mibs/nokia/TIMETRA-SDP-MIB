@@ -52,10 +52,11 @@ IMPORTS
     tmnxServNotifications, tmnxServObjs,
     tmnxSvcObjs, tstpTraps
                                                          FROM TIMETRA-SERV-MIB
-    SdpBindId, ServiceAdminStatus,
-    TCpmProtPolicyID, TFCSet,
-    TItemDescription, TLNamedItemOrEmpty,
-    TNamedItem, TNamedItemOrEmpty,
+    AluNgeKeygroupIdOrZero, SdpBindId,
+    ServiceAdminStatus, TCpmProtPolicyID,
+    TFCSet, TItemDescription,
+    TLNamedItemOrEmpty, TNamedItem,
+    TNamedItemOrEmpty,
     TPolicyStatementNameOrEmpty,
     TQosQGrpInstanceIDorZero,
     TSdpEgressPolicyID, TSdpIngressPolicyID,
@@ -91,7 +92,7 @@ timetraServicesSdpMIBModule      MODULE-IDENTITY
         "This document is the SNMP MIB module to manage and provision the
          various services of the Nokia SROS system.
 
-         Copyright 2003-2017 Nokia. All rights reserved. Reproduction of this
+         Copyright 2003-2018 Nokia. All rights reserved. Reproduction of this
          document is authorized on the condition that the foregoing copyright
          notice is included.
 
@@ -402,7 +403,7 @@ sdpOperStatus                    OBJECT-TYPE
     ::= { sdpInfoEntry 9 }
 
 sdpAdminPathMtu                  OBJECT-TYPE
-    SYNTAX      Integer32 (0 | 576..9194)
+    SYNTAX      Integer32 (0 | 576..9782)
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -644,7 +645,7 @@ sdpCollectAcctStats              OBJECT-TYPE
     ::= { sdpInfoEntry 30 }
 
 sdpAccountingPolicyId            OBJECT-TYPE
-    SYNTAX      Unsigned32
+    SYNTAX      Unsigned32 (0..99)
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -749,7 +750,7 @@ sdpBandwidthBookingFactor        OBJECT-TYPE
 
 sdpOperBandwidth                 OBJECT-TYPE
     SYNTAX      Unsigned32
-    UNITS       "kilobits per second"
+    UNITS       "kilobps"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -761,7 +762,7 @@ sdpOperBandwidth                 OBJECT-TYPE
 
 sdpAvailableBandwidth            OBJECT-TYPE
     SYNTAX      Unsigned32
-    UNITS       "kilobits per second"
+    UNITS       "kilobps"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -771,7 +772,7 @@ sdpAvailableBandwidth            OBJECT-TYPE
 
 sdpMaxBookableBandwidth          OBJECT-TYPE
     SYNTAX      Unsigned32
-    UNITS       "kilobits per second"
+    UNITS       "kilobps"
     MAX-ACCESS  accessible-for-notify
     STATUS      current
     DESCRIPTION
@@ -785,7 +786,7 @@ sdpMaxBookableBandwidth          OBJECT-TYPE
 
 sdpBookedBandwidth               OBJECT-TYPE
     SYNTAX      Unsigned32
-    UNITS       "kilobits per second"
+    UNITS       "kilobps"
     MAX-ACCESS  accessible-for-notify
     STATUS      current
     DESCRIPTION
@@ -1287,7 +1288,9 @@ SdpBindEntry                     ::= SEQUENCE
     sdpBindForceQinqVcForwarding     TruthValue,
     sdpBindIngressVlanTranslation    INTEGER,
     sdpBindIngressVlanTranslationId  Integer32,
-    sdpBindMinReqdSdpOperMtu         Integer32
+    sdpBindMinReqdSdpOperMtu         Integer32,
+    sdpBindForceQinqVcFwding         INTEGER,
+    sdpBindMulticastSource           TruthValue
 }
 
 sdpBindId                        OBJECT-TYPE
@@ -1517,10 +1520,11 @@ sdpBindSplitHorizonGrp           OBJECT-TYPE
     DESCRIPTION
         "This value of the object sdpBindSplitHorizonGrp specifies the name of
          the split-horizon group where the spoke SDP Bind belongs to. This
-         object can be set only at the time the row is created. Per default a
-         spoke SDP Bind does not belong to any split-horizon group. The name
-         specified must correspond to an existing split-horizon group in the
-         TLS service where this spoke SDP Bind is defined."
+         object can be set only at the time the row is created and is mutually
+         exclusive with sdpBindMulticastSource. Per default a spoke SDP Bind
+         does not belong to any split-horizon group. The name specified must
+         correspond to an existing split-horizon group in the TLS service where
+         this spoke SDP Bind is defined."
     DEFVAL      { "" }
     ::= { sdpBindEntry 19 }
 
@@ -1690,7 +1694,7 @@ sdpBindCollectAcctStats          OBJECT-TYPE
     ::= { sdpBindEntry 26 }
 
 sdpBindAccountingPolicyId        OBJECT-TYPE
-    SYNTAX      Unsigned32
+    SYNTAX      Unsigned32 (0..99)
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -1882,7 +1886,7 @@ sdpBindForceVlanVcForwarding     OBJECT-TYPE
 
 sdpBindAdminBandwidth            OBJECT-TYPE
     SYNTAX      SdpBindBandwidth
-    UNITS       "kilobits per second"
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -1895,7 +1899,7 @@ sdpBindAdminBandwidth            OBJECT-TYPE
 
 sdpBindOperBandwidth             OBJECT-TYPE
     SYNTAX      SdpBindBandwidth
-    UNITS       "kilobits per second"
+    UNITS       "kilobps"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -2488,7 +2492,7 @@ sdpBindBfdEncap                  OBJECT-TYPE
 sdpBindForceQinqVcForwarding     OBJECT-TYPE
     SYNTAX      TruthValue
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of sdpBindForceQinqVcForwarding specifies whether or not the
          datapath should forcefully insert two VLAN tags when sdpBindVcType is
@@ -2547,6 +2551,35 @@ sdpBindMinReqdSdpOperMtu         OBJECT-TYPE
         "The value of sdpBindMinReqdSdpOperMtu indicates the minimum required
          SDP MTU size used with this SDP binding."
     ::= { sdpBindEntry 82 }
+
+sdpBindForceQinqVcFwding         OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none     (0),
+        ctagctag (1),
+        stagctag (2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of sdpBindForceQinqVcFwding specifies whether or not the
+         datapath should forcefully insert two VLAN tags which are copied from
+         the qinq service-delimiting vlan values.
+
+         The sdpBindVcType should be either set to 'ether' or 'vlan'."
+    DEFVAL      { none }
+    ::= { sdpBindEntry 83 }
+
+sdpBindMulticastSource           OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of sdpBindMulticastSource specifies whether or not the
+         multicast source is enabled on the SDP. This object can only be set at
+         the time the row is created and is mutually exclusive with
+         sdpBindSplitHorizonGrp."
+    DEFVAL      { false }
+    ::= { sdpBindEntry 84 }
 
 sdpBindBaseStatsTable            OBJECT-TYPE
     SYNTAX      SEQUENCE OF SdpBindBaseStatsEntry
@@ -4180,7 +4213,7 @@ sdpBindCpipePeerPayloadSize      OBJECT-TYPE
 
 sdpBindCpipeLocalBitrate         OBJECT-TYPE
     SYNTAX      Unsigned32
-    UNITS       "64 Kbits/s"
+    UNITS       "sixty-four kilobps"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -4189,7 +4222,7 @@ sdpBindCpipeLocalBitrate         OBJECT-TYPE
 
 sdpBindCpipePeerBitrate          OBJECT-TYPE
     SYNTAX      Unsigned32
-    UNITS       "64 Kbits/s"
+    UNITS       "sixty-four kilobps"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -4951,7 +4984,17 @@ PwTemplateEntry                  ::= SEQUENCE
     pwTemplateForceQinqVcForwarding  TruthValue,
     pwTemplatePreferProvSdp          TruthValue,
     pwTemplateEntropyLabel           TruthValue,
-    pwTemplateName                   TLNamedItemOrEmpty
+    pwTemplateName                   TLNamedItemOrEmpty,
+    pwTemplateGreDelivery            TruthValue,
+    pwTemplateIngQoSNetworkPlcyName  TLNamedItemOrEmpty,
+    pwTemplateEgrQoSNetworkPlcyName  TLNamedItemOrEmpty,
+    pwTemplateIngressIpFilterName    TLNamedItemOrEmpty,
+    pwTemplateIngressIpv6FilterName  TLNamedItemOrEmpty,
+    pwTemplateIngressMacFilterName   TLNamedItemOrEmpty,
+    pwTemplateEgressIpFilterName     TLNamedItemOrEmpty,
+    pwTemplateEgressIpv6FilterName   TLNamedItemOrEmpty,
+    pwTemplateEgressMacFilterName    TLNamedItemOrEmpty,
+    pwTemplateForceQinqVcFwding      INTEGER
 }
 
 pwTemplateId                     OBJECT-TYPE
@@ -5008,7 +5051,7 @@ pwTemplateVcType                 OBJECT-TYPE
     ::= { pwTemplateEntry 5 }
 
 pwTemplateAccountingPolicyId     OBJECT-TYPE
-    SYNTAX      Unsigned32
+    SYNTAX      Unsigned32 (0..99)
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -5269,14 +5312,14 @@ pwTemplateIgmpImportPlcy         OBJECT-TYPE
 
 pwTemplateIgmpLastMembIntvl      OBJECT-TYPE
     SYNTAX      Unsigned32 (1..50)
-    UNITS       "deci-seconds"
+    UNITS       "deciseconds"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
         "The value of pwTemplateIgmpLastMembIntvl specifies the Max Response
-         Time (in tenths of a second) used in Group-Specific and
-         Group-Source-Specific Queries sent in response to 'leave' messages.
-         This is also the amount of time between Group-Specific Query messages.
+         Time (in deciseconds) used in Group-Specific and Group-Source-Specific
+         Queries sent in response to 'leave' messages. This is also the amount
+         of time between Group-Specific Query messages.
 
          This value may be tuned to modify the leave latency of the network. A
          reduced value results in reduced time to detect the loss of the last
@@ -5364,7 +5407,7 @@ pwTemplateIgmpMcacPolicyName     OBJECT-TYPE
 
 pwTemplateIgmpMcacUnconstBW      OBJECT-TYPE
     SYNTAX      Integer32 (-1 | 0..2147483647)
-    UNITS       "kbps"
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      obsolete
     DESCRIPTION
@@ -5383,7 +5426,7 @@ pwTemplateIgmpMcacUnconstBW      OBJECT-TYPE
 
 pwTemplateIgmpMcacPrRsvMndBW     OBJECT-TYPE
     SYNTAX      Integer32 (-1..2147483647)
-    UNITS       "kbps"
+    UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      obsolete
     DESCRIPTION
@@ -5570,7 +5613,7 @@ pwTemplateShgAutoLearnMacProtect OBJECT-TYPE
     ::= { pwTemplateEntry 56 }
 
 pwTemplateIngQoSNetworkPlcyId    OBJECT-TYPE
-    SYNTAX      TSdpIngressPolicyID
+    SYNTAX      TSdpIngressPolicyID (0..65535)
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -5580,7 +5623,7 @@ pwTemplateIngQoSNetworkPlcyId    OBJECT-TYPE
     ::= { pwTemplateEntry 57 }
 
 pwTemplateEgrQoSNetworkPlcyId    OBJECT-TYPE
-    SYNTAX      TSdpEgressPolicyID
+    SYNTAX      TSdpEgressPolicyID (0..65535)
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -5597,8 +5640,8 @@ pwTemplateIngQoSFpRedirectQGrp   OBJECT-TYPE
         "The value of pwTemplateIngQoSFpRedirectQGrp specifies the
          forwarding-plane queue group Policy for this PW template.
 
-         This object must be set along with pwTemplateIngQoSNetworkPlcyId
-         object.
+         This object must be set along with pwTemplateIngQoSNetworkPlcyId or
+         pwTemplateIngQoSNetworkPlcyName object.
 
          An 'inconsistentValue' error is returned if
          pwTemplateIngQoSFpRedirectQGrp is set to a non-default value and an
@@ -5615,8 +5658,8 @@ pwTemplateEgrQoSPortRedirectQGrp OBJECT-TYPE
         "The value of pwTemplateEgrQoSPortRedirectQGrp specifies the
          forwarding-plane queue group Policy for this PW template.
 
-         This object must be set along with pwTemplateEgrQoSNetworkPlcyId
-         object.
+         This object must be set along with pwTemplateEgrQoSNetworkPlcyId or
+         pwTemplateEgrQoSNetworkPlcyName object.
 
          An 'inconsistentValue' error is returned if
          pwTemplateEgrQoSPortRedirectQGrp is set to a non-default value and an
@@ -5659,7 +5702,7 @@ pwTemplateBlockOnPeerFault       OBJECT-TYPE
 pwTemplateForceQinqVcForwarding  OBJECT-TYPE
     SYNTAX      TruthValue
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of pwTemplateForceQinqVcForwarding specifies whether or not
          the datapath should forcefully insert two VLAN tags when
@@ -5706,6 +5749,133 @@ pwTemplateName                   OBJECT-TYPE
          PW template."
     DEFVAL      { ''H }
     ::= { pwTemplateEntry 67 }
+
+pwTemplateGreDelivery            OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of pwTemplateGreDelivery specifies whether or not to use a
+         GRE tunnel should be used when creating an auto SDP. An
+         'inconsistentValue' error is returned if pwTemplateGreDelivery is
+         modified after creation of the entry."
+    DEFVAL      { false }
+    ::= { pwTemplateEntry 68 }
+
+pwTemplateIngQoSNetworkPlcyName  OBJECT-TYPE
+    SYNTAX      TLNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the pwTemplateIngQoSNetworkPlcyName specifies the ingress
+         QoS network policy name applied to this PW template."
+    DEFVAL      { "" }
+    ::= { pwTemplateEntry 69 }
+
+pwTemplateEgrQoSNetworkPlcyName  OBJECT-TYPE
+    SYNTAX      TLNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the pwTemplateEgrQoSNetworkPlcyName specifies the egress
+         QoS network policy name applied to this PW template."
+    DEFVAL      { "" }
+    ::= { pwTemplateEntry 70 }
+
+pwTemplateIngressIpFilterName    OBJECT-TYPE
+    SYNTAX      TLNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of pwTemplateIngressIpFilterName specifies the ingress
+         Filter name.
+
+         When the value of this object is set to non-default, the value of
+         object pwTemplateIngressIpFilterId is ignored."
+    DEFVAL      { "" }
+    ::= { pwTemplateEntry 71 }
+
+pwTemplateIngressIpv6FilterName  OBJECT-TYPE
+    SYNTAX      TLNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of pwTemplateIngressIpv6FilterName specifies the ingress
+         Filter name.
+
+         When the value of this object is set to non-default, the value of
+         object pwTemplateIngressIpv6FilterId is ignored."
+    DEFVAL      { "" }
+    ::= { pwTemplateEntry 72 }
+
+pwTemplateIngressMacFilterName   OBJECT-TYPE
+    SYNTAX      TLNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of pwTemplateIngressMacFilterName specifies the ingress
+         Filter name.
+
+         When the value of this object is set to non-default, the value of
+         object pwTemplateIngressMacFilterId is ignored."
+    DEFVAL      { "" }
+    ::= { pwTemplateEntry 73 }
+
+pwTemplateEgressIpFilterName     OBJECT-TYPE
+    SYNTAX      TLNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of pwTemplateEgressIpFilterName specifies the ingress Filter
+         name.
+
+         When the value of this object is set to non-default, the value of
+         object pwTemplateEgressIpFilterId is ignored."
+    DEFVAL      { "" }
+    ::= { pwTemplateEntry 74 }
+
+pwTemplateEgressIpv6FilterName   OBJECT-TYPE
+    SYNTAX      TLNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of pwTemplateEgressIpv6FilterName specifies the ingress
+         Filter name.
+
+         When the value of this object is set to non-default, the value of
+         object pwTemplateEgressIpv6FilterId is ignored."
+    DEFVAL      { "" }
+    ::= { pwTemplateEntry 75 }
+
+pwTemplateEgressMacFilterName    OBJECT-TYPE
+    SYNTAX      TLNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of pwTemplateEgressMacFilterName specifies the ingress
+         Filter name.
+
+         When the value of this object is set to non-default, the value of
+         object pwTemplateEgressMacFilterId is ignored."
+    DEFVAL      { "" }
+    ::= { pwTemplateEntry 76 }
+
+pwTemplateForceQinqVcFwding      OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none     (0),
+        ctagctag (1),
+        stagctag (2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of pwTemplateForceQinqVcFwding specifies whether or not the
+         datapath should forcefully insert two VLAN tags which are copied from
+         the qinq service-delimiting vlan values.
+
+         The pwTemplateVcType should be either set to 'ether' or 'vlan'."
+    DEFVAL      { none }
+    ::= { pwTemplateEntry 77 }
 
 pwTemplateIgmpSnpgGrpSrcTblLC    OBJECT-TYPE
     SYNTAX      TimeStamp
@@ -5940,7 +6110,7 @@ sdpBindTlsMrpLastChngd           OBJECT-TYPE
 
 sdpBindTlsMrpJoinTime            OBJECT-TYPE
     SYNTAX      Unsigned32 (1..10)
-    UNITS       "deci-seconds"
+    UNITS       "deciseconds"
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -5952,7 +6122,7 @@ sdpBindTlsMrpJoinTime            OBJECT-TYPE
 
 sdpBindTlsMrpLeaveTime           OBJECT-TYPE
     SYNTAX      Unsigned32 (30..60)
-    UNITS       "deci-seconds"
+    UNITS       "deciseconds"
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -5964,7 +6134,7 @@ sdpBindTlsMrpLeaveTime           OBJECT-TYPE
 
 sdpBindTlsMrpLeaveAllTime        OBJECT-TYPE
     SYNTAX      Unsigned32 (60..300)
-    UNITS       "deci-seconds"
+    UNITS       "deciseconds"
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -5976,7 +6146,7 @@ sdpBindTlsMrpLeaveAllTime        OBJECT-TYPE
 
 sdpBindTlsMrpPeriodicTime        OBJECT-TYPE
     SYNTAX      Unsigned32 (10..100)
-    UNITS       "deci-seconds"
+    UNITS       "deciseconds"
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -7035,7 +7205,8 @@ SdpPwPortEntry                   ::= SEQUENCE
     sdpPwPortEgrShapSapSecShaper     TNamedItemOrEmpty,
     sdpPwPortMonOperGrp              TNamedItemOrEmpty,
     sdpPwPortIngVcLabel              Unsigned32,
-    sdpPwPortEgrVcLabel              Unsigned32
+    sdpPwPortEgrVcLabel              Unsigned32,
+    sdpPwPortControlWord             TruthValue
 }
 
 sdpPwPortId                      OBJECT-TYPE
@@ -7279,6 +7450,16 @@ sdpPwPortEgrVcLabel              OBJECT-TYPE
          used by this device to send packets to the far-end device in this SDP."
     DEFVAL      { 0 }
     ::= { sdpPwPortEntry 16 }
+
+sdpPwPortControlWord             OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The sdpPwPortControlWord specifies whether the use of the
+         'ControlWord' is preferred or not."
+    DEFVAL      { false }
+    ::= { sdpPwPortEntry 17 }
 
 sdpGrpTblLastChanged             OBJECT-TYPE
     SYNTAX      TimeStamp
@@ -8280,7 +8461,7 @@ sdpBindTlsFdbMacStatsTable       OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "This table maintains the count of MAC address entries per FDB type for
-         the SAPs in VPLS services."
+         the SDPs in VPLS services."
     ::= { tmnxSdpObjs 60 }
 
 sdpBindTlsFdbMacStatsEntry       OBJECT-TYPE
@@ -8289,7 +8470,7 @@ sdpBindTlsFdbMacStatsEntry       OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "This entry maintains the count of MAC address entries per FDB type for
-         the SAP in a VPLS service."
+         the SDP in a VPLS service."
     INDEX       {
         svcId,
         sdpBindId,
@@ -8306,7 +8487,7 @@ sdpBindTlsFdbMacStatsNumEntries  OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The value of sdpBindTlsFdbMacStatsNumEntries indicates the number of
-         MAC address entries of the FDB type in the SAP in this service."
+         MAC address entries of the FDB type in the SDP in this service."
     ::= { sdpBindTlsFdbMacStatsEntry 1 }
 
 sdpBindPwLoopbackTable           OBJECT-TYPE
@@ -8473,7 +8654,10 @@ PwTemplateAugEntry               ::= SEQUENCE
     pwTemplateAugStpRootGuard        TruthValue,
     pwTemplateAugStpAdminStatus      TmnxEnabledDisabledAdminState,
     pwTemplateAugL2ptTermination     TmnxEnabledDisabled,
-    pwTemplateAugL2ptProtocols       L2ptProtocols
+    pwTemplateAugL2ptProtocols       L2ptProtocols,
+    pwTemplateAugGreAllowFrag        TruthValue,
+    pwTemplateAugAluNgeKeyGroupIn    AluNgeKeygroupIdOrZero,
+    pwTemplateAugAluNgeKeyGroupOut   AluNgeKeygroupIdOrZero
 }
 
 pwTemplateAugLastChgd            OBJECT-TYPE
@@ -8600,6 +8784,38 @@ pwTemplateAugL2ptProtocols       OBJECT-TYPE
          Protocol Tunnel PDUs are terminated on this pseudo-wire template."
     DEFVAL      { {} }
     ::= { pwTemplateAugEntry 10 }
+
+pwTemplateAugGreAllowFrag        OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of pwTemplateAugGreAllowFrag specifies whether to allow GRE
+         encapsulated packets to be sent without setting the DF bit.
+
+         This object is valid only when pwTemplateGreDelivery is set to 'true'."
+    DEFVAL      { false }
+    ::= { pwTemplateAugEntry 11 }
+
+pwTemplateAugAluNgeKeyGroupIn    OBJECT-TYPE
+    SYNTAX      AluNgeKeygroupIdOrZero
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The pwTemplateAugAluNgeKeyGroupIn specifies keygroup identifier for
+         the inbound direction."
+    DEFVAL      { 0 }
+    ::= { pwTemplateAugEntry 12 }
+
+pwTemplateAugAluNgeKeyGroupOut   OBJECT-TYPE
+    SYNTAX      AluNgeKeygroupIdOrZero
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The pwTemplateAugAluNgeKeyGroupOut specifies keygroup identifier for
+         the outbound direction."
+    DEFVAL      { 0 }
+    ::= { pwTemplateAugEntry 13 }
 
 sdpSegRouteTableLastChgd         OBJECT-TYPE
     SYNTAX      TimeStamp
@@ -8743,7 +8959,7 @@ SdpEvpnMHEthSegEntry             ::= SEQUENCE
 }
 
 sdpEvpnMHEthSegName              OBJECT-TYPE
-    SYNTAX      TNamedItemOrEmpty (SIZE (0|1..28))
+    SYNTAX      TNamedItemOrEmpty
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -10150,7 +10366,6 @@ tmnxSdp7750V15v0Compliance       MODULE-COMPLIANCE
             sdpBindTlsEtreeGroup,
             tmnxSdpBindCpmProtV12v0Group,
             tmnxSdpBindCtrlChanReqGroup,
-            tmnxSdpBindV11v0Group,
             tmnxSdpBindCtrlChanAckGroup,
             tmnxSdpPBBEpipePWRedV12v0Group,
             tmnxSdpPbbEpipeNotifyObjsGroup,
@@ -10245,7 +10460,6 @@ tmnxSdp7450V15v0Compliance       MODULE-COMPLIANCE
             tmnxSdpBindCpmProtV12v0Group,
             tmnxSdpBindCtrlChanReqGroup,
             tmnxSdpBindCtrlChanAckGroup,
-            tmnxSdpBindV11v0Group,
             tmnxSdpPBBEpipePWRedV12v0Group,
             tmnxSdpPbbEpipeNotifyObjsGroup,
             tmnxSdpPbbEpipeNotifV12v0Group,
@@ -10270,6 +10484,47 @@ tmnxSdp7450V15v0Compliance       MODULE-COMPLIANCE
             sdpOperTunnelFarEndGroup
         }
     ::= { tmnxSdpCompliances 29 }
+
+tmnxSdp7750V16v0Compliance       MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of services SDPs on Nokia 7750
+         SROS series systems release 16.0."
+    MODULE
+        MANDATORY-GROUPS {
+            pwTemplateGreGroup,
+            pwTemplateQosV16v0Group,
+            pwTemplateFilterNameV16v0Group,
+            tmnxSdpBindQinqV16v0Group
+        }
+    ::= { tmnxSdpCompliances 30 }
+
+tmnxSdp7450V16v0Compliance       MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of services SDPs on Nokia 7450
+         SROS series systems release 16.0."
+    MODULE
+        MANDATORY-GROUPS {
+            pwTemplateGreGroup,
+            pwTemplateQosV16v0Group,
+            pwTemplateFilterNameV16v0Group,
+            tmnxSdpBindQinqV16v0Group
+        }
+    ::= { tmnxSdpCompliances 31 }
+
+tmnxSdpV19v0Compliance           MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of services SDPs on Nokia SROS
+         series systems release 19.0"
+    MODULE
+        MANDATORY-GROUPS {
+            sdpPwPortControlWordGroup,
+            pwTemplateNgeAutoBindGroup,
+            sdpBindMcastSrcV19v0Group
+        }
+    ::= { tmnxSdpCompliances 32 }
 
 tmnxSdpGroups                    OBJECT IDENTIFIER ::= { tmnxSdpConformance 2 }
 
@@ -11914,7 +12169,7 @@ tmnxSdpBindV11v0Group            OBJECT-GROUP
         sdpBindForceQinqVcForwarding,
         pwTemplateForceQinqVcForwarding
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The group of objects supporting management of the SDP feature on Nokia
          SROS series systems in release 11.0."
@@ -12259,6 +12514,98 @@ sdpOperTunnelFarEndGroup         OBJECT-GROUP
         "The group of objects supporting management of tunnel far-end for SDP
          on Nokia SROS series systems in release 15.0."
     ::= { tmnxSdpGroups 559 }
+
+pwTemplateGreGroup               OBJECT-GROUP
+    OBJECTS     {
+        pwTemplateGreDelivery,
+        pwTemplateAugGreAllowFrag
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of PW template GRE feature
+         on Nokia SROS series systems in release 16.0."
+    ::= { tmnxSdpGroups 560 }
+
+pwTemplateQosV16v0Group          OBJECT-GROUP
+    OBJECTS     {
+        pwTemplateIngQoSNetworkPlcyName,
+        pwTemplateEgrQoSNetworkPlcyName
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of PW template QoS feature
+         on Nokia SROS series systems in release 16.0."
+    ::= { tmnxSdpGroups 561 }
+
+pwTemplateFilterNameV16v0Group   OBJECT-GROUP
+    OBJECTS     {
+        pwTemplateIngressIpFilterName,
+        pwTemplateIngressIpv6FilterName,
+        pwTemplateIngressMacFilterName,
+        pwTemplateEgressIpFilterName,
+        pwTemplateEgressIpv6FilterName,
+        pwTemplateEgressMacFilterName
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of SAP templates Filter
+         feature on Nokia SROS series systems in release 16.0."
+    ::= { tmnxSdpGroups 562 }
+
+tmnxSdpBindQinqV16v0Group        OBJECT-GROUP
+    OBJECTS     {
+        sdpBindForceQinqVcFwding,
+        pwTemplateForceQinqVcFwding
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of Qinq preserve and
+         translation feature on Nokia SROS series systems in release 16.0."
+    ::= { tmnxSdpGroups 564 }
+
+tmnxSdpBindV16v0ObsoletedGroup   OBJECT-GROUP
+    OBJECTS     {
+        sdpBindForceQinqVcForwarding,
+        pwTemplateForceQinqVcForwarding
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of the SDP feature on Nokia
+         SROS series systems in release 16.0."
+    ::= { tmnxSdpGroups 565 }
+
+sdpPwPortControlWordGroup        OBJECT-GROUP
+    OBJECTS     {
+        sdpPwPortControlWord
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of the SDP pseudo-wire port
+         with control-word feature on Nokia SROS series systems in release
+         19.10."
+    ::= { tmnxSdpGroups 566 }
+
+pwTemplateNgeAutoBindGroup       OBJECT-GROUP
+    OBJECTS     {
+        pwTemplateAugAluNgeKeyGroupIn,
+        pwTemplateAugAluNgeKeyGroupOut
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of the SDP pseudo-wire port
+         with control-word feature on Nokia SROS series systems in release
+         19.10."
+    ::= { tmnxSdpGroups 567 }
+
+sdpBindMcastSrcV19v0Group        OBJECT-GROUP
+    OBJECTS     {
+        sdpBindMulticastSource
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of additional objects supporting management of the SDP
+         feature on Nokia SROS series systems in release 19.0."
+    ::= { tmnxSdpGroups 568 }
 
 sdpTrapsPrefix                   OBJECT IDENTIFIER ::= { tmnxServNotifications 4 }
 

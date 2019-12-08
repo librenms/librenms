@@ -5,7 +5,8 @@ IMPORTS
     bgp4PathAttrIpAddrPrefixLen,
     bgp4PathAttrPeer
                                                          FROM BGP4-MIB
-    InetAddress, InetAddressType,
+    InetAddress, InetAddressPrefixLength,
+    InetAddressType,
     InetAutonomousSystemNumber
                                                          FROM INET-ADDRESS-MIB
     MODULE-COMPLIANCE, NOTIFICATION-GROUP,
@@ -32,16 +33,14 @@ IMPORTS
     TPolicyStatementNameOrEmpty,
     TResolveStatus,
     TXLPolicyNameOrExpOrEmpty,
-    TmnxAddressAndPrefixAddress,
-    TmnxAddressAndPrefixPrefix,
-    TmnxAddressAndPrefixType,
     TmnxAdminState,
     TmnxAdminStateTruthValue,
     TmnxBGPFamilyType,
     TmnxBgpAutonomousSystem,
     TmnxBgpLocalPreference,
     TmnxBgpPreference, TmnxCreateOrigin,
-    TmnxEnabledDisabled, TmnxOperState,
+    TmnxEnabledDisabled, TmnxHigh32,
+    TmnxLow32, TmnxOperState,
     TmnxVPNRouteDistinguisher, TmnxVRtrID
                                                          FROM TIMETRA-TC-MIB
     vRtrID
@@ -58,7 +57,7 @@ timetraBgpMIBModule              MODULE-IDENTITY
         "This document is the SNMP MIB module for Nokia's implementation of
          BGP.
 
-         Copyright 2003-2017 Nokia. All rights reserved. Reproduction of this
+         Copyright 2003-2018 Nokia. All rights reserved. Reproduction of this
          document is authorized on the condition that the foregoing copyright
          notice is included.
 
@@ -542,8 +541,8 @@ TmnxIpFamily                     ::= TEXTUAL-CONVENTION
         labelIpv6    (18),
         bgpLs        (19),
         mcastVpnIpv6 (20),
-        reserved21   (21),
-        reserved22   (22)
+        srplcyIpv4   (21),
+        srplcyIpv6   (22)
     }
 
 TmnxVpnCapability                ::= TEXTUAL-CONVENTION
@@ -556,7 +555,8 @@ TmnxVpnCapability                ::= TEXTUAL-CONVENTION
         mpBGP             (1),
         orfExtendCommSend (2),
         orfExtendCommRecv (3),
-        asn4Byte          (4)
+        asn4Byte          (4),
+        extNHEncoding     (5)
     }
 
 TmnxAdvLabelAddressFamily        ::= TEXTUAL-CONVENTION
@@ -609,7 +609,8 @@ TmnxBgpFlowRouteExtCommAction    ::= TEXTUAL-CONVENTION
         nextEntry     (4),
         markDscp      (5),
         redirectToIp  (6),
-        redirectToIf  (7)
+        redirectToIf  (7),
+        redirectToLsp (8)
     }
 
 TmnxIpNhChgFamily                ::= TEXTUAL-CONVENTION
@@ -619,7 +620,10 @@ TmnxIpNhChgFamily                ::= TEXTUAL-CONVENTION
          the ebgp next-hop should remain unchanged."
     SYNTAX      BITS {
         labelIpv4 (0),
-        labelIpv6 (1)
+        labelIpv6 (1),
+        reserved2 (2),
+        reserved3 (3),
+        reserved4 (4)
     }
 
 TmnxIpFamilyIdentifier           ::= TEXTUAL-CONVENTION
@@ -652,7 +656,9 @@ TmnxIpFamilyIdentifier           ::= TEXTUAL-CONVENTION
         labelIpv4    (17),
         labelIpv6    (18),
         bgpLs        (19),
-        mcastVpnIpv6 (20)
+        mcastVpnIpv6 (20),
+        srplcyIpv4   (21),
+        srplcyIpv6   (22)
     }
 
 tBgpObjects                      OBJECT IDENTIFIER ::= { tmnxSRObjs 14 }
@@ -729,7 +735,7 @@ TBgpInstanceEntry                ::= SEQUENCE
     tBgpInstanceOperStatus           BgpOperState,
     tBgpInstanceLocalASPrivate       TruthValue,
     tBgpInstanceMd5Auth              TruthValue,
-    tBgpInstanceMd5AuthKey           OCTET STRING,
+    tBgpInstanceMd5AuthKey           DisplayString,
     tBgpInstanceClusterId            IpAddress,
     tBgpInstanceDisableClientReflect TruthValue,
     tBgpInstanceIBgpMultipath        TruthValue,
@@ -1261,7 +1267,7 @@ tBgpInstanceMd5Auth              OBJECT-TYPE
     ::= { tBgpInstanceEntry 42 }
 
 tBgpInstanceMd5AuthKey           OBJECT-TYPE
-    SYNTAX      OCTET STRING (SIZE (0..255))
+    SYNTAX      DisplayString (SIZE (0..255))
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -1904,7 +1910,7 @@ tBgp4PathAttrOriginID            OBJECT-TYPE
     ::= { tBgp4PathAttrEntry 2 }
 
 tBgp4PathAttrClusterList         OBJECT-TYPE
-    SYNTAX      OCTET STRING (SIZE (1..256))
+    SYNTAX      OCTET STRING (SIZE (1..257))
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -1915,7 +1921,7 @@ tBgp4PathAttrClusterList         OBJECT-TYPE
     ::= { tBgp4PathAttrEntry 3 }
 
 tBgp4PathAttrCommunity           OBJECT-TYPE
-    SYNTAX      OCTET STRING (SIZE (1..256))
+    SYNTAX      OCTET STRING (SIZE (1..257))
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -1926,7 +1932,7 @@ tBgp4PathAttrCommunity           OBJECT-TYPE
     ::= { tBgp4PathAttrEntry 4 }
 
 tBgp4PathAttrExtCommunity        OBJECT-TYPE
-    SYNTAX      OCTET STRING (SIZE (1..256))
+    SYNTAX      OCTET STRING (SIZE (1..257))
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -2039,7 +2045,7 @@ TBgpInstanceParamsEntry          ::= SEQUENCE
     tBgpInstanceDisableFEFailover    TruthValue,
     tBgpInstanceDisableComms         TruthValue,
     tBgpInstanceDisableExtComms      TruthValue,
-    tBgpInstanceDefaultOriginate     TruthValue,
+    tBgpInstanceDefaultOriginate     TmnxIpFamily,
     tBgpInstanceAdvertiseInactiveRts TruthValue,
     tBgpInstancePeerTracking         TruthValue,
     tBgpInstanceAuthKeyChain         TNamedItemOrEmpty,
@@ -2094,7 +2100,8 @@ TBgpInstanceParamsEntry          ::= SEQUENCE
     tBgpInstanceORRLocation          Unsigned32,
     tBgpInstanceORRAllowLocalFallbk  TruthValue,
     tBgpInstanceWeightedEcmp         TruthValue,
-    tBgpInstanceFSValidateDestPfx    TruthValue
+    tBgpInstanceFSValidateDestPfx    TruthValue,
+    tBgpInstanceFSValidateRedirectIP TruthValue
 }
 
 tBgpInstanceDisableFEFailover    OBJECT-TYPE
@@ -2133,14 +2140,13 @@ tBgpInstanceDisableExtComms      OBJECT-TYPE
     ::= { tBgpInstanceParamsEntry 3 }
 
 tBgpInstanceDefaultOriginate     OBJECT-TYPE
-    SYNTAX      TruthValue
+    SYNTAX      TmnxIpFamily
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        "The value of tBgpInstanceDefaultOriginate enables or disables the
-         sending of default routes to the peer, making it independent of the
-         route policies."
-    DEFVAL      { false }
+        "The value of tBgpInstanceDefaultOriginate specifies the types of
+         AFI/SAFI for which SROS BGP will originate default route independent
+         of the RTM default route"
     ::= { tBgpInstanceParamsEntry 4 }
 
 tBgpInstanceAdvertiseInactiveRts OBJECT-TYPE
@@ -2923,7 +2929,7 @@ tBgpInstanceNHResolveAllowStatic OBJECT-TYPE
     ::= { tBgpInstanceParamsEntry 58 }
 
 tBgpInstanceORRLocation          OBJECT-TYPE
-    SYNTAX      Unsigned32 (0..16)
+    SYNTAX      Unsigned32 (0..255)
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -2980,6 +2986,30 @@ tBgpInstanceFSValidateDestPfx    OBJECT-TYPE
          specification routes are considered valid."
     DEFVAL      { false }
     ::= { tBgpInstanceParamsEntry 62 }
+
+tBgpInstanceFSValidateRedirectIP OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpInstanceFSValidateRedirectIP specifies whether
+         validation of flow specification routes received with a
+         redirect-to-IPv4 extended community is enabled on this router. A flow
+         specification route is considered valid if the origin AS in the
+         AS_PATH and AS4_PATH attribute of the flow specification route matches
+         the origin AS in the AS_PATH and AS4_PATH attribute of the best-match
+         unicast route for the IPv4 address in the global administrator field
+         of the extended community.
+
+         When the value of tBgpInstanceFSValidateRedirectIP is 'true',
+         validation of flow specification routes received with a
+         redirect-to-IPv4 extended community is enabled.
+
+         When the value of tBgpInstanceFSValidateRedirectIP is 'false',
+         validation of flow specification routes received with a
+         redirect-to-IPv4 extended community is disabled."
+    DEFVAL      { false }
+    ::= { tBgpInstanceParamsEntry 63 }
 
 tBgpInstancePlcyTable            OBJECT-TYPE
     SYNTAX      SEQUENCE OF TBgpInstancePlcyEntry
@@ -3607,7 +3637,12 @@ TBgpShortcutTunnelEntry          ::= SEQUENCE
     tBgpShortcutTunnelDisallowIgp    TruthValue,
     tBgpShortcutTunnelSrIsis         TruthValue,
     tBgpShortcutTunnelSrOspf         TruthValue,
-    tBgpShortcutTunnelSrTe           TruthValue
+    tBgpShortcutTunnelSrTe           TruthValue,
+    tBgpShortcutTunnelAdminTags      TruthValue,
+    tBgpShortcutTunnelSrPolicy       TruthValue,
+    tBgpShortcutTunnelRibApi         TruthValue,
+    tBgpShortcutTunnelMplsFwdPlcy    TruthValue,
+    tBgpShortcutTunnelSrOspf3        TruthValue
 }
 
 tBgpShortcutTunnelFamily         OBJECT-TYPE
@@ -3735,6 +3770,64 @@ tBgpShortcutTunnelSrTe           OBJECT-TYPE
     DEFVAL      { false }
     ::= { tBgpShortcutTunnelEntry 10 }
 
+tBgpShortcutTunnelAdminTags      OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpShortcutTunnelAdminTags specifies the system to  only
+         consider LSPs marked with an admin-tag for next hop resolution.
+         Untagged LSPs will not be considered.  When disabled this reverts to
+         default behaviour. While tagged  SR-TE LSPs will be considered first,
+         the system can fall back to using untagged LSP of other types and not
+         exclude them."
+    DEFVAL      { false }
+    ::= { tBgpShortcutTunnelEntry 11 }
+
+tBgpShortcutTunnelSrPolicy       OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpShortcutTunnelSrPolicy specifies whether SR Policy is
+         used for IGP shortcuts to resolve paths to BGP next-hops belonging to
+         a specific family."
+    DEFVAL      { false }
+    ::= { tBgpShortcutTunnelEntry 12 }
+
+tBgpShortcutTunnelRibApi         OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpShortcutTunnelRibApi specifies whether RIB API is
+         used for IGP shortcuts to resolve paths to BGP next-hops belonging to
+         a specific family."
+    DEFVAL      { false }
+    ::= { tBgpShortcutTunnelEntry 13 }
+
+tBgpShortcutTunnelMplsFwdPlcy    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpShortcutTunnelMplsFwdPlcy specifies whether MPLS
+         Forwarding policy is used for IGP shortcuts to resolve  paths to BGP
+         next-hops belonging to a specific family."
+    DEFVAL      { false }
+    ::= { tBgpShortcutTunnelEntry 14 }
+
+tBgpShortcutTunnelSrOspf3        OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpShortcutTunnelSrOspf3 specifies whether SR OSPF3 is
+         used for IGP shortcuts to resolve paths to BGP next-hops belonging to
+         a specific family."
+    DEFVAL      { false }
+    ::= { tBgpShortcutTunnelEntry 15 }
+
 tBgpLabelRtTunnelTblLstCh        OBJECT-TYPE
     SYNTAX      TimeStamp
     MAX-ACCESS  read-only
@@ -3783,7 +3876,12 @@ TBgpLabelRtTunnelEntry           ::= SEQUENCE
     tBgpLabelRtTunnelSrOspf          TruthValue,
     tBgpLabelRtTunnelBgp             TruthValue,
     tBgpLabelRtTunnelSrTe            TruthValue,
-    tBgpLabelRtTunnelUdp             TruthValue
+    tBgpLabelRtTunnelUdp             TruthValue,
+    tBgpLabelRtTunnelAdminTags       TruthValue,
+    tBgpLabelRtTunnelSrPolicy        TruthValue,
+    tBgpLabelRtTunnelRibApi          TruthValue,
+    tBgpLabelRtTunnelMplsFwdPlcy     TruthValue,
+    tBgpLabelRtTunnelSrOspf3         TruthValue
 }
 
 tBgpLabelRtTunnelFamily          OBJECT-TYPE
@@ -3903,13 +4001,73 @@ tBgpLabelRtTunnelUdp             OBJECT-TYPE
     DEFVAL      { false }
     ::= { tBgpLabelRtTunnelEntry 10 }
 
+tBgpLabelRtTunnelAdminTags       OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpLabelRtTunnelAdminTags specifies the system to only
+         consider LSPs marked with an admin-tag for next hop resolution.
+         Untagged LSPs will not be considered.  When disabled this reverts to
+         default behaviour. While tagged RSVP  and SR-TE LSPs will be
+         considered first, the system can fall back to using untagged LSP of
+         other types and not exclude them."
+    DEFVAL      { false }
+    ::= { tBgpLabelRtTunnelEntry 11 }
+
+tBgpLabelRtTunnelSrPolicy        OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpLabelRtTunnelSrPolicy specifies whether Sr-policy is
+         allowed to be used for resolving BGP labeled routes belonging to a
+         specific family type."
+    DEFVAL      { false }
+    ::= { tBgpLabelRtTunnelEntry 12 }
+
+tBgpLabelRtTunnelRibApi          OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpLabelRtTunnelRibApi specifies whether RIB API is
+         allowed to be used for resolving BGP labeled routes belonging to a
+         specific family type."
+    DEFVAL      { false }
+    ::= { tBgpLabelRtTunnelEntry 13 }
+
+tBgpLabelRtTunnelMplsFwdPlcy     OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpLabelRtTunnelMplsFwdPlcy specifies whether MPLS
+         Forwarding Policy is allowed to be used for resolving BGP labeled
+         routes belonging to  a specific family type."
+    DEFVAL      { false }
+    ::= { tBgpLabelRtTunnelEntry 14 }
+
+tBgpLabelRtTunnelSrOspf3         OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpLabelRtTunnelSrOspf3 specifies whether SR OSPF3 is
+         allowed to be used for resolving BGP labeled routes belonging to a
+         specific family type."
+    DEFVAL      { false }
+    ::= { tBgpLabelRtTunnelEntry 15 }
+
 tBgpInstanceMultiPathTable       OBJECT-TYPE
     SYNTAX      SEQUENCE OF TBgpInstanceMultiPathEntry
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "tBgpInstanceMultiPathTable consists of information about BGP multipath
-         on each running instance of BGP."
+         on each running instance of BGP.
+
+         This table is deprecated and replaced with tBgpInstMultipathNgTable."
     ::= { tBgpInstanceObjects 14 }
 
 tBgpInstanceMultiPathEntry       OBJECT-TYPE
@@ -4189,11 +4347,17 @@ TBgpORRLocationEntry             ::= SEQUENCE
     tBgpORRSecondaryIPAddrType       InetAddressType,
     tBgpORRSecondaryIPAddr           InetAddress,
     tBgpORRTertiaryIPAddrType        InetAddressType,
-    tBgpORRTertiaryIPAddr            InetAddress
+    tBgpORRTertiaryIPAddr            InetAddress,
+    tBgpORRPrimaryIPv6AddrType       InetAddressType,
+    tBgpORRPrimaryIPv6Addr           InetAddress,
+    tBgpORRSecondaryIPv6AddrType     InetAddressType,
+    tBgpORRSecondaryIPv6Addr         InetAddress,
+    tBgpORRTertiaryIPv6AddrType      InetAddressType,
+    tBgpORRTertiaryIPv6Addr          InetAddress
 }
 
 tBgpORRLocationId                OBJECT-TYPE
-    SYNTAX      Unsigned32 (1..16)
+    SYNTAX      Unsigned32 (1..255)
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
@@ -4296,6 +4460,84 @@ tBgpORRTertiaryIPAddr            OBJECT-TYPE
          If the tertiary IP address is reset, tBgpORRTertiaryIPAddrType is set
          to unknown and tBgpORRTertiaryIPAddr returns a null string."
     ::= { tBgpORRLocationEntry 9 }
+
+tBgpORRPrimaryIPv6AddrType       OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpORRPrimaryIPv6AddrType specifies the address type of
+         the primary IP address. tBgpORRPrimaryIPv6AddrType can be either
+         unknown or ipv6."
+    ::= { tBgpORRLocationEntry 10 }
+
+tBgpORRPrimaryIPv6Addr           OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpORRPrimaryIPv6Addr specifies the preferred IPv6
+         address to calculate the optimal-route-reflection cost from the
+         associated location to a bgp next-hop.
+
+         If the tBgpORRPrimaryIPAddrType is set to ipv6, then the primary IP
+         address is a IPv6 address.
+
+         If the primary IP address is reset, tBgpORRPrimaryIPv6AddrType is set
+         to unknown and tBgpORRPrimaryIPv6Addr returns a null string."
+    ::= { tBgpORRLocationEntry 11 }
+
+tBgpORRSecondaryIPv6AddrType     OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpORRSecondaryIPv6AddrType specifies the address type
+         of the secondary IP address. tBgpORRSecondaryIPv6AddrType can be
+         either unknown or ipv6."
+    ::= { tBgpORRLocationEntry 12 }
+
+tBgpORRSecondaryIPv6Addr         OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpORRSecondaryIPv6Addr specifies the second preferred
+         IPv6 address to calculate the optimal-route-reflection cost from the
+         associated location to a bgp next-hop.
+
+         If the tBgpORRSecondaryIPv6AddrType is set to ipv6, then the secondary
+         IP address is a IPv6 address.
+
+         If the secondary IP address is reset, tBgpORRSecondaryIPv6AddrType is
+         set to unknown and tBgpORRSecondaryIPv6Addr returns a null string."
+    ::= { tBgpORRLocationEntry 13 }
+
+tBgpORRTertiaryIPv6AddrType      OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpORRTertiaryIPv6AddrType specifies the address type of
+         the tertiary IP address. tBgpORRTertiaryIPAddrType can be either
+         unknown or ipv6."
+    ::= { tBgpORRLocationEntry 14 }
+
+tBgpORRTertiaryIPv6Addr          OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpORRTertiaryIPv6Addr specifies the third preferred
+         IPv6 address to calculate the optimal-route-reflection cost from the
+         associated location to a bgp next-hop.
+
+         If the tBgpORRTertiaryIPAddrType is set to ipv6, then the tertiary IP
+         address is a IPv6 address.
+
+         If the tertiary IP address is reset, tBgpORRTertiaryIPv6AddrType is
+         set to unknown and tBgpORRTertiaryIPAddr returns a null string."
+    ::= { tBgpORRLocationEntry 15 }
 
 tBgpInstanceAddPathTblLstCh      OBJECT-TYPE
     SYNTAX      TimeStamp
@@ -4563,7 +4805,32 @@ TBgpInstanceParamsExtEntry       ::= SEQUENCE
     tBgpInstanceLLGRFwdingBitsSet    INTEGER,
     tBgpInstanceLLGRAdvStaleToNeigh  TruthValue,
     tBgpInstLLGRAdvToNeighWthoutNoEx TruthValue,
-    tBgpInstanceLLGR                 TruthValue
+    tBgpInstanceLLGR                 TruthValue,
+    tBgpInstanceAdvIpv6NhFamily      TmnxIpFamily,
+    tBgpInstanceExtendNhEncoding     TmnxIpFamily,
+    tBgpInstanceBypassMRAITimer      TruthValue,
+    tBgpInstanceDisableLargeComms    TruthValue,
+    tBgpInstanceImportSrPolicy       TruthValue,
+    tBgpInstanceEnfNbrTrust          TmnxIpFamily,
+    tBgpInstanceLoopDetectThreshold  Unsigned32,
+    tBgpInstanceAllowUnresLeaking    TruthValue,
+    tBgpInstanceConvMinWaitToAdv     Unsigned32,
+    tBgpInstanceSendExportPolicy     TLPolicyNameOrExpOrEmpty,
+    tBgpInstEbgpPreference           TmnxBgpPreference,
+    tBgpInstIbgpPreference           TmnxBgpPreference,
+    tBgpInstEbgpLabelPreference      TmnxBgpPreference,
+    tBgpInstIbgpLabelPreference      TmnxBgpPreference,
+    tBgpInstEBGPRejWithoutPlcyImpt   TruthValue,
+    tBgpInstEBGPRejWithoutPlcyExpt   TruthValue,
+    tBgpInstRemovePrivateReplaceAS   TruthValue,
+    tBgpInstBlockPrefixSID           TruthValue,
+    tBgpInstDefOriginate             TmnxIpFamily,
+    tBgpPrefixSidRangeType           INTEGER,
+    tBgpPrefixSidRangeStartLabel     Unsigned32,
+    tBgpPrefixSidRangeMaxIdx         Unsigned32,
+    tBgpSrAdminState                 TmnxAdminState,
+    tBgpSegmentRouting               TruthValue,
+    tBgpSelLabelIpv4Inst             TruthValue
 }
 
 tBgpInstanceEnforceFirstAS       OBJECT-TYPE
@@ -4677,6 +4944,279 @@ tBgpInstanceLLGR                 OBJECT-TYPE
     DEFVAL      { false }
     ::= { tBgpInstanceParamsExtEntry 8 }
 
+tBgpInstanceAdvIpv6NhFamily      OBJECT-TYPE
+    SYNTAX      TmnxIpFamily
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpInstanceAdvIpv6NhFamily specifies the types of
+         AFI/SAFI the SROS BGP supports extended next-hop encoding and
+         resolution."
+    ::= { tBgpInstanceParamsExtEntry 9 }
+
+tBgpInstanceExtendNhEncoding     OBJECT-TYPE
+    SYNTAX      TmnxIpFamily
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpInstanceExtendNhEncoding specifies the types of
+         AFI/SAFI the Bgp instance is configured to support extended next-hop
+         encoding."
+    ::= { tBgpInstanceParamsExtEntry 10 }
+
+tBgpInstanceBypassMRAITimer      OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpInstanceBypassMRAITimer specifies whether the Bgp
+         instance is configured to send out the BGP update immediately after
+         the session comes up, without waiting for Minimum Route Advertisement
+         Interval, tBgpInstanceMinRouteAdvertisement, to countdown to zero.
+
+         If the value is set to 'true', tBgpInstanceMinRouteAdvertisement's
+         value is disregarded and BGP updates are sent out immediately after
+         the session comes up.
+
+         If the value is set to 'false', the system waits for
+         tBgpInstanceMinRouteAdvertisement's full value to countdown before
+         sending out the BGP updates after the session comes up."
+    DEFVAL      { false }
+    ::= { tBgpInstanceParamsExtEntry 11 }
+
+tBgpInstanceDisableLargeComms    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpInstanceDisableLargeComms enables or disables sending
+         of community attribute to the peer for large communities."
+    DEFVAL      { false }
+    ::= { tBgpInstanceParamsExtEntry 12 }
+
+tBgpInstanceImportSrPolicy       OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpInstanceImportSrPolicy enables or disables import of
+         sr-policy for use in resolving next-hop."
+    DEFVAL      { false }
+    ::= { tBgpInstanceParamsExtEntry 13 }
+
+tBgpInstanceEnfNbrTrust          OBJECT-TYPE
+    SYNTAX      TmnxIpFamily
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpInstanceEnfNbrTrust specifies the address families on
+         which ILM forwarding behavior is enabled."
+    DEFVAL      { {} }
+    ::= { tBgpInstanceParamsExtEntry 14 }
+
+tBgpInstanceLoopDetectThreshold  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..15)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpInstanceLoopDetectThreshold specifies the occurence
+         of the global ASN when exceeded triggers the loop-detect behavior."
+    DEFVAL      { 0 }
+    ::= { tBgpInstanceParamsExtEntry 15 }
+
+tBgpInstanceAllowUnresLeaking    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpInstanceAllowUnresLeaking specifies whether  or not a
+         VPRN can import a route."
+    DEFVAL      { false }
+    ::= { tBgpInstanceParamsExtEntry 16 }
+
+tBgpInstanceConvMinWaitToAdv     OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..3600)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpInstanceConvMinWaitToAdv specifies the timer value
+         for which no routes are advertised."
+    DEFVAL      { 0 }
+    ::= { tBgpInstanceParamsExtEntry 17 }
+
+tBgpInstanceSendExportPolicy     OBJECT-TYPE
+    SYNTAX      TLPolicyNameOrExpOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpInstanceSendExportPolicy specifies the send default
+         export policy."
+    DEFVAL      { "" }
+    ::= { tBgpInstanceParamsExtEntry 18 }
+
+tBgpInstEbgpPreference           OBJECT-TYPE
+    SYNTAX      TmnxBgpPreference (0..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpInstEbgpPreference specifies the route preference for
+         ebgp routes."
+    DEFVAL      { 0 }
+    ::= { tBgpInstanceParamsExtEntry 19 }
+
+tBgpInstIbgpPreference           OBJECT-TYPE
+    SYNTAX      TmnxBgpPreference (0..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpInstIbgpPreference specifies the route preference for
+         ibgp routes."
+    DEFVAL      { 0 }
+    ::= { tBgpInstanceParamsExtEntry 20 }
+
+tBgpInstEbgpLabelPreference      OBJECT-TYPE
+    SYNTAX      TmnxBgpPreference (0..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpInstEbgpLabelPreference specifies the route
+         preference for label-IPv4 and label-IPv6 ebgp routes."
+    DEFVAL      { 0 }
+    ::= { tBgpInstanceParamsExtEntry 21 }
+
+tBgpInstIbgpLabelPreference      OBJECT-TYPE
+    SYNTAX      TmnxBgpPreference (0..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpInstIbgpLabelPreference specifies the route
+         preference for label-IPv4 and label-IPv6 ibgp routes."
+    DEFVAL      { 0 }
+    ::= { tBgpInstanceParamsExtEntry 22 }
+
+tBgpInstEBGPRejWithoutPlcyImpt   OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpInstEBGPRejWithoutPlcyImpt enables or disables if
+         policies can be imported."
+    DEFVAL      { false }
+    ::= { tBgpInstanceParamsExtEntry 23 }
+
+tBgpInstEBGPRejWithoutPlcyExpt   OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpInstEBGPRejWithoutPlcyExpt enables or disables if
+         policies can be exported."
+    DEFVAL      { false }
+    ::= { tBgpInstanceParamsExtEntry 24 }
+
+tBgpInstRemovePrivateReplaceAS   OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpInstRemovePrivateReplaceAS specifies if private AS
+         numbers in the AS Path should be replaced with the configured global
+         AS before advertising them to BGP peers."
+    DEFVAL      { false }
+    ::= { tBgpInstanceParamsExtEntry 25 }
+
+tBgpInstBlockPrefixSID           OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpInstBlockPrefixSID enables or disables sending of the
+          prefix SID attribute."
+    DEFVAL      { false }
+    ::= { tBgpInstanceParamsExtEntry 26 }
+
+tBgpInstDefOriginate             OBJECT-TYPE
+    SYNTAX      TmnxIpFamily
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpInstDefOriginate specifies the types of AFI/SAFI for
+         which SROS BGP will originate default route independent of the RTM
+         default route"
+    ::= { tBgpInstanceParamsExtEntry 27 }
+
+tBgpPrefixSidRangeType           OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none   (0),
+        global (1),
+        local  (2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPrefixSidRangeType specifies whether global
+         or  operation mode is selected. If local mode is used,
+         tBgpPrefixSidRangeStartLabel and tBgpPrefixSidRangeMaxIdx
+         describe the range. If global mode is selected those fields are
+         not used. "
+    DEFVAL      { none }
+    ::= { tBgpInstanceParamsExtEntry 29 }
+
+tBgpPrefixSidRangeStartLabel     OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..524287)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPrefixSidRangeStartLabel specifies the local label
+         starting offset value."
+    DEFVAL      { 0 }
+    ::= { tBgpInstanceParamsExtEntry 30 }
+
+tBgpPrefixSidRangeMaxIdx         OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..524287)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPrefixSidRangeMaxIdx specifies the maximum local SID
+         index that can be used."
+    DEFVAL      { 1 }
+    ::= { tBgpInstanceParamsExtEntry 31 }
+
+tBgpSrAdminState                 OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tBgpSrAdminState specifies the desired
+         administrative state of Segment Routing for this BGP instance."
+    DEFVAL      { outOfService }
+    ::= { tBgpInstanceParamsExtEntry 32 }
+
+tBgpSegmentRouting               OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpSegmentRouting specifies whether or not segment
+         routing capabilities are enabled on this instance of BGP.
+
+         When the value is set to 'false' segment routing is disabled and  any
+         previous configuration of other segment routing parameters  is
+         removed."
+    DEFVAL      { false }
+    ::= { tBgpInstanceParamsExtEntry 33 }
+
+tBgpSelLabelIpv4Inst             OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpSelLabelIpv4Inst specifies whether to enable/disable
+         selective download of label-ipv4 routes"
+    DEFVAL      { false }
+    ::= { tBgpInstanceParamsExtEntry 35 }
+
 tBgpInstanceLLGRFamilyTblLstCh   OBJECT-TYPE
     SYNTAX      TimeStamp
     MAX-ACCESS  read-only
@@ -4763,6 +5303,327 @@ tBgpInstLLGRFamilyOvrideStaleTm  OBJECT-TYPE
          for this particular AFI/SAFI when the system is in helper mode."
     DEFVAL      { 16777216 }
     ::= { tBgpInstanceLLGRFamilyEntry 5 }
+
+tBgpConvergenceTblLstCh          OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpConvergenceTblLstCh indicates the last timestamp when
+         an entry in the tBgpConvergenceTable was last changed."
+    ::= { tBgpInstanceObjects 27 }
+
+tBgpConvergenceTable             OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TBgpConvergenceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tBgpConvergenceTable is the list of configured objects  for
+         different family types to delay advertisement of BGP  routes until
+         convergence has occured.
+
+         The table entries are indexed by BGP instance and family type."
+    ::= { tBgpInstanceObjects 28 }
+
+tBgpConvergenceEntry             OBJECT-TYPE
+    SYNTAX      TBgpConvergenceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) in the tBgpConvergenceTable.
+
+         An entry is created when an entry in tBgpInstanceEntry is. When
+         created, all objects are initialized to their default values."
+    INDEX       {
+        tBgpInstanceIndex,
+        tBgpConvergenceFamily
+    }
+    ::= { tBgpConvergenceTable 1 }
+
+TBgpConvergenceEntry             ::= SEQUENCE
+{
+    tBgpConvergenceFamily            TmnxIpFamilyIdentifier,
+    tBgpConvergenceLstCh             TimeStamp,
+    tBgpConvergenceMaxWaitToAdv      Unsigned32,
+    tBgpConvTimerEstablishedPeers    Unsigned32,
+    tBgpConvEstablishedPeers         Unsigned32,
+    tBgpConvFirstSessEstablishedTime Unsigned32,
+    tBgpConvLastSessEstablishedTime  Unsigned32,
+    tBgpConvergedPeers               Unsigned32,
+    tBgpConvergenceState             INTEGER,
+    tBgpConvergenceTime              Unsigned32,
+    tBgpConvergenceOperMaxWaitToAdv  Unsigned32
+}
+
+tBgpConvergenceFamily            OBJECT-TYPE
+    SYNTAX      TmnxIpFamilyIdentifier
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpConvergenceFamily specifies the address family for
+         which the convergence selection applies."
+    ::= { tBgpConvergenceEntry 1 }
+
+tBgpConvergenceLstCh             OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value tBgpConvergenceLstCh indicates when an entry in
+         tBgpConvergenceTable was last changed."
+    ::= { tBgpConvergenceEntry 2 }
+
+tBgpConvergenceMaxWaitToAdv      OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..3600)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpConvergenceMaxWaitToAdv specifies the maximum amount
+         of time,  in seconds, measured from the time when the first session
+         (configured  or dynamic) that supports the address family comes up
+         after a BGP  restart, until BGP is allowed to advertise any routes in
+         that address  family to any peer."
+    DEFVAL      { 0 }
+    ::= { tBgpConvergenceEntry 3 }
+
+tBgpConvTimerEstablishedPeers    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpConvTimerEstablishedPeers indicates the number of BGP
+         sessions (configured and dynamic) that support the address  family and
+         that were in established state when tBgpInstanceConvMinWaitToAdv
+         timer expired."
+    ::= { tBgpConvergenceEntry 4 }
+
+tBgpConvEstablishedPeers         OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpConvEstablishedPeers that support the address  family
+         and that currently in established state."
+    ::= { tBgpConvergenceEntry 5 }
+
+tBgpConvFirstSessEstablishedTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpConvFirstSessEstablishedTime indicates the  first
+         session supporting the address family came up, measured  from the time
+         that BGP instance restarted."
+    ::= { tBgpConvergenceEntry 6 }
+
+tBgpConvLastSessEstablishedTime  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpConvLastSessEstablishedTime indicates  the last
+         session supporting the address family came up,  measured from the time
+         that the BGP instance restarted."
+    ::= { tBgpConvergenceEntry 7 }
+
+tBgpConvergedPeers               OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpConvergedPeers indicates the number of peers that
+         have  sent an EOR marker for the address family since the last BGP
+         restart."
+    ::= { tBgpConvergenceEntry 8 }
+
+tBgpConvergenceState             OBJECT-TYPE
+    SYNTAX      INTEGER {
+        waiting   (1),
+        started   (2),
+        partial   (3),
+        timeout   (4),
+        converged (5)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpConvergenceState indicates the convergence state of
+         the address family."
+    ::= { tBgpConvergenceEntry 9 }
+
+tBgpConvergenceTime              OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpConvergenceTime indicates the elapsed time in
+         seconds,  starting from the last BGP restart, to reach the converged
+         state for the  address family."
+    ::= { tBgpConvergenceEntry 10 }
+
+tBgpConvergenceOperMaxWaitToAdv  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "tBgpConvergenceOperMaxWaitToAdv indicates the opertional timer value after which
+         the local BGP instance starts advertising all its own family RIB-OUTs
+         to all corresponding family established  peers."
+    DEFVAL      { 0 }
+    ::= { tBgpConvergenceEntry 11 }
+
+tBgpInstMultipathNgTable         OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TBgpInstMultipathNgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tBgpInstMultipathNgTable is the list of configured multi-path
+         mechanisms for different BGP family types.
+
+         The table entries are indexed by BGP instance and family type. Each
+         entry denotes the multi-path selection used to select the number of
+         paths of a specific BGP family type."
+    ::= { tBgpInstanceObjects 29 }
+
+tBgpInstMultipathNgEntry         OBJECT-TYPE
+    SYNTAX      TBgpInstMultipathNgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) in the tBgpInstMultipathNgTable.
+
+         When created, all objects are initialized to their default values."
+    INDEX       {
+        tBgpInstanceIndex,
+        tBgpInstMultipathNgFamily
+    }
+    ::= { tBgpInstMultipathNgTable 1 }
+
+TBgpInstMultipathNgEntry         ::= SEQUENCE
+{
+    tBgpInstMultipathNgFamily        TmnxIpFamilyIdentifier,
+    tBgpInstMultipathNgRowStatus     RowStatus,
+    tBgpInstMultipathNgLstCh         TimeStamp,
+    tBgpInstMultipathNgBgp           Integer32,
+    tBgpInstMultipathNgEBgp          Integer32,
+    tBgpInstMultipathNgIBgp          Integer32,
+    tBgpInstMultipathNgRestrict      INTEGER,
+    tBgpInstMultipathNgUnequalCost   TruthValue
+}
+
+tBgpInstMultipathNgFamily        OBJECT-TYPE
+    SYNTAX      TmnxIpFamilyIdentifier
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpInstMultipathNgFamily specifies the address family
+         for which the multi-path selection applies."
+    ::= { tBgpInstMultipathNgEntry 1 }
+
+tBgpInstMultipathNgRowStatus     OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpInstMultipathNgRowStatus specifies the row status for
+         this table entry. It is used to create and delete row entries in this
+         table."
+    ::= { tBgpInstMultipathNgEntry 2 }
+
+tBgpInstMultipathNgLstCh         OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value tBgpInstMultipathNgLstCh indicates when an entry in
+         tBgpInstMultipathNgTable was last changed."
+    ::= { tBgpInstMultipathNgEntry 3 }
+
+tBgpInstMultipathNgBgp           OBJECT-TYPE
+    SYNTAX      Integer32 (0..64)
+    UNITS       "number-of-paths"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpInstMultipathNgBgp specifies if BGP multipath is
+         enabled or disabled for this instance and family.
+
+         A value of '0' would disable address family specific BGP multipath.
+
+         Any other value would specify the number of paths for BGP Multipath."
+    DEFVAL      { 0 }
+    ::= { tBgpInstMultipathNgEntry 4 }
+
+tBgpInstMultipathNgEBgp          OBJECT-TYPE
+    SYNTAX      Integer32 (0..64)
+    UNITS       "number-of-paths"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpInstMultipathNgEBgp specifies the maximum number of
+         paths that can be installed into RTM when the best path is received
+         from an EBGP peer.
+
+         A value of '0' would indicate to use the number of paths from
+         tBgpInstMultipathNgBgp.
+
+         Any other value would specify the number of paths for EBGP Multipath."
+    DEFVAL      { 0 }
+    ::= { tBgpInstMultipathNgEntry 5 }
+
+tBgpInstMultipathNgIBgp          OBJECT-TYPE
+    SYNTAX      Integer32 (0..64)
+    UNITS       "number-of-paths"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpInstMultipathNgIBgp specifies the maximum number of
+         paths that can be installed into RTM when the best path is received
+         from an IBGP peer.
+
+         A value of '0' would indicate to use the number of paths from
+         tBgpInstMultipathNgBgp.
+
+         Any other value would specify the number of paths for IBGP Multipath."
+    DEFVAL      { 0 }
+    ::= { tBgpInstMultipathNgEntry 6 }
+
+tBgpInstMultipathNgRestrict      OBJECT-TYPE
+    SYNTAX      INTEGER {
+        sameAsPathLength (1),
+        sameNeighborAs   (2),
+        exactAsPath      (3)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "When the value of tBgpInstMultipathNgRestrict is set to
+         'sameAsPathLength', it forces multipaths to have the same AS path
+          length (unless as-path-ignore is configured).
+
+         When the value of tBgpInstMultipathNgRestrict is set to
+         'sameNeighborAs', it forces multipaths to have the same AS path length
+         (unless as-path-ignore is configured) and the same neighbor AS.
+
+         When the value of tBgpInstMultipathNgRestrict is set to 'exactAsPath'
+         it forces multipaths to have the exact same AS paths, meaning the same
+         ASNs in exactly the same order and contained in exactly the same types
+         of elements."
+    DEFVAL      { sameAsPathLength }
+    ::= { tBgpInstMultipathNgEntry 7 }
+
+tBgpInstMultipathNgUnequalCost   OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpInstMultipathNgUnequalCost specifies the selection of
+         multipaths ignores differences in next-hop cost compared to the best
+         path."
+    DEFVAL      { false }
+    ::= { tBgpInstMultipathNgEntry 8 }
 
 tBgpPeerGroupObjects             OBJECT IDENTIFIER ::= { tBgpObjects 3 }
 
@@ -4857,7 +5718,7 @@ TBgpPeerGroupEntry               ::= SEQUENCE
     tBgpPeerGroupOperStatus          BgpOperState,
     tBgpPeerGroupLocalASPrivate      TruthValue,
     tBgpPeerGroupMd5Auth             TruthValue,
-    tBgpPeerGroupMd5AuthKey          OCTET STRING,
+    tBgpPeerGroupMd5AuthKey          DisplayString,
     tBgpPeerGroupClusterId           IpAddress,
     tBgpPeerGroupDisableClientReflect TruthValue,
     tBgpPeerGroupGracefulRestart     TruthValue,
@@ -5467,7 +6328,7 @@ tBgpPeerGroupMd5Auth             OBJECT-TYPE
     ::= { tBgpPeerGroupEntry 42 }
 
 tBgpPeerGroupMd5AuthKey          OBJECT-TYPE
-    SYNTAX      OCTET STRING (SIZE (0..255))
+    SYNTAX      DisplayString (SIZE (0..255))
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -5845,7 +6706,7 @@ tBgpPeerGroupMaxPrefixLogOnly    OBJECT-TYPE
 
 tBgpPeerGroupMaxPrefixThreshold  OBJECT-TYPE
     SYNTAX      Unsigned32 (1..100)
-    UNITS       "percentage"
+    UNITS       "percent"
     MAX-ACCESS  read-create
     STATUS      obsolete
     DESCRIPTION
@@ -5950,7 +6811,7 @@ TBgpPeerGroupParamsEntry         ::= SEQUENCE
     tBgpPGDisableFEFailover          TruthValue,
     tBgpPGDisableComms               TruthValue,
     tBgpPGDisableExtComms            TruthValue,
-    tBgpPGDefaultOriginate           TruthValue,
+    tBgpPGDefaultOriginate           TmnxIpFamily,
     tBgpPGAdvertiseInactiveRts       TruthValue,
     tBgpPGMinTTLValue                Unsigned32,
     tBgpPGTTLLogId                   TFilterLogId,
@@ -6005,7 +6866,11 @@ TBgpPeerGroupParamsEntry         ::= SEQUENCE
     tBgpPGLLGRAdvStaleToNeigh        TruthValue,
     tBgpPGLLGRAdvToNeighWthoutNoEx   TruthValue,
     tBgpPGLLGR                       TruthValue,
-    tBgpPGLocalAddressIfName         TNamedItemOrEmpty
+    tBgpPGLocalAddressIfName         TNamedItemOrEmpty,
+    tBgpPeerGroupAdvIpv6NhFamily     TmnxIpFamily,
+    tBgpPGExtendNhEncoding           TmnxIpFamily,
+    tBgpPGBypassMRAITimer            TruthValue,
+    tBgpPGDisableLargeComms          TruthValue
 }
 
 tBgpPGParamsInheritance          OBJECT-TYPE
@@ -6022,7 +6887,9 @@ tBgpPGParamsInheritance          OBJECT-TYPE
          tBgpPGDisableFEFailover           0x0000000000000002
          tBgpPGDisableComms                0x0000000000000004
          tBgpPGDisableExtComms             0x0000000000000008
+         $feature (TIMOS_FEATURE_BGP_DEFAULT_ORIGINATE)
          tBgpPGDefaultOriginate            0x0000000000000010
+         }
          tBgpPGAdvertiseInactiveRts        0x0000000000000020
          tBgpPGPeerTracking                0x0000000000000400
          tBgpPGAuthKeyChain                0x0000000000000800
@@ -6052,6 +6919,11 @@ tBgpPGParamsInheritance          OBJECT-TYPE
          tBgpPGMcastVpnV4AddPathLimit      0x0004000000000000
          tBgpPGMcastVpnV6AddPathLimit      0x0008000000000000
          tBgpPGLLGR                        0x0400000000000000
+         tBgpPGLocalAddressIfName          0x0800000000000000
+         tBgpPeerGroupAdvIpv6NhFamily      0x1000000000000000
+         tBgpPGExtendNhEncoding            0x2000000000000000
+         tBgpPGBypassMRAITimer             0x4000000000000000
+         tBgpPGDisableLargeComms           0x0800000000000000
 
          When the bit for an object is set to one, then the object's
          administrative and operational value are whatever the DEFVAL or most
@@ -6102,14 +6974,13 @@ tBgpPGDisableExtComms            OBJECT-TYPE
     ::= { tBgpPeerGroupParamsEntry 4 }
 
 tBgpPGDefaultOriginate           OBJECT-TYPE
-    SYNTAX      TruthValue
+    SYNTAX      TmnxIpFamily
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        "The value of tBgpPGDefaultOriginate enables or disables the sending of
-         default routes to the peer, making it independent of the route
-         policies."
-    DEFVAL      { false }
+        "The value of tBgpPGDefaultOriginate specifies the types of AFI/SAFI
+         for which SROS BGP will originate default route independent of the RTM
+         default route."
     ::= { tBgpPeerGroupParamsEntry 5 }
 
 tBgpPGAdvertiseInactiveRts       OBJECT-TYPE
@@ -6766,7 +7637,7 @@ tBgpPGDefRxEvpnEncap             OBJECT-TYPE
     ::= { tBgpPeerGroupParamsEntry 45 }
 
 tBgpPGORRLocation                OBJECT-TYPE
-    SYNTAX      Unsigned32 (0..16)
+    SYNTAX      Unsigned32 (0..255)
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -6970,6 +7841,55 @@ tBgpPGLocalAddressIfName         OBJECT-TYPE
          Either tBgpPGLocalAddressIfName or tBgpPGLocalAddress can be set at a
          time. The other one is set to default."
     ::= { tBgpPeerGroupParamsEntry 60 }
+
+tBgpPeerGroupAdvIpv6NhFamily     OBJECT-TYPE
+    SYNTAX      TmnxIpFamily
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPeerGroupAdvIpv6NhFamily specifies the types of
+         AFI/SAFI the SROS BGP group supports extended next-hop encoding and
+         resolution."
+    ::= { tBgpPeerGroupParamsEntry 61 }
+
+tBgpPGExtendNhEncoding           OBJECT-TYPE
+    SYNTAX      TmnxIpFamily
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPGExtendNhEncoding specifies the type of AFI/SAFI the
+         Bgp group is configured to support extended next-hop encoding."
+    ::= { tBgpPeerGroupParamsEntry 62 }
+
+tBgpPGBypassMRAITimer            OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPGBypassMRAITimer specifies whether the Bgp instance
+         is configured to send out the BGP update immediately after the session
+         comes up, without waiting for Minimum Route Advertisement Interval,
+         tBgpPeerGroupMinRouteAdvertisement, to countdown to zero.
+
+         If the value is set to 'true', tBgpPeerGroupMinRouteAdvertisement's
+         value is disregarded and BGP updates are sent out immediately after
+         the session comes up.
+
+         If the value is set to 'false', the system waits for
+         tBgpPeerGroupMinRouteAdvertisement's full value to countdown before
+         sending out the BGP updates after the session comes up."
+    DEFVAL      { false }
+    ::= { tBgpPeerGroupParamsEntry 63 }
+
+tBgpPGDisableLargeComms          OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPGDisableLargeComms enables or disables sending of
+         community attribute to the peer for large communities."
+    DEFVAL      { false }
+    ::= { tBgpPeerGroupParamsEntry 64 }
 
 tBgpPeerGroupPlcyTable           OBJECT-TYPE
     SYNTAX      SEQUENCE OF TBgpPeerGroupPlcyEntry
@@ -7441,7 +8361,7 @@ tBgpPeerGroupPfxLmtLogOnly       OBJECT-TYPE
 
 tBgpPeerGroupPfxLmtThreshold     OBJECT-TYPE
     SYNTAX      Unsigned32 (1..100)
-    UNITS       "percentage"
+    UNITS       "percent"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -7532,16 +8452,16 @@ tBgpPeerGroupDynamicPeerPfxEntry OBJECT-TYPE
 
 TBgpPeerGroupDynamicPeerPfxEntry ::= SEQUENCE
 {
-    tBgpPGDynamicPeerPrefixType      TmnxAddressAndPrefixType,
-    tBgpPGDynamicPeerPrefix          TmnxAddressAndPrefixAddress,
-    tBgpPGDynamicPeerPrefixLength    TmnxAddressAndPrefixPrefix,
+    tBgpPGDynamicPeerPrefixType      InetAddressType,
+    tBgpPGDynamicPeerPrefix          InetAddress,
+    tBgpPGDynamicPeerPrefixLength    InetAddressPrefixLength,
     tBgpPGDynamicPeerPfxLastChanged  TimeStamp,
     tBgpPGDynamicPeerPfxRowStatus    RowStatus,
     tBgpPGDynamicPeerPfxGroupName    BgpPeerGroupName
 }
 
 tBgpPGDynamicPeerPrefixType      OBJECT-TYPE
-    SYNTAX      TmnxAddressAndPrefixType
+    SYNTAX      InetAddressType
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
@@ -7550,7 +8470,7 @@ tBgpPGDynamicPeerPrefixType      OBJECT-TYPE
     ::= { tBgpPeerGroupDynamicPeerPfxEntry 1 }
 
 tBgpPGDynamicPeerPrefix          OBJECT-TYPE
-    SYNTAX      TmnxAddressAndPrefixAddress (SIZE (4|16|20))
+    SYNTAX      InetAddress (SIZE (4|16|20))
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
@@ -7559,7 +8479,7 @@ tBgpPGDynamicPeerPrefix          OBJECT-TYPE
     ::= { tBgpPeerGroupDynamicPeerPfxEntry 2 }
 
 tBgpPGDynamicPeerPrefixLength    OBJECT-TYPE
-    SYNTAX      TmnxAddressAndPrefixPrefix (0..128)
+    SYNTAX      InetAddressPrefixLength (0..128)
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
@@ -7683,6 +8603,373 @@ tBgpPGLLGRFamilyOvrideStaleTm    OBJECT-TYPE
          for this particular AFI/SAFI when the system is in helper mode."
     DEFVAL      { 16777216 }
     ::= { tBgpPGLLGRFamilyEntry 5 }
+
+tBgpPGParamsExtTblLstCh          OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPGParamsExtTblLstCh indicates the timestamp when an
+         entry in tBgpPeerGroupParamsExtTable was last changed."
+    ::= { tBgpPeerGroupObjects 13 }
+
+tBgpPeerGroupParamsExtTable      OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TBgpPeerGroupParamsExtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about the attributes configured  for
+         the BGP instance."
+    ::= { tBgpPeerGroupObjects 14 }
+
+tBgpPeerGroupParamsExtEntry      OBJECT-TYPE
+    SYNTAX      TBgpPeerGroupParamsExtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the tBgpPeerGroupParamsExtTable. Each entry maintains the
+         attributes configured for BGP instance."
+    INDEX       {
+        tBgpInstanceIndex,
+        tBgpPeerGroupName
+    }
+    ::= { tBgpPeerGroupParamsExtTable 1 }
+
+TBgpPeerGroupParamsExtEntry      ::= SEQUENCE
+{
+    tBgpPGParamsExtInheritanceHi     TmnxHigh32,
+    tBgpPGParamsExtInheritanceLo     TmnxLow32,
+    tBgpPGLinkAcceptEbgp             TmnxIpFamily,
+    tBgpPGLinkSendEbgp               TmnxIpFamily,
+    tBgpPGLinkAggPaths               TmnxIpFamily,
+    tBgpPGLoopDetectThreshold        Unsigned32,
+    tBgpPGSendExportPolicy           TLPolicyNameOrExpOrEmpty,
+    tBgpPGEbgpPreference             TmnxBgpPreference,
+    tBgpPGIbgpPreference             TmnxBgpPreference,
+    tBgpPGEbgpLabelPreference        TmnxBgpPreference,
+    tBgpPGIbgpLabelPreference        TmnxBgpPreference,
+    tBgpPGEBGPRejWithoutPlcyImpt     TruthValue,
+    tBgpPGEBGPRejWithoutPlcyExpt     TruthValue,
+    tBgpPGMultipathEligible          TruthValue,
+    tBgpPGRemovePrivateReplaceAs     TruthValue,
+    tBgpPGBlockPrefixSID             TruthValue,
+    tBgpPGDefOriginate               TmnxIpFamily,
+    tBgpPGSelLabelIpv4Inst           TruthValue
+}
+
+tBgpPGParamsExtInheritanceHi     OBJECT-TYPE
+    SYNTAX      TmnxHigh32 (0..4294967295)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPGParamsExtInheritanceHi specifies the upper 32 bits
+         of inheritance object. The object specifies if the peer entry in this
+         row, should inherit the operational value of an object, or use the
+         administratively set value.
+
+         This object is a bit-mask, with the following positions:
+
+
+         When the bit for an object is set to one, then the object's
+         administrative and operational value are whatever the DEFVAL or most
+         recently SET value is.
+
+         When the bit for an object is set to zero, then the object's
+         administrative and operational value are inherited from the
+         corresponding object in tBgpInstanceTable.
+
+         By default all of these attributes should be inherited from the
+         tBgpInstanceTable."
+    DEFVAL      { 0 }
+    ::= { tBgpPeerGroupParamsExtEntry 1 }
+
+tBgpPGParamsExtInheritanceLo     OBJECT-TYPE
+    SYNTAX      TmnxLow32 (0..4294967295)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPGParamsExtInheritanceLo specifies the lower  32 bits
+         of the inheritance object. The object specifies if the peer entry in
+         this row, should inherit the operational value of an object, or use
+         the administratively set value.
+
+         This object is a bit-mask, with the following positions:
+         tBgpPGParamsExtInheritanceHi        0x00000001
+         tBgpPGParamsExtInheritanceLo        0x00000002
+         tBgpPGLinkAcceptEbgp                0x00000004
+         tBgpPGLinkSendEbgp                  0x00000008
+         tBgpPGLinkAggPaths                  0x00000010
+         tBgpPGLoopDetectThreshold           0x00000020
+         tBgpPGSendExportPolicy              0x00000040
+         tBgpPGEbgpPreference                0x00000080
+         tBgpPGIbgpPreference                0x00000100
+         tBgpPGEbgpLabelPreference           0x00000200
+         tBgpPGIbgpLabelPreference           0x00000400
+         tBgpPGEBGPRejWithoutPlcyImpt        0x00000800
+         tBgpPGEBGPRejWithoutPlcyExpt        0x00001000
+         tBgpPGMultipathEligible             0x00002000
+         tBgpPGRemovePrivateReplaceAs        0x00004000
+         tBgpPGBlockPrefixSID                0x00008000
+         tBgpPGDefOriginate                  0x00010000
+         tBgpPGSelLabelIpv4Inst              0x00040000
+
+         When the bit for an object is set to one, then the object's
+         administrative and operational value are whatever the DEFVAL or most
+         recently SET value is.
+
+         When the bit for an object is set to zero, then the object's
+         administrative and operational value are inherited from the
+         corresponding object in tBgpInstanceTable.
+
+         By default all of these attributes should be inherited from the
+         tBgpInstanceTable."
+    DEFVAL      { 0 }
+    ::= { tBgpPeerGroupParamsExtEntry 2 }
+
+tBgpPGLinkAcceptEbgp             OBJECT-TYPE
+    SYNTAX      TmnxIpFamily
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPGLinkAcceptEbgp specifies the address families of
+         the routes received from a single-hop EBGP neighbor, for which a Link
+         Bandwidth Extended Community with static AS and bandwidth values is
+         allowed."
+    DEFVAL      { {} }
+    ::= { tBgpPeerGroupParamsExtEntry 3 }
+
+tBgpPGLinkSendEbgp               OBJECT-TYPE
+    SYNTAX      TmnxIpFamily
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPGLinkSendEbgp specifies the address families of the
+         routes sent to a single-hop EBGP neighbor, for which a Link Bandwidth
+         Extended Community with static AS and bandwidth values is allowed."
+    DEFVAL      { {} }
+    ::= { tBgpPeerGroupParamsExtEntry 4 }
+
+tBgpPGLinkAggPaths               OBJECT-TYPE
+    SYNTAX      TmnxIpFamily
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPGLinkAggPaths specifies the families of the  routes
+         for which aggregate bandwidth is supported  for a re-advertising
+         router."
+    DEFVAL      { {} }
+    ::= { tBgpPeerGroupParamsExtEntry 5 }
+
+tBgpPGLoopDetectThreshold        OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..15)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPGLoopDetectThreshold specifies the occurence of the
+         global ASN when exceeded triggers the loop-detect behavior."
+    DEFVAL      { 0 }
+    ::= { tBgpPeerGroupParamsExtEntry 6 }
+
+tBgpPGSendExportPolicy           OBJECT-TYPE
+    SYNTAX      TLPolicyNameOrExpOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPGSendExportPolicy specifies the send default export
+         policy."
+    DEFVAL      { "" }
+    ::= { tBgpPeerGroupParamsExtEntry 7 }
+
+tBgpPGEbgpPreference             OBJECT-TYPE
+    SYNTAX      TmnxBgpPreference (0..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPGEbgpPreference specifies the route preference for
+         ebgp routes."
+    DEFVAL      { 0 }
+    ::= { tBgpPeerGroupParamsExtEntry 8 }
+
+tBgpPGIbgpPreference             OBJECT-TYPE
+    SYNTAX      TmnxBgpPreference (0..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPGIbgpPreference specifies the route preference for
+         ibgp routes."
+    DEFVAL      { 0 }
+    ::= { tBgpPeerGroupParamsExtEntry 9 }
+
+tBgpPGEbgpLabelPreference        OBJECT-TYPE
+    SYNTAX      TmnxBgpPreference (0..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPGEbgpLabelPreference specifies the route preference
+         for label-IPv4 and label-IPv6 ebgp routes."
+    DEFVAL      { 0 }
+    ::= { tBgpPeerGroupParamsExtEntry 10 }
+
+tBgpPGIbgpLabelPreference        OBJECT-TYPE
+    SYNTAX      TmnxBgpPreference (0..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPGIbgpLabelPreference specifies the route preference
+         for label-IPv4 and label-IPv6 ibgp routes."
+    DEFVAL      { 0 }
+    ::= { tBgpPeerGroupParamsExtEntry 11 }
+
+tBgpPGEBGPRejWithoutPlcyImpt     OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPGEBGPRejWithoutPlcyImpt enables or disables if
+         policies can be imported."
+    DEFVAL      { false }
+    ::= { tBgpPeerGroupParamsExtEntry 12 }
+
+tBgpPGEBGPRejWithoutPlcyExpt     OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPGEBGPRejWithoutPlcyExpt enables or disables if
+         policies can be imported."
+    DEFVAL      { false }
+    ::= { tBgpPeerGroupParamsExtEntry 13 }
+
+tBgpPGMultipathEligible          OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPGMultipathEligible specifies whether this group is
+         multi-path eligible."
+    DEFVAL      { false }
+    ::= { tBgpPeerGroupParamsExtEntry 14 }
+
+tBgpPGRemovePrivateReplaceAs     OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPGRemovePrivateReplaceAs specifies whether or not to
+         replace the private autonomous system number (ASN) in AS-Path, if the
+         AS-Path contains the ASN of the external BGP (eBGP) neighbor on this
+         BGP peer group."
+    DEFVAL      { false }
+    ::= { tBgpPeerGroupParamsExtEntry 15 }
+
+tBgpPGBlockPrefixSID             OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPGBlockPrefixSID enables or disables sending of the
+         prefix SID attribute."
+    DEFVAL      { false }
+    ::= { tBgpPeerGroupParamsExtEntry 16 }
+
+tBgpPGDefOriginate               OBJECT-TYPE
+    SYNTAX      TmnxIpFamily
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPGDefOriginate specifies the types of AFI/SAFI for
+         which SROS BGP will originate default route independent of the RTM
+         default route."
+    ::= { tBgpPeerGroupParamsExtEntry 17 }
+
+tBgpPGSelLabelIpv4Inst           OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPGSelLabelIpv4Inst specifies whether to
+         enable/disable selective download of label-ipv4 routes"
+    DEFVAL      { false }
+    ::= { tBgpPeerGroupParamsExtEntry 19 }
+
+tBgpPeerGrpDynNbrAsRngTblLstChg  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The tBgpPeerGrpDynNbrAsRngTblLstChg indicates the last timestamp when
+         an entry in the tBgpPeerGroupDynNbrAsRangeTable was last changed."
+    ::= { tBgpPeerGroupObjects 15 }
+
+tBgpPeerGroupDynNbrAsRangeTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TBgpPeerGroupDynNbrAsRangeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tBgpPeerGroupDynNbrAsRangeTable contains BGP peering
+         dynamic-neighbor AS ranges."
+    ::= { tBgpPeerGroupObjects 16 }
+
+tBgpPeerGroupDynNbrAsRangeEntry  OBJECT-TYPE
+    SYNTAX      TBgpPeerGroupDynNbrAsRangeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) in the tBgpPeerGroupDynNbrAsRangeTable."
+    INDEX       {
+        tBgpInstanceIndex,
+        tBgpPGDynamicPeerPrefixType,
+        tBgpPGDynamicPeerPrefix,
+        tBgpPGDynamicPeerPrefixLength,
+        tBgpPeerGroupDynNbrAsRangeIndex
+    }
+    ::= { tBgpPeerGroupDynNbrAsRangeTable 1 }
+
+TBgpPeerGroupDynNbrAsRangeEntry  ::= SEQUENCE
+{
+    tBgpPeerGroupDynNbrAsRangeIndex  Integer32,
+    tBgpPeerGroupDynNbrAsRangeChg    TimeStamp,
+    tBgpPeerGroupDynNbrAsRangeMin    Unsigned32,
+    tBgpPeerGroupDynNbrAsRangeMax    Unsigned32
+}
+
+tBgpPeerGroupDynNbrAsRangeIndex  OBJECT-TYPE
+    SYNTAX      Integer32 (1..32)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tBgpPeerGroupDynNbrAsRangeIndex indicates index used to store this
+         range."
+    ::= { tBgpPeerGroupDynNbrAsRangeEntry 1 }
+
+tBgpPeerGroupDynNbrAsRangeChg    OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The tBgpPeerGroupDynNbrAsRangeChg indicates when this entry was last
+         changed."
+    ::= { tBgpPeerGroupDynNbrAsRangeEntry 2 }
+
+tBgpPeerGroupDynNbrAsRangeMin    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The tBgpPeerGroupDynNbrAsRangeMin specifies the minimum value of AS
+         range."
+    DEFVAL      { 0 }
+    ::= { tBgpPeerGroupDynNbrAsRangeEntry 3 }
+
+tBgpPeerGroupDynNbrAsRangeMax    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The tBgpPeerGroupDynNbrAsRangeMax specifies the maximum value of AS
+         range."
+    DEFVAL      { 0 }
+    ::= { tBgpPeerGroupDynNbrAsRangeEntry 4 }
 
 tBgpPeerObjects                  OBJECT IDENTIFIER ::= { tBgpObjects 4 }
 
@@ -9254,7 +10541,7 @@ TBgpPeerNgEntry                  ::= SEQUENCE
     tBgpPeerNgOperStatus             BgpOperState,
     tBgpPeerNgLocalASPrivate         TruthValue,
     tBgpPeerNgMd5Auth                TruthValue,
-    tBgpPeerNgMd5AuthKey             OCTET STRING,
+    tBgpPeerNgMd5AuthKey             DisplayString,
     tBgpPeerNgClusterId              IpAddress,
     tBgpPeerNgDisableClientReflect   TruthValue,
     tBgpPeerNgGracefulRestart        TruthValue,
@@ -9935,7 +11222,7 @@ tBgpPeerNgMd5Auth                OBJECT-TYPE
     ::= { tBgpPeerNgEntry 44 }
 
 tBgpPeerNgMd5AuthKey             OBJECT-TYPE
-    SYNTAX      OCTET STRING (SIZE (0..255))
+    SYNTAX      DisplayString (SIZE (0..255))
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -10379,7 +11666,7 @@ tBgpPeerNgMaxPrefixLogOnly       OBJECT-TYPE
 
 tBgpPeerNgMaxPrefixThreshold     OBJECT-TYPE
     SYNTAX      Unsigned32 (1..100)
-    UNITS       "percentage"
+    UNITS       "percent"
     MAX-ACCESS  read-create
     STATUS      obsolete
     DESCRIPTION
@@ -10580,7 +11867,26 @@ TBgpPeerNgOperEntry              ::= SEQUENCE
     tBgpPeerOperLLGRFamilySupported  TmnxBGPFamilyType,
     tBgpPeerOperLLGRFamilyNegotiated TmnxBGPFamilyType,
     tBgpPeerOperLLGRStatus           INTEGER,
-    tBgpPeerOperLLGRFamilySent       TmnxBGPFamilyType
+    tBgpPeerOperLLGRFamilySent       TmnxBGPFamilyType,
+    tBgpPeerOperSrplcyV4SupPfxDamp   Counter32,
+    tBgpPeerOperSrplcyV4RecvPfxs     Counter32,
+    tBgpPeerOperSrplcyV4SentPfxs     Counter32,
+    tBgpPeerOperSrplcyV4ActivePfxs   Counter32,
+    tBgpPeerOperSrplcyV4RejPfxs      Counter32,
+    tBgpPeerRemoteExtNhEncoding      TmnxIpFamily,
+    tBgpPeerEORSent                  TmnxIpFamily,
+    tBgpPeerEORReceived              TmnxIpFamily,
+    tBgpPeerConvExceededMinWait      INTEGER,
+    tBgpPeerOperAS4Byte              InetAutonomousSystemNumber,
+    tBgpPeerNgOperEPreference        TmnxBgpPreference,
+    tBgpPeerNgOperIPreference        TmnxBgpPreference,
+    tBgpPeerNgOperELabelPreference   TmnxBgpPreference,
+    tBgpPeerNgOperILabelPreference   TmnxBgpPreference,
+    tBgpPeerOperSrplcyV6SupPfxDamp   Counter32,
+    tBgpPeerOperSrplcyV6RecvPfxs     Counter32,
+    tBgpPeerOperSrplcyV6SentPfxs     Counter32,
+    tBgpPeerOperSrplcyV6ActivePfxs   Counter32,
+    tBgpPeerOperSrplcyV6RejPfxs      Counter32
 }
 
 tBgpPeerNgOperMsgOctetsRcvd      OBJECT-TYPE
@@ -11879,6 +13185,187 @@ tBgpPeerOperLLGRFamilySent       OBJECT-TYPE
          of NLRI that long lived GR is configured on this system."
     ::= { tBgpPeerNgOperEntry 141 }
 
+tBgpPeerOperSrplcyV4SupPfxDamp   OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPeerOperSrplcyV4SupPfxDamp indicates the number of
+         srplcy-ipv4 prefixes from this peer, which have been suppressed by
+         damping"
+    ::= { tBgpPeerNgOperEntry 142 }
+
+tBgpPeerOperSrplcyV4RecvPfxs     OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPeerOperSrplcyV4RecvPfxs indicates the number of
+         srplcy-ipv4 prefixes received from this peer."
+    ::= { tBgpPeerNgOperEntry 143 }
+
+tBgpPeerOperSrplcyV4SentPfxs     OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPeerOperSrplcyV4SentPfxs indicates the number of
+         srplcy-ipv4 prefixes transmitted to this peer."
+    ::= { tBgpPeerNgOperEntry 144 }
+
+tBgpPeerOperSrplcyV4ActivePfxs   OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPeerOperSrplcyV4ActivePfxs indicates the number of
+         active srplcy-ipv4 prefixes from this peer."
+    ::= { tBgpPeerNgOperEntry 145 }
+
+tBgpPeerOperSrplcyV4RejPfxs      OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPeerOperSrplcyV4RejPfxs indicates the number of
+         srplcy-ipv4 prefixes rejected from this peer."
+    ::= { tBgpPeerNgOperEntry 146 }
+
+tBgpPeerRemoteExtNhEncoding      OBJECT-TYPE
+    SYNTAX      TmnxIpFamily
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPeerRemoteExtNhEncoding specifies the types of
+         AFI/SAFI the Bgp peer supports for remote extended next-hop encoding."
+    ::= { tBgpPeerNgOperEntry 147 }
+
+tBgpPeerEORSent                  OBJECT-TYPE
+    SYNTAX      TmnxIpFamily
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPeerEORSent specifies the types of AFI/SAFI for which
+         the EOR marker was sent."
+    ::= { tBgpPeerNgOperEntry 148 }
+
+tBgpPeerEORReceived              OBJECT-TYPE
+    SYNTAX      TmnxIpFamily
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPeerEORReceived specifies the types of AFI/SAFI for
+         which the EOR marker was received."
+    ::= { tBgpPeerNgOperEntry 149 }
+
+tBgpPeerConvExceededMinWait      OBJECT-TYPE
+    SYNTAX      INTEGER {
+        no      (1),
+        yes     (2),
+        unknown (3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPeerConvExceededMinWait indicates establishment  of
+         session relative to tBgpInstanceConvMinWaitToAdv timer."
+    ::= { tBgpPeerNgOperEntry 150 }
+
+tBgpPeerOperAS4Byte              OBJECT-TYPE
+    SYNTAX      InetAutonomousSystemNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPeerOperAS4Byte indicates the autonomous system
+         number for the dynamic neighbor."
+    ::= { tBgpPeerNgOperEntry 151 }
+
+tBgpPeerNgOperEPreference        OBJECT-TYPE
+    SYNTAX      TmnxBgpPreference (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPeerNgOperEPreference specifies the route preference
+         for ebgp routes."
+    DEFVAL      { 0 }
+    ::= { tBgpPeerNgOperEntry 152 }
+
+tBgpPeerNgOperIPreference        OBJECT-TYPE
+    SYNTAX      TmnxBgpPreference (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPeerNgOperIPreference specifies the route preference
+         for ibgp routes."
+    DEFVAL      { 0 }
+    ::= { tBgpPeerNgOperEntry 153 }
+
+tBgpPeerNgOperELabelPreference   OBJECT-TYPE
+    SYNTAX      TmnxBgpPreference (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPeerNgOperELabelPreference specifies the route
+         preference for label-IPv4 and label-IPv6 ebgp routes."
+    DEFVAL      { 0 }
+    ::= { tBgpPeerNgOperEntry 154 }
+
+tBgpPeerNgOperILabelPreference   OBJECT-TYPE
+    SYNTAX      TmnxBgpPreference (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPeerNgOperILabelPreference specifies the route
+         preference for label-IPv4 and label-IPv6 ibgp routes."
+    DEFVAL      { 0 }
+    ::= { tBgpPeerNgOperEntry 155 }
+
+tBgpPeerOperSrplcyV6SupPfxDamp   OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPeerOperSrplcyV6SupPfxDamp indicates the number of
+         srplcy-ipv6 prefixes from this peer, which have been suppressed by
+         damping"
+    ::= { tBgpPeerNgOperEntry 156 }
+
+tBgpPeerOperSrplcyV6RecvPfxs     OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPeerOperSrplcyV6RecvPfxs indicates the number of
+         srplcy-ipv6 prefixes received from this peer."
+    ::= { tBgpPeerNgOperEntry 157 }
+
+tBgpPeerOperSrplcyV6SentPfxs     OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPeerOperSrplcyV6SentPfxs indicates the number of
+         srplcy-ipv6 prefixes transmitted to this peer."
+    ::= { tBgpPeerNgOperEntry 158 }
+
+tBgpPeerOperSrplcyV6ActivePfxs   OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPeerOperSrplcyV6ActivePfxs indicates the number of
+         active srplcy-ipv6 prefixes from this peer."
+    ::= { tBgpPeerNgOperEntry 159 }
+
+tBgpPeerOperSrplcyV6RejPfxs      OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPeerOperSrplcyV6RejPfxs indicates the number of
+         srplcy-ipv6 prefixes rejected from this peer."
+    ::= { tBgpPeerNgOperEntry 160 }
+
 tBgpPeerNgSendOrfRouteTargetTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF TBgpPeerNgSendOrfRouteTargetEntry
     MAX-ACCESS  not-accessible
@@ -11958,7 +13445,7 @@ TBgpPeerNgParamsEntry            ::= SEQUENCE
     tBgpPeerNgDisableFEFailover      TruthValue,
     tBgpPeerNgDisableComms           TruthValue,
     tBgpPeerNgDisableExtComms        TruthValue,
-    tBgpPeerNgDefaultOriginate       TruthValue,
+    tBgpPeerNgDefaultOriginate       TmnxIpFamily,
     tBgpPeerNgAdvertiseInactiveRts   TruthValue,
     tBgpPeerNgMinTTLValue            Unsigned32,
     tBgpPeerNgTracking               TruthValue,
@@ -12013,7 +13500,10 @@ TBgpPeerNgParamsEntry            ::= SEQUENCE
     tBgpPeerLLGRAdvStaleToNeigh      TruthValue,
     tBgpPeerLLGRAdvToNeighWthoutNoEx TruthValue,
     tBgpPeerLLGR                     TruthValue,
-    tBgpPeerLocalAddressIfName       TNamedItemOrEmpty
+    tBgpPeerLocalAddressIfName       TNamedItemOrEmpty,
+    tBgpPeerAdvIpv6NhFamily          TmnxIpFamily,
+    tBgpPeerExtendNhEncoding         TmnxIpFamily,
+    tBgpPeerBypassMRAITimer          TruthValue
 }
 
 tBgpPeerNgParamsInheritance      OBJECT-TYPE
@@ -12071,6 +13561,9 @@ tBgpPeerNgParamsInheritance      OBJECT-TYPE
          tBgpPeerNgMcastVpnV6AddPathLimit   0x0010000000000000
          tBgpPeerLLGR                       0x0800000000000000
          tBgpPeerLocalAddressIfName         0x1000000000000000
+         tBgpPeerAdvIpv6NhFamily            0x2000000000000000
+         tBgpPeerExtendNhEncoding           0x4000000000000000
+         tBgpPeerBypassMRAITimer            0x8000000000000000
 
          When the bit for an object is set to one, then the object's
          administrative and operational value are whatever the DEFVAL or most
@@ -12122,14 +13615,13 @@ tBgpPeerNgDisableExtComms        OBJECT-TYPE
     ::= { tBgpPeerNgParamsEntry 4 }
 
 tBgpPeerNgDefaultOriginate       OBJECT-TYPE
-    SYNTAX      TruthValue
+    SYNTAX      TmnxIpFamily
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        "The value of tBgpPeerNgDefaultOriginate enables or disables the
-         sending of default routes to the peer, making it independent of the
-         route policies."
-    DEFVAL      { false }
+        "The value of tBgpPeerNgDefaultOriginate specifies the types of
+         AFI/SAFI for which SROS BGP will originate default route independent
+         of the RTM default route."
     ::= { tBgpPeerNgParamsEntry 5 }
 
 tBgpPeerNgAdvertiseInactiveRts   OBJECT-TYPE
@@ -12809,7 +14301,7 @@ tBgpPeerNgLabelPreference        OBJECT-TYPE
     ::= { tBgpPeerNgParamsEntry 45 }
 
 tBgpPeerNgORRLocation            OBJECT-TYPE
-    SYNTAX      Unsigned32 (0..16)
+    SYNTAX      Unsigned32 (0..255)
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -13013,6 +14505,44 @@ tBgpPeerLocalAddressIfName       OBJECT-TYPE
         "The value of tBgpPeerLocalAddressIfName specifies the local interface
          name that the peer is to use as advertisement source address."
     ::= { tBgpPeerNgParamsEntry 60 }
+
+tBgpPeerAdvIpv6NhFamily          OBJECT-TYPE
+    SYNTAX      TmnxIpFamily
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPeerAdvIpv6NhFamily specifies the types of AFI/SAFI
+         the SROS BGP peer supports extended next-hop encoding and resolution."
+    ::= { tBgpPeerNgParamsEntry 61 }
+
+tBgpPeerExtendNhEncoding         OBJECT-TYPE
+    SYNTAX      TmnxIpFamily
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPeerExtendNhEncoding specifies the types of AFI/SAFI
+         the Bgp peer is configured to support extended next-hop encoding."
+    ::= { tBgpPeerNgParamsEntry 62 }
+
+tBgpPeerBypassMRAITimer          OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPeerBypassMRAITimer specifies whether the Bgp
+         instance is configured to send out the BGP update immediately after
+         the session comes up, without waiting for Minimum Route Advertisement
+         Interval, tBgpPeerNgMinRouteAdvertisement, to countdown to zero.
+
+         If the value is set to 'true', tBgpPeerNgMinRouteAdvertisement's value
+         is disregarded and BGP updates are sent out immediately after the
+         session comes up.
+
+         If the value is set to 'false', the system waits for
+         tBgpPeerNgMinRouteAdvertisement's full value to countdown before
+         sending out the BGP updates after the session comes up."
+    DEFVAL      { false }
+    ::= { tBgpPeerNgParamsEntry 63 }
 
 tBgpPeerPlcyTable                OBJECT-TYPE
     SYNTAX      SEQUENCE OF TBgpPeerPlcyEntry
@@ -13492,7 +15022,7 @@ tBgpPeerNgPfxLmtLogOnly          OBJECT-TYPE
 
 tBgpPeerNgPfxLmtThreshold        OBJECT-TYPE
     SYNTAX      Unsigned32 (1..100)
-    UNITS       "percentage"
+    UNITS       "percent"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -13696,6 +15226,318 @@ tBgpPeerLLGRFamilyFlagsSupported OBJECT-TYPE
          F-bit is negotiated with the peer for this family."
     ::= { tBgpPeerLLGRFamilyEntry 9 }
 
+tBgpPeerNgParamsExtTblLstCh      OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPeerNgParamsExtTblLstCh indicates the timestamp when
+         an entry in the tBgpPeerNgParamsExtTable was last changed."
+    ::= { tBgpPeerObjects 16 }
+
+tBgpPeerNgParamsExtTable         OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TBgpPeerNgParamsExtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tBgpPeerNgParamsExtTable consists of information about the
+         attributes configured for the BGP instance.
+
+         The table entries are indexed by BGP instance."
+    ::= { tBgpPeerObjects 17 }
+
+tBgpPeerNgParamsExtEntry         OBJECT-TYPE
+    SYNTAX      TBgpPeerNgParamsExtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the tBgpPeerNgParamsTable. An entry is created when an
+         entry in tBgpPeerNgEntry is. Each entry maintains the attributes
+         configured for BGP peer instance."
+    INDEX       {
+        tBgpPeerNgInstanceIndex,
+        tBgpPeerNgAddressType,
+        tBgpPeerNgAddress
+    }
+    ::= { tBgpPeerNgParamsExtTable 1 }
+
+TBgpPeerNgParamsExtEntry         ::= SEQUENCE
+{
+    tBgpPeerNgParamsExtInheritanceHi TmnxHigh32,
+    tBgpPeerNgParamsExtInheritanceLo TmnxLow32,
+    tBgpPeerNgDisableLargeComms      TruthValue,
+    tBgpPeerNgLinkAcceptEbgp         TmnxIpFamily,
+    tBgpPeerNgLinkSendEbgp           TmnxIpFamily,
+    tBgpPeerNgLinkAggPaths           TmnxIpFamily,
+    tBgpPeerNgLoopDetectThreshold    Unsigned32,
+    tBgpPeerNgSendExportPolicy       TLPolicyNameOrExpOrEmpty,
+    tBgpPeerNgEbgpPreference         TmnxBgpPreference,
+    tBgpPeerNgIbgpPreference         TmnxBgpPreference,
+    tBgpPeerNgEbgpLabelPreference    TmnxBgpPreference,
+    tBgpPeerNgIbgpLabelPreference    TmnxBgpPreference,
+    tBgpPeerNgEBGPRejWithoutPlcyImpt TruthValue,
+    tBgpPeerNgEBGPRejWithoutPlcyExpt TruthValue,
+    tBgpPeerNgMultipathEligible      TruthValue,
+    tBgpPeerNgRemovePrivateReplace   TruthValue,
+    tBgpPeerNgBlockPrefixSID         TruthValue,
+    tBgpPeerNgSelLabelIpv4Inst       TruthValue,
+    tBgpPeerNgDefOriginate           TmnxIpFamily
+}
+
+tBgpPeerNgParamsExtInheritanceHi OBJECT-TYPE
+    SYNTAX      TmnxHigh32 (0..4294967295)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPeerNgParamsExtInheritanceHi specifies the upper 32
+         bits of inheritance object. The object specifies if the peer entry in
+         this row, should inherit the operational value of an object, or use
+         the administratively set value.
+
+         This object is a bit-mask, with the following positions:
+
+
+         When the bit for an object is set to one, then the object's
+         administrative and operational value are whatever the DEFVAL or most
+         recently SET value is.
+
+         When the bit for an object is set to zero, then the object's
+         administrative and operational value are inherited from the
+         corresponding object in tBgpPeerGroupTable, or from the corresponding
+         object in tBgpInstanceTable.
+
+         By default all of these attributes should be inherited from the
+         tBgpPeerGroupTable."
+    DEFVAL      { 0 }
+    ::= { tBgpPeerNgParamsExtEntry 1 }
+
+tBgpPeerNgParamsExtInheritanceLo OBJECT-TYPE
+    SYNTAX      TmnxLow32 (0..4294967295)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPeerNgParamsExtInheritanceLo specifies the lower  32
+         bits of the inheritance object. The object specifies if the peer entry
+         in this row, should inherit the operational value of an object, or use
+         the administratively set value.
+
+         This object is a bit-mask, with the following positions:
+
+         tBgpPeerNgParamsExtInheritanceHi   0x00000001
+         tBgpPeerNgParamsExtInheritanceLo   0x00000002
+         tBgpPeerNgDisableLargeComms        0x00000004
+         tBgpPeerNgLinkAcceptEbgp           0x00000008
+         tBgpPeerNgLinkSendEbgp             0x00000010
+         tBgpPeerNgLinkAggPaths             0x00000020
+         tBgpPeerNgLoopDetectThreshold      0x00000040
+         feature (TIMOS_FEATURE_BGP_DEFAULT_ORIGINATE) {
+         tBgpPeerNgSendExportPolicy         0x00000080
+         }
+         feature (TIMOS_FEATURE_BGP_EBGP_IBGP_PREFERENCE) {
+         tBgpPeerNgEbgpPreference           0x00000100
+         tBgpPeerNgIbgpPreference           0x00000200
+         tBgpPeerNgEbgpLabelPreference      0x00000400
+         tBgpPeerNgIbgpLabelPreference      0x00000800
+         }
+         feature (TIMOS_FEATURE_BGP_EBGP_REJECT_WITHOUT_PLCY) {
+         tBgpPeerNgEBGPRejWithoutPlcyImpt   0x00001000
+         tBgpPeerNgEBGPRejWithoutPlcyExpt   0x00002000
+         }
+         tBgpPeerNgMultipathEligible        0x00004000
+         tBgpPeerNgRemovePrivateReplace     0x00008000
+         tBgpPeerNgBlockPrefixSID           0x00010000
+         tBgpPeerNgSelLabelIpv4Inst            0x00020000
+         tBgpPeerNgDefOriginate             0x00040000
+
+         When the bit for an object is set to one, then the object's
+         administrative and operational value are whatever the DEFVAL or most
+         recently SET value is.
+
+         When the bit for an object is set to zero, then the object's
+         administrative and operational value are inherited from the
+         corresponding object in tBgpPeerGroupTable, or from the corresponding
+         object in tBgpInstanceTable.
+
+         By default all of these attributes should be inherited from the
+         tBgpPeerGroupTable."
+    DEFVAL      { 0 }
+    ::= { tBgpPeerNgParamsExtEntry 2 }
+
+tBgpPeerNgDisableLargeComms      OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPeerNgDisableLargeComms enables or disables sending
+         of community attribute to the peer for large communities."
+    DEFVAL      { false }
+    ::= { tBgpPeerNgParamsExtEntry 3 }
+
+tBgpPeerNgLinkAcceptEbgp         OBJECT-TYPE
+    SYNTAX      TmnxIpFamily
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPeerNgLinkAcceptEbgp specifies the address families
+         of the routes received from a single-hop EBGP neighbor, for which a
+         Link Bandwidth Extended Community with static AS and bandwidth values
+         is allowed."
+    DEFVAL      { {} }
+    ::= { tBgpPeerNgParamsExtEntry 4 }
+
+tBgpPeerNgLinkSendEbgp           OBJECT-TYPE
+    SYNTAX      TmnxIpFamily
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPeerNgLinkSendEbgp specifies the address families of
+         the routes sent to a single-hop EBGP neighbor, for which a Link
+         Bandwidth Extended Community with static AS and bandwidth values is
+         allowed."
+    DEFVAL      { {} }
+    ::= { tBgpPeerNgParamsExtEntry 5 }
+
+tBgpPeerNgLinkAggPaths           OBJECT-TYPE
+    SYNTAX      TmnxIpFamily
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPeerNgLinkAggPaths specifies the families of the
+         routes for which aggregate bandwidth is supported  for a
+         re-advertising router."
+    DEFVAL      { {} }
+    ::= { tBgpPeerNgParamsExtEntry 6 }
+
+tBgpPeerNgLoopDetectThreshold    OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..15)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPeerNgLoopDetectThreshold specifies the occurence of
+         the global ASN when exceeded triggers the loop-detect behavior."
+    DEFVAL      { 0 }
+    ::= { tBgpPeerNgParamsExtEntry 7 }
+
+tBgpPeerNgSendExportPolicy       OBJECT-TYPE
+    SYNTAX      TLPolicyNameOrExpOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPeerNgSendExportPolicy specifies the send default
+         export policy."
+    DEFVAL      { "" }
+    ::= { tBgpPeerNgParamsExtEntry 8 }
+
+tBgpPeerNgEbgpPreference         OBJECT-TYPE
+    SYNTAX      TmnxBgpPreference (0..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPeerNgEbgpPreference specifies the route preference
+         for ebgp routes."
+    DEFVAL      { 0 }
+    ::= { tBgpPeerNgParamsExtEntry 9 }
+
+tBgpPeerNgIbgpPreference         OBJECT-TYPE
+    SYNTAX      TmnxBgpPreference (0..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPeerNgIbgpPreference specifies the route preference
+         for ibgp routes."
+    DEFVAL      { 0 }
+    ::= { tBgpPeerNgParamsExtEntry 10 }
+
+tBgpPeerNgEbgpLabelPreference    OBJECT-TYPE
+    SYNTAX      TmnxBgpPreference (0..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPeerNgEbgpLabelPreference specifies the route
+         preference for label-IPv4 and label-IPv6 ebgp routes."
+    DEFVAL      { 0 }
+    ::= { tBgpPeerNgParamsExtEntry 11 }
+
+tBgpPeerNgIbgpLabelPreference    OBJECT-TYPE
+    SYNTAX      TmnxBgpPreference (0..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPeerNgIbgpLabelPreference specifies the route
+         preference for label-IPv4 and label-IPv6 ibgp routes."
+    DEFVAL      { 0 }
+    ::= { tBgpPeerNgParamsExtEntry 12 }
+
+tBgpPeerNgEBGPRejWithoutPlcyImpt OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPeerNgEBGPRejWithoutPlcyImpt enables or disables if
+         policies can be imported."
+    DEFVAL      { false }
+    ::= { tBgpPeerNgParamsExtEntry 13 }
+
+tBgpPeerNgEBGPRejWithoutPlcyExpt OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPeerNgEBGPRejWithoutPlcyExpt enables or disables if
+         policies can be exported."
+    DEFVAL      { false }
+    ::= { tBgpPeerNgParamsExtEntry 14 }
+
+tBgpPeerNgMultipathEligible      OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPeerNgMultipathEligible specifies whether this group
+         neighbor is multi-path eligible."
+    DEFVAL      { false }
+    ::= { tBgpPeerNgParamsExtEntry 15 }
+
+tBgpPeerNgRemovePrivateReplace   OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPeerNgRemovePrivateReplace specifies whether BGP will
+         replace private AS numbers for this peer."
+    DEFVAL      { false }
+    ::= { tBgpPeerNgParamsExtEntry 16 }
+
+tBgpPeerNgBlockPrefixSID         OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPeerNgBlockPrefixSID enables or disables sending of
+         the prefix SID attribute."
+    DEFVAL      { false }
+    ::= { tBgpPeerNgParamsExtEntry 17 }
+
+tBgpPeerNgSelLabelIpv4Inst       OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPeerNgSelLabelIpv4Inst specifies whether to
+         enable/disable selective download of label-ipv4 routes"
+    DEFVAL      { false }
+    ::= { tBgpPeerNgParamsExtEntry 18 }
+
+tBgpPeerNgDefOriginate           OBJECT-TYPE
+    SYNTAX      TmnxIpFamily
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpPeerNgDefOriginate specifies the types of AFI/SAFI
+         for which SROS BGP will originate default route independent of the RTM
+         default route."
+    ::= { tBgpPeerNgParamsExtEntry 19 }
+
 tBgpInstanceConfederationObjects OBJECT IDENTIFIER ::= { tBgpObjects 5 }
 
 tBgpConfederationTableLastChanged OBJECT-TYPE
@@ -13886,7 +15728,7 @@ TBgpPeeringPolicyEntry           ::= SEQUENCE
     tBgpPrngPlcyASOverride           TruthValue,
     tBgpPrngPlcyAuthKeyChain         TNamedItemOrEmpty,
     tBgpPrngPlcyMd5Auth              TruthValue,
-    tBgpPrngPlcyMd5AuthKey           OCTET STRING,
+    tBgpPrngPlcyMd5AuthKey           DisplayString,
     tBgpPrngPlcyClusterId            IpAddress,
     tBgpPrngPlcyConnectRetry         BgpConnectRetryTime,
     tBgpPrngPlcyDampening            TruthValue,
@@ -14010,7 +15852,7 @@ tBgpPrngPlcyInheritance          OBJECT-TYPE
          tBgpPrngPlcyLoopDetect             0x0000000200000000
          tBgpPrngPlcyMEDSource              0x0000000400000000
          tBgpPrngPlcyMEDValue               0x0000000800000000
-         tBgpPrngPlcyMinASOrigination       0x0000001000000000
+         obsoleted tBgpPrngPlcyMinASOrigination       0x0000001000000000
          tBgpPrngPlcyMinRteAdvertisement    0x0000002000000000
          tBgpPrngPlcyMultihop               0x0000004000000000
          tBgpPrngPlcyNextHopSelf            0x0000008000000000
@@ -14107,7 +15949,7 @@ tBgpPrngPlcyMd5Auth              OBJECT-TYPE
     ::= { tBgpPeeringPolicyEntry 10 }
 
 tBgpPrngPlcyMd5AuthKey           OBJECT-TYPE
-    SYNTAX      OCTET STRING (SIZE (0..255))
+    SYNTAX      DisplayString (SIZE (0..255))
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -14485,7 +16327,7 @@ tBgpPrngPlcyMinASOrigination     OBJECT-TYPE
     SYNTAX      BgpMinASOriginationTime
     UNITS       "seconds"
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of the object tBgpPrngPlcyMinASOrigination specifies the
          minimal interval (in seconds) at which a given path attribute can be
@@ -14666,7 +16508,7 @@ tBgpPrngPlcyMaxPrefixLogOnly     OBJECT-TYPE
 
 tBgpPrngPlcyMaxPrefixThreshold   OBJECT-TYPE
     SYNTAX      Unsigned32 (1..100)
-    UNITS       "percentage"
+    UNITS       "percent"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -15251,6 +17093,30 @@ tBgp4BadErrorMessageType         OBJECT-TYPE
          in the BGP packet."
     ::= { tBgpNotificationObjs 22 }
 
+tBgpOldConvergenceState          OBJECT-TYPE
+    SYNTAX      INTEGER {
+        waiting   (1),
+        started   (2),
+        partial   (3),
+        timeout   (4),
+        converged (5)
+    }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpOldConvergenceState indicates the convergence state
+         of the address family."
+    ::= { tBgpNotificationObjs 23 }
+
+tBgpASN4Byte                     OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpASN4Byte indicates the autonomous system number for
+         the dynamic neighbor."
+    ::= { tBgpNotificationObjs 24 }
+
 tmnxBgpConformance               OBJECT IDENTIFIER ::= { tmnxSRConfs 14 }
 
 tmnxBgpCompliances               OBJECT IDENTIFIER ::= { tmnxBgpConformance 1 }
@@ -15637,7 +17503,7 @@ tmnxBgpV14v0Compliance           MODULE-COMPLIANCE
     ::= { tmnxBgpCompliances 14 }
 
 tmnxBgpV15v0Compliance           MODULE-COMPLIANCE
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The compliance statement for revision 15.0 of TIMETRA-BGP-MIB for
          management of extended BGP features on Nokia SROS series systems."
@@ -15719,6 +17585,137 @@ tmnxBgpV15v0Compliance           MODULE-COMPLIANCE
             tmnxBgpLocalAddressV15v4Group
         }
     ::= { tmnxBgpCompliances 15 }
+
+tmnxBgpV16v0Compliance           MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for revision 16.0 of TIMETRA-BGP-MIB for
+         management of extended BGP features on Nokia SROS series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxBgpMultiPathV14v0Group,
+            tmnxBgpLabelRtTunnelV14v0Group,
+            tmnxBgpShortcutTunnelV14v0Group,
+            tmnxBgpEntropyLabelV14v0Group,
+            tmnxBgpRibRouteImportV14v0Group,
+            tmnxPeerNgV14v1Group,
+            tmnxPeerNgV15v0Group,
+            tmnxBgpPeerGroupV13v0Group,
+            tmnxBgpNotificationV13v0Group,
+            tmnxBgpLinkBandwidthExtCommGroup,
+            tmnxBgpRibLeakImportV13v0Group,
+            tmnxBgpShortcutTunnelV13v0Group,
+            tmnxBgpLabelRtTunnelV13v0Group,
+            tmnxBgpDynamicPeerLmtV13v0Group,
+            tmnxBgpPeerGroupV13v1Group,
+            tmnxBgpGlobalV13v0Group,
+            tmnxBgpGlobalV13v1Group,
+            tmnxBgpPeerV13v0Group,
+            tmnxBgpObsoleteV13v0Group,
+            tmnxBgpNotificationV13v1Group,
+            tmnxBgpObsoletedNtfnV13v0Group,
+            tmnxBgpInstanceParamsV5v0Group,
+            tmnxBgpPeerGroupParamsV5v0Group,
+            tmnxBgp4PathAttrGroup,
+            tmnxBgpInstanceParamsV6v0Group,
+            tmnxBgpPeerGroupParamsV6v0Group,
+            tmnxBgpPeerParamsV6v0Group,
+            tmnxBgpPeeringPolicyV16v0Group,
+            tmnxBgp4ByteASNV7v0Group,
+            tmnxBgpPeerGroupV11v0Group,
+            tmnxBgpNotifyObjsV7v0Group,
+            tmnxBgpNotificationV7v0Group,
+            tmnxBgpInstanceV8v0Group,
+            tmnxBgpPeerV8v0Group,
+            tmnxBgpPeerV9v0Group,
+            tmnxBgpDisableCapNegoV9v0Group,
+            tmnxBgpGlobalV10v0Group,
+            tmnxBgpPeeringPlcyV10v0Group,
+            tmnxBgpRTConstraintV10v0Group,
+            tmnxBgpGlobalDCGroup,
+            tmnxBgpDPOscilationV11v0Group,
+            tmnxBgpMvpnVrfImportGroup,
+            tmnxBgpNHUnchangedGroup,
+            tmnxBgpMcastIpv6Group,
+            tmnxBgpPrefixOriginValidGroup,
+            tmnxBgpResolveLabelRoutesGroup,
+            tmnxBgpThirdPartyNHGroup,
+            tmnxBgpObsoleteV12v0Group,
+            tmnxBgpNotificationV12v0Group,
+            tmnxBgpNotifyObjsV12v0Group,
+            tmnxBgpPeerNgV13v0Group,
+            tmnxBgpPeerNgDynamicV13v0Group,
+            tmnxBgpPeerNgEvpnMplsV13v0Group,
+            tmnxBgpDynPeerLmtNtfnV13v0Group,
+            tmnxBgpInstanceV14v0Group,
+            tmnxBgpInstanceParamsV14v0Group,
+            tmnxBgpInstanceParamsV14v4Group,
+            tmnxBgpPeerGroupParamsV14v4Group,
+            tmnxBgpPeerParamsGroup,
+            tmnxBgpInstanceParamsV15v0Group,
+            tmnxBgpLabelRtTunnelV15v0Group,
+            tmnxBgpORRV15v0Group,
+            tmnxBgpWeightedEcmpGroup,
+            tmnxBgpObjectsV15v0ObsoleteGroup,
+            tmnxBgpObsoleteNotifyV15v0Group,
+            tmnxBgpNotifyObjsV15v0Group,
+            tmnxBgpObsoleteNfyObjsV15v0Group,
+            tmnxBgpAddPathV15v0Group,
+            tmnxBgpLblRibSeparateV15v0Group,
+            tmnxBgpEnforceFirstASGroup,
+            tmnxBgpInstanceParamsExtGroup,
+            tmnxBgpLLGRV15v0Group,
+            tmnxBgpNotificationV15v0Group,
+            tmnxBgpLocalAddressV15v4Group,
+            tmnxBgpIpv6NhAdvAndResV16v0Group,
+            tmnxBgpBypassMRAITimerV16v0Group,
+            tmnxBgpAdminTagsV16v0Group,
+            tmnxPeerNgV16v0Group,
+            tmnxBgpLargeCommsV16v0Group,
+            tmnxBgpNHResFilterV16v0Group,
+            tmnxBgpLabelSecurityGroup,
+            tmnxBgpRibApiGroup,
+            tmnxBgpTunnelMplsFwdPlcyGroup,
+            tmnxBgpLinkBandwidthGroup,
+            tmnxBgpORRV16v0Group,
+            tmnxBgpTunnelSrOspf3,
+            tmnxBgpLoopDetectThreshold,
+            tmnxBgpSrTePolicyIpv6Group
+        }
+    ::= { tmnxBgpCompliances 16 }
+
+tmnxBgpV19v0Compliance           MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for revision 19.0 of TIMETRA-BGP-MIB for
+         management of extended BGP features on Nokia SROS series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxBgpNHResGroup,
+            tmnxBgpConvergenceGroup,
+            tmnxBgpNotificationV19v0Group,
+            tmnxBgpInstanceV19v0Group,
+            tmnxBgpDefaultOriginate,
+            tBgpPeerGrpDynNbrAsGroup,
+            tmnxBgpPreferenceGroup,
+            tmnxBgpEBGPRejectWithoutPolicy,
+            tmnxBgpRemovePrivateReplace,
+            tmnxBgpBlockPrefixSIDGroup,
+            tmnxPeerNgV19v5Group,
+            tmnxBgpNotifyObjsV19v0Group
+        }
+    ::= { tmnxBgpCompliances 17 }
+
+tmnxBgpSegRoutingV19Compliance   MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The complaince statement for revision 19.10 of TIMETRA-BGP-MIB for
+         management of extended BGP features of Nokia SROS series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxBgpSegRoutingV19Group
+        }
+    ::= { tmnxBgpCompliances 18 }
 
 tmnxBgpGroups                    OBJECT IDENTIFIER ::= { tmnxBgpConformance 2 }
 
@@ -17623,7 +19620,7 @@ tmnxBgpPeeringPolicyV10v0Group   OBJECT-GROUP
         tBgpPrngPlcyDisable4ByteASN,
         tBgpPrngPlcyRemovePrivateASLmtd
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The group of objects supporting management of BGP peering policies on
          Nokia SROS series systems since release 10.0."
@@ -19141,7 +21138,8 @@ tmnxBgpPeerParamsObsoleteGroup   OBJECT-GROUP
 tmnxBgpInstanceParamsV15v0Group  OBJECT-GROUP
     OBJECTS     {
         tBgpInstanceNHResolveAllowStatic,
-        tBgpInstanceFSValidateDestPfx
+        tBgpInstanceFSValidateDestPfx,
+        tBgpInstanceFSValidateRedirectIP
     }
     STATUS      current
     DESCRIPTION
@@ -19418,6 +21416,444 @@ tmnxBgpLocalAddressV15v4Group    OBJECT-GROUP
          interface support in Nokia SROS series system since release 15.0.R4."
     ::= { tmnxBgpGroups 134 }
 
+tmnxBgpIpv6NhAdvAndResV16v0Group OBJECT-GROUP
+    OBJECTS     {
+        tBgpInstanceAdvIpv6NhFamily,
+        tBgpPeerGroupAdvIpv6NhFamily,
+        tBgpPeerAdvIpv6NhFamily,
+        tBgpInstanceExtendNhEncoding,
+        tBgpPGExtendNhEncoding,
+        tBgpPeerExtendNhEncoding,
+        tBgpPeerRemoteExtNhEncoding
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of extended BGP parameters
+         on Nokia SROS series systems since release 16.0.R1."
+    ::= { tmnxBgpGroups 135 }
+
+tmnxBgpBypassMRAITimerV16v0Group OBJECT-GROUP
+    OBJECTS     {
+        tBgpInstanceBypassMRAITimer,
+        tBgpPGBypassMRAITimer,
+        tBgpPeerBypassMRAITimer
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of extended BGP parameters
+         on Nokia SROS series systems since release 16.0.R1."
+    ::= { tmnxBgpGroups 136 }
+
+tmnxBgpAdminTagsV16v0Group       OBJECT-GROUP
+    OBJECTS     {
+        tBgpShortcutTunnelAdminTags,
+        tBgpLabelRtTunnelAdminTags
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of extended BGP parameters
+         on Nokia SROS series systems since release 16.0.R1."
+    ::= { tmnxBgpGroups 137 }
+
+tmnxPeerNgV16v0Group             OBJECT-GROUP
+    OBJECTS     {
+        tBgpPeerOperSrplcyV4SupPfxDamp,
+        tBgpPeerOperSrplcyV4RecvPfxs,
+        tBgpPeerOperSrplcyV4SentPfxs,
+        tBgpPeerOperSrplcyV4ActivePfxs,
+        tBgpPeerOperSrplcyV4RejPfxs
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of extended BGP peers on
+         Nokia SROS series systems since release 16.0."
+    ::= { tmnxBgpGroups 138 }
+
+tmnxBgpLargeCommsV16v0Group      OBJECT-GROUP
+    OBJECTS     {
+        tBgpPeerNgParamsExtTblLstCh,
+        tBgpInstanceDisableLargeComms,
+        tBgpPGDisableLargeComms,
+        tBgpPeerNgParamsExtInheritanceHi,
+        tBgpPeerNgParamsExtInheritanceLo,
+        tBgpPeerNgDisableLargeComms
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of extended BGP parameters
+         on Nokia SROS series systems since release 16.0.R1."
+    ::= { tmnxBgpGroups 139 }
+
+tmnxBgpNHResFilterV16v0Group     OBJECT-GROUP
+    OBJECTS     {
+        tBgpLabelRtTunnelSrPolicy,
+        tBgpShortcutTunnelSrPolicy,
+        tBgpInstanceImportSrPolicy
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of extended BGP parameters
+         on Nokia SROS series systems since release 16.0.R1."
+    ::= { tmnxBgpGroups 140 }
+
+tmnxBgpPeeringPolicyV16v0Group   OBJECT-GROUP
+    OBJECTS     {
+        tBgpPeeringPolicyTableLastChngd,
+        tBgpPrngPlcyRowStatus,
+        tBgpPrngPlcyLastChngd,
+        tBgpPrngPlcyDescription,
+        tBgpPrngPlcyInheritance,
+        tBgpPrngPlcyAdvertiseInactiveRts,
+        tBgpPrngPlcyNoAggregatorID,
+        tBgpPrngPlcyASOverride,
+        tBgpPrngPlcyAuthKeyChain,
+        tBgpPrngPlcyMd5Auth,
+        tBgpPrngPlcyMd5AuthKey,
+        tBgpPrngPlcyClusterId,
+        tBgpPrngPlcyConnectRetry,
+        tBgpPrngPlcyDampening,
+        tBgpPrngPlcyDisableClientReflect,
+        tBgpPrngPlcyDisableComms,
+        tBgpPrngPlcyDisableExtComms,
+        tBgpPrngPlcyDisableFEFailover,
+        tBgpPrngPlcyHoldTime,
+        tBgpPrngPlcyKeepAlive,
+        tBgpPrngPlcyLocalAddressType,
+        tBgpPrngPlcyLocalAddress,
+        tBgpPrngPlcyLocalAS,
+        tBgpPrngPlcyLocalASPrivate,
+        tBgpPrngPlcyLocalPreference,
+        tBgpPrngPlcyLoopDetect,
+        tBgpPrngPlcyMEDSource,
+        tBgpPrngPlcyMEDValue,
+        tBgpPrngPlcyMinRteAdvertisement,
+        tBgpPrngPlcyMultihop,
+        tBgpPrngPlcyNextHopSelf,
+        tBgpPrngPlcyPassive,
+        tBgpPrngPlcyPeerAS,
+        tBgpPrngPlcyPreference,
+        tBgpPrngPlcyMaxPrefix,
+        tBgpPrngPlcyRemovePrivateAS,
+        tBgpPrngPlcyMinTTLValue,
+        tBgpPrngPlcyPeerType,
+        tBgpPeerGroupDynamicPeerGroup,
+        tBgpPrngPlcyDisable4ByteASN,
+        tBgpPrngPlcyRemovePrivateASLmtd
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of BGP peering policies on
+         Nokia SROS series systems since release 16.0."
+    ::= { tmnxBgpGroups 141 }
+
+tmnxBgpObjectsV16v0ObsoleteGroup OBJECT-GROUP
+    OBJECTS     {
+        tBgpPrngPlcyMinASOrigination
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of obsolete objects for BGP parameters on Nokia SROS series
+         systems since release 16.0."
+    ::= { tmnxBgpGroups 142 }
+
+tmnxBgpLabelSecurityGroup        OBJECT-GROUP
+    OBJECTS     {
+        tBgpInstanceEnfNbrTrust
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects for BGP label security on Nokia SROS series
+         systems since release 16.0."
+    ::= { tmnxBgpGroups 143 }
+
+tmnxBgpRibApiGroup               OBJECT-GROUP
+    OBJECTS     {
+        tBgpLabelRtTunnelRibApi,
+        tBgpShortcutTunnelRibApi
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects for BGP RIB API on Nokia SROS series systems
+         since release 16.0."
+    ::= { tmnxBgpGroups 144 }
+
+tmnxBgpTunnelMplsFwdPlcyGroup    OBJECT-GROUP
+    OBJECTS     {
+        tBgpShortcutTunnelMplsFwdPlcy,
+        tBgpLabelRtTunnelMplsFwdPlcy
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of BGP shortcut using
+         segmented routing tunnel on Nokia  SROS series systems since release
+         16.0."
+    ::= { tmnxBgpGroups 145 }
+
+tmnxBgpLinkBandwidthGroup        OBJECT-GROUP
+    OBJECTS     {
+        tBgpPGParamsExtTblLstCh,
+        tBgpPGParamsExtInheritanceHi,
+        tBgpPGParamsExtInheritanceLo,
+        tBgpPGLinkAcceptEbgp,
+        tBgpPGLinkSendEbgp,
+        tBgpPGLinkAggPaths,
+        tBgpPeerNgLinkAcceptEbgp,
+        tBgpPeerNgLinkSendEbgp,
+        tBgpPeerNgLinkAggPaths
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting BGP Link Bandwidth on Nokia SROS
+         series systems since release 16.0."
+    ::= { tmnxBgpGroups 146 }
+
+tmnxBgpORRV16v0Group             OBJECT-GROUP
+    OBJECTS     {
+        tBgpORRPrimaryIPv6AddrType,
+        tBgpORRPrimaryIPv6Addr,
+        tBgpORRSecondaryIPv6AddrType,
+        tBgpORRSecondaryIPv6Addr,
+        tBgpORRTertiaryIPv6AddrType,
+        tBgpORRTertiaryIPv6Addr
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of BGP Optimal Route
+         Reflector parameters on Nokia SROS series systems since release 16.0."
+    ::= { tmnxBgpGroups 147 }
+
+tmnxBgpTunnelSrOspf3             OBJECT-GROUP
+    OBJECTS     {
+        tBgpShortcutTunnelSrOspf3,
+        tBgpLabelRtTunnelSrOspf3
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of BGP shortcut using
+         segmented routing tunnel on Nokia  SROS series systems since release
+         16.0."
+    ::= { tmnxBgpGroups 148 }
+
+tmnxBgpLoopDetectThreshold       OBJECT-GROUP
+    OBJECTS     {
+        tBgpInstanceLoopDetectThreshold,
+        tBgpPeerNgLoopDetectThreshold,
+        tBgpPGLoopDetectThreshold
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of BGP loop detect
+         threshold on Nokia  SROS series systems since release 16.0."
+    ::= { tmnxBgpGroups 149 }
+
+tmnxBgpNHResGroup                OBJECT-GROUP
+    OBJECTS     {
+        tBgpInstanceAllowUnresLeaking
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects extending the support of BGP Next Hop  Resolution
+         functionality on Nokia SROS series systems since 19.0."
+    ::= { tmnxBgpGroups 150 }
+
+tmnxBgpConvergenceGroup          OBJECT-GROUP
+    OBJECTS     {
+        tBgpInstanceConvMinWaitToAdv,
+        tBgpConvergenceTblLstCh,
+        tBgpConvergenceFamily,
+        tBgpConvergenceLstCh,
+        tBgpConvergenceMaxWaitToAdv,
+        tBgpPeerEORSent,
+        tBgpPeerEORReceived,
+        tBgpPeerConvExceededMinWait,
+        tBgpConvTimerEstablishedPeers,
+        tBgpConvEstablishedPeers,
+        tBgpConvFirstSessEstablishedTime,
+        tBgpConvLastSessEstablishedTime,
+        tBgpConvergedPeers,
+        tBgpConvergenceState,
+        tBgpConvergenceTime,
+        tBgpConvergenceOperMaxWaitToAdv
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects providing support for BGP convergence tracking on
+         Nokia SROS series systems since 19.0."
+    ::= { tmnxBgpGroups 151 }
+
+tmnxBgpNotificationV19v0Group    NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tBgpInstConvStateTransition
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting convergence  notifications on virtual
+         routers for version 19.0 Nokia  SROS series systems."
+    ::= { tmnxBgpGroups 152 }
+
+tmnxBgpInstanceV19v0Group        OBJECT-GROUP
+    OBJECTS     {
+        tBgpInstMultipathNgRowStatus,
+        tBgpInstMultipathNgLstCh,
+        tBgpInstMultipathNgBgp,
+        tBgpInstMultipathNgEBgp,
+        tBgpInstMultipathNgIBgp,
+        tBgpInstMultipathNgRestrict,
+        tBgpInstMultipathNgUnequalCost,
+        tBgpPGMultipathEligible,
+        tBgpPeerNgMultipathEligible
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of each extended BGP
+         instance on Nokia SROS series systems since release 19.0."
+    ::= { tmnxBgpGroups 153 }
+
+tmnxBgpDefaultOriginate          OBJECT-GROUP
+    OBJECTS     {
+        tBgpInstDefOriginate,
+        tBgpPGDefOriginate,
+        tBgpPeerNgDefOriginate,
+        tBgpInstanceSendExportPolicy,
+        tBgpPGSendExportPolicy,
+        tBgpPeerNgSendExportPolicy
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of BGP default originate on
+         Nokia  SROS series systems since release 19.0."
+    ::= { tmnxBgpGroups 154 }
+
+tBgpPeerGrpDynNbrAsGroup         OBJECT-GROUP
+    OBJECTS     {
+        tBgpPeerGrpDynNbrAsRngTblLstChg,
+        tBgpPeerGroupDynNbrAsRangeChg,
+        tBgpPeerGroupDynNbrAsRangeMin,
+        tBgpPeerGroupDynNbrAsRangeMax,
+        tBgpPeerOperAS4Byte
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of BGP peering
+         dynamic-neighbor AS range feature on SROS series systems since release
+         19.0."
+    ::= { tmnxBgpGroups 155 }
+
+tmnxBgpPreferenceGroup           OBJECT-GROUP
+    OBJECTS     {
+        tBgpInstEbgpPreference,
+        tBgpInstIbgpPreference,
+        tBgpInstEbgpLabelPreference,
+        tBgpInstIbgpLabelPreference,
+        tBgpPGEbgpPreference,
+        tBgpPGIbgpPreference,
+        tBgpPGEbgpLabelPreference,
+        tBgpPGIbgpLabelPreference,
+        tBgpPeerNgEbgpPreference,
+        tBgpPeerNgIbgpPreference,
+        tBgpPeerNgEbgpLabelPreference,
+        tBgpPeerNgIbgpLabelPreference,
+        tBgpPeerNgOperEPreference,
+        tBgpPeerNgOperIPreference,
+        tBgpPeerNgOperELabelPreference,
+        tBgpPeerNgOperILabelPreference
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects providing support for BGP ebgp ibgp preference on
+         Nokia SROS series systems since 19.0."
+    ::= { tmnxBgpGroups 156 }
+
+tmnxBgpEBGPRejectWithoutPolicy   OBJECT-GROUP
+    OBJECTS     {
+        tBgpPeerNgEBGPRejWithoutPlcyImpt,
+        tBgpPeerNgEBGPRejWithoutPlcyExpt,
+        tBgpInstEBGPRejWithoutPlcyImpt,
+        tBgpInstEBGPRejWithoutPlcyExpt,
+        tBgpPGEBGPRejWithoutPlcyImpt,
+        tBgpPGEBGPRejWithoutPlcyExpt
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of BGP EBGP Reject Without
+         Policy on Nokia  SROS series systems since release 19.0."
+    ::= { tmnxBgpGroups 157 }
+
+tmnxBgpRemovePrivateReplace      OBJECT-GROUP
+    OBJECTS     {
+        tBgpInstRemovePrivateReplaceAS,
+        tBgpPGRemovePrivateReplaceAs,
+        tBgpPeerNgRemovePrivateReplace
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of BGP remove-private
+         replace on Nokia  SROS series systems since release 19.0."
+    ::= { tmnxBgpGroups 158 }
+
+tmnxBgpBlockPrefixSIDGroup       OBJECT-GROUP
+    OBJECTS     {
+        tBgpInstBlockPrefixSID,
+        tBgpPGBlockPrefixSID,
+        tBgpPeerNgBlockPrefixSID
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of BGP Block Prefix SID on
+         Nokia SROS series systems since release 19.0."
+    ::= { tmnxBgpGroups 159 }
+
+tmnxPeerNgV19v5Group             OBJECT-GROUP
+    OBJECTS     {
+        tBgpPeerNgSelLabelIpv4Inst,
+        tBgpSelLabelIpv4Inst,
+        tBgpPGSelLabelIpv4Inst
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of BGP on Nokia SROS series
+         systems since release 19.5."
+    ::= { tmnxBgpGroups 160 }
+
+tmnxBgpNotifyObjsV19v0Group      OBJECT-GROUP
+    OBJECTS     {
+        tBgpOldConvergenceState,
+        tBgpASN4Byte
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notify objects supporting management of extended BGP on
+         Nokia SROS series systems release 19.0."
+    ::= { tmnxBgpGroups 161 }
+
+tmnxBgpSegRoutingV19Group        OBJECT-GROUP
+    OBJECTS     {
+        tBgpPrefixSidRangeType,
+        tBgpPrefixSidRangeStartLabel,
+        tBgpPrefixSidRangeMaxIdx,
+        tBgpSrAdminState,
+        tBgpSegmentRouting
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of BGP Segment Routing on
+         Nokia SROS series systems release 19.10."
+    ::= { tmnxBgpGroups 163 }
+
+tmnxBgpSrTePolicyIpv6Group       OBJECT-GROUP
+    OBJECTS     {
+        tBgpPeerOperSrplcyV6SupPfxDamp,
+        tBgpPeerOperSrplcyV6RecvPfxs,
+        tBgpPeerOperSrplcyV6SentPfxs,
+        tBgpPeerOperSrplcyV6ActivePfxs,
+        tBgpPeerOperSrplcyV6RejPfxs
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of extended BGP peers on
+         Nokia SROS series systems since release 19."
+    ::= { tmnxBgpGroups 164 }
+
 tBgpNotificationsPrefix          OBJECT IDENTIFIER ::= { tmnxSRNotifyPrefix 14 }
 
 tBgpNotifications                OBJECT IDENTIFIER ::= { tBgpNotificationsPrefix 0 }
@@ -19444,7 +21880,8 @@ tBgpMaxPrefix100                 NOTIFICATION-TYPE
 
 tBgpPeerGRStatusChange           NOTIFICATION-TYPE
     OBJECTS     {
-        tBgpPeerOperGRStatus
+        tBgpPeerOperGRStatus,
+        tBgpASN4Byte
     }
     STATUS      obsolete
     DESCRIPTION
@@ -19495,7 +21932,8 @@ tBgpPeerNgGRStatusChange         NOTIFICATION-TYPE
 tBgpNgEstablished                NOTIFICATION-TYPE
     OBJECTS     {
         tBgpPeerNgLastError,
-        tBgpPeerNgConnState
+        tBgpPeerNgConnState,
+        tBgpASN4Byte
     }
     STATUS      current
     DESCRIPTION
@@ -19509,7 +21947,8 @@ tBgpNgEstablished                NOTIFICATION-TYPE
 tBgpNgBackwardTransition         NOTIFICATION-TYPE
     OBJECTS     {
         tBgpPeerNgLastError,
-        tBgpPeerNgConnState
+        tBgpPeerNgConnState,
+        tBgpASN4Byte
     }
     STATUS      current
     DESCRIPTION
@@ -19525,7 +21964,8 @@ tBgpPeerNgHoldTimeInconsistent   NOTIFICATION-TYPE
         tBgpPeerNgHoldTime,
         tBgpPeerNgAddrType,
         tBgpPeerNgAddr,
-        tBgpPeerNgMinHoldTime
+        tBgpPeerNgMinHoldTime,
+        tBgpASN4Byte
     }
     STATUS      current
     DESCRIPTION
@@ -19538,18 +21978,19 @@ tBgpPeerNgHoldTimeInconsistent   NOTIFICATION-TYPE
 tBgpFlowspecUnsupportdComAction  NOTIFICATION-TYPE
     OBJECTS     {
         tBgpFlowspecExtCommunityAction,
-        tBgpFlowspecExtCommActionValue
+        tBgpFlowspecExtCommActionValue,
+        tBgpASN4Byte
     }
     STATUS      current
     DESCRIPTION
         "[CAUSE] The tBgpFlowspecUnsupportdComAction notification is generated
-         when the best route for a flow specification NLRI(Network Layer
+         when the best route for a flow specification NLRI (Network Layer
          Reachability Information) is received from a remote BGP peer with an
          extended community action that is unsupported.
 
-         [EFFECT] The BGP peer dose not create ip filter entry for the received
-         flow route even if the NLRI(Network Layer Reachability Information)
-         has valid extended community actions.
+         [EFFECT] The BGP peer dose not create an ip filter entry for the
+         received flow route even if the NLRI (Network Layer Reachability
+         Information) has valid extended community actions.
 
          [RECOVERY] There is no recovery required for this notification."
     ::= { tBgpNotifications 10 }
@@ -19654,7 +22095,8 @@ tBgp4RouteInvalid                NOTIFICATION-TYPE
         tBgpPeerNgAddrType,
         tBgpPeerNgAddr,
         tBgpRouteInvalidReason,
-        tBgpRouteNLRI
+        tBgpRouteNLRI,
+        tBgpASN4Byte
     }
     STATUS      current
     DESCRIPTION
@@ -19677,7 +22119,8 @@ tBgp4PathAttrInvalid             NOTIFICATION-TYPE
         tBgpPeerNgAddr,
         tBgp4PathAttrType,
         tBgp4PathAttrLength,
-        tBgp4PathAttribute
+        tBgp4PathAttribute,
+        tBgpASN4Byte
     }
     STATUS      current
     DESCRIPTION
@@ -19695,7 +22138,8 @@ tBgp4WithdrawnRtFromUpdateError  NOTIFICATION-TYPE
         vRtrID,
         tBgpPeerNgAddrType,
         tBgpPeerNgAddr,
-        tBgp4WithdrawnRoutePrefix
+        tBgp4WithdrawnRoutePrefix,
+        tBgpASN4Byte
     }
     STATUS      current
     DESCRIPTION
@@ -19714,7 +22158,8 @@ tBgp4UpdateInvalid               NOTIFICATION-TYPE
         vRtrID,
         tBgpPeerNgAddrType,
         tBgpPeerNgAddr,
-        tBgp4UpdateMessage
+        tBgp4UpdateMessage,
+        tBgpASN4Byte
     }
     STATUS      current
     DESCRIPTION
@@ -19747,7 +22192,8 @@ tBgpReceivedInvalidNlri          NOTIFICATION-TYPE
 
 tBgpMaxNgPfxLmt                  NOTIFICATION-TYPE
     OBJECTS     {
-        tBgpPeerNgPfxLmtMaxPrefix
+        tBgpPeerNgPfxLmtMaxPrefix,
+        tBgpASN4Byte
     }
     STATUS      current
     DESCRIPTION
@@ -19765,7 +22211,8 @@ tBgpMaxNgPfxLmt                  NOTIFICATION-TYPE
 tBgpMaxNgPfxLmtThresholdReached  NOTIFICATION-TYPE
     OBJECTS     {
         tBgpPeerNgPfxLmtMaxPrefix,
-        tBgpPeerNgPfxLmtThreshold
+        tBgpPeerNgPfxLmtThreshold,
+        tBgpASN4Byte
     }
     STATUS      current
     DESCRIPTION
@@ -19784,7 +22231,8 @@ tBgpMaxNgPfxLmtThresholdReached  NOTIFICATION-TYPE
 
 tBgpInstanceDynamicPeerLmtReachd NOTIFICATION-TYPE
     OBJECTS     {
-        tBgpInstanceDynamicPeerLimit
+        tBgpInstanceDynamicPeerLimit,
+        tBgpASN4Byte
     }
     STATUS      current
     DESCRIPTION
@@ -19800,7 +22248,8 @@ tBgpInstanceDynamicPeerLmtReachd NOTIFICATION-TYPE
 
 tBgpPGDynamicPeerLmtReached      NOTIFICATION-TYPE
     OBJECTS     {
-        tBgpPGDynamicPeerLimit
+        tBgpPGDynamicPeerLimit,
+        tBgpASN4Byte
     }
     STATUS      current
     DESCRIPTION
@@ -19821,7 +22270,8 @@ tBgp4PathAttrDiscarded           NOTIFICATION-TYPE
         tBgpPeerNgAddr,
         tBgp4PathAttrType,
         tBgp4PathAttrLength,
-        tBgp4PathAttribute
+        tBgp4PathAttribute,
+        tBgpASN4Byte
     }
     STATUS      current
     DESCRIPTION
@@ -19834,5 +22284,22 @@ tBgp4PathAttrDiscarded           NOTIFICATION-TYPE
 
          [RECOVERY] There is no recovery required for this notification."
     ::= { tBgpNotifications 24 }
+
+tBgpInstConvStateTransition      NOTIFICATION-TYPE
+    OBJECTS     {
+        tBgpConvergenceState,
+        tBgpConvergenceFamily,
+        tBgpOldConvergenceState
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The tBgpInstConvStateTransition notification is  generated
+         when the convergence state for IPv4-unicast transitions from partial
+         to converged.
+
+         [EFFECT] A log entry is generated.
+
+         [RECOVERY] There is no recovery required for this notification."
+    ::= { tBgpNotifications 25 }
 
 END

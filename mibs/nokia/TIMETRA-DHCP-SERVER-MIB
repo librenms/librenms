@@ -22,6 +22,7 @@ IMPORTS
     TItemDescription, TNamedItem,
     TNamedItemOrEmpty, TmnxActionType,
     TmnxAdminState, TmnxCreateOrigin,
+    TmnxDhcpOptionDisplay,
     TmnxDhcpOptionType,
     TmnxDhcpServerDUIDTypeCode,
     TmnxPppoeUserNameOrEmpty, TmnxVRtrID,
@@ -42,7 +43,7 @@ timetraDhcpServerMIBModule       MODULE-IDENTITY
          (Dynamic Host Configuration Protocol) server for the Nokia SROS
          device.
 
-         Copyright 2008-2017 Nokia. All rights reserved. Reproduction of this
+         Copyright 2008-2018 Nokia. All rights reserved. Reproduction of this
          document is authorized on the condition that the foregoing copyright
          notice is included.
 
@@ -975,7 +976,8 @@ TmnxDhcpSvrPoolOptionEntry       ::= SEQUENCE
     tmnxDhcpSvrPoolOptionRowStatus   RowStatus,
     tmnxDhcpSvrPoolOptionLastCh      TimeStamp,
     tmnxDhcpSvrPoolOptionType        TmnxDhcpOptionType,
-    tmnxDhcpSvrPoolOptionValue       OCTET STRING
+    tmnxDhcpSvrPoolOptionValue       OCTET STRING,
+    tmnxDhcpSvrPoolOptionDisplay     TmnxDhcpOptionDisplay
 }
 
 tmnxDhcpSvrPoolOptionNumber      OBJECT-TYPE
@@ -1035,6 +1037,15 @@ tmnxDhcpSvrPoolOptionValue       OBJECT-TYPE
          This object is mandatory at creation time. A zero length value is only
          allowed when the value of tmnxDhcpSvrPoolOptionType is 'hex (3)'."
     ::= { tmnxDhcpSvrPoolOptionEntry 5 }
+
+tmnxDhcpSvrPoolOptionDisplay     OBJECT-TYPE
+    SYNTAX      TmnxDhcpOptionDisplay
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxDhcpSvrPoolOptionDisplay indicates a hint
+         of how the tmnxDhcpSvrPoolOptionValue can be displayed."
+    ::= { tmnxDhcpSvrPoolOptionEntry 6 }
 
 tmnxDhcpServerSubnetTableLastCh  OBJECT-TYPE
     SYNTAX      TimeStamp
@@ -1551,7 +1562,8 @@ TmnxDhcpSvrSubnetOptionEntry     ::= SEQUENCE
     tmnxDhcpSvrSubnetOptionRowStatus RowStatus,
     tmnxDhcpSvrSubnetOptionLastCh    TimeStamp,
     tmnxDhcpSvrSubnetOptionType      TmnxDhcpOptionType,
-    tmnxDhcpSvrSubnetOptionValue     OCTET STRING
+    tmnxDhcpSvrSubnetOptionValue     OCTET STRING,
+    tmnxDhcpSvrSubnetOptionDisplay   TmnxDhcpOptionDisplay
 }
 
 tmnxDhcpSvrSubnetOptionNumber    OBJECT-TYPE
@@ -1592,7 +1604,7 @@ tmnxDhcpSvrSubnetOptionType      OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The value of the object tmnxDhcpSvrSubnetOptionType specifies how the
-         value of this option in stored in tmnxDhcpSvrSubnetOptionValue.
+         value of this option is stored in tmnxDhcpSvrSubnetOptionValue.
 
          The value of this object cannot be set to 'domain (5)' when the value
          of tmnxDhcpServerCfgAddrType is set to 'ipv4(1)'.
@@ -1611,6 +1623,15 @@ tmnxDhcpSvrSubnetOptionValue     OBJECT-TYPE
          This object is mandatory at creation time. A zero length value is only
          allowed when the value of tmnxDhcpSvrSubnetOptionType is 'hex (3)'."
     ::= { tmnxDhcpSvrSubnetOptionEntry 5 }
+
+tmnxDhcpSvrSubnetOptionDisplay   OBJECT-TYPE
+    SYNTAX      TmnxDhcpOptionDisplay
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxDhcpSvrSubnetOptionDisplay indicates a
+         hint of how the tmnxDhcpSvrSubnetOptionValue can be displayed."
+    ::= { tmnxDhcpSvrSubnetOptionEntry 6 }
 
 tmnxDhcpSvrLeaseTable            OBJECT-TYPE
     SYNTAX      SEQUENCE OF TmnxDhcpSvrLeaseEntry
@@ -1837,11 +1858,11 @@ tmnxDhcpSvrLeasePPPoEUserName    OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The value of object tmnxDhcpSvrLeasePPPoEUserName indicates the PPPoE
+        "The value of object tmnxDhcpSvrLeasePPPoEUserName indicates the PPP
          user name.
 
          This object is only relevant if the value of
-         tmnxDhcpSvrLeaseClientType is equal to 'pppoe'."
+         tmnxDhcpSvrLeaseClientType is equal to 'ppp'."
     ::= { tmnxDhcpSvrLeaseEntry 12 }
 
 tmnxDhcpSvrLeaseOpt82CircId      OBJECT-TYPE
@@ -1895,7 +1916,7 @@ tmnxDhcpSvrLeaseIAOptionType     OBJECT-TYPE
         "The value of object tmnxDhcpSvrLeaseIAOptionType indicates the type of
          the option.
 
-         - 'notApplicable (0)': AI is not applicable to this lease.
+         - 'notApplicable (0)': IA is not applicable to this lease.
 
          - 'iaNa (1)':
                 The IA_NA option type is used to request the assignment of
@@ -2086,7 +2107,10 @@ TmnxDhcpServerStatsEntry         ::= SEQUENCE
     tmnxDhcpSvrStatsDropIntWithFo    Counter32,
     tmnxDhcpSvrStatsDropIntConflicts Counter32,
     tmnxDhcpSvrStatsDropAudit        Counter32,
-    tmnxDhcpSvrStatsDropTxFailed     Counter32
+    tmnxDhcpSvrStatsDropTxFailed     Counter32,
+    tmnxDhcpSvrStatsRxIntReqPpp      Counter64,
+    tmnxDhcpSvrStatsRxIntReqIpoe     Counter64,
+    tmnxDhcpSvrStatsRxIntReqIpsec    Counter64
 }
 
 tmnxDhcpSvrStatsRxDiscovers      OBJECT-TYPE
@@ -2387,7 +2411,7 @@ tmnxDhcpSvrStatsDropDuplDiffGi   OBJECT-TYPE
 tmnxDhcpSvrStatsRxIntRequests    OBJECT-TYPE
     SYNTAX      Counter64
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxDhcpSvrStatsRxIntRequests indicates the number of
          internal request calls received by the DHCP server instance from the
@@ -2456,6 +2480,36 @@ tmnxDhcpSvrStatsDropTxFailed     OBJECT-TYPE
         "The value of tmnxDhcpSvrStatsDropTxFailed indicates the number of DHCP
          responses dropped because this server instance could not transmit it."
     ::= { tmnxDhcpServerStatsEntry 36 }
+
+tmnxDhcpSvrStatsRxIntReqPpp      OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDhcpSvrStatsRxIntReqPpp indicates the number of
+         internal request calls received by the DHCP server instance from the
+         local address assignment infrastructure for PPP."
+    ::= { tmnxDhcpServerStatsEntry 37 }
+
+tmnxDhcpSvrStatsRxIntReqIpoe     OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDhcpSvrStatsRxIntReqIpoe indicates the number of
+         internal request calls received by the DHCP server instance from the
+         local address assignment infrastructure for IPoE."
+    ::= { tmnxDhcpServerStatsEntry 38 }
+
+tmnxDhcpSvrStatsRxIntReqIpsec    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDhcpSvrStatsRxIntReqIpsec indicates the number of
+         internal request calls received by the DHCP server instance from the
+         local address assignment infrastructure for IPsec."
+    ::= { tmnxDhcpServerStatsEntry 39 }
 
 tmnxDhcpSvrDeclinedAddrTable     OBJECT-TYPE
     SYNTAX      SEQUENCE OF TmnxDhcpSvrDeclinedAddrEntry
@@ -2558,11 +2612,11 @@ tmnxDhcpSvrDeclinedAddrUserName  OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The value of object tmnxDhcpSvrDeclinedAddrUserName indicates the
-         PPPoE user name.
+        "The value of object tmnxDhcpSvrDeclinedAddrUserName indicates the PPP
+         user name.
 
          This object is only relevant if the value of
-         tmnxDhcpSvrDeclinedAddrClientType is equal to 'pppoe'."
+         tmnxDhcpSvrDeclinedAddrClientType is equal to 'ppp'."
     ::= { tmnxDhcpSvrDeclinedAddrEntry 7 }
 
 tmnxDhcpSvrDeclinedAddrCircId    OBJECT-TYPE
@@ -4147,7 +4201,8 @@ TmnxDhcpServerStats6Entry        ::= SEQUENCE
     tmnxDhcpSvrStats6DropAudit       Counter64,
     tmnxDhcpSvrStats6RxLeasequeries  Counter64,
     tmnxDhcpSvrStats6TxLqReplies     Counter64,
-    tmnxDhcpSvrStats6DropLqNotAllow  Counter32
+    tmnxDhcpSvrStats6DropLqNotAllow  Counter32,
+    tmnxDhcpSvrStats6RxIntIpsec      Counter64
 }
 
 tmnxDhcpSvrStats6RxSolicits      OBJECT-TYPE
@@ -4507,6 +4562,16 @@ tmnxDhcpSvrStats6DropLqNotAllow  OBJECT-TYPE
          DHCP leasequery packets dropped by the server instance because the
          server is configured not to allow leasequery packets."
     ::= { tmnxDhcpServerStats6Entry 36 }
+
+tmnxDhcpSvrStats6RxIntIpsec      OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDhcpSvrStats6RxIntIpsec indicates the number of
+         internal request calls received by the DHCP server instance from the
+         local address assignment infrastructure for IPsec."
+    ::= { tmnxDhcpServerStats6Entry 37 }
 
 tmnxDhcpSvrSubnetStats6Table     OBJECT-TYPE
     SYNTAX      SEQUENCE OF TmnxDhcpSvrSubnetStats6Entry
@@ -7858,7 +7923,8 @@ TmnxDhcpsDefOptionEntry          ::= SEQUENCE
     tmnxDhcpsDefOptionRowStatus      RowStatus,
     tmnxDhcpsDefOptionLastCh         TimeStamp,
     tmnxDhcpsDefOptionType           TmnxDhcpOptionType,
-    tmnxDhcpsDefOptionValue          OCTET STRING
+    tmnxDhcpsDefOptionValue          OCTET STRING,
+    tmnxDhcpsDefOptionDisplay        TmnxDhcpOptionDisplay
 }
 
 tmnxDhcpsDefOptionNumber         OBJECT-TYPE
@@ -7918,6 +7984,15 @@ tmnxDhcpsDefOptionValue          OBJECT-TYPE
          This object is mandatory at creation time. A zero length value is only
          allowed when the value of tmnxDhcpsDefOptionType is 'hex (3)'."
     ::= { tmnxDhcpsDefOptionEntry 5 }
+
+tmnxDhcpsDefOptionDisplay        OBJECT-TYPE
+    SYNTAX      TmnxDhcpOptionDisplay
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxDhcpsDefOptionDisplay indicates a hint of
+         how the tmnxDhcpsDefOptionValue can be displayed."
+    ::= { tmnxDhcpsDefOptionEntry 6 }
 
 tmnxDhcpServerNotificationObjs   OBJECT IDENTIFIER ::= { tmnxDhcpServer 2 }
 
@@ -8370,7 +8445,7 @@ tmnxDhcpServerV14v0Compliance    MODULE-COMPLIANCE
     ::= { tmnxDhcpServerCompliances 9 }
 
 tmnxDhcpServerV15v0Compliance    MODULE-COMPLIANCE
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The compliance statement for management of DHCP Server on Nokia SROS
          series systems release 15.0."
@@ -8404,6 +8479,44 @@ tmnxDhcpServerV15v0Compliance    MODULE-COMPLIANCE
             tmnxDhcpsAutoProvisionGroup
         }
     ::= { tmnxDhcpServerCompliances 10 }
+
+tmnxDhcpServerV16v0Compliance    MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of DHCP Server on Nokia SROS
+         series systems release 16.0."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxDhcpServerV8v0Group,
+            tmnxDhcpServerV9v0Group,
+            tmnxDhcpServerV10v0Group,
+            tmnxDhcpServerV12v0Group,
+            tmnxDhcpServerV13v0Group,
+            tmnxDhcpServerV16v0Group,
+            tmnxDhcpServerDuidGroup,
+            tmnxDhcpLeaseGroup,
+            tmnxDhcpLeaseV12v0Group,
+            tmnxDhcpStatsV8v0Group,
+            tmnxDhcpStatsV9v0Group,
+            tmnxDhcpStatsV13v0Group,
+            tmnxDhcpAddrListGroup,
+            tmnxDhcpToolsGroup,
+            tmnxDhcpSvrNotifGroup,
+            tmnxDhcpSvrNotifV10v0Group,
+            tmnxDhcpSvrNotifV12v0Group,
+            tmnxDhcpSvrNotifV13v0Group,
+            tmnxDhcpsFailoverGroup,
+            tmnxDhcpsFailoverV10v0Group,
+            tmnxDhcpsFailoverV11v0Group,
+            tmnxDhcpsFailoverV12v0Group,
+            tmnxDhcpSvrFoNotifGroup,
+            tmnxDhcpServerStickyLseGroup,
+            tmnxDhcpsPrefixLenExtensionGroup,
+            tmnxDhcpsAutoProvisionGroup,
+            tmnxDhcpStatsV16v0Group,
+            tmnxDhcpIntReqStatsGroup
+        }
+    ::= { tmnxDhcpServerCompliances 11 }
 
 tmnxDhcpServerGroups             OBJECT IDENTIFIER ::= { tmnxDhcpServerConformance 2 }
 
@@ -9051,7 +9164,7 @@ tmnxDhcpStatsV11v0Group          OBJECT-GROUP
         tmnxDhcpSvrSubnetStatsFoOfferP,
         tmnxDhcpSvrSubnetStatsFoOfferPT
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The group of objects providing DHCP statistics on Nokia SROS series
          systems since release 11.0."
@@ -9353,6 +9466,186 @@ tmnxDhcpsAutoProvisionGroup      OBJECT-GROUP
          capability on Nokia SROS series systems."
     ::= { tmnxDhcpServerGroups 29 }
 
+tmnxDhcpStatsV16v0Group          OBJECT-GROUP
+    OBJECTS     {
+        tmnxDhcpSvrPoolStatsFree,
+        tmnxDhcpSvrPoolStatsOffered,
+        tmnxDhcpSvrPoolStatsStable,
+        tmnxDhcpSvrPoolStatsFRPending,
+        tmnxDhcpSvrPoolStatsRemPending,
+        tmnxDhcpSvrPoolStatsDeclined,
+        tmnxDhcpSvrPoolStatsFoFree,
+        tmnxDhcpSvrPoolStatsFoOffered,
+        tmnxDhcpSvrPoolStatsFoStable,
+        tmnxDhcpSvrPoolStatsFoFRPend,
+        tmnxDhcpSvrPoolStatsFoRemPend,
+        tmnxDhcpSvrPoolStatsFoDeclined,
+        tmnxDhcpSvrPoolStatsProv,
+        tmnxDhcpSvrPoolStatsFoProv,
+        tmnxDhcpSvrPoolStatsHasExt,
+        tmnxDhcpSvrPoolStatsExtResetT,
+        tmnxDhcpSvrPoolStatsStableP,
+        tmnxDhcpSvrPoolStatsStablePT,
+        tmnxDhcpSvrPoolStatsFoStableP,
+        tmnxDhcpSvrPoolStatsFoStablePT,
+        tmnxDhcpSvrPoolStatsUsed,
+        tmnxDhcpSvrPoolStatsUsedP,
+        tmnxDhcpSvrPoolStatsUsedPT,
+        tmnxDhcpSvrPoolStatsFoUsed,
+        tmnxDhcpSvrPoolStatsFoUsedP,
+        tmnxDhcpSvrPoolStatsFoUsedPT,
+        tmnxDhcpSvrPoolStatsFree,
+        tmnxDhcpSvrPoolStatsFreeP,
+        tmnxDhcpSvrPoolStatsFreePT,
+        tmnxDhcpSvrPoolStatsFoFree,
+        tmnxDhcpSvrPoolStatsFoFreeP,
+        tmnxDhcpSvrPoolStatsFoFreePT,
+        tmnxDhcpSvrPoolStatsUsedPct,
+        tmnxDhcpSvrPoolStatsUsedPctP,
+        tmnxDhcpSvrPoolStatsUsedPctPT,
+        tmnxDhcpSvrPoolStatsFoUsdPct,
+        tmnxDhcpSvrPoolStatsFoUsdPctP,
+        tmnxDhcpSvrPoolStatsFoUsdPctPT,
+        tmnxDhcpSvrPoolStatsFreePct,
+        tmnxDhcpSvrPoolStatsFreePctP,
+        tmnxDhcpSvrPoolStatsFreePctPT,
+        tmnxDhcpSvrPoolStatsFoFrePct,
+        tmnxDhcpSvrPoolStatsFoFrePctP,
+        tmnxDhcpSvrPoolStatsFoFrePctPT,
+        tmnxDhcpSvrPoolStatsOfferP,
+        tmnxDhcpSvrPoolStatsOfferPT,
+        tmnxDhcpSvrPoolStatsFoOfferP,
+        tmnxDhcpSvrPoolStatsFoOfferPT,
+        tmnxDhcpSvrStatsRxIntReleases,
+        tmnxDhcpSvrStatsDropIntWithLudb,
+        tmnxDhcpSvrStatsDropIntWithFo,
+        tmnxDhcpSvrStatsDropIntConflicts,
+        tmnxDhcpSvrStatsDropTxFailed,
+        tmnxDhcpSvrSubnetStats6HasExt,
+        tmnxDhcpSvrSubnetStats6ExtResetT,
+        tmnxDhcpSvrSubnetStats6StableP,
+        tmnxDhcpSvrSubnetStats6StablePT,
+        tmnxDhcpSvrSubnetStats6ProvBlk,
+        tmnxDhcpSvrSubnetStats6UsedBlk,
+        tmnxDhcpSvrSubnetStats6UsedBlkP,
+        tmnxDhcpSvrSubnetStats6UsedBlkPT,
+        tmnxDhcpSvrSubnetStats6FreeBlk,
+        tmnxDhcpSvrSubnetStats6FreeBlkP,
+        tmnxDhcpSvrSubnetStats6FreeBlkPT,
+        tmnxDhcpSvrSubnetStats6UsedPct,
+        tmnxDhcpSvrSubnetStats6UsedPctP,
+        tmnxDhcpSvrSubnetStats6UsedPctPT,
+        tmnxDhcpSvrSubnetStats6FreePct,
+        tmnxDhcpSvrSubnetStats6FreePctP,
+        tmnxDhcpSvrSubnetStats6FreePctPT,
+        tmnxDhcpSvrSubnetStats6AdvertP,
+        tmnxDhcpSvrSubnetStats6AdvertPT,
+        tmnxDhcpsPoolStats6Stable,
+        tmnxDhcpsPoolStats6FoStable,
+        tmnxDhcpsPoolStats6HasExt,
+        tmnxDhcpsPoolStats6ExtResetT,
+        tmnxDhcpsPoolStats6StableP,
+        tmnxDhcpsPoolStats6StablePT,
+        tmnxDhcpsPoolStats6FoStableP,
+        tmnxDhcpsPoolStats6FoStablePT,
+        tmnxDhcpsPoolStats6ProvBlk,
+        tmnxDhcpsPoolStats6FoProvBlk,
+        tmnxDhcpsPoolStats6UsedBlk,
+        tmnxDhcpsPoolStats6UsedBlkP,
+        tmnxDhcpsPoolStats6UsedBlkPT,
+        tmnxDhcpsPoolStats6FoUsedBlk,
+        tmnxDhcpsPoolStats6FoUsedBlkP,
+        tmnxDhcpsPoolStats6FoUsedBlkPT,
+        tmnxDhcpsPoolStats6FreeBlk,
+        tmnxDhcpsPoolStats6FreeBlkP,
+        tmnxDhcpsPoolStats6FreeBlkPT,
+        tmnxDhcpsPoolStats6FoFreeBlk,
+        tmnxDhcpsPoolStats6FoFreeBlkP,
+        tmnxDhcpsPoolStats6FoFreeBlkPT,
+        tmnxDhcpsPoolStats6UsedPct,
+        tmnxDhcpsPoolStats6UsedPctP,
+        tmnxDhcpsPoolStats6UsedPctPT,
+        tmnxDhcpsPoolStats6FoUsedPct,
+        tmnxDhcpsPoolStats6FoUsedPctP,
+        tmnxDhcpsPoolStats6FoUsedPctPT,
+        tmnxDhcpsPoolStats6FreePct,
+        tmnxDhcpsPoolStats6FreePctP,
+        tmnxDhcpsPoolStats6FreePctPT,
+        tmnxDhcpsPoolStats6FoFreePct,
+        tmnxDhcpsPoolStats6FoFreePctP,
+        tmnxDhcpsPoolStats6FoFreePctPT,
+        tmnxDhcpsPoolStats6Advertise,
+        tmnxDhcpsPoolStats6AdvertP,
+        tmnxDhcpsPoolStats6AdvertPT,
+        tmnxDhcpsPoolStats6FoAdvertise,
+        tmnxDhcpsPoolStats6FoAdvertP,
+        tmnxDhcpsPoolStats6FoAdvertPT,
+        tmnxDhcpsPoolStats6IntNoPfxWan,
+        tmnxDhcpsPoolStats6IntNoPfxSlaa,
+        tmnxDhcpSvrSubnetStatsHasExt,
+        tmnxDhcpSvrSubnetStatsExtResetT,
+        tmnxDhcpSvrSubnetStatsStableP,
+        tmnxDhcpSvrSubnetStatsStablePT,
+        tmnxDhcpSvrSubnetStatsFoStableP,
+        tmnxDhcpSvrSubnetStatsFoStablePT,
+        tmnxDhcpSvrSubnetStatsUsed,
+        tmnxDhcpSvrSubnetStatsUsedP,
+        tmnxDhcpSvrSubnetStatsUsedPT,
+        tmnxDhcpSvrSubnetStatsFoUsed,
+        tmnxDhcpSvrSubnetStatsFoUsedP,
+        tmnxDhcpSvrSubnetStatsFoUsedPT,
+        tmnxDhcpSvrSubnetStatsFreeP,
+        tmnxDhcpSvrSubnetStatsFreePT,
+        tmnxDhcpSvrSubnetStatsFoFreeP,
+        tmnxDhcpSvrSubnetStatsFoFreePT,
+        tmnxDhcpSvrSubnetStatsUsedPct,
+        tmnxDhcpSvrSubnetStatsUsedPctP,
+        tmnxDhcpSvrSubnetStatsUsedPctPT,
+        tmnxDhcpSvrSubnetStatsFoUsdPct,
+        tmnxDhcpSvrSubnetStatsFoUsdPctP,
+        tmnxDhcpSvrSubnetStatsFoUsdPctPT,
+        tmnxDhcpSvrSubnetStatsFreePct,
+        tmnxDhcpSvrSubnetStatsFreePctP,
+        tmnxDhcpSvrSubnetStatsFreePctPT,
+        tmnxDhcpSvrSubnetStatsFoFrePct,
+        tmnxDhcpSvrSubnetStatsFoFrePctP,
+        tmnxDhcpSvrSubnetStatsFoFrePctPT,
+        tmnxDhcpSvrSubnetStatsOfferP,
+        tmnxDhcpSvrSubnetStatsOfferPT,
+        tmnxDhcpSvrSubnetStatsFoOfferP,
+        tmnxDhcpSvrSubnetStatsFoOfferPT
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects providing DHCP statistics on Nokia SROS series
+         systems since release 11.0."
+    ::= { tmnxDhcpServerGroups 30 }
+
+tmnxDhcpIntReqStatsGroup         OBJECT-GROUP
+    OBJECTS     {
+        tmnxDhcpSvrStatsRxIntReqPpp,
+        tmnxDhcpSvrStatsRxIntReqIpoe,
+        tmnxDhcpSvrStatsRxIntReqIpsec,
+        tmnxDhcpSvrStats6RxIntIpsec
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects providing DHCP statistics on Nokia SROS series
+         systems for internal requests."
+    ::= { tmnxDhcpServerGroups 31 }
+
+tmnxDhcpServerV16v0Group         OBJECT-GROUP
+    OBJECTS     {
+        tmnxDhcpSvrPoolOptionDisplay,
+        tmnxDhcpSvrSubnetOptionDisplay,
+        tmnxDhcpsDefOptionDisplay
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting DHCP server capability on Nokia SROS
+         series systems added in release 16.0."
+    ::= { tmnxDhcpServerGroups 32 }
+
 tmnxDhcpsObsoletedNotifyGroup    NOTIFICATION-GROUP
     NOTIFICATIONS {
         tmnxDhcpSvrSubnetBindingCreate,
@@ -9377,7 +9670,8 @@ tmnxDhcpsObsoleteGroup           OBJECT-GROUP
         tmnxDhcpSvrSubnetBindUnbindTime,
         tmnxDhcpSvrSubnetBindState,
         tmnxDhcpSvrSubntBndngTbleLastCh,
-        tmnxDhcpSvrSubnetBindActive
+        tmnxDhcpSvrSubnetBindActive,
+        tmnxDhcpSvrStatsRxIntRequests
     }
     STATUS      current
     DESCRIPTION
