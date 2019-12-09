@@ -17,6 +17,27 @@ $param = array();
 
 $pagetitle[] = 'Alert Log';
 
+$alert_states = array(
+    // divined from librenms/alerts.php
+    'any' => -1,
+    'Ok (recovered)' => 0,
+    'Alert' => 1,
+//    'Acknowledged' => 2,
+    'Worse' => 3,
+    'Better' => 4,
+);
+
+$alert_severities = array(
+    // alert_rules.status is enum('ok','warning','critical')
+    'Any' => '',
+    'Ok, warning and critical' => 1,
+    'Warning and critical' => 2,
+    'Critical' => 3,
+    'OK' => 4,
+    'Warning' => 5,
+    'Critical' => 6,
+);
+
 echo '<div class="panel panel-default panel-condensed">
                 <div class="panel-heading">
                     <div class="row">
@@ -31,20 +52,24 @@ echo '<div class="panel panel-default panel-condensed">
             ';
 
 if (isset($_POST['device_id'])) {
-    $default_option = '<option value="' . (int)$_POST['device_id'] . '" selected="selected">';
-    $default_option .= htmlentities($_POST['hostname']) . '</option>';
+    $selected_device = '<option value="' . (int)$_POST['device_id'] . '" selected="selected">';
+    $selected_device .= htmlentities($_POST['hostname']) . '</option>';
 } else {
-    $default_option = '';
+    $selected_device = '';
 }
 if (isset($_POST['state'])) {
-    $selected_state = htmlspecialchars($_POST['state']);
+    $selected_state = '<option value="' . $_POST['state'] . '" selected="selected">';
+    $selected_state .= array_search((int)$_POST['state'], $alert_states) . '</option>';
 } else {
-    $selected_state = '-1';
+    $selected_state = '';
+    $_POST['state'] = -1;
 }
 if (isset($_POST['min_severity'])) {
-    $selected_min_severity = htmlspecialchars($_POST['min_severity']);
+    $selected_min_severity = '<option value="' . $_POST['min_severity'] . '" selected="selected">';
+    $selected_min_severity .= array_search((int)$_POST['min_severity'], $alert_severities) . '</option>';
 } else {
-    $selected_min_severity = '1';
+    $selected_min_severity = '';
+    $_POST['min_severity'] = '';
 }
 
 ?>
@@ -80,7 +105,7 @@ if (isset($_POST['min_severity'])) {
                 <strong>Device&nbsp;</strong> \
                 </label> \
                 <select name="device_id" id="device_id" class="form-control input-sm" style="min-width: 175px;"> \
-                <?php echo $default_option; ?> \
+                <?php echo $selected_device; ?> \
                </select> \
                </div> \
                <div class="form-group"> \
@@ -88,7 +113,7 @@ if (isset($_POST['min_severity'])) {
                <strong>&nbsp;State&nbsp;</strong> \
                </label> \
                <select name="state" id="state" class="form-control input-sm"> \
-               0 \
+                <?php echo $selected_state; ?> \
                <option value="-1">Any</option> \
                <option value="0">Ok (recovered)</option> \
                <option value="1">Alert</option> \
@@ -101,6 +126,7 @@ if (isset($_POST['min_severity'])) {
                <strong>&nbsp;Severity&nbsp;</strong> \
                </label> \
                <select name="min_severity" id="min_severity" class="form-control input-sm"> \
+                <?php echo $selected_min_severity; ?> \
                <option value>Any</option> \
                <option value="3">Critical</option> \
                <option value="5">Warning</option> \
@@ -117,8 +143,8 @@ if (isset($_POST['min_severity'])) {
             return {
                 id: "alertlog",
                 device_id: '<?php echo htmlspecialchars($_POST['device_id']); ?>',
-                state: '<?php echo $selected_state; ?>',
-                min_severity: '<?php echo $selected_min_severity; ?>'
+                state: '<?php echo htmlspecialchars($_POST['state']);; ?>',
+                min_severity: '<?php echo htmlspecialchars($_POST['min_severity']); ?>'
             };
         },
         url: "ajax_table.php"
