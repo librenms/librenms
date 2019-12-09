@@ -34,8 +34,7 @@ $alert_severities = array(
     'Warning and critical' => 2,
     'Critical' => 3,
     'OK' => 4,
-    'Warning' => 5,
-    'Critical' => 6,
+    'Warning' => 5
 );
 
 echo '<div class="panel panel-default panel-condensed">
