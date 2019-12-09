@@ -142,7 +142,7 @@ if (isset($_POST['min_severity'])) {
             return {
                 id: "alertlog",
                 device_id: '<?php echo htmlspecialchars($_POST['device_id']); ?>',
-                state: '<?php echo htmlspecialchars($_POST['state']);; ?>',
+                state: '<?php echo htmlspecialchars($_POST['state']); ?>',
                 min_severity: '<?php echo htmlspecialchars($_POST['min_severity']); ?>'
             };
         },
