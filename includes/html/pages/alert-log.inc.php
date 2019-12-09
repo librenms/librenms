@@ -19,7 +19,7 @@ $pagetitle[] = 'Alert Log';
 
 $alert_states = array(
     // divined from librenms/alerts.php
-    'any' => -1,
+    'Any' => -1,
     'Ok (recovered)' => 0,
     'Alert' => 1,
 //    'Acknowledged' => 2,
