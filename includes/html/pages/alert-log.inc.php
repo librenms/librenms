@@ -41,7 +41,11 @@ if (isset($_POST['state'])) {
 } else {
     $state = '-1';
 }
-
+if (isset($_POST['min_severity'])) {
+    $min_severity = htmlspecialchars($_POST['state']);
+} else {
+    $min_severity = '1';
+}
 
 ?>
 
@@ -89,6 +93,19 @@ if (isset($_POST['state'])) {
                <option value="1">Alert</option> \
                </select> \
                </div> \
+               <div class="form-group"> \
+               <label> \
+               <strong>&nbsp;Minimal severity&nbsp;</strong> \
+               </label> \
+               <select name="min_severity" id="state" class="form-control input-sm"> \
+               <option value="1">Ok</option> \
+               <option value="2">Warning</option> \
+               <option value="3">Critical</option> \
+               <option value="4">Ok only</option> \
+               <option value="5">Warning only</option> \
+               <option value="6">Critical only</option> \
+               </select> \
+               </div> \
                <button type="submit" class="btn btn-default input-sm">Filter</button> \
                </form></span></div> \
                <div class="col-sm-4 actionBar"><p class="{{css.search}}"></p><p class="{{css.actions}}"></p></div></div></div>'
@@ -97,7 +114,8 @@ if (isset($_POST['state'])) {
             return {
                 id: "alertlog",
                 device_id: '<?php echo htmlspecialchars($_POST['device_id']); ?>',
-                state: '<?php echo $state; ?>'
+                state: '<?php echo $state; ?>',
+                $common_output[] = '<?php echo min_severity; ?>'
             };
         },
         url: "ajax_table.php"
