@@ -37,14 +37,14 @@ if (isset($_POST['device_id'])) {
     $default_option = '';
 }
 if (isset($_POST['state'])) {
-    $state = htmlspecialchars($_POST['state']);
+    $selected_state = htmlspecialchars($_POST['state']);
 } else {
-    $state = '-1';
+    $selected_state = '-1';
 }
 if (isset($_POST['min_severity'])) {
-    $min_severity = htmlspecialchars($_POST['min_severity']);
+    $selected_min_severity = htmlspecialchars($_POST['min_severity']);
 } else {
-    $min_severity = '1';
+    $selected_min_severity = '1';
 }
 
 ?>
@@ -88,6 +88,7 @@ if (isset($_POST['min_severity'])) {
                <strong>&nbsp;State&nbsp;</strong> \
                </label> \
                <select name="state" id="state" class="form-control input-sm"> \
+               0 \
                <option value="-1">Any</option> \
                <option value="0">Ok (recovered)</option> \
                <option value="1">Alert</option> \
@@ -116,8 +117,8 @@ if (isset($_POST['min_severity'])) {
             return {
                 id: "alertlog",
                 device_id: '<?php echo htmlspecialchars($_POST['device_id']); ?>',
-                state: '<?php echo $state; ?>',
-                min_severity: '<?php echo $min_severity; ?>'
+                state: '<?php echo $selected_state; ?>',
+                min_severity: '<?php echo $selected_min_severity; ?>'
             };
         },
         url: "ajax_table.php"
