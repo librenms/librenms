@@ -103,6 +103,7 @@ try {
     }
 
     if ($db_rev == 1000) {
+        $migrate_opts['--seed'] = true;
         $return = Artisan::call('migrate', $migrate_opts);
         echo Artisan::output();
     }
