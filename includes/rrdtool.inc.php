@@ -278,7 +278,7 @@ function rrdtool_escape($string, $length = null)
     $result = shorten_interface_type($string);
     $result = str_replace("'", '', $result);            # remove quotes
     if (is_numeric($length)) {
-        $extra = substr_count($string, ':', 0, $length);
+        $extra = substr_count($string, ':', 0, min(strlen($string), $length));
         $result = substr(str_pad($result, $length), 0, ($length + $extra));
         if ($extra > 0) {
             $result = substr($result, 0, (-1 * $extra));
