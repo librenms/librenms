@@ -96,7 +96,8 @@ function rrdtool_close()
  * @param $command The command to send to the rrdtool process
  * @return array The output of stdout and stderr in an array
  */
-function rrdtool_sync_command($cmd) {
+function rrdtool_sync_command($cmd) 
+{
     global $debug, $rrd_sync_process;
     /** @var Proc $rrd_sync_process */
 
