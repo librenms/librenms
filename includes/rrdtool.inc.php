@@ -90,6 +90,37 @@ function rrdtool_close()
 }
 
 /**
+ * Send synchronous rrd command and wait *PROPERLY* for response.
+ *
+ * @internal
+ * @param $command The command to send to the rrdtool process
+ * @return array The output of stdout and stderr in an array
+ */
+function rrdtool_sync_command($cmd) {
+    global $debug, $rrd_sync_process;
+    /** @var Proc $rrd_sync_process */
+
+    if (rrdtool_initialize(false)) {
+        if ($debug) {
+            echo "<p>$cmd</p>\n";
+        }
+        $output = $rrd_sync_process->sendCommand($cmd);
+        while ($output[1] == "" && !preg_match('/^(?:OK |ERROR:)/m', $output[0])) {
+            $append = $rrd_sync_process->getOutput();
+            $output[0] .= $append[0];
+            $output[1] .= $append[1];
+        }
+        if ($debug) {
+            echo "<p>STDOUT:\n" . $output[0] . "</p>";
+            echo "<p>STDERR:\n" . $output[1] . "</p>";
+        }
+        return $output;
+    } else {
+        throw new Exception('rrdtool could not start');
+    }
+}
+
+/**
  * Generates a graph file at $graph_file using $options
  * Opens its own rrdtool pipe.
  *
@@ -99,23 +130,9 @@ function rrdtool_close()
  */
 function rrdtool_graph($graph_file, $options)
 {
-    global $debug, $rrd_sync_process;
-    /** @var Proc $rrd_sync_process */
+    $cmd = rrdtool_build_command('graph', $graph_file, $options);
 
-    if (rrdtool_initialize(false)) {
-        $cmd = rrdtool_build_command('graph', $graph_file, $options);
-
-        $output = implode($rrd_sync_process->sendCommand($cmd));
-
-        if ($debug) {
-            echo "<p>$cmd</p>";
-            echo "<p>command returned ($output)</p>";
-        }
-
-        return $output;
-    } else {
-        return 0;
-    }
+    return implode(rrdtool_sync_command($cmd));
 }
 
 
@@ -157,7 +174,7 @@ function rrdtool($command, $filename, $options)
     // send the command!
     if ($command == 'last' && rrdtool_initialize(false)) {
         // send this to our synchronous process so output is guaranteed
-        $output = $rrd_sync_process->sendCommand($cmd);
+        $output = rrdtool_sync_command($cmd);
     } elseif (rrdtool_initialize()) {
         // don't care about the return of other commands, so send them to the faster async process
         $output = $rrd_async_process->sendCommand($cmd);
