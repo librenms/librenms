@@ -30,6 +30,8 @@ if (empty($insert)) {
 }
 
 if (!empty($insert)) {
+    $update_time_only = [];
+    $now = \Carbon\Carbon::now();
     // synchronize with the database
     foreach ($insert as $vlan_id => $mac_address_table) {
         echo " {$vlans_by_id[$vlan_id]}: ";
@@ -37,43 +39,38 @@ if (!empty($insert)) {
         foreach ($mac_address_table as $mac_address_entry => $entry) {
             if ($existing_fdbs[$vlan_id][$mac_address_entry]) {
                 $new_port = $entry['port_id'];
+                $port_fdb_id = $existing_fdbs[$vlan_id][$mac_address_entry]['ports_fdb_id'];
 
                 if ($existing_fdbs[$vlan_id][$mac_address_entry]['port_id'] != $new_port) {
-                    $port_fdb_id = $existing_fdbs[$vlan_id][$mac_address_entry]['ports_fdb_id'];
-                    dbUpdate(
-                        array('port_id' => $new_port, 'updated_at' => array('NOW()'),),
-                        'ports_fdb',
-                        '`device_id` = ? AND `vlan_id` = ? AND `mac_address` = ?',
-                        array($device['device_id'], $vlan_id, $mac_address_entry)
-                    );
+                    DB::table('ports_fdb')
+                        ->where('ports_fdb_id', $port_fdb_id)
+                        ->update([
+                            'port_id' => $new_port,
+                            'updated_at' => $now,
+                        ]);
                     echo 'U';
                 } else {
-                    dbUpdate(
-                        array('updated_at' => array('NOW()'),), //we need to do this unless we use Eloquent "update" method
-                        'ports_fdb',
-                        '`device_id` = ? AND `vlan_id` = ? AND `mac_address` = ?',
-                        array($device['device_id'], $vlan_id, $mac_address_entry)
-                    );
+                    $update_time_only[] = $port_fdb_id;
                     echo '.';
                 }
                 unset($existing_fdbs[$vlan_id][$mac_address_entry]);
             } else {
-                $new_entry = array(
+                DB::table('ports_fdb')->insert([
                     'port_id' => $entry['port_id'],
                     'mac_address' => $mac_address_entry,
                     'vlan_id' => $vlan_id,
                     'device_id' => $device['device_id'],
-                    'created_at' => array('NOW()'), //we need to do this unless we use Eloquent "create" method
-                    'updated_at' => array('NOW()'), //we need to do this unless we use Eloquent "update" method
-                );
-
-                dbInsert($new_entry, 'ports_fdb');
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ]);
                 echo '+';
             }
         }
 
         echo PHP_EOL;
     }
+
+    DB::table('ports_fdb')->whereIn('ports_fdb_id', $update_time_only)->update(['updated_at' => $now]);
 
     //We do not delete anything here, as daily.sh will take care of the cleaning.
 
@@ -91,5 +88,7 @@ unset(
     $vlans,
     $port,
     $fdbPort_table,
-    $entries
+    $entries,
+    $update_time_only,
+    $now
 );

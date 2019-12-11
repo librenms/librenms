@@ -19,8 +19,8 @@ IMPORTS
    SnmpAdminString
       FROM SNMP-FRAMEWORK-MIB
 	  
-	noDefect, allowTransitionsToIdle, allowTransitionsToLowPower
-		FROM ADSL2-LINE-TC-MIB
+   Adsl2LConfProfPmMode
+      FROM ADSL2-LINE-TC-MIB
 
    HCPerfIntervalThreshold,
    HCPerfTimeElapsed
@@ -72,10 +72,8 @@ IMPORTS
    Xdsl2LineTxRefVnUs,
    Xdsl2BitsAlloc,
    Xdsl2MrefPsdDs,
-   Xdsl2MrefPsdUs,
+   Xdsl2MrefPsdUs
    
-   profile8a, profile8b, profile8c, profile8d,  profile12a, profile12b, profile17a, profile30a
-
           FROM   VDSL2-LINE-TC-MIB       -- [This document]
 
    MODULE-COMPLIANCE,

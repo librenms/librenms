@@ -47,6 +47,7 @@ class GitHub
         'security' => [],
         'device' => [],
         'webui' => [],
+        'authentication' => [],
         'graphs' => [],
         'snmp traps' => [],
         'applications' => [],

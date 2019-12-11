@@ -101,16 +101,29 @@ foreach ($result_options as $option) {
 
 echo '</select></td>';
 
-$query = 'FROM alert_rules';
-$where = '';
 $param = [];
 if (isset($device['device_id']) && $device['device_id'] > 0) {
-    $query .= ' LEFT JOIN alert_device_map ON alert_rules.id=alert_device_map.rule_id';
-    $where   = 'WHERE (device_id=? OR device_id IS NULL)';
+    //device selected
+
+    $global_rules = "SELECT ar1.* FROM alert_rules AS ar1 WHERE ar1.id NOT IN (SELECT agm1.rule_id FROM alert_group_map AS agm1 UNION DISTINCT SELECT adm1.rule_id FROM alert_device_map AS adm1)";
+
+    $device_rules = "SELECT ar2.* FROM alert_rules AS ar2 WHERE ar2.id IN (SELECT adm2.rule_id FROM alert_device_map AS adm2 WHERE adm2.device_id=?)";
     $param[] = $device['device_id'];
+
+    $device_group_rules = "SELECT ar3.* FROM alert_rules AS ar3 WHERE ar3.id IN (SELECT agm3.rule_id FROM alert_group_map AS agm3 LEFT JOIN device_group_device AS dgd3 ON agm3.group_id=dgd3.device_group_id WHERE dgd3.device_id=?)";
+    $param[] = $device['device_id'];
+
+    $full_query = '('. $global_rules .') UNION DISTINCT ('. $device_rules .') UNION DISTINCT ('. $device_group_rules .')';
+} else {
+    // no device selected
+    $full_query = 'SELECT alert_rules.* FROM alert_rules';
 }
 
-$count = dbFetchCell("SELECT COUNT(*) $query $where", $param);
+$full_query .= ' ORDER BY id ASC';
+
+$rule_list = dbFetchRows($full_query, $param);
+$count = count($rule_list);
+
 if (isset($_POST['page_number']) && $_POST['page_number'] > 0 && $_POST['page_number'] <= $count) {
     $page_number = $_POST['page_number'];
 } else {
@@ -118,9 +131,18 @@ if (isset($_POST['page_number']) && $_POST['page_number'] > 0 && $_POST['page_nu
 }
 
 $start = (($page_number - 1) * $results);
-$full_query = "SELECT alert_rules.* $query $where ORDER BY alert_rules.id ASC LIMIT $start,$results";
 
-foreach (dbFetchRows($full_query, $param) as $rule) {
+$index = 0;
+foreach ($rule_list as $rule) {
+    $index++;
+
+    if ($index < $start) {
+        continue;
+    }
+    if ($index > $start + $results) {
+        break;
+    }
+
     $sub   = dbFetchRows('SELECT * FROM alerts WHERE rule_id = ? ORDER BY `state` DESC, `id` DESC LIMIT 1', array($rule['id']));
     $ico   = 'check';
     $col   = 'success';
