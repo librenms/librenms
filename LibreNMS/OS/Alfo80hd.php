@@ -43,8 +43,8 @@ class Alfo80hd extends OS implements
     {
         $oid = '.1.3.6.1.4.1.3373.1103.15.4.1.';
         return array(
-            new WirelessSensor('rate', $this->getDeviceId(), $oid . '17.1', 'alfo80hd-tx-rate', 1, 'Tx Rate'),
-            new WirelessSensor('rate', $this->getDeviceId(), $oid . '18.1', 'alfo80hd-rx-rate', 2, 'Rx Rate'),
+            new WirelessSensor('rate', $this->getDeviceId(), $oid . '17.1', 'alfo80hd-tx-rate', 1, 'Tx Rate', null, 1000, 1),
+            new WirelessSensor('rate', $this->getDeviceId(), $oid . '18.1', 'alfo80hd-rx-rate', 2, 'Rx Rate', null, 1000, 1),
         );
     }
 }
