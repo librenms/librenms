@@ -21,7 +21,7 @@
     "port": "(%ports.deleted = 0 && %ports.ignore = 0 && %ports.disabled = 0)",
     "port_down": "(%ports.ifOperStatus = \"down\" && %ports.ifAdminStatus != \"down\" && %macros.port)",
     "port_up": "(%ports.ifOperStatus = \"up\" && %ports.ifAdminStatus = \"up\" && %macros.port)",
-    "port_usage_perc": "((%ports.ifInOctets_rate*8) \/ %ports.ifSpeed)*100",
+    "port_usage_perc": "((SELECT IF(%ports.ifOutOctets_rate>%ports.ifInOctets_rate, %ports.ifOutOctets_rate, %ports.ifInOctets_rate)*8) \/ %ports.ifSpeed)*100",
     "port_in_usage_perc": "((%ports.ifInOctets_rate*8) \/ %ports.ifSpeed)*100",
     "port_out_usage_perc": "((%ports.ifOutOctets_rate*8) \/ %ports.ifSpeed)*100",
     "port_now_down": "%ports.ifOperStatus != %ports.ifOperStatus_prev && %ports.ifOperStatus_prev = \"up\" && %ports.ifAdminStatus = \"up\" && %macros.port",
