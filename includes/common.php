@@ -1344,13 +1344,13 @@ function get_sql_filter_min_severity($min_severity)
     );
     if (is_numeric($min_severity)) {
         $min_severity_id = $min_severity;
-    } elseif (!empty(($min_severity)) {
+    } elseif (!empty($min_severity)) {
         $min_severity_id = $alert_severities[$min_severity];
     }
     if (isset($min_severity_id)) {
         return " AND `alert_rules`.`severity` " . ($min_severity_id > 3 ? "" : ">") . "= " . ($min_severity_id > 3 ? $min_severity_id - 3 : $min_severity_id);
     }
-    return ""
+    return "";
 }
 
 if (!function_exists('ends_with')) {
