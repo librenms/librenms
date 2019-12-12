@@ -1324,6 +1324,34 @@ function str_i_contains($haystack, $needles)
     return false;
 }
 
+    /**
+     * Get alert_rules sql filter by minimal severity
+     *
+     * @param  string|int $min_severity
+     * @return string
+     */
+
+function get_sql_filter_min_severity($min_severity) {
+    $alert_severities = array(
+        // alert_rules.status is enum('ok','warning','critical')
+        'ok' => 1,
+        'warning' => 2,
+        'critical' => 3,
+        'ok only' => 4,
+        'warning only' => 5,
+        'critical only' => 6,
+    );
+    if (is_numeric($min_severity)) {
+        $min_severity_id = $vars['min_severity'];
+    } elseif (!empty(($min_severity)) {
+        $min_severity_id = $alert_severities[$vars['min_severity']];
+    }
+    if (isset($min_severity_id)) {
+        return " AND `alert_rules`.`severity` " . ($min_severity_id > 3 ? "" : ">") . "= " . ($min_severity_id > 3 ? $min_severity_id - 3 : $min_severity_id);
+    }
+    return ""
+}
+
 if (!function_exists('ends_with')) {
     /**
      * Determine if a given string ends with a given substring.
