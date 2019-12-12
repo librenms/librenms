@@ -37,14 +37,7 @@ if ($vars['state'] >= 0) {
 }
 
 if (isset($vars['min_severity'])) {
-    if (is_numeric($vars['min_severity'])) {
-        $min_severity_id = $vars['min_severity'];
-    } elseif (!empty($vars['min_severity'])) {
-        $min_severity_id = $alert_severities[$vars['min_severity']];
-    }
-    if (isset($min_severity_id)) {
-        $where .= " AND R.`severity` " . ($min_severity_id > 3 ? "" : ">") . "= " . ($min_severity_id > 3 ? $min_severity_id - 3 : $min_severity_id);
-    }
+    $where .=  get_sql_filter_min_severity($vars['min_severity'], "R");
 }
 
 if (Auth::user()->hasGlobalRead()) {
