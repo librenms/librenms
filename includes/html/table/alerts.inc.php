@@ -47,7 +47,7 @@ if (is_numeric($vars['state'])) {
 }
 
 if (isset($vars['min_severity'])) {
-    $where .=  get_sql_filter_min_severity($vars['min_severity']);
+    $where .=  get_sql_filter_min_severity($vars['min_severity'], "alert_rules");
 }
 
 if (is_numeric($vars['group'])) {

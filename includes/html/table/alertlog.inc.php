@@ -26,7 +26,7 @@ if ($vars['state'] >= 0) {
 }
 
 if (isset($vars['min_severity'])) {
-    $where .=  get_sql_filter_min_severity($vars['min_severity']);
+    $where .=  get_sql_filter_min_severity($vars['min_severity'], "R");
 }
 
 if (Auth::user()->hasGlobalRead()) {

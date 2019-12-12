@@ -1328,10 +1328,11 @@ function str_i_contains($haystack, $needles)
      * Get alert_rules sql filter by minimal severity
      *
      * @param  string|int $min_severity
+     * @param  string $alert_rules_name
      * @return string
      */
 
-function get_sql_filter_min_severity($min_severity)
+function get_sql_filter_min_severity($min_severity, $alert_rules_name)
 {
     $alert_severities = array(
         // alert_rules.status is enum('ok','warning','critical')
@@ -1348,7 +1349,7 @@ function get_sql_filter_min_severity($min_severity)
         $min_severity_id = $alert_severities[$min_severity];
     }
     if (isset($min_severity_id)) {
-        return " AND `alert_rules`.`severity` " . ($min_severity_id > 3 ? "" : ">") . "= " . ($min_severity_id > 3 ? $min_severity_id - 3 : $min_severity_id);
+        return " AND `$alert_rules_name`.`severity` " . ($min_severity_id > 3 ? "" : ">") . "= " . ($min_severity_id > 3 ? $min_severity_id - 3 : $min_severity_id);
     }
     return "";
 }
