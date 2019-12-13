@@ -71,11 +71,12 @@ class RoutesTablesController extends TableController
             $query->on('ports.port_id', 'route.port_id');
         };
         $showAllRoutes = trim(\Request::get('showAllRoutes'));
-        $showIPv4 = trim(\Request::get('showIPv4'));
-        $showIPv6 = trim(\Request::get('showIPv6'));
-        $protocols = array();
-        $protocols[] = ($showIPv4 == 'false') ?: 'ipv4';
-        $protocols[] = ($showIPv6 == 'false') ?: 'ipv6';
+        $showProtocols = trim(\Request::get('showProtocols'));
+        if ($showProtocols == 'all') {
+            $protocols = array('ipv4', 'ipv6');
+        } else {
+            $protocols = array($showProtocols);
+        }
         if ($request->device_id && $showAllRoutes == 'false') {
             $query=Route::hasAccess($request->user())
                 ->leftJoin('ports', $join)
@@ -90,7 +91,8 @@ class RoutesTablesController extends TableController
         if ($request->device_id && $showAllRoutes == 'true') {
             $query=Route::hasAccess($request->user())
                 ->leftJoin('ports', $join)
-                ->where('route.device_id', $request->device_id);
+                ->where('route.device_id', $request->device_id)
+                ->whereIn('route.inetCidrRouteDestType', $protocols);
             return $query;
         }
         return Route::hasAccess($request->user())
