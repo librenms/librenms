@@ -27,14 +27,29 @@ var grid = $("#routes").bootgrid({
     post: function ()
     {
         var check_showAllRoutes = document.getElementById('check_showAllRoutes');
+        var check_showIPv4 = document.getElementById('check_showIPv4');
+        var check_showIPv6 = document.getElementById('check_showIPv6');
         if (check_showAllRoutes) {
             var showAllRoutes = document.getElementById('check_showAllRoutes').checked;
         } else {
             var showAllRoutes = false;
         }
+        if (check_showIPv4) {
+            var showIPv4 = document.getElementById('check_showIPv4').checked;
+        } else {
+            var showIPv4 = false;
+        }
+        if (check_showIPv6) {
+            var showIPv6 = document.getElementById('check_showIPv6').checked;
+        } else {
+            var showIPv6 = false;
+        }
+
         return {
             device_id: "<?php echo $device['device_id']; ?>",
             showAllRoutes: showAllRoutes,
+            showIPv4: showIPv4,
+            showIPv6: showIPv6,
         };
     },
     url: "ajax/table/routes"
@@ -44,11 +59,18 @@ var add = $(".actionBar").append(
         '<div class="search form-group pull-left" style="width:auto">' +
         '<?php echo csrf_field() ?>'+
         '<input type="checkbox" name="check_showAllRoutes" data-size="small" id="check_showAllRoutes">' +
-        '&nbsp;Include historical routes in the table.' +
+        '&nbsp;Include historical routes in the table&nbsp;' +
+        '<input type="checkbox" name="check_showIPv4" data-size="small" id="check_showIPv4">' +
+        '&nbsp;Show IPv4 Routes&nbsp;' +
+        '<input type="checkbox" name="check_showIPv6" data-size="small" id="check_showIPv6">' +
+        '&nbsp;Show IPv6 Routes&nbsp;' +
         '</div>');
-$("#check_showAllRoutes").bootstrapSwitch({
+$("[type='checkbox']").bootstrapSwitch({
     'onSwitchChange': function(event, state){
-         $('#routes').bootgrid('reload');  
+         $('#routes').bootgrid('reload');
     }
 });
+
+$("#check_showIPv4").bootstrapSwitch('state', true);
+$("#check_showIPv6").bootstrapSwitch('state', true);
 </script>

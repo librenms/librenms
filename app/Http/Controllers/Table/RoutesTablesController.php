@@ -71,10 +71,16 @@ class RoutesTablesController extends TableController
             $query->on('ports.port_id', 'route.port_id');
         };
         $showAllRoutes = trim(\Request::get('showAllRoutes'));
+        $showIPv4 = trim(\Request::get('showIPv4'));
+        $showIPv6 = trim(\Request::get('showIPv6'));
+        $protocols = array();
+        $protocols[] = ($showIPv4 == 'false') ?: 'ipv4';
+        $protocols[] = ($showIPv6 == 'false') ?: 'ipv6';
         if ($request->device_id && $showAllRoutes == 'false') {
             $query=Route::hasAccess($request->user())
                 ->leftJoin('ports', $join)
                 ->where('route.device_id', $request->device_id)
+                ->whereIn('route.inetCidrRouteDestType', $protocols)
                 ->where('updated_at', Route::hasAccess($request->user())
                     ->where('route.device_id', $request->device_id)
                     ->select('updated_at')
