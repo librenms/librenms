@@ -908,6 +908,8 @@ mpls_lsp_paths:
     - { Field: mplsLspPathTimeUp, Type: bigint(20), 'Null': true, Extra: '' }
     - { Field: mplsLspPathTimeDown, Type: bigint(20), 'Null': true, Extra: '' }
     - { Field: mplsLspPathTransitionCount, Type: 'int(10) unsigned', 'Null': true, Extra: '' }
+    - { Field: mplsLspPathTunnelARHopListIndex, Type: 'int(10) unsigned', 'Null': true, Extra: '' }
+    - { Field: mplsLspPathTunnelCHopListIndex, Type: 'int(10) unsigned', 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [lsp_path_id], Unique: true, Type: BTREE }
     device_id: { Name: device_id, Columns: [device_id], Unique: false, Type: BTREE }
@@ -996,6 +998,42 @@ mpls_services:
     - { Field: svcTlsFdbNumEntries, Type: int(11), 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [svc_id], Unique: true, Type: BTREE }
+    device_id: { Name: device_id, Columns: [device_id], Unique: false, Type: BTREE }
+mpls_tunnel_ar_hops:
+  Columns:
+    - { Field: ar_hop_id, Type: 'int(10) unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: mplsTunnelARHopListIndex, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: mplsTunnelARHopIndex, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: device_id, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: lsp_path_id, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: mplsTunnelARHopAddrType, Type: 'enum(''unknown'',''ipV4'',''ipV6'',''asNumber'',''lspid'',''unnum'')', 'Null': true, Extra: '' }
+    - { Field: mplsTunnelARHopIpv4Addr, Type: varchar(15), 'Null': true, Extra: '' }
+    - { Field: mplsTunnelARHopIpv6Addr, Type: varchar(45), 'Null': true, Extra: '' }
+    - { Field: mplsTunnelARHopAsNumber, Type: 'int(10) unsigned', 'Null': true, Extra: '' }
+    - { Field: mplsTunnelARHopStrictOrLoose, Type: 'enum(''strict'',''loose'')', 'Null': true, Extra: '' }
+    - { Field: mplsTunnelARHopRouterId, Type: varchar(15), 'Null': true, Extra: '' }
+    - { Field: localProtected, Type: 'enum(''false'',''true'')', 'Null': false, Extra: '', Default: 'false' }
+    - { Field: linkProtectionInUse, Type: 'enum(''false'',''true'')', 'Null': false, Extra: '', Default: 'false' }
+    - { Field: bandwidthProtected, Type: 'enum(''false'',''true'')', 'Null': false, Extra: '', Default: 'false' }
+    - { Field: nextNodeProtected, Type: 'enum(''false'',''true'')', 'Null': false, Extra: '', Default: 'false' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [ar_hop_id], Unique: true, Type: BTREE }
+    device_id: { Name: device_id, Columns: [device_id], Unique: false, Type: BTREE }
+mpls_tunnel_c_hops:
+  Columns:
+    - { Field: c_hop_id, Type: 'int(10) unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: mplsTunnelCHopListIndex, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: mplsTunnelCHopIndex, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: device_id, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: lsp_path_id, Type: 'int(10) unsigned', 'Null': true, Extra: '' }
+    - { Field: mplsTunnelCHopAddrType, Type: 'enum(''unknown'',''ipV4'',''ipV6'',''asNumber'',''lspid'',''unnum'')', 'Null': true, Extra: '' }
+    - { Field: mplsTunnelCHopIpv4Addr, Type: varchar(15), 'Null': true, Extra: '' }
+    - { Field: mplsTunnelCHopIpv6Addr, Type: varchar(45), 'Null': true, Extra: '' }
+    - { Field: mplsTunnelCHopAsNumber, Type: 'int(10) unsigned', 'Null': true, Extra: '' }
+    - { Field: mplsTunnelCHopStrictOrLoose, Type: 'enum(''strict'',''loose'')', 'Null': true, Extra: '' }
+    - { Field: mplsTunnelCHopRouterId, Type: varchar(15), 'Null': true, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [c_hop_id], Unique: true, Type: BTREE }
     device_id: { Name: device_id, Columns: [device_id], Unique: false, Type: BTREE }
 munin_plugins:
   Columns:
