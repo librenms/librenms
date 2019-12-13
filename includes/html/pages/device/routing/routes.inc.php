@@ -49,7 +49,6 @@ var grid = $("#routes").bootgrid({
     url: "ajax/table/routes"
 });
 
-
 var add = $(".actionBar").append(
         '<div class="search form-group pull-left" style="width:auto">' +
         '<?php echo csrf_field() ?>' +
@@ -59,7 +58,7 @@ var add = $(".actionBar").append(
         '<option value="ipv6">IPv6 only</option>' +
         '</select>&nbsp;' +
         '<input type="checkbox" name="check_showAllRoutes" data-size="small" id="check_showAllRoutes">' +
-        '&nbsp;Include historical routes in the table&nbsp;' +
+        '&nbsp;Include historical routes in the table' +
         '</div>');
 
 $("#check_showAllRoutes").bootstrapSwitch({
