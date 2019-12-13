@@ -10631,6 +10631,8 @@
                     "mplsLspPathTimeUp": null,
                     "mplsLspPathTimeDown": null,
                     "mplsLspPathTransitionCount": null,
+                    "mplsLspPathTunnelARHopListIndex": 0,
+                    "mplsLspPathTunnelCHopListIndex": 0,
                     "vrf_oid": 1,
                     "lsp_oid": 1
                 },
@@ -10651,6 +10653,8 @@
                     "mplsLspPathTimeUp": null,
                     "mplsLspPathTimeDown": null,
                     "mplsLspPathTransitionCount": null,
+                    "mplsLspPathTunnelARHopListIndex": 2,
+                    "mplsLspPathTunnelCHopListIndex": 2,
                     "vrf_oid": 1,
                     "lsp_oid": 2
                 },
@@ -10671,6 +10675,8 @@
                     "mplsLspPathTimeUp": null,
                     "mplsLspPathTimeDown": null,
                     "mplsLspPathTransitionCount": null,
+                    "mplsLspPathTunnelARHopListIndex": 3,
+                    "mplsLspPathTunnelCHopListIndex": 7,
                     "vrf_oid": 1,
                     "lsp_oid": 3
                 },
@@ -10691,6 +10697,8 @@
                     "mplsLspPathTimeUp": null,
                     "mplsLspPathTimeDown": null,
                     "mplsLspPathTransitionCount": null,
+                    "mplsLspPathTunnelARHopListIndex": 1,
+                    "mplsLspPathTunnelCHopListIndex": 8,
                     "vrf_oid": 1,
                     "lsp_oid": 5
                 },
@@ -10711,6 +10719,8 @@
                     "mplsLspPathTimeUp": null,
                     "mplsLspPathTimeDown": null,
                     "mplsLspPathTransitionCount": null,
+                    "mplsLspPathTunnelARHopListIndex": 4,
+                    "mplsLspPathTunnelCHopListIndex": 5,
                     "vrf_oid": 1,
                     "lsp_oid": 6
                 },
@@ -10731,6 +10741,8 @@
                     "mplsLspPathTimeUp": null,
                     "mplsLspPathTimeDown": null,
                     "mplsLspPathTransitionCount": null,
+                    "mplsLspPathTunnelARHopListIndex": 5,
+                    "mplsLspPathTunnelCHopListIndex": 9,
                     "vrf_oid": 1,
                     "lsp_oid": 7
                 }
@@ -11353,6 +11365,8 @@
                     "mplsLspPathTimeUp": 0,
                     "mplsLspPathTimeDown": 1234414735,
                     "mplsLspPathTransitionCount": 8,
+                    "mplsLspPathTunnelARHopListIndex": 0,
+                    "mplsLspPathTunnelCHopListIndex": 0,
                     "vrf_oid": 1,
                     "lsp_oid": 1
                 },
@@ -11373,6 +11387,8 @@
                     "mplsLspPathTimeUp": 2126215009,
                     "mplsLspPathTimeDown": 0,
                     "mplsLspPathTransitionCount": 1,
+                    "mplsLspPathTunnelARHopListIndex": 2,
+                    "mplsLspPathTunnelCHopListIndex": 2,
                     "vrf_oid": 1,
                     "lsp_oid": 2
                 },
@@ -11393,6 +11409,8 @@
                     "mplsLspPathTimeUp": 968111987,
                     "mplsLspPathTimeDown": 0,
                     "mplsLspPathTransitionCount": 13,
+                    "mplsLspPathTunnelARHopListIndex": 3,
+                    "mplsLspPathTunnelCHopListIndex": 7,
                     "vrf_oid": 1,
                     "lsp_oid": 3
                 },
@@ -11413,6 +11431,8 @@
                     "mplsLspPathTimeUp": 487669387,
                     "mplsLspPathTimeDown": 0,
                     "mplsLspPathTransitionCount": 19,
+                    "mplsLspPathTunnelARHopListIndex": 1,
+                    "mplsLspPathTunnelCHopListIndex": 8,
                     "vrf_oid": 1,
                     "lsp_oid": 5
                 },
@@ -11433,6 +11453,8 @@
                     "mplsLspPathTimeUp": 1234595321,
                     "mplsLspPathTimeDown": 0,
                     "mplsLspPathTransitionCount": 1,
+                    "mplsLspPathTunnelARHopListIndex": 4,
+                    "mplsLspPathTunnelCHopListIndex": 5,
                     "vrf_oid": 1,
                     "lsp_oid": 6
                 },
@@ -11453,6 +11475,8 @@
                     "mplsLspPathTimeUp": 362844288,
                     "mplsLspPathTimeDown": 0,
                     "mplsLspPathTransitionCount": 1,
+                    "mplsLspPathTunnelARHopListIndex": 5,
+                    "mplsLspPathTunnelCHopListIndex": 9,
                     "vrf_oid": 1,
                     "lsp_oid": 7
                 }
