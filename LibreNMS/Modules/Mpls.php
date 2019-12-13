@@ -53,7 +53,7 @@ class Mpls implements Module
 
             echo "\nMPLS LSP Paths: ";
             ModuleModelObserver::observe('\App\Models\MplsLspPath');
-            $this->syncModels($os->getDeviceModel(), 'mplsLspPaths', $os->discoverMplsPaths($lsps));
+            $paths = $this->syncModels($os->getDeviceModel(), 'mplsLspPaths', $os->discoverMplsPaths($lsps));
 
             echo "\nMPLS SDPs: ";
             ModuleModelObserver::observe('\App\Models\MplsSdp');
@@ -70,6 +70,14 @@ class Mpls implements Module
             echo "\nMPLS SDP Bindings: ";
             ModuleModelObserver::observe('\App\Models\MplsSdpBind');
             $this->syncModels($os->getDeviceModel(), 'mplsSdpBinds', $os->discoverMplsSdpBinds($sdps, $svcs));
+
+            echo "\nMPLS Tunnel Active Routing Hops: ";
+            ModuleModelObserver::observe('\App\Models\MplsTunnelArHop');
+            $this->syncModels($os->getDeviceModel(), 'mplsTunnelArHops', $os->discoverMplsTunnelArHops($paths));
+
+            echo "\nMPLS Tunnel Constrained Shortest Path First Hops: ";
+            ModuleModelObserver::observe('\App\Models\MplsTunnelCHop');
+            $this->syncModels($os->getDeviceModel(), 'mplsTunnelCHops', $os->discoverMplsTunnelCHops($paths));
 
             echo PHP_EOL;
         }
@@ -96,7 +104,7 @@ class Mpls implements Module
             if ($device->mplsLspPaths()->exists()) {
                 echo "\nMPLS LSP Paths: ";
                 ModuleModelObserver::observe('\App\Models\MplsLspPath');
-                $this->syncModels($device, 'mplsLspPaths', $os->pollMplsPaths($lsps));
+                $paths = $this->syncModels($device, 'mplsLspPaths', $os->pollMplsPaths($lsps));
             }
 
             if ($device->mplsSdps()->exists()) {
@@ -123,6 +131,18 @@ class Mpls implements Module
                 $this->syncModels($device, 'mplsSdpBinds', $os->pollMplsSdpBinds($sdps, $svcs));
             }
 
+            if ($device->mplsTunnelArHops()->exists()) {
+                echo "\nMPLS Tunnel Active Routing Hops: ";
+                ModuleModelObserver::observe('\App\Models\MplsTunnelArHop');
+                $this->syncModels($device, 'mplsTunnelArHops', $os->pollMplsTunnelArHops($paths));
+            }
+
+            if ($device->mplsTunnelCHops()->exists()) {
+                echo "\nMPLS Tunnel Constrained Shortest Path First Hops: ";
+                ModuleModelObserver::observe('\App\Models\MplsTunnelCHop');
+                $this->syncModels($device, 'mplsTunnelCHops', $os->pollMplsTunnelCHops($paths));
+            }
+
             echo PHP_EOL;
         }
     }
@@ -141,5 +161,7 @@ class Mpls implements Module
         $os->getDeviceModel()->mplsServices()->delete();
         $os->getDeviceModel()->mplsSaps()->delete();
         $os->getDeviceModel()->mplsSdpBinds()->delete();
+        $os->getDeviceModel()->mplsTunnelArHops()->delete();
+        $os->getDeviceModel()->mplsTunnelCHops()->delete();
     }
 }

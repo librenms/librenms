@@ -62,4 +62,14 @@ interface MplsPolling
      * @return Collection MplsSdpBind objects
      */
     public function pollMplsSdpBinds($sdps, $svcs);
+
+    /**
+     * @return Collection MplsTunnelArHop objects
+     */
+    public function pollMplsTunnelArHops($paths);
+
+    /**
+     * @return Collection MplsTunnelCHop objects
+     */
+    public function pollMplsTunnelCHops($paths);
 }

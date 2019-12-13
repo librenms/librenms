@@ -641,6 +641,16 @@ class Device extends BaseModel
         return $this->hasMany('App\Models\MplsSdpBind', 'device_id');
     }
 
+    public function mplsTunnelArHops()
+    {
+        return $this->hasMany('App\Models\MplsTunnelArHop', 'device_id');
+    }
+
+    public function mplsTunnelCHops()
+    {
+        return $this->hasMany('App\Models\MplsTunnelCHop', 'device_id');
+    }
+
     public function syslogs()
     {
         return $this->hasMany('App\Models\Syslog', 'device_id', 'device_id');
