@@ -30,7 +30,6 @@ use Illuminate\Http\Request;
 use LibreNMS\Config;
 use LibreNMS\Util\Url;
 
-
 class MapController extends Controller
 {
     public function __construct()
