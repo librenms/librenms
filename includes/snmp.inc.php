@@ -634,8 +634,7 @@ function snmpwalk_cache_triple_oid($device, $oid, $array, $mib = null, $mibdir =
  * @param string $mibdir custom mib dir to search for mib
  * @return array grouped array of data
  */
-function snmpwalk_group($device, $oid, $mib = '', $depth = 1, $array = array(), $mibdir = null,
-                        $communityStringIndexing = 0)
+function snmpwalk_group($device, $oid, $mib = '', $depth = 1, $array = array(), $mibdir = null, $communityStringIndexing = 0)
 {
     d_echo("communityStringIndexing $communityStringIndexing\n");
     $cmd = gen_snmpwalk_cmd($device, $oid, '-OQUsetX', $mib, $mibdir, $communityStringIndexing);
