@@ -86,7 +86,7 @@ class YamlDiscovery
                             $current_data[$name] = static::replaceValues($name, $index, $count, $data, $pre_cache);
                         } else {
                             // replace references to data
-                            $current_data[$name] = dynamic_discovery_get_value($name, $index, $data, $pre_cache, $value);
+                            $current_data[$name] = static::getValueFromData($name, $index, $data, $pre_cache, $value);
                         }
                     }
 
@@ -108,7 +108,7 @@ class YamlDiscovery
 
     public static function replaceValues($name, $index, $count, $data, $pre_cache)
     {
-        $value = dynamic_discovery_get_value($name, $index, $data, $pre_cache);
+        $value = static::getValueFromData($name, $index, $data, $pre_cache);
         if (is_null($value)) {
             // built in replacements
             $search = [
@@ -130,7 +130,7 @@ class YamlDiscovery
 
             // search discovery data for values
             $value = preg_replace_callback('/{{ \$([a-zA-Z0-9.]+) }}/', function ($matches) use ($index, $data, $pre_cache) {
-                $replace = dynamic_discovery_get_value($matches[1], $index, $data, $pre_cache, null);
+                $replace = static::getValueFromData($matches[1], $index, $data, $pre_cache, null);
                 if (is_null($replace)) {
                     d_echo('Warning: No variable available to replace ' . $matches[1] . ".\n");
                     return ''; // remove the unavailable variable
