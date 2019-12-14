@@ -49,7 +49,7 @@ class MapController extends Controller
                              'background' => Config::get('network_map_legend.di.node'),
                          ),
                          'border' => Config::get('network_map_legend.di.border'),
-                         'background' => Config::get('network_map_legend.di.node'),
+                         'background' => Config::get('network_map_legend.di.node')
                      ),
                  );
     }
