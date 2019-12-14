@@ -30,6 +30,7 @@ use Illuminate\Http\Request;
 use LibreNMS\Config;
 use LibreNMS\Util\Url;
 
+
 class MapController extends Controller
 {
     public function __construct()
@@ -75,14 +76,7 @@ class MapController extends Controller
     // Device Dependency Map
     public function dependencyMap(Request $request)
     {
-        $user = $request->user();
-
-        if (!$user->hasGlobalRead()) {
-            $device_id_list = Permissions::devicesForUser($user)->toArray();
-            $devices = Device::whereIn('device_id', $device_id_list)->get();
-        } else {
-            $devices = Device::get();
-        }
+        $devices = Device::hasAccess($request->user())->with('parents')->get();
 
         $dependencies = array();
         $devices_by_id  = [];
