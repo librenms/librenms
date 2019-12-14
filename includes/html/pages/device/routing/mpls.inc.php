@@ -219,6 +219,7 @@ if ($vars['view'] == 'paths') {
         echo '</tr>';
         echo '<tr><td colspan="12" class="hiddenRow">';
         echo '<div class="accordian-body collapse" id="path-map' . $i . '">';
+        // FIXME include only on expanded data-toggle
         include 'includes/html/pages/routing/mpls-path-map.inc.php';
         echo '</div>
              </td>
