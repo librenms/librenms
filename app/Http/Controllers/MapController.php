@@ -38,12 +38,12 @@ class MapController extends Controller
         $this->middleware('deny-demo');
     }
 
-    protected function vis_options()
+    protected function visOptions()
     {
         return Config::get('network_map_vis_options');
     }
 
-    protected function node_disabled_style()
+    protected function nodeDisabledStyle()
     {
         return array('color' => array(
                          'highlight' => array(
@@ -55,7 +55,7 @@ class MapController extends Controller
                  );
     }
 
-    protected function node_down_style()
+    protected function nodeDownStyle()
     {
         return array('color' => array(
                          'highlight' => array(
@@ -68,15 +68,14 @@ class MapController extends Controller
                  );
     }
 
-    protected function node_up_style()
+    protected function nodeUpStyle()
     {
         return array();
     }
 
     // Device Dependency Map
-    public function dependency_map(Request $request)
+    public function dependencyMap(Request $request)
     {
-
         $user = $request->user();
 
         if (!$user->hasGlobalRead()) {
@@ -100,11 +99,11 @@ class MapController extends Controller
             );
 
             if ($items['disabled']) {
-                $device_style = $this->node_disabled_style();
+                $device_style = $this->nodeDisabledStyle();
             } elseif (! $items['status']) {
-                $device_style = $this->node_down_style();
+                $device_style = $this->nodeDownStyle();
             } else {
-                $device_style = $this->node_up_style();
+                $device_style = $this->nodeUpStyle();
             }
 
             // List all Device
@@ -131,7 +130,7 @@ class MapController extends Controller
 
         $data = [
             'node_count' => count($devices_by_id),
-            'options' => $this->vis_options(),
+            'options' => $this->visOptions(),
             'nodes' => json_encode(array_values($devices_by_id)),
             'edges' => json_encode($dependencies),
         ];

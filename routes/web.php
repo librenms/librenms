@@ -28,7 +28,7 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
     Route::resource('users', 'UserController');
     Route::get('about', 'AboutController@index');
     Route::get('authlog', 'UserController@authlog');
-    Route::get('dependency-map', 'MapController@dependency_map');
+    Route::get('dependency-map', 'MapController@dependencyMap');
 
     // admin pages
     Route::group(['guard' => 'admin'], function () {
