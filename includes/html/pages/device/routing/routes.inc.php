@@ -43,7 +43,7 @@ var grid = $("#routes").bootgrid({
         return {
             device_id: "<?php echo $device['device_id']; ?>",
             showAllRoutes: showAllRoutes,
-            showProtocols: list_showProtocols,
+            showProtocols: list_showProtocols
         };
     },
     url: "ajax/table/routes"
