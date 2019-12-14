@@ -49,7 +49,7 @@ class MapController extends Controller
                              'background' => Config::get('network_map_legend.di.node'),
                          ),
                          'border' => Config::get('network_map_legend.di.border'),
-                         'background' => Config::get('network_map_legend.di.node')
+                         'background' => Config::get('network_map_legend.di.node'),
                      ),
                  );
     }
@@ -97,7 +97,7 @@ class MapController extends Controller
                 array(
                     'id'    => $items['device_id'],
                     'label' => $items->shortDisplayName(),
-                    'title' => Url::deviceLink($items, $items->shortDisplayName()),
+                    'title' => Url::deviceLink($items, Null, [], 0, 0, 0, 0),
                     'shape' => 'box',
                 ),
                 $device_style
