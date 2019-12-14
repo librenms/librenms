@@ -97,7 +97,7 @@ class MapController extends Controller
                 array(
                     'id'    => $items['device_id'],
                     'label' => $items->shortDisplayName(),
-                    'title' => Url::deviceLink($items, Null, [], 0, 0, 0, 0),
+                    'title' => Url::deviceLink($items, null, [], 0, 0, 0, 0),
                     'shape' => 'box',
                 ),
                 $device_style
