@@ -92,12 +92,6 @@ class MapController extends Controller
 
         // List all devices
         foreach ($devices as $items) {
-            $device_attributes = array(
-                'device_id' => $items['device_id'],
-                'os'        => $items['os'],
-                'hostname'  => $items['hostname'],
-            );
-
             if ($items['disabled']) {
                 $device_style = $this->nodeDisabledStyle();
             } elseif (! $items['status']) {
