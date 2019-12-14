@@ -147,7 +147,7 @@ class YamlDiscovery
      * Helper function for dynamic discovery to search for data from pre_cached snmp data
      *
      * @param string $name The name of the field from the discovery data or just an oid
-     * @param int $index The index of the current sensor
+     * @param string $index The index of the current sensor
      * @param array $discovery_data The discovery data for the current sensor
      * @param array $pre_cache all pre-cached snmp data
      * @param mixed $default The default value to return if data is not found
@@ -169,6 +169,8 @@ class YamlDiscovery
                     return $pre_cache[$name][$index][$name];
                 } elseif (isset($pre_cache[$index][$name])) {
                     return $pre_cache[$index][$name];
+                } elseif (isset($pre_cache[$name][$index])) {
+                    return $pre_cache[$name][$index];
                 } elseif (count($pre_cache[$name]) === 1) {
                     return current($pre_cache[$name]);
                 }
@@ -252,6 +254,10 @@ class YamlDiscovery
                 // Dynamic skipping of data
                 $op = isset($skip_value['op']) ? $skip_value['op'] : '!=';
                 $tmp_value = static::getValueFromData($skip_value['oid'], $index, $yaml_item_data, $pre_cache);
+                if (str_contains($skip_value['oid'], '.')) {
+                    list($skip_value['oid'], $targeted_index) = explode('.', $skip_value['oid'], 2);
+                    $tmp_value = static::getValueFromData($skip_value['oid'], $targeted_index, $yaml_item_data, $pre_cache);
+                }
                 if (compare_var($tmp_value, $skip_value['value'], $op)) {
                     return true;
                 }

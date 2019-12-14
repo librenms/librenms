@@ -90,6 +90,11 @@ modules:
                     num_oid: '.1.3.6.1.4.1.1991.1.1.3.31.2.2.1.5.{{ $index }}'
                     descr: 'Unit {{ $index }} Stack State'
                     index: 'snStackingOperUnitState.{{ $index }}'
+                    skip_values:
+                        -
+                          oid: snStackingGlobalConfigState.0
+                          op: '!='
+                          value: 1
                     group: Stacking Status
                     state_name: snStackingOperUnitState
                     states:
@@ -104,6 +109,10 @@ modules:
                     descr: 'Unit {{ $index }} Stack-port 1 to Unit {{ $snStackingOperUnitNeighbor1 }}'
                     index: 'snStackingOperUnitStackPort1State.{{ $index }}'
                     skip_values:
+                        -
+                          oid: snStackingGlobalConfigState.0
+                          op: '!='
+                          value: 1
                         -
                           oid: snStackingOperUnitStackPort1
                           op: '='
@@ -121,6 +130,10 @@ modules:
                     descr: 'Unit {{ $index }} Stack-port 2 to Unit {{ $snStackingOperUnitNeighbor2 }}'
                     index: 'snStackingOperUnitStackPort2State.{{ $index }}'
                     skip_values:
+                        -
+                          oid: snStackingGlobalConfigState.0
+                          op: '!='
+                          value: 1
                         -
                           oid: snStackingOperUnitStackPort2
                           op: '='
