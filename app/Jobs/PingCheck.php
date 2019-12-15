@@ -35,6 +35,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
 use LibreNMS\Alert\AlertRules;
 use LibreNMS\Config;
+use LibreNMS\Sping;
 use LibreNMS\RRD\RrdDefinition;
 use Log;
 use Symfony\Component\Process\Process;
@@ -45,6 +46,10 @@ class PingCheck implements ShouldQueue
 
     private $process;
     private $rrd_tags;
+
+    private $use_icmp_ping;
+    private $use_snmp_ping;
+    private $record_snmp_ping_rtt;
 
     /** @var \Illuminate\Database\Eloquent\Collection List of devices keyed by hostname */
     private $devices;
@@ -76,15 +81,22 @@ class PingCheck implements ShouldQueue
         $rrd_def = RrdDefinition::make()->addDataset('ping', 'GAUGE', 0, 65535, $rrd_step * 2);
         $this->rrd_tags = ['rrd_def' => $rrd_def, 'rrd_step' => $rrd_step];
 
-        // set up fping process
-        $timeout = Config::get('fping_options.timeout', 500); // must be smaller than period
-        $retries = Config::get('fping_options.retries', 2);  // how many retries on failure
+        $this->use_snmp_ping = Config::get('use_snmp_ping') === true ? true : false;
+        $this->use_icmp_ping = !$this->use_snmp_ping;
 
-        $cmd = ['fping', '-f', '-', '-e', '-t', $timeout, '-r', $retries];
+        if ($this->use_icmp_ping) {
+            // set up fping process
+            $timeout = Config::get('fping_options.timeout', 500); // must be smaller than period
+            $retries = Config::get('fping_options.retries', 2);  // how many retries on failure
+            $cmd = ['fping', '-f', '-', '-e', '-t', $timeout, '-r', $retries];
+            $wait = Config::get('rrd.step', 300) * 2;
+            $this->process = new Process($cmd, null, null, null, $wait);
+        }
 
-        $wait = Config::get('rrd.step', 300) * 2;
-
-        $this->process = new Process($cmd, null, null, null, $wait);
+        if ($this->use_snmp_ping) {
+            $this->record_snmp_ping_rtt = Config::get('record_snmp_ping_rtt') === true ? true : false;
+            $this->process = null;
+        }
     }
 
     /**
@@ -97,16 +109,34 @@ class PingCheck implements ShouldQueue
         $ping_start = microtime(true);
 
         $this->fetchDevices();
+        $device_set = $this->tiered->get(1, collect())->keys()// root nodes before standalone nodes
+            ->merge($this->devices->keys())
+            ->unique();
 
+        if ($this->use_icmp_ping) {
+            $this->handleFping($device_set);
+        } else {
+            $this->handleSping($device_set);
+        }
+
+        // check for any left over devices
+        if ($this->deferred->isNotEmpty()) {
+            d_echo("Leftover devices, this shouldn't happen: " . $this->deferred->flatten(1)->implode('hostname', ', ') . PHP_EOL);
+            d_echo("Devices left in tier: " . collect($this->current)->implode('hostname', ', ') . PHP_EOL);
+        }
+
+        if (\App::runningInConsole()) {
+            printf("Pinged %s devices in %.2fs\n", $this->devices->count(), microtime(true) - $ping_start);
+        }
+    }
+
+    private function handleFping($device_set)
+    {
         d_echo($this->process->getCommandLine() . PHP_EOL);
 
         // send hostnames to stdin to avoid overflowing cli length limits
-        $ordered_device_list = $this->tiered->get(1, collect())->keys()// root nodes before standalone nodes
-        ->merge($this->devices->keys())
-            ->unique()
-            ->implode(PHP_EOL);
-
-        $this->process->setInput($ordered_device_list);
+        $fping_input = $device_set->implode(PHP_EOL);
+        $this->process->setInput($fping_input);
         $this->process->start(); // start as early as possible
 
         foreach ($this->process as $type => $line) {
@@ -129,19 +159,23 @@ class PingCheck implements ShouldQueue
                 $captured
             )) {
                 $this->recordData($captured);
-
                 $this->processTier();
             }
         }
+    }
 
-        // check for any left over devices
-        if ($this->deferred->isNotEmpty()) {
-            d_echo("Leftover devices, this shouldn't happen: " . $this->deferred->flatten(1)->implode('hostname', ', ') . PHP_EOL);
-            d_echo('Devices left in tier: ' . collect($this->current)->implode('hostname', ', ') . PHP_EOL);
-        }
-
-        if (\App::runningInConsole()) {
-            printf("Pinged %s devices in %.2fs\n", $this->devices->count(), microtime(true) - $ping_start);
+    private function handleSping($device_set)
+    {
+        $probe = new Sping;
+        $targets = $this->devices->intersectByKeys($device_set->flip())->values();
+        foreach ($targets as $t) {
+            $response = $probe->sping($t);
+            if ($response['result'] === true) {
+                $this->recordData(['hostname' => $t['hostname'], 'status' => 'alive', 'rtt' => $response['last_ping_timetaken']]);
+                $this->processTier();
+            } else {
+                $this->recordData(['hostname' => $t['hostname'], 'status' => 'unreachable', 'rtt' => (float)0.0]);
+            }
         }
     }
 
@@ -153,9 +187,11 @@ class PingCheck implements ShouldQueue
 
         global $vdebug;
 
+        $base_columns = ['devices.device_id', 'hostname', 'overwrite_ip', 'status', 'status_reason', 'last_ping', 'last_ping_timetaken', 'max_depth'];
+        $snmp_columns = ['transport', 'port', 'snmpver', 'community', 'authname', 'authlevel', 'authalgo', 'authpass', 'cryptoalgo', 'cryptopass'];
         /** @var Builder $query */
         $query = Device::canPing()
-            ->select(['devices.device_id', 'hostname', 'overwrite_ip', 'status', 'status_reason', 'last_ping', 'last_ping_timetaken', 'max_depth'])
+            ->select(array_merge($base_columns, ($this->use_snmp_ping ? $snmp_columns : [])))
             ->orderBy('max_depth');
 
         if ($this->groups) {
@@ -245,13 +281,18 @@ class PingCheck implements ShouldQueue
             // mark up only if snmp is not down too
             $device->status = ($data['status'] == 'alive' && $device->status_reason != 'snmp');
             $device->last_ping = Carbon::now();
-            $device->last_ping_timetaken = isset($data['rtt']) ? $data['rtt'] : 0;
+            $device->last_ping_timetaken = (float)0.0;
+            if (isset($data['rtt'])) {
+                if ($this->use_icmp_ping || ($this->use_snmp_ping && $this->record_snmp_ping_rtt)) {
+                    $device->last_ping_timetaken = floatval($data['rtt']);
+                }
+            }
 
             if ($device->isDirty('status')) {
                 // if changed, update reason
-                $device->status_reason = $device->status ? '' : 'icmp';
+                $device->status_reason = $device->status ? '' : ($this->use_snmp_ping ? 'snmp_ping' : 'icmp');
                 $type = $device->status ? 'up' : 'down';
-                Log::event('Device status changed to ' . ucfirst($type) . ' from icmp check.', $device->device_id, $type);
+                Log::event('Device status changed to ' . ucfirst($type) . ' from ping check.', $device->device_id, $type);
             }
 
             $device->save(); // only saves if needed (which is every time because of last_ping)

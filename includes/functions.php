@@ -19,6 +19,7 @@ use LibreNMS\Exceptions\InvalidPortAssocModeException;
 use LibreNMS\Exceptions\LockException;
 use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
 use LibreNMS\Fping;
+use LibreNMS\Sping;
 use LibreNMS\Util\IPv4;
 use LibreNMS\Util\IPv6;
 use LibreNMS\Util\MemcacheLock;
@@ -564,13 +565,19 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
         throw new HostIpExistsException($message);
     }
 
-    // Test reachability
-    if (! $force_add) {
+    $use_snmp_ping = Config::get('use_snmp_ping') === true ? true : false;
+    // Test reachability with fping, unless SNMP check for reachability is preferred
+    if (! $force_add && ! $use_snmp_ping) {
         $address_family = snmpTransportToAddressFamily($transport);
         $ping_result = isPingable($ip, $address_family);
         if (! $ping_result['result']) {
             throw new HostUnreachablePingException("Could not ping $host");
         }
+    }
+
+    // Skip SNMP connectivity tests, unless SNMP chesk for reachability is mandated
+    if (isset($additional['snmp_disable']) && $additional['snmp_disable'] == 1 && ! $use_snmp_ping) {
+        return createHost($host, '', $snmp_version, $port, $transport, [], $poller_group, 1, true, $overwrite_ip, $additional);
     }
 
     // if $snmpver isn't set, try each version of snmp
@@ -580,9 +587,6 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
         $snmpvers = [$snmp_version];
     }
 
-    if (isset($additional['snmp_disable']) && $additional['snmp_disable'] == 1) {
-        return createHost($host, '', $snmp_version, $port, $transport, [], $poller_group, 1, true, $overwrite_ip, $additional);
-    }
     $host_unreachable_exception = new HostUnreachableException("Could not connect to $host, please check the snmp details and snmp reachability");
     // try different snmp variables to add the device
     foreach ($snmpvers as $snmpver) {
@@ -611,12 +615,15 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
             throw new SnmpVersionUnsupportedException("Unsupported SNMP Version \"$snmpver\", must be v1, v2c, or v3");
         }
     }
-    if (isset($additional['ping_fallback']) && $additional['ping_fallback'] == 1) {
+
+    // Allow ping fallback, unless SNMP check for reachability is mandated
+    if (isset($additional['ping_fallback']) && $additional['ping_fallback'] == 1 && !$use_snmp_ping) {
         $additional['snmp_disable'] = 1;
         $additional['os'] = 'ping';
 
         return createHost($host, '', $snmp_version, $port, $transport, [], $poller_group, 1, true, $overwrite_ip, $additional);
     }
+
     throw $host_unreachable_exception;
 }
 
@@ -707,6 +714,11 @@ function isPingable($hostname, $address_family = 'ipv4', $attribs = [])
         'last_ping_timetaken' => $status['avg'],
         'db' => array_intersect_key($status, array_flip(['xmt', 'rcv', 'loss', 'min', 'max', 'avg'])),
     ];
+}
+
+function isSPingable($device)
+{
+    return app()->make(Sping::class)->sping($device);
 }
 
 function getpollergroup($poller_group = '0')
@@ -2108,9 +2120,14 @@ function runTraceroute($device)
  */
 function device_is_up($device, $record_perf = false)
 {
-    $address_family = snmpTransportToAddressFamily($device['transport']);
-    $poller_target = Device::pollerTarget($device['hostname']);
-    $ping_response = isPingable($poller_target, $address_family, $device['attribs']);
+    $use_snmp_ping = Config::get('use_snmp_ping') === true ? true : false;
+    if ($use_snmp_ping) {
+        $ping_response = isSPingable($device);
+    } else {
+        $address_family = snmpTransportToAddressFamily($device['transport']);
+        $poller_target = Device::pollerTarget($device['hostname']);
+        $ping_response = isPingable($poller_target, $address_family, $device['attribs']);
+    }
     $device_perf = $ping_response['db'];
     $device_perf['device_id'] = $device['device_id'];
     $device_perf['timestamp'] = ['NOW()'];
@@ -2147,7 +2164,7 @@ function device_is_up($device, $record_perf = false)
     } else {
         echo 'Unpingable';
         $response['status'] = '0';
-        $response['status_reason'] = 'icmp';
+        $response['status_reason'] = ($use_snmp_ping ? 'snmp_ping' : 'icmp');
     }
 
     if ($device['status'] != $response['status'] || $device['status_reason'] != $response['status_reason']) {
