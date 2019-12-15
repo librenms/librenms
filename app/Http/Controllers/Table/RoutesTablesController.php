@@ -71,10 +71,17 @@ class RoutesTablesController extends TableController
             $query->on('ports.port_id', 'route.port_id');
         };
         $showAllRoutes = trim(\Request::get('showAllRoutes'));
+        $showProtocols = trim(\Request::get('showProtocols'));
+        if ($showProtocols == 'all') {
+            $protocols = array('ipv4', 'ipv6');
+        } else {
+            $protocols = array($showProtocols);
+        }
         if ($request->device_id && $showAllRoutes == 'false') {
             $query=Route::hasAccess($request->user())
                 ->leftJoin('ports', $join)
                 ->where('route.device_id', $request->device_id)
+                ->whereIn('route.inetCidrRouteDestType', $protocols)
                 ->where('updated_at', Route::hasAccess($request->user())
                     ->where('route.device_id', $request->device_id)
                     ->select('updated_at')
@@ -84,7 +91,8 @@ class RoutesTablesController extends TableController
         if ($request->device_id && $showAllRoutes == 'true') {
             $query=Route::hasAccess($request->user())
                 ->leftJoin('ports', $join)
-                ->where('route.device_id', $request->device_id);
+                ->where('route.device_id', $request->device_id)
+                ->whereIn('route.inetCidrRouteDestType', $protocols);
             return $query;
         }
         return Route::hasAccess($request->user())
@@ -101,8 +109,10 @@ class RoutesTablesController extends TableController
     {
         if ($search = trim(\Request::get('searchPhrase'))) {
             $searchLike = '%' . $search . '%';
-            return $query->where('route.inetCidrRouteNextHop', 'like', $searchLike)
-                ->orWhere('route.inetCidrRouteDest', 'like', $searchLike);
+            return $query->where(function ($query) use ($searchLike) {
+                return $query->where('route.inetCidrRouteNextHop', 'like', $searchLike)
+                    ->orWhere('route.inetCidrRouteDest', 'like', $searchLike);
+            });
         }
         return $query;
     }
