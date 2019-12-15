@@ -40,7 +40,7 @@ class Slack extends Transport
         $host          = $api['url'];
         $curl          = curl_init();
         $slack_msg     = strip_tags($obj['msg']);
-        $color         = self::getColorForState($obj['state']),
+        $color         = self::getColorForState($obj['state']);
         $data          = [
             'attachments' => [
                 0 => [
