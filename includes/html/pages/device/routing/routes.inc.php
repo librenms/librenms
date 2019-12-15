@@ -52,7 +52,7 @@ var grid = $("#routes").bootgrid({
 var add = $(".actionBar").append(
         '<div class="search form-group pull-left" style="width:auto">' +
         '<?php echo csrf_field() ?>' +
-        '<select name="list_showProtocols" id="list_showProtocols" class="input-sm" onChange="updateProtocolFilter(this);">' +
+        '<select name="list_showProtocols" id="list_showProtocols" class="input-sm" onChange="updateTable();">' +
         '<option value="all">all Protocols</option>' +
         '<option value="ipv4">IPv4 only</option>' +
         '<option value="ipv6">IPv6 only</option>' +
@@ -63,11 +63,11 @@ var add = $(".actionBar").append(
 
 $("#check_showAllRoutes").bootstrapSwitch({
     'onSwitchChange': function(event, state){
-         $('#routes').bootgrid('reload');
+         updateTable();
     }
 });
 
-function updateProtocolFilter(e) {
+function updateTable() {
     $('#routes').bootgrid('reload');
 };
 </script>
