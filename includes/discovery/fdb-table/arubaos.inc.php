@@ -46,8 +46,7 @@ if (!empty($fdbPort_table)) {
 
     foreach ($fdbPort_table as $vlan => $data) {
         d_echo("VLAN: $vlan\n");
-        $dot1dBasePortIfIndex = snmpwalk_group($device, 'dot1dBasePortIfIndex', 'BRIDGE-MIB', 1,
-                                               $dot1dBasePortIfIndex, null, $vlan);
+        $dot1dBasePortIfIndex = snmpwalk_group($device, 'dot1dBasePortIfIndex', 'BRIDGE-MIB', 1, $dot1dBasePortIfIndex, null, $vlan);
     }
 
     foreach ($dot1dBasePortIfIndex as $portLocal => $data) {
@@ -69,7 +68,7 @@ if (!empty($fdbPort_table)) {
             }
 
             $port_id = $portid_dict[$dot1dBasePort];
-            if ($port_id === NULL) {
+            if ($port_id === null) {
                 $port_id = 0;
             }
             $vlan_id = isset($vlans_dict[$vlan]) ? $vlans_dict[$vlan] : 0;
