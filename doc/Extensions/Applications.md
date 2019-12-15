@@ -1460,6 +1460,7 @@ extend puppet-agent /etc/snmp/puppet_agent.py
 The Script needs `python3-yaml` package to be installed.
 
 Per default script searches for on of this files:
+
 * /var/cache/puppet/state/last_run_summary.yaml
 * /opt/puppetlabs/puppet/cache/state/last_run_summary.yaml
 
