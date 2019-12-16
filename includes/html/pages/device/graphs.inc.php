@@ -74,7 +74,7 @@ foreach ($graph_enable as $graph => $entry) {
             $graph_title = \LibreNMS\Config::get("graph_types.device.$graph.descr");
             $graph_array['type'] = 'device_'.$graph;
             include 'includes/html/print-device-graph.php';
-        }        
+        }
     }
 }
 
