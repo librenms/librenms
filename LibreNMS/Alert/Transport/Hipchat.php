@@ -62,7 +62,19 @@ class Hipchat extends Transport
             $option["message_format"] = 'text';
         }
 
-        $color = self::getColorForState($obj['state']);
+        // Sane default of making the message color green if the message indicates
+        // that the alert recovered.   If it rebooted, make it yellow.
+        if (stripos($obj["msg"], "recovered")) {
+            $color = "green";
+        } elseif (stripos($obj["msg"], "rebooted")) {
+            $color = "yellow";
+        } else {
+            if (empty($option["color"]) || $option["color"] == 'u') {
+                $color = 'red';
+            } else {
+                $color = $option["color"];
+            }
+        }
 
         $data[] = "message=" . urlencode($obj["msg"]);
         if ($version == 1) {
