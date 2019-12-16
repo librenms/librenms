@@ -53,10 +53,7 @@ foreach (dbFetchRows("SELECT * FROM `customoids` WHERE `customoid_passed` = 1 AN
     $tags = compact('rrd_name', 'rrd_def');
 
     data_update($device, 'customoid', $tags, $fields);
-    dbUpdate(array('customoid_current' => $oid_value, 'lastupdate' => array('NOW()')), 'customoids', '`customoid_id` = ?', array($customoid['customoid_id']));
-    if ($oid_value != $prev_oid_value) {
-        dbUpdate(array('customoid_prev' => $prev_oid_value), 'customoids', '`customoid_id` = ?', array($customoid['customoid_id']));
-    }
+    dbUpdate(array('customoid_current' => $oid_value, 'lastupdate' => array('NOW()'), 'customoid_prev' => $prev_oid_value), 'customoids', '`customoid_id` = ?', array($customoid['customoid_id']));
 }//end foreach
 
 unset($customoid, $prev_oid_value, $rawdata, $user_funcs, $oid_value, $error, $fields, $rrd_def, $rrd_name, $tags);
