@@ -187,7 +187,7 @@ $('#save-oid-button').on('click', function (e) {
             if (data.status == 'ok') {
                 toastr.success(data.message);
                 $('#create-oid-form').modal('hide');
-                window.location.reload(); // FIXME: reload table
+                window.location.reload(); 
             } else {
                 toastr.error(data.message);
             }
