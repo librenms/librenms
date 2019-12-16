@@ -23,7 +23,7 @@ foreach (dbFetchRows('SELECT * FROM `customoids` WHERE `device_id` = ? ORDER BY 
     $graph_array['title'] = $customoid['customoid_descr'];
     $graph_array['type']  = 'customoid';
 
-    include 'includes/html/print-graphrow.inc.php';
+    include 'includes/html/print-device-graph.php';
 
     echo '</div></div>';
 
