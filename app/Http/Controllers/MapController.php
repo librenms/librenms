@@ -32,11 +32,6 @@ use LibreNMS\Util\Url;
 
 class MapController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('deny-demo');
-    }
-
     protected function visOptions()
     {
         return Config::get('network_map_vis_options');
@@ -44,32 +39,32 @@ class MapController extends Controller
 
     protected function nodeDisabledStyle()
     {
-        return array('color' => array(
-                         'highlight' => array(
+        return ['color' => [
+                         'highlight' => [
                              'background' => Config::get('network_map_legend.di.node'),
-                         ),
+                         ],
                          'border' => Config::get('network_map_legend.di.border'),
                          'background' => Config::get('network_map_legend.di.node'),
-                     ),
-                 );
+                     ],
+               ];
     }
 
     protected function nodeDownStyle()
     {
-        return array('color' => array(
-                         'highlight' => array(
+        return ['color' => [
+                         'highlight' => [
                              'background' => Config::get('network_map_legend.dn.node'),
                              'border' => Config::get('network_map_legend.dn.border'),
-                         ),
+                         ],
                          'border' => Config::get('network_map_legend.dn.border'),
                          'background' => Config::get('network_map_legend.dn.node'),
-                     ),
-                 );
+                     ],
+               ];
     }
 
     protected function nodeUpStyle()
     {
-        return array();
+        return [];
     }
 
     // Device Dependency Map
@@ -77,40 +72,40 @@ class MapController extends Controller
     {
         $devices = Device::hasAccess($request->user())->with('parents')->get();
 
-        $dependencies = array();
+        $dependencies = [];
         $devices_by_id  = [];
 
         // Build the style variables we need
 
         // List all devices
-        foreach ($devices as $items) {
-            if ($items['disabled']) {
+        foreach ($devices as $device) {
+            if ($device['disabled']) {
                 $device_style = $this->nodeDisabledStyle();
-            } elseif (! $items['status']) {
+            } elseif (! $device['status']) {
                 $device_style = $this->nodeDownStyle();
             } else {
                 $device_style = $this->nodeUpStyle();
             }
 
             // List all Device
-            $devices_by_id[$items['device_id']] = array_merge(
-                array(
-                    'id'    => $items['device_id'],
-                    'label' => $items->shortDisplayName(),
-                    'title' => Url::deviceLink($items, null, [], 0, 0, 0, 0),
+            $devices_by_id[$device['device_id']] = array_merge(
+                [
+                    'id'    => $device['device_id'],
+                    'label' => $device->shortDisplayName(),
+                    'title' => Url::deviceLink($device, null, [], 0, 0, 0, 0),
                     'shape' => 'box',
-                ),
+                ],
                 $device_style
             );
 
             // List all Device Dependencies
-            $parents = $items->parents()->get();
+            $parents = $device->parents()->get();
             foreach ($parents as $parent) {
-                $dependencies[] = array(
-                                        'from'  => $items['device_id'],
-                                        'to'    => $parent['device_id'],
-                                        'width' => 2,
-                                  );
+                $dependencies[] = [
+                    'from'  => $device['device_id'],
+                    'to'    => $parent['device_id'],
+                    'width' => 2,
+                ];
             };
         }
 
