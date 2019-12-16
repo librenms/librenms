@@ -21,7 +21,7 @@ class CreateCustomoidsTable extends Migration
             $table->double('customoid_current')->nullable();
             $table->double('customoid_prev')->nullable();
             $table->string('customoid_oid', 255)->nullable();
-            $table->string('customoid_datatype', 20)->default(GAUGE);
+            $table->string('customoid_datatype', 20)->default('GAUGE');
             $table->string('customoid_unit', 20)->nullable();
             $table->unsignedInteger('customoid_divisor')->default(1);
             $table->unsignedInteger('customoid_multiplier')->default(1);
