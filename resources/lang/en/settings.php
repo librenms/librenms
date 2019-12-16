@@ -332,131 +332,131 @@ return [
         ],
         'discovery_modules' => [
             'arp-table' => [
-                'description' => 'arp-table'
+                'description' => 'ARP Table'
             ],
             'applications' => [
-                'description' => 'applications'
+                'description' => 'Applications'
             ],
             'bgp-peers' => [
-                'description' => 'bgp-peers'
+                'description' => 'BGP Peers'
             ],
             'cisco-cbqos' => [
-                'description' => 'cisco-cbqos'
+                'description' => 'Cisco CBQOS'
             ],
             'cisco-cef' => [
-                'description' => 'cisco-cef'
+                'description' => 'Cisco CEF'
             ],
             'cisco-mac-accounting' => [
-                'description' => 'cisco-mac-accounting'
+                'description' => 'Cisco MAC Accounting'
             ],
             'cisco-otv' => [
-                'description' => 'cisco-otv'
+                'description' => 'Cisco OTV'
             ],
             'cisco-qfp' => [
-                'description' => 'cisco-qfp'
+                'description' => 'Cisco QFP'
             ],
             'cisco-sla' => [
-                'description' => 'cisco-sla'
+                'description' => 'Cisco SLA'
             ],
             'cisco-pw' => [
-                'description' => 'cisco-pw'
+                'description' => 'Cisco PW'
             ],
             'cisco-vrf-lite' => [
-                'description' => 'cisco-vrf-list'
+                'description' => 'Cisco VRF List'
             ],
             'discovery-arp' => [
-                'description' => 'discovery-arp'
+                'description' => 'Discovery ARP'
             ],
             'discovery-protocols' => [
-                'description' => 'discovery-protocols'
+                'description' => 'Discovery Protocols'
             ],
             'entity-physical' => [
-                'description' => 'entity-physical'
+                'description' => 'Entity Physical'
             ],
             'entity-state' => [
-                'description' => 'entity-state'
+                'description' => 'Entity State'
             ],
             'fdb-table' => [
-                'description' => 'fdb-table'
+                'description' => 'FDB Table'
             ],
             'hr-device' => [
-                'description' => 'hr-device'
+                'description' => 'HR Device'
             ],
             'ipv4-addresses' => [
-                'description' => 'ipv4-addresses'
+                'description' => 'IPv4 Addresses'
             ],
             'ipv6-addresses' => [
-                'description' => 'ipv6-addresses'
+                'description' => 'IPv6 Addresses'
             ],
             'junose-atm-vp' => [
-                'description' => 'junose-atm-vp'
+                'description' => 'Junose ATM VP'
             ],
             'libvirt-vminfo' => [
-                'description' => 'libvirt-vminfo'
+                'description' => 'Libvirt VMInfo'
             ],
             'loadbalancers' => [
-                'description' => 'loadbalancers'
+                'description' => 'Loadbalancers'
             ],
             'mef' => [
-                'description' => 'mef'
+                'description' => 'MEF'
             ],
             'mempools' => [
-                'description' => 'mempools'
+                'description' => 'Mempools'
             ],
             'mpls' => [
-                'description' => 'mpls'
+                'description' => 'MPLS'
             ],
             'ntp' => [
-                'description' => 'ntp'
+                'description' => 'NTP'
             ],
             'os' => [
-                'description' => 'os'
+                'description' => 'OS'
             ],
             'ports' => [
-                'description' => 'ports'
+                'description' => 'Ports'
             ],
             'ports-stack' => [
-                'description' => 'ports-stack'
+                'description' => 'Ports Stack'
             ],
             'processors' => [
-                'description' => 'processors'
+                'description' => 'Processors'
             ],
 
             'route' => [
-                'description' => 'route'
+                'description' => 'Route'
             ],
 
             'sensors' => [
-                'description' => 'sensors'
+                'description' => 'Sensors'
             ],
 
             'services' => [
-                'description' => 'services'
+                'description' => 'Services'
             ],
             'storage' => [
-                'description' => 'storage'
+                'description' => 'Storage'
             ],
 
             'stp' => [
-                'description' => 'stp'
+                'description' => 'STP'
             ],
             'toner' => [
-                'description' => 'toner'
+                'description' => 'Toner'
             ],
             'ucd-diskio' => [
-                'description' => 'ucd-diskio'
+                'description' => 'UCD DiskIO'
             ],
             'vlans' => [
-                'description' => 'vlans'
+                'description' => 'VLans'
             ],
             'vmware-vminfo' => [
-                'description' => 'vmware-vminfo'
+                'description' => 'VMWare VMInfo'
             ],
             'vrf' => [
-                'description' => 'vrf'
+                'description' => 'VRF'
             ],
             'wireless' => [
-                'description' => 'wireless'
+                'description' => 'Wireless'
             ],
         ],
         'distributed_poller' => [
@@ -739,139 +739,139 @@ return [
         ],
         'poller_modules' => [
             'unix-agent' => [
-                'description' => 'unix-agent'
+                'description' => 'Unix Agent'
             ],
             'os' => [
-                'description' => 'os'
+                'description' => 'OS'
             ],
             'ipmi' => [
-                'description' => 'ipmi'
+                'description' => 'IPMI'
             ],
             'sensors' => [
-                'description' => 'sensors'
+                'description' => 'Sensors'
             ],
             'processors' => [
-                'description' => 'processors'
+                'description' => 'Processors'
             ],
             'mempools' => [
-                'description' => 'mempools'
+                'description' => 'Mempools'
             ],
             'storage' => [
-                'description' => 'storage'
+                'description' => 'Storage'
             ],
             'netstats' => [
-                'description' => 'netstats'
+                'description' => 'Netstats'
             ],
             'hr-mib' => [
-                'description' => 'hr-mib'
+                'description' => 'HR Mib'
             ],
             'ucd-mib' => [
-                'description' => 'ucd-mib'
+                'description' => 'Ucd Mib'
             ],
             'ipSystemStats' => [
                 'description' => 'ipSystemStats'
             ],
             'ports' => [
-                'description' => 'ports'
+                'description' => 'Ports'
             ],
             'bgp-peers' => [
-                'description' => 'bgp-peers'
+                'description' => 'BGP Peers'
             ],
             'junose-atm-vp' => [
-                'description' => 'junos-atm-vp'
+                'description' => 'JunOS ATM VP'
             ],
             'toner' => [
-                'description' => 'toner'
+                'description' => 'Toner'
             ],
             'ucd-diskio' => [
-                'description' => 'ucd-diskio'
+                'description' => 'UCD DiskIO'
             ],
             'wifi' => [
-                'description' => 'wifi'
+                'description' => 'Wifi'
             ],
             'wireless' => [
-                'description' => 'wireless'
+                'description' => 'Wireless'
             ],
             'ospf' => [
-                'description' => 'ospf'
+                'description' => 'OSPF'
             ],
             'cisco-ipsec-flow-monitor' => [
-                'description' => 'cisco-ipsec-flow-monitor'
+                'description' => 'Cisco IPSec flow Monitor'
             ],
             'cisco-remote-access-monitor' => [
-                'description' => 'cisco-remote-access-monitor'
+                'description' => 'Cisco remote access Monitor'
             ],
             'cisco-cef' => [
-                'description' => 'cisco-cef'
+                'description' => 'Cisco CEF'
             ],
             'cisco-sla' => [
-                'description' => 'cisco-sla'
+                'description' => 'Cisco SLA'
             ],
             'cisco-mac-accounting' => [
-                'description' => 'cisco-mac-accounting'
+                'description' => 'Cisco MAC Accounting'
             ],
             'cipsec-tunnels' => [
-                'description' => 'cipsec-tunnels'
+                'description' => 'Cipsec Tunnels'
             ],
             'cisco-ace-loadbalancer' => [
-                'description' => 'cisco-ace-loadbalancer'
+                'description' => 'Cisco ACE Loadbalancer'
             ],
             'cisco-ace-serverfarms' => [
-                'description' => 'cisco-ace-serverfarms'
+                'description' => 'Cisco ACE Serverfarms'
             ],
             'cisco-asa-firewall' => [
-                'description' => 'cisco-asa-firewall'
+                'description' => 'Cisco ASA Firewall'
             ],
             'cisco-voice' => [
-                'description' => 'cisco-voice'
+                'description' => 'Cisco Voice'
             ],
             'cisco-cbqos' => [
-                'description' => 'cisco-cbqos'
+                'description' => 'Cisco CBQOS'
             ],
             'cisco-otv' => [
-                'description' => 'cisco-otv'
+                'description' => 'Cisco OTV'
             ],
             'cisco-qfp' => [
-                'description' => 'cisco-qfp'
+                'description' => 'Cisco QFP'
             ],
             'cisco-vpdn' => [
-                'description' => 'cisco-vpdn'
+                'description' => 'Cisco VPDN'
             ],
             'nac' => [
-                'description' => 'nac'
+                'description' => 'NAC'
             ],
             'netscaler-vsvr' => [
-                'description' => 'netscaler-vsvr'
+                'description' => 'Netscaler VSVR'
             ],
             'aruba-controller' => [
-                'description' => 'aruba-controller'
+                'description' => 'Aruba Controller'
             ],
             'entity-physical' => [
-                'description' => 'entity-physical'
+                'description' => 'Entity Physical'
             ],
             'entity-state' => [
-                'description' => 'entity-state'
+                'description' => 'Entity State'
             ],
             'applications' => [
-                'description' => 'applications'
+                'description' => 'Applications'
             ],
             'mib' => [
-                'description' => 'mib'
+                'description' => 'MIB'
             ],
             'stp' => [
-                'description' => 'stp'
+                'description' => 'STP'
             ],
             'ntp' => [
-                'description' => 'ntp'
+                'description' => 'NTP'
             ],
             'loadbalancers' => [
-                'description' => 'loadbalancers'
+                'description' => 'Loadbalancers'
             ],
             'mef' => [
-                'description' => 'mef'
+                'description' => 'MEF'
             ],
             'mpls' => [
-                'description' => 'mpls'
+                'description' => 'MPLS'
             ],
         ],
         'ports_fdb_purge' => [
