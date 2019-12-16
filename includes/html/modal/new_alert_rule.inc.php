@@ -14,7 +14,7 @@
 
 use LibreNMS\Alerting\QueryBuilderFilter;
 
-if (Auth::user()->hasGlobalAdmin()) {
+if (! Auth::user()->hasGlobalAdmin()) {
     $filters = json_encode(new QueryBuilderFilter('alert'));
 
     ?>
