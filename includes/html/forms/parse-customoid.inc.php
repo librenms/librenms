@@ -1,12 +1,13 @@
 <?php
 
-use LibreNMS\Authentication\LegacyAuth;
-
-if (!LegacyAuth::user()->hasGlobalAdmin()) {
-    header('Content-type: text/plain');
-    die('ERROR: You need to be admin');
+if (!Auth::user()->hasGlobalAdmin()) {
+    $response = array(
+        'status'  => 'error',
+        'message' => 'Need to be admin',
+    );
+    echo _json_encode($response);
+    exit;
 }
-
 $customoid_id = $_POST['customoid_id'];
 
 if (is_numeric($customoid_id) && $customoid_id > 0) {

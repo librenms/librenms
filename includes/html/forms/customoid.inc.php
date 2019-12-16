@@ -1,14 +1,14 @@
 <?php
 
-use LibreNMS\Authentication\LegacyAuth;
-
 header('Content-type: application/json');
 
-if (!LegacyAuth::user()->hasGlobalAdmin()) {
-    die(json_encode([
-        'status' => 'error',
-        'message' => 'You need to be admin.'
-    ]));
+if (!Auth::user()->hasGlobalAdmin()) {
+    $response = array(
+        'status'  => 'error',
+        'message' => 'Need to be admin',
+    );
+    echo _json_encode($response);
+    exit;
 }
 
 $status = 'ok';
