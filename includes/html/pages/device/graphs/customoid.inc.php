@@ -4,9 +4,9 @@ $row = 1;
 
 foreach (dbFetchRows('SELECT * FROM `customoids` WHERE `device_id` = ? ORDER BY `customoid_descr`', array($device['device_id'])) as $customoid) {
     if (!is_integer($row / 2)) {
-        $row_colour = $config['list_colour']['even'];
+        $row_colour = Config::get("list_colour.even");
     } else {
-        $row_colour = $config['list_colour']['odd'];
+        $row_colour = Config::get("list_colour.odd");
     }
     $customoid_descr     = $customoid['customoid_descr'];
     $customoid_unit      = $customoid['customoid_unit'];
@@ -23,7 +23,7 @@ foreach (dbFetchRows('SELECT * FROM `customoids` WHERE `device_id` = ? ORDER BY 
     $graph_array['title'] = $customoid['customoid_descr'];
     $graph_array['type']  = 'customoid';
 
-    include 'includes/html/print-device-graph.php';
+    include 'includes/html/print-graphrow.inc.php';
 
     echo '</div></div>';
 
