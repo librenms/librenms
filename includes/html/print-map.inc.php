@@ -14,7 +14,7 @@
 
 use LibreNMS\Config;
 
-$mark_node = $_POST['mark_node'] | 0;
+$highlight_node = $_POST['highlight_node'] | 0;
 
 //Don't know where this should come from, but it is used later, so I just define it here.
 $row_colour="#ffffff";
@@ -240,7 +240,7 @@ foreach ($list as $items) {
             $devices_by_id[$local_device_id] = array_merge($devices_by_id[$local_device_id], $node_down_style);
         }
 
-        if ((empty($device['hostname'])) && ($local_device_id == $mark_node)) {
+        if ((empty($device['hostname'])) && ($local_device_id == $highlight_node)) {
             $devices_by_id[$local_device_id] = array_merge($devices_by_id[$local_device_id], $node_mark_style);
         }
     }
@@ -255,7 +255,7 @@ foreach ($list as $items) {
             $devices_by_id[$remote_device_id] = array_merge($devices_by_id[$remote_device_id], $node_down_style);
         }
 
-        if ((empty($device['hostname'])) && ($remote_device_id == $mark_node)) {
+        if ((empty($device['hostname'])) && ($remote_device_id == $highlight_node)) {
             $devices_by_id[$remote_device_id] = array_merge($devices_by_id[$remote_device_id], $node_mark_style);
         }
     }
@@ -343,7 +343,7 @@ if (count($devices_by_id) > 1 && count($links) > 0) {
 <?php echo csrf_field() ?>
 <?php if (empty($device['hostname'])) { ?>
 <div class="pull-right">
-<select name="mark_node" id="mark_node" class="input-sm" onChange="this.form.submit()";>
+<select name="highlight_node" id="highlight_node" class="input-sm" onChange="this.form.submit()";>
 <option value="0">None</option>
 <?php foreach ($devices_by_id as $dev) { ?>
 <option value="<?=$dev['id']?>"><?=$dev['label']?></option>
@@ -386,7 +386,7 @@ var network = new vis.Network(container, data, options);
         }
     });
 
-$('#mark_node option[value="<?=$mark_node?>"]').prop('selected', true);
+$('#highlight_node option[value="<?=$highlight_node?>"]').prop('selected', true);
 </script>
 
 <?php
