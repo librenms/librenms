@@ -339,8 +339,7 @@ array_multisort(array_column($devices_by_id, 'label'), SORT_ASC, $devices_by_id)
 if (count($devices_by_id) > 1 && count($links) > 0) {
 ?>
 
-<form name="printmapform" method="post" action="" class="form-horizontal" role="form">
-<?php echo csrf_field() ?>
+<form name="printmapform" method="get" action="" class="form-horizontal" role="form">
 <?php if (empty($device['hostname'])) { ?>
 <div class="pull-right">
 <select name="highlight_node" id="highlight_node" class="input-sm" onChange="this.form.submit()";>
