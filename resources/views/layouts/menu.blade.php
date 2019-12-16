@@ -34,10 +34,10 @@
                                 <li><a href="{{ url('availability-map') }}"><i class="fa fa-arrow-circle-up fa-fw fa-lg"
                                                                                aria-hidden="true"></i> @lang('Availability')
                                     </a></li>
+                                <li><a href="{{ url('maps/dependency') }}"><i class="fa fa-chain fa-fw fa-lg"
+                                                                  aria-hidden="true"></i> @lang('Device Dependency')</a></li>
                                 <li><a href="{{ url('map') }}"><i class="fa fa-sitemap fa-fw fa-lg"
                                                                   aria-hidden="true"></i> @lang('Network')</a></li>
-                                <li><a href="{{ url('dependency-map') }}"><i class="fa fa-chain fa-fw fa-lg"
-                                                                  aria-hidden="true"></i> @lang('Device Dependency')</a></li>
                                 @if($device_groups->isNotEmpty())
                                     <li class="dropdown-submenu"><a><i class="fa fa-th fa-fw fa-lg"
                                                                                 aria-hidden="true"></i> @lang('Device Groups Maps')

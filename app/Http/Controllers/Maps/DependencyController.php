@@ -1,6 +1,6 @@
 <?php
 /**
- * MapController.php
+ * DependencyController.php
  *
  * Controller for graphing Relationships
  *
@@ -23,50 +23,14 @@
  * @author     Thomas Berberich <sourcehhdoctor@gmail.com>
  */
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Maps;
 
 use App\Models\Device;
 use Illuminate\Http\Request;
-use LibreNMS\Config;
 use LibreNMS\Util\Url;
 
-class MapController extends Controller
+class DependencyController extends MapController
 {
-    protected function visOptions()
-    {
-        return Config::get('network_map_vis_options');
-    }
-
-    protected function nodeDisabledStyle()
-    {
-        return ['color' => [
-                         'highlight' => [
-                             'background' => Config::get('network_map_legend.di.node'),
-                         ],
-                         'border' => Config::get('network_map_legend.di.border'),
-                         'background' => Config::get('network_map_legend.di.node'),
-                     ],
-               ];
-    }
-
-    protected function nodeDownStyle()
-    {
-        return ['color' => [
-                         'highlight' => [
-                             'background' => Config::get('network_map_legend.dn.node'),
-                             'border' => Config::get('network_map_legend.dn.border'),
-                         ],
-                         'border' => Config::get('network_map_legend.dn.border'),
-                         'background' => Config::get('network_map_legend.dn.node'),
-                     ],
-               ];
-    }
-
-    protected function nodeUpStyle()
-    {
-        return [];
-    }
-
     // Device Dependency Map
     public function dependencyMap(Request $request)
     {
