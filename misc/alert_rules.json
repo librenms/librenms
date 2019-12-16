@@ -411,5 +411,27 @@
   {
     "rule": "%applications.app_type='portactivity' && %applications_metrics.imaps_total_from>'0'",
     "name": "IRCD Connections From"
+  },
+ {
+    "rule": "customoids.customoid_current >= `customoids.customoid_limit` && customoids.customoid_alert = \"1\" && macros.device_up = \"1\"",
+    "name": "CustomOID over limit",
+    "default": true
+  },
+  {
+    "rule": "customoids.customoid_current <= `customoids.customoid_limit_low` && customoids.customoid_alert = \"1\" && macros.device_up = \"1\"",
+    "name": "CustomOID under limit",
+    "default": true
+  },
+  {
+    "rule": "customoids.customoid_current >= `customoids.customoid_limit_warn` && customoids.customoid_alert = \"1\" && macros.device_up = \"1\"",
+    "name": "CustomOID over warning limit",
+    "severity": "warning",
+    "default": true
+  },
+  {
+    "rule": "customoids.customoid_current <= `customoids.customoid_limit_low_warn` && customoids.customoid_alert = \"1\" && macros.device_up = \"1\"",
+    "name": "CustomOID under warning limit",
+    "severity": "warning",
+    "default": true
   }
 ]
