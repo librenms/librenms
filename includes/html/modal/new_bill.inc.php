@@ -44,10 +44,10 @@ if (Auth::user()->hasGlobalAdmin()) {
                         <select class="form-control input-sm" id="device" name="device" onchange="getInterfaceList(this)">
                             <option value=''>Select a device</option>
                             <?php
-                              $devices = dbFetchRows('SELECT * FROM `devices` ORDER BY hostname');
+                              $devices = dbFetchRows('SELECT * FROM `devices` ORDER BY sysName');
                             foreach ($devices as $device) {
                                 $selected = $device['device_id'] == $port_device_id ? " selected" : "";
-                                echo "<option value='${device['device_id']}' $selected>${device['hostname']}</option>\n";
+                                echo "<option value='${device['device_id']}' $selected>${device['sysName']}</option>\n";
                             }
                                 ?>
                         </select>
