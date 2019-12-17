@@ -27,6 +27,26 @@
             "order": 1,
             "type": "boolean"
         },
+        "alert_colour.ok": {
+            "default": "#00ff00",
+            "type": "color"
+        },
+        "alert_colour.bad": {
+            "default": "#ff0000",
+            "type": "color"
+        },
+        "alert_colour.acknowledged": {
+            "default": "#337ab7",
+            "type": "color"
+        },
+        "alert_colour.worse": {
+            "default": "#ff0000",
+            "type": "color"
+        },
+        "alert_colour.better": {
+            "default": "#f0ad4e",
+            "type": "color"
+        },
         "alert.default_copy": {
             "default": true,
             "group": "alerting",
