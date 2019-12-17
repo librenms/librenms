@@ -29,8 +29,11 @@ $sql = 'FROM `ports`';
 
 if (!Auth::user()->hasGlobalRead()) {
     $port_ids = Permissions::portsForUser()->toArray() ?: [0];
-    $where .= " AND `ports`.`port_id` IN " . dbGenPlaceholders(count($port_ids));
-    $param = array_merge($param, $port_ids);
+    $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
+    $where .= " AND (`ports`.`port_id` IN " . dbGenPlaceholders(count($port_ids));
+    $where .= " OR `D`.`device_id` IN " .dbGenPlaceholders(count($device_ids));
+    $where .= ")";
+    $param = array_merge($param, $port_ids, $device_ids);
 }
 
 $sql .= ' LEFT JOIN `devices` AS `D` ON `ports`.`device_id` = `D`.`device_id`';

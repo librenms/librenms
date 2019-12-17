@@ -147,6 +147,11 @@ if (! Auth::user()->hasGlobalAdmin()) {
 
         // Display device groups this user doesn't have access to
         echo '<h4>Grant access to new Device Group</h4>';
+        $allow_dynamic = \LibreNMS\Config::get('permission.device_group.allow_dynamic');
+        if (!$allow_dynamic) {
+            echo "<i>Dynamic groups are disabled, set permission.device_group.allow_dynamic to enable.</i>";
+        }
+
         echo "<form class='form-inline' role='form' method='post' action=''>
             " . csrf_field() . "
             <input type='hidden' value='".$user_data['user_id']."' name='user_id'>
@@ -158,12 +163,14 @@ if (! Auth::user()->hasGlobalAdmin()) {
 
         $device_groups = DeviceGroup::query()
             ->whereNotIn('id', $user->deviceGroups->pluck('id'))
-            ->orderBy('name')->get(['id', 'type', 'name']);
-        $allow_dynamic = \LibreNMS\Config::get('permission.device_group.allow_dynamic');
+            ->when(!$allow_dynamic, function ($query) {
+                return $query->where('type', 'static');
+            })
+            ->orderBy('name')
+            ->get(['id', 'name']);
+
         foreach ($device_groups as $group) {
-                echo '<option value="'.$group->id . '"';
-                echo ($allow_dynamic || $group->type == 'static') ? '>' : ' disabled title="Dynamic groups are disabled by default. Set permission.device_group.allow_dynamic to enable.">';
-                echo $group->name . '</option>';
+            echo '<option value="'.$group->id . '">' . $group->name . '</option>';
         }
 
         echo "</select>
