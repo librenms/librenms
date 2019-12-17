@@ -1324,7 +1324,6 @@ function str_i_contains($haystack, $needles)
     return false;
 }
 
-
     /**
      * Get alert_rules sql filter by minimal severity
      *
@@ -1332,7 +1331,6 @@ function str_i_contains($haystack, $needles)
      * @param  string $alert_rules_name
      * @return string
      */
-
 
 function get_sql_filter_min_severity($min_severity, $alert_rules_name)
 {
