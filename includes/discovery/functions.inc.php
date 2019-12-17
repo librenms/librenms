@@ -913,6 +913,9 @@ function get_device_divisor($device, $os_version, $sensor_type, $oid)
         }
     } elseif ($device['os'] == 'huaweiups') {
         if ($sensor_type == 'frequency') {
+            if (starts_with($device['hardware'], "UPS2000")) {
+                return 10;
+            }
             return 100;
         }
     } elseif ($device['os'] == 'hpe-rtups') {
