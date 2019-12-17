@@ -181,7 +181,7 @@ class AlertUtil
         WHERE a.disabled = 0 AND (
             (d.device_id IS NULL AND g.group_id IS NULL)
             OR (a.invert_map = 0 AND (d.device_id=? OR dg.device_id=?))
-            OR (a.invert_map = 1 AND ? NOT IN (SELECT d.device_id) AND ? NOT IN (SELECT dg.device_id))
+            OR (a.invert_map = 1 AND (d.device_id != ? OR d.device_id IS NULL) AND (dg.device_id != ? OR dg.device_id IS NULL))
         )";
 
         $params = [$device_id, $device_id, $device_id, $device_id, $device_id, $device_id];
