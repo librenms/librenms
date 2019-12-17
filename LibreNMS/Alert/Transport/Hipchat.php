@@ -76,7 +76,6 @@ class Hipchat extends Transport
             }
         }
 
-
         $data[] = "message=" . urlencode($obj["msg"]);
         if ($version == 1) {
             $data[] = "room_id=" . urlencode($option["room_id"]);
