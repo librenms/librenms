@@ -1,0 +1,1067 @@
+-- *****************************************************************
+-- UBQS-DOT1BRIDGE-MIB : Ubiquoss DOT1BRIDGE MIB      
+--
+-- July 2009,   Park Hyung Eun
+--   
+-- Copyright (c) 2009 by Ubiquoss, Corp.
+-- All rights reserved.
+-- *****************************************************************
+--   
+
+UBQS-DOT1BRIDGE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    NOTIFICATION-TYPE,
+    Counter32,
+    IpAddress,
+    Gauge32,
+    Integer32,
+    Unsigned32
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP,
+    NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    TEXTUAL-CONVENTION,
+    RowStatus,
+    DisplayString,
+    TruthValue,  
+    MacAddress
+        FROM SNMPv2-TC
+    VlanIndex,
+    	FROM Q-BRIDGE-MIB
+ 	UbiPortList,
+ 	UbiBridgeId
+        FROM UBQS-TC
+    ubiMgmtv2
+        FROM UBQS-SMI;                                     
+
+
+ubiDot1BridgeMIB MODULE-IDENTITY
+    LAST-UPDATED    "200905260000Z"
+    ORGANIZATION 	"Ubiquoss Corp."
+	CONTACT-INFO
+		"	Ubiquoss
+			Customer Service
+
+		 Postal: 24F Milennium B/D,
+		 	467-12, Dogok-Dong,
+			GangNam-Gu, Seoul 135-270
+			Korea
+
+		   Tel: 82-2-2190-3100"     
+	DESCRIPTION
+        "The MIB module for entities implementing 
+        the IEEE 802.1 management."
+    ::= { ubiMgmtv2 5 }
+
+ 
+ 
+-- *****************************************************************
+-- Textual Conventions
+-- *****************************************************************
+     
+VlanStpType   ::= TEXTUAL-CONVENTION
+STATUS          current
+    DESCRIPTION
+        "The type of the Spanning Tree Protocol (STP) running on
+        this VLAN."           
+    SYNTAX          INTEGER  {    
+                        stp(1),
+                        stp-vlan-bridge(2),
+                        rstp(3),
+                        rstp-vlan-bridge(4),
+                        mstp(5),
+                        provider-rstp(6),
+                        provider-mstp(7),
+                        rpvstExt(8)		-- rpvst+ 
+        }
+
+         
+UbiVlanIntType   ::= TEXTUAL-CONVENTION
+STATUS          current
+    DESCRIPTION
+        "The type of the VLAN.         
+   		 other(1),
+         backbone_p2p(2),        -- backbone point to point  
+         backbone_m2m(3),		-- backbone multipoint to multipoint    
+         customer(4),
+         service_p2p(5),         -- service point to point   
+         service_m2m(6)          -- service multipoint to multipoint"
+    SYNTAX          INTEGER  {  
+    		other(1),
+        	backbone_p2p(2),        -- backbone point to point  
+        	backbone_m2m(3),		-- backbone multipoint to multipoint    
+            customer(4),
+            service_p2p(5),         -- service point to point   
+            service_m2m(6)          -- service multipoint to multipoint   
+   }    
+
+UbiVlanType   ::= TEXTUAL-CONVENTION
+STATUS          current
+    DESCRIPTION
+        "The type of the VLAN."           
+    SYNTAX          BITS 
+      	{            
+            static(0), 
+            dynamic(1),  
+            cvlan(2),
+            svlan(3),
+            svlan_p2p(4),
+            svlan_m2m(5),
+            --PBB
+            bvlan(6),
+            bvlan_p2p(7),
+            bvlan_m2m(8),
+            -- PBB TE
+            tevlan(9),
+            auto(10)
+      	}     
+      	
+UbiBridgeType    ::= TEXTUAL-CONVENTION
+STATUS          current
+    DESCRIPTION
+        "Indicates the component type(s) of this bridge.  The
+ 		  following component types are possible:
+ 	
+ 	    	iComponent(1) - An S-VLAN aware component of a Backbone
+ 	        		Edge Bridge which performs encapsulation of customer
+ 	        		frames.
+ 	
+ 	    	bComponent(2) - An S-VLAN aware component of a Backbone
+ 	        		Edge Bridge which bundles backbone service instances
+ 	        		into B-VLANs.
+ 	
+ 	    	cVlanComponent(3) - A C-VLAN aware component of an
+ 	        		enterprise VLAN bridge or of a Provider Bridge used
+ 	        		to process C-tagged frames.       
+ 	         	
+ 	    	sVlanComponent(4) - An S-VLAN aware component of a
+ 	        		Provider Bridge.    
+  
+ 	    	dBridgeComponent(5) - A VLAN unaware component of an
+ 	        		802.1D bridge.
+ 	       
+ 	        edgeComponent (6) - A C-VLAN or S-VLAN aware component of a
+ 	        		Provider Bridge."           
+    SYNTAX          INTEGER  {          
+			iComponent(1),
+			bComponent(2),
+			cVlanComponent(3),      		-- vlan bridge or provider edge bridge
+			sVlanComponent(4),              -- provider bridge
+			dBridgeComponent(5),  
+			edgeComponent(6),                -- provider edge bridge
+    }                                                        
+    
+          
+ 
+-- *****************************************************************
+-- ubiDo1MIBObjects
+-- *****************************************************************
+
+ubiDot1BridgeMIBNotificationsPrefix  	OBJECT IDENTIFIER		::= { ubiDot1BridgeMIB 0 }
+ubiVlanMIBObjects  						OBJECT IDENTIFIER		::= { ubiDot1BridgeMIB 1 }        
+ubiBridgeMIBObjects  					OBJECT IDENTIFIER		::= { ubiDot1BridgeMIB 2 }
+ubiMacAddressTableMIBObjects			OBJECT IDENTIFIER		::= { ubiDot1BridgeMIB 3 }      
+
+ubiDot1BridgeMIBConformance  			OBJECT IDENTIFIER		::= { ubiDot1BridgeMIB 10 }
+  
+  
+
+-- *****************************************************************
+-- ubiVlanMIBNotificationEnables
+-- *****************************************************************
+ubiVlanNotifications  OBJECT IDENTIFIER			::= { ubiDot1BridgeMIBNotificationsPrefix 0 }
+
+	ubiVlanCreated NOTIFICATION-TYPE
+    	OBJECTS         { ubiVlanName }
+    	STATUS          current
+    	DESCRIPTION
+        	"A ubiVlanCreated notification is generated by a
+       		device when a VLAN is created."
+   	::= { ubiVlanNotifications 1 }
+
+	ubiVlanDeleted NOTIFICATION-TYPE
+    	OBJECTS         { ubiVlanName }
+    	STATUS          current
+    	DESCRIPTION
+        	"A ubiVlanDeleted notification is generated by a
+        	device when a VLAN is deleted."
+   	::= { ubiVlanNotifications 2 }
+
+-- *****************************************************************
+-- ubiFdbNotifications
+-- *****************************************************************
+ubiFdbNotifications  OBJECT IDENTIFIER			::= { ubiDot1BridgeMIBNotificationsPrefix 1 }
+
+	ubiFdbAlarmAsserted NOTIFICATION-TYPE
+    	OBJECTS         { }
+    	STATUS          current
+    	DESCRIPTION
+        	"A ubiFdbAlarmAsserted notification is generated by a
+       		device when the number of FDB entries exceeds high threshold."
+   	::= { ubiFdbNotifications 1 }
+   	
+	ubiFdbAlarmCleared NOTIFICATION-TYPE
+    	OBJECTS         { }
+    	STATUS          current
+    	DESCRIPTION
+        	"A ubiFdbAlarmCleared notification is generated by a
+       		device when the number of FDB entries meets low threshold."
+   	::= { ubiFdbNotifications 2 }
+   
+-- *****************************************************************
+-- ubiVlanMIBNotificationEnables
+-- *****************************************************************
+
+ubiVlanNotificationEnables  OBJECT IDENTIFIER		::= { ubiVlanMIBObjects 1 }
+
+	ubiVlanCreateEnabled OBJECT-TYPE
+    	SYNTAX          TruthValue
+    	MAX-ACCESS      read-write
+    	STATUS          current
+    	DESCRIPTION
+        	"An indication of whether the notification should
+        	be generated when a VLAN is created. 
+
+        	If the value of this object is 'true' then the
+        	vlanCreated notification will be generated.
+
+        	If the value of this object is 'false' then the
+        	vlanCreated notification will not be generated."        
+  	 	DEFVAL          { false } 
+    	::= { ubiVlanNotificationEnables 1 }
+
+  	ubiVlanDeleteEnabled OBJECT-TYPE
+    	SYNTAX          TruthValue
+    	MAX-ACCESS      read-write
+    	STATUS          current
+    	DESCRIPTION
+        	"An indication of whether the notification should
+        	be generated when a VLAN is deleted.  
+
+        	If the value of this object is 'true' then the
+        	vlanDeleted notification will be generated.
+
+        	If the value of this object is 'false' then the
+        	vlanDeleted notification will not be generated."  
+  	 	DEFVAL          { false } 
+    	::= { ubiVlanNotificationEnables 2 }        
+                                          
+  
+-- *****************************************************************
+-- ubiVlanTable
+-- *****************************************************************
+
+	ubiVlanTable OBJECT-TYPE
+		SYNTAX          SEQUENCE OF UbiVlanEntry 
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"This table contains information on the VLANs which
+        	currently exist."
+    	::= { ubiVlanMIBObjects 2 }
+
+  	ubiVlanEntry OBJECT-TYPE
+    	SYNTAX          UbiVlanEntry
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"Information about one current VLAN."
+    	INDEX           { ubiVlanIndex } 
+    	::= { ubiVlanTable 1 }
+
+  	
+  	UbiVlanEntry ::= SEQUENCE {
+        	ubiVlanIndex              	VlanIndex,    
+        	ubiVlanIfIndex            	Integer32,  
+        	ubiVlanName               	DisplayString,   
+        	ubiVlanStatus				INTEGER,
+        	ubiVlanType                	UbiVlanType,     
+        	ubiVlanMtu					Integer32,       
+        	ubiVlanStpType            	INTEGER,
+        	ubiVlanRowStatus       		RowStatus
+        }
+
+  	ubiVlanIndex OBJECT-TYPE
+    	SYNTAX          VlanIndex
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"The VLAN-id of this VLAN." 
+    	::= { ubiVlanEntry 1 }
+
+  	ubiVlanIfIndex OBJECT-TYPE
+    	SYNTAX          Integer32
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"The value of the ifIndex corresponding to 
+        	 this VLAN-id." 
+    	::= { ubiVlanEntry 2 }
+
+  	ubiVlanName OBJECT-TYPE
+    	SYNTAX          DisplayString (SIZE  (1..32))
+    	MAX-ACCESS      read-create
+    	STATUS          current   
+    	DESCRIPTION
+        	"The name of this VLAN."        
+    	::= { ubiVlanEntry 3 }
+
+  	ubiVlanStatus OBJECT-TYPE
+    	SYNTAX          INTEGER    
+    	{	          
+    		inactive(1),
+    		active(2)
+    	}
+    	MAX-ACCESS      read-write
+    	STATUS          current
+    	DESCRIPTION
+        	"The current state of the VLAN."    
+    	DEFVAL          { active }
+      	::= { ubiVlanEntry 4 }
+
+  	ubiVlanType OBJECT-TYPE
+		SYNTAX      UbiVlanType 
+   		MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"Indicates the type(s) of this vlan." 
+    	::= { ubiVlanEntry 5 }
+
+  	ubiVlanMtu OBJECT-TYPE
+    	SYNTAX          Integer32 (1500..10218)
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"The MTU size on this VLAN."
+    	DEFVAL          { 1500 }  
+    	::= { ubiVlanEntry 6 }
+ 
+ 
+  	ubiVlanStpType OBJECT-TYPE
+    	SYNTAX          VlanStpType
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"The type of the Spanning Tree Protocol (STP) running on
+        	this VLAN.
+        	
+        	STP Type:                      
+        	            stp(1),
+                        stp-vlan-bridge(2),
+                        rstp(3),
+                        rstp-vlan-bridge(4),
+                        mstp(5),
+                        provider-rstp(6),
+                        provider-mstp(7),
+                        rpvstExt(8)		-- rpvst+ 
+			" 
+    	::= { ubiVlanEntry 7 }     
+              
+  	ubiVlanRowStatus OBJECT-TYPE
+    	SYNTAX          RowStatus
+    	MAX-ACCESS      read-create
+    	STATUS          deprecated
+    	DESCRIPTION
+        	"The status of Vlan row. This table is deprecated 
+        	 by ubiVlanStaticTable." 
+    	::= { ubiVlanEntry 8 }
+                                                                    
+                                                                    
+-- *****************************************************************
+-- ubiVlanMembershipTable
+-- *****************************************************************
+	ubiVlanMembershipTable OBJECT-TYPE
+    	SYNTAX          SEQUENCE OF UbiVlanMembershipEntry 
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"A table for configuring VLAN port membership.
+        	There is one row for each bridge port."
+    	::= { ubiVlanMIBObjects 3 }
+
+	ubiVlanMembershipEntry OBJECT-TYPE
+    	SYNTAX          UbiVlanMembershipEntry
+     	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"An entry (conceptual row) in the ubiVlanMembershipTable."
+    	INDEX           { ubiVlanIndex } 
+    	::= { ubiVlanMembershipTable 1 }
+
+	UbiVlanMembershipEntry ::= SEQUENCE {  
+        ubiVmMemberPorts 			UbiPortList 
+       }
+
+	ubiVmMemberPorts OBJECT-TYPE
+    	SYNTAX          UbiPortList
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"The set of the device's member ports that belong
+        	to the VLAN. A bit is corresponding with the bridge port id." 
+    	::= { ubiVlanMembershipEntry 1 }
+                 
+                 
+-- *****************************************************************
+-- ubiVlanStaticTable   (including vlanType)     
+-- *****************************************************************
+	ubiVlanStaticTable OBJECT-TYPE
+    	SYNTAX          SEQUENCE OF UbiVlanStaticEntry 
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"A table containing static configuration information for
+ 			 each VLAN. This table contains vlan type for entry creatation 
+ 			 and encompasses the ubiVlanTable."
+    	::= { ubiVlanMIBObjects 4 }
+
+	ubiVlanStaticEntry OBJECT-TYPE
+    	SYNTAX          UbiVlanStaticEntry
+     	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"Static information for a VLAN configured into 
+        	the device by management."
+   	INDEX           { ubiVlanIndex } 
+    	::= { ubiVlanStaticTable 1 }
+
+	UbiVlanStaticEntry ::= SEQUENCE {     
+        ubiVlanStaticBridgeId			UbiBridgeId,  
+        ubiVlanStaticVlanType 			UbiVlanIntType,   
+        ubiVlanStaticAdditiveType		BITS,
+        ubiVlanStaticRowStatus			RowStatus,
+       }
+ 
+                               
+	ubiVlanStaticBridgeId OBJECT-TYPE
+    	SYNTAX          UbiBridgeId
+    	MAX-ACCESS      read-create    
+    	STATUS          current
+    	DESCRIPTION
+        	"Indicates the bridge group id."        	 
+       	::= { ubiVlanStaticEntry 1 }
+ 
+	ubiVlanStaticVlanType OBJECT-TYPE
+    	SYNTAX          UbiVlanIntType
+    	MAX-ACCESS      read-create
+    	STATUS          current
+    	DESCRIPTION
+        	"Indicates the type(s) of this vlan.
+       
+   		 	other(1)
+   		 	backbone_p2p(2): backbone point to point  
+   		 	backbone_m2m(3): backbone multipoint to multipoint    
+   		 	customer(4)
+   		 	service_p2p(5): service point to point   
+   		 	service_m2m(6): service multipoint to multipoint
+		" 
+    	::= { ubiVlanStaticEntry 2 }      
+    	
+	ubiVlanStaticAdditiveType OBJECT-TYPE
+    	SYNTAX          BITS {              
+    		multicast(0)
+    	}
+    	MAX-ACCESS      read-create
+    	STATUS          current
+    	DESCRIPTION
+        	"Indicates the additive characteristic(s) for this vlan.
+ 				multicast(0) - Indicates a vlan has capability 
+ 						for multicast traffic"
+       	::= { ubiVlanStaticEntry 3 }
+                                                                       
+	ubiVlanStaticRowStatus OBJECT-TYPE
+    	SYNTAX          RowStatus
+    	MAX-ACCESS      read-create
+    	STATUS          current
+    	DESCRIPTION
+        	"The status of vlan row."
+       	::= { ubiVlanStaticEntry 4 }                                          
+          
+-- *****************************************************************
+-- ubiBridgeTable
+-- *****************************************************************
+
+	ubiBridgeTable OBJECT-TYPE
+		SYNTAX          SEQUENCE OF UbiBridgeEntry 
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"A table that contains generic information about
+ 			 every bridge group."
+    	::= { ubiBridgeMIBObjects 1 }
+
+  	ubiBridgeEntry OBJECT-TYPE
+    	SYNTAX          UbiBridgeEntry
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"A list of information for each bridge."
+    	INDEX           { ubiBridgeId } 
+    	::= { ubiBridgeTable 1 }
+
+  	
+  	UbiBridgeEntry ::= SEQUENCE {
+        	ubiBridgeId              		UbiBridgeId,    
+        	ubiBridgeProtocol            	UbiBridgeType,     
+	       	ubiBridgeTopology				INTEGER,
+        	ubiBridgeAgeingTime				Unsigned32,  
+        	ubiBridgeRowStatus      		RowStatus
+        	
+    }
+
+  	ubiBridgeId OBJECT-TYPE
+    	SYNTAX          UbiBridgeId
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"The component identifier is used to distinguish between 
+        	the multiple virtual bridge instances." 
+    	::= { ubiBridgeEntry 1 }
+                                     
+                                     
+  	ubiBridgeProtocol OBJECT-TYPE
+    	SYNTAX          UbiBridgeType
+    	MAX-ACCESS      read-create
+    	STATUS          current
+    	DESCRIPTION
+        	"Indicates the component type(s) of this bridge.  The
+ 		  following component types are possible:
+ 	
+ 	    	iComponent(1) - An S-VLAN aware component of a Backbone
+ 	        		Edge Bridge which performs encapsulation of customer
+ 	        		frames.
+ 	
+ 	    	bComponent(2) - An S-VLAN aware component of a Backbone
+ 	        		Edge Bridge which bundles backbone service instances
+ 	        		into B-VLANs.
+ 	
+ 	    	cVlanComponent(3) - A C-VLAN aware component of an
+ 	        		enterprise VLAN bridge or of a Provider Bridge used
+ 	        		to process C-tagged frames.
+ 	
+ 	    	sVlanComponent(4) - An S-VLAN aware component of a
+ 	        		Provider Bridge.
+ 	
+ 	    	dBridgeComponent(5) - A VLAN unaware component of an
+ 	        		802.1D bridge.        	
+ 	        
+ 	        edgeComponent (6) - A C-VLAN or S-VLAN aware component of a
+ 	        		Provider Bridge." 
+    	::= { ubiBridgeEntry 2 }
+    
+ 
+  	ubiBridgeTopology OBJECT-TYPE
+    	SYNTAX          INTEGER {
+    		none(1),
+			ring(2)
+    	}
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"Topology type of this bridge entry" 
+    	::= { ubiBridgeEntry 3 }
+
+
+  	ubiBridgeAgeingTime OBJECT-TYPE
+    	SYNTAX          Unsigned32
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"Ageing time of this bridge entry"
+       	::= { ubiBridgeEntry 4}
+  
+   	ubiBridgeRowStatus OBJECT-TYPE
+    	SYNTAX          RowStatus
+    	MAX-ACCESS      read-create
+    	STATUS          current
+    	DESCRIPTION
+        	"The status of bridge row." 
+    	::= { ubiBridgeEntry 5 }
+
+                 
+
+-- *****************************************************************
+-- ubiBridgePortTable
+-- *****************************************************************    
+
+	ubiBridgePortTable OBJECT-TYPE
+		SYNTAX          SEQUENCE OF UbiBridgePortEntry 
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"A table that contains generic information about
+ 			 every interface information of bridge group."
+    	::= { ubiBridgeMIBObjects 2 }
+
+  	ubiBridgePortEntry OBJECT-TYPE
+    	SYNTAX          UbiBridgePortEntry
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"A list of interface information for each bridge"
+    	INDEX           { ubiBridgeId, ubiBridgePort } 
+    	::= { ubiBridgePortTable 1 }
+
+  	
+  	UbiBridgePortEntry ::= SEQUENCE {    
+  			ubiBridgePort				Integer32,    
+  			ubiBridgePortIfIndex		Integer32,
+  			ubiBridgePortName			DisplayString,
+        	ubiBridgePortStatus      	INTEGER
+        }
+
+   	ubiBridgePort OBJECT-TYPE
+    	SYNTAX          Integer32
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"The port number of the port for which this entry
+			contains bridge management information." 
+    	::= { ubiBridgePortEntry 1 }
+
+   	ubiBridgePortIfIndex OBJECT-TYPE
+    	SYNTAX          Integer32
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"The value of the instance of the ifIndex object,
+ 			defined in IF-MIB, for the interface corresponding
+ 			to this port." 
+    	::= { ubiBridgePortEntry 2 }
+
+   	ubiBridgePortName OBJECT-TYPE
+    	SYNTAX          DisplayString
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"A textual string containing information about this
+ 			port." 
+    	::= { ubiBridgePortEntry 3 }
+                 
+   	ubiBridgePortStatus OBJECT-TYPE
+    	SYNTAX          INTEGER  {
+    		none(0), 
+    		disabled(1),
+    		listening(2),
+    		learning(3),
+    		forwarding(4),
+    		blocking(5),
+    		discarding(6),
+    		discarding-edge(7)
+    	}
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"The current status of the bridge port." 
+    	::= { ubiBridgePortEntry 4 }
+                 
+
+-- *****************************************************************
+-- ubiBridgeVlanTable
+-- *****************************************************************    
+
+	ubiBridgeVlanTable OBJECT-TYPE
+		SYNTAX          SEQUENCE OF UbiBridgeVlanEntry 
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"A table that contains generic information about
+ 			 every VLAN configuration of bridge group."
+    	::= { ubiBridgeMIBObjects 3 }
+
+  	ubiBridgeVlanEntry OBJECT-TYPE
+    	SYNTAX          UbiBridgeVlanEntry
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"Information controlling VLAN configuration for bridge"
+    	INDEX           { ubiBridgeId, ubiVlanIndex } 
+    	::= { ubiBridgeVlanTable 1 }
+
+  	
+  	UbiBridgeVlanEntry ::= SEQUENCE {    
+	       	ubiBridgeVlanStatus      	INTEGER
+        }
+                 
+   	ubiBridgeVlanStatus OBJECT-TYPE
+    	SYNTAX          INTEGER  {
+    		none(0), 
+    		up(1),
+    		down(2)
+       	}
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"The current status of the VLAN" 
+    	::= { ubiBridgeVlanEntry 1 }
+                                                          
+-- *****************************************************************
+-- ubiMacAddressTableObjects
+-- *****************************************************************
+	ubiMacAddressAgingTime			OBJECT-TYPE
+		SYNTAX			Integer32(10..600)
+		ACCESS			read-write
+		STATUS			current
+		DESCRIPTION
+			"aging-time of mac-address-table"
+		::= { ubiMacAddressTableMIBObjects 1 }
+		
+-- ubiMacTableListTable
+		
+	ubiMacTableListTable			OBJECT-TYPE
+		SYNTAX			SEQUENCE OF UbiMacTableListEntry
+		ACCESS			not-accessible
+		STATUS			current
+		DESCRIPTION
+			"The static table of mac-address-table list entrys"
+		::= { ubiMacAddressTableMIBObjects 2 }
+		
+	ubiMacTableListEntry			OBJECT-TYPE
+		SYNTAX			UbiMacTableListEntry
+		ACCESS			not-accessible
+		STATUS			current
+		DESCRIPTION
+			"The entry representing static mac-address-table list member"
+		INDEX	
+		{ 
+			ubiMacTableAddress,
+			ubiMacTableIfindex,
+			ubiMacTableType,
+			ubiMacTableForward,
+			ubiMacTableVlanId
+		}
+		::= { ubiMacTableListTable 1 }
+		
+	UbiMacTableListEntry ::= SEQUENCE {
+		ubiMacTableAddress		MacAddress, 
+		ubiMacTableIfindex		Integer32,
+		ubiMacTableType    		INTEGER,
+		ubiMacTableForward		INTEGER,		
+		ubiMacTableVlanId		Integer32,
+		ubiMacTableRowStatus	RowStatus
+	}
+	
+	ubiMacTableAddress		OBJECT-TYPE
+		SYNTAX			DisplayString(SIZE(1..6))
+		ACCESS			read-only
+		STATUS			current
+		DESCRIPTION
+			"mac address of static mac-address-table entry"
+		::= { ubiMacTableListEntry 1 }
+
+	ubiMacTableIfindex		OBJECT-TYPE
+		SYNTAX			Integer32
+		ACCESS			read-only
+		STATUS			current
+		DESCRIPTION
+			"interface name of static mac-address-table entry"
+		::= { ubiMacTableListEntry 2 }		
+		
+	ubiMacTableType			OBJECT-TYPE
+		SYNTAX			INTEGER
+		{
+			static(1)
+--			dynamic(2),
+--			multicast(3)
+		}
+		ACCESS			read-only
+		STATUS			current
+		DESCRIPTION
+			"type of static mac-address-type entry.
+			 If create mac-address-table, type must be static"
+		::= { ubiMacTableListEntry 3 }
+		
+	ubiMacTableForward		OBJECT-TYPE
+		SYNTAX			INTEGER
+		{
+			discard(0),
+			forward(1)
+		}	          
+		ACCESS			read-only
+		STATUS			current
+		DESCRIPTION
+			"forward state of static mac-address-table entry"
+		::= { ubiMacTableListEntry 4 }
+
+	ubiMacTableVlanId		OBJECT-TYPE
+		SYNTAX			Integer32(1..4094)
+		ACCESS			read-only
+		STATUS			current
+		DESCRIPTION
+			"vlan of static mac-address-table entry"
+		::= { ubiMacTableListEntry 5 }
+				
+	ubiMacTableRowStatus	OBJECT-TYPE
+		SYNTAX			RowStatus
+		ACCESS			read-create
+		STATUS			current
+		DESCRIPTION
+			"row status, only static type" 
+		::= { ubiMacTableListEntry 6 }			
+		
+-- ubiMacTableCountTable
+
+--	ubiMacTableVlanCountTable		OBJECT-TYPE
+--		SYNTAX			SEQUENCE OF UbiMacTableVlanCountEntry
+--		ACCESS			not-accessible
+--		STATUS			current
+--		DESCRIPTION
+--			"The table of mac-address-table vlan count entry"					
+--		::= { ubiMacAddressTableObjects 3 }
+		
+--	ubiMacTableVlanCountEntry		OBJECT-TYPE
+--		SYNTAX			UbiMacTableVlanCountEntry
+--		ACCESS			not-accessible
+--		STATUS			current
+--		DESCRIPTION
+--			"The entry representing mac-address-table vlan count"
+--		INDEX	{ vlanIndex }
+--		::= { ubiMacTableVlanCountTable 1 }
+		
+--	UbiMacTableVlanCountEntry ::= SEQUENCE {
+--		ubiMacVlanDynamicCount		Integer32,
+--		ubiMacVlanStaticCount		Integer32,
+--		ubiMacVlanMulticastCount	Integer32,
+--		ubiMacVlanAvailTotal		Integer32
+--	}
+	
+--	ubiMacVlanDynamicCount		OBJECT-TYPE
+--		SYNTAX			Integer32
+--		ACCESS			read-only
+--		STATUS			current
+--		DESCRIPTION
+--			"dynamic mac count of specific vlan"
+--		::= { ubiMacTableVlanCountEntry 1 }
+		
+--	ubiMacVlanStaticCount		OBJECT-TYPE
+--		SYNTAX			Integer32
+--		ACCESS			read-only
+--		STATUS			current
+--		DESCRIPTION
+--			"static mac count of specific vlan"
+--		::= { ubiMacTableVlanCountEntry 2 }
+		
+--	ubiMacVlanMulticastCount	OBJECT-TYPE
+--		SYNTAX			Integer32
+--		ACCESS			read-only
+--		STATUS			current
+--		DESCRIPTION
+--			"multicast mac count of specific vlan"
+--		::= { ubiMacTableVlanCountEntry 3 }
+		
+
+-- ubiClearMacTable 
+    ubiClearMacTable		OBJECT IDENTIFIER ::= { ubiMacAddressTableMIBObjects 3 }
+	
+    ubiClearMacType			OBJECT-TYPE
+    	SYNTAX			INTEGER
+    	{
+    		static(1),
+    		dynamic(2),
+    		multicast(3)
+    	}               
+    	ACCESS			read-write
+    	STATUS			current
+    	DESCRIPTION
+    		"type of mac-address-table list to be cleared"
+    	::= { ubiClearMacTable 1 }
+    	
+    ubiClearMacAddress		OBJECT-TYPE
+    	SYNTAX			DisplayString(SIZE(1..14))
+    	ACCESS			read-write
+    	STATUS			current
+    	DESCRIPTION
+    		"address of mac-address-table list to be cleared.
+    		 If this value is set, 
+    		 ifindex and vlanId must not be set."
+    	::= { ubiClearMacTable 2 }
+    	
+    ubiClearMacIfindex		OBJECT-TYPE
+    	SYNTAX			Integer32
+    	ACCESS			read-write
+    	STATUS			current
+    	DESCRIPTION
+    		"ifindex of mac-address-table list to be cleared.
+    		 If this value is set,
+    		 macAddr and vlanId must not be set."
+    	::= { ubiClearMacTable 3 }
+    	
+    ubiClearMacVlanId		OBJECT-TYPE
+    	SYNTAX			Integer32(1..4094)
+    	ACCESS			read-write
+    	STATUS			current
+    	DESCRIPTION
+    		"vlan id of mac-address-table list to be cleared.
+    		 If this value is set,
+    		 macAddr and ifindex must not be set."
+    	::= { ubiClearMacTable 4 }
+    	
+    ubiClearMacBridgeId		OBJECT-TYPE
+    	SYNTAX			Integer32(1..32)
+    	ACCESS			read-write
+    	STATUS			current
+    	DESCRIPTION
+    		"bridge id of mac-address-table list to be cleared"
+    	::= { ubiClearMacTable 5 }
+    	
+    ubiClearMacInstanceId	OBJECT-TYPE
+    	SYNTAX			Integer32(1..63)
+    	ACCESS			read-write
+    	STATUS			current
+    	DESCRIPTION
+    		"instance id of mac-address-table list to be cleared.
+    		 before set this value, ifindex must be set."
+    	::= { ubiClearMacTable 6 }		
+    
+	ubiClearMacExcute		OBJECT-TYPE
+		SYNTAX			INTEGER
+		{
+			none(0),
+			excute(1)
+		}	 		 
+		ACCESS			read-write 
+		STATUS			current
+		DESCRIPTION
+			"value to control to clear mac-address-table"
+		::= { ubiClearMacTable 7 }    
+		
+-- *****************************************************************
+-- ubiMacTotalCount
+-- *****************************************************************
+	ubiMacTotalCount			OBJECT-TYPE
+		SYNTAX			Integer32
+		ACCESS			read-only
+		STATUS			current
+		DESCRIPTION
+			"Total count of mac-address-table"
+		::= { ubiMacAddressTableMIBObjects 4 }
+
+	
+			 
+                                                       
+-- *****************************************************************
+-- ubiDot1MIBConformance
+-- *****************************************************************
+
+-- Conformance Information
+ubiDot1BridgeMIBCompliances  	OBJECT IDENTIFIER		::= { ubiDot1BridgeMIBConformance 1 }
+ubiDot1BridgeMIBGroups  		OBJECT IDENTIFIER		::= { ubiDot1BridgeMIBConformance 2 }
+
+
+-- compliance statements
+
+	ubiVlanMIBCompliance MODULE-COMPLIANCE
+    	STATUS          current
+    	DESCRIPTION
+        	"The compliance statement for DOT1 implementations."
+    	MODULE          -- this module
+    	MANDATORY-GROUPS {             
+                        ubiVlanGroup,   
+                        ubiVlanNotifEnabledGroup,
+                    }
+    	::= { ubiDot1BridgeMIBCompliances 1 }
+
+-- units of conformance
+
+	ubiVlanGroup OBJECT-GROUP
+    	OBJECTS         {   
+    					ubiVlanIndex,
+    					ubiVlanIfIndex,
+                        ubiVlanState,
+                        ubiVlanType,
+                        ubiVlanName,
+                        ubiVlanMtu,
+                        ubiVlanStpType,
+                        ubiVlanRowStatus,
+                        ubiVmMemberPorts
+                    }
+    	STATUS          current
+    	DESCRIPTION
+        	"A collection of objects for the monitoring 
+        	 VLAN information."
+    	::= { ubiDot1BridgeMIBGroups 1 }
+
+	ubiVlanNotifEnabledGroup OBJECT-GROUP
+    	OBJECTS         {
+                        ubiVlanCreatedNotifEnabled,
+                        ubiVlanDeletedNotifEnabled
+                    }
+    	STATUS          current
+    	DESCRIPTION
+        	"A collection of objects to indicate whether a
+        	certain group of notifications are enabled."
+    	::= { ubiDot1BridgeMIBGroups 2 }
+  
+	ubiVlanStaticGroup OBJECT-GROUP
+    	OBJECTS         {   
+    					ubiVlanStaticBridgeId ,
+    					ubiVlanStaticVlanType ,
+                        ubiVlanStaticAdditiveType ,
+                        ubiVlanStaticRowStatus 
+        }
+    	STATUS          current
+    	DESCRIPTION
+        	"A collection of objects for VLAN creation with type."
+    	::= { ubiDot1BridgeMIBGroups 3 }
+ 
+-- compliance statements
+
+	ubiBridgeMIBCompliance MODULE-COMPLIANCE
+    	STATUS          current
+    	DESCRIPTION
+        	"The compliance statement for DOT1 implementations."
+    	MODULE          -- this module
+    	MANDATORY-GROUPS {             
+                        ubiBridgeGroup,    
+                        ubiBridgePortGroup,
+                        ubiBridgeVlanGroup
+                    }
+    	::= { ubiDot1BridgeMIBCompliances 2 }
+
+-- units of conformance
+
+	ubiBridgeGroup OBJECT-GROUP
+    	OBJECTS         {   
+    					ubiBridgeId,
+    					ubiBridgeProtocol,
+                        ubiVlubiBridgeTopology,
+                        ubiBridgeAgeingTime,
+                        ubiBridgeRowStatus 
+        }
+    	STATUS          current
+    	DESCRIPTION
+        	"A collection of objects for the bridge information."
+    	::= { ubiDot1BridgeMIBGroups 4 }
+
+	ubiBridgePortGroup OBJECT-GROUP
+    	OBJECTS         {   
+    					ubiBridgePort ,
+    					ubiBridgePortIfIndex ,
+                        ubiBridgePortName ,
+                        ubiBridgePortStatus 
+        }
+    	STATUS          current
+    	DESCRIPTION
+        	"A collection of objects for the bridge port information."
+    	::= { ubiDot1BridgeMIBGroups 5 }
+ 
+	ubiBridgeVlanGroup OBJECT-GROUP
+    	OBJECTS         {   
+    				ubiBridgeVlanStatus 
+    	}
+    	STATUS          current
+    	DESCRIPTION
+        	"A collection of objects for the bridge VLAN information."
+    	::= { ubiDot1BridgeMIBGroups 6 }     
+    	
+  
+  
+END
+
+
+
+

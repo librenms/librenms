@@ -45,4 +45,14 @@ class Env
 
         return $value;
     }
+
+    /**
+     * Detect if LibreNMS is installed from the official Docker image.
+     *
+     * @return bool
+     */
+    public static function librenmsDocker()
+    {
+        return getenv('LIBRENMS_DOCKER') === '1';
+    }
 }

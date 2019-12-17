@@ -122,6 +122,7 @@ by following the steps under the `SNMP Extend` heading.
 1. [Proxmox](#proxmox) - SNMP extend
 1. [Raspberry PI](#raspberry-pi) - SNMP extend
 1. [SDFS info](#sdfs-info) - SNMP extend
+1. [Seafile](#seafile) - SNMP extend
 1. [SMART](#smart) - SNMP extend
 1. [Squid](#squid) - SNMP proxy
 1. [TinyDNS/djbdns](#tinydns-aka-djbdns) - Agent
@@ -913,8 +914,8 @@ $mysql_port = 3306;
 
 Note that depending on your MySQL installation (chrooted install for example),
 you may have to specify 127.0.0.1 instead of localhost. Localhost make
-a MySQL connexion via the mysql socket, while 127.0.0.1 make a standard
-IP connexion to mysql.
+a MySQL connection via the mysql socket, while 127.0.0.1 make a standard
+IP connection to mysql.
 
 5: Edit your snmpd.conf file and add:
 
@@ -1459,7 +1460,7 @@ extend raspberry /etc/snmp/raspberry.sh
 4: Edit your sudo users (usually `visudo`) and add at the bottom:
 
 ```
-snmp ALL=(ALL) NOPASSWD: /etc/snmp/raspberry.sh, /usr/bin/vcgencmd*
+snmp ALL=(ALL) NOPASSWD: /etc/snmp/raspberry.sh, /usr/bin/vcgencmd
 ```
 
 **Note:** If you are using Raspian, the default user is
@@ -1469,6 +1470,8 @@ the user snmpd is using with `ps aux | grep snmpd`
 5: Restart snmpd on PI host
 
 # Seafile
+
+SNMP extend script to monitor your Seafile Server
 
 ## SNMP Extend
 
@@ -1508,12 +1511,13 @@ username = Login to Seafile Server.
            It is important that used Login has admin privileges.
            Otherwise most API calls will be denied.
 password = Password to the configured login.
-        the device name. 1 is the default. 0 will use the device name.
-account_identifier = Defines how accounts are listed.
+account_identifier = Defines how user accounts are listed in RRD Graph.
                      Options are: name, email
 hide_monitoring_account = With this Boolean you can hide the Account which you
                           use to access Seafile API
 ```
+
+**Note:**It is recommended to use a dedicated Administrator account for monitoring.
 
 # SMART
 

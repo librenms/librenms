@@ -157,8 +157,8 @@
         "%macros.port_usage_perc > 80",
         {"condition":"AND","rules":[{"id":"macros.port_usage_perc","field":"macros.port_usage_perc","type":"integer","input":"text","operator":"greater","value":"80"}],"valid":true},
         "macros.port_usage_perc > 80",
-        "SELECT * FROM devices,ports WHERE (devices.device_id = ? AND devices.device_id = ports.device_id) AND (((ports.ifInOctets_rate*8) / ports.ifSpeed)*100) > 80",
-        ["select * from `devices` left join `ports` on `devices`.`device_id` = `ports`.`device_id` where ((((ports.ifInOctets_rate*8) / ports.ifSpeed)*100) > ?)", ["80"]]],
+        "SELECT * FROM devices,ports WHERE (devices.device_id = ? AND devices.device_id = ports.device_id) AND (((SELECT IF(ports.ifOutOctets_rate>ports.ifInOctets_rate, ports.ifOutOctets_rate, ports.ifInOctets_rate)*8) / ports.ifSpeed)*100) > 80",
+        ["select * from `devices` left join `ports` on `devices`.`device_id` = `ports`.`device_id` where ((((SELECT IF(ports.ifOutOctets_rate>ports.ifInOctets_rate, ports.ifOutOctets_rate, ports.ifInOctets_rate)*8) / ports.ifSpeed)*100) > ?)", ["80"]]],
     [
         "%devices.sysName ~ \"..domain.com\" || %devices.sysName ~ \"switch.\" &&",
         {"condition":"OR","rules":[{"id":"devices.sysName","field":"devices.sysName","type":"string","input":"text","operator":"regex","value":"..domain.com"},{"id":"devices.sysName","field":"devices.sysName","type":"string","input":"text","operator":"regex","value":"switch."}],"valid":true},

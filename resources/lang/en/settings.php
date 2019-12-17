@@ -282,6 +282,10 @@ return [
             'description' => 'Use full user DN',
             'help' => "Uses a user's full DN as the value of the member attribute in a group instead of member: username using the prefix and suffix. (it’s member: uid=username,ou=groups,dc=domain,dc=com)"
         ],
+        'auth_ldap_wildcard_ou' => [
+            'description' => 'Wildcard user OU',
+            'help' => "Search for user matching user name independently of OU set in user suffix. Useful if your users are in different OU. Bind username, if set, still user suffix"
+        ],
         'auth_ldap_version' => [
             'description' => 'LDAP version',
             'help' => 'LDAP version to use to talk to the server.  Usually this should be v3',
@@ -570,6 +574,12 @@ return [
             'url' => [
                 'description' => 'URL to your Oxidized API',
                 'help' => 'Oxidized API url (For example: http://127.0.0.1:8888)'
+            ]
+        ],
+        'password' => [
+            'min_length' => [
+                'description' => 'Minimum password length',
+                'help' => 'Passwords shorter than the given length will be rejected'
             ]
         ],
         'peeringdb' => [

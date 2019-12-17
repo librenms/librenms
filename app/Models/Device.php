@@ -40,6 +40,7 @@ class Device extends BaseModel
             $device->ports()->delete();
             $device->syslogs()->delete();
             $device->eventlogs()->delete();
+            $device->applications()->delete();
 
             // handle device dependency updates
             $device->children->each->updateMaxDepth($device->device_id);

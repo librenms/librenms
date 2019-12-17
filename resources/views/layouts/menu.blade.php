@@ -470,9 +470,12 @@
             </form>
             <ul class="nav navbar-nav navbar-right">
                 <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-user fa-fw fa-lg fa-nav-icons" aria-hidden="true"></i><span class="hidden-sm"><small>{{ Auth::user()->username }}</small></span>
-                        <span class="visible-xs-inline-block">@lang('User')</span><span
-                            class="badge badge-navbar-user count-notif {{ $notification_count ? 'badge-danger' : 'badge-default' }}">{{ $notification_count }}</span></a>
+                    <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown">
+                        <i class="fa fa-user fa-fw fa-lg fa-nav-icons" aria-hidden="true"></i>
+                        <span class="badge badge-navbar-user count-notif {{ $notification_count ? 'badge-danger' : 'badge-default' }}">{{ $notification_count ?: '' }}</span>
+                        <span class="hidden-sm"><small>{{ Auth::user()->username }}</small></span>
+                        <span class="visible-xs-inline-block">@lang('User')</span>
+                    </a>
                     <ul class="dropdown-menu">
                         <li><a href="{{ url('preferences') }}"><i class="fa fa-cog fa-fw fa-lg"
                                                                   aria-hidden="true"></i> @lang('My Settings')</a></li>
@@ -667,7 +670,7 @@
             valueKey: 'name',
             templates: {
                 header: '<h5><strong>&nbsp;BGP Sessions</strong></h5>',
-                suggestion: Handlebars.compile('<p><a href="@{{url}}"><small>@{{bgp_image}} @{{name}} - @{{hostname}}<br />AS@{{localas}} -> AS@{{remoteas}}</small></a></p>')
+                suggestion: Handlebars.compile('<p><a href="@{{url}}"><small><i class="@{{bgp_image}}" aria-hidden="true"></i> @{{name}} - @{{hostname}}<br />AS@{{localas}} -> AS@{{remoteas}}</small></a></p>')
             }
         }).on('typeahead:select', function (ev, suggestion) {
             window.location.href = suggestion.url;

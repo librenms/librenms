@@ -24,16 +24,6 @@ $alert_states = array(
     'better' => 4,
 );
 
-$alert_severities = array(
-    // alert_rules.status is enum('ok','warning','critical')
-    'ok' => 1,
-    'warning' => 2,
-    'critical' => 3,
-    'ok only' => 4,
-    'warning only' => 5,
-    'critical only' => 6,
-);
-
 $show_recovered = false;
 
 if (is_numeric($vars['device_id']) && $vars['device_id'] > 0) {
@@ -139,15 +129,9 @@ foreach (dbFetchRows($sql, $param) as $alert) {
         }
     }
 
-    $severity = $alert['severity'];
-    if ($alert['state'] == 3) {
-        $severity .= ' <strong>+</strong>';
-    } elseif ($alert['state'] == 4) {
-        $severity .= ' <strong>-</strong>';
-    }
-
     $hostname = '<div class="incident">' . generate_device_link($alert, format_hostname($alert, shorthost($alert['hostname']))) . '<div id="incident' . ($alert['id']) . '" class="collapse">' . $fault_detail . '</div></div>';
 
+    $severity = $alert['severity'];
     switch ($severity) {
         case 'critical':
             $severity_ico = '<span class="alert-status label-danger">&nbsp;</span>';
@@ -161,6 +145,12 @@ foreach (dbFetchRows($sql, $param) as $alert) {
         default:
             $severity_ico = '<span class="alert-status label-info">&nbsp;</span>';
             break;
+    }
+
+    if ($alert['state'] == 3) {
+        $severity .= ' <strong>+</strong>';
+    } elseif ($alert['state'] == 4) {
+        $severity .= ' <strong>-</strong>';
     }
 
     if ((int)$alert['state'] === 2) {

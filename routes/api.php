@@ -74,12 +74,14 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
         Route::delete('rules/{id}', 'LegacyApiController@delete_rule')->name('delete_rule');
         Route::post('services/{hostname}', 'LegacyApiController@add_service_for_host')->name('add_service_for_host');
         Route::get('oxidized/config/search/{searchstring}', 'LegacyApiController@search_oxidized')->name('search_oxidized');
+        Route::get('oxidized/config/{device_name}', 'LegacyApiController@get_oxidized_config')->name('get_oxidized_config');
         Route::post('devicegroups', 'LegacyApiController@add_device_group')->name('add_device_group');
     });
 
     // restricted by access
     Route::group(['prefix' => 'devices'], function () {
         Route::get('{hostname}', 'LegacyApiController@get_device')->name('get_device');
+        Route::get('{hostname}/discover', 'LegacyApiController@trigger_device_discovery')->name('trigger_device_discovery');
         Route::get('{hostname}/graphs/health/{type}/{sensor_id?}', 'LegacyApiController@get_graph_generic_by_hostname')->name('get_health_graph');
         Route::get('{hostname}/graphs/wireless/{type}/{sensor_id?}', 'LegacyApiController@get_graph_generic_by_hostname')->name('get_wireless_graph');
         Route::get('{hostname}/vlans', 'LegacyApiController@get_vlans')->name('get_vlans');

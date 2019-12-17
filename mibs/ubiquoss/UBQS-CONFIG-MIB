@@ -1,0 +1,590 @@
+-- *****************************************************************
+-- UBQS-CONFIG-MIB.mib:  Ubiquoss Enterprise Structure of Management Information
+--
+-- Feb 2011, bookn Kim
+--
+-- Copyright (c) 2006 by Ubiquoss, Corp.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+--
+
+UBQS-CONFIG-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS	
+	DisplayString 
+		FROM RFC1213-MIB  
+	IANAifType                               
+		FROM IANAifType-MIB  
+	InetAddressType
+		FROM INET-ADDRESS-MIB
+	ubiMgmtv2
+		FROM UBQS-SMI		
+	RowStatus
+		FROM SNMPv2-TC;
+		         
+ubiConfigMIB  MODULE-IDENTITY
+	LAST-UPDATED "0607130000Z"
+    ORGANIZATION "Ubiquoss Corp."
+    CONTACT-INFO
+        "Chair    :  bookn Kim
+                     Ubiquoss Corp.
+         Postal:     24F Milennium B/D,
+		 	         467-12, Dogok-Dong,
+					 GangNam-Gu, Seoul 135-270
+					 Korea
+         EMail:      jisoo@ubiquoss.com
+         Phone:      +82-2-2190-3100
+
+         Co-editor:  Paul 
+                     Ubiquoss Corp.
+         Postal:     24F Milennium B/D,
+		 	         467-12, Dogok-Dong,
+					 GangNam-Gu, Seoul 135-270
+					 Korea
+         EMail:      paul@ubiquoss.com
+         Phone:      +82-2-2190-3100"
+    DESCRIPTION
+        "This MIB module defines MIB objects which provide
+         mechanisms to remotely configure the parameters
+         used by an SNMP entity."
+	::= { ubiMgmtv2  18 }	
+
+-- ***********************************************************   
+-- TEXTUAL-CONVENTION
+-- ***********************************************************
+
+ConfigMethodType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Represents 'copy <source> <destination>'.
+         each source method has possible destination methods.
+         The mapping list below:
+         
+         	source					|	destination
+         	===================================================
+         	startup-config			|	running-config
+         							|	ftp
+         							|	tftp
+         	---------------------------------------------------
+         	running-config			|	startup-config
+         							|	ftp
+         							|	tftp
+         							|	flash
+         							|	usbflash
+         	---------------------------------------------------
+         	ftp						|	startup-config
+         							|	running-config
+         							|	flash
+         							|	config-file
+         	---------------------------------------------------
+         	tftp					|	startup-config
+         							|	running-config
+         							|	flash
+         							|	config-file
+         	---------------------------------------------------
+         	flash					|	ftp
+         							|	tftp
+         							|	flash
+         							|	usbflash
+         	---------------------------------------------------
+         	usbflash				|	flash
+         							|	usbflash
+         	---------------------------------------------------						
+         "
+    SYNTAX       INTEGER
+    {
+    	noMethod(0),
+    	startupConfig(1),
+    	runningConfig(2),
+    	ftp(3),
+    	tftp(4),
+    	flash(5),
+    	usbFlash(6),
+    	configFile(7)
+    }
+     
+-- ***********************************************************   
+-- ubiConfigMIB
+-- ***********************************************************
+     
+ubiConfigMIBObjects	 		OBJECT IDENTIFIER ::= { ubiConfigMIB 1 }
+ubiConfigErase				OBJECT IDENTIFIER ::= { ubiConfigMIBObjects 2 }
+ubiConfigCopy				OBJECT IDENTIFIER ::= { ubiConfigMIBObjects 3 }
+	     
+-- ***********************************************************
+-- ubiConfigTable
+-- ***********************************************************
+    ubiConfigInfoTable   OBJECT-TYPE
+        SYNTAX          SEQUENCE  OF  UbiConfigInfoEntry
+        ACCESS          not-accessible
+        STATUS          current 
+        DESCRIPTION
+               "The table of configuration file list 
+               	that consists of image and config
+                "
+        ::=  { ubiConfigMIBObjects 1 }
+
+    ubiConfigInfoEntry   OBJECT-TYPE
+        SYNTAX          UbiConfigInfoEntry
+        ACCESS      	not-accessible
+        STATUS          current 
+        DESCRIPTION
+                "The entry representing one element of configuration file list"
+        INDEX           {ubiConfigName}
+        ::=  { ubiConfigInfoTable 1 }
+
+    UbiConfigInfoEntry  ::=  SEQUENCE {
+    	ubiConfigName			DisplayString,
+    	ubiConfigType			INTEGER,
+    	ubiConfigCurrentStatus	INTEGER,
+    	ubiConfigNextStatus		INTEGER
+    }
+
+    ubiConfigName  OBJECT-TYPE
+    	SYNTAX      DisplayString
+    	ACCESS      read-only
+    	STATUS      current 
+     	DESCRIPTION
+        	"Configuration file name or image name"
+       	::= { ubiConfigInfoEntry 1 }
+       
+    ubiConfigType  OBJECT-TYPE
+    	SYNTAX      INTEGER
+    	{
+    		other(0),
+    		config(1),
+    		image(2)
+    	}       	
+    	ACCESS      read-only
+    	STATUS      current 
+    	DESCRIPTION
+        	"Configuration type
+        	
+        	 config : configuration file
+        	 image	: image file
+        	 other 	: other type file"
+       	::= { ubiConfigInfoEntry 2 }
+       	
+	ubiConfigCurrentStatus	OBJECT-TYPE 
+		SYNTAX		INTEGER
+		{
+			noCurrent(0),
+			currentConfig(1)
+		}
+		ACCESS		read-only
+		STATUS		current
+		DESCRIPTION
+			"Current configuration file status"
+		::= { ubiConfigInfoEntry 3 }
+	
+	ubiConfigNextStatus		OBJECT-TYPE
+		SYNTAX		INTEGER
+		{
+			noNext(0),
+			nextConfig(1)
+		}
+		ACCESS		read-write
+		STATUS		current
+		DESCRIPTION
+			"Next configuration file status"
+		::= { ubiConfigInfoEntry 4 }
+    
+-- ***********************************************************
+-- System erase config
+-- *********************************************************** 
+
+	ubiConfigEraseMode	OBJECT-TYPE
+		SYNTAX		INTEGER
+		{
+			noMode(0),
+			startupConfig(1),
+			fileInFlash(2),
+			fileInUsbFlash(3)
+		}
+		ACCESS		read-write
+		STATUS		current
+		DESCRIPTION
+			"The type of object to be erased.
+			 To erase a file, value must be 1, 2 or 3.
+			 fileInFlash means config and image file at system flash and
+			 fileInUsbFlash means config and image file at USB flash.
+			 "
+		::= { ubiConfigErase 1 }
+		
+	ubiConfigEraseFileName	OBJECT-TYPE
+		SYNTAX		DisplayString
+		ACCESS		read-write
+		STATUS		current
+		DESCRIPTION
+			"If mode is 'configFile', configuration file name to be erased.
+			 startupConfig doesn't need this object"
+		::= { ubiConfigErase 2 }
+		
+	ubiConfigEraseOperate	OBJECT-TYPE
+		SYNTAX		INTEGER
+		{
+			none(0),
+			excute(1)
+		}
+		ACCESS		read-write
+		STATUS		current
+		DESCRIPTION
+			"Excute to erase configuration"
+		::= { ubiConfigErase 3 }
+		
+	ubiConfigEraseUsbPartNum	OBJECT-TYPE
+		SYNTAX		Integer32(0..9)
+		ACCESS		read-write
+		STATUS		current
+		DESCRIPTION
+			"The number of USB flash partition which has a file to be erase.
+			This object is only for when ubiConfigEraseMode is 'fileInUsbFlash'."
+		::= { ubiConfigErase 4 }
+		           
+-- ***********************************************************
+-- System copy config
+-- *********************************************************** 
+	ubiConfigSourceMethod	OBJECT-TYPE
+    	SYNTAX		ConfigMethodType
+    	ACCESS		read-write
+    	STATUS		current
+    	DESCRIPTION
+    		"configuration source control method
+    		
+    		Represents 'copy <source> <destination>'.
+       		each source method has possible destination methods.
+         	The mapping list below:
+         
+         	source					|	destination
+         	===================================================
+         	startup-config			|	running-config
+         							|	ftp
+         							|	tftp
+         	---------------------------------------------------
+         	running-config			|	startup-config
+         							|	ftp
+         							|	tftp
+         							|	flash
+         							|	usbflash
+         	---------------------------------------------------
+         	ftp						|	startup-config
+         							|	running-config
+         							|	flash
+         							|	config-file
+         	---------------------------------------------------
+         	tftp					|	startup-config
+         							|	running-config
+         							|	flash
+         							|	config-file
+         	---------------------------------------------------
+         	flash					|	ftp
+         							|	tftp
+         							|	flash
+         							|	usbflash
+         	---------------------------------------------------
+         	usbflash				|	flash
+         							|	usbflash
+         	---------------------------------------------------	
+    		"
+    	::= { ubiConfigCopy 1 }
+
+    ubiConfigSourceFileName  OBJECT-TYPE
+       	SYNTAX      DisplayString
+       	ACCESS      read-write
+       	STATUS      current 
+       	DESCRIPTION
+        	"If not startup or running, source file name"
+       	::= { ubiConfigCopy 2 }
+	
+	ubiConfigSourceIpAddress  OBJECT-TYPE
+       	SYNTAX      DisplayString
+       	ACCESS      read-write
+       	STATUS      current 
+       	DESCRIPTION
+        	"If tftp or ftp, ip address to be connected"
+       	::= { ubiConfigCopy 3 }
+    
+    ubiConfigSouceUserId	OBJECT-TYPE
+    	SYNTAX		DisplayString
+    	ACCESS		read-write
+    	STATUS		current
+    	DESCRIPTION
+    		"If ftp, server user id"
+    	::= { ubiConfigCopy 4 }
+    	
+    ubiConfigSourceUserPassword	OBJECT-TYPE
+    	SYNTAX		DisplayString
+    	ACCESS		read-write
+    	STATUS		current
+    	DESCRIPTION
+    		"If ftp, server user password"
+    	::= { ubiConfigCopy 5 } 
+    	
+    ubiConfigSourcePartNum	OBJECT-TYPE
+    	SYNTAX		DisplayString
+    	ACCESS		read-write
+    	STATUS		current
+    	DESCRIPTION
+    		"If usbflash, system partition number"
+    	::= { ubiConfigCopy 6 }
+    	
+    ubiConfigDestinationMethod	OBJECT-TYPE
+    	SYNTAX		ConfigMethodType
+    	ACCESS		read-write
+    	STATUS		current
+    	DESCRIPTION
+    		"configuration destination control method
+    		
+    		Represents 'copy <source> <destination>'.
+        	each source method has possible destination methods.
+         	The mapping list below:
+         
+         	source					|	destination
+         	===================================================
+         	startup-config			|	running-config
+         							|	ftp
+         							|	tftp
+         	---------------------------------------------------
+         	running-config			|	startup-config
+         							|	ftp
+         							|	tftp
+         							|	flash
+         							|	usbflash
+         	---------------------------------------------------
+         	ftp						|	startup-config
+         							|	running-config
+         							|	flash
+         	---------------------------------------------------
+         	tftp					|	startup-config
+         							|	running-config
+         							|	flash
+         	---------------------------------------------------
+         	flash					|	ftp
+         							|	tftp
+         							|	flash
+         							|	usbflash
+         	---------------------------------------------------
+         	usbflash				|	flash
+         							|	usbflash
+         	---------------------------------------------------	"
+    	::= { ubiConfigCopy 7 }
+    	
+    ubiConfigDestinationFileName	OBJECT-TYPE
+    	SYNTAX		DisplayString
+    	ACCESS		read-write
+    	STATUS		current
+    	DESCRIPTION
+    		"If startup or running, destination file name"
+    	::= { ubiConfigCopy 8 }
+    
+    ubiConfigDestinationIpAddress	OBJECT-TYPE
+    	SYNTAX		DisplayString
+    	ACCESS		read-write
+    	STATUS		current
+    	DESCRIPTION
+    		"If ftp or tftp, server ip address"
+    	::= { ubiConfigCopy 9 }
+    	
+    ubiConfigDestinationUserId		OBJECT-TYPE
+    	SYNTAX		DisplayString
+    	ACCESS		read-write
+    	STATUS		current
+    	DESCRIPTION
+    		"If ftp, server user id"
+    	::= { ubiConfigCopy 10 }
+    	
+    ubiConfigDestinationUserPassword	OBJECT-TYPE
+    	SYNTAX		DisplayString
+    	ACCESS		read-write
+    	STATUS		current
+    	DESCRIPTION
+    		"If ftp, server user password"
+    	::= { ubiConfigCopy 11 }
+ 
+ 	ubiConfigDestinationPartNum	OBJECT-TYPE
+ 		SYNTAX		DisplayString
+ 		ACCESS		read-write
+ 		STATUS		current
+ 		DESCRIPTION
+ 			"If usbflash, system partition number"
+ 		::= { ubiConfigCopy 12 }
+ 		   	
+    ubiConfigCopyOperate	OBJECT-TYPE
+    	SYNTAX		INTEGER
+    	{
+    		none(0),
+    		excute(1)
+    	}
+    	ACCESS		read-write
+    	STATUS		current
+    	DESCRIPTION
+    		"excute to copy configuration"
+    	::= { ubiConfigCopy 13 }
+
+-- ***********************************************************
+-- ubiUsbConfigTable
+-- ***********************************************************
+    ubiUsbConfigInfoTable   OBJECT-TYPE
+        SYNTAX          SEQUENCE  OF  UbiUsbConfigInfoEntry
+        ACCESS          not-accessible
+        STATUS          current 
+        DESCRIPTION
+               "The table of configuration file list 
+               	that consists of image and config at usbflash
+               "
+        ::=  { ubiConfigMIBObjects 4 }
+
+    ubiUsbConfigInfoEntry   OBJECT-TYPE
+        SYNTAX          UbiUsbConfigInfoEntry
+        ACCESS      	not-accessible
+        STATUS          current 
+        DESCRIPTION
+                "The entry representing one element of configuration file list at usbflash"
+        INDEX           {ubiUsbPartNum, ubiUsbConfigName}
+        ::=  { ubiUsbConfigInfoTable 1 }
+
+    UbiUsbConfigInfoEntry  ::=  SEQUENCE {
+    	ubiUsbPartNum				Integer32,
+    	ubiUsbConfigName			DisplayString,
+    	ubiUsbConfigType			INTEGER,
+    	ubiUsbConfigCurrentStatus	INTEGER,
+    	ubiUsbConfigNextStatus		INTEGER
+    }
+    
+    ubiUsbPartNum  OBJECT-TYPE
+    	SYNTAX      Integer32(0..9)
+    	ACCESS      read-only
+    	STATUS      current 
+    	DESCRIPTION
+        	"The file system partition number for USB flash."
+       	::= { ubiUsbConfigInfoEntry 1 }
+
+    ubiUsbConfigName  OBJECT-TYPE
+    	SYNTAX      DisplayString
+    	ACCESS      read-only
+    	STATUS      current 
+     	DESCRIPTION
+        	"Configuration file name or image name"
+       	::= { ubiUsbConfigInfoEntry 2 }
+       
+    ubiUsbConfigType  OBJECT-TYPE
+    	SYNTAX      INTEGER
+    	{
+    		other(0),
+    		config(1),
+    		image(2)
+    	}       	
+    	ACCESS      read-only
+    	STATUS      current 
+    	DESCRIPTION
+        	"Configuration type
+        	
+        	 config : configuration file
+        	 image	: image file
+        	 other 	: other type file"
+       	::= { ubiUsbConfigInfoEntry 3 }
+       	
+	ubiUsbConfigCurrentStatus	OBJECT-TYPE 
+		SYNTAX		INTEGER
+		{
+			noCurrent(0),
+			currentConfig(1)
+		}
+		ACCESS		read-only
+		STATUS		current
+		DESCRIPTION
+			"Current configuration file status"
+		::= { ubiUsbConfigInfoEntry 4 }
+	
+	ubiUsbConfigNextStatus		OBJECT-TYPE
+		SYNTAX		INTEGER
+		{
+			noNext(0),
+			nextConfig(1)
+		}
+		ACCESS		read-write
+		STATUS		current
+		DESCRIPTION
+			"Next configuration file status"
+		::= { ubiUsbConfigInfoEntry 5 }
+	
+        	
+-- the following two OBJECT IDENTIFIERS are used to define SNMPv2 Notifications
+-- that are backward compatible with SNMPv1 Traps.
+ubiConfigMIBNotificationPrefix OBJECT IDENTIFIER ::= { ubiConfigMIB 0 }
+
+
+-- conformance information
+
+ubiConfigMIBConformance OBJECT IDENTIFIER ::= { ubiConfigMIB 2 }
+ubiConfigMIBCompliances OBJECT IDENTIFIER ::= { ubiConfigMIBConformance 1 }
+ubiConfigMonMIBGroups      OBJECT IDENTIFIER ::= { ubiConfigMIBConformance 2 }
+
+
+-- compliance statements
+ubiConfigMIBCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+                "The compliance statement for entities which implement
+                the ubiquoss system configuration MIB."
+        MODULE  -- this module
+                MANDATORY-GROUPS { ubiConfigMIBGroup,
+                                   ubiConfigMIBNotifGroup
+                                  }
+
+        GROUP   ubiConfigMIBGroup
+        DESCRIPTION
+                "This group is applicable for implementations which
+                 need information for system configuration."
+
+        GROUP   ubiConfigMIBNotifGroup
+        DESCRIPTION
+                "This group is applicable for implementations which
+                 need alarm notifications for system configuration."
+                         
+        ::= { ubiConfigMIBCompliances 1 }
+
+-- units of conformance
+ubiConfigMIBGroup OBJECT-GROUP
+        OBJECTS {
+        	ubiConfigName,
+            ubiConfigType,
+			ubiConfigCurrentStatus,
+			ubiConfigNextStatus,
+
+            ubiConfigEraseMode,
+            ubiConfigEraseFileName,
+            ubiConfigEraseOperate,
+                                  
+            ubiConfigSourceMethod,
+            ubiConfigSourceFileName,
+            ubiConfigSourceIpAddress,
+            ubiConfigSourceUserId,
+            ubiConfigSourceUserPassword,
+            ubiConfigSourcePartNum,
+            ubiConfigDestinationMethod,
+            ubiConfigDestinationFileName,
+            ubiConfigDestinationIpAddress,
+            ubiConfigDestinationUserId,
+            ubiConfigDestinationUserPassword,
+            ubiConfigDestinationPartNum,
+            ubiConfigCopyOperate        							
+        }
+        STATUS  current
+        DESCRIPTION
+                "ubiquoss system configuration."
+        ::= { ubiConfigMonMIBGroups 1 }
+
+ubiConfigMIBNotifGroup NOTIFICATION-GROUP
+        NOTIFICATIONS  {
+                ubiConfigRemoveNotification
+        }
+        STATUS current
+        DESCRIPTION
+                "A notification group providing alarm notification
+                 for system configuration. "
+        ::= { ubiConfigMonMIBGroups 2 }
+                            
+ END
+ 
