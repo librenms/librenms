@@ -175,12 +175,16 @@ class AlertUtil
     public static function getRules($device_id)
     {
         $query = "SELECT DISTINCT a.* FROM alert_rules a
-        LEFT JOIN alert_device_map d ON a.id=d.rule_id
+        LEFT JOIN alert_device_map d ON a.id=d.rule_id AND d.device_id = ?
         LEFT JOIN alert_group_map g ON a.id=g.rule_id
-        LEFT JOIN device_group_device dg ON g.group_id=dg.device_group_id
-        WHERE a.disabled = 0 AND ((d.device_id IS NULL AND g.group_id IS NULL) OR d.device_id=? OR dg.device_id=?)";
+        LEFT JOIN device_group_device dg ON g.group_id=dg.device_group_id AND dg.device_id = ?
+        WHERE a.disabled = 0 AND (
+            (d.device_id IS NULL AND g.group_id IS NULL)
+            OR (a.invert_map = 0 AND (d.device_id=? OR dg.device_id=?))
+            OR (a.invert_map = 1 AND ? NOT IN (SELECT d.device_id) AND ? NOT IN (SELECT dg.device_id))
+        )";
 
-        $params = [$device_id, $device_id];
+        $params = [$device_id, $device_id, $device_id, $device_id, $device_id, $device_id];
         return dbFetchRows($query, $params);
     }
 

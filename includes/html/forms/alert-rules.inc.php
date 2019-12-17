@@ -58,6 +58,7 @@ $invert       = mres(isset($_POST['invert']) ? $_POST['invert'] : null);
 $name         = mres($_POST['name']);
 $proc         = mres($_POST['proc']);
 $recovery     = ($vars['recovery']);
+$invert_map   = mres(isset($_POST['invert_map']) ? $_POST['invert_map'] : null);
 $severity     = mres($_POST['severity']);
 
 if (!is_numeric($count)) {
@@ -81,6 +82,12 @@ if ($invert == 'on') {
 
 $recovery = empty($recovery) ? $recovery = false : true;
 
+if ($invert_map == 'on') {
+    $invert_map = true;
+} else {
+    $invert_map = false;
+}
+
 $extra = array(
     'mute'     => $mute,
     'count'    => $count,
@@ -101,7 +108,8 @@ if (is_numeric($rule_id) && $rule_id > 0) {
             'name' => $name,
             'proc' => $proc,
             'query' => $query,
-            'builder' => $builder_json
+            'builder' => $builder_json,
+            'invert_map' => $invert_map
         ),
         'alert_rules',
         'id=?',
