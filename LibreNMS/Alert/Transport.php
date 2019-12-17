@@ -52,7 +52,6 @@ abstract class Transport implements TransportInterface
             3 => '#FF0000', // Worse - red
             4 => '#F0AD4E', // Better - yellow
         );
-
         return isset($colors[$state]) ? $colors[$state] : '#337AB7';
     }
 }
