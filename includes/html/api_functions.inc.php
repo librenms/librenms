@@ -1199,16 +1199,7 @@ function get_inventory_for_device(\Illuminate\Http\Request $request)
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     return check_device_permission($device_id, function ($device_id) use ($request) {
         $params    = [];
-        $sql = 'SELECT `D`.`device_id` AS `device_id`,
-                       `D`.`hostname` AS `hostname`,
-                       `entPhysicalDescr` AS `description`,
-                       `entPhysicalName` AS `name`,
-                       `entPhysicalModelName` AS `model`,
-                       `entPhysicalSerialNum` AS `serial`,
-                       `entPhysicalHardwareRev` as `revision`,
-                       `entPhysicalFirmwareRev` as `version`
-               FROM entPhysical AS E, devices AS D
-               WHERE `D`.`device_id`=? AND D.device_id = E.device_id';
+        $sql = 'SELECT * FROM `entPhysical` WHERE device_id = ?';
         $params[] = $device_id;
         $inventory = dbFetchRows($sql, $params);
         return api_success($inventory, 'inventory');
