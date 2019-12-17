@@ -3287,7 +3287,7 @@
                     "edge": "#ff777788",
                     "node": "#ffdddd"
                 },
-                "mark": {
+                "highlight": {
                     "border": "#ee4000",
                     "borderWidth": 3
                 }

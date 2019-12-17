@@ -169,14 +169,14 @@ $node_down_style = array(
         'background' => Config::get('network_map_legend.dn.node'),
     ),
 );
-$node_mark_style = array(
+$node_highlight_style = array(
     'color' => array(
         'highlight' => array(
-            'border' => Config::get('network_map_legend.mark.border'),
+            'border' => Config::get('network_map_legend.highlight.border'),
         ),
-        'border' => Config::get('network_map_legend.mark.border'),
+        'border' => Config::get('network_map_legend.highlight.border'),
     ),
-    'borderWidth' => Config::get('network_map_legend.mark.borderWidth'),
+    'borderWidth' => Config::get('network_map_legend.highlight.borderWidth'),
 );
 $edge_disabled_style = array(
     'dashes' => array(8,12),
@@ -241,7 +241,7 @@ foreach ($list as $items) {
         }
 
         if ((empty($device['hostname'])) && ($local_device_id == $highlight_node)) {
-            $devices_by_id[$local_device_id] = array_merge($devices_by_id[$local_device_id], $node_mark_style);
+            $devices_by_id[$local_device_id] = array_merge($devices_by_id[$local_device_id], $node_highlight_style);
         }
     }
 
@@ -256,7 +256,7 @@ foreach ($list as $items) {
         }
 
         if ((empty($device['hostname'])) && ($remote_device_id == $highlight_node)) {
-            $devices_by_id[$remote_device_id] = array_merge($devices_by_id[$remote_device_id], $node_mark_style);
+            $devices_by_id[$remote_device_id] = array_merge($devices_by_id[$remote_device_id], $node_highlight_style);
         }
     }
 
