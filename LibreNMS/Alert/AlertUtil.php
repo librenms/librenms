@@ -176,12 +176,12 @@ class AlertUtil
     {
         $query = "SELECT DISTINCT a.* FROM alert_rules a
         LEFT JOIN alert_device_map d ON a.id=d.rule_id AND d.device_id = ?
-        LEFT JOIN alert_group_map g ON a.id=g.rule_id
+        LEFT JOIN alert_group_map g ON a.id=g.rule_id AND (a.invert_map = 0 OR a.invert_map = 1 AND g.group_id IN (SELECT DISTINCT device_group_id FROM device_group_device WHERE device_id = ?))
         LEFT JOIN device_group_device dg ON g.group_id=dg.device_group_id AND dg.device_id = ?
         WHERE a.disabled = 0 AND (
             (d.device_id IS NULL AND g.group_id IS NULL)
             OR (a.invert_map = 0 AND (d.device_id=? OR dg.device_id=?))
-            OR (a.invert_map = 1 AND (d.device_id != ? OR d.device_id IS NULL) AND (dg.device_id != ? OR (dg.device_id IS NULL AND g.group_id is NULL)))
+            OR (a.invert_map = 1  AND (d.device_id != ? OR d.device_id IS NULL) AND (dg.device_id != ? OR dg.device_id IS NULL))
         )";
 
         $params = [$device_id, $device_id, $device_id, $device_id, $device_id, $device_id];
