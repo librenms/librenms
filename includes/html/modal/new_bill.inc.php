@@ -47,8 +47,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                               $devices = dbFetchRows('SELECT * FROM `devices` ORDER BY hostname');
                             foreach ($devices as $device) {
                                 $selected = $device['device_id'] == $port_device_id ? " selected" : "";
-                                $hostname = format_hostname($device);
-                                echo "<option value='${device['device_id']}' $selected>$hostname</option>\n";
+                                echo "<option value='${device['device_id']}' $selected>" . format_hostname($device) . "</option>\n";
                             }
                                 ?>
                         </select>
