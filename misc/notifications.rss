@@ -68,5 +68,10 @@
     <description>RutOS 2xx pinState renamed to rutos2xx_pinState.  Update any alert rules you may have.</description>
     <pubDate>Thu, 10 Oct 2019 00:00:00 +0000</pubDate>
   </item>
+  <item>
+    <title>Cisco Wireless Controller classified as Wireless</title>
+    <description>Cisco WLC is now classified as type "Wireless" instead of "Network".  Update any alert rules you may have.</description>
+    <pubDate>Wed, 18 Dec 2019 00:00:00 +0000</pubDate>
+  </item>
 </channel>
 </rss>
