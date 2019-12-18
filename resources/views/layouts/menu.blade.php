@@ -592,7 +592,7 @@
                         name: port.name,
                         description: port.description,
                         colours: port.colours,
-                        hostname: hostname
+                        hostname: port.hostname
                     };
                 });
             },
