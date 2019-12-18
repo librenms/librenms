@@ -184,7 +184,7 @@ class AlertUtil
             OR (a.invert_map = 1  AND (d.device_id != ? OR d.device_id IS NULL) AND (dg.device_id != ? OR dg.device_id IS NULL))
         )";
 
-        $params = [$device_id, $device_id, $device_id, $device_id, $device_id, $device_id];
+        $params = [$device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id];
         return dbFetchRows($query, $params);
     }
 
