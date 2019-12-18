@@ -71,7 +71,7 @@
   <item>
     <title>Cisco Wireless Controller classified as Wireless</title>
     <description>Cisco WLC is now classified as type "Wireless" instead of "Network".  Update any alert rules you may have.</description>
-    <pubDate>Thu, 20 Dec 2019 00:00:00 +0000</pubDate>
+    <pubDate>Wed, 18 Dec 2019 00:00:00 +0000</pubDate>
   </item>
 </channel>
 </rss>
