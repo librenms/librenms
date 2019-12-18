@@ -592,7 +592,7 @@
                         name: port.name,
                         description: port.description,
                         colours: port.colours,
-                        sysName: port.sysName
+                        hostname: hostname
                     };
                 });
             },
@@ -615,7 +615,7 @@
                         bgp_image: bgp.bgp_image,
                         remoteas: bgp.remoteas,
                         colours: bgp.colours,
-                        sysName: bgp.sysName
+                        hostname: bgp.hostname
                     };
                 });
             },
@@ -659,7 +659,7 @@
             valueKey: 'name',
             templates: {
                 header: '<h5><strong>&nbsp;Ports</strong></h5>',
-                suggestion: Handlebars.compile('<p><a href="@{{url}}"><small><i class="fa fa-link fa-sm icon-theme" aria-hidden="true"></i> <strong>@{{name}}</strong> – @{{sysName}}<br /><i>@{{description}}</i></small></a></p>')
+                suggestion: Handlebars.compile('<p><a href="@{{url}}"><small><i class="fa fa-link fa-sm icon-theme" aria-hidden="true"></i> <strong>@{{name}}</strong> – @{{hostname}}<br /><i>@{{description}}</i></small></a></p>')
             }
         },
         {
@@ -670,7 +670,7 @@
             valueKey: 'name',
             templates: {
                 header: '<h5><strong>&nbsp;BGP Sessions</strong></h5>',
-                suggestion: Handlebars.compile('<p><a href="@{{url}}"><small><i class="@{{bgp_image}}" aria-hidden="true"></i> @{{name}} - @{{sysName}}<br />AS@{{localas}} -> AS@{{remoteas}}</small></a></p>')
+                suggestion: Handlebars.compile('<p><a href="@{{url}}"><small><i class="@{{bgp_image}}" aria-hidden="true"></i> @{{name}} - @{{hostname}}<br />AS@{{localas}} -> AS@{{remoteas}}</small></a></p>')
             }
         }).on('typeahead:select', function (ev, suggestion) {
             window.location.href = suggestion.url;
