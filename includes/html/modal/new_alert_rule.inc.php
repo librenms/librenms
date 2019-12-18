@@ -109,14 +109,12 @@ if (Auth::user()->hasGlobalAdmin()) {
                                         <input type='checkbox' name='recovery' id='recovery'>
                                     </div>
                                 </div>
-                                <div class="form-group" title="Restricts this alert rule to the selected devices or groups.">
-                                    <label for='maps' class='col-sm-3 col-md-2 control-label'>Map to: </label>
-                                    <div class="col-sm-9 col-md-10">
+                                <div class="form-group form-inline">
+                                    <label for='maps' class='col-sm-3 col-md-2 control-label' title="Restricts this alert rule to the selected devices or groups.">Match devices and groups list: </label>
+                                    <div class="col-sm-9 col-md-6">
                                         <select id="maps" name="maps[]" class="form-control" multiple="multiple"></select>
                                     </div>
-                                </div>
-                                <div class="form-group" title="If ON, alert rule won't match any device in map to ">
-                                    <label for='invert_map' class='col-sm-3 col-md-2 control-label'>Invert map to: </label>
+                                    <label for='invert_map' class='col-sm-2 col-md-2 control-label' title="If ON, alert rule won't match any device in map to">Not in list: </label>
                                     <div class='col-sm-2'>
                                         <input type='checkbox' name='invert_map' id='invert_map'>
                                     </div>
@@ -372,6 +370,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                 if (extra.adv_query) {
                     $('#adv_query').val(extra.adv_query);
                 }
+                
                 $("[name='mute']").bootstrapSwitch('state', extra.mute);
                 $("[name='invert']").bootstrapSwitch('state', extra.invert);
                 if (typeof extra.recovery == 'undefined') {
@@ -385,13 +384,13 @@ if (Auth::user()->hasGlobalAdmin()) {
                     extra.options.override_query = false;
                 }
                 $("[name='recovery']").bootstrapSwitch('state', extra.recovery);
-
+                
                 if (rule.invert_map == 1) {
                     $("[name='invert_map']").bootstrapSwitch('state', true);
                 }else{
                     $("[name='invert_map']").bootstrapSwitch('state', false);
                 }
-
+                
                 $("[name='override_query']").bootstrapSwitch('state', extra.options.override_query);
             } else {
                 $('#count').val('-1');
