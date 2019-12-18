@@ -98,7 +98,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                                     <div class='col-sm-2' title="Show alert status in the webui, but do not issue notifications.">
                                         <input type="checkbox" name="mute" id="mute">
                                     </div>
-                                    <label for='invert' class='col-sm-3 col-md-2 control-label' title="Alert when this rule doesn't match." style="vertical-align: top;">Invert match: </label>
+                                    <label for='invert' class='col-sm-3 col-md-3 control-label' title="Alert when this rule doesn't match." style="vertical-align: top;">Invert alert match: </label>
                                     <div class='col-sm-2' title="Alert when this rule doesn't match.">
                                         <input type='checkbox' name='invert' id='invert'>
                                     </div>
@@ -110,12 +110,12 @@ if (Auth::user()->hasGlobalAdmin()) {
                                     </div>
                                 </div>
                                 <div class="form-group form-inline">
-                                    <label for='maps' class='col-sm-3 col-md-2 control-label' title="Restricts this alert rule to the selected devices or groups.">Match devices and groups list: </label>
+                                    <label for='maps' class='col-sm-3 col-md-2 control-label' title="Restricts this alert rule to the selected devices and groups.">Match devices and groups list: </label>
                                     <div class="col-sm-7 col-md-7">
                                         <select id="maps" name="maps[]" class="form-control" multiple="multiple"></select>
                                     </div>
                                     <div>
-                                        <label for='invert_map' class=' control-label' text-align="left" title="If ON, alert rule won't match any device in map to">Not in list: </label>
+                                        <label for='invert_map' class=' control-label' text-align="left" title="If ON, alert rule check will run on all devices except the selected devices and groups.">Invert list: </label>
                                         <input type='checkbox' name='invert_map' id='invert_map'>
                                     </div>
                                 </div>
@@ -370,7 +370,6 @@ if (Auth::user()->hasGlobalAdmin()) {
                 if (extra.adv_query) {
                     $('#adv_query').val(extra.adv_query);
                 }
-                
                 $("[name='mute']").bootstrapSwitch('state', extra.mute);
                 $("[name='invert']").bootstrapSwitch('state', extra.invert);
                 if (typeof extra.recovery == 'undefined') {
@@ -384,13 +383,13 @@ if (Auth::user()->hasGlobalAdmin()) {
                     extra.options.override_query = false;
                 }
                 $("[name='recovery']").bootstrapSwitch('state', extra.recovery);
-                
+
                 if (rule.invert_map == 1) {
                     $("[name='invert_map']").bootstrapSwitch('state', true);
                 }else{
                     $("[name='invert_map']").bootstrapSwitch('state', false);
                 }
-                
+
                 $("[name='override_query']").bootstrapSwitch('state', extra.options.override_query);
             } else {
                 $('#count').val('-1');
