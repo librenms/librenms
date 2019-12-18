@@ -476,6 +476,7 @@ with `[1]`, `[2]`, `[3]`, etc.
 ```php
 $config['snmp']['community'][0] = "public";
 ```
+>NOTE: This list of SNMP communities is used for auto discovery, and as a default set for any manually added device.
 
 The default v3 snmp details to use, you can expand this array with
 `[1]`, `[2]`, `[3]`, etc.
