@@ -111,11 +111,11 @@ if (Auth::user()->hasGlobalAdmin()) {
                                 </div>
                                 <div class="form-group form-inline">
                                     <label for='maps' class='col-sm-3 col-md-2 control-label' title="Restricts this alert rule to the selected devices or groups.">Match devices and groups list: </label>
-                                    <div class="col-sm-9 col-md-6">
+                                    <div class="col-sm-7 col-md-7">
                                         <select id="maps" name="maps[]" class="form-control" multiple="multiple"></select>
                                     </div>
-                                    <label for='invert_map' class='col-sm-2 col-md-2 control-label' title="If ON, alert rule won't match any device in map to">Not in list: </label>
-                                    <div class='col-sm-2'>
+                                    <div>
+                                        <label for='invert_map' class=' control-label' text-align="left" title="If ON, alert rule won't match any device in map to">Not in list: </label>
                                         <input type='checkbox' name='invert_map' id='invert_map'>
                                     </div>
                                 </div>
