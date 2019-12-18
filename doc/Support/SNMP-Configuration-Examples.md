@@ -172,14 +172,23 @@ set snmp view mysnmpv3view oid iso include
 
 #### RouterOS 6.x
 
+CLI SNMP v2 Configuration
 ```
-#Terminal SNMP v2 Configuration
 /snmp community
 set [ find default=yes ] read-access=no
 add addresses=<SRC IP/NETWORK> name=<COMMUNITY>
 /snmp
 set contact="<NAME>" enabled=yes engine-id=<ENGINE ID> location="<LOCALTION>"
 ```
+Notes:
+* About the snmp community commands:
+    * The commands change the default snmp community.  It is probably possible to create a new one instead.
+    * <SRC IP/NETWORK> specify the address and host (not network) netmask of the LibreNMS server.  Example: 192.168.8.71/32
+    * trap-version=2 must also be specified if some other trap-version has been set
+    * trap-interfaces may also be used to limit the interfaces the router listens on
+* About the snmp command:
+    * contact, engine-id and location are optional
+    * trap-community is probably required if a new snmp community has been created.
 
 ### Palo Alto
 
