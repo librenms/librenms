@@ -44,7 +44,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                         <select class="form-control input-sm" id="device" name="device" onchange="getInterfaceList(this)">
                             <option value=''>Select a device</option>
                             <?php
-                              $devices = dbFetchRows('SELECT * FROM `devices` ORDER BY sysName, hostname');
+                              $devices = dbFetchRows('SELECT * FROM `devices` ORDER BY hostname');
                             foreach ($devices as $device) {
                                 $selected = $device['device_id'] == $port_device_id ? " selected" : "";
                                 $hostname = format_hostname($device);
