@@ -86,14 +86,14 @@ if ($action == "test") {
             'customoid_id=?',
             array($id)
         ) >= 0) {
-            $message = "Test successful for <i>$name</i>, value $rawdata reveiced";
+            $message = "Test successful for <i>$name</i>, value $rawdata received";
         } else {
             $status   = 'error';
             $message = "Failed to set pass on OID <i>$name</i>";
         }
     } else {
         $status  = 'error';
-        $message = "Invalid data in SNMP reply, value $rawdata reveiced";
+        $message = "Invalid data in SNMP reply, value $rawdata received";
     }
 } else {
     if (is_numeric($id) && $id > 0) {
