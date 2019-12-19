@@ -136,7 +136,8 @@ if (is_numeric($rule_id) && $rule_id > 0) {
             'name' => $name,
             'proc' => $proc,
             'query' => $query,
-            'builder' => $builder_json
+            'builder' => $builder_json,
+            'invert_map' => $invert_map
         ), 'alert_rules');
 
         if ($rule_id) {
