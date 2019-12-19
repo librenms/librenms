@@ -38,4 +38,3 @@ $('#visualization').height(height + 'px');
     });
 </script>
 @endsection
-
