@@ -411,6 +411,29 @@ customers:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [customer_id], Unique: true, Type: BTREE }
     username: { Name: username, Columns: [username], Unique: true, Type: BTREE }
+customoids:
+  Columns:
+    - { Field: customoid_id, Type: 'int(10) unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: device_id, Type: 'int(10) unsigned', 'Null': false, Extra: '', Default: '0' }
+    - { Field: customoid_descr, Type: varchar(255), 'Null': true, Extra: '', Default: '' }
+    - { Field: customoid_deleted, Type: tinyint(4), 'Null': false, Extra: '', Default: '0' }
+    - { Field: customoid_current, Type: double, 'Null': true, Extra: '' }
+    - { Field: customoid_prev, Type: double, 'Null': true, Extra: '' }
+    - { Field: customoid_oid, Type: varchar(255), 'Null': true, Extra: '' }
+    - { Field: customoid_datatype, Type: varchar(20), 'Null': false, Extra: '', Default: GAUGE }
+    - { Field: customoid_unit, Type: varchar(20), 'Null': true, Extra: '' }
+    - { Field: customoid_divisor, Type: 'int(10) unsigned', 'Null': false, Extra: '', Default: '1' }
+    - { Field: customoid_multiplier, Type: 'int(10) unsigned', 'Null': false, Extra: '', Default: '1' }
+    - { Field: customoid_limit, Type: double, 'Null': true, Extra: '' }
+    - { Field: customoid_limit_warn, Type: double, 'Null': true, Extra: '' }
+    - { Field: customoid_limit_low, Type: double, 'Null': true, Extra: '' }
+    - { Field: customoid_limit_low_warn, Type: double, 'Null': true, Extra: '' }
+    - { Field: customoid_alert, Type: tinyint(4), 'Null': false, Extra: '', Default: '0' }
+    - { Field: customoid_passed, Type: tinyint(4), 'Null': false, Extra: '', Default: '0' }
+    - { Field: lastupdate, Type: timestamp, 'Null': false, Extra: 'on update CURRENT_TIMESTAMP', Default: CURRENT_TIMESTAMP }
+    - { Field: user_func, Type: varchar(100), 'Null': true, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [customoid_id], Unique: true, Type: BTREE }
 dashboards:
   Columns:
     - { Field: dashboard_id, Type: 'int(10) unsigned', 'Null': false, Extra: auto_increment }
