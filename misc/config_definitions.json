@@ -1988,6 +1988,14 @@
             },
             "type": "graph"
         },
+        "graph_types.device.customoid": {
+            "default": {
+                "section": "customoid",
+                "order": 0,
+                "descr": "Custom OID"
+            },
+            "type": "graph"
+        },
         "graph_types.device.fdb_count": {
             "default": {
                 "section": "system",
@@ -3666,6 +3674,11 @@
 
         },
         "poller_modules.ports": {
+            "default": true,
+            "type": "boolean"
+
+        },
+        "poller_modules.customoid": {
             "default": true,
             "type": "boolean"
 
