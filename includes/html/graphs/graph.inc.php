@@ -39,6 +39,9 @@ $graph_title = format_hostname($device);
 
 if ($auth && is_custom_graph($type, $subtype, $device)) {
     include(Config::get('install_dir') . "/includes/html/graphs/custom.inc.php");
+} elseif ($auth && is_customoid_graph($type, $subtype)) {
+    $unit   = $vars['unit'];
+    include(Config::get('install_dir') . "/includes/html/graphs/customoid/customoid.inc.php");
 } elseif ($auth && is_mib_graph($type, $subtype)) {
     include Config::get('install_dir') . "/includes/html/graphs/$type/mib.inc.php";
 } elseif ($auth && is_file(Config::get('install_dir') . "/includes/html/graphs/$type/$subtype.inc.php")) {
