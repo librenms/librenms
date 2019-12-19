@@ -2008,7 +2008,9 @@
             "default": {
                 "section": "firewall",
                 "order": 0,
-                "descr": "UDP connections p/s"
+                "descr": "UDP connections p/s",
+		"type": "integer"
+
             }
 	},
 
@@ -2016,7 +2018,9 @@
             "default": {
                 "section": "firewall",
                 "order": 0,
-                "descr": "TCP connections p/s"
+                "descr": "TCP connections p/s",
+		"type": "integer"
+
             }
 	},
 
@@ -2024,7 +2028,9 @@
             "default": {
                 "section": "firewall",
                 "order": 0,
-                "descr": "Other connections p/s"
+                "descr": "Other connections p/s",
+		"type": "integer"
+
             }
 	},
 
