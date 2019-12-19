@@ -371,6 +371,7 @@ class Config
             }
 
             self::set('os', array_replace_recursive($os_defs, self::get('os')));
+
         } else {
             // load from yaml
             if ($existing) {
