@@ -112,6 +112,7 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
         // dashboard widgets
         Route::group(['prefix' => 'dash', 'namespace' => 'Widgets'], function () {
             Route::post('alerts', 'AlertsController');
+            Route::post('alertlog_stats', 'AlertlogStatsController');
             Route::post('availability-map', 'AvailabilityMapController');
             Route::post('component-status', 'ComponentStatusController');
             Route::post('device-summary-horiz', 'DeviceSummaryHorizController');
