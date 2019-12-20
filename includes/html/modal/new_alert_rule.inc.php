@@ -115,7 +115,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                                         <select id="maps" name="maps[]" class="form-control" multiple="multiple"></select>
                                     </div>
                                     <div>
-                                        <label for='invert_map' class=' control-label' text-align="left" title="If ON, alert rule check will run on all devices except the selected devices and groups.">Invert list match: </label>
+                                        <label for='invert_map' class='col-md-1' style="width: 14.1333%;" text-align="left" title="If ON, alert rule check will run on all devices except the selected devices and groups.">All devices except in list: </label>
                                         <input type='checkbox' name='invert_map' id='invert_map'>
                                     </div>
                                 </div>
