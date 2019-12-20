@@ -51,9 +51,9 @@ class Config
 
         // merge all config sources together config_definitions.json > db config > config.php
         self::loadDefaults();
-        self::loadAllOs(true);
         self::loadDB();
         self::loadUserConfigFile(self::$config);
+        self::loadAllOs(true);
 
         // final cleanups and validations
         self::processConfig();
