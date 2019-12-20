@@ -139,7 +139,7 @@ if (isset($_REQUEST['search'])) {
                         'name'        => $name,
                         'description' => $description,
                         'colours'     => $port_colour,
-                        'hostname'    => $result['hostname'],
+                        'hostname'    => format_hostname($result),
                         'port_id'     => $result['port_id'],
                     );
                 }//end foreach
@@ -196,7 +196,7 @@ if (isset($_REQUEST['search'])) {
                         'bgp_image'   => $bgp_image,
                         'remoteas'    => $remoteas,
                         'colours'     => $port_colour,
-                        'hostname'    => $result['hostname'],
+                        'hostname'    => format_hostname($result),
                     );
                 }//end foreach
             }//end if
@@ -235,7 +235,7 @@ if (isset($_REQUEST['search'])) {
 
                     $device[] = array(
                         'name'            => $name,
-                        'hostname'        => $result['hostname'],
+                        'hostname'        => format_hostname($result),
                         'app_id'          => $result['app_id'],
                         'device_id'       => $result['device_id'],
                         'colours'         => $highlight_colour,
@@ -282,7 +282,7 @@ if (isset($_REQUEST['search'])) {
 
                     $device[] = array(
                         'name'            => $name,
-                        'hostname'        => $result['hostname'],
+                        'hostname'        => format_hostname($result),
                         'device_id'       => $result['device_id'],
                         'colours'         => $highlight_colour,
                         'device_image'    => getIcon($result),
