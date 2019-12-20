@@ -369,9 +369,7 @@ class Config
                 // remove unneeded os
                 $os_defs = array_diff_key($os_defs, Device::distinct('os')->get('os')->toArray());
             }
-
             self::set('os', array_replace_recursive($os_defs, self::get('os')));
-
         } else {
             // load from yaml
             if ($existing) {
@@ -385,7 +383,6 @@ class Config
             foreach ($os_list as $file) {
                 if (is_readable($file)) {
                     $tmp = Symfony\Component\Yaml\Yaml::parse(file_get_contents($file));
-
                     self::set("os.{$tmp['os']}", array_replace_recursive($tmp, self::get("os.{$tmp['os']}", [])));
                 }
             }
