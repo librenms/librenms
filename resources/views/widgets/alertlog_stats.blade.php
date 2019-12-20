@@ -7,7 +7,7 @@
     <table id="alertlog-stats_{{ $id }}" class="table table-hover table-condensed alerts">
         <thead>
         <tr>
-            <th data-column-id="count" data-order="desc">Count</th>
+            <th data-column-id="count">Count</th>
             <th data-column-id="hostname">Device</th>
             <th data-column-id="alert_rule">Alert rule</th>
         </tr>
@@ -17,7 +17,7 @@
 <script>
     var grid = $("#alertlog-stats_{{ $id }}").bootgrid({
         ajax: true,
-        rowCount: [50, 100, 250, -1],
+        rowCount: [10, 100, 250, -1],
         post: function () {
             return {
                 id: "alertlog-stats",

@@ -44,11 +44,7 @@ if (empty($total)) {
     $total = 0;
 }
 
-if (!isset($sort) || empty($sort)) {
-    $sort = 'DESC';
-}
-
-$sql .= " GROUP BY D.device_id, R.name ORDER BY $sort";
+$sql .= " GROUP BY D.device_id, R.name ORDER BY COUNT(*) DESC";
 
 if (isset($current)) {
     $limit_low = (($current * $rowCount) - ($rowCount));
