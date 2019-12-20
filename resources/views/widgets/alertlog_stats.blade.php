@@ -4,7 +4,7 @@
     </div>
 </div>
 <div class="table-responsive">
-    <table id="alertlog-stats_{{ $id }}" class="table table-hover table-condensed alerts">
+    <table id="alertlog-stats_{{ $id }}" class="table table-hover table-condensed table-striped">
         <thead>
         <tr>
             <th data-column-id="count">Count</th>
@@ -17,7 +17,7 @@
 <script>
     var grid = $("#alertlog-stats_{{ $id }}").bootgrid({
         ajax: true,
-        rowCount: [25, 100, 250, -1],
+        rowCount: [50, 100, 250, -1],
         post: function () {
             return {
                 id: "alertlog-stats",
