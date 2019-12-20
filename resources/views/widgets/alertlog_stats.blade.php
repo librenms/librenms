@@ -17,7 +17,7 @@
 <script>
     var grid = $("#alertlog-stats_{{ $id }}").bootgrid({
         ajax: true,
-        rowCount: [10, 100, 250, -1],
+        rowCount: [25, 100, 250, -1],
         post: function () {
             return {
                 id: "alertlog-stats",
