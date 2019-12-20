@@ -1294,6 +1294,7 @@ function list_oxidized(\Illuminate\Http\Request $request)
             'vyos'       => 'vyatta',
             'slms'       => 'zhoneolt',
             'fireware'   => 'firewareos',
+            'fortigate'  => 'fortios',
         ];
 
         $device['os'] = str_replace(array_keys($models), array_values($models), $device['os']);
