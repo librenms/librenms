@@ -25,13 +25,13 @@
 
 namespace LibreNMS;
 
-use App\Models\Device;
 use App\Models\GraphType;
 use Exception;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Arr;
 use LibreNMS\DB\Eloquent;
 use Log;
+use App\Models\Device;
 
 class Config
 {
