@@ -382,7 +382,7 @@ class Config
 
             foreach ($os_list as $file) {
                 if (is_readable($file)) {
-                    $tmp = Symfony\Component\Yaml\Yaml::parse(file_get_contents($file));
+                    $tmp = \Symfony\Component\Yaml\Yaml::parse(file_get_contents($file));
                     self::set("os.{$tmp['os']}", array_replace_recursive($tmp, self::get("os.{$tmp['os']}", [])));
                 }
             }
