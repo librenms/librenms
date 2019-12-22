@@ -1497,7 +1497,7 @@ function load_os(&$device)
  */
 function load_all_os($existing = false, $cached = true)
 {
-    Config::loadAllOs($existing, $cached);
+    Device::loadAllOs($existing, $cached);
 }
 
 /**

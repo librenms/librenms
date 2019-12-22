@@ -53,10 +53,10 @@ class Config
         self::loadDefaults();
         self::loadDB();
         self::loadUserConfigFile(self::$config);
-        self::loadAllOs(true);
 
         // final cleanups and validations
         self::processConfig();
+        Device::loadAllOs(true);
 
         // set to global for legacy/external things (is this needed?)
         global $config;
@@ -347,46 +347,6 @@ class Config
 
         // load graph types from the database
         self::loadGraphsFromDb(self::$config);
-    }
-
-    /**
-     * Load all OS, optionally load just the OS used by existing devices
-     * Default cache time is 1 day. Controlled by os_def_cache_time.
-     *
-     * @param bool $existing Only load OS that have existing OS in the database
-     * @param bool $cached Load os definitions from the cache file
-     */
-    public static function loadAllOs($existing = false, $cached = true)
-    {
-        $install_dir = self::get('install_dir');
-        $cache_file = $install_dir . '/cache/os_defs.cache';
-
-        if ($cached && is_file($cache_file) && (time() - filemtime($cache_file) < self::get('os_def_cache_time'))) {
-            // Cached
-            $os_defs = unserialize(file_get_contents($cache_file));
-
-            if ($existing) {
-                // remove unneeded os
-                $os_defs = array_diff_key($os_defs, Device::distinct('os')->get('os')->toArray());
-            }
-            self::set('os', array_replace_recursive($os_defs, self::get('os')));
-        } else {
-            // load from yaml
-            if ($existing) {
-                $os_list = array_map(function ($os) use ($install_dir) {
-                    return $install_dir . '/includes/definitions/' . $os . '.yaml';
-                }, Device::distinct('os')->get('os')->toArray());
-            } else {
-                $os_list = glob($install_dir . '/includes/definitions/*.yaml');
-            }
-
-            foreach ($os_list as $file) {
-                if (is_readable($file)) {
-                    $tmp = \Symfony\Component\Yaml\Yaml::parse(file_get_contents($file));
-                    self::set("os.{$tmp['os']}", array_replace_recursive($tmp, self::get("os.{$tmp['os']}", [])));
-                }
-            }
-        }
     }
 
     private static function loadGraphsFromDb(&$config)
