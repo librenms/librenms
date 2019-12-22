@@ -34,7 +34,6 @@ class Device extends BaseModel
     public static function boot()
     {
         parent::boot();
-
         self::loadAllOs(true);
 
         static::deleting(function (Device $device) {
