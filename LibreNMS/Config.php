@@ -25,13 +25,13 @@
 
 namespace LibreNMS;
 
-use App\Models\Device;
 use App\Models\GraphType;
 use Exception;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Arr;
 use LibreNMS\DB\Eloquent;
 use Log;
+use App\Models\Device;
 
 class Config
 {
@@ -51,9 +51,9 @@ class Config
 
         // merge all config sources together config_definitions.json > db config > config.php
         self::loadDefaults();
-        self::loadAllOs(true);
         self::loadDB();
         self::loadUserConfigFile(self::$config);
+        self::loadAllOs(true);
 
         // final cleanups and validations
         self::processConfig();
@@ -369,9 +369,7 @@ class Config
                 // remove unneeded os
                 $os_defs = array_diff_key($os_defs, Device::distinct('os')->get('os')->toArray());
             }
-
             self::set('os', array_replace_recursive($os_defs, self::get('os')));
-
         } else {
             // load from yaml
             if ($existing) {
@@ -384,8 +382,7 @@ class Config
 
             foreach ($os_list as $file) {
                 if (is_readable($file)) {
-                    $tmp = Symfony\Component\Yaml\Yaml::parse(file_get_contents($file));
-
+                    $tmp = \Symfony\Component\Yaml\Yaml::parse(file_get_contents($file));
                     self::set("os.{$tmp['os']}", array_replace_recursive($tmp, self::get("os.{$tmp['os']}", [])));
                 }
             }
