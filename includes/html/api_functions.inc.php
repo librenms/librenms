@@ -27,7 +27,7 @@ use LibreNMS\Util\IPv4;
 function api_success($result, $result_name, $message = null, $code = 200, $count = null, $extra = null)
 {
     if (isset($result) && !isset($result_name)) {
-        return api_error(500, 'Result name not specified');
+        return api_error(404, 'Result name not specified');
     }
 
     $output = ['status' => 'ok'];
