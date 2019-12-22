@@ -31,7 +31,6 @@ use Illuminate\Database\QueryException;
 use Illuminate\Support\Arr;
 use LibreNMS\DB\Eloquent;
 use Log;
-use App\Models\Device;
 
 class Config
 {
@@ -56,7 +55,6 @@ class Config
 
         // final cleanups and validations
         self::processConfig();
-        Device::loadAllOs(true);
 
         // set to global for legacy/external things (is this needed?)
         global $config;
