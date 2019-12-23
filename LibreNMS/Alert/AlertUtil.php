@@ -196,6 +196,20 @@ class AlertUtil
     }
 
     /**
+     * Check if device is set to ignore alerts
+     * @param int $device_id Device-ID
+     * @return bool
+     */
+    public static function hasAlertIgnore($device_id)
+    {
+        $query = "SELECT `devices`.ignore FROM `devices`
+        WHERE `devices_id`=?";
+
+        $params = [$device_id];
+        return dbFetchCell($query, $params) == "1";
+    }
+
+    /**
      * Process Macros
      * @param string $rule Rule to process
      * @param int $x Recursion-Anchor
