@@ -23,7 +23,6 @@ discovery_modules:
         entity-physical: false
         fdb-table: false
         hr-device: false
-        mpls: false
         ntp: false
         ports-stack: false
         storage: false
