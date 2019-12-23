@@ -203,7 +203,7 @@ class AlertUtil
     public static function hasAlertIgnore($device_id)
     {
         $query = "SELECT `devices`.ignore FROM `devices`
-        WHERE `devices_id`=?";
+        WHERE `device_id`=?";
 
         $params = [$device_id];
         return dbFetchCell($query, $params) == "1";
