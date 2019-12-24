@@ -94,52 +94,54 @@ $common_output[] = '
         ajax: true,
         rowCount: [50, 100, 250, -1],
         templates: {
-            header: \'<div id="{{ctx.id}}" class="{{css.header}}"><div class="row">
-                <div class="col-sm-8 actionBar"><span class="pull-left">
-                <form method="post" action="" class="form-inline" role="form" id="result_form">
-                ' . csrf_field() . '
-                <input type=hidden name="hostname" id="hostname"> ';
+            header: \'<div id="{{ctx.id}}" class="{{css.header}}"><div class="row"> \
+                <div class="col-sm-8 actionBar"><span class="pull-left"> \
+                <form method="post" action="" class="form-inline" role="form" id="result_form"> \
+                ' . csrf_field() . ' \
+            <input type=hidden name="hostname" id="hostname"> \
+';
 
-if (isset($vars['fromdevice']) &&  ! $vars['fromdevice']) {
-    $common_output[] = '<div class="form-group">
-                <label>
-                <strong>Device&nbsp;</strong>
-                </label>
-                <select name="device_id" id="device_id" class="form-control input-sm" style="min-width: 175px;">
-                ' . $selected_device. '
-               </select>
-               </div>';
+if (isset($vars['fromdevice']) && $vars['fromdevice']) {
+    $common_output[] = '<div class="form-group"> \
+                <label> \
+                <strong>Device&nbsp;</strong> \
+                </label> \
+                <select name="device_id" id="device_id" class="form-control input-sm" style="min-width: 175px;"> \
+                ' . $selected_device. ' \
+               </select> \
+               </div> \
+               ';
 }
 
-$common_output[] = '<div class="form-group">
-               <label>
-               <strong>&nbsp;State&nbsp;</strong>
-               </label>
-               <select name="state" id="state" class="form-control input-sm">
-                $common_output[] = ' . $selected_state. '
-               <option value="-1">Any</option>
-               <option value="0">Ok (recovered)</option>
-               <option value="1">Alert</option>
-               <option value="3">Worse</option>
-               <option value="4">Better</option>
-               </select>
-               </div>
-               <div class="form-group">
-               <label>
-               <strong>&nbsp;Severity&nbsp;</strong>
-               </label>
-               <select name="min_severity" id="min_severity" class="form-control input-sm">
-                ' . $selected_min_severity. '
-               <option value>Any</option>
-               <option value="3">Critical</option>
-               <option value="5">Warning</option>
-               <option value="4">Ok</option>
-               <option value="2">Warning and critical</option>
-               <option value="1">Ok, warning and critical</option>
-               </select>
-               </div>
-               <button type="submit" class="btn btn-default input-sm">Filter</button>
-               </form></span></div>
+$common_output[] = '<div class="form-group"> \
+               <label> \
+               <strong>&nbsp;State&nbsp;</strong> \
+               </label> \
+               <select name="state" id="state" class="form-control input-sm"> \
+                $common_output[] = ' . $selected_state. ' \
+               <option value="-1">Any</option> \
+               <option value="0">Ok (recovered)</option> \
+               <option value="1">Alert</option> \
+               <option value="3">Worse</option> \
+               <option value="4">Better</option> \
+               </select> \
+               </div> \
+               <div class="form-group"> \
+               <label> \
+               <strong>&nbsp;Severity&nbsp;</strong> \
+               </label> \
+               <select name="min_severity" id="min_severity" class="form-control input-sm"> \
+                ' . $selected_min_severity. ' \
+               <option value>Any</option> \
+               <option value="3">Critical</option> \
+               <option value="5">Warning</option> \
+               <option value="4">Ok</option> \
+               <option value="2">Warning and critical</option> \
+               <option value="1">Ok, warning and critical</option> \
+               </select> \
+               </div> \
+               <button type="submit" class="btn btn-default input-sm">Filter</button> \
+               </form></span></div> \
                <div class="col-sm-4 actionBar"><p class="{{css.search}}"></p><p class="{{css.actions}}"></p></div></div></div>\'
         },
         post: function () {
