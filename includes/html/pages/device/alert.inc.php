@@ -15,6 +15,10 @@
  * @author     LibreNMS Contributors
 */
 
+if (!isset($vars['section'])) {
+    $vars['section'] = 'alerts';
+}
+
 echo '<br>';
 echo '<div class="panel panel-default">';
 echo '<div class="panel-heading">';
@@ -33,7 +37,7 @@ echo ' | ';
 if ($vars['section'] == 'alerts-log') {
     echo '<span class="pagemenu-selected"></span>';
 }
-echo generate_link('Active alerts', $vars, array('section' => 'alert-log'));
+echo generate_link('Alert history', $vars, array('section' => 'alert-log'));
 if ($vars['section'] == 'alert-log') {
     echo '</span>';
 }
