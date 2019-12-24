@@ -98,9 +98,9 @@ $common_output[] = '
                 <div class="col-sm-8 actionBar"><span class="pull-left"> \
                 <form method="post" action="" class="form-inline" role="form" id="result_form"> \
                 ' . csrf_field() . ' \
-            <input type=hidden name="hostname" id="hostname"> ';
+                <input type=hidden name="hostname" id="hostname"> ';
 
-if (isset($vars['fromdevice']) && $vars['fromdevice']) {
+if (isset($vars['fromdevice']) &&  ! $vars['fromdevice']) {
     $common_output[] = '<div class="form-group"> \ 
                 <label> \
                 <strong>Device&nbsp;</strong> \
@@ -108,7 +108,7 @@ if (isset($vars['fromdevice']) && $vars['fromdevice']) {
                 <select name="device_id" id="device_id" class="form-control input-sm" style="min-width: 175px;"> \
                 ' . $selected_device. ' \
                </select> \
-               </div> ';
+               </div>';
 }
 
 $common_output[] = '<div class="form-group"> \
