@@ -34,7 +34,7 @@ if ($vars['section'] == 'alerts') {
 
 echo ' | ';
    
-if ($vars['section'] == 'alerts-log') {
+if ($vars['section'] == 'alert-log') {
     echo '<span class="pagemenu-selected">';
 }
 echo generate_link('Alert history', $vars, array('section' => 'alert-log'));
