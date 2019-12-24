@@ -198,4 +198,4 @@ $common_output[] = '
         $(\'#hostname\').val(e.params.data.text);
     });
 </script>
-'
+';
