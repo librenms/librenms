@@ -101,7 +101,7 @@ $common_output[] = '
             <input type=hidden name="hostname" id="hostname"> \
 ';
 
-if (isset($vars['fromdevice']) && $vars['fromdevice']) {
+if (isset($vars['fromdevice']) && !$vars['fromdevice']) {
     $common_output[] = '<div class="form-group"> \
                 <label> \
                 <strong>Device&nbsp;</strong> \
