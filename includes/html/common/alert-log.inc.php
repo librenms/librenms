@@ -98,11 +98,11 @@ $common_output[] = '
                 <div class="col-sm-8 actionBar"><span class="pull-left"> \
                 <form method="post" action="" class="form-inline" role="form" id="result_form"> \
                 ' . csrf_field() . ' \
+            <input type=hidden name="hostname" id="hostname"> \
             ';
 
 if (isset($vars['fromdevice']) && $vars['fromdevice']) {
-    $common_output[] = '<input type=hidden name="hostname" id="hostname"> \
-                <div class="form-group"> \ 
+    $common_output[] = '<div class="form-group"> \ 
                 <label> \
                 <strong>Device&nbsp;</strong> \
                 </label> \
