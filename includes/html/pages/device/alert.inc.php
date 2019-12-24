@@ -48,11 +48,12 @@ echo '<div style="width:99%;margin:0 auto;">';
 switch ($vars['section']) {
     case 'alerts':
         //$vars['fromdevice'] = true;
-        include 'includes/html/pages/alerts.inc.php';
+        include 'includes/html/common/alerts.inc.php';
         break;
     case 'alert-log':
-        //$vars['fromdevice'] = true;
-        include 'includes/html/pages/alert-log.inc.php';
+        $vars['fromdevice'] = true;
+        $device_id = (int)$vars['device'];
+        include 'includes/html/common/alert-log.inc.php';
         break;
 
     default:
