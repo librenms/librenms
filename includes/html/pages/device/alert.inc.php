@@ -48,11 +48,13 @@ echo '<div style="width:99%;margin:0 auto;">';
 switch ($vars['section']) {
     case 'alerts':
         include 'includes/html/common/alerts.inc.php';
+        echo implode('', $common_output);
         break;
     case 'alert-log':
         $vars['fromdevice'] = true;
         $device_id = (int)$vars['device'];
         include 'includes/html/common/alert-log.inc.php';
+        echo implode('', $common_output);
         break;
 
     default:
