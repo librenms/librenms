@@ -20,21 +20,26 @@ echo '<div class="panel panel-default">';
 echo '<div class="panel-heading">';
 echo '<strong>Alerts</strong>  &#187; ';
 
-echo '<span class="pagemenu-selected"></span>';
+if ($vars['section'] == 'alerts') {
+    echo '<span class="pagemenu-selected"></span>';
+}
 echo generate_link('Active alerts', $vars, array('section' => 'alerts'));
-echo '</span>';
+if ($vars['section'] == 'alerts') {
+    echo '</span>';
+}
 
 echo ' | ';
    
-echo '<span class="pagemenu-selected"></span>';
-echo generate_link('Alerts history', $vars, array('section' => 'alert-log'));
-echo '</span>';
+if ($vars['section'] == 'alerts-log') {
+    echo '<span class="pagemenu-selected"></span>';
+}
+echo generate_link('Active alerts', $vars, array('section' => 'alert-log'));
+if ($vars['section'] == 'alert-log') {
+    echo '</span>';
+}
 
 echo '</div><br>';
 echo '<div style="width:99%;margin:0 auto;">';
-
-include 'includes/html/pages/alerts.inc.php';
-include 'includes/html/pages/alert-log.inc.php';
 
 switch ($vars['section']) {
     case 'alerts':
