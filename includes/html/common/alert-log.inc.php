@@ -54,8 +54,8 @@ if (isset($_POST['device_id'])) {
     $selected_device = '<option value="' . (int)$_POST['device_id'] . '" selected="selected">';
     $selected_device .= htmlentities($_POST['hostname']) . '</option>';
 } else {
-    $selected_device = $device['device_id'];
-    $_POST['device_id'] = $device['device_id'];
+    $selected_device = $device_id;
+    $_POST['device_id'] = $device_id;
 }
 if (isset($_POST['state'])) {
     $selected_state = '<option value="' . $_POST['state'] . '" selected="selected">';

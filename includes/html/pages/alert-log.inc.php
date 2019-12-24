@@ -13,7 +13,7 @@
  * @author     LibreNMS Contributors
 */
 
-$device['device_id'] = '';
+$device_id;= '';
 require_once 'includes/html/common/alert-log.inc.php';
 echo implode('', $common_output);
-unset($device['device_id']);
+unset($device_id);
