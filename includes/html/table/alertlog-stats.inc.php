@@ -23,7 +23,7 @@ if (is_numeric($vars['device_id'])) {
 $where .= ' AND `E`.`state` = 1'; // state 1 => alert
 
 if (is_numeric($vars['time_interval'])) {
-    $where .= ' AND E.`timestamp` > DATE_SUB(NOW(),INTERVAL ? DAY)';
+    $where .= ' AND E.`time_logged` > DATE_SUB(NOW(),INTERVAL ? DAY)';
     $param[] = $vars['time_interval'];
 }
 
