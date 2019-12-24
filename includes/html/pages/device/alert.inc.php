@@ -25,7 +25,7 @@ echo '<div class="panel-heading">';
 echo '<strong>Alerts</strong>  &#187; ';
 
 if ($vars['section'] == 'alerts') {
-    echo '<span class="pagemenu-selected"></span>';
+    echo '<span class="pagemenu-selected">';
 }
 echo generate_link('Active alerts', $vars, array('section' => 'alerts'));
 if ($vars['section'] == 'alerts') {
@@ -35,7 +35,7 @@ if ($vars['section'] == 'alerts') {
 echo ' | ';
    
 if ($vars['section'] == 'alerts-log') {
-    echo '<span class="pagemenu-selected"></span>';
+    echo '<span class="pagemenu-selected">';
 }
 echo generate_link('Alert history', $vars, array('section' => 'alert-log'));
 if ($vars['section'] == 'alert-log') {
