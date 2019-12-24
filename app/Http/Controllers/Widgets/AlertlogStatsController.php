@@ -33,7 +33,8 @@ class AlertlogStatsController extends WidgetController
     protected $defaults = [
         'title' => null,
         'device_id' => '',
-        'min_severity' => 2
+        'min_severity' => 2,
+        'time_interval' => 7
     ];
 
     public function getView(Request $request)

@@ -14,4 +14,8 @@
             @endforeach
         </select>
     </div>
+    <div class="form-group">
+        <label for="time_interval-{{ $id }}" class="control-label">@lang('Last days')</label>
+        <input class="form-control" name="time_interval" id="time_interval-{{ $id }}" value="{{ $time_interval }}">
+    </div>
 @endsection

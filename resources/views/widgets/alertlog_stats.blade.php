@@ -23,6 +23,7 @@
                 id: "alertlog-stats",
                 device_id: "",
                 min_severity: '{{ $min_severity }}',
+                time_interval: '{{ $time_interval }}'
             };
         },
         url: "ajax_table.php"

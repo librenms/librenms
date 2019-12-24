@@ -22,6 +22,10 @@ if (is_numeric($vars['device_id'])) {
 
 $where .= ' AND `E`.`state` = 1'; // state 1 => alert
 
+if (is_numeric($vars['time_interval'])) {
+    $where .= ' AND E.`timestamp` > DATE_SUB(NOW(),INTERVAL ? DAY)';
+    $param[] = $vars['time_interval'];
+}
 
 if (isset($vars['min_severity'])) {
     $where .=  get_sql_filter_min_severity($vars['min_severity'], "R");
