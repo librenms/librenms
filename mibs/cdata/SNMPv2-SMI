@@ -1,0 +1,119 @@
+SNMPv2-SMI DEFINITIONS ::= BEGIN
+
+org OBJECT IDENTIFIER ::= { iso  3 }
+
+dod OBJECT IDENTIFIER ::= { org  6 }
+
+internet OBJECT IDENTIFIER ::= { dod  1 }
+
+directory OBJECT IDENTIFIER  ::= { internet  1 }
+
+mgmt  OBJECT IDENTIFIER  ::= { internet  2 }
+
+mib-2  OBJECT IDENTIFIER  ::= { mgmt  1 }
+
+transmission  OBJECT IDENTIFIER  ::= { mib-2  10 }
+
+experimental  OBJECT IDENTIFIER  ::= { internet  3 }
+
+private  OBJECT IDENTIFIER  ::= { internet  4 }
+
+enterprises  OBJECT IDENTIFIER  ::= { private  1 }
+
+security  OBJECT IDENTIFIER  ::= { internet  5 }
+
+snmpV2  OBJECT IDENTIFIER  ::= { internet  6 }
+
+snmpDomains  OBJECT IDENTIFIER  ::= { snmpV2  1 }
+
+snmpProxys  OBJECT IDENTIFIER  ::= { snmpV2  2 }
+
+snmpModules  OBJECT IDENTIFIER  ::= { snmpV2  3 }
+
+--ObjectName    ::=
+--    OBJECT IDENTIFIER
+
+--NotificationName ::=
+--    OBJECT IDENTIFIER
+
+--ObjectSyntax ::=
+--    CHOICE {
+--        simple
+--            SimpleSyntax,
+--
+--        application-wide
+--            ApplicationSyntax
+--}
+
+--SimpleSyntax ::=
+--    CHOICE {
+--        integer-value
+--            INTEGER,
+--
+--        string-value
+--            OCTET STRING,
+--
+--        objectID-value
+--            OBJECT IDENTIFIER
+--}
+
+--Integer32 ::=
+--    [UNIVERSAL 2]
+--    IMPLICIT INTEGER
+
+--ApplicationSyntax ::=
+--    CHOICE {
+--        ipAddress-value
+--            IpAddress,
+--
+--        counter-value
+--            Counter32,
+--
+--        timeticks-value
+--            TimeTicks,
+--
+--        arbitrary-value
+--            Opaque,
+--
+--        big-counter-value
+--            Counter64,
+--
+--        unsigned-integer-value
+--            Unsigned32
+--}
+
+--IpAddress ::=
+--    [APPLICATION 0]
+--    IMPLICIT OCTET STRING
+
+--Counter32 ::=
+--    [APPLICATION 1]
+--    IMPLICIT INTEGER
+
+--Gauge32 ::=
+--    [APPLICATION 2]
+--    IMPLICIT INTEGER
+
+--Unsigned32 ::=
+--    [APPLICATION 2]
+--    IMPLICIT INTEGER
+
+--TimeTicks ::=
+--    [APPLICATION 3]
+--    IMPLICIT INTEGER
+
+--Opaque ::=
+--    [APPLICATION 4]
+--    IMPLICIT OCTET STRING
+
+--Counter64 ::=
+--    [APPLICATION 6]
+--    IMPLICIT INTEGER
+
+--zeroDotZero OBJECT-IDENTITY
+--    STATUS       current
+--    DESCRIPTION
+--        "A value used for null identifiers."
+--    ::= { 0  0 }
+
+END
