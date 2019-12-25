@@ -2,7 +2,7 @@
 /*
  * LibreNMS Cdata memory information module
  *
- * Copyright (c) 2015 Mike Rostermund <mike@kollegienet.dk>
+ * Copyright (c) 2019 hartred <tumanov@asarta.ru>
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation, either version 3 of the License, or (at your
