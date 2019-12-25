@@ -1,6 +1,6 @@
 <?php
 /*
- * LibreNMS Ubiquiti UniFi memory information module
+ * LibreNMS Cdata memory information module
  *
  * Copyright (c) 2015 Mike Rostermund <mike@kollegienet.dk>
  * This program is free software: you can redistribute it and/or modify it
