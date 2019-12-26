@@ -15,7 +15,7 @@
     </table>
 </div>
 <script>
-    var grid = $("#alertlog-stats_{{ $id }}").bootgrid({
+    $("#alertlog-stats_{{ $id }}").bootgrid({
         ajax: true,
         rowCount: [50, 100, 250, -1],
         post: function () {
@@ -27,34 +27,5 @@
             };
         },
         url: "ajax_table.php"
-    }).on("loaded.rs.jquery.bootgrid", function () {
-
-        var results = $("div.infos").text().split(" ");
-        low = results[1] - 1;
-        high = results[3];
-        max = high - low;
-        search = $('.search-field').val();
-
-        grid.find(".incident-toggle").each(function () {
-            $(this).parent().addClass('incident-toggle-td');
-        }).on("click", function (e) {
-            var target = $(this).data("target");
-            $(target).collapse('toggle');
-            $(this).toggleClass('fa-plus fa-minus');
-        });
-        grid.find(".incident").each(function () {
-            $(this).parent().addClass('col-lg-4 col-md-4 col-sm-4 col-xs-4');
-            $(this).parent().parent().on("mouseenter", function () {
-                $(this).find(".incident-toggle").fadeIn(200);
-            }).on("mouseleave", function () {
-                $(this).find(".incident-toggle").fadeOut(200);
-            }).on("click", "td:not(.incident-toggle-td)", function () {
-                var target = $(this).parent().find(".incident-toggle").data("target");
-                if ($(this).parent().find(".incident-toggle").hasClass('fa-plus')) {
-                    $(this).parent().find(".incident-toggle").toggleClass('fa-plus fa-minus');
-                    $(target).collapse('toggle');
-                }
-            });
-        });
     });
 </script>
