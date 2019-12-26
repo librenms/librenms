@@ -1,8 +1,10 @@
 <?php
 /**
- * VmwVmHBDetected.php
+ * VmwUtil.php
  *
  * -Description-
+ * 
+ * Common utility class for handling VmWare ESXi traps.
  * 
  * Assuming VMWare Tools is installed the VMHost will receive a periodic
  * heartbeat from a VMGuest. This trap is sent once a heartbeat is 
@@ -30,25 +32,38 @@
 
 namespace LibreNMS\Snmptrap\Handlers;
 
-use App\Models\Device;
-use LibreNMS\Interfaces\SnmptrapHandler;
-use LibreNMS\Snmptrap\Trap;
-use LibreNMS\Snmptrap\Handlers\VmwUtil;
-use Log;
-
-class VmwVmHBDetected implements SnmptrapHandler
+class VmwUtil
 {
     /**
-     * Handle snmptrap.
-     * Data is pre-parsed and delivered as a Trap.
-     *
-     * @param Device $device
+     * Get the VMGuest hostname
+     * 
      * @param Trap $trap
-     * @return void
+     * @return string
      */
-    public function handle(Device $device, Trap $trap) 
+    public static function getGuestName($trap)
     {
-        $vmGuestName = VmwUtil::getGuestName($trap); 
-        Log::event("Heartbeat from guest $vmGuestName detected", $device->device_id, 'trap', 1);
+        return $trap->getOidData($trap->findOid('VMWARE-VMINFO-MIB::vmwVmDisplayName'));
+    }
+
+    /**
+     * Get the VMGuest ID number
+     * 
+     * @param Trap $trap
+     * @return string
+     */
+    public static function getGuestId($trap)
+    {
+        return $trap->getOidData($trap->findOid('VMWARE-VMINFO-MIB::vmwVmID'));
+    }
+    
+    /**
+     * Get the VMGuest configuration path
+     * 
+     * @param Trap $trap
+     * @return string
+     */
+    public static function getGuestConfigPath($trap)
+    {
+        return $trap->getOidData($trap->findOid('VMWARE-VMINFO-MIB::vmwVmConfigFilePath'));
     }
 }
