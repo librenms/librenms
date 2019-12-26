@@ -69,7 +69,7 @@ VMWARE-VMINFO-MIB::vmwVmID.0 28 VMWARE-VMINFO-MIB::vmwVmConfigFilePath.0 /vmfs/v
 VMWARE-VMINFO-MIB::vmwVmDisplayName.28 $guest->hostname
 SNMP-COMMUNITY-MIB::snmpTrapAddress.0 $guest->ip
 SNMP-COMMUNITY-MIB::snmpTrapCommunity.0 \"public\"
-SNMPv2-MIB::snmpTrapEnterprise.0 VMWARE-PRODUCTS-MIB::vmwESX"; 
+SNMPv2-MIB::snmpTrapEnterprise.0 VMWARE-PRODUCTS-MIB::vmwESX";
 
         $trap = new Trap($trapText);
         $message = "Heartbeat from guest $guest->hostname detected";
