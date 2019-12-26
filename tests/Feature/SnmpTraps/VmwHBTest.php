@@ -1,6 +1,6 @@
 <?php
 /**
- * VmwPowerStateTest.php
+ * VmwHBTest.php
  * -Description-
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  *
- * Tests vmwVmPoweredOff, vmwVmPoweredOn, and vmwVmSuspended traps from VMWare ESXi hosts.
+ * Tests vmwVmHBLost and vmwVmHBDetected traps from VMWare ESXi hosts.
  *
  * @package    LibreNMS
  * @link       http://librenms.org
@@ -32,9 +32,9 @@ use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
 use LibreNMS\Tests\Feature\SnmpTraps\SnmpTrapTestCase;
 
-class VmwPowerStateTest extends SnmpTrapTestCase
+class VmwHBTest extends SnmpTrapTestCase
 {
-    public function testVmwVmPoweredOffTrap()
+    public function testVmwVmHBLostTrap()
     {
         $device = factory(Device::class)->create();
         $guest = factory(Device::class)->create();
@@ -42,7 +42,7 @@ class VmwPowerStateTest extends SnmpTrapTestCase
         $trapText = "$device->hostname
 UDP: [$device->ip]:28386->[10.10.10.100]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 5:18:30:26.00
-SNMPv2-MIB::snmpTrapOID.0 VMWARE-VMINFO-MIB::vmwVmPoweredOff
+SNMPv2-MIB::snmpTrapOID.0 VMWARE-VMINFO-MIB::vmwVmHBLost
 VMWARE-VMINFO-MIB::vmwVmID.0 28 VMWARE-VMINFO-MIB::vmwVmConfigFilePath.0 /vmfs/volumes/50101bda-eaf6ac7e-7e44-d4ae5267fb9f/$guest->hostname/$guest->hostname.vmx
 VMWARE-VMINFO-MIB::vmwVmDisplayName.28 $guest->hostname
 SNMP-COMMUNITY-MIB::snmpTrapAddress.0 $guest->ip
@@ -50,13 +50,13 @@ SNMP-COMMUNITY-MIB::snmpTrapCommunity.0 \"public\"
 SNMPv2-MIB::snmpTrapEnterprise.0 VMWARE-PRODUCTS-MIB::vmwESX";
 
         $trap = new Trap($trapText);
-        $message = "Guest $guest->hostname was powered off";
-        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
+        $message = "Heartbeat from guest $guest->hostname lost";
+        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 4);
 
-        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle VmwVmPoweredOffTrap');
+        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle VmwVmHBLostTrap');
     }
 
-    public function testVmwVmPoweredONTrap()
+    public function testVmwVmHBDetectedTrap()
     {
         $device = factory(Device::class)->create();
         $guest = factory(Device::class)->create();
@@ -64,39 +64,17 @@ SNMPv2-MIB::snmpTrapEnterprise.0 VMWARE-PRODUCTS-MIB::vmwESX";
         $trapText = "$device->hostname
 UDP: [$device->ip]:28386->[10.10.10.100]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 5:18:30:26.00
-SNMPv2-MIB::snmpTrapOID.0 VMWARE-VMINFO-MIB::vmwVmPoweredOn
+SNMPv2-MIB::snmpTrapOID.0 VMWARE-VMINFO-MIB::vmwVmHBDetected
 VMWARE-VMINFO-MIB::vmwVmID.0 28 VMWARE-VMINFO-MIB::vmwVmConfigFilePath.0 /vmfs/volumes/50101bda-eaf6ac7e-7e44-d4ae5267fb9f/$guest->hostname/$guest->hostname.vmx
 VMWARE-VMINFO-MIB::vmwVmDisplayName.28 $guest->hostname
 SNMP-COMMUNITY-MIB::snmpTrapAddress.0 $guest->ip
 SNMP-COMMUNITY-MIB::snmpTrapCommunity.0 \"public\"
-SNMPv2-MIB::snmpTrapEnterprise.0 VMWARE-PRODUCTS-MIB::vmwESX";
+SNMPv2-MIB::snmpTrapEnterprise.0 VMWARE-PRODUCTS-MIB::vmwESX"; 
 
         $trap = new Trap($trapText);
-        $message = "Guest $guest->hostname was powered on";
-        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
+        $message = "Heartbeat from guest $guest->hostname detected";
+        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 1);
 
-        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle VmwVmPoweredOnTrap');
-    }
-
-    public function testVmwVmSuspendedTrap()
-    {
-        $device = factory(Device::class)->create();
-        $guest = factory(Device::class)->create();
-
-        $trapText = "$device->hostname
-UDP: [$device->ip]:28386->[10.10.10.100]:162
-DISMAN-EVENT-MIB::sysUpTimeInstance 5:18:30:26.00
-SNMPv2-MIB::snmpTrapOID.0 VMWARE-VMINFO-MIB::vmwVmSuspended
-VMWARE-VMINFO-MIB::vmwVmID.0 28 VMWARE-VMINFO-MIB::vmwVmConfigFilePath.0 /vmfs/volumes/50101bda-eaf6ac7e-7e44-d4ae5267fb9f/$guest->hostname/$guest->hostname.vmx
-VMWARE-VMINFO-MIB::vmwVmDisplayName.28 $guest->hostname
-SNMP-COMMUNITY-MIB::snmpTrapAddress.0 $guest->ip
-SNMP-COMMUNITY-MIB::snmpTrapCommunity.0 \"public\"
-SNMPv2-MIB::snmpTrapEnterprise.0 VMWARE-PRODUCTS-MIB::vmwESX";
-
-        $trap = new Trap($trapText);
-        $message = "Guest $guest->hostname has been suspended";
-        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
-
-        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle VmwVmSuspendedTrap');
+        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle VmwVmHBDetectedTrap');
     }
 }
