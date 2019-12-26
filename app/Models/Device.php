@@ -227,9 +227,10 @@ class Device extends BaseModel
         } else {
             // load from yaml
             if ($existing) {
-                $os_list = array_map(function ($os) use ($install_dir) {
-                    return $install_dir . '/includes/definitions/' . $os . '.yaml';
-                }, self::distinct('os')->get('os')->toArray());
+                $os_list = [];
+                foreach (self::distinct('os')->get('os')->toArray() as $os) {
+                    $os_list[] = $install_dir . '/includes/definitions/' . $os['os'] . '.yaml';
+                }
             } else {
                 $os_list = glob($install_dir . '/includes/definitions/*.yaml');
             }
