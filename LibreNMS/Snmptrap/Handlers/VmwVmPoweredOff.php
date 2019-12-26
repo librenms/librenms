@@ -42,9 +42,9 @@ class VmwVmPoweredOff implements SnmptrapHandler
      * @param Trap $trap
      * @return void
      */
-    public function handle(Device $device, Trap $trap) 
+    public function handle(Device $device, Trap $trap)
     {
         $vmGuestName = $trap->getOidData($trap->findOid('VMWARE-VMINFO-MIB::vmwVmDisplayName'));
-        Log::event("Guest $vmGuestName powered off", $device->device_id, 'trap', 2);
+        Log::event("Guest $vmGuestName was powered off", $device->device_id, 'trap', 2);
     }
 }
