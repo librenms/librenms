@@ -1,6 +1,6 @@
 @extends('layouts.librenmsv1')
 
-@section('title', __('Dependency Map'))
+@section('title', __('Device Dependency Map'))
 
 @section('content')
 
@@ -38,3 +38,4 @@ $('#visualization').height(height + 'px');
     });
 </script>
 @endsection
+

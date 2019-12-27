@@ -80,6 +80,6 @@ class DeviceDependencyController extends MapController
             'edges' => json_encode($dependencies),
         ];
 
-        return view('map.dependency', $data);
+        return view('map.device-dependency', $data);
     }
 }

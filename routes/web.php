@@ -31,7 +31,7 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
 
     // Maps
     Route::group(['prefix' => 'maps', 'namespace' => 'Maps'], function () {
-        Route::get('dependency', 'DeviceDependencyController@dependencyMap');
+        Route::get('devicedependency', 'DeviceDependencyController@dependencyMap');
     });
 
     // admin pages
