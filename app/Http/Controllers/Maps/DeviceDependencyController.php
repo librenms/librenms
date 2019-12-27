@@ -29,7 +29,7 @@ use App\Models\Device;
 use Illuminate\Http\Request;
 use LibreNMS\Util\Url;
 
-class DependencyController extends MapController
+class DeviceDependencyController extends MapController
 {
     // Device Dependency Map
     public function dependencyMap(Request $request)
@@ -63,7 +63,7 @@ class DependencyController extends MapController
             );
 
             // List all Device Dependencies
-            $parents = $device->parents()->get();
+            $parents = $device->parents;
             foreach ($parents as $parent) {
                 $dependencies[] = [
                     'from'  => $device['device_id'],
