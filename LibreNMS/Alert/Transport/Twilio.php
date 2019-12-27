@@ -27,7 +27,7 @@ class Twilio extends Transport
         $twilio_opts['to']    = $this->config['twilio-to'];
         return $this->contacttwilio($obj, $twilio_opts);
     }
-    
+
     public static function contactTwilio($obj, $opts)
     {
         $params = [
@@ -57,7 +57,7 @@ class Twilio extends Transport
         curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
         curl_setopt($curl, CURLOPT_USERPWD, $params["sid"]. ":" . $params["token"]);
         curl_setopt($curl, CURLOPT_POSTFIELDS, $post);
-        
+
         curl_exec($curl);
 
         if (curl_getinfo($curl, CURLINFO_RESPONSE_CODE)) {

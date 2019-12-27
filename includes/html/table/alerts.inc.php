@@ -24,16 +24,6 @@ $alert_states = array(
     'better' => 4,
 );
 
-$alert_severities = array(
-    // alert_rules.status is enum('ok','warning','critical')
-    'ok' => 1,
-    'warning' => 2,
-    'critical' => 3,
-    'ok only' => 4,
-    'warning only' => 5,
-    'critical only' => 6,
-);
-
 $show_recovered = false;
 
 if (is_numeric($vars['device_id']) && $vars['device_id'] > 0) {
@@ -57,14 +47,7 @@ if (is_numeric($vars['state'])) {
 }
 
 if (isset($vars['min_severity'])) {
-    if (is_numeric($vars['min_severity'])) {
-        $min_severity_id = $vars['min_severity'];
-    } elseif (!empty($vars['min_severity'])) {
-        $min_severity_id = $alert_severities[$vars['min_severity']];
-    }
-    if (isset($min_severity_id)) {
-        $where .= " AND `alert_rules`.`severity` " . ($min_severity_id > 3 ? "" : ">") . "= " . ($min_severity_id > 3 ? $min_severity_id - 3 : $min_severity_id);
-    }
+    $where .=  get_sql_filter_min_severity($vars['min_severity'], "alert_rules");
 }
 
 if (is_numeric($vars['group'])) {

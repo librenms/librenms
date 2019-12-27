@@ -1,0 +1,33 @@
+os: barracudawafirewall
+text: 'Barracuda Web Application Firewall'
+type: firewall
+icon: barracuda
+mib_dir:
+        - barracuda
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+poller_modules:
+        bgp-peers: false
+        hr-mib: false
+        ntp: false
+        ospf: false
+        storage: false
+        stp: false
+        ucd-diskio: false
+        wireless: false
+discovery_modules:
+        bgp-peers: false
+        cisco-vrf-lite: false
+        discovery-protocols: false
+        entity-physical: false
+        fdb-table: false
+        hr-device: false
+        ntp: false
+        ports-stack: false
+        storage: false
+        stp: false
+        ucd-diskio: false
+        wireless: false
+discovery:
+    - sysDescr: 'Barracuda Web Application Firewall'

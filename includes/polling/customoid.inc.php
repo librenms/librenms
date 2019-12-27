@@ -1,0 +1,59 @@
+<?php
+
+use LibreNMS\RRD\RrdDefinition;
+
+foreach (dbFetchRows("SELECT * FROM `customoids` WHERE `customoid_passed` = 1 AND `device_id` = ?", array($device['device_id'])) as $customoid) {
+    d_echo($customoid);
+
+    $prev_oid_value = $customoid['customoid_current'];
+
+    $rawdata = snmp_get($device, $customoid['customoid_oid'], '-Oqv');
+    
+    $user_funcs = array(
+        "celsius_to_fahrenheit",
+        "fahrenheit_to_celsius",
+        "uw_to_dbm"
+    );
+
+    if (is_numeric($rawdata)) {
+        $graphs['customoid'] = true;
+        $oid_value = $rawdata;
+    } else {
+        $oid_value = 0;
+        $error = "Invalid SNMP reply.";
+    }
+
+    if ($customoid['customoid_divisor'] && $oid_value !== 0) {
+        $oid_value = ($oid_value / $customoid['customoid_divisor']);
+    }
+    if ($customoid['customoid_multiplier']) {
+        $oid_value = ($oid_value * $customoid['customoid_multiplier']);
+    }
+
+    if (isset($customoid['user_func']) && in_array($customoid['user_func'], $user_funcs)) {
+        $oid_value = $customoid['user_func']($oid_value);
+    }
+
+    echo 'Custom OID '.$customoid['customoid_descr'].': ';
+    echo $oid_value.' '.$customoid['customoid_unit']."\n";
+
+    $fields = array(
+        'oid' => $oid_value,
+    );
+
+    $rrd_name = array('customoid', $customoid['customoid_descr']);
+    if ($customoid['customoid_datatype'] == 'COUNTER') {
+        $datatype = $customoid['customoid_datatype'];
+    } else {
+        $datatype = 'GAUGE';
+    }
+    $rrd_def = RrdDefinition::make()
+        ->addDataset('oid_value', $datatype);
+
+    $tags = compact('rrd_name', 'rrd_def');
+
+    data_update($device, 'customoid', $tags, $fields);
+    dbUpdate(array('customoid_current' => $oid_value, 'lastupdate' => array('NOW()'), 'customoid_prev' => $prev_oid_value), 'customoids', '`customoid_id` = ?', array($customoid['customoid_id']));
+}//end foreach
+
+unset($customoid, $prev_oid_value, $rawdata, $user_funcs, $oid_value, $error, $fields, $rrd_def, $rrd_name, $tags);

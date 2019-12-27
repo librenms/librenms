@@ -25,6 +25,10 @@ if ($vars['state'] >= 0) {
     $param[] = mres($vars['state']);
 }
 
+if (isset($vars['min_severity'])) {
+    $where .=  get_sql_filter_min_severity($vars['min_severity'], "R");
+}
+
 if (Auth::user()->hasGlobalRead()) {
     $sql = " FROM `alert_log` AS E LEFT JOIN devices AS D ON E.device_id=D.device_id RIGHT JOIN alert_rules AS R ON E.rule_id=R.id WHERE $where";
 } else {
