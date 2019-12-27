@@ -381,6 +381,12 @@
                 "type": "string"
             }
         },
+        "bad_ifoperstatus": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
         "processor_stacked": {
             "type": "boolean"
         },

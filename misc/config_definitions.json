@@ -620,6 +620,12 @@
                 "mpls"
             ]
         },
+        "bad_ifoperstatus": {
+            "type": "array",
+            "default": [
+                "notPresent"
+            ]
+        },
         "base_url": {
             "group": "system",
             "section": "server",
