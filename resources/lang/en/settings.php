@@ -31,7 +31,6 @@ return [
             'general' => 'General Discovery Settings',
             'route' => 'Routes Discovery Module',
             'discovery_modules' => 'Discovery Modules',
-            'poller_modules' => 'Poller Modules'
         ],
         'external' => [
             'binaries' => 'Binary Locations',
@@ -47,6 +46,7 @@ return [
             'ping' => 'Ping',
             'rrdtool' => 'RRDTool Setup',
             'snmp' => 'SNMP',
+            'poller_modules' => 'Poller Modules',
         ],
         'system' => [
             'cleanup' => 'Cleanup',
