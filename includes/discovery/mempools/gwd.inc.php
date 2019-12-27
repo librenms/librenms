@@ -12,7 +12,6 @@
 
 if ($device['os'] === 'gwd') {
     echo 'gwd:';
-
     $usage = snmp_get($device, '.1.3.6.1.4.1.10072.2.20.1.1.2.1.1.20.1.1', '-Ovq');
     if (is_numeric($usage)) {
         $descr = 'Memory';
