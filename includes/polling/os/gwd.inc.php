@@ -13,10 +13,3 @@
 $hardware = trim(snmp_get($device, '.1.3.6.1.4.1.10072.2.20.1.1.1.1.1.9.1', '-OQv'), '"');
 $version = trim(snmp_get($device, '.1.3.6.1.4.1.10072.2.20.1.1.1.1.1.7.1', '-OQv'), '"');
 $serial = trim(snmp_get($device, '.1.3.6.1.4.1.10072.2.20.1.1.2.1.1.18.1.1', '-OQv'), '"');
-
-if (empty($hardware) && empty($version)) {
-    $hardware =  $hardware;
-    $version = $software;
-    $serial = $serial;
-    unset($temp_data);
-}
