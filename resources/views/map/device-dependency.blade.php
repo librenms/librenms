@@ -9,7 +9,6 @@
 @else
 <div class="alert alert-success" role="alert">@lang('No devices found')</div>
 @endif
-
 @endsection
 
 @section('scripts')
