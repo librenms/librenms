@@ -10,13 +10,12 @@
  * the source code distribution for details.
  */
 
-if ($device['os'] == 'gwd') {
-    echo 'GWD-MEMORY-POOL: ';
+if ($device['os'] === 'gwd') {
+    echo 'gwd:';
 
-    $total = snmp_get($device, '.1.3.6.1.4.1.10072.2.20.1.1.2.1.1.28.1.1', '-OvQ', 'GW-EPON-MIB');
-    $usage  = snmp_get($device, '.1.3.6.1.4.1.10072.2.20.1.1.2.1.1.20.1.1', '-OvQ', 'GW-EPON-MIB');
-
-    if (is_numeric($total) && is_numeric($usage)) {
-        discover_mempool($valid_mempool, $device, 0, 'gwd', 'Memory', '1', null, null);
+    $usage = snmp_get($device, '.1.3.6.1.4.1.10072.2.20.1.1.2.1.1.20.1.1', '-Ovq');
+    if (is_numeric($usage)) {
+        $descr = 'Memory';
+        discover_mempool($valid_mempool, $device, 0, 'gwd', $descr, '1', null, null);
     }
 }
