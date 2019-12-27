@@ -10,6 +10,8 @@
  * the source code distribution for details.
  */
 
-$mempool['total']   = snmp_get($device, ".1.3.6.1.4.1.10072.2.20.1.1.2.1.1.28.1.1", "-Ovq");
-$mempool['used']    = snmp_get($device, ".1.3.6.1.4.1.10072.2.20.1.1.2.1.1.20.1.1", "-Ovq");
-$mempool['free']    = ($mempool['total'] - $mempool['used']);
+$temp_data = snmp_get_multi_oid($device, ['.1.3.6.1.4.1.10072.2.20.1.1.2.1.1.28.1.1', '.1.3.6.1.4.1.10072.2.20.1.1.2.1.1.20.1.1'], '-OQUn');
+$mempool['total'] = $temp_data['.1.3.6.1.4.1.10072.2.20.1.1.2.1.1.28.1.1'];
+$mempool['used'] = $temp_data['.1.3.6.1.4.1.10072.2.20.1.1.2.1.1.20.1.1'];
+$mempool['free'] = $mempool['total'] - $mempool['used'];
+unset($temp_data);
