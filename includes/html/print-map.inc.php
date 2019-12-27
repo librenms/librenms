@@ -342,7 +342,7 @@ if (count($devices_by_id) > 1 && count($links) > 0) {
 <form name="printmapform" method="get" action="" class="form-horizontal" role="form">
 <?php if (empty($device['hostname'])) { ?>
 <div class="pull-right">
-<select name="highlight_node" id="highlight_node" class="input-sm" onChange="this.form.submit()";>
+<select name="highlight_node" id="highlight_node" class="input-sm" onChange="highlightNode()";>
 <option value="0">None</option>
 <?php foreach ($devices_by_id as $dev) { ?>
 <option value="<?=$dev['id']?>"><?=$dev['label']?></option>
@@ -384,6 +384,11 @@ var network = new vis.Network(container, data, options);
             window.location.href = "device/device="+properties.nodes+"/tab=neighbours/selection=map/"
         }
     });
+
+function highlightNode(e) {
+    highlight_node = document.getElementById("highlight_node").value;
+    window.location.pathname = 'map/highlight_node=' + highlight_node;
+}
 
 $('#highlight_node option[value="<?=$highlight_node?>"]').prop('selected', true);
 </script>
