@@ -111,6 +111,9 @@ class Device extends BaseModel
     public static function pollerTarget($hostname)
     {
         $ret = static::where('hostname', $hostname)->first(['hostname', 'overwrite_ip']);
+        if (empty($ret)) {
+            return $hostname;
+        }
         $_overwrite_ip = $ret->overwrite_ip;
         $_hostname = $ret->hostname;
 
