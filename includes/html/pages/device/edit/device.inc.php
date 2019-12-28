@@ -33,6 +33,7 @@ if ($_POST['editing']) {
         $device_model->ignore = (int)isset($_POST['ignore']);
         $device_model->disabled = (int)isset($_POST['disabled']);
         $device_model->type = $_POST['type'];
+        $device_model->overwrite_ip = $_POST['overwrite_ip'];
 
         if ($device_model->isDirty('type')) {
             set_dev_attrib($device, 'override_device_type', true);
@@ -100,6 +101,12 @@ if ($_POST['editing']) {
         </div>
         <div class="col-sm-2">
             <button name="hostname-edit-button" id="hostname-edit-button" class="btn btn-danger"> <i class="fa fa-pencil"></i> </button>
+        </div>
+    </div>
+    <div class="form-group" data-toggle="tooltip" data-container="body" data-placement="bottom" title="Use this IP instead of resolved one for polling" >
+        <label for="edit-overwrite_ip-input" class="col-sm-2 control-label" >Overwrite IP:</label>
+        <div class="col-sm-6">
+            <input type="text" id="edit-overwrite_up-input" name="overwrite_ip" class="form-control" value=<?php echo($device_model->overwrite_ip); ?>>
         </div>
     </div>
      <div class="form-group">

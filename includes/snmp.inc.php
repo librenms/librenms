@@ -15,6 +15,7 @@
  * the source code distribution for details.
  */
 
+use App\Models\Device;
 use LibreNMS\Config;
 use LibreNMS\RRD\RrdDefinition;
 
@@ -171,7 +172,8 @@ function gen_snmp_cmd($cmd, $device, $oids, $options = null, $mib = null, $mibdi
         array_push($cmd, '-r', $retries);
     }
 
-    $cmd[] = $device['transport'].':'.$device['hostname'].':'.$device['port'];
+    $pollertarget = Device::pollerTarget($device['hostname']);
+    $cmd[] = $device['transport'].':'.$pollertarget.':'.$device['port'];
     $cmd = array_merge($cmd, (array)$oids);
 
     return $cmd;
