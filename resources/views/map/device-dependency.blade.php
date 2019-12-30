@@ -5,6 +5,9 @@
 @section('content')
 
 @if($node_count)
+@if($group_id)
+<div class="alert alert-info" role="info">@lang('You are viewing a Device Group filtered Dependency Map. Graphing may be incomplete.')</div>
+@endif
 <div id="visualization"></div>
 @else
 <div class="alert alert-success" role="alert">@lang('No devices found')</div>

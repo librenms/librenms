@@ -32,7 +32,7 @@ use LibreNMS\Util\Url;
 class DeviceDependencyController extends MapController
 {
     // Device Dependency Map
-    public function dependencyMap(Request $request)
+    public function dependencyMap(Request $request, $group_id=0)
     {
         $devices = Device::hasAccess($request->user())->with('parents', 'location')->get();
 
@@ -43,6 +43,17 @@ class DeviceDependencyController extends MapController
 
         // List all devices
         foreach ($devices as $device) {
+            if ($group_id) {
+                if (! in_array($group_id, $device->groups()->pluck('id')->toArray())) {
+                    continue;
+                }
+            }
+
+            $groups = $device->groups()->pluck('id')->toArray();
+            if ($group_id && (! in_array($group_id, $groups))) {
+                continue;
+            }
+
             if ($device->disabled) {
                 $device_style = $this->nodeDisabledStyle();
             } elseif (! $device->status) {
@@ -74,6 +85,7 @@ class DeviceDependencyController extends MapController
         }
 
         $data = [
+            'group_id' => $group_id,
             'node_count' => count($devices_by_id),
             'options' => $this->visOptions(),
             'nodes' => json_encode(array_values($devices_by_id)),
