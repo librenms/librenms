@@ -13,7 +13,7 @@
 @endsection
 
 @section('scripts')
-<script src="js/vis.min.js"></script>
+<script src="{{ asset('js/vis.min.js') }}"></script>
 <script type="text/javascript">
     var height = $(window).height() - 100;
     $('#visualization').height(height + 'px');
