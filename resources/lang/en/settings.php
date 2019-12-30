@@ -5,6 +5,7 @@ return [
     'groups' => [
         'alerting' => 'Alerting',
         'auth' => 'Authentication',
+        'authorization' => 'Authorization',
         'external' => 'External',
         'global' => 'Global',
         'os' => 'OS',
@@ -22,6 +23,9 @@ return [
             'general' => 'General Authentication Settings',
             'ad' => 'Active Directory Settings',
             'ldap' => 'LDAP Settings'
+        ],
+        'authorization' => [
+            'device-group' => 'Device Group Settings'
         ],
         'discovery' => [
             'general' => 'General Discovery Settings',
@@ -591,6 +595,13 @@ return [
         'perf_times_purge' => [
             'description' => 'Poller performance log entries older than (days)',
             'help' => 'Cleanup done by daily.sh'
+        ],
+        'permission' => [
+            'device_group' => [
+                'allow_dynamic' => [
+                    'description' => 'Enable user access via dynamic Device Groups',
+                ]
+            ]
         ],
         'ping' => [
             'description' => 'Path to ping'

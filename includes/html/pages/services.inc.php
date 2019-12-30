@@ -120,13 +120,15 @@ require_once 'includes/html/modal/delete_service.inc.php';
                     $sql_param[] = $state;
                 }
 
-                if (Auth::user()->hasGlobalRead()) {
-                    $host_sql = 'SELECT `D`.`device_id`,`D`.`hostname`,`D`.`sysName` FROM devices AS D, services AS S WHERE D.device_id = S.device_id GROUP BY `D`.`hostname`, `D`.`device_id`, `D`.`sysName` ORDER BY D.hostname';
-                    $host_par = array();
-                } else {
-                    $host_sql = 'SELECT `D`.`device_id`,`D`.`hostname`,`D`.`sysName` FROM devices AS D, services AS S, devices_perms AS P WHERE D.device_id = S.device_id AND D.device_id = P.device_id AND P.user_id = ? GROUP BY `D`.`hostname`, `D`.`device_id`, `D`.`sysName` ORDER BY D.hostname';
-                    $host_par = array(Auth::id());
+                $host_par = array();
+                $perms_sql = null;
+                if (!Auth::user()->hasGlobalRead()) {
+                    $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
+                    $perms_sql .= " AND `D`.`device_id` IN " .dbGenPlaceholders(count($device_ids));
+                    $host_par = $device_ids;
                 }
+
+                $host_sql = 'SELECT `D`.`device_id`,`D`.`hostname`,`D`.`sysName` FROM devices AS D, services AS S WHERE D.device_id = S.device_id ' . $perms_sql . ' GROUP BY `D`.`hostname`, `D`.`device_id`, `D`.`sysName` ORDER BY D.hostname';
 
                 $shift = 1;
                 foreach (dbFetchRows($host_sql, $host_par) as $device) {
