@@ -18,7 +18,7 @@
                         <th data-column-id="auth_type" data-visible="{{ $multiauth ? 'true' : 'false' }}">@lang('Auth')</th>
                         <th data-column-id="email">@lang('Email')</th>
                         @if(\LibreNMS\Authentication\LegacyAuth::getType() == 'mysql')
-                        <th data-column-id="enabled">@lang('Enabled')</th>
+                        <th data-column-id="enabled" data-formatter="enabled">@lang('Enabled')</th>
                         @endif
                         <th data-column-id="descr">@lang('Description')</th>
                         <th data-column-id="action" data-formatter="actions" data-sortable="false" data-searchable="false">@lang('Actions')</th>
@@ -54,6 +54,13 @@
             var user_grid = $("#users");
             user_grid.bootgrid({
                 formatters: {
+                    enabled: function (column, row) {
+                        if (row['enabled'] == 1) {
+                            return '<span class="fa fa-fw fa-check text-success"></span>';
+                        } else {
+                            return '<span class="fa fa-fw fa-close text-danger"></span>';
+                        }
+                    },
                     actions: function (column, row) {
                         var edit_button = '<form action="{{ route('users.edit', ':user_id') }}'.replace(':user_id', row['user_id']) + '" method="GET">' +
                             '@csrf' +
