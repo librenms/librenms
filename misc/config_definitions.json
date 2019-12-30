@@ -3314,6 +3314,10 @@
                     "border": "#ff5555",
                     "edge": "#ff777788",
                     "node": "#ffdddd"
+                },
+                "highlight": {
+                    "border": "#ee4000",
+                    "borderWidth": 3
                 }
             },
             "type": "array"
