@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\DeviceGroup;
 use App\Models\User;
 
 $no_refresh = true;
@@ -30,6 +31,14 @@ if (! Auth::user()->hasGlobalAdmin()) {
             if (!dbFetchCell('SELECT COUNT(*) FROM devices_perms WHERE `device_id` = ? AND `user_id` = ?', array($vars['device_id'], $user_data['user_id']))) {
                 dbInsert(array('device_id' => $vars['device_id'], 'user_id' => $user_data['user_id']), 'devices_perms');
             }
+        }
+
+        if ($vars['action'] == 'deldevgroupperm') {
+            $user->deviceGroups()->detach($vars['device_group_id']);
+        }
+
+        if ($vars['action'] == 'adddevgroupperm') {
+            $user->deviceGroups()->syncWithoutDetaching($vars['device_group_id']);
         }
 
         if ($vars['action'] == 'delifperm') {
@@ -112,7 +121,65 @@ if (! Auth::user()->hasGlobalAdmin()) {
            </div>
            <button type='submit' class='btn btn-default' name='Submit'>Add</button></form>";
 
-        echo "</div>
+        echo '</div>
+           <div class="col-md-4">';
+
+        // Display devices this users has access to
+        echo '<h3>Device access via Device Group (beta)</h3>';
+
+        echo "<div class='panel panel-default panel-condensed'>
+            <table class='table table-hover table-condensed table-striped'>
+              <tr>
+                <th>Device Group</th>
+                <th>Action</th>
+              </tr>";
+
+        foreach ($user->deviceGroups as $device_group_perm) {
+            echo '<tr><td><strong>'.$device_group_perm->name."</td><td> <a href='edituser/action=deldevgroupperm/user_id=".$user->user_id.'/device_group_id='.$device_group_perm->id."'><i class='fa fa-trash fa-lg icon-theme' aria-hidden='true'></i></a></strong></td></tr>";
+        }
+
+        echo '</table>
+          </div>';
+
+        if ($user->deviceGroups->isEmpty()) {
+            echo 'None Configured';
+        }
+
+        // Display device groups this user doesn't have access to
+        echo '<h4>Grant access to new Device Group</h4>';
+        $allow_dynamic = \LibreNMS\Config::get('permission.device_group.allow_dynamic');
+        if (!$allow_dynamic) {
+            echo "<i>Dynamic groups are disabled, set permission.device_group.allow_dynamic to enable.</i>";
+        }
+
+        echo "<form class='form-inline' role='form' method='post' action=''>
+            " . csrf_field() . "
+            <input type='hidden' value='".$user_data['user_id']."' name='user_id'>
+            <input type='hidden' value='edituser' name='page'>
+            <input type='hidden' value='adddevgroupperm' name='action'>
+            <div class='form-group'>
+              <label class='sr-only' for='device_group_id'>Device</label>
+              <select name='device_group_id' id='device_group_id' class='form-control'>";
+
+        $device_groups = DeviceGroup::query()
+            ->whereNotIn('id', $user->deviceGroups->pluck('id'))
+            ->when(!$allow_dynamic, function ($query) {
+                return $query->where('type', 'static');
+            })
+            ->orderBy('name')
+            ->get(['id', 'name']);
+
+        foreach ($device_groups as $group) {
+            echo '<option value="'.$group->id . '">' . $group->name . '</option>';
+        }
+
+        echo "</select>
+           </div>
+           <button type='submit' class='btn btn-default' name='Submit'>Add</button></form>";
+
+        echo "</div></div>
+
+        <div class='row'>
           <div class='col-md-4'>";
         echo '<h3>Interface Access</h3>';
 
@@ -143,7 +210,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
             echo 'None Configured';
         }
 
-        // Display devices this user doesn't have access to
+        // Display interfaces this user doesn't have access to
         echo '<h4>Grant access to new interface</h4>';
 
         echo "<form action='' method='post' class='form-horizontal' role='form'>

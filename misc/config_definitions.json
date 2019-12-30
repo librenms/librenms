@@ -3610,6 +3610,13 @@
             "order": 6,
             "type": "integer"
         },
+        "permission.device_group.allow_dynamic": {
+            "default": false,
+            "group": "authorization",
+            "order": 1,
+            "section": "device-group",
+            "type": "boolean"
+        },
         "ping": {
             "default": "/bin/ping",
             "group": "external",
