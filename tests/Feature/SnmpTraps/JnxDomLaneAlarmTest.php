@@ -31,11 +31,10 @@ use App\Models\Device;
 use App\Models\Port;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
-use Log;
+use LibreNMS\Tests\Feature\SnmpTraps\SnmpTrapTestCase;
 
-class JnxDomLaneAlarmTest extends LaravelTestCase
+class JnxDomLaneAlarmTest extends SnmpTrapTestCase
 {
-
     public function testJnxDomLaneAlarmSetTrap()
     {
         $device = factory(Device::class)->create();

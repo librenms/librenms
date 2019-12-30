@@ -55,6 +55,8 @@ if (!Auth::user()->hasGlobalAdmin()) {
 
     $panes['component'] = 'Components';
 
+    $panes['customoid'] = 'Custom OID';
+
     print_optionbar_start();
 
     unset($sep);

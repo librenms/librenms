@@ -434,6 +434,24 @@ function renamehost($id, $new, $source = 'console')
     return "Renaming of $host failed\n";
 }
 
+function device_discovery_trigger($id)
+{
+    global $debug;
+
+    if (isCli() === false) {
+        ignore_user_abort(true);
+        set_time_limit(0);
+    }
+
+    $update = dbUpdate(array('last_discovered' => array('NULL')), 'devices', '`device_id` = ?', array($id));
+    if (!empty($update) || $update == '0') {
+        $message = 'Device will be rediscovered';
+    } else {
+        $message = 'Error rediscovering device';
+    }
+    return array('status'=> $update, 'message' => $message);
+}
+
 function delete_device($id)
 {
     global $debug;
@@ -670,6 +688,11 @@ function isPingable($hostname, $address_family = 'ipv4', $attribs = [])
         Config::get('fping_options.timeout', 500),
         $address_family
     );
+
+    if ($status['dup'] > 0) {
+        Log::event('Duplicate ICMP response detected! This could indicate a network issue.', getidbyname($hostname), 'icmp', 4);
+        $status['exitcode'] = 0;   // when duplicate is detected fping returns 1. The device is up, but there is another issue. Clue admins in with above event.
+    }
 
     return [
         'result' => ($status['exitcode'] == 0 && $status['loss'] < 100),
@@ -927,7 +950,7 @@ function send_mail($emails, $subject, $message, $html = false)
                 $mail->addAddress($email, $email_name);
             }
             $mail->Subject = $subject;
-            $mail->XMailer = Config::get('project_name_version');
+            $mail->XMailer = Config::get('project_name');
             $mail->CharSet = 'utf-8';
             $mail->WordWrap = 76;
             $mail->Body = $message;
@@ -1318,6 +1341,14 @@ function convert_delay($delay)
     return($delay_sec);
 }
 
+function normalize_snmp_ip_address($data)
+{
+    // $data is received from snmpwalk, can be ipv4 xxx.xxx.xxx.xxx or ipv6 xx:xx:...:xx (16 chunks)
+    // ipv4 is returned unchanged, ipv6 is returned with one ':' removed out of two, like
+    //  xxxx:xxxx:...:xxxx (8 chuncks)
+    return (preg_replace('/([0-9a-fA-F]{2}):([0-9a-fA-F]{2})/', '\1\2', explode('%', $data, 2)[0]));
+}
+
 function guidv4($data)
 {
     // http://stackoverflow.com/questions/2040240/php-function-to-generate-v4-uuid#15875555
@@ -1445,26 +1476,29 @@ function fping($host, $count = 3, $interval = 1000, $timeout = 500, $address_fam
 {
     // Default to ipv4
     $fping_name = $address_family == 'ipv6' ? 'fping6' : 'fping';
-    $fping_path = Config::get($fping_name, $fping_name);
-
-    // build the parameters
-    $params = '-e -q -c ' . max($count, 1);
-
     $interval = max($interval, 20);
-    $params .= ' -p ' . $interval;
 
-    $params .= ' -t ' . max($timeout, $interval);
+    // build the command
+    $cmd = [
+        Config::get($fping_name, $fping_name),
+        '-e',
+        '-q',
+        '-c',
+        max($count, 1),
+        '-p',
+        $interval,
+        '-t',
+        max($timeout, $interval),
+        $host
+    ];
 
-    $cmd = "$fping_path $params $host";
-
-    d_echo("[FPING] $cmd\n");
-
-    $process = new Process($cmd);
+    $process = app()->make(Process::class, ['command' => $cmd]);
+    d_echo('[FPING] ' . $process->getCommandLine() . PHP_EOL);
     $process->run();
     $output = $process->getErrorOutput();
 
-    preg_match('#= (\d+)/(\d+)/(\d+)%, min/avg/max = ([\d.]+)/([\d.]+)/([\d.]+)$#', $output, $parsed);
-    list(, $xmt, $rcv, $loss, $min, $avg, $max) = $parsed;
+    preg_match('#= (\d+)/(\d+)/(\d+)%(, min/avg/max = ([\d.]+)/([\d.]+)/([\d.]+))?$#', $output, $parsed);
+    list(, $xmt, $rcv, $loss, , $min, $avg, $max) = array_pad($parsed, 8, 0);
 
     if ($loss < 0) {
         $xmt = 1;
@@ -1473,12 +1507,13 @@ function fping($host, $count = 3, $interval = 1000, $timeout = 500, $address_fam
     }
 
     $response = [
-        'xmt'  => set_numeric($xmt),
-        'rcv'  => set_numeric($rcv),
-        'loss' => set_numeric($loss),
-        'min'  => set_numeric($min),
-        'max'  => set_numeric($max),
-        'avg'  => set_numeric($avg),
+        'xmt'  => (int)$xmt,
+        'rcv'  => (int)$rcv,
+        'loss' => (int)$loss,
+        'min'  => (float)$min,
+        'max'  => (float)$max,
+        'avg'  => (float)$avg,
+        'dup'  => substr_count($output, 'duplicate'),
         'exitcode' => $process->getExitCode(),
     ];
     d_echo($response);
@@ -2373,7 +2408,7 @@ function dump_db_schema()
             $output[$table]['Columns'][] = $def;
         }
 
-        foreach (dbFetchRows("SHOW INDEX FROM `$table`") as $key) {
+        foreach (array_sort_by_column(dbFetchRows("SHOW INDEX FROM `$table`"), 'Key_name') as $key) {
             $key_name = $key['Key_name'];
             if (isset($output[$table]['Indexes'][$key_name])) {
                 $output[$table]['Indexes'][$key_name]['Columns'][] = $key['Column_name'];
@@ -2461,8 +2496,8 @@ function get_db_schema()
 function get_device_oid_limit($device)
 {
     // device takes priority
-    if ($device['snmp_max_oid'] > 0) {
-        return $device['snmp_max_oid'];
+    if ($device['attribs']['snmp_max_oid'] > 0) {
+        return $device['attribs']['snmp_max_oid'];
     }
 
     // then os
@@ -2515,6 +2550,36 @@ function lock_and_purge($table, $sql)
         echo $e->getMessage() . PHP_EOL;
         return -1;
     }
+}
+
+/**
+ * If Distributed, create a lock, then purge the mysql table according to the sql query
+ *
+ * @param string $table
+ * @param string $sql
+ * @param string $msg
+ * @return int exit code
+ */
+function lock_and_purge_query($table, $sql, $msg)
+{
+    $purge_name = $table . '_purge';
+
+    if (Config::get('distributed_poller')) {
+        MemcacheLock::lock($purge_name, 0, 86000);
+    }
+    $purge_duration = Config::get($purge_name);
+    if (!(is_numeric($purge_duration) && $purge_duration > 0)) {
+        return -2;
+    }
+    try {
+        if (dbQuery($sql, array($purge_duration))) {
+            printf($msg, $purge_duration);
+        }
+    } catch (LockException $e) {
+        echo $e->getMessage() . PHP_EOL;
+        return -1;
+    }
+    return 0;
 }
 
 /**

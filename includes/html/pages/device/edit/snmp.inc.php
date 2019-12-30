@@ -277,13 +277,11 @@ echo "        </select>
     </div>";
 
 ?>
+
 <div class="form-group">
-    <div class="col-sm-offset-2 col-sm-9">
-        <div class="checkbox">
-            <label>
-                <input type="checkbox" name="no_checks" id="no_checks"> Don't perform ICMP or SNMP checks?
-            </label>
-        </div>
+    <label for="no_checks" class="control-label col-sm-2">Don't perform ICMP or SNMP checks</label>
+    <div class="col-sm-9">
+         <input type="checkbox" name="no_checks" id="no_checks" data-size="small">
     </div>
 </div>
 </div>
@@ -326,6 +324,8 @@ echo '
 
 ?>
 <script>
+$('[name="no_checks"]').bootstrapSwitch();
+
 function changeForm() {
     snmpVersion = $("#snmpver").val();
     if(snmpVersion == 'v1' || snmpVersion == 'v2c') {

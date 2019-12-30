@@ -29,11 +29,12 @@ var grid = $("#ipv6-search").bootgrid({
 <?php
 
 $sql = 'SELECT `devices`.`device_id`,`hostname`, `sysName` FROM `devices`';
+$param = [];
 
 if (!Auth::user()->hasGlobalRead()) {
-    $sql    .= ' LEFT JOIN `devices_perms` AS `DP` ON `devices`.`device_id` = `DP`.`device_id`';
-    $where  .= ' WHERE `DP`.`user_id`=?';
-    $param[] = Auth::id();
+    $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
+    $where .= " WHERE `devices`.`device_id` IN " .dbGenPlaceholders(count($device_ids));
+    $param = array_merge($param, $device_ids);
 }
 
 $sql .= " $where ORDER BY `hostname`";

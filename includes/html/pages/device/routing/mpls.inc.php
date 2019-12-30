@@ -281,7 +281,8 @@ if ($vars['view'] == 'sdps') {
 } // end sdps view
 
 if ($vars['view'] == 'sdpbinds') {
-    echo '<th><a title="SDP Binding identifier. SDP identifier : Service identifier">SDP Bind Id</a></th>
+    echo '<th><a title="The value of this object specifies the Service identifier. This value should be unique within the service domain.">Service Id</a></th>
+        <th><a title="SDP Binding identifier. SDP identifier : Service identifier">SDP Bind Id</a></th>
         <th><a title="This object specifies whether this Service SDP binding is a spoke or a mesh.">Bind Type</a></th>
         <th><a title="The value of VC Type is an enumerated integer that specifies the type of virtual circuit (VC) associated with the SDP binding">VC Type</a></th>
         <th><a title="The desired state of this Service-SDP binding.">Admin State</a></th>
@@ -306,7 +307,7 @@ sapDown: The SAP associated with the service is down.">Oper State</a></th>
 
     $i = 0;
 
-    foreach (dbFetchRows('SELECT * FROM `mpls_sdp_binds` WHERE `device_id` = ? ORDER BY `sdp_oid`, `svc_oid`', array($device['device_id'])) as $sdpbind) {
+    foreach (dbFetchRows('SELECT b.*, s.svc_oid AS svcId FROM `mpls_sdp_binds` AS b LEFT JOIN `mpls_services` AS s ON `b`.`svc_id` = `s`.`svc_id` WHERE `b`.`device_id` = ? ORDER BY `sdp_oid`, `svc_oid`', array($device['device_id'])) as $sdpbind) {
         if (!is_integer($i / 2)) {
             $bg_colour = \LibreNMS\Config::get('list_colour.even');
         } else {
@@ -326,7 +327,8 @@ sapDown: The SAP associated with the service is down.">Oper State</a></th>
         }
 
         echo "<tr bgcolor=$bg_colour>
-            <td>" . $sdpbind['sdp_oid'] . ':' . $sdpbind['svc_oid'] . '</td>
+            <td>" . $sdpbind['svcId'] . '</td>
+            <td>' . $sdpbind['sdp_oid'] . ':' . $sdpbind['svc_oid'] . '</td>
             <td>' . $sdpbind['sdpBindType'] . '</td>
             <td>' . $sdpbind['sdpBindVcType'] . '</td>
             <td><span class="label label-' . $adminstate_status_color . '">' . $sdpbind['sdpBindAdminStatus'] . '</td>

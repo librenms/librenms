@@ -27,6 +27,9 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton('permissions', function ($app) {
             return new Permissions();
         });
+        $this->app->singleton('device-cache', function ($app) {
+            return new \LibreNMS\Cache\Device();
+        });
     }
 
     /**
@@ -109,5 +112,14 @@ class AppServiceProvider extends ServiceProvider
             $ip = substr($value, 0, strpos($value, '/') ?: strlen($value)); // allow prefixes too
             return IP::isValid($ip) || Validate::hostname($value);
         }, __('The :attribute must a valid IP address/network or hostname.'));
+
+        Validator::extend('zero_or_exists', function ($attribute, $value, $parameters, $validator) {
+            if ($value === 0) {
+                return true;
+            }
+
+            $validator = Validator::make([$attribute => $value], [$attribute => 'exists:' . implode(',', $parameters)]);
+            return $validator->passes();
+        }, __('validation.exists'));
     }
 }

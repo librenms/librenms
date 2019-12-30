@@ -9,7 +9,7 @@ manually running to process data.
 ## Command options
 
 ```bash
-	LibreNMS 2014.master Poller
+    LibreNMS 2014.master Poller
 
 -h <device id> | <device hostname wildcard>  Poll single device
 -h odd                                       Poll odd numbered devices  (same as -i 2 -n 0)

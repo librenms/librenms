@@ -58,7 +58,7 @@ When using SELinux on the LibreNMS server, you need to allow Apache
 default. You can use SELinux Booleans to allow network access to LDAP
 resources with this command:
 
-```shell
+```bash
 setsebool -P httpd_can_connect_ldap=1
 ```
 
@@ -66,7 +66,7 @@ setsebool -P httpd_can_connect_ldap=1
 
 You can test authentication with this script:
 
-```shell
+```bash
 ./scripts/auth_test.php
 ```
 
@@ -195,6 +195,7 @@ $config['auth_ldap_uid_attribute'] = 'uidnumber';   // attribute for unique id
 $config['auth_ldap_debug'] = false;                 // enable for verbose debug messages
 $config['auth_ldap_userdn'] = true;                 // Uses a users full DN as the value of the member attribute in a group instead of member: username. (it’s member: uid=username,ou=groups,dc=domain,dc=com)
 $config['auth_ldap_userlist_filter'] = 'service=informatique'; // Replace 'service=informatique' by your ldap filter to limit the number of responses if you have an ldap directory with thousand of users
+$config['auth_ldap_wildcard_ou'] = false; // Search for user matching user name independently of OU set in auth_ldap_suffix. Useful if your users are in different OU. Bind username, if set, still user auth_ldap_suffix
 ```
 
 ## LDAP bind user (optional)

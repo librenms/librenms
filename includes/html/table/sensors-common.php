@@ -23,16 +23,13 @@ $class      = mres($vars['class']);
 
 $sql = " FROM `$table` AS S, `devices` AS D";
 
-if (!Auth::user()->hasGlobalRead()) {
-    $sql .= ', devices_perms as P';
-}
-
 $sql .= " WHERE S.sensor_class=? AND S.device_id = D.device_id ";
 $param[] = mres($vars['class']);
 
 if (!Auth::user()->hasGlobalRead()) {
-    $sql .= " AND D.device_id = P.device_id AND P.user_id = ?";
-    $param[] = Auth::id();
+    $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
+    $sql .= " AND `D`.`device_id` IN " .dbGenPlaceholders(count($device_ids));
+    $param = array_merge($param, $device_ids);
 }
 
 if (isset($searchPhrase) && !empty($searchPhrase)) {
@@ -92,7 +89,7 @@ foreach (dbFetchRows($sql, $param) as $sensor) {
     unset($link_array['height'], $link_array['width'], $link_array['legend']);
     $link_graph = generate_url($link_array);
 
-    $link = generate_url(array('page' => 'device', 'device' => $sensor['device_id'], 'tab' => $tab, 'metric' => $sensor['sensor_class']));
+    $link = generate_url(array('page' => 'device', 'device' => $sensor['device_id'], 'tab' => $group, 'metric' => $sensor['sensor_class']));
 
     $overlib_content = '<div style="width: 580px;"><span class="overlib-text">'.$sensor['hostname'].' - '.$sensor['sensor_descr'].'</span>';
     foreach (array('day', 'week', 'month', 'year') as $period) {

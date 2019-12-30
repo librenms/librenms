@@ -10,7 +10,7 @@ path: blob/master/doc/
 
 # Install Required Packages
 
-```
+```bash
 apt install software-properties-common
 add-apt-repository universe
 apt update
@@ -19,21 +19,21 @@ apt install curl apache2 composer fping git graphviz imagemagick libapache2-mod-
 
 # Add librenms user
 
-```
+```bash
 useradd librenms -d /opt/librenms -M -r
 usermod -a -G librenms www-data
 ```
 
 # Download LibreNMS
 
-```
+```bash
 cd /opt
 git clone https://github.com/librenms/librenms.git
 ```
 
 # Set permissions
 
-```
+```bash
 chown -R librenms:librenms /opt/librenms
 chmod 770 /opt/librenms
 setfacl -d -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstrap/cache/ /opt/librenms/storage/
@@ -42,7 +42,7 @@ setfacl -R -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstra
 
 # Install PHP dependencies
 
-```
+```bash
 su - librenms
 ./scripts/composer_wrapper.php install --no-dev
 exit
@@ -52,7 +52,7 @@ exit
 
 ## Configure MySQL
 
-```
+```bash
 systemctl restart mysql
 mysql -uroot -p
 ```
@@ -67,7 +67,7 @@ FLUSH PRIVILEGES;
 exit
 ```
 
-```
+```bash
 vi /etc/mysql/mariadb.conf.d/50-server.cnf
 ```
 
@@ -78,7 +78,7 @@ innodb_file_per_table=1
 lower_case_table_names=0
 ```
 
-```
+```bash
 systemctl restart mysql
 ```
 
@@ -91,16 +91,18 @@ See <http://php.net/manual/en/timezones.php> for a list of supported
 timezones.  Valid examples are: "America/New_York",
 "Australia/Brisbane", "Etc/UTC".
 
-    vi /etc/php/7.2/apache2/php.ini
-    vi /etc/php/7.2/cli/php.ini
+```bash
+vi /etc/php/7.2/apache2/php.ini
+vi /etc/php/7.2/cli/php.ini
 
-    a2enmod php7.2
-    a2dismod mpm_event
-    a2enmod mpm_prefork
+a2enmod php7.2
+a2dismod mpm_event
+a2enmod mpm_prefork
+```
 
 ## Configure Apache
 
-```
+```bash
 vi /etc/apache2/sites-available/librenms.conf
 ```
 
@@ -124,7 +126,7 @@ Add the following config, edit `ServerName` as required:
 > should be :)) then you will need to disable the default
 > site. `a2dissite 000-default`
 
-```
+```bash
 a2ensite librenms.conf
 a2enmod rewrite
 systemctl restart apache2
@@ -132,14 +134,14 @@ systemctl restart apache2
 
 # Configure snmpd
 
-```
+```bash
 cp /opt/librenms/snmpd.conf.example /etc/snmp/snmpd.conf
 vi /etc/snmp/snmpd.conf
 ```
 
 Edit the text which says `RANDOMSTRINGGOESHERE` and set your own community string.
 
-```
+```bash
 curl -o /usr/bin/distro https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/distro
 chmod +x /usr/bin/distro
 systemctl restart snmpd
@@ -147,7 +149,7 @@ systemctl restart snmpd
 
 # Cron job
 
-```
+```bash
 cp /opt/librenms/librenms.nonroot.cron /etc/cron.d/librenms
 ```
 
@@ -165,11 +167,11 @@ LibreNMS keeps logs in `/opt/librenms/logs`. Over time these can
 become large and be rotated out.  To rotate out the old logs you can
 use the provided logrotate config file:
 
-```
+```bash
 cp /opt/librenms/misc/librenms.logrotate /etc/logrotate.d/librenms
 ```
 
-# Web installer ##
+# Web installer
 
 Now head to the web installer and follow the on-screen instructions.
 
@@ -183,7 +185,7 @@ on-screen to the file. If you have to do this, please remember to set
 the permissions on config.php after you copied the on-screen contents
 to the file. Run:
 
-```
+```bash
 chown librenms:librenms /opt/librenms/config.php
 ```
 
@@ -205,7 +207,7 @@ We now suggest that you add localhost as your first device from within the WebUI
 If you ever have issues with your install, run validate.php as root in
 the librenms directory:
 
-```
+```bash
 cd /opt/librenms
 ./validate.php
 ```

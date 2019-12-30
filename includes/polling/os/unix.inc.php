@@ -19,6 +19,8 @@ if (in_array($device['os'], array("linux", "endian", "proxmox", "recoveryos"))) 
         $hardware = "Generic ARMv6";
     } elseif (strstr($device['sysDescr'], "armv7")) {
         $hardware = "Generic ARMv7";
+    } elseif (strstr($device['sysDescr'], "aarch64")) {
+        $hardware = "Generic ARMv8 64-bit";
     } elseif (strstr($device['sysDescr'], "armv")) {
         $hardware = "Generic ARM";
     }

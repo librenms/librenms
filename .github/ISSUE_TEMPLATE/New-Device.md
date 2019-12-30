@@ -14,8 +14,8 @@ Please confirm each of the sections below by putting an `x` in the box like `[x]
 - [ ] Please provide as much detail as possible.
 - [ ] Please do NOT post more than 10 lines of debug information here, use a pastebin service or GitHub Gists.
 
-Please keep in mind that LibreNMS is a community project, it is run by people like you using their free time. 
-Which means it may take time before support is added to LibreNMS. 
+Please keep in mind that LibreNMS is a community project, it is run by people like you using their free time.
+Which means it may take time before support is added to LibreNMS.
 
 We encourage you to do it yourself and submit it in GitHub as a Pull request. It is not so difficult, most of
 it can be done without writing a single line of code. You can find the documentation below :

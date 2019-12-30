@@ -545,13 +545,8 @@ class IRCBot
                     $this->user['level'] = LegacyAuth::get()->getUserlevel($user['username']);
                     $this->user['expire'] = (time() + ($this->config['irc_authtime'] * 3600));
                     if ($this->user['level'] < 5) {
-                        foreach (dbFetchRows('SELECT device_id FROM devices_perms WHERE user_id = ?', array($this->user['id'])) as $tmp) {
-                            $this->user['devices'][] = $tmp['device_id'];
-                        }
-
-                        foreach (dbFetchRows('SELECT port_id FROM ports_perms WHERE user_id = ?', array($this->user['id'])) as $tmp) {
-                            $this->user['ports'][] = $tmp['port_id'];
-                        }
+                        $this->user['devices'] = Permissions::devicesForUser($this->user['id'])->toArray();
+                        $this->user['ports'] = Permissions::portsForUser($this->user['id'])->toArray();
                     }
                     if ($this->debug) {
                         $this->log("HostAuth on irc for '".$user['username']."', ID: '".$user_id."', Host: '".$host);
@@ -581,13 +576,8 @@ class IRCBot
                 $tmp = LegacyAuth::get()->getUserlevel($tmp_user['username']);
                 $this->user['level'] = $tmp;
                 if ($this->user['level'] < 5) {
-                    foreach (dbFetchRows('SELECT device_id FROM devices_perms WHERE user_id = ?', array($this->user['id'])) as $tmp) {
-                        $this->user['devices'][] = $tmp['device_id'];
-                    }
-
-                    foreach (dbFetchRows('SELECT port_id FROM ports_perms WHERE user_id = ?', array($this->user['id'])) as $tmp) {
-                        $this->user['ports'][] = $tmp['port_id'];
-                    }
+                        $this->user['devices'] = Permissions::devicesForUser($this->user['id'])->toArray();
+                        $this->user['ports'] = Permissions::portsForUser($this->user['id'])->toArray();
                 }
 
                 return $this->respond('Authenticated.');
@@ -622,7 +612,7 @@ class IRCBot
     private function _reload()
     {
         if ($this->user['level'] == 10) {
-            $new_config = Config::load();
+            $new_config = Config::reload();
             $this->respond('Reloading configuration & defaults');
             if ($new_config != $this->config) {
                 return $this->__construct();
@@ -669,9 +659,9 @@ class IRCBot
     {
         $versions       = version_info();
         $schema_version = $versions['db_schema'];
-        $version        = substr($versions['local_sha'], 0, 7);
+        $version        = $versions['local_ver'];
 
-        $msg = $this->config['project_name_version'].', Version: '.$version.', DB schema: '.$schema_version.', PHP: '.PHP_VERSION;
+        $msg = $this->config['project_name'].', Version: '.$version.', DB schema: '.$schema_version.', PHP: '.PHP_VERSION;
         return $this->respond($msg);
     }//end _version()
 

@@ -286,12 +286,13 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
         $mplsBindCache = snmpwalk_cache_multi_oid($this->getDevice(), 'sdpBindBaseStatsTable', $mplsBindCache, 'TIMETRA-SDP-MIB', 'nokia', '-OQUsb');
 
         $binds = collect();
-        foreach ($mplsBindCache as $value) {
+        foreach ($mplsBindCache as $key => $value) {
+            list($svcId) = explode('.', $key);
             $bind_id = str_replace(' ', '', $value['sdpBindId']);
             $sdp_oid = hexdec(substr($bind_id, 0, 8));
             $svc_oid = hexdec(substr($bind_id, 9, 16));
             $sdp_id = $sdps->firstWhere('sdp_oid', $sdp_oid)->sdp_id;
-            $svc_id = $svcs->firstWhere('svc_oid', $svc_oid)->svc_id;
+            $svc_id = $svcs->firstWhere('svc_oid', $svcId)->svc_id;
             $binds->push(new MplsSdpBind([
                 'sdp_id' => $sdp_id,
                 'svc_id' => $svc_id,
@@ -529,12 +530,13 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
         $mplsBindCache = snmpwalk_cache_multi_oid($this->getDevice(), 'sdpBindBaseStatsTable', $mplsBindCache, 'TIMETRA-SDP-MIB', 'nokia', '-OQUsb');
 
         $binds = collect();
-        foreach ($mplsBindCache as $value) {
+        foreach ($mplsBindCache as $key => $value) {
+            list($svcId) = explode('.', $key);
             $bind_id = str_replace(' ', '', $value['sdpBindId']);
             $sdp_oid = hexdec(substr($bind_id, 0, 8));
             $svc_oid = hexdec(substr($bind_id, 9, 16));
             $sdp_id = $sdps->firstWhere('sdp_oid', $sdp_oid)->sdp_id;
-            $svc_id = $svcs->firstWhere('svc_oid', $svc_oid)->svc_id;
+            $svc_id = $svcs->firstWhere('svc_oid', $svcId)->svc_id;
             $binds->push(new MplsSdpBind([
                 'sdp_id' => $sdp_id,
                 'svc_id' => $svc_id,

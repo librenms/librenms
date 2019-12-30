@@ -131,7 +131,6 @@ own. To apply your changes, run `service snmpd restart` for Centos
 6.x. If you have deployed a separate database server, you will likely
 want to configure snmpd on that host as well.
 
-
 # Adding the librenms-user for Apache
 
 ```bash

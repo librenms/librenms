@@ -5,7 +5,7 @@ if ($_GET['legend']) {
 }
 
 $rrd_options  = " --alt-autoscale-max -E --start $from --end ".($to - 150)." --width $width --height $height ";
-$rrd_options .= \LibreNMS\Config::get('rrdgraph_def_text') . ' -c FONT#' . \LibreNMS\Config::get('rrdgraph_def_text_color');
+$rrd_options .= \LibreNMS\Config::get('rrdgraph_def_text') . ' -c FONT#' . ltrim(\LibreNMS\Config::get('rrdgraph_def_text_color'), '#');
 
 if ($height < '99') {
     $rrd_options .= ' --only-graph';

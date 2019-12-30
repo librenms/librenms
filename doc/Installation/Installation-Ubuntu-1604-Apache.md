@@ -10,25 +10,29 @@ path: blob/master/doc/
 
 # Install Required Packages
 
-    apt install acl apache2 composer fping git graphviz imagemagick libapache2-mod-php7.0 mariadb-client mariadb-server mtr-tiny nmap php7.0-cli php7.0-curl php7.0-gd php7.0-json php7.0-mbstring php7.0-mcrypt php7.0-mysql php7.0-snmp php7.0-xml php7.0-zip python-memcache python-mysqldb rrdtool snmp snmpd whois
-
+```bash
+apt install acl apache2 composer fping git graphviz imagemagick libapache2-mod-php7.0 mariadb-client mariadb-server mtr-tiny nmap php7.0-cli php7.0-curl php7.0-gd php7.0-json php7.0-mbstring php7.0-mcrypt php7.0-mysql php7.0-snmp php7.0-xml php7.0-zip python-memcache python-mysqldb rrdtool snmp snmpd whois
+```
 
 # Add librenms user
 
-    useradd librenms -d /opt/librenms -M -r
-    usermod -a -G librenms www-data
+```bash
+useradd librenms -d /opt/librenms -M -r
+usermod -a -G librenms www-data
+```
 
 # Install LibreNMS
 
-    cd /opt
-    composer create-project --no-dev --keep-vcs librenms/librenms librenms dev-master
-
+```bash
+cd /opt
+composer create-project --no-dev --keep-vcs librenms/librenms librenms dev-master
+```
 
 # DB Server
 
 ## Configure MySQL
 
-```
+```bash
 systemctl restart mysql
 mysql -uroot -p
 ```
@@ -43,7 +47,7 @@ FLUSH PRIVILEGES;
 exit
 ```
 
-```
+```bash
 vi /etc/mysql/mariadb.conf.d/50-server.cnf
 ```
 
@@ -54,7 +58,7 @@ innodb_file_per_table=1
 lower_case_table_names=0
 ```
 
-```
+```bash
 systemctl restart mysql
 ```
 
@@ -67,12 +71,12 @@ See <http://php.net/manual/en/timezones.php> for a list of supported
 timezones.  Valid examples are: "America/New_York",
 "Australia/Brisbane", "Etc/UTC".
 
-```
+```bash
 vi /etc/php/7.0/apache2/php.ini
 vi /etc/php/7.0/cli/php.ini
 ```
 
-```
+```bash
 a2enmod php7.0
 a2dismod mpm_event
 a2enmod mpm_prefork
@@ -81,7 +85,7 @@ phpenmod mcrypt
 
 ## Configure Apache
 
-```
+```bash
 vi /etc/apache2/sites-available/librenms.conf
 ```
 
@@ -105,7 +109,7 @@ Add the following config, edit `ServerName` as required:
 > should be :)) then you will need to disable the default
 > site. `a2dissite 000-default`
 
-```
+```bash
 a2ensite librenms.conf
 a2enmod rewrite
 systemctl restart apache2
@@ -113,14 +117,14 @@ systemctl restart apache2
 
 # Configure snmpd
 
-```
+```bash
 cp /opt/librenms/snmpd.conf.example /etc/snmp/snmpd.conf
 vi /etc/snmp/snmpd.conf
 ```
 
 Edit the text which says `RANDOMSTRINGGOESHERE` and set your own community string.
 
-```
+```bash
 curl -o /usr/bin/distro https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/distro
 chmod +x /usr/bin/distro
 systemctl restart snmpd
@@ -128,7 +132,7 @@ systemctl restart snmpd
 
 ## Cron job
 
-```
+```bash
 cp /opt/librenms/librenms.nonroot.cron /etc/cron.d/librenms
 ```
 
@@ -146,13 +150,13 @@ LibreNMS keeps logs in `/opt/librenms/logs`. Over time these can
 become large and be rotated out.  To rotate out the old logs you can
 use the provided logrotate config file:
 
-```
+```bash
 cp /opt/librenms/misc/librenms.logrotate /etc/logrotate.d/librenms
 ```
 
 # Set permissions
 
-```
+```bash
 chown -R librenms:librenms /opt/librenms
 setfacl -d -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstrap/cache/ /opt/librenms/storage/
 setfacl -R -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstrap/cache/ /opt/librenms/storage/
@@ -164,14 +168,13 @@ Now head to the web installer and follow the on-screen instructions.
 
 <http://librenms.example.com/install.php>
 
-
 The web installer might prompt you to create a `config.php` file in
 your librenms install location manually, copying the content displayed
 on-screen to the file. If you have to do this, please remember to set
 the permissions on config.php after you copied the on-screen contents
 to the file. Run:
 
-```
+```bash
 chown librenms:librenms /opt/librenms/config.php
 ```
 
@@ -193,7 +196,7 @@ We now suggest that you add localhost as your first device from within the WebUI
 If you ever have issues with your install, run validate.php as root in
 the librenms directory:
 
-```
+```bash
 cd /opt/librenms
 ./validate.php
 ```

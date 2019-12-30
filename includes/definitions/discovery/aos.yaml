@@ -1,0 +1,62 @@
+mib: ALCATEL-IND1-CHASSIS-MIB:RADLAN-rndMng:RADLAN-HWENVIROMENT
+modules:
+    sensors:
+        state:
+            data:
+                -
+                    oid: alaChasEntPhysFanTable
+                    value: alaChasEntPhysFanStatus
+                    num_oid: '.1.3.6.1.4.1.6486.800.1.1.1.3.1.1.11.1.2.{{ $index }}'
+                    descr: 'Fan {{ $subindex1 }}'
+                    index: 'FanStatus.{{ $index }}'
+                    states:
+                        - { value: 0, descr: noStatus, graph: 1, generic: 2 }
+                        - { value: 1, descr: notRunning, graph: 1, generic: 1 }
+                        - { value: 2, descr: running, graph: 1, generic: 0 }
+                    skip_values:
+                      -
+                        oid: alaChasEntPhysFanStatus
+                        op: '='
+                        value: 0
+                -
+                    oid: rlEnvMonFanStatusTable
+                    value: rlEnvMonFanState
+                    num_oid: '.1.3.6.1.4.1.89.83.1.1.1.3.{{ $index }}'
+                    descr: 'Fan State Sensor'
+                    index: 'FanStatus.{{ $index }}'
+                    states:
+                        - { value: 1, descr: normal, graph: 1, generic: 0 }
+                        - { value: 2, descr: warning, graph: 1, generic: 1 }
+                        - { value: 3, descr: critical, graph: 1, generic: 2 }
+                        - { value: 4, descr: shutdown, graph: 1, generic: 2 }
+                        - { value: 5, descr: notpresent, graph: 1, generic: 3 }
+                        - { value: 6, descr: notFunctioning, graph: 1, generic: 2 }
+                    skip_values:
+                      -
+                        oid: rlEnvMonFanState
+                        op: '='
+                        value: 5
+                -
+                    oid: rlEnvMonSupplyStatusTable
+                    value: rlEnvMonSupplyState
+                    num_oid: '.1.3.6.1.4.1.89.83.1.2.1.3.{{ $index }}'
+                    descr: 'PowerSupply State Sensor'
+                    index: 'PowerSupply.{{ $index }}'
+                    states:
+                        - { value: 1, descr: normal, graph: 1, generic: 0 }
+                        - { value: 2, descr: warning, graph: 1, generic: 1 }
+                        - { value: 3, descr: critical, graph: 1, generic: 2 }
+                        - { value: 4, descr: shutdown, graph: 1, generic: 2 }
+                        - { value: 5, descr: notpresent, graph: 1, generic: 3 }
+                        - { value: 6, descr: notFunctioning, graph: 1, generic: 2 }
+                    skip_values:
+                      -
+                        oid: rlEnvMonSupplyState
+                        op: '='
+                        value: 5
+    processors:
+          data:
+              -
+                  oid: rlCpuUtilDuringLastMinute
+                  num_oid: '.1.3.6.1.4.1.89.1.8.{{ $index }}'
+                  index: 0

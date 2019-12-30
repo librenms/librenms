@@ -72,6 +72,37 @@ Output:
 }
 ```
 
+### `discover_device`
+
+Trigger a discovery of given device.
+
+Route: `/api/v0/devices/:hostname/discover`
+
+- hostname can be either the device hostname or id
+
+Input:
+
+  -
+
+Example:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/discover
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "result": {
+        "status": 0,
+        "message": "Device will be rediscovered"
+    },
+    "count": 2
+}
+```
+
 ### `get_graphs`
 
 Get a list of available graphs for a device, this does not include ports.
@@ -927,6 +958,7 @@ Input:
   - ipv4: search by IPv4 address
   - ipv6: search by IPv6 address (compressed or uncompressed)
   - location: search by location
+  - hostname: search by hostname
 - query: If searching by, then this will be used as the input.
 
 Example:
@@ -1173,4 +1205,65 @@ Output:
         ]
     }
 ]
+```
+
+
+### `search_oxidized`
+
+search all oxidized device configs for a string.
+
+Route: `api/v0/oxidized/config/search/:searchstring`
+
+  - searchstring is the specific string you would like to search for.
+  
+Input:
+
+-
+
+Example:
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/oxidized/config/search/vlan10
+```
+
+Output:
+```json
+{
+    "status": "ok",
+    "nodes": [
+        {
+            "node": "asr9k.librenms.org",
+            "full_name": "cisco\/ASR9K.Librenms.org"
+        },
+        {
+            "node": "ios.Librenms.org",
+            "full_name": "cisco\/ios.Librenms.org"
+        }
+    ],
+    "count": 2
+}
+```
+
+### `get_oxidized_config`
+
+Returns a specific device's config from oxidized.
+
+Route: `api/v0/oxidized/config/:device_name`
+
+  - device_name is the full dns name of the device used when adding the device to librenms.
+  
+Input:
+
+-
+
+Example:
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/oxidized/config/router.corp.com
+```
+
+Output:
+```json
+{
+    "status": "ok",
+    "config": "DEVICE CONFIG HERE"
+}
 ```

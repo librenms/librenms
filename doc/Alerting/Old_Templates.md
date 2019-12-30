@@ -3,7 +3,7 @@ path: blob/master/doc/
 
 # Templates
 
-Templates can be assigned to a single or a group of rules and can contain any kind of text. There is also a default template which is used for any rule that isn't associated with a template. This template can be found under `Alert Templates` page and can be edited. It also has an option revert it back to its default content. 
+Templates can be assigned to a single or a group of rules and can contain any kind of text. There is also a default template which is used for any rule that isn't associated with a template. This template can be found under `Alert Templates` page and can be edited. It also has an option revert it back to its default content.
 
 The template-parser understands `if` and `foreach` controls and replaces certain placeholders with information gathered about the alert.
 
@@ -11,10 +11,8 @@ The template-parser understands `if` and `foreach` controls and replaces certain
 
 Controls:
 
-- if-else (Else can be omitted):
-`{if %placeholder == value}Some Text{else}Other Text{/if}`
-- foreach-loop:
-`{foreach %faults}Key: %key<br/>Value: %value{/foreach}`
+- if-else (Else can be omitted): `{if %placeholder == value}Some Text{else}Other Text{/if}`
+- foreach-loop: `{foreach %faults}Key: %key<br/>Value: %value{/foreach}`
 
 Placeholders:
 
@@ -27,7 +25,7 @@ Placeholders are special variables that if used within the template will be repl
 - sysName of the Device: `%sysName`
 - sysDescr of the Device: `%sysDescr`
 - hardware of the Device: `%hardware`
-- Software version of the Device: `%version` 
+- Software version of the Device: `%version`
 - location of the Device: `%location`
 - uptime of the Device (in seconds): `%uptime`
 - short uptime of the Device (28d 22h 30m 7s): `%uptime_short`
@@ -73,6 +71,7 @@ The Default Template is a 'one-size-fit-all'. We highly recommend defining your 
 ## Examples
 
 Default Template:
+
 ```text
 %title
 Severity: %severity
@@ -84,7 +83,9 @@ Rule: {if %name}%name{else}%rule{/if}
 {foreach %faults}  #%key: %value.string{/foreach}{/if}
 Alert sent to: {foreach %contacts}%value <%key> {/foreach}
 ```
+
 Ports Utilization Template:
+
 ```text
 %title
 Device Name: %hostname
@@ -102,12 +103,13 @@ Outbound Utilization: {calc ((%value.ifOutOctets_rate*8)/%value.ifSpeed)*100}%
 ```
 
 Storage:
+
 ```text
 
 %title
 
 Device Name: %hostname
-Severity: %severity 
+Severity: %severity
 Uptime: %uptime_short
 {if %state == 0}Time elapsed: %elapsed{/if}
 Timestamp: %timestamp
@@ -121,12 +123,13 @@ Server: %sysName {foreach %faults}Mount Point: %value.storage_descr Percent Util
 ```
 
 Temperature Sensors:
+
 ```text
 
 %title
 
 Device Name: %hostname
-Severity: %severity 
+Severity: %severity
 Timestamp: %timestamp
 Uptime: %uptime_short
 {if %state == 0}Time elapsed: %elapsed{/if}
@@ -148,12 +151,13 @@ High Temperature Limit: %value.sensor_limit°C
 ```
 
 Value Sensors:
+
 ```text
 
 %title
 
 Device Name: %hostname
-Severity: %severity 
+Severity: %severity
 Timestamp: %timestamp
 Uptime: %uptime_short
 {if %state == 0}Time elapsed: %elapsed{/if}
@@ -175,11 +179,12 @@ Limit: %value.sensor_limit
 ```
 
 Memory Alert:
+
 ```text
 %title
 
 Device Name: %hostname
-Severity: %severity 
+Severity: %severity
 Uptime: %uptime_short
 {if %state == 0}Time elapsed: %elapsed{/if}
 Timestamp: %timestamp
@@ -188,12 +193,12 @@ Description: %description
 Notes: %notes
 
 Server: %hostname {foreach %faults}
-Memory Description: %value.mempool_descr 
+Memory Description: %value.mempool_descr
 Percent Utilized: %value.mempool_perc{/foreach}
 ```
 
-
 Conditional formatting example, will display a link to the host in email or just the hostname in any other transport:
+
 ```text
 {if %transport == mail}<a href="https://my.librenms.install/device/device=%hostname/">%hostname</a>
 {else}
@@ -208,12 +213,14 @@ Note the use of double-quotes.  Single quotes (`'`) in templates will be escaped
 Note: To use HTML emails you must set HTML email to Yes in the WebUI under Global Settings > Alerting Settings > Email transport > Use HTML emails
 
 Note: To include Graphs you must enable unauthorized graphs in config.php. Allow_unauth_graphs_cidr is optional, but more secure.
+
 ```
-$config['allow_unauth_graphs_cidr'] = array('127.0.0.1/32');  
+$config['allow_unauth_graphs_cidr'] = array('127.0.0.1/32');
 $config['allow_unauth_graphs'] = true;
 ```
 
 Service Alert:
+
 ```
 <div style="font-family:Helvetica;">
 <h2>{if %state == 1}<span style="color:red;">%severity{/if}
@@ -225,16 +232,17 @@ Service Alert:
 <b>Duration:</b> %elapsed<br>
 <br>
 
-{if %faults}                                                                                       
-{foreach %faults}<b>%value.service_desc - %value.service_type</b><br>                                         
+{if %faults}
+{foreach %faults}<b>%value.service_desc - %value.service_type</b><br>
 %value.service_message<br>
-<br>                                                                                         
-{/foreach}                                                                                                             
+<br>
+{/foreach}
 {/if}
 </div>
 ```
 
 Processor Alert with Graph:
+
 ```
 %title <br>
 Severity: %severity  <br>
@@ -257,11 +265,11 @@ Template: CPU alert <br>
 
 ## Included
 
-We include a few templates for you to use, these are specific to the type of alert rules you are creating. For example if you create a rule that would alert on BGP sessions then you can 
+We include a few templates for you to use, these are specific to the type of alert rules you are creating. For example if you create a rule that would alert on BGP sessions then you can
 assign the BGP template to this rule to provide more information.
 
 The included templates apart from the default template are:
 
-  - BGP Sessions
-  - Ports
-  - Temperature
+- BGP Sessions
+- Ports
+- Temperature

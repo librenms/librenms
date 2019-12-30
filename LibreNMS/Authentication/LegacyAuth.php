@@ -73,12 +73,4 @@ class LegacyAuth
         static::$_instance = null;
         return static::get();
     }
-
-    public static function setUpLegacySession()
-    {
-        if (!isset($_SESSION)) {
-            @session_start();
-            session_write_close();
-        }
-    }
 }

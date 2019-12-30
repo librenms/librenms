@@ -1,0 +1,13 @@
+# IES4206/5206/5212/6217
+os: ies52xxM
+text: 'ZyXEL IES MSAN'
+group: zyxel
+type: network
+icon: zyxel
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.890.1.5.13.15

@@ -21,7 +21,7 @@ $sqlparams     = array();
 $options       = getopt('h:m:i:n:d::v::a::q', array('os:','type:'));
 
 if (!isset($options['q'])) {
-    echo \LibreNMS\Config::get('project_name_version') . " Discovery\n";
+    echo \LibreNMS\Config::get('project_name')." Discovery\n";
 }
 
 if (isset($options['h'])) {
@@ -117,6 +117,7 @@ if (!empty(\LibreNMS\Config::get('distributed_poller_group'))) {
 
 global $device;
 foreach (dbFetch("SELECT * FROM `devices` WHERE disabled = 0 AND snmp_disable = 0 $where ORDER BY device_id DESC", $sqlparams) as $device) {
+    DeviceCache::setPrimary($device['device_id']);
     $discovered_devices += (int)discover_device($device, $module_override);
 }
 

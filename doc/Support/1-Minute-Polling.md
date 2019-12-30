@@ -24,7 +24,7 @@ We now have support for polling data at intervals to fit your needs.
   [RRDCached](../Extensions/RRDCached.md) configuration that can save
   a lot of write IOPS.
 
-To make the changes, please navigate to `/settings/sub=external/`
+To make the changes, please navigate to `/settings/poller/rrdtool/`
 within your WebUI. Select RRDTool Setup and then update the two values
 for step and heartbeat intervals:
 

@@ -232,13 +232,10 @@ function poll_device($device, $force_module = false)
 
     $device_start = microtime(true);
 
-    $attribs = get_dev_attribs($device['device_id']);
+    $attribs = DeviceCache::getPrimary()->getAttribs();
     $device['attribs'] = $attribs;
 
     load_os($device);
-
-    $device['snmp_max_repeaters'] = $attribs['snmp_max_repeaters'];
-    $device['snmp_max_oid'] = $attribs['snmp_max_oid'];
 
     unset($array);
 

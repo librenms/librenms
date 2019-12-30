@@ -1,5 +1,6 @@
 source: os/Settings.md
 path: blob/master/doc/
+
 # Optional OS Settings
 
 This page documents settings that can be set in the os yaml files or
@@ -26,8 +27,7 @@ It is possible to filter some sensors from the configuration:
 $config['os']['vrp']['disabled_sensors']['current'] = true;
 ```
 
-- Filter all sensors matching regexp ``` '/PEM Iout/' ``` for
-Operating System iosxe.
+- Filter all sensors matching regexp ```'/PEM Iout/'``` for Operating System iosxe.
 
 ```php
 $config['os']['iosxe']['disabled_sensors_regex'][] = '/PEM Iout/';
@@ -39,13 +39,14 @@ $config['os']['iosxe']['disabled_sensors_regex'][] = '/PEM Iout/';
 $config['disabled_sensors']['current'] = true;
 ```
 
-- Filter all sensors matching regexp ``` '/PEM Iout/' ```.
+- Filter all sensors matching regexp ```'/PEM Iout/'```.
 
 ```php
 $config['disabled_sensors_regex'][] = '/PEM Iout/';
 ```
 
 ### Ignoring Interfaces
+
 See also: [Global Ignoring Interfaces Config](../../Support/Configuration.md#interfaces-to-be-ignored)
 
 > These settings are merged with the global settings, so you can only
@@ -69,6 +70,7 @@ good_if: # ignore all other bad_if settings ifDescr (substring, case insensitive
 ```
 
 ### Controlling interface labels
+
 By default we use ifDescr to label ports/interfaces.
 Setting either `ifname` or `ifalias` will override that.  Only set one
 of these.  ifAlias is user supplied. `ifindex` will append the ifindex

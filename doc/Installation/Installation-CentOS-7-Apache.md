@@ -16,7 +16,7 @@ yum install epel-release
 ```
 
 ```
-yum install git cronie fping jwhois ImageMagick mtr MySQL-python MySQL-python net-snmp net-snmp-utils nmap python-memcached rrdtool policycoreutils-python httpd mariadb mariadb-server unzip
+yum install git cronie fping jwhois ImageMagick mtr MySQL-python net-snmp net-snmp-utils nmap python-memcached rrdtool policycoreutils-python httpd mariadb mariadb-server unzip
 ```
 
 ### Install PHP
@@ -368,4 +368,4 @@ If you would like to help make LibreNMS better there are [many ways to
 help](http://docs.librenms.org/Support/FAQ/#what-can-i-do-to-help). You
 can also [back LibreNMS on Open
 Collective](https://t.libren.ms/donations).
- 
+

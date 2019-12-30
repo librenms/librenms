@@ -64,15 +64,18 @@ entered as a new line.
 
 ## API
 
-The API transport allows to reach any service provider using POST or GET URLs
+The API transport allows to reach any service provider using POST, PUT or GET URLs
 (Like SMS provider, etc). It can be used in multiple ways:
-- The same text built from the Alert template is available in the variable 
+
+- The same text built from the Alert template is available in the variable
 ``` $msg ```, which can then be sent as an option to the API. Be carefull that
 HTTP GET requests are usually limited in length.
 - The API-Option fields can be directly built from the variables defined in
 [Template-Syntax](Templates.md#syntax) but without the 'alert->' prefix.
-For instance, ``` $alert->uptime ``` is available as ``` $uptime ``` in the 
+For instance, ``` $alert->uptime ``` is available as ``` $uptime ``` in the
 API transport
+- The API-Headers allows you to add the headers that the api endpoint requires.
+- The API-body allow sending data in the format required by the ApI endpoint.
 
 A few variables commonly used :
 
@@ -96,13 +99,13 @@ A few variables commonly used :
 **Example:**
 
 The example below will use the API named sms-api of my.example.com and send
-the title of the alert to the provided number using the provided service key. 
+the title of the alert to the provided number using the provided service key.
 Refer to your service documentation to configure it properly.
 
 | Config | Example |
 | ------ | ------- |
 | API Method    | GET |
-| API URL       | http://my.example.com/sms-api
+| API URL       | <http://my.example.com/sms-api>
 | API Options   | rcpt=0123456789 <br/> key=0987654321abcdef <br/> msg=(LNMS) {{ $title }} |
 | API Username  | myUsername |
 | API Password  | myPassword |
@@ -113,8 +116,18 @@ the title and text of the alert to a screen in the Network Operation Center.
 | Config | Example |
 | ------ | ------- |
 | API Method    | POST |
-| API URL       | http://my.example.com/wall-display
+| API URL       | <http://my.example.com/wall-display>
 | API Options   | title={{ $title }} <br/> msg={{ $msg }}|
+
+The example below will use the API named component of my.example.com with id 1, body as json status value and headers send token authentication and content type required.
+
+| Config | Example |
+| ------ | ------- |
+| API Method    | PUT |
+| API URL       | http://my.example.com/comonent/1
+| API Headers   | X-Token=HASH
+|               | Content-Type=application/json
+| API Body      | { "status": 2 }
 
 ## Boxcar
 
@@ -198,7 +211,7 @@ in the Discord Docs below.
 
 | Config | Example |
 | ------ | ------- |
-| Discord URL | https://discordapp.com/api/webhooks/4515489001665127664/82-sf4385ysuhfn34u2fhfsdePGLrg8K7cP9wl553Fg6OlZuuxJGaa1d54fe |
+| Discord URL | <https://discordapp.com/api/webhooks/4515489001665127664/82-sf4385ysuhfn34u2fhfsdePGLrg8K7cP9wl553Fg6OlZuuxJGaa1d54fe> |
 | Options | username=myname |
 
 ## Elasticsearch
@@ -226,7 +239,7 @@ tokens to authenticate with Gitlab and will store the token in cleartext.
 
 | Config | Example |
 | ------ | ------- |
-| Host | http://gitlab.host.tld |
+| Host | <http://gitlab.host.tld> |
 | Project ID | 1 |
 | Personal Access Token | AbCdEf12345 |
 
@@ -242,7 +255,7 @@ for details on acceptable values.
 
 | Config | Example |
 | ------ | ------- |
-| API URL | https://api.hipchat.com/v1/rooms/message?auth_token=109jawregoaihj |
+| API URL | <https://api.hipchat.com/v1/rooms/message?auth_token=109jawregoaihj> |
 | Room ID | 7654321 |
 | From Name | LibreNMS |
 | Options | color = red <br/> notify = 1 <br/> message_format = text |
@@ -282,7 +295,7 @@ LibreNMS database.
 
 | Config | Example |
 | ------ | ------- |
-| URL | https://myjira.mysite.com |
+| URL | <https://myjira.mysite.com> |
 | Project Key | JIRAPROJECTKEY |
 | Issue Type | Myissuetype |
 | Jira Username | myjirauser |
@@ -302,12 +315,6 @@ LibreNMS database.
 
 ## Mail
 
-For all but the default contact, we support setting multiple email
-addresses separated by a comma. So you can set the devices sysContact,
-override the sysContact or have your users emails set like:
-
-`email@domain.com, alerting@domain.com`
-
 The E-Mail transports uses the same email-configuration like the rest of LibreNMS.
 As a small reminder, here is it's configuration directives including defaults:
 
@@ -326,7 +333,7 @@ API which are then posted to a specific channel.
 
 | Config | Example |
 | ------ | ------- |
-| WebHook URL | https://outlook.office365.com/webhook/123456789 |
+| WebHook URL | <https://outlook.office365.com/webhook/123456789> |
 
 ## Nagios Compatible
 
@@ -361,7 +368,7 @@ integration. More detail with screenshots is available in
 
 | Config | Example |
 | ------ | ------- |
-| WebHook URL | https://url/path/to/webhook |
+| WebHook URL | <https://url/path/to/webhook> |
 
 ## osTicket
 
@@ -371,7 +378,7 @@ LibreNMS can send alerts to osTicket API which are then converted to osTicket ti
 
 | Config | Example |
 | ------ | ------- |
-| API URL | http://osticket.example.com/api/http.php/tickets.json |
+| API URL | <http://osticket.example.com/api/http.php/tickets.json> |
 | API Token | 123456789 |
 
 ## PagerDuty
@@ -396,7 +403,7 @@ Service you have created in the PagerDuty portal.
 Want to spice up your noc life? LibreNMS will flash all lights
 connected to your philips hue bridge whenever an alert is triggered.
 
-To setup, go to the you http://`your-bridge-ip`/debug/clip.html
+To setup, go to the you <http://`your-bridge-ip`/debug/clip.html>
 
 - Update the "URL:" field to `/api`
 - Paste this in the "Message Body" {"devicetype":"librenms"}
@@ -429,7 +436,7 @@ Here an example using 3 numbers, any amount of numbers is supported:
 
 | Config | Example |
 | ------ | ------- |
-| PlaySMS | https://localhost/index.php?app=ws |
+| PlaySMS | <https://localhost/index.php?app=ws> |
 | User | user1 |
 | Token | MYFANCYACCESSTOKEN |
 | From | My Name |
@@ -510,7 +517,7 @@ We currently support the following attachment options:
 
 | Config | Example |
 | ------ | ------- |
-| Webhook URL | https://slack.com/url/somehook |
+| Webhook URL | <https://slack.com/url/somehook> |
 | Slack Options | author_name=Me |
 
 ## SMSEagle
@@ -560,32 +567,32 @@ Each fault will be sent as a separate syslog.
    list. To do this click on the following url:
    [https://telegram.me/botfather](https://telegram.me/botfather)
 
-2. Generate a new bot with the command "/newbot" BotFather is then
+1. Generate a new bot with the command "/newbot" BotFather is then
    asking for a username and a normal name. After that your bot is
    created and you get a HTTP token. (for more options for your bot
    type "/help")
 
-3. Add your bot to telegram with the following url:
+1. Add your bot to telegram with the following url:
    `http://telegram.me/<botname>` to use app or
    `https://web.telegram.org/<botname>` to use in web, and send some
    text to the bot.
 
-4. The BotFather should have responded with a token, copy your token
+1. The BotFather should have responded with a token, copy your token
    code and go to the following page in chrome:
    `https://api.telegram.org/bot<tokencode>/getUpdates` (this could
    take a while so continue to refresh until you see something similar
    to below)
 
-5. You see a json code with the message you sent to the bot. Copy the
+1. You see a json code with the message you sent to the bot. Copy the
    Chat id. In this example that is “-9787468” within this example:
    `"message":{"message_id":7,"from":"id":656556,"first_name":"Joo","last_name":"Doo","username":"JohnDoo"},"chat":{"id":-9787468,"title":"Telegram
    Group"},"date":1435216924,"text":"Hi"}}]}`.
 
-6. Now create a new "Telegram transport" in LibreNMS (Global Settings
+1. Now create a new "Telegram transport" in LibreNMS (Global Settings
    -> Alerting Settings -> Telegram transport). Click on 'Add Telegram
    config' and put your chat id and token into the relevant box.
 
-7. If want to use a group to receive alerts, you need to pick the Chat
+1. If want to use a group to receive alerts, you need to pick the Chat
    ID of the group chat, and not of the Bot itself.
 
 [Telegram Docs](https://core.telegram.org/api)
@@ -630,7 +637,7 @@ such as librenms. I.e:
 
 | Config | Example |
 | ------ | ------- |
-| Post URL | https://alert.victorops.com/integrations/generic/20132414/alert/2f974ce1-08fc-4dg8-a4f4-9aee6cf35c98/librenms |
+| Post URL | <https://alert.victorops.com/integrations/generic/20132414/alert/2f974ce1-08fc-4dg8-a4f4-9aee6cf35c98/librenms> |
 
 ## Kayako Classic
 
@@ -646,7 +653,7 @@ appropriate department and a user email to provide, which is used as
 ticket author.  To get department id: navigate to appropriate
 department name at the departments list page in Admin CP and watch the
 number at the end of url. Example:
-http://servicedesk.example.com/admin/Base/Department/Edit/17. Department
+<http://servicedesk.example.com/admin/Base/Department/Edit/17>. Department
 ID is 17
 
 As a requirement, you have to know API Url, API Key and API Secret to
@@ -658,7 +665,7 @@ connect to servicedesk
 
 | Config | Example |
 | ------ | ------- |
-| Kayako URL | http://servicedesk.example.com/api/ |
+| Kayako URL | <http://servicedesk.example.com/api/> |
 | Kayako API Key | 8cc02f38-7465-4a0c-8730-bb3af122167b |
 | Kayako API Secret | Y2NhZDIxNDMtNjVkMi0wYzE0LWExYTUtZGUwMjJiZDI0ZWEzMmRhOGNiYWMtNTU2YS0yODk0LTA1MTEtN2VhN2YzYzgzZjk5 |
 | Kayako Department | 1 |

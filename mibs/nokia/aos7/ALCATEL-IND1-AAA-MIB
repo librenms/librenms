@@ -1,0 +1,3232 @@
+ALCATEL-IND1-AAA-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE, IpAddress,
+        Integer32, Unsigned32, NOTIFICATION-TYPE
+            FROM SNMPv2-SMI
+        MacAddress, RowStatus
+            FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+            FROM SNMPv2-CONF
+        SnmpAdminString        FROM SNMP-FRAMEWORK-MIB
+        InetAddressType, InetAddress, InetAddressPrefixLength
+            FROM INET-ADDRESS-MIB
+        softentIND1AAA
+            FROM ALCATEL-IND1-BASE;
+
+
+    alcatelIND1AAAMIB MODULE-IDENTITY
+        LAST-UPDATED  "201311070000Z"
+        ORGANIZATION  "Alcatel-Lucent"
+        CONTACT-INFO
+            "Please consult with Customer Service to ensure the most appropriate
+             version of this document is used with the products in question:
+
+                      Alcatel-Lucent, Enterprise Solutions Division
+                    (Formerly Alcatel Internetworking, Incorporated)
+                               26801 West Agoura Road
+                            Agoura Hills, CA  91301-5122
+                              United States Of America
+
+            Telephone:               North America  +1 800 995 2696
+                                     Latin America  +1 877 919 9526
+                                     Europe         +31 23 556 0100
+                                     Asia           +65 394 7933
+                                     All Other      +1 818 878 4507
+
+            Electronic Mail:         support@ind.alcatel.com
+            World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+            File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+        DESCRIPTION
+            "This module describes an authoritative enterprise-specific Simple
+             Network Management Protocol (SNMP) Management Information Base (MIB):
+
+                 For the Birds Of Prey Product Line
+                 Authentication, Authorization, and Accounting (AAA) Subsystem.
+
+             The right to make changes in specification and other information
+             contained in this document without prior notice is reserved.
+
+             No liability shall be assumed for any incidental, indirect, special, or
+             consequential damages whatsoever arising from or related to this
+             document or the information contained herein.
+
+             Vendors, end-users, and other interested parties are granted
+             non-exclusive license to use this specification in connection with
+             management of the products for which it is intended to be used.
+
+                         Copyright (C) 1995-2007 Alcatel-Lucent
+                             ALL RIGHTS RESERVED WORLDWIDE"
+
+        REVISION      "201005130000Z"
+        DESCRIPTION
+            "Fixed the Notifications to use MIB Module OID.0 as Notifications root."
+
+        REVISION      "200704030000Z"
+        DESCRIPTION
+            "The latest version of this MIB Module."
+
+        ::= { softentIND1AAA 1 }
+
+
+
+    alcatelIND1AAAMIBObjects OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Authentication, Authorization, and Accounting (AAA)
+            Subsystem Managed Objects."
+        ::= { alcatelIND1AAAMIB 1 }
+
+
+    alcatelIND1AAAMIBConformance OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Authentication, Authorization, and Accounting (AAA)
+            Subsystem Conformance Information."
+        ::= { alcatelIND1AAAMIB 2 }
+
+
+    alcatelIND1AAAMIBGroups OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Authentication, Authorization, and Accounting (AAA)
+            Subsystem Units Of Conformance."
+        ::= { alcatelIND1AAAMIBConformance 1 }
+
+
+    alcatelIND1AAAMIBCompliances OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Authentication, Authorization, and Accounting (AAA)
+            Subsystem Compliance Statements."
+        ::= { alcatelIND1AAAMIBConformance 2 }
+
+
+
+--    Overview of the AAA MIB
+--
+--    this MIB provides configuration of the AAA services including the
+--    servers and the local user database
+--
+
+--    AAA server MIB
+
+    aaaServerMIB    OBJECT IDENTIFIER ::= { alcatelIND1AAAMIBObjects 1 }
+
+--
+--    Server configuration table
+--
+
+    aaaServerTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF AaaServerEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "This table shows current configuration for each AAA server."
+        ::= { aaaServerMIB 1 }
+
+    aaaServerEntry OBJECT-TYPE
+        SYNTAX        AaaServerEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "An AAA server configuration identified by its protocol
+             and its index. An entry is created/removed when a server
+             is defined or undefined with IOS configuration commands
+             via CLI or by issuing appropriate sets to this table
+             using snmp."
+        INDEX     { aaasName }
+        ::= { aaaServerTable 1 }
+
+    AaaServerEntry ::= SEQUENCE
+        {
+            aaasName            SnmpAdminString,
+            aaasProtocol        INTEGER,
+            aaasHostName        SnmpAdminString,
+            aaasIpAddress       IpAddress,
+            aaasHostName2       SnmpAdminString,
+            aaasIpAddress2      IpAddress,
+            aaasRetries         Integer32,
+            aaasTimout          Integer32,
+            aaasRadKey          SnmpAdminString,
+            aaasRadAuthPort     Integer32,
+            aaasRadAcctPort     Integer32,
+            aaasLdapPort        Integer32,
+            aaasLdapDn          SnmpAdminString,
+            aaasLdapPasswd      SnmpAdminString,
+            aaasLdapSearchBase  SnmpAdminString,
+            aaasLdapServType    INTEGER,
+            aaasLdapEnableSsl   INTEGER,
+            aaasRowStatus       RowStatus,
+            aaasTacacsKey       SnmpAdminString,
+            aaasTacacsPort      Integer32,
+            aaasVrfName            SnmpAdminString,
+            aaasRadKeyHash          SnmpAdminString,
+            aaasLdapPasswdHash      SnmpAdminString,
+            aaasTacacsKeyHash       SnmpAdminString
+        }
+
+    aaasName OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "Name of the server.
+            This name is given by the operator to refer the server."
+        ::= { aaaServerEntry 1}
+
+    aaasProtocol OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                          radius(1),
+                            ldap(2),
+                             ace(3),
+                          tacacs(4)
+                      }
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Protocol used with the server:
+                 radius(1) - RADIUS
+                   ldap(2) - LDAP
+                    ace(3) - ACE
+                 tacacs(4) - TACACS+"
+        ::= { aaaServerEntry 2}
+
+    aaasHostName OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 0 .. 64 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "DNS name of the server host."
+        ::= { aaaServerEntry 3}
+
+    aaasIpAddress OBJECT-TYPE
+        SYNTAX        IpAddress
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+                "IP address of the server host."
+        ::= { aaaServerEntry 4}
+
+    aaasHostName2 OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 0 .. 64 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "DNS name of the backup server host."
+        ::= { aaaServerEntry 5}
+
+    aaasIpAddress2 OBJECT-TYPE
+        SYNTAX        IpAddress
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "IP address of the backup server host."
+        ::= { aaaServerEntry 6}
+
+    aaasRetries OBJECT-TYPE
+        SYNTAX        Integer32 ( 0 .. 32 )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            " Number of retries the switch makes to the server to
+            authenticate a user before trying the next backup server.
+            The default value is 3."
+        DEFVAL        { 3 }
+        ::= { aaaServerEntry 7}
+
+    aaasTimout OBJECT-TYPE
+        SYNTAX        Integer32 ( 0 .. 30 )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Time-out for server replies to authentication requests.
+            The default value is 2."
+        DEFVAL        { 2 }
+        ::= { aaaServerEntry 8}
+
+    aaasRadKey OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 0 .. 64 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The shared secret is a string of characters known to the switch
+            and to the RADIUS server, but it is not sent out over the network.
+            The secret can be any text string and must be configured here as
+            well as on the server. The secret is stored encrypted using a two
+            way algorithm."
+        ::= { aaaServerEntry 9}
+
+
+    aaasRadAuthPort OBJECT-TYPE
+        SYNTAX        Integer32 ( 0 .. 65535 )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "For RADIUS server only.
+            Port number for authentication request;
+            the host is not used for authentication if set to 0.
+            The default value is 1645."
+        DEFVAL        { 1645 }
+        ::= { aaaServerEntry 10}
+
+    aaasRadAcctPort OBJECT-TYPE
+        SYNTAX        Integer32 ( 0 .. 65535 )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "For RADIUS server only.
+            Port number for accounting request;
+            the host is not used for authentication if set to 0.
+            The default value is 1646."
+        DEFVAL        { 1646 }
+        ::= { aaaServerEntry 11}
+
+    aaasLdapPort OBJECT-TYPE
+        SYNTAX        Integer32 ( 0 .. 65535 )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "For LDAP server only.
+            Port number for LDAP server host."
+        DEFVAL        { 0 }
+        ::= { aaaServerEntry 12}
+
+    aaasLdapDn OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 0 .. 255 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "For LDAP server only.
+            the super user dn, i.e., the administrative distinguished name
+            recognized by the LDAP-enabled directory servers
+            (e.g., cn=manager)"
+        ::= { aaaServerEntry 13}
+
+    aaasLdapPasswd OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "For LDAP server only.
+            the super user password, i.e., the administrative password
+            recognized by LDAP-enabled directory servers (e.g., secret).
+            The secret is stored encrypted using a two way algorithm."
+        ::= { aaaServerEntry 14}
+
+    aaasLdapSearchBase OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 0 .. 64 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "For LDAP server only.
+             Search base recognized by LDAP-enabled
+             directory servers (e.g.,o=company, c=US)."
+        ::= { aaaServerEntry 15}
+
+    aaasLdapServType OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                                 ns(0),
+                            generic(1),
+                           netscape(2),
+                             novell(3),
+                                sun(4),
+                          microsoft(5)
+                      }
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "For LDAP server only.
+             Directory server type used in LDAP Authentication:
+                        ns(0) - non significant value
+                   generic(1) - Generic Schema
+                  netscape(2) - Netscape Directory Server
+                    novell(3) - Novell NDS
+                       sun(4) - Sun Directory Services
+                 microsoft(5) - Microsoft Active Directory"
+        DEFVAL        { netscape }
+        ::= { aaaServerEntry 16}
+
+    aaasLdapEnableSsl OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                             ns(0),
+                           true(1),
+                          false(2)
+                      }
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Only for LDAP server.
+            Specify if the connection between the swtich and the LDAP server
+            use a SSL session."
+        DEFVAL        { false }
+        ::= { aaaServerEntry 17}
+
+
+    aaasRowStatus OBJECT-TYPE
+        SYNTAX        RowStatus
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The status of this table entry."
+        DEFVAL        { notInService }
+        ::= { aaaServerEntry 18}
+
+   aaasTacacsKey OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 0 .. 64 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The shared secret is a string of characters known to the switch
+            and to the TACACS+ server, but it is not sent out over the network.
+            The secret can be any text string and must be configured here as
+            well as on the server. The secret is stored encrypted using a two
+            way algorithm."
+        ::= { aaaServerEntry 19}
+
+
+    aaasTacacsPort OBJECT-TYPE
+        SYNTAX        Integer32 ( 0 .. 65535 )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "For TACACS+ server only.
+            Port number for LDAP server host."
+        DEFVAL        { 49 }
+        ::= { aaaServerEntry 20}
+
+    aaasVrfName OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of the VRF that the server is on.
+            This VRF name is valid only when the server type is RADIUS.
+            (aaasProtocol = 1 (Radius)."
+        ::= { aaaServerEntry 21}
+
+    aaasRadKeyHash OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 0 .. 256 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The encrypted version of the aaasRadKey attribute."
+        ::= { aaaServerEntry 22}
+
+    aaasLdapPasswdHash OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 0 .. 256 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The encrypted version of the aaasLdapPasswd attribute."
+        ::= { aaaServerEntry 23}
+
+   aaasTacacsKeyHash OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 0 .. 256 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The encrypted version of the aaasTacacsKey attribute."
+        ::= { aaaServerEntry 24}
+
+
+
+--    AAA authentication accounting MIB
+
+    aaaAuthAcctMIB    OBJECT IDENTIFIER ::= { alcatelIND1AAAMIBObjects 2 }
+
+
+--
+--    Authenticated switch access configuration table
+--
+
+    aaaAuthSATable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF AaaAuthSAEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "This table allow to display and modify the configuration of the
+            authentication servers for the switch accesses."
+        ::= { aaaAuthAcctMIB 1 }
+
+    aaaAuthSAEntry OBJECT-TYPE
+        SYNTAX        AaaAuthSAEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A switch access authentication entry is specified by the type
+            of access."
+        INDEX { aaatsInterface}
+        ::= { aaaAuthSATable 1 }
+
+    AaaAuthSAEntry ::= SEQUENCE
+        {
+            aaatsInterface    INTEGER,
+            aaatsName1        SnmpAdminString,
+            aaatsName2        SnmpAdminString,
+            aaatsName3        SnmpAdminString,
+            aaatsName4        SnmpAdminString,
+            aaatsRowStatus    RowStatus,
+            aaatsCertificate  INTEGER
+        }
+
+    aaatsInterface OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                          default(1),
+                          console(2),
+                           telnet(3),
+                              ftp(4),
+                             http(5),
+                             snmp(6),
+                              ssh(7)
+                      }
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "Type of connection that must be authenticated
+            default(1) -define the default authentication method for console,
+            telnet, ftp, snmp , http and ssh. If the operator
+            interface is not especially configured the default value
+            is applied to this interface."
+        ::= { aaaAuthSAEntry 1}
+
+
+    aaatsName1 OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of the server.
+            Special value 'local' correspond to the local database.
+            Other name correspond to an index value of the aaaServerTable
+            snmp entry can only use ldap server and local database."
+        ::= { aaaAuthSAEntry 2}
+
+    aaatsName2 OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of a server used if the precedent is not accessible.
+            Special value 'local' correspond to the local database.
+            Other name correspond to an index value of the aaaServerTable
+            snmp entry can only use ldap server and local database."
+        DEFVAL { "" }
+        ::= { aaaAuthSAEntry 3}
+
+    aaatsName3 OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of a server used if the precedent is not accessible.
+            Special value 'local' correspond to the local database.
+            Other name correspond to an index value of the aaaServerTable
+            snmp entry can only use ldap server and local database."
+        DEFVAL { "" }
+        ::= { aaaAuthSAEntry 4}
+
+    aaatsName4 OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of a server used if the precedent is not accessible.
+            Special value 'local' correspond to the local database.
+            Other name correspond to an index value of the aaaServerTable
+            snmp entry can only use ldap server and local database."
+        DEFVAL { "" }
+        ::= { aaaAuthSAEntry 5}
+
+    aaatsRowStatus OBJECT-TYPE
+        SYNTAX        RowStatus
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The status of this table entry."
+        DEFVAL        { notInService }
+        ::= { aaaAuthSAEntry 7}
+
+   aaatsCertificate OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                        noCertificate(0),
+                        certificateOnly(1),
+                        certificateWithPassword(2)
+                      }
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "use of x509 user certificate during the HTTPs session establisment.
+            noCertificate(0)- no user certificate is required,
+            certificateOnly(1) - the DN from the certifiicate is used to access to the authorization
+            data of the user
+            certificateWithPassword(2) - the user must execute a log-in procedure with user
+            name and password after his certificate validation"
+            DEFVAL        { noCertificate }
+            ::= { aaaAuthSAEntry 8}
+
+
+--
+--    Accounting configuration table for switch accesses
+--
+
+    aaaAcctSATable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF AaaAcctSAEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "This table shows current configuration for Switch access accounting."
+    ::= { aaaAuthAcctMIB 2 }
+
+    aaaAcctSAEntry OBJECT-TYPE
+        SYNTAX        AaaAcctSAEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "Accounting configuration for switch access."
+        INDEX     { aaacsInterface }
+        ::= { aaaAcctSATable 1 }
+
+    AaaAcctSAEntry ::= SEQUENCE
+        {
+            aaacsInterface    Integer32,
+            aaacsName1        SnmpAdminString,
+            aaacsName2        SnmpAdminString,
+            aaacsName3        SnmpAdminString,
+            aaacsName4        SnmpAdminString,
+            aaacsRowStatus    RowStatus
+        }
+
+    aaacsInterface OBJECT-TYPE
+        SYNTAX        Integer32 ( 1 .. 1 )
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "For now, accounting for console, telnet, ftp, http, snmp, ssh are stored
+            in the same set of servers, the index is always (1)."
+        ::= { aaaAcctSAEntry 1}
+
+
+    aaacsName1 OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of the server.
+            Special value 'local' correspond to the local log.
+            Other name correspond to an index value of the aaaServerTable
+            An Ace server can not be used for accounting."
+        ::= { aaaAcctSAEntry 2}
+
+    aaacsName2 OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of a server used if the precedent is not accessible.
+            Special value 'local' correspond to the local log.
+            Other name correspond to an index value of the aaaServerTable
+            An Ace server can not be used for accounting."
+        DEFVAL { "" }
+        ::= { aaaAcctSAEntry 3}
+
+    aaacsName3 OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of a server used if the precedent is not accessible.
+            Special value 'local' correspond to the local log.
+            Other name correspond to an index value of the aaaServerTable
+            An Ace server can not be used for accounting."
+        DEFVAL { "" }
+    ::= { aaaAcctSAEntry 4}
+
+    aaacsName4 OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of a server used if the precedent is not accessible.
+            Special value 'local' correspond to the local log.
+            Other name correspond to an index value of the aaaServerTable
+            An Ace server can not be used for accounting."
+        DEFVAL { "" }
+    ::= { aaaAcctSAEntry 5}
+
+    aaacsRowStatus OBJECT-TYPE
+        SYNTAX        RowStatus
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The status of this table entry."
+        DEFVAL        { notInService }
+        ::= { aaaAcctSAEntry 6}
+
+
+
+
+--
+--    Accounting configuration table for commands
+--
+    aaaAcctCmdTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF AaaAcctCmdEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "This table stores the commands that will be logged during an accounting session.
+                         This feature is valid only for Tacacs+ accounting"
+    ::= { aaaAuthAcctMIB 3 }
+
+    aaaAcctCmdEntry OBJECT-TYPE
+        SYNTAX        AaaAcctCmdEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "Tacacs+ Accounting configuration for executed commands."
+        INDEX     { aaacmdInterface }
+        ::= { aaaAcctCmdTable 1 }
+
+    AaaAcctCmdEntry ::= SEQUENCE
+        {
+            aaacmdInterface       Integer32,
+            aaacmdSrvName1        SnmpAdminString,
+            aaacmdSrvName2        SnmpAdminString,
+            aaacmdSrvName3        SnmpAdminString,
+            aaacmdSrvName4        SnmpAdminString,
+            aaacmdRowStatus       RowStatus
+        }
+
+    aaacmdInterface OBJECT-TYPE
+        SYNTAX        Integer32 ( 1 .. 1 )
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "For now, accounting for console, telnet, ftp, http, snmp, ssh are stored
+            in the same set of servers, the index is always (1)."
+        ::= { aaaAcctCmdEntry 1}
+
+
+    aaacmdSrvName1 OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of the Tacacs+ server.
+            Other name correspond to an index value of the aaaServerTable"
+        ::= { aaaAcctCmdEntry 2}
+
+    aaacmdSrvName2 OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of the Tacacs+  server used if the precedent is not accessible.
+            Other name correspond to an index value of the aaaServerTable"
+        DEFVAL { "" }
+        ::= { aaaAcctCmdEntry 3}
+
+    aaacmdSrvName3 OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of the Tacacs+  server used if the precedent is not accessible.
+            Other name correspond to an index value of the aaaServerTable"
+        DEFVAL { "" }
+    ::= { aaaAcctCmdEntry 4}
+
+    aaacmdSrvName4 OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of the Tacacs+ server used if the precedent is not accessible.
+            Other name correspond to an index value of the aaaServerTable"
+        DEFVAL { "" }
+    ::= { aaaAcctCmdEntry 5}
+
+    aaacmdRowStatus OBJECT-TYPE
+        SYNTAX        RowStatus
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The status of this table entry."
+        DEFVAL        { notInService }
+        ::= { aaaAcctCmdEntry 6}
+
+--
+--    Authenticated Device configuration table
+--
+
+   aaaAuthDATable  OBJECT-TYPE
+        SYNTAX        SEQUENCE OF AaaAuthDAEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "This table shows current configuration for MAC/Onex/Captive Portal authentication."
+    ::= { aaaAuthAcctMIB 4 }
+
+    aaaAuthDAEntry OBJECT-TYPE
+        SYNTAX        AaaAuthDAEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "configuration for MAC/Onex/Captive Portal authentication."
+        INDEX     { aaadaInterface }
+        ::= { aaaAuthDATable 1 }
+
+    AaaAuthDAEntry ::= SEQUENCE
+        {
+            aaadaInterface    Integer32,
+            aaadaName1        SnmpAdminString,
+            aaadaName2        SnmpAdminString,
+            aaadaName3        SnmpAdminString,
+            aaadaName4        SnmpAdminString,
+            aaadaRowStatus    RowStatus
+        }
+
+
+    aaadaInterface OBJECT-TYPE
+        SYNTAX        Integer32 ( 1 .. 3 )
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "one for mac , two for 1x, three for captive portal authentication"
+        ::= { aaaAuthDAEntry 1}
+
+
+    aaadaName1 OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of the server.
+            It corresponds to an index value of the aaaServerTable
+            Only RADIUS server can be used in front hand."
+        ::= { aaaAuthDAEntry 2}
+
+    aaadaName2 OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of the server.
+            It corresponds to an index value of the aaaServerTable
+            Only RADIUS server can be used in front hand."
+        DEFVAL { "" }
+
+        ::= { aaaAuthDAEntry 3}
+
+    aaadaName3 OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of the server.
+            It corresponds to an index value of the aaaServerTable
+            Only RADIUS server can be used in front hand."
+        DEFVAL { "" }
+        ::= { aaaAuthDAEntry 4}
+
+    aaadaName4 OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of the server.
+            It corresponds to an index value of the aaaServerTable
+            Only RADIUS server can be used in front hand."
+        DEFVAL { "" }
+        ::= { aaaAuthDAEntry 5}
+
+    aaadaRowStatus OBJECT-TYPE
+        SYNTAX        RowStatus
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The status of this table entry."
+        DEFVAL        { notInService }
+        ::= { aaaAuthDAEntry 6}
+
+
+    aaaAcctDATable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF AaaAcctDAEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "This table shows current configuration for device access accounting."
+    ::= { aaaAuthAcctMIB 5 }
+
+    aaaAcctDAEntry OBJECT-TYPE
+        SYNTAX        AaaAcctDAEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "Accounting configuration for device access."
+        INDEX     { aaacdInterface }
+        ::= { aaaAcctDATable 1 }
+
+    AaaAcctDAEntry ::= SEQUENCE
+        {
+            aaacdInterface          Integer32, 
+            aaacdName1              SnmpAdminString,
+            aaacdName2              SnmpAdminString,
+            aaacdName3              SnmpAdminString,
+            aaacdName4              SnmpAdminString,
+            aaacdRowStatus          RowStatus,
+            aaacdSyslogIPAddrType   InetAddressType,      
+            aaacdSyslogIPAddr       InetAddress,      
+            aaacdSyslogUdpPort      Unsigned32,
+	    aaacdCallngStationId    INTEGER				      
+        }
+
+    aaacdInterface OBJECT-TYPE
+        SYNTAX	      Integer32 ( 1 .. 3 )
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "accounting for mac ,onex  & captive portal " 
+        ::= { aaaAcctDAEntry 1}
+
+
+    aaacdName1 OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of the server.
+            Special value 'local' correspond to the local log.
+            Other name correspond to an index value of the aaaServerTable
+            for accounting."
+        ::= { aaaAcctDAEntry 2}
+
+    aaacdName2 OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of a server used if the precedent is not accessible.
+            Special value 'local' correspond to the local log.
+            Other name correspond to an index value of the aaaServerTable
+            for accounting."
+        DEFVAL { "" }
+        ::= { aaaAcctDAEntry 3}
+
+    aaacdName3 OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of a server used if the precedent is not accessible.
+            Special value 'local' correspond to the local log.
+            Other name correspond to an index value of the aaaServerTable
+            for accounting."
+        DEFVAL { "" }
+    ::= { aaaAcctDAEntry 4}
+
+    aaacdName4 OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 0 .. 32 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Name of a server used if the precedent is not accessible.
+            Special value 'local' correspond to the local log.
+            Other name correspond to an index value of the aaaServerTable
+            for accounting."
+        DEFVAL { "" }
+    ::= { aaaAcctDAEntry 5}
+
+        aaacdRowStatus OBJECT-TYPE
+        SYNTAX        RowStatus
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The status of this table entry."
+        DEFVAL        { notInService }
+        ::= { aaaAcctDAEntry 6 }
+    
+    aaacdSyslogIPAddrType OBJECT-TYPE
+        SYNTAX       InetAddressType 
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Accounting Syslog IpAddress type"
+        ::= { aaaAcctDAEntry 7 }
+
+    aaacdSyslogIPAddr OBJECT-TYPE
+        SYNTAX       InetAddress 
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Accounting Syslog IpAddress "
+        ::= { aaaAcctDAEntry 8 }
+
+    aaacdSyslogUdpPort OBJECT-TYPE
+        SYNTAX      Unsigned32 
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Accounting Syslog Udp port "
+         DEFVAL { 514 }
+        ::= { aaaAcctDAEntry 9 }
+	
+    aaacdCallngStationId  OBJECT-TYPE
+	SYNTAX      INTEGER
+		     {
+                         mac(1),
+                         ip(2)
+                      }
+
+	MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Raduis Calling Station ID "
+	::= { aaaAcctDAEntry 10 }
+
+    alaAaaAuthConfig  OBJECT IDENTIFIER ::= { aaaAuthAcctMIB 6 } 
+
+--
+--   Global Objects for Onex/MAC/Captive Portal authentication/accounting 
+---
+
+    alaAaaOnexReAuthStatus OBJECT-TYPE
+        SYNTAX       INTEGER {
+                    enable(1),           
+                    disable(2)
+                    }
+        MAX-ACCESS read-write
+        STATUS current 
+        DESCRIPTION 
+            " Enable/Disable Reauthentication for user authenticated  using Onex "
+            DEFVAL { disable }
+       ::= { alaAaaAuthConfig 1 }
+
+    alaAaaOnexReAuthIntrvl OBJECT-TYPE
+        SYNTAX      Integer32  
+        MAX-ACCESS read-write
+        STATUS current 
+        DESCRIPTION 
+            " Reauthentication Interval  for user authenticated  using Onex "
+            DEFVAL { 3600 }
+       ::= { alaAaaAuthConfig 2 }
+
+
+    alaAaaOnexReAuthTrustRadStatus OBJECT-TYPE
+        SYNTAX       INTEGER {
+                                enable(1),           
+                                disable(2)
+                             }
+        MAX-ACCESS read-write
+        STATUS current 
+        DESCRIPTION 
+            " Reauthentication Trust Radius status   for user authenticated  using Onex "
+            DEFVAL { disable }
+       ::= { alaAaaAuthConfig 3 }
+
+    alaAaaOnexIntrmIntrvl OBJECT-TYPE
+        SYNTAX      Integer32  
+        MAX-ACCESS read-write
+        STATUS current 
+        DESCRIPTION 
+            " Accounting Interim  Interval   "
+            DEFVAL { 600 }
+       ::= { alaAaaAuthConfig 4 }
+
+    alaAaaOnexIntmIntvlTrstRadSts OBJECT-TYPE
+        SYNTAX       INTEGER {
+                    enable(1),           
+                    disable(2)
+                    }
+        MAX-ACCESS read-write
+        STATUS current 
+        DESCRIPTION 
+            " Using Onex ,Interim  Interval Trust Radius Status   "
+            DEFVAL { disable }
+       ::= { alaAaaAuthConfig 5 }
+
+    alaAaaMacIntrmIntrvl OBJECT-TYPE
+        SYNTAX      Integer32  
+        MAX-ACCESS  read-write
+        STATUS current 
+        DESCRIPTION 
+            " Using Mac, Accounting Interim  Interval   "
+            DEFVAL { 600 }
+       ::= { alaAaaAuthConfig 6 }
+
+    alaAaaMacIntmIntvlTrstRadStatus OBJECT-TYPE
+        SYNTAX       INTEGER {
+                    enable(1),           
+                    disable(2)
+                    }
+        MAX-ACCESS read-write
+        STATUS current 
+        DESCRIPTION 
+            " Using Mac ,Interim  Interval Trust Radius Status   "
+            DEFVAL { disable }
+       ::= { alaAaaAuthConfig 7 }
+
+    alaAaaMacSessTimeoutStatus OBJECT-TYPE
+        SYNTAX       INTEGER {
+                    enable(1),           
+                    disable(2)
+                    }
+        MAX-ACCESS read-write
+        STATUS current 
+        DESCRIPTION 
+            " Using Mac,Interim  Session Timeout Status   "
+            DEFVAL { disable }
+       ::= { alaAaaAuthConfig 8 }
+
+    alaAaaMacSessTimeoutIntrvl OBJECT-TYPE
+        SYNTAX      Integer32  
+        MAX-ACCESS read-write
+        STATUS current 
+        DESCRIPTION 
+            " Using Mac,Session Timeout Status Interval  "
+            DEFVAL { 43200 }
+       ::= { alaAaaAuthConfig 9 }
+
+    alaAaaMacSesTimeoutTrstRadStatus OBJECT-TYPE
+        SYNTAX       INTEGER {
+                    enable(1),           
+                    disable(2)
+                    }
+        MAX-ACCESS read-write
+        STATUS current 
+        DESCRIPTION 
+            "Session Timeout Radius Status for Mac based authenticated user "
+            DEFVAL { disable }
+       ::= { alaAaaAuthConfig 10 }
+
+    alaAaaMacInActLogoutStatus OBJECT-TYPE
+        SYNTAX       INTEGER {
+                    enable(1),           
+                    disable(2)
+                    }
+        MAX-ACCESS read-write
+        STATUS current 
+        DESCRIPTION 
+            "Session Timeout Trust Radius Status  for Captive Portal  method based authenticated user "
+            DEFVAL { disable }
+       ::= { alaAaaAuthConfig 11 }
+
+    alaAaaMacInActLogoutIntrvl    OBJECT-TYPE
+        SYNTAX      Integer32  
+        MAX-ACCESS read-write
+        STATUS current 
+        DESCRIPTION 
+            "InActivity logout Interval for MAC based authenticated user "
+          DEFVAL { 600 }
+       ::= { alaAaaAuthConfig 12 }
+
+
+    alaAaaCpIntrmIntrvl OBJECT-TYPE
+        SYNTAX      Integer32  
+        MAX-ACCESS read-write
+        STATUS current 
+        DESCRIPTION 
+            " Using Captive Portal, Accounting Interim  Interval   "
+         DEFVAL { 600 }
+       ::= { alaAaaAuthConfig 13 }
+
+    alaAaaCpIntmIntvlTrstRadStatus OBJECT-TYPE
+        SYNTAX       INTEGER {
+                    enable(1),           
+                    disable(2)
+                    }
+        MAX-ACCESS read-write
+        STATUS current 
+        DESCRIPTION 
+            " Using Captive Portal ,Interim  Interval Trust Radius Status   "
+            DEFVAL { disable }
+       ::= { alaAaaAuthConfig 14 }
+
+
+    alaAaaCpSessTimeoutStatus OBJECT-TYPE
+        SYNTAX       INTEGER {
+                    enable(1),           
+                    disable(2)
+                    }
+        MAX-ACCESS read-write
+        STATUS current 
+        DESCRIPTION 
+            "Session Timeout Status for Captive Portal  method based authenticated user "
+            DEFVAL { disable }
+       ::= { alaAaaAuthConfig 15 }
+
+    alaAaaCpSessTimeoutIntrvl OBJECT-TYPE
+        SYNTAX      Integer32  
+        MAX-ACCESS read-write
+        STATUS current 
+        DESCRIPTION 
+            "Session Timeout Interval for Captive Portal  method based authenticated user "
+       DEFVAL { 43200 }
+       ::= { alaAaaAuthConfig 16 }
+
+    alaAaaCpSessTmotTrstRadStatus OBJECT-TYPE
+        SYNTAX       INTEGER {
+                    enable(1),           
+                    disable(2)
+                    }
+        MAX-ACCESS read-write
+        STATUS current 
+        DESCRIPTION 
+            "Session Timeout Trust Radius Status  for Captive Portal  method based authenticated user "
+            DEFVAL { disable }
+       ::= { alaAaaAuthConfig 17 }
+
+    alaAaaCpInActLogoutStatus OBJECT-TYPE
+        SYNTAX       INTEGER {
+                    enable(1),           
+                    disable(2)
+                    }
+        MAX-ACCESS read-write
+        STATUS current 
+        DESCRIPTION 
+            "InActivity logout Status for Captive Portal based authenticated user "
+            DEFVAL { disable }
+       ::= { alaAaaAuthConfig 18 }
+
+    alaAaaCpInActLogoutIntrvl    OBJECT-TYPE
+        SYNTAX      Integer32  
+        MAX-ACCESS read-write
+        STATUS current 
+        DESCRIPTION 
+            "InActivity logout Interval  for Captive Portal based authenticated user "
+ 	DEFVAL { 600 }
+       ::= { alaAaaAuthConfig 19 }
+
+   alaAaaTacacsServerCmdAuthorization OBJECT-TYPE
+	SYNTAX INTEGER{
+	enable(1),
+	disable(2)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	   "Getting command based authorization from TACACS+ server"
+      ::= { alaAaaAuthConfig 20 }
+
+
+--
+--    user local database configuration table
+--
+    aaaUserMIB    OBJECT IDENTIFIER ::= { alcatelIND1AAAMIBObjects 3 }
+
+    aaaUserTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF AaaUserEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "This table shows current configuration for the local user database."
+        ::= { aaaUserMIB 1 }
+
+    aaaUserEntry OBJECT-TYPE
+        SYNTAX        AaaUserEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "An user configuration identified by its user name."
+        INDEX { aaauUserName }
+        ::= { aaaUserTable 1 }
+
+    AaaUserEntry ::= SEQUENCE
+        {
+            aaauUserName       SnmpAdminString,
+            aaauPassword       SnmpAdminString,
+            aaauReadRight1     Unsigned32,
+            aaauReadRight2     Unsigned32,
+            aaauWriteRight1    Unsigned32,
+            aaauWriteRight2    Unsigned32,
+            aaauSnmpLevel      INTEGER,
+            aaauSnmpAuthKey    OCTET STRING,
+            aaauRowStatus      RowStatus,
+            aaauOldPassword    SnmpAdminString,
+            aaauPasswordExpirationDate          SnmpAdminString,
+            aaauPasswordExpirationInMinute      Integer32,
+            aaauPasswordAllowModifyDate         SnmpAdminString,
+            aaauPasswordLockoutEnable           INTEGER,
+            aaauBadAtempts                      Integer32,
+            aaauReadRight3     Unsigned32,
+            aaauReadRight4     Unsigned32,
+            aaauWriteRight3    Unsigned32,
+            aaauWriteRight4    Unsigned32,
+            aaauSnmpPrivPassword OCTET STRING
+        }
+
+    aaauUserName OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 0 .. 63 ) )
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "Name of the user."
+        ::= { aaaUserEntry 1}
+
+    aaauPassword OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 0 .. 47 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Password of the user. For get response the password in encoded in a
+            one way method. This makes the password readable by noone."
+        ::= { aaaUserEntry 2}
+
+    aaauReadRight1 OBJECT-TYPE
+        SYNTAX        Unsigned32 ( 0 .. 4294967295 )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Specifies the families that the user can execute with read right.
+            Each bit of the 32-bit integer mask represents a command's family
+            number. When the family bit is set, the user is allowed to run
+            commands of this family.First part of the bitmask.If the value is
+            not specified, the value configured for the 'default' user is taken"
+        ::= { aaaUserEntry 3}
+
+    aaauReadRight2 OBJECT-TYPE
+        SYNTAX        Unsigned32 ( 0 .. 4294967295 )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Specifies the families that the user can execute with read right.
+            Each bit of the 32-bit integer mask represents a command's family
+            number. When the family bit is set, the user is allowed to run
+            commands of this family.Second part of the bitmask.If the value is
+            not specified, the value configured for the 'default' user is taken"
+        ::= { aaaUserEntry 4}
+
+
+    aaauWriteRight1 OBJECT-TYPE
+        SYNTAX        Unsigned32 ( 0 .. 4294967295 )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Specifies the families that the user can execute with write right.
+            Each bit of the 32-bit integer mask represents a command's family
+            number. When the family bit is set, the user is allowed to run commands of
+            this family. First part of the bitmask.If the value is
+            not specified, the value configured for the 'default' user is taken"
+        ::= { aaaUserEntry 5}
+
+    aaauWriteRight2 OBJECT-TYPE
+        SYNTAX        Unsigned32 ( 0 .. 4294967295 )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Specifies the families that the user can execute with write right.
+            Each bit of the 32-bit integer mask represents a command's family
+            number. When the family bit is set, the user is allowed to run commands of
+            this family. Second part of the bitmask.If the value is
+            not specified, the value configured for the 'default' user is taken"
+        ::= { aaaUserEntry 6}
+
+    aaauSnmpLevel OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                               no(1),
+                           noauth(2),
+                              sha(3),
+                              md5(4),
+                           shaDes(5),
+                           md5Des(6),
+                           shaAes(7),
+                           sha224(8),
+                           sha256(9)
+                      }
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Specifies if the user is authorized to use SNMP and if yes its security level.
+                     no(1) - Not authorized to use SNMP.
+                 noauth(2) - SNMPv1,SNMPv2c or SNMPv3 without authentication.
+                    sha(3) - SNMPv3 with SHA authentication and no encryption.
+                    md5(4) - SNMPv3 with MD5 authentication and no encryption.
+                sha-des(5) - SNMPv3 with SHA authentication and DES encryption.
+                md5-des(6) - SNMPv3 with MD5 authentication and DES encryption.
+                sha-aes(7) - SNMPv3 with SHA authentication and AES encryption.
+                 sha224(8) - SNMPv3 with SHA224 authentication and no encryption.
+                 sha256(9) - SNMPv3 with SHA256 authentication and no encryption.
+             If the value is not specified, the value configured for the 'default' user
+             is taken"
+        ::= { aaaUserEntry 7}
+
+    aaauSnmpAuthKey OBJECT-TYPE
+        SYNTAX        OCTET STRING ( SIZE( 0 .. 255 ) )
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Authentication key of the user. The key is encoded in a two way method.
+            The encryption key is deducted from this key."
+        ::= { aaaUserEntry 8}
+
+    aaauRowStatus OBJECT-TYPE
+        SYNTAX        RowStatus
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The status of this table entry."
+        DEFVAL        { notInService }
+        ::= { aaaUserEntry 9}
+
+    aaauOldPassword OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 0 .. 47 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Internal use"
+        ::= { aaaUserEntry 10}
+
+    aaauPasswordExpirationDate OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 0 .. 16 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The local time of when the password would be expired.
+             This date will be reset once the value of
+             aaaAsaDefaultPasswordExpirationInDays is updated.
+
+             Only the following format is valid:
+
+             mm/dd/yyyy hh:mm
+
+             where
+             mm   - month  (1-12)
+             dd   - day    (1-31)
+             yyyy - year   (2000-2050)
+             hh   - hour   (1-24)
+             mm   - minute (1-59)
+
+             Password will not be expired if set to empty string"
+        ::= { aaaUserEntry 11}
+
+    aaauPasswordExpirationInMinute OBJECT-TYPE
+        SYNTAX        Integer32 ( -1 .. 216000 )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Number of minutes from now till the password expiration time.
+             Setting this object will update aaauPasswordExpirationDate.
+             If -1, password will not be expired.
+             If  0, password has been expired."
+        ::= { aaaUserEntry 12}
+
+     aaauPasswordAllowModifyDate OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 0 .. 16 ) )
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The local time of when the password can be start to be modified.
+             This date will be reset once the value of
+             aaauPasswordAllowModifyDate is updated.
+
+             Only the following format is valid:
+
+             mm/dd/yyyy hh:mm
+
+             where
+             mm   - month  (1-12)
+             dd   - day    (1-31)
+             yyyy - year   (2000-2050)
+             hh   - hour   (1-24)
+             mm   - minute (1-59)
+
+             Password will not be expired if set to empty string"
+        ::= { aaaUserEntry 13}
+
+     aaauPasswordLockoutEnable OBJECT-TYPE
+        SYNTAX        INTEGER {lockout(1),unlock(2),expired(3)}
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Indicate whether this account is locked out."
+            DEFVAL { unlock }
+        ::= { aaaUserEntry 14}
+
+     aaauBadAtempts OBJECT-TYPE
+        SYNTAX        Integer32 ( 0 .. 999 )
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Number bad password attempts in the observation window."
+            DEFVAL { 0 }
+        ::= { aaaUserEntry 15}
+
+    aaauReadRight3 OBJECT-TYPE
+        SYNTAX        Unsigned32 ( 0 .. 4294967295 )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Specifies the families that the user can execute with read right.
+            Each bit of the 32-bit integer mask represents a command's family
+            number. When the family bit is set, the user is allowed to run
+            commands of this family.First part of the bitmask.If the value is
+            not specified, the value configured for the 'default' user is taken"
+        ::= { aaaUserEntry 16}
+
+    aaauReadRight4 OBJECT-TYPE
+        SYNTAX        Unsigned32 ( 0 .. 4294967295 )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Specifies the families that the user can execute with read right.
+            Each bit of the 32-bit integer mask represents a command's family
+            number. When the family bit is set, the user is allowed to run
+            commands of this family.Second part of the bitmask.If the value is
+            not specified, the value configured for the 'default' user is taken"
+        ::= { aaaUserEntry 17}
+
+
+    aaauWriteRight3 OBJECT-TYPE
+        SYNTAX        Unsigned32 ( 0 .. 4294967295 )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Specifies the families that the user can execute with write right.
+            Each bit of the 32-bit integer mask represents a command's family
+            number. When the family bit is set, the user is allowed to run commands of
+            this family. First part of the bitmask.If the value is
+            not specified, the value configured for the 'default' user is taken"
+        ::= { aaaUserEntry 18}
+
+    aaauWriteRight4 OBJECT-TYPE
+        SYNTAX        Unsigned32 ( 0 .. 4294967295 )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Specifies the families that the user can execute with write right.
+            Each bit of the 32-bit integer mask represents a command's family
+            number. When the family bit is set, the user is allowed to run commands of
+            this family. Second part of the bitmask.If the value is
+            not specified, the value configured for the 'default' user is taken"
+        ::= { aaaUserEntry 19}
+
+    aaauSnmpPrivPassword OBJECT-TYPE
+        SYNTAX        OCTET STRING ( SIZE( 8 .. 30 ) )
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Authentication key of the user. The key is encoded in a two way method.
+            The encryption key is deducted from this key."
+        ::= { aaaUserEntry 20}
+
+
+--    ASA specific configuration MIB
+
+    aaaAsaConfig    OBJECT IDENTIFIER ::= { alcatelIND1AAAMIBObjects 4 }
+
+--
+--    ASA configuration group
+--
+
+    aaaAsaPasswordSizeMin OBJECT-TYPE
+        SYNTAX        Integer32 ( 0 .. 31 )
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "Minimum number of digits of the passwords
+            ( nominator aaauPassword)."
+          DEFVAL     { 0 }
+        ::= { aaaAsaConfig 1}
+
+    aaaAsaDefaultPasswordExpirationInDays OBJECT-TYPE
+        SYNTAX        Integer32 ( 0 .. 150 )
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "Default password expiration time in days to be applied to all users.
+             Updating this object will reset aaauPasswordExpirationDate.
+             Password expiration will not be enforced if set to 0."
+          DEFVAL     { 0 }
+        ::= { aaaAsaConfig 2}
+
+   aaaAsaPasswordContainUserName OBJECT-TYPE
+        SYNTAX        INTEGER {enable(1),disable(2)}
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "Indicate whether check password contains username or not."
+            DEFVAL { disable }
+        ::= { aaaAsaConfig 3}
+
+   aaaAsaPasswordMinUpperCase OBJECT-TYPE
+        SYNTAX        Integer32 ( 0 .. 7 )
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "Minimum number of English uppercase characters required for password. 0 is disable"
+            DEFVAL     { 0 }
+        ::= { aaaAsaConfig 4}
+
+   aaaAsaPasswordMinLowerCase OBJECT-TYPE
+        SYNTAX        Integer32 ( 0 .. 7 )
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "Minimum number of English lowercase characters required for password 0 is disable."
+            DEFVAL     { 0 }
+        ::= { aaaAsaConfig 5}
+
+    aaaAsaPasswordMinDigit OBJECT-TYPE
+        SYNTAX        Integer32 ( 0 .. 7 )
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "Minimum number of base-10 digits required for password. 0 is disable"
+            DEFVAL     { 0 }
+        ::= { aaaAsaConfig 6}
+
+    aaaAsaPasswordMinNonAlphan OBJECT-TYPE
+        SYNTAX        Integer32 ( 0 .. 7 )
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "Minimum number of non-alphanumeric required for password. 0 is disable"
+            DEFVAL     { 0 }
+        ::= { aaaAsaConfig 7}
+
+    aaaAsaPasswordHistory OBJECT-TYPE
+        SYNTAX        Integer32 ( 0 .. 24 )
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "Password history feature will prevent users from repeatedly using the same password. 0 is disable"
+            DEFVAL     { 4 }
+        ::= { aaaAsaConfig 8}
+
+  aaaAsaPasswordMinAge OBJECT-TYPE
+        SYNTAX        Integer32 ( 0 .. 150 )
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "The password can't be modified in these days. 0 is disable"
+            DEFVAL     { 0 }
+        ::= { aaaAsaConfig 9}
+
+   aaaAsaLockoutWindow OBJECT-TYPE
+        SYNTAX        Integer32 ( 0 .. 99999 )
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "The window of time in which the system increments the bad logon count.(minutes) 0 is disable"
+        DEFVAL        { 0 }
+        ::= { aaaAsaConfig 10}
+
+   aaaAsaLockoutDuration OBJECT-TYPE
+        SYNTAX        Integer32 ( 0 .. 99999 )
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "The amount of time that an account is locked due to the aaauLockoutThreshold being exceeded.(minutes) 0 is disable"
+        DEFVAL        { 0 }
+        ::= { aaaAsaConfig 11}
+
+   aaaAsaLockoutThreshold OBJECT-TYPE
+        SYNTAX        Integer32 ( 0 .. 999 )
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+             "The number of invalid logon attempts that are permitted before the account is locked out. 0 is disable"
+        DEFVAL        { 0 }
+        ::= { aaaAsaConfig 12}
+
+    aaaAsaAccessPolicyAdminConsoleOnly OBJECT-TYPE
+        SYNTAX        INTEGER {enable(1),disable(2)}
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+             "Enable or disable AdminUser console only restriction"
+        DEFVAL { disable }
+        ::= { aaaAsaConfig 13}
+
+     aaaAsaAccessMode OBJECT-TYPE   
+        SYNTAX        INTEGER { default (1),enhanced(2) }  
+        MAX-ACCESS    read-write   
+        STATUS        current  
+        DESCRIPTION    
+             "Set access mode to enhanced or default.  0 is default 1 is enhanced"     
+        DEFVAL { default }     
+        ::= { aaaAsaConfig 14}     
+   
+     aaaAsaAccessIpLockoutThreshold   OBJECT-TYPE  
+        SYNTAX INTEGER(0..999)     
+        MAX-ACCESS  read-write     
+        STATUS current     
+        DESCRIPTION    
+             "When aaaAsaAccessMode is enhanced, This object indicates the value of the threshold for failed login     
+              attempts from an IP address after which the IP address will be banned from switch access.    
+              when aaaAsaAccessMode, this  is set to 0, disable"   
+            DEFVAL      { 6 }  
+        ::= {aaaAsaConfig 15}  
+   
+     aaaAsaAccessManagementIpStatus   OBJECT-TYPE  
+        SYNTAX       INTEGER {     
+                                enable(1),     
+                                disable(2)     
+                             }     
+        MAX-ACCESS read-write  
+        STATUS current     
+        DESCRIPTION    
+            " When aaaAsaAccessMode is enhanced, When enabled , session allowed only for   
+               pre-configured/allowed management station  defined in aaaSwitchAccessMgmtStationTable.  
+              If disabled, any station can try to establish session is authenticated successfully,     
+              when disabled aaaSwitchAccessMgmtStationTable will be destroyed.     
+               When aaaAsaAccessMode is default, aaaAsaAccessManagementIpStatus will be disable"   
+            DEFVAL { disable }     
+        ::= {aaaAsaConfig 16}  
+
+    alaAaaClientAttr        OBJECT IDENTIFIER ::= { alcatelIND1AAAMIBObjects 5 } 
+
+--
+--   Even in Client Attributes ,we may have different categories (like radius , tacas)so creating one more node  
+-- 
+    alaAaaRadClientGlobalAttr  OBJECT IDENTIFIER ::= { alaAaaClientAttr 1 } 
+
+    alaAaaRadNasPortId   OBJECT-TYPE
+        SYNTAX          SnmpAdminString ( SIZE(0 ..31 ) )  
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Radius Client Attribute NAS Port Identifier"  
+        ::= { alaAaaRadClientGlobalAttr 1 }    
+
+    alaAaaRadNasIdentifier   OBJECT-TYPE
+        SYNTAX          SnmpAdminString ( SIZE(0 ..31 ) )  
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Radius Client Attribute NAS Identifier"  
+        ::= { alaAaaRadClientGlobalAttr 2 }    
+
+    alaAaaRadUserNameDelim OBJECT-TYPE
+        SYNTAX          SnmpAdminString ( SIZE(0 ..31 ) )  
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Radius Client Attribute user name delimiter"  
+        ::= { alaAaaRadClientGlobalAttr 3 }    
+
+    alaAaaRadPasswordDelim OBJECT-TYPE
+        SYNTAX          SnmpAdminString ( SIZE(0 ..31 ) )  
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Radius Client Attribute user password delimiter"  
+        ::= { alaAaaRadClientGlobalAttr 4 }    
+
+    alaAaaRadCallnStnIdDelim   OBJECT-TYPE
+        SYNTAX          SnmpAdminString ( SIZE(0 ..31 ) )  
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Radius Client attribute Calling Station delimiter"  
+        ::= { alaAaaRadClientGlobalAttr 5 }    
+
+    alaAaaRadCalldStnIdDelim   OBJECT-TYPE
+        SYNTAX          SnmpAdminString ( SIZE(0 ..31 ) )  
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Radius Client attribute Called Station delimiter"  
+        ::= { alaAaaRadClientGlobalAttr 6 }    
+
+    alaAaaRadUserNameCase OBJECT-TYPE
+        SYNTAX          INTEGER  
+                    {
+                        lowerCase(1),
+                        upperCase(2)
+                    }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Radius client attribute UserName case"  
+            DEFVAL { upperCase }
+        ::= {  alaAaaRadClientGlobalAttr 7 }    
+
+    alaAaaRadPasswordCase OBJECT-TYPE
+        SYNTAX          INTEGER  
+                    {
+                        lowerCase(1),
+                        upperCase(2)
+                    }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Radius client attribute Password case"  
+            DEFVAL { upperCase }
+        ::= { alaAaaRadClientGlobalAttr 8 }    
+
+    alaAaaRadCallingStationIdCase OBJECT-TYPE
+        SYNTAX          INTEGER  
+                    {
+                        lowerCase(1),
+                        upperCase(2)
+                    }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Radius client attribute  CallingStationId case"  
+            DEFVAL { upperCase }
+        ::= { alaAaaRadClientGlobalAttr 9 }    
+
+    alaAaaRadCalledStationIdCase OBJECT-TYPE
+        SYNTAX          INTEGER  
+                    {
+                        lowerCase(1),
+                        upperCase(2)
+                    }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Radius client attribute  CalledStationId case"  
+            DEFVAL { upperCase }
+         ::= { alaAaaRadClientGlobalAttr 10 }    
+
+    alaAaaProfileObjects OBJECT IDENTIFIER ::= { alcatelIND1AAAMIBObjects 6 } 
+--
+--   Even in Profiles ,we may have different categories so creating one more node  
+-- 
+    alaAaaProfileConfig  OBJECT IDENTIFIER ::= { alaAaaProfileObjects 1 } 
+
+--   Profile   table 
+-- AG AAA Profile will be created  with this table 
+
+    alaAaaProfTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF AlaAaaProfEntry
+        MAX-ACCESS   not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table contain AAA profiles details for Onex/MAC/Captive Portal "
+        ::=  {   alaAaaProfileConfig 1 } 
+
+    alaAaaProfEntry OBJECT-TYPE
+        SYNTAX           AlaAaaProfEntry
+        MAX-ACCESS       not-accessible
+        STATUS           current
+        DESCRIPTION
+            "Each entry defines  AAA  profile for Onex/MAC"
+        INDEX { alaAaaProfName }
+        ::= { alaAaaProfTable 1 }
+
+    AlaAaaProfEntry ::= SEQUENCE
+        {
+            alaAaaProfName                           SnmpAdminString,
+            alaAaaProfOnexReAuthSts                 INTEGER,
+            alaAaaProfOnexReAuthIntrvl              Integer32,
+            alaAaaProfOnexReAuthTrstRadSts          INTEGER,
+            alaAaaProfOnexIntrmIntrvl               Integer32,
+            alaAaaProfOnexIntmItvlTstRadSts         INTEGER,
+            alaAaaProfMacIntrmIntrvl                 Integer32,
+            alaAaaProfMacIntmItvlTrstRadSts          INTEGER,
+            alaAaaProfMacSessTimeoutSts              INTEGER,  
+            alaAaaProfMacSessTimeoutIntrvl           Integer32, 
+            alaAaaProfMacSessTmoutTrstRadSts         INTEGER, 
+            alaAaaProfMacInActLogoutSts              INTEGER, 
+            alaAaaProfMacInActLogoutIntrvl           Integer32,    
+            alaAaaProfCpSessTimeoutSts               INTEGER,
+            alaAaaProfCpSessTimeoutIntrvl            Integer32,
+            alaAaaProfCpSessTmotTrstRadSts           INTEGER,
+            alaAaaProfCpInActLogoutSts               INTEGER,
+            alaAaaProfCpInActLogoutIntrvl            Integer32,
+            alaAaaProfCpIntrmIntrvl                  Integer32,
+            alaAaaProfCpItrmIntlTrstRadSts           INTEGER,
+            alaAaaProfRadNasPortId                   SnmpAdminString,
+            alaAaaProfRadNasIdentifier               SnmpAdminString, 
+            alaAaaProfRadUserNameDelim               SnmpAdminString, 
+            alaAaaProfRadPasswrdDelim                SnmpAdminString, 
+            alaAaaProfRadCallnStnIdDelim             SnmpAdminString,   
+            alaAaaProfRadCalldStnIdDelim             SnmpAdminString, 
+            alaAaaProfRadUserNameCase                INTEGER,       
+            alaAaaProfRadPasswordCase                INTEGER,       
+            alaAaaProfRadCallnStnIdCase              INTEGER,       
+            alaAaaProfRadCalldStnIdCase              INTEGER,       
+            alaAaaProfRowStatus                      RowStatus
+    }
+
+    alaAaaProfName  OBJECT-TYPE
+        SYNTAX    SnmpAdminString ( SIZE( 1 .. 32 ) ) 
+        MAX-ACCESS   not-accessible 
+        STATUS        current
+        DESCRIPTION
+            " AAA  profile name  for Onex/MAC/Captive Portal authenticated sessions "
+        ::= { alaAaaProfEntry  1 }
+
+
+    alaAaaProfOnexReAuthSts OBJECT-TYPE
+        SYNTAX       INTEGER {
+                                enable(1),           
+                                disable(2)
+                             }
+        MAX-ACCESS read-create
+        STATUS current 
+        DESCRIPTION 
+            " AAA  profile Re-auth Status for  Onex authenticated sessions "
+            DEFVAL { disable }
+        ::= { alaAaaProfEntry 2 }
+
+    alaAaaProfOnexReAuthIntrvl OBJECT-TYPE
+        SYNTAX      Integer32  
+        MAX-ACCESS read-create
+        STATUS current 
+        DESCRIPTION 
+        " AAA  profile Re-auth Interval for  Onex authenticated sessions "
+            DEFVAL { 3600 }
+       ::= { alaAaaProfEntry 3 }
+
+
+    alaAaaProfOnexReAuthTrstRadSts OBJECT-TYPE
+        SYNTAX       INTEGER {
+                                 enable(1),           
+                                 disable(2)
+                              }
+        MAX-ACCESS read-create
+        STATUS current 
+        DESCRIPTION 
+        " AAA  profile Re-auth Trust Radius Status for  Onex authenticated sessions "
+        DEFVAL { disable }
+       ::= { alaAaaProfEntry 4 }
+
+    alaAaaProfOnexIntrmIntrvl OBJECT-TYPE
+        SYNTAX      Integer32  
+        MAX-ACCESS read-create
+        STATUS current 
+        DESCRIPTION 
+        " AAA  profile Interium Interval  for  Onex authenticated sessions "
+   	 DEFVAL { 600 }
+       ::= { alaAaaProfEntry 5 }
+
+    alaAaaProfOnexIntmItvlTstRadSts    OBJECT-TYPE
+        SYNTAX       INTEGER {
+                                enable(1),           
+                                disable(2)
+                             }
+        MAX-ACCESS read-create
+        STATUS current 
+        DESCRIPTION 
+        " AAA  profile Interium Interval Trust Radius Status  for  Onex authenticated sessions "
+        DEFVAL { disable }
+       ::= { alaAaaProfEntry 6 }
+
+    alaAaaProfMacIntrmIntrvl OBJECT-TYPE
+        SYNTAX      Integer32  
+        MAX-ACCESS read-create
+        STATUS current 
+        DESCRIPTION 
+        " AAA  profile Interium Interval  for  MAC  authenticated sessions "
+   	 DEFVAL { 600 }
+       ::= { alaAaaProfEntry 7 }
+
+    alaAaaProfMacIntmItvlTrstRadSts OBJECT-TYPE
+        SYNTAX       INTEGER {
+                    enable(1),           
+                    disable(2)
+                    }
+        MAX-ACCESS read-create
+        STATUS current 
+        DESCRIPTION 
+        " AAA  profile Interium Interval Trust Radius Status for  MAC  authenticated sessions "
+        DEFVAL { disable }
+       ::= { alaAaaProfEntry  8 }
+
+
+    alaAaaProfMacSessTimeoutSts OBJECT-TYPE
+        SYNTAX       INTEGER {
+                                 enable(1),           
+                                 disable(2)
+                             }
+        MAX-ACCESS read-create
+        STATUS current 
+        DESCRIPTION 
+        " AAA  profile Session Timeout  Status for  MAC  authenticated sessions "
+        DEFVAL { disable }
+       ::= { alaAaaProfEntry 9 }
+
+    alaAaaProfMacSessTimeoutIntrvl OBJECT-TYPE
+        SYNTAX      Integer32  
+        MAX-ACCESS read-create
+        STATUS current 
+        DESCRIPTION 
+        " AAA  profile Session Timeout  Interval for  MAC  authenticated sessions "
+   	 DEFVAL { 43200 }
+       ::= { alaAaaProfEntry 10 }
+
+    alaAaaProfMacSessTmoutTrstRadSts OBJECT-TYPE
+        SYNTAX       INTEGER {
+                                enable(1),           
+                                disable(2)
+                              }
+        MAX-ACCESS read-create
+        STATUS current 
+        DESCRIPTION 
+        " AAA  profile Session Timeout  Trust Radius Status for  MAC  authenticated sessions "
+         DEFVAL { disable }
+       ::= { alaAaaProfEntry 11 }
+
+    alaAaaProfMacInActLogoutSts OBJECT-TYPE
+        SYNTAX       INTEGER {
+                                enable(1),           
+                                disable(2)
+                             }
+        MAX-ACCESS read-create
+        STATUS current 
+        DESCRIPTION 
+        " AAA  profile InActivity Logout  Status for  MAC  authenticated sessions "
+        DEFVAL { disable }
+       ::= { alaAaaProfEntry 12 }
+
+    alaAaaProfMacInActLogoutIntrvl    OBJECT-TYPE
+        SYNTAX      Integer32  
+        MAX-ACCESS read-create
+        STATUS current 
+        DESCRIPTION 
+        " AAA  profile InActivity Logout  Interval for  MAC  authenticated sessions "
+  	   DEFVAL { 600 }
+       ::= { alaAaaProfEntry 13 }
+
+    alaAaaProfCpSessTimeoutSts OBJECT-TYPE
+        SYNTAX       INTEGER {
+                                 enable(1),           
+                                 disable(2)
+                            }
+        MAX-ACCESS read-create
+        STATUS current 
+        DESCRIPTION 
+            "AAA profile Captive Portal Session Timeout Status. "
+            DEFVAL { disable }
+       ::= { alaAaaProfEntry 14 }
+
+
+    alaAaaProfCpSessTimeoutIntrvl OBJECT-TYPE
+        SYNTAX      Integer32  
+        MAX-ACCESS read-create
+        STATUS current 
+        DESCRIPTION 
+            "AAA profile Captive Portal Session Timeout Interval. "
+  	  DEFVAL  { 432000 }
+       ::= { alaAaaProfEntry 15 }
+
+    alaAaaProfCpSessTmotTrstRadSts OBJECT-TYPE
+        SYNTAX       INTEGER
+        {
+                    enable(1),     
+                    disable(2)
+        }
+       MAX-ACCESS read-create
+       STATUS current 
+       DESCRIPTION
+            "AAA profile Captive Portal Session Timeout Trust radius Status "
+       DEFVAL { disable }
+       ::= { alaAaaProfEntry 16 }
+
+    alaAaaProfCpInActLogoutSts OBJECT-TYPE
+       SYNTAX       INTEGER 
+       {
+            enable(1),
+            disable(2)
+       }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+            "AAA profile Captive Portal Inactivity Logout Status." 
+       DEFVAL { disable }
+       ::= { alaAaaProfEntry 17 }
+
+    alaAaaProfCpInActLogoutIntrvl    OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+            "AAA profile Captive Portal Inactivity Logout Interval." 
+ 	DEFVAL  { 600 }
+       ::= { alaAaaProfEntry 18 }
+
+    alaAaaProfCpIntrmIntrvl OBJECT-TYPE
+        SYNTAX      Integer32  
+        MAX-ACCESS read-create
+        STATUS current 
+        DESCRIPTION 
+            "AAA profile Captive Portal Interim Interval." 
+ 	DEFVAL  { 43200 }
+       ::= { alaAaaProfEntry 19 }
+
+    alaAaaProfCpItrmIntlTrstRadSts OBJECT-TYPE
+        SYNTAX       INTEGER 
+                     {
+                         enable(1),           
+                         disable(2)
+                     }
+        MAX-ACCESS  read-create
+        STATUS      current 
+        DESCRIPTION 
+            "AAA profile Captive Portal Interim Interval Trust Radius Status." 
+            DEFVAL { disable }
+       ::= { alaAaaProfEntry 20 }
+
+
+    alaAaaProfRadNasPortId   OBJECT-TYPE
+       SYNTAX          SnmpAdminString ( SIZE(0 ..31 ) )  
+       MAX-ACCESS      read-create
+       STATUS          current
+       DESCRIPTION
+        "Radius Client Attribute NAS Port Identifier"  
+       ::= { alaAaaProfEntry 21 }    
+  
+    alaAaaProfRadNasIdentifier   OBJECT-TYPE
+        SYNTAX          SnmpAdminString ( SIZE(0 ..31 ) )  
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "Radius Client Attribute  NAS  Identifier"  
+        ::= { alaAaaProfEntry 22 }    
+
+
+    alaAaaProfRadUserNameDelim     OBJECT-TYPE
+        SYNTAX          SnmpAdminString ( SIZE(0 ..31 ) )  
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "Radius Client Attribute  user name delimiter"  
+        ::= { alaAaaProfEntry 23 }    
+
+    alaAaaProfRadPasswrdDelim    OBJECT-TYPE
+        SYNTAX          SnmpAdminString ( SIZE(0 ..31 ) )  
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "Radius Client Attribute Password delimiter"  
+        ::= { alaAaaProfEntry  24 }    
+
+    alaAaaProfRadCallnStnIdDelim   OBJECT-TYPE
+        SYNTAX          SnmpAdminString ( SIZE(0 ..31 ) )  
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "Radius Client attribute Calling Station delimiter"  
+        ::= { alaAaaProfEntry 25 }    
+
+    alaAaaProfRadCalldStnIdDelim OBJECT-TYPE
+        SYNTAX          SnmpAdminString ( SIZE(0 ..31 ) )  
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "Radius Client attribute Called Station delimiter"  
+        ::= { alaAaaProfEntry 26 }    
+
+
+    alaAaaProfRadUserNameCase OBJECT-TYPE
+        SYNTAX          INTEGER  
+                        {
+                             lowerCase(1),
+                             upperCase(2)
+                        }
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+             "Radius client Attribute UserName case"  
+        DEFVAL { upperCase }
+        ::= { alaAaaProfEntry 27 }    
+
+    alaAaaProfRadPasswordCase OBJECT-TYPE
+         SYNTAX          INTEGER  
+                        {
+                           lowerCase(1),
+                           upperCase(2)
+                        }
+         MAX-ACCESS     read-create
+         STATUS          current
+         DESCRIPTION
+            "Radius client  attribute Password case"  
+        	DEFVAL { upperCase }
+         ::= { alaAaaProfEntry 28 }    
+
+    alaAaaProfRadCallnStnIdCase  OBJECT-TYPE
+        SYNTAX          INTEGER  
+                        {
+                            lowerCase(1),
+                            upperCase(2)
+                        }
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "Radius client attribute  CallingStationId case"  
+       		DEFVAL { upperCase }
+        ::= { alaAaaProfEntry 29 }    
+
+    alaAaaProfRadCalldStnIdCase OBJECT-TYPE
+        SYNTAX          INTEGER  
+                       {
+                           lowerCase(1),
+                           upperCase(2)
+                       }
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+           "Radius client attribute  CalledStationId case"  
+       		DEFVAL { upperCase }
+        ::= { alaAaaProfEntry 30 }    
+
+    alaAaaProfRowStatus OBJECT-TYPE
+        SYNTAX        RowStatus
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Row  status of table ."
+        DEFVAL        { notInService }
+        ::= { alaAaaProfEntry 31 }
+
+--
+--   Profile based Authorization table 
+--
+    alaAaaProfAuthTable  OBJECT-TYPE
+        SYNTAX        SEQUENCE OF  AlaAaaProfAuthEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "This table shows aaa profiles for configuring authentication server for MAC/Onex/Captive Portal"
+        ::= { alaAaaProfileConfig 2 }
+
+    alaAaaProfAuthEntry OBJECT-TYPE
+        SYNTAX       AlaAaaProfAuthEntry 
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "configuration for MAC/Onex authentication."
+        INDEX     { alaAaaProfName, alaAaaProfAuthInterface}
+        ::= { alaAaaProfAuthTable 1 }
+
+    AlaAaaProfAuthEntry ::= SEQUENCE
+        {
+            alaAaaProfAuthInterface      INTEGER, 
+            alaAaaProfAuthSrvName1       SnmpAdminString,
+            alaAaaProfAuthSrvName2       SnmpAdminString,
+            alaAaaProfAuthSrvName3       SnmpAdminString,
+            alaAaaProfAuthSrvName4       SnmpAdminString,
+            alaAaaProfAuthRowStatus       RowStatus
+        }
+
+    alaAaaProfAuthInterface  OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                         mac(1),
+                         dot1x(2),
+ 			 captivePortal(3)
+                       }  
+        MAX-ACCESS    not-accessible 
+        STATUS        current
+        DESCRIPTION
+            "one for mac, two for 1x,threee for Captive Portal"
+        ::= { alaAaaProfAuthEntry 1}
+
+    alaAaaProfAuthSrvName1   OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 0 .. 31 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            " Radius authenticated server"
+        ::= { alaAaaProfAuthEntry 2}
+
+    alaAaaProfAuthSrvName2   OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 0 .. 31 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            " Radius authenticated server"
+        ::= { alaAaaProfAuthEntry 3}
+
+    alaAaaProfAuthSrvName3   OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 0 .. 31 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            " Radius authenticated server"
+        ::= { alaAaaProfAuthEntry 4}
+
+    alaAaaProfAuthSrvName4    OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 0 .. 31 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            " Radius authenticated server"
+        ::= { alaAaaProfAuthEntry 5}
+
+    alaAaaProfAuthRowStatus   OBJECT-TYPE
+        SYNTAX        RowStatus
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The status of this table entry."
+        DEFVAL        { notInService }
+        ::= { alaAaaProfAuthEntry 6 }
+
+
+--
+--   Profile based Accounting  table 
+--
+    alaAaaProfAcctTable  OBJECT-TYPE
+        SYNTAX        SEQUENCE OF  AlaAaaProfAcctEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            " Profile Table for configuring radius accounting server for MAC/Onex authentication."
+        ::= { alaAaaProfileConfig 3 }
+
+    alaAaaProfAcctEntry OBJECT-TYPE
+        SYNTAX       AlaAaaProfAcctEntry 
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "configuration for MAC/Onex/Captive Portal accounting."
+        INDEX     { alaAaaProfName, alaAaaProfAcctInterface}
+        ::= { alaAaaProfAcctTable 1 }
+
+    AlaAaaProfAcctEntry ::= SEQUENCE
+        {
+            alaAaaProfAcctInterface          INTEGER,
+            alaAaaProfAcctSrvName1           SnmpAdminString,
+            alaAaaProfAcctSrvName2           SnmpAdminString,
+            alaAaaProfAcctSrvName3           SnmpAdminString,
+            alaAaaProfAcctSrvName4           SnmpAdminString,
+            alaAaaProfAcctSyslogIPAddrType   InetAddressType,      
+            alaAaaProfAcctSyslogIPAddr       InetAddress,      
+            alaAaaProfAcctSyslogUdpPort      Unsigned32,      
+            alaAaaProfAcctCalingStationId    INTEGER,		
+            alaAaaProfAcctRowStatus          RowStatus
+        }
+
+    alaAaaProfAcctInterface  OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                         mac(1),
+                         dot1x(2),
+                         captivePortal(3)
+                       }  
+        MAX-ACCESS    not-accessible 
+        STATUS        current
+        DESCRIPTION
+            "one for mac, two for 1x, three for Captive Portal"
+        ::= { alaAaaProfAcctEntry 1 }
+
+    alaAaaProfAcctSrvName1   OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 0 .. 31 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Radius accounting Server for Onex/MAC/Captive Portal accounting  sessions."
+        ::= { alaAaaProfAcctEntry 2 }
+
+    alaAaaProfAcctSrvName2   OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 0 .. 31 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Radius accounting Server for Onex/MAC/Captive Portal accounting  sessions."
+        ::= { alaAaaProfAcctEntry 3 }
+
+    alaAaaProfAcctSrvName3   OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 0 .. 31 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Radius accounting Server for Onex/MAC/Captive Portal accounting  sessions."
+        ::= { alaAaaProfAcctEntry 4 }
+
+    alaAaaProfAcctSrvName4    OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 0 .. 31 ) )
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Radius accounting Server for Onex/MAC/Captive Portal accounting  sessions."
+        ::= { alaAaaProfAcctEntry 5 }
+
+    alaAaaProfAcctSyslogIPAddrType   OBJECT-TYPE
+        SYNTAX       InetAddressType 
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Accounting Syslog IpAddress type"
+        ::= { alaAaaProfAcctEntry 6 }
+
+    alaAaaProfAcctSyslogIPAddr OBJECT-TYPE
+        SYNTAX       InetAddress 
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Accounting Syslog IpAddress "
+        ::= { alaAaaProfAcctEntry 7 }
+
+    alaAaaProfAcctSyslogUdpPort    OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..65535) 
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Accounting Syslog Udp port "
+        DEFVAL  { 514 }
+        ::= { alaAaaProfAcctEntry 8 }
+	
+	alaAaaProfAcctCalingStationId OBJECT-TYPE	 
+	SYNTAX      INTEGER	 
+			{	 
+				mac(1),	 
+				ip(2)	 
+			}	 
+
+	MAX-ACCESS    read-create	 
+        STATUS        current	 
+	DESCRIPTION	 
+	"Raduis Calling Station ID "	 
+	::= { alaAaaProfAcctEntry 9 } 
+
+    alaAaaProfAcctRowStatus   OBJECT-TYPE
+        SYNTAX        RowStatus
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The status of this table entry."
+        DEFVAL        { notInService }
+        ::= { alaAaaProfAcctEntry 10 }
+
+
+-- START: AAA SWITCH ACCESS CONFIG-RELATED MIB---------------------
+
+    aaaSwitchAccessConfig   OBJECT IDENTIFIER ::= { alcatelIND1AAAMIBObjects 7 }
+
+-- SwitchAccess config MIB --
+
+    aaaSwitchAccessMgmtStationTable OBJECT-TYPE
+        SYNTAX           SEQUENCE OF AaaSwitchAccessMgmtStationEntry
+        MAX-ACCESS       not-accessible
+        STATUS           current
+        DESCRIPTION
+            "This table is used to configure SwitchAccess management station's Ip address."
+        ::= {aaaSwitchAccessConfig 1 }
+
+    aaaSwitchAccessMgmtStationEntry  OBJECT-TYPE
+        SYNTAX                  AaaSwitchAccessMgmtStationEntry
+        MAX-ACCESS               not-accessible
+        STATUS                   current
+        DESCRIPTION
+            "SwitchAccessManagementStation configuration."
+        INDEX  { aaaSwitchAccessMgmtStationIpType,
+                 aaaSwitchAccessMgmtStationIpAddress,
+                 aaaSwitchAccessMgmtStationIpPrefixLength
+               }
+        ::= { aaaSwitchAccessMgmtStationTable 1 }
+
+    AaaSwitchAccessMgmtStationEntry  ::= SEQUENCE
+        {
+        aaaSwitchAccessMgmtStationIpType      InetAddressType,
+        aaaSwitchAccessMgmtStationIpAddress   InetAddress,
+        aaaSwitchAccessMgmtStationIpPrefixLength    InetAddressPrefixLength,
+        aaaSwitchAccessMgmtStationRowStatus   RowStatus
+        }
+
+    aaaSwitchAccessMgmtStationIpType OBJECT-TYPE
+        SYNTAX                  InetAddressType {  unknown(0), ipv4(1) }
+        MAX-ACCESS              not-accessible
+        STATUS                  current
+        DESCRIPTION
+            "The Ip Address Type for the SwitchAccess management station"
+        ::= { aaaSwitchAccessMgmtStationEntry  1 }
+
+    aaaSwitchAccessMgmtStationIpAddress OBJECT-TYPE
+        SYNTAX                  InetAddress (SIZE (4 | 16))
+        MAX-ACCESS              not-accessible
+        STATUS                  current
+        DESCRIPTION
+            "The Ip Address for the SwitchAccess management station"
+        ::= { aaaSwitchAccessMgmtStationEntry  2 }
+
+    aaaSwitchAccessMgmtStationIpPrefixLength OBJECT-TYPE
+        SYNTAX                  InetAddressPrefixLength
+        MAX-ACCESS              not-accessible
+        STATUS                  current
+        DESCRIPTION
+            "The prefix length that, when combined
+            with aaaSwitchAccessMgmtStationIpAddress , gives the prefix for this
+            entry.  The InetAddressType is given by the
+            aaaSwitchAccessMgmtStationIpType object.
+            Currntly release supports only IPV4."
+        ::= { aaaSwitchAccessMgmtStationEntry 3 }
+
+    aaaSwitchAccessMgmtStationRowStatus  OBJECT-TYPE
+        SYNTAX                         RowStatus
+        MAX-ACCESS                     read-create
+        STATUS                         current
+        DESCRIPTION
+            "The Rowstatus of the AaaSwitchAccessMgmtStationEntry."
+        ::= { aaaSwitchAccessMgmtStationEntry  4 }
+
+--
+-- Banned IP list, this table will be populated by software
+--
+
+    aaaSwitchAccessBannedIpTable OBJECT-TYPE
+        SYNTAX           SEQUENCE OF AaaSwitchAccessBannedIpEntry
+        MAX-ACCESS       not-accessible
+        STATUS           current
+        DESCRIPTION
+            "This table is populated by software for Banned Ip address."
+        ::= {aaaSwitchAccessConfig  2}
+
+    aaaSwitchAccessBannedIpEntry OBJECT-TYPE
+        SYNTAX                  AaaSwitchAccessBannedIpEntry
+        MAX-ACCESS               not-accessible
+        STATUS                   current
+        DESCRIPTION
+            "SwitchAccessManagementStation configuration."
+        INDEX  {
+                 aaaSwitchAccessBannedIpType,
+                 aaaSwitchAccessBannedIpAddress
+               }
+        ::= { aaaSwitchAccessBannedIpTable 1 }
+
+    AaaSwitchAccessBannedIpEntry   ::= SEQUENCE
+        {
+           aaaSwitchAccessBannedIpType      InetAddressType,
+           aaaSwitchAccessBannedIpAddress   InetAddress,
+           aaaSwitchAccessBannedIpRowStatus  RowStatus
+        }
+
+    aaaSwitchAccessBannedIpType   OBJECT-TYPE
+        SYNTAX                     InetAddressType
+        MAX-ACCESS                  not-accessible
+        STATUS                      current
+        DESCRIPTION
+            "IP address type of banned IP"
+        ::= { aaaSwitchAccessBannedIpEntry   1 }
+
+
+    aaaSwitchAccessBannedIpAddress   OBJECT-TYPE
+        SYNTAX                      InetAddress (SIZE (4|16))
+        MAX-ACCESS                  not-accessible
+        STATUS                      current
+        DESCRIPTION
+            "IP address of banned IP"
+        ::= { aaaSwitchAccessBannedIpEntry   2 }
+
+    aaaSwitchAccessBannedIpRowStatus  OBJECT-TYPE
+        SYNTAX       RowStatus
+        MAX-ACCESS   read-create 
+        STATUS        current
+        DESCRIPTION
+            "Rowstatus of the AaaSwitchAccessBannedIpEntry, Since this table
+             is populated by switch, only destroy action is allowed."
+        ::= { aaaSwitchAccessBannedIpEntry   3 }
+
+--
+--  Switch Access Priv mask based on session  type
+--
+
+     aaaSwitchAccessPrivMaskTable OBJECT-TYPE
+         SYNTAX        SEQUENCE OF AaaSwitchAccessPrivMaskEntry
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION
+             "This table is used to define the user privilege based on access type along with users existing privilege level."
+     ::= { aaaSwitchAccessConfig 3}
+
+    aaaSwitchAccessPrivMaskEntry OBJECT-TYPE
+        SYNTAX        AaaSwitchAccessPrivMaskEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "Priv mask configuration identified by the access type"
+        INDEX { aaaSwitchAccessType }
+        ::= { aaaSwitchAccessPrivMaskTable 1 }
+
+    AaaSwitchAccessPrivMaskEntry ::= SEQUENCE
+        {
+           aaaSwitchAccessType           INTEGER,
+           aaaSwitchAccessReadRight1     Unsigned32,
+           aaaSwitchAccessReadRight2     Unsigned32,
+           aaaSwitchAccessReadRight3     Unsigned32,
+           aaaSwitchAccessReadRight4     Unsigned32,
+           aaaSwitchAccessWriteRight1    Unsigned32,
+           aaaSwitchAccessWriteRight2    Unsigned32,
+           aaaSwitchAccessWriteRight3    Unsigned32,
+           aaaSwitchAccessWriteRight4    Unsigned32
+        }
+
+    aaaSwitchAccessType    OBJECT-TYPE
+        SYNTAX       INTEGER
+                     {
+                           console(1),
+                           telnet(2),
+                              ssh(3),
+                             http(4),
+                             https(5)
+                      }
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "Type of connection for which privilege mask should be applied for.
+             If no specific privilege is configured, by default all the mode shall have
+             all the privilege for the user."
+        ::= { aaaSwitchAccessPrivMaskEntry 1}
+
+    aaaSwitchAccessReadRight1     OBJECT-TYPE
+        SYNTAX        Unsigned32 ( 0 .. 4294967295 )
+        MAX-ACCESS    read-write 
+        STATUS        current
+        DESCRIPTION
+            "Specifies the families through the access type can execute with read right.
+            Each bit of the 32-bit integer mask represents a command's family
+            number. When the family bit is set, through the access type the user is allowed to run
+            commands of this family.First part of the bitmask.If the value is
+            not specified, the value configured for the 'default'."
+        ::= { aaaSwitchAccessPrivMaskEntry 2}
+
+    aaaSwitchAccessReadRight2    OBJECT-TYPE
+        SYNTAX        Unsigned32 ( 0 .. 4294967295 )
+        MAX-ACCESS    read-write 
+        STATUS        current
+        DESCRIPTION
+             "Specifies the families through the access type can execute with read right.
+            Each bit of the 32-bit integer mask represents a command's family
+            number. When the family bit is set, through the access type the user is allowed to run
+            commands of this family.First part of the bitmask.If the value is
+            not specified, the value configured for the 'default'."
+        ::= { aaaSwitchAccessPrivMaskEntry 3}
+
+    aaaSwitchAccessReadRight3    OBJECT-TYPE
+        SYNTAX        Unsigned32 ( 0 .. 4294967295 )
+        MAX-ACCESS    read-write 
+        STATUS        current
+        DESCRIPTION
+             "Specifies the families through the access type can execute with read right.
+            Each bit of the 32-bit integer mask represents a command's family
+            number. When the family bit is set, through the access type the user is allowed to run
+            commands of this family.First part of the bitmask.If the value is
+            not specified, the value configured for the 'default'."
+        ::= { aaaSwitchAccessPrivMaskEntry 4}
+
+    aaaSwitchAccessReadRight4    OBJECT-TYPE
+        SYNTAX        Unsigned32 ( 0 .. 4294967295 )
+        MAX-ACCESS    read-write 
+        STATUS        current
+        DESCRIPTION
+             "Specifies the families through the access type can execute with read right.
+            Each bit of the 32-bit integer mask represents a command's family
+            number. When the family bit is set, through the access type the user is allowed to run
+            commands of this family.First part of the bitmask.If the value is
+            not specified, the value configured for the 'default'."
+        ::= { aaaSwitchAccessPrivMaskEntry 5}
+
+     aaaSwitchAccessWriteRight1   OBJECT-TYPE
+        SYNTAX        Unsigned32 ( 0 .. 4294967295 )
+        MAX-ACCESS    read-write 
+        STATUS        current
+        DESCRIPTION
+            "Specifies the families through the access type can execute with read right.
+            Each bit of the 32-bit integer mask represents a command's family
+            number. When the family bit is set, through the access type the user is allowed to run
+            commands of this family.First part of the bitmask.If the value is
+            not specified, the value configured for the 'default'."
+        ::= { aaaSwitchAccessPrivMaskEntry 6}
+
+    aaaSwitchAccessWriteRight2    OBJECT-TYPE
+        SYNTAX        Unsigned32 ( 0 .. 4294967295 )
+        MAX-ACCESS    read-write 
+        STATUS        current
+        DESCRIPTION
+          "Specifies the families through the access type can execute with read right.
+            Each bit of the 32-bit integer mask represents a command's family
+            number. When the family bit is set, through the access type the user is allowed to run
+            commands of this family.First part of the bitmask.If the value is
+            not specified, the value configured for the 'default'."
+        ::= { aaaSwitchAccessPrivMaskEntry 7}
+
+    aaaSwitchAccessWriteRight3    OBJECT-TYPE
+        SYNTAX        Unsigned32 ( 0 .. 4294967295 )
+        MAX-ACCESS    read-write 
+        STATUS        current
+        DESCRIPTION
+          "Specifies the families through the access type can execute with read right.
+            Each bit of the 32-bit integer mask represents a command's family
+            number. When the family bit is set, through the access type the user is allowed to run
+            commands of this family.First part of the bitmask.If the value is
+            not specified, the value configured for the 'default'."
+        ::= { aaaSwitchAccessPrivMaskEntry 8}
+
+    aaaSwitchAccessWriteRight4    OBJECT-TYPE
+        SYNTAX        Unsigned32 ( 0 .. 4294967295 )
+        MAX-ACCESS    read-write 
+        STATUS        current
+        DESCRIPTION
+          "Specifies the families through the access type can execute with read right.
+            Each bit of the 32-bit integer mask represents a command's family
+            number. When the family bit is set, through the access type the user is allowed to run
+            commands of this family.First part of the bitmask.If the value is
+            not specified, the value configured for the 'default'."
+        ::= { aaaSwitchAccessPrivMaskEntry 9}
+
+-- END: AAA SWITCH ACCESS CONFIG-RELATED MIB---------------------
+
+
+--
+-- User profile save
+--
+
+alaAaaUserProfileSave OBJECT-TYPE
+    SYNTAX        INTEGER {
+        userProfile (1),
+        globalProfile (2)
+    }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This object is used for saving the profiles to a file.
+        userProfile (1) : when set through CLI user profile file is created at /flash/switch/.profiles location and 
+                          synced  accross Chassis/VC.
+        globalProfile (2): when set through CLI GlobalProfile.txt is generated and synced accross VC/Chassiss."
+    ::= { alaAaaProfileConfig 4 }
+
+    alaAaaCommonCriteriaConfig   OBJECT IDENTIFIER ::= { alcatelIND1AAAMIBObjects 8 }
+
+    alaAaaCommonCriteriaMode   OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        enable(1),
+                        disable(2)
+                    }
+        MAX-ACCESS read-write
+        STATUS current 
+        DESCRIPTION 
+            " Enable/Disable Common Criteria mode."
+        DEFVAL { disable }
+        ::= { alaAaaCommonCriteriaConfig 1 }
+
+--
+-- START: AAA TLS CONFIG-RELATED MIB---------------------
+--
+    alaAaaTlsConfig   OBJECT IDENTIFIER ::= { alcatelIND1AAAMIBObjects 9 }
+
+    alaAaaTlsBaseConfig   OBJECT IDENTIFIER ::= { alaAaaTlsConfig 1 }
+
+    alaAaaTlsCaFileName   OBJECT-TYPE
+        SYNTAX        SnmpAdminString (SIZE (0..255))
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Name of the CA bundle file (in PEM format) stored in /flash/switch directory."
+        ::= { alaAaaTlsBaseConfig 1 }
+
+    alaAaaTlsCrlFileName   OBJECT-TYPE
+        SYNTAX        SnmpAdminString (SIZE (0..255))
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Name of the CRL file (in PEM format) stored in /flash/switch directory."
+        ::= { alaAaaTlsBaseConfig 2 }
+
+    alaAaaTlsKeyFileName   OBJECT-TYPE
+        SYNTAX        SnmpAdminString (SIZE (0..255))
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Name of the rsa key file stored in /flash/switch directory."
+        ::= { alaAaaTlsBaseConfig 3 }
+
+    alaAaaTlsSelfSignedCert   OBJECT IDENTIFIER ::= { alaAaaTlsConfig 2 }
+
+    alaAaaTlsSelfSignedCertFileName   OBJECT-TYPE
+        SYNTAX        SnmpAdminString (SIZE (0..255))
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Name of the self-signed certificate file stored in /flash/switch directory."
+        ::= { alaAaaTlsSelfSignedCert 1 }
+
+    alaAaaTlsSelfSignedCertKeyFileName   OBJECT-TYPE
+        SYNTAX        SnmpAdminString (SIZE (0..255))
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Name of the key file file stored in /flash/switch directory."
+        ::= { alaAaaTlsSelfSignedCert 2 }
+
+    alaAaaTlsSelfSignedCertValidPeriod   OBJECT-TYPE
+        SYNTAX        Integer32 (0..3650)
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "The valid period in days of certificate."
+        ::= { alaAaaTlsSelfSignedCert 3 }
+
+    alaAaaTlsSelfSignedCertCommonName   OBJECT-TYPE
+        SYNTAX        SnmpAdminString (SIZE (0..32))
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "The certificate common name."
+        ::= { alaAaaTlsSelfSignedCert 4 }
+
+    alaAaaTlsSelfSignedCertOrgName   OBJECT-TYPE
+        SYNTAX        SnmpAdminString (SIZE (0..32))
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "The certificate organization name ."
+        ::= { alaAaaTlsSelfSignedCert 5 }
+
+    alaAaaTlsSelfSignedCertOrgUnit   OBJECT-TYPE
+        SYNTAX        SnmpAdminString (SIZE (0..32))
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "The certificate organization unit."
+        ::= { alaAaaTlsSelfSignedCert 6 }
+
+    alaAaaTlsSelfSignedCertLocality   OBJECT-TYPE
+        SYNTAX        SnmpAdminString (SIZE (0..32))
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Locality of the certificate organization."
+        ::= { alaAaaTlsSelfSignedCert 7 }
+
+    alaAaaTlsSelfSignedCertState   OBJECT-TYPE
+        SYNTAX        SnmpAdminString (SIZE (0..32))
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "The state of certificate organization."
+        ::= { alaAaaTlsSelfSignedCert 8 }
+
+    alaAaaTlsSelfSignedCertCountry   OBJECT-TYPE
+        SYNTAX        SnmpAdminString (SIZE (2))
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "The country of certificate organization."
+        ::= { alaAaaTlsSelfSignedCert 9 }
+
+    alaAaaTlsSelfSignedCertAction   OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                        create (1),
+                        delete (2)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Create/delete self-signed certificate stored in /flash/switch directory."
+        ::= { alaAaaTlsSelfSignedCert 10 }
+
+    alaAaaTlsCsr   OBJECT IDENTIFIER ::= { alaAaaTlsConfig 3 }
+
+    alaAaaTlsCsrFileName   OBJECT-TYPE
+        SYNTAX        SnmpAdminString (SIZE (0..255))
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "The domain name of csr file stored in /flash/switch directory."
+        ::= { alaAaaTlsCsr 1 }
+
+    alaAaaTlsCsrKeyFileName   OBJECT-TYPE
+        SYNTAX        SnmpAdminString (SIZE (0..255))
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Name of key file stored in /flash/switch directory."
+        ::= { alaAaaTlsCsr 2 }
+
+    alaAaaTlsCsrCommonName   OBJECT-TYPE
+        SYNTAX        SnmpAdminString (SIZE (0..32))
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "The csr common name."
+        ::= { alaAaaTlsCsr 3 }
+
+    alaAaaTlsCsrOrgName   OBJECT-TYPE
+        SYNTAX        SnmpAdminString (SIZE (0..32))
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "The csr organization name ."
+        ::= { alaAaaTlsCsr 4 }
+
+    alaAaaTlsCsrOrgUnit   OBJECT-TYPE
+        SYNTAX        SnmpAdminString (SIZE (0..32))
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "The csr organization unit."
+        ::= { alaAaaTlsCsr 5 }
+
+    alaAaaTlsCsrLocality   OBJECT-TYPE
+        SYNTAX        SnmpAdminString (SIZE (0..32))
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Locality of the certificate organization."
+        ::= { alaAaaTlsCsr 6 }
+
+    alaAaaTlsCsrState   OBJECT-TYPE
+        SYNTAX        SnmpAdminString (SIZE (0..32))
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "The state of certificate organization."
+        ::= { alaAaaTlsCsr 7 }
+
+    alaAaaTlsCsrCountry   OBJECT-TYPE
+        SYNTAX        SnmpAdminString (SIZE (2))
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "The country of certificate organization."
+        ::= { alaAaaTlsCsr 8 }
+
+    alaAaaTlsValidate   OBJECT IDENTIFIER ::= { alaAaaTlsConfig 4 }
+
+    alaAaaTlsValidateCa   OBJECT-TYPE
+        SYNTAX        SnmpAdminString (SIZE (1..255))
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Name of the CA certificate (in PEM format) used to validate."
+        ::= { alaAaaTlsValidate 1 }
+
+    alaAaaTlsValidateCert   OBJECT-TYPE
+        SYNTAX        SnmpAdminString (SIZE (1..255))
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Name of the certificate (in PEM format) needed to validate."
+        ::= { alaAaaTlsValidate 2 }
+--
+-- END: AAA TLS CONFIG-RELATED MIB---------------------
+--
+
+--
+-- Compliance Statements
+--
+
+    alcatelIND1AAAMIBCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+            "Compliance statement for
+             Authentication, Authorization, and Accounting (AAA) Subsystem."
+        MODULE  -- this module
+
+            MANDATORY-GROUPS
+            {
+                aaaServerMIBGroup,
+                aaaAuthAcctGroup,
+                aaaUserMIBGroup,
+                alaAaaClientAttrGroup,
+                alaAaaProfileObjectsGroup,
+                aaaSwitchAccessMIBGroup,
+                alaAaaCommonCriteriaGroup,
+                alaAaaTlsBaseConfigGroup,
+                alaAaaTlsSelfSignedCertGroup,
+                alaAaaTlsCsrGroup
+            }
+
+        ::= { alcatelIND1AAAMIBCompliances 1 }
+
+
+
+--
+-- Units Of Conformance
+--
+
+    aaaServerMIBGroup OBJECT-GROUP
+        OBJECTS
+        {
+            aaasProtocol,           -- Server configuration table
+            aaasHostName,
+            aaasIpAddress,
+            aaasHostName2,
+            aaasIpAddress2,
+            aaasRetries,
+            aaasTimout,
+            aaasRadKey,
+            aaasRadAuthPort,
+            aaasRadAcctPort,
+            aaasLdapPort,
+            aaasLdapDn,
+            aaasLdapPasswd,
+            aaasLdapSearchBase,
+            aaasLdapServType,
+            aaasLdapEnableSsl,
+            aaasRowStatus,
+            aaasTacacsKey,
+            aaasTacacsPort,
+            aaasVrfName,
+	        aaasRadKeyHash,
+            aaasLdapPasswdHash,
+            aaasTacacsKeyHash,
+            aaaAsaAccessMode,
+            aaaAsaAccessIpLockoutThreshold,
+            aaaAsaAccessManagementIpStatus   
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of objects for management of AAA Server."
+        ::= { alcatelIND1AAAMIBGroups 1 }
+
+
+    aaaAuthAcctGroup OBJECT-GROUP
+        OBJECTS
+        {
+            -- Authenticated switch access configuration table
+            aaatsName1,
+            aaatsName2,
+            aaatsName3,
+            aaatsName4,
+            aaatsRowStatus,
+            aaatsCertificate,
+
+            -- Accounting configuration table for switch accesses
+            aaacsName1,
+            aaacsName2,
+            aaacsName3,
+            aaacsName4,
+            aaacsRowStatus,
+
+            aaacmdSrvName1,
+            aaacmdSrvName2,
+            aaacmdSrvName3,
+            aaacmdSrvName4,
+            aaacmdRowStatus,
+
+	    -- Device Authentication
+            aaadaInterface,
+            aaadaName1,
+            aaadaName2,
+            aaadaName3,
+            aaadaName4,
+            aaadaRowStatus,
+
+            -- Configuration Device Accounting
+             aaacdName1,
+            aaacdName2,
+            aaacdName3,
+            aaacdName4,
+            aaacdRowStatus,
+            aaacdSyslogIPAddrType,      
+            aaacdSyslogIPAddr,    
+            aaacdSyslogUdpPort, 
+	    aaacdCallngStationId,
+          --   Auth Config 
+            alaAaaOnexReAuthStatus,
+            alaAaaOnexReAuthIntrvl,
+            alaAaaOnexReAuthTrustRadStatus,
+            alaAaaOnexIntrmIntrvl,
+            alaAaaOnexIntmIntvlTrstRadSts,
+            alaAaaMacIntrmIntrvl,
+            alaAaaMacIntmIntvlTrstRadStatus,
+            alaAaaMacSessTimeoutStatus,
+            alaAaaMacSessTimeoutIntrvl,
+            alaAaaMacSesTimeoutTrstRadStatus,
+            alaAaaMacInActLogoutStatus,
+            alaAaaMacInActLogoutIntrvl,
+            alaAaaCpSessTimeoutStatus,
+            alaAaaCpSessTimeoutIntrvl,
+            alaAaaCpSessTmotTrstRadStatus,
+            alaAaaCpIntrmIntrvl,
+            alaAaaCpIntmIntvlTrstRadStatus,
+            alaAaaCpInActLogoutStatus,
+            alaAaaCpInActLogoutIntrvl,
+	    alaAaaTacacsServerCmdAuthorization 
+}
+        STATUS  current
+        DESCRIPTION
+            "Collection of objects for management of AAA Authentication Accounting."
+        ::= { alcatelIND1AAAMIBGroups 2 }
+
+
+    aaaUserMIBGroup OBJECT-GROUP
+        OBJECTS
+        {
+                -- User local database configuration table
+                aaauPassword,
+                aaauReadRight1,
+                aaauReadRight2,
+                aaauWriteRight1,
+                aaauWriteRight2,
+                aaauSnmpLevel,
+                aaauSnmpAuthKey,
+                aaauRowStatus,
+                aaauOldPassword,
+                aaauPasswordExpirationDate,
+                aaauPasswordExpirationInMinute,
+                aaauPasswordAllowModifyDate,
+                aaauPasswordLockoutEnable ,
+                aaauBadAtempts,
+                aaauReadRight3,
+                aaauReadRight4,
+                aaauWriteRight3,
+                aaauWriteRight4,
+                aaaAsaPasswordSizeMin, -- ASA specific configuration MIB
+                aaaAsaDefaultPasswordExpirationInDays,
+                aaaAsaPasswordContainUserName,
+                aaaAsaPasswordMinUpperCase,
+                aaaAsaPasswordMinLowerCase,
+                aaaAsaPasswordMinDigit,
+                aaaAsaPasswordMinNonAlphan,
+                aaaAsaPasswordHistory,
+                aaaAsaPasswordMinAge,
+                aaaAsaLockoutWindow,
+                aaaAsaLockoutDuration,
+                aaaAsaLockoutThreshold,
+                aaaAsaAccessPolicyAdminConsoleOnly,
+                aaauSnmpPrivPassword 
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of objects for management of AAA User Local Database."
+        ::= { alcatelIND1AAAMIBGroups 3 }
+
+alaAaaClientAttrGroup OBJECT-GROUP
+    OBJECTS
+    {
+      alaAaaRadNasPortId,
+      alaAaaRadNasIdentifier,
+      alaAaaRadUserNameDelim,
+      alaAaaRadPasswordDelim,
+      alaAaaRadCallnStnIdDelim,
+      alaAaaRadCalldStnIdDelim,
+      alaAaaRadUserNameCase,
+      alaAaaRadPasswordCase,
+      alaAaaRadCallingStationIdCase,
+      alaAaaRadCalledStationIdCase
+    }
+    STATUS current 
+    DESCRIPTION
+      "Collection of object for AAA client attributes"
+    ::= { alcatelIND1AAAMIBGroups 4 }
+
+ alaAaaProfileObjectsGroup OBJECT-GROUP
+ OBJECTS
+{
+    -- AAA Onex/MAC/Captive Portal Profile Table 
+        alaAaaProfOnexReAuthSts,       
+        alaAaaProfOnexReAuthIntrvl,
+        alaAaaProfOnexReAuthTrstRadSts,
+        alaAaaProfOnexIntrmIntrvl,         
+        alaAaaProfOnexIntmItvlTstRadSts, 
+        alaAaaProfMacIntrmIntrvl,
+        alaAaaProfMacIntmItvlTrstRadSts,
+        alaAaaProfMacSessTimeoutSts,
+        alaAaaProfMacSessTimeoutIntrvl,
+        alaAaaProfMacSessTmoutTrstRadSts, 
+        alaAaaProfMacInActLogoutSts,    
+        alaAaaProfMacInActLogoutIntrvl,
+	    alaAaaProfCpSessTimeoutSts,
+        alaAaaProfCpSessTimeoutIntrvl,
+        alaAaaProfCpSessTmotTrstRadSts,
+        alaAaaProfCpInActLogoutSts,
+        alaAaaProfCpInActLogoutIntrvl,
+        alaAaaProfCpIntrmIntrvl,
+        alaAaaProfCpItrmIntlTrstRadSts,
+        alaAaaProfRadNasPortId,     
+        alaAaaProfRadNasIdentifier,
+        alaAaaProfRadUserNameDelim, 
+        alaAaaProfRadPasswrdDelim,
+        alaAaaProfRadCallnStnIdDelim,
+        alaAaaProfRadCalldStnIdDelim,
+        alaAaaProfRadUserNameCase,            
+        alaAaaProfRadPasswordCase, 
+        alaAaaProfRadCallnStnIdCase, 
+        alaAaaProfRadCalldStnIdCase, 
+        alaAaaProfRowStatus,
+
+        ---Profile based authenticated table objects for Onex/MAC/Captive Portal
+        alaAaaProfAuthSrvName1,   
+        alaAaaProfAuthSrvName2, 
+        alaAaaProfAuthSrvName3,
+        alaAaaProfAuthSrvName4, 
+        alaAaaProfAuthRowStatus, 
+        ---Profile based accounting  table objects for Onex/MAC/Captive Portal
+        alaAaaProfAcctSrvName1, 
+        alaAaaProfAcctSrvName2,    
+        alaAaaProfAcctSrvName3,    
+        alaAaaProfAcctSrvName4,   
+        alaAaaProfAcctSyslogIPAddrType,  
+        alaAaaProfAcctSyslogIPAddr,     
+        alaAaaProfAcctSyslogUdpPort,   
+	alaAaaProfAcctCalingStationId,
+        alaAaaProfAcctRowStatus,
+        ---User Profile save object
+        alaAaaUserProfileSave
+    }
+    STATUS current 
+    DESCRIPTION
+      "Collection of AAA profile objects"
+    ::= { alcatelIND1AAAMIBGroups 5 }
+
+    aaaSwitchAccessMIBGroup OBJECT-GROUP
+        OBJECTS
+        {
+           aaaSwitchAccessMgmtStationRowStatus,
+           aaaSwitchAccessBannedIpRowStatus,
+           aaaSwitchAccessReadRight1,
+           aaaSwitchAccessReadRight2,
+           aaaSwitchAccessReadRight3,
+           aaaSwitchAccessReadRight4,
+           aaaSwitchAccessWriteRight1,
+           aaaSwitchAccessWriteRight2,
+           aaaSwitchAccessWriteRight3,
+           aaaSwitchAccessWriteRight4
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of objects for management of AAA Switch Access."
+        ::= { alcatelIND1AAAMIBGroups 6 }
+
+    alaAaaCommonCriteriaGroup  OBJECT-GROUP
+        OBJECTS
+        {
+           alaAaaCommonCriteriaMode
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of objects for common criteria."
+        ::= { alcatelIND1AAAMIBGroups 7 }
+
+     alaAaaTlsBaseConfigGroup OBJECT-GROUP
+        OBJECTS
+        {
+            alaAaaTlsCaFileName,
+            alaAaaTlsCrlFileName,
+            alaAaaTlsKeyFileName
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of objects for management of AAA TLS base configuration."
+        ::= { alcatelIND1AAAMIBGroups 8 }
+
+     alaAaaTlsSelfSignedCertGroup OBJECT-GROUP
+        OBJECTS
+        {
+            alaAaaTlsSelfSignedCertFileName,
+            alaAaaTlsSelfSignedCertKeyFileName,
+            alaAaaTlsSelfSignedCertValidPeriod,
+            alaAaaTlsSelfSignedCertCommonName,
+            alaAaaTlsSelfSignedCertOrgName,
+            alaAaaTlsSelfSignedCertOrgUnit,
+            alaAaaTlsSelfSignedCertLocality,
+            alaAaaTlsSelfSignedCertState,
+            alaAaaTlsSelfSignedCertCountry,
+            alaAaaTlsSelfSignedCertAction
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of objects for management of AAA TLS self-signed certificate."
+        ::= { alcatelIND1AAAMIBGroups 9 }
+
+     alaAaaTlsCsrGroup OBJECT-GROUP
+        OBJECTS
+        {
+            alaAaaTlsCsrFileName,
+            alaAaaTlsCsrKeyFileName,
+            alaAaaTlsCsrCommonName,
+            alaAaaTlsCsrOrgName,
+            alaAaaTlsCsrOrgUnit,
+            alaAaaTlsCsrLocality,
+            alaAaaTlsCsrState,
+            alaAaaTlsCsrCountry
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of objects for management of AAA TLS CSR."
+        ::= { alcatelIND1AAAMIBGroups 10 }
+
+     alaAaaTlsValidateGroup OBJECT-GROUP
+        OBJECTS
+        {
+            alaAaaTlsValidateCa,
+            alaAaaTlsValidateCert
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of objects for certificate validation."
+        ::= { alcatelIND1AAAMIBGroups 11 }
+
+END

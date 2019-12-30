@@ -215,14 +215,14 @@ if (!empty($argv[1])) {
     }
 } else {
     c_echo(
-        "\n" . Config::get('project_name_version') . ' Add Host Tool
+        "\n". Config::get('project_name').' Add Host Tool
 
     Usage (SNMPv1/2c)    : ./addhost.php [-g <poller group>] [-f] [-b] [-p <port assoc mode>] <%Whostname%n> [community] [v1|v2c] [port] [' . $transports_regex . ']
     Usage (SNMPv3)       :
         Config Defaults  : ./addhost.php [-g <poller group>] [-f] [-b] [-p <port assoc mode>] <%Whostname%n> any v3 [user] [port] [' . $transports_regex . ']
         No Auth, No Priv : ./addhost.php [-g <poller group>] [-f] [-b] [-p <port assoc mode>] <%Whostname%n> nanp v3 [user] [port] [' . $transports_regex . ']
         Auth, No Priv    : ./addhost.php [-g <poller group>] [-f] [-b] [-p <port assoc mode>] <%Whostname%n> anp v3 <user> <password> [md5|sha] [port] [' . $transports_regex . ']
-        Auth,    Priv    : ./addhost.php [-g <poller group>] [-f] [-b] [-p <port assoc mode>] <%Whostname%n> ap v3 <user> <password> <enckey> [md5|sha] [aes|dsa] [port] [' . $transports_regex . ']
+        Auth,    Priv    : ./addhost.php [-g <poller group>] [-f] [-b] [-p <port assoc mode>] <%Whostname%n> ap v3 <user> <password> <enckey> [md5|sha] [aes|des] [port] [' . $transports_regex . ']
     Usage (ICMP only)    : ./addhost.php [-g <poller group>] [-f] -P <%Whostname%n> [os] [hardware]
 
     -g <poller group> allows you to add a device to be pinned to a specific poller when using distributed polling. X can be any number associated with a poller group

@@ -93,6 +93,8 @@ class RunAlerts
         $obj['ip']            = inet6_ntop($device['ip']);
         $obj['hardware']      = $device['hardware'];
         $obj['version']       = $device['version'];
+        $obj['serial']        = $device['serial'];
+        $obj['features']      = $device['features'];
         $obj['location']      = $device['location'];
         $obj['uptime']        = $device['uptime'];
         $obj['uptime_short']  = Time::formatInterval($device['uptime'], 'short');

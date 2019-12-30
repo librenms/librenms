@@ -30,11 +30,10 @@ namespace LibreNMS\Tests;
 use App\Models\Device;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
-use Log;
+use LibreNMS\Tests\Feature\SnmpTraps\SnmpTrapTestCase;
 
-class JnxCmCfgChangeTest extends LaravelTestCase
+class JnxCmCfgChangeTest extends SnmpTrapTestCase
 {
-
     public function testConfigChangeTrap()
     {
 

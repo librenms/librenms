@@ -7,13 +7,14 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use LibreNMS\Authentication\LegacyAuth;
+use Permissions;
 
 class User extends Authenticatable
 {
     use Notifiable;
 
     protected $primaryKey = 'user_id';
-    protected $fillable = ['realname', 'username', 'email', 'level', 'descr', 'can_modify_passwd', 'auth_type', 'auth_id'];
+    protected $fillable = ['realname', 'username', 'email', 'level', 'descr', 'can_modify_passwd', 'auth_type', 'auth_id', 'enabled'];
     protected $hidden = ['password', 'remember_token', 'pivot'];
     protected $attributes = [ // default values
         'descr' => '',
@@ -83,7 +84,7 @@ class User extends Authenticatable
      */
     public function canAccessDevice($device)
     {
-        return $this->hasGlobalRead() || $this->devices->contains($device);
+        return $this->hasGlobalRead() || Permissions::canAccessDevice($device, $this->user_id);
     }
 
     /**
@@ -158,6 +159,20 @@ class User extends Authenticatable
         $this->attributes['can_modify_passwd'] = $modify ? 1 : 0;
     }
 
+    public function setEnabledAttribute($enable)
+    {
+        $this->attributes['enabled'] = $enable ? 1 : 0;
+    }
+
+    public function getDevicesAttribute()
+    {
+        // pseudo relation
+        if (!array_key_exists('devices', $this->relations)) {
+            $this->setRelation('devices', $this->devices()->get());
+        }
+        return $this->getRelation('devices');
+    }
+
     // ---- Define Relationships ----
 
     public function apiToken()
@@ -167,11 +182,15 @@ class User extends Authenticatable
 
     public function devices()
     {
-        if ($this->hasGlobalRead()) {
-            return Device::query();
-        } else {
-            return $this->belongsToMany('App\Models\Device', 'devices_perms', 'user_id', 'device_id');
-        }
+        // pseudo relation
+        return Device::query()->when(!$this->hasGlobalRead(), function ($query) {
+            return $query->whereIn('device_id', Permissions::devicesForUser($this));
+        });
+    }
+
+    public function deviceGroups()
+    {
+        return $this->belongsToMany('App\Models\DeviceGroup', 'devices_group_perms', 'user_id', 'device_group_id');
     }
 
     public function ports()

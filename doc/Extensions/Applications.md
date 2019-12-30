@@ -88,6 +88,7 @@ by following the steps under the `SNMP Extend` heading.
 1. [Apache](#apache) - SNMP extend, Agent
 1. [Asterisk](#asterisk) - SNMP extend
 1. [BIND9/named](#bind9-aka-named) - SNMP extend, Agent
+1. [Certificate](#certificate) - Certificate extend
 1. [C.H.I.P.](#chip) - SNMP extend
 1. [DHCP Stats](#dhcp-stats) - SNMP extend
 1. [Entropy](#entropy) - SNMP extend
@@ -121,6 +122,7 @@ by following the steps under the `SNMP Extend` heading.
 1. [Proxmox](#proxmox) - SNMP extend
 1. [Raspberry PI](#raspberry-pi) - SNMP extend
 1. [SDFS info](#sdfs-info) - SNMP extend
+1. [Seafile](#seafile) - SNMP extend
 1. [SMART](#smart) - SNMP extend
 1. [Squid](#squid) - SNMP proxy
 1. [TinyDNS/djbdns](#tinydns-aka-djbdns) - Agent
@@ -231,7 +233,7 @@ Extend` heading top of page.
 
 1: Create stats file with appropriate permissions:
 
-```shell
+```bash
 ~$ touch /var/run/named/stats
 ~$ chown bind:bind /var/run/named/stats
 ```
@@ -335,12 +337,47 @@ via `wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/
 
 3: Set the variable 'agent' to '1' in the config.
 
+# Certificate
+
+A small python3 script that checks age and remaining validity of certificates
+
+This script needs following packages on Debian/Ubuntu Systems:
+* python3
+* python3-openssl
+
+Content of an example /etc/snmp/certificate.json . Please edit with your own settings.
+```
+{"domains": [
+    {"fqdn": "www.mydomain.com"},
+    {"fqdn": "some.otherdomain.org",
+     "port": 8443},
+    {"fqdn": "personal.domain.net"}
+]
+}
+```
+Key 'domains' contains a list of domains to check.
+Optional you can define a port. By default it checks on port 443.
+
+## SNMP Extend
+1. Copy the shell script to the desired host.
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/certificate.py -O /etc/snmp/certificate.py
+```
+
+2. Run `chmod +x /etc/snmp/certificate.py`
+
+3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+```
+extend certificate /etc/snmp/certificate.py
+```
+4. Restart snmpd on your host
+
+The application should be auto-discovered as described at the top of the page. If it is not, please follow the steps set out under `SNMP Extend` heading top of page.
+
 # C.H.I.P
 
 C.H.I.P. is a $9 R8 based tiny computer ideal for small projects.
 Further details: <https://getchip.com/pages/chip>
-
-## SNMP Extend
 
 1: Copy the shell script to the desired host.
 
@@ -877,8 +914,8 @@ $mysql_port = 3306;
 
 Note that depending on your MySQL installation (chrooted install for example),
 you may have to specify 127.0.0.1 instead of localhost. Localhost make
-a MySQL connexion via the mysql socket, while 127.0.0.1 make a standard
-IP connexion to mysql.
+a MySQL connection via the mysql socket, while 127.0.0.1 make a standard
+IP connection to mysql.
 
 5: Edit your snmpd.conf file and add:
 
@@ -1423,7 +1460,7 @@ extend raspberry /etc/snmp/raspberry.sh
 4: Edit your sudo users (usually `visudo`) and add at the bottom:
 
 ```
-snmp ALL=(ALL) NOPASSWD: /etc/snmp/raspberry.sh, /usr/bin/vcgencmd*
+snmp ALL=(ALL) NOPASSWD: /etc/snmp/raspberry.sh, /usr/bin/vcgencmd
 ```
 
 **Note:** If you are using Raspian, the default user is
@@ -1431,6 +1468,56 @@ snmp ALL=(ALL) NOPASSWD: /etc/snmp/raspberry.sh, /usr/bin/vcgencmd*
 the user snmpd is using with `ps aux | grep snmpd`
 
 5: Restart snmpd on PI host
+
+# Seafile
+
+SNMP extend script to monitor your Seafile Server
+
+## SNMP Extend
+
+1: Copy the Python script, seafile.py, to the desired host. `wget
+https://github.com/librenms/librenms-agent/raw/master/snmp/seafile.py -O
+/etc/snmp/seafile.py`
+
+Also you have to install the requests Package for Python3.
+Under Ubuntu/Debian just run `apt install python3-requests`
+
+2: Run `chmod +x /etc/snmp/seafile.py`
+
+3: Edit your snmpd.conf file and add:
+
+```
+extend seafile /etc/snmp/seafile.py
+```
+
+4: You will also need to create the config file, which is named
+seafile.json . The script has to be located at /etc/snmp/.
+
+
+```
+{"url": "https://seafile.mydomain.org",
+ "username": "some_admin_login@mail.address",
+ "password": "password",
+ "account_identifier": "name"
+ "hide_monitoring_account": true
+}
+```
+
+The variables are as below.
+
+```
+url = Url how to get access to Seafile Server
+username = Login to Seafile Server.
+           It is important that used Login has admin privileges.
+           Otherwise most API calls will be denied.
+password = Password to the configured login.
+account_identifier = Defines how user accounts are listed in RRD Graph.
+                     Options are: name, email
+hide_monitoring_account = With this Boolean you can hide the Account which you
+                          use to access Seafile API
+```
+
+**Note:**It is recommended to use a dedicated Administrator account for monitoring.
 
 # SMART
 
@@ -1563,14 +1650,14 @@ adjust this path if necessary.
 1: Replace your _log_'s `run` file, typically located in
    `/service/dns/log/run` with:
 
-```shell
+```bash
 #!/bin/sh
 exec setuidgid dnslog tinystats ./main/tinystats/ multilog t n3 s250000 ./main/
 ```
 
 2: Create tinystats directory and chown:
 
-```shell
+```bash
 mkdir /service/dns/log/main/tinystats
 chown dnslog:nofiles /service/dns/log/main/tinystats
 ```

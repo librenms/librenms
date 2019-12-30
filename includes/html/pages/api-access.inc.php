@@ -116,11 +116,11 @@ echo '
     </div>
   </div>
 ';
-if ($_SESSION['api_token'] === true) {
+if (Session::get('api_token') === true) {
     echo "<script>
       $('#thanks').html('<div class=\"alert alert-info\">The API token has been added.</div>');</script>
     ";
-    unset($_SESSION['api_token']);
+    Session::forget('api_token');
 }
 
 echo '

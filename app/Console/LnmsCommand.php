@@ -34,6 +34,17 @@ abstract class LnmsCommand extends Command
 {
     protected $developer = false;
 
+    /**
+     * Create a new command instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->setDescription(__('commands.' . $this->getName() . '.description'));
+    }
+
     public function isHidden()
     {
         return $this->hidden || ($this->developer && $this->getLaravel()->environment() !== 'production');

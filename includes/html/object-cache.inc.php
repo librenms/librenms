@@ -5,13 +5,6 @@
 // It would be interesting to know where this is used.  It probably should have its own API.
 use LibreNMS\ObjectCache;
 
-foreach (dbFetchRows('SELECT * FROM `devices` ORDER BY `hostname`') as $device) {
-    $cache['devices']['hostname'][$device['hostname']] = $device['device_id'];
-    $cache['devices']['id'][$device['device_id']]      = $device;
-
-    $cache['device_types'][$device['type']]++;
-}
-
 $devices  = new ObjectCache('devices');
 $ports    = new ObjectCache('ports');
 $services = new ObjectCache('services');

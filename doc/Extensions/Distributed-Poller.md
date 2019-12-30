@@ -214,7 +214,6 @@ $config['distributed_poller_memcached_host'] = "example.com";
 $config['distributed_poller_memcached_port'] = 11211;
 $config['distributed_poller']                = true;
 $config['rrdcached']                         = "example.com:42217";
-$config['update']                            = 0;
 ```
 
 `/etc/cron.d/librenms`
@@ -242,7 +241,6 @@ $config['distributed_poller_memcached_host'] = "example.com";
 $config['distributed_poller_memcached_port'] = 11211;
 $config['distributed_poller']                = true;
 $config['rrdcached']                         = "example.com:42217";
-$config['update']                            = 0;
 ```
 
 `/etc/cron.d/librenms`
@@ -268,7 +266,6 @@ $config['distributed_poller_memcached_host'] = "example.com";
 $config['distributed_poller_memcached_port'] = 11211;
 $config['distributed_poller']                = true;
 $config['rrdcached']                         = "example.com:42217";
-$config['update']                            = 0;
 ```
 
 `/etc/cron.d/librenms`

@@ -1,0 +1,455 @@
+-- *****************************************************************
+-- UBQS-LAG-MIB.: Ubiquoss LAG MIB      
+--
+-- Dec 2010,   Park Hyung Eun
+--   
+-- Copyright (c) 2010 by Ubiquoss, Corp.
+-- All rights reserved.
+-- *****************************************************************
+--   
+
+UBQS-LAG-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    NOTIFICATION-TYPE,
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP,
+    NOTIFICATION-GROUP,
+        FROM SNMPv2-CONF
+    TEXTUAL-CONVENTION,
+    RowStatus,
+        FROM SNMPv2-TC
+    ifIndex, InterfaceIndex,
+        FROM IF-MIB   
+	DisplayString, 		
+		FROM RFC1213-MIB 
+    UbiPortList,
+  FROM UBQS-TC           
+    ubiMgmtv2
+        FROM UBQS-SMI;                                     
+  
+
+ubiLagMIB MODULE-IDENTITY
+    LAST-UPDATED    "201012070000Z"
+    ORGANIZATION  "Ubiquoss Corp."
+ CONTACT-INFO
+  " Ubiquoss
+   Customer Service
+
+   Postal: 24F Milennium B/D,
+    467-12, Dogok-Dong,
+   GangNam-Gu, Seoul 135-270
+   Korea
+
+     Tel: 82-2-2190-3100"     
+ DESCRIPTION
+        "Link Aggregation MIB module for managing 802.3ad"
+    ::= { ubiMgmtv2 16 }
+
+ 
+ 
+-- *****************************************************************
+-- Textual Conventions
+-- *****************************************************************
+    UbiLagList ::= TEXTUAL-CONVENTION
+     STATUS  current
+     DESCRIPTION
+      "The type of aggregation load-balance"
+     SYNTAX  BITS
+     {
+      src-mac(1),
+   dst-mac(2),
+   src-dst-mac(3),
+   src-ip(4),
+   dst-ip(5),
+   src-dst-ip(6),
+   src-port(7),
+   dst-port(8),
+   src-dst-port(9)       
+     }       
+
+-- *****************************************************************
+-- ubiLagMIBObjects
+-- *****************************************************************
+
+ubiLagMIBNotificationsPrefix   OBJECT IDENTIFIER  ::= { ubiLagMIB 0 }
+ubiLagMIBObjects      OBJECT IDENTIFIER  ::= { ubiLagMIB 1 }        
+ubiLagMIBConformance     OBJECT IDENTIFIER  ::= { ubiLagMIB 2 }
+                                                                       
+                                                                       
+                                                                       
+ubiAgg        OBJECT IDENTIFIER  ::= { ubiLagMIBObjects 1 }                                                                         
+                                                                    
+                
+-- *****************************************************************
+-- ubiLagNotification
+-- *****************************************************************
+                                                                      
+ubiBackupIntfMIBNotifications	OBJECT IDENTIFIER ::= { ubiLagMIBNotificationsPrefix 1 }
+
+	ubiBackupIntfSwitchover	NOTIFICATION-TYPE
+		OBJECTS {                                     
+			ubiReduIfIndex,  
+     		ubiReduBackupIfIndex,
+     		ubiReduIfName,
+     		ubiReduLink,
+     		ubiReduMode,
+     		ubiReduRvt,
+     		ubiReduBackupIf
+   		}
+		STATUS	current
+		DESCRIPTION
+			"Backup Interface Switchover Notifiaction"
+		::= { ubiBackupIntfMIBNotifications 1 }
+                                                                    
+                
+-- *****************************************************************
+-- ubiAggTable
+-- *****************************************************************
+
+ ubiAggTable OBJECT-TYPE
+  SYNTAX          SEQUENCE OF UbiAggEntry 
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+         "A table that contains the generic aggregation 
+         information."
+     ::= { ubiAgg 1 }
+
+   ubiAggEntry OBJECT-TYPE
+     SYNTAX          UbiAggEntry
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+         "A list of information for each aggregation."
+     INDEX           { ubiLagAggId } 
+     ::= { ubiAggTable 1 }
+            
+   UbiAggEntry ::= SEQUENCE {
+         ubiAggId               Integer32,       
+         ubiAggDelete   INTEGER
+        }
+
+   ubiAggId OBJECT-TYPE
+     SYNTAX          Integer32
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+         "Aggregation ID" 
+     ::= { ubiAggEntry 1 }                 
+            
+   ubiAggDelete OBJECT-TYPE
+     SYNTAX          INTEGER  {
+      none(0),
+      set(1)
+     }
+     MAX-ACCESS      read-write
+     STATUS          current
+     DESCRIPTION
+         "Remove the particular aggregation. If it is success 
+          to remove the entry, the corresponding port information 
+          is deleted from ubiAggPortTable." 
+     ::= { ubiAggEntry 2 }                    
+                                                          
+-- *****************************************************************
+-- ubiAggPortTable
+-- *****************************************************************
+
+ ubiAggPortTable OBJECT-TYPE
+  SYNTAX          SEQUENCE OF UbiAggPortEntry 
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+         "A table that contains the aggregation port 
+         information."
+     ::= { ubiAgg 2 }
+
+   ubiAggPortEntry OBJECT-TYPE
+     SYNTAX          UbiAggPortEntry
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+         "A list of information for each aggregation port."
+     INDEX           { ubiLagAggId, ifIndex } 
+     ::= { ubiAggPortTable 1 }
+
+   
+   UbiAggPortEntry ::= SEQUENCE {
+         ubiAggPortAggMode  INTEGER,   
+         ubiAggPortRowStatus  RowStatus   
+        }
+     
+   ubiAggPortAggMode OBJECT-TYPE
+     SYNTAX          INTEGER { 
+      other(1),      -- none of the following 
+      on(2),  
+      off(3),
+      active(4),
+      passive(5)
+     }
+     MAX-ACCESS      read-create
+     STATUS          current
+     DESCRIPTION
+         "The mode of aggregation that needed to create 
+          the particular aggregation and set the aggregation 
+          port." 
+     ::= { ubiAggPortEntry 1 }
+    
+    ubiAggPortRowStatus OBJECT-TYPE
+     SYNTAX          RowStatus
+     MAX-ACCESS      read-create
+     STATUS          current
+     DESCRIPTION
+         "The status of aggregation row.
+          The createAndGo(4)can create the aggregation and 
+          set the particular port to that aggregation.
+          The destroy(6) can unset the particular port from the aggregation.
+          If you want to remove the aggregation, set ubiAggDelete." 
+     ::= { ubiAggPortEntry 2 }
+                                           
+-- *****************************************************************
+-- ubiLagLoadBalanceTable
+-- *****************************************************************
+    ubiLagLoadBalanceTable OBJECT-TYPE
+  SYNTAX          SEQUENCE OF UbiLagLoadBalanceEntry
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+         "A table that contains the aggregation load-balance 
+         information."
+     ::= { ubiAgg 3 }
+   
+   ubiLagLoadBalanceEntry OBJECT-TYPE
+     SYNTAX          UbiLagLoadBalanceEntry
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+         "A list of information for aggregation load-balance."
+        INDEX           { ubiLagLoadBalanceAggId } 
+     ::= { ubiLagLoadBalanceTable 1 }
+ 
+   UbiLagLoadBalanceEntry ::= SEQUENCE {
+     ubiLagLoadBalanceAggId  INTEGER,
+     ubiLagLoadBalanceMode   UbiLagList
+   }
+
+   ubiLagLoadBalanceAggId  OBJECT-TYPE
+     SYNTAX   INTEGER(0..256)
+     MAX-ACCESS  not-accessible
+     STATUS   current
+     DESCRIPTION
+      "This object consists of two cases.
+       First case is '0' that means global configuration. 
+       In this case, all ports inside a switch are affected by 
+       load-balance configured globally.
+       Second case is '1-256' that means aggregator id.
+       In this case, load-balance configuration affects 
+       particular port only.
+       Two case couldn't be used together."
+     ::= { ubiLagLoadBalanceEntry 1 }
+     
+ ubiLagLoadBalanceMode  OBJECT-TYPE
+  SYNTAX   UbiLagList
+  MAX-ACCESS  read-write
+  STATUS   current
+  DESCRIPTION
+   "The mode of port-group load-balance"
+  ::= { ubiLagLoadBalanceEntry 2 }
+
+-- *****************************************************************
+-- ubiRedundancyPort
+-- *****************************************************************                                                  
+ubiRedundancyPort OBJECT IDENTIFIER ::= { ubiLagMIBObjects 2 } 
+
+-- *****************************************************************
+-- ubiRedundancyPortTable
+-- *****************************************************************
+    ubiRedundancyPortTable OBJECT-TYPE
+  SYNTAX          SEQUENCE OF UbiRedundancyPortEntry
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+         "A table that contains the redundancy port 
+         information."
+     ::= { ubiRedundancyPort 1 }
+
+     ubiRedundancyPortEntry OBJECT-TYPE
+     SYNTAX          UbiRedundancyPortEntry
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+         "A list of information for redundancy prot."
+        INDEX           { ubiReduIfIndex } 
+     ::= { ubiRedundancyPortTable 1 }
+
+   UbiRedundancyPortEntry ::= SEQUENCE {
+     ubiReduIfIndex    	InterfaceIndex,  
+     ubiReduBackupIfIndex               InterfaceIndex,
+     ubiReduIfName    	DisplayString,
+     ubiReduLink     	INTEGER,
+     ubiReduMode     	INTEGER,
+     ubiReduRvt     	INTEGER,
+     ubiReduBackupIf    DisplayString,
+     ubiReduStatus    	INTEGER,
+     ubiReduWtr    	INTEGER,
+     ubiReduHoldoff   INTEGER,
+     ubiReduRowStatus   RowStatus
+   }
+ 
+   ubiReduIfIndex  OBJECT-TYPE
+     SYNTAX   InterfaceIndex
+     MAX-ACCESS  read-only
+     STATUS   current
+     DESCRIPTION
+      "Ifindex of Backup Interface"
+     ::= { ubiRedundancyPortEntry 1 }
+
+    ubiReduBackupIfIndex  OBJECT-TYPE
+     SYNTAX   InterfaceIndex
+     MAX-ACCESS  read-write
+     STATUS   current
+     DESCRIPTION
+      "Backup Interce Ifindex"
+     ::= { ubiRedundancyPortEntry 2 }
+
+   ubiReduIfName  OBJECT-TYPE
+     SYNTAX   DisplayString
+     MAX-ACCESS  read-only
+     STATUS   current
+     DESCRIPTION
+      "interface name of Backup Interface"
+     ::= { ubiRedundancyPortEntry 3 }
+
+   ubiReduLink   OBJECT-TYPE
+     SYNTAX   INTEGER
+     MAX-ACCESS  read-only
+     STATUS   current
+     DESCRIPTION
+      "Link of Backup interface
+       1 : up
+       2 : down
+      "
+     ::= { ubiRedundancyPortEntry 4 }
+  
+   ubiReduMode   OBJECT-TYPE
+     SYNTAX   INTEGER
+     MAX-ACCESS  read-only
+     STATUS   current
+     DESCRIPTION
+      "mode of backup interface
+       0 : none
+       1 : primary
+       2 : secondary
+      "
+     ::= { ubiRedundancyPortEntry 5 }     
+     
+   ubiReduRvt   OBJECT-TYPE
+     SYNTAX   INTEGER
+     MAX-ACCESS  read-only
+     STATUS   current
+     DESCRIPTION
+      "revert mode of backup interface
+       0 : Off
+       1 : On
+      "
+     ::= { ubiRedundancyPortEntry 6 }     
+     
+   ubiReduBackupIf  OBJECT-TYPE
+     SYNTAX   DisplayString
+     MAX-ACCESS  read-only
+     STATUS   current
+     DESCRIPTION
+      "backup interface name of backup interface"
+     ::= { ubiRedundancyPortEntry 7 }
+     
+   ubiReduStatus  OBJECT-TYPE
+     SYNTAX   INTEGER
+     MAX-ACCESS  read-only
+     STATUS   current
+     DESCRIPTION
+      "state of backup interface
+      0 : none
+      1 : normal operation
+      2 : backup mode
+      3 : wait to backup
+      4 : wait to revert
+      5 : both down
+      6 : disable
+      "
+     ::= { ubiRedundancyPortEntry 8 }
+                                                    
+   ubiReduWtr   OBJECT-TYPE
+     SYNTAX   INTEGER
+     MAX-ACCESS  read-write
+     STATUS   current
+     DESCRIPTION
+      "Wtr of backup interface
+      1..720 : Set
+      0 : Unset
+      "
+     ::= { ubiRedundancyPortEntry 9 }
+
+   ubiReduHoldoff   OBJECT-TYPE
+     SYNTAX   INTEGER
+     MAX-ACCESS  read-write
+     STATUS   current
+     DESCRIPTION
+      "Holdoff of backup interface
+      1..10 : Set
+      0 : Unset"
+     ::= { ubiRedundancyPortEntry 10 }
+
+   ubiReduRowStatus  OBJECT-TYPE
+     SYNTAX   RowStatus
+     MAX-ACCESS  read-create
+     STATUS   current
+     DESCRIPTION
+      "The status of backup interface row.
+       The createAndGo(4)can create the backup interface and 
+       set the particular port to that backup interface.
+       The destroy(6) can unset the particular port from the backup interface.
+       If you want to remove the backup interface, set backup interface Delete."
+     ::= { ubiRedundancyPortEntry 11 }
+     
+-- *****************************************************************
+-- ubiLagMIBConformance
+-- *****************************************************************
+
+-- Conformance Information
+ubiLagMIBCompliances   OBJECT IDENTIFIER  ::= { ubiLagMIBConformance 1 }
+ubiLagMIBGroups    OBJECT IDENTIFIER  ::= { ubiLagMIBConformance 2 }
+
+
+-- compliance statements
+
+ ubiLagMIBCompliance MODULE-COMPLIANCE
+     STATUS          current
+     DESCRIPTION
+         "The compliance statement for Lag implementations."
+     MODULE          -- this module
+     MANDATORY-GROUPS {      
+        ubiAggGroup       
+        }
+     ::= { ubiLagMIBCompliances 1 }
+
+-- units of conformance
+
+ ubiAggGroup OBJECT-GROUP
+     OBJECTS         {     
+      ubiAggDelete,
+      ubiAggId,   
+         ubiAggAdminStatus,   
+         ubiAggRowStatus  
+        }
+     STATUS          current
+     DESCRIPTION
+         "A collection of objects that provide aggregation 
+          creation or deletion."
+     ::= { ubiLagMIBGroups 1 }
+
+END
+
+ 

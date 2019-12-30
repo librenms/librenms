@@ -7,6 +7,7 @@ use Fico7489\Laravel\Pivot\Traits\PivotEventTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Query\JoinClause;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
@@ -14,6 +15,7 @@ use LibreNMS\Util\IPv4;
 use LibreNMS\Util\IPv6;
 use LibreNMS\Util\Url;
 use LibreNMS\Util\Time;
+use Permissions;
 
 class Device extends BaseModel
 {
@@ -33,12 +35,14 @@ class Device extends BaseModel
     public static function boot()
     {
         parent::boot();
+        self::loadAllOs(true);
 
         static::deleting(function (Device $device) {
             // delete related data
             $device->ports()->delete();
             $device->syslogs()->delete();
             $device->eventlogs()->delete();
+            $device->applications()->delete();
 
             // handle device dependency updates
             $device->children->each->updateMaxDepth($device->device_id);
@@ -203,6 +207,44 @@ class Device extends BaseModel
     }
 
     /**
+     * Load all OS, optionally load just the OS used by existing devices
+     * Default cache time is 1 day. Controlled by os_def_cache_time.
+     *
+     * @param bool $existing Only load OS that have existing OS in the database
+     * @param bool $cached Load os definitions from the cache file
+     */
+    public static function loadAllOs($existing = false, $cached = true)
+    {
+        $install_dir = \LibreNMS\Config::get('install_dir');
+        $cache_file = $install_dir . '/cache/os_defs.cache';
+        if ($cached && is_file($cache_file) && (time() - filemtime($cache_file) < \LibreNMS\Config::get('os_def_cache_time'))) {
+            // Cached
+            $os_defs = unserialize(file_get_contents($cache_file));
+            if ($existing) {
+                // remove unneeded os
+                $os_defs = array_diff_key($os_defs, self::distinct('os')->get('os')->toArray());
+            }
+            \LibreNMS\Config::set('os', array_replace_recursive($os_defs, \LibreNMS\Config::get('os')));
+        } else {
+            // load from yaml
+            if ($existing) {
+                $os_list = [];
+                foreach (self::distinct('os')->get('os')->toArray() as $os) {
+                    $os_list[] = $install_dir . '/includes/definitions/' . $os['os'] . '.yaml';
+                }
+            } else {
+                $os_list = glob($install_dir . '/includes/definitions/*.yaml');
+            }
+            foreach ($os_list as $file) {
+                if (is_readable($file)) {
+                    $tmp = \Symfony\Component\Yaml\Yaml::parse(file_get_contents($file));
+                    \LibreNMS\Config::set("os.{$tmp['os']}", array_replace_recursive($tmp, \LibreNMS\Config::get("os.{$tmp['os']}", [])));
+                }
+            }
+        }
+    }
+
+    /**
      * Get the shortened display name of this device.
      * Length is always overridden by shorthost_target_length.
      *
@@ -243,9 +285,7 @@ class Device extends BaseModel
             return true;
         }
 
-        return DB::table('devices_perms')
-            ->where('user_id', $user->user_id)
-            ->where('device_id', $this->device_id)->exists();
+        return Permissions::canAccessDevice($this->device_id, $user->user_id);
     }
 
     public function formatUptime($short = false)
@@ -332,6 +372,45 @@ class Device extends BaseModel
         }
 
         $this->save();
+    }
+
+    public function getAttrib($name)
+    {
+        return $this->attribs->pluck('attrib_value', 'attrib_type')->get($name);
+    }
+
+    public function setAttrib($name, $value)
+    {
+        $attrib = $this->attribs->first(function ($item) use ($name) {
+            return $item->attrib_type === $name;
+        });
+
+        if (!$attrib) {
+            $attrib = new DeviceAttrib(['attrib_type' => $name]);
+            $this->attribs->push($attrib);
+        }
+
+        $attrib->attrib_value = $value;
+        return (bool)$this->attribs()->save($attrib);
+    }
+
+    public function forgetAttrib($name)
+    {
+        $attrib_index = $this->attribs->search(function ($attrib) use ($name) {
+            return $attrib->attrib_type === $name;
+        });
+
+        if ($attrib_index !== false) {
+            $this->attribs->forget($attrib_index);
+            return (bool)$this->attribs->get($attrib_index)->delete();
+        }
+
+        return false;
+    }
+
+    public function getAttribs()
+    {
+        return $this->attribs->pluck('attrib_value', 'attrib_type')->toArray();
     }
 
     // ---- Accessors/Mutators ----
@@ -443,6 +522,11 @@ class Device extends BaseModel
     public function alerts()
     {
         return $this->hasMany('App\Models\Alert', 'device_id');
+    }
+
+    public function attribs()
+    {
+        return $this->hasMany('App\Models\DeviceAttrib', 'device_id');
     }
 
     public function alertSchedules()
@@ -604,6 +688,11 @@ class Device extends BaseModel
     {
         // FIXME does not include global read
         return $this->belongsToMany('App\Models\User', 'devices_perms', 'device_id', 'user_id');
+    }
+
+    public function vrfLites()
+    {
+        return $this->hasMany('App\Models\VrfLite', 'device_id');
     }
 
     public function vrfs()

@@ -3,7 +3,7 @@ path: blob/master/doc/
 
 # Example hardware setups
 
-The information in this document is direct from users, it's a place for people to share their 
+The information in this document is direct from users, it's a place for people to share their
 setups so you have an idea of what may be required for your install.
 
 To obtain the device, port and sensor counts you can run:

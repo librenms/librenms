@@ -1,0 +1,675 @@
+-- *****************************************************************
+-- UBQS-MPLS-MIB : Ubiquoss MPLS MIB
+--   
+-- Jun 2011,  Park Hyung Eun
+--
+-- Copyright (c) 2011 by Ubiquoss, Corp.
+--   
+-- All rights reserved.
+-- ***************************************************************
+
+UBQS-MPLS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,            
+    Unsigned32,
+    Integer32,
+    NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP,
+    NOTIFICATION-GROUP
+        FROM SNMPv2-CONF         
+    InetAddress, 
+    InetAddressType,
+    InetAddressPrefixLength,    
+    InetAddressPrefixLength
+    	FROM INET-ADDRESS-MIB     
+    IpAddress,
+    RowStatus,
+    TimeStamp,
+    DisplayString,    
+    TruthValue,       
+    MacAddress,
+    TEXTUAL-CONVENTION
+    	FROM SNMPv2-TC       	 
+    InterfaceIndex                     
+    	FROM IF-MIB    
+   mplsStdMIB, MplsLSPID, MplsLabel, MplsBitRate,
+   MplsOwner
+      FROM MPLS-TC-STD-MIB                               -- [RFC3811]   
+   ubiMplsGroupMIB
+        FROM UBQS-SMI;
+
+
+ubiMplsMIB MODULE-IDENTITY
+        LAST-UPDATED    "201106220000Z"
+        ORGANIZATION 	"Ubiquoss Corp."
+	    CONTACT-INFO
+		"	Ubiquoss
+			Customer Service
+
+		 Postal: 24F Milennium B/D,
+		 	467-12, Dogok-Dong,
+			GangNam-Gu, Seoul 135-270
+			Korea
+
+		   Tel: 82-2-2190-3100"   
+    DESCRIPTION
+        "This MIB module defines the MPLS protocol."
+     ::= { ubiMplsGroupMIB 1 }
+
+
+
+-- ***********************************************************
+-- Textual Conventions
+-- ***********************************************************          
+
+	UbiMplsOpcode ::= TEXTUAL-CONVENTION
+          STATUS      current
+          DESCRIPTION
+             "This enumeration defines the operation code for MPLS. 
+              The values are defined as follows:
+             
+              other(0) - None of the following.
+              push(1) - Add a label onto the label stack.
+              pop(2) - The top label is removed.
+              swap(3) - The top label in the label stack 
+                       is replaced with another.
+              "
+          SYNTAX  INTEGER {      
+          			other(0),
+                    push(1),
+                    pop(2),
+                    swap(3),
+                    pop_for_vpn(4),
+                    dlvr_to_ip(5),     
+                    push_and_lookup(6),
+                    push_for_vc(7),
+                    push_and_lookup_for_vc(8),
+                 	pop_for_vc(9),
+                 	swap_and_lookup(10),
+                 	mpls_no_op(11),
+                 	ftn_lookup(12)
+                }
+                              
+                              
+-- ***************************************************************
+--   ubiMplsMIB
+-- ***************************************************************
+ubiMplsMIBNotificationPrefix  	OBJECT IDENTIFIER		::= { ubiMplsMIB 0 } 
+ubiMplsMIBObjects  				OBJECT IDENTIFIER		::= { ubiMplsMIB 1 }     
+ubiMplsMIBConformance  			OBJECT IDENTIFIER		::= { ubiMplsMIB 2 }
+        
+            
+ubiMplsGlobal					OBJECT IDENTIFIER		::= { ubiMplsMIBObjects 1 } 
+ubiMplsTrace					OBJECT IDENTIFIER		::= { ubiMplsMIBObjects 10 } 	                   
+ubiLspTraceSend					OBJECT IDENTIFIER		::= { ubiMplsTrace 1 } 
+ubiLspTraceResult				OBJECT IDENTIFIER		::= { ubiMplsTrace 2 } 
+                                                                                     
+                                                                                     
+ -- ***************************************************************
+--   ubiPwMIBNotificationPrefix
+-- ***************************************************************
+ubiMplsMIBNotifications  	OBJECT IDENTIFIER		::= { ubiMplsMIBNotificationPrefix 1 }  
+
+	ubiLspTraceSendCompletion NOTIFICATION-TYPE
+    	OBJECTS         { 
+    			ubiLSPTraceSendCompleted		        
+    	}
+    	STATUS          current
+    	DESCRIPTION
+        	""
+   	::= { ubiMplsMIBNotifications 1 }
+
+                                           
+-- ***********************************************************
+-- ubiMplsGlobal
+-- ***********************************************************
+                                            
+    -- ***********************************************************
+-- ubiMplsInterfaceTable
+-- ***********************************************************   
+	ubiMplsInterfaceTable OBJECT-TYPE
+    	SYNTAX          SEQUENCE OF UbiMplsInterfaceEntry 
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	""
+    	::= { ubiMplsMIBObjects 2 }
+
+	ubiMplsInterfaceEntry OBJECT-TYPE
+    	SYNTAX          UbiMplsInterfaceEntry
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	""
+    	INDEX  { ifIndex } 
+    	::= { ubiMplsInterfaceTable 1 }
+
+	UbiMplsInterfaceEntry ::= SEQUENCE {         
+			ubiMplsIfLabelSpace			INTEGER
+	}
+  
+	ubiMplsIfLabelSpace OBJECT-TYPE
+    	SYNTAX          INTEGER {
+    		none(-1),
+    		perPlatform(0)            		-- TODO perInterface    
+     	}
+    	MAX-ACCESS      read-write
+    	STATUS          current    
+    	DESCRIPTION
+        	""  
+	   	::= { ubiMplsInterfaceEntry 1 }   
+                             
+          
+          
+-- ***********************************************************
+-- ubiMplsFtnTable
+-- ***********************************************************   
+	ubiMplsFtnTable OBJECT-TYPE
+    	SYNTAX          SEQUENCE OF UbiMplsFtnEntry 
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	""
+    	::= { ubiMplsMIBObjects 3 }
+
+	ubiMplsFtnEntry OBJECT-TYPE
+    	SYNTAX          UbiMplsFtnEntry
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	""
+    	INDEX  { ubiMplsFtnIndex } 
+    	::= { ubiMplsFtnTable 1 }
+
+	UbiMplsFtnEntry ::= SEQUENCE {         
+			ubiMplsFtnIndex				Integer32,
+			ubiMplsFtnFecAddress		IpAddress,
+			ubiMplsFtnFecPrefixLen		InetAddressPrefixLength,
+			ubiMplsFtnTunnelId		 	Integer32,    
+			ubiMplsFtnOpcode			UbiMplsOpcode,
+			ubiMplsFtnOutLabel		 	MplsLabel,      
+			ubiMplsFtnOutIfIndex		Integer32,     
+			ubiMplsFtnNexthopAddress	IpAddress,     
+			ubiMplsFtnOwner		     	MplsOwner,
+ 			ubiMplsFtnLspType 			INTEGER, 	
+ 			ubiMplsFtnRowStatus 		RowStatus   
+ 			
+ 	}
+  
+	ubiMplsFtnIndex OBJECT-TYPE
+    	SYNTAX          Integer32
+    	MAX-ACCESS      not-accessible
+    	STATUS          current    
+    	DESCRIPTION
+        	""  
+	   	::= { ubiMplsFtnEntry 1 }   
+         
+	ubiMplsFtnFecAddress OBJECT-TYPE
+    	SYNTAX          IpAddress
+    	MAX-ACCESS      read-write
+    	STATUS          current    
+    	DESCRIPTION
+        	""  
+	   	::= { ubiMplsFtnEntry 2 }   
+        
+	ubiMplsFtnFecPrefixLen OBJECT-TYPE
+    	SYNTAX          InetAddressPrefixLength
+    	MAX-ACCESS      read-write
+    	STATUS          current    
+    	DESCRIPTION
+        	""  
+	   	::= { ubiMplsFtnEntry 3 }     
+	   	                 
+	ubiMplsFtnTunnelId OBJECT-TYPE
+    	SYNTAX          Integer32
+    	MAX-ACCESS      read-create
+    	STATUS          current    
+    	DESCRIPTION
+        	""  
+	   	::= { ubiMplsFtnEntry 4 }   
+
+	ubiMplsFtnOpcode OBJECT-TYPE
+    	SYNTAX          UbiMplsOpcode
+    	MAX-ACCESS      read-only
+    	STATUS          current    
+    	DESCRIPTION
+        	"This enumeration defines the operation code for MPLS. 
+              The values are defined as follows:
+             
+              other(0) - None of the following.
+              push(1) - Add a label onto the label stack.
+              pop(2) - The top label is removed.
+              swap(3) - The top label in the label stack 
+                       is replaced with another.
+			"  
+	   	::= { ubiMplsFtnEntry 5 }  
+     
+	ubiMplsFtnOutLabel OBJECT-TYPE
+    	SYNTAX          MplsLabel
+    	MAX-ACCESS      read-write
+    	STATUS          current    
+    	DESCRIPTION
+        	""  
+	   	::= { ubiMplsFtnEntry 6 }   
+
+	ubiMplsFtnOutIfIndex OBJECT-TYPE
+    	SYNTAX          Integer32
+    	MAX-ACCESS      read-write
+    	STATUS          current    
+    	DESCRIPTION
+        	""  
+	   	::= { ubiMplsFtnEntry 7 }      
+     
+	ubiMplsFtnNexthopAddress OBJECT-TYPE
+    	SYNTAX          IpAddress
+    	MAX-ACCESS      read-write
+    	STATUS          current    
+    	DESCRIPTION
+        	""  
+	   	::= { ubiMplsFtnEntry 8 }   
+	   	       
+	ubiMplsFtnOwner OBJECT-TYPE
+    	SYNTAX          MplsOwner 
+    	MAX-ACCESS      read-write
+    	STATUS          current    
+    	DESCRIPTION
+        	"The values of
+              this enumeration are defined as follows:
+
+              unknown(1) - the local network management
+              subsystem cannot discern which
+              component created the object.
+
+              other(2) - the local network management
+              subsystem is able to discern which component
+              created the object, but the component is not
+              listed within the following choices,
+              e.g., command line interface (cli).
+
+              snmp(3) - The Simple Network Management Protocol
+              was used to configure this object initially.
+
+              ldp(4) - The Label Distribution Protocol was
+              used to configure this object initially.
+
+              crldp(5) - The Constraint-Based Label Distribution
+              Protocol was used to configure this object
+              initially.
+
+              rsvpTe(6) - The Resource Reservation Protocol was
+              used to configure this object initially.
+
+              policyAgent(7) - A policy agent (perhaps in
+              combination with one of the above protocols) was
+              used to configure this object initially.
+
+              An object created by any of the above choices
+              MAY be modified or destroyed by the same or a
+              different choice."  
+	   	::= { ubiMplsFtnEntry 9 } 
+
+ 	ubiMplsFtnLspType OBJECT-TYPE
+    	SYNTAX          INTEGER {
+    	       none(0),
+    	       primary(1),
+    	       secondary(2)
+    	}
+    	MAX-ACCESS      read-write
+    	STATUS          current    
+    	DESCRIPTION
+        	""  
+	   	::= { ubiMplsFtnEntry 10 }    
+  
+	ubiMplsFtnRowStatus OBJECT-TYPE
+    	SYNTAX          RowStatus
+    	MAX-ACCESS      read-create
+    	STATUS          current    
+    	DESCRIPTION
+        	""  
+	   	::= { ubiMplsFtnEntry 11 }   
+
+
+-- ***********************************************************
+-- ubiMplsIlmTable
+-- ***********************************************************   
+	ubiMplsIlmTable OBJECT-TYPE
+    	SYNTAX          SEQUENCE OF UbiMplsIlmEntry 
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	""
+    	::= { ubiMplsMIBObjects 4 }
+
+	ubiMplsIlmEntry OBJECT-TYPE
+    	SYNTAX          UbiMplsIlmEntry
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	""
+    	INDEX  { ubiMplsIlmIndex } 
+    	::= { ubiMplsIlmTable 1 }
+
+	UbiMplsIlmEntry ::= SEQUENCE {         
+			ubiMplsIlmIndex				Integer32,
+			ubiMplsIlmFecAddress		IpAddress,
+			ubiMplsIlmFecPrefixLen		InetAddressPrefixLength,
+			ubiMplsIlmOpcode			UbiMplsOpcode,
+			ubiMplsIlmInLabel		 	MplsLabel,   
+			ubiMplsIlmInIfIndex			Integer32,
+			ubiMplsIlmOutLabel		 	MplsLabel,   
+			ubiMplsIlmOutIfIndex		Integer32,  
+			ubiMplsIlmNexthopAddress	IpAddress,     
+			ubiMplsIlmOwner		     	MplsOwner,
+ 			ubiMplsIlmLspType 			INTEGER, 	
+ 			ubiMplsIlmRowStatus 		RowStatus   
+ 			
+ 	}
+  
+	ubiMplsIlmIndex OBJECT-TYPE
+    	SYNTAX          Integer32
+    	MAX-ACCESS      not-accessible
+    	STATUS          current    
+    	DESCRIPTION
+        	""  
+	   	::= { ubiMplsIlmEntry 1 }   
+         
+	ubiMplsIlmFecAddress OBJECT-TYPE
+    	SYNTAX          IpAddress
+    	MAX-ACCESS      read-create
+    	STATUS          current    
+    	DESCRIPTION
+        	""  
+	   	::= { ubiMplsIlmEntry 2 }   
+        
+	ubiMplsIlmFecPrefixLen OBJECT-TYPE
+    	SYNTAX          InetAddressPrefixLength
+    	MAX-ACCESS      read-create
+    	STATUS          current    
+    	DESCRIPTION
+        	""  
+	   	::= { ubiMplsIlmEntry 3 }     
+
+	ubiMplsIlmOpcode OBJECT-TYPE
+    	SYNTAX          UbiMplsOpcode
+    	MAX-ACCESS      read-only
+    	STATUS          current    
+    	DESCRIPTION
+        	"This enumeration defines the operation code for MPLS. 
+              The values are defined as follows:
+             
+              other(0) - None of the following.
+              push(1) - Add a label onto the label stack.
+              pop(2) - The top label is removed.
+              swap(3) - The top label in the label stack 
+                       is replaced with another.
+			"  
+	   	::= { ubiMplsIlmEntry 4 }   
+	   	                 
+	ubiMplsIlmInLabel OBJECT-TYPE
+    	SYNTAX          MplsLabel
+    	MAX-ACCESS      read-create
+    	STATUS          current    
+    	DESCRIPTION
+        	""  
+	   	::= { ubiMplsIlmEntry 5 }   
+ 
+ 	ubiMplsIlmInIfIndex OBJECT-TYPE
+    	SYNTAX          Integer32
+    	MAX-ACCESS      read-create
+    	STATUS          current    
+    	DESCRIPTION
+        	""  
+	   	::= { ubiMplsIlmEntry 6 }    
+     
+	ubiMplsIlmOutLabel OBJECT-TYPE
+    	SYNTAX          MplsLabel
+    	MAX-ACCESS      read-create
+    	STATUS          current    
+    	DESCRIPTION
+        	""  
+	   	::= { ubiMplsIlmEntry 7 }        
+	   	
+ 	ubiMplsIlmOutIfIndex OBJECT-TYPE
+    	SYNTAX          Integer32
+    	MAX-ACCESS      read-create
+    	STATUS          current    
+    	DESCRIPTION
+        	""  
+	   	::= { ubiMplsIlmEntry 8 }    
+   
+	ubiMplsIlmNexthopAddress OBJECT-TYPE
+    	SYNTAX          IpAddress
+    	MAX-ACCESS      read-write
+    	STATUS          current    
+    	DESCRIPTION
+        	""  
+	   	::= { ubiMplsIlmEntry 9 }   
+	   	     
+	ubiMplsIlmOwner OBJECT-TYPE
+    	SYNTAX          MplsOwner 
+    	MAX-ACCESS      read-only
+    	STATUS          current    
+    	DESCRIPTION
+        	"The values of
+              this enumeration are defined as follows:
+
+              unknown(1) - the local network management
+              subsystem cannot discern which
+              component created the object.
+
+              other(2) - the local network management
+              subsystem is able to discern which component
+              created the object, but the component is not
+              listed within the following choices,
+              e.g., command line interface (cli).
+
+              snmp(3) - The Simple Network Management Protocol
+              was used to configure this object initially.
+
+              ldp(4) - The Label Distribution Protocol was
+              used to configure this object initially.
+
+              crldp(5) - The Constraint-Based Label Distribution
+              Protocol was used to configure this object
+              initially.
+
+              rsvpTe(6) - The Resource Reservation Protocol was
+              used to configure this object initially.
+
+              policyAgent(7) - A policy agent (perhaps in
+              combination with one of the above protocols) was
+              used to configure this object initially.
+
+              An object created by any of the above choices
+              MAY be modified or destroyed by the same or a
+              different choice."  
+	   	::= { ubiMplsIlmEntry 10 } 
+
+ 	ubiMplsIlmLspType OBJECT-TYPE
+    	SYNTAX          INTEGER {
+    	       none(0),
+    	       primary(1),
+    	       secondary(2)
+    	}
+    	MAX-ACCESS      read-write
+    	STATUS          current    
+    	DESCRIPTION
+        	""  
+	   	::= { ubiMplsIlmEntry 11 }    
+  
+	ubiMplsIlmRowStatus OBJECT-TYPE
+    	SYNTAX          RowStatus
+    	MAX-ACCESS      read-create
+    	STATUS          current    
+    	DESCRIPTION
+        	""  
+	   	::= { ubiMplsIlmEntry 12 }   
+
+
+-- ***********************************************************
+-- ubiMplsTraceSend
+-- ***********************************************************   
+
+	ubiLspTraceSendFecType OBJECT-TYPE
+    	SYNTAX          INTEGER {
+    	 	none(0),
+    	 	ldp(1),
+    	 	rsvp(2),
+    	 	ipv4(3),
+    	 	ipv6(4)
+    	}
+    	MAX-ACCESS      read-write
+    	STATUS          current    
+    	DESCRIPTION
+        	""  
+	   	::= { ubiLspTraceSend 1 }  
+
+	ubiLspTraceSendTargetType OBJECT-TYPE
+    	SYNTAX          INTEGER {
+    	 	none(0),
+    	 	ipv4(1),
+    	 	ipv6(2),
+    	 	rsvp_tunnel(3)
+    	}
+    	MAX-ACCESS      read-write
+    	STATUS          current    
+    	DESCRIPTION
+        	""  
+	   	::= { ubiLspTraceSend 2 }  
+
+	ubiLspTraceSendTarget OBJECT-TYPE
+    	SYNTAX          OCTET STRING
+    	MAX-ACCESS      read-write
+    	STATUS          current    
+    	DESCRIPTION
+        	""  
+	   	::= { ubiLspTraceSend 3 }  
+                   
+   	ubiLspTraceSrcAddr OBJECT-TYPE
+    	SYNTAX          OCTET STRING
+    	MAX-ACCESS      read-write
+    	STATUS          current    
+    	DESCRIPTION
+        	""  
+	   	::= { ubiLspTraceSend 4 }  
+          
+	ubiLspTraceSendForceExplicitNull OBJECT-TYPE
+    	SYNTAX          TruthValue
+    	MAX-ACCESS      read-write
+    	STATUS          current    
+    	DESCRIPTION
+        	""  	   	
+        ::= { ubiLspTraceSend 5 }  
+                    
+	ubiLspTraceSendExecute OBJECT-TYPE
+    	SYNTAX          INTEGER  {
+    		send(1)
+    	}
+    	MAX-ACCESS      read-write
+    	STATUS          current    
+    	DESCRIPTION
+        	""  
+	   	::= { ubiLspTraceSend 15 }  
+                 
+                 
+ -- ***********************************************************
+-- ubiLspTraceResult
+-- ***********************************************************   
+	ubiLspTraceSendCompleted OBJECT-TYPE
+    	SYNTAX          INTEGER {
+			success(1),
+			fail(2)
+    	}
+    	MAX-ACCESS      read-only
+    	STATUS          current    
+    	DESCRIPTION
+        	""  
+	   	::= { ubiLspTraceResult 1 }  
+       
+ -- Table        
+	ubiMplsTraceResultTable OBJECT-TYPE
+    	SYNTAX          SEQUENCE OF UbiMplsTraceResultEntry 
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	""
+    	::= { ubiLspTraceResult 2 }
+
+	ubiMplsTraceResultEntry OBJECT-TYPE
+    	SYNTAX          UbiMplsTraceResultEntry
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	""
+    	INDEX  { ubiMplsLspTraceResultIndex } 
+    	::= { ubiMplsTraceResultTable 1 }
+
+	UbiMplsTraceResultEntry ::= SEQUENCE {         
+			ubiLspTraceResultIndex				Integer32,
+			ubiLspTraceResultInLabel			MplsLabel,       
+			ubiLspTraceResultHopAddr		InetAddress 		
+ 	}
+  
+	ubiLspTraceResultIndex OBJECT-TYPE
+    	SYNTAX          Integer32
+    	MAX-ACCESS      not-accessible
+    	STATUS          current    
+    	DESCRIPTION
+        	""  
+	   	::= { ubiMplsTraceResultEntry 1 }   
+               
+	ubiLspTraceResultInLabel OBJECT-TYPE
+    	SYNTAX          MplsLabel
+    	MAX-ACCESS      read-only
+    	STATUS          current    
+    	DESCRIPTION
+        	""  
+	   	::= { ubiMplsTraceResultEntry 2 }   
+
+	ubiLspTraceResultHopAddr OBJECT-TYPE
+    	SYNTAX          InetAddress
+    	MAX-ACCESS      read-only
+    	STATUS          current    
+    	DESCRIPTION
+        	""  
+	   	::= { ubiMplsTraceResultEntry 3 }   
+                                          
+                                          
+-- ***********************************************************
+-- ubiMplsMIBConformance
+-- ***********************************************************
+ubiMplsMIBCompliances  	OBJECT IDENTIFIER		::= { ubiMplsMIBConformance 1 }
+ubiMplsMIBGroups  	 	OBJECT IDENTIFIER		::= { ubiMplsMIBConformance 2 }
+-- Compliance
+
+	ubiMplsMIBCompliance MODULE-COMPLIANCE
+    	STATUS          current
+    	DESCRIPTION
+        	"The compliance statement for entities which
+        	implement the UBQS-MPLS-MIB"
+   	 	MODULE          -- this module
+    	MANDATORY-GROUPS {  
+    			ubiMplsMIBGroup
+        }  
+        GROUP    ubiMplsMIBGroup
+        DESCRIPTION 
+        	"The ubiMplsMIBGroup is applicable for implementations which
+ 			need to get the MPLS information."    
+     	::= { ubiMplsMIBCompliances 1 }
+
+
+	ubiMplsMIBGroup OBJECT-GROUP
+    	OBJECTS         {     
+    	}   
+    	STATUS          current
+    	DESCRIPTION
+        	"A collection of objects containing
+        	information about the MPLS information."
+    	::= { ubiMplsMIBGroups 1 }
+    	                               
+    	                               
+END

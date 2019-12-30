@@ -126,9 +126,8 @@ function discover_device(&$device, $force_module = false)
 
     $valid = array();
     // Reset $valid array
-    $attribs = get_dev_attribs($device['device_id']);
+    $attribs = DeviceCache::getPrimary()->getAttribs();
     $device['attribs'] = $attribs;
-    $device['snmp_max_repeaters'] = $attribs['snmp_max_repeaters'];
 
     $device_start = microtime(true);
     // Start counting device poll time
@@ -914,6 +913,9 @@ function get_device_divisor($device, $os_version, $sensor_type, $oid)
         }
     } elseif ($device['os'] == 'huaweiups') {
         if ($sensor_type == 'frequency') {
+            if (starts_with($device['hardware'], "UPS2000")) {
+                return 10;
+            }
             return 100;
         }
     } elseif ($device['os'] == 'hpe-rtups') {

@@ -20,7 +20,13 @@ class MysqlAuthorizer extends AuthorizerBase
         $username = $credentials['username'] ?? null;
         $password = $credentials['password'] ?? null;
 
-        $hash = User::thisAuth()->where(['username' => $username])->value('password');
+        $user_data = User::thisAuth()->where(['username' => $username])->select('password', 'enabled')->first();
+        $hash = $user_data->password;
+        $enabled = $user_data->enabled;
+
+        if (! $enabled) {
+            throw new AuthenticationException($message = 'login denied');
+        }
 
         // check for old passwords
         if (strlen($hash) == 32) {
@@ -138,6 +144,7 @@ class MysqlAuthorizer extends AuthorizerBase
         // could be used on cli, use Eloquent helper
         Eloquent::DB()->table('bill_perms')->where('user_id', $user_id)->delete();
         Eloquent::DB()->table('devices_perms')->where('user_id', $user_id)->delete();
+        Eloquent::DB()->table('devices_group_perms')->where('user_id', $user_id)->delete();
         Eloquent::DB()->table('ports_perms')->where('user_id', $user_id)->delete();
         Eloquent::DB()->table('users_prefs')->where('user_id', $user_id)->delete();
 

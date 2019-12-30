@@ -1,0 +1,804 @@
+-- *****************************************************************
+-- UBQS-ERPS-MIB: Ubiquoss ERPS MIB      
+--
+-- Nov 2010,   Park Hyung Eun
+--   
+-- Copyright (c) 2010 by Ubiquoss, Corp.
+-- All rights reserved.
+-- *****************************************************************
+--   
+
+UBQS-ERPS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    NOTIFICATION-TYPE,
+    Counter32,
+    IpAddress,
+    Gauge32,
+    Integer32,
+    Unsigned32
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP,
+    NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    TEXTUAL-CONVENTION,
+    RowStatus,
+    DisplayString,
+    TruthValue,
+        FROM SNMPv2-TC
+    ifIndex,
+        FROM IF-MIB     
+    VlanIndex,
+    	FROM Q-BRIDGE-MIB   
+    ubiSysMacAddr,
+    	FROM UBQS-SYSTEM-MIB
+    Dot1agCfmMaintDomainName,
+    Dot1agCfmMaintAssocName,
+    	FROM UBQS-CFM-MIB		 
+    UbiBridgeId,
+        FROM UBQS-TC
+    ubiMgmtv2
+        FROM UBQS-SMI;
+
+
+ubiErpsMIB MODULE-IDENTITY
+    LAST-UPDATED    "201011290000Z"
+    ORGANIZATION 	"Ubiquoss Corp."
+	CONTACT-INFO
+		"	Ubiquoss
+			Customer Service
+
+		 Postal: 24F Milennium B/D,
+		 	467-12, Dogok-Dong,
+			GangNam-Gu, Seoul 135-270
+			Korea
+
+		   Tel: 82-2-2190-3100"     
+	DESCRIPTION
+        ""      
+    ::= { ubiMgmtv2 11 }
+
+ 
+ 
+-- *****************************************************************
+-- Textual Conventions
+-- *****************************************************************
+          
+          
+-- *****************************************************************
+-- ubiERPSMIB
+-- *****************************************************************
+ubiErpsMIBNotificationPrefix  	OBJECT IDENTIFIER		::= { ubiErpsMIB 0 }   
+ubiErpsMIBObjects  				OBJECT IDENTIFIER		::= { ubiErpsMIB 1 }   
+ubiErpsMIBConformance  			OBJECT IDENTIFIER		::= { ubiErpsMIB 2 }   
+         
+         
+ubiErpsGlobal					OBJECT IDENTIFIER		::= { ubiErpsMIBObjects 4 }                   
+ubiErpsNotificationEnables      OBJECT IDENTIFIER		::= { ubiErpsMIBObjects 5 }
+
+
+-- *****************************************************************
+-- ubiCfmNotifications
+-- *****************************************************************
+ubiErpsMIBNotifications  OBJECT IDENTIFIER				::= { ubiErpsMIBNotificationPrefix 0 }
+
+	ubiErpsRingStateChange NOTIFICATION-TYPE
+    	OBJECTS         { 
+    					  ubiSysMacAddr,
+    					  ubiErpsSwitchBridgeId,
+    					  ubiErpsSwitchRingId,    
+    					  ubiErpsSwitchCurrentState,
+    					  ubiErpsSwitchEastIf,
+    					  ubiErpsSwitchEastIfState,
+    					  ubiErpsSwitchWestIf,
+    					  ubiErpsSwitchWestIfState,
+    					 }
+    	STATUS          current
+    	DESCRIPTION
+        	"Notification of ERPS State Change."
+   	::= { ubiErpsMIBNotifications 1 }             
+   	
+	ubiErpsRingEastIfStateChange NOTIFICATION-TYPE
+    	OBJECTS         { 
+    					  ubiSysMacAddr,
+    					  ubiErpsSwitchBridgeId,
+    					  ubiErpsSwitchRingId,    
+    					  ubiErpsSwitchEastIf,
+    					  ubiErpsSwitchEastIfState
+    					}
+    	STATUS          current
+    	DESCRIPTION
+        	"Notification of East Ring Port State Change."
+   	::= { ubiErpsMIBNotifications 2 }
+   	
+	ubiErpsRingWestIfStateChange NOTIFICATION-TYPE
+    	OBJECTS         { 
+    					  ubiSystemMacAddr,
+    					  ubiErpsSwitchBridgeId,
+    					  ubiErpsSwitchRingId,    
+    					  ubiErpsSwitchWestIf,
+    					  ubiErpsSwitchWestIfState
+    					 }
+    	STATUS          current
+    	DESCRIPTION
+        	"Notification of West Ring Port State Change."
+   	::= { ubiErpsMIBNotifications 3 }
+
+         
+-- *****************************************************************
+-- ubiErpsBaseTable
+-- *****************************************************************          
+
+	ubiErpsBaseTable OBJECT-TYPE
+		SYNTAX          SEQUENCE OF UbiErpsBaseEntry 
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"The table of ERPS Base information."
+    	::= { ubiErpsMIBObjects 1 }
+
+  	ubiErpsBaseEntry OBJECT-TYPE
+    	SYNTAX          UbiErpsBaseEntry
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"The entry of ERPS Base information."
+    	INDEX           { ubiErpsBaseBridgeId, ubiErpsBaseRingId, 
+    					  ubiErpsBaseEastIf, ubiErpsBaseWestIf, 
+    					  ubiErpsBaseInstId  } 
+    	::= { ubiErpsBaseTable 1 }
+
+  	
+  	UbiErpsBaseEntry ::= SEQUENCE {      
+ 	       	ubiErpsBaseBridgeId			UbiBridgeId, 	
+	       	ubiErpsBaseRingId			Integer32,     
+	       	ubiErpsBaseEastIf			Integer32,
+	       	ubiErpsBaseWestIf			Integer32,     
+	       	ubiErpsBaseInstId			Integer32,
+        	ubiErpsBaseRowStatus       	RowStatus           
+        }
+
+  	ubiErpsBaseBridgeId OBJECT-TYPE
+    	SYNTAX          UbiBridgeId
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"ERPS Base Bridge ID." 
+    	::= { ubiErpsBaseEntry 1 }
+
+	ubiErpsBaseRingId OBJECT-TYPE
+    	SYNTAX      Integer32
+    	MAX-ACCESS  read-only
+   	 	STATUS      current
+    	DESCRIPTION
+      	 	"ERPS Base Ring ID."
+    	::= { ubiErpsBaseEntry 2 }
+  
+	ubiErpsBaseEastIf OBJECT-TYPE
+    	SYNTAX      Integer32
+    	MAX-ACCESS  read-only
+    	STATUS      current
+    	DESCRIPTION
+       		"ERPS Base East Ring port."
+        ::= { ubiErpsBaseEntry 3 }
+  
+	ubiErpsBaseWestIf OBJECT-TYPE
+    	SYNTAX      Integer32
+    	MAX-ACCESS  read-only
+    	STATUS      current
+    	DESCRIPTION
+       		"ERPS Base West Ring port."
+        ::= { ubiErpsBaseEntry 4 }
+  
+	ubiErpsBaseInstId OBJECT-TYPE
+  		SYNTAX      Integer32
+		MAX-ACCESS  read-only
+  	  	STATUS      current
+    	DESCRIPTION
+       		"ERPS Base Instance ID."
+    	::= { ubiErpsBaseEntry 5 }
+                        
+	ubiErpsBaseRowStatus OBJECT-TYPE
+    	SYNTAX      RowStatus
+    	MAX-ACCESS  read-create
+    	STATUS      current
+    	DESCRIPTION
+       		"The status of the row."
+    	::= { ubiErpsBaseEntry 6 }
+ 
+ 
+-- *****************************************************************
+-- ubiErpsVlanTable
+-- *****************************************************************          
+
+	ubiErpsVlanTable OBJECT-TYPE
+		SYNTAX          SEQUENCE OF UbiErpsVlanEntry 
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"The table of ERPS Vlan information."
+    	::= { ubiErpsMIBObjects 2 }
+
+  	ubiErpsVlanEntry OBJECT-TYPE
+    	SYNTAX          UbiErpsVlanEntry
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"The entry of ERPS Vlan information."
+    	INDEX           { ubiErpsBaseBridgeId, ubiErpsBaseRingId, 
+    					  ubiErpsVlanVlanId, ubiErpsVlanServiceVlan } 
+    	::= { ubiErpsVlanTable 1 }
+
+  	
+  	UbiErpsVlanEntry ::= SEQUENCE {   
+            ubiErpsVlanVlanId   			VlanIndex,      
+            ubiErpsVlanServiceVlanType		INTEGER,
+        	ubiErpsVlanRowStatus       		RowStatus           
+        }  
+        
+	ubiErpsVlanVlanId OBJECT-TYPE
+    	SYNTAX      VlanIndex
+    	MAX-ACCESS  read-only
+    	STATUS      current
+    	DESCRIPTION
+       		"Vlan ID."
+        ::= { ubiErpsVlanEntry 1 }
+  
+	ubiErpsVlanServiceVlanType OBJECT-TYPE
+  		SYNTAX      INTEGER {
+  			service_vlan(1),
+  			protected_vlan(2)
+  		}
+		MAX-ACCESS  read-only
+  	  	STATUS      current
+    	DESCRIPTION
+       		"ERPS Vlan Type.
+       		  service_vlan(1) - Control Vlan
+       		  protected_vlan(2) - Service Valn"
+    	::= { ubiErpsVlanEntry 2 }
+                                                         
+	ubiErpsVlanRowStatus OBJECT-TYPE
+    	SYNTAX      RowStatus
+    	MAX-ACCESS  read-create
+    	STATUS      current
+    	DESCRIPTION
+       		"The status of the row."
+    	::= { ubiErpsVlanEntry 3 }
+ 
+   
+ 
+-- *****************************************************************
+-- ubiErpsSwitchTable
+-- *****************************************************************          
+
+	ubiErpsSwitchTable OBJECT-TYPE
+		SYNTAX          SEQUENCE OF UbiErpsSwitchEntry 
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"The table of ERPS Switch information."
+    	::= { ubiErpsMIBObjects 3 }
+
+  	ubiErpsSwitchEntry OBJECT-TYPE
+    	SYNTAX          UbiErpsSwitchEntry
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"The entry of ERPS Switch information."
+    	INDEX           { ubiErpsSwitchBridgeId, ubiErpsSwitchRingId } 
+    	::= { ubiErpsSwitchTable 1 }
+
+         
+  	UbiErpsSwitchEntry ::= SEQUENCE {      
+ 	       	ubiErpsSwitchBridgeId			UbiBridgeId, 	
+	       	ubiErpsSwitchRingId				Integer32,      		 
+			ubiErpsSwitchVersion       		INTEGER,
+ 			ubiErpsSwitchNodeType   		INTEGER,   
+ 	       	ubiErpsSwitchEastIf				Integer32,
+	       	ubiErpsSwitchWestIf				Integer32,   
+	       	ubiErpsSwitchEastIfState		INTEGER,
+	       	ubiErpsSwitchWestIfState		INTEGER,   	       				
+ 			ubiErpsSwitchRingProtectionLink INTEGER,
+ 			ubiErpsSwitchRevertiveMode		TruthValue,
+			ubiErpsSwitchMegLevel   		Integer32,      
+         	ubiErpsSwitchPropagateTc		TruthValue,
+        	ubiErpsSwitchGuardTimer			Integer32,
+        	ubiErpsSwitchHoldOff			Integer32,
+        	ubiErpsSwitchWaitToRestore		Integer32,     
+        	ubiErpsSwitchWaitToBlock		Integer32,      	
+			ubiErpsSwitchMajorRingId		Integer32,    
+        	ubiErpsSwitchEthoamEvent		TruthValue,			
+        	ubiErpsSwitchForcedSwitch		INTEGER,
+        	ubiErpsSwitchManualSwitch		INTEGER,
+        	ubiErpsSwitchClear				INTEGER,
+			ubiErpsSwitchCurrentState		INTEGER,
+			ubiErpsSwitchLastEvent			INTEGER,
+			ubiErpsSwitchSuppressEast		TruthValue,
+			ubiErpsSwitchSuppressWest		TruthValue,
+			ubiErpsSwitchCotNode			TruthValue,      
+			ubiErpsSwitchCotNbrPort			INTEGER,  
+			ubiErpsSwitchMdName				Dot1agCfmMaintDomainName,  			
+			ubiErpsSwitchMaName				Dot1agCfmMaintAssocName 
+	}  
+     
+   	ubiErpsSwitchBridgeId OBJECT-TYPE
+    	SYNTAX          UbiBridgeId
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"Bridge ID ERPS is running." 
+    	::= { ubiErpsSwitchEntry 1 }
+
+	ubiErpsSwitchRingId OBJECT-TYPE
+    	SYNTAX      	Integer32
+    	MAX-ACCESS  	not-accessible
+   	 	STATUS      	current
+    	DESCRIPTION
+      	 	"G8032 ERPS Ring ID."
+    	::= { ubiErpsSwitchEntry 2 }
+         
+  	ubiErpsSwitchVersion OBJECT-TYPE
+    	SYNTAX          INTEGER (1 | 2)
+    	MAX-ACCESS      read-write
+    	STATUS          current
+    	DESCRIPTION
+        	"G8032 ERPS Version.
+        	   1 - Version 1
+        	   2 - Version 2" 
+    	::= { ubiErpsSwitchEntry 3 }
+    
+  	ubiErpsSwitchNodeType OBJECT-TYPE
+    	SYNTAX          INTEGER {
+    		ring_none(1),
+    		rpl_owner(2),
+    		rpl_neighbor(3)
+    	}
+    	MAX-ACCESS      read-write
+    	STATUS          current
+    	DESCRIPTION
+        	"G8032 ERPS Node Type.
+        	  ring_none(1) - non-RPL Owner
+        	  rpl_owner(2) - RPL Owner
+        	  rpl_neigbor(3) - RPL Neighober" 
+    	::= { ubiErpsSwitchEntry 4 }
+                               
+ 
+	ubiErpsSwitchEastIf OBJECT-TYPE
+    	SYNTAX      Integer32 
+    	MAX-ACCESS  read-only
+    	STATUS      current
+    	DESCRIPTION
+       		"East Ring port of ERPS."
+    	::= { ubiErpsSwitchEntry 5 } 
+
+ 
+	ubiErpsSwitchWestIf OBJECT-TYPE
+    	SYNTAX      Integer32
+    	MAX-ACCESS  read-only
+    	STATUS      current
+    	DESCRIPTION
+       		"West Ring port of ERPS."
+    	::= { ubiErpsSwitchEntry 6 } 
+
+ 
+	ubiErpsSwitchEastIfState OBJECT-TYPE
+    	SYNTAX      INTEGER {
+			down(1),
+			block(2),
+			forward(3)
+    	}
+    	MAX-ACCESS  read-only
+    	STATUS      current
+    	DESCRIPTION
+       		"Port status of east ring port."
+    	::= { ubiErpsSwitchEntry 7 } 
+
+ 
+	ubiErpsSwitchWestIfState OBJECT-TYPE
+    	SYNTAX      INTEGER {
+			down(1),
+			block(2),
+			forward(3)
+    	}
+    	MAX-ACCESS  read-only
+    	STATUS      current
+    	DESCRIPTION
+       		"Port status of west ring port."
+    	::= { ubiErpsSwitchEntry 8 } 
+                               
+                               
+	ubiErpsSwitchRingProtectionLink OBJECT-TYPE
+    	SYNTAX     INTEGER {      
+    		none(1),
+    		east(2),
+    		west(3)
+    	}
+    	MAX-ACCESS  read-write
+   	 	STATUS      current
+    	DESCRIPTION
+      	 	"Indication of Ring protection link(RPL).
+      	 	   none(1) - non-RPL
+      	 	   east(2) - East port is RPL
+      	 	   wast(3) - West port is RPL"
+    	::= { ubiErpsSwitchEntry 9 }
+     
+	ubiErpsSwitchRevertiveMode OBJECT-TYPE
+    	SYNTAX     TruthValue
+    	MAX-ACCESS  read-write
+   	 	STATUS      current
+    	DESCRIPTION
+      	 	"G8032 ERPS Switch Mode. 
+      	 	 - If this is configured, it is revertive mode,
+      	 	   is not, it is non-revertive mode."
+    	::= { ubiErpsSwitchEntry 10 }
+  
+  	ubiErpsSwitchMegLevel OBJECT-TYPE
+    	SYNTAX          Integer32
+    	MAX-ACCESS      read-write
+    	STATUS          current
+    	DESCRIPTION
+        	"G8032 ERPS MEG Level." 
+    	::= { ubiErpsSwitchEntry 11 }
+  
+	ubiErpsSwitchPropagateTc OBJECT-TYPE
+  		SYNTAX      TruthValue
+		MAX-ACCESS  read-write
+  	  	STATUS      current
+    	DESCRIPTION
+       		"If this is configured, when sub-ring topolgy is changed,
+       		 sub-ring transmits Topology Change Message to major-ring."
+    	::= { ubiErpsSwitchEntry 12 }
+                                                         
+	ubiErpsSwitchGuardTimer OBJECT-TYPE
+    	SYNTAX      Integer32    
+     	UNITS		"milliseconds"      	
+    	MAX-ACCESS  read-write
+    	STATUS      current    
+    	DESCRIPTION
+       		"Guard Timer value."
+    	::= { ubiErpsSwitchEntry 13 }
+ 
+	ubiErpsSwitchHoldOff OBJECT-TYPE
+    	SYNTAX      Integer32       
+       	UNITS		"milliseconds"  
+    	MAX-ACCESS  read-write
+    	STATUS      current      	
+    	DESCRIPTION
+       		"Hold-off Timer value."
+    	::= { ubiErpsSwitchEntry 14 }
+
+ 	ubiErpsSwitchWaitToRestore OBJECT-TYPE
+    	SYNTAX      Integer32    
+       	UNITS		"minutes"      	
+    	MAX-ACCESS  read-write
+    	STATUS      current       	
+    	DESCRIPTION
+       		"Wait to Restore Timer value."
+    	::= { ubiErpsSwitchEntry 15 } 
+
+ 	ubiErpsSwitchWaitToBlock OBJECT-TYPE
+    	SYNTAX      Integer32   
+        UNITS		"seconds"     	
+    	MAX-ACCESS  read-write
+    	STATUS      current             	
+    	DESCRIPTION
+       		"Waith to Block Timer value."
+    	::= { ubiErpsSwitchEntry 16 } 
+
+ 	ubiErpsSwitchMajorRingId OBJECT-TYPE
+    	SYNTAX      Integer32
+    	MAX-ACCESS  read-write
+    	STATUS      current
+    	DESCRIPTION
+       		"Major-ring ID who is inter operated."
+    	::= { ubiErpsSwitchEntry 17 } 
+
+ 	ubiErpsSwitchEthoamEvent OBJECT-TYPE
+    	SYNTAX      TruthValue
+    	MAX-ACCESS  read-write
+    	STATUS      current
+    	DESCRIPTION
+       		"Enable interopering with CFM CCM."
+    	::= { ubiErpsSwitchEntry 18 } 
+
+ 	ubiErpsSwitchForcedSwitch OBJECT-TYPE
+    	SYNTAX      INTEGER {        
+    		none(1),
+    		east(2),
+    		west(3),
+    		both(4)
+    	}
+    	MAX-ACCESS  read-write
+    	STATUS      current
+    	DESCRIPTION
+       		"Indication of Forced swith ring port.
+       		   none - none
+       		   east - east ring port
+       		   west - west ring port
+       		   both - both ring port"
+    	::= { ubiErpsSwitchEntry 19 } 
+
+
+ 	ubiErpsSwitchManualSwitch OBJECT-TYPE
+    	SYNTAX      INTEGER {
+    		none(1),
+    		east(2),
+    		west(3),
+    		both(4)
+    	}
+    	MAX-ACCESS  read-write
+    	STATUS      current
+    	DESCRIPTION
+       		"Indication of Manual swith ring port.
+       		   none - none
+       		   east - east ring port
+       		   west - west ring port
+       		   both - both ring port"
+    	::= { ubiErpsSwitchEntry 20 } 
+
+
+ 	ubiErpsSwitchClear OBJECT-TYPE
+    	SYNTAX      INTEGER {      
+    		none(1),
+    		east(2),
+    		west(3),    	
+    	}
+    	MAX-ACCESS  read-write
+    	STATUS      current
+    	DESCRIPTION
+       		"Clear Forced/Manual swith."
+    	::= { ubiErpsSwitchEntry 21 } 
+
+ 	ubiErpsSwitchCurrentState OBJECT-TYPE
+    	SYNTAX      INTEGER 
+    	{
+    	 	init(1),
+    	 	idle(2),
+    	 	protection(3),
+    	 	manual_switch(4),
+    	 	forced_switch(5),
+    	 	pending(6)
+    	}
+    	MAX-ACCESS  read-only
+    	STATUS      current
+    	DESCRIPTION
+       		"Informaiont of ERPS current state.
+       		    init(1)           
+       		     - Initialize State machine: One of ring ports is blocked. 
+       		    idle(2)           
+       		     - Idle state: RPL is blocked and ring ports of others are unblocked.
+       		    protection(3)     
+       		     - Protection state: When links are failed, 
+       		       RPL is unblocked and ring ports of others are unblocked.
+       		    manual_switch(4)  
+       		     - Manual switch state: Manually switched port is blocked 
+       		       and ring ports of others are unblocked.
+       		    forced_switch(5) 
+       		     - Force switch state: Forcedly switched ports are blocked 
+       		       and ring ports of others are unblocked.
+       		    pending(6)        
+       		     - Pneding state: When status of links changed to 'unfailed', 
+       		       one of them is still unblocked."
+    	::= { ubiErpsSwitchEntry 22 } 
+          
+ 
+ 	ubiErpsSwitchLastEvent OBJECT-TYPE
+    	SYNTAX      INTEGER  {   
+    		r_aps_nr(1),    
+    		r_aps_nr_rb(2),
+    		r_aps_wtb_running(3),
+    		wtb_expires(4),
+    		r_aps_wtr_running(5),
+    		wtr_expires(6),    
+    		ms(7),
+    		r_aps_ms(8),
+    		clear(9),
+    		l_clear_sf(10),
+    		l_sf(11),
+    		r_aps_sf(12),
+    		fs(13),
+    		r_aps_fs(14),
+    		event_flush_req(15)
+    	}
+    	MAX-ACCESS  read-only
+    	STATUS      current
+    	DESCRIPTION
+       		"Last Event of ERPS.
+       		  r_aps_nr(1) - received R-APS(NR)
+       		  r_aps_nr_rb(2) - received R-APS(NR/RB)
+       		  r_aps_wtb_running(3) - WTB is started
+       		  wtb_espires(4) - WTB is expired
+       		  r_aps_wtr_running(5) - WTR is started
+       		  wtr_expires(6) - WTR is expired
+       		  ms(7) - Manual switched
+       		  r_aps_ms(8) - rceived R-APS(MS)
+       		  clear(9) - Clear Pending/MS/FS state
+       		  l_clear_sf(10) - Local clear SF
+       		  l_sf(11) - Local SF
+       		  r_aps_sf(12) - received R-APS(SF)
+       		  fs(13) - Forced switch
+       		  r_aps_fs(14) - rceived R-APS(FS)
+       		  event_flush_req(15) - rceived R-APS(Flush request)"
+    	::= { ubiErpsSwitchEntry 23 }                                 	                             
+ 
+	ubiErpsSwitchSuppressEast OBJECT-TYPE
+    	SYNTAX      TruthValue
+    	MAX-ACCESS  read-write
+    	STATUS      current
+    	DESCRIPTION
+       		"Suppress trasmission R-APS to east ring port."
+    	::= { ubiErpsSwitchEntry 24 } 
+
+	ubiErpsSwitchSuppressWest OBJECT-TYPE
+    	SYNTAX      TruthValue
+    	MAX-ACCESS  read-write
+    	STATUS      current
+    	DESCRIPTION
+       		"uppress trasmission R-APS to west ring port"
+    	::= { ubiErpsSwitchEntry 25 }  
+      
+	ubiErpsSwitchCotNode OBJECT-TYPE
+    	SYNTAX     	TruthValue
+    	MAX-ACCESS  read-write
+    	STATUS      current
+    	DESCRIPTION
+       		"Indication of COT node."
+    	::= { ubiErpsSwitchEntry 26 }                             
+
+	ubiErpsSwitchCotNbrPort OBJECT-TYPE
+    	SYNTAX     	INTEGER {       
+    		none(1),
+    		east(2),
+    		west(3)
+    	}
+    	MAX-ACCESS  read-write
+    	STATUS      current
+    	DESCRIPTION
+       		"Indication of COT neighbor port.
+       		  none(1) - none
+       		  east(2) - east ring port
+       		  west(3) - west ring port"
+    	::= { ubiErpsSwitchEntry 27 }                   
+                                                     
+     
+   	ubiErpsSwitchMdName OBJECT-TYPE
+    	SYNTAX          Dot1agCfmMaintDomainName
+    	MAX-ACCESS      read-write
+    	STATUS          current
+    	DESCRIPTION
+        	"CFM Maintenance Domain Name for inter operation." 
+    	::= { ubiErpsSwitchEntry 28 }
+
+     
+   	ubiErpsSwitchMaName OBJECT-TYPE
+    	SYNTAX          Dot1agCfmMaintAssocName
+    	MAX-ACCESS      read-write
+    	STATUS          current
+    	DESCRIPTION
+        	"CFM Maintenance association Name for inter operation." 
+    	::= { ubiErpsSwitchEntry 29 }
+
+
+-- *****************************************************************
+-- ubiErpsGlobal
+-- *****************************************************************
+  
+	ubiErpsGlobalHoldOff OBJECT-TYPE
+    	SYNTAX      Integer32       
+       	UNITS		"milliseconds"  
+    	MAX-ACCESS  read-write
+    	STATUS      current      	
+    	DESCRIPTION
+       		"Global hold-off timer value."
+    	::= { ubiErpsGlobal 1 }
+ 
+
+
+-- *****************************************************************
+-- ubiErpsNotificationEnables
+-- *****************************************************************
+
+	ubiErpsRingStateChangeEnabled OBJECT-TYPE
+    	SYNTAX      TruthValue       
+    	MAX-ACCESS  read-write
+    	STATUS      current      	
+    	DESCRIPTION
+       		"Enable Notificaion of ERPS State Change."
+    	::= { ubiErpsNotificationEnables 1 }
+
+	ubiErpsRingEastIfStateChangeEnabled OBJECT-TYPE
+    	SYNTAX      TruthValue       
+    	MAX-ACCESS  read-write
+    	STATUS      current      	
+    	DESCRIPTION
+       		"Enable Notificaiont of East Port Status Change."
+    	::= { ubiErpsNotificationEnables 2 }     
+    	
+	ubiErpsRingWestIfStateChangeEnabled OBJECT-TYPE
+    	SYNTAX      TruthValue       
+    	MAX-ACCESS  read-write
+    	STATUS      current      	
+    	DESCRIPTION
+       		"Enable Notificaiont of East Port Status Change."
+    	::= { ubiErpsNotificationEnables 3 }   
+                                                      
+                                                      
+
+-- ***********************************************************
+-- ubiIfErpsTable
+-- ***********************************************************
+
+  	ubiIfErpsTable OBJECT-TYPE
+		SYNTAX     SEQUENCE OF UbiIfErpsEntry
+		MAX-ACCESS not-accessible
+		STATUS     current
+		DESCRIPTION
+			"The table of ERPS information on interface."
+		::=  {  ubiErpsMIBObjects 6 }
+                                                
+                                                
+  	ubiIfErpsEntry OBJECT-TYPE
+		SYNTAX     UbiIfErpsEntry
+		MAX-ACCESS not-accessible
+		STATUS     current
+		DESCRIPTION                                 
+			"The entry of ERPS information on interface."		
+		INDEX   { ifIndex }
+		::= { ubiIfErpsTable 1 }
+ 
+ 
+	UbiIfErpsEntry ::= SEQUENCE
+    {       
+    	ubiIfErpsAggMinLink			Integer32
+    }     
+
+	ubiIfErpsAggMinLink OBJECT-TYPE
+		SYNTAX     	Integer32 (1..8)
+		MAX-ACCESS 	read-write
+		STATUS     	current
+		DESCRIPTION
+			"Minmum Link count to activate Port-channel in ERPS.
+			   - To activate Port-channel, actived members of port-channel 
+			     must be minmum link count at least."
+		::= { ubiIfErpsEntry 1 }
+ 
+                                                      
+                                                      
+-- *****************************************************************
+-- ubiErpsMIBConformance
+-- *****************************************************************
+
+-- Conformance Information
+ubiErpsMIBCompliances  	OBJECT IDENTIFIER		::= { ubiErpsMIBConformance 1 }
+ubiErpsMIBGroups  		OBJECT IDENTIFIER		::= { ubiErpsMIBConformance 2 }
+
+
+-- compliance statements
+
+	ubiErpsMIBCompliance MODULE-COMPLIANCE
+    	STATUS          current
+    	DESCRIPTION
+        	"The compliance statement for VTP implementations."
+    	MODULE          -- this module
+    	MANDATORY-GROUPS {   
+    					ubiErpsBaseGroup          
+                      }
+    	::= { ubiErpsMIBCompliances 1 }
+
+-- units of conformance
+
+	ubiErpsBaseGroup OBJECT-GROUP
+    	OBJECTS         {   
+                    }
+    	STATUS          current
+    	DESCRIPTION
+        	""
+    	::= { ubiErpsMIBGroups 1 }
+END
+
+
+
+

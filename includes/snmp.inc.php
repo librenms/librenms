@@ -267,7 +267,7 @@ function snmp_get($device, $oid, $options = null, $mib = null, $mibdir = null)
     $time_start = microtime(true);
 
     if (strstr($oid, ' ')) {
-        echo report_this_text("snmp_get called for multiple OIDs: $oid");
+        throw new Exception("snmp_get called for multiple OIDs: $oid");
     }
 
     $cmd = gen_snmpget_cmd($device, $oid, $options, $mib, $mibdir);
@@ -1381,7 +1381,7 @@ function snmpwalk_array_num($device, $oid, $indexes = 1)
  */
 function get_device_max_repeaters($device)
 {
-    return $device['snmp_max_repeaters'] ?:
+    return $device['attribs']['snmp_max_repeaters'] ??
         Config::getOsSetting($device['os'], 'snmp.max_repeaters', false);
 }
 

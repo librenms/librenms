@@ -80,7 +80,7 @@ class WorldMapController extends WidgetController
                     $device->zOffset = 10000;
 
                     if ($device->isUnderMaintenance()) {
-                        if ($status == 0) {
+                        if (in_array(0, $status)) {
                             return false;
                         }
                         $device->markerIcon = 'blueMarker';

@@ -26,12 +26,15 @@
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use App\Models\Device;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
-use LibreNMS\Tests\LaravelTestCase;
+use LibreNMS\Tests\DBTestCase;
 
-class FgTrapAvOversizeTest extends LaravelTestCase
+class FgTrapAvOversizeTest extends DBTestCase
 {
+    use DatabaseTransactions;
+
     public function testAvOversize()
     {
         $device = factory(Device::class)->create();

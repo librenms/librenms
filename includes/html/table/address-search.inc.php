@@ -5,15 +5,14 @@ use LibreNMS\Util\IP;
 $param = array();
 
 if (!Auth::user()->hasGlobalRead()) {
-    $perms_sql .= ' LEFT JOIN `devices_perms` AS `DP` ON `D`.`device_id` = `DP`.`device_id`';
-    $where     .= ' AND `DP`.`user_id`=?';
-    $param[]    = array(Auth::id());
+    $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
+    $where .= " AND `D`.`device_id` IN " .dbGenPlaceholders(count($device_ids));
+    $param = array_merge($param, $device_ids);
 }
 
 list($address,$prefix) = explode('/', $vars['address']);
 if ($vars['search_type'] == 'ipv4') {
     $sql  = ' FROM `ipv4_addresses` AS A, `ports` AS I, `ipv4_networks` AS N, `devices` AS D';
-    $sql .= $perms_sql;
     $sql .= " WHERE I.port_id = A.port_id AND I.device_id = D.device_id AND N.ipv4_network_id = A.ipv4_network_id $where ";
     if (!empty($address)) {
         $sql .= " AND ipv4_address LIKE '%".$address."%'";
@@ -25,7 +24,6 @@ if ($vars['search_type'] == 'ipv4') {
     }
 } elseif ($vars['search_type'] == 'ipv6') {
     $sql  = ' FROM `ipv6_addresses` AS A, `ports` AS I, `ipv6_networks` AS N, `devices` AS D';
-    $sql .= $perms_sql;
     $sql .= " WHERE I.port_id = A.port_id AND I.device_id = D.device_id AND N.ipv6_network_id = A.ipv6_network_id $where ";
     if (!empty($address)) {
         $sql .= " AND (ipv6_address LIKE '%".$address."%' OR ipv6_compressed LIKE '%".$address."%')";
@@ -36,7 +34,6 @@ if ($vars['search_type'] == 'ipv4') {
     }
 } elseif ($vars['search_type'] == 'mac') {
     $sql  = ' FROM `ports` AS I, `devices` AS D';
-    $sql .= $perms_sql;
     $sql .= " WHERE I.device_id = D.device_id AND `ifPhysAddress` LIKE '%".str_replace(array(':', ' ', '-', '.', '0x'), '', mres($vars['address']))."%' $where ";
 }//end if
 if (is_numeric($vars['device_id'])) {

@@ -25,18 +25,14 @@
 
 namespace LibreNMS\Tests;
 
-abstract class DBTestCase extends LaravelTestCase
+abstract class DBTestCase extends TestCase
 {
-    public function setUp(): void
+    public static function setUpBeforeClass()
     {
-        parent::setUp();
-        $this->dbSetUp();
-        set_debug(false);
-    }
+        if (!getenv('DBTEST')) {
+            static::markTestSkipped('Database tests not enabled.  Set DBTEST=1 to enable.');
+        }
 
-    public function tearDown(): void
-    {
-        $this->dbTearDown();
-        parent::tearDown();
+        parent::setUpBeforeClass();
     }
 }

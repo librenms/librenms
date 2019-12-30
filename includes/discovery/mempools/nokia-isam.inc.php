@@ -38,7 +38,7 @@ if ($device['os'] == 'nokia-isam') {
         
                 $descr = $slotTable[$index].' Memory ('.$index.')';
 
-                discover_mempool($valid_mempool, $device, $index, 'nokia-isam', $descr, '1', $entPhysicalIndex, null);
+                discover_mempool($valid_mempool, $device, $index, 'nokia-isam', $descr, '1', $entPhysicalIndex, null, '98');
             }
         }
     }

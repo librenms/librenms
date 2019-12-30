@@ -34,28 +34,38 @@ class Api extends Transport
     {
         $url = $this->config['api-url'];
         $options = $this->config['api-options'];
+        $headers = $this->config['api-headers'];
+        $body = $this->config['api-body'];
         $method = $this->config['api-method'];
         $auth = [$this->config['api-auth-username'], $this->config['api-auth-password']];
-        return $this->contactAPI($obj, $url, $options, $method, $auth);
+        return $this->contactAPI($obj, $url, $options, $method, $auth, $headers, $body);
     }
 
-    private function contactAPI($obj, $api, $options, $method, $auth)
+    private function contactAPI($obj, $api, $options, $method, $auth, $headers, $body)
     {
         $request_opts = [];
+        $request_heads = [];
         $query = [];
 
         $method = strtolower($method);
         $host = explode("?", $api, 2)[0]; //we don't use the parameter part, cause we build it out of options.
 
-        //get each line of key-values and process the variables;
+        //get each line of key-values and process the variables for Headers;
+        foreach (preg_split("/\\r\\n|\\r|\\n/", $headers, -1, PREG_SPLIT_NO_EMPTY) as $current_line) {
+            list($u_key, $u_val) = explode('=', $current_line, 2);
+            foreach ($obj as $p_key => $p_val) {
+                $u_val = str_replace("{{ $" . $p_key . ' }}', $p_val, $u_val);
+            }
+            //store the parameter in the array for HTTP headers
+            $request_heads[$u_key] = $u_val;
+        }
+        //get each line of key-values and process the variables for Options;
         foreach (preg_split("/\\r\\n|\\r|\\n/", $options, -1, PREG_SPLIT_NO_EMPTY) as $current_line) {
             list($u_key, $u_val) = explode('=', $current_line, 2);
-
             // Replace the values
             foreach ($obj as $p_key => $p_val) {
                 $u_val = str_replace("{{ $" . $p_key . ' }}', $p_val, $u_val);
             }
-            
             //store the parameter in the array for HTTP query
             $query[$u_key] = $u_val;
         }
@@ -64,9 +74,16 @@ class Api extends Transport
         if (isset($auth) && !empty($auth[0])) {
             $request_opts['auth'] = $auth;
         }
+        if (count($request_heads) > 0) {
+            $request_opts['headers'] = $request_heads;
+        }
         if ($method == "get") {
             $request_opts['query'] = $query;
             $res = $client->request('GET', $host, $request_opts);
+        } elseif ($method == "put") {
+            $request_opts['query'] = $query;
+            $request_opts['body'] = $body;
+            $res = $client->request('PUT', $host, $request_opts);
         } else { //Method POST
             $request_opts['form_params'] = $query;
             $res = $client->request('POST', $host, $request_opts);
@@ -92,11 +109,12 @@ class Api extends Transport
                 [
                     'title' => 'API Method',
                     'name' => 'api-method',
-                    'descr' => 'API Method: GET or POST',
+                    'descr' => 'API Method: GET, POST or PUT',
                     'type' => 'select',
                     'options' => [
                         'GET' => 'GET',
-                        'POST' => 'POST'
+                        'POST' => 'POST',
+                        'PUT' => 'PUT'
                     ]
                 ],
                 [
@@ -109,6 +127,18 @@ class Api extends Transport
                     'title' => 'Options',
                     'name' => 'api-options',
                     'descr' => 'Enter the options (format: option=value separated by new lines)',
+                    'type' => 'textarea',
+                ],
+                [
+                    'title' => 'headers',
+                    'name' => 'api-headers',
+                    'descr' => 'Enter the headers (format: option=value separated by new lines)',
+                    'type' => 'textarea',
+                ],
+                [
+                    'title' => 'body',
+                    'name' => 'api-body',
+                    'descr' => 'Enter the body (only used by PUT method, discarded otherwise)',
                     'type' => 'textarea',
                 ],
                 [
@@ -125,7 +155,7 @@ class Api extends Transport
                 ]
             ],
             'validation' => [
-                'api-method' => 'in:GET,POST',
+                'api-method' => 'in:GET,POST,PUT',
                 'api-url' => 'required|url'
             ]
         ];

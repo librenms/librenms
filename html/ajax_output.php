@@ -13,6 +13,7 @@
  */
 
 session_start();
+session_write_close();
 if (isset($_SESSION['stage']) && $_SESSION['stage'] == 2) {
     $init_modules = array('web', 'nodb');
     require realpath(__DIR__ . '/..') . '/includes/init.php';
