@@ -149,4 +149,9 @@ class DeviceGroup extends BaseModel
     {
         return $this->belongsToMany('App\Models\Service', 'device_group_device', 'device_group_id', 'device_id');
     }
+
+    public function users()
+    {
+        return $this->belongsToMany('App\Models\User', 'devices_group_perms', 'device_group_id', 'user_id');
+    }
 }

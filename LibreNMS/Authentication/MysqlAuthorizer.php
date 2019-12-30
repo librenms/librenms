@@ -144,6 +144,7 @@ class MysqlAuthorizer extends AuthorizerBase
         // could be used on cli, use Eloquent helper
         Eloquent::DB()->table('bill_perms')->where('user_id', $user_id)->delete();
         Eloquent::DB()->table('devices_perms')->where('user_id', $user_id)->delete();
+        Eloquent::DB()->table('devices_group_perms')->where('user_id', $user_id)->delete();
         Eloquent::DB()->table('ports_perms')->where('user_id', $user_id)->delete();
         Eloquent::DB()->table('users_prefs')->where('user_id', $user_id)->delete();
 

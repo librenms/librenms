@@ -28,9 +28,10 @@ if (!empty($device['hostname'])) {
 }
 
 if (!Auth::user()->hasGlobalRead()) {
-    $join_sql    .= ' LEFT JOIN `devices_perms` AS `DP` ON `D1`.`device_id` = `DP`.`device_id`';
-    $sql  .= ' AND `DP`.`user_id`=?';
-    $sql_array[] = Auth::id();
+    $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
+    $sql .= " AND `D1`.`device_id` IN " .dbGenPlaceholders(count($device_ids));
+    $sql .= " AND `D2`.`device_id` IN " .dbGenPlaceholders(count($device_ids));
+    $sql_array = array_merge($sql_array, $device_ids, $device_ids);
 }
 
 $devices_by_id = array();

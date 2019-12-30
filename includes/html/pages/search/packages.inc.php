@@ -77,9 +77,9 @@ $query = 'SELECT packages.name FROM packages,devices ';
 $param = array();
 
 if (!Auth::user()->hasGlobalRead()) {
-    $query .= " LEFT JOIN `devices_perms` AS `DP` ON `devices`.`device_id` = `DP`.`device_id`";
-    $sql_where .= " AND `DP`.`user_id`=?";
-    $param[] = Auth::id();
+    $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
+    $where .= " AND `D`.`device_id` IN " .dbGenPlaceholders(count($device_ids));
+    $param = array_merge($param, $device_ids);
 }
 
 $query .= " WHERE packages.device_id = devices.device_id AND packages.name LIKE '%".mres($_POST['package'])."%' $sql_where GROUP BY packages.name";
