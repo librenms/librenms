@@ -1,0 +1,15 @@
+os: fortianalyzer
+text: 'Fortinet FortiAnalyzer'
+type: appliance
+icon: fortinet
+mib_dir:
+    - fortinet
+empty_ifdescr: true
+ifname: true
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_fortigate_cpu, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.12356.103.3 #FortiAnalyzer
