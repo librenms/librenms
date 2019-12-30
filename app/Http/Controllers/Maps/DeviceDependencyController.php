@@ -49,11 +49,6 @@ class DeviceDependencyController extends MapController
                 }
             }
 
-            $groups = $device->groups()->pluck('id')->toArray();
-            if ($group_id && (! in_array($group_id, $groups))) {
-                continue;
-            }
-
             if ($device->disabled) {
                 $device_style = $this->nodeDisabledStyle();
             } elseif (! $device->status) {
