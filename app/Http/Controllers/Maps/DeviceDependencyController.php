@@ -34,7 +34,7 @@ class DeviceDependencyController extends MapController
     // Device Dependency Map
     public function dependencyMap(Request $request)
     {
-        $devices = Device::hasAccess($request->user())->with('parents')->get();
+        $devices = Device::hasAccess($request->user())->with('parents', 'location')->get();
 
         $dependencies = [];
         $devices_by_id  = [];
@@ -43,18 +43,18 @@ class DeviceDependencyController extends MapController
 
         // List all devices
         foreach ($devices as $device) {
-            if ($device['disabled']) {
+            if ($device->disabled) {
                 $device_style = $this->nodeDisabledStyle();
-            } elseif (! $device['status']) {
+            } elseif (! $device->status) {
                 $device_style = $this->nodeDownStyle();
             } else {
                 $device_style = $this->nodeUpStyle();
             }
 
             // List all Device
-            $devices_by_id[$device['device_id']] = array_merge(
+            $devices_by_id[] = array_merge(
                 [
-                    'id'    => $device['device_id'],
+                    'id'    => $device->device_id,
                     'label' => $device->shortDisplayName(),
                     'title' => Url::deviceLink($device, null, [], 0, 0, 0, 0),
                     'shape' => 'box',
@@ -66,8 +66,8 @@ class DeviceDependencyController extends MapController
             $parents = $device->parents;
             foreach ($parents as $parent) {
                 $dependencies[] = [
-                    'from'  => $device['device_id'],
-                    'to'    => $parent['device_id'],
+                    'from'  => $device->device_id,
+                    'to'    => $parent->device_id,
                     'width' => 2,
                 ];
             };

@@ -9,13 +9,14 @@
 @else
 <div class="alert alert-success" role="alert">@lang('No devices found')</div>
 @endif
+
 @endsection
 
 @section('scripts')
 <script src="js/vis.min.js"></script>
 <script type="text/javascript">
-var height = $(window).height() - 100;
-$('#visualization').height(height + 'px');
+    var height = $(window).height() - 100;
+    $('#visualization').height(height + 'px');
     // create an array with nodes
     var nodes = {!! $nodes !!};
 
