@@ -39,14 +39,47 @@ class DeviceDependencyController extends MapController
         $dependencies = [];
         $devices_by_id  = [];
 
+        // Device IDs of Devices to show
+        $device_nodes = [];
+        $device_parents = [];
+        $device_childs = [];
+
         // Build the style variables we need
 
-        // List all devices
+        //get child and parent Device ID's - for showing showing them
+        //even if they are not member oder Device Group
         foreach ($devices as $device) {
             if ($group_id) {
                 if (! in_array($group_id, $device->groups()->pluck('id')->toArray())) {
                     continue;
                 }
+            }
+
+            $device_nodes[] = $device->device_id;
+
+            // no Device Group Filter set, no parent/child discovery needed
+            if (! $group_id) {
+                continue;
+            }
+
+            $parents = $device->parents;
+            foreach ($parents as $parent) {
+                    $device_parents[] = $parent->device_id;
+            };
+
+            $childs = $device->children;
+            foreach ($childs as $child) {
+                    $device_childs[] = $child->device_id;
+            };
+        }
+
+        $devices_to_show = array_merge($device_nodes, array_merge($device_parents, $device_childs));
+
+        // List all devices
+        foreach ($devices as $device) {
+
+            if (! in_array($device->device_id, $devices_to_show)) {
+                continue;
             }
 
             if ($device->disabled) {
@@ -80,7 +113,6 @@ class DeviceDependencyController extends MapController
         }
 
         $data = [
-            'group_id' => $group_id,
             'node_count' => count($devices_by_id),
             'options' => $this->visOptions(),
             'nodes' => json_encode(array_values($devices_by_id)),
