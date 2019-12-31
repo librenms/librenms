@@ -5,9 +5,9 @@ $param = array();
 $sql .= ' FROM `ipv4_mac` AS M, `ports` AS P, `devices` AS D ';
 
 if (!Auth::user()->hasGlobalRead()) {
-    $sql    .= ' LEFT JOIN `devices_perms` AS `DP` ON `D`.`device_id` = `DP`.`device_id`';
-    $where  .= ' AND `DP`.`user_id`=?';
-    $param[] = Auth::id();
+    $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
+    $where .= " AND `D`.`device_id` IN " .dbGenPlaceholders(count($device_ids));
+    $param = array_merge($param, $device_ids);
 }
 
 $sql .= " WHERE M.port_id = P.port_id AND P.device_id = D.device_id $where ";

@@ -10,13 +10,13 @@
  * the source code distribution for details.
  */
  
-$hardware = trim(snmp_get($device, '.1.3.6.1.4.1.34592.1.3.1.5.2.1.1.4.0', '-OQv'), '"');
-$version = trim(snmp_get($device, '.1.3.6.1.4.1.34592.1.3.1.5.2.1.1.5.0', '-OQv'), '"');
-$serial = trim(snmp_get($device, '.1.3.6.1.4.1.17409.2.3.1.1.13.0', '-OQv'), '"');
-
-if (empty($hardware) && empty($version)) {
-    $hardware =  $hardware;
-    $version = $software;
-    $serial = $serial;
-    unset($temp_data);
+$gwd_temp = snmp_get_multi_oid($device, ['.1.3.6.1.4.1.34592.1.3.1.5.2.1.1.4.0', '.1.3.6.1.4.1.34592.1.3.1.5.2.1.1.5.0', '.1.3.6.1.4.1.17409.2.3.1.3.1.1.9.1.0', '.1.3.6.1.4.1.17409.2.3.1.3.1.1.7.1.0', '.1.3.6.1.4.1.17409.2.3.1.1.13.0'], '-OQUn');
+$version   = $gwd_temp['.1.3.6.1.4.1.17409.2.3.1.3.1.1.9.1.0'];
+if (empty($version)) {
+    $version   = $gwd_temp['.1.3.6.1.4.1.34592.1.3.1.5.2.1.1.5.0'];
 }
+$hardware  = $gwd_temp['.1.3.6.1.4.1.17409.2.3.1.3.1.1.7.1.0'];
+if (empty($hardware)) {
+    $hardware  = $gwd_temp['.1.3.6.1.4.1.34592.1.3.1.5.2.1.1.4.0'];
+}
+$serial    = $gwd_temp['.1.3.6.1.4.1.17409.2.3.1.1.13.0'];
