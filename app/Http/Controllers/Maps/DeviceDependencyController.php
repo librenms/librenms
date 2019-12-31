@@ -79,7 +79,6 @@ class DeviceDependencyController extends MapController
 
         // List all devices
         foreach ($devices as $device) {
-
             if (! in_array($device->device_id, $devices_to_show)) {
                 continue;
             }

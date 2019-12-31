@@ -47,6 +47,18 @@ class MapController extends Controller
                ];
     }
 
+    protected function nodeHighlightStyle()
+    {
+        return ['color' => [
+                         'highlight' => [
+                             'border' => Config::get('network_map_legend.highlight.border'),
+                         ],
+                         'border' => Config::get('network_map_legend.highlight.border'),
+                     ],
+                'borderWidth' => Config::get('network_map_legend.highlight.borderWidth'),
+               ];
+    }
+
     protected function nodeDownStyle()
     {
         return ['color' => [
