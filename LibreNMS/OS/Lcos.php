@@ -47,6 +47,35 @@ class Lcos extends OS implements
     WirelessRssiDiscovery
 {
     /**
+     * Convert String to decimal encoded string notation
+     *
+     * @param string
+     * @return decimal encoded OID string
+     */
+    private function strToDecOid($index)
+    {
+        for ($i = 0, $j = strlen($index); $i < $j; $i++) {
+                $dec_index[] = ord($index{$i});
+        }
+        return implode('.', $dec_index);
+    }
+
+    /**
+     * Convert MAC String to decimal encoded string notation
+     *
+     * @param colon separated string (MAC address notation)
+     * @return decimal encoded OID string
+     */
+    private function macToDecOid($mac)
+    {
+        $octet = explode(':', $mac);
+        foreach ($octet as $key => $value) {
+            $dec_index[$key] = hexdec($value);
+        }
+        return implode('.', $dec_index);
+    }
+
+    /**
      * Discover wireless frequency.  This is in Hz. Type is frequency.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
      *
@@ -63,14 +92,10 @@ class Lcos extends OS implements
             if (isset($sensors[$radio])) {
                 continue;
             }
-            for ($i = 0, $j = strlen($index); $i < $j; $i++) {
-                $dec_index[] = ord($index{$i});
-            }
-            $dec_index = '6.' . implode('.', $dec_index);
             $sensors[$radio] = new WirelessSensor(
                 'frequency',
                 $this->getDeviceId(),
-                '.1.3.6.1.4.1.2356.11.1.3.57.1.3.' . $dec_index,
+                '.1.3.6.1.4.1.2356.11.1.3.57.1.3.' . '6.' . $this->strToDecOid($index),
                 'lcos',
                 $radio,
                 "Frequency ($radio)",
@@ -109,14 +134,10 @@ class Lcos extends OS implements
             if (isset($sensors[$radio])) {
                 continue;
             }
-            for ($i = 0, $j = strlen($index); $i < $j; $i++) {
-                $dec_index[] = ord($index{$i});
-            }
-            $dec_index = '6.' . implode('.', $dec_index);
             $sensors[$radio] = new WirelessSensor(
                 'capacity',
                 $this->getDeviceId(),
-                '.1.3.6.1.4.1.2356.11.1.3.57.1.6.' . $dec_index,
+                '.1.3.6.1.4.1.2356.11.1.3.57.1.6.' . '6.' . $this->strToDecOid($index),
                 'lcos',
                 $radio,
                 "Modem Load ($radio)",
@@ -143,14 +164,10 @@ class Lcos extends OS implements
             if (isset($sensors[$radio])) {
                 continue;
             }
-            for ($i = 0, $j = strlen($index); $i < $j; $i++) {
-                $dec_index[] = ord($index{$i});
-            }
-            $dec_index = '6.' . implode('.', $dec_index);
             $sensors[$radio] = new WirelessSensor(
                 'noise-floor',
                 $this->getDeviceId(),
-                '.1.3.6.1.4.1.2356.11.1.3.57.1.5.' . $dec_index,
+                '.1.3.6.1.4.1.2356.11.1.3.57.1.5.' . '6.' . $this->strToDecOid($index),
                 'lcos',
                 $radio,
                 "Noise Floor ($radio)",
@@ -178,14 +195,10 @@ class Lcos extends OS implements
             if (isset($sensors[$radio])) {
                 continue;
             }
-            for ($i = 0, $j = strlen($index); $i < $j; $i++) {
-                $dec_index[] = ord($index{$i});
-            }
-            $dec_index = '6.' . implode('.', $dec_index);
             $sensors[$radio] = new WirelessSensor(
                 'power',
                 $this->getDeviceId(),
-                '.1.3.6.1.4.1.2356.11.1.3.57.1.7.' . $dec_index,
+                '.1.3.6.1.4.1.2356.11.1.3.57.1.7.' . '6.' . $this->strToDecOid($index),
                 'lcos-tx',
                 $radio,
                 "Tx Power ($radio)",
@@ -214,16 +227,10 @@ class Lcos extends OS implements
                 continue;
             }
 
-            $octet = explode(':', $bssid);
-            foreach ($octet as $key => $value) {
-                $mac_index[$key] = hexdec($value);
-            }
-
-            $mac_index = implode('.', $mac_index) . '.0';
             $sensors[$bssid] = new WirelessSensor(
                 'ccq',
                 $this->getDeviceId(),
-                '.1.3.6.1.4.1.2356.11.1.3.44.1.10.' . $mac_index,
+                '.1.3.6.1.4.1.2356.11.1.3.44.1.10.' . $this->macToDecOid($bssid) . '.0',
                 'lcos',
                 $bssid,
                 "CCQ " . $entry['lcsStatusWlanCompetingNetworksEntryInterpointPeerName'] . " $bssid",
@@ -252,16 +259,10 @@ class Lcos extends OS implements
                 continue;
             }
 
-            $octet = explode(':', $bssid);
-            foreach ($octet as $key => $value) {
-                $mac_index[$key] = hexdec($value);
-            }
-
-            $mac_index = implode('.', $mac_index) . '.0';
             $sensors[$bssid] = new WirelessSensor(
                 'rate',
                 $this->getDeviceId(),
-                '.1.3.6.1.4.1.2356.11.1.3.44.1.35.' . $mac_index,
+                '.1.3.6.1.4.1.2356.11.1.3.44.1.35.' . $this->macToDecOid($bssid) . '.0',
                 'lcos-tx',
                 $bssid,
                 "TX Rate " . $entry['lcsStatusWlanCompetingNetworksEntryInterpointPeerName'] . " $bssid",
@@ -292,16 +293,10 @@ class Lcos extends OS implements
                 continue;
             }
 
-            $octet = explode(':', $bssid);
-            foreach ($octet as $key => $value) {
-                $mac_index[$key] = hexdec($value);
-            }
-
-            $mac_index = implode('.', $mac_index) . '.0';
             $sensors[$bssid] = new WirelessSensor(
                 'rssi',
                 $this->getDeviceId(),
-                '.1.3.6.1.4.1.2356.11.1.3.44.1.26.' . $mac_index,
+                '.1.3.6.1.4.1.2356.11.1.3.44.1.26.' . $this->macToDecOid($bssid) . '.0',
                 'lcos',
                 $bssid,
                 "RSSI " . $entry['lcsStatusWlanCompetingNetworksEntryInterpointPeerName'] . " $bssid",
