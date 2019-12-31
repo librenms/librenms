@@ -28,12 +28,12 @@ $param = array();
 $sql = 'FROM `ports`';
 
 if (!Auth::user()->hasGlobalRead()) {
-    $sql .= ' LEFT JOIN `devices_perms` AS `DP` ON `ports`.`device_id` = `DP`.`device_id`';
-    $sql .= ' LEFT JOIN `ports_perms` AS `PP` ON `ports`.`port_id` = `PP`.`port_id`';
-
-    $where .= ' AND (`DP`.`user_id`=? OR `PP`.`user_id`=?)';
-    $param[] = Auth::id();
-    $param[] = Auth::id();
+    $port_ids = Permissions::portsForUser()->toArray() ?: [0];
+    $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
+    $where .= " AND (`ports`.`port_id` IN " . dbGenPlaceholders(count($port_ids));
+    $where .= " OR `D`.`device_id` IN " .dbGenPlaceholders(count($device_ids));
+    $where .= ")";
+    $param = array_merge($param, $port_ids, $device_ids);
 }
 
 $sql .= ' LEFT JOIN `devices` AS `D` ON `ports`.`device_id` = `D`.`device_id`';

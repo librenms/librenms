@@ -315,12 +315,6 @@ LibreNMS database.
 
 ## Mail
 
-For all but the default contact, we support setting multiple email
-addresses separated by a comma. So you can set the devices sysContact,
-override the sysContact or have your users emails set like:
-
-`email@domain.com, alerting@domain.com`
-
 The E-Mail transports uses the same email-configuration like the rest of LibreNMS.
 As a small reminder, here is it's configuration directives including defaults:
 
