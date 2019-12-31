@@ -32,7 +32,7 @@ use LibreNMS\Util\Url;
 class DeviceDependencyController extends MapController
 {
     // Device Dependency Map
-    public function dependencyMap(Request $request, $group_id = 0)
+    public function dependencyMap(Request $request, $group_id = 0, $highlight_node = 0)
     {
         $devices = Device::hasAccess($request->user())->with('parents', 'location')->get();
 
@@ -75,6 +75,8 @@ class DeviceDependencyController extends MapController
 
         $devices_to_show = array_merge($device_nodes, array_merge($device_parents, $device_childs));
 
+        $device_list = [];
+
         // List all devices
         foreach ($devices as $device) {
 
@@ -82,12 +84,18 @@ class DeviceDependencyController extends MapController
                 continue;
             }
 
+            $device_list[] = ['id' => $device->device_id, 'label' => $device->hostname];
+
             if ($device->disabled) {
                 $device_style = $this->nodeDisabledStyle();
             } elseif (! $device->status) {
                 $device_style = $this->nodeDownStyle();
             } else {
                 $device_style = $this->nodeUpStyle();
+            }
+
+            if ($device->device_id == $highlight_node) {
+                $device_style = array_merge($device_style, $this->nodeHighlightStyle());
             }
 
             // List all Device
@@ -112,7 +120,12 @@ class DeviceDependencyController extends MapController
             };
         }
 
+        array_multisort(array_column($device_list, 'label'), SORT_ASC, $device_list);
+
         $data = [
+            'device_list' => $device_list,
+            'group_id' => $group_id,
+            'highlight_node' => $highlight_node,
             'node_count' => count($devices_by_id),
             'options' => $this->visOptions(),
             'nodes' => json_encode(array_values($devices_by_id)),

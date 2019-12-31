@@ -5,6 +5,14 @@
 @section('content')
 
 @if($node_count)
+<div class="pull-right">
+<select name="highlight_node" id="highlight_node" class="input-sm" onChange="highlightNode()";>
+<option value="0">None</option>
+@foreach($device_list as $device)
+<option value="{{ $device['id'] }}">{{ $device['label'] }}</option>
+@endforeach
+</select>
+</div>
 <div id="visualization"></div>
 @else
 <div class="alert alert-success" role="alert">@lang('No devices found')</div>
@@ -39,6 +47,13 @@
             window.location.href = "device/device="+properties.nodes+"/"
         }
     });
+
+    function highlightNode(e) {
+        highlight_node = document.getElementById("highlight_node").value;
+        window.location.pathname = 'maps/devicedependency/group={{ $group_id }}/highlight_node=' + highlight_node;
+    }
+
+    $('#highlight_node option[value="{{$highlight_node}}"]').prop('selected', true);
 </script>
 @endsection
 
