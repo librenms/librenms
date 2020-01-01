@@ -26,27 +26,37 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessSinrDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrpDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrqDiscovery;
 use LibreNMS\OS;
 
 class Rutos2xx extends OS implements
-    WirelessSnrDiscovery,
-    WirelessRssiDiscovery
+    WirelessSinrDiscovery,
+    WirelessRsrpDiscovery,
+    WirelessRsrqDiscovery
 {
-    public function discoverWirelessSnr()
+    public function discoverWirelessSinr()
     {
         $oid = '.1.3.6.1.4.1.48690.2.22.0'; // TELTONIKA-MIB::SINR.0
         return array(
-            new WirelessSensor('snr', $this->getDeviceId(), $oid, 'rutos-2xx', 1, 'SINR', null, -1, 1),
+            new WirelessSensor('sinr', $this->getDeviceId(), $oid, 'rutos-2xx', 1, 'SINR', null, -1, 1),
         );
     }
 
-    public function discoverWirelessRssi()
+    public function discoverWirelessRsrp()
     {
         $oid = '.1.3.6.1.4.1.48690.2.23.0'; // TELTONIKA-MIB::RSRP.0
         return array(
-            new WirelessSensor('rssi', $this->getDeviceId(), $oid, 'rutos-2xx', 1, 'RSRP', null, 1, 1),
+            new WirelessSensor('rsrp', $this->getDeviceId(), $oid, 'rutos-2xx', 1, 'RSRP', null, 1, 1),
+        );
+    }
+    
+    public function discoverWirelessRsrq()
+    {
+        $oid = '.1.3.6.1.4.1.48690.2.24.0'; // TELTONIKA-MIB::RSRQ.0
+        return array(
+            new WirelessSensor('rsrq', $this->getDeviceId(), $oid, 'rutos-2xx', 1, 'RSRQ', null, 1, 1),
         );
     }
 }
