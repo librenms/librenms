@@ -169,5 +169,3 @@ class HiveosWireless extends OS implements
         return $data;
     }
 }
-
-
