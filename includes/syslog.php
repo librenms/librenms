@@ -57,9 +57,15 @@ function process_syslog($entry, $update)
     }
 
     $entry['host'] = preg_replace("/^::ffff:/", "", $entry['host']);
-    if ($new_host = Config::get("syslog_xlate.{$entry['host']}")) {
-        $entry['host'] = $new_host;
+    $axlate = Config::get('syslog_xlate');
+    if(true == is_array($axlate)){
+       foreach ($axlate as $xname => $xlate) {
+           if ( $xname == $entry['host']){
+              $entry['host'] = $xlate;
+          }
+       }
     }
+
     $entry['device_id'] = get_cache($entry['host'], 'device_id');
     if ($entry['device_id']) {
         $os = get_cache($entry['host'], 'os');
