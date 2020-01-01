@@ -5,6 +5,7 @@ namespace App\Models;
 use DB;
 use Illuminate\Database\Eloquent\Builder;
 use LibreNMS\Util\Rewrite;
+use Permissions;
 
 class Port extends DeviceRelatedModel
 {
@@ -62,7 +63,7 @@ class Port extends DeviceRelatedModel
     /**
      * Check if user can access this port.
      *
-     * @param User $user
+     * @param User|int $user
      * @return bool
      */
     public function canAccess($user)
@@ -75,15 +76,7 @@ class Port extends DeviceRelatedModel
             return true;
         }
 
-        $port_query = DB::table('ports_perms')
-            ->where('user_id', $user->user_id)
-            ->where('port_id', $this->port_id);
-
-        $device_query = DB::table('devices_perms')
-            ->where('user_id', $user->user_id)
-            ->where('device_id', $this->device_id);
-
-        return $port_query->union($device_query)->exists();
+        return Permissions::canAccessDevice($this->device_id, $user) || Permissions::canAccessPort($this->port_id, $user);
     }
 
     // ---- Accessors/Mutators ----

@@ -434,6 +434,24 @@ function renamehost($id, $new, $source = 'console')
     return "Renaming of $host failed\n";
 }
 
+function device_discovery_trigger($id)
+{
+    global $debug;
+
+    if (isCli() === false) {
+        ignore_user_abort(true);
+        set_time_limit(0);
+    }
+
+    $update = dbUpdate(array('last_discovered' => array('NULL')), 'devices', '`device_id` = ?', array($id));
+    if (!empty($update) || $update == '0') {
+        $message = 'Device will be rediscovered';
+    } else {
+        $message = 'Error rediscovering device';
+    }
+    return array('status'=> $update, 'message' => $message);
+}
+
 function delete_device($id)
 {
     global $debug;

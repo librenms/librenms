@@ -914,8 +914,8 @@ $mysql_port = 3306;
 
 Note that depending on your MySQL installation (chrooted install for example),
 you may have to specify 127.0.0.1 instead of localhost. Localhost make
-a MySQL connexion via the mysql socket, while 127.0.0.1 make a standard
-IP connexion to mysql.
+a MySQL connection via the mysql socket, while 127.0.0.1 make a standard
+IP connection to mysql.
 
 5: Edit your snmpd.conf file and add:
 
@@ -1460,7 +1460,7 @@ extend raspberry /etc/snmp/raspberry.sh
 4: Edit your sudo users (usually `visudo`) and add at the bottom:
 
 ```
-snmp ALL=(ALL) NOPASSWD: /etc/snmp/raspberry.sh, /usr/bin/vcgencmd*
+snmp ALL=(ALL) NOPASSWD: /etc/snmp/raspberry.sh, /usr/bin/vcgencmd
 ```
 
 **Note:** If you are using Raspian, the default user is

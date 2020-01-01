@@ -717,6 +717,23 @@ function get_graphs(\Illuminate\Http\Request $request)
     });
 }
 
+function trigger_device_discovery(\Illuminate\Http\Request $request)
+{
+    // return details of a single device
+    $hostname = $request->route('hostname');
+
+    // use hostname as device_id if it's all digits
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    // find device matching the id
+    $device = device_by_id_cache($device_id);
+    if (!$device) {
+        return api_error(404, "Device $hostname does not exist");
+    }
+
+    $ret = device_discovery_trigger($device_id);
+    return api_success($ret, 'result');
+}
+
 function list_available_health_graphs(\Illuminate\Http\Request $request)
 {
     $hostname = $request->route('hostname');
@@ -1192,6 +1209,21 @@ function get_inventory(\Illuminate\Http\Request $request)
 }
 
 
+function get_inventory_for_device(\Illuminate\Http\Request $request)
+{
+    $hostname = $request->route('hostname');
+    // use hostname as device_id if it's all digits
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    return check_device_permission($device_id, function ($device_id) use ($request) {
+        $params    = [];
+        $sql = 'SELECT * FROM `entPhysical` WHERE device_id = ?';
+        $params[] = $device_id;
+        $inventory = dbFetchRows($sql, $params);
+        return api_success($inventory, 'inventory');
+    });
+}
+
+
 function search_oxidized(\Illuminate\Http\Request $request)
 {
     $search_in_conf_textbox = $request->route('searchstring');
@@ -1201,6 +1233,17 @@ function search_oxidized(\Illuminate\Http\Request $request)
         return api_error(404, "Received no data from Oxidized");
     } else {
         return api_success($result, 'nodes');
+    }
+}
+
+function get_oxidized_config(\Illuminate\Http\Request $request)
+{
+    $hostname = $request->route('device_name');
+    $result = json_decode(file_get_contents(Config::get('oxidized.url') . '/node/fetch/' . $hostname . '?format=json'), true);
+    if (!$result) {
+        return api_error(404, "Received no data from Oxidized");
+    } else {
+        return api_success($result, 'config');
     }
 }
 
@@ -1251,6 +1294,7 @@ function list_oxidized(\Illuminate\Http\Request $request)
             'vyos'       => 'vyatta',
             'slms'       => 'zhoneolt',
             'fireware'   => 'firewareos',
+            'fortigate'  => 'fortios',
         ];
 
         $device['os'] = str_replace(array_keys($models), array_values($models), $device['os']);

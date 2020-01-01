@@ -84,9 +84,9 @@ Source: `(ports.ifOperStatus != "up" AND ports.ifAdminStatus != "down" AND macro
 
 Entity: `macros.port_usage_perc`
 
-Description: Return port-usage in percent.
+Description: Return port-usage (max value of in and out) in percent.
 
-Source: `((ports.ifInOctets_rate*8) / ports.ifSpeed)*100`
+Source: `((SELECT IF(ports.ifOutOctets_rate>ports.ifInOctets_rate, ports.ifOutOctets_rate, ports.ifInOctets_rate)*8) / ports.ifSpeed)*100`
 
 ## Time
 
