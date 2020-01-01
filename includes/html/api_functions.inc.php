@@ -406,7 +406,6 @@ function add_device(\Illuminate\Http\Request $request)
         return api_error(400, 'You haven\'t specified an SNMP version to use');
     }
 
-
     $additional['overwrite_ip'] = $data['overwrite_ip'] ?: null;
 
     try {
