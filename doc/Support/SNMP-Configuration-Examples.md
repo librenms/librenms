@@ -457,7 +457,7 @@ service snmpd restart
    LibreNMS server IP address
 1. Validate change by clicking "Apply"
 
->Note: SNMPv3 can be supported on Windows playforms with the use of Net-SNMP.
+>Note: SNMPv3 can be supported on Windows platforms with the use of Net-SNMP.
 
 ### Mac OSX
 
