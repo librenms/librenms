@@ -15,6 +15,7 @@ use LibreNMS\Util\IPv4;
 use LibreNMS\Util\IPv6;
 use LibreNMS\Util\Url;
 use LibreNMS\Util\Time;
+use Permissions;
 
 class Device extends BaseModel
 {
@@ -227,9 +228,10 @@ class Device extends BaseModel
         } else {
             // load from yaml
             if ($existing) {
-                $os_list = array_map(function ($os) use ($install_dir) {
-                    return $install_dir . '/includes/definitions/' . $os . '.yaml';
-                }, self::distinct('os')->get('os')->toArray());
+                $os_list = [];
+                foreach (self::distinct('os')->get('os')->toArray() as $os) {
+                    $os_list[] = $install_dir . '/includes/definitions/' . $os['os'] . '.yaml';
+                }
             } else {
                 $os_list = glob($install_dir . '/includes/definitions/*.yaml');
             }
@@ -283,9 +285,7 @@ class Device extends BaseModel
             return true;
         }
 
-        return DB::table('devices_perms')
-            ->where('user_id', $user->user_id)
-            ->where('device_id', $this->device_id)->exists();
+        return Permissions::canAccessDevice($this->device_id, $user->user_id);
     }
 
     public function formatUptime($short = false)
@@ -677,6 +677,16 @@ class Device extends BaseModel
     public function mplsSdpBinds()
     {
         return $this->hasMany('App\Models\MplsSdpBind', 'device_id');
+    }
+
+    public function mplsTunnelArHops()
+    {
+        return $this->hasMany('App\Models\MplsTunnelArHop', 'device_id');
+    }
+
+    public function mplsTunnelCHops()
+    {
+        return $this->hasMany('App\Models\MplsTunnelCHop', 'device_id');
     }
 
     public function syslogs()

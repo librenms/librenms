@@ -3314,6 +3314,10 @@
                     "border": "#ff5555",
                     "edge": "#ff777788",
                     "node": "#ffdddd"
+                },
+                "highlight": {
+                    "border": "#ee4000",
+                    "borderWidth": 3
                 }
             },
             "type": "array"
@@ -3609,6 +3613,13 @@
             "section": "cleanup",
             "order": 6,
             "type": "integer"
+        },
+        "permission.device_group.allow_dynamic": {
+            "default": false,
+            "group": "authorization",
+            "order": 1,
+            "section": "device-group",
+            "type": "boolean"
         },
         "ping": {
             "default": "/bin/ping",

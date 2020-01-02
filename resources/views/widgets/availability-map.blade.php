@@ -23,7 +23,7 @@
 <br style="clear:both;">
 
 @foreach($devices as $device)
-    <a href="{{ \LibreNMS\Util\Url::deviceUrl($device) }}" title="{{ $device->displayName() }} - {{ $device->formatUptime(true) }}">
+    <a href="{{ \LibreNMS\Util\Url::deviceUrl($device) }}" title="{{ $device->displayName() }}@if($device->formatUptime(true)) - @endif{{ $device->formatUptime(true) }}">
         @if($type == 0)
             @if($color_only_select)
                 <span class="label {{ $device->labelClass }} widget-availability-fixed widget-availability label-font-border"> </span>
