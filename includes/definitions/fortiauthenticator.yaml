@@ -1,15 +1,132 @@
-os: fortiauthenticator
-text: 'Fortinet FortiAuthenticator'
-type: appliance
-icon: fortinet
-mib_dir:
-    - fortinet
-empty_ifdescr: true
-ifname: true
-over:
-    - { graph: device_bits, text: 'Device Traffic' }
-    - { graph: device_fortigate_cpu, text: 'CPU Usage' }
-    - { graph: device_mempool, text: 'Memory Usage' }
-discovery:
-    - sysObjectID:
-        - .1.3.6.1.4.1.8072.3.2 # FortiAuthenticator
+mib: FORTINET-FORTIAUTHENTICATOR-MIB
+modules:
+    processors:
+        data:
+            -
+                oid: fgSysCpuUsage
+                num_oid: '.1.3.6.1.4.1.12356.101.4.1.3.{{ $index }}'
+                type: fortigate-fixed
+    sensors:
+        state:
+            data:
+                -
+                    oid: facTrapAuthUsersThreshold
+                    num_oid: '.1.3.6.1.4.1.12356.113.0.100.{{ $index }}'
+                    descr: 'Users'
+                    group: 'Threshold'
+                    states:
+                        - { value: 1, descr: yes, graph: 1, generic: 2 }
+                        - { value: 0, descr: no, graph: 1, generic: 0 }
+                -
+                    oid: facTrapAuthGroupThreshold
+                    num_oid: '.1.3.6.1.4.1.12356.113.0.101.{{ $index }}'
+                    descr: 'Groups'
+                    group: 'Threshold'
+                    states:
+                        - { value: 1, descr: yes, graph: 1, generic: 2 }
+                        - { value: 0, descr: no, graph: 1, generic: 0 }
+                -
+                    oid: facTrapRadiusNasThreshold
+                    num_oid: '.1.3.6.1.4.1.12356.113.0.102.{{ $index }}'
+                    descr: 'NAS'
+                    group: 'Threshold'
+                    states:
+                        - { value: 1, descr: yes, graph: 1, generic: 2 }
+                        - { value: 0, descr: no, graph: 1, generic: 0 }
+                -
+                    oid: facTrapAuthEventsThreshold
+                    num_oid: '.1.3.6.1.4.1.12356.113.0.103.{{ $index }}'
+                    descr: 'NAS'
+                    group: 'Threshold'
+                    states:
+                        - { value: 1, descr: yes, graph: 1, generic: 2 }
+                        - { value: 0, descr: no, graph: 1, generic: 0 }
+                -
+                    oid: facTrapAuthFailureThreshold
+                    num_oid: '.1.3.6.1.4.1.12356.113.0.104.{{ $index }}'
+                    descr: 'Failures'
+                    group: 'Threshold'
+                    value: facTrapAuthFailureThreshold
+                    states:
+                        - { value: 1, descr: yes, graph: 1, generic: 2 }
+                        - { value: 0, descr: no, graph: 1, generic: 0 }
+                -
+                    oid: facTrapUserLockout
+                    num_oid: '.1.3.6.1.4.1.12356.113.0.105.{{ $index }}'
+                    descr: 'User Lockout'
+                    value: facTrapUserLockout
+                    states:
+                        - { value: 1, descr: yes, graph: 1, generic: 2 }
+                        - { value: 0, descr: no, graph: 1, generic: 0 }
+        count:
+            data:
+                -   
+                    oid: facAuthUserCount
+                    num_oid: '.1.3.6.1.4.1.12356.113.1.202.1.{{ $index }}'
+                    descr: 'Users'
+                    group: 'Current'
+                - 
+                    oid: facAuthGroupCount
+                    num_oid: '.1.3.6.1.4.1.12356.113.1.202.2.{{ $index }}'
+                    descr: 'Groups'
+                    group: 'Current'
+                - 
+                    oid: facAuthUsersRemaining
+                    num_oid: '.1.3.6.1.4.1.12356.113.1.202.4.{{ $index }}'
+                    descr: 'Users'
+                    group: 'Remaining'
+                -   
+                    oid: facAuthGroupRemaining
+                    num_oid: '.1.3.6.1.4.1.12356.113.1.202.5.{{ $index }}'
+                    descr: 'Groups'
+                    group: 'Remaining'
+                -   
+                    oid: facRadiusNasCount
+                    num_oid: '.1.3.6.1.4.1.12356.113.1.202.7.{{ $index }}'
+                    descr: 'NAS'
+                    group: 'Current'
+                -   
+                    oid: facRadiusNasRemaining
+                    num_oid: '.1.3.6.1.4.1.12356.113.1.202.8.{{ $index }}'
+                    descr: 'NAS'
+                    group: 'Remaining'
+                -   
+                    oid: facRadiusLoginsTotal
+                    num_oid: '.1.3.6.1.4.1.12356.113.1.202.10.{{ $index }}'
+                    descr: 'Success'
+                    group: 'Login - Total'
+                -   
+                    oid: facRadiusLogins5Mins
+                    num_oid: '.1.3.6.1.4.1.12356.113.1.202.11.{{ $index }}'
+                    descr: 'Success'
+                    group: 'Login - Last 5m'
+                -   
+                    oid: facRadiusFailuresTotal
+                    num_oid: '.1.3.6.1.4.1.12356.113.1.202.12.{{ $index }}'
+                    descr: 'Failures'
+                    group: 'Login - Total'
+                -   
+                    oid: facRadiusFailures5Mins
+                    num_oid: '.1.3.6.1.4.1.12356.113.1.202.13.{{ $index }}'
+                    descr: 'Failures'
+                    group: 'Login - Last 5m'
+                -   
+                    oid: facAuthEventsTotal
+                    num_oid: '.1.3.6.1.4.1.12356.113.1.202.20.{{ $index }}'
+                    descr: 'Total'
+                    group: 'Login - Total'
+                -   
+                    oid: facAuthEvents5Mins
+                    num_oid: '.1.3.6.1.4.1.12356.113.1.202.21.{{ $index }}'
+                    descr: 'Total'
+                    group: 'Login - Last 5m'
+                -   
+                    oid: facAuthFailuresTotal
+                    num_oid: '.1.3.6.1.4.1.12356.113.1.202.22.{{ $index }}'
+                    descr: 'Failures'
+                    group: 'Login - Total'
+                -   
+                    oid: facAuthFailures5Mins
+                    num_oid: '.1.3.6.1.4.1.12356.113.1.202.23.{{ $index }}'
+                    descr: 'Failures'
+                    group: 'Login - Last 5m'
