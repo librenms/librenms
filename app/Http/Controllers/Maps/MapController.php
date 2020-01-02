@@ -76,4 +76,20 @@ class MapController extends Controller
     {
         return [];
     }
+
+    protected function deviceStyle($device, $highlight_node = 0) {
+        if ($device->disabled) {
+            $device_style = $this->nodeDisabledStyle();
+        } elseif (! $device->status) {
+            $device_style = $this->nodeDownStyle();
+        } else {
+            $device_style = $this->nodeUpStyle();
+        }
+
+        if ($device->device_id == $highlight_node) {
+            $device_style = array_merge($device_style, $this->nodeHighlightStyle());
+        }
+
+        return $device_style;
+    }
 }

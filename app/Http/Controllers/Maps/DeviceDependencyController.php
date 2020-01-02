@@ -31,74 +31,43 @@ use LibreNMS\Util\Url;
 
 class DeviceDependencyController extends MapController
 {
+    protected static function deviceList($request) {
+
+        $group_id = $request->get('group') | 0;
+
+        if (! $group_id) {
+            return Device::hasAccess($request->user())->with('parents', 'location')->get();
+        }
+
+        $devices = Device::inDeviceGroup($group_id)
+          ->hasAccess($request->user())
+          ->with([
+            'location',
+            'parents' => function ($query) use ($request) {
+              $query->hasAccess($request->user());
+            },
+            'children' => function ($query) use ($request) {
+              $query->hasAccess($request->user());
+            }])
+          ->get();
+
+        return $devices->merge($devices->map->only('children', 'parents')->flatten());
+    }
+
     // Device Dependency Map
     public function dependencyMap(Request $request)
     {
-        $devices = Device::hasAccess($request->user())->with('parents', 'location')->get();
-
         $group_id = $request->get('group') | 0;
         $highlight_node = $request->get('highlight_node') | 0;
 
         $dependencies = [];
         $devices_by_id  = [];
-
-        // Device IDs of Devices to show
-        $device_nodes = [];
-        $device_parents = [];
-        $device_childs = [];
-
-        // Build the style variables we need
-
-        //get child and parent Device ID's - for showing showing them
-        //even if they are not member oder Device Group
-        foreach ($devices as $device) {
-            if ($group_id) {
-                if (! in_array($group_id, $device->groups()->pluck('id')->toArray())) {
-                    continue;
-                }
-            }
-
-            $device_nodes[] = $device->device_id;
-
-            // no Device Group Filter set, no parent/child discovery needed
-            if (! $group_id) {
-                continue;
-            }
-
-            $parents = $device->parents;
-            foreach ($parents as $parent) {
-                    $device_parents[] = $parent->device_id;
-            };
-
-            $childs = $device->children;
-            foreach ($childs as $child) {
-                    $device_childs[] = $child->device_id;
-            };
-        }
-
-        $devices_to_show = array_merge($device_nodes, array_merge($device_parents, $device_childs));
-
         $device_list = [];
 
         // List all devices
-        foreach ($devices as $device) {
-            if (! in_array($device->device_id, $devices_to_show)) {
-                continue;
-            }
+        foreach (self::deviceList($request) as $device) {
 
             $device_list[] = ['id' => $device->device_id, 'label' => $device->hostname];
-
-            if ($device->disabled) {
-                $device_style = $this->nodeDisabledStyle();
-            } elseif (! $device->status) {
-                $device_style = $this->nodeDownStyle();
-            } else {
-                $device_style = $this->nodeUpStyle();
-            }
-
-            if ($device->device_id == $highlight_node) {
-                $device_style = array_merge($device_style, $this->nodeHighlightStyle());
-            }
 
             // List all Device
             $devices_by_id[] = array_merge(
@@ -108,7 +77,7 @@ class DeviceDependencyController extends MapController
                     'title' => Url::deviceLink($device, null, [], 0, 0, 0, 0),
                     'shape' => 'box',
                 ],
-                $device_style
+                $this->deviceStyle($device, $highlight_node)
             );
 
             // List all Device Dependencies
