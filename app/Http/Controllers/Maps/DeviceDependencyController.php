@@ -33,7 +33,7 @@ class DeviceDependencyController extends MapController
 {
     protected static function deviceList($request)
     {
-        $group_id = $request->get('group') || 0;
+        $group_id = $request->get('group');
 
         if (! $group_id) {
             return Device::hasAccess($request->user())->with('parents', 'location')->get();
@@ -57,8 +57,8 @@ class DeviceDependencyController extends MapController
     // Device Dependency Map
     public function dependencyMap(Request $request)
     {
-        $group_id = $request->get('group') || 0;
-        $highlight_node = $request->get('highlight_node') || 0;
+        $group_id = $request->get('group');
+        $highlight_node = $request->get('highlight_node');
 
         $dependencies = [];
         $devices_by_id  = [];
