@@ -14,6 +14,7 @@
 */
 
 $where = 1;
+$param = [];
 
 if (is_numeric($vars['device_id'])) {
     $where .= ' AND E.device_id = ?';
@@ -31,13 +32,19 @@ if (isset($vars['min_severity'])) {
 
 if (!Auth::user()->hasGlobalRead()) {
     $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
-    $where .= " AND `D`.`device_id` IN " .dbGenPlaceholders(count($device_ids));
+    $where .= " AND `E`.`device_id` IN " .dbGenPlaceholders(count($device_ids));
     $param = array_merge($param, $device_ids);
 }
 
 if (isset($searchPhrase) && !empty($searchPhrase)) {
-    $sql .= " AND (`D`.`hostname` LIKE '%$searchPhrase%' OR `D`.`sysName` LIKE '%$searchPhrase%' OR `E`.`time_logged` LIKE '%$searchPhrase%' OR `name` LIKE '%$searchPhrase%')";
+    $where .= " AND (`D`.`hostname` LIKE ? OR `D`.`sysName` LIKE ? OR `E`.`time_logged` LIKE ? OR `name` LIKE ?)";
+    $param[] = "%$searchPhrase%";
+    $param[] = "%$searchPhrase%";
+    $param[] = "%$searchPhrase%";
+    $param[] = "%$searchPhrase%";
 }
+
+$sql = " FROM `alert_log` AS E LEFT JOIN devices AS D ON E.device_id=D.device_id RIGHT JOIN alert_rules AS R ON E.rule_id=R.id WHERE $where";
 
 $count_sql = "SELECT COUNT(`E`.`id`) $sql";
 $total = dbFetchCell($count_sql, $param);
