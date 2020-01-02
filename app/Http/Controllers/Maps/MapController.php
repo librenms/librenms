@@ -77,7 +77,8 @@ class MapController extends Controller
         return [];
     }
 
-    protected function deviceStyle($device, $highlight_node = 0) {
+    protected function deviceStyle($device, $highlight_node = 0)
+    {
         if ($device->disabled) {
             $device_style = $this->nodeDisabledStyle();
         } elseif (! $device->status) {

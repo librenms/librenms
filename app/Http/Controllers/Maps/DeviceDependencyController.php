@@ -31,8 +31,8 @@ use LibreNMS\Util\Url;
 
 class DeviceDependencyController extends MapController
 {
-    protected static function deviceList($request) {
-
+    protected static function deviceList($request)
+    {
         $group_id = $request->get('group') | 0;
 
         if (! $group_id) {
@@ -40,16 +40,16 @@ class DeviceDependencyController extends MapController
         }
 
         $devices = Device::inDeviceGroup($group_id)
-          ->hasAccess($request->user())
-          ->with([
-            'location',
-            'parents' => function ($query) use ($request) {
-              $query->hasAccess($request->user());
-            },
-            'children' => function ($query) use ($request) {
-              $query->hasAccess($request->user());
-            }])
-          ->get();
+            ->hasAccess($request->user())
+            ->with([
+                'location',
+                'parents' => function ($query) use ($request) {
+                  $query->hasAccess($request->user());
+                },
+                'children' => function ($query) use ($request) {
+                  $query->hasAccess($request->user());
+                }])
+            ->get();
 
         return $devices->merge($devices->map->only('children', 'parents')->flatten());
     }
@@ -66,7 +66,6 @@ class DeviceDependencyController extends MapController
 
         // List all devices
         foreach (self::deviceList($request) as $device) {
-
             $device_list[] = ['id' => $device->device_id, 'label' => $device->hostname];
 
             // List all Device
