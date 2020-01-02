@@ -50,7 +50,7 @@
 
     function highlightNode(e) {
         highlight_node = document.getElementById("highlight_node").value;
-        window.location.pathname = 'maps/devicedependency/group={{ $group_id }}/highlight_node=' + highlight_node;
+        window.location.href = 'maps/devicedependency?group={{ $group_id }}&highlight_node=' + highlight_node;
     }
 
     $('#highlight_node option[value="{{$highlight_node}}"]').prop('selected', true);

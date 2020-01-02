@@ -32,9 +32,12 @@ use LibreNMS\Util\Url;
 class DeviceDependencyController extends MapController
 {
     // Device Dependency Map
-    public function dependencyMap(Request $request, $group_id = 0, $highlight_node = 0)
+    public function dependencyMap(Request $request)
     {
         $devices = Device::hasAccess($request->user())->with('parents', 'location')->get();
+
+        $group_id = $request->get('group') | 0;
+        $highlight_node = $request->get('highlight_node') | 0;
 
         $dependencies = [];
         $devices_by_id  = [];

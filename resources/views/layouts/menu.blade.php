@@ -42,7 +42,7 @@
                                         </a>
                                         <ul class="dropdown-menu scrollable-menu">
                                         @foreach($device_groups as $group)
-                                            <li><a href="{{ url("maps/devicedependency/group=$group->id") }}" title="{{ $group->desc }}"><i class="fa fa-chain fa-fw fa-lg" aria-hidden="true"></i>
+                                            <li><a href="{{ url("maps/devicedependency?group=$group->id") }}" title="{{ $group->desc }}"><i class="fa fa-chain fa-fw fa-lg" aria-hidden="true"></i>
                                                 {{ ucfirst($group->name) }}
                                             </a></li>
                                         @endforeach
