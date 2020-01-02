@@ -27,7 +27,7 @@ $switch = snmp_get($device, ".1.3.6.1.4.1.32050.2.1.26.5.3", "-Ovqe");
 
 if ($switch) {
     //Create State Index
-          $state_name = 'switchInput';
+    $state_name = 'switchInput';
     $states = [
         ['value' => 0, 'generic' => 0, 'graph' => 1, 'descr' => 'Open'],
         ['value' => 1, 'generic' => 0, 'graph' => 1, 'descr' => 'Closed'],
