@@ -1,6 +1,6 @@
 <?php
 /**
- * VmwUtil.php
+ * VmwTrapUtil.php
  *
  * -Description-
  * 
@@ -32,7 +32,7 @@
 
 namespace LibreNMS\Snmptrap\Handlers;
 
-class VmwUtil
+class VmwTrapUtil
 {
     /**
      * Get the VMGuest hostname

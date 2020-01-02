@@ -30,7 +30,7 @@ namespace LibreNMS\Snmptrap\Handlers;
 use App\Models\Device;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
-use LibreNMS\Snmptrap\Handlers\VmwUtil;
+use LibreNMS\Snmptrap\Handlers\VmwTrapUtil;
 use Log;
 
 class VmwVmPoweredOff implements SnmptrapHandler
@@ -45,7 +45,7 @@ class VmwVmPoweredOff implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-        $vmGuestName = VmwUtil::getGuestName($trap);
+        $vmGuestName = VmwTrapUtil::getGuestName($trap);
         Log::event("Guest $vmGuestName was powered off", $device->device_id, 'trap', 2);
     }
 }
