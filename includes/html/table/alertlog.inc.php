@@ -29,6 +29,8 @@ if (isset($vars['min_severity'])) {
     $where .=  get_sql_filter_min_severity($vars['min_severity'], "R");
 }
 
+$sql = " FROM `alert_log` AS E LEFT JOIN devices AS D ON E.device_id=D.device_id RIGHT JOIN alert_rules AS R ON E.rule_id=R.id WHERE $where";
+
 if (!Auth::user()->hasGlobalRead()) {
     $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
     $where .= " AND `D`.`device_id` IN " .dbGenPlaceholders(count($device_ids));
