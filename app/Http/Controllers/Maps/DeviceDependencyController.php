@@ -50,8 +50,7 @@ class DeviceDependencyController extends MapController
                     $query->hasAccess($request->user());
                 }])
             ->get();
-
-        return $devices->merge($devices->map->only('children', 'parents')->flatten());
+        return $devices->loadMissing('parents', 'location')->merge($devices->map->only('children', 'parents')->flatten());
     }
 
     // Device Dependency Map
