@@ -1,6 +1,6 @@
 <?php
 
-$oid  = 'rbSysVoltage.0';
+$oid  = '.1.3.6.1.4.1.31926.1.1.0';
 $oids = snmp_walk($device, "$oid", '-OsqnU', 'RADIO-BRIDGE-MIB');
 d_echo($oids."\n");
 
