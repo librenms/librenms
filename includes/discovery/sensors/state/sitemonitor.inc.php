@@ -54,4 +54,3 @@ if ($switch) {
     create_sensor_to_state_index($device, $state_name, $sensor_index);
 }
 
-
