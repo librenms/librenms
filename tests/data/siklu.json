@@ -1197,7 +1197,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_prev": 46.0,
+                    "sensor_prev": null,
                     "user_func": null,
                     "state_name": null
                 }
