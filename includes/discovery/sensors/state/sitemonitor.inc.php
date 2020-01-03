@@ -41,7 +41,7 @@ if ($switch) {
         $device,
         '.1.3.6.1.4.1.32050.2.1.26.5.3',
         $sensor_index,
-        'sitemonitor ',
+        $state_name,
         'Switch Input',
         1,
         1,
