@@ -44,10 +44,10 @@ class DeviceDependencyController extends MapController
             ->with([
                 'location',
                 'parents' => function ($query) use ($request) {
-                  $query->hasAccess($request->user());
+                    $query->hasAccess($request->user());
                 },
                 'children' => function ($query) use ($request) {
-                  $query->hasAccess($request->user());
+                    $query->hasAccess($request->user());
                 }])
             ->get();
 
