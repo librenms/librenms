@@ -2,7 +2,7 @@
 /**
  * sitemonitor.inc.php
  *
- * LibreNMS state discovery module for Aruba Instant
+ * LibreNMS state discovery module for Packetflux SiteMonitor Base II
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,8 +29,8 @@ if ($switch) {
     //Create State Index
     $state_name = 'switchInput';
     $states = [
-        ['value' => 0, 'generic' => 1, 'graph' => 1, 'descr' => 'Open'],
-        ['value' => 1, 'generic' => 1, 'graph' => 1, 'descr' => 'Closed'],
+        ['value' => 0, 'generic' => 0, 'graph' => 1, 'descr' => 'Open'],
+        ['value' => 1, 'generic' => 0, 'graph' => 1, 'descr' => 'Closed'],
     ];
     create_state_index($state_name, $states);
 
@@ -39,18 +39,16 @@ if ($switch) {
         $valid['sensor'],
         'state',
         $device,
-        '.1.3.6.1.4.1.32050.2.1.26.5.' . $sensor_index,
+        '.1.3.6.1.4.1.32050.2.1.26.5.3',
         $sensor_index,
-        $state_name,
+        'sitemonitor ',
         'Switch Input',
+        1,
         1,
         null,
         null,
         null,
-        null,
-        $state,
-        'snmp',
-        0
+        null
     );
 
     create_sensor_to_state_index($device, $state_name, $sensor_index);
