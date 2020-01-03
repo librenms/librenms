@@ -3,6 +3,7 @@
  * arubaos.inc.php
  *
  * Discover ArubaOS FDB data with Q-BRIDGE-MIB and BRIDGE-MIB
+ *  based on bridge.inc.php
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,9 +19,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @package    LibreNMS
+ * @subpackage discovery/fdb-table
  * @link       http://librenms.org
- * @copyright  2017 Tony Murray
- * @author     Tony Murray <murraytony@gmail.com>
+ * @copyright  2020 LibreNMS
+ * @author     Ken Lui <tmpest1@yahoo.com>
  */
 
 // Try Q-BRIDGE-MIB::dot1qTpFdbPort first
