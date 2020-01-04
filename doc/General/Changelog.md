@@ -1,3 +1,372 @@
+## 1.59
+*(2020-01-04)*
+
+A big thank you to the following 29 contributors this last month:
+
+  - SourceDoctor (15)
+  - PipoCanaja (11)
+  - louis-oui (6)
+  - hrtrd (4)
+  - Jellyfrog (3)
+  - cjwbath (3)
+  - djamp42 (2)
+  - murrant (2)
+  - Derova (2)
+  - CharlesMAtkinson (2)
+  - vitalisator (2)
+  - kedare (1)
+  - dlehman83 (1)
+  - willhseitz (1)
+  - Munzy (1)
+  - ProTofik (1)
+  - theochita (1)
+  - computman007 (1)
+  - jozefrebjak (1)
+  - dsgagi (1)
+  - seros1521 (1)
+  - kamils85 (1)
+  - jviersel (1)
+  - achrstl (1)
+  - ajsiersema (1)
+  - jayceeemperador (1)
+  - dlangille (1)
+  - kkrumm1 (1)
+  - dbuschjr (1)
+
+#### Feature
+* Custom OID polling and graphing ([#10945](https://github.com/librenms/librenms/pull/10945)) - [louis-oui](https://github.com/louis-oui)
+
+#### Device
+* Update epmp.yaml ([#10989](https://github.com/librenms/librenms/pull/10989)) - [dbuschjr](https://github.com/dbuschjr)
+* Mpls Path Visualization ([#10936](https://github.com/librenms/librenms/pull/10936)) - [vitalisator](https://github.com/vitalisator)
+* Support new os GWD ([#10978](https://github.com/librenms/librenms/pull/10978)) - [hrtrd](https://github.com/hrtrd)
+* Barracuda Web Application Firewall basic support ([#10970](https://github.com/librenms/librenms/pull/10970)) - [jayceeemperador](https://github.com/jayceeemperador)
+* Support new os C-DATA ([#10975](https://github.com/librenms/librenms/pull/10975)) - [hrtrd](https://github.com/hrtrd)
+* Ixia ANUE basic support ([#10946](https://github.com/librenms/librenms/pull/10946)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Support new os SNR ([#10704](https://github.com/librenms/librenms/pull/10704)) - [hrtrd](https://github.com/hrtrd)
+* Categorise Cisco WLC as wireless, like the other controller-based wireless platforms ([#10953](https://github.com/librenms/librenms/pull/10953)) - [cjwbath](https://github.com/cjwbath)
+* Rewrite Microsemi Midspan Power Sensors with mib ([#10959](https://github.com/librenms/librenms/pull/10959)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Added Huawei UPS2000 support ([#10831](https://github.com/librenms/librenms/pull/10831)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Cisco Viptela basic support ([#10947](https://github.com/librenms/librenms/pull/10947)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Fix raisecom fan speed sensor limits ([#10930](https://github.com/librenms/librenms/pull/10930)) - [vitalisator](https://github.com/vitalisator)
+* Added support for additional Edge-Core ECS devices ([#10924](https://github.com/librenms/librenms/pull/10924)) - [kamils85](https://github.com/kamils85)
+* Added iBoot PDU (dataprobe) support ([#10898](https://github.com/librenms/librenms/pull/10898)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Add queues to Barracuda Email Security GW ([#10915](https://github.com/librenms/librenms/pull/10915)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Added detection of Edge-Core ECS4100 ([#10801](https://github.com/librenms/librenms/pull/10801)) - [jozefrebjak](https://github.com/jozefrebjak)
+* Add EdgeSwitch 10XP definition ([#10909](https://github.com/librenms/librenms/pull/10909)) - [computman007](https://github.com/computman007)
+* Updated Aruba ClearPass appliance detection for new sysObjectId ([#10892](https://github.com/librenms/librenms/pull/10892)) - [cjwbath](https://github.com/cjwbath)
+* IES OS discovery, removed trailing "-" from sysdescr ([#10897](https://github.com/librenms/librenms/pull/10897)) - [djamp42](https://github.com/djamp42)
+
+#### Webui
+* Device group based access ([#10568](https://github.com/librenms/librenms/pull/10568)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Dont't show ' - ' on ping only Devices in Availability Widget ([#10988](https://github.com/librenms/librenms/pull/10988)) - [SourceDoctor](https://github.com/SourceDoctor)
+* User Enabled State as Icon ([#10984](https://github.com/librenms/librenms/pull/10984)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Highlight Nodes on Network map ([#10943](https://github.com/librenms/librenms/pull/10943)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Capcity -\> Capacity ([#10974](https://github.com/librenms/librenms/pull/10974)) - [dlangille](https://github.com/dlangille)
+* Fix Device Mouseover View ([#10962](https://github.com/librenms/librenms/pull/10962)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Add alert history in device section ([#10972](https://github.com/librenms/librenms/pull/10972)) - [louis-oui](https://github.com/louis-oui)
+* Use sysName instead of hostname on AJAX search and new billing form ([#10951](https://github.com/librenms/librenms/pull/10951)) - [kedare](https://github.com/kedare)
+* Add severity filter to webui alert history ([#10918](https://github.com/librenms/librenms/pull/10918)) - [louis-oui](https://github.com/louis-oui)
+* Protocol filter for Routing Table View ([#10933](https://github.com/librenms/librenms/pull/10933)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Fix for device config file identification ([#10942](https://github.com/librenms/librenms/pull/10942)) - [jviersel](https://github.com/jviersel)
+* Fix icon for bgp search ([#10931](https://github.com/librenms/librenms/pull/10931)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Devices Unpolled Warning ([#10903](https://github.com/librenms/librenms/pull/10903)) - [Munzy](https://github.com/Munzy)
+* Show Date from last discovery and last poll ([#10876](https://github.com/librenms/librenms/pull/10876)) - [SourceDoctor](https://github.com/SourceDoctor)
+
+#### Graphs
+* Use format_hostname for graph default title ([#10891](https://github.com/librenms/librenms/pull/10891)) - [PipoCanaja](https://github.com/PipoCanaja)
+
+#### Api
+* Update oxidized model mapping ([#10966](https://github.com/librenms/librenms/pull/10966)) - [seros1521](https://github.com/seros1521)
+* Adds API to fetch all inventory items for a given device ([#10885](https://github.com/librenms/librenms/pull/10885)) - [ajsiersema](https://github.com/ajsiersema)
+* API Call to trigger Device Discovery ([#10861](https://github.com/librenms/librenms/pull/10861)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Add ability to fetch oxidized device config via the librenms API ([#10913](https://github.com/librenms/librenms/pull/10913)) - [theochita](https://github.com/theochita)
+
+#### Alerting
+* Get Colors from getColorState function for Alert Transport Rocket ([#10955](https://github.com/librenms/librenms/pull/10955)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Get Colors from getColorState function for Alert Transport Mattermost ([#10956](https://github.com/librenms/librenms/pull/10956)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Get Colors from getColorState function for Alert Transport Slack ([#10957](https://github.com/librenms/librenms/pull/10957)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Move Alert State Color Definition to config_defintion ([#10958](https://github.com/librenms/librenms/pull/10958)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Port usage perc CI/CD fix ([#10935](https://github.com/librenms/librenms/pull/10935)) - [louis-oui](https://github.com/louis-oui)
+* More appropriate state colours for MS Teams alerts ([#10911](https://github.com/librenms/librenms/pull/10911)) - [cjwbath](https://github.com/cjwbath)
+* Fixed port_usage_perc macro to match max(in,out) ([#10932](https://github.com/librenms/librenms/pull/10932)) - [louis-oui](https://github.com/louis-oui)
+* Update alert rules with backticks ([#10902](https://github.com/librenms/librenms/pull/10902)) - [willhseitz](https://github.com/willhseitz)
+
+#### Discovery
+* Improve ports-fdb discovery sql queries ([#10883](https://github.com/librenms/librenms/pull/10883)) - [murrant](https://github.com/murrant)
+
+#### Bug
+* Fix alertlog sql after b361710148dc2d90d4df94e036d273e763e01521 ([#10991](https://github.com/librenms/librenms/pull/10991)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Regression fixes ([#10976](https://github.com/librenms/librenms/pull/10976)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Fix Capture Debug page symfony timeout error ([#10926](https://github.com/librenms/librenms/pull/10926)) - [dsgagi](https://github.com/dsgagi)
+* Fix alert icons wrongly defaults to blue info level ([#10906](https://github.com/librenms/librenms/pull/10906)) - [louis-oui](https://github.com/louis-oui)
+
+#### Refactor
+* Globalize getColorForState function ([#10944](https://github.com/librenms/librenms/pull/10944)) - [SourceDoctor](https://github.com/SourceDoctor)
+
+#### Cleanup
+* Centralize redundant discovery SQL Query ([#10875](https://github.com/librenms/librenms/pull/10875)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Typo VDSL2-LINE-MIB ([#10914](https://github.com/librenms/librenms/pull/10914)) - [PipoCanaja](https://github.com/PipoCanaja)
+
+#### Documentation
+* Update alert transport doc. ([#10963](https://github.com/librenms/librenms/pull/10963)) - [kkrumm1](https://github.com/kkrumm1)
+* Clarify Configuration.md ([#10960](https://github.com/librenms/librenms/pull/10960)) - [CharlesMAtkinson](https://github.com/CharlesMAtkinson)
+* RouterOS 6.x ([#10961](https://github.com/librenms/librenms/pull/10961)) - [CharlesMAtkinson](https://github.com/CharlesMAtkinson)
+* Update Oxidized.md ([#10864](https://github.com/librenms/librenms/pull/10864)) - [achrstl](https://github.com/achrstl)
+* Updated Spelling ([#10921](https://github.com/librenms/librenms/pull/10921)) - [Derova](https://github.com/Derova)
+* Removed typo from the code ([#10912](https://github.com/librenms/librenms/pull/10912)) - [ProTofik](https://github.com/ProTofik)
+* Fix missing documentation parts for Seafile ([#10905](https://github.com/librenms/librenms/pull/10905)) - [SourceDoctor](https://github.com/SourceDoctor)
+
+#### Misc
+* Fix spelling ([#10987](https://github.com/librenms/librenms/pull/10987)) - [dlehman83](https://github.com/dlehman83)
+
+
+## 1.59
+*(2020-01-04)*
+
+A big thank you to the following 29 contributors this last month:
+
+  - SourceDoctor (15)
+  - PipoCanaja (11)
+  - louis-oui (6)
+  - hrtrd (4)
+  - Jellyfrog (3)
+  - cjwbath (3)
+  - djamp42 (2)
+  - murrant (2)
+  - Derova (2)
+  - CharlesMAtkinson (2)
+  - vitalisator (2)
+  - kedare (1)
+  - dlehman83 (1)
+  - willhseitz (1)
+  - Munzy (1)
+  - ProTofik (1)
+  - theochita (1)
+  - computman007 (1)
+  - jozefrebjak (1)
+  - dsgagi (1)
+  - seros1521 (1)
+  - kamils85 (1)
+  - jviersel (1)
+  - achrstl (1)
+  - ajsiersema (1)
+  - jayceeemperador (1)
+  - dlangille (1)
+  - kkrumm1 (1)
+  - dbuschjr (1)
+
+#### Feature
+* Custom OID polling and graphing ([#10945](https://github.com/librenms/librenms/pull/10945)) - [louis-oui](https://github.com/louis-oui)
+
+#### Device
+* Update epmp.yaml ([#10989](https://github.com/librenms/librenms/pull/10989)) - [dbuschjr](https://github.com/dbuschjr)
+* Mpls Path Visualization ([#10936](https://github.com/librenms/librenms/pull/10936)) - [vitalisator](https://github.com/vitalisator)
+* Support new os GWD ([#10978](https://github.com/librenms/librenms/pull/10978)) - [hrtrd](https://github.com/hrtrd)
+* Barracuda Web Application Firewall basic support ([#10970](https://github.com/librenms/librenms/pull/10970)) - [jayceeemperador](https://github.com/jayceeemperador)
+* Support new os C-DATA ([#10975](https://github.com/librenms/librenms/pull/10975)) - [hrtrd](https://github.com/hrtrd)
+* Ixia ANUE basic support ([#10946](https://github.com/librenms/librenms/pull/10946)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Support new os SNR ([#10704](https://github.com/librenms/librenms/pull/10704)) - [hrtrd](https://github.com/hrtrd)
+* Categorise Cisco WLC as wireless, like the other controller-based wireless platforms ([#10953](https://github.com/librenms/librenms/pull/10953)) - [cjwbath](https://github.com/cjwbath)
+* Rewrite Microsemi Midspan Power Sensors with mib ([#10959](https://github.com/librenms/librenms/pull/10959)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Added Huawei UPS2000 support ([#10831](https://github.com/librenms/librenms/pull/10831)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Cisco Viptela basic support ([#10947](https://github.com/librenms/librenms/pull/10947)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Fix raisecom fan speed sensor limits ([#10930](https://github.com/librenms/librenms/pull/10930)) - [vitalisator](https://github.com/vitalisator)
+* Added support for additional Edge-Core ECS devices ([#10924](https://github.com/librenms/librenms/pull/10924)) - [kamils85](https://github.com/kamils85)
+* Added iBoot PDU (dataprobe) support ([#10898](https://github.com/librenms/librenms/pull/10898)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Add queues to Barracuda Email Security GW ([#10915](https://github.com/librenms/librenms/pull/10915)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Added detection of Edge-Core ECS4100 ([#10801](https://github.com/librenms/librenms/pull/10801)) - [jozefrebjak](https://github.com/jozefrebjak)
+* Add EdgeSwitch 10XP definition ([#10909](https://github.com/librenms/librenms/pull/10909)) - [computman007](https://github.com/computman007)
+* Updated Aruba ClearPass appliance detection for new sysObjectId ([#10892](https://github.com/librenms/librenms/pull/10892)) - [cjwbath](https://github.com/cjwbath)
+* IES OS discovery, removed trailing "-" from sysdescr ([#10897](https://github.com/librenms/librenms/pull/10897)) - [djamp42](https://github.com/djamp42)
+
+#### Webui
+* Device group based access ([#10568](https://github.com/librenms/librenms/pull/10568)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Dont't show ' - ' on ping only Devices in Availability Widget ([#10988](https://github.com/librenms/librenms/pull/10988)) - [SourceDoctor](https://github.com/SourceDoctor)
+* User Enabled State as Icon ([#10984](https://github.com/librenms/librenms/pull/10984)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Highlight Nodes on Network map ([#10943](https://github.com/librenms/librenms/pull/10943)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Capcity -\> Capacity ([#10974](https://github.com/librenms/librenms/pull/10974)) - [dlangille](https://github.com/dlangille)
+* Fix Device Mouseover View ([#10962](https://github.com/librenms/librenms/pull/10962)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Add alert history in device section ([#10972](https://github.com/librenms/librenms/pull/10972)) - [louis-oui](https://github.com/louis-oui)
+* Use sysName instead of hostname on AJAX search and new billing form ([#10951](https://github.com/librenms/librenms/pull/10951)) - [kedare](https://github.com/kedare)
+* Add severity filter to webui alert history ([#10918](https://github.com/librenms/librenms/pull/10918)) - [louis-oui](https://github.com/louis-oui)
+* Protocol filter for Routing Table View ([#10933](https://github.com/librenms/librenms/pull/10933)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Fix for device config file identification ([#10942](https://github.com/librenms/librenms/pull/10942)) - [jviersel](https://github.com/jviersel)
+* Fix icon for bgp search ([#10931](https://github.com/librenms/librenms/pull/10931)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Devices Unpolled Warning ([#10903](https://github.com/librenms/librenms/pull/10903)) - [Munzy](https://github.com/Munzy)
+* Show Date from last discovery and last poll ([#10876](https://github.com/librenms/librenms/pull/10876)) - [SourceDoctor](https://github.com/SourceDoctor)
+
+#### Graphs
+* Use format_hostname for graph default title ([#10891](https://github.com/librenms/librenms/pull/10891)) - [PipoCanaja](https://github.com/PipoCanaja)
+
+#### Api
+* Update oxidized model mapping ([#10966](https://github.com/librenms/librenms/pull/10966)) - [seros1521](https://github.com/seros1521)
+* Adds API to fetch all inventory items for a given device ([#10885](https://github.com/librenms/librenms/pull/10885)) - [ajsiersema](https://github.com/ajsiersema)
+* API Call to trigger Device Discovery ([#10861](https://github.com/librenms/librenms/pull/10861)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Add ability to fetch oxidized device config via the librenms API ([#10913](https://github.com/librenms/librenms/pull/10913)) - [theochita](https://github.com/theochita)
+
+#### Alerting
+* Get Colors from getColorState function for Alert Transport Mattermost ([#10956](https://github.com/librenms/librenms/pull/10956)) - [SourceDoctor](https://github.com/SourceDoctor)
+* More appropriate state colours for MS Teams alerts ([#10911](https://github.com/librenms/librenms/pull/10911)) - [cjwbath](https://github.com/cjwbath)
+* Fixed port_usage_perc macro to match max(in,out) ([#10932](https://github.com/librenms/librenms/pull/10932)) - [louis-oui](https://github.com/louis-oui)
+* Update alert rules with backticks ([#10902](https://github.com/librenms/librenms/pull/10902)) - [willhseitz](https://github.com/willhseitz)
+
+#### Discovery
+* Improve ports-fdb discovery sql queries ([#10883](https://github.com/librenms/librenms/pull/10883)) - [murrant](https://github.com/murrant)
+
+#### Bug
+* Fix alertlog sql after b361710148dc2d90d4df94e036d273e763e01521 ([#10991](https://github.com/librenms/librenms/pull/10991)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Regression fixes ([#10976](https://github.com/librenms/librenms/pull/10976)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Fix Capture Debug page symfony timeout error ([#10926](https://github.com/librenms/librenms/pull/10926)) - [dsgagi](https://github.com/dsgagi)
+* Fix alert icons wrongly defaults to blue info level ([#10906](https://github.com/librenms/librenms/pull/10906)) - [louis-oui](https://github.com/louis-oui)
+
+#### Refactor
+* Globalize getColorForState function ([#10944](https://github.com/librenms/librenms/pull/10944)) - [SourceDoctor](https://github.com/SourceDoctor)
+
+#### Cleanup
+* Typo VDSL2-LINE-MIB ([#10914](https://github.com/librenms/librenms/pull/10914)) - [PipoCanaja](https://github.com/PipoCanaja)
+
+#### Documentation
+* Update alert transport doc. ([#10963](https://github.com/librenms/librenms/pull/10963)) - [kkrumm1](https://github.com/kkrumm1)
+* Clarify Configuration.md ([#10960](https://github.com/librenms/librenms/pull/10960)) - [CharlesMAtkinson](https://github.com/CharlesMAtkinson)
+* RouterOS 6.x ([#10961](https://github.com/librenms/librenms/pull/10961)) - [CharlesMAtkinson](https://github.com/CharlesMAtkinson)
+* Update Oxidized.md ([#10864](https://github.com/librenms/librenms/pull/10864)) - [achrstl](https://github.com/achrstl)
+* Updated Spelling ([#10921](https://github.com/librenms/librenms/pull/10921)) - [Derova](https://github.com/Derova)
+* Removed typo from the code ([#10912](https://github.com/librenms/librenms/pull/10912)) - [ProTofik](https://github.com/ProTofik)
+* Fix missing documentation parts for Seafile ([#10905](https://github.com/librenms/librenms/pull/10905)) - [SourceDoctor](https://github.com/SourceDoctor)
+
+#### Misc
+* Fix spelling ([#10987](https://github.com/librenms/librenms/pull/10987)) - [dlehman83](https://github.com/dlehman83)
+* Get Colors from getColorState function for Alert Transport Rocket ([#10955](https://github.com/librenms/librenms/pull/10955)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Get Colors from getColorState function for Alert Transport Slack ([#10957](https://github.com/librenms/librenms/pull/10957)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Move Alert State Color Definition to config_defintion ([#10958](https://github.com/librenms/librenms/pull/10958)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Port usage perc CI/CD fix ([#10935](https://github.com/librenms/librenms/pull/10935)) - [louis-oui](https://github.com/louis-oui)
+* Centralize redundant discovery SQL Query ([#10875](https://github.com/librenms/librenms/pull/10875)) - [SourceDoctor](https://github.com/SourceDoctor)
+
+
+## 1.59
+*(2020-01-04)*
+
+A big thank you to the following 29 contributors this last month:
+
+  - SourceDoctor (15)
+  - PipoCanaja (11)
+  - louis-oui (6)
+  - hrtrd (4)
+  - Jellyfrog (3)
+  - cjwbath (3)
+  - djamp42 (2)
+  - murrant (2)
+  - Derova (2)
+  - CharlesMAtkinson (2)
+  - vitalisator (2)
+  - kedare (1)
+  - dlehman83 (1)
+  - willhseitz (1)
+  - Munzy (1)
+  - ProTofik (1)
+  - theochita (1)
+  - computman007 (1)
+  - jozefrebjak (1)
+  - dsgagi (1)
+  - seros1521 (1)
+  - kamils85 (1)
+  - jviersel (1)
+  - achrstl (1)
+  - ajsiersema (1)
+  - jayceeemperador (1)
+  - dlangille (1)
+  - kkrumm1 (1)
+  - dbuschjr (1)
+
+#### Feature
+* Custom OID polling and graphing ([#10945](https://github.com/librenms/librenms/pull/10945)) - [louis-oui](https://github.com/louis-oui)
+
+#### Device
+* Update epmp.yaml ([#10989](https://github.com/librenms/librenms/pull/10989)) - [dbuschjr](https://github.com/dbuschjr)
+* Mpls Path Visualization ([#10936](https://github.com/librenms/librenms/pull/10936)) - [vitalisator](https://github.com/vitalisator)
+* Support new os GWD ([#10978](https://github.com/librenms/librenms/pull/10978)) - [hrtrd](https://github.com/hrtrd)
+* Barracuda Web Application Firewall basic support ([#10970](https://github.com/librenms/librenms/pull/10970)) - [jayceeemperador](https://github.com/jayceeemperador)
+* Support new os C-DATA ([#10975](https://github.com/librenms/librenms/pull/10975)) - [hrtrd](https://github.com/hrtrd)
+* Ixia ANUE basic support ([#10946](https://github.com/librenms/librenms/pull/10946)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Support new os SNR ([#10704](https://github.com/librenms/librenms/pull/10704)) - [hrtrd](https://github.com/hrtrd)
+* Categorise Cisco WLC as wireless, like the other controller-based wireless platforms ([#10953](https://github.com/librenms/librenms/pull/10953)) - [cjwbath](https://github.com/cjwbath)
+* Rewrite Microsemi Midspan Power Sensors with mib ([#10959](https://github.com/librenms/librenms/pull/10959)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Added Huawei UPS2000 support ([#10831](https://github.com/librenms/librenms/pull/10831)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Cisco Viptela basic support ([#10947](https://github.com/librenms/librenms/pull/10947)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Fix raisecom fan speed sensor limits ([#10930](https://github.com/librenms/librenms/pull/10930)) - [vitalisator](https://github.com/vitalisator)
+* Added support for additional Edge-Core ECS devices ([#10924](https://github.com/librenms/librenms/pull/10924)) - [kamils85](https://github.com/kamils85)
+* Added iBoot PDU (dataprobe) support ([#10898](https://github.com/librenms/librenms/pull/10898)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Add queues to Barracuda Email Security GW ([#10915](https://github.com/librenms/librenms/pull/10915)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Added detection of Edge-Core ECS4100 ([#10801](https://github.com/librenms/librenms/pull/10801)) - [jozefrebjak](https://github.com/jozefrebjak)
+* Add EdgeSwitch 10XP definition ([#10909](https://github.com/librenms/librenms/pull/10909)) - [computman007](https://github.com/computman007)
+* IES OS discovery, removed trailing "-" from sysdescr ([#10897](https://github.com/librenms/librenms/pull/10897)) - [djamp42](https://github.com/djamp42)
+
+#### Webui
+* Device group based access ([#10568](https://github.com/librenms/librenms/pull/10568)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Dont't show ' - ' on ping only Devices in Availability Widget ([#10988](https://github.com/librenms/librenms/pull/10988)) - [SourceDoctor](https://github.com/SourceDoctor)
+* User Enabled State as Icon ([#10984](https://github.com/librenms/librenms/pull/10984)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Highlight Nodes on Network map ([#10943](https://github.com/librenms/librenms/pull/10943)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Capcity -\> Capacity ([#10974](https://github.com/librenms/librenms/pull/10974)) - [dlangille](https://github.com/dlangille)
+* Fix Device Mouseover View ([#10962](https://github.com/librenms/librenms/pull/10962)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Use sysName instead of hostname on AJAX search and new billing form ([#10951](https://github.com/librenms/librenms/pull/10951)) - [kedare](https://github.com/kedare)
+* Add severity filter to webui alert history ([#10918](https://github.com/librenms/librenms/pull/10918)) - [louis-oui](https://github.com/louis-oui)
+* Protocol filter for Routing Table View ([#10933](https://github.com/librenms/librenms/pull/10933)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Fix icon for bgp search ([#10931](https://github.com/librenms/librenms/pull/10931)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Devices Unpolled Warning ([#10903](https://github.com/librenms/librenms/pull/10903)) - [Munzy](https://github.com/Munzy)
+* Show Date from last discovery and last poll ([#10876](https://github.com/librenms/librenms/pull/10876)) - [SourceDoctor](https://github.com/SourceDoctor)
+
+#### Graphs
+* Use format_hostname for graph default title ([#10891](https://github.com/librenms/librenms/pull/10891)) - [PipoCanaja](https://github.com/PipoCanaja)
+
+#### Api
+* Adds API to fetch all inventory items for a given device ([#10885](https://github.com/librenms/librenms/pull/10885)) - [ajsiersema](https://github.com/ajsiersema)
+* API Call to trigger Device Discovery ([#10861](https://github.com/librenms/librenms/pull/10861)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Add ability to fetch oxidized device config via the librenms API ([#10913](https://github.com/librenms/librenms/pull/10913)) - [theochita](https://github.com/theochita)
+
+#### Alerting
+* Get Colors from getColorState function for Alert Transport Mattermost ([#10956](https://github.com/librenms/librenms/pull/10956)) - [SourceDoctor](https://github.com/SourceDoctor)
+* More appropriate state colours for MS Teams alerts ([#10911](https://github.com/librenms/librenms/pull/10911)) - [cjwbath](https://github.com/cjwbath)
+* Update alert rules with backticks ([#10902](https://github.com/librenms/librenms/pull/10902)) - [willhseitz](https://github.com/willhseitz)
+
+#### Discovery
+* Improve ports-fdb discovery sql queries ([#10883](https://github.com/librenms/librenms/pull/10883)) - [murrant](https://github.com/murrant)
+
+#### Bug
+* Fix alertlog sql after b361710148dc2d90d4df94e036d273e763e01521 ([#10991](https://github.com/librenms/librenms/pull/10991)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Regression fixes ([#10976](https://github.com/librenms/librenms/pull/10976)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Fix Capture Debug page symfony timeout error ([#10926](https://github.com/librenms/librenms/pull/10926)) - [dsgagi](https://github.com/dsgagi)
+* Fix alert icons wrongly defaults to blue info level ([#10906](https://github.com/librenms/librenms/pull/10906)) - [louis-oui](https://github.com/louis-oui)
+
+#### Refactor
+* Globalize getColorForState function ([#10944](https://github.com/librenms/librenms/pull/10944)) - [SourceDoctor](https://github.com/SourceDoctor)
+
+#### Cleanup
+* Typo VDSL2-LINE-MIB ([#10914](https://github.com/librenms/librenms/pull/10914)) - [PipoCanaja](https://github.com/PipoCanaja)
+
+#### Documentation
+* Update alert transport doc. ([#10963](https://github.com/librenms/librenms/pull/10963)) - [kkrumm1](https://github.com/kkrumm1)
+* RouterOS 6.x ([#10961](https://github.com/librenms/librenms/pull/10961)) - [CharlesMAtkinson](https://github.com/CharlesMAtkinson)
+* Update Oxidized.md ([#10864](https://github.com/librenms/librenms/pull/10864)) - [achrstl](https://github.com/achrstl)
+* Updated Spelling ([#10921](https://github.com/librenms/librenms/pull/10921)) - [Derova](https://github.com/Derova)
+* Removed typo from the code ([#10912](https://github.com/librenms/librenms/pull/10912)) - [ProTofik](https://github.com/ProTofik)
+* Fix missing documentation parts for Seafile ([#10905](https://github.com/librenms/librenms/pull/10905)) - [SourceDoctor](https://github.com/SourceDoctor)
+
+#### Misc
+* Fix spelling ([#10987](https://github.com/librenms/librenms/pull/10987)) - [dlehman83](https://github.com/dlehman83)
+* Get Colors from getColorState function for Alert Transport Rocket ([#10955](https://github.com/librenms/librenms/pull/10955)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Add alert history in device section ([#10972](https://github.com/librenms/librenms/pull/10972)) - [louis-oui](https://github.com/louis-oui)
+* Update oxidized model mapping ([#10966](https://github.com/librenms/librenms/pull/10966)) - [seros1521](https://github.com/seros1521)
+* Get Colors from getColorState function for Alert Transport Slack ([#10957](https://github.com/librenms/librenms/pull/10957)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Clarify Configuration.md ([#10960](https://github.com/librenms/librenms/pull/10960)) - [CharlesMAtkinson](https://github.com/CharlesMAtkinson)
+* Move Alert State Color Definition to config_defintion ([#10958](https://github.com/librenms/librenms/pull/10958)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Fix for device config file identification ([#10942](https://github.com/librenms/librenms/pull/10942)) - [jviersel](https://github.com/jviersel)
+* Port usage perc CI/CD fix ([#10935](https://github.com/librenms/librenms/pull/10935)) - [louis-oui](https://github.com/louis-oui)
+* Fixed port_usage_perc macro to match max(in,out) ([#10932](https://github.com/librenms/librenms/pull/10932)) - [louis-oui](https://github.com/louis-oui)
+* Centralize redundant discovery SQL Query ([#10875](https://github.com/librenms/librenms/pull/10875)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Updated Aruba ClearPass appliance detection for new sysObjectId ([#10892](https://github.com/librenms/librenms/pull/10892)) - [cjwbath](https://github.com/cjwbath)
+
+
 ## 1.58
 *(2019-11-24)*
 
