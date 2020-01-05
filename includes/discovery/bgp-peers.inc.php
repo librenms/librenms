@@ -97,6 +97,9 @@ if (Config::get('enable_bgp')) {
             } elseif ($device['os_group'] === 'cisco') {
                 $peers_data = snmp_walk($device, 'cbgpPeer2RemoteAs', '-Oq', 'CISCO-BGP4-MIB');
                 $peer2 = !empty($peers_data);
+            } elseif ($device['os_group'] === 'brocade') {
+                $peers_data = snmp_walk($device, 'bgp4V2PeerRemoteAs', '-Oq', 'BGP4V2-MIB', 'brocade');
+                $peer2 = !empty($peers_data);
             }
 
             if (empty($peers_data)) {
@@ -128,7 +131,6 @@ if (Config::get('enable_bgp')) {
                         if ($peer2 === true) {
                             $af_data = snmpwalk_cache_oid($device, 'cbgpPeer2AddrFamilyEntry', array(), 'CISCO-BGP4-MIB');
                         }
-
                         if (empty($af_data)) {
                             $af_data = snmpwalk_cache_oid($device, 'cbgpPeerAddrFamilyEntry', array(), 'CISCO-BGP4-MIB');
                             $peer2 = false;
@@ -146,6 +148,14 @@ if (Config::get('enable_bgp')) {
                     d_echo("VRP:");
                     $af_data = snmpwalk_cache_oid($device, 'hwBgpPeers', $af_data, 'HUAWEI-BGP-VPN-MIB');
                     $af_list = build_cbgp_peers($device, $peer, $af_data, $peer2);
+                }
+
+                if ($device['os_group'] === 'brocade') {
+                    // Brocade doesn't return MP-BGP SAFIs in the BGP4V2-MIB data, so it only displays the unicast SAFI
+                    d_echo("Brocade:");
+                    $afi = IP::parse($peer['ip'])->getFamily();
+                    $af_list[$peer['ip']][$afi]['unicast'] = 1;
+                    add_cbgp_peer($device, $peer, $afi, 'unicast');
                 }
 
                 if (!$bgp4_mib && $device['os'] == 'junos') {
