@@ -29,6 +29,11 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
     Route::get('about', 'AboutController@index');
     Route::get('authlog', 'UserController@authlog');
 
+    // Maps
+    Route::group(['prefix' => 'maps', 'namespace' => 'Maps'], function () {
+        Route::get('devicedependency', 'DeviceDependencyController@dependencyMap');
+    });
+
     // admin pages
     Route::group(['guard' => 'admin'], function () {
         Route::get('settings/{tab?}/{section?}', 'SettingsController@index')->name('settings');
