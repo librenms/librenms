@@ -759,7 +759,7 @@ function createHost(
         $device['os'] = getHostOS($device);
 
         $snmphost = snmp_get($device, "sysName.0", "-Oqv", "SNMPv2-MIB");
-        if (host_exists($host, $snmphost)) {
+        if ($snmphost != 'none' && host_exists($host, $snmphost)) {
             throw new HostExistsException("Already have host $host ($snmphost) due to duplicate sysName");
         }
     }
