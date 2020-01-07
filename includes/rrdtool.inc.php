@@ -275,31 +275,18 @@ function rrdtool_update($filename, $data)
  */
 function rrdtool_escape($string, $length = null)
 {
-    global $debug;
-
-    if ($debug) {
-        echo "<p>". __FUNCTION__ . "() backtrace:<p>";
-        echo "<pre>";
-        debug_print_backtrace();
-        echo "</pre>";
-    }
-
     $result = shorten_interface_type($string);
     $result = str_replace("'", '', $result);            # remove quotes
-    if (is_numeric($length)) {
 
+    if (is_numeric($length)) {
         # preserve original $length for str_pad()
 
         # determine correct strlen() for substr_count()
         $string_length=strlen($string);
+        $substr_count_length=$length;
+
         if ($length > $string_length) {
             $substr_count_length=$string_length; # If $length is greater than the haystack length, then substr_count() will produce a warning; fix warnings.
-        } else {
-            $substr_count_length=$length;
-        }
-
-        if ($debug) {
-            echo "<p>". __FUNCTION__ . "() string=$string,length=$length,string_length=$string_length,substr_count_length=$substr_count_length</p>";
         }
 
         $extra = substr_count($string, ':', 0, $substr_count_length);
@@ -310,10 +297,6 @@ function rrdtool_escape($string, $length = null)
     }
 
     $result = str_replace(':', '\:', $result);          # escape colons
-
-    if ($debug) {
-        echo "<p>". __FUNCTION__ . "() final result='$result'<p>";
-    }
 
     return $result.' ';
 } // rrdtool_escape
