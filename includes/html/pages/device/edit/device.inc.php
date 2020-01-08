@@ -87,8 +87,8 @@ if ($_POST['editing']) {
             del_dev_attrib($device, 'disable_notify');
         }
 
-        $update_message = 'Device alert settings updated.';
-        $updated        = 1;
+        //$update_message = 'Device alert settings updated.';
+        //$updated        = 1;
     } else {
         include 'includes/html/error-no-perm.inc.php';
     }
