@@ -75,7 +75,7 @@ if ($_POST['editing']) {
         if ($override_sysContact_bool) {
             set_dev_attrib($device, 'override_sysContact_bool', '1');
         } else {
-            del_dev_attrib($device, 'override_sysContact_bool');
+            set_dev_attrib($device, 'override_sysContact_bool', '0');
         }
 
         if (isset($override_sysContact_string)) {
@@ -84,7 +84,7 @@ if ($_POST['editing']) {
         if ($disable_notify) {
             set_dev_attrib($device, 'disable_notify', '1');
         } else {
-            del_dev_attrib($device, 'disable_notify');
+            set_dev_attrib($device, 'disable_notify', '0');
         }
 
         //$update_message = 'Device alert settings updated.';
