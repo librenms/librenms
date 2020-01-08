@@ -368,7 +368,7 @@ adding to /etc/snmp/snmpd.conf :
 
 ## <a name="faq28"> What does ignore alert tag on device?</a>
 
-It used to tag a device to not match specific alert rules where `devices.ignore = 1` condition is added is set.
+It used to tag a device to not match specific alert rules where `devices.ignore = 1` condition is is set.
 
 ## <a name="faq8"> How do I add support for a new OS?</a>
 
