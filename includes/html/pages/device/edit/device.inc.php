@@ -32,6 +32,7 @@ if ($_POST['editing']) {
         $device_model->purpose = $_POST['descr'];
         $device_model->ignore = (int)isset($_POST['ignore']);
         $device_model->disabled = (int)isset($_POST['disabled']);
+        $device_model->disable_notify = (int)isset($_POST['disable_notify']);
         $device_model->type = $_POST['type'];
 
         if ($device_model->isDirty('type')) {
@@ -70,8 +71,6 @@ if ($_POST['editing']) {
             $override_sysContact_string = mres($_POST['sysContact']);
         }
 
-        $disable_notify = mres($_POST['disable_notify']);
-
         if ($override_sysContact_bool) {
             set_dev_attrib($device, 'override_sysContact_bool', '1');
         } else {
@@ -81,14 +80,7 @@ if ($_POST['editing']) {
         if (isset($override_sysContact_string)) {
             set_dev_attrib($device, 'override_sysContact_string', $override_sysContact_string);
         };
-        if ($disable_notify) {
-            set_dev_attrib($device, 'disable_notify', '1');
-        } else {
-            set_dev_attrib($device, 'disable_notify', '0');
-        }
 
-        //$update_message = 'Device alert settings updated.';
-        //$updated        = 1;
     } else {
         include 'includes/html/error-no-perm.inc.php';
     }
