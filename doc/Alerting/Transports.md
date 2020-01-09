@@ -502,10 +502,17 @@ required value is for url, without this then no call to Rocket.chat will be made
 ## Slack
 
 The Slack transport will POST the alert message to your Slack Incoming
-WebHook using the attachments option, you are able to specify multiple
-webhooks along with the relevant options to go with it. Simple html
-tags are stripped from the message. All options are optional, the
-only required value is for url, without this  then no call to Slack will be made.
+WebHook using either the attachments option (default) or sending a raw JSON payload.
+
+For the Default option, you are able to specify multiple webhooks along with the
+relevant options to go with it. Simple html tags are stripped from the message.
+
+For a JSON payload, the intended use case is for sending specially formatted messages
+to slack using [block kit](https://api.slack.com/block-kit). Alert templates using JSON as the
+payload type should contain raw JSON only, formatted according to
+[Slack docs](https://api.slack.com/docs/message-attachments).
+
+All options are optional, the only required value is for url, without this then no call to Slack will be made.
 
 We currently support the following attachment options:
 

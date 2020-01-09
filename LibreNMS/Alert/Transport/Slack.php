@@ -31,6 +31,7 @@ class Slack extends Transport
     {
         $slack_opts = $this->parseUserOptions($this->config['slack-options']);
         $slack_opts['url'] = $this->config['slack-url'];
+        $slack_opts['fmt'] = $this->config['slack-format'];
 
         return $this->contactSlack($obj, $slack_opts);
     }
@@ -39,10 +40,14 @@ class Slack extends Transport
     {
         $host          = $api['url'];
         $curl          = curl_init();
-        $slack_msg     = strip_tags($obj['msg']);
-        $color         = self::getColorForState($obj['state']);
-        $data          = [
-            'attachments' => [
+
+        if ($api['fmt'] == 'JSON') {
+            $alert_message = $obj['msg'];
+        } else {
+            $slack_msg     = strip_tags($obj['msg']);
+            $color         = ($obj['state'] == 0 ? '#00FF00' : '#FF0000');
+            $data          = [
+                'attachments' => [
                 0 => [
                     'fallback' => $slack_msg,
                     'color' => $color,
@@ -51,12 +56,12 @@ class Slack extends Transport
                     'mrkdwn_in' => ['text', 'fallback'],
                     'author_name' => $api['author_name'],
                 ],
-            ],
-            'channel' => $api['channel'],
-            'username' => $api['username'],
-            'icon_emoji' => ':' .$api['icon_emoji'].':',
-        ];
-        $alert_message = json_encode($data);
+                ],
+                'channel' => $api['channel'],
+            ];
+            $alert_message = json_encode($data);
+        }
+
         curl_setopt($curl, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
         set_curl_proxy($curl);
         curl_setopt($curl, CURLOPT_URL, $host);
@@ -80,6 +85,16 @@ class Slack extends Transport
         return [
             'config' => [
                 [
+                    'title' => 'Slack Payload Format',
+                    'name' => 'slack-format',
+                    'descr' => 'Webhook POST payload format',
+                    'type' => 'select',
+                    'options' => [
+                        'Default' => 'Default',
+                        'JSON' => 'JSON',
+                    ]
+                ],
+                [
                     'title' => 'Webhook URL',
                     'name' => 'slack-url',
                     'descr' => 'Slack Webhook URL',
@@ -90,7 +105,8 @@ class Slack extends Transport
                     'name' => 'slack-options',
                     'descr' => 'Slack Options',
                     'type' => 'textarea',
-                ]
+                ],
+
             ],
             'validation' => [
                 'slack-url' => 'required|url',
