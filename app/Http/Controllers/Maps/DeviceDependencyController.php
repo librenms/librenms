@@ -56,13 +56,11 @@ class DeviceDependencyController extends MapController
         return $devices->merge($devices->map->only('children', 'parents')->flatten())->loadMissing('parents', 'location');
     }
 
-    protected function highlight_isolated_devices($devices_by_id, $isolated_device_ids)
+    protected function highlightIsolatedDevices($devices_by_id, $isolated_device_ids)
     {
         $new_device_list = [];
-        foreach($devices_by_id as $device)
-        {
-            if (in_array($device['id'], $isolated_device_ids))
-            {
+        foreach ($devices_by_id as $device) {
+            if (in_array($device['id'], $isolated_device_ids)) {
                 $new_device_list[] = array_merge($device, $this->nodeHighlightStyle());
                 continue;
             }
@@ -123,7 +121,7 @@ class DeviceDependencyController extends MapController
         if ($highlight_node == $this->isolated_device_id) {
             $device_associations = array_unique($device_associations);
             $isolated_device_ids = array_diff($device_id_all, $device_associations);
-            $devices_by_id = $this->highlight_isolated_devices($devices_by_id, $isolated_device_ids);
+            $devices_by_id = $this->highlightIsolatedDevices($devices_by_id, $isolated_device_ids);
         }
 
         array_multisort(array_column($device_list, 'label'), SORT_ASC, $device_list);
