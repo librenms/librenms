@@ -40,7 +40,7 @@ $response[] = array(
     'ifAdminStatus' => '',
     'ifOperStatus' => "<button type='submit' value='Alerted' class='btn btn-default btn-sm' id='alerted-toggle' title='Toggle alerting on all currently-alerted ports'>Alerted</button><button type='submit' value='Down' class='btn btn-default btn-sm' id='down-select' title='Disable alerting on all currently-down ports'>Down</button>",
     'disabled' => "<button type='submit' value='Toggle' class='btn btn-default btn-sm' id='disable-toggle' title='Toggle polling for all ports'>Toggle</button><button type='submit' value='Select' class='btn btn-default btn-sm' id='disable-select' title='Disable polling on all ports'>Select All</button>",
-    'ignore' => "<button type='submit' value='Toggle' class='btn btn-default btn-sm' id='ignore-toggle' title='Toggle alerting for all ports'>Toggle</button><button type='submit' value='Select' class='btn btn-default btn-sm' id='ignore-select' title='Disable alerting on all ports'>Select All</button>",
+    'ignore' => "<button type='submit' value='Toggle' class='btn btn-default btn-sm' id='ignore-toggle' title='Toggle alert tag for all ports'>Toggle</button><button type='submit' value='Select' class='btn btn-default btn-sm' id='ignore-select' title='Disable alert tag on all ports'>Select All</button>",
     'ifAlias' => ''
 );
 
