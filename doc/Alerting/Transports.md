@@ -527,6 +527,50 @@ We currently support the following attachment options:
 | Webhook URL | <https://slack.com/url/somehook> |
 | Slack Options | author_name=Me |
 
+**Example Alert Template using JSON (BGP Sessions):**
+
+```json
+{
+    "blocks": [
+        {
+            "type": "section",
+            "fields": [
+                {
+                    "type": "mrkdwn",
+                    "text": "*Severity:*\n{{ $alert->severity }}"
+                },
+                {
+                    "type": "mrkdwn",
+                    "text": "*When:*\n{{ $alert->timestamp }}"
+                },
+ @foreach ($alert->faults as $key => $value)
+                {
+                    "type": "mrkdwn",
+                    "text": "*Peer Name:*\n{{ $value['astext'] }}"
+                },
+                {
+                    "type": "mrkdwn",
+                    "text": "*Peer IP, ASN:*\n{{ $value['bgpPeerIdentifier'] }}, {{ $value['bgpPeerRemoteAs'] }}"
+                },
+                {
+                    "type": "mrkdwn",
+                    "text": "*Bgp State:*\n{{ $value['bgpPeerState'] }}"
+                },
+                {
+                    "type": "mrkdwn",
+                    "text": "*Time In State:*\n{{ $value['bgpPeerFsmEstablishedTime'] }} seconds"
+                }
+ @endforeach
+            ]
+        }
+    ]
+}
+```
+
+prints the following in slack:
+
+![slack-msg-formatted](img/slack-msg-example.png)
+
 ## SMSEagle
 
 SMSEagle is a hardware SMS Gateway that can be used via their HTTP API
