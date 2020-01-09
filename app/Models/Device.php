@@ -15,6 +15,7 @@ use LibreNMS\Util\IPv4;
 use LibreNMS\Util\IPv6;
 use LibreNMS\Util\Url;
 use LibreNMS\Util\Time;
+use Permissions;
 
 class Device extends BaseModel
 {
@@ -34,6 +35,7 @@ class Device extends BaseModel
     public static function boot()
     {
         parent::boot();
+        self::loadAllOs(true);
 
         static::deleting(function (Device $device) {
             // delete related data
@@ -205,6 +207,44 @@ class Device extends BaseModel
     }
 
     /**
+     * Load all OS, optionally load just the OS used by existing devices
+     * Default cache time is 1 day. Controlled by os_def_cache_time.
+     *
+     * @param bool $existing Only load OS that have existing OS in the database
+     * @param bool $cached Load os definitions from the cache file
+     */
+    public static function loadAllOs($existing = false, $cached = true)
+    {
+        $install_dir = \LibreNMS\Config::get('install_dir');
+        $cache_file = $install_dir . '/cache/os_defs.cache';
+        if ($cached && is_file($cache_file) && (time() - filemtime($cache_file) < \LibreNMS\Config::get('os_def_cache_time'))) {
+            // Cached
+            $os_defs = unserialize(file_get_contents($cache_file));
+            if ($existing) {
+                // remove unneeded os
+                $os_defs = array_diff_key($os_defs, self::distinct('os')->get('os')->toArray());
+            }
+            \LibreNMS\Config::set('os', array_replace_recursive($os_defs, \LibreNMS\Config::get('os')));
+        } else {
+            // load from yaml
+            if ($existing) {
+                $os_list = [];
+                foreach (self::distinct('os')->get('os')->toArray() as $os) {
+                    $os_list[] = $install_dir . '/includes/definitions/' . $os['os'] . '.yaml';
+                }
+            } else {
+                $os_list = glob($install_dir . '/includes/definitions/*.yaml');
+            }
+            foreach ($os_list as $file) {
+                if (is_readable($file)) {
+                    $tmp = \Symfony\Component\Yaml\Yaml::parse(file_get_contents($file));
+                    \LibreNMS\Config::set("os.{$tmp['os']}", array_replace_recursive($tmp, \LibreNMS\Config::get("os.{$tmp['os']}", [])));
+                }
+            }
+        }
+    }
+
+    /**
      * Get the shortened display name of this device.
      * Length is always overridden by shorthost_target_length.
      *
@@ -245,9 +285,7 @@ class Device extends BaseModel
             return true;
         }
 
-        return DB::table('devices_perms')
-            ->where('user_id', $user->user_id)
-            ->where('device_id', $this->device_id)->exists();
+        return Permissions::canAccessDevice($this->device_id, $user->user_id);
     }
 
     public function formatUptime($short = false)
@@ -639,6 +677,16 @@ class Device extends BaseModel
     public function mplsSdpBinds()
     {
         return $this->hasMany('App\Models\MplsSdpBind', 'device_id');
+    }
+
+    public function mplsTunnelArHops()
+    {
+        return $this->hasMany('App\Models\MplsTunnelArHop', 'device_id');
+    }
+
+    public function mplsTunnelCHops()
+    {
+        return $this->hasMany('App\Models\MplsTunnelCHop', 'device_id');
     }
 
     public function syslogs()

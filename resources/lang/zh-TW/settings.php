@@ -632,8 +632,8 @@ return [
             'description' => 'sfdp 路徑'
         ],
         'shorthost_target_length' => [
-            'description' => 'shortend hostname maximum length',
-            'help' => 'shrinks hostname to maximum length, but always complete subdomain parts'
+            'description' => 'Shortened hostname maximum length',
+            'help' => 'Shrinks hostname to maximum length, but always complete subdomain parts'
         ],
         'site_style' => [
             'description' => '設定站台 css 樣式',

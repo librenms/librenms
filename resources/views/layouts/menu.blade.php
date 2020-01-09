@@ -34,6 +34,20 @@
                                 <li><a href="{{ url('availability-map') }}"><i class="fa fa-arrow-circle-up fa-fw fa-lg"
                                                                                aria-hidden="true"></i> @lang('Availability')
                                     </a></li>
+                                <li><a href="{{ url('maps/devicedependency') }}"><i class="fa fa-chain fa-fw fa-lg"
+                                                                  aria-hidden="true"></i> @lang('Device Dependency')</a></li>
+                                @if($device_groups->isNotEmpty())
+                                    <li class="dropdown-submenu"><a><i class="fa fa-chain fa-fw fa-lg"
+                                                                                aria-hidden="true"></i> @lang('Device Groups Dependencies')
+                                        </a>
+                                        <ul class="dropdown-menu scrollable-menu">
+                                        @foreach($device_groups as $group)
+                                            <li><a href="{{ url("maps/devicedependency?group=$group->id") }}" title="{{ $group->desc }}"><i class="fa fa-chain fa-fw fa-lg" aria-hidden="true"></i>
+                                                {{ ucfirst($group->name) }}
+                                            </a></li>
+                                        @endforeach
+                                    </ul></li>
+                                @endif
                                 <li><a href="{{ url('map') }}"><i class="fa fa-sitemap fa-fw fa-lg"
                                                                   aria-hidden="true"></i> @lang('Network')</a></li>
                                 @if($device_groups->isNotEmpty())

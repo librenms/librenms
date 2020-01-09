@@ -861,6 +861,13 @@ function is_custom_graph($type, $subtype, $device)
     return false;
 } // is_custom_graph
 
+function is_customoid_graph($type, $subtype)
+{
+    if (!empty($subtype) && $type == 'customoid') {
+        return true;
+    }
+    return false;
+} // is_customoid_graph
 
 /*
  * FIXME: Dummy implementation
@@ -1490,37 +1497,7 @@ function load_os(&$device)
  */
 function load_all_os($existing = false, $cached = true)
 {
-    $install_dir = Config::get('install_dir');
-    $cache_file = $install_dir . '/cache/os_defs.cache';
-
-    if ($cached && is_file($cache_file) && (time() - filemtime($cache_file) < Config::get('os_def_cache_time'))) {
-        // Cached
-        $os_defs = unserialize(file_get_contents($cache_file));
-
-        if ($existing) {
-            // remove unneeded os
-            $os_defs = array_diff_key($os_defs, dbFetchColumn('SELECT DISTINCT(`os`) FROM `devices`'));
-        }
-
-        Config::set('os', array_replace_recursive($os_defs, Config::get('os')));
-    } else {
-        // load from yaml
-        if ($existing) {
-            $os_list = array_map(function ($os) use ($install_dir) {
-                return $install_dir . '/includes/definitions/' . $os . '.yaml';
-            }, dbFetchColumn('SELECT DISTINCT(`os`) FROM `devices`'));
-        } else {
-            $os_list = glob($install_dir . '/includes/definitions/*.yaml');
-        }
-
-        foreach ($os_list as $file) {
-            if (is_readable($file)) {
-                $tmp = Symfony\Component\Yaml\Yaml::parse(file_get_contents($file));
-
-                Config::set("os.{$tmp['os']}", array_replace_recursive($tmp, Config::get("os.{$tmp['os']}", [])));
-            }
-        }
-    }
+    Device::loadAllOs($existing, $cached);
 }
 
 /**
@@ -1565,6 +1542,22 @@ function fahrenheit_to_celsius($value, $scale = 'fahrenheit')
 {
     if ($scale === 'fahrenheit') {
         $value = ($value - 32) / 1.8;
+    }
+    return sprintf('%.02f', $value);
+}
+
+/**
+ * Converts celsius to fahrenheit (with 2 decimal places)
+ * if $scale is not celsius, it assumes celsius and  returns the value
+ *
+ * @param float $value
+ * @param string $scale fahrenheit or celsius
+ * @return string (containing a float)
+ */
+function celsius_to_fahrenheit($value, $scale = 'celsius')
+{
+    if ($scale === 'celsius') {
+        $value = ($value * 1.8) + 32;
     }
     return sprintf('%.02f', $value);
 }

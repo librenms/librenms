@@ -1,0 +1,3211 @@
+BWS-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, Counter32, Integer32, Counter64, NOTIFICATION-TYPE
+            FROM SNMPv2-SMI
+        TimeStamp
+            FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP 
+            FROM SNMPv2-CONF
+        InetAddress, InetAddressType, InetPortNumber
+            FROM INET-ADDRESS-MIB
+        barracuda
+            FROM BARRACUDA-REF;
+            
+    bws MODULE-IDENTITY
+        LAST-UPDATED "201902121200Z"
+        ORGANIZATION "Barracuda Networks, Inc."
+        CONTACT-INFO
+            "
+            Barracuda Networks Inc.
+            3175 S. Winchester Blvd.
+            Campbell, CA 95008 
+            "
+        DESCRIPTION
+            "
+            Barracuda Website Firewall MIB.
+            Provides:
+                Objects:
+                    * 1.3.6.1.4.1.20632.8.2 -- totalApplications
+                    * 1.3.6.1.4.1.20632.8.3 -- totalServers
+                    * 1.3.6.1.4.1.20632.8.4 -- totalAttacks
+                    * 1.3.6.1.4.1.20632.8.5 -- activeApplications
+                    * 1.3.6.1.4.1.20632.8.6 -- activeServers
+                    * 1.3.6.1.4.1.20632.8.7 -- bwsMessageRsvd
+                    * 1.3.6.1.4.1.20632.8.8 -- systemLoad
+                    * 1.3.6.1.4.1.20632.8.9 -- cpuFanSpeed
+                    * 1.3.6.1.4.1.20632.8.10 -- systemFanSpeed
+                    * 1.3.6.1.4.1.20632.8.11 -- cpuTemperature
+                    * 1.3.6.1.4.1.20632.8.12 -- firmwareStorage
+                    * 1.3.6.1.4.1.20632.8.13 -- logStorage
+                    * 1.3.6.1.4.1.20632.8.14 -- highAvailabilityStatus
+                    * 1.3.6.1.4.1.20632.8.15 -- operationalMode
+                    * 1.3.6.1.4.1.20632.8.16 -- dataPathStatus
+                    * 1.3.6.1.4.1.20632.8.17 -- linkStatus
+                    * 1.3.6.1.4.1.20632.8.18 -- vipStatus
+                    * 1.3.6.1.4.1.20632.8.19 -- memUtilization
+                    * 1.3.6.1.4.1.20632.8.20 -- cpuUtilization
+                    * 1.3.6.1.4.1.20632.8.21 -- totalBandwidth
+                    * 1.3.6.1.4.1.20632.8.22 -- uptime
+                    * 1.3.6.1.4.1.20632.8.23 -- totalMem
+                    * 1.3.6.1.4.1.20632.8.24 -- freeMem
+                    * 1.3.6.1.4.1.20632.8.25 -- currentFirmwareVersion
+                    * 1.3.6.1.4.1.20632.8.26 -- virusDefUpdates
+                    * 1.3.6.1.4.1.20632.8.27 -- securityDefUpdates
+                    * 1.3.6.1.4.1.20632.8.28 -- systemSerialNumber
+                Traps:
+                    * 1.3.6.1.4.1.20632.8.1.3 -- tempCritical
+                    * 1.3.6.1.4.1.20632.8.1.4 -- tempHigh
+                    * 1.3.6.1.4.1.20632.8.1.5 -- systemFailOver
+                    * 1.3.6.1.4.1.20632.8.1.6 -- switchingToMaintMode
+                    * 1.3.6.1.4.1.20632.8.1.7 -- fanDead
+                    * 1.3.6.1.4.1.20632.8.1.8 -- dataPortLinkDown
+                    * 1.3.6.1.4.1.20632.8.1.9 -- serverDown
+                    * 1.3.6.1.4.1.20632.8.1.10 -- peerDown
+                    * 1.3.6.1.4.1.20632.8.1.11 -- dataPortLinkUp
+                    * 1.3.6.1.4.1.20632.8.1.12 -- serverUp
+                    * 1.3.6.1.4.1.20632.8.1.13 -- peerUp
+                    * 1.3.6.1.4.1.20632.8.1.14 -- switchingToBypassMode 
+                    * 1.3.6.1.4.1.20632.8.1.15 -- switchingToInlineMode 
+                    * 1.3.6.1.4.1.20632.8.1.16 -- sharedSecretKeyAboutToExpire
+                    * 1.3.6.1.4.1.20632.8.1.17 -- sharedSecretKeyExpired
+                    * 1.3.6.1.4.1.20632.8.1.18 -- firmwareStorageHigh
+                    * 1.3.6.1.4.1.20632.8.1.19 -- logStorageHigh
+                    * 1.3.6.1.4.1.20632.8.1.20 -- raidDegrading
+                    * 1.3.6.1.4.1.20632.8.1.21 -- energizeUpdateExpire
+                    * 1.3.6.1.4.1.20632.8.1.22 -- firmwareUpdateAvailable
+                    * 1.3.6.1.4.1.20632.8.1.24 -- attackDefinitionUpdateAvailable
+                    * 1.3.6.1.4.1.20632.8.1.25 -- processCountHigh
+                    * 1.3.6.1.4.1.20632.8.1.26 -- memoryUsageHigh
+                    * 1.3.6.1.4.1.20632.8.1.27 -- newAttackDefinitionInstalled
+                    * 1.3.6.1.4.1.20632.8.1.28 -- systemFailure
+            "
+        REVISION     "201902121200Z" -- Feb 12, 2019
+        DESCRIPTION  "Updated: Added bwsStats object"
+        ::= { barracuda 8 }
+
+
+bwstraps OBJECT IDENTIFIER ::= { bws 1 }
+bwsStats OBJECT IDENTIFIER ::= { bws 50 }
+
+
+bwsMIBConformance  OBJECT IDENTIFIER ::= { bws 51 }
+bwsMIBCompliances  OBJECT IDENTIFIER ::= { bwsMIBConformance 1 }
+bwsMIBGroups       OBJECT IDENTIFIER ::= { bwsMIBConformance 2 }
+      
+--
+-- Objects
+--
+
+    totalApplications OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Total applications configured."
+         ::= { bws 2 }
+         
+    totalServers OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Total servers configured."
+         ::= { bws 3 }
+         
+    totalAttacks OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Count of attacks in last one hour"
+         ::= { bws 4 }
+         
+    activeApplications OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Total Applications configured whose status is on"
+         ::= { bws 5 }
+         
+    activeServers OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Total Servers whose operational status is in-service"
+         ::= { bws 6 }
+         
+    bwsMessage OBJECT-TYPE
+         SYNTAX      OCTET STRING
+         MAX-ACCESS  accessible-for-notify
+         STATUS      current
+         DESCRIPTION
+                     "System Log Message."
+         ::= { bws 7 }
+
+    systemLoad OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "System Load in percentage."
+         ::= { bws 8 }
+
+    cpuFanSpeed OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Cpu Fan Speen in RPM."
+         ::= { bws 9 }
+
+    systemFanSpeed OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "System Fan Speen in RPM."
+         ::= { bws 10 }
+
+    cpuTemperature OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Cpu Temperature in degree Celsius."
+         ::= { bws 11 }
+
+    firmwareStorage OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Firware Storage in percentage."
+         ::= { bws 12 }
+
+    logStorage OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Log Storage in percentage."
+         ::= { bws 13 }
+
+    highAvailabilityStatus OBJECT-TYPE
+         SYNTAX      OCTET STRING
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "High Availability Status."
+         ::= { bws 14 }
+
+    operationalMode OBJECT-TYPE
+         SYNTAX      OCTET STRING
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Operation Mode."
+         ::= { bws 15 }
+
+    dataPathStatus OBJECT-TYPE
+         SYNTAX      OCTET STRING
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Data Path Status."
+         ::= { bws 16 }
+
+    linkStatus OBJECT-TYPE
+         SYNTAX      OCTET STRING
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Link Status."
+         ::= { bws 17 }
+
+    vipStatus OBJECT-TYPE
+         SYNTAX      OCTET STRING
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "VIP Status."
+         ::= { bws 18 }
+
+   memUtilization OBJECT-TYPE
+         SYNTAX      OCTET STRING
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Memory Utilization."
+         ::= { bws 19 }
+
+   cpuUtilization OBJECT-TYPE
+         SYNTAX      OCTET STRING
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "CPU Utilization ."
+         ::= { bws 20 }
+
+   totalBandwidth OBJECT-TYPE
+         SYNTAX      OCTET STRING
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Total Bandwidth ."
+         ::= { bws 21 }
+
+   uptime OBJECT-TYPE
+         SYNTAX      OCTET STRING
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Uptime."
+         ::= { bws 22 }
+
+   totalMem OBJECT-TYPE
+         SYNTAX      OCTET STRING
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Total Memory."
+         ::= { bws 23 }
+
+   freeMem OBJECT-TYPE
+         SYNTAX      OCTET STRING
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Free Memory."
+         ::= { bws 24 }
+
+   currentFirmwareVersion OBJECT-TYPE
+         SYNTAX      OCTET STRING (SIZE(1..64))
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION "Current firmware version running in the system(WAF)"
+         ::= { bws 25 }
+
+   virusDefUpdates    OBJECT-TYPE
+         SYNTAX      OCTET STRING (SIZE (1..64))
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION "This management object shall contain the current version of the
+                      virus definitions and the date and time when the last virus definition
+                      got updated."
+         ::= { bws 26 }
+
+   securityDefUpdates OBJECT-TYPE
+         SYNTAX       OCTET STRING (SIZE (1..64))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION  "This management object shall contain the current version of the
+                       security definitions and the date and time when the last security
+                       definitions got updated."
+         ::= { bws 27 }
+
+   systemSerialNumber OBJECT-TYPE
+         SYNTAX       OCTET STRING (SIZE (1..64))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION  "This management object shall contain the system serial number"
+         ::= { bws 28 }
+
+--
+-- Stats
+--
+
+bwsHttpProxyStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BwsHttpProxyStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of HTTP proxy stats. "
+    ::= { bwsStats 1 }
+
+bwsHttpProxyStatsEntry OBJECT-TYPE
+    SYNTAX     BwsHttpProxyStatsEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "HTTP proxy stats entry. "
+    INDEX {httpProxyAddressType, httpProxyAddress, httpProxyPort}
+    ::= { bwsHttpProxyStatsTable 1 }
+
+BwsHttpProxyStatsEntry ::= SEQUENCE {
+    httpProxyAddressType            InetAddressType,
+    httpProxyAddress                InetAddress,
+    httpProxyPort                   InetPortNumber,
+    httpProxyActiveConn             Counter32,
+    httpProxyTotalConn              Counter32,
+    httpProxyTotalReq               Counter32,
+    httpProxyServerReq              Counter32,   
+    httpProxyServerErr              Counter32,
+    httpProxyClientAbrt             Counter32,
+    httpProxyServerAbrt             Counter32,
+    httpProxySessionTimeOut         Counter32,
+    httpProxyParseErr               Counter32,
+    httpProxyUnknownRsp             Counter32,
+    httpProxyInBytes                Counter64,
+    httpProxyOutBytes               Counter64,
+    httpProxyWAFBlockedIntrusions   Counter32,
+    httpProxyWAFMonitoredIntrusions Counter32,
+    httpProxyWAFWarnings            Counter32
+} 
+
+httpProxyAddressType  OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The type of the http Proxy address, as defined
+            in the InetAddress MIB. "
+    REFERENCE "RFC 4001"
+    ::= { bwsHttpProxyStatsEntry 1 }
+
+httpProxyAddress  OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The http Proxy address. "
+    ::= { bwsHttpProxyStatsEntry 2 }
+
+httpProxyPort  OBJECT-TYPE
+    SYNTAX     InetPortNumber
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The port on which http Proxy is listening. "
+    ::= { bwsHttpProxyStatsEntry 3 }
+
+httpProxyActiveConn  OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of active connections. "
+    ::= { bwsHttpProxyStatsEntry 4 }
+
+httpProxyTotalConn  OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Total number of connections. "
+    ::= { bwsHttpProxyStatsEntry 5 }
+
+httpProxyTotalReq  OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Total number of requests. "
+    ::= { bwsHttpProxyStatsEntry 6 }
+
+httpProxyServerReq  OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Total number of server requests. "
+    ::= { bwsHttpProxyStatsEntry 7 }
+
+httpProxyServerErr OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Total number of server errors. "
+    ::= { bwsHttpProxyStatsEntry 8 }
+
+httpProxyClientAbrt  OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Total number of client aborts. "
+    ::= { bwsHttpProxyStatsEntry 9 }
+
+httpProxyServerAbrt  OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Total number of server aborts. "
+    ::= { bwsHttpProxyStatsEntry 10 }
+
+httpProxySessionTimeOut OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Total number of session timeouts. "
+    ::= { bwsHttpProxyStatsEntry 11 }
+
+httpProxyParseErr OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Total number of parse errors. "
+    ::= { bwsHttpProxyStatsEntry 12 }
+
+httpProxyUnknownRsp OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Total number of unknown responses. "
+    ::= { bwsHttpProxyStatsEntry 13 }
+
+httpProxyInBytes OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Total number of In octets. "
+    ::= { bwsHttpProxyStatsEntry 14 }
+
+httpProxyOutBytes OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Total number of Out octets. "
+    ::= { bwsHttpProxyStatsEntry 15 }
+
+httpProxyWAFBlockedIntrusions OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Total number of WAF blocked intrusions. "
+    ::= { bwsHttpProxyStatsEntry 16 }
+
+httpProxyWAFMonitoredIntrusions OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Total number of WAF monitored intrusions. "
+    ::= { bwsHttpProxyStatsEntry 17 }
+
+httpProxyWAFWarnings OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Total number of WAF warnings. "
+    ::= { bwsHttpProxyStatsEntry 18 }
+
+
+---
+--bwsSslProxyStatsTable
+---
+
+bwsSslProxyStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BwsSslProxyStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of SSL stats. "
+    ::= { bwsStats 2 }
+
+bwsSslProxyStatsEntry OBJECT-TYPE
+    SYNTAX     BwsSslProxyStatsEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "SSL stats entry. "
+    INDEX {sslProxyAddressType, sslProxyAddress, sslProxyPort}
+    ::= { bwsSslProxyStatsTable 1 }
+
+BwsSslProxyStatsEntry ::= SEQUENCE {
+    sslProxyAddressType           InetAddressType,
+    sslProxyAddress               InetAddress,
+    sslProxyPort                  InetPortNumber,
+    sslProxyActiveConn            Counter32,
+    sslProxyFullHandshakes        Counter32,
+    sslProxyResumptionHandshakes  Counter32,
+    sslProxyHandshakeAttempts     Counter32,
+    sslProxyCacheHits             Counter32,
+    sslProxyCacheMiss             Counter32,
+    sslProxyCacheTimeouts         Counter32,
+    sslProxyErrPms                Counter32,
+    sslProxyAuthBadCertErr        Counter32,
+    sslProxyAuthBadCNErr          Counter32,
+    sslProxyBadDNCErr             Counter32,
+    sslProxyBadCRLErr             Counter32,
+    sslProxyInBytes               Counter64,
+    sslProxyOutBytes              Counter64,
+    sslProxyTotalReq              Counter32,
+    sslProxyTotalConn             Counter32,
+    sslProxyCurrentConn           Counter32
+}
+ 
+sslProxyAddressType  OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The type of the SSL Proxy address, as defined
+            in the InetAddress MIB. "
+    REFERENCE "RFC 4001"
+    ::= { bwsSslProxyStatsEntry 1 }
+
+sslProxyAddress  OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The SSL Proxy address. "
+    ::= { bwsSslProxyStatsEntry 2 }
+
+sslProxyPort  OBJECT-TYPE
+    SYNTAX    InetPortNumber 
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The port on which SSL Proxy is listening. "
+    ::= { bwsSslProxyStatsEntry 3 }
+
+sslProxyActiveConn  OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of active connections. "
+    ::= { bwsSslProxyStatsEntry 4 }
+
+sslProxyFullHandshakes  OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of full handshakes. "
+    ::= { bwsSslProxyStatsEntry 5 }
+
+sslProxyResumptionHandshakes  OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of resumption handshakes. "
+    ::= { bwsSslProxyStatsEntry 6 }
+
+sslProxyHandshakeAttempts  OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of handshake attempts. "
+    ::= { bwsSslProxyStatsEntry 7 }
+
+sslProxyCacheHits  OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of cache hits. "
+    ::= { bwsSslProxyStatsEntry 8 }
+
+sslProxyCacheMiss  OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of cache hits. "
+    ::= { bwsSslProxyStatsEntry 9 }
+
+sslProxyCacheTimeouts  OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of cache hits. "
+    ::= { bwsSslProxyStatsEntry 10 }
+
+sslProxyErrPms OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of PMC errors. "
+    ::= { bwsSslProxyStatsEntry 11 }
+
+sslProxyAuthBadCertErr OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of bad certificates. "
+    ::= { bwsSslProxyStatsEntry 12 }
+
+sslProxyAuthBadCNErr OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of bad CN errors. "
+    ::= { bwsSslProxyStatsEntry 13 }
+
+sslProxyBadDNCErr OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of bad DNC errors. "
+    ::= { bwsSslProxyStatsEntry 14 }
+
+sslProxyBadCRLErr OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of bad CRL errors. "
+    ::= { bwsSslProxyStatsEntry 15 }
+
+
+sslProxyInBytes OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of IN octets. "
+    ::= { bwsSslProxyStatsEntry 16 }
+
+sslProxyOutBytes OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of OUT octets. "
+    ::= { bwsSslProxyStatsEntry 17 }
+
+sslProxyTotalReq OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Total number of requests. "
+    ::= { bwsSslProxyStatsEntry 18 }
+
+sslProxyTotalConn OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Total number of connections. "
+    ::= { bwsSslProxyStatsEntry 19 }
+
+sslProxyCurrentConn OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Current number of connections. "
+    ::= { bwsSslProxyStatsEntry 20 }
+
+
+---
+--bwsCompressionStatsTable
+---
+
+bwsCompressionStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BwsCompressionStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of compression stats. "
+    ::= { bwsStats 3 }
+
+bwsCompressionStatsEntry OBJECT-TYPE
+    SYNTAX     BwsCompressionStatsEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "Compression stats entry. "
+    INDEX {webCmprProtocol, webCmprAddressType, webCmprAddress, webCmprPort}
+    ::= { bwsCompressionStatsTable 1 }
+
+BwsCompressionStatsEntry ::= SEQUENCE {
+    webCmprProtocol               Integer32,
+    webCmprAddressType            InetAddressType,
+    webCmprAddress                InetAddress,
+    webCmprPort                   InetPortNumber,
+    webCmprNoOfReqCompressed      Counter32,
+    webCmprCompressibleDataSize   Counter32,
+    webCmprCompressedDataSize     Counter32
+}
+
+webCmprProtocol OBJECT-TYPE
+    SYNTAX     Integer32 (0..65535)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The protocol used (https or https)."
+    ::= { bwsCompressionStatsEntry 1 }
+
+webCmprAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The type of the Proxy address, as defined
+            in the InetAddress MIB. "
+    REFERENCE "RFC 4001"
+    ::= { bwsCompressionStatsEntry 2 }
+
+webCmprAddress OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The Proxy address. "
+    ::= { bwsCompressionStatsEntry 3 }
+
+webCmprPort OBJECT-TYPE
+    SYNTAX     InetPortNumber
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The port on which Proxy is listening. "
+    ::= { bwsCompressionStatsEntry 4 }
+
+webCmprNoOfReqCompressed OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of requests that got compressed. "
+    ::= { bwsCompressionStatsEntry 5 }
+
+webCmprCompressibleDataSize OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Compressible data size. "
+    ::= { bwsCompressionStatsEntry 6 }
+
+webCmprCompressedDataSize OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Compressed data size. "
+    ::= { bwsCompressionStatsEntry 7 }
+
+---
+--bwsCacheStateTable
+---
+
+bwsCacheStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BwsCacheStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of cache stats. "
+    ::= { bwsStats 4 }
+
+bwsCacheStatsEntry OBJECT-TYPE
+    SYNTAX     BwsCacheStatsEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "Cashe stats entry. "
+    INDEX {webCacheProtocol, webCacheAddressType, webCacheAddress, webCachePort}
+    ::= { bwsCacheStatsTable 1 }
+
+BwsCacheStatsEntry ::= SEQUENCE {
+    webCacheProtocol               Integer32,
+    webCacheAddressType            InetAddressType,
+    webCacheAddress                InetAddress,
+    webCachePort                   InetPortNumber,
+    webCacheHits                   Counter32,
+    webCacheMiss                   Counter32,
+    webCacheStale                  Counter32,
+    webCacheCacheableRes           Counter32,
+    webCacheReq                    Counter32,
+    webCacheCachedObjects          Counter32,
+    webCacheLongHdrs               Counter32,
+    webCacheBytesOut               Counter32
+}
+ 
+webCacheProtocol OBJECT-TYPE
+    SYNTAX     Integer32 (0..65535)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The protocol used (https or https)."
+    ::= { bwsCacheStatsEntry 1 }
+
+webCacheAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The type of the Proxy address, as defined
+            in the InetAddress MIB. "
+    REFERENCE "RFC 4001"
+    ::= { bwsCacheStatsEntry 2 }
+
+webCacheAddress OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The Proxy address. "
+    ::= { bwsCacheStatsEntry 3 }
+
+webCachePort OBJECT-TYPE
+    SYNTAX     InetPortNumber
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The port on which Proxy is listening. "
+    ::= { bwsCacheStatsEntry 4 }
+
+webCacheHits OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of hits. "
+    ::= { bwsCacheStatsEntry 5 }
+
+webCacheMiss OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of miss. "
+    ::= { bwsCacheStatsEntry 6 }
+
+webCacheStale OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of stales. "
+    ::= { bwsCacheStatsEntry 7 }
+
+webCacheCacheableRes OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of cacheable responses. "
+    ::= { bwsCacheStatsEntry 8 }
+
+webCacheReq OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of requests. "
+    ::= { bwsCacheStatsEntry 9 }
+
+webCacheCachedObjects OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of cached objects. "
+    ::= { bwsCacheStatsEntry 10 }
+
+webCacheLongHdrs OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of long headers. "
+    ::= { bwsCacheStatsEntry 11 }
+
+webCacheBytesOut OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of out bytes. "
+    ::= { bwsCacheStatsEntry 12 }
+
+
+---
+--bwsHttpSrvrStatsTable
+---
+
+bwsHttpSrvrStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BwsHttpSrvrStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of HTTP server stats. "
+    ::= { bwsStats 5 }
+
+bwsHttpSrvrStatsEntry OBJECT-TYPE
+    SYNTAX     BwsHttpSrvrStatsEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "HTTP Server stats entry. "
+    INDEX {httpSrvrSrvcAddressType, httpSrvrSrvcAddress, httpSrvrSrvcPort, httpSrvrAddressType, httpSrvrAddress, httpSrvrPort}
+    ::= { bwsHttpSrvrStatsTable 1 }
+
+BwsHttpSrvrStatsEntry ::= SEQUENCE {
+    httpSrvrSrvcAddressType        InetAddressType,
+    httpSrvrSrvcAddress            InetAddress,
+    httpSrvrSrvcPort               InetPortNumber,
+    httpSrvrAddressType            InetAddressType,
+    httpSrvrAddress                InetAddress,
+    httpSrvrPort                   InetPortNumber,
+    httpSrvrTotReqAccepted         Counter32,
+    httpSrvrTotReqActive           Counter32,
+    httpSrvrTotReqRejected         Counter32,
+    httpSrvrTotSuccess             Counter32,
+    httpSrvrTotRefused             Counter32,
+    httpSrvrTotTimedout            Counter32,
+    httpSrvrAvgReqPerConn          Counter32,
+    httpSrvrTotResponse            Counter32,
+    httpSrvrAvgResTime             Counter32,
+    httpSrvrMaxResTime             Counter32,
+    httpSrvrMinResTime             Counter32,
+    httpSrvrNumReqEnqueue          Counter32,
+    httpSrvrNumFreeConn            Counter32,
+    httpSrvrNumOpeningConn         Counter32,
+    httpSrvrNumConn                Counter32,
+    httpSrvrNumIBDisabled          Counter32,
+    httpSrvrNumOOBDisabled         Counter32,
+    httpSrvrNumOOBEnabled          Counter32,
+    httpSrvrLastDisabledTime       TimeStamp,
+    httpSrvrState                  Integer32,
+    httpSrvrInBytes                Counter64,
+    httpSrvrOutBytes               Counter64
+}
+
+httpSrvrSrvcAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The type of the servse address, as defined
+            in the InetAddress MIB. "
+    REFERENCE "RFC 4001"
+    ::= { bwsHttpSrvrStatsEntry 1 }
+
+httpSrvrSrvcAddress  OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The http service address. "
+    ::= { bwsHttpSrvrStatsEntry 2 }
+
+httpSrvrSrvcPort  OBJECT-TYPE
+    SYNTAX     InetPortNumber
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The port on which http service is listening. "
+    ::= { bwsHttpSrvrStatsEntry 3 }
+
+httpSrvrAddressType  OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The type of the server address, as defined
+            in the InetAddress MIB. "
+    REFERENCE "RFC 4001"
+    ::= { bwsHttpSrvrStatsEntry 4 }
+
+httpSrvrAddress  OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The http server address. "
+    ::= { bwsHttpSrvrStatsEntry 5 }
+
+httpSrvrPort  OBJECT-TYPE
+    SYNTAX     InetPortNumber
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The port on which http server is listening. "
+    ::= { bwsHttpSrvrStatsEntry 6 }
+
+httpSrvrTotReqAccepted OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The total number of request accepted by http servers. "
+    ::= { bwsHttpSrvrStatsEntry 7 }
+
+httpSrvrTotReqActive OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The total number of active request at servers. "
+    ::= { bwsHttpSrvrStatsEntry 8 }
+
+httpSrvrTotReqRejected OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The total number of request rejected at servers. "
+    ::= { bwsHttpSrvrStatsEntry 9 }
+
+httpSrvrTotSuccess OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The total number of request successfull at servers. "
+    ::= { bwsHttpSrvrStatsEntry 10 }
+
+httpSrvrTotRefused OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The total number of request rejected at servers. "
+    ::= { bwsHttpSrvrStatsEntry 11 }
+
+httpSrvrTotTimedout OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The total number of request timedout at servers. "
+    ::= { bwsHttpSrvrStatsEntry 12 }
+
+httpSrvrAvgReqPerConn OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The average number of request per connection at servers. "
+    ::= { bwsHttpSrvrStatsEntry 13 }
+
+httpSrvrTotResponse OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The total number of response at servers. "
+    ::= { bwsHttpSrvrStatsEntry 14 }
+
+httpSrvrAvgResTime OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The average response time at servers. "
+    ::= { bwsHttpSrvrStatsEntry 15 }
+
+httpSrvrMaxResTime OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The maximum response time at servers. "
+    ::= { bwsHttpSrvrStatsEntry 16 }
+
+httpSrvrMinResTime OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The minimum response time at servers. "
+    ::= { bwsHttpSrvrStatsEntry 17 }
+
+httpSrvrNumReqEnqueue OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The number of enqueued requests. "
+    ::= { bwsHttpSrvrStatsEntry 18 }
+
+httpSrvrNumFreeConn OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of free connections. "
+    ::= { bwsHttpSrvrStatsEntry 19 }
+
+httpSrvrNumOpeningConn OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of opening connection . "
+    ::= { bwsHttpSrvrStatsEntry 20 }
+
+httpSrvrNumConn OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of connections . "
+    ::= { bwsHttpSrvrStatsEntry 21 }
+
+httpSrvrNumIBDisabled OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of IB disables . "
+    ::= { bwsHttpSrvrStatsEntry 22 }
+
+httpSrvrNumOOBDisabled OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of OOB disables. "
+    ::= { bwsHttpSrvrStatsEntry 23 }
+
+httpSrvrNumOOBEnabled OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of OOB enables. "
+    ::= { bwsHttpSrvrStatsEntry 24 }
+
+httpSrvrLastDisabledTime OBJECT-TYPE
+    SYNTAX     TimeStamp
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Last disabled time at server. "
+    ::= { bwsHttpSrvrStatsEntry 25 }
+
+httpSrvrState OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Server state. "
+    ::= { bwsHttpSrvrStatsEntry 26 }
+
+httpSrvrInBytes OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Total IN bytes. "
+    ::= { bwsHttpSrvrStatsEntry 27 }
+
+httpSrvrOutBytes OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Total OUT bytes. "
+    ::= { bwsHttpSrvrStatsEntry 28 }
+
+
+
+---
+--bwsSslSrvrStatsTable
+---
+
+bwsSslSrvrStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BwsSslSrvrStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of Ssl server stats. "
+    ::= { bwsStats 6 }
+
+bwsSslSrvrStatsEntry OBJECT-TYPE
+    SYNTAX     BwsSslSrvrStatsEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "Ssl Server stats entry. "
+    INDEX {sslSrvrSrvcAddressType, sslSrvrSrvcAddress, sslSrvrSrvcPort, sslSrvrAddressType, sslSrvrAddress, sslSrvrPort}
+    ::= { bwsSslSrvrStatsTable 1 }
+
+BwsSslSrvrStatsEntry ::= SEQUENCE {
+    sslSrvrSrvcAddressType        InetAddressType,
+    sslSrvrSrvcAddress            InetAddress,
+    sslSrvrSrvcPort               InetPortNumber,
+    sslSrvrAddressType            InetAddressType,
+    sslSrvrAddress                InetAddress,
+    sslSrvrPort                   InetPortNumber,
+    sslSrvrTotReqAccepted         Counter32,
+    sslSrvrTotReqActive           Counter32,
+    sslSrvrTotReqRejected         Counter32,
+    sslSrvrTotSuccess             Counter32,
+    sslSrvrTotRefused             Counter32,
+    sslSrvrTotTimedout            Counter32,
+    sslSrvrAvgReqPerConn          Counter32,
+    sslSrvrTotResponse            Counter32,
+    sslSrvrAvgResTime             Counter32,
+    sslSrvrMaxResTime             Counter32,
+    sslSrvrMinResTime             Counter32,
+    sslSrvrNumReqEnqueue          Counter32,
+    sslSrvrNumFreeConn            Counter32,
+    sslSrvrNumOpeningConn         Counter32,
+    sslSrvrNumConn                Counter32,
+    sslSrvrNumIBDisabled          Counter32,
+    sslSrvrNumOOBDisabled         Counter32,
+    sslSrvrNumOOBEnabled          Counter32,
+    sslSrvrLastDisabledTime       TimeStamp,
+    sslSrvrState                  Integer32,
+    sslSrvrInBytes                Counter64,
+    sslSrvrOutBytes               Counter64
+}
+
+sslSrvrSrvcAddressType  OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The type of the service address, as defined
+            in the InetAddress MIB. "
+    REFERENCE "RFC 4001"
+    ::= { bwsSslSrvrStatsEntry 1 }
+
+sslSrvrSrvcAddress  OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The ssl service address. "
+    ::= { bwsSslSrvrStatsEntry 2 }
+
+sslSrvrSrvcPort  OBJECT-TYPE
+    SYNTAX     InetPortNumber
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The port on which ssl service is listening. "
+    ::= { bwsSslSrvrStatsEntry 3 }
+
+sslSrvrAddressType  OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The type of the server address, as defined
+            in the InetAddress MIB. "
+    REFERENCE "RFC 4001"
+    ::= { bwsSslSrvrStatsEntry 4 }
+
+sslSrvrAddress  OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The ssl server address. "
+    ::= { bwsSslSrvrStatsEntry 5 }
+
+sslSrvrPort  OBJECT-TYPE
+    SYNTAX     InetPortNumber
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The port on which ssl server is listening. "
+    ::= { bwsSslSrvrStatsEntry 6 }
+
+sslSrvrTotReqAccepted OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The total number of request accepted by ssl server. "
+    ::= { bwsSslSrvrStatsEntry 7 }
+
+sslSrvrTotReqActive OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The total number of active request at server. "
+    ::= { bwsSslSrvrStatsEntry 8 }
+
+sslSrvrTotReqRejected OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The total number of request rejected at server. "
+    ::= { bwsSslSrvrStatsEntry 9 }
+
+sslSrvrTotSuccess OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The total number of request successfull at server. "
+    ::= { bwsSslSrvrStatsEntry 10 }
+
+sslSrvrTotRefused OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The total number of request rejected at server. "
+    ::= { bwsSslSrvrStatsEntry 11 }
+
+sslSrvrTotTimedout OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The total number of request timedout at server. "
+    ::= { bwsSslSrvrStatsEntry 12 }
+
+sslSrvrAvgReqPerConn OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The average number of request per connection at server. "
+    ::= { bwsSslSrvrStatsEntry 13 }
+
+sslSrvrTotResponse OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The total number of response at server. "
+    ::= { bwsSslSrvrStatsEntry 14 }
+
+sslSrvrAvgResTime OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The average response time at server. "
+    ::= { bwsSslSrvrStatsEntry 15 }
+
+sslSrvrMaxResTime OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The maximum response time at server. "
+    ::= { bwsSslSrvrStatsEntry 16 }
+
+sslSrvrMinResTime OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The minimum response time at server. "
+    ::= { bwsSslSrvrStatsEntry 17 }
+
+sslSrvrNumReqEnqueue OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The number of request enqueued at server. "
+    ::= { bwsSslSrvrStatsEntry 18 }
+
+sslSrvrNumFreeConn OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of free connection at server. "
+    ::= { bwsSslSrvrStatsEntry 19 }
+
+sslSrvrNumOpeningConn OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of opening connection at server. "
+    ::= { bwsSslSrvrStatsEntry 20 }
+
+sslSrvrNumConn OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of connections at server. "
+    ::= { bwsSslSrvrStatsEntry 21 }
+
+sslSrvrNumIBDisabled OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of IB disabled at server. "
+    ::= { bwsSslSrvrStatsEntry 22 }
+
+sslSrvrNumOOBDisabled OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of OOB disabled at server. "
+    ::= { bwsSslSrvrStatsEntry 23 }
+
+sslSrvrNumOOBEnabled OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of OOB enabled at server. "
+    ::= { bwsSslSrvrStatsEntry 24 }
+
+sslSrvrLastDisabledTime OBJECT-TYPE
+    SYNTAX     TimeStamp
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Last disabled time at server. "
+    ::= { bwsSslSrvrStatsEntry 25 }
+
+sslSrvrState OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Server state. "
+    ::= { bwsSslSrvrStatsEntry 26 }
+
+sslSrvrInBytes OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Total IN bytes. "
+    ::= { bwsSslSrvrStatsEntry 27 }
+
+sslSrvrOutBytes OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Total OUT bytes. "
+    ::= { bwsSslSrvrStatsEntry 28 }
+
+
+---
+--bwsIpsReqSrvcStatsTable
+---
+
+bwsIpsReqSrvcStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BwsIpsReqSrvcStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of IPS request service stats. "
+    ::= { bwsStats 7 }
+
+bwsIpsReqSrvcStatsEntry OBJECT-TYPE
+    SYNTAX    BwsIpsReqSrvcStatsEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "IPS request service stats entry. "
+    INDEX {ipsReqSrvcAddressType, ipsReqSrvcAddress, ipsReqSrvcPort}
+    ::= { bwsIpsReqSrvcStatsTable 1 }
+
+BwsIpsReqSrvcStatsEntry ::= SEQUENCE {
+    ipsReqSrvcAddressType         InetAddressType,
+    ipsReqSrvcAddress             InetAddress,
+    ipsReqSrvcPort                InetPortNumber,
+    ipsReqSrvcNoOfUrlProfMatched  Counter64,
+    ipsReqSrvcNoOfAppProfViol     Counter64,
+    ipsReqSrvcTotProfViol         Counter64
+}
+
+ipsReqSrvcAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The type of the service address, as defined
+            in the InetAddress MIB. "
+    REFERENCE "RFC 4001"
+    ::= { bwsIpsReqSrvcStatsEntry 1 }
+
+ipsReqSrvcAddress OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The service address. "
+    ::= { bwsIpsReqSrvcStatsEntry 2 }
+
+ipsReqSrvcPort OBJECT-TYPE
+    SYNTAX     InetPortNumber
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The port on which ips service is listening. "
+    ::= { bwsIpsReqSrvcStatsEntry 3 }
+
+ipsReqSrvcNoOfUrlProfMatched OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of URL profiles matched. "
+    ::= { bwsIpsReqSrvcStatsEntry 4 }
+
+ipsReqSrvcNoOfAppProfViol OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of app profile violations. "
+    ::= { bwsIpsReqSrvcStatsEntry 5 }
+
+ipsReqSrvcTotProfViol OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Total number of profile violations. "
+    ::= { bwsIpsReqSrvcStatsEntry 6 }
+
+
+---
+--bwsIpsLrnSrvcStatsTable
+---
+
+bwsIpsLrnSrvcStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BwsIpsLrnSrvcStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of IPS request service stats. "
+    ::= { bwsStats 8 }
+
+bwsIpsLrnSrvcStatsEntry OBJECT-TYPE
+    SYNTAX    BwsIpsLrnSrvcStatsEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "IPS request service stats entry. "
+    INDEX {ipsLrnSrvcAddressType, ipsLrnSrvcAddress, ipsLrnSrvcPort}
+    ::= { bwsIpsLrnSrvcStatsTable 1 }
+
+BwsIpsLrnSrvcStatsEntry ::= SEQUENCE {
+    ipsLrnSrvcAddressType         InetAddressType,
+    ipsLrnSrvcAddress             InetAddress,
+    ipsLrnSrvcPort                InetPortNumber,
+    ipsLrnSrvcUpdatesByReq        Counter64,
+    ipsLrnSrvcUpdatesByRsp        Counter64,
+    ipsLrnSrvcTotUpdatesByReq     Counter64,
+    ipsLrnSrvcTotUpdatesByRsp     Counter64,
+    ipsLrnSrvcTotUrlUpdated       Counter64,
+    ipsLrnSrvcTotParamsLearned    Counter64,
+    ipsLrnSrvcTimeLastUpdated     TimeStamp,
+    ipsLrnSrvcTimeLocked          TimeStamp
+}
+
+ipsLrnSrvcAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The type of the service address, as defined
+            in the InetAddress MIB. "
+    REFERENCE "RFC 4001"
+    ::= { bwsIpsLrnSrvcStatsEntry 1 }
+
+ipsLrnSrvcAddress OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The service address. "
+    ::= { bwsIpsLrnSrvcStatsEntry 2 }
+
+ipsLrnSrvcPort OBJECT-TYPE
+    SYNTAX     InetPortNumber
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The port on which ips service is listening. "
+    ::= { bwsIpsLrnSrvcStatsEntry 3 }
+
+ipsLrnSrvcUpdatesByReq OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of updated by requests. "
+    ::= { bwsIpsLrnSrvcStatsEntry 4 }
+
+ipsLrnSrvcUpdatesByRsp OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of updated by response. "
+    ::= { bwsIpsLrnSrvcStatsEntry 5 }
+
+ipsLrnSrvcTotUpdatesByReq OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Total number of updated by requests. "
+    ::= { bwsIpsLrnSrvcStatsEntry 6 }
+
+ipsLrnSrvcTotUpdatesByRsp OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Total number of updated by response. "
+    ::= { bwsIpsLrnSrvcStatsEntry 7 }
+
+ipsLrnSrvcTotUrlUpdated OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Total number URL updated. "
+    ::= { bwsIpsLrnSrvcStatsEntry 8 }
+
+ipsLrnSrvcTotParamsLearned OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Total number parameters learned. "
+    ::= { bwsIpsLrnSrvcStatsEntry 9 }
+
+ipsLrnSrvcTimeLastUpdated OBJECT-TYPE
+    SYNTAX     TimeStamp
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Time at which last update was done. "
+    ::= { bwsIpsLrnSrvcStatsEntry 10 }
+
+ipsLrnSrvcTimeLocked OBJECT-TYPE
+    SYNTAX     TimeStamp
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Time at which profile was locked. "
+    ::= { bwsIpsLrnSrvcStatsEntry 11 }
+
+
+---
+--bwsIpsReqLimitStatsTable
+---
+
+bwsIpsReqLimitStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BwsIpsReqLimitStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of IPS request limit stats. "
+    ::= { bwsStats 9 }
+
+bwsIpsReqLimitStatsEntry OBJECT-TYPE
+    SYNTAX    BwsIpsReqLimitStatsEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "IPS request limit stats entry. "
+    INDEX {ipsReqLimitAddressType, ipsReqLimitAddress, ipsReqLimitPort}
+    ::= { bwsIpsReqLimitStatsTable 1 }
+
+BwsIpsReqLimitStatsEntry ::= SEQUENCE {
+    ipsReqLimitAddressType         InetAddressType,
+    ipsReqLimitAddress             InetAddress,
+    ipsReqLimitPort                InetPortNumber,
+    ipsReqLimitUrlLenOFErr         Counter32,
+    ipsReqLimitQueryLenOFErr       Counter32,
+    ipsReqLimitReqLenOFErr         Counter32,
+    ipsReqLimitCookieLenOFErr      Counter32,
+    ipsReqLimitHdrCntOFErr         Counter32,
+    ipsReqLimitHdrLenOFErr         Counter32,
+    ipsReqLimitContentLenErr       Counter32,
+    ipsReqLimitBlkdMethodErr       Counter32
+}
+
+ipsReqLimitAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The type of the service address, as defined
+            in the InetAddress MIB. "
+    REFERENCE "RFC 4001"
+    ::= { bwsIpsReqLimitStatsEntry 1 }
+
+ipsReqLimitAddress OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The service address. "
+    ::= { bwsIpsReqLimitStatsEntry 2 }
+
+ipsReqLimitPort OBJECT-TYPE
+    SYNTAX     InetPortNumber
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The port on which ips service is listening. "
+    ::= { bwsIpsReqLimitStatsEntry 3 }
+
+ipsReqLimitUrlLenOFErr OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of URL length overflow error. "
+    ::= { bwsIpsReqLimitStatsEntry 4 }
+
+ipsReqLimitQueryLenOFErr OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of query length overflow error. "
+    ::= { bwsIpsReqLimitStatsEntry 5 }
+
+ipsReqLimitReqLenOFErr OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of request length overflow error. "
+    ::= { bwsIpsReqLimitStatsEntry 6 }
+
+ipsReqLimitCookieLenOFErr OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of Cookie length overflow error. "
+    ::= { bwsIpsReqLimitStatsEntry 7 }
+
+ipsReqLimitHdrCntOFErr OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of header count overflow error. "
+    ::= { bwsIpsReqLimitStatsEntry 8 }
+
+ipsReqLimitHdrLenOFErr OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of header length overflow error. "
+    ::= { bwsIpsReqLimitStatsEntry 9 }
+
+ipsReqLimitContentLenErr OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of content length overflow error. "
+    ::= { bwsIpsReqLimitStatsEntry 10 }
+
+ipsReqLimitBlkdMethodErr OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of blocked method error. "
+    ::= { bwsIpsReqLimitStatsEntry 11 }
+
+
+---
+--bwsIpsUrlNormStatsTable
+---
+
+bwsIpsUrlNormStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BwsIpsUrlNormStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of IPS URL normalization stats. "
+    ::= { bwsStats 10 }
+
+bwsIpsUrlNormStatsEntry OBJECT-TYPE
+    SYNTAX    BwsIpsUrlNormStatsEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "IPS URL normalization stats entry. "
+    INDEX {ipsUrlNormAddressType, ipsUrlNormAddress, ipsUrlNormPort}
+    ::= { bwsIpsUrlNormStatsTable 1 }
+
+BwsIpsUrlNormStatsEntry ::= SEQUENCE {
+    ipsUrlNormAddressType         InetAddressType,
+    ipsUrlNormAddress             InetAddress,
+    ipsUrlNormPort                InetPortNumber,
+    ipsUrlNormEncodingErr         Counter32,
+    ipsUrlNormSlashDotInUrlErr    Counter32,
+    ipsUrlNormTildaInUrl          Counter32,
+    ipsUrlNormCharSetEncodingErr  Counter32
+}
+
+ipsUrlNormAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The type of the service address, as defined
+            in the InetAddress MIB. "
+    REFERENCE "RFC 4001"
+    ::= { bwsIpsUrlNormStatsEntry 1 }
+
+ipsUrlNormAddress OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The service address. "
+    ::= { bwsIpsUrlNormStatsEntry 2 }
+
+ipsUrlNormPort OBJECT-TYPE
+    SYNTAX     InetPortNumber
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The port on which ips service is listening. "
+    ::= { bwsIpsUrlNormStatsEntry 3 }
+
+ipsUrlNormEncodingErr OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of encoding error. "
+    ::= { bwsIpsUrlNormStatsEntry 4 }
+
+ipsUrlNormSlashDotInUrlErr OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of slash dot in URL error. "
+    ::= { bwsIpsUrlNormStatsEntry 5 }
+
+ipsUrlNormTildaInUrl OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of tilda in URL error. "
+    ::= { bwsIpsUrlNormStatsEntry 6 }
+
+ipsUrlNormCharSetEncodingErr OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of character set encoding error. "
+    ::= { bwsIpsUrlNormStatsEntry 7 }
+
+
+
+---
+--bwsIpsCookieSecStatsTable
+---
+
+bwsIpsCookieSecStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BwsIpsCookieSecStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of IPS cookie security stats. "
+    ::= { bwsStats 11 }
+
+bwsIpsCookieSecStatsEntry OBJECT-TYPE
+    SYNTAX    BwsIpsCookieSecStatsEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "IPS cookie security stats entry. "
+    INDEX {ipsCookieSecAddressType, ipsCookieSecAddress, ipsCookieSecPort}
+    ::= { bwsIpsCookieSecStatsTable 1 }
+
+BwsIpsCookieSecStatsEntry ::= SEQUENCE {
+    ipsCookieSecAddressType         InetAddressType,
+    ipsCookieSecAddress             InetAddress,
+    ipsCookieSecPort                InetPortNumber,
+    ipsCookieSecEncrypted           Counter32,
+    ipsCookieSecTampered            Counter32,
+    ipsCookieSecNumCookieAllow      Counter32,
+    ipsCookieSecNumCookieSet        Counter32,
+    ipsCookieSecNumCookieErr        Counter32,
+    ipsCookieSecCookieDecErr        Counter32,
+    ipsCookieSecCookieDecrypted     Counter32
+}
+
+ipsCookieSecAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The type of the service address, as defined
+            in the InetAddress MIB. "
+    REFERENCE "RFC 4001"
+    ::= { bwsIpsCookieSecStatsEntry 1 }
+
+ipsCookieSecAddress OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The service address. "
+    ::= { bwsIpsCookieSecStatsEntry 2 }
+
+ipsCookieSecPort OBJECT-TYPE
+    SYNTAX     InetPortNumber
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The port on which ips service is listening. "
+    ::= { bwsIpsCookieSecStatsEntry 3 }
+
+ipsCookieSecEncrypted OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of cookie encrypted. "
+    ::= { bwsIpsCookieSecStatsEntry 4 }
+
+ipsCookieSecTampered OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of cookie tampered. "
+    ::= { bwsIpsCookieSecStatsEntry 5 }
+
+ipsCookieSecNumCookieAllow OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of cookie allowed. "
+    ::= { bwsIpsCookieSecStatsEntry 6 }
+
+ipsCookieSecNumCookieSet OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of cookie set. "
+    ::= { bwsIpsCookieSecStatsEntry 7 }
+
+ipsCookieSecNumCookieErr OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of cookie error. "
+    ::= { bwsIpsCookieSecStatsEntry 8 }
+
+ipsCookieSecCookieDecErr OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of cookie dec error. "
+    ::= { bwsIpsCookieSecStatsEntry 9 }
+
+ipsCookieSecCookieDecrypted OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of cookie decrypted. "
+    ::= { bwsIpsCookieSecStatsEntry 10 }
+
+
+
+
+---
+--bwsIpsUrlAclStatsTable
+---
+
+bwsIpsUrlAclStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BwsIpsUrlAclStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of IPS URL ACLstats. "
+    ::= { bwsStats 12 }
+
+bwsIpsUrlAclStatsEntry OBJECT-TYPE
+    SYNTAX    BwsIpsUrlAclStatsEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "IPS URL ACL stats entry. "
+    INDEX {ipsUrlAclAddressType, ipsUrlAclAddress, ipsUrlAclPort}
+    ::= { bwsIpsUrlAclStatsTable 1 }
+
+BwsIpsUrlAclStatsEntry ::= SEQUENCE {
+    ipsUrlAclAddressType         InetAddressType,
+    ipsUrlAclAddress             InetAddress,
+    ipsUrlAclPort                InetPortNumber,
+    ipsUrlAclProcessAclHits      Counter32,
+    ipsUrlAclPolicyHits          Counter32,
+    ipsUrlAclTimeStamp           TimeStamp,
+    ipsUrlAclReserved            OCTET STRING,
+    ipsUrlAclAllowAclHits        Counter32
+}
+
+ipsUrlAclAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The type of the service address, as defined
+            in the InetAddress MIB. "
+    REFERENCE "RFC 4001"
+    ::= { bwsIpsUrlAclStatsEntry 1 }
+
+ipsUrlAclAddress OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The service address. "
+    ::= { bwsIpsUrlAclStatsEntry 2 }
+
+ipsUrlAclPort OBJECT-TYPE
+    SYNTAX    InetPortNumber 
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The port on which ips service is listening. "
+    ::= { bwsIpsUrlAclStatsEntry 3 }
+
+ipsUrlAclProcessAclHits OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of ACL hits. "
+    ::= { bwsIpsUrlAclStatsEntry 4 }
+
+ipsUrlAclPolicyHits OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of ACL policy hits. "
+    ::= { bwsIpsUrlAclStatsEntry 5 }
+
+ipsUrlAclTimeStamp OBJECT-TYPE
+    SYNTAX     TimeStamp
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Time stamp at which this entry was last modified. "
+    ::= { bwsIpsUrlAclStatsEntry 6 }
+
+ipsUrlAclReserved OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Reserved. "
+    ::= { bwsIpsUrlAclStatsEntry 7 }
+
+ipsUrlAclAllowAclHits OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of ACL policy hits. "
+    ::= { bwsIpsUrlAclStatsEntry 8 }
+
+
+---
+--bwsIpsHdrAclStatsTable
+---
+
+bwsIpsHdrAclStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BwsIpsHdrAclStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of IPS header ACL stats. "
+    ::= { bwsStats 13 }
+
+bwsIpsHdrAclStatsEntry OBJECT-TYPE
+    SYNTAX    BwsIpsHdrAclStatsEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "IPS header ACL stats entry. "
+    INDEX {ipsHdrAclAddressType, ipsHdrAclAddress, ipsHdrAclPort}
+    ::= { bwsIpsHdrAclStatsTable 1 }
+
+BwsIpsHdrAclStatsEntry ::= SEQUENCE {
+    ipsHdrAclAddressType         InetAddressType,
+    ipsHdrAclAddress             InetAddress,
+    ipsHdrAclPort                InetPortNumber,
+    ipsHdrAclHits                Counter32,
+    ipsHdrAclTimeStamp           TimeStamp
+}
+
+ipsHdrAclAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The type of the service address, as defined
+            in the InetAddress MIB. "
+    REFERENCE "RFC 4001"
+    ::= { bwsIpsHdrAclStatsEntry 1 }
+
+ipsHdrAclAddress OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The service address. "
+    ::= { bwsIpsHdrAclStatsEntry 2 }
+
+ipsHdrAclPort OBJECT-TYPE
+    SYNTAX     InetPortNumber
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The port on which ips service is listening. "
+    ::= { bwsIpsHdrAclStatsEntry 3 }
+
+ipsHdrAclHits OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of ACL hits. "
+    ::= { bwsIpsHdrAclStatsEntry 4 }
+
+ipsHdrAclTimeStamp OBJECT-TYPE
+    SYNTAX     TimeStamp
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Time stamp at which this entry was last modified. "
+    ::= { bwsIpsHdrAclStatsEntry 5 }
+
+
+
+
+---
+--bwsIpsWebAddrTransStatsTable
+---
+
+bwsIpsWebAddrTransStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BwsIpsWebAddrTransStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of IPS header ACL stats. "
+    ::= { bwsStats 14 }
+
+bwsIpsWebAddrTransStatsEntry OBJECT-TYPE
+    SYNTAX    BwsIpsWebAddrTransStatsEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "IPS header ACL stats entry. "
+    INDEX {ipsWebAddrTransAddressType, ipsWebAddrTransAddress, ipsWebAddrTransPort}
+    ::= { bwsIpsWebAddrTransStatsTable 1 }
+
+BwsIpsWebAddrTransStatsEntry ::= SEQUENCE {
+    ipsWebAddrTransAddressType         InetAddressType,
+    ipsWebAddrTransAddress             InetAddress,
+    ipsWebAddrTransPort                InetPortNumber,
+    ipsWebAddrTransReqUrlTrans         Counter32,
+    ipsWebAddrTransRspUrlTrans         Counter32,
+    ipsWebAddrTransReqUrlReWritten     Counter32,
+    ipsWebAddrTransReqHdrReWritten     Counter32,
+    ipsWebAddrTransRspHdrReWritten     Counter32,
+    ipsWebAddrTransReqReDirection      Counter32,
+    ipsWebAddrTransTimeStamp           TimeStamp
+}
+
+ipsWebAddrTransAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The type of the service address, as defined
+            in the InetAddress MIB. "
+    REFERENCE "RFC 4001"
+    ::= { bwsIpsWebAddrTransStatsEntry 1 }
+
+ipsWebAddrTransAddress OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The service address. "
+    ::= { bwsIpsWebAddrTransStatsEntry 2 }
+
+ipsWebAddrTransPort OBJECT-TYPE
+    SYNTAX     InetPortNumber
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The port on which ips service is listening. "
+    ::= { bwsIpsWebAddrTransStatsEntry 3 }
+
+ipsWebAddrTransReqUrlTrans OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of URL translation requests. "
+    ::= { bwsIpsWebAddrTransStatsEntry 4 }
+
+ipsWebAddrTransRspUrlTrans OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of URL translation response. "
+    ::= { bwsIpsWebAddrTransStatsEntry 5 }
+
+ipsWebAddrTransReqUrlReWritten OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of URL re-written. "
+    ::= { bwsIpsWebAddrTransStatsEntry 6 }
+
+ipsWebAddrTransReqHdrReWritten OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of request header re-written. "
+    ::= { bwsIpsWebAddrTransStatsEntry 7 }
+
+ipsWebAddrTransRspHdrReWritten OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of response header re-written. "
+    ::= { bwsIpsWebAddrTransStatsEntry 8 }
+
+ipsWebAddrTransReqReDirection OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of request redirection. "
+    ::= { bwsIpsWebAddrTransStatsEntry 9 }
+
+ipsWebAddrTransTimeStamp OBJECT-TYPE
+    SYNTAX     TimeStamp
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Time stamp at which this entry was last modified. "
+    ::= { bwsIpsWebAddrTransStatsEntry 10 }
+
+
+
+---
+--bwsIpsAccessCtrlStatsTable
+---
+
+bwsIpsAccessCtrlStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BwsIpsAccessCtrlStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of IPS access control stats. "
+    ::= { bwsStats 15 }
+
+bwsIpsAccessCtrlStatsEntry OBJECT-TYPE
+    SYNTAX    BwsIpsAccessCtrlStatsEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "IPS access control stats entry. "
+    INDEX {ipsAccessCtrlAddressType, ipsAccessCtrlAddress, ipsAccessCtrlPort}
+    ::= { bwsIpsAccessCtrlStatsTable 1 }
+
+BwsIpsAccessCtrlStatsEntry ::= SEQUENCE {
+    ipsAccessCtrlAddressType         InetAddressType,
+    ipsAccessCtrlAddress             InetAddress,
+    ipsAccessCtrlPort                InetPortNumber,
+    ipsAccessCtrlMissingCookie       Counter32,
+    ipsAccessCtrlNoAuthHdr           Counter32,
+    ipsAccessCtrlInvalidCookie       Counter32,
+    ipsAccessCtrlExpiredCookie       Counter32,
+    ipsAccessCtrlAccessDenied        Counter32,
+    ipsAccessCtrlGenFailure          Counter32,
+    ipsAccessCtrlAccessAttempts      Counter32,
+    ipsAccessCtrlAccessAttemptsTotRtt Counter32,
+    ipsAccessCtrlInvalidSrcIp        Counter32,
+    ipsAccessCtrlAuthCacheHits       Counter32,
+    ipsAccessCtrlAuthCacheMiss       Counter32,
+    ipsAccessCtrlAuthCacheExp        Counter32,
+    ipsAccessCtrlTimeStamp           TimeStamp
+}
+
+ipsAccessCtrlAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The type of the service address, as defined
+            in the InetAddress MIB. "
+    REFERENCE "RFC 4001"
+    ::= { bwsIpsAccessCtrlStatsEntry 1 }
+
+ipsAccessCtrlAddress OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The service address. "
+    ::= { bwsIpsAccessCtrlStatsEntry 2 }
+
+ipsAccessCtrlPort OBJECT-TYPE
+    SYNTAX     InetPortNumber
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The port on which ips service is listening. "
+    ::= { bwsIpsAccessCtrlStatsEntry 3 }
+
+ipsAccessCtrlMissingCookie OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of missing cookies. "
+    ::= { bwsIpsAccessCtrlStatsEntry 4 }
+
+ipsAccessCtrlNoAuthHdr OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of no authorization header. "
+    ::= { bwsIpsAccessCtrlStatsEntry 5 }
+
+ipsAccessCtrlInvalidCookie OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of invalid cookie. "
+    ::= { bwsIpsAccessCtrlStatsEntry 6 }
+
+ipsAccessCtrlExpiredCookie OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of expired cookie. "
+    ::= { bwsIpsAccessCtrlStatsEntry 7 }
+
+ipsAccessCtrlAccessDenied OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of access denied. "
+    ::= { bwsIpsAccessCtrlStatsEntry 8 }
+
+ipsAccessCtrlGenFailure OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of general failure. "
+    ::= { bwsIpsAccessCtrlStatsEntry 9 }
+
+ipsAccessCtrlAccessAttempts OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of access attempts. "
+    ::= { bwsIpsAccessCtrlStatsEntry 10 }
+
+ipsAccessCtrlAccessAttemptsTotRtt OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of access attempts. "
+    ::= { bwsIpsAccessCtrlStatsEntry 11 }
+
+ipsAccessCtrlInvalidSrcIp OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of invalid source ip. "
+    ::= { bwsIpsAccessCtrlStatsEntry 12 }
+
+ipsAccessCtrlAuthCacheHits OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of authorization cache hits. "
+    ::= { bwsIpsAccessCtrlStatsEntry 13 }
+
+ipsAccessCtrlAuthCacheMiss OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of authorization cache miss. "
+    ::= { bwsIpsAccessCtrlStatsEntry 14 }
+
+ipsAccessCtrlAuthCacheExp OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of authorization cache expiry. "
+    ::= { bwsIpsAccessCtrlStatsEntry 15 }
+
+ipsAccessCtrlTimeStamp OBJECT-TYPE
+    SYNTAX     TimeStamp
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Time stamp at which this entry was last modified. "
+    ::= { bwsIpsAccessCtrlStatsEntry 16 }
+
+
+
+
+
+---
+--bwsIpsRCStatsTable
+---
+
+bwsIpsRCStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BwsIpsRCStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of IPS rate control stats. "
+    ::= { bwsStats 16 }
+
+bwsIpsRCStatsEntry OBJECT-TYPE
+    SYNTAX    BwsIpsRCStatsEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "IPS rate control stats entry. "
+    INDEX {ipsRCAddressType, ipsRCAddress, ipsRCPort}
+    ::= { bwsIpsRCStatsTable 1 }
+
+BwsIpsRCStatsEntry ::= SEQUENCE {
+    ipsRCAddressType         InetAddressType,
+    ipsRCAddress             InetAddress,
+    ipsRCPort                InetPortNumber,
+    ipsRCTotServed           Counter32,
+    ipsRCTotQueued           Counter32,
+    ipsRCTotDropped          Counter32,
+    ipsRCTotOutOfResource    Counter32,
+    ipsRCTimeStamp           TimeStamp
+}
+
+ipsRCAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The type of the service address, as defined
+            in the InetAddress MIB. "
+    REFERENCE "RFC 4001"
+    ::= { bwsIpsRCStatsEntry 1 }
+
+ipsRCAddress OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The service address. "
+    ::= { bwsIpsRCStatsEntry 2 }
+
+ipsRCPort OBJECT-TYPE
+    SYNTAX     InetPortNumber
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The port on which ips service is listening. "
+    ::= { bwsIpsRCStatsEntry 3 }
+
+ipsRCTotServed OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Total number of RC served. "
+    ::= { bwsIpsRCStatsEntry 4 }
+
+ipsRCTotQueued OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Total number RC queued. "
+    ::= { bwsIpsRCStatsEntry 5 }
+
+ipsRCTotDropped OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Total number RC dropped. "
+    ::= { bwsIpsRCStatsEntry 6 }
+
+ipsRCTotOutOfResource OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Total number of out of resource error. "
+    ::= { bwsIpsRCStatsEntry 7 }
+
+ipsRCTimeStamp OBJECT-TYPE
+    SYNTAX     TimeStamp
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Time stamp at which this entry was last modified. "
+    ::= { bwsIpsRCStatsEntry 8 }
+
+
+
+
+---
+--bwsIpsUrlPolicyStatsTable
+---
+
+bwsIpsUrlPolicyStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BwsIpsUrlPolicyStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of IPS UrlPolicy stats. "
+    ::= { bwsStats 17 }
+
+bwsIpsUrlPolicyStatsEntry OBJECT-TYPE
+    SYNTAX    BwsIpsUrlPolicyStatsEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "IPS UrlPolicy stats entry. "
+    INDEX {ipsUrlPolicyAddressType, ipsUrlPolicyAddress, ipsUrlPolicyPort}
+    ::= { bwsIpsUrlPolicyStatsTable 1 }
+
+BwsIpsUrlPolicyStatsEntry ::= SEQUENCE {
+    ipsUrlPolicyAddressType         InetAddressType,
+    ipsUrlPolicyAddress             InetAddress,
+    ipsUrlPolicyPort                InetPortNumber,
+    ipsUrlPolicyTotServed           Counter32,
+    ipsUrlPolicyTotQueued           Counter32,
+    ipsUrlPolicyTotDropped          Counter32,
+    ipsUrlPolicyTotOutOfResource    Counter32,
+    ipsUrlPolicyEntryCtrlAuth       Counter32,
+    ipsUrlPolicyTimeStamp           TimeStamp
+}
+
+ipsUrlPolicyAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The type of the service address, as defined
+            in the InetAddress MIB. "
+    REFERENCE "RFC 4001"
+    ::= { bwsIpsUrlPolicyStatsEntry 1 }
+
+ipsUrlPolicyAddress OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The service address. "
+    ::= { bwsIpsUrlPolicyStatsEntry 2 }
+
+ipsUrlPolicyPort OBJECT-TYPE
+    SYNTAX     InetPortNumber
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The port on which ips service is listening. "
+    ::= { bwsIpsUrlPolicyStatsEntry 3 }
+
+ipsUrlPolicyTotServed OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Total number of UrlPolicy served. "
+    ::= { bwsIpsUrlPolicyStatsEntry 4 }
+
+ipsUrlPolicyTotQueued OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Total number UrlPolicy queued. "
+    ::= { bwsIpsUrlPolicyStatsEntry 5 }
+
+ipsUrlPolicyTotDropped OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Total number UrlPolicy dropped. "
+    ::= { bwsIpsUrlPolicyStatsEntry 6 }
+
+ipsUrlPolicyTotOutOfResource OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Total number of out of resource error. "
+    ::= { bwsIpsUrlPolicyStatsEntry 7 }
+
+ipsUrlPolicyEntryCtrlAuth OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Total number entry control authentication. "
+    ::= { bwsIpsUrlPolicyStatsEntry 8 }
+
+
+ipsUrlPolicyTimeStamp OBJECT-TYPE
+    SYNTAX     TimeStamp
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Time stamp at which this entry was last modified. "
+    ::= { bwsIpsUrlPolicyStatsEntry 9 }
+
+---
+--bwsSMUserSessionTable
+---
+bwsSMUserSessionTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BwsSMUserSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of siteminder user session info. "
+    ::= { bwsStats 18 }
+
+bwsSMUserSessionEntry OBJECT-TYPE
+    SYNTAX   BwsSMUserSessionEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "siteminder user session info entry. "
+    INDEX {smRealmName}
+    ::= { bwsSMUserSessionTable 1 }
+
+BwsSMUserSessionEntry ::= SEQUENCE {
+    smRealmName                     OCTET STRING,
+    smAgentName                    OCTET STRING,
+    smNumUserSessions               Integer32
+} 
+
+smRealmName OBJECT-TYPE
+    SYNTAX    OCTET STRING (SIZE (1..30))
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The realm name."
+    ::= { bwsSMUserSessionEntry 1 }
+
+smAgentName OBJECT-TYPE
+    SYNTAX     OCTET STRING (SIZE (1..30))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The agent name. "
+    ::= { bwsSMUserSessionEntry 2 }
+
+smNumUserSessions OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Number of user sessions. "
+    ::= { bwsSMUserSessionEntry 3 }
+
+
+---
+--bwsServiceStatusTable
+---
+bwsServiceStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BwsServiceStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of service status info. "
+    ::= { bwsStats 19 }
+
+bwsServiceStatusEntry OBJECT-TYPE
+    SYNTAX   BwsServiceStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "service status info entry. "
+    INDEX {srvcName}
+    ::= { bwsServiceStatusTable 1 }
+
+BwsServiceStatusEntry ::= SEQUENCE {
+    srvcName                    OCTET STRING,
+    serviceName                 OCTET STRING,
+    serviceAddress              InetAddress,
+    servicePort                 InetPortNumber,
+    serviceStatus               OCTET STRING
+}
+srvcName  OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The name of service used for indexing. "
+    ::= { bwsServiceStatusEntry 1 }
+
+serviceName OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "service name. "
+    ::= { bwsServiceStatusEntry 2 }
+
+serviceAddress  OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The service address. "
+    ::= { bwsServiceStatusEntry 3 }
+servicePort  OBJECT-TYPE
+    SYNTAX     InetPortNumber
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The port on which service is listening. "
+    ::= { bwsServiceStatusEntry 4 }
+
+serviceStatus OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "service status. "
+    ::= { bwsServiceStatusEntry 5 }
+
+
+--
+-- Traps
+--
+
+
+    tempCritical NOTIFICATION-TYPE
+         OBJECTS { bwsMessage } 
+         STATUS      current
+         DESCRIPTION
+                     "Severity: Alert
+                      System temperature exceeded its threshold."
+         ::= { bwstraps 3 }
+
+    tempHigh NOTIFICATION-TYPE
+         OBJECTS { bwsMessage } 
+         STATUS      current
+         DESCRIPTION
+                     "Severity: Critical
+                      System temperature is higher than 80C."
+         ::= { bwstraps 4 }
+
+    systemFailOver NOTIFICATION-TYPE
+         OBJECTS { bwsMessage } 
+         STATUS      current
+         DESCRIPTION
+                     "Severity: Critical
+                      System has failed over."
+         ::= { bwstraps 5 }
+
+    switchingToMaintMode NOTIFICATION-TYPE
+         OBJECTS { bwsMessage } 
+         STATUS      current
+         DESCRIPTION
+                     "Severity: Warning
+                      System is in failed state."
+         ::= { bwstraps 6 }
+
+    fanDead NOTIFICATION-TYPE
+         OBJECTS { bwsMessage } 
+         STATUS      current
+         DESCRIPTION
+                     "Severity: Error
+                      One of the System fans is dead."
+         ::= { bwstraps 7 }
+         
+    dataPortLinkDown NOTIFICATION-TYPE
+         OBJECTS { bwsMessage } 
+         STATUS      current
+         DESCRIPTION
+                     "Severity: Error
+                      Data link is down."
+         ::= { bwstraps 8 }
+         
+         
+    serverDown NOTIFICATION-TYPE
+         OBJECTS { bwsMessage } 
+         STATUS      current
+         DESCRIPTION
+                     "Severity: Error
+                      Back-end Server is down."
+         ::= { bwstraps 9 }
+         
+    peerDown NOTIFICATION-TYPE
+         OBJECTS { bwsMessage } 
+         STATUS      current
+         DESCRIPTION
+                     "Severity: Error
+                      Peer is down."
+         ::= { bwstraps 10 }
+
+    dataPortLinkUp NOTIFICATION-TYPE
+         OBJECTS { bwsMessage } 
+         STATUS      current
+         DESCRIPTION
+                     "Severity: Information
+                      Peer is up."
+         ::= { bwstraps 11 }
+         
+    serverUp NOTIFICATION-TYPE
+         OBJECTS { bwsMessage } 
+         STATUS      current
+         DESCRIPTION
+                     "Severity: Information
+                      Back-end Server is up."
+         ::= { bwstraps 12 }
+
+    peerUp NOTIFICATION-TYPE
+         OBJECTS { bwsMessage } 
+         STATUS      current
+         DESCRIPTION
+                     "Severity: Information
+                      Peer is up."
+         ::= { bwstraps 13 }
+
+    switchingToBypassMode NOTIFICATION-TYPE
+         OBJECTS { bwsMessage } 
+         STATUS      current
+         DESCRIPTION
+                     "Severity: Information
+                      Switching to bypass mode."
+         ::= { bwstraps 14 }
+
+    switchingToInlineMode NOTIFICATION-TYPE
+         OBJECTS { bwsMessage } 
+         STATUS      current
+         DESCRIPTION
+                     "Severity: Information
+                      Switching to inline mode."
+         ::= { bwstraps 15 }
+
+    sharedSecretKeyAboutToExpire NOTIFICATION-TYPE
+         OBJECTS { bwsMessage } 
+         STATUS      current
+         DESCRIPTION
+                     "Severity: Information
+                      Shared secret key about to expire."
+         ::= { bwstraps 16 }
+
+    sharedSecretKeyExpired NOTIFICATION-TYPE
+         OBJECTS { bwsMessage } 
+         STATUS      current
+         DESCRIPTION
+                     "Severity: Information
+                      Shared secret key expired."
+         ::= { bwstraps 17 }
+    
+   firmwareStorageHigh NOTIFICATION-TYPE
+         OBJECTS { bwsMessage } 
+         STATUS      current
+         DESCRIPTION
+                     "Severity: Alert
+                      Firmware storage exceeds 75%."
+         ::= { bwstraps 18 }
+
+    logStorageHigh NOTIFICATION-TYPE
+         OBJECTS { bwsMessage } 
+         STATUS      current
+         DESCRIPTION
+                     "Severity: Alert
+                      Log storage exceeds 85%."
+         ::= { bwstraps 19 }
+
+    raidDegrading NOTIFICATION-TYPE
+         OBJECTS { bwsMessage } 
+         STATUS      current
+         DESCRIPTION
+                     "Severity: Alert
+                      One of the RAID arrays is degrading."
+         ::= { bwstraps 20 }
+
+    energizeUpdateExpire NOTIFICATION-TYPE
+        OBJECTS { bwsMessage }
+        STATUS      current
+        DESCRIPTION
+                     "Severity: Alert
+                      Energize Updates subscription is about to expire."
+        ::= { bwstraps 21 }
+
+    firmwareUpdateAvailable NOTIFICATION-TYPE
+        OBJECTS { bwsMessage }
+        STATUS      current
+        DESCRIPTION
+                    "Severity: Alert
+                     New Firmware Update is available."
+        ::= { bwstraps 22 }
+
+    attackDefinitionUpdateAvailable NOTIFICATION-TYPE
+        OBJECTS { bwsMessage }
+        STATUS      current
+        DESCRIPTION
+                    "Severity: Alert
+                     New Attack Definition is available."
+        ::= { bwstraps 24 }
+
+    processCountHigh NOTIFICATION-TYPE
+	OBJECTS { bwsMessage }
+        STATUS      current
+        DESCRIPTION
+                    "Severity: Alert 
+		     CPU Usage exceeded its threshold."
+ 	::= { bwstraps 25 }
+
+    memoryUsageHigh NOTIFICATION-TYPE
+	OBJECTS { bwsMessage }
+        STATUS      current
+        DESCRIPTION
+                    "Severity: Alert 
+		     Memory Usage exceeded its threshold."
+ 	::= { bwstraps 26 }
+
+    newAttackDefinitionInstalled NOTIFICATION-TYPE
+        OBJECTS { bwsMessage }
+        STATUS      current
+        DESCRIPTION
+                    "Severity: Alert
+                     New Attack Definition is installed."
+        ::= { bwstraps 27 }
+
+    systemFailure NOTIFICATION-TYPE
+         OBJECTS { bwsMessage }
+         STATUS      current
+         DESCRIPTION
+                     "Severity: Alert
+                      System had crashed or is in failed state."
+         ::= { bwstraps 28 }
+
+
+
+bwsMIBCompliance MODULE-COMPLIANCE
+    STATUS     current
+    DESCRIPTION
+           "The compliance statement for bws mib."
+    MODULE -- this module
+    MANDATORY-GROUPS { bwsStatsGroup, bwsTrapGroup }
+
+    ::= { bwsMIBCompliances 1 }
+
+bwsStatsGroup OBJECT-GROUP
+    OBJECTS {
+---
+--scalars
+--
+    totalApplications, totalServers,
+    totalAttacks, activeApplications,
+    activeServers, bwsMessage,
+    systemLoad, cpuFanSpeed,
+    systemFanSpeed, cpuTemperature,
+    firmwareStorage, logStorage,
+    highAvailabilityStatus, operationalMode,
+    dataPathStatus, linkStatus,
+    vipStatus, memUtilization,
+    cpuUtilization, totalBandwidth,
+    uptime, totalMem,
+    freeMem, currentFirmwareVersion,
+    virusDefUpdates, securityDefUpdates,
+    systemSerialNumber,
+---
+--bwsHttpProxyStatsTable
+---
+    httpProxyActiveConn, httpProxyTotalConn, httpProxyTotalReq,
+    httpProxyServerReq, httpProxyServerErr, httpProxyClientAbrt,
+    httpProxyServerAbrt, httpProxySessionTimeOut, httpProxyParseErr,
+    httpProxyUnknownRsp, httpProxyInBytes, httpProxyOutBytes,
+    httpProxyWAFBlockedIntrusions, httpProxyWAFMonitoredIntrusions,
+    httpProxyWAFWarnings,
+---
+---bwsSslProxyStatsTable
+---
+    sslProxyActiveConn, sslProxyFullHandshakes, sslProxyResumptionHandshakes,
+    sslProxyHandshakeAttempts, sslProxyCacheHits, sslProxyCacheMiss,
+    sslProxyCacheTimeouts, sslProxyErrPms, sslProxyAuthBadCertErr,
+    sslProxyAuthBadCNErr, sslProxyBadDNCErr, sslProxyBadCRLErr,
+    sslProxyInBytes, sslProxyOutBytes, sslProxyTotalReq,
+    sslProxyTotalConn, sslProxyCurrentConn,
+---
+--bwsCompressionStatsTable
+---
+    webCmprNoOfReqCompressed, webCmprCompressibleDataSize,
+    webCmprCompressedDataSize,
+---
+--bwsCacheStateTable
+---
+    webCacheHits, webCacheMiss,
+    webCacheStale, webCacheCacheableRes, webCacheReq,
+    webCacheCachedObjects, webCacheLongHdrs, webCacheBytesOut,
+---
+--bwsHttpSrvrStatsTable
+---
+    httpSrvrTotReqAccepted, httpSrvrTotReqActive, httpSrvrTotReqRejected,
+    httpSrvrTotSuccess, httpSrvrTotRefused, httpSrvrTotTimedout,
+    httpSrvrAvgReqPerConn, httpSrvrTotResponse, httpSrvrAvgResTime,
+    httpSrvrMaxResTime, httpSrvrMinResTime, httpSrvrNumReqEnqueue,
+    httpSrvrNumFreeConn, httpSrvrNumOpeningConn, httpSrvrNumConn,
+    httpSrvrNumIBDisabled, httpSrvrNumOOBDisabled, httpSrvrNumOOBEnabled,
+    httpSrvrLastDisabledTime, httpSrvrState, httpSrvrInBytes,
+    httpSrvrOutBytes,
+---
+--bwsSslSrvrStatsTable
+---
+    sslSrvrTotReqAccepted, sslSrvrTotReqActive, sslSrvrTotReqRejected,
+    sslSrvrTotSuccess, sslSrvrTotRefused, sslSrvrTotTimedout,
+    sslSrvrAvgReqPerConn, sslSrvrTotResponse, sslSrvrAvgResTime,
+    sslSrvrMaxResTime, sslSrvrMinResTime, sslSrvrNumReqEnqueue,
+    sslSrvrNumFreeConn, sslSrvrNumOpeningConn, sslSrvrNumConn,
+    sslSrvrNumIBDisabled, sslSrvrNumOOBDisabled, sslSrvrNumOOBEnabled,
+    sslSrvrLastDisabledTime, sslSrvrState, sslSrvrInBytes,
+    sslSrvrOutBytes,
+---
+--bwsIpsReqSrvcStatsTable
+---
+    ipsReqSrvcNoOfUrlProfMatched, ipsReqSrvcNoOfAppProfViol, ipsReqSrvcTotProfViol,
+---
+--bwsIpsLrnSrvcStatsTable
+---
+    ipsLrnSrvcUpdatesByReq, ipsLrnSrvcUpdatesByRsp, ipsLrnSrvcTotUpdatesByReq,
+    ipsLrnSrvcTotUpdatesByRsp, ipsLrnSrvcTotUrlUpdated, ipsLrnSrvcTotParamsLearned,
+    ipsLrnSrvcTimeLastUpdated, ipsLrnSrvcTimeLocked,
+---
+--bwsIpsReqLimitStatsTable
+---
+    ipsReqLimitUrlLenOFErr, ipsReqLimitQueryLenOFErr, ipsReqLimitReqLenOFErr,
+    ipsReqLimitCookieLenOFErr, ipsReqLimitHdrCntOFErr, ipsReqLimitHdrLenOFErr,
+    ipsReqLimitContentLenErr, ipsReqLimitBlkdMethodErr,
+---
+--bwsIpsUrlNormStatsTable
+---
+    ipsUrlNormEncodingErr, ipsUrlNormSlashDotInUrlErr, ipsUrlNormTildaInUrl,
+    ipsUrlNormCharSetEncodingErr,
+---
+--bwsIpsCookieSecStatsTable
+---
+    ipsCookieSecEncrypted, ipsCookieSecTampered, ipsCookieSecNumCookieAllow,
+    ipsCookieSecNumCookieSet, ipsCookieSecNumCookieErr, ipsCookieSecCookieDecErr,
+    ipsCookieSecCookieDecrypted,
+---
+--bwsIpsUrlAclStatsTable
+---
+    ipsUrlAclProcessAclHits, ipsUrlAclPolicyHits, ipsUrlAclTimeStamp,
+    ipsUrlAclReserved, ipsUrlAclAllowAclHits,
+---
+--bwsIpsHdrAclStatsTable
+---
+    ipsHdrAclHits, ipsHdrAclTimeStamp,
+---
+--bwsIpsWebAddrTransStatsTable
+---
+    ipsWebAddrTransReqUrlTrans, ipsWebAddrTransRspUrlTrans, ipsWebAddrTransReqUrlReWritten,
+    ipsWebAddrTransReqHdrReWritten, ipsWebAddrTransRspHdrReWritten, ipsWebAddrTransReqReDirection,
+    ipsWebAddrTransTimeStamp,
+---
+--bwsIpsAccessCtrlStatsTable
+---
+    ipsAccessCtrlMissingCookie, ipsAccessCtrlNoAuthHdr, ipsAccessCtrlInvalidCookie,
+    ipsAccessCtrlExpiredCookie, ipsAccessCtrlAccessDenied, ipsAccessCtrlGenFailure,
+    ipsAccessCtrlAccessAttempts, ipsAccessCtrlAccessAttemptsTotRtt,
+    ipsAccessCtrlInvalidSrcIp, ipsAccessCtrlAuthCacheHits, ipsAccessCtrlAuthCacheMiss,
+    ipsAccessCtrlAuthCacheExp, ipsAccessCtrlTimeStamp,
+---
+--bwsIpsRCStatsTable
+---
+    ipsRCTotServed, ipsRCTotQueued, ipsRCTotDropped,
+    ipsRCTotOutOfResource, ipsRCTimeStamp,
+---
+--bwsIpsUrlPolicyStatsTable
+---
+    ipsUrlPolicyTotServed, ipsUrlPolicyTotQueued, ipsUrlPolicyTotDropped,
+    ipsUrlPolicyTotOutOfResource, ipsUrlPolicyEntryCtrlAuth, ipsUrlPolicyTimeStamp,
+---
+--bwsServiceStatusTable
+---
+    serviceName, serviceAddress, servicePort, serviceStatus,
+---
+--bwsSMUserSessionTable
+---
+    smAgentName, smNumUserSessions
+    }
+    STATUS       current
+    DESCRIPTION "A collection of stats objects for bws."
+    ::= { bwsMIBGroups 1 }
+
+
+bwsTrapGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+    tempCritical, tempHigh, systemFailOver, switchingToMaintMode,
+    fanDead, dataPortLinkDown, serverDown, peerDown,
+    dataPortLinkUp, serverUp, peerUp, switchingToBypassMode,
+    switchingToInlineMode, sharedSecretKeyAboutToExpire,
+    sharedSecretKeyExpired, firmwareStorageHigh, logStorageHigh,
+    raidDegrading, energizeUpdateExpire, firmwareUpdateAvailable,
+    processCountHigh, memoryUsageHigh, attackDefinitionUpdateAvailable,
+    newAttackDefinitionInstalled, systemFailure
+    }
+    STATUS       current
+    DESCRIPTION "A collection of notification objects for bws."
+    ::= { bwsMIBGroups 2 }
+
+END

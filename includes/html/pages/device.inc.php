@@ -351,7 +351,7 @@ if (device_permitted($vars['device']) || $permitted_by_port) {
             </li>';
 
         echo '<li role="presentation" '.$select['alerts'].'>
-            <a href="'.generate_device_url($device, array('tab' => 'alerts')).'">
+            <a href="'.generate_device_url($device, array('tab' => 'alert')).'">
             <i class="fa fa-exclamation-circle fa-lg icon-theme"  aria-hidden="true"></i> Alerts
             </a>
             </li>';

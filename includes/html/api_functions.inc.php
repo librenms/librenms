@@ -1209,6 +1209,21 @@ function get_inventory(\Illuminate\Http\Request $request)
 }
 
 
+function get_inventory_for_device(\Illuminate\Http\Request $request)
+{
+    $hostname = $request->route('hostname');
+    // use hostname as device_id if it's all digits
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    return check_device_permission($device_id, function ($device_id) use ($request) {
+        $params    = [];
+        $sql = 'SELECT * FROM `entPhysical` WHERE device_id = ?';
+        $params[] = $device_id;
+        $inventory = dbFetchRows($sql, $params);
+        return api_success($inventory, 'inventory');
+    });
+}
+
+
 function search_oxidized(\Illuminate\Http\Request $request)
 {
     $search_in_conf_textbox = $request->route('searchstring');
@@ -1279,6 +1294,7 @@ function list_oxidized(\Illuminate\Http\Request $request)
             'vyos'       => 'vyatta',
             'slms'       => 'zhoneolt',
             'fireware'   => 'firewareos',
+            'fortigate'  => 'fortios',
         ];
 
         $device['os'] = str_replace(array_keys($models), array_values($models), $device['os']);

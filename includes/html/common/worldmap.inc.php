@@ -91,14 +91,16 @@ var greenMarker = L.AwesomeMarkers.icon({
         $param = $show_status;
     } else {
     // Normal user - grab devices that user has permissions to
+        $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
+
         $sql = "SELECT DISTINCT(`devices`.`device_id`) as `device_id`,`location`,`sysName`,`hostname`,`os`,`status`,`lat`,`lng`
-                FROM `devices_perms`, `devices`
+                FROM `devices`
                 LEFT JOIN `locations` ON `devices`.location_id=`locations`.`id`
                 WHERE `disabled`=0 AND `ignore`=0 AND ((`lat` != '' AND `lng` != '') OR (`location` REGEXP '\[[0-9\.\, ]+\]'))
-                AND `devices`.`device_id` = `devices_perms`.`device_id`
-                AND `devices_perms`.`user_id` = ? AND `status` IN " . dbGenPlaceholders(count($show_status)) .
+                AND `devices`.`device_id` IN " . dbGenPlaceholders(count($device_ids)) .
+                " AND `status` IN " . dbGenPlaceholders(count($show_status)) .
                 " ORDER BY `status` ASC, `hostname`";
-        $param = array_merge([Auth::id()], $show_status);
+        $param = array_merge($device_ids, $show_status);
     }
 
     foreach (dbFetchRows($sql, $param) as $map_devices) {

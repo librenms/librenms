@@ -1,0 +1,22 @@
+BARRACUDA-REF DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, enterprises
+            FROM SNMPv2-SMI;
+            
+    barracuda MODULE-IDENTITY
+        LAST-UPDATED "200906100000Z"  -- June 10, 2009
+        ORGANIZATION "Barracuda Networks, Inc."
+        CONTACT-INFO
+            "
+            Barracuda Networks Inc.
+            3175 S. Winchester Blvd.
+            Campbell, CA 95008
+            "
+        DESCRIPTION
+            "
+            Main Barracuda MIB
+            "
+        ::= { enterprises 20632 } -- assigned by IANA
+
+END

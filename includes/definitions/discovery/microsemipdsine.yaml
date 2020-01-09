@@ -1,0 +1,26 @@
+mib: MICROSEMI-PDSINE-MIB
+modules:
+    sensors:
+        power:
+            data:
+                -
+                    oid: portTable
+                    value: portConsumptionPower
+                    num_oid: '.1.3.6.1.4.1.7428.1.2.1.1.1.3.{{ $index }}'
+                    descr: 'Consumption, unit {{ $subindex0 }}, port {{ $subindex1 }}'
+                    index: 'power-{{ $index }}'
+                    group: 'Ports (Unit {{ $subindex0 }})'
+                -
+                    oid: mainPSEMaxPower
+                    value: mainPSEMaxPower
+                    group: 'Main (Unit {{ $index }})'
+                    num_oid: '.1.3.6.1.4.1.7428.1.2.2.1.1.5.{{ $index }}'
+                    descr: 'Max Power (Unit {{ $index }})'
+                    index: 'mainpw-{{ $index }}'
+                -
+                    oid: POWER-ETHERNET-MIB::pethMainPseConsumptionPower
+                    value: pethMainPseConsumptionPower
+                    group: 'Main (Unit {{ $index }})'
+                    descr: 'Used Power (Unit {{ $index }})'
+                    index: 'usedmainpw-{{ $index }}'
+                    num_oid: '.1.3.6.1.2.1.105.1.3.1.1.4.{{ $index }}'
