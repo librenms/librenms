@@ -53,7 +53,7 @@ class AlertRules
             $device_alert['state'] = 0;
             $device_alert['alerted'] = 0;
             $device_alert['open'] = 0;
-            dbUpdate($device_alert, 'alerts', '`device_id` = ?', array($device['device_id']));
+            dbUpdate($device_alert, 'alerts', '`device_id` = ?', array($device_id));
             return false;
         }
         //Checks each rule.
