@@ -23,4 +23,5 @@
  * @author     Russell Morris <rmorris@rkmorris.us>
  */
 
-$hardware = snmp_get($device, 'sysDescr.0', '-Osqnv');
+//$hardware = snmp_get($device, 'sysDescr.0', '-Osqnv');
+$hardware = $device['sysDescr'];
