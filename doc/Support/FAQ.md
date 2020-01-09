@@ -30,7 +30,7 @@ path: blob/master/doc/
 - [Why is my EdgeRouter device not detected?](#faq25)
 - [Why are some of my disks not showing?](#faq26)
 - [Why are my disks reporting an incorrect size?](#faq27)
-- [What does ignore alert tag on device?](#faq28)
+- [What does mean \"ignore alert tag\" on device, component, service and port?](#faq28)
 - [Why can't Normal and Global View users see Oxidized?](#faq29)
 - [What is the Demo User for?](#faq30)
 - [Why does modifying 'Default Alert Template' fail?](#faq31)
@@ -366,10 +366,12 @@ adding to /etc/snmp/snmpd.conf :
 
 `realStorageUnits 0`
 
-## <a name="faq28"> What does ignore alert tag on device?</a>
+## <a name="faq28"> What does mean \"ignore alert tag\" on device, component, service and port?</a>
 
-It used to tag a device to not match specific alert rules where
-`devices.ignore = 1` condition is is set.
+Tag device, component, service and port to ignore alerts. Alert checks will still run.
+However, ignore tag can be read in alert rules. For example on device, if `devices.ignore = 0` 
+or `macros.device = 1` condition is is set and ignore alert tag is on,
+the alert rule won't match. The alert rule is ignored.
 
 ## <a name="faq8"> How do I add support for a new OS?</a>
 
