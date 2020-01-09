@@ -30,7 +30,7 @@ path: blob/master/doc/
 - [Why is my EdgeRouter device not detected?](#faq25)
 - [Why are some of my disks not showing?](#faq26)
 - [Why are my disks reporting an incorrect size?](#faq27)
-- [What is the Difference between Disable Device and Ignore a Device?](#faq28)
+- [What does ignore alert tag on device?](#faq28)
 - [Why can't Normal and Global View users see Oxidized?](#faq29)
 - [What is the Demo User for?](#faq30)
 - [Why does modifying 'Default Alert Template' fail?](#faq31)
@@ -366,10 +366,10 @@ adding to /etc/snmp/snmpd.conf :
 
 `realStorageUnits 0`
 
-## <a name="faq28"> What is the Difference between Disable Device and Ignore a Device?</a>
+## <a name="faq28"> What does ignore alert tag on device?</a>
 
-- Disable stops polling.
-- Ignore disables alerting.
+It used to tag a device to not match specific alert rules where
+`devices.ignore = 1` condition is is set.
 
 ## <a name="faq8"> How do I add support for a new OS?</a>
 
