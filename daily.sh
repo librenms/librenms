@@ -257,6 +257,9 @@ main () {
                 status_run 'Cleaning up DB' "$DAILY_SCRIPT cleanup"
                 status_run 'Fetching notifications' "$DAILY_SCRIPT notifications"
                 status_run 'Caching PeeringDB data' "$DAILY_SCRIPT peeringdb"
+                status_run 'Generating vue-i18n translations' 'php lnms vue-i18n:generate'
+                status_run 'Generating updated json language files' 'php lnms translation:generate'
+
             ;;
             cleanup)
                 # Cleanups
