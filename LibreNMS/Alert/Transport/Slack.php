@@ -106,7 +106,6 @@ class Slack extends Transport
                     'descr' => 'Slack Options',
                     'type' => 'textarea',
                 ],
-
             ],
             'validation' => [
                 'slack-url' => 'required|url',
