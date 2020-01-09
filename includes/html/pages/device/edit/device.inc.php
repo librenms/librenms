@@ -186,11 +186,11 @@ $disable_notify             = get_dev_attrib($device, 'disable_notify');
       <label for="override_sysContact" class="col-sm-2 control-label">Override sysContact</label>
       <div class="col-sm-6">
         <input onChange="edit.sysContact.disabled=!edit.override_sysContact.checked" type="checkbox" id="override_sysContact" name="override_sysContact" data-size="small"
-  <?php
-  if ($override_sysContact_bool) {
-      echo ' checked="1"';
-  };
-  ?>
+    <?php
+    if ($override_sysContact_bool) {
+        echo ' checked="1"';
+    };
+    ?>
    />
       </div>
     </div>
@@ -199,12 +199,12 @@ $disable_notify             = get_dev_attrib($device, 'disable_notify');
       </div>
       <div class="col-sm-6">
         <input id="sysContact" class="form-control" name="sysContact" size="32"
-  <?php
-  if (!$override_sysContact_bool) {
-      echo ' disabled="1"';
-  };
-  ?>
-   value="<?php echo $override_sysContact_string; ?>" />
+    <?php
+    if (!$override_sysContact_bool) {
+        echo ' disabled="1"';
+    };
+    ?>
+    value="<?php echo $override_sysContact_string; ?>" />
       </div>
     </div>
     <div class="form-group">
@@ -249,11 +249,11 @@ $disable_notify             = get_dev_attrib($device, 'disable_notify');
       <label for="disable_notify" class="col-sm-2 control-label">Disable alerting:</label>
       <div class="col-sm-6">
         <input id="disable_notify" type="checkbox" name="disable_notify" data-size="small"
-  <?php
-  if ($disable_notify) {
-      echo ' checked="1"';
-  };
-  ?>
+    <?php
+    if ($disable_notify) {
+        echo ' checked="1"';
+    };
+    ?>
    />
       </div>
     </div>
