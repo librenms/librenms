@@ -132,7 +132,7 @@ allow syslogd_t self:process execmem;
 allow syslogd_t ping_exec_t:file execute;
 ```
 
-Then, as root, execute the followin commands:
+Then, as root, execute the following commands:
 
 ```ssh
 checkmodule -M -m -o mycustom-librenms-rsyslog.mod mycustom-librenms-rsyslog.te
