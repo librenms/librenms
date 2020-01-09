@@ -79,8 +79,7 @@ if ($_POST['editing']) {
 
         if (isset($override_sysContact_string)) {
             set_dev_attrib($device, 'override_sysContact_string', $override_sysContact_string);
-        };
-
+        }
     } else {
         include 'includes/html/error-no-perm.inc.php';
     }
