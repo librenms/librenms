@@ -111,6 +111,7 @@ Add the following to your LibreNMS `config.php` file to enable the Syslog extens
 $config['enable_syslog'] = 1;
 ```
 
+
 If no messages make it to the syslog tab in LibreNMS, chances are you experience an issue with SELinux. If so, create a file mycustom-librenms-rsyslog.te , with the following content:
 
 ```
