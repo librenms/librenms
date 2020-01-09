@@ -20,7 +20,6 @@ class MigrateDevicesAttribsTable extends Migration
         \DB::statement("UPDATE devices d, devices_attribs da SET d.disable_notify=1  WHERE da.attrib_type='disable_notify' AND da.attrib_value=1 AND d.device_id = da.device_id;");
         \DB::statement("DELETE FROM devices_attribs WHERE attrib_type='disable_notify' AND attrib_value=1;");
     }
-}
 
     /**
      * Reverse the migrations.
@@ -34,7 +33,5 @@ class MigrateDevicesAttribsTable extends Migration
         Schema::table('devices', function (Blueprint $table) {
             $table->dropColumn('disable_notify');
         });
-
     }
-
 }
