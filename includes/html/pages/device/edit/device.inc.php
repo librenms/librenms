@@ -258,7 +258,9 @@ $disable_notify             = get_dev_attrib($device, 'disable_notify');
       </div>
     </div>
     <div class="form-group">
-        <label for="ignore" class="col-sm-2 control-label" title="help">Ignore alert tag:</label>
+        <label for="ignore" class="col-sm-2 control-label" title="Tag device to ignore alerts. Alert checks will still run.
+However, ignore tag can be read in alert rules.
+If `devices.ignore = 0` or `macros.device = 1` condition is is set and ignore alert tag is on, the alert rule won't match.">Ignore alert tag:</label>
         <div class="col-sm-6">
            <input name="ignore" type="checkbox" id="ignore" value="1" data-size="small"
                 <?php
