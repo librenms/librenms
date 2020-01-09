@@ -249,12 +249,11 @@ $disable_notify             = get_dev_attrib($device, 'disable_notify');
       <label for="disable_notify" class="col-sm-2 control-label">Disable alerting:</label>
       <div class="col-sm-6">
         <input id="disable_notify" type="checkbox" name="disable_notify" data-size="small"
-    <?php
-    if ($disable_notify) {
-        echo ' checked="1"';
-    };
-    ?>
-   />
+                <?php
+                if ($device_model->disable_notify) {
+                    echo("checked=checked");
+                }
+                ?> />
       </div>
     </div>
     <div class="form-group">
