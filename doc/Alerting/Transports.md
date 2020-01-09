@@ -525,6 +525,7 @@ We currently support the following attachment options:
 | Config | Example |
 | ------ | ------- |
 | Webhook URL | <https://slack.com/url/somehook> |
+| Slack Template Format | Default (default), JSON |
 | Slack Options | author_name=Me |
 
 **Example Alert Template using JSON (BGP Sessions):**

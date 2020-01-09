@@ -85,9 +85,9 @@ class Slack extends Transport
         return [
             'config' => [
                 [
-                    'title' => 'Slack Payload Format',
+                    'title' => 'Slack Template Format',
                     'name' => 'slack-format',
-                    'descr' => 'Webhook POST payload format',
+                    'descr' => 'Alert template format for Slack',
                     'type' => 'select',
                     'options' => [
                         'Default' => 'Default',
