@@ -47,6 +47,11 @@ class AlertRules
             echo "Under Maintenance, Skipping alerts.\r\n";
             return false;
         }
+        //Check to see if disable alerting is set
+        if (AlertUtil::hasDisableNotify($device_id)) {
+            echo "Disable alerting is set, Skipping alerts.\r\n";
+            return false;
+        }
         //Checks each rule.
         foreach (AlertUtil::getRules($device_id) as $rule) {
             c_echo('Rule %p#'.$rule['id'].' (' . $rule['name'] . '):%n ');
