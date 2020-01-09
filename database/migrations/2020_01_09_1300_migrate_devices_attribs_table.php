@@ -22,8 +22,6 @@ class MigrateDevicesAttribsTable extends Migration
     }
 }
 
-    }
-
     /**
      * Reverse the migrations.
      *
