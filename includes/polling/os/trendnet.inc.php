@@ -19,8 +19,8 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2016 Neil Lathwood
- * @author     Neil Lathwood <neil@lathwood.co.uk>
+ * @copyright  2020 Russell Morris
+ * @author     Russell Morris <rmorris@rkmorris.us>
  */
 
 $hardware = snmp_get($device, 'sysDescr.0', '-Osqnv');
