@@ -26,7 +26,7 @@ class AlterMplsLspPathsTable extends Migration
     public function down()
     {
         Schema::table('mpls_lsp_paths', function (Blueprint $table) {
-            $table->unsignedInteger('mplsLspPathOperMetric')->nullable()->change();
+            $table->unsignedInteger('mplsLspPathOperMetric')->change();
         });
     }
 }
