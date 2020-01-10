@@ -8,6 +8,7 @@
 <div class="pull-right">
 <select name="highlight_node" id="highlight_node" class="input-sm" onChange="highlightNode()";>
 <option value="0">None</option>
+<option value="{{ $isolated_device_id }}">@lang('Isolated Devices')</option>
 @foreach($device_list as $device)
 <option value="{{ $device['id'] }}">{{ $device['label'] }}</option>
 @endforeach
