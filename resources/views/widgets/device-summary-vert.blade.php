@@ -28,7 +28,7 @@
             @endif
         </tr>
         <tr>
-            <th><span class="grey">@lang('Ignored')</span></th>
+            <th><span class="grey">@lang('Ignored tag')</span></th>
             <td><a href="{{ url('devices/format=list_detail/ignore=1') }}"><span class="grey"> {{ $devices['ignored'] }}</span></a></td>
             <td><a href="{{ url('ports/format=list_detail/ignore=1') }}"><span class="grey"> {{ $ports['ignored'] }}</span></a></td>
             @if($show_services)

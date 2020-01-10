@@ -99,7 +99,7 @@ class AvailabilityMapController extends WidgetController
         }
 
         if (!$settings['show_disabled_and_ignored']) {
-            $device_query->isActive();
+            $device_query->isNotDisabled();
         }
         $device_query->orderBy($settings['order_by']);
         $devices = $device_query->select('devices.device_id', 'hostname', 'sysName', 'status', 'uptime', 'disabled', 'disable_notify')->get();

@@ -6,7 +6,7 @@
                 <th><span class="grey">@lang('Total')</span></th>
                 <th><span class="green">@lang('Up')</span></th>
                 <th><span class="red">@lang('Down')</span></th>
-                <th><span class="grey">@lang('Ignored')</span></th>
+                <th><span class="grey">@lang('Ignore tag')</span></th>
                 <th><span class="black">@lang('Disabled')</span></th>
                 @if($summary_errors)
                     <th class="black">@lang('Errored')</th>
@@ -20,7 +20,7 @@
                 <td><a href="{{ url('devices/state=up/format=list_detail') }}"><span class="green"> {{ $devices['up'] }}</span></a></td>
                 <td><a href="{{ url('devices/state=down/format=list_detail') }}"><span class="red"> {{ $devices['down'] }}</span></a></td>
                 <td><a href="{{ url('devices/ignore=1/format=list_detail') }}"><span class="grey"> {{ $devices['ignored'] }}</span></a></td>
-                <td><a href="{{ url('devices/disabled=1/format=list_detail') }}"><span class="black"> {{ $devices['disabled'] }}</span></a></td>
+                <td><a href="{{ url('devices/disabled=1/disable_notify=1/format=list_detail') }}"><span class="black"> {{ $devices['disabled'] }}</span></a></td>
                 @if($summary_errors)
                     <td>-</td>
                 @endif

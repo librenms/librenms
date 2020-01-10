@@ -146,7 +146,7 @@ if (defined('SHOW_SETTINGS')) {
     $host_up_count = 0;
     $host_warn_count = 0;
     $host_down_count = 0;
-    $host_ignored_count = 0;
+    $host_disable_notify_count = 0;
     $host_disabled_count = 0;
     $service_up_count = 0;
     $service_warn_count = 0;
@@ -202,7 +202,7 @@ if (defined('SHOW_SETTINGS')) {
             } elseif ($device['disable_notify'] == '1') {
                 $deviceState = "alert-disabled";
                 $deviceLabel = "label-default";
-                $host_ignored_count++;
+                $host_disable_notify_count++;
             } elseif ($device['status'] == '1') {
                 if (($device['uptime'] < Config::get('uptime_warning')) && ($device['uptime'] != 0)) {
                     $deviceState = 'warn';
@@ -372,7 +372,7 @@ if (defined('SHOW_SETTINGS')) {
 
     if ($show_disabled_ignored == 1) {
         $disabled_ignored_header = '
-            <span class="label label-default label-font-border label-border">ignored: '.$host_ignored_count.'</span>
+            <span class="label label-default label-font-border label-border">alert-disabled: '.$host_disable_notify_count.'</span>
             <span class="label blackbg label-font-border label-border">disabled: '.$host_disabled_count.'</span>';
     }
 
