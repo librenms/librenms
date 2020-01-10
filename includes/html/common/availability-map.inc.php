@@ -169,7 +169,7 @@ if (defined('SHOW_SETTINGS')) {
             $in_devices = dbFetchColumn($device_group, [Session::get('group_view')]);
         }
 
-        $sql = 'SELECT `D`.`hostname`, `D`.`sysName`, `D`.`device_id`, `D`.`status`, `D`.`uptime`, `D`.`os`, `D`.`icon`, `D`.`ignore`, `D`.`disabled` FROM `devices` AS `D`';
+        $sql = 'SELECT `D`.`hostname`, `D`.`sysName`, `D`.`device_id`, `D`.`status`, `D`.`uptime`, `D`.`os`, `D`.`icon`, `D`.`disable_notify`, `D`.`disabled` FROM `devices` AS `D`';
 
         if (!Auth::user()->hasGlobalRead()) {
             $sql .= ' , `devices_perms` AS P WHERE D.`device_id` = P.`device_id` AND P.`user_id` = ? AND ';
@@ -180,9 +180,9 @@ if (defined('SHOW_SETTINGS')) {
         }
 
         if ($show_disabled_ignored != 1) {
-            $sql .= '`D`.`ignore` = 0 AND `D`.`disabled` = 0 ';
+            $sql .= '`D`.`disable_notify` = 0 AND `D`.`disabled` = 0 ';
         } else {
-            $sql .= '(`D`.`status` IN (0,1,2) OR `D`.`ignore` = 1 OR `D`.`disabled` = 1)';
+            $sql .= '(`D`.`status` IN (0,1,2) OR `D`.`disable_notify` = 1 OR `D`.`disabled` = 1)';
         }
 
         if (Config::get('webui.availability_map_use_device_groups') != 0 && !empty($in_devices)) {
@@ -199,7 +199,7 @@ if (defined('SHOW_SETTINGS')) {
                 $deviceState = "disabled";
                 $deviceLabel = "blackbg";
                 $host_disabled_count++;
-            } elseif ($device['ignore'] == '1') {
+            } elseif ($device['disable_notify'] == '1') {
                 $deviceState = "ignored";
                 $deviceLabel = "label-default";
                 $host_ignored_count++;
