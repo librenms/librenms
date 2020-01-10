@@ -106,7 +106,7 @@ class AvailabilityMapController extends WidgetController
 
         // process status
         $uptime_warn = Config::get('uptime_warning', 84600);
-        $totals = ['warn' => 0, 'up' => 0, 'down' => 0, 'disabled' => 0, 'noalert' => 0];
+        $totals = ['warn' => 0, 'up' => 0, 'down' => 0, 'noalert' => 0, 'disabled' => 0];
         foreach ($devices as $device) {
             if ($device->disabled) {
                 $totals['disabled']++;
@@ -114,7 +114,7 @@ class AvailabilityMapController extends WidgetController
                 $device->labelClass = "blackbg";
             } elseif ($device->disable_notify) {
                 $totals['noalert']++;
-                $device->stateName = "no-alert";
+                $device->stateName = "noalert";
                 $device->labelClass = "label-default";
             } elseif ($device->status == 1) {
                 if (($device->uptime < $uptime_warn) && ($device->uptime != 0)) {
