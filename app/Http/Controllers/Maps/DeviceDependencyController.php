@@ -31,6 +31,9 @@ use LibreNMS\Util\Url;
 
 class DeviceDependencyController extends MapController
 {
+
+    protected $isolated_device_id = -1;
+
     protected static function deviceList($request)
     {
         $group_id = $request->get('group');
@@ -53,6 +56,20 @@ class DeviceDependencyController extends MapController
         return $devices->merge($devices->map->only('children', 'parents')->flatten())->loadMissing('parents', 'location');
     }
 
+    protected function highlightIsolatedDevices($devices_by_id, $isolated_device_ids)
+    {
+        $new_device_list = [];
+        foreach ($devices_by_id as $device) {
+            if (in_array($device['id'], $isolated_device_ids)) {
+                $new_device_list[] = array_merge($device, $this->nodeHighlightStyle());
+                continue;
+            }
+            $new_device_list[] = $device;
+        }
+
+        return $new_device_list;
+    }
+
     // Device Dependency Map
     public function dependencyMap(Request $request)
     {
@@ -60,12 +77,17 @@ class DeviceDependencyController extends MapController
         $highlight_node = $request->get('highlight_node');
 
         $dependencies = [];
-        $devices_by_id  = [];
+        $devices_by_id = [];
         $device_list = [];
+
+        // collect Device IDs and Parents/Children to find isolated Devices
+        $device_id_all = [];
+        $device_associations = [];
 
         // List all devices
         foreach (self::deviceList($request) as $device) {
             $device_list[] = ['id' => $device->device_id, 'label' => $device->hostname];
+            $device_id_all[] = $device->device_id;
 
             // List all Device
             $devices_by_id[] = array_merge(
@@ -79,8 +101,14 @@ class DeviceDependencyController extends MapController
             );
 
             // List all Device Dependencies
+            $children = $device->children;
+            foreach ($children as $child) {
+                $device_associations[] = $child->device_id;
+            }
+
             $parents = $device->parents;
             foreach ($parents as $parent) {
+                $device_associations[] = $parent->device_id;
                 $dependencies[] = [
                     'from'  => $device->device_id,
                     'to'    => $parent->device_id,
@@ -89,9 +117,18 @@ class DeviceDependencyController extends MapController
             };
         }
 
+        // highlight isolated Devices
+        if ($highlight_node == $this->isolated_device_id) {
+            $device_associations = array_unique($device_associations);
+            $isolated_device_ids = array_diff($device_id_all, $device_associations);
+
+            $devices_by_id = $this->highlightIsolatedDevices($devices_by_id, $isolated_device_ids);
+        }
+
         array_multisort(array_column($device_list, 'label'), SORT_ASC, $device_list);
 
         $data = [
+            'isolated_device_id' => $this->isolated_device_id,
             'device_list' => $device_list,
             'group_id' => $group_id,
             'highlight_node' => $highlight_node,
