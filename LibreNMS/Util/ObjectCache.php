@@ -184,6 +184,8 @@ class ObjectCache
                     return $query->isIgnored()->count();
                 case 'disabled':
                     return $query->isDisabled()->count();
+                case 'disable_notify':
+                    return $query->isDisableNotify()->count();
                 case 'total':
                 default:
                     return $query->count();
