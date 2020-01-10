@@ -348,7 +348,7 @@ if ($format == "graph") {
                     state: '<?php echo mres($vars['state']); ?>',
                     disabled: '<?php echo mres($vars['disabled']); ?>',
                     ignore: '<?php echo mres($vars['ignore']); ?>',
-                    disabled_notify: '<?php echo mres($vars['disabled_notify']); ?>',
+                    disable_notify: '<?php echo mres($vars['disable_notify']); ?>',
                     group: '<?php echo mres($vars['group']); ?>',
                 };
             },
