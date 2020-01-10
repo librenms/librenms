@@ -102,19 +102,19 @@ class AvailabilityMapController extends WidgetController
             $device_query->isActive();
         }
         $device_query->orderBy($settings['order_by']);
-        $devices = $device_query->select('devices.device_id', 'hostname', 'sysName', 'status', 'uptime', 'disabled', 'ignore')->get();
+        $devices = $device_query->select('devices.device_id', 'hostname', 'sysName', 'status', 'uptime', 'disabled', 'disable_notify')->get();
 
         // process status
         $uptime_warn = Config::get('uptime_warning', 84600);
-        $totals = ['warn' => 0, 'up' => 0, 'down' => 0, 'ignored' => 0, 'disabled' => 0];
+        $totals = ['warn' => 0, 'up' => 0, 'down' => 0, 'disabled' => 0, 'no-alert' => 0];
         foreach ($devices as $device) {
             if ($device->disabled) {
                 $totals['disabled']++;
                 $device->stateName = "disabled";
                 $device->labelClass = "blackbg";
-            } elseif ($device->ignore) {
-                $totals['ignored']++;
-                $device->stateName = "ignored";
+            } elseif ($device->disable_notify) {
+                $totals['no-alert'']++;
+                $device->stateName = "no-alert'";
                 $device->labelClass = "label-default";
             } elseif ($device->status == 1) {
                 if (($device->uptime < $uptime_warn) && ($device->uptime != 0)) {

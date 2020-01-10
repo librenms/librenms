@@ -83,7 +83,7 @@ if (defined('SHOW_SETTINGS')) {
     $common_output[] = '
     <div class="form-group">
         <div class="col-sm-4">
-            <label for="show_disabled_and_ignored" class="control-label availability-map-widget-header">Disabled/ignored</label>
+            <label for="show_disabled_and_ignored" class="control-label availability-map-widget-header">Disabled polling/alerting</label>
         </div>
         <div class="col-sm-6">
             <select class="form-control" name="show_disabled_and_ignored">
