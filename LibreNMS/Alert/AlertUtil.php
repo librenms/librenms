@@ -196,6 +196,17 @@ class AlertUtil
     }
 
     /**
+     * Check if device is set to ignore alerts
+     * @param int $device_id Device-ID
+     * @return bool
+     */
+    public static function hasDisableNotify($device_id)
+    {
+        $device = Device::find($device_id);
+        return !is_null($device) && $device->disable_notify;
+    }
+
+    /**
      * Process Macros
      * @param string $rule Rule to process
      * @param int $x Recursion-Anchor
