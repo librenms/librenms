@@ -65,8 +65,8 @@ class DB:
                 pass
 
             try:
-                if db_port == 0:
-                    self.conn = MySQLdb.connect(host=db_server, user=db_username, passwd=db_password, db=db_dbname)
+                if config['db_socket']:
+                    self.conn = MySQLdb.connect(unix_socket=db_socket, user=db_username, passwd=db_password, db=db_dbname)
                 else:
                     self.conn = MySQLdb.connect(host=db_server, port=db_port, user=db_username, passwd=db_password, db=db_dbname)
                 break
@@ -134,21 +134,17 @@ except ValueError:
 
 poller_path = config['install_dir'] + '/poller.php'
 discover_path = config['install_dir'] + '/discovery.php'
+
 db_username = config['db_user']
 db_password = config['db_pass']
-db_port = int(config['db_port'])
 
-if config['db_host'][:5].lower() == 'unix:':
-    db_server = config['db_host']
-    db_port = 0
-elif config['db_socket']:
-    db_server = config['db_socket']
-    db_port = 0
+if config['db_socket']:
+    db_socket = config['db_socket']
 else:
     db_server = config['db_host']
+    db_port = int(config['db_port'])
 
 db_dbname = config['db_name']
-
 
 try:
     amount_of_workers = int(config['poller_service_workers'])
@@ -282,7 +278,7 @@ def poll_worker():
             dont_query_until = datetime.now() + timedelta(seconds=retry_query)
             time.sleep(1)
             continue
-            
+
         device_id, status, next_poll, next_discovery  = dev_row[0]
 
         if not getLock('queue.{0}'.format(device_id), db):
@@ -326,7 +322,7 @@ def poll_worker():
             pass
         finally:
             releaseLock('{0}.{1}'.format(action, device_id), db)
-        
+
 
 for i in range(0, amount_of_workers):
     t = threading.Thread(target=poll_worker)
