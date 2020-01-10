@@ -113,8 +113,8 @@ class AvailabilityMapController extends WidgetController
                 $device->stateName = "disabled";
                 $device->labelClass = "blackbg";
             } elseif ($device->disable_notify) {
-                $totals['no-alert'']++;
-                $device->stateName = "no-alert'";
+                $totals['no-alert']++;
+                $device->stateName = "no-alert";
                 $device->labelClass = "label-default";
             } elseif ($device->status == 1) {
                 if (($device->uptime < $uptime_warn) && ($device->uptime != 0)) {
