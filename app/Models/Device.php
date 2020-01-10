@@ -488,8 +488,14 @@ class Device extends BaseModel
     public function scopeIsDisabled($query)
     {
         return $query->where([
-            ['disable_notify', '=', 1],
             ['disabled', '=', 1]
+        ]);
+    }
+
+    public function scopeIsDisableNotify($query)
+    {
+        return $query->where([
+            ['disable_notify', '=', 1]
         ]);
     }
 
