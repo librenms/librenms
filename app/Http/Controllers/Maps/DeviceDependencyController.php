@@ -74,7 +74,8 @@ class DeviceDependencyController extends MapController
         return $new_device_list;
     }
 
-    protected function getParentDevices($device) {
+    protected function getParentDevices($device)
+    {
         foreach ($device->parents as $parent) {
             if (! in_array($parent->device_id, $this->deviceIdAll)) {
                 continue;
@@ -94,7 +95,7 @@ class DeviceDependencyController extends MapController
     {
         $group_id = $request->get('group');
         $highlight_node = $request->get('highlight_node');
-        $show_parent_device_path = $request->get('showparentdevicepath');
+        $show_device_path = $request->get('showparentdevicepath');
 
         $dependencies = [];
         $devices_by_id = [];
@@ -142,8 +143,7 @@ class DeviceDependencyController extends MapController
             $isolated_device_ids = array_diff($this->deviceIdAll, $device_associations);
 
             $devices_by_id = $this->highlightDevices($devices_by_id, $isolated_device_ids);
-        }
-        elseif ($show_parent_device_path && ($highlight_node > 0)) {
+        } elseif ($show_device_path && ($highlight_node > 0)) {
             foreach (self::deviceList($request) as $device) {
                 if ($device->device_id != $highlight_node) {
                     continue;
@@ -157,7 +157,7 @@ class DeviceDependencyController extends MapController
         array_multisort(array_column($device_list, 'label'), SORT_ASC, $device_list);
 
         $data = [
-            'showparentdevicepath' => $show_parent_device_path,
+            'showparentdevicepath' => $show_device_path,
             'isolated_device_id' => $this->isolatedDeviceId,
             'device_list' => $device_list,
             'group_id' => $group_id,
