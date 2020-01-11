@@ -60,11 +60,11 @@ class DeviceDependencyController extends MapController
         return $devices->merge($devices->map->only('children', 'parents')->flatten())->loadMissing('parents', 'location');
     }
 
-    protected function highlightDevices($devices_by_id, $isolated_device_ids)
+    protected function highlightDevices($devices_by_id, $device_id_list)
     {
         $new_device_list = [];
         foreach ($devices_by_id as $device) {
-            if (in_array($device['id'], $isolated_device_ids)) {
+            if (in_array($device['id'], $device_id_list)) {
                 $new_device_list[] = array_merge($device, $this->nodeHighlightStyle());
                 continue;
             }
