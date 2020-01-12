@@ -127,7 +127,7 @@ function gen_snmpget_cmd($device, $oids, $options = null, $mib = null, $mibdir =
  * @param string $mibdir a mib directory to search for mibs, usually prepended with +
  * @return array the fully assembled command, ready to run
  */
-function gen_snmpwalk_cmd($device, $oids, $options = null, $mib = null, $mibdir = null)
+function gen_snmpwalk_cmd($device, $oids, $options = null, $mib = null, $mibdir = null, $strIndexing = null)
 {
     if ($device['snmpver'] == 'v1' || (isset($device['os']) && Config::getOsSetting($device['os'], 'nobulk'))) {
         $snmpcmd = [Config::get('snmpwalk')];
@@ -138,7 +138,7 @@ function gen_snmpwalk_cmd($device, $oids, $options = null, $mib = null, $mibdir 
             $snmpcmd[] = "-Cr$max_repeaters";
         }
     }
-    return gen_snmp_cmd($snmpcmd, $device, $oids, $options, $mib, $mibdir);
+    return gen_snmp_cmd($snmpcmd, $device, $oids, $options, $mib, $mibdir, $strIndexing);
 } //end gen_snmpwalk_cmd()
 
 /**
@@ -152,13 +152,13 @@ function gen_snmpwalk_cmd($device, $oids, $options = null, $mib = null, $mibdir 
  * @param string $mibdir a mib directory to search for mibs, usually prepended with +
  * @return array the fully assembled command, ready to run
  */
-function gen_snmp_cmd($cmd, $device, $oids, $options = null, $mib = null, $mibdir = null)
+function gen_snmp_cmd($cmd, $device, $oids, $options = null, $mib = null, $mibdir = null, $strIndexing = null)
 {
     if (!isset($device['transport'])) {
         $device['transport'] = 'udp';
     }
 
-    $cmd = snmp_gen_auth($device, $cmd);
+    $cmd = snmp_gen_auth($device, $cmd, $strIndexing);
     $cmd = $options ? array_merge($cmd, (array)$options) : $cmd;
     if ($mib) {
         array_push($cmd, '-m', $mib);
@@ -634,9 +634,10 @@ function snmpwalk_cache_triple_oid($device, $oid, $array, $mib = null, $mibdir =
  * @param string $mibdir custom mib dir to search for mib
  * @return array grouped array of data
  */
-function snmpwalk_group($device, $oid, $mib = '', $depth = 1, $array = array(), $mibdir = null)
+function snmpwalk_group($device, $oid, $mib = '', $depth = 1, $array = array(), $mibdir = null, $strIndexing = null)
 {
-    $cmd = gen_snmpwalk_cmd($device, $oid, '-OQUsetX', $mib, $mibdir);
+    d_echo("communityStringIndexing $strIndexing\n");
+    $cmd = gen_snmpwalk_cmd($device, $oid, '-OQUsetX', $mib, $mibdir, $strIndexing);
     $data = rtrim(external_exec($cmd));
 
     $line = strtok($data, "\n");
@@ -773,7 +774,7 @@ function snmp_cache_port_oids($oids, $port, $device, $array, $mib = 0)
  * @param array $cmd
  * @return array
  */
-function snmp_gen_auth(&$device, $cmd = [])
+function snmp_gen_auth(&$device, $cmd = [], $strIndexing = null)
 {
     if ($device['snmpver'] === 'v3') {
         array_push($cmd, '-v3', '-l', $device['authlevel']);
@@ -797,7 +798,7 @@ function snmp_gen_auth(&$device, $cmd = [])
             d_echo('DEBUG: '.$device['snmpver']." : Unsupported SNMPv3 AuthLevel (wtf have you done ?)\n");
         }
     } elseif ($device['snmpver'] === 'v2c' || $device['snmpver'] === 'v1') {
-        array_push($cmd, '-' . $device['snmpver'], '-c', $device['community']);
+        array_push($cmd, '-' . $device['snmpver'], '-c', $device['community'] . ($strIndexing != null ? '@' . $strIndexing : null));
     } else {
         d_echo('DEBUG: '.$device['snmpver']." : Unsupported SNMP Version (shouldn't be possible to get here)\n");
     }
