@@ -149,11 +149,11 @@ class ModuleTestHelper
 
             $snmp_options = ['-OUneb', '-Ih'];
             if ($oid_data['method'] == 'walk') {
-                $data = snmp_walk($device, $oid_data['oid'], $snmp_options, $oid_data['mib']);
+                $data = snmp_walk($device, $oid_data['oid'], $snmp_options, $oid_data['mib'], $oid_data['mibdir']);
             } elseif ($oid_data['method'] == 'get') {
-                $data = snmp_get($device, $oid_data['oid'], $snmp_options, $oid_data['mib']);
+                $data = snmp_get($device, $oid_data['oid'], $snmp_options, $oid_data['mib'], $oid_data['mibdir']);
             } elseif ($oid_data['method'] == 'getnext') {
-                $data = snmp_getnext($device, $oid_data['oid'], $snmp_options, $oid_data['mib']);
+                $data = snmp_getnext($device, $oid_data['oid'], $snmp_options, $oid_data['mib'], $oid_data['mibdir']);
             }
 
             if (isset($data) && $data !== false) {
@@ -203,6 +203,8 @@ class ModuleTestHelper
         foreach ($snmp_matches[0] as $index => $line) {
             preg_match("/'-m' '\+?([a-zA-Z0-9:\-]+)'/", $line, $mib_matches);
             $mib = $mib_matches[1];
+            preg_match("/'-M' '\+?([a-zA-Z0-9:\-\/]+)'/", $line, $mibdir_matches);
+            $mibdir = $mibdir_matches[1];
             $method = $snmp_matches[1][$index];
             $oids = explode("' '", trim($snmp_matches[2][$index]));
 
@@ -210,6 +212,7 @@ class ModuleTestHelper
                 $snmp_oids["{$oid}_$method"] = [
                     'oid' => $oid,
                     'mib' => $mib,
+                    'mibdir' => $mibdir,
                     'method' => $method,
                 ];
             }
