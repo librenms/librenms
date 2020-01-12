@@ -35,6 +35,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessCcqDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\OS;
+use LibreNMS\Util\Rewrite;
 
 class Lcos extends OS implements
     WirelessFrequencyDiscovery,
@@ -56,21 +57,6 @@ class Lcos extends OS implements
     {
         for ($i = 0, $j = strlen($index); $i < $j; $i++) {
                 $dec_index[] = ord($index{$i});
-        }
-        return implode('.', $dec_index);
-    }
-
-    /**
-     * Convert MAC String to decimal encoded string notation
-     *
-     * @param colon separated string (MAC address notation)
-     * @return decimal encoded OID string
-     */
-    private function macToDecOid($mac)
-    {
-        $octet = explode(':', $mac);
-        foreach ($octet as $key => $value) {
-            $dec_index[$key] = hexdec($value);
         }
         return implode('.', $dec_index);
     }
@@ -230,7 +216,7 @@ class Lcos extends OS implements
             $sensors[$bssid] = new WirelessSensor(
                 'ccq',
                 $this->getDeviceId(),
-                '.1.3.6.1.4.1.2356.11.1.3.44.1.10.' . $this->macToDecOid($bssid) . '.0',
+                '.1.3.6.1.4.1.2356.11.1.3.44.1.10.' . Rewrite::oidMac($bssid) . '.0',
                 'lcos',
                 $bssid,
                 "CCQ " . $entry['lcsStatusWlanCompetingNetworksEntryInterpointPeerName'] . " $bssid",
@@ -262,7 +248,7 @@ class Lcos extends OS implements
             $sensors[$bssid] = new WirelessSensor(
                 'rate',
                 $this->getDeviceId(),
-                '.1.3.6.1.4.1.2356.11.1.3.44.1.35.' . $this->macToDecOid($bssid) . '.0',
+                '.1.3.6.1.4.1.2356.11.1.3.44.1.35.' . Rewrite::oidMac($bssid) . '.0',
                 'lcos-tx',
                 $bssid,
                 "TX Rate " . $entry['lcsStatusWlanCompetingNetworksEntryInterpointPeerName'] . " $bssid",
@@ -296,7 +282,7 @@ class Lcos extends OS implements
             $sensors[$bssid] = new WirelessSensor(
                 'rssi',
                 $this->getDeviceId(),
-                '.1.3.6.1.4.1.2356.11.1.3.44.1.26.' . $this->macToDecOid($bssid) . '.0',
+                '.1.3.6.1.4.1.2356.11.1.3.44.1.26.' . Rewrite::oidMac($bssid) . '.0',
                 'lcos',
                 $bssid,
                 "RSSI " . $entry['lcsStatusWlanCompetingNetworksEntryInterpointPeerName'] . " $bssid",
