@@ -13,7 +13,7 @@
                     "os": "ifotec",
                     "type": "network",
                     "serial": null,
-                    "icon": "ifotec.svg",
+                    "icon": "ifotec.png",
                     "location": null
                 }
             ]
@@ -31,7 +31,7 @@
                     "os": "ifotec",
                     "type": "network",
                     "serial": null,
-                    "icon": "ifotec.svg",
+                    "icon": "ifotec.png",
                     "location": "N/A"
                 }
             ]
