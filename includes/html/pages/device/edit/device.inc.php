@@ -32,6 +32,7 @@ if ($_POST['editing']) {
         $device_model->purpose = $_POST['descr'];
         $device_model->ignore = (int)isset($_POST['ignore']);
         $device_model->disabled = (int)isset($_POST['disabled']);
+        $device_model->disable_notify = (int)isset($_POST['disable_notify']);
         $device_model->type = $_POST['type'];
 
         if ($device_model->isDirty('type')) {
@@ -64,12 +65,32 @@ if ($_POST['editing']) {
                 Toastr::error('Only administrative users may update the device hostname');
             }
         }
+
+        $override_sysContact_bool = mres($_POST['override_sysContact']);
+        if (isset($_POST['sysContact'])) {
+            $override_sysContact_string = mres($_POST['sysContact']);
+        }
+
+        if ($override_sysContact_bool) {
+            set_dev_attrib($device, 'override_sysContact_bool', '1');
+        } else {
+            set_dev_attrib($device, 'override_sysContact_bool', '0');
+        }
+
+        if (isset($override_sysContact_string)) {
+            set_dev_attrib($device, 'override_sysContact_string', $override_sysContact_string);
+        }
     } else {
         include 'includes/html/error-no-perm.inc.php';
     }
 }
 
+$override_sysContact_bool   = get_dev_attrib($device, 'override_sysContact_bool');
+$override_sysContact_string = get_dev_attrib($device, 'override_sysContact_string');
+$disable_notify             = get_dev_attrib($device, 'disable_notify');
+
 ?>
+
 <h3> Device Settings </h3>
 <div class="row">
     <div class="col-md-1 col-md-offset-2">
@@ -153,6 +174,31 @@ if ($_POST['editing']) {
         </div>
     </div>
     <div class="form-group">
+      <label for="override_sysContact" class="col-sm-2 control-label">Override sysContact</label>
+      <div class="col-sm-6">
+        <input onChange="edit.sysContact.disabled=!edit.override_sysContact.checked" type="checkbox" id="override_sysContact" name="override_sysContact" data-size="small"
+    <?php
+    if ($override_sysContact_bool) {
+        echo ' checked="1"';
+    };
+    ?>
+   />
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="col-sm-2">
+      </div>
+      <div class="col-sm-6">
+        <input id="sysContact" class="form-control" name="sysContact" size="32"
+    <?php
+    if (!$override_sysContact_bool) {
+        echo ' disabled="1"';
+    };
+    ?>
+    value="<?php echo $override_sysContact_string; ?>" />
+      </div>
+    </div>
+    <div class="form-group">
         <label for="parent_id" class="col-sm-2 control-label">This device depends on:</label>
         <div class="col-sm-6">
             <select multiple name="parent_id[]" id="parent_id" class="form-control">
@@ -180,7 +226,7 @@ if ($_POST['editing']) {
         </div>
     </div>
     <div class="form-group">
-        <label for="disabled" class="col-sm-2 control-label">Disable polling:</label>
+        <label for="disabled" class="col-sm-2 control-label">Disable polling and alerting:</label>
         <div class="col-sm-6">
           <input name="disabled" type="checkbox" id="disabled" value="1" data-size="small"
                 <?php
@@ -191,7 +237,20 @@ if ($_POST['editing']) {
         </div>
     </div>
     <div class="form-group">
-        <label for="ignore" class="col-sm-2 control-label">Ignore alerts:</label>
+      <label for="disable_notify" class="col-sm-2 control-label">Disable alerting:</label>
+      <div class="col-sm-6">
+        <input id="disable_notify" type="checkbox" name="disable_notify" data-size="small"
+                <?php
+                if ($device_model->disable_notify) {
+                    echo("checked=checked");
+                }
+                ?> />
+      </div>
+    </div>
+    <div class="form-group">
+        <label for="ignore" class="col-sm-2 control-label" title="Tag device to ignore alerts. Alert checks will still run.
+However, ignore tag can be read in alert rules.
+If `devices.ignore = 0` or `macros.device = 1` condition is is set and ignore alert tag is on, the alert rule won't match.">Ignore alert tag:</label>
         <div class="col-sm-6">
            <input name="ignore" type="checkbox" id="ignore" value="1" data-size="small"
                 <?php

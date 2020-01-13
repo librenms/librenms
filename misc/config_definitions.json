@@ -833,166 +833,289 @@
             "type": "boolean"
         },
         "discovery_modules.os": {
+            "order": 230,
+            "group": "discovery",
+            "section": "discovery_modules",
             "default": true,
             "type": "boolean"
         },
         "discovery_modules.ports": {
+            "order": 240,
+            "group": "discovery",
+            "section": "discovery_modules",
             "default": true,
             "type": "boolean"
         },
         "discovery_modules.ports-stack": {
+            "order": 250,
+            "group": "discovery",
+            "section": "discovery_modules",
             "default": true,
             "type": "boolean"
         },
         "discovery_modules.entity-physical": {
+            "order": 110,
+            "group": "discovery",
+            "section": "discovery_modules",
             "default": true,
             "type": "boolean"
         },
         "discovery_modules.entity-state": {
+            "order": 120,
+            "group": "discovery",
+            "section": "discovery_modules",
             "default": false,
             "type": "boolean"
         },
         "discovery_modules.processors": {
+            "order": 260,
+            "group": "discovery",
+            "section": "discovery_modules",
             "default": true,
             "type": "boolean"
         },
         "discovery_modules.mempools": {
+            "order": 200,
+            "group": "discovery",
+            "section": "discovery_modules",
             "default": true,
             "type": "boolean"
         },
         "discovery_modules.cisco-vrf-lite": {
+            "order": 80,
+            "group": "discovery",
+            "section": "discovery_modules",
             "default": true,
             "type": "boolean"
         },
         "discovery_modules.cisco-mac-accounting": {
+            "order": 60,
+            "group": "discovery",
+            "section": "discovery_modules",
             "default": false,
             "type": "boolean"
         },
         "discovery_modules.cisco-pw": {
+            "order": 70,
+            "group": "discovery",
+            "section": "discovery_modules",
             "default": false,
             "type": "boolean"
         },
         "discovery_modules.vrf": {
+            "order": 360,
+            "group": "discovery",
+            "section": "discovery_modules",
             "default": false,
             "type": "boolean"
         },
         "discovery_modules.cisco-cef": {
+            "order": 50,
+            "group": "discovery",
+            "section": "discovery_modules",
             "default": false,
             "type": "boolean"
         },
         "discovery_modules.cisco-sla": {
+            "order": 80,
+            "group": "discovery",
+            "section": "discovery_modules",
             "default": false,
             "type": "boolean"
         },
         "discovery_modules.cisco-cbqos": {
+            "order": 40,
+            "group": "discovery",
+            "section": "discovery_modules",
             "default": false,
             "type": "boolean"
         },
         "discovery_modules.cisco-otv": {
+            "order": 70,
+            "group": "discovery",
+            "section": "discovery_modules",
             "default": false,
             "type": "boolean"
         },
         "discovery_modules.cisco-qfp": {
+            "order": 80,
+            "group": "discovery",
+            "section": "discovery_modules",
             "default": false,
             "type": "boolean"
         },
         "discovery_modules.ipv4-addresses": {
+            "order": 150,
+            "group": "discovery",
+            "section": "discovery_modules",
             "default": true,
             "type": "boolean"
         },
         "discovery_modules.ipv6-addresses": {
+            "order": 160,
+            "group": "discovery",
+            "section": "discovery_modules",
             "default": true,
             "type": "boolean"
         },
         "discovery_modules.route": {
+            "order": 270,
+            "group": "discovery",
+            "section": "discovery_modules",
             "default": false,
             "type": "boolean"
         },
         "discovery_modules.sensors": {
+            "order": 280,
+            "group": "discovery",
+            "section": "discovery_modules",
             "default": true,
             "type": "boolean"
         },
         "discovery_modules.storage": {
+            "order": 300,
+            "group": "discovery",
+            "section": "discovery_modules",
             "default": true,
             "type": "boolean"
         },
         "discovery_modules.hr-device": {
+            "order": 140,
+            "group": "discovery",
+            "section": "discovery_modules",
             "default": true,
             "type": "boolean"
         },
         "discovery_modules.discovery-protocols": {
+            "order": 100,
+            "group": "discovery",
+            "section": "discovery_modules",
             "default": true,
             "type": "boolean"
         },
         "discovery_modules.arp-table": {
+            "order": 20,
+            "group": "discovery",
+            "section": "discovery_modules",
             "default": true,
             "type": "boolean"
         },
         "discovery_modules.discovery-arp": {
+            "order": 90,
+            "group": "discovery",
+            "section": "discovery_modules",
             "default": false,
             "type": "boolean"
         },
         "discovery_modules.junose-atm-vp": {
+            "order": 160,
+            "group": "discovery",
+            "section": "discovery_modules",
             "default": false,
             "type": "boolean"
         },
         "discovery_modules.bgp-peers": {
+            "order": 30,
+            "group": "discovery",
+            "section": "discovery_modules",
             "default": true,
             "type": "boolean"
         },
         "discovery_modules.vlans": {
+            "order": 340,
+            "group": "discovery",
+            "section": "discovery_modules",
             "default": true,
             "type": "boolean"
         },
         "discovery_modules.vmware-vminfo": {
+            "order": 350,
+            "group": "discovery",
+            "section": "discovery_modules",
             "default": false,
             "type": "boolean"
         },
         "discovery_modules.libvirt-vminfo": {
+            "order": 170,
+            "group": "discovery",
+            "section": "discovery_modules",
             "default": false,
             "type": "boolean"
         },
         "discovery_modules.toner": {
+            "order": 320,
+            "group": "discovery",
+            "section": "discovery_modules",
             "default": false,
             "type": "boolean"
         },
         "discovery_modules.ucd-diskio": {
+            "order": 330,
+            "group": "discovery",
+            "section": "discovery_modules",
             "default": true,
             "type": "boolean"
         },
         "discovery_modules.applications": {
+            "order": 10,
+            "group": "discovery",
+            "section": "discovery_modules",
             "default": false,
             "type": "boolean"
         },
         "discovery_modules.services": {
+            "order": 290,
+            "group": "discovery",
+            "section": "discovery_modules",
             "default": true,
             "type": "boolean"
         },
         "discovery_modules.stp": {
+            "order": 310,
+            "group": "discovery",
+            "section": "discovery_modules",
             "default": true,
             "type": "boolean"
         },
         "discovery_modules.ntp": {
+            "order": 220,
+            "group": "discovery",
+            "section": "discovery_modules",
             "default": true,
             "type": "boolean"
         },
         "discovery_modules.loadbalancers": {
+            "order": 180,
+            "group": "discovery",
+            "section": "discovery_modules",
             "default": false,
             "type": "boolean"
         },
         "discovery_modules.mef": {
+            "order": 190,
+            "group": "discovery",
+            "section": "discovery_modules",
             "default": false,
             "type": "boolean"
         },
         "discovery_modules.wireless": {
+            "order": 370,
+            "group": "discovery",
+            "section": "discovery_modules",
             "default": true,
             "type": "boolean"
         },
         "discovery_modules.fdb-table": {
+            "order": 130,
+            "group": "discovery",
+            "section": "discovery_modules",
             "default": true,
             "type": "boolean"
         },
         "discovery_modules.mpls": {
+            "order": 210,
+            "group": "discovery",
+            "section": "discovery_modules",
             "default": true,
             "type": "boolean"
         },
@@ -3632,62 +3755,88 @@
             "type": "text"
         },
         "poller_modules.unix-agent": {
+            "order": 420,
+            "group": "poller",
+            "section": "poller_modules",
             "default": false,
             "type": "boolean"
         },
         "poller_modules.os": {
+            "order": 320,
+            "group": "poller",
+            "section": "poller_modules",
             "default": true,
             "type": "boolean"
-
         },
         "poller_modules.ipmi": {
+            "order": 210,
+            "group": "poller",
+            "section": "poller_modules",
             "default": true,
             "type": "boolean"
         },
         "poller_modules.sensors": {
+            "order": 360,
+            "group": "poller",
+            "section": "poller_modules",
             "default": true,
             "type": "boolean"
-
         },
         "poller_modules.processors": {
+            "order": 350,
+            "group": "poller",
+            "section": "poller_modules",
             "default": true,
             "type": "boolean"
-
         },
         "poller_modules.mempools": {
+            "order": 250,
+            "group": "poller",
+            "section": "poller_modules",
             "default": true,
             "type": "boolean"
-
         },
         "poller_modules.storage": {
+            "order": 370,
+            "group": "poller",
+            "section": "poller_modules",
             "default": true,
             "type": "boolean"
-
         },
         "poller_modules.netstats": {
+            "order": 300,
+            "group": "poller",
+            "section": "poller_modules",
             "default": true,
             "type": "boolean"
-
         },
         "poller_modules.hr-mib": {
+            "order": 190,
+            "group": "poller",
+            "section": "poller_modules",
             "default": true,
             "type": "boolean"
-
         },
         "poller_modules.ucd-mib": {
+            "order": 410,
+            "group": "poller",
+            "section": "poller_modules",
             "default": true,
             "type": "boolean"
-
         },
         "poller_modules.ipSystemStats": {
+            "order": 200,
+            "group": "poller",
+            "section": "poller_modules",
             "default": true,
             "type": "boolean"
-
         },
         "poller_modules.ports": {
+            "order": 340,
+            "group": "poller",
+            "section": "poller_modules",
             "default": true,
             "type": "boolean"
-
         },
         "poller_modules.customoid": {
             "default": true,
@@ -3695,169 +3844,235 @@
 
         },
         "poller_modules.bgp-peers": {
+            "order": 30,
+            "group": "poller",
+            "section": "poller_modules",
             "default": true,
             "type": "boolean"
-
         },
         "poller_modules.junose-atm-vp": {
+            "order": 220,
+            "group": "poller",
+            "section": "poller_modules",
             "default": false,
             "type": "boolean"
-
         },
         "poller_modules.toner": {
+            "order": 390,
+            "group": "poller",
+            "section": "poller_modules",
             "default": false,
             "type": "boolean"
-
         },
         "poller_modules.ucd-diskio": {
+            "order": 400,
+            "group": "poller",
+            "section": "poller_modules",
             "default": true,
             "type": "boolean"
-
         },
         "poller_modules.wifi": {
+            "order": 430,
+            "group": "poller",
+            "section": "poller_modules",
             "default": false,
             "type": "boolean"
-
         },
         "poller_modules.wireless": {
+            "order": 440,
+            "group": "poller",
+            "section": "poller_modules",
             "default": true,
             "type": "boolean"
-
         },
         "poller_modules.ospf": {
+            "order": 330,
+            "group": "poller",
+            "section": "poller_modules",
             "default": true,
             "type": "boolean"
-
         },
         "poller_modules.cisco-ipsec-flow-monitor": {
+            "order": 90,
+            "group": "poller",
+            "section": "poller_modules",
             "default": false,
             "type": "boolean"
-
         },
         "poller_modules.cisco-remote-access-monitor": {
+            "order": 130,
+            "group": "poller",
+            "section": "poller_modules",
             "default": false,
             "type": "boolean"
-
         },
         "poller_modules.cisco-cef": {
+            "order": 80,
+            "group": "poller",
+            "section": "poller_modules",
             "default": false,
             "type": "boolean"
-
         },
         "poller_modules.cisco-sla": {
+            "order": 140,
+            "group": "poller",
+            "section": "poller_modules",
             "default": false,
             "type": "boolean"
-
         },
         "poller_modules.cisco-mac-accounting": {
+            "order": 100,
+            "group": "poller",
+            "section": "poller_modules",
             "default": false,
             "type": "boolean"
-
         },
         "poller_modules.cipsec-tunnels": {
+            "order": 30,
+            "group": "poller",
+            "section": "poller_modules",
             "default": false,
             "type": "boolean"
-
         },
         "poller_modules.cisco-ace-loadbalancer": {
+            "order": 40,
+            "group": "poller",
+            "section": "poller_modules",
             "default": false,
             "type": "boolean"
-
         },
         "poller_modules.cisco-ace-serverfarms": {
+            "order": 50,
+            "group": "poller",
+            "section": "poller_modules",
             "default": false,
             "type": "boolean"
-
         },
         "poller_modules.cisco-asa-firewall": {
+            "order": 60,
+            "group": "poller",
+            "section": "poller_modules",
             "default": false,
             "type": "boolean"
-
         },
         "poller_modules.cisco-voice": {
+            "order": 150,
+            "group": "poller",
+            "section": "poller_modules",
             "default": false,
             "type": "boolean"
-
         },
         "poller_modules.cisco-cbqos": {
+            "order": 70,
+            "group": "poller",
+            "section": "poller_modules",
             "default": false,
             "type": "boolean"
-
         },
         "poller_modules.cisco-otv": {
+            "order": 110,
+            "group": "poller",
+            "section": "poller_modules",
             "default": false,
             "type": "boolean"
-
         },
         "poller_modules.cisco-qfp": {
+            "order": 120,
+            "group": "poller",
+            "section": "poller_modules",
             "default": false,
             "type": "boolean"
-
         },
         "poller_modules.cisco-vpdn": {
+            "order": 160,
+            "group": "poller",
+            "section": "poller_modules",
             "default": false,
             "type": "boolean"
-
         },
         "poller_modules.nac": {
+            "order": 280,
+            "group": "poller",
+            "section": "poller_modules",
             "default": false,
             "type": "boolean"
-
         },
         "poller_modules.netscaler-vsvr": {
+            "order": 290,
+            "group": "poller",
+            "section": "poller_modules",
             "default": false,
             "type": "boolean"
-
         },
         "poller_modules.aruba-controller": {
+            "order": 20,
+            "group": "poller",
+            "section": "poller_modules",
             "default": false,
             "type": "boolean"
-
         },
         "poller_modules.entity-physical": {
+            "order": 170,
+            "group": "poller",
+            "section": "poller_modules",
             "default": true,
             "type": "boolean"
-
         },
         "poller_modules.entity-state": {
+            "order": 180,
+            "group": "poller",
+            "section": "poller_modules",
             "default": false,
             "type": "boolean"
-
         },
         "poller_modules.applications": {
+            "order": 10,
+            "group": "poller",
+            "section": "poller_modules",
             "default": true,
             "type": "boolean"
-
         },
         "poller_modules.mib": {
+            "order": 260,
+            "group": "poller",
+            "section": "poller_modules",
             "default": false,
             "type": "boolean"
-
         },
         "poller_modules.stp": {
+            "order": 380,
+            "group": "poller",
+            "section": "poller_modules",
             "default": true,
             "type": "boolean"
-
         },
         "poller_modules.ntp": {
+            "order": 310,
+            "group": "poller",
+            "section": "poller_modules",
             "default": true,
             "type": "boolean"
-
         },
         "poller_modules.loadbalancers": {
+            "order": 230,
+            "group": "poller",
+            "section": "poller_modules",
             "default": false,
             "type": "boolean"
-
         },
         "poller_modules.mef": {
+            "order": 240,
+            "group": "poller",
+            "section": "poller_modules",
             "default": false,
             "type": "boolean"
-
         },
         "poller_modules.mpls": {
+            "order": 270,
+            "group": "poller",
+            "section": "poller_modules",
             "default": true,
             "type": "boolean"
-
         },
         "port_descr_parser": {
             "default": "includes/port-descr-parser.inc.php",

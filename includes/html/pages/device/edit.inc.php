@@ -26,7 +26,6 @@ if (!Auth::user()->hasGlobalAdmin()) {
     if (!$device['snmp_disable']) {
         $panes['apps']     = 'Applications';
     }
-    $panes['alerts']   = 'Alert Settings';
     $panes['alert-rules'] = 'Alert Rules';
     if (!$device['snmp_disable']) {
         $panes['modules']  = 'Modules';

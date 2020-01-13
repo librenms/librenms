@@ -58,6 +58,18 @@ class AppServiceProvider extends ServiceProvider
         Blade::if('admin', function () {
             return auth()->check() && auth()->user()->isAdmin();
         });
+
+        Blade::directive('deviceLink', function ($arguments) {
+            return "<?php echo \LibreNMS\Util\Url::deviceLink($arguments); ?>";
+        });
+
+        Blade::directive('deviceUrl', function ($arguments) {
+            return "<?php echo \LibreNMS\Util\Url::deviceUrl($arguments); ?>";
+        });
+
+        Blade::directive('portLink', function ($arguments) {
+            return "<?php echo \LibreNMS\Util\Url::portLink($arguments); ?>";
+        });
     }
 
     private function configureMorphAliases()
