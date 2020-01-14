@@ -32,7 +32,7 @@ foreach ($data as $index => $value) {
     if ($value < "999") {
         $tempCurr = $value;
         $temperature_oid = '.' . $temp_oid . '.' . $index;
-        $descr = "Slot " . $index . " " .$descr_data[$index];
+        $descr = $descr_data[$index];
         discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, $index, 'smartax', $descr, '1', '1', null, null, null, null, $tempCurr);
     }
 }
