@@ -37,20 +37,20 @@ class VmwPowerStateTest extends SnmpTrapTestCase
     public function testVmwVmPoweredOffTrap()
     {
         $device = factory(Device::class)->create();
-        $guest = factory(Device::class)->create();
+        $guest = factory(Vminfo::class)->create();
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:28386->[10.10.10.100]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 5:18:30:26.00
 SNMPv2-MIB::snmpTrapOID.0 VMWARE-VMINFO-MIB::vmwVmPoweredOff
-VMWARE-VMINFO-MIB::vmwVmID.0 28 VMWARE-VMINFO-MIB::vmwVmConfigFilePath.0 /vmfs/volumes/50101bda-eaf6ac7e-7e44-d4ae5267fb9f/$guest->hostname/$guest->hostname.vmx
-VMWARE-VMINFO-MIB::vmwVmDisplayName.28 $guest->hostname
-SNMP-COMMUNITY-MIB::snmpTrapAddress.0 $guest->ip
+VMWARE-VMINFO-MIB::vmwVmID.0 28 VMWARE-VMINFO-MIB::vmwVmConfigFilePath.0 /vmfs/volumes/50101bda-eaf6ac7e-7e44-d4ae5267fb9f/$guest->vmwVmDisplayName/$guest->vmwVmDisplayName.vmx
+VMWARE-VMINFO-MIB::vmwVmDisplayName.28 $guest->vmwVmDisplayName
+SNMP-COMMUNITY-MIB::snmpTrapAddress.0 $device->ip
 SNMP-COMMUNITY-MIB::snmpTrapCommunity.0 \"public\"
 SNMPv2-MIB::snmpTrapEnterprise.0 VMWARE-PRODUCTS-MIB::vmwESX";
 
         $trap = new Trap($trapText);
-        $message = "Guest $guest->hostname was powered off";
+        $message = "Guest $guest->vmwVmDisplayName was powered off";
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle VmwVmPoweredOffTrap');

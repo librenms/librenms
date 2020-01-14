@@ -119,3 +119,13 @@ $factory->define(\App\Models\Syslog::class, function (Faker\Generator $faker) {
         'msg' => $faker->text(),
     ];
 });
+
+$factory->define(\App\Models\Vminfo::class, function (Faker\Generator $faker) {
+    return [
+        'vm_type' => $faker->domainWord.'.'.$faker->domainName,
+        'vmwVmVMID' => $faker->randomDigit,
+        'vmwVmDisplayName' => $faker->domainWord.'.'.$faker->domainName,
+        'vmwVmGuestOS' => $faker->text(255),
+		'vmwVmState' => $faker->randomElement(['powered on', 'powered off', 'suspended']), 
+    ];
+});
