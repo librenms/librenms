@@ -46,6 +46,12 @@ class VmwVmSuspended implements SnmptrapHandler
     public function handle(Device $device, Trap $trap) 
     {
         $vmGuestName = VmwTrapUtil::getGuestName($trap);
+
+        $vminfo = $device->vminfo()->where('vmwVmDisplayName', $vmGuestName)->first();
+        $vminfo->vmwVmState = "suspended";
+
         Log::event("Guest $vmGuestName has been suspended", $device->device_id, 'trap', 2);
+
+        $vminfo->save();
     }
 }

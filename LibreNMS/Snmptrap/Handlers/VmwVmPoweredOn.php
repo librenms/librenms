@@ -46,6 +46,12 @@ class VmwVmPoweredOn implements SnmptrapHandler
     public function handle(Device $device, Trap $trap) 
     {
         $vmGuestName = VmwTrapUtil::getGuestName($trap);
+
+        $vminfo = $device->vminfo()->where('vmwVmDisplayName', $vmGuestName)->first();
+        $vminfo->vmwVmState = "powered on";
+
         Log::event("Guest $vmGuestName was powered on", $device->device_id, 'trap', 2);
+
+        $vminfo->save();
     }
 }
