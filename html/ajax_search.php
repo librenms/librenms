@@ -80,7 +80,7 @@ if (isset($_REQUEST['search'])) {
                         $highlight_colour = '#008000';
                     }
 
-                    $num_ports = dbFetchCell('SELECT COUNT(*) FROM `ports` AS `I`, `devices` AS `D` WHERE $perms_sql AND `I`.`device_id` = `D`.`device_id` AND D.device_id = ?', array_merge($device_ids, [$result['device_id']]));
+                    $num_ports = dbFetchCell('SELECT COUNT(*) FROM `ports` AS `I`, `devices` AS `D` WHERE ' . $perms_sql . ' AND `I`.`device_id` = `D`.`device_id` AND `I`.`ignore` = 0 AND `I`.`deleted` = 0 AND `D`.`device_id` = ?', array_merge($device_ids, [$result['device_id']]));
 
 
                     $device[] = array(

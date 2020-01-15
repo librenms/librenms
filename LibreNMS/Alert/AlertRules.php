@@ -44,7 +44,16 @@ class AlertRules
 
         //Check to see if under maintenance
         if (AlertUtil::isMaintenance($device_id) > 0) {
-            echo "Under Maintenance, Skipping alerts.\r\n";
+            echo "Under Maintenance, skipping alert rules check.\r\n";
+            return false;
+        }
+        //Check to see if disable alerting is set
+        if (AlertUtil::hasDisableNotify($device_id)) {
+            echo "Disable alerting is set, Clearing active alerts and skipping alert rules check\r\n";
+            $device_alert['state'] = 0;
+            $device_alert['alerted'] = 0;
+            $device_alert['open'] = 0;
+            dbUpdate($device_alert, 'alerts', '`device_id` = ?', array($device_id));
             return false;
         }
         //Checks each rule.
