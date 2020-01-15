@@ -12,8 +12,10 @@ echo '</td>';
 
 if ($vm['vmwVmState'] == 'powered off') {
     echo '<td class="list"><span style="min-width:40px; display:inline-block;" class="label label-default">OFF</span></td>';
-} else {
+} elseif ($vm['vmwVmState'] == 'powered on') {
     echo '<td class="list"><span style="min-width:40px; display:inline-block;" class="label label-success">ON</span></td>';
+} elseif ($vm['vmwVmState'] == 'suspended') {
+    echo '<td class="list"><span style="min-width:40px; display:inline-block;" class="label label-warning">SUSPEND</span></td>';
 }
 
 if ($vm['vmwVmGuestOS'] == 'E: tools not installed') {
