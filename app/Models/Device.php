@@ -447,6 +447,7 @@ class Device extends BaseModel
         return $query->where([
             ['status', '=', 1],
             ['ignore', '=', 0],
+            ['disable_notify', '=', 0],
             ['disabled', '=', 0]
         ]);
     }
@@ -463,6 +464,7 @@ class Device extends BaseModel
     {
         return $query->where([
             ['status', '=', 0],
+            ['disable_notify', '=', 0],
             ['ignore', '=', 0],
             ['disabled', '=', 0]
         ]);
@@ -487,6 +489,21 @@ class Device extends BaseModel
     {
         return $query->where([
             ['disabled', '=', 1]
+        ]);
+    }
+
+    public function scopeIsDisableNotify($query)
+    {
+        return $query->where([
+            ['disable_notify', '=', 1]
+        ]);
+    }
+
+    public function scopeIsNotDisabled($query)
+    {
+        return $query->where([
+            ['disable_notify', '=', 0],
+            ['disabled', '=', 0]
         ]);
     }
 

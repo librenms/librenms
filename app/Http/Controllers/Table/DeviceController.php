@@ -50,13 +50,14 @@ class DeviceController extends TableController
             'state' => 'nullable|in:0,1,up,down',
             'disabled' => 'nullable|in:0,1',
             'ignore' => 'nullable|in:0,1',
+            'disable_notify' => 'nullable|in:0,1',
             'group' => 'nullable|int',
         ];
     }
 
     protected function filterFields($request)
     {
-        return ['os', 'version', 'hardware', 'features', 'type', 'status' => 'state', 'disabled', 'ignore', 'location_id' => 'location'];
+        return ['os', 'version', 'hardware', 'features', 'type', 'status' => 'state', 'disabled', 'disable_notify', 'ignore', 'location_id' => 'location'];
     }
 
     protected function searchFields($request)
@@ -156,6 +157,8 @@ class DeviceController extends TableController
     private function getLabel($device)
     {
         if ($device->disabled == 1) {
+            return 'blackbg';
+        } elseif ($device->disable_notify == 1) {
             return 'blackbg';
         } elseif ($device->ignore == 1) {
             return 'label-default';

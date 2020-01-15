@@ -67,7 +67,7 @@ $sql = ' FROM `alerts` LEFT JOIN `devices` ON `alerts`.`device_id`=`devices`.`de
 
 if (!Auth::user()->hasGlobalRead()) {
     $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
-    $where .= " AND `D`.`device_id` IN " .dbGenPlaceholders(count($device_ids));
+    $where .= " AND `devices`.`device_id` IN " .dbGenPlaceholders(count($device_ids));
     $param = array_merge($param, $device_ids);
 }
 

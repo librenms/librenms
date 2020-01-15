@@ -165,7 +165,7 @@ if ($format == "graph") {
     if (!empty($vars['state'])) {
         $where .= " AND status= ?";
         $sql_param[] = $state;
-        $where .= " AND disabled='0' AND `ignore`='0'";
+        $where .= " AND disabled='0' AND `disable_notify`='0'";
         $sql_param[] = '';
     }
     if (!empty($vars['disabled'])) {
@@ -175,6 +175,10 @@ if ($format == "graph") {
     if (!empty($vars['ignore'])) {
         $where .= " AND `ignore`= ?";
         $sql_param[] = $vars['ignore'];
+    }
+    if (!empty($vars['disable_notify'])) {
+        $where .= " AND `disable_notify`= ?";
+        $sql_param[] = $vars['disable_notify'];
     }
     if (!empty($vars['location']) && $vars['location'] == "Unset") {
         $location_filter = '';
@@ -344,6 +348,7 @@ if ($format == "graph") {
                     state: '<?php echo mres($vars['state']); ?>',
                     disabled: '<?php echo mres($vars['disabled']); ?>',
                     ignore: '<?php echo mres($vars['ignore']); ?>',
+                    disable_notify: '<?php echo mres($vars['disable_notify']); ?>',
                     group: '<?php echo mres($vars['group']); ?>',
                 };
             },

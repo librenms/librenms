@@ -75,6 +75,7 @@ alert_rules:
     - { Field: query, Type: text, 'Null': false, Extra: '' }
     - { Field: builder, Type: text, 'Null': false, Extra: '' }
     - { Field: proc, Type: varchar(80), 'Null': true, Extra: '' }
+    - { Field: invert_map, Type: tinyint(1), 'Null': false, Extra: '', Default: '0' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     name: { Name: name, Columns: [name], Unique: true, Type: BTREE }
