@@ -28,11 +28,19 @@
             @endif
         </tr>
         <tr>
-            <th><span class="grey">@lang('Ignored')</span></th>
-            <td><a href="{{ url('devices/format=list_detail/ignore=1') }}"><span class="grey"> {{ $devices['ignored'] }}</span></a></td>
-            <td><a href="{{ url('ports/format=list_detail/ignore=1') }}"><span class="grey"> {{ $ports['ignored'] }}</span></a></td>
+            <th><span class="blue">@lang('Ignored tag')</span></th>
+            <td><a href="{{ url('devices/format=list_detail/ignore=1') }}"><span class="blue"> {{ $devices['ignored'] }}</span></a></td>
+            <td><a href="{{ url('ports/format=list_detail/ignore=1') }}"><span class="blue"> {{ $ports['ignored'] }}</span></a></td>
             @if($show_services)
-                <td><a href="{{ url('services/view=details/ignore=1') }}"><span class="grey"> {{ $services['ignored'] }}</span></a></td>
+                <td><a href="{{ url('services/view=details/ignore=1') }}"><span class="blue"> {{ $services['ignored'] }}</span></a></td>
+            @endif
+        </tr>
+        <tr>
+            <th><span class="grey">@lang('Alert disabled')</span></th>
+            <td><a href="{{ url('devices/format=list_detail/disable_notify=1') }}"><span class="grey"> {{ $devices['disable_notify'] }}</span></a></td>
+            <td><span class="grey"> NA</span></a></td>
+            @if($show_services)
+                <td><span class="grey"> NA</span></a></td>
             @endif
         </tr>
         <tr>
