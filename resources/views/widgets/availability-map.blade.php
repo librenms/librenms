@@ -2,7 +2,7 @@
 <div class="widget-availability-host">
     <span>@lang('Total hosts')</span>
     @if($show_disabled_and_ignored)
-        <a href="{{ url('devices/ignore=1') }}"><span class="label label-default label-font-border label-border">@lang('ignored'): {{ $device_totals['ignored'] }}</span></a>
+        <a href="{{ url('devices/disable_notify=1') }}"><span class="label label-default label-font-border label-border">@lang('alert-disabled'): {{ $device_totals['ignored'] }}</span></a>
         <a href="{{ url('devices/disabled=1') }}"><span class="label blackbg label-font-border label-border">@lang('disabled'): {{ $device_totals['disabled'] }}</span></a>
     @endif
     <a href="{{ url('devices/state=up') }}"><span class="label label-success label-font-border label-border">@lang('up'): {{ $device_totals['up'] }}</span></a>
