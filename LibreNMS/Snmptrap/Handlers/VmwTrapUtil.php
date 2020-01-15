@@ -3,14 +3,14 @@
  * VmwTrapUtil.php
  *
  * -Description-
- * 
+ *
  * Common utility class for handling VmWare ESXi traps.
- * 
+ *
  * Assuming VMWare Tools is installed the VMHost will receive a periodic
- * heartbeat from a VMGuest. This trap is sent once a heartbeat is 
+ * heartbeat from a VMGuest. This trap is sent once a heartbeat is
  * received after not receiving heartbeats for a configured period
  * of time.
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -36,7 +36,7 @@ class VmwTrapUtil
 {
     /**
      * Get the VMGuest hostname
-     * 
+     *
      * @param Trap $trap
      * @return string
      */
@@ -47,7 +47,7 @@ class VmwTrapUtil
 
     /**
      * Get the VMGuest ID number
-     * 
+     *
      * @param Trap $trap
      * @return string
      */
@@ -55,10 +55,10 @@ class VmwTrapUtil
     {
         return $trap->getOidData($trap->findOid('VMWARE-VMINFO-MIB::vmwVmID'));
     }
-    
+
     /**
      * Get the VMGuest configuration path
-     * 
+     *
      * @param Trap $trap
      * @return string
      */

@@ -3,12 +3,12 @@
  * VmwVmHBDetected.php
  *
  * -Description-
- * 
+ *
  * Assuming VMWare Tools is installed the VMHost will receive a periodic
- * heartbeat from a VMGuest. This trap is sent once a heartbeat is 
+ * heartbeat from a VMGuest. This trap is sent once a heartbeat is
  * received after not receiving heartbeats for a configured period
  * of time.
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -32,8 +32,8 @@ namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
 use LibreNMS\Interfaces\SnmptrapHandler;
-use LibreNMS\Snmptrap\Trap;
 use LibreNMS\Snmptrap\Handlers\VmwTrapUtil;
+use LibreNMS\Snmptrap\Trap;
 use Log;
 
 class VmwVmHBDetected implements SnmptrapHandler
@@ -46,9 +46,9 @@ class VmwVmHBDetected implements SnmptrapHandler
      * @param Trap $trap
      * @return void
      */
-    public function handle(Device $device, Trap $trap) 
+    public function handle(Device $device, Trap $trap)
     {
-        $vmGuestName = VmwTrapUtil::getGuestName($trap); 
+        $vmGuestName = VmwTrapUtil::getGuestName($trap);
         Log::event("Heartbeat from guest $vmGuestName detected", $device->device_id, 'trap', 1);
     }
 }
