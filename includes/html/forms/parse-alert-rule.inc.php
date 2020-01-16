@@ -77,6 +77,5 @@ if (is_array($rule)) {
         'builder'    => $builder,
         'severity'   => $rule['severity'],
         'adv_query'  => $rule['query'],
-        'invert_map'  => $rule['invert_map'],
     ]);
 }
