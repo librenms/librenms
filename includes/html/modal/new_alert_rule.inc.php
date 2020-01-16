@@ -98,7 +98,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                                     <div class='col-sm-2' title="Show alert status in the webui, but do not issue notifications.">
                                         <input type="checkbox" name="mute" id="mute">
                                     </div>
-                                    <label for='invert' class='col-sm-3 col-md-3 control-label' title="Alert when this rule doesn't match." style="vertical-align: top;">Invert rule match: </label>
+                                    <label for='invert' class='col-sm-3 col-md-2 control-label' title="Alert when this rule doesn't match." style="vertical-align: top;">Invert match: </label>
                                     <div class='col-sm-2' title="Alert when this rule doesn't match.">
                                         <input type='checkbox' name='invert' id='invert'>
                                     </div>
@@ -109,14 +109,10 @@ if (Auth::user()->hasGlobalAdmin()) {
                                         <input type='checkbox' name='recovery' id='recovery'>
                                     </div>
                                 </div>
-                                <div class="form-group form-inline">
-                                    <label for='maps' class='col-sm-3 col-md-2 control-label' title="Restricts this alert rule to the selected devices and groups.">Match devices and groups list: </label>
-                                    <div class="col-sm-7" style="width: 56%;">
+                                <div class="form-group" title="Restricts this alert rule to the selected devices or groups.">
+                                    <label for='maps' class='col-sm-3 col-md-2 control-label'>Map To: </label>
+                                    <div class="col-sm-9 col-md-10">
                                         <select id="maps" name="maps[]" class="form-control" multiple="multiple"></select>
-                                    </div>
-                                    <div>
-                                        <label for='invert_map' class='col-md-1' style="width: 14.1333%;" text-align="left" title="If ON, alert rule check will run on all devices except the selected devices and groups.">All devices except in list: </label>
-                                        <input type='checkbox' name='invert_map' id='invert_map'>
                                     </div>
                                 </div>
                                 <div class="form-group" title="Restricts this alert rule to specified transports.">
@@ -296,7 +292,6 @@ if (Auth::user()->hasGlobalAdmin()) {
                 $("#invert").bootstrapSwitch('state', false);
                 $("#recovery").bootstrapSwitch('state', true);
                 $("#override_query").bootstrapSwitch('state', false);
-                $("#invert_map").bootstrapSwitch('state', false);
                 $(this).find("input[type=text]").val("");
                 $('#count').val('-1');
                 $('#delay').val('1m');
@@ -370,12 +365,12 @@ if (Auth::user()->hasGlobalAdmin()) {
                 if (extra.adv_query) {
                     $('#adv_query').val(extra.adv_query);
                 }
+
                 $("[name='mute']").bootstrapSwitch('state', extra.mute);
                 $("[name='invert']").bootstrapSwitch('state', extra.invert);
                 if (typeof extra.recovery == 'undefined') {
                     extra.recovery = true;
                 }
-
                 if (typeof extra.options == 'undefined') {
                     extra.options = new Array();
                 }
@@ -383,13 +378,6 @@ if (Auth::user()->hasGlobalAdmin()) {
                     extra.options.override_query = false;
                 }
                 $("[name='recovery']").bootstrapSwitch('state', extra.recovery);
-
-                if (rule.invert_map == 1) {
-                    $("[name='invert_map']").bootstrapSwitch('state', true);
-                }else{
-                    $("[name='invert_map']").bootstrapSwitch('state', false);
-                }
-
                 $("[name='override_query']").bootstrapSwitch('state', extra.options.override_query);
             } else {
                 $('#count').val('-1');
