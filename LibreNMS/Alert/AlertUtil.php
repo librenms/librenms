@@ -174,6 +174,7 @@ class AlertUtil
 
     public static function getRules($device_id)
     {
+        // cfdfs
         $query = "SELECT DISTINCT a.* FROM alert_rules a
         LEFT JOIN alert_device_map d ON a.id=d.rule_id AND (a.invert_map = 0 OR a.invert_map = 1 AND d.device_id = ?)
         LEFT JOIN alert_group_map g ON a.id=g.rule_id AND (a.invert_map = 0 OR a.invert_map = 1 AND g.group_id IN (SELECT DISTINCT device_group_id FROM device_group_device WHERE device_id = ?))
