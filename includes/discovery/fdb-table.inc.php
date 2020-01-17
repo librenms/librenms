@@ -41,7 +41,7 @@ if (!empty($insert)) {
                 $new_port = $entry['port_id'];
                 $port_fdb_id = $existing_fdbs[$vlan_id][$mac_address_entry]['ports_fdb_id'];
 
-                // Sometimes new_port ends up as 0 if we didn't get a complete dot1dBasePort 
+                // Sometimes new_port ends up as 0 if we didn't get a complete dot1dBasePort
                 // dictionary from BRIDGE-MIB - don't write a 0 over a previously known port
                 if ($existing_fdbs[$vlan_id][$mac_address_entry]['port_id'] != $new_port && $new_port != 0) {
                     DB::table('ports_fdb')
