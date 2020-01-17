@@ -26,7 +26,6 @@
 
 namespace LibreNMS\Util;
 
-use DateTime;
 use Exception;
 use Requests;
 use Requests_Response;
@@ -174,7 +173,7 @@ GRAPHQL;
         $data = json_encode(['query' => $query]);
         $prs = Requests::post($this->graphql, $this->getHeaders(), $data);
         $prs = json_decode($prs->body, true);
-        if(!isset($prs['data'])) {
+        if (!isset($prs['data'])) {
             var_dump($prs);
         }
 
@@ -196,7 +195,8 @@ GRAPHQL;
      * @param array $labels
      * @return array
      */
-    private function parseLabels($labels) {
+    private function parseLabels($labels)
+    {
         return array_map(function ($label) {
             $name = preg_replace('/ :[\S]+:/', '', strtolower($label['name']));
             return str_replace('-', ' ', $name);
@@ -213,23 +213,23 @@ GRAPHQL;
         $valid_labels = array_keys($this->changelog);
 
         foreach ($this->pull_requests as $k => $pr) {
-                // check valid labels in order
-                $category = 'misc';
-                foreach ($valid_labels as $valid_label) {
-                    if (in_array($valid_label, $pr['labels'])) {
-                        $category = $valid_label;
-                        break; // only put in the first found label
-                    }
+            // check valid labels in order
+            $category = 'misc';
+            foreach ($valid_labels as $valid_label) {
+                if (in_array($valid_label, $pr['labels'])) {
+                    $category = $valid_label;
+                    break; // only put in the first found label
                 }
+            }
 
-                // only add the changelog if it isn't set to ignore
-                if (!in_array('ignore changelog', $pr['labels'])) {
-                    $title = addcslashes(ucfirst(trim(preg_replace('/^[\S]+: /', '', $pr['title']))), '<>');
-                    $this->changelog[$category][] = "$title ([#{$pr['number']}]({$pr['url']})) - [{$pr['author']['login']}]({$pr['author']['url']})" . PHP_EOL;
-                }
+            // only add the changelog if it isn't set to ignore
+            if (!in_array('ignore changelog', $pr['labels'])) {
+                $title = addcslashes(ucfirst(trim(preg_replace('/^[\S]+: /', '', $pr['title']))), '<>');
+                $this->changelog[$category][] = "$title ([#{$pr['number']}]({$pr['url']})) - [{$pr['author']['login']}]({$pr['author']['url']})" . PHP_EOL;
+            }
 
-                $this->recordUserInfo($pr['author']);
-                $this->recordUserInfo($pr['mergedBy'], 'changelog_mergers');
+            $this->recordUserInfo($pr['author']);
+            $this->recordUserInfo($pr['mergedBy'], 'changelog_mergers');
         }
     }
 
@@ -240,7 +240,8 @@ GRAPHQL;
      * @param array $user
      * @param string $type
      */
-    private function recordUserInfo($user, $type = 'changelog_users') {
+    private function recordUserInfo($user, $type = 'changelog_users')
+    {
         $user_count = &$this->$type;
 
         $user_count[$user['login']] = isset($user_count[$user['login']])
@@ -288,7 +289,8 @@ GRAPHQL;
      * @param $users
      * @return string
      */
-    private function formatUserList($users) {
+    private function formatUserList($users)
+    {
         $output = '';
         arsort($users);
         foreach ($users as $user => $count) {
