@@ -5,7 +5,7 @@ if (Auth::user()->hasGlobalRead()) {
 
     $data['up'] = array('query' => "SELECT COUNT(*) FROM ports AS I, devices AS D WHERE I.`deleted` = '0' AND D.`device_id` = I.`device_id` AND I.`ignore` = '0' AND D.`ignore` = '0' AND I.`ifOperStatus` = 'up'",);
 
-    $data['down'] = array('query' => "SELECT COUNT(*) FROM ports AS I, devices AS D WHERE I.`deleted` = '0' AND D.`device_id` = I.`device_id` AND I.`ignore` = '0' AND D.`ignore` = '0' AND I.`ifOperStatus` = 'down' AND I.`ifAdminStatus` = 'up'");
+    $data['down'] = array('query' => "SELECT COUNT(*) FROM ports AS I, devices AS D WHERE I.`deleted` = '0' AND D.`device_id` = I.`device_id` AND I.`ignore` = '0' AND D.`ignore` = '0' AND I.`ifOperStatus` <> 'up' AND I.`ifAdminStatus` = 'up'");
 
     $data['shutdown'] = array('query' => "SELECT COUNT(*) FROM ports AS I, devices AS D WHERE I.`deleted` = '0' AND D.`device_id` = I.`device_id` AND I.`ignore` = '0' AND D.`ignore` = '0' AND I.`ifAdminStatus` = 'down'");
 
@@ -27,7 +27,7 @@ if (Auth::user()->hasGlobalRead()) {
     );
 
     $data['down'] = array(
-        'query'  => "SELECT COUNT(*) FROM ports AS I, devices AS D WHERE $perms_sql AND I.`deleted` = '0' AND I.`device_id` = D.`device_id` AND I.`ignore` = '0' AND D.`ignore` = '0' AND I.`ifOperStatus` = 'down' AND I.`ifAdminStatus` = 'up'",
+        'query'  => "SELECT COUNT(*) FROM ports AS I, devices AS D WHERE $perms_sql AND I.`deleted` = '0' AND I.`device_id` = D.`device_id` AND I.`ignore` = '0' AND D.`ignore` = '0' AND I.`ifOperStatus` <> 'up' AND I.`ifAdminStatus` = 'up'",
         'params' => $device_ids
     );
 

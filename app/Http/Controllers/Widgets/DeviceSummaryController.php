@@ -54,7 +54,7 @@ abstract class DeviceSummaryController extends WidgetController
     {
         $data = $this->getSettings();
 
-        $data['devices'] = ObjectCache::deviceCounts(['total', 'up', 'down', 'ignored', 'disabled']);
+        $data['devices'] = ObjectCache::deviceCounts(['total', 'up', 'down', 'ignored', 'disabled', 'disable_notify']);
 
         $data['ports'] = $data['summary_errors'] ?
             ObjectCache::portCounts(['total', 'up', 'down', 'ignored', 'shutdown', 'errored']) :
