@@ -46,6 +46,6 @@ class Application extends DeviceRelatedModel
 
     public function displayName()
     {
-        return niceCase($this->app_type);
+        return StringHelpers::niceCase($this->app_type);
     }
 }
