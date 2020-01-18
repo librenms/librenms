@@ -24,6 +24,7 @@
  */
 
 namespace App\Models;
+
 use LibreNMS\Util\StringHelpers;
 
 class Application extends DeviceRelatedModel
