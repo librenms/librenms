@@ -120,6 +120,7 @@ by following the steps under the `SNMP Extend` heading.
 1. [PowerDNS Recursor](#powerdns-recursor) - Direct, SNMP extend, Agent
 1. [PowerDNS dnsdist](#powerdns-dnsdist) - SNMP extend
 1. [Proxmox](#proxmox) - SNMP extend
+1. [PureFTPd](#pureftpd) - SNMP extend
 1. [Raspberry PI](#raspberry-pi) - SNMP extend
 1. [SDFS info](#sdfs-info) - SNMP extend
 1. [Seafile](#seafile) - SNMP extend
@@ -1438,6 +1439,46 @@ snmp ALL=(ALL) NOPASSWD: /usr/local/bin/proxmox
 ```
 
 6: Restart snmpd on your host
+
+# PureFTPd
+
+SNMP extend script to monitor PureFTPd.
+
+## SNMP Extend
+
+1: Download the script onto the desired host. `wget
+   https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/pureftpd.py
+   -O /etc/snmp/pureftpd.py`
+
+2: Make the script executable: `chmod +x /etc/snmp/pureftpd.py`
+
+3: Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
+
+```
+extend pureftpd /etc/snmp/pureftpd.py
+```
+
+4: Edit your sudo users (usually `visudo`) and add at the bottom:
+
+```
+snmp ALL=(ALL) NOPASSWD: /usr/sbin/pure-ftpwho
+```
+or the path where your pure-ftpwho is located
+
+
+5: If pure-ftpwho is not located in /usr/sbin
+
+you will also need to create the config file, which is named
+
+pureftpd.json . The file has to be located in /etc/snmp/.
+
+
+```
+{"pureftpwho_cmd": "/usr/sbin/pure-ftpwho"
+}
+```
+
+5: Restart snmpd on your host
 
 # Raspberry PI
 
