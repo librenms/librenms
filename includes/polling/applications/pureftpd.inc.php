@@ -25,7 +25,11 @@ $idle_connections = 0;
 $dl_bitrate = 0;
 $ul_bitrate = 0;
 
+$users_connected = 0;
+
 foreach ($pureftpd_data as $client) {
+    $users_connected++;
+
     $state = 'DL';
     if (array_key_exists($state, $client)) {
         $dl_connections += $client[$state]['connections'];
@@ -56,6 +60,18 @@ $fields = array (
     'download' => $dl_connections,
     'upload' => $ul_connections,
     'idle' => $idle_connections
+    );
+$metrics[$dataset] = $fields;
+$tags = array('name' => $dataset, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
+data_update($device, 'app', $tags, $fields);
+
+#PureFTPd - connected Users
+$dataset = 'users';
+$rrd_name = array('app', $name, $app_id, $dataset);
+$rrd_def = RrdDefinition::make()
+    ->addDataset('total', 'GAUGE', 0);
+$fields = array (
+    'total' => $users_connected
     );
 $metrics[$dataset] = $fields;
 $tags = array('name' => $dataset, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);

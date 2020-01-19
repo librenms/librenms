@@ -46,8 +46,9 @@ $graphs['powerdns-recursor'] = array(
     'outqueries'
 );
 $graphs['pureftpd'] = array(
+    'bitrate',
     'connections',
-    'bitrate'
+    'users'
 );
 $graphs['rrdcached'] = array(
     'queue_length',
