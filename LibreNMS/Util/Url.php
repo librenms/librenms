@@ -388,10 +388,12 @@ class Url
                 $possibilities[] = "$distro.png";
 
                 // second, prefer the first two words of $feature (i.e. 'Red Hat' becomes 'redhat')
-                $distro = Str::replaceFirst(' ', null, strtolower(trim($feature)), ' ');
-                $distro = Str::before($distro, ' ');
-                $possibilities[] = "$distro.svg";
-                $possibilities[] = "$distro.png";
+                if (strpos($feature, ' ') !== false) {
+                    $distro = Str::replaceFirst(' ', null, strtolower(trim($feature)));
+                    $distro = Str::before($distro, ' ');
+                    $possibilities[] = "$distro.svg";
+                    $possibilities[] = "$distro.png";
+                }
             }
             $os_icon = Config::getOsSetting($os, 'icon', $os);
             $possibilities[] = "$os_icon.svg";
