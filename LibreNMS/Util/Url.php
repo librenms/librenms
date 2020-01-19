@@ -382,7 +382,14 @@ class Url
 
         if ($os) {
             if ($os == "linux") {
+                // first, prefer the first word of $feature
                 $distro = Str::before(strtolower(trim($feature)), ' ');
+                $possibilities[] = "$distro.svg";
+                $possibilities[] = "$distro.png";
+
+                // second, prefer the first two words of $feature (i.e. 'Red Hat' becomes 'redhat')
+                $distro = Str::replaceFirst(' ', '', strtolower(trim($feature)), ' ');
+                $distro = Str::before($distro, ' ');
                 $possibilities[] = "$distro.svg";
                 $possibilities[] = "$distro.png";
             }
