@@ -1,0 +1,1225 @@
+-- *****************************************************************
+-- CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB.my
+--   
+-- MIB support for the Resilient Ethernet Protocol Feature
+--   
+-- Oct 2006, Nagaraj Hegde
+-- Copyright (c) 2006-2007-2011 by cisco Systems Inc.
+--   
+-- All rights reserved.
+--   
+-- ****************************************************************
+
+CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    NOTIFICATION-TYPE,
+    Unsigned32,
+    Integer32,
+    Counter32
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE,
+    NOTIFICATION-GROUP,
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+    TruthValue,
+    RowStatus,
+    TimeStamp,
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    InterfaceIndex,
+    InterfaceIndexOrZero
+        FROM IF-MIB
+    VlanId
+        FROM Q-BRIDGE-MIB
+    CiscoVlanList
+        FROM CISCO-TC
+    ciscoMgmt
+        FROM CISCO-SMI;
+
+
+ciscoResilientEthernetProtocolMIB MODULE-IDENTITY
+    LAST-UPDATED    "201101110000Z"
+    ORGANIZATION    "Cisco Systems, Inc."
+    CONTACT-INFO
+            "Cisco Systems
+            Customer Service
+
+
+            Postal: 170 W Tasman Drive
+
+            San Jose, CA  95134
+
+            USA
+
+
+            Tel: +1 800 553-NETS
+
+
+            E-mail: cs-lan-switch-snmp@cisco.com"
+    DESCRIPTION
+        "This MIB module defines objects required for managing
+        Resilient Ethernet Protocol (REP).
+
+        Resilient Ethernet Protocol (REP) is a Cisco proprietary 
+        protocol that provides an alternative to Spanning Tree 
+        Protocol (STP) to control network loops, handle link 
+        failures and improve convergence time. 
+
+        REP controls a group of ports connected in a segment; 
+        ensures that the segment does not create any bridging loops, 
+        and responds to link failures within the segment. 
+
+        The following diagram depicts a REP segment:
+
+        [Sw E1]E---NE[Sw 1]NE---NE[Sw 2]NE.........
+                                                  .
+                                                  .
+        [Sw E2]E---NE[Sw N]NE---NE[Sw N-1]NE.......
+
+        Sw : Switch.
+        E  : Edge port.
+        NE : Non-Edge port.  
+        E1/E2: Edge switches.  E1 and E2 can either be same or 
+        different switches.
+
+        A REP segment is a chain of ports connected to each other 
+        and configured with a segment identifier.  Each segment 
+        consists of standard (non-edge) segment ports and up to
+        two edge ports.  A device can have only two ports that 
+        belong to the same segment, and each segment port can have
+        only one external neighbor. 
+
+        One edge port in a REP segment acts as the primary edge
+        port; the other as the secondary edge port.  It is the primary 
+        edge port that always participates in VLAN load balancing in 
+        a REP segment.  REP VLAN load balancing is achieved by blocking
+        some VLANs at a configured alternate port and all other VLANs at
+        an edge port.  The execution (preemption) of VLAN load balancing
+        is triggered by manually enforcing it or after a pre-defined
+        delay, after the REP segment is complete.
+
+        When segment is completed, all ports will be in open state
+        except one port that can be in alternate state that is used for
+        VLAN load balancing as explained above."
+    REVISION        "201101110000Z"
+    DESCRIPTION
+        "Modified crepIfPortRole object to include failedPortNoNeighbor
+        and failedPortLogicalOpen states."
+    REVISION        "201010270000Z"
+    DESCRIPTION
+        "Extended 'RepPortType' to allow 'edgeNoNeighbor' and
+        'edgeNoNeighborPrimary'. This was done to support REP Edge No
+        Neighbor feature."
+    REVISION        "200705220000Z"
+    DESCRIPTION
+        "Modified 'crepSegmentPreemptStatus' and 'crepIfOperStatus'
+        objects."
+    REVISION        "200702190000Z"
+    DESCRIPTION
+        "Initial Version of the MIB."
+    ::= { ciscoMgmt 601 }
+
+
+
+-- Textual Conventions
+
+RepPortType ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "This TC describes the port type of the REP port.
+
+        'notEdge'     - non-edge Port.
+
+        'edge'        - edge port for the segment.
+
+        'edgePrimary' - primary edge port for the segment.
+
+        'edgeNoNeighbor'        - no neighbor edge port for the
+        segment.
+
+        'edgeNoNeighborPrimary' - primary no neighbor edge port for the
+        segment."
+    SYNTAX          INTEGER  {
+                        notEdge(1),
+                        edge(2),
+                        edgePrimary(3),
+                        edgeNoNeighbor(4),
+                        edgeNoNeighborPrimary(5)
+                    }
+
+RepSegmentId ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "This TC describes an object to provide the unique
+        identifier for the REP segment."
+    SYNTAX          Unsigned32
+
+RepSegmentList ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "This TC describes an object that indicates the list
+        of REP segments.  Each octet within this value specifies
+        a set of eight segments.  The first octet represents the
+        first 8 segments of the range of segments specified by 
+        the object, the second octet represents the next 8 segments
+        etc.  
+
+        Within each octet, the most significant bit represents
+        the lowest numbered segment, and the least significant bit
+        represents the highest numbered segment.  If that bit has 
+        a value of '1' then that segment is included in the set of 
+        segments; the segment is not included if its bit has a value
+        of '0'.
+
+        NMS may omit any zero-valued octets from the end of this string
+        in order to reduce SetPDU size, and the agent may also omit
+        zero-valued trailing octets, to reduce the size of GetResponse
+        PDUs.
+
+        The maximum length of the object that uses this TC is calculated
+        to be the ceiling whole number of 
+        ((crepMaxSegmentId - crepMinSegmentId + 1) / 8).  
+        Any octets beyond this length in the SetPDU should be ignored."
+    SYNTAX          OCTET STRING
+ciscoRepMIBNotifs  OBJECT IDENTIFIER
+    ::= { ciscoResilientEthernetProtocolMIB 0 }
+
+ciscoRepMIBObjects  OBJECT IDENTIFIER
+    ::= { ciscoResilientEthernetProtocolMIB 1 }
+
+ciscoRepMIBConform  OBJECT IDENTIFIER
+    ::= { ciscoResilientEthernetProtocolMIB 2 }
+
+crepGlobalInfo  OBJECT IDENTIFIER
+    ::= { ciscoRepMIBObjects 1 }
+
+crepInterfaceConfig  OBJECT IDENTIFIER
+    ::= { ciscoRepMIBObjects 2 }
+
+crepSegmentConfig  OBJECT IDENTIFIER
+    ::= { ciscoRepMIBObjects 3 }
+
+
+crepSegmentTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CrepSegmentEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table specifies REP segments configured on the
+        device."
+    ::= { crepSegmentConfig 1 }
+
+crepSegmentEntry OBJECT-TYPE
+    SYNTAX          CrepSegmentEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A list of REP segment entries.
+
+        The number of segments configured on the device determines
+        the number of entries.  An entry is created when a segment
+        identifier value is configured on an interface and no 
+        matching entry exists already.
+
+        The entry is deleted once the segment ceases to exist 
+        on the device."
+    INDEX           { crepSegmentId } 
+    ::= { crepSegmentTable 1 }
+
+CrepSegmentEntry ::= SEQUENCE {
+        crepSegmentId            RepSegmentId,
+        crepSegmentInterface1    InterfaceIndex,
+        crepSegmentInterface2    InterfaceIndexOrZero,
+        crepSegmentComplete      TruthValue,
+        crepSegmentPreempt       TruthValue,
+        crepSegmentPreemptStatus INTEGER
+}
+
+crepSegmentId OBJECT-TYPE
+    SYNTAX          RepSegmentId
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object identifies the segment identifier." 
+    ::= { crepSegmentEntry 1 }
+
+crepSegmentInterface1 OBJECT-TYPE
+    SYNTAX          InterfaceIndex
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the ifIndex-value assigned to
+        the first interface that is part of the segment."
+    REFERENCE
+        "K. McCloghrie and F. Kastenholz, 
+        'The Interfaces Group MIB', RFC-2863, June 2000." 
+    ::= { crepSegmentEntry 2 }
+
+crepSegmentInterface2 OBJECT-TYPE
+    SYNTAX          InterfaceIndexOrZero
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the ifIndex-value assigned to
+        the second interface that is part of the segment. 
+
+        The value of zero means that the InterfaceIndex is not
+        known.  The reasons for value being zero might include
+        the second interface might not yet been configured for
+        this segment and the device may be the edge of the
+        segment."
+    REFERENCE
+        "K. McCloghrie and F. Kastenholz, 
+        'The Interfaces Group MIB', RFC-2863, June 2000." 
+    ::= { crepSegmentEntry 3 }
+
+crepSegmentComplete OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates if the segment is complete
+        such that no port in the segment is in failed state." 
+    ::= { crepSegmentEntry 4 }
+
+crepSegmentPreempt OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object should be set to true by NMS for
+        triggering manual preemption.  This may cause a
+        momentary traffic disruption.
+
+        Though this can be done for any node in the segment,
+        it is only effective on the device acting as the REP
+        primary edge.
+
+        Setting this object false has no effect.  This object
+        always returns false when read." 
+    ::= { crepSegmentEntry 5 }
+
+crepSegmentPreemptStatus OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        none(1),
+                        preemptSuccessful(2),
+                        preemptFailure(3),
+                        preemptTrigger(4),
+                        preemptTriggerFailure(5)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the status of the last preemption
+        trigger.
+
+        'none'                 - preemption trigger is not executed.
+
+        'preemptSuccessful'    - preemption action for the previous 
+                                 trigger is successful.
+
+        'preemptFailure'       - preemption trigger was successful.  
+                                 However, preemption failed due to some
+                                 problem on the segment. 
+
+        'preemptTrigger'       - preemption is triggered successfully 
+                                 and the result is awaited.
+
+        'preemptTriggerFailure'- preemption on the segment is not 
+                                 performed as the preemption trigger 
+                                 failed.  The failure could be due to 
+                                 invalid port ID or neighbor number 
+                                 specified in 'crepBlockPortNumInfo'
+                                 or 'crepBlockPortIdInfo' respectively, 
+                                 when the value of 
+                                 'crepLoadBalanceBlockPortType' is 
+                                 'offset' or 'portId' respectively.
+                                 In addition, reason for failure can be 
+                                 that crepLoadBalanceBlockPortType = 
+                                 'prefFlag' and there is no REP port
+                                 in the segment configured as preferred 
+                                 port.
+
+        The value should be 'none' on all agents other than the one 
+        serving as the primary edge for the segment.  The value will be
+        'none' on the agent serving as the primary edge for the segment
+        if preemption trigger is not executed yet.
+
+        If the device is not capable of assessing the final outcome of
+        preemption trigger, then the state should remain in
+        'preemptTrigger' state." 
+    ::= { crepSegmentEntry 6 }
+ 
+
+
+crepInterfaceConfigTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CrepInterfaceConfigEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table provides REP configuration for interfaces in the
+        device.  This table contains one entry for each interface
+        running REP."
+    ::= { crepInterfaceConfig 1 }
+
+crepInterfaceConfigEntry OBJECT-TYPE
+    SYNTAX          CrepInterfaceConfigEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry exists for each interface, if REP is configured on it.
+        On a system that supports REP, all ports with ifType = 
+        'ethernetCsmacd' and those ethernet based virtual ports with 
+        ifType = 'propVirtual' also support REP.
+
+        REP can be configured or unconfigured or modified directly on
+        the agent as well.
+
+        Dynamically created rows are expected to be non-volatile
+        such that they persist after an agent restarts."
+    INDEX           { crepIfIndex } 
+    ::= { crepInterfaceConfigTable 1 }
+
+CrepInterfaceConfigEntry ::= SEQUENCE {
+        crepIfIndex                    InterfaceIndex,
+        crepIfSegmentId                RepSegmentId,
+        crepIfOperStatus               INTEGER,
+        crepIfPortRole                 INTEGER,
+        crepIfPortID                   OCTET STRING,
+        crepIfAdminEdgePortType        RepPortType,
+        crepIfOperEdgePortType         RepPortType,
+        crepIfPreferredConfig          TruthValue,
+        crepifBlockedVlans1k           CiscoVlanList,
+        crepifBlockedVlans2k           CiscoVlanList,
+        crepifBlockedVlans3k           CiscoVlanList,
+        crepifBlockedVlans4k           CiscoVlanList,
+        crepLoadBalanceBlockPortType   INTEGER,
+        crepBlockPortNumInfo           Integer32,
+        crepBlockPortIdInfo            OCTET STRING,
+        crepIfPreemptDelayTimer        Integer32,
+        crepIfStcnPropagateToSTP       TruthValue,
+        crepIfStcnPropagateToOtherSegs RepSegmentList,
+        crepIfStcnPropagateToIf        InterfaceIndexOrZero,
+        crepIfConfigRowStatus          RowStatus
+}
+
+crepIfIndex OBJECT-TYPE
+    SYNTAX          InterfaceIndex
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object identifies the ifIndex-value assigned to the
+        interface."
+    REFERENCE
+        "K. McCloghrie and F. Kastenholz, 
+        'The Interfaces Group MIB', RFC-2863, June 2000." 
+    ::= { crepInterfaceConfigEntry 1 }
+
+crepIfSegmentId OBJECT-TYPE
+    SYNTAX          RepSegmentId
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the segment that the interface is part.
+        This object can be modified when crepIfConfigRowStatus is 'active'.
+
+        The valid range is from crepMinSegmentId to crepMaxSegmentId." 
+    ::= { crepInterfaceConfigEntry 2 }
+
+crepIfOperStatus OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        none(1),
+                        initDown(2),
+                        noNeighbour(3),
+                        oneWay(4),
+                        twoWay(5),
+                        flapping(6),
+                        wait(7),
+                        unknown(8)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the current operational link state
+        of the REP port.  If a REP configured interface is down,
+        it will be in 'initDown' state.  
+
+        'none'        - REP is not operational on the interface.  This
+                        value is used when sending the crepLinkStatus 
+                        notification when REP configuration is removed
+                        from the interface.
+
+        'initDown'    - initial REP link state.  
+
+        'noNeighbor'  - state in which REP is yet to discover its
+                        neighbor.                     
+
+        'oneWay'      - the state in which messages have been received
+                        from the neighbor but the link has not been 
+                        declared to be twoWay yet.       
+
+        'twoWay'      - the fully operational state for REP.          
+
+        'flapping'    - the state in which there is a mismatch in the 
+                        received port information (either local or 
+                        remote) for the neighbor.
+
+        'wait'        - the forced transient state before REP starts
+                        discovering its neighbor.
+
+        'unknown'     - the link state cannot be determined." 
+    ::= { crepInterfaceConfigEntry 3 }
+
+crepIfPortRole OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        failedPort(1),
+                        alternatePort(2),
+                        openPort(3),
+                        failedPortNoNeighbor(4),
+                        failedPortLogicalOpen(5)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the role or state of a REP port depending
+        on its link status and whether it is forwarding or blocking 
+        traffic.
+
+        'failedPort'    - a port with a non-operational link status,
+                         such that no traffic is forwarded on it.
+
+        'alternatePort' - a port forwarding traffic only for a subset of 
+                         VLANs, for the purpose of VLAN load balancing.
+
+        'openPort'      - a port forwarding traffic for all VLANs.
+
+        'failedPortNoNeighbor'  - a port with a non-operational link 
+                                  status and does not have a external 
+                                  neighbor.
+
+        'failedPortLogicalOpen' - a port with a non-operational link 
+                                  status and does not have a external 
+                                  neighbor but is in forwarding state 
+                                  for traffic." 
+    ::= { crepInterfaceConfigEntry 4 }
+
+crepIfPortID OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE  (8))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the REP port identifier automatically
+        assigned by REP when enabled." 
+    ::= { crepInterfaceConfigEntry 5 }
+
+crepIfAdminEdgePortType OBJECT-TYPE
+    SYNTAX          RepPortType
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the configured edge port type for the
+        interface."
+    DEFVAL          { notEdge } 
+    ::= { crepInterfaceConfigEntry 6 }
+
+crepIfOperEdgePortType OBJECT-TYPE
+    SYNTAX          RepPortType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the actual edge port type for the
+        interface.  Value 'edge' indicates that the port is secondary 
+        edge port." 
+    ::= { crepInterfaceConfigEntry 7 }
+
+crepIfPreferredConfig OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies if port should get preference to become
+        the alternate port among other equal ports in the segment.
+
+        Setting this value to true does not guaranty that the port
+        will become the alternate port.  'crepIfPortRole' should be
+        checked for the actual status."
+    DEFVAL          { false } 
+    ::= { crepInterfaceConfigEntry 8 }
+
+crepifBlockedVlans1k OBJECT-TYPE
+    SYNTAX          CiscoVlanList
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the list of VLANs configured to be
+        blocked at the alternate port for VLANs with values of 0 through
+        1023.  If the bit is set to '1', then the VLAN is marked for
+        blocking.
+
+        This value is only effective on the device acting as the REP
+        primary edge.  In addition, this value is effective only if 
+        'crepLoadBalanceBlockPortType' is not 'none'." 
+    ::= { crepInterfaceConfigEntry 9 }
+
+crepifBlockedVlans2k OBJECT-TYPE
+    SYNTAX          CiscoVlanList
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the list of VLANs configured to be
+        blocked at the alternate port for VLANs with values of 1024
+        through 2047.  If the bit is set to '1', then the VLAN is marked
+        for blocking.
+
+        This value is only effective on the device acting as the REP
+        primary edge.  In addition, this value is effective only if 
+        'crepLoadBalanceBlockPortType' is not 'none'.  This object is
+        only instantiated on devices that support the extended VLANs." 
+    ::= { crepInterfaceConfigEntry 10 }
+
+crepifBlockedVlans3k OBJECT-TYPE
+    SYNTAX          CiscoVlanList
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the list of VLANs configured to be
+        blocked at the alternate port for VLANs with values of 2048
+        through 3071.  If the bit is set to '1', then the VLAN is marked
+        for blocking.
+
+        This value is only effective on the device acting as the REP
+        primary edge.  In addition, this value is effective only if 
+        'crepLoadBalanceBlockPortType' is not 'none'.  This object is
+        only instantiated on devices that support the extended VLANs." 
+    ::= { crepInterfaceConfigEntry 11 }
+
+crepifBlockedVlans4k OBJECT-TYPE
+    SYNTAX          CiscoVlanList
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the list of VLANs configured to be
+        blocked at the alternate port for VLANs with values of 3072
+        through 4095.  If the bit is set to '1', then the VLAN is marked
+        for blocking.
+
+        This value is only effective on the device acting as the REP
+        primary edge.  In addition, this value is effective only if 
+        'crepLoadBalanceBlockPortType' is not 'none'.  This object is
+        only instantiated on devices that support the extended VLANs." 
+    ::= { crepInterfaceConfigEntry 12 }
+
+crepLoadBalanceBlockPortType OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        none(1),
+                        offset(2),
+                        portId(3),
+                        prefFlag(4)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the method defined to identify the
+        alternate port in the segment that takes part in VLAN load
+        balancing by blocking a subset of VLANs after preemption.      
+
+        'none'     - no method is specified to identify the alternate
+        port.  In this case, the primary edge blocks all VLANs after
+        preemption.
+
+        'offset'   - identification is done by a number which indicates
+        the offset of the port from an edge port.  
+        'crepBlockPortNumInfo' defines the value.
+
+        'portId'   - identification is done by the port identifier of
+        the port.  'crepBlockPortIdInfo' defines the value.
+
+        'prefFlag' - to select the port in the segment that is 
+        configured as the preferred alternate port for VLAN load balancing.
+
+        While setting the value to 'offset' or 'portId', corresponding
+        values for the value defining objects (mentioned along with the
+        corresponding descriptions above) should also be provided, along with.
+        Additionally, at least one of objects that define the VLANs to 
+        be blocked (crepifBlockedVlans1k, crepifBlockedVlans2k, 
+        crepifBlockedVlans3k, crepifBlockedVlans4k) should be provided with
+        a non-empty value, when setting the value to anything other than 'none'.    
+
+        This value is only effective on the device acting as the REP
+        primary edge."
+    DEFVAL          { none } 
+    ::= { crepInterfaceConfigEntry 13 }
+
+crepBlockPortNumInfo OBJECT-TYPE
+    SYNTAX          Integer32 (-256..256)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the offset of the port in the segment
+        to be blocked for VLAN load balancing.  Positive numbers 
+        indicate the offset from the primary edge port and negative
+        numbers indicates the downstream neighbor from the secondary
+        edge port.     
+
+        [Sw E1]E1---NE1[Sw 1]NE2---NE1[Sw 2]NE2.........
+                                                       .
+                                                       .
+        [Sw E2]E2---NE2[Sw N]NE1---NE2[Sw N-1]NE1.......
+
+         Sw : Switch.
+         E  : Edge port.
+         NE : Non-Edge port.  
+         E1/E2: Edge switches.  E1 and E2 can either be same or 
+         different switches.
+
+        In the segment depicted above, consider port E1 on 'Sw E1' is 
+        the primary edge and E2 on 'Sw E2' is the secondary edge.  
+        Value 1 for this object indicates primary edge port, 2 indicates
+        NE1 on 'Sw 1', 3 indicates NE2 on 'Sw 1' and so on.  Value -1 
+        indicates secondary edge port, -2 indicates NE2 on 'Sw N', -3 
+        indicates NE1 on 'Sw N' and so on.  Usage of value 0 is invalid.
+
+        This value is only effective on the device acting as the REP
+        primary edge and has relevance only if 
+        crepLoadBalanceBlockPortType = 'offset'." 
+    ::= { crepInterfaceConfigEntry 14 }
+
+crepBlockPortIdInfo OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE  (8))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the port identifier of the port in the
+        segment to be blocked for VLAN load balancing.  'crepIfPortID'
+        object of the corresponding port provides the port identifier.
+
+        This value is only effective on the device acting as the REP
+        primary edge and has relevance only if 
+        crepLoadBalanceBlockPortType = 'portId'." 
+    ::= { crepInterfaceConfigEntry 15 }
+
+crepIfPreemptDelayTimer OBJECT-TYPE
+    SYNTAX          Integer32 (-1..300)
+    UNITS           "delay in seconds"
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the interval of time that REP waits
+        before triggering preemption after the segment is complete.
+
+        The value -1 is used to indicate that no time delay is
+        configured and the preemption will happen manually.
+
+        This value is only effective on the device acting as the
+        REP primary edge."
+    DEFVAL          { -1 } 
+    ::= { crepInterfaceConfigEntry 16 }
+
+crepIfStcnPropagateToSTP OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies if the REP edge propagates the
+        segment topology change notifications to the spanning 
+        tree network.
+
+        This value is only effective on the device acting as the
+        REP primary edge."
+    DEFVAL          { false } 
+    ::= { crepInterfaceConfigEntry 17 }
+
+crepIfStcnPropagateToOtherSegs OBJECT-TYPE
+    SYNTAX          RepSegmentList
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the list of segments to which the
+        REP edge propagates the segment topology change notifications.
+
+        This value is only effective on the device acting as the
+        REP primary edge."
+    DEFVAL          { "" } 
+    ::= { crepInterfaceConfigEntry 18 }
+
+crepIfStcnPropagateToIf OBJECT-TYPE
+    SYNTAX          InterfaceIndexOrZero
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the interface to which the REP edge
+        should propagate the segment topology change notifications.
+        The interface should be of type ifType = 'ethernetCsmacd' 
+        or an ethernet based virtual port with ifType = 'propVirtual'. 
+        '0' specifies that the device should not propagate STCNs to
+        any interface.
+
+        This value is only effective on the device acting as the REP
+        primary edge."
+    DEFVAL          { 0 } 
+    ::= { crepInterfaceConfigEntry 19 }
+
+crepIfConfigRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object is used to manage the creation, deletion, and
+        modification of rows in this table.
+
+        A row may be created using the 'CreateAndGo' option.  When the
+        row is successfully created, the agent would set the RowStatus
+        to 'active'.  'crepIfSegmentId' should be specified for the 
+        successful creation of the row.
+
+        A row may be deleted by setting this object to 'destroy'.
+
+        All writeable columns in this row can be modified when the 
+        value of this object is 'active'." 
+    ::= { crepInterfaceConfigEntry 20 }
+ 
+
+
+crepInterfaceStatsTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CrepInterfaceStatsEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A table for REP interfaces statistics.
+        This table augments the crepInterfaceConfigTable."
+    ::= { crepInterfaceConfig 2 }
+
+crepInterfaceStatsEntry OBJECT-TYPE
+    SYNTAX          CrepInterfaceStatsEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The counter entries are not persistent.  This is because
+        once REP is un-configured on the interface the row would be
+        deleted and hence they will restart if REP is configured 
+        once again on the interface.  NMS need to check for
+        'crepCounterDiscontinuityTime' to see if the counters have
+        restarted."
+    AUGMENTS           { crepInterfaceConfigEntry  } 
+    ::= { crepInterfaceStatsTable 1 }
+
+CrepInterfaceStatsEntry ::= SEQUENCE {
+        crepCounterDiscontinuityTime TimeStamp,
+        crepLslRxPdus                Counter32,
+        crepLslTxPdus                Counter32,
+        crepHflRxPdus                Counter32,
+        crepHflTxPdus                Counter32,
+        crepBpaTlvRxPackets          Counter32,
+        crepBpaTlvTxPackets          Counter32,
+        crepBpaStcnLslRxPackets      Counter32,
+        crepBpaStcnLslTxPackets      Counter32,
+        crepBpaStcnHflRxPackets      Counter32,
+        crepBpaStcnHflTxPackets      Counter32,
+        crepEpaElectionTlvRxPackets  Counter32,
+        crepEpaElectionTlvTxPackets  Counter32,
+        crepEpaCommandTlvRxPackets   Counter32,
+        crepEpaCommandTlvTxPackets   Counter32,
+        crepEpaInfoTlvRxPackets      Counter32,
+        crepEpaInfoTlvTxPackets      Counter32
+}
+
+crepCounterDiscontinuityTime OBJECT-TYPE
+    SYNTAX          TimeStamp
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The value of sysUpTime on the most recent occasion at which
+        REP counters suffered a discontinuity on this interface.
+        If no such discontinuities have occurred since the first 
+        initialization of REP, then this object contains the sysUpTime
+        value of first initialization." 
+    ::= { crepInterfaceStatsEntry 1 }
+
+crepLslRxPdus OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the number of link status layer PDUs
+        received on the port." 
+    ::= { crepInterfaceStatsEntry 2 }
+
+crepLslTxPdus OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the number of link status layer PDUs
+        transmitted on the port." 
+    ::= { crepInterfaceStatsEntry 3 }
+
+crepHflRxPdus OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the number of hardware flood layer PDUs
+        received on the port." 
+    ::= { crepInterfaceStatsEntry 4 }
+
+crepHflTxPdus OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the number of hardware flood layer PDUs
+        transmitted on the port." 
+    ::= { crepInterfaceStatsEntry 5 }
+
+crepBpaTlvRxPackets OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the number of blocked port advertisement
+        TLVs received on the port." 
+    ::= { crepInterfaceStatsEntry 6 }
+
+crepBpaTlvTxPackets OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the number of blocked port advertisement
+        TLVs transmitted on the port." 
+    ::= { crepInterfaceStatsEntry 7 }
+
+crepBpaStcnLslRxPackets OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the number of segment topology change
+        notifications received as blocked port advertisement through 
+        link status layer." 
+    ::= { crepInterfaceStatsEntry 8 }
+
+crepBpaStcnLslTxPackets OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the number of segment topology change
+        notifications transmitted as blocked port advertisement through 
+        link status layer." 
+    ::= { crepInterfaceStatsEntry 9 }
+
+crepBpaStcnHflRxPackets OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the number of segment topology change
+        notifications received as blocked port advertisement 
+        through hardware flood layer." 
+    ::= { crepInterfaceStatsEntry 10 }
+
+crepBpaStcnHflTxPackets OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the number of segment topology change
+        notifications transmitted as blocked port advertisement 
+        through hardware flood layer." 
+    ::= { crepInterfaceStatsEntry 11 }
+
+crepEpaElectionTlvRxPackets OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the number of end port advertisement
+        election TLVs received that are used for determining the
+        role, namely primary edge or secondary edge." 
+    ::= { crepInterfaceStatsEntry 12 }
+
+crepEpaElectionTlvTxPackets OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the number of end port advertisement
+        election TLVs transmitted that are used for determining the
+        role, namely primary edge or secondary edge." 
+    ::= { crepInterfaceStatsEntry 13 }
+
+crepEpaCommandTlvRxPackets OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the number of end port advertisement
+        command TLVs received that are used to authorize a port to 
+        takeover the segment for the purpose of VLAN load balancing." 
+    ::= { crepInterfaceStatsEntry 14 }
+
+crepEpaCommandTlvTxPackets OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the number of end port advertisement
+        command TLVs transmitted that are used to authorize a port to 
+        takeover the segment for the purpose of VLAN load balancing." 
+    ::= { crepInterfaceStatsEntry 15 }
+
+crepEpaInfoTlvRxPackets OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the number of end port advertisement
+        information TLVs received on the port.  These messages are sent
+        by the end ports (configured edge port, or port which is down
+        or port which does not have internal peer) to discover the 
+        segment information." 
+    ::= { crepInterfaceStatsEntry 16 }
+
+crepEpaInfoTlvTxPackets OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the number of end port advertisement
+        information TLVs transmitted on the port.  These messages are
+        sent by the end ports (configured edge port, or port which is
+        down or port which does not have internal peer) to discover
+        the segment information." 
+    ::= { crepInterfaceStatsEntry 17 }
+ 
+
+
+crepVersion OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the version of REP being used." 
+    ::= { crepGlobalInfo 1 }
+
+crepAdminVlan OBJECT-TYPE
+    SYNTAX          VlanId
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The administrative VLAN used by REP to transmit its
+        hardware flooding layer messages.
+
+        If the VLAN does not already exist, set operation does not
+        create the VLAN.  The administrative VLAN cannot be the
+        RSPAN VLAN."
+    DEFVAL          { 1 } 
+    ::= { crepGlobalInfo 2 }
+
+crepNotifsEnable OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies whether the system will generate REP
+        notifications.  This object affects the generation of all REP 
+        notifications defined in this MIB module." 
+    ::= { crepGlobalInfo 3 }
+
+crepGlobalRepNotifsRate OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..1000)
+    UNITS           "notifications per second"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the maximum rate at which the system will
+        generate notifications defined by this MIB module.  If this 
+        object value is 0, then the system will not impose a limit on
+        the rate at which it will generate notification defined by this
+        MIB module." 
+    ::= { crepGlobalInfo 4 }
+
+crepMinSegmentId OBJECT-TYPE
+    SYNTAX          RepSegmentId
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the minimum segment identifier that can be
+        configured on the device." 
+    ::= { crepGlobalInfo 5 }
+
+crepMaxSegmentId OBJECT-TYPE
+    SYNTAX          RepSegmentId
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the maximum segment identifier that can be
+        configured on the device." 
+    ::= { crepGlobalInfo 6 }
+
+crepLinkStatus NOTIFICATION-TYPE
+    OBJECTS         {
+                        crepIfSegmentId,
+                        crepIfOperStatus
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This notification is sent when a REP interface has entered or
+        left REP link operational status.  The link is considered 
+        operational when 'crepIfOperStatus' is 'twoWay'. 
+        'crepIfOperStatus' would be 'none' if the 
+        crepInterfaceConfigEntry entry has been removed."
+   ::= { ciscoRepMIBNotifs 1 }
+
+crepPreemptionStatus NOTIFICATION-TYPE
+    OBJECTS         { crepSegmentPreemptStatus }
+    STATUS          current
+    DESCRIPTION
+        "This notification indicates the status of the preemption
+        triggered on REP primary edge."
+   ::= { ciscoRepMIBNotifs 2 }
+
+crepPortRoleChange NOTIFICATION-TYPE
+    OBJECTS         {
+                        crepIfSegmentId,
+                        crepIfPortRole
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This notification is sent when the role of a Port changes
+        that are indicated by 'crepIfPortRole'."
+   ::= { ciscoRepMIBNotifs 3 }
+-- Conformance
+
+ciscoRepMIBCompliances  OBJECT IDENTIFIER
+    ::= { ciscoRepMIBConform 1 }
+
+ciscoRepMIBGroups  OBJECT IDENTIFIER
+    ::= { ciscoRepMIBConform 2 }
+
+
+ciscoRepMIBCompliance MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+        "The compliance statement for
+        CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        ciscoRepGlobalGroup,
+                        ciscoRepNotificationGroup,
+                        ciscoRepInterfaceGroup,
+                        ciscoRepSegmentGroup
+                    }
+
+    OBJECT          crepIfConfigRowStatus
+    SYNTAX          INTEGER  {
+                        active(1),
+                        createAndGo(4),
+                        destroy(6)
+                    }
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Support for createAndWait, notReady and notInService values are
+        not required."
+
+    OBJECT          crepNotifsEnable
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "read-write access is not required."
+
+    OBJECT          crepGlobalRepNotifsRate
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "read-write access is not required."
+    ::= { ciscoRepMIBCompliances 1 }
+
+-- Units of Conformance
+
+ciscoRepGlobalGroup OBJECT-GROUP
+    OBJECTS         {
+                        crepVersion,
+                        crepAdminVlan,
+                        crepNotifsEnable,
+                        crepGlobalRepNotifsRate,
+                        crepMinSegmentId,
+                        crepMaxSegmentId
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of global objects for use with the REP feature."
+    ::= { ciscoRepMIBGroups 1 }
+
+ciscoRepInterfaceGroup OBJECT-GROUP
+    OBJECTS         {
+                        crepIfSegmentId,
+                        crepIfOperStatus,
+                        crepIfPortRole,
+                        crepIfPortID,
+                        crepIfAdminEdgePortType,
+                        crepIfOperEdgePortType,
+                        crepIfPreferredConfig,
+                        crepifBlockedVlans1k,
+                        crepifBlockedVlans2k,
+                        crepifBlockedVlans3k,
+                        crepifBlockedVlans4k,
+                        crepLoadBalanceBlockPortType,
+                        crepBlockPortNumInfo,
+                        crepBlockPortIdInfo,
+                        crepIfPreemptDelayTimer,
+                        crepIfStcnPropagateToSTP,
+                        crepIfStcnPropagateToOtherSegs,
+                        crepIfStcnPropagateToIf,
+                        crepIfConfigRowStatus,
+                        crepCounterDiscontinuityTime,
+                        crepLslRxPdus,
+                        crepLslTxPdus,
+                        crepHflRxPdus,
+                        crepHflTxPdus,
+                        crepBpaTlvRxPackets,
+                        crepBpaTlvTxPackets,
+                        crepBpaStcnLslRxPackets,
+                        crepBpaStcnLslTxPackets,
+                        crepBpaStcnHflRxPackets,
+                        crepBpaStcnHflTxPackets,
+                        crepEpaElectionTlvRxPackets,
+                        crepEpaElectionTlvTxPackets,
+                        crepEpaCommandTlvRxPackets,
+                        crepEpaCommandTlvTxPackets,
+                        crepEpaInfoTlvRxPackets,
+                        crepEpaInfoTlvTxPackets
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of interface specific objects for use with the REP
+        feature."
+    ::= { ciscoRepMIBGroups 2 }
+
+ciscoRepNotificationGroup NOTIFICATION-GROUP
+   NOTIFICATIONS    {
+                        crepLinkStatus,
+                        crepPreemptionStatus,
+                        crepPortRoleChange
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of notifications for use with the REP feature."
+    ::= { ciscoRepMIBGroups 3 }
+
+ciscoRepSegmentGroup OBJECT-GROUP
+    OBJECTS         {
+                        crepSegmentInterface1,
+                        crepSegmentInterface2,
+                        crepSegmentComplete,
+                        crepSegmentPreempt,
+                        crepSegmentPreemptStatus
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of segment specific objects for use with the REP feature."
+    ::= { ciscoRepMIBGroups 4 }
+
+END
