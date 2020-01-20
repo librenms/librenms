@@ -110,10 +110,9 @@ foreach ($query->get(['bill_id', 'bill_name']) as $bill) {
             }
         } else {
             echo "WATCH out! - Wrong counters. Table 'bill_port_counters' not updated\n";
-            logfile("WATCH out! - Wrong counters. Table 'bill_port_counters' not updated");
-            
+            logfile("WATCH out! - Wrong counters. Table 'bill_port_counters' not updated");         
         }
-        ////////////////////////////////EndCountersValidation&DB-Update        
+        ////////////////////////////////EndCountersValidation&DB-Update
         $delta     = ($delta + $port_data['in_delta'] + $port_data['out_delta']);
         $in_delta  = ($in_delta + $port_data['in_delta']);
         $out_delta = ($out_delta + $port_data['out_delta']);
