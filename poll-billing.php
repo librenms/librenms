@@ -105,12 +105,11 @@ foreach ($query->get(['bill_id', 'bill_name']) as $bill) {
             if (dbUpdate($fields, 'bill_port_counters', "`port_id`='" . mres($port_id) . "' AND `bill_id`='$bill_id'") == 0) {
                 $fields['bill_id'] = $bill_id;
                 $fields['port_id'] = $port_id;
-
                 dbInsert($fields, 'bill_port_counters');
             }
         } else {
             echo "WATCH out! - Wrong counters. Table 'bill_port_counters' not updated\n";
-            logfile("WATCH out! - Wrong counters. Table 'bill_port_counters' not updated");         
+            logfile("WATCH out! - Wrong counters. Table 'bill_port_counters' not updated");
         }
         ////////////////////////////////EndCountersValidation&DB-Update
         $delta     = ($delta + $port_data['in_delta'] + $port_data['out_delta']);
