@@ -748,7 +748,7 @@ Verify it is working by running `/usr/lib/check_mk_agent/local/gpsd`
 wget https://github.com/librenms/librenms-agent/master/snmp/mailcow-dockerized-postfix -O /etc/snmp/mailcow-dockerized-postfix
 ```
 
-2: Run `chmod +x /etc/snmp/mailscanner.php`
+2: Run `chmod +x /etc/snmp/mailcow-dockerized-postfix`
 
 3: Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 
