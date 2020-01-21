@@ -717,6 +717,11 @@ class Device extends BaseModel
         return $this->belongsToMany('App\Models\User', 'devices_perms', 'device_id', 'user_id');
     }
 
+    public function vminfo()
+    {
+        return $this->hasMany('App\Models\Vminfo', 'device_id');
+    }
+
     public function vrfLites()
     {
         return $this->hasMany('App\Models\VrfLite', 'device_id');
