@@ -1,3 +1,4 @@
+mib: WebGraph-Thermo-Hygrometer-US-MIB
 modules:
     sensors:
         temperature:
