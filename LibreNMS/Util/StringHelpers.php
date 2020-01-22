@@ -61,6 +61,7 @@ class StringHelpers
             'smart' => 'SMART',
             'powerdns-recursor' => 'PowerDNS Recursor',
             'powerdns-dnsdist' => 'PowerDNS dnsdist',
+            'pureftpd' => 'PureFTPd',
             'dhcp-stats' => 'DHCP Stats',
             'ups-nut' => 'UPS nut',
             'ups-apcups' => 'UPS apcups',
