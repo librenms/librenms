@@ -45,20 +45,23 @@ class Slack extends Transport
             $alert_message = $obj['msg'];
         } else {
             $slack_msg     = strip_tags($obj['msg']);
-            $color         = ($obj['state'] == 0 ? '#00FF00' : '#FF0000');
+            $color         = self::getColorForState($obj['state']);
             $data          = [
                 'attachments' => [
-                0 => [
-                    'fallback' => $slack_msg,
-                    'color' => $color,
-                    'title' => $obj['title'],
-                    'text' => $slack_msg,
-                    'mrkdwn_in' => ['text', 'fallback'],
-                    'author_name' => $api['author_name'],
-                ],
+                    0 => [
+                        'fallback' => $slack_msg,
+                        'color' => $color,
+                        'title' => $obj['title'],
+                        'text' => $slack_msg,
+                        'mrkdwn_in' => ['text', 'fallback'],
+                        'author_name' => $api['author_name'],
+                    ],
                 ],
                 'channel' => $api['channel'],
+                'username' => $api['username'],
+                'icon_emoji' => ':' .$api['icon_emoji'].':',
             ];
+
             $alert_message = json_encode($data);
         }
 
