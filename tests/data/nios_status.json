@@ -314,13 +314,6 @@
                     "state_name": "ibServiceStatus",
                     "state_descr": "Working",
                     "state_draw_graph": 0,
-                    "state_value": 0,
-                    "state_generic_value": 0
-                },
-                {
-                    "state_name": "ibServiceStatus",
-                    "state_descr": "Working",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
