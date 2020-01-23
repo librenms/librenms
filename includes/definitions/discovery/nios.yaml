@@ -4,7 +4,8 @@ modules:
         pre-cache:
             data:
                 - 
-                    oid: ibServiceName
+                    oid: 
+                        - ibServiceName
                     snmp_flags: ['-OQUsb']
 
         state:
