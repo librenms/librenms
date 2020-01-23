@@ -134,6 +134,7 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
             Route::post('top-devices', 'TopDevicesController');
             Route::post('top-interfaces', 'TopInterfacesController');
             Route::post('worldmap', 'WorldMapController');
+            Route::post('alertlog-stats', 'AlertlogStatsController');
         });
     });
 
