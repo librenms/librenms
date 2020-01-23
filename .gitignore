@@ -31,7 +31,6 @@ html/plugins/*
 !html/plugins/Test/
 includes/custom/*
 junk
-librenms-agent
 nbproject
 patches
 !/lib/yaml
