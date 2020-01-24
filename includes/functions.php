@@ -1051,7 +1051,7 @@ function include_dir($dir, $regex = "")
 
 /**
  * Check if port is valid to poll.
- * Settings: empty_ifdescr, good_if, bad_if, bad_if_regexp, bad_ifname_regexp, bad_ifalias_regexp, bad_iftype
+ * Settings: empty_ifdescr, good_if, bad_if, bad_if_regexp, bad_ifname_regexp, bad_ifalias_regexp, bad_iftype, bad_ifoperstatus
  *
  * @param array $port
  * @param array $device
@@ -1078,6 +1078,7 @@ function is_port_valid($port, $device)
     $ifName  = $port['ifName'];
     $ifAlias = $port['ifAlias'];
     $ifType  = $port['ifType'];
+    $ifOperStatus = $port['ifOperStatus'];
 
     if (str_i_contains($ifDescr, Config::getOsSetting($device['os'], 'good_if'))) {
         return true;
@@ -1104,7 +1105,6 @@ function is_port_valid($port, $device)
         }
     }
 
-
     foreach (Config::getCombined($device['os'], 'bad_ifalias_regexp') as $bar) {
         if (preg_match($bar ."i", $ifAlias)) {
             d_echo("ignored by ifName: $ifAlias (matched: $bar)\n");
@@ -1115,6 +1115,13 @@ function is_port_valid($port, $device)
     foreach (Config::getCombined($device['os'], 'bad_iftype') as $bt) {
         if (str_contains($ifType, $bt)) {
             d_echo("ignored by ifType: $ifType (matched: $bt )\n");
+            return false;
+        }
+    }
+
+    foreach (Config::getCombined($device['os'], 'bad_ifoperstatus') as $bos) {
+        if (str_contains($ifOperStatus, $bos)) {
+            d_echo("ignored by ifOperStatus: $ifOperStatus (matched: $bos)\n");
             return false;
         }
     }

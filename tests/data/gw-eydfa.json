@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
-                    "location": null,
                     "os": "gw-eydfa",
                     "type": "network",
                     "serial": null,
-                    "icon": "glassway.svg"
+                    "icon": "glassway.svg",
+                    "location": null
                 }
             ]
         },
@@ -28,11 +28,11 @@
                     "version": "V3.1.0",
                     "hardware": "GW-6420-WDM",
                     "features": null,
-                    "location": "<private>",
                     "os": "gw-eydfa",
                     "type": "network",
                     "serial": "180619085787",
-                    "icon": "glassway.svg"
+                    "icon": "glassway.svg",
+                    "location": "<private>"
                 }
             ]
         }

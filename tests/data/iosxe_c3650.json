@@ -3,51 +3,89 @@
         "discovery": {
             "processors": [
                 {
-                    "entPhysicalIndex": "1000",
-                    "hrDeviceIndex": "0",
+                    "entPhysicalIndex": 1000,
+                    "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.9.9.109.1.1.2.1.5.1000.0",
                     "processor_index": "1000.0",
                     "processor_type": "cpm",
-                    "processor_usage": "8",
+                    "processor_usage": 8,
                     "processor_descr": "Switch 1: Core 0",
-                    "processor_precision": "1",
-                    "processor_perc_warn": "75"
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": "1000",
-                    "hrDeviceIndex": "0",
+                    "entPhysicalIndex": 1000,
+                    "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.9.9.109.1.1.2.1.5.1000.1",
                     "processor_index": "1000.1",
                     "processor_type": "cpm",
-                    "processor_usage": "2",
+                    "processor_usage": 2,
                     "processor_descr": "Switch 1: Core 1",
-                    "processor_precision": "1",
-                    "processor_perc_warn": "75"
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": "1000",
-                    "hrDeviceIndex": "0",
+                    "entPhysicalIndex": 1000,
+                    "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.9.9.109.1.1.2.1.5.1000.2",
                     "processor_index": "1000.2",
                     "processor_type": "cpm",
-                    "processor_usage": "3",
+                    "processor_usage": 3,
                     "processor_descr": "Switch 1: Core 2",
-                    "processor_precision": "1",
-                    "processor_perc_warn": "75"
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": "1000",
-                    "hrDeviceIndex": "0",
+                    "entPhysicalIndex": 1000,
+                    "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.9.9.109.1.1.2.1.5.1000.3",
                     "processor_index": "1000.3",
                     "processor_type": "cpm",
-                    "processor_usage": "2",
+                    "processor_usage": 2,
                     "processor_descr": "Switch 1: Core 3",
-                    "processor_precision": "1",
-                    "processor_perc_warn": "75"
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
                 }
             ]
         },
         "poller": "matches discovery"
+    },
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.9.1.2066",
+                    "sysDescr": "Cisco IOS Software, IOS-XE Software, Catalyst L3 Switch Software (CAT3K_CAA-UNIVERSALK9-M), Version 03.07.05E RELEASE SOFTWARE (fc1)\nTechnical Support: http://www.cisco.com/techsupport\r\nCopyright (c) 1986-2017 by Cisco Systems, Inc.\r\nCompiled Fri 10-Feb-",
+                    "sysContact": null,
+                    "version": null,
+                    "hardware": null,
+                    "features": null,
+                    "os": "iosxe",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "cisco.svg",
+                    "location": null
+                }
+            ]
+        },
+        "poller": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.9.1.2066",
+                    "sysDescr": "Cisco IOS Software, IOS-XE Software, Catalyst L3 Switch Software (CAT3K_CAA-UNIVERSALK9-M), Version 03.07.05E RELEASE SOFTWARE (fc1)\nTechnical Support: http://www.cisco.com/techsupport\r\nCopyright (c) 1986-2017 by Cisco Systems, Inc.\r\nCompiled Fri 10-Feb-",
+                    "sysContact": "<private>",
+                    "version": "03.07.05E",
+                    "hardware": "cat36xxstack",
+                    "features": "UNIVERSALK9",
+                    "os": "iosxe",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "cisco.svg",
+                    "location": "<private>"
+                }
+            ]
+        }
     }
 }

@@ -28,11 +28,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
-                    "location": null,
                     "os": "ray",
                     "type": "wireless",
                     "serial": null,
-                    "icon": "ray.png"
+                    "icon": "ray.png",
+                    "location": null
                 }
             ]
         },
@@ -46,11 +46,11 @@
                     "version": "4.1.51.0",
                     "hardware": "RAY10EU",
                     "features": "H1",
-                    "location": null,
                     "os": "ray",
                     "type": "wireless",
                     "serial": "9879015",
-                    "icon": "ray.png"
+                    "icon": "ray.png",
+                    "location": null
                 }
             ]
         }

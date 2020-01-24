@@ -15,6 +15,7 @@ use LibreNMS\Util\IPv4;
 use LibreNMS\Util\IPv6;
 use LibreNMS\Util\Url;
 use LibreNMS\Util\Time;
+use Permissions;
 
 class Device extends BaseModel
 {
@@ -302,9 +303,7 @@ class Device extends BaseModel
             return true;
         }
 
-        return DB::table('devices_perms')
-            ->where('user_id', $user->user_id)
-            ->where('device_id', $this->device_id)->exists();
+        return Permissions::canAccessDevice($this->device_id, $user->user_id);
     }
 
     public function formatUptime($short = false)
@@ -420,8 +419,11 @@ class Device extends BaseModel
         });
 
         if ($attrib_index !== false) {
+            $deleted=(bool)$this->attribs->get($attrib_index)->delete();
+            // only forget the attrib_index after delete, otherwise delete() will fail fatally with:
+            // Symfony\\Component\\Debug\Exception\\FatalThrowableError(code: 0):  Call to a member function delete() on null
             $this->attribs->forget($attrib_index);
-            return (bool)$this->attribs->get($attrib_index)->delete();
+            return $deleted;
         }
 
         return false;
@@ -466,6 +468,7 @@ class Device extends BaseModel
         return $query->where([
             ['status', '=', 1],
             ['ignore', '=', 0],
+            ['disable_notify', '=', 0],
             ['disabled', '=', 0]
         ]);
     }
@@ -482,6 +485,7 @@ class Device extends BaseModel
     {
         return $query->where([
             ['status', '=', 0],
+            ['disable_notify', '=', 0],
             ['ignore', '=', 0],
             ['disabled', '=', 0]
         ]);
@@ -506,6 +510,21 @@ class Device extends BaseModel
     {
         return $query->where([
             ['disabled', '=', 1]
+        ]);
+    }
+
+    public function scopeIsDisableNotify($query)
+    {
+        return $query->where([
+            ['disable_notify', '=', 1]
+        ]);
+    }
+
+    public function scopeIsNotDisabled($query)
+    {
+        return $query->where([
+            ['disable_notify', '=', 0],
+            ['disabled', '=', 0]
         ]);
     }
 
@@ -698,6 +717,16 @@ class Device extends BaseModel
         return $this->hasMany('App\Models\MplsSdpBind', 'device_id');
     }
 
+    public function mplsTunnelArHops()
+    {
+        return $this->hasMany('App\Models\MplsTunnelArHop', 'device_id');
+    }
+
+    public function mplsTunnelCHops()
+    {
+        return $this->hasMany('App\Models\MplsTunnelCHop', 'device_id');
+    }
+
     public function syslogs()
     {
         return $this->hasMany('App\Models\Syslog', 'device_id', 'device_id');
@@ -707,6 +736,11 @@ class Device extends BaseModel
     {
         // FIXME does not include global read
         return $this->belongsToMany('App\Models\User', 'devices_perms', 'device_id', 'user_id');
+    }
+
+    public function vminfo()
+    {
+        return $this->hasMany('App\Models\Vminfo', 'device_id');
     }
 
     public function vrfLites()

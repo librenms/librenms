@@ -3,17 +3,87 @@
         "discovery": {
             "processors": [
                 {
-                    "entPhysicalIndex": "0",
-                    "hrDeviceIndex": "0",
+                    "entPhysicalIndex": 0,
+                    "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.89.1.7.0",
                     "processor_index": "0",
                     "processor_type": "powerconnect-nv",
-                    "processor_usage": "83",
+                    "processor_usage": 83,
                     "processor_descr": "Processor",
-                    "processor_precision": "1",
-                    "processor_perc_warn": "75"
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
                 }
             ]
+        },
+        "poller": "matches discovery"
+    },
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "",
+                    "sysObjectID": ".1.3.6.1.4.1.674.10895.3031",
+                    "sysDescr": "48G Ethernet Switch",
+                    "sysContact": null,
+                    "version": null,
+                    "hardware": null,
+                    "features": null,
+                    "os": "powerconnect",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "dell.svg",
+                    "location": null
+                }
+            ]
+        },
+        "poller": {
+            "devices": [
+                {
+                    "sysName": "",
+                    "sysObjectID": ".1.3.6.1.4.1.674.10895.3031",
+                    "sysDescr": "48G Ethernet Switch",
+                    "sysContact": null,
+                    "version": null,
+                    "hardware": "Dell ",
+                    "features": null,
+                    "os": "powerconnect",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "dell.svg",
+                    "location": null
+                }
+            ]
+        }
+    },
+    "sensors": {
+        "discovery": {
+            "sensors": [
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "temperature",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.89.53.15.1.9.1",
+                    "sensor_index": "0",
+                    "sensor_type": "powerconnect",
+                    "sensor_descr": "Internal Temperature",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": 45,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": 0,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                }
+            ],
+            "state_indexes": []
         },
         "poller": "matches discovery"
     }

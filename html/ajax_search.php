@@ -20,6 +20,14 @@ if (isset($_REQUEST['search'])) {
     if (strlen($search) > 0) {
         $found = 0;
 
+        if (!Auth::user()->hasGlobalRead()) {
+            $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
+            $perms_sql = "`D`.`device_id` IN " .dbGenPlaceholders(count($device_ids));
+        } else {
+            $device_ids = [];
+            $perms_sql = "1";
+        }
+
         if ($_REQUEST['type'] == 'group') {
             foreach (dbFetchRows("SELECT id,name FROM device_groups WHERE name LIKE ?", ["%$search%"]) as $group) {
                 if ($_REQUEST['map']) {
@@ -43,13 +51,13 @@ if (isset($_REQUEST['search'])) {
             // Device search
             if (Auth::user()->hasGlobalRead()) {
                 $results = dbFetchRows(
-                    "SELECT * FROM `devices` LEFT JOIN `locations` ON `locations`.`id` = `devices`.`location_id` WHERE `devices`.`hostname` LIKE ? OR `locations`.`location` LIKE ? OR `devices`.`sysName` LIKE ? OR `devices`.`purpose` LIKE ? OR `devices`.`notes` LIKE ? ORDER BY `devices`.hostname LIMIT " . $limit,
-                    ["%$search%", "%$search%", "%$search%", "%$search%", "%$search%"]
+                    "SELECT * FROM `devices` LEFT JOIN `locations` ON `locations`.`id` = `devices`.`location_id` WHERE `devices`.`hostname` LIKE ? OR `locations`.`location` LIKE ? OR `devices`.`sysName` LIKE ? OR `devices`.`purpose` LIKE ? OR `devices`.`notes` LIKE ? ORDER BY `devices`.hostname LIMIT ?",
+                    ["%$search%", "%$search%", "%$search%", "%$search%", "%$search%", $limit]
                 );
             } else {
                 $results = dbFetchRows(
-                    "SELECT * FROM `devices` AS `D` INNER JOIN `devices_perms` AS `P` ON `P`.`device_id` = `D`.`device_id` LEFT JOIN `locations` ON `locations`.`id` = `D`.`location_id` WHERE `P`.`user_id` = ? AND (D.`hostname` LIKE ? OR D.`sysName` LIKE ? OR `locations`.`location` LIKE ?) ORDER BY hostname LIMIT " . $limit,
-                    [Auth::id(), "%$search%", "%$search%", "%$search%"]
+                    "SELECT * FROM `devices` AS `D` LEFT JOIN `locations` ON `locations`.`id` = `D`.`location_id` WHERE $perms_sql AND (D.`hostname` LIKE ? OR D.`sysName` LIKE ? OR `locations`.`location` LIKE ?) ORDER BY hostname LIMIT ?",
+                    array_merge($device_ids, ["%$search%", "%$search%", "%$search%", $limit])
                 );
             }
 
@@ -72,11 +80,8 @@ if (isset($_REQUEST['search'])) {
                         $highlight_colour = '#008000';
                     }
 
-                    if (Auth::user()->hasGlobalRead()) {
-                        $num_ports = dbFetchCell('SELECT COUNT(*) FROM `ports` WHERE device_id = ?', [$result['device_id']]);
-                    } else {
-                        $num_ports = dbFetchCell('SELECT COUNT(*) FROM `ports` AS `I`, `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` AND `I`.`device_id` = `D`.`device_id` AND D.device_id = ?', [Auth::id(), $result['device_id']]);
-                    }
+                    $num_ports = dbFetchCell('SELECT COUNT(*) FROM `ports` AS `I`, `devices` AS `D` WHERE ' . $perms_sql . ' AND `I`.`device_id` = `D`.`device_id` AND `I`.`ignore` = 0 AND `I`.`deleted` = 0 AND `D`.`device_id` = ?', array_merge($device_ids, [$result['device_id']]));
+
 
                     $device[] = array(
                         'name'            => $name,
@@ -99,13 +104,13 @@ if (isset($_REQUEST['search'])) {
             // Search ports
             if (Auth::user()->hasGlobalRead()) {
                 $results = dbFetchRows(
-                    "SELECT `ports`.*,`devices`.* FROM `ports` LEFT JOIN `devices` ON  `ports`.`device_id` =  `devices`.`device_id` WHERE `ifAlias` LIKE ? OR `ifDescr` LIKE ? OR `ifName` LIKE ? ORDER BY ifDescr LIMIT ".$limit,
-                    ["%$search%", "%$search%", "%$search%"]
+                    "SELECT `ports`.*,`devices`.* FROM `ports` LEFT JOIN `devices` ON  `ports`.`device_id` =  `devices`.`device_id` WHERE `ifAlias` LIKE ? OR `ifDescr` LIKE ? OR `ifName` LIKE ? ORDER BY ifDescr LIMIT ?",
+                    ["%$search%", "%$search%", "%$search%", $limit]
                 );
             } else {
                 $results = dbFetchRows(
-                    "SELECT DISTINCT(`I`.`port_id`), `I`.*, `D`.`hostname` FROM `ports` AS `I`, `devices` AS `D`, `devices_perms` AS `P`, `ports_perms` AS `PP` WHERE ((`P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id`) OR (`PP`.`user_id` = ? AND `PP`.`port_id` = `I`.`port_id` AND `I`.`device_id` = `D`.`device_id`)) AND `D`.`device_id` = `I`.`device_id` AND (`ifAlias` LIKE ? OR `ifDescr` LIKE ? OR `ifName` LIKE ?) ORDER BY ifDescr LIMIT ".$limit,
-                    [Auth::id(), Auth::id(), "%$search%", "%$search%", "%$search%"]
+                    "SELECT DISTINCT(`I`.`port_id`), `I`.*, `D`.`hostname` FROM `ports` AS `I`, `devices` AS `D` WHERE $perms_sql AND `D`.`device_id` = `I`.`device_id` AND (`ifAlias` LIKE ? OR `ifDescr` LIKE ? OR `ifName` LIKE ?) ORDER BY ifDescr LIMIT ?",
+                    array_merge($device_ids, ["%$search%", "%$search%", "%$search%", $limit])
                 );
             }
 
@@ -149,17 +154,10 @@ if (isset($_REQUEST['search'])) {
             die($json);
         } elseif ($_REQUEST['type'] == 'bgp') {
             // Search bgp peers
-            if (Auth::user()->hasGlobalRead()) {
-                $results = dbFetchRows(
-                    "SELECT `bgpPeers`.*,`devices`.* FROM `bgpPeers` LEFT JOIN `devices` ON  `bgpPeers`.`device_id` =  `devices`.`device_id` WHERE `astext` LIKE ? OR `bgpPeerIdentifier` LIKE ? OR `bgpPeerRemoteAs` LIKE ? ORDER BY `astext` LIMIT " . $limit,
-                    ["%$search%", "%$search%", "%$search%"]
-                );
-            } else {
-                $results = dbFetchRows(
-                    "SELECT `bgpPeers`.*,`D`.* FROM `bgpPeers`, `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` AND  `bgpPeers`.`device_id`=`D`.`device_id` AND  (`astext` LIKE ? OR `bgpPeerIdentifier` LIKE ? OR `bgpPeerRemoteAs` LIKE ?) ORDER BY `astext` LIMIT ".$limit,
-                    [Auth::id(), "%$search%", "%$search%", "%$search%"]
-                );
-            }
+            $results = dbFetchRows(
+                "SELECT `bgpPeers`.*,`D`.* FROM `bgpPeers`, `devices` AS `D` WHERE $perms_sql AND  `bgpPeers`.`device_id`=`D`.`device_id` AND  (`astext` LIKE ? OR `bgpPeerIdentifier` LIKE ? OR `bgpPeerRemoteAs` LIKE ?) ORDER BY `astext` LIMIT ?",
+                array_merge($device_ids, ["%$search%", "%$search%", "%$search%", $limit])
+            );
 
             if (count($results)) {
                 $found = 1;
@@ -205,17 +203,11 @@ if (isset($_REQUEST['search'])) {
             die($json);
         } elseif ($_REQUEST['type'] == 'applications') {
             // Device search
-            if (Auth::user()->hasGlobalRead()) {
-                $results = dbFetchRows(
-                    "SELECT * FROM `applications` INNER JOIN `devices` ON devices.device_id = applications.device_id WHERE `app_type` LIKE ? OR `hostname` LIKE ? ORDER BY hostname LIMIT ".$limit,
-                    ["%$search%", "%$search%"]
-                );
-            } else {
-                $results = dbFetchRows(
-                    "SELECT * FROM `applications` INNER JOIN `devices` AS `D` ON `D`.`device_id` = `applications`.`device_id` INNER JOIN `devices_perms` AS `P` ON `P`.`device_id` = `D`.`device_id` WHERE `P`.`user_id` = ? AND (`app_type` LIKE ? OR `hostname` LIKE ?) ORDER BY hostname LIMIT ".$limit,
-                    [Auth::id(), "%$search%", "%$search%"]
-                );
-            }
+            $results = dbFetchRows(
+                "SELECT * FROM `applications` INNER JOIN `devices` AS `D` ON `D`.`device_id` = `applications`.`device_id` WHERE $perms_sql AND (`app_type` LIKE ? OR `hostname` LIKE ?) ORDER BY hostname LIMIT ?",
+                array_merge($device_ids, ["%$search%", "%$search%", $limit])
+            );
+
 
             if (count($results)) {
                 $found   = 1;
@@ -252,17 +244,11 @@ if (isset($_REQUEST['search'])) {
             die($json);
         } elseif ($_REQUEST['type'] == 'munin') {
             // Device search
-            if (Auth::user()->hasGlobalRead()) {
-                $results = dbFetchRows(
-                    "SELECT * FROM `munin_plugins` INNER JOIN `devices` ON devices.device_id = munin_plugins.device_id WHERE `mplug_type` LIKE ? OR `mplug_title` LIKE ? OR `hostname` LIKE ? ORDER BY hostname LIMIT ".$limit,
-                    ["%$search%", "%$search%", "%$search%"]
-                );
-            } else {
-                $results = dbFetchRows(
-                    "SELECT * FROM `munin_plugins` INNER JOIN `devices` AS `D` ON `D`.`device_id` = `munin_plugins`.`device_id` INNER JOIN `devices_perms` AS `P` ON `P`.`device_id` = `D`.`device_id` WHERE `P`.`user_id` = ? AND (`mplug_type` LIKE ? OR `mplug_title` LIKE ? OR `hostname` LIKE ?) ORDER BY hostname LIMIT ".$limit,
-                    [Auth::id(), "%$search%", "%$search%", "%$search%"]
-                );
-            }
+            $results = dbFetchRows(
+                "SELECT * FROM `munin_plugins` INNER JOIN `devices` AS `D` ON `D`.`device_id` = `munin_plugins`.`device_id` WHERE $perms_sql AND (`mplug_type` LIKE ? OR `mplug_title` LIKE ? OR `hostname` LIKE ?) ORDER BY hostname LIMIT ?",
+                array_merge($device_ids, ["%$search%", "%$search%", "%$search%", $limit])
+            );
+
 
             if (count($results)) {
                 $found   = 1;
@@ -299,17 +285,11 @@ if (isset($_REQUEST['search'])) {
             die($json);
         } elseif ($_REQUEST['type'] == 'iftype') {
             // Device search
-            if (Auth::user()->hasGlobalRead()) {
-                $results = dbFetchRows(
-                    "SELECT `ports`.ifType FROM `ports` WHERE `ifType` LIKE ? GROUP BY ifType ORDER BY ifType LIMIT ".$limit,
-                    ["%$search%"]
-                );
-            } else {
-                $results = dbFetchRows(
-                    "SELECT `I`.ifType FROM `ports` AS `I`, `devices` AS `D`, `devices_perms` AS `P`, `ports_perms` AS `PP` WHERE ((`P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id`) OR (`PP`.`user_id` = ? AND `PP`.`port_id` = `I`.`port_id` AND `I`.`device_id` = `D`.`device_id`)) AND `D`.`device_id` = `I`.`device_id` AND (`ifType` LIKE ?) GROUP BY ifType ORDER BY ifType LIMIT ".$limit,
-                    [Auth::id(), Auth::id(), "%$search%"]
-                );
-            }
+            $results = dbFetchRows(
+                "SELECT `ports`.ifType FROM `ports` WHERE $perms_sql AND `ifType` LIKE ? GROUP BY ifType ORDER BY ifType LIMIT ?",
+                array_merge($device_ids, ["%$search%", $limit])
+            );
+
             if (count($results)) {
                 $found   = 1;
                 $devices = count($results);
@@ -327,13 +307,13 @@ if (isset($_REQUEST['search'])) {
             // Device search
             if (Auth::user()->hasGlobalRead()) {
                 $results = dbFetchRows(
-                    "SELECT `bills`.bill_id, `bills`.bill_name FROM `bills` WHERE `bill_name` LIKE ? OR `bill_notes` LIKE ? LIMIT ".$limit,
-                    ["%$search%", "%$search%"]
+                    "SELECT `bills`.bill_id, `bills`.bill_name FROM `bills` WHERE `bill_name` LIKE ? OR `bill_notes` LIKE ? LIMIT ?",
+                    ["%$search%", "%$search%", $limit]
                 );
             } else {
                 $results = dbFetchRows(
-                    "SELECT `bills`.bill_id, `bills`.bill_name FROM `bills` INNER JOIN `bill_perms` ON `bills`.bill_id = `bill_perms`.bill_id WHERE `bill_perms`.user_id = ? AND (`bill_name` LIKE ? OR `bill_notes` LIKE ?) LIMIT ".$limit,
-                    [Auth::id(), "%$search%", "%$search%"]
+                    "SELECT `bills`.bill_id, `bills`.bill_name FROM `bills` INNER JOIN `bill_perms` ON `bills`.bill_id = `bill_perms`.bill_id WHERE `bill_perms`.user_id = ? AND (`bill_name` LIKE ? OR `bill_notes` LIKE ?) LIMIT ?",
+                    [Auth::id(), "%$search%", "%$search%", $limit]
                 );
             }
             $json = json_encode($results);

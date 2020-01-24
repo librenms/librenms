@@ -680,7 +680,7 @@ function devclass($device)
         $class = 'list-device';
     }
 
-    if (isset($device['ignore']) && $device['ignore'] == '1') {
+    if (isset($device['disable_notify']) && $device['disable_notify'] == '1') {
         $class = 'list-device-ignored';
         if (isset($device['status']) && $device['status'] == '1') {
             $class = 'list-device-ignored-up';

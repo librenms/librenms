@@ -2,7 +2,7 @@
 
 if (in_array($device['os'], array("linux", "endian", "proxmox", "recoveryos"))) {
     list(,,$version) = explode(" ", $device['sysDescr']);
-    if (preg_match('[3-6]86', $device['sysDescr'])) {
+    if (preg_match('/[3-6]86/', $device['sysDescr'])) {
         $hardware = "Generic x86";
     } elseif (strstr($device['sysDescr'], "x86_64")) {
         $hardware = "Generic x86 64-bit";

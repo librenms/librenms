@@ -277,8 +277,19 @@ function rrdtool_escape($string, $length = null)
 {
     $result = shorten_interface_type($string);
     $result = str_replace("'", '', $result);            # remove quotes
+
     if (is_numeric($length)) {
-        $extra = substr_count($string, ':', 0, $length);
+        # preserve original $length for str_pad()
+
+        # determine correct strlen() for substr_count()
+        $string_length=strlen($string);
+        $substr_count_length=$length;
+
+        if ($length > $string_length) {
+            $substr_count_length=$string_length; # If $length is greater than the haystack length, then substr_count() will produce a warning; fix warnings.
+        }
+
+        $extra = substr_count($string, ':', 0, $substr_count_length);
         $result = substr(str_pad($result, $length), 0, ($length + $extra));
         if ($extra > 0) {
             $result = substr($result, 0, (-1 * $extra));
@@ -286,6 +297,7 @@ function rrdtool_escape($string, $length = null)
     }
 
     $result = str_replace(':', '\:', $result);          # escape colons
+
     return $result.' ';
 } // rrdtool_escape
 
