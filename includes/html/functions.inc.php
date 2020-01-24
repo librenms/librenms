@@ -1117,7 +1117,7 @@ function search_oxidized_config($search_in_conf_textbox)
     
     $nodes = json_decode(file_get_contents($oxidized_search_url, false, $context), true);
     // Look up Oxidized node names to LibreNMS devices for a link
-    foreach($nodes as &$n) {
+    foreach ($nodes as &$n) {
         $dev = device_by_name($n['node']);
         $n['dev_id'] = $dev ? $dev['device_id'] : false;
     }
