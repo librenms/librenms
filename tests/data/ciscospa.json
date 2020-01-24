@@ -8,13 +8,13 @@
                     "sysDescr": "Linux SPA112 2.6.26.5 #1 PREEMPT Wed Aug 2 14:04:45 CST 2017 armv5tejl",
                     "sysContact": null,
                     "version": null,
-                    "hardware": "",
+                    "hardware": null,
                     "features": null,
-                    "location": null,
                     "os": "ciscospa",
                     "type": "appliance",
                     "serial": null,
-                    "icon": "cisco.svg"
+                    "icon": "cisco.svg",
+                    "location": null
                 }
             ]
         },
@@ -28,11 +28,11 @@
                     "version": "0.00.51",
                     "hardware": "SPA112",
                     "features": null,
-                    "location": "<private>",
                     "os": "ciscospa",
                     "type": "appliance",
                     "serial": null,
-                    "icon": "cisco.svg"
+                    "icon": "cisco.svg",
+                    "location": "<private>"
                 }
             ]
         }
