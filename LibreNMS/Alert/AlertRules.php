@@ -112,7 +112,7 @@ class AlertRules
                         if (is_null($current_state)) {
                             dbInsert(array('state' => 1, 'device_id' => $device_id, 'rule_id' => $rule['id'], 'open' => 1,'alerted' => 0), 'alerts');
                         } else {
-                            dbUpdate(['state' => 1, 'open' => 1], 'alerts', 'device_id = ? && rule_id = ?', [$device_id, $rule['id']]);
+                            dbUpdate(['state' => 1, 'open' => 1, 'timestamp' => array('NOW()')], 'alerts', 'device_id = ? && rule_id = ?', [$device_id, $rule['id']]);
                         }
                         c_echo(PHP_EOL . 'Status: %rALERT');
                     }
@@ -125,7 +125,7 @@ class AlertRules
                         if (is_null($current_state)) {
                             dbInsert(['state' => 0, 'device_id' => $device_id, 'rule_id' => $rule['id'], 'open' => 1, 'alerted' => 0], 'alerts');
                         } else {
-                            dbUpdate(['state' => 0, 'open' => 1, 'note' => ''], 'alerts', 'device_id = ? && rule_id = ?', [$device_id, $rule['id']]);
+                            dbUpdate(['state' => 0, 'open' => 1, 'note' => '', 'timestamp' => array('NOW()')], 'alerts', 'device_id = ? && rule_id = ?', [$device_id, $rule['id']]);
                         }
 
                         c_echo(PHP_EOL . 'Status: %gOK');

@@ -1,6 +1,13 @@
 mib: IB-PLATFORMONE-MIB
 modules:
     sensors:
+        pre-cache:
+            data:
+                - 
+                    oid: 
+                        - ibServiceName
+                    snmp_flags: ['-OQUsb']
+
         state:
             data:
                 -
@@ -19,3 +26,15 @@ modules:
                     states:
                         - { value: 1, generic: 0, graph: 1, descr: Active }
                         - { value: 2, generic: 0, graph: 1, descr: Passive }
+                -
+                    oid: ibServiceStatus
+                    num_oid: '.1.3.6.1.4.1.7779.3.1.1.2.1.9.1.2.{{ $index }}'
+                    index: 'ibServiceStatus.{{ $index }}'
+                    descr: '{{ $ibServiceName }} Status'
+                    snmp_flags: ['-OQUsbe', '-Pu']
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: Working }
+                        - { value: 2, generic: 1, graph: 0, descr: Warning }
+                        - { value: 3, generic: 2, graph: 0, descr: Failed }
+                        - { value: 4, generic: 2, graph: 0, descr: Inactive }
+                        - { value: 5, generic: 3, graph: 0, descr: Unknown }

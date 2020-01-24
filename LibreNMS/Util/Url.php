@@ -382,9 +382,18 @@ class Url
 
         if ($os) {
             if ($os == "linux") {
+                // first, prefer the first word of $feature
                 $distro = Str::before(strtolower(trim($feature)), ' ');
                 $possibilities[] = "$distro.svg";
                 $possibilities[] = "$distro.png";
+
+                // second, prefer the first two words of $feature (i.e. 'Red Hat' becomes 'redhat')
+                if (strpos($feature, ' ') !== false) {
+                    $distro = Str::replaceFirst(' ', null, strtolower(trim($feature)));
+                    $distro = Str::before($distro, ' ');
+                    $possibilities[] = "$distro.svg";
+                    $possibilities[] = "$distro.png";
+                }
             }
             $os_icon = Config::getOsSetting($os, 'icon', $os);
             $possibilities[] = "$os_icon.svg";

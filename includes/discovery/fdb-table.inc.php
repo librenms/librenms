@@ -57,6 +57,14 @@ if (!empty($insert)) {
                 }
                 unset($existing_fdbs[$vlan_id][$mac_address_entry]);
             } else {
+                if (is_null($entry['port_id'])) {
+                    // fix SQLSTATE[23000]: Integrity constraint violation: 1048 Column 'port_id' cannot be null
+                    // If $entry['port_id'] truly is null then  Illuminate throws a fatal errory and all subsequent processing stops.
+                    // Cisco ISO (and others) may have null ids. We still want them inserted as new
+                    // strings work with DB::table->insert().
+                    $entry['port_id']='';
+                }
+
                 DB::table('ports_fdb')->insert([
                     'port_id' => $entry['port_id'],
                     'mac_address' => $mac_address_entry,
