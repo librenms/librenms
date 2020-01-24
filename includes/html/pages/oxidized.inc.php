@@ -81,11 +81,16 @@ $pagetitle[] = 'Oxidized';
             success: function (data) {
                 $('#search-output').empty();
                 $("#search-output").show();
-                if (data.output)
-                    $('#search-output').append('Config appears on the following device(s):<br />');
+                if (data.output) {
+                    $('#search-output').append('<p>Config appears on the following device(s):</p>');
                     $.each(data.output, function (row, value) {
-                        $('#search-output').append(value['full_name'] + '<br />');
-                });
+                        if (value['dev_id']) {
+                            $('#search-output').append('<p><a href="device/device=' + value['dev_id'] + '/tab=showconfig/">' + value['full_name'] + '</p>');
+                        } else {
+                            $('#search-output').append('<p>' + value['full_name'] + '</p>');
+                        }
+                        });
+                }
             },
             error: function () {
                 toastr.error('Error');
