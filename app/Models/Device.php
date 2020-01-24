@@ -401,8 +401,11 @@ class Device extends BaseModel
         });
 
         if ($attrib_index !== false) {
+            $deleted=(bool)$this->attribs->get($attrib_index)->delete();
+            // only forget the attrib_index after delete, otherwise delete() will fail fatally with:
+            // Symfony\\Component\\Debug\Exception\\FatalThrowableError(code: 0):  Call to a member function delete() on null
             $this->attribs->forget($attrib_index);
-            return (bool)$this->attribs->get($attrib_index)->delete();
+            return $deleted;
         }
 
         return false;
@@ -715,6 +718,11 @@ class Device extends BaseModel
     {
         // FIXME does not include global read
         return $this->belongsToMany('App\Models\User', 'devices_perms', 'device_id', 'user_id');
+    }
+
+    public function vminfo()
+    {
+        return $this->hasMany('App\Models\Vminfo', 'device_id');
     }
 
     public function vrfLites()

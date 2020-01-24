@@ -88,8 +88,18 @@ class DefaultWidgetSeeder extends Seeder
                 "base_dimensions" => "6,3",
             ],
             [
+                "widget_title" => "Alert History Stats",
+                "widget" => "alertlog-stats",
+                "base_dimensions" => "6,3",
+            ],
+            [
                 "widget_title" => "Server Stats",
                 "widget" => "server-stats",
+                "base_dimensions" => "6,3",
+            ],
+            [
+                "widget_title" => "Alert History",
+                "widget" => "alertlog",
                 "base_dimensions" => "6,3",
             ]
         ];
