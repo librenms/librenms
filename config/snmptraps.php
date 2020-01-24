@@ -47,6 +47,8 @@ return [
         'JUNIPER-LDP-MIB::jnxLdpLspUp' => \LibreNMS\Snmptrap\Handlers\JnxLdpLspUp::class,
         'JUNIPER-LDP-MIB::jnxLdpSesDown' => \LibreNMS\Snmptrap\Handlers\JnxLdpSesDown::class,
         'JUNIPER-LDP-MIB::jnxLdpSesUp' => \LibreNMS\Snmptrap\Handlers\JnxLdpSesUp::class,
+        'JUNIPER-MIB::jnxPowerSupplyFailure' => \LibreNMS\Snmptrap\Handlers\JnxPowerSupplyFailure::class,
+        'JUNIPER-MIB::jnxPowerSupplyOk' => \LibreNMS\Snmptrap\Handlers\JnxPowerSupplyOk::class,
         'JUNIPER-VPN-MIB::jnxVpnIfDown' => \LibreNMS\Snmptrap\Handlers\JnxVpnIfDown::class,
         'JUNIPER-VPN-MIB::jnxVpnIfUp' => \LibreNMS\Snmptrap\Handlers\JnxVpnIfUp::class,
         'JUNIPER-VPN-MIB::jnxVpnPwDown' => \LibreNMS\Snmptrap\Handlers\JnxVpnPwDown::class,
