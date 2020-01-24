@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
-                    "location": null,
                     "os": "smartax",
                     "type": "network",
                     "serial": null,
-                    "icon": "huawei.svg"
+                    "icon": "huawei.svg",
+                    "location": null
                 }
             ]
         },
@@ -28,11 +28,11 @@
                     "version": "MA5600V800R015C00B058",
                     "hardware": "SmartAX MA5600T",
                     "features": null,
-                    "location": "<private>",
                     "os": "smartax",
                     "type": "network",
                     "serial": "020ANHT0F1028887",
-                    "icon": "huawei.svg"
+                    "icon": "huawei.svg",
+                    "location": "<private>"
                 }
             ]
         }
