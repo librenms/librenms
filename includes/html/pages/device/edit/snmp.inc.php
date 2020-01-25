@@ -3,9 +3,7 @@
 use LibreNMS\Config;
 
 if ($_POST['editing']) {
-
     if (Auth::user()->hasGlobalAdmin()) {
-
         $poller_group = isset($_POST['poller_group']) ? clean($_POST['poller_group']) : 0;
         $snmp_enabled = ($_POST['snmp'] == 'on');
 
@@ -51,9 +49,7 @@ if ($_POST['editing']) {
                 $update['retries'] = array('NULL');
             }
             $update = array_merge($update, $v3);
-
         } else {
-
             // snmp is disabled
             $update['snmp_disable'] = 1;
             $update['os']           = $_POST['os'] ? clean($_POST['os_id']) : "ping";
@@ -63,89 +59,88 @@ if ($_POST['editing']) {
             $update['icon']         = null;
             $update['sysName']      = $_POST['sysName'] ? clean($_POST['sysName']) : null;
             $update['poller_group'] = $poller_group;
-
         }
 
+        $rows_updated=0;
+        $device_is_snmpable = false;
         $device_snmp_details = deviceArray($device['hostname'], $community, $snmpver, $port, $transport, $v3, $port_assoc_mode);
-        if ($force_save === true || !$snmp_enabled || isSNMPable($device_snmp_details)) {
 
+        if ($force_save !== true) {
+            $device_issnmpable= isSNMPable($device_snmp_details);
+        }
+
+        if ($force_save === true || !$snmp_enabled || $device_issnmpable) {
+            // update devices table
             $rows_updated = dbUpdate($update, 'devices', '`device_id` = ?', array($device['device_id']));
+        }
 
-            if ($snmp_enabled) {
+        if ($snmp_enabled && ($force_save === true || $device_issnmpable)) {
+            // update devices_attribs table
 
-                // set_dev_attrib and del_dev_attrib *only* return (bool)
-                // setAttrib() returns true if it was set and false if it was not (e.g. it didn't change)
-                // forgetAttrib() returns true if it was deleted and false if it was not (e.g. it didn't exist)
-                // Symfony throws FatalThrowableError on error
+            // note:
+            // set_dev_attrib and del_dev_attrib *only* return (bool)
+            // setAttrib() returns true if it was set and false if it was not (e.g. it didn't change)
+            // forgetAttrib() returns true if it was deleted and false if it was not (e.g. it didn't exist)
+            // Symfony throws FatalThrowableError on error
 
-                // max_repeaters
+            $devices_attribs=array('snmp_max_repeaters', 'snmp_max_oid');
 
-                $max_repeaters_get = get_dev_attrib($device, 'snmp_max_repeaters');
-                $max_repeaters_set = false; // testing $max_repeaters_set === false is not a true indicator of a failure
+            foreach ($devices_attribs as $devices_attrib) {
+                // defaults
+                $feedback_prefix=$devices_attrib;
+                $form_value=null;
+                $form_value_is_numeric=false; // does not need to be a number greater than zero
 
-                if ($max_repeaters != $max_repeaters_get) {
+                if ($devices_attrib == 'snmp_max_repeaters') {
+                    $feedback_prefix="SNMP Max Repeaters";
+                    $form_value=$max_repeaters;
+                    $form_value_is_numeric=true;
+                }
 
-                    if (is_numeric($max_repeaters) && $max_repeaters != 0) {
-                        $max_repeaters_set=set_dev_attrib($device, 'snmp_max_repeaters', $max_repeaters);
+                if ($devices_attrib == 'snmp_max_oid') {
+                    $feedback_prefix="SNMP Max OID";
+                    $form_value=$max_oid;
+                    $form_value_is_numeric=true;
+                }
+
+                $get_devices_attrib = get_dev_attrib($device, $devices_attrib);
+                $set_devices_attrib = false; // testing $set_devices_attrib === false is not a true indicator of a failure
+
+                if ($form_value != $get_devices_attrib) {
+                    if ($form_value_is_numeric && is_numeric($form_value) && $form_value != 0) {
+                        $set_devices_attrib=set_dev_attrib($device, $devices_attrib, $form_value);
                     }
 
-                    if (!is_numeric($max_repeaters)) {
-                        $max_repeaters_set=del_dev_attrib($device, 'snmp_max_repeaters');
+                    if (!$form_value_is_numeric) {
+                        $set_devices_attrib=set_dev_attrib($device, $devices_attrib, $form_value);
                     }
 
-                    if ($max_repeaters_set) {
-                        $max_repeaters_set = get_dev_attrib($device, 'snmp_max_repeaters'); // re-check the db value
+                    if ($form_value_is_numeric && !is_numeric($form_value)) {
+                        $set_devices_attrib=del_dev_attrib($device, $devices_attrib);
                     }
 
-                    if ($max_repeaters == $max_repeaters_set) {
-                        if (is_null($max_repeaters_set) || $max_repeaters_set == '') {
-                            $update_message[] = "SNMP max repeaters deleted.";
-                        }
-
-                        if (!is_null($max_repeaters_set) && $max_repeaters_set != '') {
-                            $update_message[] = "SNMP max repeaters updated to $max_repeaters_set.";
-                        }
+                    if (!$form_value_is_numeric && $form_value == '') {
+                        $set_devices_attrib=del_dev_attrib($device, $devices_attrib);
                     }
 
-                    if ($max_repeaters != $max_repeaters_set) {
-                        $update_failed_message[] = "SNMP max repeaters update failed.";
+                    if ($set_devices_attrib) {
+                        $set_devices_attrib = get_dev_attrib($device, $devices_attrib); // re-check the db value
+                    }
+
+                    if ($form_value == $set_devices_attrib && (is_null($set_devices_attrib) || $set_devices_attrib == '')) {
+                        $update_message[] = "$feedback_prefix deleted.";
+                    }
+
+                    if ($form_value == $set_devices_attrib && (!is_null($set_devices_attrib) && $set_devices_attrib != '')) {
+                        $update_message[] = "$feedback_prefix updated to $set_devices_attrib.";
+                    }
+
+                    if ($form_value != $set_devices_attrib) {
+                        $update_failed_message[] = "$feedback_prefix update failed.";
                     }
                 }
 
-                // max_oid
-
-                $max_oid_get = get_dev_attrib($device, 'snmp_max_oid');
-                $max_oid_set = false; // testing $max_oid_set === false is not a true indicator of a failure
-
-                if ($max_oid != $max_oid_get) {
-
-                    if (is_numeric($max_oid) && $max_oid != 0) {
-                        $max_oid_set=set_dev_attrib($device, 'snmp_max_oid', $max_oid);
-                    }
-
-                    if (!is_numeric($max_oid)) {
-                        $max_oid_set=del_dev_attrib($device, 'snmp_max_oid');
-                    }
-
-                    if ($max_oid_set) {
-                        $max_oid_set = get_dev_attrib($device, 'snmp_max_oid'); // re-check the db value
-                    }
-
-                    if ($max_oid == $max_oid_set) {
-                        if (is_null($max_oid_set) || $max_oid_set == '') {
-                            $update_message[] = "SNMP max oid deleted.";
-                        }
-
-                        if (!is_null($max_oid_set) && $max_oid_set != '') {
-                            $update_message[] = "SNMP max oid updated to $max_oid_set.";
-                        }
-                    }
-
-                    if ($max_oid != $max_oid_set) {
-                        $update_failed_message[] = "SNMP max oid update failed.";
-                    }
-                }
-
+                unset($get_devices_attrib, $set_devices_attrib);
             }
 
             if ($rows_updated > 0) {
@@ -155,29 +150,18 @@ if ($_POST['editing']) {
             if ($rows_updated == 0 && !isset($update_message) && !isset($update_failed_message)) {
                 $update_message[] = 'Nothing changed.';
             }
-
-        } else {
-            $update_failed_message[] = 'Could not connect to device with SNMP details';
         }
 
+        if ($snmp_enabled && ($force_save !== true && !$device_issnmpable)) {
+            $update_failed_message[] = 'Could not connect to the device with that SNMP configuration.  To save anyway, turn on Force Save.';
+        }
     }//end if (Auth::user()->hasGlobalAdmin())
 }//end if ($_POST['editing'])
 
 $device = dbFetchRow('SELECT * FROM `devices` WHERE `device_id` = ?', array($device['device_id']));
 $descr  = $device['purpose'];
 
-if (isset($update_message)) {
-    if (is_array($update_message)) {
-        foreach ($update_message as $message) {
-            print_message($message);
-        }
-    }
-
-    if (is_string($update_message)) {
-        print_message(join("<br />", $update_message));
-    }
-}
-
+// only print error messages at the top of the page, because they stand out
 if (isset($update_failed_message)) {
     if (is_array($update_failed_message)) {
         foreach ($update_failed_message as $error) {
@@ -186,7 +170,7 @@ if (isset($update_failed_message)) {
     }
 
     if (is_string($update_failed_message)) {
-        print_error(join("<br />", $update_failed_message));
+        print_error($update_failed_message);
     }
 }
 
@@ -393,17 +377,37 @@ if (Config::get('distributed_poller') === true) {
     </div>
 </div>
 
-<?php
-echo '
-    <div class="row">
-        <div class="col-md-1 col-md-offset-2">
-            <button type="submit" name="Submit"  class="btn btn-success"><i class="fa fa-check"></i> Save</button>
-        </div>
+<div class="row">
+    <div class="col-md-1 col-md-offset-2">
+        <button type="submit" name="Submit"  class="btn btn-success"><i class="fa fa-check"></i> Save</button>
     </div>
-    </form>
-    ';
+</div>
+</form>
 
+<?php
+// print normal messages at the bottom of the page, so they are where our eyes (and mouse pointer) are focused
+$updates=false;
+if (isset($update_message)) {
+    $updates=true;
+}
+
+if ($updates) {
+    echo '<br \>';
+};
+
+if (isset($update_message)) {
+    if (is_array($update_message)) {
+        foreach ($update_message as $message) {
+            print_message($message);
+        }
+    }
+
+    if (is_string($update_message)) {
+        print_message($update_message);
+    }
+}
 ?>
+
 <script>
 $('[name="force_save"]').bootstrapSwitch();
 
