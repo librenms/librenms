@@ -4,11 +4,11 @@ use LibreNMS\Config;
 
 if ($_POST['editing']) {
     if (Auth::user()->hasGlobalAdmin()) {
+        $force_save    = ($_POST['force_save'] == 'on');
         $poller_group = isset($_POST['poller_group']) ? clean($_POST['poller_group']) : 0;
         $snmp_enabled = ($_POST['snmp'] == 'on');
 
         if ($snmp_enabled) {
-            $force_save    = ($_POST['force_save'] == 'on');
             $community    = clean($_POST['community']);
             $snmpver      = clean($_POST['snmpver']);
             $transport    = $_POST['transport'] ? clean($_POST['transport']) : $transport = 'udp';
@@ -65,7 +65,7 @@ if ($_POST['editing']) {
         $device_is_snmpable = false;
         $device_snmp_details = deviceArray($device['hostname'], $community, $snmpver, $port, $transport, $v3, $port_assoc_mode);
 
-        if ($force_save !== true) {
+        if ($force_save !== true && $snmp_enabled) {
             $device_issnmpable= isSNMPable($device_snmp_details);
         }
 
