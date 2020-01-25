@@ -309,7 +309,7 @@ echo "        </select>
     <div class='form-group'>
         <label for='max_repeaters' class='col-sm-2 control-label'>Max Repeaters</label>
         <div class='col-sm-1'>
-            <input id='max_repeaters' name='max_repeaters' class='form-control input-sm' value='".$max_repeaters."' placeholder='max rep' />
+            <input id='max_repeaters' name='max_repeaters' class='form-control input-sm' value='".$max_repeaters."' placeholder='max repeaters' />
         </div>
     </div>
     <div class='form-group'>
