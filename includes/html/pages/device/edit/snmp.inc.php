@@ -106,38 +106,36 @@ if ($_POST['editing']) {
                 $get_devices_attrib = get_dev_attrib($device, $devices_attrib);
                 $set_devices_attrib = false; // testing $set_devices_attrib === false is not a true indicator of a failure
 
-                if ($form_value != $get_devices_attrib) {
-                    if ($form_value_is_numeric && is_numeric($form_value) && $form_value != 0) {
-                        $set_devices_attrib=set_dev_attrib($device, $devices_attrib, $form_value);
-                    }
+                if ($form_value != $get_devices_attrib && $form_value_is_numeric && is_numeric($form_value) && $form_value != 0) {
+                    $set_devices_attrib=set_dev_attrib($device, $devices_attrib, $form_value);
+                }
 
-                    if (!$form_value_is_numeric) {
-                        $set_devices_attrib=set_dev_attrib($device, $devices_attrib, $form_value);
-                    }
+                if ($form_value != $get_devices_attrib && !$form_value_is_numeric) {
+                    $set_devices_attrib=set_dev_attrib($device, $devices_attrib, $form_value);
+                }
 
-                    if ($form_value_is_numeric && !is_numeric($form_value)) {
-                        $set_devices_attrib=del_dev_attrib($device, $devices_attrib);
-                    }
+                if ($form_value != $get_devices_attrib && $form_value_is_numeric && !is_numeric($form_value)) {
+                    $set_devices_attrib=del_dev_attrib($device, $devices_attrib);
+                }
 
-                    if (!$form_value_is_numeric && $form_value == '') {
-                        $set_devices_attrib=del_dev_attrib($device, $devices_attrib);
-                    }
+                if ($form_value != $get_devices_attrib && !$form_value_is_numeric && $form_value == '') {
+                    $set_devices_attrib=del_dev_attrib($device, $devices_attrib);
+                }
 
-                    if ($set_devices_attrib) {
-                        $set_devices_attrib = get_dev_attrib($device, $devices_attrib); // re-check the db value
-                    }
+                if ($form_value != $get_devices_attrib && $set_devices_attrib) {
+                    $set_devices_attrib = get_dev_attrib($device, $devices_attrib); // re-check the db value
+                }
 
-                    if ($form_value == $set_devices_attrib && (is_null($set_devices_attrib) || $set_devices_attrib == '')) {
-                        $update_message[] = "$feedback_prefix deleted.";
-                    }
+                if ($form_value != $get_devices_attrib && $form_value == $set_devices_attrib && (is_null($set_devices_attrib) || $set_devices_attrib == '')) {
+                    $update_message[] = "$feedback_prefix deleted.";
+                }
 
-                    if ($form_value == $set_devices_attrib && (!is_null($set_devices_attrib) && $set_devices_attrib != '')) {
-                        $update_message[] = "$feedback_prefix updated to $set_devices_attrib.";
-                    }
+                if ($form_value != $get_devices_attrib && $form_value == $set_devices_attrib && (!is_null($set_devices_attrib) && $set_devices_attrib != '')) {
+                    $update_message[] = "$feedback_prefix updated to $set_devices_attrib.";
+                }
 
-                    if ($form_value != $set_devices_attrib) {
-                        $update_failed_message[] = "$feedback_prefix update failed.";
-                    }
+                if ($form_value != $get_devices_attrib && $form_value != $set_devices_attrib) {
+                    $update_failed_message[] = "$feedback_prefix update failed.";
                 }
 
                 unset($get_devices_attrib, $set_devices_attrib);
