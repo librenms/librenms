@@ -63,9 +63,9 @@ if ($_POST['editing']) {
 
         $rows_updated=0;
         $device_is_snmpable = false;
-        $device_snmp_details = deviceArray($device['hostname'], $community, $snmpver, $port, $transport, $v3, $port_assoc_mode);
 
         if ($force_save !== true && $snmp_enabled) {
+            $device_snmp_details = deviceArray($device['hostname'], $community, $snmpver, $port, $transport, $v3, $port_assoc_mode);
             $device_issnmpable= isSNMPable($device_snmp_details);
         }
 
