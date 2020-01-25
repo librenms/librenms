@@ -57,7 +57,6 @@ if ($_POST['editing']) {
 
                 $update = array_merge($update, $v3);
             }
-
         } else {
             // snmp is disabled
             $update['features'] = null;
@@ -164,16 +163,15 @@ if ($_POST['editing']) {
         if ($rows_updated == 0 && !isset($update_message) && !isset($update_failed_message)) {
             $update_message[] = 'SNMP settings did not change';
         }
-
     }//end if (Auth::user()->hasGlobalAdmin())
 }//end if ($_POST['editing'])
 
 // the following unsets are for security; the database is authoritative
 // i.e. prevent unintentional artifacts from being saved or used (again), posting around the form, etc.
-unset ($_POST);
+unset($_POST);
 // these are only used for editing and should not be used as-is
-unset ($force_save, $poller_group, $snmp_enabled);
-unset ($community, $max_repeaters, $max_oid, $port, $port_assoc_mode, $retries, $snmpver, $transport, $timeout);
+unset($force_save, $poller_group, $snmp_enabled);
+unset($community, $max_repeaters, $max_oid, $port, $port_assoc_mode, $retries, $snmpver, $transport, $timeout);
 
 // get up-to-date database values for use on the form
 $device = dbFetchRow('SELECT * FROM `devices` WHERE `device_id` = ?', array($device['device_id']));
