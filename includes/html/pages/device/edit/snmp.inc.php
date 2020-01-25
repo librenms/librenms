@@ -4,38 +4,39 @@ use LibreNMS\Config;
 
 if ($_POST['editing']) {
     if (Auth::user()->hasGlobalAdmin()) {
-        $force_save    = ($_POST['force_save'] == 'on');
+        $force_save = ($_POST['force_save'] == 'on');
         $poller_group = isset($_POST['poller_group']) ? clean($_POST['poller_group']) : 0;
         $snmp_enabled = ($_POST['snmp'] == 'on');
 
         if ($snmp_enabled) {
-            $community    = clean($_POST['community']);
-            $snmpver      = clean($_POST['snmpver']);
-            $transport    = $_POST['transport'] ? clean($_POST['transport']) : $transport = 'udp';
-            $port = $_POST['port'] ? clean($_POST['port']) : Config::get('snmp.port');
-            $timeout      = clean($_POST['timeout']);
-            $retries      = clean($_POST['retries']);
-            $port_assoc_mode = clean($_POST['port_assoc_mode']);
             $max_repeaters = clean($_POST['max_repeaters']);
-            $max_oid      = clean($_POST['max_oid']);
-            $v3           = array(
-                'authlevel'  => clean($_POST['authlevel']),
-                'authname'   => clean($_POST['authname']),
-                'authpass'   => clean($_POST['authpass']),
-                'authalgo'   => clean($_POST['authalgo']),
-                'cryptopass' => clean($_POST['cryptopass']),
-                'cryptoalgo' => clean($_POST['cryptoalgo']),
-            );
+            $max_oid = clean($_POST['max_oid']);
+            $port = $_POST['port'] ? clean($_POST['port']) : Config::get('snmp.port');
+            $port_assoc_mode = clean($_POST['port_assoc_mode']);
+            $retries = clean($_POST['retries']);
+            $snmpver = clean($_POST['snmpver']);
+            $transport = $_POST['transport'] ? clean($_POST['transport']) : $transport = 'udp';
+            $timeout = clean($_POST['timeout']);
 
             $update = array(
-                'community'    => $community,
-                'snmpver'      => $snmpver,
-                'port'         => $port,
-                'transport'    => $transport,
                 'poller_group' => $poller_group,
+                'port' => $port,
                 'port_association_mode' => $port_assoc_mode,
                 'snmp_disable' => 0,
+                'snmpver' => $snmpver,
+                'transport' => $transport,
             );
+
+            if ($retries) {
+                $update['retries'] = $retries;
+            } else {
+                $update['retries'] = array('NULL');
+            }
+
+            if ($snmpver != "v3") {
+                $community = clean($_POST['community']);
+                $update['community' ] = $community;
+            }
 
             if ($timeout) {
                 $update['timeout'] = $timeout;
@@ -43,26 +44,34 @@ if ($_POST['editing']) {
                 $update['timeout'] = array('NULL');
             }
 
-            if ($retries) {
-                $update['retries'] = $retries;
-            } else {
-                $update['retries'] = array('NULL');
+            $v3 = array();
+            if ($snmpver == "v3") {
+                $community = ''; // if v3 works, we don't need a community
+
+                $v3['authalgo'] = clean($_POST['authalgo']);
+                $v3['authlevel'] = clean($_POST['authlevel']);
+                $v3['authname'] = clean($_POST['authname']);
+                $v3['authpass'] = clean($_POST['authpass']);
+                $v3['cryptoalgo'] = clean($_POST['cryptoalgo']);
+                $v3['cryptopass'] = clean($_POST['cryptopass']);
+
+                $update = array_merge($update, $v3);
             }
-            $update = array_merge($update, $v3);
+
         } else {
             // snmp is disabled
-            $update['snmp_disable'] = 1;
-            $update['os']           = $_POST['os'] ? clean($_POST['os_id']) : "ping";
-            $update['hardware']     = clean($_POST['hardware']);
-            $update['features']     = null;
-            $update['version']      = null;
-            $update['icon']         = null;
-            $update['sysName']      = $_POST['sysName'] ? clean($_POST['sysName']) : null;
+            $update['features'] = null;
+            $update['hardware'] = clean($_POST['hardware']);
+            $update['icon'] = null;
+            $update['os'] = $_POST['os'] ? clean($_POST['os_id']) : "ping";
             $update['poller_group'] = $poller_group;
+            $update['snmp_disable'] = 1;
+            $update['sysName'] = $_POST['sysName'] ? clean($_POST['sysName']) : null;
+            $update['version'] = null;
         }
 
-        $rows_updated=0;
         $device_is_snmpable = false;
+        $rows_updated=0;
 
         if ($force_save !== true && $snmp_enabled) {
             $device_snmp_details = deviceArray($device['hostname'], $community, $snmpver, $port, $transport, $v3, $port_assoc_mode);
@@ -127,11 +136,11 @@ if ($_POST['editing']) {
                 }
 
                 if ($form_value != $get_devices_attrib && $form_value == $set_devices_attrib && (is_null($set_devices_attrib) || $set_devices_attrib == '')) {
-                    $update_message[] = "$feedback_prefix deleted.";
+                    $update_message[] = "$feedback_prefix deleted";
                 }
 
                 if ($form_value != $get_devices_attrib && $form_value == $set_devices_attrib && (!is_null($set_devices_attrib) && $set_devices_attrib != '')) {
-                    $update_message[] = "$feedback_prefix updated to $set_devices_attrib.";
+                    $update_message[] = "$feedback_prefix updated to $set_devices_attrib";
                 }
 
                 if ($form_value != $get_devices_attrib && $form_value != $set_devices_attrib) {
@@ -140,40 +149,75 @@ if ($_POST['editing']) {
 
                 unset($get_devices_attrib, $set_devices_attrib);
             }
+            unset($devices_attrib);
+        }
 
-            if ($rows_updated > 0) {
-                $update_message[] = $rows_updated.' Device record updated.';
-            }
-
-            if ($rows_updated == 0 && !isset($update_message) && !isset($update_failed_message)) {
-                $update_message[] = 'Nothing changed.';
-            }
+        if ($rows_updated > 0) {
+            $update_message[] = 'Device record updated';
         }
 
         if ($snmp_enabled && ($force_save !== true && !$device_issnmpable)) {
-            $update_failed_message[] = 'Could not connect to the device with that SNMP configuration.  To save anyway, turn on Force Save.';
+            $update_failed_message[] = "Could not connect to " . $device['hostname'] . " with those SNMP settings.  To save anyway, turn on Force Save.";
+            $update_message[] = 'SNMP settings reverted';
         }
+
+        if ($rows_updated == 0 && !isset($update_message) && !isset($update_failed_message)) {
+            $update_message[] = 'SNMP settings did not change';
+        }
+
     }//end if (Auth::user()->hasGlobalAdmin())
 }//end if ($_POST['editing'])
 
-$device = dbFetchRow('SELECT * FROM `devices` WHERE `device_id` = ?', array($device['device_id']));
-$descr  = $device['purpose'];
+// the following unsets are for security; the database is authoritative
+// i.e. prevent unintentional artifacts from being saved or used (again), posting around the form, etc.
+unset ($_POST);
+// these are only used for editing and should not be used as-is
+unset ($force_save, $poller_group, $snmp_enabled);
+unset ($community, $max_repeaters, $max_oid, $port, $port_assoc_mode, $retries, $snmpver, $transport, $timeout);
 
-// only print error messages at the top of the page, because they stand out
+// get up-to-date database values for use on the form
+$device = dbFetchRow('SELECT * FROM `devices` WHERE `device_id` = ?', array($device['device_id']));
+$max_oid = get_dev_attrib($device, 'snmp_max_oid');
+$max_repeaters = get_dev_attrib($device, 'snmp_max_repeaters');
+
+echo "<h3> SNMP Settings </h3>";
+
+// use Toastr to print normal (success) messages, similar to Device Settings
+if (isset($update_message)) {
+    $toastr_options=array();
+
+    if (is_array($update_message)) {
+        foreach ($update_message as $message) {
+            Toastr::success($message, null, $toastr_options);
+        }
+    }
+
+    if (is_string($update_message)) {
+        Toastr::success($update_message, null, $toastr_options);
+    }
+
+    unset($message, $toastr_options, $update_message);
+}
+
+// use Toastr:error to call attention to the problem; don't let it time out
 if (isset($update_failed_message)) {
+    $toastr_options=array();
+    $toastr_options["closeButton"]=true;
+    $toastr_options["extendedTimeOut"]=0;
+    $toastr_options["timeOut"]=0;
+
     if (is_array($update_failed_message)) {
         foreach ($update_failed_message as $error) {
-            print_error($error);
+            Toastr::error($error, null, $toastr_options);
         }
     }
 
     if (is_string($update_failed_message)) {
-        print_error($update_failed_message);
+        Toastr::error($update_failed_message, null, $toastr_options);
     }
-}
 
-$max_repeaters = get_dev_attrib($device, 'snmp_max_repeaters');
-$max_oid = get_dev_attrib($device, 'snmp_max_oid');
+    unset($error, $update_failed_message);
+}
 
 echo "
     <form id='edit' name='edit' method='post' action='' role='form' class='form-horizontal'>
@@ -382,30 +426,6 @@ if (Config::get('distributed_poller') === true) {
 </div>
 </form>
 
-<?php
-// print normal messages at the bottom of the page, so they are where our eyes (and mouse pointer) are focused
-$updates=false;
-if (isset($update_message)) {
-    $updates=true;
-}
-
-if ($updates) {
-    echo '<br \>';
-};
-
-if (isset($update_message)) {
-    if (is_array($update_message)) {
-        foreach ($update_message as $message) {
-            print_message($message);
-        }
-    }
-
-    if (is_string($update_message)) {
-        print_message($update_message);
-    }
-}
-?>
-
 <script>
 $('[name="force_save"]').bootstrapSwitch();
 
@@ -474,10 +494,12 @@ $("#os").on("typeahead:selected typeahead:autocompleted", function(e,datum) {
 $("[name='snmp']").bootstrapSwitch('offColor','danger');
 
 <?php
-if ($snmpver == 'v3' || $device['snmpver'] == 'v3') {
-    echo "$('#snmpv1_2').toggle();";
+if ($device['snmpver'] == 'v3') {
+    echo "$('#snmpv1_2').hide();";
+    echo "$('#snmpv3').show();";
 } else {
-    echo "$('#snmpv3').toggle();";
+    echo "$('#snmpv1_2').show();";
+    echo "$('#snmpv3').hide();";
 }
 
 ?>
