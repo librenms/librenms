@@ -227,7 +227,7 @@ if (defined('SHOW_SETTINGS')) {
                 if ($directpage == "yes") {
                     $deviceIcon = getIconTag($device);
                     $temp_output[] = '
-                    <a href="' .generate_device_url($device). '" title="' . $device_system_name . " - " . formatUptime($device['uptime']) . '">
+                    <a href="' .generate_device_url($device). '" title="' . $device_system_name . ($device['uptime'] ? " - " : "") . formatUptime($device['uptime']) . '">
                     <div class="device-availability ' . $deviceState . '" style="width:' . Config::get('webui.availability_map_box_size') . 'px;">
                         <span class="availability-label label ' . $deviceLabel . ' label-font-border">' . $deviceState . '</span>
                         <span class="device-icon">' . $deviceIcon . '</span><br>
