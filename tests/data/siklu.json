@@ -1135,7 +1135,7 @@
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 46.0,
+                    "sensor_current": 46,
                     "sensor_limit": 52.9,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 39.1,
@@ -1151,59 +1151,7 @@
             ],
             "state_indexes": []
         },
-        "poller": {
-            "sensors": [
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "temperature",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.31926.1.2.0",
-                    "sensor_index": ".1.3.6.1.4.1.31926.1.2.0",
-                    "sensor_type": "siklu",
-                    "sensor_descr": "System Temp",
-                    "group": null,
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 25,
-                    "sensor_limit": 45,
-                    "sensor_limit_warn": null,
-                    "sensor_limit_low": 15,
-                    "sensor_limit_low_warn": null,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "state_name": null
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "voltage",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.31926.1.1.0",
-                    "sensor_index": "rbSysVoltage.0",
-                    "sensor_type": "siklu",
-                    "sensor_descr": "System voltage",
-                    "group": null,
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 46.0,
-                    "sensor_limit": 52.9,
-                    "sensor_limit_warn": null,
-                    "sensor_limit_low": 39.1,
-                    "sensor_limit_low_warn": null,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "state_name": null
-                }
-            ],
-            "state_indexes": []
-        }
+        "poller": "matches discovery"
     },
     "wireless": {
         "discovery": {
