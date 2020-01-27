@@ -1114,7 +1114,14 @@ function search_oxidized_config($search_in_conf_textbox)
         )
     );
     $context = stream_context_create($opts);
-    return json_decode(file_get_contents($oxidized_search_url, false, $context), true);
+    
+    $nodes = json_decode(file_get_contents($oxidized_search_url, false, $context), true);
+    // Look up Oxidized node names to LibreNMS devices for a link
+    foreach ($nodes as &$n) {
+        $dev = device_by_name($n['node']);
+        $n['dev_id'] = $dev ? $dev['device_id'] : false;
+    }
+    return $nodes;
 }
 
 /**
@@ -1186,50 +1193,16 @@ function get_oxidized_nodes_list()
             //user cannot see this device, so let's skip it.
             continue;
         }
-        $fa_color = $object['status'] == 'success' ? 'success' : 'danger';
-        echo "
-        <tr>
-        <td>
-        " . generate_device_link($device);
-        if ($device['device_id'] == 0) {
-            echo "(device '" . $object['name'] . "' not in LibreNMS)";
-        }
-        echo "
-        </td>
-        <td>
-        " . $device['sysName'] . "
-        </td>
-        <td>
-        <i class='fa fa-square text-" . $fa_color . "'></i>
-        </td>
-        <td>
-        " . $object['time'] . "
-        </td>
-        <td>
-        " . $object['model'] . "
-        </td>
-        <td>
-        " . $object['group'] . "
-        </td>
-        <td>
-        ";
-        if (! $device['device_id'] == 0) {
-            echo "
-          <button class='btn btn-default btn-sm' name='btn-refresh-node-devId" . $device['device_id'] . "' id='btn-refresh-node-devId" . $device['device_id'] . "' onclick='refresh_oxidized_node(\"" . $device['hostname'] . "\")'>
-            <i class='fa fa-refresh'></i>
-          </button>
-          <a href='" . generate_url(array('page' => 'device', 'device' => $device['device_id'], 'tab' => 'showconfig')) . "'>
-            <i class='fa fa-align-justify fa-lg icon-theme'></i>
-          </a>
-            ";
-        } else {
-            echo "
-          <button class='btn btn-default btn-sm' disabled name='btn-refresh-node-devId" . $device['device_id'] . "' id='btn-refresh-node-devId" . $device['device_id'] . "'>
-            <i class='fa fa-refresh'></i>
-          </button>";
-        }
-        echo "
-        </td>
+        
+        echo "<tr>
+        <td>" . $device['device_id'] . "</td>
+        <td>" . $object['name'] . "</td>
+        <td>" . $device['sysName'] . "</td>
+        <td>" . $object['status'] . "</td>
+        <td>" . $object['time'] . "</td>
+        <td>" . $object['model'] . "</td>
+        <td>" . $object['group'] . "</td>
+        <td></td>
         </tr>";
     }
 }
