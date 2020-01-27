@@ -186,6 +186,10 @@ if ($format == "graph") {
     if (!empty($vars['location'])) {
         $location_filter = $vars['location'];
     }
+    if (isset($vars['poller_group'])) {
+        $where .= " AND `poller_group`= ?";
+        $sql_param[] = $vars['poller_group'];
+    }
     if (!empty($vars['group'])) {
         $where .= " AND ( ";
         foreach (DB::table('device_group_device')->where('device_group_id', $vars['group'])->pluck('device_id') as $dev) {
@@ -350,6 +354,7 @@ if ($format == "graph") {
                     ignore: '<?php echo mres($vars['ignore']); ?>',
                     disable_notify: '<?php echo mres($vars['disable_notify']); ?>',
                     group: '<?php echo mres($vars['group']); ?>',
+                    poller_group: '<?php echo mres($vars['poller_group']); ?>',
                 };
             },
             url: "<?php echo url('/ajax/table/device') ?>"
