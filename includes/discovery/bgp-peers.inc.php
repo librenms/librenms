@@ -71,9 +71,11 @@ if (Config::get('enable_bgp')) {
                         discover_new_device($name, $device, 'BGP');
                     }
                     echo '+';
+                    $vrp_bgp_peer_count ++;
                 } else {
                     dbUpdate(['bgpPeerRemoteAs' => $value['hwBgpPeerRemoteAs'], 'astext' => $astext], 'bgpPeers', 'device_id = ? AND bgpPeerIdentifier = ? AND vrf_id = ?', [$device['device_id'], $address, $vrfId]);
                     echo '.';
+                    $vrp_bgp_peer_count ++;
                 }
                 if (dbFetchCell('SELECT COUNT(*) from `bgpPeers_cbgp` WHERE device_id = ? AND bgpPeerIdentifier = ? AND afi=? AND safi=?', array($device['device_id'], $value['hwBgpPeerRemoteAddr'], $value['afi'], $value['safi'])) < 1) {
                     $device['context_name'] = $vrfName;
@@ -124,8 +126,10 @@ if (Config::get('enable_bgp')) {
 
         unset($bgpPeersCache);
         unset($bgpPeers);
-
-        return; //Finish BGP discovery here
+        if ($vrp_bgp_peer_count > 0) {
+            return; //Finish BGP discovery here, cause we collected data
+        }
+        // If not, we continue with standard BGP4 MIB
     }
 
     if ($device['os'] == 'timos') {
@@ -264,6 +268,12 @@ if (Config::get('enable_bgp')) {
                 if (!empty($af_data)) {
                     $af_list = build_cbgp_peers($device, $peer, $af_data, $peer2);
                 }
+                #if ($device['os'] == 'vrp') {
+                #    d_echo("VRP:");
+                #    $af_data = snmpwalk_cache_oid($device, 'hwBgpPeers', $af_data, 'HUAWEI-BGP-VPN-MIB');
+                #    $af_list = build_cbgp_peers($device, $peer, $af_data, $peer2);
+                #}
+
                 if (!$bgp4_mib && $device['os'] == 'junos') {
                     $afis['ipv4'] = 'ipv4';
                     $afis['ipv6'] = 'ipv6';
