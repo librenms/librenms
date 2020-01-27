@@ -22,7 +22,7 @@ if (Config::get('enable_bgp')) {
             $address = str_replace($oid[0].".".$oid[1].".".$oid[2].".".$oid[3].".", '', $key);
             if ($oid[3] == 'ipv6') {
                 $address = IP::fromHexString($address)->compressed();
-            } elseif  ($oid[3] != 'ipv4') {
+            } elseif ($oid[3] != 'ipv4') {
                 // we have a malformed OID reply, let's skip it
                 continue;
             }
@@ -61,7 +61,7 @@ if (Config::get('enable_bgp')) {
                         'bgpPeerInUpdateElapsedTime' => 0,
                         'astext' => $astext,
                     ];
-                    if (empty ($vrfId)) {
+                    if (empty($vrfId)) {
                         unset($peers['vrf_id']);
                     }
                     dbInsert($peers, 'bgpPeers');
@@ -91,7 +91,7 @@ if (Config::get('enable_bgp')) {
         foreach ($peers as $value) {
             $vrfId = $value['vrf_id'];
             $checkVrf = ' AND vrf_id = ? ';
-            if(empty ($vrfId)) {
+            if (empty($vrfId)) {
                 $checkVrf = ' AND `vrf_id` IS NULL ';
             }
             $vrfName = $map_vrf['byId'][$vrfId]['vrf_name'];
@@ -268,11 +268,6 @@ if (Config::get('enable_bgp')) {
                 if (!empty($af_data)) {
                     $af_list = build_cbgp_peers($device, $peer, $af_data, $peer2);
                 }
-                #if ($device['os'] == 'vrp') {
-                #    d_echo("VRP:");
-                #    $af_data = snmpwalk_cache_oid($device, 'hwBgpPeers', $af_data, 'HUAWEI-BGP-VPN-MIB');
-                #    $af_list = build_cbgp_peers($device, $peer, $af_data, $peer2);
-                #}
 
                 if (!$bgp4_mib && $device['os'] == 'junos') {
                     $afis['ipv4'] = 'ipv4';
