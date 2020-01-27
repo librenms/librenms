@@ -52,6 +52,7 @@ class DeviceController extends TableController
             'ignore' => 'nullable|in:0,1',
             'disable_notify' => 'nullable|in:0,1',
             'group' => 'nullable|int',
+            'poller_group' => 'nullable|int',
         ];
     }
 
@@ -86,6 +87,10 @@ class DeviceController extends TableController
             $query->whereHas('groups', function ($query) use ($group) {
                 $query->where('id', $group);
             });
+        }
+
+        if ($request->get('poller_group') !== null) {
+            $query->where('poller_group', $request->get('poller_group'));
         }
 
         return $query;

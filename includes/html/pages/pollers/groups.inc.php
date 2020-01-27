@@ -25,20 +25,32 @@ require_once 'includes/html/modal/poller_groups.inc.php';
         <tr>
             <th>ID</th>
             <th>Group Name</th>
+            <th>Devices</th>
             <th>Description</th>
             <th>Action</th>
         </tr>
-
 <?php
-$query = 'SELECT * FROM `poller_groups`';
 
-foreach (dbFetchRows($query) as $group) {
+$default_group = ['id' => 0,
+                  'group_name' =>'(default poller group)',
+                  'descr' => 'Devices which are not assigned to a poller group will be handled by this poller'];
+
+$group_list = dbFetchRows('SELECT * FROM `poller_groups`');
+array_unshift($group_list, $default_group);
+
+foreach ($group_list as $group) {
+    $group_device_count = dbFetchCell('SELECT COUNT(*) FROM devices WHERE `poller_group`=?', $group['id']);
     echo '
         <tr id="'.$group['id'].'">
             <td>'.$group['id'].'</td>
             <td>'.$group['group_name'].'</td>
-            <td>'.$group['descr'].'</td>
-            <td><button type="button" class="btn btn-success btn-xs" id="'.$group['id'].'" data-group_id="'.$group['id'].'" data-toggle="modal" data-target="#poller-groups">Edit</button> <button type="button" class="btn btn-danger btn-xs" id="'.$group['id'].'" data-group_id="'.$group['id'].'" data-toggle="modal" data-target="#confirm-delete">Delete</button></td>
+            <td><a href="/devices/poller_group='.$group['id'].'")">'.$group_device_count.'</a></td>
+            <td>'.$group['descr'].'</td>';
+    echo '<td>';
+    if ($group['id']) {
+        echo '<button type="button" class="btn btn-success btn-xs" id="'.$group['id'].'" data-group_id="'.$group['id'].'" data-toggle="modal" data-target="#poller-groups">Edit</button> <button type="button" class="btn btn-danger btn-xs" id="'.$group['id'].'" data-group_id="'.$group['id'].'" data-toggle="modal" data-target="#confirm-delete">Delete</button>';
+    }
+    echo '</td>
         </tr>
 ';
 }
