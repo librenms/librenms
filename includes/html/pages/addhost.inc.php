@@ -270,7 +270,7 @@ if (Config::get('distributed_poller') === true) {
                       <option value="0"> Default poller group</option>
     ';
 
-    foreach (dbFetchRows('SELECT `id`,`group_name` FROM `poller_groups`') as $group) {
+    foreach (dbFetchRows('SELECT `id`,`group_name` FROM `poller_groups` ORDER BY `group_name`') as $group) {
         echo '<option value="'.$group['id'].'">'.$group['group_name'].'</option>';
     }
 
