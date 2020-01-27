@@ -22,6 +22,9 @@ if (Config::get('enable_bgp')) {
             $address = str_replace($oid[0].".".$oid[1].".".$oid[2].".".$oid[3].".", '', $key);
             if ($oid[3] == 'ipv6') {
                 $address = IP::fromHexString($address)->compressed();
+            } elseif  ($oid[3] != 'ipv4') {
+                // we have a malformed OID reply, let's skip it
+                continue;
             }
 
             $bgpPeers[$vrfInstance][$address] = $value;
