@@ -30,8 +30,7 @@ $fields = array(
                 'last_error'     => intval(trim($last_error)),
                 'last_warning'   => intval(trim($last_warning)),
 );
-// DEBUG
-// dump($fields);
+
 $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);
 update_application($app, $backupninja, $fields);
