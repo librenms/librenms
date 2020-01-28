@@ -28,11 +28,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
-                    "location": null,
                     "os": "comware",
                     "type": "network",
                     "serial": null,
-                    "icon": "hpe.svg"
+                    "icon": "hpe.svg",
+                    "location": null
                 }
             ]
         },
@@ -46,11 +46,11 @@
                     "version": "7.1.045",
                     "hardware": "5900AF-48G-4XG-2QSFP+ Switch\r",
                     "features": "2422P01",
-                    "location": "<private>",
                     "os": "comware",
                     "type": "network",
                     "serial": null,
-                    "icon": "hpe.svg"
+                    "icon": "hpe.svg",
+                    "location": "<private>"
                 }
             ]
         }

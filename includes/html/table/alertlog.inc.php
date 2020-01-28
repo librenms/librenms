@@ -13,6 +13,17 @@
  * @author     LibreNMS Contributors
 */
 
+$alert_severities = array(
+    // alert_rules.status is enum('ok','warning','critical')
+    'ok' => 1,
+    'warning' => 2,
+    'critical' => 3,
+    'ok only' => 4,
+    'warning only' => 5,
+    'critical only' => 6,
+);
+
+
 $where = 1;
 $param = [];
 

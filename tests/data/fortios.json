@@ -8,13 +8,13 @@
                     "sysDescr": null,
                     "sysContact": null,
                     "version": null,
-                    "hardware": "",
+                    "hardware": null,
                     "features": null,
-                    "location": null,
                     "os": "fortios",
                     "type": "appliance",
                     "serial": null,
-                    "icon": "fortinet.svg"
+                    "icon": "fortinet.svg",
+                    "location": null
                 }
             ]
         },
@@ -26,13 +26,13 @@
                     "sysDescr": null,
                     "sysContact": "<private>",
                     "version": "v5.6.0-build1557 170727 (GA)",
-                    "hardware": "",
+                    "hardware": null,
                     "features": "with Analyzer features",
-                    "location": "<private>",
                     "os": "fortios",
                     "type": "appliance",
                     "serial": "FMG-VM0000000000",
-                    "icon": "fortinet.svg"
+                    "icon": "fortinet.svg",
+                    "location": "<private>"
                 }
             ]
         }
@@ -139,6 +139,68 @@
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
                     "mempool_perc_warn": 90
+                }
+            ]
+        }
+    },
+    "storage": {
+        "discovery": {
+            "storage": [
+                {
+                    "storage_mib": "hrstorage",
+                    "storage_index": "3",
+                    "storage_type": "hrStorageFixedDisk",
+                    "storage_descr": "Compact Flash Disk",
+                    "storage_size": 511647744,
+                    "storage_units": 4096,
+                    "storage_used": 108093440,
+                    "storage_free": 0,
+                    "storage_perc": 0,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                },
+                {
+                    "storage_mib": "hrstorage",
+                    "storage_index": "4",
+                    "storage_type": "hrStorageFixedDisk",
+                    "storage_descr": "Internal Hard Disk",
+                    "storage_size": 316928753664,
+                    "storage_units": 4096,
+                    "storage_used": 24925618176,
+                    "storage_free": 0,
+                    "storage_perc": 0,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                }
+            ]
+        },
+        "poller": {
+            "storage": [
+                {
+                    "storage_mib": "hrstorage",
+                    "storage_index": "3",
+                    "storage_type": "hrStorageFixedDisk",
+                    "storage_descr": "Compact Flash Disk",
+                    "storage_size": 511647744,
+                    "storage_units": 4096,
+                    "storage_used": 108093440,
+                    "storage_free": 403554304,
+                    "storage_perc": 21,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                },
+                {
+                    "storage_mib": "hrstorage",
+                    "storage_index": "4",
+                    "storage_type": "hrStorageFixedDisk",
+                    "storage_descr": "Internal Hard Disk",
+                    "storage_size": 316928753664,
+                    "storage_units": 4096,
+                    "storage_used": 24925618176,
+                    "storage_free": 292003135488,
+                    "storage_perc": 8,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
                 }
             ]
         }
