@@ -131,20 +131,20 @@ if ($device['os_group'] == 'cisco') {
                 if (is_array($t_oids[$index])) {
                     foreach ($t_oids[$index] as $t_index => $key) {
                         // Critical Limit
-                        if ($key['entSensorThresholdSeverity'] == 'major' && $key['entSensorThresholdRelation'] == 'greaterOrEqual') {
+                        if (($key['entSensorThresholdSeverity'] == 'major' || $key['entSensorThresholdSeverity'] == 'critical') && ($key['entSensorThresholdRelation'] == 'greaterOrEqual' || $key['entSensorThresholdRelation'] == 'greaterThan')) {
                             $limit = ($key['entSensorThresholdValue'] * $multiplier / $divisor);
                         }
 
-                        if ($key['entSensorThresholdSeverity'] == 'major' && $key['entSensorThresholdRelation'] == 'lessOrEqual') {
+                        if (($key['entSensorThresholdSeverity'] == 'major' || $key['entSensorThresholdSeverity'] == 'critical') && ($key['entSensorThresholdRelation'] == 'lessOrEqual' || $key['entSensorThresholdRelation'] == 'lessThan')) {
                             $limit_low = ($key['entSensorThresholdValue'] * $multiplier / $divisor);
                         }
 
                         // Warning Limit
-                        if ($key['entSensorThresholdSeverity'] == 'minor' && $key['entSensorThresholdRelation'] == 'greaterOrEqual') {
+                        if ($key['entSensorThresholdSeverity'] == 'minor' && ($key['entSensorThresholdRelation'] == 'greaterOrEqual' || $key['entSensorThresholdRelation'] == 'greaterThan')) {
                             $warn_limit = ($key['entSensorThresholdValue'] * $multiplier / $divisor);
                         }
 
-                        if ($key['entSensorThresholdSeverity'] == 'minor' && $key['entSensorThresholdRelation'] == 'lessOrEqual') {
+                        if ($key['entSensorThresholdSeverity'] == 'minor' && ($key['entSensorThresholdRelation'] == 'lessOrEqual' || $key['entSensorThresholdRelation'] == 'lessThan')) {
                             $warn_limit_low = ($key['entSensorThresholdValue'] * $multiplier / $divisor);
                         }
                     }//end foreach
