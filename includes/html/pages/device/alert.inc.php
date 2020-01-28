@@ -47,6 +47,8 @@ echo '<div style="width:99%;margin:0 auto;">';
 
 switch ($vars['section']) {
     case 'alerts':
+        include 'includes/html/modal/alert_notes.inc.php';
+        include 'includes/html/modal/alert_ack.inc.php';
         include 'includes/html/common/alerts.inc.php';
         echo implode('', $common_output);
         break;
