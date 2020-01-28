@@ -1,9 +1,0 @@
-os: wut-57613
-text: 'Web-Thermo-Hygrometer 57613'
-type: environment
-icon: wut
-over:
-    - { graph: device_temperature, text: Temperature }
-    - { graph: device_humidity, text: Humidity }
-discovery:
-    - sysObjectID:  .1.3.6.1.4.1.5040.1.2.16
