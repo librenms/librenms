@@ -4,7 +4,7 @@ require 'includes/html/graphs/common.inc.php';
 $i               = 0;
 $scale_min       = 0;
 $nototal         = 1;
-$unit_text       = 'Peers';
+$unit_text       = 'SIP Peers';
 $rrd_filename    = rrd_name($device['hostname'], array('app', 'asterisk', 'stats', $app['app_id']));
 
 $astsip_access_array = array(
