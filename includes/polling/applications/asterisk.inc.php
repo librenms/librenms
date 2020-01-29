@@ -70,4 +70,4 @@ update_application($app, $rawdata, $iax2_fields);
 
 unset($rrd_name, $rrd_def, $iax2_fields, $iax2_tags);
 
-unset($asterisk,$rawdata); // these are used for all rrds
+unset($asterisk, $rawdata); // these are used for all rrds
