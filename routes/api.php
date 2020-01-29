@@ -76,6 +76,11 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
         Route::get('oxidized/config/search/{searchstring}', 'LegacyApiController@search_oxidized')->name('search_oxidized');
         Route::get('oxidized/config/{device_name}', 'LegacyApiController@get_oxidized_config')->name('get_oxidized_config');
         Route::post('devicegroups', 'LegacyApiController@add_device_group')->name('add_device_group');
+        Route::post('locations', 'LegacyApiController@add_location')->name('add_location');
+        Route::patch('locations/{location_id_or_name}', 'LegacyApiController@edit_location')->name('edit_location');
+        Route::delete('locations/{location}', 'LegacyApiController@del_location')->name('del_location');
+        Route::delete('services/{id}', 'LegacyApiController@del_service_from_host')->name('del_service_from_host');
+        Route::patch('services/{id}', 'LegacyApiController@edit_service_for_host')->name('edit_service_for_host');
     });
 
     // restricted by access
