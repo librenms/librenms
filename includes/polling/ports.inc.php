@@ -415,6 +415,7 @@ $port_association_mode = Config::get('default_port_association_mode');
 if ($device['port_association_mode']) {
     $port_association_mode = get_port_assoc_mode_name($device['port_association_mode']);
 }
+
 $ports_found = [];
 // New interface detection
 foreach ($port_stats as $ifIndex => $port) {
