@@ -5,21 +5,20 @@ $i               = 0;
 $scale_min       = 0;
 $nototal         = 1;
 $unit_text       = 'Peers';
-$rrd_filename    = rrd_name($device['hostname'], array('app', 'asterisk', 'stats', $app['app_id']));
+$rrd_filename    = rrd_name($device['hostname'], array('app', 'asterisk', 'stats-iax2', $app['app_id']));
 
-$astsip_access_array = array(
-    'sippeers' => 'Total Peers',
-    'sipmononline' => 'Online (Monitored)',
-    'sipmonoffline'=> 'Offline (Monitored)',
-    'sipunmononline' => 'Online (Unmonitored)',
-    'sipunmonoffline' => 'Offline (Unmonitored)'
+$astiax2_access_array = array(
+    'iax2peers' => 'Total Peers',
+    'iax2online' => 'Online',
+    'iax2offline'=> 'Offline',
+    'iax2unmonitored' => 'Unmonitored'
 );
 
 $colours      = 'mixed';
 $rrd_list     = array();
 
 if (rrdtool_check_rrd_exists($rrd_filename)) {
-    foreach ($astsip_access_array as $ds => $descr) {
+    foreach ($astiax2_access_array as $ds => $descr) {
         $rrd_list[$i]['filename'] = $rrd_filename;
         $rrd_list[$i]['descr']    = $descr;
         $rrd_list[$i]['ds']       = $ds;

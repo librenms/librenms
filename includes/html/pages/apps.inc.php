@@ -306,6 +306,7 @@ $graphs['asterisk'] = array(
     'calls',
     'channels',
     'sip',
+    'iax2',
 );
 echo '<div class="panel panel-default">';
 echo '<div class="panel-heading">';
