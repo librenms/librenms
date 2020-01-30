@@ -1102,7 +1102,9 @@ Extend` heading top of page.
 
 A small shell script that checks your system package manager for any
 available updates. Supports apt-get/pacman/yum/zypper package
-managers.
+managers. In order to reduce load, responses from package manager
+are cached in /tmp and refreshed every 5 hours. This make significant
+difference on older systems
 
 For pacman users automatically refreshing the database, it is
 recommended you use an alternative database location
