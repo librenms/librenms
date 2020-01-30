@@ -2205,13 +2205,12 @@ function validate_column_list($columns, $tableName)
 
 function missing_fields($required_fields, $data)
 {
-    $missing = [];
     foreach ($required_fields as $required) {
         if (empty($data[$required])) {
-            return True;
+            return true;
         }
     }
-    return False;
+    return false;
 }
 
 function add_service_for_host(\Illuminate\Http\Request $request)
