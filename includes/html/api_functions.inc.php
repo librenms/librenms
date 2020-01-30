@@ -2203,47 +2203,45 @@ function validate_column_list($columns, $tableName)
     return true;
 }
 
+function missing_fields($required_fields, $data)
+{
+    $missing = [];
+    foreach ($required_fields as $required) {
+        if (empty($data[$required])) {
+            return True;
+        }
+    }
+    return False;
+}
+
 function add_service_for_host(\Illuminate\Http\Request $request)
 {
     $hostname = $request->route('hostname');
-    // use hostname as device_id if it's all digits
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-
     $data = json_decode($request->getContent(), true);
-    $required_fields = ['type', 'ip'];
-    $missing = missing_fields($required_fields, $data);
-    if (!empty($missing)) {
-        $size = sizeof($missing);
-        return api_error(400, sprintf("Field%s %s missing: %s.", (($size > 1) ? 's' : ''), (($size > 1) ? 'are' : 'is'), implode(', ', $missing)));
+    if (missing_fields(array('type', 'ip'), $data)) {
+        return api_error(400, 'Required fields missing (ip and type needed)');
     }
-    // Check if service type exists
     if (!in_array($data['type'], list_available_services())) {
         return api_error(400, "The service " . $data['type'] . " does not exist.\n Available service types: " . implode(', ', list_available_services()));
     }
-    // Get parameters
     $service_type = $data['type'];
     $service_ip   = $data['ip'];
     $service_desc = $data['desc'] ? $data['desc'] : '';
     $service_param = $data['param'] ? $data['param'] : '';
     $service_ignore = $data['ignore'] ? true : false; // Default false
-
-    // Set the service
     $service_id = add_service($device_id, $service_type, $service_desc, $service_ip, $service_param, (int)$service_ignore);
     if ($service_id != false) {
         return api_success_noresult(201, "Service $service_type has been added to device $hostname (#$service_id)");
     }
-
     return api_error(500, 'Failed to add the service');
 }
 
 function add_location(\Illuminate\Http\Request $request)
 {
     $data = json_decode($request->getContent(), true);
-    $required_fields = ['location','lat', 'lng'];
-    $missing = missing_fields($required_fields, $data);
-    if (!empty($missing)) {
-        $size = sizeof($missing);
-        return api_error(400, sprintf("Field%s %s missing: %s.", (($size > 1) ? 's' : ''), (($size > 1) ? 'are' : 'is'), implode(', ', $missing)));
+    if (missing_fields(array('location','lat', 'lng'), $data)) {
+        return api_error(400, 'Required fields missing (location, lat and lng needed)');
     }
     // Set the location
     $timestamp = date("Y-m-d H:m:s");
@@ -2253,16 +2251,6 @@ function add_location(\Illuminate\Http\Request $request)
         return api_success_noresult(201, "Location added with id #$location_id");
     }
     return api_error(500, 'Failed to add the location');
-}
-
-function missing_fields($required_fields, $data) {
-    $missing = [];
-    foreach ($required_fields as $required) {
-        if (empty($data[$required])) {
-            $missing[] = $required;
-        }
-    }
-    return $missing;
 }
 
 function edit_location(\Illuminate\Http\Request $request)
@@ -2331,7 +2319,6 @@ function edit_service_for_host(\Illuminate\Http\Request $request)
     }
     return api_error(500, "Failed to update the service with id $service_id");
 }
-
 
 /**
  * Display Librenms Instance Info
