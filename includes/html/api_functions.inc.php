@@ -2210,26 +2210,16 @@ function add_service_for_host(\Illuminate\Http\Request $request)
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
 
     $data = json_decode($request->getContent(), true);
-    $missing_fields = [];
-
-    // Check if some required fields are empty
-    if (empty($data['type'])) {
-        $missing_fields[] = 'type';
+    $required_fields = ['type', 'ip'];
+    $missing = missing_fields($required_fields, $data);
+    if (!empty($missing)) {
+        $size = sizeof($missing);
+        return api_error(400, sprintf("Field%s %s missing: %s.", (($size > 1) ? 's' : ''), (($size > 1) ? 'are' : 'is'), implode(', ', $missing)));
     }
-    if (empty($data['ip'])) {
-        $missing_fields[] = 'ip';
-    }
-
-    // Print error if required fields are missing
-    if (!empty($missing_fields)) {
-        return api_error(400, sprintf("Service field%s %s missing: %s.", ((sizeof($missing_fields)>1)?'s':''), ((sizeof($missing_fields)>1)?'are':'is'), implode(', ', $missing_fields)));
-    }
-
     // Check if service type exists
     if (!in_array($data['type'], list_available_services())) {
         return api_error(400, "The service " . $data['type'] . " does not exist.\n Available service types: " . implode(', ', list_available_services()));
     }
-
     // Get parameters
     $service_type = $data['type'];
     $service_ip   = $data['ip'];
@@ -2249,22 +2239,11 @@ function add_service_for_host(\Illuminate\Http\Request $request)
 function add_location(\Illuminate\Http\Request $request)
 {
     $data = json_decode($request->getContent(), true);
-    $missing_fields = [];
-
-    // Check if some required fields are empty
-    if (empty($data['lat'])) {
-        $missing_fields[] = 'lat';
-    }
-    if (empty($data['lng'])) {
-        $missing_fields[] = 'lng';
-    }
-    if (empty($data['location'])) {
-        $missing_fields[] = 'location';
-    }
-
-    //Print error if required fields are missing
-    if (!empty($missing_fields)) {
-        return api_error(400, sprintf("Location field%s %s missing: %s.", ((sizeof($missing_fields) > 1) ? 's' : ''), ((sizeof($missing_fields) > 1) ? 'are' : 'is'), implode(', ', $missing_fields)));
+    $required_fields = ['location','lat', 'lng'];
+    $missing = missing_fields($required_fields, $data);
+    if (!empty($missing)) {
+        $size = sizeof($missing);
+        return api_error(400, sprintf("Field%s %s missing: %s.", (($size > 1) ? 's' : ''), (($size > 1) ? 'are' : 'is'), implode(', ', $missing)));
     }
     // Set the location
     $timestamp = date("Y-m-d H:m:s");
@@ -2274,6 +2253,16 @@ function add_location(\Illuminate\Http\Request $request)
         return api_success_noresult(201, "Location added with id #$location_id");
     }
     return api_error(500, 'Failed to add the location');
+}
+
+function missing_fields($required_fields, $data) {
+    $missing = [];
+    foreach ($required_fields as $required) {
+        if (empty($data[$required])) {
+            $missing[] = $required;
+        }
+    }
+    return $missing;
 }
 
 function edit_location(\Illuminate\Http\Request $request)
