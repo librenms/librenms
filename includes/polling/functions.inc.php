@@ -244,15 +244,15 @@ function poll_device($device, $force_module = false)
     echo 'Device ID:   ' . $device['device_id'] . PHP_EOL;
     echo 'OS:          ' . $device['os'] . PHP_EOL;
 
-    if (!empty($device['overwrite_ip'])) {
-        $ip = $device['overwrite_ip'];
-    } else {
+    if (empty($device['overwrite_ip'])) {
         $ip = dnslookup($device);
+    } else {
+        $ip = $device['overwrite_ip'];
     }
 
     $db_ip = null;
     if (!empty($ip)) {
-        if (!empty($device['overwrite_ip'])) {
+        if (empty($device['overwrite_ip'])) {
             echo 'Resolved IP: '.$ip.PHP_EOL;
         } else {
             echo 'Assigned IP: '.$ip.PHP_EOL;
