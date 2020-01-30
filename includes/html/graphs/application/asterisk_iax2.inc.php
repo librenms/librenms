@@ -5,7 +5,7 @@ $i               = 0;
 $scale_min       = 0;
 $nototal         = 1;
 $unit_text       = 'IAX2 Peers';
-$rrd_filename    = rrd_name($device['hostname'], array('app', 'asterisk', 'stats-iax2', $app['app_id']));
+$rrd_filename    = rrd_name($device['hostname'], array('app', 'asterisk', 'iax2', $app['app_id']));
 
 $astiax2_access_array = array(
     'iax2peers' => 'Total Peers',
