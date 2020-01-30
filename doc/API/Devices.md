@@ -1018,6 +1018,7 @@ Route: `/api/v0/devices`
 Input (JSON):
 
 - hostname: device hostname
+- overwrite_ip: alternate polling IP. Will be use instead of hostname (optional)
 - port: SNMP port (defaults to port defined in config).
 - transport: SNMP protocol (defaults to transport defined in config).
 - version: SNMP version to use, v1, v2c or v3. Defaults to v2c.
