@@ -991,11 +991,16 @@ function alert_details($details)
         }
 
         if ($fallback === true) {
+            $fault_detail_data = [];
             foreach ($tmp_alerts as $k => $v) {
-                if (!empty($v) && $k != 'device_id' && (stristr($k, 'id') || stristr($k, 'desc') || stristr($k, 'msg')) && substr_count($k, '_') <= 1) {
-                    $fault_detail .= "$k => '$v', ";
+                if (in_array($k, ['device_id', 'sysObjectID', 'sysDescr', 'location_id'])) {
+                    continue;
+                }
+                if (!empty($v) && (stristr($k, 'id') || stristr($k, 'desc') || stristr($k, 'msg')) && substr_count($k, '_') <= 1) {
+                    $fault_detail_data[] = "$k => '$v'";
                 }
             }
+            $fault_detail .= count($fault_detail_data) ? implode('<br>&nbsp;&nbsp;&nbsp', $fault_detail_data) : '';
 
             $fault_detail = rtrim($fault_detail, ', ');
         }
