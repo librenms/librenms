@@ -85,7 +85,7 @@ class Api extends Transport
             $request_opts['body'] = $body;
             $res = $client->request('PUT', $host, $request_opts);
         } else { //Method POST
-            $request_opts['form_params'] = $query;
+            $request_opts['query'] = $query;
             $res = $client->request('POST', $host, $request_opts);
         }
 
