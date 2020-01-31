@@ -993,8 +993,14 @@ function alert_details($details)
         }
 
         if (in_array('app_id', array_keys($tmp_alerts))) {
-            $metric = str_replace("_", " ", $tmp_alerts['metric']);
-            $fault_detail .= $metric ." => ". $tmp_alerts['value'];
+            $fault_detail .= "<a href='" . generate_url(array('page' => 'device',
+                                                              'device' => $tmp_alerts['device_id'],
+                                                              'tab' => 'apps',
+                                                              'app' => $tmp_alerts['app_type'])) . "'>";
+            $fault_detail .= $tmp_alerts['metric'];
+            $fault_detail .= "</a>";
+
+            $fault_detail .= " => ". $tmp_alerts['value'];
             $fallback = false;
         }
 
