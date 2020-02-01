@@ -352,22 +352,15 @@ if (Config::get('enable_ports_poe')) {
 
     if ($device['os'] == 'ios' || $device['os'] == 'iosxe') {
         echo 'cpeExtPsePortEntry';
-        $port_stats_poe = snmpwalk_cache_oid($device, 'cpeExtPsePortEntry', array(), 'CISCO-POWER-ETHERNET-EXT-MIB');
-        $port_ent_to_if = snmpwalk_cache_oid($device, 'portIfIndex', array(), 'CISCO-STACK-MIB');
+        $port_stats_poe = snmpwalk_cache_oid($device, 'cpeExtPsePortEntry', [], 'CISCO-POWER-ETHERNET-EXT-MIB');
+        $port_ent_to_if = snmpwalk_cache_oid($device, 'portIfIndex', [], 'CISCO-STACK-MIB');
 
         if (!$port_ent_to_if) {
-            $ifTable_ifDescr = snmpwalk_cache_oid($device,
-                                                 'ifDescr',
-                                                 array(),
-                                                 'IF-MIB');
-            $port_ent_to_if = array();
+            $ifTable_ifDescr = snmpwalk_cache_oid($device, 'ifDescr', [], 'IF-MIB');
+            $port_ent_to_if = [];
             foreach ($ifTable_ifDescr as $if_index => $if_descr) {
-                if (preg_match('/^[[:alpha:]]+ethernet([0-9\/.]+)$/i',
-                               $if_descr['ifDescr'],
-                               $matches)) {
-                    $port_ent_to_if[str_replace('/', '.', $matches[1])] = array(
-                        'portIfIndex' => $if_index
-                    );
+                if (preg_match('/^[[:alpha:]]+ethernet([0-9\/.]+)$/i', $if_descr['ifDescr'], $matches)) {
+                    $port_ent_to_if[str_replace('/', '.', $matches[1])] = ['portIfIndex' => $if_index];
                 }
             }
         }
