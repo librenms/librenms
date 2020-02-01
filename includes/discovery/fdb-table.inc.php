@@ -41,7 +41,9 @@ if (!empty($insert)) {
                 $new_port = $entry['port_id'];
                 $port_fdb_id = $existing_fdbs[$vlan_id][$mac_address_entry]['ports_fdb_id'];
 
-                if ($existing_fdbs[$vlan_id][$mac_address_entry]['port_id'] != $new_port) {
+                // Sometimes new_port ends up as 0 if we didn't get a complete dot1dBasePort
+                // dictionary from BRIDGE-MIB - don't write a 0 over a previously known port
+                if ($existing_fdbs[$vlan_id][$mac_address_entry]['port_id'] != $new_port && $new_port != 0) {
                     DB::table('ports_fdb')
                         ->where('ports_fdb_id', $port_fdb_id)
                         ->update([
@@ -55,6 +57,14 @@ if (!empty($insert)) {
                 }
                 unset($existing_fdbs[$vlan_id][$mac_address_entry]);
             } else {
+                if (is_null($entry['port_id'])) {
+                    // fix SQLSTATE[23000]: Integrity constraint violation: 1048 Column 'port_id' cannot be null
+                    // If $entry['port_id'] truly is null then  Illuminate throws a fatal errory and all subsequent processing stops.
+                    // Cisco ISO (and others) may have null ids. We still want them inserted as new
+                    // strings work with DB::table->insert().
+                    $entry['port_id']='';
+                }
+
                 DB::table('ports_fdb')->insert([
                     'port_id' => $entry['port_id'],
                     'mac_address' => $mac_address_entry,

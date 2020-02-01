@@ -2,7 +2,7 @@
 <div class="widget-availability-host">
     <span>@lang('Total hosts')</span>
     @if($show_disabled_and_ignored)
-        <a href="{{ url('devices/ignore=1') }}"><span class="label label-default label-font-border label-border">@lang('ignored'): {{ $device_totals['ignored'] }}</span></a>
+        <a href="{{ url('devices/disable_notify=1') }}"><span class="label label-default label-font-border label-border">@lang('alert-disabled'): {{ $device_totals['ignored'] }}</span></a>
         <a href="{{ url('devices/disabled=1') }}"><span class="label blackbg label-font-border label-border">@lang('disabled'): {{ $device_totals['disabled'] }}</span></a>
     @endif
     <a href="{{ url('devices/state=up') }}"><span class="label label-success label-font-border label-border">@lang('up'): {{ $device_totals['up'] }}</span></a>
@@ -23,7 +23,7 @@
 <br style="clear:both;">
 
 @foreach($devices as $device)
-    <a href="{{ \LibreNMS\Util\Url::deviceUrl($device) }}" title="{{ $device->displayName() }} - {{ $device->formatUptime(true) }}">
+    <a href="@deviceUrl($device)" title="{{ $device->displayName() }}@if($device->formatUptime(true)) - @endif{{ $device->formatUptime(true) }}">
         @if($type == 0)
             @if($color_only_select)
                 <span class="label {{ $device->labelClass }} widget-availability-fixed widget-availability label-font-border"> </span>
@@ -37,7 +37,7 @@
 @endforeach
 
 @foreach($services as $service)
-    <a href="{{ \LibreNMS\Util\Url::deviceUrl($service->device, ['tab' => 'services']) }}" title="{{ $service->device->displayName() }} - {{ $service->service_type }} - {{ $service->service_desc }}">
+    <a href="@deviceUrl($service->device, ['tab' => 'services'])" title="{{ $service->device->displayName() }} - {{ $service->service_type }} - {{ $service->service_desc }}">
         @if($type == 0)
             @if($color_only_select)
                 <span class="label {{ $service->labelClass }} widget-availability-fixed widget-availability label-font-border"> </span>

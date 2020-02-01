@@ -9,7 +9,7 @@
 | you a convenient way to create models for testing and seeding your
 | database. Just tell the factory how a default model should look.
 |
-*/
+ */
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
@@ -43,24 +43,24 @@ $factory->state(App\Models\User::class, 'read', function ($faker) {
 
 $factory->define(\App\Models\Bill::class, function (Faker\Generator $faker) {
     return [
-        'bill_name' => $faker->text
+        'bill_name' => $faker->text,
     ];
 });
 
 $factory->define(\App\Models\Device::class, function (Faker\Generator $faker) {
     return [
-        'hostname'      => $faker->domainWord.'.'.$faker->domainName,
-        'ip'            => $faker->randomElement([$faker->ipv4, $faker->ipv6]),
-        'status'        => $status = random_int(0, 1),
+        'hostname' => $faker->domainWord . '.' . $faker->domainName,
+        'ip' => $faker->randomElement([$faker->ipv4, $faker->ipv6]),
+        'status' => $status = random_int(0, 1),
         'status_reason' => $status == 0 ? $faker->randomElement(['snmp', 'icmp']) : '', // allow invalid states?
     ];
 });
 
 $factory->define(\App\Models\Port::class, function (Faker\Generator $faker) {
     return [
-        'ifIndex'      => $faker->unique()->numberBetween(),
-        'ifName'       => $faker->text(20),
-        'ifDescr'      => $faker->text(255),
+        'ifIndex' => $faker->unique()->numberBetween(),
+        'ifName' => $faker->text(20),
+        'ifDescr' => $faker->text(255),
         'ifLastChange' => $faker->unixTime(),
     ];
 });
@@ -101,7 +101,7 @@ $factory->define(\App\Models\Ipv4Address::class, function (Faker\Generator $fake
 
 $factory->define(\App\Models\Ipv4Network::class, function (Faker\Generator $faker) {
     return [
-        'ipv4_network'   => $faker->ipv4 . '/' . $faker->numberBetween(0, 32),
+        'ipv4_network' => $faker->ipv4 . '/' . $faker->numberBetween(0, 32),
     ];
 });
 
@@ -117,5 +117,17 @@ $factory->define(\App\Models\Syslog::class, function (Faker\Generator $faker) {
         'timestamp' => Carbon::now(),
         'program' => $faker->asciify(str_repeat('*', $faker->numberBetween(0, 32))),
         'msg' => $faker->text(),
+    ];
+});
+
+$factory->define(\App\Models\Vminfo::class, function (Faker\Generator $faker) {
+    return [
+        'vm_type' => $faker->text(16),
+        'vmwVmVMID' => $faker->randomDigit,
+        'vmwVmDisplayName' => $faker->domainWord . '.' . $faker->domainName,
+        'vmwVmGuestOS' => $faker->text(128),
+        'vmwVmMemSize' => $faker->randomDigit,
+        'vmwVmCpus' => $faker->randomDigit,
+        'vmwVmState' => $faker->randomElement(['powered on', 'powered off', 'suspended']),
     ];
 });

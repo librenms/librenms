@@ -34,6 +34,20 @@
                                 <li><a href="{{ url('availability-map') }}"><i class="fa fa-arrow-circle-up fa-fw fa-lg"
                                                                                aria-hidden="true"></i> @lang('Availability')
                                     </a></li>
+                                <li><a href="{{ url('maps/devicedependency') }}"><i class="fa fa-chain fa-fw fa-lg"
+                                                                  aria-hidden="true"></i> @lang('Device Dependency')</a></li>
+                                @if($device_groups->isNotEmpty())
+                                    <li class="dropdown-submenu"><a><i class="fa fa-chain fa-fw fa-lg"
+                                                                                aria-hidden="true"></i> @lang('Device Groups Dependencies')
+                                        </a>
+                                        <ul class="dropdown-menu scrollable-menu">
+                                        @foreach($device_groups as $group)
+                                            <li><a href="{{ url("maps/devicedependency?group=$group->id") }}" title="{{ $group->desc }}"><i class="fa fa-chain fa-fw fa-lg" aria-hidden="true"></i>
+                                                {{ ucfirst($group->name) }}
+                                            </a></li>
+                                        @endforeach
+                                    </ul></li>
+                                @endif
                                 <li><a href="{{ url('map') }}"><i class="fa fa-sitemap fa-fw fa-lg"
                                                                   aria-hidden="true"></i> @lang('Network')</a></li>
                                 @if($device_groups->isNotEmpty())
@@ -670,7 +684,7 @@
             valueKey: 'name',
             templates: {
                 header: '<h5><strong>&nbsp;BGP Sessions</strong></h5>',
-                suggestion: Handlebars.compile('<p><a href="@{{url}}"><small>@{{bgp_image}} @{{name}} - @{{hostname}}<br />AS@{{localas}} -> AS@{{remoteas}}</small></a></p>')
+                suggestion: Handlebars.compile('<p><a href="@{{url}}"><small><i class="@{{bgp_image}}" aria-hidden="true"></i> @{{name}} - @{{hostname}}<br />AS@{{localas}} -> AS@{{remoteas}}</small></a></p>')
             }
         }).on('typeahead:select', function (ev, suggestion) {
             window.location.href = suggestion.url;

@@ -21,5 +21,7 @@ discovery:
     -
       sysObjectID:
         - .1.3.6.1.4.1.8072.3.2.10
+        - .1.3.6.1.4.1.27282.3.2.10
       sysDescr_regex:
         - '/^Linux UBNT/'
+        - '/^RTL8380/'

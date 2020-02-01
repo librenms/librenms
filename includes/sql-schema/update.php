@@ -103,6 +103,7 @@ try {
     }
 
     if ($db_rev == 1000) {
+        Artisan::call('db:seed', ['--force' => true, '--ansi' => true, '--class' => DefaultWidgetSeeder::class]);
         $return = Artisan::call('migrate', $migrate_opts);
         echo Artisan::output();
     }

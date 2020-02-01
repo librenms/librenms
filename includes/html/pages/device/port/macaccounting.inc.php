@@ -20,7 +20,7 @@ if ($port['ifAdminStatus'] == 'down') {
     $status = "<span class='grey'>Disabled</span>";
 }
 
-if ($port['ifAdminStatus'] == 'up' && $port['ifOperStatus'] == 'down') {
+if ($port['ifAdminStatus'] == 'up' && $port['ifOperStatus'] != 'up') {
     $status = "<span class='red'>Enabled / Disconnected</span>";
 }
 

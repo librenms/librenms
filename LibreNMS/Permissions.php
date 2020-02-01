@@ -31,6 +31,7 @@ use App\Models\Port;
 use App\Models\User;
 use Auth;
 use DB;
+use LibreNMS\Config;
 
 class Permissions
 {
@@ -140,7 +141,7 @@ class Permissions
     }
 
     /**
-     * Get a list of port_id of all ports the user can access
+     * Get a list of port_id of all ports the user can access directly
      *
      * @param User|int $user
      * @return \Illuminate\Support\Collection
@@ -153,7 +154,7 @@ class Permissions
     }
 
     /**
-     * Get a list of bill_id of all bills the user can access
+     * Get a list of bill_id of all bills the user can access directly
      *
      * @param User|int $user
      * @return \Illuminate\Support\Collection
@@ -193,7 +194,9 @@ class Permissions
     public function getDevicePermissions()
     {
         if (is_null($this->devicePermissions)) {
-            $this->devicePermissions = DB::table('devices_perms')->get();
+            $this->devicePermissions = DB::table('devices_perms')
+                ->union($this->getDeviceGroupPermissionsQuery())
+                ->get();
         }
 
         return $this->devicePermissions;
@@ -261,5 +264,20 @@ class Permissions
     private function getBillId($bill)
     {
         return $bill instanceof Bill ? $bill->bill_id : (is_numeric($bill) ? (int)$bill : 0);
+    }
+
+    /**
+     * @return \Illuminate\Database\Query\Builder
+     */
+    public function getDeviceGroupPermissionsQuery()
+    {
+        return DB::table('devices_group_perms')
+        ->select('devices_group_perms.user_id', 'device_group_device.device_id')
+        ->join('device_group_device', 'device_group_device.device_group_id', '=', 'devices_group_perms.device_group_id')
+        ->when(!Config::get('permission.device_group.allow_dynamic'), function ($query) {
+            return $query
+                ->join('device_groups', 'device_groups.id', '=', 'devices_group_perms.device_group_id')
+                ->where('device_groups.type', 'static');
+        });
     }
 }

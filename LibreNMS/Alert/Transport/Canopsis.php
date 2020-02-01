@@ -79,7 +79,7 @@ class Canopsis extends Transport
         $conn->close();
         return true;
     }
-    
+
     public static function configTemplate()
     {
         return [

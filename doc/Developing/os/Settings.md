@@ -66,7 +66,8 @@ bad_iftype: # ifType (substring)
     - sonet
 good_if: # ignore all other bad_if settings ifDescr (substring, case insensitive)
     - virtual
-
+bad_ifoperstatus # IfOperStatus (substring, case insensitive)
+    - notPresent
 ```
 
 ### Controlling interface labels

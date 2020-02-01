@@ -165,7 +165,7 @@ if ($format == "graph") {
     if (!empty($vars['state'])) {
         $where .= " AND status= ?";
         $sql_param[] = $state;
-        $where .= " AND disabled='0' AND `ignore`='0'";
+        $where .= " AND disabled='0' AND `disable_notify`='0'";
         $sql_param[] = '';
     }
     if (!empty($vars['disabled'])) {
@@ -176,11 +176,19 @@ if ($format == "graph") {
         $where .= " AND `ignore`= ?";
         $sql_param[] = $vars['ignore'];
     }
+    if (!empty($vars['disable_notify'])) {
+        $where .= " AND `disable_notify`= ?";
+        $sql_param[] = $vars['disable_notify'];
+    }
     if (!empty($vars['location']) && $vars['location'] == "Unset") {
         $location_filter = '';
     }
     if (!empty($vars['location'])) {
         $location_filter = $vars['location'];
+    }
+    if (isset($vars['poller_group'])) {
+        $where .= " AND `poller_group`= ?";
+        $sql_param[] = $vars['poller_group'];
     }
     if (!empty($vars['group'])) {
         $where .= " AND ( ";
@@ -344,7 +352,9 @@ if ($format == "graph") {
                     state: '<?php echo mres($vars['state']); ?>',
                     disabled: '<?php echo mres($vars['disabled']); ?>',
                     ignore: '<?php echo mres($vars['ignore']); ?>',
+                    disable_notify: '<?php echo mres($vars['disable_notify']); ?>',
                     group: '<?php echo mres($vars['group']); ?>',
+                    poller_group: '<?php echo mres($vars['poller_group']); ?>',
                 };
             },
             url: "<?php echo url('/ajax/table/device') ?>"

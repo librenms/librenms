@@ -1,6 +1,6 @@
 os: ciscowlc
 text: 'Cisco WLC'
-type: network
+type: wireless
 ifname: true
 over:
     - { graph: device_bits, text: 'Device Traffic' }

@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
-                    "location": null,
                     "os": "apex-lynx",
                     "type": "wireless",
                     "serial": null,
-                    "icon": "trango.png"
+                    "icon": "trango.png",
+                    "location": null
                 }
             ]
         },
@@ -28,11 +28,11 @@
                     "version": "2p6r22b0D031716",
                     "hardware": "Trango Apex Lynx-2.0.2",
                     "features": null,
-                    "location": "<private>",
                     "os": "apex-lynx",
                     "type": "wireless",
                     "serial": null,
-                    "icon": "trango.png"
+                    "icon": "trango.png",
+                    "location": "<private>"
                 }
             ]
         }
@@ -54,7 +54,7 @@
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
                     "ifHighSpeed": null,
-                    "ifOperStatus": null,
+                    "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
                     "ifAdminStatus_prev": null,
@@ -159,7 +159,7 @@
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
                     "ifHighSpeed": null,
-                    "ifOperStatus": null,
+                    "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
                     "ifAdminStatus_prev": null,
@@ -264,7 +264,7 @@
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
                     "ifHighSpeed": null,
-                    "ifOperStatus": null,
+                    "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
                     "ifAdminStatus_prev": null,
@@ -374,7 +374,7 @@
                     "ifPromiscuousMode": "false",
                     "ifHighSpeed": 10,
                     "ifOperStatus": "up",
-                    "ifOperStatus_prev": null,
+                    "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
                     "ifAdminStatus_prev": null,
                     "ifDuplex": null,
@@ -479,7 +479,7 @@
                     "ifPromiscuousMode": "false",
                     "ifHighSpeed": 100,
                     "ifOperStatus": "up",
-                    "ifOperStatus_prev": null,
+                    "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
                     "ifAdminStatus_prev": null,
                     "ifDuplex": null,
@@ -584,7 +584,7 @@
                     "ifPromiscuousMode": "false",
                     "ifHighSpeed": 100,
                     "ifOperStatus": "up",
-                    "ifOperStatus_prev": null,
+                    "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
                     "ifAdminStatus_prev": null,
                     "ifDuplex": null,

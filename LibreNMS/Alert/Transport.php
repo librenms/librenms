@@ -3,6 +3,7 @@
 namespace LibreNMS\Alert;
 
 use LibreNMS\Interfaces\Alert\Transport as TransportInterface;
+use LibreNMS\Config;
 
 abstract class Transport implements TransportInterface
 {
@@ -36,5 +37,23 @@ abstract class Transport implements TransportInterface
             }
         }
         return $options;
+    }
+
+        /**
+     * Get the hex color string for a particular state
+     * @param integer $state State code from alert
+     * @return string Hex color, default to #337AB7 blue if state unrecognised
+     */
+    public static function getColorForState($state)
+    {
+        $colors = array(
+            0 => Config::get('alert_colour.ok'),
+            1 => Config::get('alert_colour.bad'),
+            2 => Config::get('alert_colour.acknowledged'),
+            3 => Config::get('alert_colour.worse'),
+            4 => Config::get('alert_colour.better'),
+        );
+
+        return isset($colors[$state]) ? $colors[$state] : '#337AB7';
     }
 }
