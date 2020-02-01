@@ -14,6 +14,8 @@ if (\LibreNMS\Config::get('enable_bgp')) {
             $peer_data_check = snmpwalk_cache_oid($device, 'aristaBgp4V2PeerRemoteAs', array(), 'ARISTA-BGP4V2-MIB');
         } elseif ($device['os'] === 'timos') {
             $peer_data_check = snmpwalk_cache_multi_oid($device, 'tBgpInstanceRowStatus', [], 'TIMETRA-BGP-MIB', 'nokia');
+        } elseif ($device['os_group'] === 'brocade') {
+            $peer_data_check = snmpwalk_cache_oid($device, 'bgp4V2PeerRemoteAs', array(), 'BGP4V2-MIB', 'brocade', '-ObQ');
         } else {
             $peer_data_check = snmpwalk_cache_oid($device, 'cbgpPeer2RemoteAs', array(), 'CISCO-BGP4-MIB');
         }
@@ -138,6 +140,25 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                                 'aristaBgp4V2PeerInUpdatesElapsedTime' => 'bgpPeerInUpdateElapsedTime',
                                 'aristaBgp4V2PeerLocalAddr' => 'bgpLocalAddr',
                             );
+                        } elseif ($device['os_group'] === 'brocade') {
+                            if ($ip_type == 2) {
+                                $ip_parts = str_split(str_replace(':', '', $peer['bgpLocalAddr']), 2);
+                                array_walk($ip_parts, function (&$aPart) {
+                                    if ($aPart == '00') {
+                                        $aPart = '0';
+                                    }
+                                    $aPart = (int)$aPart;
+                                });
+                                $peer['bgpLocalAddr'] = implode('.', $ip_parts);
+                            }
+                            $peer_identifier = "1.$ip_type.$ip_len.{$peer['bgpLocalAddr']}.$ip_type.$ip_len.$bgp_peer_ident";
+                            $mib = 'BGP4V2-MIB';
+                            $oid_map = array(
+                                'bgp4V2PeerState' => 'bgpPeerState',
+                                'bgp4V2PeerAdminStatus' => 'bgpPeerAdminStatus',
+                                'bgp4V2PeerFsmEstablishedTime' => 'bgpPeerFsmEstablishedTime',
+                                'bgp4V2PeerInUpdatesElapsedTime' => 'bgpPeerInUpdateElapsedTime',
+                            );
                         } else {
                             $peer_identifier = $ip_type . '.' . $ip_len . '.' . $bgp_peer_ident;
                             $mib = 'CISCO-BGP4-MIB';
@@ -261,7 +282,7 @@ if (\LibreNMS\Config::get('enable_bgp')) {
             }
 
             // --- Populate cbgp data ---
-            if ($device['os_group'] == 'vrp' || $device['os_group'] == 'cisco' || $device['os'] == 'junos' || $device['os_group'] === 'arista') {
+            if ($device['os_group'] == 'vrp' || $device['os_group'] == 'cisco' || $device['os'] == 'junos' || $device['os_group'] === 'arista' || $device['os_group'] === 'brocade') {
                 // Poll each AFI/SAFI for this peer (using CISCO-BGP4-MIB or BGP4-V2-JUNIPER MIB)
                 $peer_afis = dbFetchRows('SELECT * FROM bgpPeers_cbgp WHERE `device_id` = ? AND bgpPeerIdentifier = ?', array($device['device_id'], $peer['bgpPeerIdentifier']));
                 foreach ($peer_afis as $peer_afi) {
@@ -394,10 +415,19 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                     if ($device['os_group'] === 'vrp') {
                         $vrpPrefixes = snmpwalk_cache_multi_oid($device, 'hwBgpPeerPrefixRcvCounter', $vrpPrefixes, 'HUAWEI-BGP-VPN-MIB', null, '-OQUs');
                         $vrpPrefixes = snmpwalk_cache_multi_oid($device, 'hwBgpPeerPrefixAdvCounter', $vrpPrefixes, 'HUAWEI-BGP-VPN-MIB', null, '-OQUs');
-                        
+
                         $key = '0.'.$afi.'.'.$safi.'.ipv4.'.$peer['bgpPeerIdentifier'];
                         $cbgpPeerAcceptedPrefixes = $vrpPrefixes[$key]['hwBgpPeerPrefixRcvCounter'];
                         $cbgpPeerAdvertisedPrefixes  = $vrpPrefixes[$key]['hwBgpPeerPrefixAdvCounter'];
+                    }
+
+                    if ($device['os_group'] === 'brocade') {
+                        if (empty($b_prefixes)) {
+                            $b_prefixes = snmpwalk_cache_multi_oid($device, 'snBgp4NeighborSummaryTable', $b_prefixes, 'FOUNDRY-SN-BGP4-GROUP-MIB', null, '-OQUs');
+                        }
+
+                        $key = array_search($peer['bgpPeerIdentifier'], array_column($b_prefixes, 'snBgp4NeighborSummaryIp', 'snBgp4NeighborSummaryIndex'), true);
+                        $cbgpPeerAcceptedPrefixes = $key ? $b_prefixes[$key]['snBgp4NeighborSummaryRouteReceived'] : null;
                     }
 
                     // Validate data

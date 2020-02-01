@@ -1080,7 +1080,7 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                         if (is_numeric($data[$limit])) {
                             $$limit = $data[$limit];
                         } else {
-                            $$limit = dynamic_discovery_get_value($limit, $index, $data, $pre_cache, 'null');
+                            $$limit = YamlDiscovery::getValueFromData($limit, $index, $data, $pre_cache, 'null');
                             if (is_numeric($$limit)) {
                                 $$limit = ($$limit / $divisor) * $multiplier;
                             }
@@ -1116,43 +1116,6 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
             }
         }
     }
-}
-
-/**
- * Helper function for dynamic discovery to search for data from pre_cached snmp data
- *
- * @param string $name The name of the field from the discovery data or just an oid
- * @param int $index The index of the current sensor
- * @param array $discovery_data The discovery data for the current sensor
- * @param array $pre_cache all pre-cached snmp data
- * @param mixed $default The default value to return if data is not found
- * @return mixed
- */
-function dynamic_discovery_get_value($name, $index, $discovery_data, $pre_cache, $default = null)
-{
-    if (isset($discovery_data[$name])) {
-        $name = $discovery_data[$name];
-    }
-
-    if (isset($pre_cache[$discovery_data['oid']][$index][$name])) {
-        return $pre_cache[$discovery_data['oid']][$index][$name];
-    }
-
-    if (isset($pre_cache[$name])) {
-        if (is_array($pre_cache[$name])) {
-            if (isset($pre_cache[$name][$index][$name])) {
-                return $pre_cache[$name][$index][$name];
-            } elseif (isset($pre_cache[$index][$name])) {
-                return $pre_cache[$index][$name];
-            } elseif (count($pre_cache[$name]) === 1) {
-                return current($pre_cache[$name]);
-            }
-        } else {
-            return $pre_cache[$name];
-        }
-    }
-
-    return $default;
 }
 
 /**
@@ -1193,13 +1156,17 @@ function build_bgp_peers($device, $data, $peer2)
         'BGP4-MIB::bgpPeerRemoteAs.',
         'HUAWEI-BGP-VPN-MIB::hwBgpPeerRemoteAs.',
         '.1.3.6.1.4.1.2636.5.1.1.2.1.1.1.13.',
+        'BGP4V2-MIB::bgp4V2PeerRemoteAs.1.ipv4.',
+        'BGP4V2-MIB::bgp4V2PeerRemoteAs.1.ipv6.',
     );
     $peers = trim(str_replace($remove, '', $data));
 
     $peerlist = array();
     $ver = '';
     foreach (explode("\n", $peers) as $peer) {
+        $local_ip = null;
         if ($peer2 === true) {
+            $peerFull = $peer;
             list($ver, $peer) = explode('.', $peer, 2);
         }
         list($peer_ip, $peer_as) = explode(' ', $peer);
@@ -1213,6 +1180,21 @@ function build_bgp_peers($device, $data, $peer2)
                 // ipv4
                 $peer_ip = implode('.', array_slice(explode('.', $peer_ip), -4));
             }
+        } elseif ($device['os_group'] === 'brocade') {
+            $rawIP = $peer_ip;
+            $ver = '';
+            $octets = count(explode('.', $rawIP));
+            if ($octets > 11) {
+                // ipv6
+                $peer_ip = (string)IP::parse(snmp2ipv6($rawIP), true);
+                $parts = explode('.2.16.', $peerFull);
+                $ip_parts =  str_split(str_replace(':', '', $parts[0]), 4);
+                $local_ip = implode(':', $ip_parts);
+            } else {
+                // ipv4
+                $peer_ip = implode('.', array_slice(explode('.', $rawIP), -4));
+                $local_ip = implode('.', array_slice(explode('.', $rawIP), 0, 4));
+            }
         } else {
             if (strstr($peer_ip, ':')) {
                 $peer_ip_snmp = preg_replace('/:/', ' ', $peer_ip);
@@ -1223,9 +1205,10 @@ function build_bgp_peers($device, $data, $peer2)
         if ($peer && $peer_ip != '0.0.0.0') {
             d_echo("Found peer $peer_ip (AS$peer_as)\n");
             $peerlist[] = array(
-                'ip'  => $peer_ip,
-                'as'  => $peer_as,
-                'ver' => $ver,
+                'ip'      => $peer_ip,
+                'as'      => $peer_as,
+                'localip' => $local_ip ?: '0.0.0.0',
+                'ver'     => $ver,
             );
         }
     }
@@ -1284,7 +1267,7 @@ function add_bgp_peer($device, $peer)
             'astext' => $peer['astext'],
             'bgpPeerState' => 'idle',
             'bgpPeerAdminStatus' => 'stop',
-            'bgpLocalAddr' => '0.0.0.0',
+            'bgpLocalAddr' => $peer['localip'] ?: '0.0.0.0',
             'bgpPeerRemoteAddr' => '0.0.0.0',
             'bgpPeerInUpdates' => 0,
             'bgpPeerOutUpdates' => 0,
