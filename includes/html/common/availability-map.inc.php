@@ -12,6 +12,7 @@
  * the source code distribution for details.
  */
 
+use LibreNMS\Alert\AlertUtil;
 use LibreNMS\Config;
 
 $mode = Session::get('map_view', 0);
@@ -146,6 +147,7 @@ if (defined('SHOW_SETTINGS')) {
     $host_up_count = 0;
     $host_warn_count = 0;
     $host_down_count = 0;
+    $host_maintenance_count = 0;
     $host_disable_notify_count = 0;
     $host_disabled_count = 0;
     $service_up_count = 0;
@@ -221,6 +223,12 @@ if (defined('SHOW_SETTINGS')) {
                 $deviceLabelOld = 'availability-map-oldview-box-down';
                 $host_down_count++;
             }
+
+            if (AlertUtil::isMaintenance($device['device_id'])) {
+                $deviceLabel = 'label-default';
+                $host_maintenance_count++;
+            }
+
             $device_system_name = format_hostname($device);
 
             if (Config::get('webui.availability_map_compact') == 0) {
@@ -382,8 +390,11 @@ if (defined('SHOW_SETTINGS')) {
                 <span>Total hosts</span>
                 <span class="label label-success label-font-border label-border">up: '.$host_up_count.'</span>
                 <span class="label label-warning label-font-border label-border">warn: '.$host_warn_count.'</span>
-                <span class="label label-danger label-font-border label-border">down: '.$host_down_count.'</span>
-                '.$disabled_ignored_header.'
+                <span class="label label-danger label-font-border label-border">down: '.$host_down_count.'</span>';
+        if ($host_maintenance_count) {
+            $temp_header[] = '<span class="label label-default label-font-border label-border">maintenance: '.$host_maintenance_count.'</span>';
+        }
+        $temp_header[] = $disabled_ignored_header.'
             </div>';
     }
 
