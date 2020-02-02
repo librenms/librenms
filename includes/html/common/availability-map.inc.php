@@ -391,9 +391,9 @@ if (defined('SHOW_SETTINGS')) {
                 <span class="label label-success label-font-border label-border">up: '.$host_up_count.'</span>
                 <span class="label label-warning label-font-border label-border">warn: '.$host_warn_count.'</span>
                 <span class="label label-danger label-font-border label-border">down: '.$host_down_count.'</span>';
-   if ($host_maintenance_count) {
-        $temp_header[] = '<span class="label label-default label-font-border label-border">maintenance: '.$host_maintenance_count.'</span>';
-   }
+        if ($host_maintenance_count) {
+            $temp_header[] = '<span class="label label-default label-font-border label-border">maintenance: '.$host_maintenance_count.'</span>';
+        }
         $temp_header[] = $disabled_ignored_header.'
             </div>';
     }
