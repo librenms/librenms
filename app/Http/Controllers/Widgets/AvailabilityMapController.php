@@ -106,7 +106,7 @@ class AvailabilityMapController extends WidgetController
 
         // process status
         $uptime_warn = Config::get('uptime_warning', 84600);
-        $totals = ['warn' => 0, 'up' => 0, 'down' => 0, 'ignored' => 0, 'disabled' => 0];
+        $totals = ['warn' => 0, 'up' => 0, 'down' => 0, 'maintenance' => 0, 'ignored' => 0, 'disabled' => 0];
         foreach ($devices as $device) {
             if ($device->disabled) {
                 $totals['disabled']++;
@@ -130,6 +130,11 @@ class AvailabilityMapController extends WidgetController
                 $totals['down']++;
                 $device->stateName = 'down';
                 $device->labelClass = 'label-danger';
+            }
+
+            if ($device->isUnderMaintenance()) {
+                $device->labelClass = 'label-default';
+                $totals['maintenance']++;
             }
         }
         return [$devices, $totals];
