@@ -31,6 +31,9 @@ $fields = array(
                 'last_warning'   => intval(trim($last_warning)),
 );
 
+// Debug
+d_echo("backupninja : $fields");
+
 $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);
 update_application($app, $backupninja, $fields);
