@@ -211,7 +211,7 @@ class Device extends BaseModel
                 if ($this->location) {
                     $query->orWhere(function ($query) {
                         $query->where('alert_schedulable_type', 'location')
-                            ->where('alert_schedulable_id', $this->location);
+                            ->where('alert_schedulable_id', $this->location->id);
                     });
                 }
             });
