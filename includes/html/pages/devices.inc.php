@@ -13,6 +13,8 @@
  * @author     LibreNMS Contributors
 */
 
+use LibreNMS\Alert\AlertUtil;
+
 $pagetitle[] = "Devices";
 
 if (!isset($vars['format'])) {
@@ -298,6 +300,7 @@ if ($format == "graph") {
                 <tr>
                     <th data-column-id="status" data-formatter="status" data-width="7px" data-searchable="false">&nbsp;</th>
                     <th data-column-id="icon" data-width="70px" data-searchable="false" data-formatter="icon" data-visible="<?php echo $detailed  ? 'true' : 'false'; ?>">Vendor</th>
+                    <th data-column-id="maintenance" data-width="5px" data-searchable="false" data-formatter="maintenance" data-visible="<?php echo $detailed  ? 'true' : 'false'; ?>"></th>
                     <th data-column-id="hostname" data-order="asc" <?php echo $detailed ? 'data-formatter="device"' : ''; ?>>Device</th>
                     <th data-column-id="metrics" data-width="<?php echo $detailed ? '100px' : '150px'; ?>" data-sortable="false" data-searchable="false" data-visible="<?php echo $detailed  ? 'true' : 'false'; ?>">Metrics</th>
                     <th data-column-id="hardware">Platform</th>
@@ -321,6 +324,12 @@ if ($format == "graph") {
                 },
                 "icon": function (column, row) {
                     return "<span class=\"device-table-icon\">" + row.icon + "</span>";
+                },
+                "maintenance": function (column, row) {
+                    if (row.maintenance) {
+                        return "<span title=\"Scheduled Maintenance\" class=\"glyphicon glyphicon-wrench\"></span>";
+                    }
+                    return '';
                 },
                 "device": function (column, row) {
                     return "<span>" + row.hostname + "</span>";
