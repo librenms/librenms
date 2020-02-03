@@ -25,6 +25,8 @@
 
 namespace LibreNMS\Tests;
 
+use LibreNMS\Device\YamlDiscovery;
+
 class FunctionsTest extends TestCase
 {
     public function testMacCleanToReadable()
@@ -95,23 +97,23 @@ sdfsd <a href="ftp://192.168.1.1/help/me/now.php">ftp://192.168.1.1/help/me/now.
         );
 
         $data = array('value' => 'temp', 'oid' => 'firstdata');
-        $this->assertNull(dynamic_discovery_get_value('missing', 0, $data, $pre_cache));
-        $this->assertSame('yar', dynamic_discovery_get_value('default', 0, $data, $pre_cache, 'yar'));
-        $this->assertSame(2, dynamic_discovery_get_value('value', 1, $data, $pre_cache));
+        $this->assertNull(YamlDiscovery::getValueFromData('missing', 0, $data, $pre_cache));
+        $this->assertSame('yar', YamlDiscovery::getValueFromData('default', 0, $data, $pre_cache, 'yar'));
+        $this->assertSame(2, YamlDiscovery::getValueFromData('value', 1, $data, $pre_cache));
 
         $data = array('oid' => 'high');
-        $this->assertSame(3, dynamic_discovery_get_value('high', 0, $data, $pre_cache));
+        $this->assertSame(3, YamlDiscovery::getValueFromData('high', 0, $data, $pre_cache));
 
         $data = array('oid' => 'table');
-        $this->assertSame(5, dynamic_discovery_get_value('first', 0, $data, $pre_cache));
-        $this->assertSame(7, dynamic_discovery_get_value('first', 1, $data, $pre_cache));
-        $this->assertSame(6, dynamic_discovery_get_value('second', 0, $data, $pre_cache));
-        $this->assertSame(8, dynamic_discovery_get_value('second', 1, $data, $pre_cache));
+        $this->assertSame(5, YamlDiscovery::getValueFromData('first', 0, $data, $pre_cache));
+        $this->assertSame(7, YamlDiscovery::getValueFromData('first', 1, $data, $pre_cache));
+        $this->assertSame(6, YamlDiscovery::getValueFromData('second', 0, $data, $pre_cache));
+        $this->assertSame(8, YamlDiscovery::getValueFromData('second', 1, $data, $pre_cache));
 
-        $this->assertSame(9, dynamic_discovery_get_value('single', 0, $data, $pre_cache));
-        $this->assertSame(10, dynamic_discovery_get_value('oneoff', 3, $data, $pre_cache));
-        $this->assertSame('Pickle', dynamic_discovery_get_value('singletable', 11, $data, $pre_cache));
-        $this->assertSame('BBQ', dynamic_discovery_get_value('doubletable', 13, $data, $pre_cache));
+        $this->assertSame(9, YamlDiscovery::getValueFromData('single', 0, $data, $pre_cache));
+        $this->assertSame(10, YamlDiscovery::getValueFromData('oneoff', 3, $data, $pre_cache));
+        $this->assertSame('Pickle', YamlDiscovery::getValueFromData('singletable', 11, $data, $pre_cache));
+        $this->assertSame('BBQ', YamlDiscovery::getValueFromData('doubletable', 13, $data, $pre_cache));
     }
 
     public function testParseAtTime()

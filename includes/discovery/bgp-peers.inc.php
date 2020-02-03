@@ -128,7 +128,6 @@ if (Config::get('enable_bgp')) {
                         if ($peer2 === true) {
                             $af_data = snmpwalk_cache_oid($device, 'cbgpPeer2AddrFamilyEntry', array(), 'CISCO-BGP4-MIB');
                         }
-
                         if (empty($af_data)) {
                             $af_data = snmpwalk_cache_oid($device, 'cbgpPeerAddrFamilyEntry', array(), 'CISCO-BGP4-MIB');
                             $peer2 = false;

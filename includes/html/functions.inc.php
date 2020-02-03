@@ -969,6 +969,7 @@ function alert_details($details)
             $fault_detail .= generate_sensor_link($tmp_alerts, $tmp_alerts['name']) . ';&nbsp; <br>' . $details;
             $fallback = false;
         }
+
         if ($tmp_alerts['bgpPeer_id']) {
             // If we have a bgpPeer_id, we format the data accordingly
             $fault_detail .= "BGP peer <a href='" .
@@ -981,12 +982,25 @@ function alert_details($details)
             $fault_detail .= ", State " . $tmp_alerts['bgpPeerState'];
             $fallback = false;
         }
+
         if ($tmp_alerts['type'] && $tmp_alerts['label']) {
             if ($tmp_alerts['error'] == "") {
                 $fault_detail .= ' ' . $tmp_alerts['type'] . ' - ' . $tmp_alerts['label'] . ';&nbsp;';
             } else {
                 $fault_detail .= ' ' . $tmp_alerts['type'] . ' - ' . $tmp_alerts['label'] . ' - ' . $tmp_alerts['error'] . ';&nbsp;';
             }
+            $fallback = false;
+        }
+
+        if (in_array('app_id', array_keys($tmp_alerts))) {
+            $fault_detail .= "<a href='" . generate_url(array('page' => 'device',
+                                                              'device' => $tmp_alerts['device_id'],
+                                                              'tab' => 'apps',
+                                                              'app' => $tmp_alerts['app_type'])) . "'>";
+            $fault_detail .= $tmp_alerts['metric'];
+            $fault_detail .= "</a>";
+
+            $fault_detail .= " => ". $tmp_alerts['value'];
             $fallback = false;
         }
 
