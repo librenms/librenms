@@ -24,19 +24,14 @@
  */
 
 $descr = snmp_get($device, '1.3.6.1.2.1.1.1.0', '-OUQnt');
-if (is_string($descr)){
-	$match=[];
-	
-	if (preg_match('/ SN ([0-9]*)/', $descr, $match) == 1){      
-		$serial   = $match[1];
-	}
-	
-	if (preg_match('/ HW V([0-9\.]*)/', $descr, $match == 1){
-		$hardware = $match[1];
-	}
-	if (preg_match('/ SW V([0-9\.]*)/', $descr, $match) == 1){
-		$version = '[' . $match[1] . ']';
-	}
+if (is_string($descr)) {
+    $match=[];
+    if (preg_match('/ SN ([0-9]*)/', $descr, $match) == 1)
+        $serial   = $match[1];
+    if (preg_match('/ HW V([0-9\.]*)/', $descr, $match == 1)
+        $hardware = $match[1];
+    if (preg_match('/ SW V([0-9\.]*)/', $descr, $match) == 1)
+        $version = '[' . $match[1] . ']';
 }
 
 unset(
