@@ -72,11 +72,10 @@ foreach ($files as $file) {
 
     if ($rrd_file == 'ping-perf') {
         $step = $icmp_step;
-        $heartbeat = $icmp_step * 2;
     } else {
         $step = $system_step;
-        $heartbeat = $system_heartbeat;
     }
+    $heartbeat = $system_heartbeat;
 
     $rrd_info = shell_exec("$rrdtool info $file");
     preg_match('/step = (\d+)/', $rrd_info, $step_matches);
