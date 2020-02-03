@@ -62,7 +62,10 @@
                                                                     "$ref": "#/definitions/comparison"
                                                                 },
                                                                 "value": {
-                                                                    "type": ["integer", "string"]
+                                                                    "type": ["integer", "string", "array"],
+                                                                    "items": {
+                                                                        "type": ["integer", "string"]
+                                                                    }
                                                                 }
                                                             },
                                                             "additionalProperties": false,
@@ -201,7 +204,10 @@
                                                                     "$ref": "#/definitions/comparison"
                                                                 },
                                                                 "value": {
-                                                                    "type": ["integer", "string"]
+                                                                    "type": ["integer", "string", "array"],
+                                                                    "items": {
+                                                                        "type": ["integer", "string"]
+                                                                    }
                                                                 }
                                                             },
                                                             "required": [
@@ -379,7 +385,10 @@
                                     "$ref": "#/definitions/comparison"
                                 },
                                 "value": {
-                                    "type": ["integer", "string"]
+                                    "type": ["integer", "string", "array"],
+                                    "items": {
+                                        "type": ["integer", "string"]
+                                    }
                                 }
                             },
                             "additionalProperties": false,
