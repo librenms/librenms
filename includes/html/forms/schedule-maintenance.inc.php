@@ -205,6 +205,7 @@ if ($sub_type == 'new-maintenance') {
     $schedule_id = mres($_POST['del_schedule_id']);
     dbDelete('alert_schedule_items', '`schedule_id`=?', array($schedule_id));
     dbDelete('alert_schedule', '`schedule_id`=?', array($schedule_id));
+    dbDelete('alert_schedulables', '`schedule_id`=?', array($schedule_id));
     $status   = 'ok';
     $message  = 'Maintenance schedule has been removed';
     $response = array(
