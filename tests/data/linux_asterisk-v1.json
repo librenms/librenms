@@ -1,0 +1,97 @@
+{
+    "applications": {
+        "discovery": {
+            "applications": [
+                {
+                    "app_type": "asterisk",
+                    "app_state": "UNKNOWN",
+                    "discovered": 1,
+                    "app_state_prev": null,
+                    "app_status": "",
+                    "app_instance": ""
+                }
+            ],
+            "application_metrics": []
+        },
+        "poller": {
+            "applications": [
+                {
+                    "app_type": "asterisk",
+                    "app_state": "OK",
+                    "discovered": 1,
+                    "app_state_prev": "UNKNOWN",
+                    "app_status": "",
+                    "app_instance": ""
+                }
+            ],
+            "application_metrics": [
+                {
+                    "metric": "iax2_iax2offline",
+                    "value": 292,
+                    "value_prev": null,
+                    "app_type": "asterisk"
+                },
+                {
+                    "metric": "iax2_iax2online",
+                    "value": 687,
+                    "value_prev": null,
+                    "app_type": "asterisk"
+                },
+                {
+                    "metric": "iax2_iax2peers",
+                    "value": 979,
+                    "value_prev": null,
+                    "app_type": "asterisk"
+                },
+                {
+                    "metric": "iax2_iax2unmonitored",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "asterisk"
+                },
+                {
+                    "metric": "stats_calls",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "asterisk"
+                },
+                {
+                    "metric": "stats_channels",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "asterisk"
+                },
+                {
+                    "metric": "stats_sipeers",
+                    "value": 48,
+                    "value_prev": null,
+                    "app_type": "asterisk"
+                },
+                {
+                    "metric": "stats_sipmonoffline",
+                    "value": 20,
+                    "value_prev": null,
+                    "app_type": "asterisk"
+                },
+                {
+                    "metric": "stats_sipmononline",
+                    "value": 28,
+                    "value_prev": null,
+                    "app_type": "asterisk"
+                },
+                {
+                    "metric": "stats_sipunmonoffline",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "asterisk"
+                },
+                {
+                    "metric": "stats_sipunmononline",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "asterisk"
+                }
+            ]
+        }
+    }
+}
