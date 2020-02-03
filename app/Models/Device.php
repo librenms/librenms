@@ -207,6 +207,13 @@ class Device extends BaseModel
                             ->whereIn('alert_schedulable_id', $this->groups->pluck('id'));
                     });
                 }
+
+                if ($this->location) {
+                    $query->orWhere(function ($query) {
+                        $query->where('alert_schedulable_type', 'location')
+                            ->where('alert_schedulable_id', $this->location->id);
+                    });
+                }
             });
 
         return $query->exists();
