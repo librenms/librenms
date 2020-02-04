@@ -2249,6 +2249,42 @@ function add_service_for_host(\Illuminate\Http\Request $request)
     return api_error(500, 'Failed to add the service');
 }
 
+function add_parents_to_host(\Illuminate\Http\Request $request) 
+{
+    $data = json_decode($request->getContent(), true);
+    $device_id = $request->route('id');
+    $parent_ids = explode(',',$data['parent_ids']);
+    foreach ($parent_ids as $parent) {
+        if (!is_numeric($parent)) {
+            return api_error(400, 'Parent IDs must be integers!');
+        }
+    }
+    if (count($parent_ids) > 1 && in_array('0', $parent_ids)) {
+        return api_error(400, 'Multiple parents cannot contain None-Parent!');
+    }
+    if (!is_numeric($device_id)) {
+        return api_error(400, "Device ID must be an integer!");
+    } elseif (in_array($device_id, $parent_ids)) {
+        return api_error(400, 'A device cannot depend itself'); 
+    }
+    \App\Models\Device::find($device_id)->parents()->sync($parent_ids);
+    return api_success_noresult(201, 'Device dependencies have been saved');
+}
+
+function del_parents_from_host(\Illuminate\Http\Request $request) 
+{
+    $device_id = $request->route('id');
+    if (!is_numeric($device_id)) {
+        return api_error(400, "Device ID must be an integer!");
+    }
+    $device = \App\Models\Device::find($device_id);
+    if ($device->parents()->detach()) {
+        return api_success_noresult(201, 'Device dependencies have been removed');
+    } else {
+        return api_error(400, 'Device dependency cannot be deleted'); 
+    }
+}
+
 /**
  * Display Librenms Instance Info
  */
