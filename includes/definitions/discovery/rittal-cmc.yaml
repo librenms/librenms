@@ -24,7 +24,7 @@ modules:
                     group: 'Air'
                     skip_values:
                         -
-                          oid: unit2SensorType
+                          oid: unit1SensorType
                           op: 'not_in_array'
                           value: [48,49,50,51,52,53,54,55,56,57]
                 -
@@ -51,9 +51,68 @@ modules:
                           oid: unit2SensorType
                           op: 'not_in_array'
                           value: [48,49,50,51,52,53,54,55,56,57]
-                          
+                -
+                    oid: cmcTcUnit3SensorTable
+                    value: unit3SensorValue
+                    descr: unit3SensorText
+                    num_oid: '.1.3.6.1.4.1.2606.4.2.5.5.2.1.5.{{ $index }}'
+                    index: 'unit3SensorIndex.{{ $index }}'
+                    group: 'Water'
+                    skip_values:
+                        -
+                          oid: unit3SensorType
+                          op: 'not_in_array'
+                          value: [58,59,64,66,100,101]
+                -
+                    oid: cmcTcUnit3SensorTable
+                    value: unit3SensorValue
+                    descr: unit3SensorText
+                    num_oid: '.1.3.6.1.4.1.2606.4.2.5.5.2.1.5.{{ $index }}'
+                    index: 'unit3SensorIndex.{{ $index }}'
+                    group: 'Air'
+                    skip_values:
+                        -
+                          oid: unit3SensorType
+                          op: 'not_in_array'
+                          value: [48,49,50,51,52,53,54,55,56,57]
+                -
+                    oid: cmcTcUnit4SensorTable
+                    value: unit4SensorValue
+                    descr: unit4SensorText
+                    num_oid: '.1.3.6.1.4.1.2606.4.2.6.5.2.1.5.{{ $index }}'
+                    index: 'unit4SensorIndex.{{ $index }}'
+                    group: 'Water'
+                    skip_values:
+                        -
+                          oid: unit4SensorType
+                          op: 'not_in_array'
+                          value: [58,59,64,66,100,101]
+                -
+                    oid: cmcTcUnit4SensorTable
+                    value: unit4SensorValue
+                    descr: unit4SensorText
+                    num_oid: '.1.3.6.1.4.1.2606.4.2.6.5.2.1.5.{{ $index }}'
+                    index: 'unit4SensorIndex.{{ $index }}'
+                    group: 'Air'
+                    skip_values:
+                        -
+                          oid: unit4SensorType
+                          op: 'not_in_array'
+                          value: [48,49,50,51,52,53,54,55,56,57]
         fanspeed:
             data:
+                -
+                    oid: cmcTcUnit1SensorTable
+                    value: unit1SensorValue
+                    descr: unit1SensorText
+                    num_oid: '.1.3.6.1.4.1.2606.4.2.3.5.2.1.5.{{ $index }}'
+                    index: 'unit1SensorIndex.{{ $index }}'
+                    group: 'Air'
+                    skip_values:
+                        -
+                          oid: unit1SensorType
+                          op: 'not_in_array'
+                          value: [40,41,42,43,44,45,46,47]
                 -
                     oid: cmcTcUnit2SensorTable
                     value: unit2SensorValue
@@ -67,6 +126,42 @@ modules:
                           op: 'not_in_array'
                           value: [40,41,42,43,44,45,46,47]
                 -
+                    oid: cmcTcUnit3SensorTable
+                    value: unit3SensorValue
+                    descr: unit3SensorText
+                    num_oid: '.1.3.6.1.4.1.2606.4.2.5.5.2.1.5.{{ $index }}'
+                    index: 'unit3SensorIndex.{{ $index }}'
+                    group: 'Air'
+                    skip_values:
+                        -
+                          oid: unit3SensorType
+                          op: 'not_in_array'
+                          value: [40,41,42,43,44,45,46,47]
+                -
+                    oid: cmcTcUnit4SensorTable
+                    value: unit4SensorValue
+                    descr: unit4SensorText
+                    num_oid: '.1.3.6.1.4.1.2606.4.2.6.5.2.1.5.{{ $index }}'
+                    index: 'unit2SensorIndex.{{ $index }}'
+                    group: 'Air'
+                    skip_values:
+                        -
+                          oid: unit2SensorType
+                          op: 'not_in_array'
+                          value: [40,41,42,43,44,45,46,47]
+                -
+                    oid: cmcTcUnit1SensorTable
+                    value: unit1SensorValue
+                    descr: unit1SensorText
+                    num_oid: '.1.3.6.1.4.1.2606.4.2.3.5.2.1.5.{{ $index }}'
+                    index: 'unit1SensorIndex.{{ $index }}'
+                    group: 'Water'
+                    skip_values:
+                        -
+                          oid: unit1SensorType
+                          op: '!='
+                          value: 61
+                -
                     oid: cmcTcUnit2SensorTable
                     value: unit2SensorValue
                     descr: unit2SensorText
@@ -78,10 +173,43 @@ modules:
                           oid: unit2SensorType
                           op: '!='
                           value: 61
-
-
+                -
+                    oid: cmcTcUnit3SensorTable
+                    value: unit3SensorValue
+                    descr: unit3SensorText
+                    num_oid: '.1.3.6.1.4.1.2606.4.2.5.5.2.1.5.{{ $index }}'
+                    index: 'unit3SensorIndex.{{ $index }}'
+                    group: 'Water'
+                    skip_values:
+                        -
+                          oid: unit3SensorType
+                          op: '!='
+                          value: 61
+                -
+                    oid: cmcTcUnit4SensorTable
+                    value: unit4SensorValue
+                    descr: unit4SensorText
+                    num_oid: '.1.3.6.1.4.1.2606.4.2.6.5.2.1.5.{{ $index }}'
+                    index: 'unit4SensorIndex.{{ $index }}'
+                    group: 'Water'
+                    skip_values:
+                        -
+                          oid: unit4SensorType
+                          op: '!='
+                          value: 61
         cooling:
             data:
+                -
+                    oid: cmcTcUnit1SensorTable
+                    value: unit1SensorValue
+                    descr: unit1SensorText
+                    num_oid: '.1.3.6.1.4.1.2606.4.2.3.5.2.1.5.{{ $index }}'
+                    index: 'unit1SensorIndex.{{ $index }}'
+                    skip_values:
+                        -
+                          oid: unit1SensorType
+                          op: '!='
+                          value: 27
                 -
                     oid: cmcTcUnit2SensorTable
                     value: unit2SensorValue
@@ -93,8 +221,41 @@ modules:
                           oid: unit2SensorType
                           op: '!='
                           value: 27
+                -
+                    oid: cmcTcUnit3SensorTable
+                    value: unit3SensorValue
+                    descr: unit3SensorText
+                    num_oid: '.1.3.6.1.4.1.2606.4.2.5.5.2.1.5.{{ $index }}'
+                    index: 'unit3SensorIndex.{{ $index }}'
+                    skip_values:
+                        -
+                          oid: unit3SensorType
+                          op: '!='
+                          value: 27
+                -
+                    oid: cmcTcUnit4SensorTable
+                    value: unit4SensorValue
+                    descr: unit4SensorText
+                    num_oid: '.1.3.6.1.4.1.2606.4.2.6.5.2.1.5.{{ $index }}'
+                    index: 'unit4SensorIndex.{{ $index }}'
+                    skip_values:
+                        -
+                          oid: unit4SensorType
+                          op: '!='
+                          value: 27
         waterflow:
             data:
+                -
+                    oid: cmcTcUnit1SensorTable
+                    value: unit1SensorValue
+                    descr: unit1SensorText
+                    num_oid: '.1.3.6.1.4.1.2606.4.2.3.5.2.1.5.{{ $index }}'
+                    index: 'unit1SensorIndex.{{ $index }}'
+                    skip_values:
+                        -
+                          oid: unit1uensorType
+                          op: '!='
+                          value: 60
                 -
                     oid: cmcTcUnit2SensorTable
                     value: unit2SensorValue
@@ -104,6 +265,28 @@ modules:
                     skip_values:
                         -
                           oid: unit2SensorType
+                          op: '!='
+                          value: 60
+                -
+                    oid: cmcTcUnit3SensorTable
+                    value: unit3SensorValue
+                    descr: unit3SensorText
+                    num_oid: '.1.3.6.1.4.1.2606.4.2.5.5.2.1.5.{{ $index }}'
+                    index: 'unit3SensorIndex.{{ $index }}'
+                    skip_values:
+                        -
+                          oid: unit3SensorType
+                          op: '!='
+                          value: 60
+                -
+                    oid: cmcTcUnit4SensorTable
+                    value: unit4SensorValue
+                    descr: unit4SensorText
+                    num_oid: '.1.3.6.1.4.1.2606.4.2.6.5.2.1.5.{{ $index }}'
+                    index: 'unit4SensorIndex.{{ $index }}'
+                    skip_values:
+                        -
+                          oid: unit4SensorType
                           op: '!='
                           value: 60
         state:
