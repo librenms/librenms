@@ -2262,14 +2262,12 @@ function add_parents_to_host(\Illuminate\Http\Request $request)
     if (count($parent_ids) > 1 && in_array('0', $parent_ids)) {
         return api_error(400, 'Multiple parents cannot contain None-Parent!');
     }
-    if (!is_numeric($device_id)) {
-        return api_error(400, "Device ID must be an integer!");
+    $validDeviceID = is_numeric($device_id) && !in_array($device_id, $parent_ids);
+    if ($validDeviceID) {
+        \App\Models\Device::find($device_id)->parents()->sync($parent_ids);
+        return api_success_noresult(201, 'Device dependencies have been saved');
     }
-    if (in_array($device_id, $parent_ids)) {
-        return api_error(400, 'A device cannot depend itself');
-    }
-    \App\Models\Device::find($device_id)->parents()->sync($parent_ids);
-    return api_success_noresult(201, 'Device dependencies have been saved');
+    return api_error(400, "A device can't depend on Itself and it's ID must be an integer");
 }
 
 function del_parents_from_host(\Illuminate\Http\Request $request)
