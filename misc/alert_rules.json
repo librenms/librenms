@@ -117,6 +117,10 @@
     "name": "Interface Errors Rate greater than 100"
   },
   {
+    "rule": "devices.inserted >= `macros.past_60m`",
+    "name": "Device added within the last 60 minutes"
+  },
+  {
     "rule": "eventlog.type = \"discovery\" && eventlog.message ~ \"@autodiscovered@\" && eventlog.datetime >= `macros.past_60m`",
     "name": "Device discovered within the last 60 minutes"
   },
