@@ -67,9 +67,13 @@ class Time
                 $result .= " $diff";
                 if ($format == 'short') {
                     $result .= substr($k, 0, 1);
-                } elseif ($diff > 1) {
+                }
+
+                if ($format != 'short' && $diff > 1) {
                     $result .= ' ' . $k;
-                } else {
+                }
+
+                if ($format != 'short' && $diff < 2) {
                     $result .= ' ' . substr($k, 0, -1);
                 }
 
