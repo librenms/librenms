@@ -2254,31 +2254,34 @@ function add_parents_to_host(\Illuminate\Http\Request $request)
     $data = json_decode($request->getContent(), true);
     $device_id = $request->route('id');
     $parent_ids = explode(',', $data['parent_ids']);
-    foreach ($parent_ids as $parent) {
-        $invalidParent = !is_numeric($parent) || $parent < 1 || is_null(Device::find($parent));
-        if ($invalidParent) {
-            return api_error(400, 'Parent IDs must be integers greater than 0 and should exist');
-        }
-    }
-    $validDeviceID = is_numeric($device_id) && !in_array($device_id, $parent_ids);
-    if ($validDeviceID) {
+    if (validateDeviceIds($parent_ids) && validateDeviceIds(array($device_id)) && (!in_array($device_id, $parent_ids))) {
         Device::find($device_id)->parents()->sync($parent_ids);
         return api_success_noresult(201, 'Device dependencies have been saved');
     }
-    return api_error(400, "A device can't depend on Itself and it's ID must be an integer");
+    return api_error(400, "Check your parent and device IDs");
 }
 
 function del_parents_from_host(\Illuminate\Http\Request $request)
 {
     $device_id = $request->route('id');
-    if (!is_numeric($device_id)) {
-        return api_error(400, "Device ID must be an integer!");
+    if (!validateDeviceIds(array($device_id))) {
+        return api_error(400, "Check your device ID!");
     }
     $device = Device::find($device_id);
     if ($device->parents()->detach()) {
         return api_success_noresult(201, 'Device dependencies have been removed');
     }
     return api_error(400, 'Device dependency cannot be deleted');
+}
+
+function validateDeviceIds($ids) {
+    foreach ($ids as $id) {
+        $invalidId = !is_numeric($id) || $id < 1 || is_null(Device::find($id));
+        if ($invalidId) {
+            return false;
+        }
+    }
+    return true;
 }
 
 /**
