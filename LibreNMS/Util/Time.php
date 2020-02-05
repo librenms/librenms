@@ -70,7 +70,7 @@ class Time
                 } elseif ($diff > 1) {
                     $result .= ' ' . $k;
                 } else {
-                    $result .= substr($k, 0, -1);
+                    $result .= ' ' . substr($k, 0, -1);
                 }
 
                 $interval -= $v * $diff;
