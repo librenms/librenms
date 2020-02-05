@@ -2281,6 +2281,7 @@ function del_parents_from_host(\Illuminate\Http\Request $request)
     $device = \App\Models\Device::find($device_id);
     if ($device->parents()->detach()) {
         return api_success_noresult(201, 'Device dependencies have been removed');
+    }
     return api_error(400, 'Device dependency cannot be deleted');
 }
 
