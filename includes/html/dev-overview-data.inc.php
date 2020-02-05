@@ -23,9 +23,6 @@ echo '</div><div class="panel-body">';
 echo '<script src="js/leaflet.js"></script>';
 echo '<script src="js/L.Control.Locate.min.js"></script>';
 
-$uptime = (Time::formatInterval($device['status'] ? $device['uptime'] : time() - strtotime($device['last_polled'])));
-$uptime_text = ($device['status'] ? 'Uptime' : 'Downtime');
-
 if ($device['os'] == 'ios' || $device['os'] == 'iosxe') {
     formatCiscoHardware($device);
 }
@@ -103,11 +100,23 @@ if ($device['sysContact']) {
       </div>';
 }
 
+if (!empty($device['inserted'])) {
+    $inserted_text = "Device Added";
+    $inserted = (Time::formatInterval(time() - strtotime($device['inserted'])) . " ago");
+    echo "<div class='row'><div class='col-sm-4'>$inserted_text</div><div class='col-sm-8' title='$inserted_text on " . $device['inserted'] . "'>$inserted</div></div>";
+}
+
+if (!empty($device['last_discovered'])) {
+    $last_discovered_text = "Last Discovered";
+    $last_discovered = (empty($device['last_discovered']) ? "Never" : Time::formatInterval(time() - strtotime($device['last_discovered'])) . " ago");
+    echo "<div class='row'><div class='col-sm-4'>$last_discovered_text</div><div class='col-sm-8' title='$last_discovered_text at " . $device['last_discovered'] . "'>$last_discovered</div></div>";
+}
+
+$uptime = (Time::formatInterval($device['status'] ? $device['uptime'] : time() - strtotime($device['last_polled'])));
+$uptime_text = ($device['status'] ? 'Uptime' : 'Downtime');
+
 if ($uptime) {
-    echo "<div class='row'>
-        <div class='col-sm-4'>$uptime_text</div>
-        <div class='col-sm-8'>$uptime</div>
-      </div>";
+    echo "<div class='row'><div class='col-sm-4'>$uptime_text</div><div class='col-sm-8'>$uptime</div></div>";
 }
 
 if ($device['location_id']) {
