@@ -2274,7 +2274,8 @@ function del_parents_from_host(\Illuminate\Http\Request $request)
     return api_error(400, 'Device dependency cannot be deleted');
 }
 
-function validateDeviceIds($ids) {
+function validateDeviceIds($ids) 
+{
     foreach ($ids as $id) {
         $invalidId = !is_numeric($id) || $id < 1 || is_null(Device::find($id));
         if ($invalidId) {
