@@ -1000,6 +1000,14 @@ function list_alerts(\Illuminate\Http\Request $request)
     }
     $sql .= ' ORDER BY A.'.$order;
 
+    $alert_rule = $_GET['alert_rule'];
+    if (isset($alert_rule)) {
+        if (is_numeric($alert_rule)) {
+            $param[] = $alert_rule;
+            $sql .= ' AND `R`.id=?';
+        }
+    }
+
     $alerts = dbFetchRows($sql, $param);
     return api_success($alerts, 'alerts');
 }
