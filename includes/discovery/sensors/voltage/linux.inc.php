@@ -109,7 +109,7 @@ if (!empty($value)) {
     $lowwarnlimit = 0;
     $descr = 'Battery Voltage';
 
-    discover_sensor($valid['sensor'], 'ups_nut', $device, $oids, $index, $type, $descr, 1, 1, $lowlimit, $lowwarnlimit, null, $limit, $value);
+    discover_sensor($valid['sensor'], 'voltage', $device, $oids, $index, $type, $descr, 1, 1, $lowlimit, $lowwarnlimit, null, $limit, $value);
 }
 unset($oids);
 
@@ -124,7 +124,7 @@ if (!empty($value)) {
     $lowwarnlimit = 0;
     $descr = 'Battery Nominal';
 
-    discover_sensor($valid['sensor'], 'ups_nut', $device, $oids, $index, $type, $descr, 1, 1, $lowlimit, $lowwarnlimit, null, $limit, $value);
+    discover_sensor($valid['sensor'], 'voltage', $device, $oids, $index, $type, $descr, 1, 1, $lowlimit, $lowwarnlimit, null, $limit, $value);
 }
 unset($oids);
 
@@ -139,7 +139,7 @@ if (!empty($value)) {
     $lowwarnlimit = 0;
     $descr = 'Line Nominal';
 
-    discover_sensor($valid['sensor'], 'ups_nut', $device, $oids, $index, $type, $descr, 1, 1, $lowlimit, $lowwarnlimit, null, $limit, $value);
+    discover_sensor($valid['sensor'], 'voltage', $device, $oids, $index, $type, $descr, 1, 1, $lowlimit, $lowwarnlimit, null, $limit, $value);
 }
 unset($oids);
 
@@ -154,5 +154,5 @@ if (!empty($value)) {
     $lowwarnlimit = 0;
     $descr = 'Input Voltage';
 
-    discover_sensor($valid['sensor'], 'ups_nut', $device, $oids, $index, $type, $descr, 1, 1, $lowlimit, $lowwarnlimit, null, $limit, $value);
+    discover_sensor($valid['sensor'], 'voltage', $device, $oids, $index, $type, $descr, 1, 1, $lowlimit, $lowwarnlimit, null, $limit, $value);
 }
