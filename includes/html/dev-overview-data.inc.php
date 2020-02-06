@@ -100,7 +100,7 @@ if ($device['sysContact']) {
       </div>';
 }
 
-if (!empty($device['inserted'])) {
+if (!empty($device['inserted']) && $device['inserted'] != "0000-00-00 00:00:00") {
     $inserted_text = "Device Added";
     $inserted = (Time::formatInterval(time() - strtotime($device['inserted'])) . " ago");
     echo "<div class='row'><div class='col-sm-4'>$inserted_text</div><div class='col-sm-8' title='$inserted_text on " . $device['inserted'] . "'>$inserted</div></div>";
