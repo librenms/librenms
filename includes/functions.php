@@ -2253,6 +2253,16 @@ function device_is_up($device, $record_perf = false)
         }
         $device_perf['debug'] = json_encode($trace_debug);
         dbInsert($device_perf, 'device_perf');
+
+        // if device_perf is inserted and the ping was successful then update device last_ping timestamp
+        if (!empty($ping_response['last_ping_timetaken']) && $ping_response['last_ping_timetaken'] != "0") {
+            dbUpdate(
+                array('last_ping' => NOW(), 'last_ping_timetaken' => $ping_response['last_ping_timetaken']),
+                'devices',
+                'device_id=?',
+                array($device['device_id'])
+            );
+        }
     }
     $response              = array();
     $response['ping_time'] = $ping_response['last_ping_timetaken'];
