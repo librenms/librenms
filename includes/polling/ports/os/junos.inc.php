@@ -1,6 +1,6 @@
 <?php
 /**
-* junos-vcp.inc.php
+* junos.inc.php
 *
 * LibreNMS Junos VirtualChassis Ports include
 *

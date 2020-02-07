@@ -86,7 +86,7 @@ class YamlDiscovery
                             $current_data[$name] = static::replaceValues($name, $index, $count, $data, $pre_cache);
                         } else {
                             // replace references to data
-                            $current_data[$name] = dynamic_discovery_get_value($name, $index, $data, $pre_cache, $value);
+                            $current_data[$name] = static::getValueFromData($name, $index, $data, $pre_cache, $value);
                         }
                     }
 
@@ -108,7 +108,7 @@ class YamlDiscovery
 
     public static function replaceValues($name, $index, $count, $data, $pre_cache)
     {
-        $value = dynamic_discovery_get_value($name, $index, $data, $pre_cache);
+        $value = static::getValueFromData($name, $index, $data, $pre_cache);
         if (is_null($value)) {
             // built in replacements
             $search = [
@@ -130,7 +130,7 @@ class YamlDiscovery
 
             // search discovery data for values
             $value = preg_replace_callback('/{{ \$([a-zA-Z0-9.]+) }}/', function ($matches) use ($index, $data, $pre_cache) {
-                $replace = dynamic_discovery_get_value($matches[1], $index, $data, $pre_cache, null);
+                $replace = static::getValueFromData($matches[1], $index, $data, $pre_cache, null);
                 if (is_null($replace)) {
                     d_echo('Warning: No variable available to replace ' . $matches[1] . ".\n");
                     return ''; // remove the unavailable variable
@@ -147,7 +147,7 @@ class YamlDiscovery
      * Helper function for dynamic discovery to search for data from pre_cached snmp data
      *
      * @param string $name The name of the field from the discovery data or just an oid
-     * @param int $index The index of the current sensor
+     * @param string $index The index of the current sensor
      * @param array $discovery_data The discovery data for the current sensor
      * @param array $pre_cache all pre-cached snmp data
      * @param mixed $default The default value to return if data is not found
@@ -169,6 +169,8 @@ class YamlDiscovery
                     return $pre_cache[$name][$index][$name];
                 } elseif (isset($pre_cache[$index][$name])) {
                     return $pre_cache[$index][$name];
+                } elseif (isset($pre_cache[$name][$index])) {
+                    return $pre_cache[$name][$index];
                 } elseif (count($pre_cache[$name]) === 1) {
                     return current($pre_cache[$name]);
                 }
@@ -252,6 +254,10 @@ class YamlDiscovery
                 // Dynamic skipping of data
                 $op = isset($skip_value['op']) ? $skip_value['op'] : '!=';
                 $tmp_value = static::getValueFromData($skip_value['oid'], $index, $yaml_item_data, $pre_cache);
+                if (str_contains($skip_value['oid'], '.')) {
+                    list($skip_value['oid'], $targeted_index) = explode('.', $skip_value['oid'], 2);
+                    $tmp_value = static::getValueFromData($skip_value['oid'], $targeted_index, $yaml_item_data, $pre_cache);
+                }
                 if (compare_var($tmp_value, $skip_value['value'], $op)) {
                     return true;
                 }

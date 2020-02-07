@@ -969,6 +969,7 @@ function alert_details($details)
             $fault_detail .= generate_sensor_link($tmp_alerts, $tmp_alerts['name']) . ';&nbsp; <br>' . $details;
             $fallback = false;
         }
+
         if ($tmp_alerts['bgpPeer_id']) {
             // If we have a bgpPeer_id, we format the data accordingly
             $fault_detail .= "BGP peer <a href='" .
@@ -981,6 +982,7 @@ function alert_details($details)
             $fault_detail .= ", State " . $tmp_alerts['bgpPeerState'];
             $fallback = false;
         }
+
         if ($tmp_alerts['type'] && $tmp_alerts['label']) {
             if ($tmp_alerts['error'] == "") {
                 $fault_detail .= ' ' . $tmp_alerts['type'] . ' - ' . $tmp_alerts['label'] . ';&nbsp;';
@@ -990,12 +992,29 @@ function alert_details($details)
             $fallback = false;
         }
 
+        if (in_array('app_id', array_keys($tmp_alerts))) {
+            $fault_detail .= "<a href='" . generate_url(array('page' => 'device',
+                                                              'device' => $tmp_alerts['device_id'],
+                                                              'tab' => 'apps',
+                                                              'app' => $tmp_alerts['app_type'])) . "'>";
+            $fault_detail .= $tmp_alerts['metric'];
+            $fault_detail .= "</a>";
+
+            $fault_detail .= " => ". $tmp_alerts['value'];
+            $fallback = false;
+        }
+
         if ($fallback === true) {
+            $fault_detail_data = [];
             foreach ($tmp_alerts as $k => $v) {
-                if (!empty($v) && $k != 'device_id' && (stristr($k, 'id') || stristr($k, 'desc') || stristr($k, 'msg')) && substr_count($k, '_') <= 1) {
-                    $fault_detail .= "$k => '$v', ";
+                if (in_array($k, ['device_id', 'sysObjectID', 'sysDescr', 'location_id'])) {
+                    continue;
+                }
+                if (!empty($v) && (stristr($k, 'id') || stristr($k, 'desc') || stristr($k, 'msg')) && substr_count($k, '_') <= 1) {
+                    $fault_detail_data[] = "$k => '$v'";
                 }
             }
+            $fault_detail .= count($fault_detail_data) ? implode('<br>&nbsp;&nbsp;&nbsp', $fault_detail_data) : '';
 
             $fault_detail = rtrim($fault_detail, ', ');
         }

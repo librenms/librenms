@@ -29,14 +29,28 @@ class Ciscospark extends Transport
 
     public function contactCiscospark($obj, $room_id, $token)
     {
-        $text = strip_tags($obj['msg']);
+        $text = null;
         $data = array (
             'roomId' => $room_id
         );
 
         $akey = 'text';
         if ($this->config['use-markdown'] === 'on') {
+            $lines = explode("\n", $obj['msg']);
+            $mlines = [];
+            /* Remove blank lines as they create weird markdown
+             * behaviors.
+             */
+            foreach ($lines as $line) {
+                $line = trim($line);
+                if ($line != '') {
+                    array_push($mlines, $line);
+                }
+            }
+            $text = implode("\n", $mlines);
             $akey = 'markdown';
+        } else {
+            $text = strip_tags($obj['msg']);
         }
         $data[$akey] = $text;
 
