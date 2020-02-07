@@ -436,7 +436,7 @@ function getidbyname($hostname)
 
 function safename($name)
 {
-    return preg_replace('/[^a-zA-Z0-9,._\-]/', '_', $name);
+    return \LibreNMS\Data\Store\Rrd::safeName($name);
 }
 
 /**
@@ -446,7 +446,7 @@ function safename($name)
  */
 function safedescr($descr)
 {
-    return preg_replace('/[^a-zA-Z0-9,._\-\/\ ]/', ' ', $descr);
+    return \LibreNMS\Data\Store\Rrd::safeDescr($descr);
 }
 
 function zeropad($num, $length = 2)

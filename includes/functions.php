@@ -1542,30 +1542,6 @@ function function_check($function)
     return function_exists($function);
 }
 
-function force_influx_data($data)
-{
-   /*
-    * It is not trivial to detect if something is a float or an integer, and
-    * therefore may cause breakages on inserts.
-    * Just setting every number to a float gets around this, but may introduce
-    * inefficiencies.
-    * I've left the detection statement in there for a possible change in future,
-    * but currently everything just gets set to a float.
-    */
-
-    if (is_numeric($data)) {
-        // If it is an Integer
-        if (ctype_digit($data)) {
-            return floatval($data);
-        // Else it is a float
-        } else {
-            return floatval($data);
-        }
-    } else {
-        return $data;
-    }
-}// end force_influx_data
-
 /**
  * Try to determine the address family (IPv4 or IPv6) associated with an SNMP
  * transport specifier (like "udp", "udp6", etc.).
@@ -2062,10 +2038,9 @@ function get_toner_levels($device, $raw_value, $capacity)
  */
 function initStats()
 {
-    global $snmp_stats, $rrd_stats;
-    global $snmp_stats_last, $rrd_stats_last;
+    global $snmp_stats;
 
-    if (!isset($snmp_stats, $rrd_stats)) {
+    if (!isset($snmp_stats)) {
         $snmp_stats = array(
             'ops' => array(
                 'snmpget' => 0,
@@ -2078,21 +2053,6 @@ function initStats()
                 'snmpwalk' => 0.0,
             )
         );
-        $snmp_stats_last = $snmp_stats;
-
-        $rrd_stats = array(
-            'ops' => array(
-                'update' => 0,
-                'create' => 0,
-                'other' => 0,
-            ),
-            'time' => array(
-                'update' => 0.0,
-                'create' => 0.0,
-                'other' => 0.0,
-            ),
-        );
-        $rrd_stats_last = $rrd_stats;
     }
 }
 
@@ -2129,7 +2089,7 @@ function printChangedStats($update_only = false)
  */
 function printStats()
 {
-    global $snmp_stats, $db_stats, $rrd_stats;
+    global $snmp_stats, $db_stats;
 
     if ($snmp_stats) {
         printf(
@@ -2167,6 +2127,7 @@ function printStats()
         );
     }
 
+    $rrd_stats = Rrd::getStats();
     if ($rrd_stats) {
         printf(
             "RRD [%d/%.2fs]: Update[%d/%.2fs] Create [%d/%.2fs] Other[%d/%.2fs]\n",
