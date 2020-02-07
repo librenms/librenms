@@ -119,7 +119,7 @@ if (isset($device['device_id']) && $device['device_id'] > 0) {
     $full_query = 'SELECT alert_rules.* FROM alert_rules';
 }
 
-$full_query .= ' ORDER BY id ASC';
+$full_query .= ' ORDER BY name ASC';
 
 $rule_list = dbFetchRows($full_query, $param);
 $count = count($rule_list);
