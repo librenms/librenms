@@ -49,7 +49,7 @@ class Datastore
 
     public static function terminate()
     {
-        Rrd::close();
+        \Rrd::close();
     }
 
     /**

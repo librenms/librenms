@@ -83,6 +83,17 @@ class RrdDefinition
     }
 
     /**
+     * Check if the give dataset name is valid for this definition
+     *
+     * @param $name
+     * @return bool
+     */
+    public function isValidDataset($name)
+    {
+        return isset($this->dataSets[$name]);
+    }
+
+    /**
      * Check that the data set type is valid.
      *
      * @param string $type
