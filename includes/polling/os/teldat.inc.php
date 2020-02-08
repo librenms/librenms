@@ -28,4 +28,3 @@ foreach ($oids as $var => $oid) {
 }
 
 unset($data, $oids);
-
