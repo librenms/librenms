@@ -233,11 +233,11 @@ foreach ($rule_list as $rule) {
         $not_device_or_group = '<strong><em>NOT</em></strong> ';
     }
 
-    // i.e. /device-groups/4/edit
+    // i.e. /device-groups/4/edit/
     if ($group_count) {
         $group_maps = dbFetchRows('SELECT device_groups.name, device_groups.id FROM alert_group_map, device_groups WHERE alert_group_map.rule_id=? and alert_group_map.group_id = device_groups.id ORDER BY name', [$rule['id']]);
         foreach ($group_maps as $group_map) {
-            $groups .= "$not_device_or_group<a href=\"/device-groups/" . $group_map['id'] . "/edit\" title='$groups_title ". $group_map['name'] . "' target=\"_blank\">" . $group_map['name'] . "</a><br>";
+            $groups .= "$not_device_or_group<a href=\"/device-groups/" . $group_map['id'] . "/edit/\" title='$groups_title ". $group_map['name'] . "' target=\"_blank\">" . $group_map['name'] . "</a><br>";
         }
     }
 
