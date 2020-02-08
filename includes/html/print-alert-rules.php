@@ -233,17 +233,19 @@ foreach ($rule_list as $rule) {
         $not_device_or_group = '<strong><em>NOT</em></strong> ';
     }
 
+    // i.e. /device-groups/4/edit
     if ($group_count) {
-        $group_maps = dbFetchRows('SELECT device_groups.name FROM alert_group_map, device_groups WHERE alert_group_map.rule_id=? and alert_group_map.group_id = device_groups.id ORDER BY name', [$rule['id']]);
+        $group_maps = dbFetchRows('SELECT device_groups.name, device_groups.id FROM alert_group_map, device_groups WHERE alert_group_map.rule_id=? and alert_group_map.group_id = device_groups.id ORDER BY name', [$rule['id']]);
         foreach ($group_maps as $group_map) {
-            $groups .= "<p title='$groups_title ". $group_map['name'] . "'>" . $not_device_or_group . $group_map['name'] . "</p>";
+            $groups .= "$not_device_or_group<a href=\"/device-groups/" . $group_map['id'] . "/edit\" title='$groups_title ". $group_map['name'] . "' target=\"_blank\">" . $group_map['name'] . "</a><br>";
         }
     }
 
+    // i.e. /device/device=24477/tab=edit/
     if ($device_count) {
-        $devices_maps = dbFetchRows('SELECT devices.hostname FROM alert_device_map, devices WHERE alert_device_map.rule_id=? and alert_device_map.device_id = devices.device_id ORDER BY hostname', [$rule['id']]);
+        $devices_maps = dbFetchRows('SELECT devices.device_id,devices.hostname FROM alert_device_map, devices WHERE alert_device_map.rule_id=? and alert_device_map.device_id = devices.device_id ORDER BY hostname', [$rule['id']]);
         foreach ($devices_maps as $device_map) {
-            $devices .= "<p title='$devices_title ". $device_map['hostname'] . "'>" . $not_device_or_group . $device_map['hostname'] . "</p>";
+            $devices .= "$not_device_or_group<a href=\"/device/device=" . $device_map['device_id'] . "/tab=edit/\" title='$devices_title ". $device_map['hostname'] . "' target=\"_blank\">" . $device_map['hostname'] . "</a>";
         }
     }
 
