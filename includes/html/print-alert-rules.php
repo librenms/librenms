@@ -263,10 +263,10 @@ foreach ($rule_list as $rule) {
         $transport_maps = dbFetchRows('SELECT transport_or_group_id,target_type FROM alert_transport_map WHERE alert_transport_map.rule_id=? ORDER BY target_type', [$rule['id']]);
         foreach ($transport_maps as $transport_map) {
             $transport_name=null;
-            if ($transport_map['target_type'] == "group" ) {
+            if ($transport_map['target_type'] == "group") {
                 $transport_name = dbFetchCell('SELECT transport_group_name FROM alert_transport_groups WHERE transport_group_id=?', [$transport_map['transport_or_group_id']]);
             }
-            if ($transport_map['target_type'] == "single" ) {
+            if ($transport_map['target_type'] == "single") {
                 $transport_name = dbFetchCell('SELECT transport_name FROM alert_transports WHERE transport_id=?', [$transport_map['transport_or_group_id']]);
             }
             $transports .= "<p>" . $transport_name . "</p>";
