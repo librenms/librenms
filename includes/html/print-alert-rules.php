@@ -216,41 +216,45 @@ foreach ($rule_list as $rule) {
     // Name
     echo '<td>'.$rule['name'].'</td>';
 
-    // Devices
+    // Devices (and Groups)
+
+    $groups=null;
     $devices=null;
+
+    if ($rule['invert_map'] == 0) {
+        $groups_title = 'This rule is restricted to devices in the group named ';
+        $devices_title = 'This rule is restricted to a device named ';
+        $not_device_or_group = null;
+    }
+
+    if ($rule['invert_map'] == 1) {
+        $devices_title = 'This rule is restricted to devices NOT named ';
+        $groups_title = 'This rule is restricted to devices NOT in the group named ';
+        $not_device_or_group = '<strong><em>NOT</em></strong> ';
+    }
+
     if ($group_count) {
         $group_maps = dbFetchRows('SELECT device_groups.name FROM alert_group_map, device_groups WHERE alert_group_map.rule_id=? and alert_group_map.group_id = device_groups.id ORDER BY name', [$rule['id']]);
         foreach ($group_maps as $group_map) {
-            $groups_title = '';
-            if ($rule['invert_map'] == 0) {
-                $groups_title = 'This rule is restricted to devices in the group named ' . $group_map['name'];
-            }
-            if ($rule['invert_map'] == 1) {
-                $groups_title = 'This rule is restricted to devices NOT in the group named ' . $group_map['name'];
-                $group_map['name'] = '<strong><em>NOT</em></strong> ' . $group_map['name'];
-            }
-            $devices .= "<p title='$groups_title'>";
-            $devices .= $group_map['name'];
-            $devices .= "</p>";
+            $groups .= "<p title='$groups_title ". $group_map['name'] . "'>" . $not_device_or_group . $group_map['name'] . "</p>";
         }
     }
+
     if ($device_count) {
         $devices_maps = dbFetchRows('SELECT devices.hostname FROM alert_device_map, devices WHERE alert_device_map.rule_id=? and alert_device_map.device_id = devices.device_id ORDER BY hostname', [$rule['id']]);
         foreach ($devices_maps as $device_map) {
-            $devices_title = '';
-            if ($rule['invert_map'] == 0) {
-                $devices_title = 'This rule is restricted to the device named ' . $device_map['hostname'];
-            }
-            if ($rule['invert_map'] == 1) {
-                $devices_title = 'This rule is restricted to devices NOT named ' . $device_map['hostname'];
-                $device_map['hostname'] = '<strong><em>NOT</em></strong> ' . $device_map['hostname'];
-            }
-            $devices .= "<p title='$devices_title'>";
-            $devices .= $device_map['hostname'];
-            $devices .= "</p>";
+            $devices .= "<p title='$devices_title ". $device_map['hostname'] . "'>" . $not_device_or_group . $device_map['hostname'] . "</p>";
         }
     }
-    echo "<td colspan='2'>$devices</td>";
+
+    echo "<td colspan='2'>";
+    if ($groups) {
+        echo $groups;
+    }
+    if ($devices) {
+        echo $devices;
+    }
+    echo "</td>";
 
     // Transports
     $transport_count = dbFetchCell('SELECT COUNT(*) FROM alert_transport_map WHERE rule_id=?', [$rule['id']]);
@@ -345,9 +349,11 @@ if (($count % $results) > 0) {
     echo generate_pagination($count, $results, $page_number);
     echo '</div>';
     echo '<div class="col pull-right">';
-    $showing_start=($page_number*$results)-$results+1;
-    $showing_end=$page_number*$results;
-    if ($showing_end > $count) $showing_end=$count;
+    $showing_start = ($page_number*$results)-$results+1;
+    $showing_end = $page_number*$results;
+    if ($showing_end > $count) {
+        $showing_end = $count;
+    }
     echo "<p class=\"pagination\">Showing $showing_start to $showing_end of $count alert rules</p>";
     echo '</div>';
     echo '</div>';
@@ -357,20 +363,20 @@ echo '<input type="hidden" name="page_number" id="page_number" value="'.$page_nu
     <input type="hidden" name="results_amount" id="results_amount" value="'.$results.'">
     </form>';
 
-        if ($count < 1) {
-            if (Auth::user()->hasGlobalAdmin()) {
-                echo '<div class="row">
-                    <div class="col-sm-12">
-                    <form role="form" method="post">
-                    ' . csrf_field() . '
-                    <p class="text-center">
-                    <button type="submit" class="btn btn-success btn-lg" id="create-default" name="create-default"><i class="fa fa-plus"></i> Click here to create the default alert rules!</button>
-                    </p>
-                    </form>
-                    </div>
-                    </div>';
-            }
-        }
+if ($count < 1) {
+    if (Auth::user()->hasGlobalAdmin()) {
+        echo '<div class="row">
+            <div class="col-sm-12">
+            <form role="form" method="post">
+            ' . csrf_field() . '
+            <p class="text-center">
+            <button type="submit" class="btn btn-success btn-lg" id="create-default" name="create-default"><i class="fa fa-plus"></i> Click here to create the default alert rules!</button>
+            </p>
+            </form>
+            </div>
+            </div>';
+    }
+}
 ?>
 <script>
 $("[data-toggle='modal'], [data-toggle='popover']").popover({
