@@ -16,7 +16,7 @@ foreach ($pre_cache['sdbMgmtCtrlDevUnitAddress'] as $sdbMgmtCtrlDevUnitAddress =
 }
 
 $unit = current($pre_cache['sdbMgmtCtrlDevUnitAddress']);
-foreach ($pre_cache['sdbDevOutMtPowerVoltAmpere']as $sdbDevOutMtIndex => $sdbDevOutMtPowerVoltAmpere) {
+foreach ($pre_cache['sdbDevOutMtPowerVoltAmpere'] as $sdbDevOutMtIndex => $sdbDevOutMtPowerVoltAmpere) {
     $name             = trim($pre_cache['sdbDevOutName'][$sdbDevOutMtIndex], '"');
     $power_oid        = ".1.3.6.1.4.1.31034.12.1.1.2.7.2.1.10.$unit.$sdbDevOutMtIndex";
     $serial_input     = $pre_cache['sdbDevIdSerialNumber'][$unit] ." Outlet ". $sdbDevOutMtIndex;
