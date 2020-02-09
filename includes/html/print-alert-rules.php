@@ -1,4 +1,32 @@
 <?php
+/**
+ * print-alert-rules.inc.php
+ *
+ * LibreNMS print alert rules table
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package    LibreNMS
+ * @link       http://librenms.org
+ * @copyright  2020 The LibreNMS Community
+ * @author     Original Author <unknown>
+ * @author     Joseph Tingiris <joseph.tingiris@gmail.com>
+ */
+
+if (!Auth::user()->hasGlobalAdmin()) {
+    die('ERROR: You need to be admin');
+}
 
 use LibreNMS\Alerting\QueryBuilderParser;
 
@@ -47,8 +75,8 @@ if (isset($_POST['create-default'])) {
 }
 
 require_once 'includes/html/modal/new_alert_rule.inc.php';
-require_once 'includes/html/modal/delete_alert_rule.inc.php';
-require_once 'includes/html/modal/alert_rule_collection.inc.php';
+require_once 'includes/html/modal/delete_alert_rule.inc.php'; // Also dies if !Auth::user()->hasGlobalAdmin()
+require_once 'includes/html/modal/alert_rule_collection.inc.php'; // Also dies if !Auth::user()->hasGlobalAdmin()
 
 require_once 'includes/html/modal/edit_transport_group.inc.php';
 require_once 'includes/html/modal/edit_alert_transport.inc.php';
@@ -63,11 +91,9 @@ if (isset($_POST['results_amount']) && $_POST['results_amount'] > 0) {
 
 echo '<div class="table-responsive">';
 echo '<div class="col pull-left">';
-if (Auth::user()->hasGlobalAdmin()) {
-    echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#create-alert" data-device_id="'.$device['device_id'].'"><i class="fa fa-plus"></i> Create new alert rule</button>';
-    echo '<i> - OR - </i>';
-    echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#search_rule_modal" data-device_id="'.$device['device_id'].'"><i class="fa fa-plus"></i> Create rule from collection</button>';
-}
+echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#create-alert" data-device_id="'.$device['device_id'].'"><i class="fa fa-plus"></i> Create new alert rule</button>';
+echo '<i> - OR - </i>';
+echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#search_rule_modal" data-device_id="'.$device['device_id'].'"><i class="fa fa-plus"></i> Create rule from collection</button>';
 echo '</div>';
 
 echo '<div class="col pull-right">';
@@ -275,11 +301,11 @@ foreach ($rule_list as $rule) {
             $transport_name=null;
             if ($transport_map['target_type'] == "group") {
                 $transport_name = dbFetchCell('SELECT transport_group_name FROM alert_transport_groups WHERE transport_group_id=?', [$transport_map['transport_or_group_id']]);
-                $transport_edit = "<a href='' data-toggle='modal' data-target='#edit-transport-group' data-group_id='" . $transport_map['transport_or_group_id'] . "' data-container='body' data-toggle='popover' data-placement='$transports_popover' data-content='Edit transport group  $transport_name'>" . $transport_name. "</a>";
+                $transport_edit = "<a href='' data-toggle='modal' data-target='#edit-transport-group' data-group_id='" . $transport_map['transport_or_group_id'] . "' data-container='body' data-toggle='popover' data-placement='$transports_popover' data-content='Edit transport group  $transport_name'>" . $transport_name . "</a>";
             }
             if ($transport_map['target_type'] == "single") {
                 $transport_name = dbFetchCell('SELECT transport_name FROM alert_transports WHERE transport_id=?', [$transport_map['transport_or_group_id']]);
-                $transport_edit = "<a href='' data-toggle='modal' data-target='#edit-alert-transport' data-transport_id='" . $transport_map['transport_or_group_id'] . "' data-container='body' data-toggle='popover' data-placement='$transports_popover' data-content='Edit transport $transport_name'>" . $transport_name. "</a>";
+                $transport_edit = "<a href='' data-toggle='modal' data-target='#edit-alert-transport' data-transport_id='" . $transport_map['transport_or_group_id'] . "' data-container='body' data-toggle='popover' data-placement='$transports_popover' data-content='Edit transport $transport_name'>" . $transport_name . "</a>";
             }
             $transports .= $transport_edit . "<br>";
         }
@@ -341,20 +367,9 @@ foreach ($rule_list as $rule) {
         $enabled_title = $rule['name'] . " is ON";
     }
 
-    if (!Auth::user()->hasGlobalAdmin()) {
-        if ($rule['disabled']) {
-            echo "<div data-toggle='popover' data-placement='$enabled_popover' data-content='" . $enabled_title . "' class='fa fa-fw fa-2x fa-pause'></div>";
-        }
-        if (!$rule['disabled']) {
-            echo "<div data-toggle='popover' data-placement='$enabled_popover' data-content='" . $enabled_title . "' class='fa fa-fw fa-2x fa-check text-success'></div>";
-        }
-    }
-
-    if (Auth::user()->hasGlobalAdmin()) {
-        echo "<div data-toggle='popover' data-placement='$enabled_popover' data-content='" . $enabled_title . "' class='btn-group btn-group-sm' role='group'>";
-        echo "<input id='".$rule['id']."' type='checkbox' name='alert-rule' data-orig_class='".$orig_class."' data-orig_colour='".$orig_col."' data-orig_state='".$orig_ico."' data-alert_id='".$rule['id']."' ".$alert_checked." data-size='small' data-content='".$enabled_title."' data-toggle='modal'>";
-        echo "</div>";
-    }
+    echo "<div data-toggle='popover' data-placement='$enabled_popover' data-content='" . $enabled_title . "' class='btn-group btn-group-sm' role='group'>";
+    echo "<input id='".$rule['id']."' type='checkbox' name='alert-rule' data-orig_class='".$orig_class."' data-orig_colour='".$orig_col."' data-orig_state='".$orig_ico."' data-alert_id='".$rule['id']."' ".$alert_checked." data-size='small' data-content='".$enabled_title."' data-toggle='modal'>";
+    echo "</div>";
     echo '</td>';
 
     // Action
@@ -362,11 +377,9 @@ foreach ($rule_list as $rule) {
     $action_popover='left';
 
     echo '<td>';
-    if (Auth::user()->hasGlobalAdmin()) {
-        echo "<div class='btn-group btn-group-sm' role='group'>";
-        echo "<button type='button' class='btn btn-primary' data-toggle='modal' data-placement='$action_popover' data-target='#create-alert' data-rule_id='".$rule['id']."' name='edit-alert-rule' data-content='Edit alert rule " . $rule['name'] . "' data-container='body'><i class='fa fa-lg fa-pencil' aria-hidden='true'></i></button> ";
-        echo "<button type='button' class='btn btn-danger' aria-label='Delete' data-placement='$action_popover' data-toggle='modal' data-target='#confirm-delete' data-alert_id='".$rule['id']."' name='delete-alert-rule' data-content=' Delete alert rule " . $rule['name'] . "' data-container='body'><i class='fa fa-lg fa-trash' aria-hidden='true'></i></button>";
-    }
+    echo "<div class='btn-group btn-group-sm' role='group'>";
+    echo "<button type='button' class='btn btn-primary' data-toggle='modal' data-placement='$action_popover' data-target='#create-alert' data-rule_id='".$rule['id']."' name='edit-alert-rule' data-content='Edit alert rule " . $rule['name'] . "' data-container='body'><i class='fa fa-lg fa-pencil' aria-hidden='true'></i></button> ";
+    echo "<button type='button' class='btn btn-danger' aria-label='Delete' data-placement='$action_popover' data-toggle='modal' data-target='#confirm-delete' data-alert_id='".$rule['id']."' name='delete-alert-rule' data-content=' Delete alert rule " . $rule['name'] . "' data-container='body'><i class='fa fa-lg fa-trash' aria-hidden='true'></i></button>";
     echo '</td>';
 
     echo "</tr>\r\n";
@@ -400,18 +413,16 @@ echo '<input type="hidden" name="page_number" id="page_number" value="'.$page_nu
     </form>';
 
 if ($count < 1) {
-    if (Auth::user()->hasGlobalAdmin()) {
-        echo '<div class="row">
-            <div class="col-sm-12">
-            <form role="form" method="post">
-            ' . csrf_field() . '
-            <p class="text-center">
-            <button type="submit" class="btn btn-success btn-lg" id="create-default" name="create-default"><i class="fa fa-plus"></i> Click here to create the default alert rules!</button>
-            </p>
-            </form>
-            </div>
-            </div>';
-    }
+    echo '<div class="row">
+        <div class="col-sm-12">
+        <form role="form" method="post">
+        ' . csrf_field() . '
+        <p class="text-center">
+        <button type="submit" class="btn btn-success btn-lg" id="create-default" name="create-default"><i class="fa fa-plus"></i> Click here to create the default alert rules!</button>
+        </p>
+        </form>
+        </div>
+        </div>';
 }
 ?>
 <script>
