@@ -236,27 +236,32 @@ foreach ($rule_list as $rule) {
         $except_device_or_group = '<strong><em>EXCEPT</em></strong> ';
     }
 
+    $device_and_group_queries=array();
     if ($group_count) {
-        $group_maps = dbFetchRows('SELECT device_groups.name, device_groups.id FROM alert_group_map, device_groups WHERE alert_group_map.rule_id=? and alert_group_map.group_id = device_groups.id ORDER BY name', [$rule['id']]);
-        foreach ($group_maps as $group_map) {
-            $groups .= "$except_device_or_group<a href=\"/device-groups/" . $group_map['id'] . "/edit\" data-container='body' data-toggle='popover' data-content='Edit device group " . $group_map['name'] . "' title='$groups_title' target=\"_blank\">" . $group_map['name'] . "</a><br>";
-        }
+        $device_and_group_queries[] = 'SELECT device_groups.name, device_groups.id FROM alert_group_map, device_groups WHERE alert_group_map.rule_id=? and alert_group_map.group_id = device_groups.id ORDER BY name';
     }
 
     if ($device_count) {
-        $devices_maps = dbFetchRows('SELECT devices.device_id,devices.hostname FROM alert_device_map, devices WHERE alert_device_map.rule_id=? and alert_device_map.device_id = devices.device_id ORDER BY hostname', [$rule['id']]);
-        foreach ($devices_maps as $device_map) {
-            $devices .= "$except_device_or_group<a href=\"/device/device=" . $device_map['device_id'] . "/tab=edit/\" data-container='body' data-toggle='popover' data-content='Edit device " . $device_map['hostname'] . "' title='$devices_title' target=\"_blank\">" . $device_map['hostname'] . "</a>";
+        $device_and_group_queries[] = 'SELECT devices.device_id,devices.hostname FROM alert_device_map, devices WHERE alert_device_map.rule_id=? and alert_device_map.device_id = devices.device_id ORDER BY hostname';
+    }
+
+    $devices_and_groups=null;
+    foreach ($device_and_group_queries as $device_and_group_query) {
+        $maps = dbFetchRows($device_and_group_query, [$rule['id']]);
+        foreach ($maps as $map) {
+            // Groups first
+            if (preg_match("/^SELECT device_groups.name/i",$device_and_group_query) == 1) {
+                $devices_and_groups .= "$except_device_or_group<a href=\"/device-groups/" . $map['id'] . "/edit\" data-container='body' data-toggle='popover' data-content='Edit device group " . $map['name'] . "' title='$groups_title' target=\"_blank\">" . $map['name'] . "</a><br>";
+            }
+            // Devices last
+            if (preg_match("/^SELECT devices.device_id/i",$device_and_group_query) == 1) {
+                $devices_and_groups .= "$except_device_or_group<a href=\"/device/device=" . $map['device_id'] . "/tab=edit/\" data-container='body' data-toggle='popover' data-content='Edit device " . $map['hostname'] . "' title='$devices_title' target=\"_blank\">" . $map['hostname'] . "</a>";
+            }
         }
     }
 
     echo "<td colspan='2'>";
-    if ($groups) {
-        echo $groups;
-    }
-    if ($devices) {
-        echo $devices;
-    }
+    echo $devices_and_groups;
     echo "</td>";
 
     // Transports
