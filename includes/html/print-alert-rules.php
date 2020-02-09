@@ -221,9 +221,6 @@ foreach ($rule_list as $rule) {
 
     // Devices (and Groups)
 
-    $groups=null;
-    $devices=null;
-
     if ($rule['invert_map'] == 0) {
         $groups_title = 'Only devices in this group.';
         $devices_title = 'Only this device.';
