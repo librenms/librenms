@@ -280,7 +280,7 @@ foreach ($rule_list as $rule) {
             }
             // Devices last
             if (preg_match("/^SELECT devices.device_id/i", $device_and_group_query) == 1) {
-                $devices_and_groups .= "$except_device_or_group<a href=\"/device/device=" . $map['device_id'] . "/tab=edit/\" data-container='body' data-toggle='popover' data-placement='$devices_and_groups_popover' data-content='Edit device " . $map['hostname'] . "' title='$devices_title' target=\"_blank\">" . $map['hostname'] . "</a>";
+                $devices_and_groups .= "$except_device_or_group<a href=\"/device/device=" . $map['device_id'] . "/tab=edit/\" data-container='body' data-toggle='popover' data-placement='$devices_and_groups_popover' data-content='Edit device " . $map['hostname'] . "' title='$devices_title' target=\"_blank\">" . $map['hostname'] . "</a><br>";
             }
         }
     }
