@@ -285,6 +285,10 @@ foreach ($rule_list as $rule) {
         }
     }
 
+    if (!$devices_and_groups) {
+        $devices_and_groups .= "<a href=\"/devices\" data-container='body' data-toggle='popover' data-placement='$devices_and_groups_popover' data-content='View All Devices' target=\"_blank\">All Devices</a><br>";
+    }
+
     echo "<td colspan='2'>";
     echo $devices_and_groups;
     echo "</td>";
