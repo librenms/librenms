@@ -33,6 +33,7 @@ if (!Auth::user()->hasGlobalAdmin()) {
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-danger danger" id="alert-rule-removal" data-target="alert-rule-removal">Delete</button>
                     <input type="hidden" name="alert_id" id="alert_id" value="">
+                    <input type="hidden" name="alert_name" id="alert_name" value="">
                     <input type="hidden" name="confirm" id="confirm" value="yes">
                 </form>
             </div>
@@ -43,12 +44,16 @@ if (!Auth::user()->hasGlobalAdmin()) {
 <script>
 $('#confirm-delete').on('show.bs.modal', function(event) {
     alert_id = $(event.relatedTarget).data('alert_id');
+    alert_name = $(event.relatedTarget).data('alert_name');
     $("#alert_id").val(alert_id);
+    $("#alert_name").val(alert_name);
+    $( "p" ).first().text( 'If you would like to remove the alert rule named \''+alert_name+'\' then please click Delete.' );
 });
 
 $('#alert-rule-removal').click('', function(event) {
     event.preventDefault();
     var alert_id = $("#alert_id").val();
+    var alert_name = $("#alert_name").val();
     $.ajax({
         type: 'POST',
         url: 'ajax_form.php',
@@ -57,12 +62,14 @@ $('#alert-rule-removal').click('', function(event) {
         success: function(msg) {
             if(msg.indexOf("ERROR:") <= -1) {
                 $("#rule_id_"+alert_id).remove();
+                toastr.success(msg);
+            } else {
+                toastr.error(msg);
             }
-            toastr.success(msg);
             $("#confirm-delete").modal('hide');
         },
-        error: function(msg) {
-            toastr.error(msg);
+        error: function() {
+            toastr.error('ERROR: ajax post failed; unable to delete alert rule');
             $("#confirm-delete").modal('hide');
         }
     });

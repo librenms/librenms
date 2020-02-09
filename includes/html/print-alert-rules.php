@@ -379,7 +379,7 @@ foreach ($rule_list as $rule) {
     echo '<td>';
     echo "<div class='btn-group btn-group-sm' role='group'>";
     echo "<button type='button' class='btn btn-primary' data-toggle='modal' data-placement='$action_popover' data-target='#create-alert' data-rule_id='".$rule['id']."' name='edit-alert-rule' data-content='Edit alert rule " . $rule['name'] . "' data-container='body'><i class='fa fa-lg fa-pencil' aria-hidden='true'></i></button> ";
-    echo "<button type='button' class='btn btn-danger' aria-label='Delete' data-placement='$action_popover' data-toggle='modal' data-target='#confirm-delete' data-alert_id='".$rule['id']."' name='delete-alert-rule' data-content=' Delete alert rule " . $rule['name'] . "' data-container='body'><i class='fa fa-lg fa-trash' aria-hidden='true'></i></button>";
+    echo "<button type='button' class='btn btn-danger' aria-label='Delete' data-placement='$action_popover' data-toggle='modal' data-target='#confirm-delete' data-alert_id='".$rule['id']."' data-alert_name='".$rule['name']."' name='delete-alert-rule' data-content=' Delete alert rule " . $rule['name'] . "' data-container='body'><i class='fa fa-lg fa-trash' aria-hidden='true'></i></button>";
     echo '</td>';
 
     echo "</tr>\r\n";
