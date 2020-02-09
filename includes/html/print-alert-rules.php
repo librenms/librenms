@@ -187,19 +187,19 @@ foreach ($rule_list as $rule) {
     $ico   = 'check';
     $col   = 'success';
     $extra = '';
-    $status_title = '';
+    $status_msg = '';
     if (sizeof($sub) == 1) {
         $sub = $sub[0];
         if ((int) $sub['state'] === 0) {
             $ico = 'check';
             $col = 'success';
-            $status_title = "All devices matching " . $rule['name'] . "  are OK";
+            $status_msg = "All devices matching " . $rule['name'] . "  are OK";
         }
         if ((int) $sub['state'] === 1 || (int) $sub['state'] === 2) {
             $ico   = 'exclamation';
             $col   = 'danger';
             $extra = 'danger';
-            $status_title = "Some devices matching " . $rule['name'] . " are currently alerting";
+            $status_msg = "Some devices matching " . $rule['name'] . " are currently alerting";
         }
     }
 
@@ -211,7 +211,7 @@ foreach ($rule_list as $rule) {
         $ico   = 'pause';
         $col   = '';
         $extra = 'active';
-        $status_title = $rule['name'] . " is OFF";
+        $status_msg = $rule['name'] . " is OFF";
     } else {
         $alert_checked = 'checked';
     }
@@ -240,22 +240,24 @@ foreach ($rule_list as $rule) {
     echo "<tr class='".$extra."' id='rule_id_".$rule['id']."'>";
 
     // Type
+
     echo "<td colspan=\"2\"><div data-toggle='popover' data-placement='top' data-content=\"$popover_msg\" class=\"$icon_indicator\"></div></td>";
 
     // Name
+
     echo '<td>'.$rule['name'].'</td>';
 
     // Devices (and Groups)
 
     if ($rule['invert_map'] == 0) {
-        $groups_title = 'Only devices in this group.';
-        $devices_title = 'Only this device.';
+        $groups_msg = 'Only devices in this group.';
+        $devices_msg = 'Only this device.';
         $except_device_or_group = null;
     }
 
     if ($rule['invert_map'] == 1) {
-        $devices_title = 'All devices EXCEPT this device. ';
-        $groups_title = 'All devices EXCEPT this group.';
+        $devices_msg = 'All devices EXCEPT this device. ';
+        $groups_msg = 'All devices EXCEPT this group.';
         $except_device_or_group = '<strong><em>EXCEPT</em></strong> ';
     }
 
@@ -276,11 +278,11 @@ foreach ($rule_list as $rule) {
         foreach ($maps as $map) {
             // Groups first
             if (preg_match("/^SELECT device_groups.name/i", $device_and_group_query) == 1) {
-                $devices_and_groups .= "$except_device_or_group<a href=\"/device-groups/" . $map['id'] . "/edit\" data-container='body' data-toggle='popover' data-placement='$devices_and_groups_popover' data-content='Edit device group " . $map['name'] . "' title='$groups_title' target=\"_blank\">" . $map['name'] . "</a><br>";
+                $devices_and_groups .= "$except_device_or_group<a href=\"/device-groups/" . $map['id'] . "/edit\" data-container='body' data-toggle='popover' data-placement='$devices_and_groups_popover' data-content='Edit device group " . $map['name'] . "' title='$groups_msg' target=\"_blank\">" . $map['name'] . "</a><br>";
             }
             // Devices last
             if (preg_match("/^SELECT devices.device_id/i", $device_and_group_query) == 1) {
-                $devices_and_groups .= "$except_device_or_group<a href=\"/device/device=" . $map['device_id'] . "/tab=edit/\" data-container='body' data-toggle='popover' data-placement='$devices_and_groups_popover' data-content='Edit device " . $map['hostname'] . "' title='$devices_title' target=\"_blank\">" . $map['hostname'] . "</a><br>";
+                $devices_and_groups .= "$except_device_or_group<a href=\"/device/device=" . $map['device_id'] . "/tab=edit/\" data-container='body' data-toggle='popover' data-placement='$devices_and_groups_popover' data-content='Edit device " . $map['hostname'] . "' title='$devices_msg' target=\"_blank\">" . $map['hostname'] . "</a><br>";
             }
         }
     }
@@ -330,9 +332,11 @@ foreach ($rule_list as $rule) {
     echo "<td colspan='2'>$transports</td>";
 
     // Extra
+
     echo '<td><small>Max: '.$rule_extra['count'].'<br />Delay: '.$rule_extra['delay'].'<br />Interval: '.$rule_extra['interval'].'</small></td>';
 
     // Rule
+
     echo "<td class='col-sm-4'>";
     if ($rule_extra['invert'] === true) {
         echo '<strong><em>Inverted</em></strong> ';
@@ -354,9 +358,9 @@ foreach ($rule_list as $rule) {
 
     $status_popover='top';
 
-    echo "<td><span data-toggle='popover' data-placement='$status_popover' data-content='$status_title' id='alert-rule-".$rule['id']."' class='fa fa-fw fa-2x fa-".$ico.' text-'.$col."'></span> ";
+    echo "<td><span data-toggle='popover' data-placement='$status_popover' data-content='$status_msg' id='alert-rule-".$rule['id']."' class='fa fa-fw fa-2x fa-".$ico.' text-'.$col."'></span> ";
     if ($rule_extra['mute'] === true) {
-        echo "<div data-toggle='popover' data-placement='$status_popover' data-content='Alerts for " . $rule['name'] . " are muted' class='fa fa-fw fa-2x fa-volume-off text-primary' aria-hidden='true'></div></td>";
+        echo "<div data-toggle='popover' data-content='Alerts for " . $rule['name'] . " are muted' class='fa fa-fw fa-2x fa-volume-off text-primary' aria-hidden='true'></div></td>";
     }
 
     // Enabled
@@ -365,14 +369,14 @@ foreach ($rule_list as $rule) {
 
     echo '<td>';
     if ($rule['disabled']) {
-        $enabled_title = $rule['name'] . " is OFF";
+        $enabled_msg = $rule['name'] . " is OFF";
     }
     if (!$rule['disabled']) {
-        $enabled_title = $rule['name'] . " is ON";
+        $enabled_msg = $rule['name'] . " is ON";
     }
 
-    echo "<div data-toggle='popover' data-placement='$enabled_popover' data-content='" . $enabled_title . "' class='btn-group btn-group-sm' role='group'>";
-    echo "<input id='".$rule['id']."' type='checkbox' name='alert-rule' data-orig_class='".$orig_class."' data-orig_colour='".$orig_col."' data-orig_state='".$orig_ico."' data-alert_id='".$rule['id']."' ".$alert_checked." data-size='small' data-content='".$enabled_title."' data-toggle='modal'>";
+    echo "<div id='on-off-checkbox-" .$rule['id']. "' data-toggle='popover' data-placement='$enabled_popover' data-content='" . $enabled_msg . "' class='btn-group btn-group-sm' role='group'>";
+    echo "<input id='".$rule['id']."' type='checkbox' name='alert-rule' data-orig_class='".$orig_class."' data-orig_colour='".$orig_col."' data-orig_state='".$orig_ico."' data-alert_id='".$rule['id']."' data-alert_name='".$rule['name']."' data-alert_status='". $status_msg. "' ".$alert_checked." data-size='small' data-toggle='modal'>";
     echo "</div>";
     echo '</td>';
 
@@ -383,7 +387,7 @@ foreach ($rule_list as $rule) {
     echo '<td>';
     echo "<div class='btn-group btn-group-sm' role='group'>";
     echo "<button type='button' class='btn btn-primary' data-toggle='modal' data-placement='$action_popover' data-target='#create-alert' data-rule_id='".$rule['id']."' name='edit-alert-rule' data-content='Edit alert rule " . $rule['name'] . "' data-container='body'><i class='fa fa-lg fa-pencil' aria-hidden='true'></i></button> ";
-    echo "<button type='button' class='btn btn-danger' aria-label='Delete' data-placement='$action_popover' data-toggle='modal' data-target='#confirm-delete' data-alert_id='".$rule['id']."' data-alert_name='".$rule['name']."' name='delete-alert-rule' data-content=' Delete alert rule " . $rule['name'] . "' data-container='body'><i class='fa fa-lg fa-trash' aria-hidden='true'></i></button>";
+    echo "<button type='button' class='btn btn-danger' aria-label='Delete' data-placement='$action_popover' data-toggle='modal' data-target='#confirm-delete' data-alert_id='".$rule['id']."' data-alert_name='".$rule['name']."' name='delete-alert-rule' data-content='Delete alert rule " . $rule['name'] . "' data-container='body'><i class='fa fa-lg fa-trash' aria-hidden='true'></i></button>";
     echo '</td>';
 
     echo "</tr>\r\n";
@@ -459,6 +463,8 @@ $('input[name="alert-rule"]').on('switchChange.bootstrapSwitch',  function(event
     event.preventDefault();
     var $this = $(this);
     var alert_id = $(this).data("alert_id");
+    var alert_name = $(this).data("alert_name");
+    var alert_status = $(this).data("alert_status");
     var orig_state = $(this).data("orig_state");
     var orig_colour = $(this).data("orig_colour");
     var orig_class = $(this).data("orig_class");
@@ -474,6 +480,8 @@ $('input[name="alert-rule"]').on('switchChange.bootstrapSwitch',  function(event
                         $('#alert-rule-'+alert_id).addClass('fa-'+orig_state);
                         $('#alert-rule-'+alert_id).removeClass('text-default');
                         $('#alert-rule-'+alert_id).addClass('text-'+orig_colour);
+                        $('#alert-rule-'+alert_id).attr('data-content', alert_status);
+                        $('#on-off-checkbox-'+alert_id).attr('data-content', alert_name+' is ON');
                         $('#rule_id_'+alert_id).removeClass('active');
                         $('#rule_id_'+alert_id).addClass(orig_class);
                     } else {
@@ -481,6 +489,8 @@ $('input[name="alert-rule"]').on('switchChange.bootstrapSwitch',  function(event
                         $('#alert-rule-'+alert_id).addClass('fa-pause');
                         $('#alert-rule-'+alert_id).removeClass('text-'+orig_colour);
                         $('#alert-rule-'+alert_id).addClass('text-default');
+                        $('#alert-rule-'+alert_id).attr('data-content', alert_name+' is OFF');
+                        $('#on-off-checkbox-'+alert_id).attr('data-content', alert_name+' is OFF');
                         $('#rule_id_'+alert_id).removeClass('warning');
                         $('#rule_id_'+alert_id).addClass('active');
                     }
