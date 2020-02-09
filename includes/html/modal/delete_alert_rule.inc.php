@@ -57,6 +57,9 @@ $('#alert-rule-removal').click('', function(event) {
         success: function(msg) {
             if(msg.indexOf("ERROR:") <= -1) {
                 $("#row_"+alert_id).remove();
+                setTimeout(function() {
+                    location.reload(1);
+                }, 1000);
             }
             $("#message").html('<div class="alert alert-info">'+msg+'</div>');
             $("#confirm-delete").modal('hide');
