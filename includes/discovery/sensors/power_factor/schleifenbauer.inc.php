@@ -15,17 +15,18 @@ foreach ($pre_cache['sdbMgmtCtrlDevUnitAddress'] as $sdbMgmtCtrlDevUnitAddress =
 
         discover_sensor($valid['sensor'], 'power_factor', $device, $power_factor_oid, $serial_input, 'schleifenbauer', $descr, $divisor, '1', '0', null, null, '1', $power_factor, 'snmp', $entPhysicalIndex);
     }
+}
 
-    foreach ($pre_cache['sdbDevOutMtPowerFactor'][$sdbDevIdIndex] as $sdbDevOutMtIndex => $sdbDevOutMtPowerFactor) {
-        $name             = trim($pre_cache['sdbDevOutName'][$sdbDevIdIndex][$sdbDevOutMtIndex], '"');
-        $power_factor_oid = ".1.3.6.1.4.1.31034.12.1.1.2.7.2.1.4.$sdbDevIdIndex.$sdbDevOutMtIndex";
-        $power_factor     = $sdbDevOutMtPowerFactor / $divisor;
-        $serial_input     = $pre_cache['sdbDevIdSerialNumber'][$sdbDevIdIndex] ." Outlet ". $sdbDevOutMtIndex;
-        $descr            = ($name != '' ? $name : "$serial_input Power Factor");
+$unit = current($pre_cache['sdbMgmtCtrlDevUnitAddress']);
+foreach ($pre_cache['sdbDevOutMtPowerFactor'] as $sdbDevOutMtIndex => $sdbDevOutMtPowerFactor) {
+    $name             = trim($pre_cache['sdbDevOutName'][$sdbDevOutMtIndex], '"');
+    $power_factor_oid = ".1.3.6.1.4.1.31034.12.1.1.2.7.2.1.4.$unit.$sdbDevOutMtIndex";
+    $power_factor     = $sdbDevOutMtPowerFactor / $divisor;
+    $serial_input     = $pre_cache['sdbDevIdSerialNumber'][$unit] ." Outlet ". $sdbDevOutMtIndex;
+    $descr            = ($name != '' ? $name : "$serial_input Power Factor");
 
-        // See includes/discovery/entity-physical/schleifenbauer.inc.php for an explanation why we set this as the entPhysicalIndex.
-        $entPhysicalIndex = $sdbMgmtCtrlDevUnitAddress * 1000000 + 100000 + $sdbDevOutMtIndex * 1000 + 150;
+    // See includes/discovery/entity-physical/schleifenbauer.inc.php for an explanation why we set this as the entPhysicalIndex.
+    $entPhysicalIndex = $sdbMgmtCtrlDevUnitAddress * 1000000 + 100000 + $sdbDevOutMtIndex * 1000 + 150;
 
-        discover_sensor($valid['sensor'], 'power_factor', $device, $power_factor_oid, $serial_input, 'schleifenbauer', $descr, $divisor, '1', '0', null, null, '1', $power_factor, 'snmp', $entPhysicalIndex);
-    }
+    discover_sensor($valid['sensor'], 'power_factor', $device, $power_factor_oid, $serial_input, 'schleifenbauer', $descr, $divisor, '1', '0', null, null, '1', $power_factor, 'snmp', $entPhysicalIndex);
 }

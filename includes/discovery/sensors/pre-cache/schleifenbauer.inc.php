@@ -41,22 +41,22 @@ echo 'sdbDevInPowerFactor ';
 $pre_cache['sdbDevInPowerFactor']       = current(snmpwalk_array_num($device, '.1.3.6.1.4.1.31034.12.1.1.2.6.1.1.4', 2));
 
 echo 'sdbDevOutName ';
-$pre_cache['sdbDevOutName']             = current(snmpwalk_array_num($device, '.1.3.6.1.4.1.31034.12.1.1.2.7.1.1.2', 2));
+$pre_cache['sdbDevOutName']             = current(snmpwalk_array_num($device, '.1.3.6.1.4.1.31034.12.1.1.2.7.1.1.2.' . current($pre_cache['sdbMgmtCtrlDevUnitAddress']), 1));
 
 echo 'sdbDevOutMtActualVoltage ';
-$pre_cache['sdbDevOutMtActualVoltage']  = current(snmpwalk_array_num($device, '.1.3.6.1.4.1.31034.12.1.1.2.7.2.1.7', 2));
+$pre_cache['sdbDevOutMtActualVoltage']  = current(snmpwalk_array_num($device, '.1.3.6.1.4.1.31034.12.1.1.2.7.2.1.7.'  . current($pre_cache['sdbMgmtCtrlDevUnitAddress']), 1));
 
 echo 'sdbDevOutMtActualCurrent ';
-$pre_cache['sdbDevOutMtActualCurrent']  = current(snmpwalk_array_num($device, '.1.3.6.1.4.1.31034.12.1.1.2.7.2.1.5', 2));
+$pre_cache['sdbDevOutMtActualCurrent']  = current(snmpwalk_array_num($device, '.1.3.6.1.4.1.31034.12.1.1.2.7.2.1.5.' . current($pre_cache['sdbMgmtCtrlDevUnitAddress']), 1));
 
 echo 'sdbDevOutMtMaxAmps ';
-$pre_cache['sdbDevOutMtMaxAmps']        = current(snmpwalk_array_num($device, '.1.3.6.1.4.1.31034.12.1.1.2.7.2.1.8', 2));
+$pre_cache['sdbDevOutMtMaxAmps']        = current(snmpwalk_array_num($device, '.1.3.6.1.4.1.31034.12.1.1.2.7.2.1.8.' . current($pre_cache['sdbMgmtCtrlDevUnitAddress']), 1));
 
 echo 'sdbDevOutMtPowerVoltAmpere ';
-$pre_cache['sdbDevOutMtPowerVoltAmpere']= current(snmpwalk_array_num($device, '.1.3.6.1.4.1.31034.12.1.1.2.7.2.1.10', 2));
+$pre_cache['sdbDevOutMtPowerVoltAmpere']= current(snmpwalk_array_num($device, '.1.3.6.1.4.1.31034.12.1.1.2.7.2.1.10.' . current($pre_cache['sdbMgmtCtrlDevUnitAddress']), 1));
 
 echo 'sdbDevOutMtKWhTotal ';
-$pre_cache['sdbDevOutMtKWhTotal']       = current(snmpwalk_array_num($device, '.1.3.6.1.4.1.31034.12.1.1.2.7.2.1.2', 2));
+$pre_cache['sdbDevOutMtKWhTotal']       = current(snmpwalk_array_num($device, '.1.3.6.1.4.1.31034.12.1.1.2.7.2.1.2.' . current($pre_cache['sdbMgmtCtrlDevUnitAddress']), 1));
 
 echo 'sdbDevOutMtPowerFactor ';
-$pre_cache['sdbDevOutMtPowerFactor']    = current(snmpwalk_array_num($device, '.1.3.6.1.4.1.31034.12.1.1.2.7.2.1.4', 2));
+$pre_cache['sdbDevOutMtPowerFactor']    = current(snmpwalk_array_num($device, '.1.3.6.1.4.1.31034.12.1.1.2.7.2.1.4.' . current($pre_cache['sdbMgmtCtrlDevUnitAddress']), 1));

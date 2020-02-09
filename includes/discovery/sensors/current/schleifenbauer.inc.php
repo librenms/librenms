@@ -17,19 +17,20 @@ foreach ($pre_cache['sdbMgmtCtrlDevUnitAddress'] as $sdbMgmtCtrlDevUnitAddress =
 
         discover_sensor($valid['sensor'], 'current', $device, $current_oid, $serial_input, 'schleifenbauer', $descr, $divisor, '1', null, null, $warn_limit, $high_limit, $current, 'snmp', $entPhysicalIndex);
     }
+}
 
-    foreach ($pre_cache['sdbDevOutMtActualCurrent'][$sdbDevIdIndex] as $sdbDevOutMtIndex => $sdbDevOutMtActualCurrent) {
-        $name             = trim($pre_cache['sdbDevOutName'][$sdbDevIdIndex][$sdbDevOutMtIndex], '"');
-        $current_oid      = ".1.3.6.1.4.1.31034.12.1.1.2.7.2.1.5.$sdbDevIdIndex.$sdbDevOutMtIndex";
-        $current          = $sdbDevOutMtActualCurrent / $divisor;
-        $serial_output     = $pre_cache['sdbDevIdSerialNumber'][$sdbDevIdIndex] ." Outlet ". $sdbDevOutMtIndex;
-        $descr            = ($name != '' ? $name : "$serial_output RMS Current");
-        $warn_limit       = $pre_cache['sdbDevOutMtMaxAmps'][$sdbDevIdIndex][$sdbDevOutMtIndex] / $divisor;
-        $high_limit       = $pre_cache['sdbDevCfMaximumLoad'][$sdbDevIdIndex];
+$unit = current($pre_cache['sdbMgmtCtrlDevUnitAddress']);
+foreach ($pre_cache['sdbDevOutMtActualCurrent'] as $sdbDevOutMtIndex => $sdbDevOutMtActualCurrent) {
+    $name             = trim($pre_cache['sdbDevOutName'][$sdbDevOutMtIndex], '"');
+    $current_oid      = ".1.3.6.1.4.1.31034.12.1.1.2.7.2.1.5.$unit.$sdbDevOutMtIndex";
+    $current          = $sdbDevOutMtActualCurrent / $divisor;
+    $serial_output     = $pre_cache['sdbDevIdSerialNumber'][$unit] ." Outlet ". $sdbDevOutMtIndex;
+    $descr            = ($name != '' ? $name : "$serial_output RMS Current");
+    $warn_limit       = $pre_cache['sdbDevOutMtMaxAmps'][$sdbDevOutMtIndex] / $divisor;
+    $high_limit       = $pre_cache['sdbDevCfMaximumLoad'][$unit];
 
-        // See includes/discovery/entity-physical/schleifenbauer.inc.php for an explanation why we set this as the entPhysicalIndex.
-        $entPhysicalIndex = $sdbMgmtCtrlDevUnitAddress * 1000000 + 100000 + $sdbDevOutMtIndex * 1000 + 120;
+    // See includes/discovery/entity-physical/schleifenbauer.inc.php for an explanation why we set this as the entPhysicalIndex.
+    $entPhysicalIndex = $sdbMgmtCtrlDevUnitAddress * 1000000 + 100000 + $sdbDevOutMtIndex * 1000 + 120;
 
-        discover_sensor($valid['sensor'], 'current', $device, $current_oid, $serial_output, 'schleifenbauer', $descr, $divisor, '1', null, null, $warn_limit, $high_limit, $current, 'snmp', $entPhysicalIndex);
-    }
+    discover_sensor($valid['sensor'], 'current', $device, $current_oid, $serial_output, 'schleifenbauer', $descr, $divisor, '1', null, null, $warn_limit, $high_limit, $current, 'snmp', $entPhysicalIndex);
 }
