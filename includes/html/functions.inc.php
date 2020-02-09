@@ -18,7 +18,8 @@ use LibreNMS\Config;
  * Compare $t with the value of $vars[$v], if that exists
  * @param string $v Name of the var to test
  * @param string $t Value to compare $vars[$v] to
- * @return boolean true, if values are the same, false if $vars[$v] is unset or values differ
+ * @return boolean true, if values are the same, false if $vars[$v] 
+ * is unset or values differ
  */
 function var_eq($v, $t)
 {
