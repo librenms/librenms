@@ -11,7 +11,7 @@ if (!empty($value)) {
     $lowwarnlimit = 0;
     $descr = 'Time Remaining';
 
-    discover_sensor($valid['sensor'], 'ups_nut', $device, $oids, $index, $type, $descr, 60, 1, $lowlimit, $lowwarnlimit, null, $limit, $value);
+    discover_sensor($valid['sensor'], 'runtime', $device, $oids, $index, $type, $descr, 60, 1, $lowlimit, $lowwarnlimit, null, $limit, $value);
 }
 
 unset($oids);
