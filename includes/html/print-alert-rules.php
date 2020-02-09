@@ -50,6 +50,9 @@ require_once 'includes/html/modal/new_alert_rule.inc.php';
 require_once 'includes/html/modal/delete_alert_rule.inc.php';
 require_once 'includes/html/modal/alert_rule_collection.inc.php';
 
+require_once 'includes/html/modal/edit_transport_group.inc.php';
+require_once 'includes/html/modal/edit_alert_transport.inc.php';
+
 echo '<form method="post" action="" id="result_form">';
 echo csrf_field();
 if (isset($_POST['results_amount']) && $_POST['results_amount'] > 0) {
@@ -68,7 +71,7 @@ if (Auth::user()->hasGlobalAdmin()) {
 echo '</div>';
 
 echo '<div class="col pull-right">';
-echo '<select title="results per page" name="results" id="results" class="form-control input-sm" onChange="updateResults(this);">';
+echo '<select data-toggle="popover" data-content="results per page" name="results" id="results" class="form-control input-sm" onChange="updateResults(this);">';
 $result_options = array(
     '10',
     '50',
@@ -164,13 +167,13 @@ foreach ($rule_list as $rule) {
         if ((int) $sub['state'] === 0) {
             $ico = 'check';
             $col = 'success';
-            $status_title = "all devices matching " . $rule['name'] . "  are OK";
+            $status_title = "All devices matching " . $rule['name'] . "  are OK";
         }
         if ((int) $sub['state'] === 1 || (int) $sub['state'] === 2) {
             $ico   = 'exclamation';
             $col   = 'danger';
             $extra = 'danger';
-            $status_title = "some devices matching " . $rule['name'] . " are alerting";
+            $status_title = "Some devices matching " . $rule['name'] . " are alerting";
         }
     }
 
@@ -211,7 +214,7 @@ foreach ($rule_list as $rule) {
     echo "<tr class='".$extra."' id='rule_id_".$rule['id']."'>";
 
     // Type
-    echo "<td colspan=\"2\"><div title=\"$popover_msg\" class=\"$icon_indicator\"></div></td>";
+    echo "<td colspan=\"2\"><div data-toggle='popover' data-content=\"$popover_msg\" class=\"$icon_indicator\"></div></td>";
 
     // Name
     echo '<td>'.$rule['name'].'</td>';
@@ -222,30 +225,28 @@ foreach ($rule_list as $rule) {
     $devices=null;
 
     if ($rule['invert_map'] == 0) {
-        $groups_title = 'This rule is restricted to devices in the group named ';
-        $devices_title = 'This rule is restricted to a device named ';
-        $not_device_or_group = null;
+        $groups_title = 'Only devices in this group.';
+        $devices_title = 'Only this device.';
+        $except_device_or_group = null;
     }
 
     if ($rule['invert_map'] == 1) {
-        $devices_title = 'This rule is restricted to devices NOT named ';
-        $groups_title = 'This rule is restricted to devices NOT in the group named ';
-        $not_device_or_group = '<strong><em>NOT</em></strong> ';
+        $devices_title = 'All devices EXCEPT this device. ';
+        $groups_title = 'All devices EXCEPT this group.';
+        $except_device_or_group = '<strong><em>EXCEPT</em></strong> ';
     }
 
-    // i.e. /device-groups/4/edit/
     if ($group_count) {
         $group_maps = dbFetchRows('SELECT device_groups.name, device_groups.id FROM alert_group_map, device_groups WHERE alert_group_map.rule_id=? and alert_group_map.group_id = device_groups.id ORDER BY name', [$rule['id']]);
         foreach ($group_maps as $group_map) {
-            $groups .= "$not_device_or_group<a href=\"/device-groups/" . $group_map['id'] . "/edit/\" title='$groups_title ". $group_map['name'] . "' target=\"_blank\">" . $group_map['name'] . "</a><br>";
+            $groups .= "$except_device_or_group<a href=\"/device-groups/" . $group_map['id'] . "/edit\" data-container='body' data-toggle='popover' data-content='Edit device group " . $group_map['name'] . "' title='$groups_title' target=\"_blank\">" . $group_map['name'] . "</a><br>";
         }
     }
 
-    // i.e. /device/device=24477/tab=edit/
     if ($device_count) {
         $devices_maps = dbFetchRows('SELECT devices.device_id,devices.hostname FROM alert_device_map, devices WHERE alert_device_map.rule_id=? and alert_device_map.device_id = devices.device_id ORDER BY hostname', [$rule['id']]);
         foreach ($devices_maps as $device_map) {
-            $devices .= "$not_device_or_group<a href=\"/device/device=" . $device_map['device_id'] . "/tab=edit/\" title='$devices_title ". $device_map['hostname'] . "' target=\"_blank\">" . $device_map['hostname'] . "</a>";
+            $devices .= "$except_device_or_group<a href=\"/device/device=" . $device_map['device_id'] . "/tab=edit/\" data-container='body' data-toggle='popover' data-content='Edit device " . $device_map['hostname'] . "' title='$devices_title' target=\"_blank\">" . $device_map['hostname'] . "</a>";
         }
     }
 
@@ -267,13 +268,28 @@ foreach ($rule_list as $rule) {
             $transport_name=null;
             if ($transport_map['target_type'] == "group") {
                 $transport_name = dbFetchCell('SELECT transport_group_name FROM alert_transport_groups WHERE transport_group_id=?', [$transport_map['transport_or_group_id']]);
+                $transport_edit = "<a href='' data-toggle='modal' data-target='#edit-transport-group' data-group_id='" . $transport_map['transport_or_group_id'] . "' data-container='body' data-toggle='popover' data-content='Edit transport group  $transport_name'>" . $transport_name. "</a>";
             }
             if ($transport_map['target_type'] == "single") {
                 $transport_name = dbFetchCell('SELECT transport_name FROM alert_transports WHERE transport_id=?', [$transport_map['transport_or_group_id']]);
+                $transport_edit = "<a href='' data-toggle='modal' data-target='#edit-alert-transport' data-transport_id='" . $transport_map['transport_or_group_id'] . "' data-container='body' data-toggle='popover' data-content='Edit transport $transport_name'>" . $transport_name. "</a>";
             }
-            $transports .= "<p>" . $transport_name . "</p>";
+            $transports .= $transport_edit . "<br>";
         }
     }
+
+    if (!$transport_count || !$transports) {
+        $default_transports = dbFetchRows('SELECT transport_id, transport_name FROM alert_transports WHERE is_default=1 ORDER BY transport_name', []);
+        foreach ($default_transports as $default_transport) {
+            $transport_edit = "<a href='' data-toggle='modal' data-target='#edit-alert-transport' data-transport_id='" . $default_transport['transport_id'] . "' data-container='body' data-toggle='popover' data-content='Edit default transport " . $default_transport['transport_name'] . "'>" . $default_transport['transport_name'] . "</a>";
+            $transports .= $transport_edit . "<br>";
+        }
+    }
+
+    if (!$transports) {
+        $transports = "none";
+    }
+
     echo "<td colspan='2'>$transports</td>";
 
     // Extra
@@ -298,9 +314,9 @@ foreach ($rule_list as $rule) {
     echo '<td>'.($rule['severity'] == "ok" ? strtoupper($rule['severity']) : ucwords($rule['severity'])).'</td>';
 
     // Status
-    echo "<td><span title='$status_title' id='alert-rule-".$rule['id']."' class='fa fa-fw fa-2x fa-".$ico.' text-'.$col."'></span> ";
+    echo "<td><span data-toggle='popover' data-content='$status_title' id='alert-rule-".$rule['id']."' class='fa fa-fw fa-2x fa-".$ico.' text-'.$col."'></span> ";
     if ($rule_extra['mute'] === true) {
-        echo "<i title='alerts for " . $rule['name'] . " are muted' class='fa fa-fw fa-2x fa-volume-off text-primary' aria-hidden='true'></i></td>";
+        echo "<i data-toggle='popover' data-content='alerts for " . $rule['name'] . " are muted' class='fa fa-fw fa-2x fa-volume-off text-primary' aria-hidden='true'></i></td>";
     }
 
     // Enabled
@@ -313,10 +329,10 @@ foreach ($rule_list as $rule) {
     }
     if (!Auth::user()->hasGlobalAdmin()) {
         if ($rule['disabled']) {
-            echo "<div title='" . $enabled_title . "' class='fa fa-fw fa-2x fa-pause'></div>";
+            echo "<div data-toggle='popover' data-content='" . $enabled_title . "' class='fa fa-fw fa-2x fa-pause'></div>";
         }
         if (!$rule['disabled']) {
-            echo "<div title='" . $enabled_title . "' class='fa fa-fw fa-2x fa-check text-success'></div>";
+            echo "<div data-toggle='popover' data-content='" . $enabled_title . "' class='fa fa-fw fa-2x fa-check text-success'></div>";
         }
     }
     if (Auth::user()->hasGlobalAdmin()) {
@@ -330,8 +346,8 @@ foreach ($rule_list as $rule) {
     echo '<td>';
     if (Auth::user()->hasGlobalAdmin()) {
         echo "<div class='btn-group btn-group-sm' role='group'>";
-        echo "<button type='button' class='btn btn-primary' data-toggle='modal' data-target='#create-alert' data-rule_id='".$rule['id']."' name='edit-alert-rule' data-content='Edit " . $rule['name'] . "' data-container='body'><i class='fa fa-lg fa-pencil' aria-hidden='true'></i></button> ";
-        echo "<button type='button' class='btn btn-danger' aria-label='Delete' data-toggle='modal' data-target='#confirm-delete' data-alert_id='".$rule['id']."' name='delete-alert-rule' data-content=' Delete " . $rule['name'] . "' data-container='body'><i class='fa fa-lg fa-trash' aria-hidden='true'></i></button>";
+        echo "<button type='button' class='btn btn-primary' data-toggle='modal' data-target='#create-alert' data-rule_id='".$rule['id']."' name='edit-alert-rule' data-content='Edit alert rule " . $rule['name'] . "' data-container='body'><i class='fa fa-lg fa-pencil' aria-hidden='true'></i></button> ";
+        echo "<button type='button' class='btn btn-danger' aria-label='Delete' data-toggle='modal' data-target='#confirm-delete' data-alert_id='".$rule['id']."' name='delete-alert-rule' data-content=' Delete alert rule " . $rule['name'] . "' data-container='body'><i class='fa fa-lg fa-trash' aria-hidden='true'></i></button>";
     }
     echo '</td>';
 
