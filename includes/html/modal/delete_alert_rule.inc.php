@@ -56,16 +56,13 @@ $('#alert-rule-removal').click('', function(event) {
         dataType: "html",
         success: function(msg) {
             if(msg.indexOf("ERROR:") <= -1) {
-                $("#row_"+alert_id).remove();
-                setTimeout(function() {
-                    location.reload(1);
-                }, 1000);
+                $("#rule_id_"+alert_id).remove();
             }
-            $("#message").html('<div class="alert alert-info">'+msg+'</div>');
+            toastr.success(msg);
             $("#confirm-delete").modal('hide');
         },
         error: function() {
-            $("#message").html('<div class="alert alert-info">The alert rule could not be deleted.</div>');
+            toastr.error('The alert rule could not be deleted.');
             $("#confirm-delete").modal('hide');
         }
     });
