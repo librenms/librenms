@@ -61,8 +61,8 @@ $('#alert-rule-removal').click('', function(event) {
             toastr.success(msg);
             $("#confirm-delete").modal('hide');
         },
-        error: function() {
-            toastr.error('The alert rule could not be deleted.');
+        error: function(msg) {
+            toastr.error(msg);
             $("#confirm-delete").modal('hide');
         }
     });
