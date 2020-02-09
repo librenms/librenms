@@ -247,11 +247,11 @@ foreach ($rule_list as $rule) {
         $maps = dbFetchRows($device_and_group_query, [$rule['id']]);
         foreach ($maps as $map) {
             // Groups first
-            if (preg_match("/^SELECT device_groups.name/i",$device_and_group_query) == 1) {
+            if (preg_match("/^SELECT device_groups.name/i", $device_and_group_query) == 1) {
                 $devices_and_groups .= "$except_device_or_group<a href=\"/device-groups/" . $map['id'] . "/edit\" data-container='body' data-toggle='popover' data-content='Edit device group " . $map['name'] . "' title='$groups_title' target=\"_blank\">" . $map['name'] . "</a><br>";
             }
             // Devices last
-            if (preg_match("/^SELECT devices.device_id/i",$device_and_group_query) == 1) {
+            if (preg_match("/^SELECT devices.device_id/i", $device_and_group_query) == 1) {
                 $devices_and_groups .= "$except_device_or_group<a href=\"/device/device=" . $map['device_id'] . "/tab=edit/\" data-container='body' data-toggle='popover' data-content='Edit device " . $map['hostname'] . "' title='$devices_title' target=\"_blank\">" . $map['hostname'] . "</a>";
             }
         }
