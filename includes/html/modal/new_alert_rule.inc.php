@@ -44,9 +44,9 @@ if (Auth::user()->hasGlobalAdmin()) {
                         <div class="tab-content">
                             <div role="tabpanel" class="tab-pane active" id="main">
                                 <div class='form-group' title="The description of this alert rule.">
-                                    <label for='name' class='col-sm-3 col-md-2 control-label'>Rule name: </label>
+                                    <label for='rule_name' class='col-sm-3 col-md-2 control-label'>Rule name: </label>
                                     <div class='col-sm-9 col-md-10'>
-                                        <input type='text' id='name' name='name' class='form-control validation' maxlength='200' required>
+                                        <input type='text' id='rule_name' name='name' class='form-control validation' maxlength='200' required>
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -316,7 +316,7 @@ if (Auth::user()->hasGlobalAdmin()) {
         });
 
         function loadRule(rule) {
-            $('#name').val(rule.name);
+            $('#rule_name').val(rule.name);
             $('#proc').val(rule.proc);
             $('#builder').queryBuilder("setRules", rule.builder);
             $('#severity').val(rule.severity).trigger('change');

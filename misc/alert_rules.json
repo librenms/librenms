@@ -5,6 +5,16 @@
     "default": true
   },
   {
+    "rule": "macros.device_down = \"1\" && devices.status_reason = \"icmp\"",
+    "name": "Device Down! Due to no ICMP response.",
+    "default": true
+  },
+  {
+    "rule": "macros.device_down = \"1\" && devices.status_reason = \"snmp\"",
+    "name": "SNMP not responding on Device - Check on SNMP Service - Device marked Down!",
+    "default": true
+  },
+  {
     "rule": "devices.uptime < \"300\" && macros.device = \"1\"",
     "name": "Device rebooted",
     "extra": "{\"count\": 1}",
