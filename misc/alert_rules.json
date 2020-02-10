@@ -2,7 +2,6 @@
   {
     "rule": "macros.device_down = \"1\"",
     "name": "Devices up/down",
-    "default": true
   },
   {
     "rule": "macros.device_down = \"1\" && devices.status_reason = \"icmp\"",
