@@ -61,11 +61,11 @@ if ($rowCount != -1) {
     $sql .= " LIMIT $limit_low,$limit_high";
 }
 
-$sql = "SELECT `D`.`device_id` AS `device_id`, `D`.`hostname` AS `hostname`,`entPhysicalDescr` AS `description`, `entPhysicalName` AS `name`, `entPhysicalModelName` AS `model`, `entPhysicalSerialNum` AS `serial` $sql";
+$sql = "SELECT `D`.`device_id` AS `device_id`, `D`.`hostname` AS `hostname`, `D`.`sysName` AS `sysName`,`entPhysicalDescr` AS `description`, `entPhysicalName` AS `name`, `entPhysicalModelName` AS `model`, `entPhysicalSerialNum` AS `serial` $sql";
 
 foreach (dbFetchRows($sql, $param) as $invent) {
     $response[] = array(
-                   'hostname'    => generate_device_link($invent, shortHost($invent['hostname'])),
+                   'hostname'    => generate_device_link($invent),
                    'description' => $invent['description'],
                    'name'        => $invent['name'],
                    'model'       => $invent['model'],
