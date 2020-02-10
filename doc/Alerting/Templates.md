@@ -364,16 +364,23 @@ Template: CPU alert <br>
 #### MS Teams formatted default template
 
 ```
-<a href="https://your.librenms.url/device/device={{ $alert->device_id }}/">{{ $alert->title }}</a>
-<pre><strong>Device name:</strong> {{ $alert->sysName }}
-<strong>Severity:</strong> {{ $alert->severity }}
-@if ($alert->state == 0)<strong>Time elapsed:</strong>{{ $alert->elapsed }}
-@endif<strong>Timestamp:</strong> {{ $alert->timestamp }}
-<strong>Unique-ID:</strong> {{ $alert->uid }}
-<strong>Rule:</strong>@if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif</pre>
-<pre style="white-space:normal;">@if ($alert->faults) <strong>Faults:</strong>
- @foreach ($alert->faults as $key => $value)  #{{ $key }}: {{ $value['string'] }}
- @endforeach </pre>  @endif
+[{{ $alert->title }}](https://your.librenms.url/device/device={{ $alert->device_id }}/)  
+**Device name:** {{ $alert->sysName }}  
+**Severity:** {{ $alert->severity }}  
+@if ($alert->state == 0)
+**Time elapsed:** {{ $alert->elapsed }}  
+@endif
+**Timestamp:** {{ $alert->timestamp }}  
+**Unique-ID:** {{ $alert->uid }}  
+@if ($alert->name)
+**Rule:** {{ $alert->name }}  
+@else
+**Rule:** {{ $alert->rule }}  
+@endif
+@if ($alert->faults)
+**Faults:**@foreach ($alert->faults as $key => $value) {{ $key }}: {{ $value['string'] }}  
+@endforeach
+@endif
 ```
 
 ## Included

@@ -41,7 +41,11 @@ class Msteams extends Transport
             'Content-type' => 'application/json',
             'Expect:'
         ));
-        curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
+        if ($this->config['use-json'] === 'on') {
+            curl_setopt($curl, CURLOPT_POSTFIELDS, $obj['msg']);
+        } else {
+            curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
+        }
         $ret  = curl_exec($curl);
         $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
@@ -61,6 +65,13 @@ class Msteams extends Transport
                     'name' => 'msteam-url',
                     'descr' => 'Microsoft Teams Webhook URL',
                     'type' => 'text',
+                ],
+                [
+                    'title' => 'Use JSON?',
+                    'name' => 'use-json',
+                    'descr' => 'Construct MessageCard with JSON directly rather than Markdown formatted text',
+                    'type' => 'checkbox',
+                    'default' => false,
                 ]
             ],
             'validation' => [
