@@ -137,7 +137,6 @@ if (isset($device['device_id']) && $device['device_id'] > 0) {
     $param[] = $device['device_id'];
 
     $full_query = '('. $global_rules .') UNION DISTINCT ('. $device_rules .') UNION DISTINCT ('. $device_group_rules .') UNION DISTINCT ('. $device_location_rules .')';
-
 } else {
     // no device selected
     $full_query = 'SELECT alert_rules.* FROM alert_rules';
