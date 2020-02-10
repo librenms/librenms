@@ -261,7 +261,7 @@ foreach ($rule_list as $rule) {
         $except_device_or_group = '<strong><em>EXCEPT</em></strong> ';
     }
 
-    $devices_and_groups_popover='left';
+    $devices_and_groups_popover='right';
 
     $groups=null;
     if ($group_count) {
