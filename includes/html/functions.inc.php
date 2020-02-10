@@ -175,9 +175,6 @@ function generate_device_link($device, $text = null, $vars = array(), $start = 0
     }
 
     $class = devclass($device);
-    if (!$text) {
-        $text = format_hostname($device['hostname']);
-    }
 
     $text = format_hostname($device, $text);
 
