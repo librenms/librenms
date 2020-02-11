@@ -41,10 +41,14 @@
                                 </td>
                                 <td>{{ $device_group->type == 'dynamic' ? $device_group->getParser()->toSql(false) : '' }}</td>
                                 <td>
-                                    <a type="button" class="btn btn-primary btn-sm" aria-label="@lang('Edit')"
+                                    <button type="button" title="@lang('Rediscover all Devices of Device Group')" class="btn btn-warning btn-sm" aria-label="@lang('Rediscover Group')"
+                                            onclick="discover_dg(this, '{{ $device_group->id }}')">
+                                        <i
+                                            class="fa fa-retweet" aria-hidden="true"></i></button>
+                                    <a type="button" title="@lang('edit Device Group')" class="btn btn-primary btn-sm" aria-label="@lang('Edit')"
                                        href="{{ route('device-groups.edit', $device_group->id) }}">
                                         <i class="fa fa-pencil" aria-hidden="true"></i></a>
-                                    <button type="button" class="btn btn-danger btn-sm" aria-label="@lang('Delete')"
+                                    <button type="button" class="btn btn-danger btn-sm" title="@lang('delete Device Group')" aria-label="@lang('Delete')"
                                             onclick="delete_dg(this, '{{ $device_group->name }}', '{{ route('device-groups.destroy', $device_group->id) }}')">
                                         <i
                                             class="fa fa-trash" aria-hidden="true"></i></button>
@@ -77,7 +81,7 @@
                         @foreach($ungrouped_devices as $device)
                             <tr id="row_{{ $device->device_id }}">
                                 <td><img alt="{{ $device->os }}" src="{{ asset($device->icon) }}" width="32px" height="32px" title="{{ $device->os }}"></td>
-                                <td>{!! \LibreNMS\Util\Url::deviceLink($device) !!}<br />{{ $device->sysName }}</td>
+                                <td>@deviceLink($device)<br />{{ $device->sysName }}</td>
                                 <td>{{ $device->hardware }}</td>
                                 <td>{{ $device->os }} {{ $device->version }} @if($device->features) ({{ $device->features }}) @endif </td>
                             </tr>
@@ -110,6 +114,24 @@
             }
 
             return false;
+        }
+        function discover_dg(button, id) {
+            $.ajax({
+                type: 'POST',
+                url: 'ajax_form.php',
+                data: { type: "rediscover-device", device_group_id: id },
+                dataType: "json",
+                success: function(data){
+                    if(data['status'] == 'ok') {
+                        toastr.success(data['message']);
+                    } else {
+                        toastr.error(data['message']);
+                    }
+                },
+                error:function(){
+                    toastr.error('An error occured setting this device Group to be rediscovered');
+                }
+            });
         }
     </script>
 @endsection

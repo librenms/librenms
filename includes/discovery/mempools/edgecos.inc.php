@@ -26,6 +26,8 @@ if ($device['os'] == 'edgecos') {
         $temp_mibs = 'ECS4210-MIB';
     } elseif (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.259.10.1.27.')) { //ECS3510
         $temp_mibs = 'ECS3510-MIB';
+    } elseif (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.259.10.1.43.')) { //ECS2100
+        $temp_mibs = 'ECS2100-MIB';
     };
 
     $temp_data = snmp_get_multi_oid($device, ['memoryTotal.0', 'memoryFreed.0','memoryAllocated.0'], '-OUQs', $temp_mibs);

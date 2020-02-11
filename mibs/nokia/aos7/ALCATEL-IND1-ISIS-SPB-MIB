@@ -594,7 +594,7 @@ alcatelIND1IsisSpbProtocolGracefulRestart    OBJECT-TYPE
         DESCRIPTION
             "The value of alcatelIND1IsisSpbProtocolGracefulRestart specifies whether the
              graceful restart is enabled or disabled for this instance of IS-IS."
-        DEFVAL { false }
+        DEFVAL { true }
         ::= { alcatelIND1IsisSpbProtocolConfig 7 }
 
 alcatelIND1IsisSpbProtocolGRHelperMode  OBJECT-TYPE
@@ -611,7 +611,7 @@ alcatelIND1IsisSpbProtocolGRHelperMode  OBJECT-TYPE
              When alcatelIND1IsisSpbProtocolGRHelperMode has a value of 'true' graceful
              restart helper capabilities are enabled.  When it has a value
              of 'false' the graceful restart helper capabilities are disabled."
-        DEFVAL { false }
+        DEFVAL { true }
         ::= { alcatelIND1IsisSpbProtocolConfig 8 }
 
 --

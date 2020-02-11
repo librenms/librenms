@@ -27,3 +27,7 @@ if ($version) {
         $version = trim(snmp_get($device, '1.3.6.1.4.1.641.1.1.1.0', '-OQv'), '"');
     }
 }
+
+//Serial number from PrinterMIB
+//Printer-MIB::prtGeneralSerialNumber.1
+$serial = trim(snmp_get($device, 'Printer-MIB::prtGeneralSerialNumber.1', '-OQv'), '"');

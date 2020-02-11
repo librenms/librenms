@@ -16,7 +16,7 @@ IMPORTS
          MODULE-COMPLIANCE,
          OBJECT-GROUP,
          NOTIFICATION-GROUP     FROM SNMPv2-CONF
-         InterfaceIndex         FROM IF-MIB;
+         InterfaceIndex, InterfaceIndexOrZero         FROM IF-MIB;
 
 
 alcatelIND1VirtualChassisMIB MODULE-IDENTITY
@@ -92,6 +92,12 @@ alcatelIND1VirtualChassisMIB MODULE-IDENTITY
             Subsystem Conformance Information."
         ::= { alcatelIND1VirtualChassisMIB 2}
 
+
+    alcatelIND1VirtualChassisMIBVCSP OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch for VC Split Protection."
+        ::= { alcatelIND1VirtualChassisMIB 3 }
 
     alcatelIND1VirtualChassisMIBGroups OBJECT-IDENTITY
         STATUS current
@@ -268,14 +274,20 @@ VirtualChassisType ::= TEXTUAL-CONVENTION
                 STATUS current
                 DESCRIPTION
                         "Virtual-chassis chassis type: 
-                        invalid(0): Only support Rushmore and Tor for now
+                        invalid(0): Only support Rushmore, Tor, Shasta, Medora, Everest 
                         rushmore(1): OS10k
                         tor(2): OS6900
+                        shasta(3): OS6860
+                        medora(4): OS9900
+                        everest(5): OS6865
                          "
                 SYNTAX INTEGER {
                         invalid(0),
                         rushmore(1),
-                        tor(2)
+                        tor(2),
+                        shasta(3),
+                        medora(4),
+                        everest(5)
                     }
 
 VirtualChassisVflSpeedType ::= TEXTUAL-CONVENTION
@@ -296,8 +308,20 @@ VirtualChassisVflSpeedType ::= TEXTUAL-CONVENTION
                         tenGB(3),
                         fortyGB(4),
                         twentyOneGB(5)
-
                     }
+
+VirtualChassisVflMode ::= TEXTUAL-CONVENTION
+                STATUS current
+                DESCRIPTION
+                        "Virtual-chassis VFL mode: 
+                        static(1): user needs to manually configure vfl and associated vfl member port   
+                        auto(2): vfl id will be automatically assigned to proper vfl member port
+                         "
+                SYNTAX INTEGER {
+                        static(1),
+                        auto(2)
+                    }
+
 
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 -- Virtual-Chassis MIB
@@ -371,7 +395,8 @@ VirtualChassisGlobalEntry ::= SEQUENCE
                 virtualChassisLicenseConsis             VirtualChassisConsistency,
                 virtualChassisGlobalConsis              VirtualChassisConsistency,
                 virtualChassisNumOfNeighbor             Integer32 ,
-                virtualChassisNumOfDirectNeighbor       Integer32
+                virtualChassisNumOfDirectNeighbor       Integer32,
+                virtualChassisVflMode                   VirtualChassisVflMode
 
         }
 virtualChassisOperChasId OBJECT-TYPE
@@ -637,6 +662,17 @@ virtualChassisNumOfDirectNeighbor OBJECT-TYPE
         "Virtual-Chassis direct neighbor count"
 ::= { virtualChassisGlobalEntry 31 }
 
+virtualChassisVflMode OBJECT-TYPE
+        SYNTAX VirtualChassisVflMode
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "Virtual-Chassis vfl mode:        
+        static(0): user needs to manually configure vfl and associated vfl member port   
+        auto(1): vfl id will be automatically assigned to proper vfl member port" 
+DEFVAL {static}
+::= { virtualChassisGlobalEntry 32 }
+
 -- ----------------------------------------------------------
 -- Virtual-Chassis Neighbor Table
 -- ----------------------------------------------------------
@@ -796,7 +832,7 @@ VirtualChassisVflEntry ::= SEQUENCE
                 virtualChassisVflId              VirtualChassisVflId,
                 virtualChassisVflDefaultVlan     Integer32,
                 virtualChassisVflOperStatus      INTEGER,
-                virtualChassisVflPrimaryPort     InterfaceIndex,
+                virtualChassisVflPrimaryPort     InterfaceIndexOrZero,
                 virtualChassisVflActivePortNum   Integer32,
                 virtualChassisVflConfigPortNum   Integer32,
                 virtualChassisVflRowStatus       RowStatus,
@@ -815,7 +851,7 @@ virtualChassisVflId OBJECT-TYPE
 virtualChassisVflDefaultVlan OBJECT-TYPE
         SYNTAX Integer32 (1..4094)
         MAX-ACCESS read-create
-        STATUS current
+        STATUS deprecated
         DESCRIPTION
         "Virtual Fabric Link default vlan"
     DEFVAL { 1}
@@ -835,11 +871,11 @@ virtualChassisVflOperStatus OBJECT-TYPE
 ::= { virtualChassisVflEntry 3 }
 
 virtualChassisVflPrimaryPort OBJECT-TYPE
-        SYNTAX InterfaceIndex
+        SYNTAX InterfaceIndexOrZero
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-        "Virtual Fabric Link primary Port ifindex"
+        "Virtual Fabric Link primary Port ifindex. 0 is for default value when virtual fabric link is not up"
 ::= { virtualChassisVflEntry 4 }
 
 virtualChassisVflActivePortNum OBJECT-TYPE
@@ -955,6 +991,9 @@ virtualChassisVflMemberPortRowStatus OBJECT-TYPE
         "Virtual Fabric Link Member Port RowStatus for creation and deletion"
 ::= { virtualChassisVflMemberPortEntry 4 }
 
+-- ----------------------------------------------------------
+-- Virtual-Chassis Trap info
+-- ----------------------------------------------------------
 
 virtualChassisTrapInfo   OBJECT IDENTIFIER ::= { alcatelIND1VirtualChassisMIBObjects 8 }
 
@@ -982,6 +1021,74 @@ virtualChassisUpgradeCompleteStatus OBJECT-TYPE
         successfully completes later after the expired timeout." 
 
 ::= { virtualChassisTrapInfo 2 }
+
+-- ----------------------------------------------------------
+-- Virtual-Chassis auto-Vfl Port Table
+-- ----------------------------------------------------------
+
+virtualChassisAutoVflPortTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF VirtualChassisAutoVflPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "Auto Virtual Fabric Link Port Table."
+::= { alcatelIND1VirtualChassisMIBObjects 9 }
+
+
+virtualChassisAutoVflPortEntry OBJECT-TYPE
+        SYNTAX VirtualChassisAutoVflPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "Virtual Fabric Link Member Port Table Entry."
+        INDEX { virtualChassisAutoVflPortIfindex }
+::= { virtualChassisAutoVflPortTable 1 }
+
+VirtualChassisAutoVflPortEntry ::= SEQUENCE
+        {
+                virtualChassisAutoVflPortIfindex                InterfaceIndex,
+                virtualChassisAutoVflIfindex                    InterfaceIndexOrZero,
+                virtualChassisAutoVflPortMemberStatus           INTEGER,
+                virtualChassisAutoVflPortRowStatus     RowStatus
+        }
+
+virtualChassisAutoVflPortIfindex OBJECT-TYPE
+        SYNTAX InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+        "Auto virtual Fabric Link Member Port ifIndex."
+::= { virtualChassisAutoVflPortEntry 1 }
+
+
+virtualChassisAutoVflIfindex OBJECT-TYPE
+                SYNTAX InterfaceIndexOrZero
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+        "Virtual Fabric Link ifIndex which is automatically assigned to this member port"
+::= { virtualChassisAutoVflPortEntry 2 }
+
+virtualChassisAutoVflPortMemberStatus OBJECT-TYPE
+                SYNTAX INTEGER
+                    {
+                        up(1),
+                        down(2),
+                        unassigned(3)
+                    }
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+        "Auto Virtual Fabric Link Port Member Port operational status"
+::= { virtualChassisAutoVflPortEntry 3 }
+
+virtualChassisAutoVflPortRowStatus OBJECT-TYPE
+                SYNTAX RowStatus
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+        "Auto Virtual Fabric Link Port RowStatus for creation and deletion"
+::= { virtualChassisAutoVflPortEntry 4 }
 
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 --  NOTIFICATIONS
@@ -1101,8 +1208,7 @@ virtualChassisUpgradeCompleteStatus OBJECT-TYPE
             "Chassis Supervision Virtual-Chassis Config Group."
 
         ::= { alcatelIND1VirtualChassisMIBGroups 1 }    
-    
-    
+
     virtualChassisGlobalGroup OBJECT-GROUP
         OBJECTS
         {
@@ -1135,7 +1241,8 @@ virtualChassisUpgradeCompleteStatus OBJECT-TYPE
                 virtualChassisLicenseConsis,
                 virtualChassisGlobalConsis,
                 virtualChassisNumOfNeighbor,
-                virtualChassisNumOfDirectNeighbor
+                virtualChassisNumOfDirectNeighbor,
+                virtualChassisVflMode
         }
         STATUS  current
         DESCRIPTION
@@ -1234,10 +1341,17 @@ virtualChassisUpgradeCompleteStatus OBJECT-TYPE
             "Chassis Supervision Virtual-Chassis trap object Group."
         ::= { alcatelIND1VirtualChassisMIBGroups 9 }
 
+    virtualChassisAutoVflPortGroup OBJECT-GROUP
+        OBJECTS
+        {
+                virtualChassisAutoVflIfindex,
+                virtualChassisAutoVflPortMemberStatus,
+                virtualChassisAutoVflPortRowStatus
+        }
+        STATUS  current
+        DESCRIPTION
+            "Auto Virtual-Chassis Vfl Port Group."
+        ::= { alcatelIND1VirtualChassisMIBGroups 10 }
 
 END
-
-
-
-
 

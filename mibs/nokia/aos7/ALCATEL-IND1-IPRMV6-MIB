@@ -12,14 +12,16 @@ IMPORTS
         FROM SNMPv2-CONF
     IANAipRouteProtocol
         FROM IANA-RTPROTO-MIB
-    Ipv6Address, Ipv6IfIndex
+    Ipv6Address, Ipv6IfIndex, Ipv6IfIndexOrZero
         FROM IPV6-TC
     routingIND1Iprm
-        FROM ALCATEL-IND1-BASE;
+        FROM ALCATEL-IND1-BASE
+    AlaIprmStaticRouteTypes, AlaIprmAdminStatus
+        FROM ALCATEL-IND1-IPRM-MIB;
 
 alcatelIND1IPRMV6MIB MODULE-IDENTITY
 
-    LAST-UPDATED  "201307260000Z"
+    LAST-UPDATED  "201309230000Z"
     ORGANIZATION  "Alcatel-Lucent"
     CONTACT-INFO
         "Please consult with Customer Service to ensure the most appropriate
@@ -87,7 +89,8 @@ AlaIprmV6RtPrefType ::= TEXTUAL-CONVENTION
                      bgpExternal(5),
                      bgpInternal(6),
                      isisl1(7),
-                     isisl2(8) 
+                     isisl2(8),
+                     import(9) 
                     }
 
 
@@ -229,11 +232,13 @@ AlaIprmV6StaticRouteEntry ::=
         alaIprmV6StaticRouteDest      Ipv6Address,
         alaIprmV6StaticRoutePfxLength Integer32,
         alaIprmV6StaticRouteNextHop   Ipv6Address,
-        alaIprmV6StaticRouteIfIndex   Ipv6IfIndex,
+        alaIprmV6StaticRouteIfIndex   Ipv6IfIndexOrZero,
         alaIprmV6StaticRouteMetric    Unsigned32,
         alaIprmV6StaticRouteStatus    RowStatus,
         alaIprmV6StaticRouteTag       Unsigned32,
-        alaIprmV6StaticRouteName      SnmpAdminString
+        alaIprmV6StaticRouteName      SnmpAdminString,
+        alaIprmV6StaticRouteBfdStatus AlaIprmAdminStatus,
+        alaIprmV6StaticRouteType      AlaIprmStaticRouteTypes
     }
 
 alaIprmV6StaticRouteDest OBJECT-TYPE
@@ -264,7 +269,7 @@ alaIprmV6StaticRouteNextHop OBJECT-TYPE
     ::= { alaIprmV6StaticRouteEntry 3 }
 
 alaIprmV6StaticRouteIfIndex OBJECT-TYPE
-    SYNTAX      Ipv6IfIndex
+    SYNTAX      Ipv6IfIndexOrZero
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
@@ -308,6 +313,22 @@ alaIprmV6StaticRouteName OBJECT-TYPE
     DESCRIPTION
         "A comment associated with the static route."
     ::= { alaIprmV6StaticRouteEntry 8 }
+
+alaIprmV6StaticRouteBfdStatus OBJECT-TYPE
+    SYNTAX     AlaIprmAdminStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "For enabling or disabling the BFD status on this static route."
+    ::= { alaIprmV6StaticRouteEntry 9 }
+
+alaIprmV6StaticRouteType OBJECT-TYPE
+    SYNTAX     AlaIprmStaticRouteTypes
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "Type of static route."
+    ::= { alaIprmV6StaticRouteEntry 10 }
 
 
 
@@ -354,6 +375,104 @@ alaIprmV6RtPrefEntryValue OBJECT-TYPE
         "The route preference value used for this type of route."
     ::= { alaIprmV6RtPrefTableEntry 2 }
 
+-- Route Leaking Export route-map
+
+alaIprmV6ExportRouteMap   OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "A route-map index representing the route-map used to filter
+         IPv6 routes exported to the Global Route Table. A value of -1 
+         indicates no routes should be exported. A value of 0 indicates 
+         all routes should be exported. Otherwise, the value is the 
+         route-map index to use for filtering."
+    ::= { alaIprmV6Config 4 }
+
+-- Route Leaking Export All route-map
+
+alaIprmV6ExportToAllVrfsRouteMap   OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Used to export IPv6 routes to all other VRFs that don't already have
+         an entry in the Import Vrf Table. The object is a route-map index 
+         representing the route-map used to filter the exported routes.
+         A value of -1 indicates no routes should be exported. A value of 0 
+         indicates all routes should be exported. Otherwise, the value is 
+         the route-map index to use for filtering."
+    ::= { alaIprmV6Config 5 }
+
+
+-- Route Leaking Import Vrf Table
+
+alaIprmV6ImportVrfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlaIprmV6ImportVrfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table specifies VRFs to import IPv6 routes from."
+    ::= { alaIprmV6Config 6 }
+
+alaIprmV6ImportVrfEntry OBJECT-TYPE
+    SYNTAX      AlaIprmV6ImportVrfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in this table is created for each VRF
+         to import IPv6 routes from."
+    INDEX {
+        alaIprmV6ImportVrfName
+       }
+    ::= { alaIprmV6ImportVrfTable 1 }
+
+AlaIprmV6ImportVrfEntry ::= SEQUENCE {
+    alaIprmV6ImportVrfName              SnmpAdminString,
+    alaIprmV6ImportVrfRouteMap          Integer32,
+    alaIprmV6ImportVrfRowStatus         RowStatus
+   }
+
+alaIprmV6ImportVrfName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (0..20))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The name of the VRF that IPv6 routes should be imported from. An
+         empty string indicates the default VRF."
+    ::= { alaIprmV6ImportVrfEntry 1 }
+
+alaIprmV6ImportVrfRouteMap OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "A route-map index representing the route-map used to filter
+         IPv6 imported routes.  A value of 0 indicates all IPv6 routes 
+         that have been exported by the specified VRF should be imported."
+    ::= { alaIprmV6ImportVrfEntry 2 }
+
+alaIprmV6ImportVrfRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "This variable is used to create, modify, and/or
+         delete a row in this table."
+    ::= { alaIprmV6ImportVrfEntry 3 }
+
+
+-- BFD status for all static routes
+
+alaIprmV6StaticAllBfd   OBJECT-TYPE
+   SYNTAX   AlaIprmAdminStatus
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+        "To enable/disable the BFD state on all IPv6 static routes."
+    DEFVAL      { disabled }
+    ::= { alaIprmV6Config 7 }
+
 
 -- conformance information
 
@@ -381,7 +500,10 @@ alaIprmV6ConfigMIBGroup OBJECT-GROUP
     OBJECTS {   alaIprmV6RouteMetric, alaIprmV6RouteValid,
                 alaIprmV6StaticRouteMetric, alaIprmV6StaticRouteStatus,
                 alaIprmV6StaticRouteTag, alaIprmV6StaticRouteName, 
-		alaIprmV6RtPrefEntryValue
+                alaIprmV6StaticRouteBfdStatus, alaIprmV6StaticRouteType,
+                alaIprmV6RtPrefEntryValue,  alaIprmV6ExportRouteMap, 
+                alaIprmV6ExportToAllVrfsRouteMap, alaIprmV6ImportVrfRouteMap,
+                alaIprmV6ImportVrfRowStatus, alaIprmV6StaticAllBfd
             }
     STATUS  current
     DESCRIPTION

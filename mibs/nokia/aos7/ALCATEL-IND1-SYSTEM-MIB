@@ -2,9 +2,9 @@ ALCATEL-IND1-SYSTEM-MIB DEFINITIONS ::= BEGIN
 
         IMPORTS
         MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE, IpAddress,
-        Integer32, Unsigned32
+        Integer32, Unsigned32, Counter64, NOTIFICATION-TYPE
                         FROM SNMPv2-SMI
-        MODULE-COMPLIANCE, OBJECT-GROUP
+        MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
                         FROM SNMPv2-CONF
         TEXTUAL-CONVENTION, TruthValue, RowStatus
                         FROM SNMPv2-TC
@@ -12,7 +12,11 @@ ALCATEL-IND1-SYSTEM-MIB DEFINITIONS ::= BEGIN
         Ipv6Address
                         FROM IPV6-TC
         hardentIND1System
-                        FROM ALCATEL-IND1-BASE;
+                        FROM ALCATEL-IND1-BASE
+        InetAddressType, InetAddress
+                        FROM INET-ADDRESS-MIB
+        VirtualOperChassisId, virtualChassisOperChasId  
+                        FROM ALCATEL-IND1-VIRTUAL-CHASSIS-MIB;
 
 alcatelIND1SystemMIB MODULE-IDENTITY
                 LAST-UPDATED "200709040000Z"
@@ -75,6 +79,20 @@ alcatelIND1SystemMIB MODULE-IDENTITY
             Subsystem Conformance Information."
         ::= { alcatelIND1SystemMIB 2 }
 
+
+    alcatelIND1SystemMIBTrapObjects OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Alcatel IND BOP Proprietary System
+            Subsystem Trap Objects."
+        ::= { alcatelIND1SystemMIB 3 }
+
+    alcatelIND1SystemMIBTraps OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For Alcatel IND BOP Proprietary System
+            Subsystem Trap Information."
+        ::= { alcatelIND1SystemMIB 4 }
 
     alcatelIND1SystemMIBGroups OBJECT-IDENTITY
         STATUS current
@@ -222,6 +240,9 @@ alcatelIND1SystemMIB MODULE-IDENTITY
         systemServices          OBJECT IDENTIFIER       ::= {alcatelIND1SystemMIBObjects 5 }
         systemSwitchLogging     OBJECT IDENTIFIER       ::= {alcatelIND1SystemMIBObjects 6 }
         systemDNS               OBJECT IDENTIFIER       ::= {alcatelIND1SystemMIBObjects 7 }
+        systemBlueToothServices OBJECT IDENTIFIER       ::= {alcatelIND1SystemMIBObjects 8 }
+        systemFips              OBJECT IDENTIFIER       ::= {alcatelIND1SystemMIBObjects 9 }
+        systemVcHardware        OBJECT IDENTIFIER       ::= {alcatelIND1SystemMIBObjects 10 }
 
         -- systemMicrocode group.  This group contains the CMM specific
         -- microcode information.
@@ -256,14 +277,14 @@ alcatelIND1SystemMIB MODULE-IDENTITY
                 }
         systemMicrocodePackageDirectoryIndex     OBJECT-TYPE
                 SYNTAX  Unsigned32
-                MAX-ACCESS      not-accessible 
+                MAX-ACCESS      not-accessible
                 STATUS          current
                 DESCRIPTION
                         "The package index for directories. Values 1-4 are pre-defined
                         as: loaded(1), certified(2), working(3), issu(4). Values 5+
 			are user working directories in /flash assigned by the system.
-			Values 5+ remain associated with a directory until reboot, 
-                        takeover, the directory no longer contains valid images or 
+			Values 5+ remain associated with a directory until reboot,
+                        takeover, the directory no longer contains valid images or
                         the directory no longer exists."
                 ::= {systemMicrocodePackageEntry 1}
         systemMicrocodePackageDirectory OBJECT-TYPE
@@ -278,7 +299,7 @@ alcatelIND1SystemMIB MODULE-IDENTITY
 
         systemMicrocodePackageIndex     OBJECT-TYPE
                 SYNTAX  Unsigned32
-                MAX-ACCESS      not-accessible 
+                MAX-ACCESS      not-accessible
                 STATUS          current
                 DESCRIPTION
                         "The index to the package sub table in the microcode table"
@@ -333,6 +354,84 @@ alcatelIND1SystemMIB MODULE-IDENTITY
                 ::=     {systemMicrocodePackageEntry 8}
 
 
+        systemMicrocodeLoadedTable     OBJECT-TYPE
+                SYNTAX  SEQUENCE OF     SystemMicrocodeLoadedEntry
+                MAX-ACCESS      not-accessible
+                STATUS  current
+                DESCRIPTION
+                        "the microcode package table"
+                ::= {systemMicrocode 2}
+
+        systemMicrocodeLoadedEntry     OBJECT-TYPE
+                SYNTAX  SystemMicrocodeLoadedEntry
+                MAX-ACCESS      not-accessible
+                STATUS  current
+                DESCRIPTION
+                        "a row in the microcode package table"
+                INDEX   {systemMicrocodeLoadedIndex}
+                ::= {systemMicrocodeLoadedTable 1}
+
+        SystemMicrocodeLoadedEntry     ::= SEQUENCE {
+                        systemMicrocodeLoadedIndex             Unsigned32,
+                        systemMicrocodeLoadedDirectory         SnmpAdminString,
+                        systemMicrocodeLoadedVersion           SnmpAdminString,
+                        systemMicrocodeLoadedName              SnmpAdminString,
+                        systemMicrocodeLoadedDescription       SnmpAdminString,
+                        systemMicrocodeLoadedSize              Unsigned32
+                }
+
+        systemMicrocodeLoadedIndex     OBJECT-TYPE
+                SYNTAX  Unsigned32
+                MAX-ACCESS      not-accessible
+                STATUS          current
+                DESCRIPTION
+                        "The index to the loaded package in microcode table"
+                ::= {systemMicrocodeLoadedEntry 1}
+
+        systemMicrocodeLoadedDirectory OBJECT-TYPE
+                SYNTAX  SnmpAdminString   (SIZE (1..108))
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "The directory name under flash where the microcode package is found.
+                        Directories with names longer than 108 characters will be skipped."
+                ::=     {systemMicrocodeLoadedEntry 2}
+
+        systemMicrocodeLoadedVersion OBJECT-TYPE
+                SYNTAX  SnmpAdminString   (SIZE (0..255))
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "The version of the microcode package (Fos.img, Fbase.img, etc.)"
+                ::=     {systemMicrocodeLoadedEntry 3}
+
+        systemMicrocodeLoadedName OBJECT-TYPE
+                SYNTAX  SnmpAdminString   (SIZE (0..255))
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "The name of the microcode package"
+                DEFVAL  { "" }
+                ::=     {systemMicrocodeLoadedEntry 4}
+
+        systemMicrocodeLoadedDescription OBJECT-TYPE
+                SYNTAX  SnmpAdminString   (SIZE (0..255))
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "The description of the microcode package"
+                DEFVAL  { "" }
+                ::=     {systemMicrocodeLoadedEntry 5}
+
+        systemMicrocodeLoadedSize OBJECT-TYPE
+                SYNTAX  Unsigned32
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "The size of the microcode package"
+                DEFVAL  { 0 }
+                ::=     {systemMicrocodeLoadedEntry 6}
+
         -- systemBootParams group.  This group contains the CMM specific
         -- boot parameter information.
 
@@ -366,7 +465,7 @@ alcatelIND1SystemMIB MODULE-IDENTITY
         -- regarding this CMM.
 
     systemHardwareFlashMfg      OBJECT-TYPE
-                SYNTAX          INTEGER {other(1), amd(2), intel(3), atmel(4), toshiba(7), sandisk(8), sst(9), spansion(10), wintec(13)}
+                SYNTAX          INTEGER {other(1), amd(2), intel(3), atmel(4), micron(5), kingston(6), toshiba(7), sandisk(8), sst(9), spansion(10), wintec(13)}
                 MAX-ACCESS      read-only
                 STATUS          current
                 DESCRIPTION
@@ -387,7 +486,7 @@ alcatelIND1SystemMIB MODULE-IDENTITY
                 ::= { systemHardware 2}
 
    systemHardwareMemoryMfg      OBJECT-TYPE
-                SYNTAX          INTEGER {other(1), amd(2), intel(3), atmel(4), micron(5), kingston(6), dataram(10), interward(11), notreadable(12)}
+                SYNTAX          INTEGER {other(1), amd(2), intel(3), atmel(4), micron(5), kingston(6), toshiba(7), agilent(8), dataram(10), interward(11), notreadable(12)}
                 MAX-ACCESS      read-only
                 STATUS          current
                 DESCRIPTION
@@ -415,7 +514,7 @@ alcatelIND1SystemMIB MODULE-IDENTITY
                 ::= { systemHardware 5}
 
         systemHardwareBootCpuType       OBJECT-TYPE
-                SYNTAX          INTEGER {other(1), sparc380(2), sparcV9(3), ppc(4), ppc8540(5), ppc8572(6)}
+                SYNTAX          INTEGER {other(1), sparc380(2), sparcV9(3), ppc(4), ppc8540(5), ppc8572(6), arm(7)}
                 MAX-ACCESS      read-only
                 STATUS          current
                 DESCRIPTION
@@ -1224,13 +1323,18 @@ alcatelIND1SystemMIB MODULE-IDENTITY
                 ::= { systemServicesArchiveEntry 5 }
 
 	systemServicesUsbEnable  OBJECT-TYPE
-		SYNTAX      Enable
-		MAX-ACCESS  read-write
+		SYNTAX      INTEGER {
+                	enableasync(1),
+	                disable(2),
+	                enablesync(3)
+                }
+                MAX-ACCESS  read-write
 		STATUS      current
 		DESCRIPTION
-			"disable/enable the USB interface"
+			"disable/enable the USB interface with mode as synchronous / asynchronous"
+                DEFVAL { disable }
 		::= { systemServices 38}
-	
+
 	systemServicesUsbAutoCopyEnable  OBJECT-TYPE
 		SYNTAX      Enable
 		MAX-ACCESS  read-write
@@ -1238,7 +1342,7 @@ alcatelIND1SystemMIB MODULE-IDENTITY
 		DESCRIPTION
 			"disable/enable the USB auto-copy facility"
 		::= { systemServices 39}
-	
+
 	systemServicesUsbMounted  OBJECT-TYPE
 		SYNTAX      Enable
 		MAX-ACCESS  read-only
@@ -1246,7 +1350,7 @@ alcatelIND1SystemMIB MODULE-IDENTITY
 		DESCRIPTION
 			"determinse if usb is mounted"
 		::= { systemServices 40}
-	
+
 --systemFileSystem group.  This group contains the parameters for
 --the multiple File Systems on the platform.
 
@@ -1880,7 +1984,7 @@ alcatelIND1SystemMIB MODULE-IDENTITY
                 MAX-ACCESS      read-write
                 STATUS          current
                 DESCRIPTION
-                	"Library name used as an index into the table of 
+                	"Library name used as an index into the table of
 					registered libraries"
                 DEFVAL { "" }
                 ::={ systemSwitchLogging 25 }
@@ -1890,11 +1994,64 @@ alcatelIND1SystemMIB MODULE-IDENTITY
                 MAX-ACCESS      read-write
                 STATUS          current
                 DESCRIPTION
-                        "Enable/disable switch logging using Loopback0 
+                        "Enable/disable switch logging using Loopback0
 						interface as the source ip address when logging
 						to syslog server"
                 DEFVAL { disabled }
                 ::={ systemSwitchLogging 26 }
+
+
+        systemSwitchLoggingDgHostTable    OBJECT-TYPE
+                SYNTAX          SEQUENCE OF SystemSwitchLoggingDgHostEntry
+                MAX-ACCESS      not-accessible
+                STATUS          current
+                DESCRIPTION
+                "The table of switch logging remote hosts for Dying Gasp."
+                ::={ systemSwitchLogging 27 }
+
+        systemSwitchLoggingDgHostEntry  OBJECT-TYPE
+            SYNTAX  SystemSwitchLoggingDgHostEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                 "A remote switch logging server entry."
+            INDEX { systemSwitchLoggingDgHostIndex }
+                ::={ systemSwitchLoggingDgHostTable 1 }
+
+        SystemSwitchLoggingDgHostEntry  ::= SEQUENCE {
+            systemSwitchLoggingDgHostIndex	    Integer32,
+	    systemSwitchLoggingDgHostIpType 	    InetAddressType,	
+	    systemSwitchLoggingDgHostIpAddr           InetAddress
+            }
+
+	systemSwitchLoggingDgHostIndex   OBJECT-TYPE
+		SYNTAX		Integer32 (1..3)
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION 
+			"Index of Dying Gasp swlod table."
+		DEFVAL  { 1 }
+		::={ systemSwitchLoggingDgHostEntry 1 }	
+
+	systemSwitchLoggingDgHostIpType OBJECT-TYPE
+		SYNTAX  InetAddressType
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"The IP address type ."
+		::= { systemSwitchLoggingDgHostEntry 2 }
+
+
+        systemSwitchLoggingDgHostIpAddr   OBJECT-TYPE
+                SYNTAX         InetAddress 
+                MAX-ACCESS      read-only
+                STATUS          current
+                DESCRIPTION
+                        "The IP Address of a remote host that can
+                        be used to send Dying Gasp switch logging records to."
+                ::={ systemSwitchLoggingDgHostEntry 3 }
+
+
 
 
         --systemDNS group.  This group contains the Domain Name Service
@@ -1971,6 +2128,321 @@ alcatelIND1SystemMIB MODULE-IDENTITY
                         "IPv6 address of the third DNS server"
                 DEFVAL { '00000000000000000000000000000000'H } -- 0.0.0.0 or ::
                 ::={ systemDNS 8 }
+
+     -- systemBlueTooth group.  This group contains the objects used by the
+         -- System BlueTooth Services.
+         systemServicesBluetoothEnable  OBJECT-TYPE
+                 SYNTAX      Enable
+                 MAX-ACCESS  read-write
+                 STATUS      current
+                 DESCRIPTION
+                         "Enable or disable Bluetooth."
+                 DEFVAL    { enabled }
+                 ::= { systemBlueToothServices 1}
+
+         systemServicesBluetoothTxPower  OBJECT-TYPE
+                 SYNTAX      INTEGER {
+                        low(1),
+                         high(2)
+                     }
+                 MAX-ACCESS  read-write
+                 STATUS      current
+                 DESCRIPTION
+                         "The Bluetooth transmit power, low or high."
+                 DEFVAL    { low }
+                 ::= { systemBlueToothServices 2}
+ 
+         systemServicesBluetoothTable    OBJECT-TYPE
+                 SYNTAX          SEQUENCE OF SystemServicesBluetoothEntry
+                 MAX-ACCESS      not-accessible
+                 STATUS          current
+                 DESCRIPTION
+                 "The table of Bluetooth devices."
+                 ::={ systemBlueToothServices 3 }
+ 
+          systemServicesBluetoothEntry OBJECT-TYPE
+             SYNTAX  SystemServicesBluetoothEntry
+             MAX-ACCESS  not-accessible
+             STATUS  current
+             DESCRIPTION
+                  "A Bluetooth device entry."
+             INDEX { systemServicesBluetoothChassisId }
+                 ::={ systemServicesBluetoothTable 1 }
+ 
+         SystemServicesBluetoothEntry ::= SEQUENCE {
+             systemServicesBluetoothChassisId    VirtualOperChassisId,
+             systemServicesBluetoothStatus       INTEGER
+             }
+ 
+         systemServicesBluetoothChassisId  OBJECT-TYPE
+                 SYNTAX      VirtualOperChassisId
+                 MAX-ACCESS  not-accessible
+                 STATUS      current
+                 DESCRIPTION
+                         "The chassis ID for this Bluetooth instance."
+                 ::= { systemServicesBluetoothEntry 1 }
+ 
+         systemServicesBluetoothStatus  OBJECT-TYPE
+                 SYNTAX      INTEGER {
+                         notPresent(1),
+                         connectionInactive(2),
+                         connectionActive(3)
+                     }
+                 MAX-ACCESS  read-only
+                 STATUS      current
+                 DESCRIPTION
+                         "The current Bluetooth status."
+                 ::= { systemServicesBluetoothEntry 2 }
+ 
+         --systemFips group.  This group contains the FIPS 140-2
+         --configuration information.
+ 
+         systemFipsAdminState OBJECT-TYPE
+                 SYNTAX        Enable
+                 MAX-ACCESS    read-write
+                 STATUS        current
+                 DESCRIPTION
+                     "Enable or disable the FIPS mode on AOS switches. This value
+                      becomes the systemFipsOperState after write-memory and reboot."
+                 DEFVAL        { disabled }
+                 ::= { systemFips 1 }
+ 
+         systemFipsOperState OBJECT-TYPE
+                 SYNTAX        Enable
+                 MAX-ACCESS    read-only
+                 STATUS        current
+                 DESCRIPTION
+                 "The Operational State of the FIPS mode on AOS switches"
+                 ::= { systemFips 2 }
+ 
+     systemVcHardwareTable OBJECT-TYPE
+             SYNTAX          SEQUENCE OF SystemVcHardwareEntry
+             MAX-ACCESS      not-accessible
+             STATUS          current
+             DESCRIPTION
+                     "The table lists the results of cable diagnostics."
+             ::= { systemVcHardware 1 }
+ 
+     systemVcHardwareEntry OBJECT-TYPE
+             SYNTAX          SystemVcHardwareEntry
+             MAX-ACCESS      not-accessible
+             STATUS          current
+             DESCRIPTION
+                     "An entry corresponding to each port."
+             INDEX           { virtualChassisOperChasId }
+             ::= { systemVcHardwareTable 1 }
+ 
+     SystemVcHardwareEntry ::= SEQUENCE {
+                 systemVcHardwareCpuVendor       SnmpAdminString,
+                 systemVcHardwareCpuModel        SnmpAdminString,
+                 systemVcHardwareFlashMfg        INTEGER, 
+                 systemVcHardwareFlashSize       Counter64,
+                 systemVcHardwareMemoryMfg       INTEGER,
+                 systemVcHardwareMemorySize      Counter64,
+                 systemVcHardwareUbootVersion    SnmpAdminString,
+                 systemVcHardwareFpga1Version    SnmpAdminString,
+                 systemVcHardwareFpga2Version    SnmpAdminString,
+                 systemVcHardwarePowerSuppliesPresent    BITS,
+                 systemVcHardwareNisPresent      BITS, 
+                 systemVcHardwareCFMsPresent     BITS,
+                 systemVcHardwareFanTraysPresent BITS
+             }
+ 
+     systemVcHardwareCpuVendor      OBJECT-TYPE
+             SYNTAX  SnmpAdminString (SIZE (0..255))
+             MAX-ACCESS      read-only
+             STATUS          current
+             DESCRIPTION
+                    "A string that identifies the CPU Vendor for this chassis in the VC."
+             DEFVAL { "" }
+             ::={ systemVcHardwareEntry 1 }
+ 
+     systemVcHardwareCpuModel        OBJECT-TYPE
+             SYNTAX          SnmpAdminString (SIZE (0..255))
+             MAX-ACCESS      read-only
+             STATUS          current
+             DESCRIPTION
+             "A string that identifies the CPU Model for this chassis in the VC."
+             DEFVAL          { "" }
+             ::={ systemVcHardwareEntry 2 }
+ 
+     systemVcHardwareFlashMfg      OBJECT-TYPE
+                 SYNTAX          INTEGER {other(1), amd(2), intel(3), atmel(4), micron(5), kingston(6), toshiba(7), sandisk(8), sst(9), spansion(10), wintec(13)}
+                 MAX-ACCESS      read-only
+                 STATUS          current
+                 DESCRIPTION
+                         "This object identifies the manufacturer of the Flash memory
+                         used on this chassis in the VC." 
+                 ::= { systemVcHardwareEntry 3}
+ 
+         systemVcHardwareFlashSize OBJECT-TYPE
+                 SYNTAX          Counter64 
+                 MAX-ACCESS      read-only
+                 STATUS          current
+                 DESCRIPTION
+                         "This object identifies the size of the flash memory available
+                         on this chassis in the VC."
+                 ::= { systemVcHardwareEntry 4}
+ 
+         systemVcHardwareMemoryMfg      OBJECT-TYPE
+                 SYNTAX          INTEGER {other(1), amd(2), intel(3), atmel(4), micron(5), kingston(6), toshiba(7), agilent(8), dataram(10), interward(11), notreadable(12)}
+                 MAX-ACCESS      read-only
+                 STATUS          current
+                 DESCRIPTION
+                         "This object identifies the manufacturer of the RAM memory
+                         used on this chassis in the VC"
+                 ::= { systemVcHardwareEntry 5}
+ 
+         systemVcHardwareMemorySize        OBJECT-TYPE
+                 SYNTAX          Counter64
+                 MAX-ACCESS      read-only
+                 STATUS          current
+                 DESCRIPTION
+                         "This object identifies the size of the RAM memory available on
+                         this chassis in the VC" 
+                 ::= { systemVcHardwareEntry 6}
+ 
+         systemVcHardwareUbootVersion      OBJECT-TYPE
+                 SYNTAX          SnmpAdminString (SIZE (0..255))
+                 MAX-ACCESS      read-only
+                 STATUS          current
+                 DESCRIPTION
+                 "A string that identifies the Uboot version for this chassis in the VC."
+                 DEFVAL          { "" }
+                 ::={ systemVcHardwareEntry 7 }
+ 
+         systemVcHardwareFpga1Version               OBJECT-TYPE
+                 SYNTAX  SnmpAdminString (SIZE (0..255))
+                 MAX-ACCESS      read-only
+                 STATUS          current
+                 DESCRIPTION
+                         "This is the version of one of the FPGA #1 this CMM in the VC."
+                 DEFVAL { "" }
+                 ::= { systemVcHardwareEntry 8 }
+ 
+         systemVcHardwareFpga2Version               OBJECT-TYPE
+                 SYNTAX  SnmpAdminString (SIZE (0..255))
+                 MAX-ACCESS      read-only
+                 STATUS          current
+                 DESCRIPTION
+                         "This is the version of one of the FPGA #2 this CMM in the VC. If this FPGA does not exist then this will be N/A"
+                 DEFVAL { "" }
+                 ::= { systemVcHardwareEntry 9 }
+ 
+         systemVcHardwarePowerSuppliesPresent        OBJECT-TYPE
+                 SYNTAX  BITS {
+                     ps1(0),
+                     ps2(1),
+                     ps3(2),
+                     ps4(3),
+                     ps5(4),
+                     ps6(5),
+                     ps7(6),
+                     ps8(7),
+                     ps9(8),
+                     ps10(9),
+                     ps11(10),
+                     ps12(11),
+                     ps13(12),
+                     ps14(13),
+                     ps15(14),
+                     ps16(15)
+ 
+                 }
+                 MAX-ACCESS      read-only
+                 STATUS          current
+                 DESCRIPTION
+                         "A List of the Power supplies that are Present"
+                 DEFVAL { {} }
+                 ::= { systemVcHardwareEntry 10 }
+ 
+         systemVcHardwareNisPresent        OBJECT-TYPE
+                 SYNTAX  BITS {
+                     ni1(0),
+                     ni2(1),
+                     ni3(2),
+                     ni4(3),
+                     ni5(4),
+                     ni6(5),
+                     ni7(6),
+                     ni8(7),
+                     ni9(8),
+                     ni10(9),
+                     ni11(10),
+                     ni12(11),
+                     ni13(12),
+                     ni14(13),
+                     ni15(14),
+                     ni16(15)
+         }
+                 MAX-ACCESS      read-only
+                 STATUS          current
+                 DESCRIPTION
+                         "A List of the NI's/Expansion modules Present"
+                 DEFVAL { {} }
+                 ::= { systemVcHardwareEntry 11 }
+ 
+         systemVcHardwareCFMsPresent        OBJECT-TYPE
+                 SYNTAX  BITS {
+                     cfm1(0),
+                     cfm2(1),
+                     cfm3(2),
+                     cfm4(3),
+                     cfm5(4),
+                     cfm6(5),
+                     cfm7(6),
+                     cfm8(7)
+                 }
+                 MAX-ACCESS      read-only
+         STATUS   current
+         DESCRIPTION
+                         "A List of the CFM's that are Present"
+                 DEFVAL { {} }
+                ::= { systemVcHardwareEntry 12 }
+ 
+         systemVcHardwareFanTraysPresent     OBJECT-TYPE
+                 SYNTAX  BITS {
+                     fanTray1(0),
+                     fanTray2(1),
+                     fanTray3(2),
+                     fanTray4(3),
+                     fanTray5(4),
+                     fanTray6(5),
+                     fanTray7(6),
+                     fanTray8(7)
+                 }
+                 MAX-ACCESS      read-only
+                 STATUS          current
+                 DESCRIPTION
+                         "A List of the Fan Trays Present"
+                 DEFVAL { {} }
+                 ::= { systemVcHardwareEntry 13 }
+
+--
+-- Trap Objects 
+--
+        systemSwlogName  OBJECT-TYPE
+                SYNTAX  SnmpAdminString (SIZE (0..255))
+                MAX-ACCESS      read-only
+                STATUS          current
+                DESCRIPTION
+                "SWLOG file name that might get overwritten since swlog file reached (90%) it size"
+                DEFVAL { "" }
+                ::= { alcatelIND1SystemMIBTrapObjects 1 }
+
+--
+-- NOTIFICATIONS 
+--
+        systemSwlogSizeTrap  NOTIFICATION-TYPE
+        OBJECTS  {
+                systemSwlogName
+        }
+        STATUS   current
+        DESCRIPTION
+           "The file specified file may get lost if not backed up , since swlog file reached 90% 
+            of its size , please back up swlog before getting overwritten."
+        ::= { alcatelIND1SystemMIBTraps 0 1 }
+
 --
 -- Compliance Statements
 --
@@ -1990,7 +2462,11 @@ alcatelIND1SystemMIB MODULE-IDENTITY
                                 systemServicesGroup,
                                 systemFileSystemGroup,
                                 systemSwitchLoggingGroup,
-                                systemDNSGroup
+                                systemDNSGroup,
+                                systemBlueToothServicesGroup,
+                                systemFipsGroup,
+                                systemVcHardwareGroup,
+                                systemNotificationGroup
             }
 
         ::= { alcatelIND1SystemMIBCompliances 1 }
@@ -2004,7 +2480,12 @@ alcatelIND1SystemMIB MODULE-IDENTITY
                                 systemMicrocodePackageName,
                                 systemMicrocodePackageDescription,
                                 systemMicrocodePackageStatus,
-                                systemMicrocodePackageSize
+                                systemMicrocodePackageSize,
+                                systemMicrocodeLoadedDirectory,
+                                systemMicrocodeLoadedVersion,
+                                systemMicrocodeLoadedName,
+                                systemMicrocodeLoadedDescription,
+                                systemMicrocodeLoadedSize
                         }
         STATUS      current
         DESCRIPTION
@@ -2167,7 +2648,9 @@ alcatelIND1SystemMIB MODULE-IDENTITY
                                 systemSwitchLoggingHostv6Port,
                                 systemSwitchLoggingHostv6Status,
                                 systemSwitchLoggingHostv6UserCommandHost,
-                                systemSwitchLoggingHostv6VrfName
+                                systemSwitchLoggingHostv6VrfName,
+			        systemSwitchLoggingDgHostIpType,
+			        systemSwitchLoggingDgHostIpAddr          
                         }
                 STATUS      current
                 DESCRIPTION
@@ -2190,6 +2673,66 @@ alcatelIND1SystemMIB MODULE-IDENTITY
                 "Group all the systemDNS parameters together"
                 ::= { alcatelIND1SystemMIBGroups 7 }
 
-END
+         systemBlueToothServicesGroup OBJECT-GROUP
+                OBJECTS{
+                                systemServicesBluetoothEnable,
+                                systemServicesBluetoothTxPower,
+                                systemServicesBluetoothStatus
+                }
+               STATUS  current
+               DESCRIPTION
+               "Group all the systemFips parameters together"
+               ::= { alcatelIND1SystemMIBGroups 8 }
 
+         systemFipsGroup OBJECT-GROUP
+                 OBJECTS{
+                                 systemFipsAdminState,
+                                 systemFipsOperState
+                         }
+                 STATUS      current
+                 DESCRIPTION
+                 "Group all the systemFips parameters together"
+                 ::= { alcatelIND1SystemMIBGroups 9 }
+ 
+         systemVcHardwareGroup OBJECT-GROUP
+                 OBJECTS     {
+                         systemVcHardwareCpuVendor,
+                         systemVcHardwareCpuModel,
+                         systemVcHardwareFlashMfg,
+                         systemVcHardwareFlashSize,
+                         systemVcHardwareMemoryMfg,
+                         systemVcHardwareMemorySize,
+                         systemVcHardwareUbootVersion,
+                         systemVcHardwareFpga1Version,
+                         systemVcHardwareFpga2Version,
+                         systemVcHardwarePowerSuppliesPresent,
+                         systemVcHardwareNisPresent,
+                         systemVcHardwareCFMsPresent,
+                         systemVcHardwareFanTraysPresent
+                 }
+         STATUS      current
+         DESCRIPTION
+             "Group all the system VC Hardware Data together"
+         ::= { alcatelIND1SystemMIBGroups 10 }
+
+         systemSwlogGroup OBJECT-GROUP
+                 OBJECTS     {
+                         systemSwlogName
+                 }
+         STATUS      current
+         DESCRIPTION
+             "Group all the swlog trap objects together"
+         ::= { alcatelIND1SystemMIBGroups 11 }
+
+        systemNotificationGroup  NOTIFICATION-GROUP
+                NOTIFICATIONS
+                {
+                                systemSwlogSizeTrap  
+                }
+                STATUS  current
+                DESCRIPTION
+                "A collection of notifications for System Services events."
+                ::= { alcatelIND1SystemMIBGroups 12 }
+
+END
 

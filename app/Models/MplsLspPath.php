@@ -28,6 +28,8 @@ class MplsLspPath extends Model implements Keyable
         'mplsLspPathTimeUp',
         'mplsLspPathTimeDown',
         'mplsLspPathTransitionCount',
+        'mplsLspPathTunnelARHopListIndex',
+        'mplsLspPathTunnelCHopListIndex',
     ];
 
     // ---- Helper Functions ----

@@ -29,6 +29,11 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
     Route::get('about', 'AboutController@index');
     Route::get('authlog', 'UserController@authlog');
 
+    // Maps
+    Route::group(['prefix' => 'maps', 'namespace' => 'Maps'], function () {
+        Route::get('devicedependency', 'DeviceDependencyController@dependencyMap');
+    });
+
     // admin pages
     Route::group(['guard' => 'admin'], function () {
         Route::get('settings/{tab?}/{section?}', 'SettingsController@index')->name('settings');
@@ -102,6 +107,7 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
             Route::post('device', 'DeviceController');
             Route::post('eventlog', 'EventlogController');
             Route::post('fdb-tables', 'FdbTablesController');
+            Route::post('routes', 'RoutesTablesController');
             Route::post('graylog', 'GraylogController');
             Route::post('location', 'LocationController');
             Route::post('port-nac', 'PortNacController');
@@ -111,6 +117,7 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
         // dashboard widgets
         Route::group(['prefix' => 'dash', 'namespace' => 'Widgets'], function () {
             Route::post('alerts', 'AlertsController');
+            Route::post('alertlog', 'AlertlogController');
             Route::post('availability-map', 'AvailabilityMapController');
             Route::post('component-status', 'ComponentStatusController');
             Route::post('device-summary-horiz', 'DeviceSummaryHorizController');
@@ -127,6 +134,7 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
             Route::post('top-devices', 'TopDevicesController');
             Route::post('top-interfaces', 'TopInterfacesController');
             Route::post('worldmap', 'WorldMapController');
+            Route::post('alertlog-stats', 'AlertlogStatsController');
         });
     });
 

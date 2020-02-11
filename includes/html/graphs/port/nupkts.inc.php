@@ -29,7 +29,7 @@ if (1) {
 
     $units       = '';
     $units_descr = 'Packets';
-    $total_units = 'B';
+    $total_units = 'pps';
     $colours_in  = 'purples';
     $multiplier  = '1';
     $colours_out = 'oranges';

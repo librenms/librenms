@@ -25,6 +25,8 @@
 
 namespace App\Models;
 
+use LibreNMS\Util\StringHelpers;
+
 class Application extends DeviceRelatedModel
 {
     /**
@@ -41,40 +43,10 @@ class Application extends DeviceRelatedModel
      */
     protected $primaryKey = 'app_id';
 
-    protected static $display_name = [
-        'bind' => 'BIND',
-        'dhcp-stats' => 'DHCP Stats',
-        'exim-stats' => 'EXIM Stats',
-        'fbsd-nfs-client' => 'FreeBSD NFS Client',
-        'fbsd-nfs-server' => 'FreeBSD NFS Server',
-        'freeradius' => 'FreeRADIUS',
-        'gpsd' => 'GPSD',
-        'mysql' => 'MySQL',
-        'nfs-stats' => 'NFS Stats',
-        'nfs-v3-stats' => 'NFS v3 Stats',
-        'nfs-server' => 'NFS Server',
-        'ntp' => 'NTP',
-        'ntp-client' => 'NTP Client',
-        'ntp-server' => 'NTP Server',
-        'opengridscheduler' => 'Open Grid Scheduler',
-        'os-updates' => 'OS Updates',
-        'php-fpm' => 'PHP-FPM',
-        'pi-hole' => 'Pi-hole',
-        'powerdns' => 'PowerDNS',
-        'powerdns-dnsdist' => 'PowerDNS dnsdist',
-        'powerdns-recursor' => 'PowerDNS Recursor',
-        'sdfsinfo' => 'SDFS info',
-        'smart' => 'SMART',
-        'ups-apcups' => 'UPS apcups',
-        'ups-nut' => 'UPS nut',
-        'zfs' => 'ZFS',
-    ];
-
     // ---- Helper Functions ----
 
     public function displayName()
     {
-        return collect(self::$display_name)
-            ->get($this->app_type, ucwords(str_replace(['_', '-'], ' ', $this->app_type)));
+        return StringHelpers::niceCase($this->app_type);
     }
 }

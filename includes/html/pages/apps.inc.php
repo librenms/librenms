@@ -45,6 +45,11 @@ $graphs['powerdns-recursor'] = array(
     'cache_performance',
     'outqueries'
 );
+$graphs['pureftpd'] = array(
+    'bitrate',
+    'connections',
+    'users'
+);
 $graphs['rrdcached'] = array(
     'queue_length',
     'events',
@@ -308,6 +313,7 @@ $graphs['asterisk'] = array(
     'calls',
     'channels',
     'sip',
+    'iax2',
 );
 echo '<div class="panel panel-default">';
 echo '<div class="panel-heading">';

@@ -269,6 +269,11 @@ if (device_permitted($vars['device']) || $permitted_by_port) {
             $routing_tabs[] = 'cisco-otv';
         }
 
+        $device_routing_count['routes'] = dbFetchCell('SELECT COUNT(*) FROM `route` WHERE `device_id` = ?', array($device['device_id']));
+        if ($device_routing_count['routes']) {
+            $routing_tabs[] = 'routes';
+        }
+
         if (is_array($routing_tabs)) {
             echo '<li role="presentation" '.$select['routing'].'>
                 <a href="'.generate_device_url($device, array('tab' => 'routing')).'">
@@ -346,7 +351,7 @@ if (device_permitted($vars['device']) || $permitted_by_port) {
             </li>';
 
         echo '<li role="presentation" '.$select['alerts'].'>
-            <a href="'.generate_device_url($device, array('tab' => 'alerts')).'">
+            <a href="'.generate_device_url($device, array('tab' => 'alert')).'">
             <i class="fa fa-exclamation-circle fa-lg icon-theme"  aria-hidden="true"></i> Alerts
             </a>
             </li>';

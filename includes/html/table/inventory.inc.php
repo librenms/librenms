@@ -3,14 +3,13 @@
 $where = '1';
 $param = array();
 
-
-
-if (Auth::user()->hasGlobalRead()) {
-    $sql = " FROM entPhysical AS E, devices AS D WHERE $where AND D.device_id = E.device_id";
-} else {
-    $sql     = " FROM entPhysical AS E, devices AS D, devices_perms AS P WHERE $where AND D.device_id = E.device_id AND P.device_id = D.device_id AND P.user_id = ?";
-    $param[] = Auth::id();
+if (!Auth::user()->hasGlobalRead()) {
+    $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
+    $where .= " AND `D`.`device_id` IN " .dbGenPlaceholders(count($device_ids));
+    $param = array_merge($param, $device_ids);
 }
+
+$sql = " FROM entPhysical AS E, devices AS D WHERE $where AND D.device_id = E.device_id";
 
 if (isset($searchPhrase) && !empty($searchPhrase)) {
     $sql .= " AND (`D`.`hostname` LIKE '%$searchPhrase%' OR `E`.`entPhysicalDescr` LIKE '%$searchPhrase%' OR `E`.`entPhysicalModelName` LIKE '%$searchPhrase%' OR `E`.`entPhysicalSerialNum` LIKE '%$searchPhrase%')";
@@ -62,11 +61,11 @@ if ($rowCount != -1) {
     $sql .= " LIMIT $limit_low,$limit_high";
 }
 
-$sql = "SELECT `D`.`device_id` AS `device_id`, `D`.`hostname` AS `hostname`,`entPhysicalDescr` AS `description`, `entPhysicalName` AS `name`, `entPhysicalModelName` AS `model`, `entPhysicalSerialNum` AS `serial` $sql";
+$sql = "SELECT `D`.`device_id` AS `device_id`, `D`.`hostname` AS `hostname`, `D`.`sysName` AS `sysName`,`entPhysicalDescr` AS `description`, `entPhysicalName` AS `name`, `entPhysicalModelName` AS `model`, `entPhysicalSerialNum` AS `serial` $sql";
 
 foreach (dbFetchRows($sql, $param) as $invent) {
     $response[] = array(
-                   'hostname'    => generate_device_link($invent, shortHost($invent['hostname'])),
+                   'hostname'    => generate_device_link($invent),
                    'description' => $invent['description'],
                    'name'        => $invent['name'],
                    'model'       => $invent['model'],

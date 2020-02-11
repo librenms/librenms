@@ -28,6 +28,8 @@ ALCATEL-IND1-SERVICE-MGR-MIB DEFINITIONS ::= BEGIN
                         FROM INET-ADDRESS-MIB
                 MplsLdpIdentifier
                         FROM MPLS-LDP-MIB
+                SnmpAdminString
+                        FROM SNMP-FRAMEWORK-MIB
                 ;
                 
 
@@ -102,10 +104,10 @@ AluSdpId ::= TEXTUAL-CONVENTION
                      Distribution Point. This ID must be unique only
                      within the node where it is defined.
                      The value 0 is used as the null ID.
-                     The value from 1 to 17407 is for static range.
-                     The value from 32768 to 50175 is for dynamic range.
+                     The value from 1 to 32767 is for static range.
+                     The value from 32768 to 65534 is for dynamic range.
                      The value 65535 is for all configured IDs."
-    SYNTAX          Unsigned32 (0|1..17407|32768..65534|65535)
+    SYNTAX          Unsigned32 (0|1..32767|32768..65534|65535)
 
 AluServiceType ::= TEXTUAL-CONVENTION
     STATUS          current
@@ -123,7 +125,10 @@ AluServiceType ::= TEXTUAL-CONVENTION
                         fpipe   (8), -- FR pipe service
                         ipipe   (9), -- IP interworking pipe service
                         cpipe   (10),-- Circuit Emulation pipe service
-                        spb     (11) -- Shortest Path Bridging Mac service "SPBM"
+                        spb     (11),-- Shortest Path Bridging Mac service "SPBM"
+                        vxlan   (12),-- Virtual Extensible LAN service "VxLAN"
+                        local   (13), -- Local service for traffic between SAPs but no tunnel
+                        rfpoverspb (14) -- RFP over SPB
                     }
 
 AluAllocationType ::= TEXTUAL-CONVENTION
@@ -133,15 +138,31 @@ AluAllocationType ::= TEXTUAL-CONVENTION
 
 AluSdpDynamicType ::= TEXTUAL-CONVENTION
     STATUS          current
-    DESCRIPTION     "SDP Dynamic Type: Unicast or Multicast"
+    DESCRIPTION     "SDP Type: Unicast or Multicast"
     SYNTAX          INTEGER {
                         unknown                 (0), -- Invalid
-                        static                  (1), -- Manually configured sdp "VPLS"
+                        static                  (1), -- Manually configured sdp
                         dynamicUnicast          (2), -- Dynamically created unicast path "*" 
                         dynamicMcastRemote      (3), -- Dynamically created multicast path from remote node "+"
                         dynamicMcastLocal       (4)  -- Dynamically created multicast path from local node "#"
+
                     }
-                    
+
+AluSdpOriginType ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION     "SDP Creation Origin"
+    SYNTAX          INTEGER {
+                        unknown                 (0), -- Invalid
+                        static                  (1), -- Manually configured sdp "VPLS"
+                        pbbDynamicUnicast       (2), -- Dynamically created unicast path "*" for PBB Tunnel
+                        pbbDynamicMcastRemote   (3), -- Dynamically created multicast path from remote node "+" for PBB Tunnel
+                        pbbDynamicMcastLocal    (4), -- Dynamically created multicast path from local node "#" for PBB Tunnel
+                        vxlanUnicast            (5), -- Far-end Unicast Ip Addr for VxLAN Tunnel
+                        vxlanMcast              (6), -- Multicast Group for VxLAN Tunnel
+                        vxlanDynamicUnicast     (7), -- Dynamically created Far-end Unicast for VxLAN Tunnel
+                        vxlanDynamicMcast       (8)  -- Dynamically created Multicast group for VxLAN Tunnel
+                    }
+
 AluDateAndTime ::= TEXTUAL-CONVENTION
     DISPLAY-HINT    "255a"
     STATUS          current
@@ -397,7 +418,7 @@ alaServiceMgrPortEntry  OBJECT-TYPE
         ::= { alaServiceMgrPortTable 1 }
 
 AlaServiceMgrPortEntry ::=
-   SEQUENCE
+  SEQUENCE
         {
             alaServiceMgrPortID             InterfaceIndex,
             alaServiceMgrPortMode           INTEGER,
@@ -545,7 +566,7 @@ alaSapExtraInfoEntry OBJECT-TYPE
 ASapExtraInfoEntry ::=
     SEQUENCE {
         alaSapInfoTrusted                   INTEGER,
-        alaSapInfoPriority                  INTEGER
+        alaSapInfoPriority                  Integer32
     }
 
 alaSapInfoTrusted  OBJECT-TYPE
@@ -561,7 +582,7 @@ alaSapInfoTrusted  OBJECT-TYPE
         ::= { alaSapExtraInfoEntry 1 }
 
 alaSapInfoPriority  OBJECT-TYPE
-    SYNTAX      INTEGER (0..7)
+    SYNTAX      Integer32 (0..7)
         MAX-ACCESS  read-write
         STATUS  obsolete
         DESCRIPTION
@@ -614,12 +635,18 @@ AlaSvcBaseInfoEntry ::=
         alaSvcEgressPacketCount     Counter32,
         alaSvcEgressByteCount       Counter64,
         alaSvcClearCounters         INTEGER,
-        alaSvcSapVlanXlation        ServiceAdminStatus
+        alaSvcSapVlanXlation        ServiceAdminStatus,
+        alaSvcVnid                  Integer32,           -- VXLAN
+        alaSvcRemoveIngressTag      ServiceAdminStatus,
+        alaSvcL3VpnIfIndex          InterfaceIndexOrZero,   -- L3-VPN
+        alaSvcL3VpnIfName           SnmpAdminString,        -- L3-VPN
+        alaSvcL3VpnVrfName          SnmpAdminString,        -- L3-VPN
+        alaSvcL3VpnMtu              Integer32               -- L3-VPN
     }
 
 alaSvcId OBJECT-TYPE
     SYNTAX          AluServiceId
-    MAX-ACCESS      read-only
+    MAX-ACCESS      accessible-for-notify
     STATUS          current
     DESCRIPTION     "The value of the object alaSvcId specifies the
                      Service identifier. This value should be unique within the
@@ -685,7 +712,6 @@ alaSvcOperStatus OBJECT-TYPE
     DESCRIPTION     "The value of the object alaSvcOperStatus indicates the
                      operating state of this service. The requirements for a
                      service to be operationally up depend on the service type:
-
                      tls services are 'up' when the service is
                      administratively up and either at least two SAP's or
                      spoke SDP Bind's, or one SAP or spoke SDP Bind and
@@ -708,7 +734,7 @@ alaSvcNumSdps OBJECT-TYPE
                      SDPs bound to this service."
     ::= { alaSvcBaseInfoEntry 9 }
 
- alaSvcLastMgmtChange OBJECT-TYPE
+alaSvcLastMgmtChange OBJECT-TYPE
       SYNTAX          AluDateAndTime
       MAX-ACCESS      read-only
       STATUS          current
@@ -802,7 +828,7 @@ alaSvcBVlan OBJECT-TYPE
     ::= { alaSvcBaseInfoEntry 19 }
 
 alaSvcMulticastMode OBJECT-TYPE
-    SYNTAX          INTEGER { headend(1), tandem(2) }
+    SYNTAX          INTEGER { headend(1), tandem(2), hybrid (3) }
     MAX-ACCESS      read-create
     STATUS          current
     DESCRIPTION     "To configure the multicast replication mode for each service:
@@ -810,7 +836,8 @@ alaSvcMulticastMode OBJECT-TYPE
                      is replicated once for each receiver in the b-domain using its
                      unicast BMAC.
                      Tandem(2) where a non-unicast packet entering the SAP port is
-                     replicated once at each node using the multicast group address."
+                     replicated once at each node using the multicast group address.
+                     Hybrid(3) combination of Head-end and Tandem replication."
     DEFVAL          { headend }
     ::= { alaSvcBaseInfoEntry 20 }
 
@@ -864,6 +891,60 @@ alaSvcSapVlanXlation OBJECT-TYPE
     DEFVAL          { down }
     ::= { alaSvcBaseInfoEntry 26 }
 
+alaSvcVnid          OBJECT-TYPE
+    SYNTAX          Integer32 (-1 | 1..16777215)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "The virtual network identifier (VNID). A 24-bit value used to designate the
+                     individual VXLAN overlay network on which the communicating VMs are situated.
+                     VMs in different VXLAN overlay networks cannot communicate with each other.
+                     Value 0 and 0xfffffff are currently reserved.
+                     Value -1 indicates all VNIDs currently configured."
+    ::= { alaSvcBaseInfoEntry 27 }
+
+alaSvcRemoveIngressTag OBJECT-TYPE
+    SYNTAX          ServiceAdminStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "To enable/disable the removal of the tag from the ingress pkts matching all SAPs
+                     configured in this service"
+    DEFVAL          { down }
+    ::= { alaSvcBaseInfoEntry 28 }
+
+alaSvcL3VpnIfIndex  OBJECT-TYPE
+    SYNTAX          InterfaceIndexOrZero
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The interface index of the L3-VPN IP interface associated with this service.
+                     Value 0 indicates no L3-VPN interface is associated with this service."
+    DEFVAL          { 0 }
+    ::= { alaSvcBaseInfoEntry 29 }
+
+alaSvcL3VpnIfName   OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE(1..32))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The interface name of the L3-VPN IP interface associated with this service"
+    ::= { alaSvcBaseInfoEntry 30 }
+
+alaSvcL3VpnVrfName OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE(1..32))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The current VRF instance name for the L3-VPN interface associated with this service.
+                     The default VRF is assumed if not specifed."
+    ::= { alaSvcBaseInfoEntry 31 }
+
+alaSvcL3VpnMtu      OBJECT-TYPE
+    SYNTAX          Integer32 (0 | 1280..9198)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "The maximum packet size of a IP control packet that can be handled by the CPU
+                     for this service.
+                     Value 0 indicates the default mtu."
+    DEFVAL          { 1500 }
+    ::= { alaSvcBaseInfoEntry 32 }
+
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 -- ALA Service Access Point (SAP) Base Info Table
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -910,7 +991,7 @@ AlaSapBaseInfoEntry ::=
 
 alaSapPortId OBJECT-TYPE
     SYNTAX          InterfaceIndex
-    MAX-ACCESS      read-only
+    MAX-ACCESS      accessible-for-notify
     STATUS          current
     DESCRIPTION     "The ID of the access port where this SAP
                      is defined."
@@ -918,7 +999,7 @@ alaSapPortId OBJECT-TYPE
 
 alaSapEncapValue OBJECT-TYPE
     SYNTAX          TmnxEncapVal
-    MAX-ACCESS      read-only
+    MAX-ACCESS      accessible-for-notify
     STATUS          current
     DESCRIPTION     "The value of the label used to identify this
                      SAP on the access port specified by sapPortId."
@@ -1195,12 +1276,14 @@ AlaSdpInfoEntry ::=
         alaSdpDynamicType                   AluSdpDynamicType,
         alaSdpBindCount                     INTEGER,
         alaSdpIsid                          INTEGER,
-        alaSdpMcastPortList                 DisplayString
+        alaSdpMcastPortList                 DisplayString,
+        alaSdpCreationOrigin                AluSdpOriginType,
+        alaSdpAdminTTL                      OCTET STRING
     }
 
 alaSdpId OBJECT-TYPE
     SYNTAX          AluSdpId
-    MAX-ACCESS      read-only
+    MAX-ACCESS      not-accessible
     STATUS          current
     DESCRIPTION     "SDP identifier."
     ::= { alaSdpInfoEntry 1 }
@@ -1219,7 +1302,7 @@ alaSdpRowStatus OBJECT-TYPE
 
 alaSdpSvcType OBJECT-TYPE
     SYNTAX          AluServiceType
-    MAX-ACCESS      read-only
+    MAX-ACCESS      read-create
     STATUS          current
     DESCRIPTION     "This object indicates the type of service where
                      this SDP is defined."
@@ -1227,8 +1310,10 @@ alaSdpSvcType OBJECT-TYPE
 
 alaSdpDelivery OBJECT-TYPE
     SYNTAX          INTEGER {
-                        gre  (1),
-                        mpls (2)
+                        gre     (1),
+                        mpls    (2),
+                        pbb     (3),
+                        vxlan   (4)
                     }
     MAX-ACCESS      read-create
     STATUS          current
@@ -1244,11 +1329,14 @@ alaSdpFarEndIpAddress OBJECT-TYPE
     MAX-ACCESS      read-create
     STATUS          current
     DESCRIPTION     "This object specifies the IP address of the
-                     remote end of the GRE or MPLS tunnel defined
-                     by this SDP. The value of this object must
+                     remote end of the MPLS or VxLAN tunnel defined
+                     by this SDP. For SPB, this object is not used. 
+                     For VxLAN, the value of this object must
                      be set for the row to become 'active', and
                      can only be changed while the admin status
-                     of the SDP is 'down'."
+                     of the SDP is 'down'. The value can be a unicast
+                     IP address of a single far-end node, or a multicast
+                     group address for multiple member nodes."
     ::= { alaSdpInfoEntry 5 }
 
 alaSdpDescription OBJECT-TYPE
@@ -1292,7 +1380,9 @@ alaSdpOperStatus OBJECT-TYPE
                         notReady               (3),
                         invalidEgressInterface (4),
                         transportTunnelDown    (5),
-                        down                   (6)
+                        down                   (6),
+                        created                (7),     -- dynamically created for SPB
+                        destroyed              (8)      -- dynamically destroyed for SPB
                     }
     MAX-ACCESS      read-only
     STATUS          current
@@ -1456,7 +1546,8 @@ alaSdpDynamicType OBJECT-TYPE
     SYNTAX          AluSdpDynamicType
     MAX-ACCESS      read-only
     STATUS          current
-    DESCRIPTION     "SDP dynamically allocated for Unicast or Multicast Path"
+    DESCRIPTION     "SDP type allocated for Unicast or Multicast Path according
+                     to the tunnel type."
     DEFVAL          { static }
     ::= { alaSdpInfoEntry 24 }
 
@@ -1464,7 +1555,7 @@ alaSdpBindCount OBJECT-TYPE
     SYNTAX          INTEGER
     MAX-ACCESS      read-only
     STATUS          current
-    DESCRIPTION     "The number of Mesh-SDPs bound to this SDP."
+    DESCRIPTION     "The number of Bind-SDPs bound to this SDP."
     ::= { alaSdpInfoEntry 25 }
 
 alaSdpIsid OBJECT-TYPE
@@ -1481,6 +1572,26 @@ alaSdpMcastPortList OBJECT-TYPE
     STATUS          current
     DESCRIPTION     "List of egress ports for this Multicast SDP."
     ::= { alaSdpInfoEntry 27 }
+
+-- VxLAN
+alaSdpCreationOrigin OBJECT-TYPE
+    SYNTAX          AluSdpOriginType
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "SDP creation origin staticly or dynamically for the tunnel types
+                     (MPLS, PBB, VxLAN...)"
+    ::= { alaSdpInfoEntry 28 }
+
+alaSdpAdminTTL      OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE (1))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "The number of hops an IP packet travels through the VxLAN tunnel
+                     before being discarded. This value is inserted into the TTL field
+                     of the IP header in the VXLAN encapsulated header originating from
+                     this node."
+     DEFVAL         { "@" }
+    ::= { alaSdpInfoEntry 29 }
 
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 -- ALA Service Distribution Point Bind (SDP-Bind) Base Info Table
@@ -1527,12 +1638,18 @@ AlaSdpBindEntry ::=
         alaSdpBindIngressPacketCount    Counter32,
         alaSdpBindIngressByteCount      Counter64,
         alaSdpBindEgressPacketCount     Counter32,
-        alaSdpBindEgressByteCount       Counter64
+        alaSdpBindEgressByteCount       Counter64,
+-- VxLAN
+        alaSdpBindCreationOrigin        AluSdpOriginType,
+        alaSdpBindFarEndIpAddress       IpAddress,
+        alaSdpBindVnid                  Integer32, 
+        alaSdpBindDescription           ServObjDesc,
+        alaSdpBindStatsAdminStatus      ServiceAdminStatus
     }
 
 alaSdpBindId OBJECT-TYPE
     SYNTAX          SdpBindId
-    MAX-ACCESS      read-only
+    MAX-ACCESS      accessible-for-notify
     STATUS          current
     DESCRIPTION     "SDP Binding identifier."
     ::= { alaSdpBindEntry 1 }
@@ -1548,7 +1665,7 @@ alaSdpBindRowStatus OBJECT-TYPE
 
 alaSdpBindSvcType OBJECT-TYPE
     SYNTAX          AluServiceType
-    MAX-ACCESS      read-only
+    MAX-ACCESS      read-create
     STATUS          current
     DESCRIPTION     "This object indicates the type of service where
                      this Sdp Bind is defined."
@@ -1620,7 +1737,9 @@ alaSdpBindOperStatus OBJECT-TYPE
                         sdpPathMtuTooSmall (7),
                         sdpNotReady        (8),
                         sdpDown            (9),
-                        sapDown            (10)
+                        sapDown            (10),
+                        created            (11),        -- dynamically created for SPB
+                        destroyed          (12)         -- dynamically destroyed for SPB
                     }
     MAX-ACCESS      read-only
     STATUS          current
@@ -1782,7 +1901,8 @@ alaSdpBindSystemName OBJECT-TYPE
     SYNTAX          DisplayString (SIZE (1..32))
     MAX-ACCESS      read-only
     STATUS          current
-    DESCRIPTION     "The neighbor host name associated with the Sdp Bind object."
+    DESCRIPTION     "The neighbor host name associated with the Sdp Bind object for SPB or
+                     the interface name to reach the far-end node for VxLAN."
     ::= { alaSdpBindEntry 21 }
 
 alaSdpBindAllocationType OBJECT-TYPE
@@ -1820,6 +1940,157 @@ alaSdpBindEgressByteCount OBJECT-TYPE
     STATUS          current
     DESCRIPTION     "The total egress byte count flowing through this SDP Bind."
     ::= { alaSdpBindEntry 26 }
+
+alaSdpBindCreationOrigin    OBJECT-TYPE
+    SYNTAX          AluSdpOriginType
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "SDP creation origin staticly or dynamically for the tunnel types
+                     (MPLS, PBB, VxLAN...)"
+    ::= { alaSdpBindEntry 27 }
+
+alaSdpBindFarEndIpAddress OBJECT-TYPE
+    SYNTAX          IpAddress
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This object specifies the Unicast IP address or the Multicast Group Address
+                     of the the SDP"
+    ::= { alaSdpBindEntry 28 }
+
+alaSdpBindVnid      OBJECT-TYPE
+    SYNTAX          Integer32(1..16777215)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The virtual network identifier (VNID). A 24-bit value used to designate the
+                     individual VXLAN overlay network on which the communicating VMs are situated.
+                     VMs in different VXLAN overlay networks cannot communicate with each other.
+                     Value 0 and 0xfffffff are currently reserved -- Propietary"
+    ::= { alaSdpBindEntry 29 }
+
+alaSdpBindDescription OBJECT-TYPE
+    SYNTAX          ServObjDesc
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "Generic information about this SDP Bind."
+    DEFVAL          { "" }
+    ::= { alaSdpBindEntry 30 }
+
+alaSdpBindStatsAdminStatus OBJECT-TYPE
+    SYNTAX          ServiceAdminStatus
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "To enable/disable the ingress/egress stats counters on this Bind SDP."
+    ::= { alaSdpBindEntry 31 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- Service Manager System Config Table
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+alaSvcMgrSysTable   OBJECT IDENTIFIER
+    ::= { alaServiceMgr 8 }
+
+-- SystemId & SystemName for this node
+alaSvcMgrSysId      OBJECT-TYPE
+    SYNTAX          MacAddress
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "SystemId (System Mac) assigned for this node by
+                     chassis supervison after boot-up"
+    ::= { alaSvcMgrSysTable 1 }
+
+alaSvcMgrSysName    OBJECT-TYPE
+    SYNTAX          DisplayString (SIZE (1..32))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "SystemName assigned for this node by
+                     chassis supervison after boot-up"
+    ::= { alaSvcMgrSysTable 2 }
+
+alaSvcMgrSysLastMgmtChange OBJECT-TYPE
+      SYNTAX          AluDateAndTime
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION     "The value of sysUpTime at the time of the most recent
+                       management-initiated change to this system configuration"
+      ::= { alaSvcMgrSysTable 3 }
+
+alaSvcMgrSysLastStatusChange OBJECT-TYPE
+    SYNTAX          AluDateAndTime
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The value of sysUpTime at the time of the most recent
+                     operating status change to the system configuration"
+    ::= { alaSvcMgrSysTable 4 }
+
+-- Trap AdminState for status updates
+alaSvcMgrSvcTrapAdminState OBJECT-TYPE
+    SYNTAX          INTEGER { enable(1), disable(2) }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "Admin state for trap generation upon a service status change"
+    DEFVAL          { disable }
+    ::= { alaSvcMgrSysTable 5 }
+
+alaSvcMgrSapTrapAdminState OBJECT-TYPE
+    SYNTAX          INTEGER { enable(1), disable(2) }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "Admin state for trap generation upon a SAP status change"
+    DEFVAL          { disable }
+    ::= { alaSvcMgrSysTable 6 }
+
+alaSvcMgrSdpTrapAdminState OBJECT-TYPE
+    SYNTAX          INTEGER { enable(1), disable(2) }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "Admin state for trap generation upon a SDP status change"
+    DEFVAL          { disable }
+    ::= { alaSvcMgrSysTable 7 }
+
+alaSvcMgrSdpBindTrapAdminState OBJECT-TYPE
+    SYNTAX          INTEGER { enable(1), disable(2) }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "Admin state for trap generation upon a Service Bind status change"
+    DEFVAL          { disable }
+    ::= { alaSvcMgrSysTable 8 }
+
+alaSvcMgrMaxTrapPerMinute   OBJECT-TYPE
+
+    SYNTAX          INTEGER (1..65534|65535)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "Set maximum trap rate per minute.
+                     The value 65535 is for unlimited trap rate."
+    DEFVAL          { 60 }
+    ::= { alaSvcMgrSysTable 9 }
+
+alaSvcMgrStatsAdminState OBJECT-TYPE
+    SYNTAX          INTEGER { enable(1), disable(2) }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "The global admin state for Service, SAP, and Sdp Bind statistics.
+                     When enabled, each Service/SAP/Bind object can reserve a set of packet/byte counters
+                     for ingress and egress flows. When disabled, all stats resources are released."
+    DEFVAL          { enable }
+    ::= { alaSvcMgrSysTable 10 }
+
+alaSvcMgrVxlanDestUdpPort OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "The VXLAN well-known destination UDP Port in the outer UDP header.
+                     IANA has assigned the value 4789 for the VXLAN UDP port"
+    DEFVAL          { 4789 }
+    ::= { alaSvcMgrSysTable 11 }
+
+alaSvcMgrVxlanVrfName OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE(1..20))
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "The current VRF instance name associated with VxLAN L3 traffic. The default VRF
+                     is assumed if not specifed"
+    ::= { alaSvcMgrSysTable 12 }
 
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -5103,6 +5374,213 @@ alaVRtrLdpSessvRtrID  OBJECT-TYPE
     ::= { alaVRtrLdpExtendedSessionEntry 5 }
 
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- AOS RFP OVER SPB related MIB
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+alaRfpSpb OBJECT IDENTIFIER ::= { alcatelIND1ServiceMgrMIBObjects 5 }
+
+alaRfpSpbLocalEndPointTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF AlaRfpSpbLocalEndPointEntry
+	MAX-ACCESS	not-accessible
+	STATUS  current
+	DESCRIPTION
+	"This table has the information about the local end points for the 
+	 point to point service."
+	::= { alaRfpSpb 1 }
+
+alaRfpSpbLocalEndPointEntry OBJECT-TYPE
+	SYNTAX	AlaRfpSpbLocalEndPointEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+	"Local End Point Entry."
+	INDEX { alaRfpSpbLocalEndPointRfp, alaRfpSpbLocalEndPoint }
+	::= { alaRfpSpbLocalEndPointTable 1 }
+
+AlaRfpSpbLocalEndPointEntry ::= SEQUENCE
+	{
+		alaRfpSpbLocalEndPointRfp				Unsigned32,
+		alaRfpSpbLocalEndPoint					Unsigned32,
+		alaRfpSpbLocalEndPointCcmInterval			INTEGER,
+		alaRfpSpbLocalEndPointAdminStatus			INTEGER,
+		alaRfpSpbLocalEndPointLevel				Integer32,
+		alaRfpSpbLocalEndPointCBVlan				Integer32,
+		alaRfpSpbLocalEndPointMaintDomain			SnmpAdminString,
+		alaRfpSpbLocalEndPointMaintAssociation			SnmpAdminString,
+		alaRfpSpbLocalEndPointRowStatus				RowStatus
+	}
+	
+alaRfpSpbLocalEndPointRfp    OBJECT-TYPE
+        SYNTAX          Unsigned32(1..32767)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+        	"This is the id for the RFP domain."
+        ::= { alaRfpSpbLocalEndPointEntry 1 }
+
+alaRfpSpbLocalEndPoint	OBJECT-TYPE
+	SYNTAX		Unsigned32(1..8191)
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"This is the local end point number for Virtual UP MEP used in Ethernet OAM."
+    	::= { alaRfpSpbLocalEndPointEntry 2 }
+
+alaRfpSpbLocalEndPointCcmInterval	OBJECT-TYPE
+	SYNTAX		INTEGER { oneSecond(1), oneMinute(2), tenSeconds(3), tenMinutes(4), hundredMilliSeconds(5) }
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"This is the Continuity Check Messages Interval."
+	DEFVAL { oneSecond }
+	::=	{ alaRfpSpbLocalEndPointEntry 3 }
+
+alaRfpSpbLocalEndPointAdminStatus OBJECT-TYPE
+	SYNTAX		INTEGER { enable (1), disable (2) }
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"The admin status of this local end point
+		enable:  This will trigger generation of CCM messages.
+		disable: This will stop generation of CCM messages.
+		"
+	DEFVAL { enable }
+	::=	{ alaRfpSpbLocalEndPointEntry 4 }
+	
+alaRfpSpbLocalEndPointLevel OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"This is the level at which the maintenance domain will be created."
+	::=	{ alaRfpSpbLocalEndPointEntry 5 }
+
+alaRfpSpbLocalEndPointCBVlan	OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"This is the primary VLAN used in the maintenance association for OAM domain."
+	::=	{ alaRfpSpbLocalEndPointEntry 6 }
+
+alaRfpSpbLocalEndPointMaintDomain	OBJECT-TYPE
+	SYNTAX		SnmpAdminString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"This is the name used for OAM maintenance domain in a string format."
+	::=	{ alaRfpSpbLocalEndPointEntry 7 }
+
+alaRfpSpbLocalEndPointMaintAssociation OBJECT-TYPE
+	SYNTAX		SnmpAdminString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"This is the name used for OAM maintenance association in a string format."
+	::=	{ alaRfpSpbLocalEndPointEntry 8 }
+
+alaRfpSpbLocalEndPointRowStatus	OBJECT-TYPE
+	SYNTAX 		RowStatus
+    	MAX-ACCESS  	read-create
+    	STATUS  	current
+    	DESCRIPTION
+	        "The status of this table entry."
+    	::= 	{ alaRfpSpbLocalEndPointEntry 9 }	
+	
+alaRfpSpbRemoteEndPointTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF AlaRfpRemoteEndPointEntry
+	MAX-ACCESS	not-accessible
+	STATUS  current
+	DESCRIPTION
+	"This table has the information about the remote end points for the 
+	 point to point service."
+	::= { alaRfpSpb 2 }
+	
+alaRfpSpbRemoteEndPointEntry OBJECT-TYPE
+	SYNTAX	AlaRfpRemoteEndPointEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+	"Remote End Point Entry."
+	INDEX { alaRfpSpbRemoteEndPointRfp, alaRfpSpbRemoteEndPoint , alaRfpSpbRemoteEndPointServiceID }
+	::= { alaRfpSpbRemoteEndPointTable 1 }
+
+AlaRfpRemoteEndPointEntry ::= SEQUENCE
+	{
+		alaRfpSpbRemoteEndPointRfp				Unsigned32,
+		alaRfpSpbRemoteEndPoint					Unsigned32,
+		alaRfpSpbRemoteEndPointServiceID			Unsigned32,
+		alaRfpSpbRemoteEndPointStatus				INTEGER,
+		alaRfpSpbRemoteEndPointSystemName			SnmpAdminString,
+		alaRfpSpbRemoteEndPointISID				Integer32,
+		alaRfpSpbRemoteEndPointBVlan				Integer32,
+		alaRfpSpbRemoteEndPointRowStatus			RowStatus
+	}
+
+alaRfpSpbRemoteEndPointRfp	OBJECT-TYPE
+	SYNTAX		Unsigned32(1..32767)
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+	"This is the id for the RFP domain."
+	::= { alaRfpSpbRemoteEndPointEntry 1 }
+
+alaRfpSpbRemoteEndPoint	OBJECT-TYPE
+	SYNTAX		Unsigned32(1..8191)
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+	"These are the remote end point numbers allowed by the maintenance domain/level."
+	::= { alaRfpSpbRemoteEndPointEntry 2 }
+
+alaRfpSpbRemoteEndPointServiceID  OBJECT-TYPE
+	SYNTAX 	   	    Unsigned32(1..32767)
+	MAX-ACCESS	    not-accessible
+	STATUS		    current
+	DESCRIPTION
+	"This is the service id learnt from remote end point."
+	::= { alaRfpSpbRemoteEndPointEntry 3 }
+
+alaRfpSpbRemoteEndPointStatus OBJECT-TYPE
+	SYNTAX 		INTEGER { ok (1), failed(2), unknown(3) }
+	MAX-ACCESS 	read-only	
+	STATUS		current
+	DESCRIPTION
+	"This is the remote BEB (Back Bone Edge Bridge) status."
+	::= { alaRfpSpbRemoteEndPointEntry 4 }
+	
+alaRfpSpbRemoteEndPointSystemName OBJECT-TYPE
+	SYNTAX 		    SnmpAdminString
+	MAX-ACCESS 	    read-only	
+	STATUS		    current
+	DESCRIPTION
+	"This is the system name of remote BEB."
+	::= { alaRfpSpbRemoteEndPointEntry 5 }
+
+alaRfpSpbRemoteEndPointISID OBJECT-TYPE
+	SYNTAX 		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"This is the ISID value associated with service id from remote end point."
+	::= { alaRfpSpbRemoteEndPointEntry 6 }
+
+alaRfpSpbRemoteEndPointBVlan OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only	
+	STATUS	current
+	DESCRIPTION
+	"This is the BVLAN value associated with a service Id from remote end point."
+	::= { alaRfpSpbRemoteEndPointEntry 7 }
+
+alaRfpSpbRemoteEndPointRowStatus OBJECT-TYPE
+	SYNTAX 		RowStatus
+	MAX-ACCESS 	read-create
+	STATUS		current
+	DESCRIPTION
+	"Remote End Point Entry Status."
+	::= { alaRfpSpbRemoteEndPointEntry 8 }
+	
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 -- Service Manager Trap Object Definition
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 smgrServiceError NOTIFICATION-TYPE
@@ -5128,7 +5606,7 @@ smgrSapError NOTIFICATION-TYPE
     ::= { alaServiceMgrNotifications 3 }
 
 smgrSapHwError NOTIFICATION-TYPE
-    OBJECTS { alaSvcId, alaSvcId, alaSapPortId, alaSapEncapValue, alaSvcVFI, alaSapVirtualPort }
+    OBJECTS { alaSvcId, alaSapPortId, alaSapEncapValue, alaSvcVFI, alaSapVirtualPort }
     STATUS      current
     DESCRIPTION
     "A critical trap to indicate a failure to allocate/de-allocate a hardware resource for a SAP,
@@ -5174,10 +5652,54 @@ smgrGeneralError NOTIFICATION-TYPE
 
 smgrStatusChange NOTIFICATION-TYPE
     OBJECTS { alaSvcId, alaSvcType, alaSvcOperStatus, alaSvcNumSaps, alaSvcNumSdps }
-    STATUS      current
+    STATUS      deprecated
     DESCRIPTION
     "A trap to indicate a status change for a group of selected services."
     ::= { alaServiceMgrNotifications 10 }
+
+smgrServiceStatusChange NOTIFICATION-TYPE
+    OBJECTS     {alaSvcId, alaSvcType, alaSvcOperStatus, alaSvcIsid, alaSvcBVlan, alaSvcMulticastMode}
+    STATUS      current
+    DESCRIPTION
+    "A change in service operating status. A service is operationally up when it's admin-up and there's at least
+     one active SAP or one active bind that is operationally up."
+    ::= { alaServiceMgrNotifications 11}
+
+smgrSapStatusChange NOTIFICATION-TYPE
+    OBJECTS     {alaSvcId, alaSapPortId, alaSapEncapValue, alaSapOperStatus}
+    STATUS      current
+    DESCRIPTION
+    "A change in SAP operating status. A SAP is operationally up when it's admin-up and the link status of the
+     physical or logical port of the SAP is operationally up."
+    ::= { alaServiceMgrNotifications 12 }
+
+smgrSdpStatusChange NOTIFICATION-TYPE
+    OBJECTS     {alaSdpId, alaSdpOperStatus, alaSdpNetworkPort, alaSdpBVlan, alaSdpSystemId,
+                 alaSdpSystemName, alaSdpDynamicType, alaSdpIsid}
+    STATUS      current
+    DESCRIPTION
+    "A change in SDP operating status. For SPB, the SDP is dynamically created or destroyed as calculated by
+     ISIS protocol when a unicast/multicast path to reach a neighbor node is determined."
+    ::= { alaServiceMgrNotifications 13 }
+
+smgrSdpBindStatusChange NOTIFICATION-TYPE
+    OBJECTS     {alaSvcId, alaSdpBindId, alaSdpBindOperStatus, alaSdpBindNetworkPort, alaSdpBindBVlan,
+                 alaSdpBindSystemId, alaSdpBindSystemName, alaSdpBindIsid}
+    STATUS      current
+    DESCRIPTION
+    "A change in SDP Bind operating status. For SPB, the SDP Bind is dynamically created or destroyed as detected
+     by ISIS when the same isid is configured in the neighbor node."
+    ::= { alaServiceMgrNotifications 14 }
+
+
+smgrVxlanSdpBindStatusChange NOTIFICATION-TYPE
+    OBJECTS     {alaSvcId, alaSdpBindId, alaSdpBindOperStatus, alaSdpBindFarEndIpAddress,
+                 alaSdpBindVnid}
+    STATUS      current
+    DESCRIPTION
+    "A change in SDP Bind operating status. A SDP Bind is dynamically created as a VTEP is discovered, or
+     destroyed when the reachability to the VTEP is gone."
+    ::= { alaServiceMgrNotifications 15 }
 
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 -- COMPLIANCE
@@ -5233,7 +5755,9 @@ alcatelIND1ServiceMgrMIBCompliance MODULE-COMPLIANCE
                 alaSvcBaseInfoEntryGroup,
                 alaSapBaseInfoEntryGroup,
                 alaSdpInfoTableGroup,
-                alaSdpBindTableGroup
+                alaSdpBindTableGroup,
+                alaSvcMgrSysTableGroup,
+		alaSvcMgrEndPointGroup
         }
         ::= { alcatelIND1ServiceMgrMIBCompliances 1 }
 
@@ -5793,7 +6317,13 @@ alaSvcBaseInfoEntryGroup OBJECT-GROUP
             alaSvcEgressPacketCount,
             alaSvcEgressByteCount,
             alaSvcClearCounters,
-            alaSvcSapVlanXlation
+            alaSvcSapVlanXlation,
+            alaSvcVnid,
+            alaSvcRemoveIngressTag,
+            alaSvcL3VpnIfIndex,
+            alaSvcL3VpnIfName,
+            alaSvcL3VpnVrfName,
+            alaSvcL3VpnMtu
         }
         STATUS current
         DESCRIPTION
@@ -5834,7 +6364,6 @@ alaSapBaseInfoEntryGroup OBJECT-GROUP
 alaSdpInfoTableGroup OBJECT-GROUP
         OBJECTS
         {
-            alaSdpId,
             alaSdpRowStatus,
             alaSdpSvcType,
             alaSdpDelivery,
@@ -5860,7 +6389,9 @@ alaSdpInfoTableGroup OBJECT-GROUP
             alaSdpDynamicType,
             alaSdpBindCount,
             alaSdpIsid,
-            alaSdpMcastPortList
+            alaSdpMcastPortList,
+            alaSdpCreationOrigin,
+            alaSdpAdminTTL
         }
         STATUS current
         DESCRIPTION
@@ -5895,7 +6426,12 @@ alaSdpBindTableGroup OBJECT-GROUP
             alaSdpBindIngressPacketCount,
             alaSdpBindIngressByteCount,
             alaSdpBindEgressPacketCount,
-            alaSdpBindEgressByteCount
+            alaSdpBindEgressByteCount,
+            alaSdpBindCreationOrigin,
+            alaSdpBindFarEndIpAddress,
+            alaSdpBindVnid,
+            alaSdpBindDescription,
+            alaSdpBindStatsAdminStatus
         }
         STATUS current
         DESCRIPTION
@@ -5910,7 +6446,12 @@ alaSmgrNotificationGroup NOTIFICATION-GROUP
           smgrSdpBindError,
           smgrSdpError,
           smgrServiceError,
-          smgrStatusChange
+          smgrStatusChange,
+          smgrServiceStatusChange,
+          smgrSapStatusChange,
+          smgrSdpStatusChange,
+          smgrSdpBindStatusChange,
+          smgrVxlanSdpBindStatusChange
         }
         STATUS  current
         DESCRIPTION
@@ -5930,4 +6471,47 @@ alaSmgrHwNotificationGroup NOTIFICATION-GROUP
               " Collection of Service Mgr Hw errors."
         ::= { alcatelIND1ServiceMgrMIBGroups 47 }
 
+alaSvcMgrSysTableGroup OBJECT-GROUP
+        OBJECTS
+        {
+            alaSvcMgrSysId,
+            alaSvcMgrSysName,
+            alaSvcMgrSdpTrapAdminState,
+            alaSvcMgrSvcTrapAdminState,
+            alaSvcMgrSapTrapAdminState,
+            alaSvcMgrSdpBindTrapAdminState,
+            alaSvcMgrMaxTrapPerMinute,
+            alaSvcMgrSysLastMgmtChange,
+            alaSvcMgrSysLastStatusChange,
+            alaSvcMgrStatsAdminState,
+            alaSvcMgrVxlanDestUdpPort,
+            alaSvcMgrVxlanVrfName
+
+        }
+        STATUS  current
+        DESCRIPTION
+              "Collection of Service Mgr System management objects."
+        ::= { alcatelIND1ServiceMgrMIBGroups 48 }
+
+
+alaSvcMgrEndPointGroup OBJECT-GROUP
+        OBJECTS
+        {
+	       alaRfpSpbLocalEndPointCcmInterval,
+    	       alaRfpSpbLocalEndPointAdminStatus,
+	       alaRfpSpbLocalEndPointLevel,
+	       alaRfpSpbLocalEndPointCBVlan,
+	       alaRfpSpbLocalEndPointMaintDomain,
+	       alaRfpSpbLocalEndPointMaintAssociation,
+	       alaRfpSpbLocalEndPointRowStatus,          
+               alaRfpSpbRemoteEndPointStatus,
+               alaRfpSpbRemoteEndPointSystemName,
+               alaRfpSpbRemoteEndPointISID,
+               alaRfpSpbRemoteEndPointBVlan,
+	       alaRfpSpbRemoteEndPointRowStatus     
+        }
+        STATUS  current
+        DESCRIPTION
+              "Collection of Service Mgr System management objects."
+        ::= { alcatelIND1ServiceMgrMIBGroups 49 }
 END

@@ -163,12 +163,12 @@
 
                 // sort groups
                 let sorted = {};
-                for (const group_key of Object.keys(groups).sort()) {
+                Object.keys(groups).sort().forEach(group_key => {
                     sorted[group_key] = {};
-                    for (const section_key of Object.keys(groups[group_key]).sort()) {
+                    Object.keys(groups[group_key]).sort().forEach(section_key => {
                         sorted[group_key][section_key] = _.sortBy(groups[group_key][section_key], 'order').map(a => a.name);
-                    }
-                }
+                    });
+                });
 
                 return sorted;
             }

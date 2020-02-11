@@ -506,6 +506,12 @@ softentIND1Saa OBJECT-IDENTITY
         "Branch for Service Assurance Agent proprietary information."
     ::= { softwareIND1Entities 56 }
 
+softentIND1LldpMed OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch for LLDP MED information."
+    ::= { softwareIND1Entities 58 }
+
 softentIND1DhcpSrv OBJECT-IDENTITY
 
     STATUS current
@@ -640,6 +646,59 @@ softentIND1ActiveLeaseSrvMIB OBJECT-IDENTITY
         "Branch for Message Service information."
     ::= { softwareIND1Entities 80 }
 
+softentIND1AppMon OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch for App Monitoring information."
+    ::= { softwareIND1Entities 81 }
+
+softentIND1Lbd OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch for Loop Back Detection information."
+    ::= { softwareIND1Entities 82 }
+
+softentIND1AutoConfig OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch for Auto Config information."
+    ::= { softwareIND1Entities 83 }
+
+softentIND1VMSnooping OBJECT-IDENTITY
+   STATUS current
+   DESCRIPTION
+         "Branch for VM Snooping."
+   ::= { softwareIND1Entities 84 }
+
+softentIND1PPPoEIA OBJECT-IDENTITY
+   STATUS current
+   DESCRIPTION
+         "Branch for VM Snooping."
+   ::= { softwareIND1Entities 85 }
+
+softentIND1EventScripting OBJECT-IDENTITY
+   STATUS current
+   DESCRIPTION
+         "Branch for Event Scripting."
+   ::= { softwareIND1Entities 86 }
+
+softentIND1LldpTrust OBJECT-IDENTITY
+   STATUS current
+   DESCRIPTION
+         "Branch for LLDP Trust."
+   ::= { softwareIND1Entities 87 }
+
+softentIND1TCAM OBJECT-IDENTITY
+   STATUS current
+   DESCRIPTION
+         "Branch for TCAM-Manager."
+   ::= { softwareIND1Entities 88 }
+
+softentIND1PrivateVlan OBJECT-IDENTITY
+   STATUS current
+   DESCRIPTION
+         "Branch for Private-Vlan."
+   ::= { softwareIND1Entities 89 }
 
 routingIND1Tm OBJECT-IDENTITY
     STATUS current
@@ -759,8 +818,4 @@ serventIND1Aqe OBJECT-IDENTITY
 
 
 END
-
-
-
-
 

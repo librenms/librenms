@@ -1,15 +1,16 @@
 ALCATEL-IND1-CAPMAN-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
-	OBJECT-TYPE,
-	MODULE-IDENTITY,
-        OBJECT-IDENTITY, Integer32, Unsigned32      FROM SNMPv2-SMI
-        RowStatus, MacAddress		       	FROM SNMPv2-TC
-        MODULE-COMPLIANCE, OBJECT-GROUP
-                                        FROM SNMPv2-CONF
-        SnmpAdminString                 FROM SNMP-FRAMEWORK-MIB
-	InterfaceIndex		       	FROM IF-MIB
-        softentIND1CapMan		FROM ALCATEL-IND1-BASE;
+    OBJECT-TYPE,
+    MODULE-IDENTITY,
+    NOTIFICATION-TYPE,
+    OBJECT-IDENTITY, Integer32, Unsigned32  FROM SNMPv2-SMI
+    RowStatus, MacAddress,DateAndTime       FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP,
+    NOTIFICATION-GROUP                      FROM SNMPv2-CONF
+    SnmpAdminString                         FROM SNMP-FRAMEWORK-MIB
+	InterfaceIndex		       	            FROM IF-MIB
+    softentIND1CapMan		FROM ALCATEL-IND1-BASE;
 		
 
 	alcatelIND1CapManMIB MODULE-IDENTITY
@@ -76,6 +77,8 @@ IMPORTS
 
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
+
+        alaCapabilityMibNotifications OBJECT IDENTIFIER ::= { alcatelIND1CapManMIBObjects 0 }
 	alaCapabilityManager  OBJECT IDENTIFIER ::= { alcatelIND1CapManMIBObjects 1 }
 	alaCapManConformance  OBJECT IDENTIFIER ::= { alcatelIND1CapManMIBObjects 2 }
 
@@ -436,7 +439,8 @@ alaCapManSwLicensingActionArg OBJECT-TYPE
 alaCapManVcSwLicensingAction OBJECT-TYPE
 	SYNTAX		INTEGER {
 				default (0),
-				applyFile (1)
+				applyFile (1),
+				applyAfn (2)
 				}
 	MAX-ACCESS	read-write
 	STATUS		current
@@ -451,6 +455,24 @@ alaCapManVcSwLicensingActionArg OBJECT-TYPE
         DESCRIPTION     "Argument of the software licensing action."
         ::= { alaCapManSwLicensingConfig 4}
 
+alaCapManVcSwLicensingAfnInfo OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(128))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "AFN related license info."
+        ::= { alaCapManSwLicensingConfig 5}
+
+alaCapManVcSwLicensingAfnStatus OBJECT-TYPE
+        SYNTAX          INTEGER {
+		unknown(1),
+		inProgress(2),
+		successful(3),
+		failed(4)
+	}
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "AFN related license status."
+        ::= { alaCapManSwLicensingConfig 6}
 
 alaCapManSwLicensingInfoTable OBJECT-TYPE
 	SYNTAX		SEQUENCE OF AlaCapManSwLicensingInfoEntry	
@@ -511,18 +533,20 @@ alaLicenseTimeRemaining OBJECT-TYPE
 		permanent license this is not applicable."
   	::= { alaCapManSwLicensingInfoEntry 4 }
 
-
+------------------------------------------------------------------
+-- Obsolete this table and replace it with alaCapabilityManager 11
+------------------------------------------------------------------
 alaCapManVcSwLicensingInfoTable OBJECT-TYPE
         SYNTAX          SEQUENCE OF AlaCapManVcSwLicensingInfoEntry
         MAX-ACCESS      not-accessible
-        STATUS          current
+        STATUS          obsolete
         DESCRIPTION     "Table of valid application license information"
         ::= { alaCapabilityManager 10 }
 
 alaCapManVcSwLicensingInfoEntry OBJECT-TYPE
         SYNTAX          AlaCapManVcSwLicensingInfoEntry
         MAX-ACCESS      not-accessible
-        STATUS          current
+        STATUS          obsolete
         DESCRIPTION     "Information of valid license applications"
         INDEX { alaVcLicensedSerialNum, alaVcLicensedMacAddress }
         ::= { alaCapManVcSwLicensingInfoTable 1 }
@@ -535,14 +559,16 @@ AlaCapManVcSwLicensingInfoEntry ::=
 	  alaVcLicenseType		INTEGER,
 	  alaVcLicenseVcSlot		Integer32,
 	  alaVcLicenseBitMap		Integer32,
-	  alaVcLicenseTimeRemain	Integer32
+	  alaVcLicenseTimeRemain	Integer32,
+          alaVcLicenseUpgradeStatus            INTEGER,
+	  alaVcLicenseExpirationDate    DateAndTime
         }
 
 
 alaVcLicensedSerialNum OBJECT-TYPE
         SYNTAX      OCTET STRING (SIZE(25))
         MAX-ACCESS  not-accessible
-        STATUS      current
+        STATUS      obsolete
         DESCRIPTION "String displaying the serial number for which this license is valid."
         ::= { alaCapManVcSwLicensingInfoEntry 1 }
  
@@ -550,7 +576,7 @@ alaVcLicensedSerialNum OBJECT-TYPE
 alaVcLicensedMacAddress OBJECT-TYPE
         SYNTAX      MacAddress
         MAX-ACCESS  not-accessible
-        STATUS      current
+        STATUS      obsolete
         DESCRIPTION "String displaying the MAC address for which this license is valid."
         ::= { alaCapManVcSwLicensingInfoEntry 2 }
 
@@ -558,19 +584,21 @@ alaVcLicensedMacAddress OBJECT-TYPE
 alaVcLicenseType OBJECT-TYPE
         SYNTAX      INTEGER {
                         demo (1),
-                        permanent (2)
+                        permanent (2),
+ 			timebased (3),
+ 			ov-generated (4)
                 }
         MAX-ACCESS  read-only
-        STATUS      current
-        DESCRIPTION "License of an application can be either Permamnent or Demo. The value of this
-                indicated the type of this license."
+        STATUS      obsolete
+        DESCRIPTION "License of an application can be either Permamnent or Demo or TimeBased or OV generated. 
+		The value of this indicated the type of this license."
 	::= { alaCapManVcSwLicensingInfoEntry 3 }
 
 
 alaVcLicenseVcSlot OBJECT-TYPE
 	SYNTAX      Integer32(0..4294967295)
         MAX-ACCESS  read-only
-        STATUS      current
+        STATUS      obsolete
         DESCRIPTION "The virtual chassis unit ID + ni slot number."
 	::= { alaCapManVcSwLicensingInfoEntry 4 }
 
@@ -578,11 +606,13 @@ alaVcLicenseVcSlot OBJECT-TYPE
 alaVcLicenseBitMap OBJECT-TYPE
 	SYNTAX      Integer32(0..4294967295)
         MAX-ACCESS  read-only
-        STATUS      current
+        STATUS      obsolete
         DESCRIPTION "The chassis license bit map.
 		0x00000001  ADVANCD
 		0x00000002  DATACENTER
 		0x00000004  U16L
+		0x00000008  AFN
+        0x00000010  POE
 	"
 	::= { alaCapManVcSwLicensingInfoEntry 5 }
 
@@ -590,12 +620,142 @@ alaVcLicenseBitMap OBJECT-TYPE
 alaVcLicenseTimeRemain OBJECT-TYPE
         SYNTAX      Integer32(-1..60)
         MAX-ACCESS  read-only
-        STATUS      current
+        STATUS      obsolete
         DESCRIPTION "Number of days remaining for demo license. For
                 permanent license this is not applicable."
         ::= { alaCapManVcSwLicensingInfoEntry 6 }
 
+alaVcLicenseUpgradeStatus OBJECT-TYPE
+         SYNTAX      INTEGER 
+                   {
+                       upgraded(1),
+                       expired(2),
+                       revoked(3),
+		       unknown(4)
+                   }
+         MAX-ACCESS  read-only
+         STATUS      obsolete
+         DESCRIPTION "Specifies the current status of the time-based/ov-generated license. For
+                 permanent/demo license this is not applicable."
+         ::= { alaCapManVcSwLicensingInfoEntry 7 }
 
+alaVcLicenseExpirationDate OBJECT-TYPE
+         SYNTAX        DateAndTime
+         MAX-ACCESS  read-only
+         STATUS      obsolete
+         DESCRIPTION "Expiration date of a time-based/ov-generated license. For
+               permanent/demo license this is not applicable."
+         ::= { alaCapManVcSwLicensingInfoEntry 8 }
+ 
+-- For new table in license manager that includes license feature id as part of the key
+
+alaCapManMibVcSwLicensingInfoTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF AlaCapManMibVcSwLicensingInfoEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "Table of valid application license information"
+        ::= { alaCapabilityManager 11 }
+
+alaCapManMibVcSwLicensingInfoEntry OBJECT-TYPE
+        SYNTAX          AlaCapManMibVcSwLicensingInfoEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "Information of valid license applications"
+        INDEX { alaMibVcLicensedSerialNum, alaMibVcLicensedMacAddress, alaMibVcLicenseFeatureId }
+        ::= { alaCapManMibVcSwLicensingInfoTable 1 }
+
+AlaCapManMibVcSwLicensingInfoEntry ::=
+        SEQUENCE
+        {
+          alaMibVcLicensedSerialNum        OCTET STRING,
+          alaMibVcLicensedMacAddress       MacAddress,
+	  alaMibVcLicenseFeatureId		INTEGER,
+          alaMibVcLicenseType              INTEGER,
+          alaMibVcLicenseVcSlot            Integer32,
+          alaMibVcLicenseTimeRemain        Integer32,
+          alaMibVcLicenseUpgradeStatus            INTEGER,
+          alaMibVcLicenseExpirationDate    DateAndTime
+        }
+
+alaMibVcLicensedSerialNum OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE(25))
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "String displaying the serial number for which this license is valid."
+        ::= { alaCapManMibVcSwLicensingInfoEntry 1 }
+
+
+alaMibVcLicensedMacAddress OBJECT-TYPE
+        SYNTAX      MacAddress
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "String displaying the MAC address for which this license is valid."
+        ::= { alaCapManMibVcSwLicensingInfoEntry 2 }
+
+alaMibVcLicenseFeatureId OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        advanced (1),
+                        datacenter (2),
+                        xniu16 (3),
+                        afn (4),
+                        poe (5)
+                }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The integer value represents the license feature Id."
+        ::= { alaCapManMibVcSwLicensingInfoEntry 3 }
+
+alaMibVcLicenseType OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        demo (1),
+                        permanent (2),
+                        timebased (3),
+                        ov-generated (4)
+                }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "License of an application can be either Permamnent or Demo or TimeBased or OV generated.
+                The value of this indicated the type of this license."
+        ::= { alaCapManMibVcSwLicensingInfoEntry 4 }
+
+
+alaMibVcLicenseVcSlot OBJECT-TYPE
+        SYNTAX      Integer32(0..4294967295)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The virtual chassis unit ID + ni slot number."
+        ::= { alaCapManMibVcSwLicensingInfoEntry 5 }
+
+alaMibVcLicenseTimeRemain OBJECT-TYPE
+        SYNTAX      Integer32(-1..60)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Number of days remaining for demo license. For
+                permanent license this is not applicable."
+        ::= { alaCapManMibVcSwLicensingInfoEntry 6 }
+
+alaMibVcLicenseUpgradeStatus OBJECT-TYPE
+         SYNTAX      INTEGER
+                   {
+                       upgraded(1),
+                       expired(2),
+                       revoked(3),
+		       not-applicable(4),
+                       unknown(5)
+                   }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION "Specifies the current status of the time-based/ov-generated license. For
+                 permanent/demo license this is not applicable."
+         ::= { alaCapManMibVcSwLicensingInfoEntry 7 }
+
+alaMibVcLicenseExpirationDate OBJECT-TYPE
+         SYNTAX        DateAndTime
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION "Expiration date of a time-based/ov-generated license. For
+               permanent/demo license this is not applicable."
+         ::= { alaCapManMibVcSwLicensingInfoEntry 8 }
 
 -- xxxxxxxxxxxxxxxxxxx
 -- capability Manager Ipmc Max Entry Table
@@ -605,7 +765,7 @@ alaVcLicenseTimeRemain OBJECT-TYPE
 alaCapabilityIpmcMaxLimits  OBJECT IDENTIFIER ::= { alaCapabilityManager 8}
 
 alaCapabilityIpmcMaxAdminLimit  OBJECT-TYPE
-   SYNTAX  Integer32  (1..4096)
+   SYNTAX  Integer32  (1..8192)
    MAX-ACCESS  read-write
    STATUS  current
    DESCRIPTION
@@ -615,7 +775,7 @@ alaCapabilityIpmcMaxAdminLimit  OBJECT-TYPE
 
 
 alaCapabilityIpmcMaxOperLimit  OBJECT-TYPE
-   SYNTAX  Integer32  (1..4096)
+   SYNTAX  Integer32  (1..8192)
    MAX-ACCESS  read-only
    STATUS  current
    DESCRIPTION
@@ -660,7 +820,18 @@ alaCapManDcbOprMode OBJECT-TYPE
         DEFVAL { enabled }
         ::= { alaCapManFeatureControlCommands 2 }
 
-
+-- -------------------------------------------------------------
+-- License Manager TRAPS
+-- -------------------------------------------------------------
+alaLicenseManagerDemoDayAlert NOTIFICATION-TYPE
+    OBJECTS 
+    {
+        alaLicenseTimeRemaining
+    }
+    STATUS  current
+    DESCRIPTION
+        "Generate trap for license manager." 
+    ::= {alaCapabilityMibNotifications 1}
 
 -- --------------------------------------------------------------
 -- Capability Manager MIB - Conformance Information
@@ -724,12 +895,15 @@ alaCapManSwLicensingGroup OBJECT-GROUP
 	alaCapManSwLicensingAction,
 	alaCapManSwLicensingActionArg,
 	alaCapManVcSwLicensingAction,
-	alaCapManVcSwLicensingActionArg
+	alaCapManVcSwLicensingActionArg,
+	alaCapManVcSwLicensingAfnInfo,
+	alaCapManVcSwLicensingAfnStatus
   }
    STATUS      current
    DESCRIPTION
       "Mandatory objects for software licensing group"
    ::= { alaCapManGroups 6 }
+
 alaCapManSwLicensingInfoGroup OBJECT-GROUP
    OBJECTS {
 	alaLicensedApplication,
@@ -767,7 +941,9 @@ alaVcLicenseCfgGroup OBJECT-GROUP
      alaVcLicenseBitMap,
      alaVcLicenseTimeRemain,
      alaVcLicenseType,
-     alaVcLicenseVcSlot
+     alaVcLicenseVcSlot,
+     alaVcLicenseUpgradeStatus,
+     alaVcLicenseExpirationDate
    }
 
    STATUS      current
@@ -775,6 +951,30 @@ alaVcLicenseCfgGroup OBJECT-GROUP
       "Created to keep SNMP4J compiler Happy"
    ::= { alaCapManGroups 10 }
 
+alaMibVcLicenseCfgGroup OBJECT-GROUP
+   OBJECTS {
+     alaMibVcLicenseFeatureId,
+     alaMibVcLicenseType,
+     alaMibVcLicenseVcSlot,
+     alaMibVcLicenseTimeRemain,
+     alaMibVcLicenseUpgradeStatus,
+     alaMibVcLicenseExpirationDate
+   }
+
+   STATUS      current
+   DESCRIPTION
+      "Created to keep SNMP4J compiler Happy"
+   ::= { alaCapManGroups 11 }
+
+alaCapManTrapGroup NOTIFICATION-GROUP
+   NOTIFICATIONS {
+     alaLicenseManagerDemoDayAlert 
+   }
+
+   STATUS      current
+   DESCRIPTION
+      "Traps for CapMan Manager"
+   ::= { alaCapManGroups 12 }
 
 -- --------------------------------------------------------------
 -- Compliance statements

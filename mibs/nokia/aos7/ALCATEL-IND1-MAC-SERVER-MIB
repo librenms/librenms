@@ -60,6 +60,10 @@ alcatelIND1MacServerMIB MODULE-IDENTITY
                    Copyright (C) 1995-2007 Alcatel-Lucent
                        ALL RIGHTS RESERVED WORLDWIDE"
 
+    REVISION      "201401240000Z"
+    DESCRIPTION
+        "Deprecated the chasRingStatus object"
+
     REVISION      "201005130000Z"
     DESCRIPTION
         "Fixed the Notifications to use MIB Module OID.0 as Notifications root."
@@ -375,9 +379,11 @@ chasRingStatus OBJECT-TYPE
                 notPresent(2)
         }
         MAX-ACCESS      read-only
-        STATUS          current
+        STATUS          deprecated
         DESCRIPTION
-        "Information specifying the whether the ring is present in the stack or not."
+        "Information specifying the whether the ring is present in the stack or not.
+         Deprecated, stack is now a Virtual Chassis systems.
+         Use ALCATEL-INDI-VIRTUAL-CHASSIS-MIB for status of Virtual Chassis."
 DEFVAL        { notPresent }
 ::= { chasMacAddrRetentionObjects 3 }
 

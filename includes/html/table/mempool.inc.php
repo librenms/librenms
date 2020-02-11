@@ -18,10 +18,12 @@
 $graph_type = 'mempool_usage';
 $where      = 1;
 $sql        = ' FROM `mempools` AS `M` LEFT JOIN `devices` AS `D` ON `M`.`device_id` = `D`.`device_id`';
+$param      = [];
+
 if (!Auth::user()->hasGlobalRead()) {
-    $sql    .= ' LEFT JOIN `devices_perms` AS `DP` ON `M`.`device_id` = `DP`.`device_id`';
-    $where  .= ' AND `DP`.`user_id`=?';
-    $param[] = Auth::id();
+    $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
+    $where .= " AND `D`.`device_id` IN " .dbGenPlaceholders(count($device_ids));
+    $param = array_merge($param, $device_ids);
 }
 
 $sql .= " WHERE $where";

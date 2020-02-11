@@ -2107,6 +2107,22 @@ alaVfcStatisticsCollectionDuration OBJECT-TYPE
                 Deprecated due to lack of HW support."
         ::= { alaVfcConfig 11 }
 
+alaVfcSystemDefaultQsetQSPId  OBJECT-TYPE
+        SYNTAX  Unsigned32 (1..128)
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                "Identifier of Qset profile."
+        ::= { alaVfcConfig 12 }
+
+alaVfcSystemDefaultQsetQSPName  OBJECT-TYPE
+        SYNTAX  SnmpAdminString (SIZE (0..32))
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                "Name of Qset profile."
+        ::= { alaVfcConfig 13 }
+
 -- -------------------------------------------------------------
 -- Compliance Statements
 -- -------------------------------------------------------------
@@ -2362,5 +2378,15 @@ alaVfcStatisticsCollectionDuration OBJECT-TYPE
             Deprecated since all objects in this group have been deprecated."
         ::= { alcatelIND1VfcMIBGroups 10 }
 
+    alaVfcSystemGroup OBJECT-GROUP
+        OBJECTS
+        {
+                alaVfcSystemDefaultQsetQSPId,
+                alaVfcSystemDefaultQsetQSPName
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of system QSet instance Objects."
+        ::= { alcatelIND1VfcMIBGroups 11 }
 
 END

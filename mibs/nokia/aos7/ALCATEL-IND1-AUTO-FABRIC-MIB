@@ -68,6 +68,9 @@ ALCATEL-IND1-AUTO-FABRIC-MIB DEFINITIONS ::= BEGIN
                 ::= { softentIND1AutoFabric 1}
 
 -- --------------------------------------------------------------
+
+alcatelIND1AUTOFABRICMIBNotifications	OBJECT IDENTIFIER ::= { alcatelIND1AUTOFABRICMIB 0 }
+
                 alcatelIND1AUTOFABRICMIBObjects OBJECT-IDENTITY
                 STATUS current
                 DESCRIPTION
@@ -214,15 +217,15 @@ ALCATEL-IND1-AUTO-FABRIC-MIB DEFINITIONS ::= BEGIN
                 ::= { alcatelIND1AUTOFABRICMIBObjects 7 }
 
         alaAutoFabricGlobalDiscoveryTimer OBJECT-TYPE
-                SYNTAX  Unsigned32  ( 1 .. 3600 )
+                SYNTAX  Unsigned32  ( 0 .. 3600 )
                 UNITS   "Minutes"
                 MAX-ACCESS  read-write
                 STATUS  current
                 DESCRIPTION
                 "This variable is used to specify auto-fabric auto
 				discovery interval, zero disables it, configurable
-                Value is from 1 to 3600 minutes."
-                DEFVAL  { 1 }
+                Value is from 2 to 3600 minutes."
+                DEFVAL  { 0 }
                 ::= { alcatelIND1AUTOFABRICMIBObjects 8 }				
 
         alaAutoFabricRemoveGlobalConfig  OBJECT-TYPE
@@ -231,11 +234,94 @@ ALCATEL-IND1-AUTO-FABRIC-MIB DEFINITIONS ::= BEGIN
                                 removeGlobalConfig(2)
                                 }
                 MAX-ACCESS      read-write
-                STATUS          current
+                STATUS          deprecated
                 DESCRIPTION
                         "This variable is used to remove the auto fabric global configuration when the user chooses to disable auto fabric"
                 DEFVAL  { default }
                 ::= { alcatelIND1AUTOFABRICMIBObjects 10 }
+
+        alaAutoFabricGlobalOSPFv2ProtocolStatus      OBJECT-TYPE
+                SYNTAX          INTEGER {
+                                enable(1),
+                                disable(2)
+                                }
+                MAX-ACCESS      read-write
+                STATUS          current
+                DESCRIPTION
+                        "This variable is used to enable or disable auto configuration on the
+                         OSPFv2 IP Protocol on the switch. "
+                DEFVAL  { enable }
+                ::= { alcatelIND1AUTOFABRICMIBObjects 11 }		
+
+        alaAutoFabricGlobalOSPFv3ProtocolStatus      OBJECT-TYPE
+                SYNTAX          INTEGER {
+                                enable(1),
+                                disable(2)
+                                }
+                MAX-ACCESS      read-write
+                STATUS          current
+                DESCRIPTION
+                        "This variable is used to enable or disable auto configuration on the
+                         OSPFv3 IP Protocol on the switch. "
+                DEFVAL  { enable }
+                ::= { alcatelIND1AUTOFABRICMIBObjects 12 }		
+
+        alaAutoFabricGlobalISISProtocolStatus      OBJECT-TYPE
+                SYNTAX          INTEGER {
+                                enable(1),
+                                disable(2)
+                                }
+                MAX-ACCESS      read-write
+                STATUS          current
+                DESCRIPTION
+                        "This variable is used to enable or disable auto configuration on the
+                         ISIS IP Protocol on the switch. "
+                DEFVAL  { enable }
+                ::= { alcatelIND1AUTOFABRICMIBObjects 13 }		
+
+        alaAutoFabricSPBDefaultProfile  OBJECT-TYPE
+                SYNTAX          INTEGER {
+                                singleService(1),
+                                autoVlan(2)
+                                }
+                MAX-ACCESS      read-write
+                STATUS          current
+                DESCRIPTION
+                        "This object specifies the default SAP profile used in the Omni switch.
+
+                         singleService: defines single service SAP profiles.
+                         autoVlan: AOS will generate SAP bindings for VLANS concerned automatically"
+                DEFVAL  { autoVlan }
+                ::= { alcatelIND1AUTOFABRICMIBObjects 14 }
+
+        alaAutoFabricLBDProtocolStatus     OBJECT-TYPE
+                SYNTAX          INTEGER {
+                                enable(1),
+                                disable(2)
+                                }
+                MAX-ACCESS      read-write
+                STATUS          current
+                DESCRIPTION
+                        "This variable is used to enable or disable AutoFabric LBD on SAP port
+                         on the switch. The value enable (1) indicates that during discovery
+                        the switch will enable Loopback detection on UNP SAP port.
+                        The value disable (2) indicates that Loobback detection will not be enabled 
+                        on UNP SAP port discovery"
+                DEFVAL  { enable }
+                ::= { alcatelIND1AUTOFABRICMIBObjects 15 }
+
+       alaAutoFabricRemoveVCReload  OBJECT-TYPE
+                SYNTAX          INTEGER {
+				default(1),	
+                                removeVCReload(2)
+                                }
+                MAX-ACCESS      read-write
+                STATUS          current 
+                DESCRIPTION
+                        "This variable is applicable only for Standalone configuration. 
+			It reloads the unit as a Standalone when the user chooses to disable auto fabric."
+                DEFVAL  { default }
+                ::= { alcatelIND1AUTOFABRICMIBObjects 17 }
 
 -- -------------------------------------------------------------
 -- AUTO-FABRIC Port Config Table
@@ -269,11 +355,12 @@ ALCATEL-IND1-AUTO-FABRIC-MIB DEFINITIONS ::= BEGIN
 
         AlaAutoFabricPortConfigEntry ::= SEQUENCE {
             alaAutoFabricPortConfigIfIndex            InterfaceIndex,
-            alaAutoFabricPortConfigStatus         INTEGER,
-            alaAutoFabricPortLACPProtocolStatus   INTEGER,
-			alaAutoFabricPortSPBProtocolStatus   INTEGER,
-			alaAutoFabricPortMVRPProtocolStatus   INTEGER,
-            alaAutoFabricPortStatus           INTEGER			
+            alaAutoFabricPortConfigStatus             INTEGER,
+            alaAutoFabricPortLACPProtocolStatus       INTEGER,
+            alaAutoFabricPortSPBProtocolStatus        INTEGER,
+            alaAutoFabricPortMVRPProtocolStatus       INTEGER,
+            alaAutoFabricPortStatus                   INTEGER,
+            alaAutoFabricPortSPBDefaultProfile        INTEGER
             }
 
             alaAutoFabricPortConfigIfIndex  OBJECT-TYPE
@@ -363,7 +450,50 @@ ALCATEL-IND1-AUTO-FABRIC-MIB DEFINITIONS ::= BEGIN
                 "The state of the Autofabric discovery window on the port."
                 ::= { alaAutoFabricPortConfigEntry 6 }
 
+        alaAutoFabricPortSPBDefaultProfile  OBJECT-TYPE
+                SYNTAX          INTEGER {
+                                singleService(1),
+                                autoVlan(2)
+                                }
+                MAX-ACCESS      read-write
+                STATUS          current
+                DESCRIPTION
+                        "This object specifies the default SAP profile used on a particular port in the switch.
 
+                         singleService: defines single service SAP profiles.
+                         autoVlan: AOS will generate SAP bindings for VLANS concerned automatically."
+                DEFVAL  { autoVlan }
+                ::= { alaAutoFabricPortConfigEntry 7 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+alaAutoFabricTrapsObj    OBJECT  IDENTIFIER ::= { alcatelIND1AUTOFABRICMIBObjects 16 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+alaAutoFabricSTPMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+        flatMode(1), 
+        perVlan(2)  
+    }
+    MAX-ACCESS        accessible-for-notify
+    STATUS            current
+    DESCRIPTION 
+        "Indicates the change in STP Mode, to Flat or 1X1, due to the change in Auto-Fabric admin-status."
+    ::= { alaAutoFabricTrapsObj 1 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- Trap Description
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+alaAutoFabricSTPModeChangeAlert NOTIFICATION-TYPE
+    OBJECTS  {
+        alaAutoFabricSTPMode
+    }
+    STATUS        current
+    DESCRIPTION
+        "This trap is sent when auto-fabric changes STP mode." 
+    ::= { alcatelIND1AUTOFABRICMIBNotifications 1 }
 
 -- -------------------------------------------------------------
 -- COMPLIANCE
@@ -376,7 +506,9 @@ alcatelIND1AUTOFABRICMIBCompliance MODULE-COMPLIANCE
         MANDATORY-GROUPS
         {
                 alaAutoFabricBaseGroup,
-                alaAutoFabricPortConfigGroup
+                alaAutoFabricPortConfigGroup,
+                alaAutoFabricNotificationGroup,
+                alaAutoFabricTrapsObjGroup
         }
    ::= { alcatelIND1AUTOFABRICMIBCompliances 1 }
 
@@ -391,11 +523,17 @@ alaAutoFabricBaseGroup   OBJECT-GROUP
         alaAutoFabricGlobalDiscovery,
         alaAutoFabricGlobalLACPProtocolStatus,
         alaAutoFabricGlobalSPBProtocolStatus,
-		alaAutoFabricGlobalMVRPProtocolStatus,
-		alaAutoFabricGlobalConfigSaveTimer,
-		alaAutoFabricGlobalConfigSaveTimerStatus,
-		alaAutoFabricGlobalDiscoveryTimer,
-		alaAutoFabricRemoveGlobalConfig
+        alaAutoFabricGlobalMVRPProtocolStatus,
+        alaAutoFabricGlobalConfigSaveTimer,
+        alaAutoFabricGlobalConfigSaveTimerStatus,
+        alaAutoFabricGlobalDiscoveryTimer,
+        alaAutoFabricRemoveGlobalConfig,
+        alaAutoFabricGlobalOSPFv2ProtocolStatus,
+        alaAutoFabricGlobalOSPFv3ProtocolStatus,
+        alaAutoFabricGlobalISISProtocolStatus,
+        alaAutoFabricSPBDefaultProfile,
+        alaAutoFabricLBDProtocolStatus,
+        alaAutoFabricRemoveVCReload
    }
   STATUS  current
   DESCRIPTION
@@ -407,14 +545,33 @@ alaAutoFabricPortConfigGroup OBJECT-GROUP
    {
         alaAutoFabricPortConfigStatus,
         alaAutoFabricPortLACPProtocolStatus,
-		alaAutoFabricPortSPBProtocolStatus,
-		alaAutoFabricPortMVRPProtocolStatus,
-        alaAutoFabricPortStatus
+        alaAutoFabricPortSPBProtocolStatus,
+        alaAutoFabricPortMVRPProtocolStatus,
+        alaAutoFabricPortStatus,
+        alaAutoFabricPortSPBDefaultProfile
    }
    STATUS  current
    DESCRIPTION
         "Collection of objects for management of AutoFabric Port Configuration Table."
    ::= { alcatelIND1AUTOFABRICMIBGroups 2 }
+
+alaAutoFabricNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        alaAutoFabricSTPModeChangeAlert
+    }
+    STATUS  current
+    DESCRIPTION
+        "Collection of notifications for Auto-Fabric."
+    ::= { alcatelIND1AUTOFABRICMIBGroups 3 }
+
+alaAutoFabricTrapsObjGroup OBJECT-GROUP
+    OBJECTS   {
+        alaAutoFabricSTPMode
+    }
+    STATUS  current
+    DESCRIPTION
+        "Collection of notificating objects for Auto-Fabric."
+    ::= { alcatelIND1AUTOFABRICMIBGroups 4 }
 
 -- -------------------------------------------------------------
 

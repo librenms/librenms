@@ -1,0 +1,1859 @@
+-- *****************************************************************
+-- UBQS-LARGESCALEOLT-DHCP-MIB.mib:  
+-- Ubiquoss Enterprise DHCP Structure of Management Information
+--
+-- July 2010, Bokyung Shin
+--
+-- Copyright (c) 2006 by Ubiquoss, Corp.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+--
+
+	UBQS-DHCP-MIB	DEFINITIONS ::= BEGIN
+	IMPORTS
+		ubiMgmtv2
+		FROM UBQS-SMI  
+       
+       	RowStatus, MacAddress, TimeTicks, PhysAddress
+		FROM SNMPv2-TC
+                
+		DisplayString 			
+		FROM RFC1213-MIB;   
+
+	ubiDhcpMIB  MODULE-IDENTITY
+	LAST-UPDATED "0607130000Z"
+    ORGANIZATION "Ubiquoss Corp."
+    CONTACT-INFO
+        "Chair    :  jisoo Kim
+                     Ubiquoss Corp.
+         Postal:     24F Milennium B/D,
+		 	         467-12, Dogok-Dong,
+					 GangNam-Gu, Seoul 135-270
+					 Korea
+         EMail:      jisoo@ubiquoss.com
+         Phone:      +82-2-2190-3100
+
+         Co-editor:  Paul 
+                     Ubiquoss Corp.
+         Postal:     24F Milennium B/D,
+		 	         467-12, Dogok-Dong,
+					 GangNam-Gu, Seoul 135-270
+					 Korea
+         EMail:      paul@ubiquoss.com
+         Phone:      +82-2-2190-3100"
+    DESCRIPTION
+        "This MIB module defines DHCP information" 
+   	::= { ubiMgmtv2  6 }	
+
+	ubiDhcpServerMIBObjects  	OBJECT IDENTIFIER ::= { ubiDhcpMIB 1 }	 
+			                                                        
+-- ***********************************************************
+-- ubiDhcpStatistics
+-- ***********************************************************
+    ubiDhcpStatisticsTable  OBJECT-TYPE
+       SYNTAX      SEQUENCE OF UbiDhcpStatisticsEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+          "DHCP statistics table."
+		::= { ubiDhcpServerMIBObjects 1}
+
+    ubiDhcpStatisticsEntry  OBJECT-TYPE
+       SYNTAX      UbiDhcpStatisticsEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+          "DHCP statistics entry."
+       INDEX       {  noIndex  }
+       ::= { ubiDhcpStatisticsTable 1 }
+
+    UbiDhcpStatisticsEntry ::= SEQUENCE {
+       ubiDhcpCurPktMFMessage                         	Unsigned32,
+       ubiDhcpCurPktBootReq                          	Unsigned32,
+       ubiDhcpCurPktDiscover                         	Unsigned32,
+       ubiDhcpCurPktReq                       		   	Unsigned32,
+       ubiDhcpCurPktDecline                				Unsigned32,
+       ubiDhcpCurPktRelease								Unsigned32,
+       ubiDhcpCurPktInform                      		Unsigned32,
+       ubiDhcpCurPktEcho                      			Unsigned32,
+       ubiDhcpCurPktReply                      			Unsigned32,
+       ubiDhcpCurPktOffer								Unsigned32,
+       ubiDhcpCurPktAck									Unsigned32,
+       ubiDhcpCurPktNak									Unsigned32
+       }
+       
+	ubiDhcpCurPktMFMessage OBJECT-TYPE
+		SYNTAX     Unsigned32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"The number of malformed messages received from dhcp servers."
+		::= { ubiDhcpStatisticsEntry 1 }     
+                
+	ubiDhcpCurPktBootReq OBJECT-TYPE
+		SYNTAX     Unsigned32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"The number of boot request messages received from dhcp servers."
+		::= { ubiDhcpStatisticsEntry 2 }   
+                
+	ubiDhcpCurPktDiscover OBJECT-TYPE
+		SYNTAX     Unsigned32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"The number of discover messages received from dhcp servers."
+		::= { ubiDhcpStatisticsEntry 3 }        
+                
+	ubiDhcpCurPktReq OBJECT-TYPE
+		SYNTAX     Unsigned32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"The number of request messages received from dhcp servers."
+		::= { ubiDhcpStatisticsEntry 4 }           
+                
+	ubiDhcpCurPktDecline OBJECT-TYPE
+		SYNTAX     Unsigned32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"The number of decline messages received from dhcp servers."
+		::= { ubiDhcpStatisticsEntry 5 }       
+                
+	ubiDhcpCurPktRelease OBJECT-TYPE
+		SYNTAX     Unsigned32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"The number of release messages received from dhcp servers."
+		::= { ubiDhcpStatisticsEntry 6 }         
+             
+	ubiDhcpCurPktInform OBJECT-TYPE
+		SYNTAX     Unsigned32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"The number of inform messages received from dhcp servers."
+		::= { ubiDhcpStatisticsEntry 7 }         
+                
+   ubiDhcpCurPktEcho OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+			"The number of echo messages received from dhcp servers."
+		::= { ubiDhcpStatisticsEntry 8 }  
+                  
+	ubiDhcpCurPktReply OBJECT-TYPE
+		SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+			"The number of reply messages sent to dhcp servers."
+        ::= { ubiDhcpStatisticsEntry 9 }  
+                                
+	ubiDhcpCurPktOffer OBJECT-TYPE
+		SYNTAX     Unsigned32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"The number of offer messages sent to dhcp servers." 
+		::= { ubiDhcpStatisticsEntry 10 }       
+		
+	ubiDhcpCurPktAck OBJECT-TYPE
+		SYNTAX     Unsigned32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"The number of offer messages sent to dhcp servers." 
+		::= { ubiDhcpStatisticsEntry 11 } 
+		
+	ubiDhcpCurPktNak OBJECT-TYPE
+		SYNTAX     Unsigned32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"The number of offer messages sent to dhcp servers." 
+		::= { ubiDhcpStatisticsEntry 12 }
+
+		                                                 
+-- ***********************************************************
+-- ubiDhcpServerPool
+-- ***********************************************************
+
+    ubiDhcpServerPoolTable  OBJECT-TYPE
+       SYNTAX      SEQUENCE OF UbiDhcpServerPoolEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+          "A list of address pool that are configured on this server."
+		::= { ubiDhcpServerMIBObjects 2}
+
+    ubiDhcpServerPoolEntry  OBJECT-TYPE
+       SYNTAX      UbiDhcpServerPoolEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+          "A logical row in the DHCP PoolTable."
+       INDEX       {  ubiDhcpServerPoolName  }
+       ::= { ubiDhcpServerPoolTable 1 }
+
+    UbiDhcpServerPoolEntry ::= SEQUENCE {
+--       	ubiDhcpServerPoolIndex                            
+--       		Integer32,
+      	ubiDhcpServerPoolName                       
+       		DisplayString,
+       	ubiDhcpServerPoolSubnet                           
+       		IpAddress,
+       	ubiDhcpServerPoolSubnetMask                       
+       		IpAddress,
+       	ubiDhcpServerPoolSubnetFreeAddress                
+       		Unsigned32,
+       	ubiDhcpServerPoolSubnetTotalAddress               
+       		Unsigned32,
+       	ubiDhcpServerPoolSubnetInUse                      
+       		Gauge32,
+       	ubiDhcpServerPoolSubnetGroup                      
+       		DisplayString,
+       	ubiDhcpServerPoolType
+       		INTEGER,    
+		ubiDhcpServerPoolDomainName
+			OCTET STRING,
+		ubiDhcpServerPoolLeaseTimeMode
+			INTEGER,
+		ubiDhcpServerPoolLeaseTimeDays
+			Integer32,
+		ubiDhcpServerPoolLeaseTimeHours
+			Integer32,
+		ubiDhcpServerPoolLeaseTimeMinutes
+			Integer32,
+		ubiDhcpServerPoolUsageThreshold
+			Integer32,    
+		ubiDhcpServerDefaultRouterInfo
+			IpAddress
+	 }
+       
+--    ubiDhcpServerPoolIndex  OBJECT-TYPE
+--       SYNTAX      Integer32
+--       MAX-ACCESS  read-only
+--       STATUS      current
+--       DESCRIPTION
+--           " "
+--       ::= { ubiDhcpServerPoolEntry 1 }
+
+    ubiDhcpServerPoolName  OBJECT-TYPE
+       SYNTAX      DisplayString
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+          "The name of the subnet, which uniquely identifies an entry
+           in the serverSubnetTable."
+       ::= { ubiDhcpServerPoolEntry 1 }
+
+    ubiDhcpServerPoolSubnet  OBJECT-TYPE
+       SYNTAX      IpAddress
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+          "The IP address of the subnet."
+       ::= { ubiDhcpServerPoolEntry 2 }
+
+    ubiDhcpServerPoolSubnetMask  OBJECT-TYPE
+       SYNTAX      IpAddress
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+          "The subnet mask of the subnet.  This MUST be the same as the
+          value of DHCP option 1 offered to clients on this subnet."
+       ::= { ubiDhcpServerPoolEntry 3 }
+
+    ubiDhcpServerPoolSubnetFreeAddress  OBJECT-TYPE
+       SYNTAX      Unsigned32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+          "The number of IP addresses which are available within this DHCP address
+           pool. If the server does not count free addresses by DHCP address pool,
+           this value will be zero."
+       ::= { ubiDhcpServerPoolEntry 4 }
+
+    ubiDhcpServerPoolSubnetTotalAddress  OBJECT-TYPE
+       SYNTAX      Unsigned32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+          "The number of IP addresses which are available within this DHCP address pool.
+           If the server does not count total addresses by DHCP address pool,
+           this value will be zero."
+       ::= { ubiDhcpServerPoolEntry 5 }
+
+    ubiDhcpServerPoolSubnetInUse  OBJECT-TYPE
+       SYNTAX      Gauge32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+          "The number of addresses in this DHCP address pool that are currently
+           in use. This number includes those addresses whose lease has not expired
+           and addresses which have been reserved (either by the server or
+           through configuration)."
+       ::= { ubiDhcpServerPoolEntry 6 }
+     
+     ubiDhcpServerPoolSubnetGroup  OBJECT-TYPE
+       SYNTAX      DisplayString
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+          ""
+       ::= { ubiDhcpServerPoolEntry 7 }  
+       
+ 
+    ubiDhcpServerPoolType  OBJECT-TYPE
+       SYNTAX      INTEGER   
+       	{
+       		none(0),      
+       		network(1),
+			host(2)
+		}
+    	
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+          ""
+       ::= { ubiDhcpServerPoolEntry 8 }    
+ 
+ 		ubiDhcpServerPoolDomainName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiDhcpServerPoolEntry 9 }
+		
+		ubiDhcpServerPoolLeaseTimeMode OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				infinite(1),
+				manual(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Expire setting mode"
+			::= { ubiDhcpServerPoolEntry 10 }
+		
+		ubiDhcpServerPoolLeaseTimeDays OBJECT-TYPE
+			SYNTAX Integer32 (0..32)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"left days(0..31)"
+			::= { ubiDhcpServerPoolEntry 11 }
+		
+		ubiDhcpServerPoolLeaseTimeHours OBJECT-TYPE
+			SYNTAX Integer32 (0..23)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiDhcpServerPoolEntry 12 }
+		
+		ubiDhcpServerPoolLeaseTimeMinutes OBJECT-TYPE
+			SYNTAX Integer32 (0..59)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiDhcpServerPoolEntry 13 }
+		
+		ubiDhcpServerPoolUsageThreshold OBJECT-TYPE
+			SYNTAX Integer32 (0..100)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"rate of used IP Numbers and available total IP Nubmber"
+			::= { ubiDhcpServerPoolEntry 14 }    
+			
+		ubiDhcpServerDefaultRouterInfo OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiDhcpServerPoolEntry 15 }
+       
+
+-- ***********************************************************
+-- dhcp Server range table 
+-- ***********************************************************
+         
+        ubiDhcpServerRangeTable  OBJECT-TYPE 
+           SYNTAX      SEQUENCE OF UbiDhcpServerRangeEntry 
+           MAX-ACCESS  not-accessible 
+           STATUS      current 
+           DESCRIPTION 
+              "A list of ranges that are configured on this server." 
+           ::= { ubiDhcpServerMIBObjects 3 } 
+         
+        ubiDhcpServerRangeEntry  OBJECT-TYPE 
+           SYNTAX      UbiDhcpServerRangeEntry 
+           MAX-ACCESS  not-accessible 
+           STATUS      current 
+           DESCRIPTION 
+              "A logical row in the dhcpRangeTable." 
+           INDEX    { ubiDhcpServerPoolIndex,
+           				ubiDhcpRangeStart } 
+           ::= { ubiDhcpServerRangeTable 1 } 
+         
+        UbiDhcpServerRangeEntry ::= SEQUENCE {   
+	       	ubiDhcpServerPoolIndex                            
+    	   		Integer32,
+            ubiDhcpServerRangeStart              
+            	IpAddress, 
+            ubiDhcpServerRangeEnd                
+            	IpAddress   
+           } 
+         
+	    ubiDhcpServerPoolIndex  OBJECT-TYPE
+	       SYNTAX      Integer32
+	       MAX-ACCESS  read-only
+	       STATUS      current
+	       DESCRIPTION
+	           " "
+	       ::= { ubiDhcpServerRangeEntry 1 }
+
+        ubiDhcpServerRangeStart  OBJECT-TYPE 
+           SYNTAX      IpAddress 
+           MAX-ACCESS  read-write 
+           STATUS      current 
+           DESCRIPTION 
+              "The IP address of the first address in the range.  The value 
+              of range start must be less than or equal to the value of range 
+              end." 
+           ::= { ubiDhcpServerRangeEntry 2 }      
+        
+         
+        ubiDhcpServerRangeEnd  OBJECT-TYPE 
+           SYNTAX      IpAddress 
+           MAX-ACCESS  read-write 
+           STATUS      current 
+           DESCRIPTION 
+              "The IP address of the last address in the range.  The value of 
+              range end must be greater than or equal to the value of range 
+              start." 
+           ::= { ubiDhcpServerRangeEntry 3 }   
+
+
+-- ***********************************************************
+-- dhcp Server NetworkPoolRange table 
+-- ***********************************************************
+        ubiDhcpServerNetPoolRangeTable  OBJECT-TYPE 
+           SYNTAX      SEQUENCE OF UbiDhcpServerNetPoolRangeEntry 
+           MAX-ACCESS  not-accessible 
+           STATUS      current 
+           DESCRIPTION 
+              "A list of ranges that are configured on this server." 
+           ::= { ubiDhcpServerMIBObjects 4 } 
+         
+        ubiDhcpServerNetPoolRangeEntry  OBJECT-TYPE 
+           SYNTAX      UbiDhcpServerNetPoolRangeEntry 
+           MAX-ACCESS  not-accessible 
+           STATUS      current 
+           DESCRIPTION 
+              "A logical row in the dhcpRangeTable." 
+           INDEX    { ubiDhcpServerNetPoolRangePoolIndex, 
+           			ubiDhcpServerNetPoolRangeStartIpAddr, ubiDhcpServerNetPoolRangeEndIpAddr } 
+           ::= { ubiDhcpServerNetPoolRangeTable 1 } 
+         
+        UbiDhcpServerNetPoolRangeEntry ::= SEQUENCE {    
+        	ubiDhcpServerNetPoolRangePoolIndex  
+        		INTEGER,
+            ubiDhcpServerNetPoolRangeStartIpAddr            
+            	IpAddress, 
+            ubiDhcpServerNetPoolRangeEndIpAddr            
+            	IpAddress,
+            ubiDhcpServerNetPoolRangeRowstatus
+            	RowStatus      
+          }       
+          
+         ubiDhcpServerNetPoolRangePoolIndex  OBJECT-TYPE 
+           SYNTAX      INTEGER 
+           MAX-ACCESS  read-only 
+           STATUS      current 
+           DESCRIPTION 
+              "" 
+           ::= { ubiDhcpServerNetPoolRangeEntry 1 }  
+                   
+        ubiDhcpServerNetPoolRangeStartIpAddr  OBJECT-TYPE 
+           SYNTAX      IpAddress 
+           MAX-ACCESS  read-write 
+           STATUS      current 
+           DESCRIPTION 
+              "The IP address of the first address in the range.  The value 
+              of range start must be less than or equal to the value of range 
+              end." 
+           ::= { ubiDhcpServerNetPoolRangeEntry 2 }      
+        
+        ubiDhcpServerNetPoolRangeEndIpAddr  OBJECT-TYPE 
+           SYNTAX      IpAddress 
+           MAX-ACCESS  read-write 
+           STATUS      current 
+           DESCRIPTION 
+              "The IP address of the last address in the range.  The value of 
+              range end must be greater than or equal to the value of range 
+              start." 
+           ::= { ubiDhcpServerNetPoolRangeEntry 3 }     
+           
+       ubiDhcpServerNetPoolRangeRowstatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"row status"
+			::= { ubiDhcpServerNetPoolRangeEntry 4 }
+
+
+-- ***********************************************************
+-- ubiDhcpServerPoolRowTable(Creation)
+-- ***********************************************************
+
+    ubiDhcpServerPoolRowTable  OBJECT-TYPE
+       SYNTAX      SEQUENCE OF UbiDhcpServerPoolRowEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+          "A list of address pool that are configured on this server."
+		::= { ubiDhcpServerMIBObjects 5 }
+
+    ubiDhcpServerPoolRowEntry  OBJECT-TYPE
+       SYNTAX      UbiDhcpServerPoolRowEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+          "A logical row in the DHCP PoolTable."
+       INDEX       {  ubiDhcpServerPoolIndex, 
+       					ubiDhcpServerRangeStart,
+       					ubiDhcpServerRangeEnd }
+       ::= { ubiDhcpServerPoolRowTable 1 } 
+       
+    UbiDhcpServerPoolRowEntry ::= 
+    SEQUENCE {        
+    	ubiDhcpServerPoolRowStatus
+			RowStatus
+    }
+  		
+		ubiDhcpServerPoolRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"row status"
+			::= { ubiDhcpServerPoolRowEntry 1 }
+
+
+-- ***********************************************************
+-- dhcp Server Fixed Addr Table 
+-- ***********************************************************
+		ubiDhcpServerFixedAddrTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF UbiDhcpServerFixedAddrEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"static ip addresses list which can be allocated"
+			::= { ubiDhcpServerMIBObjects 6 }
+		
+		ubiDhcpServerFixedAddrEntry OBJECT-TYPE
+			SYNTAX UbiDhcpServerFixedAddrEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { ubiDhcpServerFixedAddrHostPoolName,
+					ubiDhcpServerFixedAddrIp,
+					ubiDhcpServerFixedAddrNetmask }        
+			::= { ubiDhcpServerFixedAddrTable 1 }
+		
+		UbiDhcpServerFixedAddrEntry ::=
+			SEQUENCE { 
+				ubiDhcpServerFixedAddrHostPoolName
+					DisplayString,
+				ubiDhcpServerFixedAddrMac
+					MacAddress,
+				ubiDhcpServerFixedAddrIp
+					IpAddress,       
+				ubiDhcpServerFixedAddrNetmask
+					IpAddress, 
+				ubiDhcpServerFixedAddrRowStatus
+					RowStatus
+			 }
+
+		ubiDhcpServerFixedAddrHostPoolName OBJECT-TYPE
+			SYNTAX DisplayString (SIZE (1..32))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"DHCP Server Pool Name"
+			::= { ubiDhcpServerFixedAddrEntry 1 }
+				
+		ubiDhcpServerFixedAddrMac OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiDhcpServerFixedAddrEntry 2 }
+		
+		ubiDhcpServerFixedAddrIp OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiDhcpServerFixedAddrEntry 3 }     
+			
+		ubiDhcpServerFixedAddrNetmask OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiDhcpServerFixedAddrEntry 4 }
+
+		
+		ubiDhcpServerFixedAddrRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiDhcpServerFixedAddrEntry 5 }
+
+-- ***********************************************************
+-- dhcp Server DNS Table
+-- ***********************************************************
+		ubiDhcpServerDnsTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF UbiDhcpServerDnsEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiDhcpServerMIBObjects 7 }
+		
+		ubiDhcpServerDnsEntry OBJECT-TYPE
+			SYNTAX UbiDhcpServerDnsEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { ubiDhcpServerDnsPoolIndex, ubiDhcpServerDnsServerAddr }
+			::= { ubiDhcpServerDnsTable 1 }
+		
+		UbiDhcpServerDnsEntry ::=
+			SEQUENCE { 
+				ubiDhcpServerDnsPoolIndex
+					Integer32,
+				ubiDhcpServerDnsServerAddr
+					IpAddress,
+				ubiDhcpServerDnsRowStatus
+					RowStatus
+			 }
+
+		ubiDhcpServerDnsPoolIndex OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiDhcpServerDnsEntry 1 }
+		
+		ubiDhcpServerDnsServerAddr OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiDhcpServerDnsEntry 2 }
+		
+		ubiDhcpServerDnsRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiDhcpServerDnsEntry 3 }
+
+-- ***********************************************************
+-- dhcp Server Binding Table
+-- ***********************************************************
+		ubiDhcpServerBindingTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF UbiDhcpServerBindingEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiDhcpServerMIBObjects 8 }
+		
+		ubiDhcpServerBindingEntry OBJECT-TYPE
+			SYNTAX UbiDhcpServerBindingEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { ubiDhcpServerBindingIndex }
+			::= { ubiDhcpServerBindingTable 1 }
+		
+		UbiDhcpServerBindingEntry ::=
+			SEQUENCE { 
+				ubiDhcpServerBindingIndex
+					INTEGER,
+				ubiDhcpServerBindingIpAddr
+					IpAddress,      
+				ubiDhcpServerBindingMacAddr
+					MacAddress,                    
+				ubiDhspServerBindingLeaseStart
+					OCTET STRING,
+				ubiDhspServerBindingLeaseExpiration
+					OCTET STRING,
+				ubiDhcpServerBindingType
+					INTEGER
+			 }
+ 
+ 	ubiDhcpServerBindingIndex OBJECT-TYPE  
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				""
+			::= { ubiDhcpServerBindingEntry 1 }
+
+ 	ubiDhcpServerBindingIpAddr OBJECT-TYPE  
+			SYNTAX IpAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				""
+			::= { ubiDhcpServerBindingEntry 2 }  
+			
+ 	ubiDhcpServerBindingMacAddr OBJECT-TYPE  
+			SYNTAX MacAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				""
+			::= { ubiDhcpServerBindingEntry 3 }          
+
+ 	ubiDhspServerBindingLeaseExpiration OBJECT-TYPE  
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				""
+			::= { ubiDhcpServerBindingEntry 4 }
+
+ 	ubiDhcpServerBindingType OBJECT-TYPE  
+			SYNTAX INTEGER   
+			{
+				  auto(1),
+				  manual(2)
+			}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				""
+			::= { ubiDhcpServerBindingEntry 5 }
+
+-- ***********************************************************
+-- dhcp Server NetworkPool Single Range table 
+-- ***********************************************************
+		ubiDhcpServerPoolSingleRangeTable  OBJECT-TYPE 
+			SYNTAX      SEQUENCE OF UbiDhcpServerPoolSingleRangeEntry 
+			MAX-ACCESS  not-accessible 
+			STATUS      current 
+			DESCRIPTION 
+              "A list of ranges that are configured on this server." 
+			::= { ubiDhcpServerMIBObjects 9 } 
+           
+        ubiDhcpServerPoolSingleRangeEntry  OBJECT-TYPE 
+           SYNTAX      UbiDhcpServerPoolSingleRangeEntry 
+           MAX-ACCESS  not-accessible 
+           STATUS      current 
+           DESCRIPTION 
+              "A logical row in the dhcpSingleRangeTable." 
+           INDEX    { ubiDhcpServerPoolSingleRangePoolIndex, 
+           			ubiDhcpServerPoolSingleRangeIpAddr } 
+           ::= { ubiDhcpServerPoolSingleRangeTable 1 } 
+         
+		UbiDhcpServerPoolSingleRangeEntry ::= SEQUENCE {    
+        	ubiDhcpServerPoolSingleRangePoolIndex  
+        		INTEGER,
+            ubiDhcpServerPoolSingleRangeIpAddr            
+            	IpAddress, 
+            ubiDhcpServerPoolSingleRangeRowstatus
+            	RowStatus      
+          }       
+          
+		ubiDhcpServerPoolSingleRangePoolIndex  OBJECT-TYPE 
+           SYNTAX      INTEGER 
+           MAX-ACCESS  read-only 
+           STATUS      current 
+           DESCRIPTION 
+              "" 
+           ::= { ubiDhcpServerPoolSingleRangeEntry 1 }  
+                   
+		ubiDhcpServerPoolSingleRangeIpAddr  OBJECT-TYPE 
+           SYNTAX      IpAddress 
+           MAX-ACCESS  read-write 
+           STATUS      current 
+           DESCRIPTION 
+              "The IP address of the address in the range.  The value 
+              of range start must be not equal to the value of other ranges." 
+           ::= { ubiDhcpServerPoolSingleRangeEntry 2 }      
+        
+		ubiDhcpServerPoolSingleRangeRowstatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"row status"
+			::= { ubiDhcpServerPoolSingleRangeEntry 3 }
+                                              
+
+-- ***********************************************************
+-- dhcp Server Info Table
+-- ***********************************************************
+	ubiDhcpServerInfoTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF UbiDhcpServerInfoEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiDhcpServerMIBObjects 10 }
+		
+		ubiDhcpServerInfoEntry OBJECT-TYPE
+			SYNTAX UbiDhcpServerInfoEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { noIndex }
+			::= { ubiDhcpServerInfoTable 1 }
+		
+		UbiDhcpServerInfoEntry ::=
+			SEQUENCE { 
+				ubiDhcpServerAdminStatus
+					INTEGER
+			 }
+				
+	ubiDhcpServerAdminStatus OBJECT-TYPE  
+			SYNTAX INTEGER
+				{
+				locked(0),
+				unlocked(1)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"setting dhcp server service"
+			::= { ubiDhcpServerInfoEntry 1 }
+		
+-- ***********************************************************
+-- dhcp lease-time mode
+-- ***********************************************************		
+
+	ubiDhcpLeaseTimeMode		OBJECT IDENTIFIER ::= { ubiDhcpServerMIBObjects 11 }
+	
+	ubiDhcpLeaseTimeModeDays	OBJECT-TYPE
+		SYNTAX	Integer32(0..30)
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+			"manual lease-time mode days configuration"
+		::= { ubiDhcpLeaseTimeMode 1 }
+		
+	ubiDhcpLeaseTimeModeHours	OBJECT-TYPE
+		SYNTAX	Integer32(0..24)
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+			"manual lease-time mode hours configuration"
+		::= { ubiDhcpLeaseTimeMode 2 }
+		
+	ubiDhcpLeaseTimeModeMinutes	OBJECT-TYPE
+		SYNTAX	Integer32(0..60)
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+			"manual lease-time mode minutes configuration"
+		::= { ubiDhcpLeaseTimeMode 3 }
+					
+	ubiDhcpLeaseTimeModeStatus	OBJECT-TYPE
+		SYNTAX	INTEGER
+		{
+			noLease(0),
+			infinite(1),
+			manual(2)
+		}            
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+			"global lease-time mode configuration"
+		::= { ubiDhcpLeaseTimeMode 4 }                                           
+                                           
+-- ***********************************************************
+-- dhcp Relay Info Table
+-- ***********************************************************
+
+ 	ubiDhcpRelayMIBObjects  	OBJECT IDENTIFIER ::= { ubiDhcpMIB 2 }	 
+
+	ubiDhcpRelayInfoTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF UbiDhcpRelayInfoEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiDhcpRelayMIBObjects 1 }
+		
+		ubiDhcpRelayInfoEntry OBJECT-TYPE
+			SYNTAX UbiDhcpRelayInfoEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { noIndex }
+			::= { ubiDhcpRelayInfoTable 1 }
+		
+		UbiDhcpRelayInfoEntry ::=
+			SEQUENCE { 
+				ubiDhcpRelayAdminStatus
+					INTEGER,
+				ubiDhcpRelayOption82Status
+					INTEGER,             
+				ubiDhcpRelayOption82Policy
+					INTEGER,
+				ubiDhcpRelayBindingListDisplayOption
+					INTEGER,
+				ubiDhcpRelayVerifyMAC
+					INTEGER
+			 }
+				
+	ubiDhcpRelayAdminStatus OBJECT-TYPE  
+			SYNTAX INTEGER
+				{
+				locked(0),
+				unlocked(1)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"setting dhcp relay agent service"
+			::= { ubiDhcpRelayInfoEntry 1 }
+		
+
+
+		ubiDhcpRelayOption82Status OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				disable(0),
+				enable(1)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiDhcpRelayInfoEntry 2 }     
+
+		ubiDhcpRelayOption82Policy OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				drop(0),
+				keep(1),
+				replace(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiDhcpRelayInfoEntry 3 }     
+
+		
+		ubiDhcpRelayBindingListDisplayOption OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				disable(0),
+				enable(1)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiDhcpRelayInfoEntry 4 } 
+			
+		ubiDhcpRelayVerifyMAC  OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				disable(0),
+				enable(1)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiDhcpRelayInfoEntry 5 }
+
+
+		
+-- ***********************************************************
+-- dhcp Relay Server Ip Table
+-- ***********************************************************
+		ubiDhcpRelayServerIPTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF UbiDhcpRelayServerIPEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiDhcpRelayMIBObjects 2 }
+		
+		ubiDhcpRelayServerIPEntry OBJECT-TYPE
+			SYNTAX UbiDhcpRelayServerIPEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { ubiDhcpRelayServerIP }
+			::= { ubiDhcpRelayServerIPTable 1 }
+		
+		UbiDhcpRelayServerIPEntry ::=
+			SEQUENCE { 
+				ubiDhcpRelayServerIP
+					IpAddress,
+				ubiDhcpRelayServerIPRowStatus
+					RowStatus
+			 }
+
+		ubiDhcpRelayServerIP OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiDhcpRelayServerIPEntry 1 }
+		
+		ubiDhcpRelayServerIPRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiDhcpRelayServerIPEntry 2 }
+
+-- ***********************************************************
+-- dhcp Relay Statistics Table
+-- ***********************************************************
+ ubiDhcpRelayStatistics OBJECT IDENTIFIER ::= { ubiDhcpRelayMIBObjects 3 }
+
+	ubiDhcpRelayCurPktDiscover OBJECT-TYPE
+		SYNTAX     Unsigned32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"The number of discover packets received from members."
+		::= { ubiDhcpRelayStatistics 3 }
+
+	ubiDhcpRelayCurPktReq OBJECT-TYPE
+		SYNTAX     Unsigned32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"The number of request packets received from members."
+		::= { ubiDhcpRelayStatistics 4 }
+
+	ubiDhcpRelayCurPktOffer OBJECT-TYPE
+		SYNTAX     Unsigned32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"The number of offer packets received from dhcp server."
+		::= { ubiDhcpRelayStatistics 10 }
+
+	ubiDhcpRelayCurPktAck OBJECT-TYPE
+		SYNTAX     Unsigned32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"The number of Ack packets received from dhcp server."
+		::= { ubiDhcpRelayStatistics 11 }
+
+-- ***********************************************************
+-- dhcp Snoop Info Table
+-- ***********************************************************
+
+ 	ubiDhcpSnoopMIBObjects  	OBJECT IDENTIFIER ::= { ubiDhcpMIB 3 }	 	
+
+	ubiDhcpSnoopInfoTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF UbiDhcpSnoopInfoEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiDhcpSnoopMIBObjects 1 }
+		
+		ubiDhcpSnoopInfoEntry OBJECT-TYPE
+			SYNTAX UbiDhcpSnoopInfoEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { noIndex }
+			::= { ubiDhcpSnoopInfoTable 1 }
+		
+		UbiDhcpSnoopInfoEntry ::=
+			SEQUENCE { 
+				ubiDhcpSnoopAdminStatus
+					INTEGER,
+				ubiDhcpSnoopLeaseTimeExtention
+					Integer32,
+				ubiDhcpSnoopBlockLogClear  
+					INTEGER,
+				ubiDhcpSnoopOption82Status
+					INTEGER,             
+				ubiDhcpSnoopOption82Policy
+					INTEGER,
+				ubiDhcpSnoopVerifyMAC
+					INTEGER,
+				ubiDhcpSnoopBindingCount
+					Integer32,
+				ubiDhcpSnoopInvalidCount
+					Integer32
+		 }
+		
+		ubiDhcpSnoopAdminStatus OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				locked(0),
+				unlocked(1)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"dhcp block enable/disable status"
+			::= { ubiDhcpSnoopInfoEntry 1 }
+		
+		ubiDhcpSnoopLeaseTimeExtention OBJECT-TYPE
+			SYNTAX Integer32 (0..600)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiDhcpSnoopInfoEntry 2 }       
+			
+		ubiDhcpSnoopBlockLogClear OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				clear (1)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiDhcpSnoopInfoEntry 3 }     
+			
+		ubiDhcpSnoopOption82Status OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				disable(0),
+				enable(1)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiDhcpSnoopInfoEntry 4 }     
+
+		ubiDhcpSnoopOption82Policy OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				drop(0),
+				keep(1),
+				replace(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiDhcpSnoopInfoEntry 5 }     
+			
+		ubiDhcpSnoopVerifyMAC  OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				disable(0),
+				enable(1)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiDhcpSnoopInfoEntry 6 }
+			
+		ubiDhcpSnoopBindingCount  OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Total count of bindings"
+			::= { ubiDhcpSnoopInfoEntry 7 }
+			
+		ubiDhcpSnoopInvalidCount  OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Total count of lease timeout bindings"
+			::= { ubiDhcpSnoopInfoEntry 8 }
+
+			
+			
+-- ***********************************************************
+-- ubiDhcpSnoopVlanTable
+-- ***********************************************************
+		ubiDhcpSnoopVlanTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF UbiDhcpSnoopVlanEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"listening interface list for block function"
+			::= { ubiDhcpSnoopMIBObjects 2 }
+		
+		ubiDhcpSnoopVlanEntry OBJECT-TYPE
+			SYNTAX UbiDhcpSnoopVlanEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { ubiVlanId }
+			::= { ubiDhcpSnoopVlanTable 1 }
+		
+		UbiDhcpSnoopVlanEntry ::=
+			SEQUENCE { 
+				ubiDhcpSnoopVlanIfName
+					DisplayString,
+				ubiDhcpSnoopVlanRowStatus
+					RowStatus
+			 }
+
+		ubiDhcpSnoopVlanIfName OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiDhcpSnoopVlanEntry 1 }
+		
+		ubiDhcpSnoopVlanRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiDhcpSnoopVlanEntry 2 }     
+			
+-- ***********************************************************
+-- dhcp Snoop Binding Table
+-- ***********************************************************
+		ubiDhcpSnoopBindingTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF UbiDhcpSnoopBindingEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"table"
+			::= { ubiDhcpSnoopMIBObjects 3 }
+		
+		ubiDhcpSnoopBindingEntry OBJECT-TYPE
+			SYNTAX UbiDhcpSnoopBindingEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { ubiDhcpSnoopBindingIndex}
+			::= { ubiDhcpSnoopBindingTable 1 }
+		
+		UbiDhcpSnoopBindingEntry ::=
+			SEQUENCE {           
+				ubiDhcpSnoopBindingIndex
+					INTEGER,
+				ubiDhcpSnoopBindingMacAddr
+					MacAddress,    
+				ubiDhcpSnoopBindingIpAddr 
+					IpAddress,  
+				ubiDhcpSnoopBindingState
+					DisplayString,
+				ubiDhcpSnoopBindingVlanName
+					DisplayString, 
+				ubiDhcpSnoopBindingPortName
+					DisplayString,
+				ubiDhcpSnoopBindingUpdate
+					INTEGER,				
+				ubiDhcpSnoopBindingLeaseTime
+					Unsigned32,
+			}           
+                            
+ 		ubiDhcpSnoopBindingIndex OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiDhcpSnoopBindingEntry 1 }
+                            
+                           
+ 		ubiDhcpSnoopBindingMacAddr OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiDhcpSnoopBindingEntry 2 }
+
+		ubiDhcpSnoopBindingIpAddr OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiDhcpSnoopBindingEntry 3 }
+
+		ubiDhcpSnoopBindingState  OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiDhcpSnoopBindingEntry 4 }
+
+ 		ubiDhcpSnoopBindingVlanName OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiDhcpSnoopBindingEntry 5 }    
+			
+ 		ubiDhcpSnoopBindingPortName OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiDhcpSnoopBindingEntry 6 }
+			
+		ubiDhcpSnoopBindingUpdate OBJECT-TYPE
+			SYNTAX INTEGER
+			{                                                            
+				update(1)
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiDhcpSnoopBindingEntry 7 }        
+			
+	    ubiDhcpSnoopBindingLeaseTime OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"dhcp binding's lease time"
+			::= { ubiDhcpSnoopBindingEntry 8 }
+                
+
+
+-- ***********************************************************
+-- dhcp Snoop Interface Table
+-- ***********************************************************
+		ubiDhcpSnoopIfTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF UbiDhcpSnoopIfEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"A table that contains dhcp snoop interface information."
+			::= { ubiDhcpSnoopMIBObjects 4 }
+		
+		ubiDhcpSnoopIfEntry OBJECT-TYPE
+			SYNTAX UbiDhcpSnoopIfEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"A list of information for dhcp snoop interface."
+			INDEX { ifIndex }
+			::= { ubiDhcpSnoopIfTable 1 }
+		
+		UbiDhcpSnoopIfEntry ::=
+			SEQUENCE {           
+				ubiDhcpSnoopIfTrust 	INTEGER				
+			}           
+                            
+ 		ubiDhcpSnoopIfTrust OBJECT-TYPE
+			SYNTAX INTEGER {
+				none(0),
+				trusted(1)
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Trust state of dhcp snoop interface."
+			::= { ubiDhcpSnoopIfEntry 1 }    
+			
+			 
+-- ***********************************************************
+--	ubiDaiMIB                                                
+-- ***********************************************************
+ 
+ubiDaiMIBObjects OBJECT IDENTIFIER ::= { ubiDhcpMIB	4 }	
+ubiArpInspection OBJECT IDENTIFIER ::= { ubiDaiMIBObjects 1 }
+
+-- ***********************************************************
+-- ubiArpInspectionTable
+-- ***********************************************************        
+
+    ubiArpInspectTable  OBJECT-TYPE
+       SYNTAX      SEQUENCE OF UbiArpInspectEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+          "ARP Inspection Table"
+		::= { ubiArpInspection 1 }
+
+    ubiArpInspectEntry  OBJECT-TYPE
+       SYNTAX      UbiArpInspectEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+          "ARP Inspection Entry"
+       INDEX       { ubiVlanId  }
+       ::= { ubiArpInspectTable 1 }
+
+    UbiArpInspectEntry ::= SEQUENCE {  
+    	ubiArpInspectRowStatus
+    		RowStatus
+        }
+       
+	ubiArpInspectRowStatus OBJECT-TYPE
+		SYNTAX     RowStatus
+		MAX-ACCESS read-create
+		STATUS     current
+		DESCRIPTION
+			"Create ARP Inspection on vlan" 
+		::= { ubiArpInspectEntry 1 }
+
+		
+-- ***********************************************************
+-- ubiArpInspectionValidateTable
+-- ***********************************************************        
+    ubiArpInspectValidateTable  OBJECT-TYPE
+       SYNTAX      SEQUENCE OF UbiArpInspectValidateEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+          "ARP Inspection Validate Table"
+		::= { ubiArpInspection 2 }
+
+    ubiArpInspectValidateEntry  OBJECT-TYPE
+       SYNTAX      UbiArpInspectValidateEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+          "ARP Inspection Validate Entry"
+       INDEX       {  noIndex  }
+       ::= { ubiArpInspectValidateTable 1 }
+
+    UbiArpInspectValidateEntry ::= SEQUENCE {  
+    	ubiArpInspectValidateDestMac
+    		INTEGER, 
+    	ubiArpInspectValidateSrcMac
+    		INTEGER, 
+		ubiArpInspectValidateIpAddr
+			INTEGER,
+		ubiArpInspectValidateArpField
+			INTEGER
+	}
+       
+	ubiArpInspectValidateDestMac OBJECT-TYPE
+		SYNTAX     INTEGER   
+		{
+			disable (0),
+			enable (1)
+		}
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"Validate destination MAC address" 
+		::= { ubiArpInspectValidateEntry 1 } 
+
+	ubiArpInspectValidateSrcMac OBJECT-TYPE
+		SYNTAX     INTEGER    
+	    {
+			disable (0),
+			enable (1)
+		}
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"Validate source MAC address" 
+		::= { ubiArpInspectValidateEntry 2 }    
+		
+	ubiArpInspectValidateIpAddr OBJECT-TYPE
+		SYNTAX     INTEGER   
+	    {
+			disable (0),
+			enable (1)
+		}
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"Validate IP address" 
+		::= { ubiArpInspectValidateEntry 3 }    
+		
+	ubiArpInspectValidateArpField OBJECT-TYPE
+		SYNTAX     INTEGER  
+	    {
+			disable (0),
+			enable (1)
+		}
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"Validate ARP field" 
+		::= { ubiArpInspectValidateEntry 4 }    
+   
+-- ***********************************************************
+-- ubiArpInspectLogInfoTable
+-- ***********************************************************         
+   ubiArpInspectLog OBJECT IDENTIFIER ::= { ubiArpInspection 3 }
+
+   
+   ubiArpInspectLogInfoTable  OBJECT-TYPE
+       SYNTAX      SEQUENCE OF UbiArpInspectLogInfoEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+          "ARP Inspection Logging Table."
+		::= { ubiArpInspectLog 1 }
+
+    ubiArpInspectLogInfoEntry  OBJECT-TYPE
+       SYNTAX      UbiArpInspectLogInfoEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+          "ARP Inspection Logging Entry."
+       INDEX       {  noIndex  }
+       ::= { ubiArpInspectLogInfoTable 1 }
+
+    UbiArpInspectLogInfoEntry ::= SEQUENCE {  
+    	ubiArpInspecLogInfoTotalLogBuffer
+    		Integer32,    
+        ubiArpInspecLogInfoLogRate
+            DisplayString,
+        ubiArpInspecLogInfoRepeatCount
+    		Integer32,
+    	ubiArpInspecLogInfoLogClear
+    		Integer32
+    }
+       
+	ubiArpInspecLogInfoTotalLogBuffer OBJECT-TYPE
+		SYNTAX     Integer32   
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"Number of entires for log buffer" 
+		::= { ubiArpInspectLogInfoEntry 1 } 
+ 
+ 
+	ubiArpInspecLogInfoLogRate OBJECT-TYPE
+		SYNTAX     DisplayString   
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"number of entries/interval of Logging Rate" 
+		::= { ubiArpInspectLogInfoEntry 2 }    
+		    
+	ubiArpInspecLogInfoRepeatCount OBJECT-TYPE
+		SYNTAX     Integer32 (0..1024)   
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"Repeat count for flush" 
+		::= { ubiArpInspectLogInfoEntry 3 } 
+ 
+	ubiArpInspecLogInfoLogClear OBJECT-TYPE
+		SYNTAX     Integer32   
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"Clear DAI Log information " 
+		::= { ubiArpInspectLogInfoEntry 4 }
+				
+-- ***********************************************************
+-- ubiArpInspectLogInfoTable
+-- ***********************************************************  		
+    ubiArpInspectLogTable  OBJECT-TYPE
+       SYNTAX      SEQUENCE OF UbiArpInspectLogEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+          "ARP Inspection Logging Table."
+		::= { ubiArpInspectLog 2 }
+
+    ubiArpInspectLogEntry  OBJECT-TYPE
+       SYNTAX      UbiArpInspectLogEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+          "ARP Inspection Logging Entry."
+       INDEX       {  ubiArpInspecLogIndex }
+       ::= { ubiArpInspectLogTable 1 }
+
+    UbiArpInspectLogEntry ::= SEQUENCE {
+    	ubiArpInspecLogIndex
+    		INTEGER,  
+		ubiArpInspecLogIfName
+			DisplayString, 
+		ubiArpInspectLogVlanName
+			DisplayString,
+		ubiArpInspectLogMacAddr
+			PhysAddress,  
+		ubiArpInspectLogIpAddr
+			IpAddress,
+		ubiArpInspectLogCount
+			Integer32		
+    }
+       
+	ubiArpInspecLogIndex OBJECT-TYPE
+		SYNTAX     INTEGER   
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"" 
+		::= { ubiArpInspectLogEntry 1 } 
+
+	ubiArpInspecLogIfName OBJECT-TYPE
+		SYNTAX     DisplayString   
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"" 
+		::= { ubiArpInspectLogEntry 2 }  
+ 
+	ubiArpInspectLogVlanName OBJECT-TYPE
+		SYNTAX     DisplayString   
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"" 
+		::= { ubiArpInspectLogEntry 3 }       
+		
+	ubiArpInspectLogMacAddr OBJECT-TYPE
+		SYNTAX     PhysAddress   
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"" 
+		::= { ubiArpInspectLogEntry 4 }   
+		
+	ubiArpInspectLogIpAddr OBJECT-TYPE
+		SYNTAX     IpAddress   
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"" 
+		::= { ubiArpInspectLogEntry 5 } 
+
+	ubiArpInspectLogCount OBJECT-TYPE
+		SYNTAX     Integer32   
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"" 
+		::= { ubiArpInspectLogEntry 6 } 
+ 
+
+-- ***********************************************************
+-- ubiArpTable
+-- ***********************************************************        
+
+    ubiArpInspectAclTable  OBJECT-TYPE
+       SYNTAX      SEQUENCE OF UbiArpInspectAclEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+          "ARP Inspection permit Table"
+		::= { ubiArpInspection 4 }
+
+    ubiArpInspectAclEntry  OBJECT-TYPE
+       SYNTAX      UbiArpInspectAclEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+          "ARP Inspection permit Entry"
+       INDEX       {  uibAclName, ubiVlanId  }
+       ::= { ubiArpInspectAclTable 1 }
+
+    UbiArpInspectAclEntry ::= SEQUENCE {  
+    	ubiArpInspectAclRowStatus
+    		RowStatus
+        }
+       
+	ubiArpInspectAclRowStatus OBJECT-TYPE
+		SYNTAX     RowStatus
+		MAX-ACCESS read-create
+		STATUS     current
+		DESCRIPTION
+			"Create ARP Inspection on vlan" 
+		::= { ubiArpInspectAclEntry 1 }
+ 
+-- ***********************************************************
+-- 
+-- ***********************************************************
+
+-- the following two OBJECT IDENTIFIERS are used to define SNMPv2 Notifications
+-- that are backward compatible with SNMPv1 Traps.
+ubiDhcpMIBNotificationPrefix OBJECT IDENTIFIER ::= { ubiDhcpMIB 0 }
+ubiDhcpMIBNotifications OBJECT IDENTIFIER ::= { ubiDhcpMIBNotificationPrefix 0 }
+
+ubiDhcpServerInUseAddressHighNotification NOTIFICATION-TYPE
+        OBJECTS {
+        		ubiAlarmIndex,
+				ubiAlarmId,
+				ubiAlarmType,
+				ubiAlarmSeverity,
+				ubiAlarmPhysicalLoc,
+				ubiAlarmLogicalLoc,
+				ubiAlarmCurStatus,
+				ubiAlarmAuxinfo,
+				ubiAlarmDateTime,
+				ubiAlarmStatus
+        		}
+        STATUS  current
+        DESCRIPTION
+                "A ubiDhcpServerInUseAddressHighNotification is sent 
+                if address in use of dhcp server reaches high threshold."
+        ::= { ubiDhcpMIBNotifications 1 }
+        
+ubiDhcpServerInUseAddressLowNotification NOTIFICATION-TYPE
+        OBJECTS {
+        		ubiAlarmIndex,
+				ubiAlarmId,
+				ubiAlarmType,
+				ubiAlarmSeverity,
+				ubiAlarmPhysicalLoc,
+				ubiAlarmLogicalLoc,
+				ubiAlarmCurStatus,
+				ubiAlarmAuxinfo,
+				ubiAlarmDateTime,
+				ubiAlarmStatus
+        		}
+        STATUS  current
+        DESCRIPTION
+                "A ubiDhcpServerInUseAddressLowNotification is sent 
+                if address in use of dhcp server reaches low threshold."
+        ::= { ubiDhcpMIBNotifications 2 }
+-- conformance information
+
+ubiDhcpMIBConformance OBJECT IDENTIFIER ::= { ubiDhcpMIB 6 }
+ubiDhcpMIBCompliances OBJECT IDENTIFIER ::= { ubiDhcpMIBConformance 1 }
+ubiDhcpMIBGroups      OBJECT IDENTIFIER ::= { ubiDhcpMIBConformance 2 }
+
+
+-- compliance statements
+ubiDhcpMIBCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+                "The compliance statement for entities which implement
+                the ubiquoss dhcp MIB."
+        MODULE  -- this module
+                MANDATORY-GROUPS { ubiDhcpMIBGroup,
+                                   ubiDhcpMIBStatusChangeNotifGroup
+                                  }
+
+        GROUP   ubiDhcpMIBGroup
+        DESCRIPTION
+                "This group is applicable for implementations which
+                 need information for dhcp server."
+
+        GROUP   ubiDhcpMIBStatusChangeNotifGroup
+        DESCRIPTION
+                "This group is applicable for implementations which
+                 need status change notifications for dhcp server."
+                         
+        ::= { ubiDhcpMIBCompliances 1 }
+
+-- units of conformance
+ubiDhcpMIBGroup OBJECT-GROUP
+        OBJECTS {
+                ubiDhcpTotalSubnets,
+				ubiDhcpFreeAddress,
+				ubiDhcpTotalAddress,
+				ubiDhcpInUse,
+				ubiDhcpAutomatic,
+				ubiDhcpManual,
+				ubiDhcpLowThreshold,
+				ubiDhcpHighThreshold,
+				ubiDhcpFreeAddrValue,
+				ubiDhcpFreeAddrUnit,
+                
+                ubiDhcpPoolSubnetName,
+				ubiDhcpPoolSubnet,
+				ubiDhcpPoolSubnetMask,
+				ubiDhcpPoolSubnetFreeAddress,
+				ubiDhcpPoolSubnetTotalAddress,
+				ubiDhcpPoolSubnetInUse
+
+        }
+        STATUS  current
+        DESCRIPTION
+                "ubiquoss dhcp."
+        ::= { ubiDhcpMIBGroups 1 }
+
+ubiDhcpMIBStatusChangeNotifGroup NOTIFICATION-GROUP
+        NOTIFICATIONS  {
+                ubiDhcpServerInUseAddressHighNotification,
+                ubiDhcpServerInUseAddressLowNotification
+        }
+        STATUS current
+        DESCRIPTION
+                "A notification group providing alarm notification
+                 for dhcp. "
+        ::= { ubiDhcpMIBGroups 2 }  
+
+-- compliance statements
+ubiDaiMIBCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+                "The compliance statement for entities which implement
+                the ubiquoss dhcp MIB."
+        MODULE  -- this module
+                MANDATORY-GROUPS { 
+                	ubiDaiMIBGroup
+                                  }
+        GROUP   ubiDaiMIBGroup
+        DESCRIPTION
+                ""
+        ::= { ubiDhcpMIBCompliances 2 }
+
+-- units of conformance
+ubiDaiMIBGroup OBJECT-GROUP
+        OBJECTS {     
+        	ubiArpInspectRowStatus, 
+      		ubiArpInspectValidateDestMac,
+    		ubiArpInspectValidateSrcMac, 
+			ubiArpInspectValidateIpAddr,
+			ubiArpInspectValidateArpField, 
+    		ubiArpInspecLoggingTotalLogBuffer, 
+    		ubiArpInspecLoggingLogNum 
+        }
+        STATUS  current
+        DESCRIPTION
+                ""
+        ::= { ubiDhcpMIBGroups 3 }
+        
+END

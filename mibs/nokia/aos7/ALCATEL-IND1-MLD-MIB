@@ -9,13 +9,13 @@ IMPORTS
         FROM INET-ADDRESS-MIB
     MODULE-COMPLIANCE, OBJECT-GROUP
         FROM SNMPv2-CONF
-    InterfaceIndex
+    InterfaceIndex, InterfaceIndexOrZero
         FROM IF-MIB
     softentIND1Mld
         FROM ALCATEL-IND1-BASE;
 
 alcatelIND1MldMIB MODULE-IDENTITY
-    LAST-UPDATED "201102230000Z" 
+    LAST-UPDATED "201509170000Z" 
     ORGANIZATION "Alcatel-Lucent"
     CONTACT-INFO
         "Please consult with Customer Service to ensure the most appropriate
@@ -54,9 +54,18 @@ alcatelIND1MldMIB MODULE-IDENTITY
          non-exclusive license to use this specification in connection with
          management of the products for which it is intended to be used.
          
-                     Copyright (C) 1995-2007 Alcatel-Lucent
+                     Copyright (C) 1995-2015 Alcatel-Lucent
                          ALL RIGHTS RESERVED WORLDWIDE"
 
+    REVISION      "201602180000Z"
+    DESCRIPTION
+        "Deprecated all objects/tables in this MIB in favor of ALCATEL-IND1-IPMS-MIB"
+    REVISION      "201509170000Z"
+    DESCRIPTION
+        "Add InitialPacketBuffer objects"
+    REVISION      "201311260000Z"
+    DESCRIPTION
+        "Using InterfaceIndexOrZero for ingress interface in source, forward, and tunnel tables."
     REVISION      "201102230000Z"
     DESCRIPTION
         "Add zero-based query object and helper address object"
@@ -84,7 +93,7 @@ alaMld OBJECT IDENTIFIER ::= { alcatelIND1MldMIBObjects 1 }
 alaMldStatus OBJECT-TYPE
     SYNTAX          INTEGER { none(0), enable(1), disable(2) }
     MAX-ACCESS      read-write
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "Administratively enable IPv6 multicast switching and routing 
          on the system."
@@ -94,7 +103,7 @@ alaMldStatus OBJECT-TYPE
 alaMldQuerying OBJECT-TYPE
     SYNTAX          INTEGER { none(0), enable(1), disable(2) }
     MAX-ACCESS      read-write
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "Administratively enable MLD Querying on the system."
     DEFVAL        { disable }
@@ -103,7 +112,7 @@ alaMldQuerying OBJECT-TYPE
 alaMldSpoofing OBJECT-TYPE
     SYNTAX          INTEGER { none(0), enable(1), disable(2) }
     MAX-ACCESS      read-write
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "Administratively enable MLD Spoofing on the system."
     DEFVAL        { disable }
@@ -112,7 +121,7 @@ alaMldSpoofing OBJECT-TYPE
 alaMldZapping OBJECT-TYPE
     SYNTAX          INTEGER { none(0), enable(1), disable(2) }
     MAX-ACCESS      read-write
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "Administratively enable MLD Zapping on the system."
     DEFVAL        { disable }
@@ -121,7 +130,7 @@ alaMldZapping OBJECT-TYPE
 alaMldVersion OBJECT-TYPE
     SYNTAX          Unsigned32
     MAX-ACCESS      read-write
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "Set the default MLD protocol Version running on the system."
     DEFVAL        { 1 }
@@ -130,7 +139,7 @@ alaMldVersion OBJECT-TYPE
 alaMldRobustness OBJECT-TYPE
     SYNTAX          Unsigned32
     MAX-ACCESS      read-write
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "Set the MLD Robustness variable used on the system."
     DEFVAL        { 2 }
@@ -140,7 +149,7 @@ alaMldQueryInterval OBJECT-TYPE
     SYNTAX          Unsigned32
     UNITS           "seconds"
     MAX-ACCESS      read-write
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "Set the MLD Query Interval used on the system."
     DEFVAL        { 125 }
@@ -150,7 +159,7 @@ alaMldQueryResponseInterval OBJECT-TYPE
     SYNTAX          Unsigned32
     UNITS           "milliseconds"
     MAX-ACCESS      read-write
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "Set the MLD Query Response Interval on the system."
     DEFVAL        { 10000 }
@@ -160,7 +169,7 @@ alaMldLastMemberQueryInterval OBJECT-TYPE
     SYNTAX          Unsigned32
     UNITS           "milliseconds"
     MAX-ACCESS      read-write
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "Set the MLD Last Member Query Interval on the system."
     DEFVAL        { 1000 }
@@ -170,7 +179,7 @@ alaMldRouterTimeout OBJECT-TYPE
     SYNTAX          Unsigned32
     UNITS           "seconds"
     MAX-ACCESS      read-write
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The MLD Router Timeout on the system."
     DEFVAL        { 90 }
@@ -180,7 +189,7 @@ alaMldSourceTimeout OBJECT-TYPE
     SYNTAX          Unsigned32
     UNITS           "seconds"
     MAX-ACCESS      read-write
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The MLD Source Timeout on the system."
     DEFVAL        { 30 }
@@ -189,7 +198,7 @@ alaMldSourceTimeout OBJECT-TYPE
 alaMldProxying OBJECT-TYPE
     SYNTAX          INTEGER { none(0), enable(1), disable(2) }
     MAX-ACCESS      read-write
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "Administratively enable MLD Proxying on the system."
     DEFVAL        { disable }
@@ -199,7 +208,7 @@ alaMldUnsolicitedReportInterval OBJECT-TYPE
     SYNTAX          Unsigned32
     UNITS           "seconds"
     MAX-ACCESS      read-write
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The MLD Unsolicited Report Interval on the system."
     DEFVAL        { 1 }
@@ -208,7 +217,7 @@ alaMldUnsolicitedReportInterval OBJECT-TYPE
 alaMldQuerierForwarding OBJECT-TYPE
     SYNTAX          INTEGER { none(0), enable(1), disable(2) }
     MAX-ACCESS      read-write
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "Administratively enable MLD Querier Forwarding on the system."
     DEFVAL        { disable }
@@ -217,7 +226,7 @@ alaMldQuerierForwarding OBJECT-TYPE
 alaMldMaxGroupLimit OBJECT-TYPE
     SYNTAX          Unsigned32  
     MAX-ACCESS      read-write
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The global limit on maximum number of MLD Group memberships that can be learnt on each 
 	port/vlan instance."
@@ -227,7 +236,7 @@ alaMldMaxGroupLimit OBJECT-TYPE
 alaMldMaxGroupExceedAction OBJECT-TYPE
     SYNTAX          INTEGER { none(0), drop(1), replace(2) }
     MAX-ACCESS      read-write
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The global configuration of action to be taken when MLD group membership limit is exceeded on a 
 	port/vlan instance."
@@ -236,7 +245,7 @@ alaMldMaxGroupExceedAction OBJECT-TYPE
 alaMldFloodUnknown OBJECT-TYPE
     SYNTAX          INTEGER { none(0), enable(1), disable(2) }
     MAX-ACCESS      read-write
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "Administratively enable flooding of multicast data packets during flow
     learning and setup."
@@ -246,7 +255,7 @@ alaMldFloodUnknown OBJECT-TYPE
 alaMldHelperAddressType OBJECT-TYPE
     SYNTAX          InetAddressType (2)
     MAX-ACCESS      read-write
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "Set the address type of the helper address.  Must be ipv4(1) and set
 at the same time as alaMldHelperAddress."
@@ -255,7 +264,7 @@ at the same time as alaMldHelperAddress."
 alaMldHelperAddress OBJECT-TYPE
     SYNTAX          InetAddress (SIZE(16))
     MAX-ACCESS      read-write
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The configured IPv6 helper address.  When an MLD report or leave
 is received by the device it will remove the IP header and regenerate a
@@ -267,12 +276,62 @@ same time as alaMldHelperAddressType"
 alaMldZeroBasedQuery OBJECT-TYPE
     SYNTAX          INTEGER { none(0), enable(1), disable(2) }
     MAX-ACCESS      read-write
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "Administratively enable the use of an all-zero source IPv6 address
 for query packets when a non-querier is querying the membership of a port"
     DEFVAL        { enable }
     ::= { alaMld 20 }
+
+alaMldInitialPacketBuffer OBJECT-TYPE
+  SYNTAX          INTEGER { none(0), enable(1), disable(2) }
+  MAX-ACCESS      read-write
+  STATUS          deprecated
+  DESCRIPTION
+      "Administratively enable/disable initial packet buffering 
+       for new multicast sources on the system"
+  DEFVAL        { disable }
+  ::= { alaMld 21 }
+
+alaMldInitialPacketBufferMaxPacket OBJECT-TYPE
+  SYNTAX          Unsigned32
+  MAX-ACCESS      read-write
+  STATUS          deprecated
+  DESCRIPTION
+        "The maximum number of packets per-flow that may be buffered"
+  DEFVAL    {4}
+  ::= { alaMld 22 }
+
+alaMldInitialPacketBufferMaxFlow OBJECT-TYPE
+  SYNTAX          Unsigned32  
+  MAX-ACCESS      read-write
+  STATUS          deprecated
+  DESCRIPTION
+        "The maximum number of flows that are allowed to be buffered"
+  DEFVAL    {32}
+  ::= { alaMld 23 }
+
+alaMldInitialPacketBufferTimeout OBJECT-TYPE
+  SYNTAX          Unsigned32  
+  UNITS           "seconds"
+  MAX-ACCESS      read-write
+  STATUS          deprecated
+  DESCRIPTION
+      "The maximum amount of time buffered packets are held"
+  DEFVAL        { 10 }
+  ::= { alaMld 24 }
+
+alaMldInitialPacketBufferMinDelay OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "milliseconds"
+    MAX-ACCESS      read-write
+    STATUS          deprecated
+    DESCRIPTION
+        "The minimum amount of time buffered packets will be held before
+         delivery may begin.  This delay is used to allow time for
+         routing information and hardware resources to be made available."
+    DEFVAL        { 0 }
+    ::= { alaMld 25 }
 
 --
 --  VLAN Configuration Table
@@ -283,7 +342,7 @@ alaMldVlan OBJECT IDENTIFIER ::= { alcatelIND1MldMIBObjects 2 }
 alaMldVlanTable OBJECT-TYPE
     SYNTAX          SEQUENCE OF MldVlanEntry
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The VLAN table contains the information on which IPv6 multicast
          switching and routing is configured."
@@ -292,7 +351,7 @@ alaMldVlanTable OBJECT-TYPE
 alaMldVlanEntry OBJECT-TYPE
     SYNTAX          MldVlanEntry
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "An entry corresponds to a VLAN on which IPv6 multicast switching
          and routing is configured."
@@ -325,7 +384,7 @@ MldVlanEntry ::= SEQUENCE {
 alaMldVlanIndex OBJECT-TYPE
     SYNTAX          Unsigned32
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The VLAN on which IPv6 multicast switching and routing 
          is configured."
@@ -334,7 +393,7 @@ alaMldVlanIndex OBJECT-TYPE
 alaMldVlanStatus OBJECT-TYPE
     SYNTAX          INTEGER { none(0), enable(1), disable(2) }
     MAX-ACCESS      read-write
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "Administratively enable IPv6 multicast switching and routing 
          on the VLAN."
@@ -343,7 +402,7 @@ alaMldVlanStatus OBJECT-TYPE
 alaMldVlanQuerying OBJECT-TYPE
     SYNTAX          INTEGER { none(0), enable(1), disable(2) }
     MAX-ACCESS      read-write
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "Administratively enable MLD Querying on the VLAN."
     ::= { alaMldVlanEntry 3 }
@@ -351,7 +410,7 @@ alaMldVlanQuerying OBJECT-TYPE
 alaMldVlanSpoofing OBJECT-TYPE
     SYNTAX          INTEGER { none(0), enable(1), disable(2) }
     MAX-ACCESS      read-write
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "Administratively enable MLD Spoofing on the VLAN."
     ::= { alaMldVlanEntry 4 }
@@ -359,7 +418,7 @@ alaMldVlanSpoofing OBJECT-TYPE
 alaMldVlanZapping OBJECT-TYPE
     SYNTAX          INTEGER { none(0), enable(1), disable(2) }
     MAX-ACCESS      read-write
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "Administratively enable MLD Zapping on the VLAN."
     ::= { alaMldVlanEntry 5 }
@@ -367,7 +426,7 @@ alaMldVlanZapping OBJECT-TYPE
 alaMldVlanVersion OBJECT-TYPE
     SYNTAX          Unsigned32
     MAX-ACCESS      read-write
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "Set the default MLD protocol Version running on the VLAN."
     ::= { alaMldVlanEntry 6 }
@@ -375,7 +434,7 @@ alaMldVlanVersion OBJECT-TYPE
 alaMldVlanRobustness OBJECT-TYPE
     SYNTAX          Unsigned32
     MAX-ACCESS      read-write
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "Set the MLD Robustness variable used on the VLAN."
     ::= { alaMldVlanEntry 7 }
@@ -384,7 +443,7 @@ alaMldVlanQueryInterval OBJECT-TYPE
     SYNTAX          Unsigned32
     UNITS           "seconds"
     MAX-ACCESS      read-write
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "Set the MLD Query Interval used on the VLAN."
     ::= { alaMldVlanEntry 8 }
@@ -393,7 +452,7 @@ alaMldVlanQueryResponseInterval OBJECT-TYPE
     SYNTAX          Unsigned32
     UNITS           "milliseconds"
     MAX-ACCESS      read-write
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "Set the MLD Query Response Interval on the VLAN."
     ::= { alaMldVlanEntry 9 }
@@ -402,7 +461,7 @@ alaMldVlanLastMemberQueryInterval OBJECT-TYPE
     SYNTAX          Unsigned32
     UNITS           "milliseconds"
     MAX-ACCESS      read-write
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "Set the MLD Last Member Query Interval on the VLAN."
     ::= { alaMldVlanEntry 10 }
@@ -411,7 +470,7 @@ alaMldVlanRouterTimeout OBJECT-TYPE
     SYNTAX          Unsigned32
     UNITS           "seconds"
     MAX-ACCESS      read-write
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "Set the MLD Router Timeout on the VLAN."
     ::= { alaMldVlanEntry 11 }
@@ -420,7 +479,7 @@ alaMldVlanSourceTimeout OBJECT-TYPE
     SYNTAX          Unsigned32
     UNITS           "seconds"
     MAX-ACCESS      read-write
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "Set the MLD Source Timeout on the VLAN."
     ::= { alaMldVlanEntry 12 }
@@ -428,7 +487,7 @@ alaMldVlanSourceTimeout OBJECT-TYPE
 alaMldVlanProxying OBJECT-TYPE
     SYNTAX          INTEGER { none(0), enable(1), disable(2) }
     MAX-ACCESS      read-write
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "Administratively enable MLD Proxying on the VLAN."
     ::= { alaMldVlanEntry 13 }
@@ -437,7 +496,7 @@ alaMldVlanUnsolicitedReportInterval OBJECT-TYPE
     SYNTAX          Unsigned32
     UNITS           "seconds"
     MAX-ACCESS      read-write
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "Set the MLD Unsolicited Report Interval on the VLAN."
     ::= { alaMldVlanEntry 14 }
@@ -445,7 +504,7 @@ alaMldVlanUnsolicitedReportInterval OBJECT-TYPE
 alaMldVlanQuerierForwarding OBJECT-TYPE
     SYNTAX          INTEGER { none(0), enable(1), disable(2) }
     MAX-ACCESS      read-write
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "Administratively enable MLD Querier Forwarding on the VLAN."
     ::= { alaMldVlanEntry 15 }
@@ -453,7 +512,7 @@ alaMldVlanQuerierForwarding OBJECT-TYPE
 alaMldVlanMaxGroupLimit OBJECT-TYPE
     SYNTAX          Unsigned32
     MAX-ACCESS      read-write
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The maximum number of MLD Group memberships that can be learnt on the VLAN."
     DEFVAL 		{0}
@@ -462,7 +521,7 @@ alaMldVlanMaxGroupLimit OBJECT-TYPE
 alaMldVlanMaxGroupExceedAction OBJECT-TYPE
     SYNTAX          INTEGER { none(0), drop(1), replace(2) }
     MAX-ACCESS      read-write
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The action to be taken when the MLD group membership limit is exceeded on the VLAN."
     DEFVAL        { none }
@@ -471,7 +530,7 @@ alaMldVlanMaxGroupExceedAction OBJECT-TYPE
 alaMldVlanZeroBasedQuery OBJECT-TYPE
     SYNTAX          INTEGER { none(0), enable(1), disable(2) }
     MAX-ACCESS      read-write
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "Administratively enable the use of an all-zero source IPv6 address
 for query packets when a non-querier is querying the membership of a port
@@ -488,7 +547,7 @@ alaMldMember OBJECT IDENTIFIER ::= { alcatelIND1MldMIBObjects 3 }
 alaMldMemberTable OBJECT-TYPE
     SYNTAX          SEQUENCE OF MldMemberEntry
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The table listing the MLD group membership information."
     ::= { alaMldMember 1 }
@@ -496,7 +555,7 @@ alaMldMemberTable OBJECT-TYPE
 alaMldMemberEntry OBJECT-TYPE
     SYNTAX          MldMemberEntry
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "An entry corresponding to an MLD group membership request."
     INDEX         { 
@@ -520,7 +579,7 @@ MldMemberEntry ::= SEQUENCE {
 alaMldMemberVlan OBJECT-TYPE
     SYNTAX          Unsigned32
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The group membership request's VLAN."
     ::= { alaMldMemberEntry 1 }
@@ -528,7 +587,7 @@ alaMldMemberVlan OBJECT-TYPE
 alaMldMemberIfIndex OBJECT-TYPE
     SYNTAX          InterfaceIndex
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The group membership request's ifIndex."
     ::= { alaMldMemberEntry 2 }
@@ -536,7 +595,7 @@ alaMldMemberIfIndex OBJECT-TYPE
 alaMldMemberGroupAddress OBJECT-TYPE
     SYNTAX          InetAddressIPv6
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The group membership request's IPv6 group address."
     ::= { alaMldMemberEntry 3 }
@@ -544,7 +603,7 @@ alaMldMemberGroupAddress OBJECT-TYPE
 alaMldMemberSourceAddress OBJECT-TYPE
     SYNTAX          InetAddressIPv6
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The group membership request's IPv6 source address."
     ::= { alaMldMemberEntry 4 }
@@ -552,7 +611,7 @@ alaMldMemberSourceAddress OBJECT-TYPE
 alaMldMemberMode OBJECT-TYPE
     SYNTAX          INTEGER { include(1), exclude(2) }
     MAX-ACCESS      read-only
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The group membership request's MLD source filter mode."
     ::= { alaMldMemberEntry 5 }
@@ -560,7 +619,7 @@ alaMldMemberMode OBJECT-TYPE
 alaMldMemberCount OBJECT-TYPE
     SYNTAX          Counter32
     MAX-ACCESS      read-only
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The group membership request's counter."
     ::= { alaMldMemberEntry 6 }
@@ -568,7 +627,7 @@ alaMldMemberCount OBJECT-TYPE
 alaMldMemberTimeout OBJECT-TYPE
     SYNTAX          TimeTicks
     MAX-ACCESS      read-only
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The group membership request's timeout."
     ::= { alaMldMemberEntry 7 }
@@ -583,7 +642,7 @@ alaMldStaticMember OBJECT IDENTIFIER ::= { alcatelIND1MldMIBObjects 4 }
 alaMldStaticMemberTable OBJECT-TYPE
     SYNTAX          SEQUENCE OF MldStaticMemberEntry
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The table listing the static MLD group membership information."
     ::= { alaMldStaticMember 1 }
@@ -591,7 +650,7 @@ alaMldStaticMemberTable OBJECT-TYPE
 alaMldStaticMemberEntry OBJECT-TYPE
     SYNTAX          MldStaticMemberEntry
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "An entry corresponding to a static MLD group membership request."
     INDEX         { 
@@ -611,7 +670,7 @@ MldStaticMemberEntry ::= SEQUENCE {
 alaMldStaticMemberVlan OBJECT-TYPE
     SYNTAX          Unsigned32
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The static group membership request's VLAN."
     ::= { alaMldStaticMemberEntry 1 }
@@ -619,7 +678,7 @@ alaMldStaticMemberVlan OBJECT-TYPE
 alaMldStaticMemberIfIndex OBJECT-TYPE
     SYNTAX          InterfaceIndex
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The static group membership request's ifIndex."
     ::= { alaMldStaticMemberEntry 2 }
@@ -627,7 +686,7 @@ alaMldStaticMemberIfIndex OBJECT-TYPE
 alaMldStaticMemberGroupAddress OBJECT-TYPE
     SYNTAX          InetAddressIPv6
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The static group membership request's IPv6 group address."
     ::= { alaMldStaticMemberEntry 3 }
@@ -635,7 +694,7 @@ alaMldStaticMemberGroupAddress OBJECT-TYPE
 alaMldStaticMemberRowStatus OBJECT-TYPE
     SYNTAX          RowStatus
     MAX-ACCESS      read-create
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "Used in accordance with installation and removal conventions
          for conceptual rows."
@@ -651,7 +710,7 @@ alaMldNeighbor OBJECT IDENTIFIER ::= { alcatelIND1MldMIBObjects 5 }
 alaMldNeighborTable OBJECT-TYPE
     SYNTAX          SEQUENCE OF MldNeighborEntry
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The table listing the neighboring IP multicast routers."
     ::= { alaMldNeighbor 1 }
@@ -659,7 +718,7 @@ alaMldNeighborTable OBJECT-TYPE
 alaMldNeighborEntry OBJECT-TYPE
     SYNTAX          MldNeighborEntry
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "An entry corresponding to an IP multicast router."
     INDEX         { 
@@ -680,7 +739,7 @@ MldNeighborEntry ::= SEQUENCE {
 alaMldNeighborVlan OBJECT-TYPE
     SYNTAX          Unsigned32
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The IP multicast router's VLAN."
     ::= { alaMldNeighborEntry 1 }
@@ -688,7 +747,7 @@ alaMldNeighborVlan OBJECT-TYPE
 alaMldNeighborIfIndex OBJECT-TYPE
     SYNTAX          InterfaceIndex
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The IP multicast router's ifIndex."
     ::= { alaMldNeighborEntry 2 }
@@ -696,7 +755,7 @@ alaMldNeighborIfIndex OBJECT-TYPE
 alaMldNeighborHostAddress OBJECT-TYPE
     SYNTAX          InetAddressIPv6
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The IP multicast router's IPv6 host address."
     ::= { alaMldNeighborEntry 3 }
@@ -704,7 +763,7 @@ alaMldNeighborHostAddress OBJECT-TYPE
 alaMldNeighborCount OBJECT-TYPE
     SYNTAX          Counter32
     MAX-ACCESS      read-only
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The IP multicast router's counter."
     ::= { alaMldNeighborEntry 4 }
@@ -712,7 +771,7 @@ alaMldNeighborCount OBJECT-TYPE
 alaMldNeighborTimeout OBJECT-TYPE
     SYNTAX          TimeTicks
     MAX-ACCESS      read-only
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The IP multicast router's timeout."
     ::= { alaMldNeighborEntry 5 }
@@ -727,7 +786,7 @@ alaMldStaticNeighbor OBJECT IDENTIFIER ::= { alcatelIND1MldMIBObjects 6 }
 alaMldStaticNeighborTable OBJECT-TYPE
     SYNTAX          SEQUENCE OF MldStaticNeighborEntry
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The table listing the static IP multicast routers."
     ::= { alaMldStaticNeighbor 1 }
@@ -735,7 +794,7 @@ alaMldStaticNeighborTable OBJECT-TYPE
 alaMldStaticNeighborEntry OBJECT-TYPE
     SYNTAX          MldStaticNeighborEntry
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "An entry corresponding to a static IP multicast router."
     INDEX         { 
@@ -753,7 +812,7 @@ MldStaticNeighborEntry ::= SEQUENCE {
 alaMldStaticNeighborVlan OBJECT-TYPE
     SYNTAX          Unsigned32
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The static IP multicast router's VLAN."
     ::= { alaMldStaticNeighborEntry 1 }
@@ -761,7 +820,7 @@ alaMldStaticNeighborVlan OBJECT-TYPE
 alaMldStaticNeighborIfIndex OBJECT-TYPE
     SYNTAX          InterfaceIndex
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The static IP multicast router's ifIndex."
     ::= { alaMldStaticNeighborEntry 2 }
@@ -769,7 +828,7 @@ alaMldStaticNeighborIfIndex OBJECT-TYPE
 alaMldStaticNeighborRowStatus OBJECT-TYPE
     SYNTAX          RowStatus
     MAX-ACCESS      read-create
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "Used in accordance with installation and removal conventions
          for conceptual rows."
@@ -785,7 +844,7 @@ alaMldQuerier OBJECT IDENTIFIER ::= { alcatelIND1MldMIBObjects 7 }
 alaMldQuerierTable OBJECT-TYPE
     SYNTAX          SEQUENCE OF MldQuerierEntry
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The table listing the neighboring MLD queriers."
     ::= { alaMldQuerier 1 }
@@ -793,7 +852,7 @@ alaMldQuerierTable OBJECT-TYPE
 alaMldQuerierEntry OBJECT-TYPE
     SYNTAX          MldQuerierEntry
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "An entry corresponding to an MLD querier."
     INDEX         { 
@@ -814,7 +873,7 @@ MldQuerierEntry ::= SEQUENCE {
 alaMldQuerierVlan OBJECT-TYPE
     SYNTAX          Unsigned32
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The MLD querier's VLAN."
     ::= { alaMldQuerierEntry 1 }
@@ -822,7 +881,7 @@ alaMldQuerierVlan OBJECT-TYPE
 alaMldQuerierIfIndex OBJECT-TYPE
     SYNTAX          InterfaceIndex
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The MLD querier's ifIndex."
     ::= { alaMldQuerierEntry 2 }
@@ -830,7 +889,7 @@ alaMldQuerierIfIndex OBJECT-TYPE
 alaMldQuerierHostAddress OBJECT-TYPE
     SYNTAX          InetAddressIPv6
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The MLD querier's IPv6 host address."
     ::= { alaMldQuerierEntry 3 }
@@ -838,7 +897,7 @@ alaMldQuerierHostAddress OBJECT-TYPE
 alaMldQuerierCount OBJECT-TYPE
     SYNTAX          Counter32
     MAX-ACCESS      read-only
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The MLD querier's counter."
     ::= { alaMldQuerierEntry 4 }
@@ -846,7 +905,7 @@ alaMldQuerierCount OBJECT-TYPE
 alaMldQuerierTimeout OBJECT-TYPE
     SYNTAX          TimeTicks
     MAX-ACCESS      read-only
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The MLD querier's timeout."
     ::= { alaMldQuerierEntry 5 }
@@ -861,7 +920,7 @@ alaMldStaticQuerier OBJECT IDENTIFIER ::= { alcatelIND1MldMIBObjects 8 }
 alaMldStaticQuerierTable OBJECT-TYPE
     SYNTAX          SEQUENCE OF MldStaticQuerierEntry
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The table listing the static MLD queriers."
     ::= { alaMldStaticQuerier 1 }
@@ -869,7 +928,7 @@ alaMldStaticQuerierTable OBJECT-TYPE
 alaMldStaticQuerierEntry OBJECT-TYPE
     SYNTAX          MldStaticQuerierEntry
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "An entry corresponding to a static MLD querier."
     INDEX         { 
@@ -887,7 +946,7 @@ MldStaticQuerierEntry ::= SEQUENCE {
 alaMldStaticQuerierVlan OBJECT-TYPE
     SYNTAX          Unsigned32
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The static MLD querier's VLAN."
     ::= { alaMldStaticQuerierEntry 1 }
@@ -895,7 +954,7 @@ alaMldStaticQuerierVlan OBJECT-TYPE
 alaMldStaticQuerierIfIndex OBJECT-TYPE
     SYNTAX          InterfaceIndex
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The static MLD querier's ifIndex."
     ::= { alaMldStaticQuerierEntry 2 }
@@ -903,7 +962,7 @@ alaMldStaticQuerierIfIndex OBJECT-TYPE
 alaMldStaticQuerierRowStatus OBJECT-TYPE
     SYNTAX          RowStatus
     MAX-ACCESS      read-create
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "Used in accordance with installation and removal conventions
          for conceptual rows."
@@ -919,7 +978,7 @@ alaMldSource OBJECT IDENTIFIER ::= { alcatelIND1MldMIBObjects 9 }
 alaMldSourceTable OBJECT-TYPE
     SYNTAX          SEQUENCE OF MldSourceEntry
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The table listing the IP multicast source information."
     ::= { alaMldSource 1 }
@@ -927,7 +986,7 @@ alaMldSourceTable OBJECT-TYPE
 alaMldSourceEntry OBJECT-TYPE
     SYNTAX          MldSourceEntry
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "An entry corresponding to an IP multicast source flow."
     INDEX         { 
@@ -941,7 +1000,7 @@ alaMldSourceEntry OBJECT-TYPE
 
 MldSourceEntry ::= SEQUENCE {
     alaMldSourceVlan                      Unsigned32,
-    alaMldSourceIfIndex                   InterfaceIndex,
+    alaMldSourceIfIndex                   InterfaceIndexOrZero,
     alaMldSourceGroupAddress              InetAddressIPv6,
     alaMldSourceHostAddress               InetAddressIPv6,
     alaMldSourceDestAddress               InetAddressIPv6,
@@ -952,23 +1011,24 @@ MldSourceEntry ::= SEQUENCE {
 alaMldSourceVlan OBJECT-TYPE
     SYNTAX          Unsigned32
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The IP multicast source flow's VLAN."
     ::= { alaMldSourceEntry 1 }
 
 alaMldSourceIfIndex OBJECT-TYPE
-    SYNTAX          InterfaceIndex
+    SYNTAX          InterfaceIndexOrZero
     MAX-ACCESS      read-only
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
-        "The IP multicast source flow's ifIndex."
+        "The IP multicast source flow's ifIndex.  The value of zero is used
+         when the ingress interface of the multicast flow is not explicitly tracked."
     ::= { alaMldSourceEntry 2 }
 
 alaMldSourceGroupAddress OBJECT-TYPE
     SYNTAX          InetAddressIPv6
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The IP multicast source flow's IPv6 group address."
     ::= { alaMldSourceEntry 3 }
@@ -976,7 +1036,7 @@ alaMldSourceGroupAddress OBJECT-TYPE
 alaMldSourceHostAddress OBJECT-TYPE
     SYNTAX          InetAddressIPv6
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The IP multicast source flow's IPv6 host address."
     ::= { alaMldSourceEntry 4 }
@@ -984,7 +1044,7 @@ alaMldSourceHostAddress OBJECT-TYPE
 alaMldSourceDestAddress OBJECT-TYPE
     SYNTAX          InetAddressIPv6
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The IP multicast source flow's IPv6 tunnel destination address."
     ::= { alaMldSourceEntry 5 }
@@ -992,7 +1052,7 @@ alaMldSourceDestAddress OBJECT-TYPE
 alaMldSourceOrigAddress OBJECT-TYPE
     SYNTAX          InetAddressIPv6
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The IP multicast source flow's IPv6 tunnel source address."
     ::= { alaMldSourceEntry 6 }
@@ -1000,7 +1060,7 @@ alaMldSourceOrigAddress OBJECT-TYPE
 alaMldSourceType OBJECT-TYPE
     SYNTAX          INTEGER { mcast(1), pim(2) }
     MAX-ACCESS      read-only
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The IP multicast source flow's encapsulation type."
     ::= { alaMldSourceEntry 7 }
@@ -1015,7 +1075,7 @@ alaMldForward OBJECT IDENTIFIER ::= { alcatelIND1MldMIBObjects 10 }
 alaMldForwardTable OBJECT-TYPE
     SYNTAX          SEQUENCE OF MldForwardEntry
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The table listing the IP multicast forward information."
     ::= { alaMldForward 1 }
@@ -1023,7 +1083,7 @@ alaMldForwardTable OBJECT-TYPE
 alaMldForwardEntry OBJECT-TYPE
     SYNTAX          MldForwardEntry
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "An entry corresponding to an IP multicast forwarded flow."
     INDEX         { 
@@ -1039,7 +1099,7 @@ alaMldForwardEntry OBJECT-TYPE
 
 MldForwardEntry ::= SEQUENCE {
     alaMldForwardVlan                     Unsigned32,
-    alaMldForwardIfIndex                  InterfaceIndex,
+    alaMldForwardIfIndex                  InterfaceIndexOrZero,
     alaMldForwardGroupAddress             InetAddressIPv6,
     alaMldForwardHostAddress              InetAddressIPv6,
     alaMldForwardDestAddress              InetAddressIPv6,
@@ -1053,23 +1113,24 @@ MldForwardEntry ::= SEQUENCE {
 alaMldForwardVlan OBJECT-TYPE
     SYNTAX          Unsigned32
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The IP multicast forwarded flow's VLAN."
     ::= { alaMldForwardEntry 1 }
 
 alaMldForwardIfIndex OBJECT-TYPE
-    SYNTAX          InterfaceIndex
+    SYNTAX          InterfaceIndexOrZero
     MAX-ACCESS      read-only
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
-        "The IP multicast forwarded flow's ifIndex."
+        "The IP multicast forwarded flow's ifIndex.  The value of zero is used
+         when the ingress interface of the multicast flow is not explicitly tracked."
     ::= { alaMldForwardEntry 2 }
 
 alaMldForwardGroupAddress OBJECT-TYPE
     SYNTAX          InetAddressIPv6
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The IP multicast forwarded flow's IPv6 group address."
     ::= { alaMldForwardEntry 3 }
@@ -1077,7 +1138,7 @@ alaMldForwardGroupAddress OBJECT-TYPE
 alaMldForwardHostAddress OBJECT-TYPE
     SYNTAX          InetAddressIPv6
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The IP multicast forwarded flow's IPv6 host address."
     ::= { alaMldForwardEntry 4 }
@@ -1085,7 +1146,7 @@ alaMldForwardHostAddress OBJECT-TYPE
 alaMldForwardDestAddress OBJECT-TYPE
     SYNTAX          InetAddressIPv6
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The IP multicast forwarded flow's IPv6 tunnel destination address."
     ::= { alaMldForwardEntry 5 }
@@ -1093,7 +1154,7 @@ alaMldForwardDestAddress OBJECT-TYPE
 alaMldForwardOrigAddress OBJECT-TYPE
     SYNTAX          InetAddressIPv6
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The IP multicast forwarded flow's IPv6 tunnel source address."
     ::= { alaMldForwardEntry 6 }
@@ -1101,7 +1162,7 @@ alaMldForwardOrigAddress OBJECT-TYPE
 alaMldForwardType OBJECT-TYPE
     SYNTAX          INTEGER { mcast(1), pim(2) }
     MAX-ACCESS      read-only
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The IP multicast forwarded flow's encapsulation type."
     ::= { alaMldForwardEntry 7 }
@@ -1109,7 +1170,7 @@ alaMldForwardType OBJECT-TYPE
 alaMldForwardNextVlan OBJECT-TYPE
     SYNTAX          Unsigned32
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The IP multicast forwarded flow's next VLAN."
     ::= { alaMldForwardEntry 8 }
@@ -1117,7 +1178,7 @@ alaMldForwardNextVlan OBJECT-TYPE
 alaMldForwardNextIfIndex OBJECT-TYPE
     SYNTAX          InterfaceIndex
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The IP multicast forwarded flow's next ifIndex."
     ::= { alaMldForwardEntry 9 }
@@ -1125,7 +1186,7 @@ alaMldForwardNextIfIndex OBJECT-TYPE
 alaMldForwardNextType OBJECT-TYPE
     SYNTAX          INTEGER { mcast(1), pim(2) }
     MAX-ACCESS      read-only
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The IP multicast forwarded flow's next encapsulation type."
     ::= { alaMldForwardEntry 10 }
@@ -1140,7 +1201,7 @@ alaMldTunnel OBJECT IDENTIFIER ::= { alcatelIND1MldMIBObjects 11 }
 alaMldTunnelTable OBJECT-TYPE
     SYNTAX          SEQUENCE OF MldTunnelEntry
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The table listing the IP multicast tunnel information."
     ::= { alaMldTunnel 1 }
@@ -1148,7 +1209,7 @@ alaMldTunnelTable OBJECT-TYPE
 alaMldTunnelEntry OBJECT-TYPE
     SYNTAX          MldTunnelEntry
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "An entry corresponding to an IP multicast tunneled flow."
     INDEX         { 
@@ -1163,7 +1224,7 @@ alaMldTunnelEntry OBJECT-TYPE
 
 MldTunnelEntry ::= SEQUENCE {
     alaMldTunnelVlan                      Unsigned32,
-    alaMldTunnelIfIndex                   InterfaceIndex,
+    alaMldTunnelIfIndex                   InterfaceIndexOrZero,
     alaMldTunnelGroupAddress              InetAddressIPv6,
     alaMldTunnelHostAddress               InetAddressIPv6,
     alaMldTunnelDestAddress               InetAddressIPv6,
@@ -1176,23 +1237,24 @@ MldTunnelEntry ::= SEQUENCE {
 alaMldTunnelVlan OBJECT-TYPE
     SYNTAX          Unsigned32
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The IP multicast tunneled flow's VLAN."
     ::= { alaMldTunnelEntry 1 }
 
 alaMldTunnelIfIndex OBJECT-TYPE
-    SYNTAX          InterfaceIndex
+    SYNTAX          InterfaceIndexOrZero
     MAX-ACCESS      read-only
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
-        "The IP multicast tunneled flow's ifIndex."
+        "The IP multicast tunneled flow's ifIndex.  The value of zero is used
+         when the ingress interface of the multicast flow is not explicitly tracked."
     ::= { alaMldTunnelEntry 2 }
 
 alaMldTunnelGroupAddress OBJECT-TYPE
     SYNTAX          InetAddressIPv6
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The IP multicast tunneled flow's IPv6 group address."
     ::= { alaMldTunnelEntry 3 }
@@ -1200,7 +1262,7 @@ alaMldTunnelGroupAddress OBJECT-TYPE
 alaMldTunnelHostAddress OBJECT-TYPE
     SYNTAX          InetAddressIPv6
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The IP multicast tunneled flow's IPv6 host address."
     ::= { alaMldTunnelEntry 4 }
@@ -1208,7 +1270,7 @@ alaMldTunnelHostAddress OBJECT-TYPE
 alaMldTunnelDestAddress OBJECT-TYPE
     SYNTAX          InetAddressIPv6
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The IP multicast tunneled flow's IPv6 tunnel destination address."
     ::= { alaMldTunnelEntry 5 }
@@ -1216,7 +1278,7 @@ alaMldTunnelDestAddress OBJECT-TYPE
 alaMldTunnelOrigAddress OBJECT-TYPE
     SYNTAX          InetAddressIPv6
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The IP multicast tunneled flow's IPv6 tunnel source address."
     ::= { alaMldTunnelEntry 6 }
@@ -1224,7 +1286,7 @@ alaMldTunnelOrigAddress OBJECT-TYPE
 alaMldTunnelType OBJECT-TYPE
     SYNTAX          INTEGER { mcast(1), pim(2) }
     MAX-ACCESS      read-only
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The IP multicast tunneled flow's encapsulation type."
     ::= { alaMldTunnelEntry 7 }
@@ -1232,7 +1294,7 @@ alaMldTunnelType OBJECT-TYPE
 alaMldTunnelNextDestAddress OBJECT-TYPE
     SYNTAX          InetAddressIPv6
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The IP multicast tunneled flow's next IPv6 tunnel destination address."
     ::= { alaMldTunnelEntry 8 }
@@ -1240,7 +1302,7 @@ alaMldTunnelNextDestAddress OBJECT-TYPE
 alaMldTunnelNextType OBJECT-TYPE
     SYNTAX          INTEGER { mcast(1), pim(2) }
     MAX-ACCESS      read-only
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The IP multicast tunneled flow's next encapsulation type."
     ::= { alaMldTunnelEntry 9 }
@@ -1255,7 +1317,7 @@ alaMldPort  OBJECT IDENTIFIER ::= { alcatelIND1MldMIBObjects 12 }
 alaMldPortTable OBJECT-TYPE
      SYNTAX      SEQUENCE OF AlaMldPortEntry
      MAX-ACCESS  not-accessible
-     STATUS      current
+     STATUS      deprecated
      DESCRIPTION 
        "The table listing the IPv6 Multicast port information."   
      ::= { alaMldPort 1 }
@@ -1263,7 +1325,7 @@ alaMldPortTable OBJECT-TYPE
 alaMldPortEntry OBJECT-TYPE
      SYNTAX     AlaMldPortEntry
      MAX-ACCESS not-accessible
-     STATUS     current
+     STATUS     deprecated
      DESCRIPTION 
        "An entry corresponding to IPv6 Multicast port information."
      INDEX        { 
@@ -1281,7 +1343,7 @@ AlaMldPortEntry ::=
 alaMldPortIfIndex OBJECT-TYPE
     SYNTAX          InterfaceIndex
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The IP multicast port's ifIndex."
     ::= { alaMldPortEntry 1 }
@@ -1289,7 +1351,7 @@ alaMldPortIfIndex OBJECT-TYPE
 alaMldPortMaxGroupLimit OBJECT-TYPE
     SYNTAX          Unsigned32
     MAX-ACCESS      read-write
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The maximum number of MLD Group memberships that can be learnt 
 	on the interface."
@@ -1299,7 +1361,7 @@ alaMldPortMaxGroupLimit OBJECT-TYPE
 alaMldPortMaxGroupExceedAction OBJECT-TYPE
     SYNTAX          INTEGER { none(0), drop(1), replace(2) }
     MAX-ACCESS      read-write
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The action to be taken when MLD group membership limit is 
 	exceeded for the interface."
@@ -1316,7 +1378,7 @@ alaMldPortVlan OBJECT IDENTIFIER ::= { alcatelIND1MldMIBObjects 13 }
 alaMldPortVlanTable OBJECT-TYPE
     SYNTAX          SEQUENCE OF AlaMldPortVlanEntry
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The table listing the MLD group membership limit information
 	for a port/vlan instance."
@@ -1325,7 +1387,7 @@ alaMldPortVlanTable OBJECT-TYPE
 alaMldPortVlanEntry OBJECT-TYPE
     SYNTAX          AlaMldPortVlanEntry
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "An entry corresponding to MLD group membership limit on a port/vlan."
     INDEX         { 
@@ -1344,7 +1406,7 @@ AlaMldPortVlanEntry ::= SEQUENCE {
 alaMldVlanId 	    OBJECT-TYPE
     SYNTAX          Unsigned32
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The IPv6 multicast group membership VLAN."
     ::= { alaMldPortVlanEntry 1 }
@@ -1352,7 +1414,7 @@ alaMldVlanId 	    OBJECT-TYPE
 alaMldPortVlanCurrentGroupCount OBJECT-TYPE
     SYNTAX          Unsigned32
     MAX-ACCESS      read-only
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The current IPv6 multicast group memberships on a port/vlan 
 	instance."
@@ -1361,7 +1423,7 @@ alaMldPortVlanCurrentGroupCount OBJECT-TYPE
 alaMldPortVlanMaxGroupLimit OBJECT-TYPE
     SYNTAX          Unsigned32
     MAX-ACCESS      read-only
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "Maximum MLD Group memberships on the port/vlan instance."
     ::= { alaMldPortVlanEntry 3 }
@@ -1369,7 +1431,7 @@ alaMldPortVlanMaxGroupLimit OBJECT-TYPE
 alaMldPortVlanMaxGroupExceedAction OBJECT-TYPE
     SYNTAX          INTEGER { none(0), drop(1), replace(2) }
     MAX-ACCESS      read-only
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The action to be taken when MLD group membership limit is
 	exceeded for the port/vlan instance."
@@ -1408,7 +1470,9 @@ alaMldGroup OBJECT-GROUP
               alaMldUnsolicitedReportInterval, alaMldQuerierForwarding,
               alaMldMaxGroupLimit, alaMldMaxGroupExceedAction,
               alaMldFloodUnknown, alaMldHelperAddressType,
-              alaMldHelperAddress, alaMldZeroBasedQuery }
+              alaMldHelperAddress, alaMldZeroBasedQuery, alaMldInitialPacketBuffer,
+	          alaMldInitialPacketBufferMaxPacket, alaMldInitialPacketBufferMaxFlow, 
+              alaMldInitialPacketBufferTimeout, alaMldInitialPacketBufferMinDelay  }
     STATUS          current
     DESCRIPTION
         "A collection of objects to support management of IPv6 multicast switching

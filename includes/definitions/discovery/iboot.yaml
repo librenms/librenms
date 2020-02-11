@@ -1,0 +1,66 @@
+mib: IBOOTPDU-MIB
+modules:
+    sensors:
+        pre-cache:
+            data:
+                - oid:
+                    - outletTable
+        temperature:
+            options:
+                skip_values: [999, 99999]
+            data:
+                -
+                    oid: temperature1
+                    value: temperature1
+                    num_oid: '.1.3.6.1.4.1.1418.6.6.5.{{ $index }}'
+                    index: 'temp1.{{ $index }}'
+                    descr: 'Temperature 1'
+                -
+                    oid: temperature2
+                    value: temperature2
+                    num_oid: '.1.3.6.1.4.1.1418.6.6.6.{{ $index }}'
+                    index: 'temp2.{{ $index }}'
+                    descr: 'Temperature 2'
+        current:
+            data:
+                -
+                    oid: currentLC1
+                    value: currentLC1
+                    num_oid: '.1.3.6.1.4.1.1418.6.6.2.{{ $index }}'
+                    index: 'currentLC1.{{ $index }}'
+                    descr: 'Current LC1'
+                    divisor: 100
+                -
+                    oid: currentLC2
+                    value: currentLC2
+                    num_oid: '.1.3.6.1.4.1.1418.6.6.4.{{ $index }}'
+                    index: 'currentLC2.{{ $index }}'
+                    descr: 'Current LC2'
+                    divisor: 100
+        voltage:
+            data:
+                -
+                    oid: voltageLC1
+                    value: voltageLC1
+                    num_oid: '.1.3.6.1.4.1.1418.6.6.1.{{ $index }}'
+                    index: 'voltageLC1.{{ $index }}'
+                    descr: 'Voltage LC1'
+                    divisor: 100
+                -
+                    oid: voltageLC2
+                    value: voltageLC2
+                    num_oid: '.1.3.6.1.4.1.1418.6.6.3.{{ $index }}'
+                    index: 'voltageLC2.{{ $index }}'
+                    descr: 'Voltage LC2'
+                    divisor: 100
+        state:
+            data:
+                -
+                    oid: outletTable
+                    value: outletActualStatus
+                    num_oid: '.1.3.6.1.4.1.1418.6.5.1.7.{{ $index }}'
+                    descr: '{{ $outletName }} (ID {{ $index }})'
+                    group: 'Actual Status'
+                    states:
+                        - { value: 1, generic: 0, descr: on, graph: 0 }
+                        - { value: 0, generic: 3, descr: off, graph: 0 }

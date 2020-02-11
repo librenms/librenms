@@ -59,7 +59,7 @@ class UserPreferencesController extends Controller
         $locales = $this->getValidLocales();
         $styles = $this->getValidStyles();
         $default_locale = \config('app.locale');
-        $default_style = Config::get('site_style_default', Config::get('site_style'));
+        $default_style = Config::get('site_style');
 
         $data = [
             'user' => $user,

@@ -20,17 +20,17 @@ class Msteams extends Transport
         if (!empty($this->config)) {
             $opts['url'] = $this->config['msteam-url'];
         }
-        
+
         return $this->contactMsteams($obj, $opts);
     }
 
     public function contactMsteams($obj, $opts)
     {
         $url   = $opts['url'];
-        $color = ($obj['state'] == 0 ? '#00FF00' : '#FF0000');
+
         $data  = array(
             'title' => $obj['title'],
-            'themeColor' => $color,
+            'themeColor' => self::getColorForState($obj['state']),
             'text' => strip_tags($obj['msg'], '<strong><em><h1><h2><h3><strike><ul><ol><li><pre><blockquote><a><img><p>')
         );
         $curl  = curl_init();

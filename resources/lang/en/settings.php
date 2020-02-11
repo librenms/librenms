@@ -5,6 +5,7 @@ return [
     'groups' => [
         'alerting' => 'Alerting',
         'auth' => 'Authentication',
+        'authorization' => 'Authorization',
         'external' => 'External',
         'global' => 'Global',
         'os' => 'OS',
@@ -23,8 +24,13 @@ return [
             'ad' => 'Active Directory Settings',
             'ldap' => 'LDAP Settings'
         ],
+        'authorization' => [
+            'device-group' => 'Device Group Settings'
+        ],
         'discovery' => [
-            'general' => 'General Discovery Settings'
+            'general' => 'General Discovery Settings',
+            'route' => 'Routes Discovery Module',
+            'discovery_modules' => 'Discovery Modules',
         ],
         'external' => [
             'binaries' => 'Binary Locations',
@@ -40,6 +46,7 @@ return [
             'ping' => 'Ping',
             'rrdtool' => 'RRDTool Setup',
             'snmp' => 'SNMP',
+            'poller_modules' => 'Poller Modules',
         ],
         'system' => [
             'cleanup' => 'Cleanup',
@@ -281,6 +288,10 @@ return [
             'description' => 'Use full user DN',
             'help' => "Uses a user's full DN as the value of the member attribute in a group instead of member: username using the prefix and suffix. (it’s member: uid=username,ou=groups,dc=domain,dc=com)"
         ],
+        'auth_ldap_wildcard_ou' => [
+            'description' => 'Wildcard user OU',
+            'help' => "Search for user matching user name independently of OU set in user suffix. Useful if your users are in different OU. Bind username, if set, still user suffix"
+        ],
         'auth_ldap_version' => [
             'description' => 'LDAP version',
             'help' => 'LDAP version to use to talk to the server.  Usually this should be v3',
@@ -318,6 +329,135 @@ return [
         'device_perf_purge' => [
             'description' => 'Device performance entries older than (days)',
             'help' => 'Cleanup done by daily.sh'
+        ],
+        'discovery_modules' => [
+            'arp-table' => [
+                'description' => 'ARP Table'
+            ],
+            'applications' => [
+                'description' => 'Applications'
+            ],
+            'bgp-peers' => [
+                'description' => 'BGP Peers'
+            ],
+            'cisco-cbqos' => [
+                'description' => 'Cisco CBQOS'
+            ],
+            'cisco-cef' => [
+                'description' => 'Cisco CEF'
+            ],
+            'cisco-mac-accounting' => [
+                'description' => 'Cisco MAC Accounting'
+            ],
+            'cisco-otv' => [
+                'description' => 'Cisco OTV'
+            ],
+            'cisco-qfp' => [
+                'description' => 'Cisco QFP'
+            ],
+            'cisco-sla' => [
+                'description' => 'Cisco SLA'
+            ],
+            'cisco-pw' => [
+                'description' => 'Cisco PW'
+            ],
+            'cisco-vrf-lite' => [
+                'description' => 'Cisco VRF List'
+            ],
+            'discovery-arp' => [
+                'description' => 'Discovery ARP'
+            ],
+            'discovery-protocols' => [
+                'description' => 'Discovery Protocols'
+            ],
+            'entity-physical' => [
+                'description' => 'Entity Physical'
+            ],
+            'entity-state' => [
+                'description' => 'Entity State'
+            ],
+            'fdb-table' => [
+                'description' => 'FDB Table'
+            ],
+            'hr-device' => [
+                'description' => 'HR Device'
+            ],
+            'ipv4-addresses' => [
+                'description' => 'IPv4 Addresses'
+            ],
+            'ipv6-addresses' => [
+                'description' => 'IPv6 Addresses'
+            ],
+            'junose-atm-vp' => [
+                'description' => 'Junose ATM VP'
+            ],
+            'libvirt-vminfo' => [
+                'description' => 'Libvirt VMInfo'
+            ],
+            'loadbalancers' => [
+                'description' => 'Loadbalancers'
+            ],
+            'mef' => [
+                'description' => 'MEF'
+            ],
+            'mempools' => [
+                'description' => 'Mempools'
+            ],
+            'mpls' => [
+                'description' => 'MPLS'
+            ],
+            'ntp' => [
+                'description' => 'NTP'
+            ],
+            'os' => [
+                'description' => 'OS'
+            ],
+            'ports' => [
+                'description' => 'Ports'
+            ],
+            'ports-stack' => [
+                'description' => 'Ports Stack'
+            ],
+            'processors' => [
+                'description' => 'Processors'
+            ],
+
+            'route' => [
+                'description' => 'Route'
+            ],
+
+            'sensors' => [
+                'description' => 'Sensors'
+            ],
+
+            'services' => [
+                'description' => 'Services'
+            ],
+            'storage' => [
+                'description' => 'Storage'
+            ],
+
+            'stp' => [
+                'description' => 'STP'
+            ],
+            'toner' => [
+                'description' => 'Toner'
+            ],
+            'ucd-diskio' => [
+                'description' => 'UCD DiskIO'
+            ],
+            'vlans' => [
+                'description' => 'VLans'
+            ],
+            'vmware-vminfo' => [
+                'description' => 'VMWare VMInfo'
+            ],
+            'vrf' => [
+                'description' => 'VRF'
+            ],
+            'wireless' => [
+                'description' => 'Wireless'
+            ],
         ],
         'distributed_poller' => [
             'description' => 'Enable Distributed Polling (requires additional setup)',
@@ -571,6 +711,12 @@ return [
                 'help' => 'Oxidized API url (For example: http://127.0.0.1:8888)'
             ]
         ],
+        'password' => [
+            'min_length' => [
+                'description' => 'Minimum password length',
+                'help' => 'Passwords shorter than the given length will be rejected'
+            ]
+        ],
         'peeringdb' => [
             'enabled' => [
                 'description' => 'Enable PeeringDB lookup',
@@ -581,8 +727,152 @@ return [
             'description' => 'Poller performance log entries older than (days)',
             'help' => 'Cleanup done by daily.sh'
         ],
+        'permission' => [
+            'device_group' => [
+                'allow_dynamic' => [
+                    'description' => 'Enable user access via dynamic Device Groups',
+                ]
+            ]
+        ],
         'ping' => [
             'description' => 'Path to ping'
+        ],
+        'poller_modules' => [
+            'unix-agent' => [
+                'description' => 'Unix Agent'
+            ],
+            'os' => [
+                'description' => 'OS'
+            ],
+            'ipmi' => [
+                'description' => 'IPMI'
+            ],
+            'sensors' => [
+                'description' => 'Sensors'
+            ],
+            'processors' => [
+                'description' => 'Processors'
+            ],
+            'mempools' => [
+                'description' => 'Mempools'
+            ],
+            'storage' => [
+                'description' => 'Storage'
+            ],
+            'netstats' => [
+                'description' => 'Netstats'
+            ],
+            'hr-mib' => [
+                'description' => 'HR Mib'
+            ],
+            'ucd-mib' => [
+                'description' => 'Ucd Mib'
+            ],
+            'ipSystemStats' => [
+                'description' => 'ipSystemStats'
+            ],
+            'ports' => [
+                'description' => 'Ports'
+            ],
+            'bgp-peers' => [
+                'description' => 'BGP Peers'
+            ],
+            'junose-atm-vp' => [
+                'description' => 'JunOS ATM VP'
+            ],
+            'toner' => [
+                'description' => 'Toner'
+            ],
+            'ucd-diskio' => [
+                'description' => 'UCD DiskIO'
+            ],
+            'wifi' => [
+                'description' => 'Wifi'
+            ],
+            'wireless' => [
+                'description' => 'Wireless'
+            ],
+            'ospf' => [
+                'description' => 'OSPF'
+            ],
+            'cisco-ipsec-flow-monitor' => [
+                'description' => 'Cisco IPSec flow Monitor'
+            ],
+            'cisco-remote-access-monitor' => [
+                'description' => 'Cisco remote access Monitor'
+            ],
+            'cisco-cef' => [
+                'description' => 'Cisco CEF'
+            ],
+            'cisco-sla' => [
+                'description' => 'Cisco SLA'
+            ],
+            'cisco-mac-accounting' => [
+                'description' => 'Cisco MAC Accounting'
+            ],
+            'cipsec-tunnels' => [
+                'description' => 'Cipsec Tunnels'
+            ],
+            'cisco-ace-loadbalancer' => [
+                'description' => 'Cisco ACE Loadbalancer'
+            ],
+            'cisco-ace-serverfarms' => [
+                'description' => 'Cisco ACE Serverfarms'
+            ],
+            'cisco-asa-firewall' => [
+                'description' => 'Cisco ASA Firewall'
+            ],
+            'cisco-voice' => [
+                'description' => 'Cisco Voice'
+            ],
+            'cisco-cbqos' => [
+                'description' => 'Cisco CBQOS'
+            ],
+            'cisco-otv' => [
+                'description' => 'Cisco OTV'
+            ],
+            'cisco-qfp' => [
+                'description' => 'Cisco QFP'
+            ],
+            'cisco-vpdn' => [
+                'description' => 'Cisco VPDN'
+            ],
+            'nac' => [
+                'description' => 'NAC'
+            ],
+            'netscaler-vsvr' => [
+                'description' => 'Netscaler VSVR'
+            ],
+            'aruba-controller' => [
+                'description' => 'Aruba Controller'
+            ],
+            'entity-physical' => [
+                'description' => 'Entity Physical'
+            ],
+            'entity-state' => [
+                'description' => 'Entity State'
+            ],
+            'applications' => [
+                'description' => 'Applications'
+            ],
+            'mib' => [
+                'description' => 'MIB'
+            ],
+            'stp' => [
+                'description' => 'STP'
+            ],
+            'ntp' => [
+                'description' => 'NTP'
+            ],
+            'loadbalancers' => [
+                'description' => 'Loadbalancers'
+            ],
+            'mef' => [
+                'description' => 'MEF'
+            ],
+            'mpls' => [
+                'description' => 'MPLS'
+            ],
         ],
         'ports_fdb_purge' => [
             'description' => 'Port FDB entries older than',
@@ -595,6 +885,14 @@ return [
         'public_status' => [
             'description' => 'Show status publicly',
             'help' => 'Shows the status of some devices on the logon page without authentication.'
+        ],
+        'routes_max_number' => [
+            'description' => 'Max number of routes allowed for discovery',
+            'help' => 'No route will be discovered if the size of the routing table is bigger than this number'
+        ],
+        'route_purge' => [
+            'description' => 'Route entries older than (days)',
+            'help' => 'Cleanup done by daily.sh'
         ],
         'rrd' => [
             'heartbeat' => [
@@ -631,8 +929,8 @@ return [
             'description' => 'Path to sfdp'
         ],
         'shorthost_target_length' => [
-            'description' => 'shortend hostname maximum length',
-            'help' => 'shrinks hostname to maximum length, but always complete subdomain parts'
+            'description' => 'Shortened hostname maximum length',
+            'help' => 'Shrinks hostname to maximum length, but always complete subdomain parts'
         ],
         'site_style' => [
             'description' => 'Set the site css style',

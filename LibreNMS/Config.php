@@ -419,7 +419,8 @@ class Config
             self::set('email_from', '"' . self::get('project_name') . '" <' . self::get('email_user') . '@' . php_uname('n') . '>');
         }
 
-            // Define some variables if they aren't set by user definition in config_definitions.json
+        // Define some variables if they aren't set by user definition in config_definitions.json
+        self::set('applied_site_style', self::get('site_style'));
         self::setDefault('html_dir', '%s/html', ['install_dir']);
         self::setDefault('rrd_dir', '%s/rrd', ['install_dir']);
         self::setDefault('mib_dir', '%s/mibs', ['install_dir']);

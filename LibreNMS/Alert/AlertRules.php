@@ -44,7 +44,16 @@ class AlertRules
 
         //Check to see if under maintenance
         if (AlertUtil::isMaintenance($device_id) > 0) {
-            echo "Under Maintenance, Skipping alerts.\r\n";
+            echo "Under Maintenance, skipping alert rules check.\r\n";
+            return false;
+        }
+        //Check to see if disable alerting is set
+        if (AlertUtil::hasDisableNotify($device_id)) {
+            echo "Disable alerting is set, Clearing active alerts and skipping alert rules check\r\n";
+            $device_alert['state'] = 0;
+            $device_alert['alerted'] = 0;
+            $device_alert['open'] = 0;
+            dbUpdate($device_alert, 'alerts', '`device_id` = ?', array($device_id));
             return false;
         }
         //Checks each rule.
@@ -103,7 +112,7 @@ class AlertRules
                         if (is_null($current_state)) {
                             dbInsert(array('state' => 1, 'device_id' => $device_id, 'rule_id' => $rule['id'], 'open' => 1,'alerted' => 0), 'alerts');
                         } else {
-                            dbUpdate(['state' => 1, 'open' => 1], 'alerts', 'device_id = ? && rule_id = ?', [$device_id, $rule['id']]);
+                            dbUpdate(['state' => 1, 'open' => 1, 'timestamp' => array('NOW()')], 'alerts', 'device_id = ? && rule_id = ?', [$device_id, $rule['id']]);
                         }
                         c_echo(PHP_EOL . 'Status: %rALERT');
                     }
@@ -116,7 +125,7 @@ class AlertRules
                         if (is_null($current_state)) {
                             dbInsert(['state' => 0, 'device_id' => $device_id, 'rule_id' => $rule['id'], 'open' => 1, 'alerted' => 0], 'alerts');
                         } else {
-                            dbUpdate(['state' => 0, 'open' => 1, 'note' => ''], 'alerts', 'device_id = ? && rule_id = ?', [$device_id, $rule['id']]);
+                            dbUpdate(['state' => 0, 'open' => 1, 'note' => '', 'timestamp' => array('NOW()')], 'alerts', 'device_id = ? && rule_id = ?', [$device_id, $rule['id']]);
                         }
 
                         c_echo(PHP_EOL . 'Status: %gOK');

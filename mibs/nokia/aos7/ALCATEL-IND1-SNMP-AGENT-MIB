@@ -13,7 +13,7 @@ IMPORTS
 
 
 alcatelIND1SNMPAgentMIB  MODULE-IDENTITY
-        LAST-UPDATED  "200704030000Z"
+        LAST-UPDATED  "201407150000Z"
         ORGANIZATION "Alcatel-Lucent"
         CONTACT-INFO
             "Please consult with Customer Service to ensure the most appropriate
@@ -55,7 +55,7 @@ alcatelIND1SNMPAgentMIB  MODULE-IDENTITY
                          Copyright (C) 1995-2007 Alcatel-Lucent
                              ALL RIGHTS RESERVED WORLDWIDE"
 
-        REVISION      "200704030000Z"
+        REVISION      "201407150000Z"
         DESCRIPTION
             "Addressing discrepancies with Alcatel Standard."
         ::= { softentIND1SnmpAgt 1 }
@@ -162,22 +162,28 @@ snmpAgtCommunityMode OBJECT-TYPE
              noLoopback0 (2),
              ipInterface (3)
        }
-       MAX-ACCESS read-write
-       STATUS        current
+       MAX-ACCESS read-only
+       STATUS        deprecated
        DESCRIPTION
               "The SNMP Agent Configuration
               1 -- Default(Loopback0 or closest IP)
               2 -- No Loopback0
-              3 -- Interface IP Specified by User"
+              3 -- Interface IP Specified by User
+              NOTE: this configuration option has been deprecated.
+              Please see alaIpServiceSourceIpTable for SNMP Source
+              IP Preferred Configuration (in ALCATEL-IND1-IP-MIB)."
        DEFVAL        { default }
        ::= {  alcatelIND1SNMPAgentMIBObjects 4 }
 
       snmpAgtSourceIp  OBJECT-TYPE
         SYNTAX     IpAddress
-        MAX-ACCESS read-write
-        STATUS        current
+        MAX-ACCESS read-only
+        STATUS        deprecated
         DESCRIPTION
-               "The Source IP of SNMP Packets"
+               "The Source IP of SNMP Packets.
+               NOTE: this configuration option has been deprecated.
+               Please see alaIpServiceSourceIpTable for SNMP Source
+               IP Preferred Configuration (in ALCATEL-IND1-IP-MIB)."
         ::= {  alcatelIND1SNMPAgentMIBObjects 5 }
 
 --

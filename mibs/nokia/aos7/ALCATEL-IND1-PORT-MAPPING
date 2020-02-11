@@ -109,6 +109,8 @@ PMapSessionEntry ::= SEQUENCE {
         pmapSessionRowStatus
                 RowStatus,
         pmapSessionUnknownUnicastFloodStatus
+                INTEGER,
+        pmapSessionDynProxyARP
                 INTEGER
         }
 
@@ -168,6 +170,17 @@ pmapSessionUnknownUnicastFloodStatus  OBJECT-TYPE
                 "To enable or disable unknown unicast flooding from network port to user ports for this session."
         DEFVAL  { enable }
         ::= { pmapSessionEntry 5 }
+
+pmapSessionDynProxyARP OBJECT-TYPE
+        SYNTAX        INTEGER {
+                      disable(1),
+		              enable(2)
+        }
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION   "Enables/disables Dynamic proxy ARP on the port mapping session."
+        DEFVAL		{ disable }
+        ::= { pmapSessionEntry 6}
 
 
 -- xxxxxxxxxxxxxxxxxxx
@@ -249,7 +262,8 @@ pmapSessionTableGroup OBJECT-GROUP
       pmapSessionStatus,
       pmapSessionDirection,
       pmapSessionRowStatus,
-      pmapSessionUnknownUnicastFloodStatus
+      pmapSessionUnknownUnicastFloodStatus,
+      pmapSessionDynProxyARP
    }
    STATUS      current
    DESCRIPTION
