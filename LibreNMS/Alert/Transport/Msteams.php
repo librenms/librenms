@@ -27,7 +27,6 @@ class Msteams extends Transport
     public function contactMsteams($obj, $opts)
     {
         $url   = $opts['url'];
-
         $data  = array(
             'title' => $obj['title'],
             'themeColor' => self::getColorForState($obj['state']),
@@ -41,14 +40,12 @@ class Msteams extends Transport
             'Content-type' => 'application/json',
             'Expect:'
         ));
+        curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
         if ($this->config['use-json'] === 'on') {
             curl_setopt($curl, CURLOPT_POSTFIELDS, $obj['msg']);
-        } else {
-            curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
         }
         $ret  = curl_exec($curl);
         $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-
         if ($code != 200) {
             var_dump("Microsoft Teams returned Error, retry later");
             return false;
@@ -69,7 +66,7 @@ class Msteams extends Transport
                 [
                     'title' => 'Use JSON?',
                     'name' => 'use-json',
-                    'descr' => 'Construct MessageCard with JSON directly rather than Markdown formatted text',
+                    'descr' => 'Compose MessageCard with JSON rather than Markdown',
                     'type' => 'checkbox',
                     'default' => false,
                 ]
