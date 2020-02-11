@@ -988,7 +988,15 @@ function list_alerts(\Illuminate\Http\Request $request)
     }
 
     $order = 'timestamp desc';
-
+    
+    $alert_rule = $request->get('alert_rule');
+    if (isset($alert_rule)) {
+        if (is_numeric($alert_rule)) {
+            $param[] = $alert_rule;
+            $sql .= ' AND `R`.id=?';
+        }
+    }
+    
     if ($request->has('order')) {
         list($sort_column, $sort_order) = explode(' ', $request->get('order'), 2);
         if (($res = validate_column_list($sort_column, 'alerts')) !== true) {
