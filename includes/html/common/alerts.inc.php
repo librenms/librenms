@@ -46,6 +46,7 @@ if (defined('SHOW_SETTINGS')) {
 
     $common_output[] = '
 <form class="form" onsubmit="widget_settings(this); return false;">
+  ' . csrf_field() . '
   <div class="form-group row">
     <div class="col-sm-4">
       <label for="acknowledged" class="control-label">Show acknowledged alerts: </label>
@@ -229,6 +230,7 @@ if (defined('SHOW_SETTINGS')) {
                 <th data-column-id="rule">Rule</th>
                 <th data-column-id="details" data-sortable="false"></th>
                 <th data-column-id="hostname">Hostname</th>
+                <th data-column-id="location">Location</th>
                 <th data-column-id="ack_ico" data-sortable="false">ACK</th>
                 <th data-column-id="notes" data-sortable="false">Notes</th>';
 

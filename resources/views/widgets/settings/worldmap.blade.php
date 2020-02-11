@@ -19,11 +19,7 @@
 
     <div class="form-group">
         <label for="init_zoom-{{ $id }}" class="control-label">@lang('Initial Zoom')</label>
-        <select class="form-control" name="init_zoom" id="init_zoom-{{ $id }}">
-            @foreach(range(0, 18) as $zoom)
-                <option value="{{ $zoom }}" @if($zoom == $init_zoom) selected @endif>{{ $zoom }}</option>
-            @endforeach
-        </select>
+        <input class="form-control" name="init_zoom" id="init_zoom-{{ $id }}" type="number" min="0" max="18" step="0.1" value="{{ $init_zoom }}" placeholder="@lang('ie. 5.8')">
     </div>
 
     <div class="form-group">
@@ -39,4 +35,19 @@
             <option value="0" @if($status == '0') selected @endif>@lang('Down')</option>
         </select>
     </div>
+
+    <div class="form-group">
+        <label for="device_group-{{ $id }}" class="control-label">@lang('Device group')</label>
+        <select class="form-control" name="device_group" id="device_group-{{ $id }}" data-placeholder="@lang('All Devices')">
+            @if($device_group)
+                <option value="{{ $device_group->id }}" selected>{{ $device_group->name }}</option>
+            @endif
+        </select>
+    </div>
+@endsection
+
+@section('javascript')
+    <script type="text/javascript">
+        init_select2('#device_group-{{ $id }}', 'device-group', {});
+    </script>
 @endsection

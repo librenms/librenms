@@ -23,9 +23,7 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-use LibreNMS\Authentication\LegacyAuth;
-
-if (!LegacyAuth::user()->hasGlobalRead()) {
+if (!Auth::user()->hasGlobalRead()) {
     return [];
 }
 
@@ -52,7 +50,7 @@ if (!empty($_REQUEST['limit'])) {
 }
 
 
-$sql = "SELECT `id`, `name` AS `text` FROM `device_groups` $query";
+$sql = "SELECT `id`, `name` AS `text` FROM `device_groups` $query order by `name`";
 $groups = dbFetchRows($sql, $params);
 
 $more = ($offset + count($groups)) < $total;

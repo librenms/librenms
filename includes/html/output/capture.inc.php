@@ -23,9 +23,7 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-use LibreNMS\Authentication\LegacyAuth;
-
-if (!LegacyAuth::user()->hasGlobalAdmin()) {
+if (!Auth::user()->hasGlobalAdmin()) {
     echo("Insufficient Privileges");
     exit();
 }
@@ -56,6 +54,8 @@ switch ($type) {
 
 // ---- Output ----
 $proc = new \Symfony\Component\Process\Process($cmd);
+$proc->setTimeout(Config::get('snmp.exec_timeout', 1200));
+
 if ($_GET['format'] == 'text') {
     header("Content-type: text/plain");
     header('X-Accel-Buffering: no');

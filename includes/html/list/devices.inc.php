@@ -23,16 +23,14 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-use LibreNMS\Authentication\LegacyAuth;
-
 $query = '';
 $where = [];
 $params = [];
 
-if (!LegacyAuth::user()->hasGlobalRead()) {
-    $query .= ' LEFT JOIN `devices_perms` USING (`device_id`)';
-    $where = '`devices_perms`.`user_id`=?';
-    $params[] = LegacyAuth::id();
+if (!Auth::user()->hasGlobalRead()) {
+    $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
+    $where[] = " `devices`.`device_id` IN " .dbGenPlaceholders(count($device_ids));
+    $params = array_merge($params, $device_ids);
 }
 
 if (!empty($_REQUEST['search'])) {
@@ -69,5 +67,7 @@ $devices = array_map(function ($device) {
 }, dbFetchRows($sql, $params));
 
 $more = ($offset + count($devices)) < $total;
+
+array_multisort(array_column($devices, 'text'), SORT_ASC, $devices);
 
 return [$devices, $more];

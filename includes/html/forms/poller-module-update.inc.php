@@ -1,10 +1,8 @@
 <?php
 
-use LibreNMS\Authentication\LegacyAuth;
-
 header('Content-type: text/plain');
 
-if (!LegacyAuth::user()->hasGlobalAdmin()) {
+if (!Auth::user()->hasGlobalAdmin()) {
     die('ERROR: You need to be admin');
 }
 

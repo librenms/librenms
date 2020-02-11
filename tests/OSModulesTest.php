@@ -25,12 +25,35 @@
 
 namespace LibreNMS\Tests;
 
+use DeviceCache;
+use LibreNMS\Config;
 use LibreNMS\Exceptions\FileNotFoundException;
 use LibreNMS\Exceptions\InvalidModuleException;
 use LibreNMS\Util\ModuleTestHelper;
 
 class OSModulesTest extends DBTestCase
 {
+    private $discoveryModules;
+    private $pollerModules;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        // backup modules
+        $this->discoveryModules = Config::get('discovery_modules');
+        $this->pollerModules = Config::get('poller_modules');
+    }
+
+    public function tearDown(): void
+    {
+        // restore modules
+        Config::set('discovery_modules', $this->discoveryModules);
+        Config::set('poller_modules', $this->pollerModules);
+
+        parent::tearDown();
+    }
+
     /**
      * Test all modules for a particular OS
      *
@@ -59,16 +82,15 @@ class OSModulesTest extends DBTestCase
     public function testOS($os, $variant, $modules)
     {
         $this->requireSnmpsim();  // require snmpsim for tests
-        global $snmpsim;
-        load_all_os(); // wiped out by application refresh
 
         try {
+            set_debug(false); // avoid all undefined index errors in the legacy code
             $helper = new ModuleTestHelper($modules, $os, $variant);
             $helper->setQuiet();
 
             $filename = $helper->getJsonFilepath(true);
             $expected_data = $helper->getTestData();
-            $results = $helper->generateTestData($snmpsim, true);
+            $results = $helper->generateTestData($this->getSnmpsim(), true);
         } catch (FileNotFoundException $e) {
             $this->fail($e->getMessage());
             return;
@@ -111,6 +133,8 @@ class OSModulesTest extends DBTestCase
                 . "\nOS $os: Polled $module data does not match that found in $filename"
             );
         }
+
+        DeviceCache::flush(); // clear cached devices
     }
 
     public function dumpedDataProvider()

@@ -231,8 +231,16 @@ class ThreadingLock(Lock):
 class RedisLock(Lock):
     def __init__(self, namespace='lock', **redis_kwargs):
         import redis
+        from redis.sentinel import Sentinel
         redis_kwargs['decode_responses'] = True
-        self._redis = redis.Redis(**redis_kwargs)
+        if redis_kwargs.get('sentinel') and redis_kwargs.get('sentinel_service'):
+            sentinels = [tuple(l.split(':')) for l in redis_kwargs.pop('sentinel').split(',')]
+            sentinel_service = redis_kwargs.pop('sentinel_service')
+            kwargs = {k: v for k, v in redis_kwargs.items() if k in ["decode_responses", "password", "db"]}
+            self._redis = Sentinel(sentinels, **kwargs).master_for(sentinel_service)
+        else:
+            kwargs = {k: v for k, v in redis_kwargs.items() if "sentinel" not in k}
+            self._redis = redis.Redis(**kwargs)
         self._redis.ping()
         self._namespace = namespace
 
@@ -284,8 +292,16 @@ class RedisLock(Lock):
 class RedisUniqueQueue(object):
     def __init__(self, name, namespace='queue', **redis_kwargs):
         import redis
+        from redis.sentinel import Sentinel
         redis_kwargs['decode_responses'] = True
-        self._redis = redis.Redis(**redis_kwargs)
+        if redis_kwargs.get('sentinel') and redis_kwargs.get('sentinel_service'):
+            sentinels = [tuple(l.split(':')) for l in redis_kwargs.pop('sentinel').split(',')]
+            sentinel_service = redis_kwargs.pop('sentinel_service')
+            kwargs = {k: v for k, v in redis_kwargs.items() if k in ["decode_responses", "password", "db"]}
+            self._redis = Sentinel(sentinels, **kwargs).master_for(sentinel_service)
+        else:
+            kwargs = {k: v for k, v in redis_kwargs.items() if "sentinel" not in k}
+            self._redis = redis.Redis(**kwargs)
         self._redis.ping()
         self.key = "{}:{}".format(namespace, name)
 

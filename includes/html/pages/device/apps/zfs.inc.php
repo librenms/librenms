@@ -50,7 +50,7 @@ if (!isset($vars['pool'])) {
 } else {
     $graphs = array(
         'zfs_pool_space'=>'Pool Space',
-        'zfs_pool_cap'=>'Pool Capcity',
+        'zfs_pool_cap'=>'Pool Capacity',
         'zfs_pool_frag'=>'Pool Fragmentation',
     );
 }

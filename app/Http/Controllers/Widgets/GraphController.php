@@ -105,7 +105,7 @@ class GraphController extends WidgetController
 
     public function getSettingsView(Request $request)
     {
-        $data = $this->getSettings();
+        $data = $this->getSettings(true);
 
         // format display name for selected graph type
         $type_parts = explode('_', $data['graph_type']);
@@ -249,7 +249,7 @@ class GraphController extends WidgetController
         return false; // non-custom aggregate types require no additional settings
     }
 
-    public function getSettings()
+    public function getSettings($settingsView = false)
     {
         if (is_null($this->settings)) {
             $id = \Request::get('id');

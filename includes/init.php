@@ -66,7 +66,7 @@ require_once $install_dir . '/includes/billing.php';
 require_once $install_dir . '/includes/syslog.php';
 if (module_selected('mocksnmp', $init_modules)) {
     require_once $install_dir . '/tests/mocks/mock.snmp.inc.php';
-} else {
+} elseif (!in_array($install_dir . '/tests/mocks/mock.snmp.inc.php', get_included_files())) {
     require_once $install_dir . '/includes/snmp.inc.php';
 }
 require_once $install_dir . '/includes/services.inc.php';
@@ -86,7 +86,7 @@ if (module_selected('polling', $init_modules)) {
 }
 
 if (module_selected('alerts', $init_modules)) {
-    require_once $install_dir . '/includes/alerts.inc.php';
+    require_once $install_dir . '/LibreNMS/Alert/RunAlerts.php';
 }
 
 // Boot Laravel

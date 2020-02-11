@@ -29,6 +29,7 @@ use DateTime;
 use DateTimeZone;
 use Exception;
 use LibreNMS\Config;
+use LibreNMS\Util\Env;
 use LibreNMS\Util\Git;
 use LibreNMS\ValidationResult;
 use LibreNMS\Validator;
@@ -37,6 +38,11 @@ class Updates extends BaseValidation
 {
     public function validate(Validator $validator)
     {
+        if (Env::librenmsDocker()) {
+            $validator->warn('Updates are managed through the official Docker image');
+            return;
+        }
+
         if (!Git::repoPresent()) {
             $validator->warn('Non-git install, updates are manual or from package');
             return;

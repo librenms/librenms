@@ -1,0 +1,107 @@
+{
+    "$schema": "http://json-schema.org/schema#",
+    "type": "object",
+    "properties": {
+        "Warning!": {
+            "type": "string"
+        },
+        "config": {
+            "type": "object",
+            "propertyNames": {
+                "pattern": "^[a-zA-Z0-9_.\\-]+$"
+            },
+            "additionalProperties": {
+                "type": "object",
+                "properties": {
+                    "default": {},
+                    "type": {
+                        "type": "string"
+                    },
+                    "section": {
+                        "type": "string"
+                    },
+                    "group": {
+                        "type": "string"
+                    },
+                    "order": {
+                        "type": "integer"
+                    },
+                    "options": {
+                        "type": "object",
+                        "minProperties": 2
+                    },
+                    "units": {
+                        "type": "string"
+                    },
+                    "validate": {
+                        "propertyNames": {
+                            "pattern": "^value",
+                            "type": "string"
+                        }
+                    },
+                    "when": {
+                        "properties": {
+                            "setting": {
+                                "type": "string"
+                            },
+                            "operator": {
+                                "type": "string",
+                                "enum": [
+                                    "equals",
+                                    "in"
+                                ]
+                            },
+                            "value": {
+                                "type": ["string", "array"]
+                            }
+                        }
+                    },
+                    "disabled": {
+                        "type": "boolean"
+                    },
+                    "hidden": {
+                        "type": "boolean"
+                    }
+                },
+                "required": ["type"],
+                "additionalProperties": false,
+                "anyOf": [
+                    {
+                        "properties": { "type": {"const": "select"} },
+                        "required": ["options"]
+                    },
+                    {
+                        "properties": {
+                            "type": {
+                                "type": "string",
+                                "enum": [
+                                    "integer",
+                                    "text",
+                                    "boolean",
+                                    "array",
+                                    "password",
+                                    "email",
+                                    "color",
+                                    "float",
+                                    "graph",
+                                    "dashboard-select",
+                                    "snmp3auth",
+                                    "ldap-groups",
+                                    "ad-groups"
+                                ]
+                            }
+                        },
+                        "not": { "required": ["options"]}
+                    }
+                ],
+                "dependencies": {
+                    "group": { "required": ["order", "section"] },
+                    "order": { "required": ["group", "section"] },
+                    "section": { "required": ["group", "order"] }
+                }
+            }
+        }
+    },
+    "required": ["Warning!", "config"],
+    "additionalProperties": false
+}

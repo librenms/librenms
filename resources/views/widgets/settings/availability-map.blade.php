@@ -56,9 +56,9 @@
 
     <div class="form-group">
         <label for="device_group-{{ $id }}" class="control-label">@lang('Device group')</label>
-        <select class="form-control" name="device_group" id="device_group-{{ $id }}"  data-placeholder="@lang('All Devices')">
+        <select class="form-control" name="device_group" id="device_group-{{ $id }}" data-placeholder="@lang('All Devices')">
             @if($device_group)
-                <option value="{{ $device_group->id }}" selected> {{ $device_group->name }} </option>
+                <option value="{{ $device_group->id }}" selected>{{ $device_group->name }}</option>
             @endif
         </select>
     </div>
@@ -66,7 +66,7 @@
 
 @section('javascript')
     <script type="text/javascript">
-        init_select2('#device_group-{{ $id }}', 'device-group', {}, '{{ $device_group ? $device_group->id : '' }}');
+        init_select2('#device_group-{{ $id }}', 'device-group', {});
 
         function toggle_availability_type(el, id) {
             console.log(el.value);

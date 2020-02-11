@@ -2,12 +2,11 @@
 
 use App\Models\Device;
 use App\Models\Location;
-use LibreNMS\Authentication\LegacyAuth;
 
 $device_model = Device::find($device['device_id']);
 
 if ($_POST['editing']) {
-    if (LegacyAuth::user()->hasGlobalAdmin()) {
+    if (Auth::user()->hasGlobalAdmin()) {
         if (isset($_POST['parent_id'])) {
             $parents = array_diff((array)$_POST['parent_id'], ['0']);
             // TODO avoid loops!
@@ -48,7 +47,7 @@ if ($_POST['editing']) {
         }
 
         if (isset($_POST['hostname']) && $_POST['hostname'] !== '' && $_POST['hostname'] !== $device['hostname']) {
-            if (LegacyAuth::user()->hasGlobalAdmin()) {
+            if (Auth::user()->hasGlobalAdmin()) {
                 $result = renamehost($device['device_id'], $_POST['hostname'], 'webui');
                 if ($result == "") {
                     Toastr::success("Hostname updated from {$device['hostname']} to {$_POST['hostname']}");
@@ -75,6 +74,7 @@ if ($_POST['editing']) {
 <div class="row">
     <div class="col-md-1 col-md-offset-2">
         <form id="delete_host" name="delete_host" method="post" action="delhost/" role="form">
+            <?php echo csrf_field() ?>
             <input type="hidden" name="id" value="<?php echo($device['device_id']); ?>">
             <button type="submit" class="btn btn-danger" name="Submit"><i class="fa fa-trash"></i> Delete device</button>
         </form>
@@ -91,6 +91,7 @@ if ($_POST['editing']) {
 </div>
 <br>
 <form id="edit" name="edit" method="post" action="" role="form" class="form-horizontal">
+<?php echo csrf_field() ?>
 <input type=hidden name="editing" value="yes">
     <div class="form-group" data-toggle="tooltip" data-container="body" data-placement="bottom" title="Change the hostname used for name resolution" >
         <label for="edit-hostname-input" class="col-sm-2 control-label" >Hostname:</label>
@@ -132,7 +133,7 @@ if ($_POST['editing']) {
     <div class="form-group">
         <label for="sysLocation" class="col-sm-2 control-label">Override sysLocation:</label>
         <div class="col-sm-6">
-          <input onclick="edit.sysLocation.disabled=!edit.override_sysLocation.checked; edit.sysLocation.select()" type="checkbox" name="override_sysLocation"
+          <input onChange="edit.sysLocation.disabled=!edit.override_sysLocation.checked; edit.sysLocation.select()" type="checkbox" name="override_sysLocation" data-size="small"
                 <?php
                 if ($device_model->override_sysLocation) {
                     echo(' checked="1"');
@@ -148,7 +149,7 @@ if ($_POST['editing']) {
                 if (!$device_model->override_sysLocation) {
                     echo(' disabled="1"');
                 }
-                ?> value="<?php echo display($device_model->location->location); ?>" />
+                ?> value="<?php echo display($device_model->location); ?>" />
         </div>
     </div>
     <div class="form-group">
@@ -179,9 +180,9 @@ if ($_POST['editing']) {
         </div>
     </div>
     <div class="form-group">
-        <label for="disabled" class="col-sm-2 control-label">Disable:</label>
+        <label for="disabled" class="col-sm-2 control-label">Disable polling:</label>
         <div class="col-sm-6">
-          <input name="disabled" type="checkbox" id="disabled" value="1"
+          <input name="disabled" type="checkbox" id="disabled" value="1" data-size="small"
                 <?php
                 if ($device_model->disabled) {
                     echo("checked=checked");
@@ -190,9 +191,9 @@ if ($_POST['editing']) {
         </div>
     </div>
     <div class="form-group">
-        <label for="ignore" class="col-sm-2 control-label">Ignore</label>
+        <label for="ignore" class="col-sm-2 control-label">Ignore alerts:</label>
         <div class="col-sm-6">
-           <input name="ignore" type="checkbox" id="ignore" value="1"
+           <input name="ignore" type="checkbox" id="ignore" value="1" data-size="small"
                 <?php
                 if ($device_model->ignore) {
                     echo("checked=checked");
@@ -208,6 +209,8 @@ if ($_POST['editing']) {
 </form>
 <br />
 <script>
+    $('[type="checkbox"]').bootstrapSwitch();
+
     $("#rediscover").click(function() {
         var device_id = $(this).data("device_id");
         $.ajax({
@@ -251,4 +254,11 @@ print_optionbar_start();
 list($sizeondisk, $numrrds) = foldersize(get_rrd_dir($device['hostname']));
 echo("Size on Disk: <b>" . formatStorage($sizeondisk) . "</b> in <b>" . $numrrds . " RRD files</b>.");
 print_optionbar_end();
+
+echo("<small>");
+echo("Last polled: <b>" . $device['last_polled'] . "</b>");
+if ($device['last_discovered']) {
+    echo("<br>Last discovered: <b>" . $device['last_discovered'] . "</b>");
+}
+echo("</small>");
 ?>

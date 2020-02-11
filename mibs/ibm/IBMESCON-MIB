@@ -1,0 +1,510 @@
+-- MIB created 11/13/98 22:12:30, by
+--   SMIC (the next generation) version 1.6.29, November 22, 1994.
+
+IBMESCON-MIB DEFINITIONS ::= BEGIN
+
+-- From file: "ibmescon.mi2"
+-- Compile options "G A T M"
+
+IMPORTS
+    enterprises, Counter32, Integer32, IpAddress
+            FROM SNMPv2-SMI-v1
+    OBJECT-TYPE
+            FROM RFC-1212
+    MacAddress
+            FROM SNMPv2-TC-v1
+    ifIndex
+            FROM RFC1213-MIB;
+
+ibmESCON OBJECT IDENTIFIER ::= { ibmArchitecture 17 }
+-- MODULE-IDENTITY
+--  LastUpdated
+--    9702241200Z
+--  OrgName
+--    IBM
+--  ContactInfo
+--    Bob Moore (remoore @ ralvm6)
+--     IBM Corporation
+--     800 Park Offices Drive
+--     CNMA/664
+--     P.O. Box 12195
+--     Research Triangle Park, NC 27709, USA
+--     Tel:    1 919 254 4436
+--     E-mail: remoore@ralvm6.vnet.ibm.com
+--    
+--     John Rooney (rooney @ yktvmv)
+--    
+--     Valerie Zoccola (zoccolav @ lgeprofs)
+--  Descr
+--    MIB for managing activity on an ESCON channel from its
+--    secondary end.
+--    
+--    'ESCON' is a trademark of the IBM Corporation.
+
+ibm             OBJECT IDENTIFIER ::= { enterprises 2 }
+ibmArchitecture OBJECT IDENTIFIER ::= { ibm 5 }
+esconPortData   OBJECT IDENTIFIER ::= { ibmESCON 1 }
+esconLinkData   OBJECT IDENTIFIER ::= { ibmESCON 2 }
+esconStationData OBJECT IDENTIFIER ::= { ibmESCON 3 }
+esconConformance OBJECT IDENTIFIER ::= { ibmESCON 4 }
+esconMibCompliances OBJECT IDENTIFIER ::= { esconConformance 1 }
+esconMibGroups  OBJECT IDENTIFIER ::= { esconConformance 2 }
+
+esconPortTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF EsconPortEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Table of objects that describe an ESCON channel port."
+    ::= { esconPortData 1 }
+
+esconPortEntry OBJECT-TYPE
+    SYNTAX EsconPortEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Table of objects that describe an ESCON channel port.  This
+        table is indexed by ifIndex from MIB-II."
+    INDEX { ifIndex }
+    ::= { esconPortTable 1 }
+
+EsconPortEntry ::= SEQUENCE {
+    esconPortControlUnitLinkAddress OCTET STRING,
+    esconPortInFiberStatus INTEGER,
+    esconPortOutFiberStatus INTEGER
+    }
+
+esconPortControlUnitLinkAddress OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE(2))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "This address identifies the ESCON Director port to which the
+        optical fiber from the ESCON device is attached."
+    ::= { esconPortEntry 1 }
+
+esconPortInFiberStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+        inLoff(1),
+        inOls(2),
+        inIdle(3),
+        inUnknown(4)
+        }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Status of the fiber into this device from the host:
+        
+               inLoff       = the light is off on the fiber into
+                              this device from the host
+               inOls        = the fiber into this device from the
+                              host is in an intermediate state between
+                              light-off and light-on
+               inIdle       = the fiber into this device from the
+                              host is in the light-on state, and is
+                              ready to transfer data from the host to
+                              this device
+               inUnknown    = the agent cannot determine the status of
+                              the fiber into this device from the host"
+    ::= { esconPortEntry 2 }
+
+esconPortOutFiberStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+        outDisableReq(1),
+        outDisableForced(2),
+        outLoffForced(3),
+        outOls(4),
+        outOlsForced(5),
+        outEnable(6),
+        outError(7)
+        }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Status of the fiber out of this device to the host:
+        
+               outDisableReq    = out disable obtained; the fiber
+                                  out of this device into the host
+                                  is not in the light-on state
+               outDisableForced = out ESCON emits OLS; the fiber
+                                  out of this device into the host
+                                  is not in the light-on state
+               outLoffForced    = out ESCON forced light-off; the fiber
+                                  out of this device into the host
+                                  is not in the light-on state
+               outOls           = the fiber out of this device into the
+                                  host is in an intermediate state
+                                  between light-off and light-on
+               outOlsforced     = out ESCON forced OLS; the fiber
+                                  out of this device into the host
+                                  is not in the light-on state
+               outEnable        = the fiber out of this device into the
+                                  host is in the light-on state, and is
+                                  ready to transfer data from this
+                                  device to the host
+               outError         = the status of the fiber out of this
+                                  device to the host is none of those
+                                  listed above.  This is a state that
+                                  should not occur"
+    ::= { esconPortEntry 3 }
+
+esconLinkTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF EsconLinkEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Table of objects that describe an ESCON channel link."
+    ::= { esconLinkData 1 }
+
+esconLinkEntry OBJECT-TYPE
+    SYNTAX EsconLinkEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Table of objects that describe an ESCON channel link.  This
+        table is indexed by ifIndex from MIB-II, by host link address,
+        and by (host) partition number."
+    INDEX { ifIndex, esconLinkHostLinkAddress, esconLinkPartitionNumber }
+    ::= { esconLinkTable 1 }
+
+EsconLinkEntry ::= SEQUENCE {
+    esconLinkHostLinkAddress OCTET STRING,
+    esconLinkPartitionNumber OCTET STRING,
+    esconLinkStatus INTEGER
+    }
+
+esconLinkHostLinkAddress OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE(1))
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "This address identifies the ESCON Director port to which the
+        optical fiber between the ESCON Director and the host is
+        attached."
+    ::= { esconLinkEntry 1 }
+
+esconLinkPartitionNumber OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE(1))
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "A number identifying a logical host within an actual host."
+    ::= { esconLinkEntry 2 }
+
+esconLinkStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+        hlpNotEstab(1),
+        hlpEstab(2),
+        hlpError(3)
+        }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Gives the status of the link:
+        
+               hlpNotEstab = Host Logical Path not established
+               hlpEstab = Host Logical Path established
+               hlpError = Host Logical Path error"
+    ::= { esconLinkEntry 3 }
+
+esconStationTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF EsconStationEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Table of objects that describe an ESCON channel station."
+    ::= { esconStationData 1 }
+
+esconStationEntry OBJECT-TYPE
+    SYNTAX EsconStationEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Table of objects that describe an ESCON channel station.  This
+        table is indexed by ifIndex from MIB-II, by host link address,
+        by (host) partition number, and by ESCON device address."
+    INDEX { ifIndex, esconStationHostLinkAddress, esconStationPartitionNumber, esconStationDeviceAddress }
+    ::= { esconStationTable 1 }
+
+EsconStationEntry ::= SEQUENCE {
+    esconStationHostLinkAddress OCTET STRING,
+    esconStationPartitionNumber OCTET STRING,
+    esconStationDeviceAddress OCTET STRING,
+    esconStationState INTEGER,
+    esconStationAttentionDelay INTEGER,
+    esconStationAttentionTimeOut INTEGER,
+    esconStationMaxBfru INTEGER,
+    esconStationUnitSize INTEGER,
+    esconStationMaxMsgSizeReceived INTEGER,
+    esconStationMaxMsgSizeSent INTEGER,
+    esconStationDataPacketsOkReceived Counter32,
+    esconStationDataPacketsKoReceived Counter32,
+    esconStationDataPacketsSent Counter32,
+    esconStationTotalFramesSent Counter32,
+    esconStationDataPacketsRetransmitted Counter32,
+    esconStationPositiveAckDataPackets Counter32,
+    esconStationSecondChanceAttentions Counter32,
+    esconStationCommandsRetried Counter32
+    }
+
+esconStationHostLinkAddress OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE(1))
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "This address identifies the ESCON Director port to which the
+        optical fiber between the ESCON Director and the host is
+        attached."
+    ::= { esconStationEntry 1 }
+
+esconStationPartitionNumber OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE(1))
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "A number identifying a logical host within an actual host."
+    ::= { esconStationEntry 2 }
+
+esconStationDeviceAddress OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE(1))
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "A unique hexadecimal number allocated to each station on the
+        same host link."
+    ::= { esconStationEntry 3 }
+
+esconStationState OBJECT-TYPE
+    SYNTAX INTEGER {
+        idle(1),
+        cpDefined(2),
+        cpReset(3),
+        cpActive(4),
+        cpDelete(5),
+        cpAbend(6),
+        cldpWait(7),
+        cldpDefinedl(8),
+        cldpError(9),
+        cldpLoad(10),
+        cldpDump(11),
+        deletePending(12),
+        deleted(13),
+        cpXidExpected(14)
+        }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The current state of the station."
+    ::= { esconStationEntry 4 }
+
+esconStationAttentionDelay OBJECT-TYPE
+    SYNTAX INTEGER(0..420)
+--  Units
+--    seconds
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Specifies the amount of time in seconds that elapses
+        from the receipt of a packet at an ESCON station (when
+        no other packets are queued) before that station sends
+        buffered data to the Host.
+        
+        An update to this object takes effect the next time the station
+        establishes communications with the host."
+    ::= { esconStationEntry 5 }
+
+esconStationAttentionTimeOut OBJECT-TYPE
+    SYNTAX INTEGER(10..840)
+--  Units
+--    seconds
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Specifies the amount of time in seconds that the station is to
+        wait for a response to an attention signal it sent to the host
+        before initiating channel disconnect.
+        
+        An update to this object takes effect the next time the station
+        establishes communications with the host."
+    ::= { esconStationEntry 6 }
+
+esconStationMaxBfru OBJECT-TYPE
+    SYNTAX INTEGER(1..65535)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Number of buffers in the host buffer pool for receiving data
+        from this station."
+    ::= { esconStationEntry 7 }
+
+esconStationUnitSize OBJECT-TYPE
+    SYNTAX INTEGER(64..4000)
+--  Units
+--    bytes
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Maximum size of a buffer, in bytes, that the host can receive
+        from this station."
+    ::= { esconStationEntry 8 }
+
+esconStationMaxMsgSizeReceived OBJECT-TYPE
+    SYNTAX INTEGER(0..65535)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The maximum length of a message that can be received on this
+        station.
+        
+        An update to this object takes effect the next time the station
+        establishes communications with the host."
+    ::= { esconStationEntry 9 }
+
+esconStationMaxMsgSizeSent OBJECT-TYPE
+    SYNTAX INTEGER(0..65535)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The maximum length of a message that can be sent from this
+        station to the host.
+        
+        An update to this object takes effect the next time the station
+        establishes communications with the host."
+    ::= { esconStationEntry 10 }
+
+esconStationDataPacketsOkReceived OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of data packets received from the host by this
+          station without Data Check."
+    ::= { esconStationEntry 11 }
+
+esconStationDataPacketsKoReceived OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of data packets received from the host by this station
+        with Data Check."
+    ::= { esconStationEntry 12 }
+
+esconStationDataPacketsSent OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of data packets sent to the host by this station."
+    ::= { esconStationEntry 13 }
+
+esconStationTotalFramesSent OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of data packets and control packets sent to the host
+        by this station."
+    ::= { esconStationEntry 14 }
+
+esconStationDataPacketsRetransmitted OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of data packets retransmitted by this station"
+    ::= { esconStationEntry 15 }
+
+esconStationPositiveAckDataPackets OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of data packets sent by this station to the host that
+        the host has positively acknowledged.  When the host sends a
+        positive acknowledgement for a group of n data packets, this
+        counter is incremented by n."
+    ::= { esconStationEntry 16 }
+
+esconStationSecondChanceAttentions OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of times this station has sent a Second Chance
+        Attention signal to the host."
+    ::= { esconStationEntry 17 }
+
+esconStationCommandsRetried OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of times a command has been retried on this
+        station"
+    ::= { esconStationEntry 18 }
+
+esconPortGroup OBJECT IDENTIFIER ::= { esconMibGroups 1 }
+-- OBJECT-GROUP
+--  Status
+--    mandatory
+--  Descr
+--    Objects that describe an ESCON channel port.
+--  objects
+--    esconPortControlUnitLinkAddress, esconPortInFiberStatus, 
+--    esconPortOutFiberStatus
+
+esconLinkGroup OBJECT IDENTIFIER ::= { esconMibGroups 2 }
+-- OBJECT-GROUP
+--  Status
+--    mandatory
+--  Descr
+--    Objects that describe an ESCON channel link.
+--  objects
+--    esconLinkStatus
+
+esconStationGroup OBJECT IDENTIFIER ::= { esconMibGroups 3 }
+-- OBJECT-GROUP
+--  Status
+--    mandatory
+--  Descr
+--    Objects that describe an ESCON channel station.
+--  objects
+--    esconStationState, esconStationAttentionDelay, 
+--    esconStationAttentionTimeOut, esconStationMaxBfru, 
+--    esconStationUnitSize, esconStationMaxMsgSizeReceived, 
+--    esconStationMaxMsgSizeSent, esconStationDataPacketsOkReceived, 
+--    esconStationDataPacketsKoReceived, 
+--    esconStationDataPacketsSent, esconStationTotalFramesSent, 
+--    esconStationDataPacketsRetransmitted, 
+--    esconStationPositiveAckDataPackets, 
+--    esconStationSecondChanceAttentions, 
+--    esconStationCommandsRetried
+
+esconMibCompliance OBJECT IDENTIFIER ::= { esconMibCompliances 1 }
+-- MODULE-COMPLIANCE
+--  Status
+--    mandatory
+--  Descr
+--    The compliance statement for the SNMPv2 entities that
+--    implement the IBM ESCON MIB.
+--  Module
+--    >>current<<
+--   MandGroup
+--    esconPortGroup
+--   MandGroup
+--    esconLinkGroup
+--   MandGroup
+--    esconStationGroup
+--   ObjVar
+--    esconStationAttentionDelay
+--   ObjVar
+--    esconStationAttentionTimeOut
+--   ObjVar
+--    esconStationMaxMsgSizeReceived
+--   ObjVar
+--    esconStationMaxMsgSizeSent
+
+
+END
+

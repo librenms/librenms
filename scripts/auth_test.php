@@ -45,6 +45,11 @@ if (Config::get('auth_mechanism') == 'ldap' || Config::get('auth_mechanism') == 
 try {
     $authorizer = LegacyAuth::get();
 
+    // ldap based auth we should bind before using, otherwise searches may fail due to anonymous bind
+    if (method_exists($authorizer, 'bind')) {
+        $authorizer->bind([]);
+    }
+
     // AD bind tests
     if ($authorizer instanceof \LibreNMS\Authentication\ActiveDirectoryAuthorizer) {
         // peek inside the class

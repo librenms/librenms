@@ -22,6 +22,7 @@ poller_modules:
     cisco-otv: true
     ipmi: false
     cisco-vpdn: true
+    cisco-qfp: true
 discovery_modules:
     cisco-cef: true
     cisco-sla: true
@@ -30,10 +31,12 @@ discovery_modules:
     cisco-pw: true
     vrf: true
     cisco-vrf-lite: true
+    cisco-qfp: true
 register_mibs:
     ciscoAAASessionMIB: CISCO-AAA-SESSION-MIB
 discovery:
     - sysDescr:
         - IOS-XE
+        - IOSXE
         - LINUX_IOSD
         - CAT3K_CAA

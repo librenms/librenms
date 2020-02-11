@@ -64,7 +64,6 @@ if (count($sensors)) {
         $graph_array['from'] = \LibreNMS\Config::get('time.day');
         $sensor_minigraph    = generate_lazy_graph_tag($graph_array);
 
-        $sensor['sensor_current'] = $sensor_class == 'runtime' ? formatUptime($sensor['sensor_current'] * 60, 'short') : $sensor['sensor_current'];
         $sensor_current = $graph_type == 'sensor_state' ? get_state_label($sensor) : get_sensor_label_color($sensor);
 
         echo '<tr>

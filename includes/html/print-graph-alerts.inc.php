@@ -17,10 +17,8 @@
  * @author     LibreNMS Contributors
 */
 
-use LibreNMS\Authentication\LegacyAuth;
-
 $pagetitle[] = "Alert Stats";
-
+$param = [];
 $sql = "";
 if (isset($device['device_id']) && $device['device_id'] > 0) {
     $sql = " AND alert_log.device_id=?";
@@ -29,13 +27,13 @@ if (isset($device['device_id']) && $device['device_id'] > 0) {
     );
 }
 
-if (LegacyAuth::user()->hasGlobalRead()) {
-    $query = "SELECT DATE_FORMAT(time_logged, '" . \LibreNMS\Config::get('alert_graph_date_format') . "') Date, COUNT(alert_log.rule_id) totalCount, alert_rules.severity Severity FROM alert_log,alert_rules WHERE alert_log.rule_id=alert_rules.id AND `alert_log`.`state` != 0 $sql GROUP BY DATE_FORMAT(time_logged, '" . \LibreNMS\Config::get('alert_graph_date_format') . "'),alert_rules.severity";
+if (!Auth::user()->hasGlobalRead()) {
+    $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
+    $sql .= " AND `alert_log`.`device_id` IN " .dbGenPlaceholders(count($device_ids));
+    $param = array_merge($param, $device_ids);
 }
 
-if (!LegacyAuth::user()->hasGlobalRead()) {
-    $query = "SELECT DATE_FORMAT(time_logged, '" . \LibreNMS\Config::get('alert_graph_date_format') . "') Date, COUNT(alert_log.device_id) totalCount, alert_rules.severity Severity FROM alert_log,alert_rules,devices_perms WHERE alert_log.rule_id=alert_rules.id AND `alert_log`.`state` != 0 $sql AND alert_log.device_id = devices_perms.device_id AND devices_perms.user_id = " . LegacyAuth::id() . " GROUP BY DATE_FORMAT(time_logged, '" . \LibreNMS\Config::get('alert_graph_date_format') . "'),alert_rules.severity";
-}
+$query = "SELECT DATE_FORMAT(time_logged, '" . \LibreNMS\Config::get('alert_graph_date_format') . "') Date, COUNT(alert_log.rule_id) totalCount, alert_rules.severity Severity FROM alert_log,alert_rules WHERE alert_log.rule_id=alert_rules.id AND `alert_log`.`state` != 0 $sql GROUP BY DATE_FORMAT(time_logged, '" . \LibreNMS\Config::get('alert_graph_date_format') . "'),alert_rules.severity";
 
 ?>
 <br>

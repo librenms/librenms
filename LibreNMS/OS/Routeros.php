@@ -33,6 +33,9 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessNoiseFloorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessDistanceDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrqDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrpDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessSinrDiscovery;
 use LibreNMS\OS;
 
 class Routeros extends OS implements
@@ -42,7 +45,10 @@ class Routeros extends OS implements
     WirelessNoiseFloorDiscovery,
     WirelessRateDiscovery,
     WirelessRssiDiscovery,
-    WirelessDistanceDiscovery
+    WirelessDistanceDiscovery,
+    WirelessRsrqDiscovery,
+    WirelessRsrpDiscovery,
+    WirelessSinrDiscovery
 {
     private $data;
 
@@ -240,5 +246,50 @@ class Routeros extends OS implements
             }
         }
         return $sensors;
+    }
+    public function discoverWirelessRsrq()
+    {
+        $sinr = '.1.3.6.1.4.1.14988.1.1.16.1.1.3.1'; //MIKROTIK-MIB::mtxrLTEModemSignalRSRQ
+        return array(
+            new WirelessSensor(
+                'rsrq',
+                $this->getDeviceId(),
+                $sinr,
+                'routeros',
+                0,
+                'Signal RSRQ',
+                null
+            )
+        );
+    }
+    public function discoverWirelessRsrp()
+    {
+        $sinr = '.1.3.6.1.4.1.14988.1.1.16.1.1.4.1'; //MIKROTIK-MIB::mtxrLTEModemSignalRSRP
+        return array(
+            new WirelessSensor(
+                'rsrp',
+                $this->getDeviceId(),
+                $sinr,
+                'routeros',
+                0,
+                'Signal RSRP',
+                null
+            )
+        );
+    }
+    public function discoverWirelessSinr()
+    {
+        $sinr = '.1.3.6.1.4.1.14988.1.1.16.1.1.7.1'; //MIKROTIK-MIB::mtxrLTEModemSignalSINR
+        return array(
+            new WirelessSensor(
+                'sinr',
+                $this->getDeviceId(),
+                $sinr,
+                'routeros',
+                0,
+                'Signal SINR',
+                null
+            )
+        );
     }
 }

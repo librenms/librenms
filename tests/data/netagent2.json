@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
-                    "location": null,
                     "os": "netagent2",
                     "type": "power",
                     "serial": null,
-                    "icon": "generic.svg"
+                    "icon": "netagent2.png",
+                    "location": null
                 }
             ]
         },
@@ -28,11 +28,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
-                    "location": "<private>",
                     "os": "netagent2",
                     "type": "power",
                     "serial": null,
-                    "icon": "generic.svg"
+                    "icon": "netagent2.png",
+                    "location": "<private>"
                 }
             ]
         }

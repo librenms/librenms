@@ -1,0 +1,1406 @@
+-- MIB created 5/06/99 21:05:56, by
+--   SMIC (the next generation) version 1.6.29, November 22, 1994.
+
+IBM-ENETDISPATCHER-MIB DEFINITIONS ::= BEGIN
+
+-- From file: "ibmenetd.mi2"
+-- Compile options "G A T M"
+
+IMPORTS
+    Counter32, Gauge32, Integer32, IpAddress, enterprises
+            FROM SNMPv2-SMI-v1
+    OBJECT-TYPE
+            FROM RFC-1212
+    TRAP-TYPE
+            FROM RFC-1215
+    DisplayString, TruthValue
+            FROM SNMPv2-TC-v1;
+
+dispatcherMib OBJECT IDENTIFIER ::= { enterprises ibm(2) ibmProd(6) ibmENetDispatcher(144) 1 }
+-- MODULE-IDENTITY
+--  LastUpdated
+--    9808140000Z
+--  OrgName
+--    IBM Internet Software
+--  ContactInfo
+--            Mr. Dana R. Thalheimer
+--     Postal: IBM Networking Software
+--             Dept HLGA/Bldg 502
+--             PO Box 12195
+--             4205 S. Miami Blvd.
+--             Research Triangle Park, NC 27709
+--    
+--             Mr. Chris Gage
+--     Postal: IBM Networking Software
+--             Dept HLGA/Bldg 502
+--             PO Box 12195
+--             4205 S. Miami Blvd.
+--             Research Triangle Park, NC 27709
+--  Descr
+--    This MIB module contains traps and operational information
+--     for the IBM eNetworkDispatcher.
+--  RevDate
+--    9711150000Z
+--  RevDescr
+--    The initial revision of this MIB module. 
+
+dispatcherMibTraps OBJECT IDENTIFIER ::= { dispatcherMib 0 }
+dispatcherMibAdmin OBJECT IDENTIFIER ::= { dispatcherMib 1 }
+dispatcherMibObjects OBJECT IDENTIFIER ::= { dispatcherMib 2 }
+dispatcherMibConformance OBJECT IDENTIFIER ::= { dispatcherMib 3 }
+indStatus       OBJECT IDENTIFIER ::= { dispatcherMibObjects 1 }
+indConfig       OBJECT IDENTIFIER ::= { dispatcherMibObjects 2 }
+indExecStatObjects OBJECT IDENTIFIER ::= { indStatus 1 }
+indHiAvailStatObjects OBJECT IDENTIFIER ::= { indStatus 6 }
+indExecCnfgObjects OBJECT IDENTIFIER ::= { indConfig 1 }
+indClstrCnfgTable OBJECT IDENTIFIER ::= { indConfig 2 }
+indPortCnfgTable OBJECT IDENTIFIER ::= { indConfig 3 }
+indSrvrCnfgTable OBJECT IDENTIFIER ::= { indConfig 4 }
+indHiAvailCnfgObjects OBJECT IDENTIFIER ::= { indConfig 6 }
+indReachCnfgTable OBJECT IDENTIFIER ::= { indConfig 7 }
+indMngrCnfgObjects OBJECT IDENTIFIER ::= { indConfig 10 }
+indMibCompliances OBJECT IDENTIFIER ::= { dispatcherMibConformance 1 }
+indMibGroups    OBJECT IDENTIFIER ::= { dispatcherMibConformance 2 }
+indMibStatGroups OBJECT IDENTIFIER ::= { indMibGroups 1 }
+indMibCnfgGroups OBJECT IDENTIFIER ::= { indMibGroups 2 }
+
+Percentages ::= Integer32(0..100)
+-- TEXTUAL-CONVENTION
+--  Status
+--    mandatory
+--  Descr
+--    Number from 0 to 100 representing the percentages of
+--     the given object.
+
+GaugeNeg1 ::= Integer32(-1..2147483647)
+-- TEXTUAL-CONVENTION
+--  Status
+--    mandatory
+--  Descr
+--    Number with Gauge32 behavior, with the additional feature
+--     that the value can go to negative 1.
+
+esNonForAddr OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Non forwarding address, any packet sent to this
+         address will be handled by the Network Dispatcher
+         machine itself and will not be forwarded"
+    ::= { indExecStatObjects 1 }
+
+esVersion OBJECT-TYPE
+    SYNTAX DisplayString
+--    Rsyntax OCTET STRING(SIZE(0..255))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The version of the executor"
+    ::= { indExecStatObjects 2 }
+
+esNumClust OBJECT-TYPE
+    SYNTAX Gauge32
+--  Units
+--    clusters
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Current number of clusters"
+    ::= { indExecStatObjects 3 }
+
+esTotalPkts OBJECT-TYPE
+    SYNTAX Counter32
+--  Units
+--    packets
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Total number of packets received
+         by the executor since it started."
+    ::= { indExecStatObjects 4 }
+
+esTooShortPkts OBJECT-TYPE
+    SYNTAX Counter32
+--  Units
+--    packets
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Total number of packets discarded by the executor,
+         since the executor started, because the packet
+         headers were too short."
+    ::= { indExecStatObjects 5 }
+
+esNonForPkts OBJECT-TYPE
+    SYNTAX Counter32
+--  Units
+--    packets
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Total number of packets sent to the non forwarding address
+         since the executor started."
+    ::= { indExecStatObjects 6 }
+
+esClstrDscrdPkts OBJECT-TYPE
+    SYNTAX Counter32
+--  Units
+--    packets
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Total number of packets discarded by the executor
+        since the executor started, which were forwarded to
+        a cluster, but were discarded because either:
+           -the port did not exist, or
+           -the port existed but had no servers"
+    ::= { indExecStatObjects 7 }
+
+esClstrErrPkts OBJECT-TYPE
+    SYNTAX Counter32
+--  Units
+--    packets
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Total number of packets not sent, since the
+         executor started, because of a network adapter
+         failure"
+    ::= { indExecStatObjects 8 }
+
+esClstrLocalPkts OBJECT-TYPE
+    SYNTAX Counter32
+--  Units
+--    packets
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Total number of packets since the executor started,
+         not for the non forwarding address, or any cluster,
+         but to be processed locally, by the Network
+         Dispatcher machine"
+    ::= { indExecStatObjects 9 }
+
+esClstrOwnAddrPkts OBJECT-TYPE
+    SYNTAX Counter32
+--  Units
+--    packets
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Total number of packets since the executor
+         started, explicitly forwarded to a server
+         located on the Network Dispatcher machine"
+    ::= { indExecStatObjects 10 }
+
+esClstrForPkts OBJECT-TYPE
+    SYNTAX Counter32
+--  Units
+--    packets
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Total number of packets since the executor
+         started, forwarded to any cluster"
+    ::= { indExecStatObjects 11 }
+
+esForErrPkts OBJECT-TYPE
+    SYNTAX Counter32
+--  Units
+--    packets
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Total number of packets with forwarding errors
+        since the executor started.  The following are
+        the scenarios which affect this counter:
+          -There was an error extracting an encapsulated
+           packet which came in from a wide area Network
+           Dispatcher
+          -An attempt to forward the packet to either a
+           local or remote server failed."
+    ::= { indExecStatObjects 12 }
+
+esNotClstrPkts OBJECT-TYPE
+    SYNTAX Counter32
+--  Units
+--    packets
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Total number of packets not addressed to
+         any active cluster and port, since the executor
+         started"
+    ::= { indExecStatObjects 13 }
+
+esHashBkts OBJECT-TYPE
+    SYNTAX Gauge32
+--  Units
+--    hash Buckets
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Current number of occupied hash buckets.  Hash buckets
+         correspond to IP address/port pairs.  If this number
+         is very low, it may indicate that the servers are getting
+         many hits from a small number of clients.  This number
+         gives an indication of the client pool diversity."
+    ::= { indExecStatObjects 14 }
+
+esStartTime OBJECT-TYPE
+    SYNTAX Counter32
+--  Units
+--    seconds
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The time when the executor was started,
+         in seconds from January 1, 1970"
+    ::= { indExecStatObjects 15 }
+
+indClstrStatTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF IndClstrStatEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "A list of cluster table entries.  The number of entries
+        should equal the current number of clusters, esNumClust.
+        The cluster table has a row for each cluster,  Each row
+        has information about the current status of that cluster."
+    ::= { indStatus 2 }
+
+indClstrStatEntry OBJECT-TYPE
+    SYNTAX IndClstrStatEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "A cluster table entry describing current status of the cluster.
+         The cluster table has a row for each cluster.
+        
+         Rows in this table can not be created or deleted via SNMP commands"
+    INDEX { csAddr }
+    ::= { indClstrStatTable 1 }
+
+IndClstrStatEntry ::= SEQUENCE {
+    csAddr IpAddress,
+    csNumPorts Gauge32,
+    csActiveSYNs Counter32,
+    csDroppedFINs Counter32,
+    csDroppedACKs Counter32,
+    csDroppedRSTs Counter32,
+    csDroppedPKTs Counter32,
+    csNonExistingPKTs Counter32
+    }
+
+csAddr OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "The cluster address in dotted decimal format"
+    ::= { indClstrStatEntry 1 }
+
+csNumPorts OBJECT-TYPE
+    SYNTAX Gauge32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The current number of ports for this cluster"
+    ::= { indClstrStatEntry 2 }
+
+csActiveSYNs OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "TH_SYNs on active connection.  This variable indicates the
+         number of requests for new connections, where those new
+         connections are the same as current active connections,
+         those not in FIN state.
+        
+         A high rate of growth in this variable could indicate
+         slow or no response from servers in this cluster."
+    ::= { indClstrStatEntry 3 }
+
+csDroppedFINs OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "FINs dropped due to no connection.  Rapid increase in this
+         variable could indicate that the staletimeout is too low.
+         Any percentage greater than 1% of total packets forwarded
+         could indicate a problem."
+    ::= { indClstrStatEntry 4 }
+
+csDroppedACKs OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "ACKSs dropped due to no connection.  Rapid increase in this
+         variable could indicate that the staletimeout is too low.
+         Any percentage greater than 1% of total packets forwarded
+         could indicate a problem."
+    ::= { indClstrStatEntry 5 }
+
+csDroppedRSTs OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "RSTs dropped due to no connection.  Rapid increase in this
+         variable could indicate that the staletimeout is too low.
+         Any percentage greater than 1% of total packets forwarded
+         could indicate a problem."
+    ::= { indClstrStatEntry 6 }
+
+csDroppedPKTs OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "PKTSs dropped due to no connection.  Rapid increase in this
+         variable could indicate that the staletimeout is too low.
+         Any percentage greater than 1% of total packets forwarded
+         could indicate a problem."
+    ::= { indClstrStatEntry 7 }
+
+csNonExistingPKTs OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS deprecated
+    DESCRIPTION
+        "This variable has no meaning and is deprecated"
+    ::= { indClstrStatEntry 8 }
+
+indPortStatTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF IndPortStatEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "A list of port table entries.  The number of entries
+        equals the sum of the number of ports for each cluster.
+        Each row in the table provides current status information
+        for a port."
+    ::= { indStatus 3 }
+
+indPortStatEntry OBJECT-TYPE
+    SYNTAX IndPortStatEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "A port entry describing current status of the port.  The port
+         table has an entry for each cluster, port combination.
+        
+         Rows in this table can not be created or deleted via SNMP commands"
+    INDEX { csAddr, psNum }
+    ::= { indPortStatTable 1 }
+
+IndPortStatEntry ::= SEQUENCE {
+    psNum Integer32,
+    psNumServers Gauge32,
+    psNumNodesDown Gauge32
+    }
+
+psNum OBJECT-TYPE
+    SYNTAX Integer32(0..65535)
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Number of this port"
+    ::= { indPortStatEntry 1 }
+
+psNumServers OBJECT-TYPE
+    SYNTAX Gauge32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Current number of servers on this port"
+    ::= { indPortStatEntry 2 }
+
+psNumNodesDown OBJECT-TYPE
+    SYNTAX Gauge32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Number of down servers"
+    ::= { indPortStatEntry 3 }
+
+indSrvrStatTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF IndSrvrStatEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "A list of server table entries.  The number of entries
+        equals the sum of the number of servers for each port.
+        Each server table entry provides current status
+        information about the port."
+    ::= { indStatus 4 }
+
+indSrvrStatEntry OBJECT-TYPE
+    SYNTAX IndSrvrStatEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "A server entry describing current status of the server.  There is
+         a row in the server table for each cluster, port, server combination.
+        
+         Rows in this table can not be created or deleted via SNMP commands"
+    INDEX { csAddr, psNum, ssAddr }
+    ::= { indSrvrStatTable 1 }
+
+IndSrvrStatEntry ::= SEQUENCE {
+    ssAddr IpAddress,
+    ssActiveConns Gauge32,
+    ssNewConns Gauge32,
+    ssTotalConns Counter32,
+    ssTotalTcpConns Counter32,
+    ssTotalUdpConns Counter32,
+    ssFinConns Gauge32,
+    ssCompleteConns Counter32,
+    ssWeight GaugeNeg1,
+    ssSavedWeight GaugeNeg1,
+    ssPortLoad GaugeNeg1,
+    ssSystemLoad Integer32,
+    ssActiveConnsWeight Integer32,
+    ssNewConnsWeight Integer32,
+    ssPortLoadWeight Integer32,
+    ssSystemLoadWeight Integer32
+    }
+
+ssAddr OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Server address in dotted decimal notation"
+    ::= { indSrvrStatEntry 1 }
+
+ssActiveConns OBJECT-TYPE
+    SYNTAX Gauge32
+--  Units
+--    connections
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Current active connections for this server"
+    ::= { indSrvrStatEntry 2 }
+
+ssNewConns OBJECT-TYPE
+    SYNTAX Gauge32
+--  Units
+--    connections
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Change in the number of total connections over the
+         last interval."
+    ::= { indSrvrStatEntry 3 }
+
+ssTotalConns OBJECT-TYPE
+    SYNTAX Counter32
+--  Units
+--    connections
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Total connections for this server, since the server
+         was added to the currently running executor"
+    ::= { indSrvrStatEntry 4 }
+
+ssTotalTcpConns OBJECT-TYPE
+    SYNTAX Counter32
+--  Units
+--    connections
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Total TCP connections for this server, since the server
+         was added to the currently running executor.
+        
+         ssTotalTcpConns plus ssTotalUdpConns equals ssTotalConns."
+    ::= { indSrvrStatEntry 5 }
+
+ssTotalUdpConns OBJECT-TYPE
+    SYNTAX Counter32
+--  Units
+--    connections
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Total UDP connections for this server, since the server
+         was added to the currently running executor.
+        
+         ssTotalTcpConns plus ssTotalUdpConns equals ssTotalConns."
+    ::= { indSrvrStatEntry 6 }
+
+ssFinConns OBJECT-TYPE
+    SYNTAX Gauge32
+--  Units
+--    connections
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Current number of connections in FIN state"
+    ::= { indSrvrStatEntry 7 }
+
+ssCompleteConns OBJECT-TYPE
+    SYNTAX Counter32
+--  Units
+--    connections
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Total number of completed connections for this server,
+         since the server was added to the currently running
+         executor."
+    ::= { indSrvrStatEntry 8 }
+
+ssWeight OBJECT-TYPE
+    SYNTAX GaugeNeg1
+--    Rsyntax Integer32(-1..2147483647)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Current weight for this server.  When the weight is zero the
+         executor will no longer forward packets to this server.  A
+         weight of -1 indicates that the Network Dispatcher administrator
+         has explicitly marked the server down."
+    ::= { indSrvrStatEntry 9 }
+
+ssSavedWeight OBJECT-TYPE
+    SYNTAX GaugeNeg1
+--    Rsyntax Integer32(-1..2147483647)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Weight the server had when marked down.  This weight will
+         be restored when the server is marked up."
+    ::= { indSrvrStatEntry 10 }
+
+ssPortLoad OBJECT-TYPE
+    SYNTAX GaugeNeg1
+--    Rsyntax Integer32(-1..2147483647)
+--  Units
+--    milliseconds
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Number of milliseconds an advisor took to complete a
+         protocol specific request to the server.  If the value
+         is -1, the advisor could not complete the request to
+         the server."
+    ::= { indSrvrStatEntry 11 }
+
+ssSystemLoad OBJECT-TYPE
+    SYNTAX Integer32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "This value is the number that the ISS agent provides
+        to the ISS monitor for this server.
+        
+        The variable is only valid if ISS is monitoring an ISS
+        agent on this server.  Otherwise, the value has no
+        meaning."
+    ::= { indSrvrStatEntry 12 }
+
+ssActiveConnsWeight OBJECT-TYPE
+    SYNTAX Integer32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The weight calculated by the manager for the
+        active connections measurement"
+    ::= { indSrvrStatEntry 13 }
+
+ssNewConnsWeight OBJECT-TYPE
+    SYNTAX Integer32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The weight calculated by the manager for the
+        new connections measurement"
+    ::= { indSrvrStatEntry 14 }
+
+ssPortLoadWeight OBJECT-TYPE
+    SYNTAX Integer32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The weight calculated by the manager for the
+         port load measurement"
+    ::= { indSrvrStatEntry 15 }
+
+ssSystemLoadWeight OBJECT-TYPE
+    SYNTAX Integer32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The weight calculated by the manager for the
+         system load measurement"
+    ::= { indSrvrStatEntry 16 }
+
+indRulesStatTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF IndRulesStatEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "A list of rule table entries.  There is no limit on the number
+         of rules.  The number of entries is the same as the number of
+         entries in the indRulesCnfgTable.  Each status entry provides
+         current status information about the rule."
+    ::= { indStatus 5 }
+
+indRulesStatEntry OBJECT-TYPE
+    SYNTAX IndRulesStatEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "A rule table entry describing the current status of a rule.
+         There is a one to one correspondence between rows of this
+         table and rows in the IndRulesCnfgTable.
+        
+         Rows in this table can not be created or deleted via SNMP commands"
+    INDEX { csAddr, psNum, rcIndex }
+-- Augments indRulesCnfgEntry
+    ::= { indRulesStatTable 1 }
+
+IndRulesStatEntry ::= SEQUENCE {
+    rsTimesFired Counter32,
+    rsNumSrvrs Gauge32
+    }
+
+rsTimesFired OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The total number of times this rule has fired"
+    ::= { indRulesStatEntry 2 }
+
+rsNumSrvrs OBJECT-TYPE
+    SYNTAX Gauge32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of servers which this rule services."
+    ::= { indRulesStatEntry 3 }
+
+hasPrimary OBJECT-TYPE
+    SYNTAX INTEGER {
+        primary(0),
+        backup(1)
+        }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Indicates whether this machine is the primary or backup machine.
+            -primary (0)
+            -backup (1)"
+    ::= { indHiAvailStatObjects 1 }
+
+hasPort OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Port used by both primary and backup Network Dispatcher machines for
+         heartbeat messages."
+    ::= { indHiAvailStatObjects 2 }
+
+hasState OBJECT-TYPE
+    SYNTAX INTEGER {
+        idle(0),
+        listen(1),
+        active(2),
+        standby(3),
+        preempt(4),
+        elect(5),
+        noExec(6)
+        }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Status of this Network Dispatcher machine.
+             -idle,   (0) this machine is routing packets and is not trying
+                          to establish contact with its partner Network
+                          Dispatcher
+             -listen, (1) high availability has just started and
+                          network dispatcher is listening for partner,
+             -active, (2) this machine is routing packets.
+             -standby,(3) this machine is monitoring the active machine.
+             -preempt,(4) transitory state during switch from primary to backup
+             -elect,  (5) network dispatcher is negotiating with partner
+                          for who will primary or backup
+             -no_exec,(6) the executor is not running"
+    ::= { indHiAvailStatObjects 3 }
+
+hasSubState OBJECT-TYPE
+    SYNTAX INTEGER {
+        notSynchronized(0),
+        synchronized(1),
+        syncIn(2),
+        syncOut(3)
+        }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "High Availability sub state:
+        
+         Synchronized and notSynchronized are normal, synchIn and synchOut are
+         transitory.  If the Network Dispatcher machine appears to be stuck
+         (for more than a minute), in a transitory state then that indicates
+         a problem.
+        
+         If HighAvailability should be running and the substate is notSynchronized,
+         then that indicates a problem.
+        
+         If High Availability is not running and the hasState is idle, then
+         all subState data is meaningless and should be ignored.
+        
+            notSynchronized (0), network dispatcher is not in conact with partner machine
+            synchronized    (1), network dispatcher is in contact with partner machine
+            sync-in         (2), network dispatcher is going into standby state
+            sync-out        (3), network dispatcher is going into active state"
+    ::= { indHiAvailStatObjects 4 }
+
+indReachStatTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF IndReachStatEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "A list of reach table entries. The number of entries
+        is typically less than 10, with a maximum of 32."
+    ::= { indStatus 7 }
+
+indReachStatEntry OBJECT-TYPE
+    SYNTAX IndReachStatEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "A reach table entry includes the address being pinged, and whether
+         the ping of that address was successful.
+        
+         Rows in this table can not be created or deleted via SNMP commands"
+    INDEX { rsAddr }
+    ::= { indReachStatTable 1 }
+
+IndReachStatEntry ::= SEQUENCE {
+    rsAddr IpAddress,
+    rsPingAble INTEGER
+    }
+
+rsAddr OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "The address the reach advisor pings."
+    ::= { indReachStatEntry 1 }
+
+rsPingAble OBJECT-TYPE
+    SYNTAX INTEGER {
+        unknown(0),
+        reachable(1),
+        unreachable(2)
+        }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Whether this reach address (rsAddr) responded to a ping.
+          unknown     (0), the rsAddr is unknown, possibly because the
+                           reach advisor is not started.
+          reachable   (1), the rsAddr was pinged successfully
+          unreachable (2)  the rsAddr was not pinged successfully"
+    ::= { indReachStatEntry 2 }
+
+indRulesCnfgTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF IndRulesCnfgEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "A list of rule config table entries  There is no limit
+         to the number of rule entries.  Each rule table row
+         describes rule configuration information."
+    ::= { indConfig 5 }
+
+indRulesCnfgEntry OBJECT-TYPE
+    SYNTAX IndRulesCnfgEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "A rule config table entry has information about the
+        current configuration of the rule.
+        
+        Rows in this table can not be created or destroyed via SNMP commands."
+    INDEX { csAddr, psNum, rcIndex }
+    ::= { indRulesCnfgTable 1 }
+
+IndRulesCnfgEntry ::= SEQUENCE {
+    rcIndex Integer32,
+    rcName DisplayString,
+    rcType INTEGER,
+    rcBeginRange Integer32,
+    rcEndRange Integer32,
+    rcPriority Integer32,
+    rcSrvrList DisplayString
+    }
+
+rcIndex OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "A unique number assigned to each rule in
+         a cluster, port combination"
+    ::= { indRulesCnfgEntry 1 }
+
+rcName OBJECT-TYPE
+    SYNTAX DisplayString
+--    Rsyntax OCTET STRING(SIZE(0..255))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The user defined name of the rule.  Rule names are
+         not necessarily unique."
+    ::= { indRulesCnfgEntry 2 }
+
+rcType OBJECT-TYPE
+    SYNTAX INTEGER {
+        true(0),
+        ip(1),
+        port(2),
+        time(3),
+        connection(4),
+        active(5)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The type of rule
+             true       (0), rules of this type are always true
+             ip         (1), the rule is based on the client IP address
+             port       (2), the rule is based on the client port
+             time       (3), the rule is based on the time of day
+             connection (4), the rule is based on the number of
+                             connections per second for the port
+             active     (5)  the rule is based on the number total
+                             active connections for the port"
+    ::= { indRulesCnfgEntry 3 }
+
+rcBeginRange OBJECT-TYPE
+    SYNTAX Integer32
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The lower value in the range used to determine
+         if the rule is true or not. The data is
+         meaningless for rule type 0."
+    ::= { indRulesCnfgEntry 4 }
+
+rcEndRange OBJECT-TYPE
+    SYNTAX Integer32
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The higher value in the range used to determine
+         if the rule is true or not.  The data is
+         meaningless for rule type 0."
+    ::= { indRulesCnfgEntry 5 }
+
+rcPriority OBJECT-TYPE
+    SYNTAX Integer32
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The rule priority.  Lower numbers are a
+         higher priority. Rule priority determines
+         the order in which rules are evaluated."
+    ::= { indRulesCnfgEntry 6 }
+
+rcSrvrList OBJECT-TYPE
+    SYNTAX DisplayString
+--    Rsyntax OCTET STRING(SIZE(0..255))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The list of servers this rule services.  The server addresses
+         are represented as strings in dotted decimal notation, separated
+         by plus signs.  For example, 37.44.24.13+12.23.54.76+9.67.127.82"
+    ::= { indRulesCnfgEntry 7 }
+
+indHrtBeatCnfgTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF IndHrtBeatCnfgEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "A list of heartBeat Table entries.  The number
+         of entries is usually less than the number of
+         interface cards in the Network Dispatcher machine.
+         The maximum is 32.
+        
+         The heart beat table lists each of the monitoring
+         and responding heartbeat pairs."
+    ::= { indConfig 8 }
+
+indHrtBeatCnfgEntry OBJECT-TYPE
+    SYNTAX IndHrtBeatCnfgEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "A indHrtBeatCnfg entry describing the monitoring
+         and responding addresses.  Each heart beat source address
+         and heart beat destination address pair is unique.
+        
+         Rows in this table can not be created or deleted via SNMP commands"
+    INDEX { hbcSrcAddr, hbcDestAddr }
+    ::= { indHrtBeatCnfgTable 1 }
+
+IndHrtBeatCnfgEntry ::= SEQUENCE {
+    hbcSrcAddr IpAddress,
+    hbcDestAddr IpAddress,
+    hbcNumber Integer32
+    }
+
+hbcSrcAddr OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Address from which Network Dispatcher machine issues heartbeat
+         monitoring to its partner"
+    ::= { indHrtBeatCnfgEntry 1 }
+
+hbcDestAddr OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Address of Network Dispatcher machine who's status is being monitored."
+    ::= { indHrtBeatCnfgEntry 2 }
+
+hbcNumber OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "An integer number assigned to the heart beat pair."
+    ::= { indHrtBeatCnfgEntry 3 }
+
+indAdvsrCnfgTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF IndAdvsrCnfgEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "A list of advisor config table entries.  The number of entries
+        equals the number of ports times the number of advisors.  Each
+        advisor table row describes the current status of the advisor,
+        port combination."
+    ::= { indConfig 9 }
+
+indAdvsrCnfgEntry OBJECT-TYPE
+    SYNTAX IndAdvsrCnfgEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "An advisor entry describing current configuration of the Advisor.  There is
+         an advisor table entry for each advisor, port combination.
+        
+         Rows in this table can not be created or deleted via SNMP commands"
+    INDEX { acPort }
+    ::= { indAdvsrCnfgTable 1 }
+
+IndAdvsrCnfgEntry ::= SEQUENCE {
+    acPort Integer32,
+    acName DisplayString,
+    acVersion DisplayString
+    }
+
+acPort OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Number of the port that the advisor is monitoring"
+    ::= { indAdvsrCnfgEntry 1 }
+
+acName OBJECT-TYPE
+    SYNTAX DisplayString
+--    Rsyntax OCTET STRING(SIZE(0..255))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Name of the advisor.  Some of the possible values are:
+         FTP, HTTP, NNTP, POP3,  SMTP, SSL, Telnet.  and custom
+         advisor names."
+    ::= { indAdvsrCnfgEntry 2 }
+
+acVersion OBJECT-TYPE
+    SYNTAX DisplayString
+--    Rsyntax OCTET STRING(SIZE(0..255))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Current version of the advisor"
+    ::= { indAdvsrCnfgEntry 3 }
+
+mcInterval OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+--  Units
+--    seconds
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "How often the manager will update server
+         weights, in seconds."
+    ::= { indMngrCnfgObjects 1 }
+
+mcRefresh OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+--  Units
+--    mngrIntervals
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Number of manager intervals (mcInterval) before
+         querying the executor for a refresh of information
+         about new and active connections"
+    ::= { indMngrCnfgObjects 2 }
+
+mcActiveProp OBJECT-TYPE
+    SYNTAX Percentages
+--    Rsyntax Integer32(0..100)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Number from 0 to 100 representing the relative importance
+         of active connections.  This number is used by the manager,
+         in calculating server weights.
+        
+         The sum of mcActiveProp, mcNewProp, mcPortProp, and
+         mcSystemProp, must be 100"
+    ::= { indMngrCnfgObjects 3 }
+
+mcNewProp OBJECT-TYPE
+    SYNTAX Percentages
+--    Rsyntax Integer32(0..100)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Number from 0 to 100 representing the relative importance
+         of new connections.  This number is used by the manager,
+         in calculating server weights.
+        
+         The sum of mcActiveProp, mcNewProp, mcPortProp, and
+         mcSystemProp, must be 100"
+    ::= { indMngrCnfgObjects 4 }
+
+mcPortProp OBJECT-TYPE
+    SYNTAX Percentages
+--    Rsyntax Integer32(0..100)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Number from 0 to 100 representing the relative importance
+         of port advisor information.  This number is used by the
+          manager, in calculating server weights.
+        
+         The sum of mcActiveProp, mcNewProp, mcPortProp, and
+         mcSystemProp, must be 100"
+    ::= { indMngrCnfgObjects 5 }
+
+mcSystemProp OBJECT-TYPE
+    SYNTAX Percentages
+--    Rsyntax Integer32(0..100)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Number from 0 to 100 representing the relative importance
+         of the information from system metrics, such as ISS.  This
+         number is used by the manager, in calculating server weights.
+        
+         The sum of mcActiveProp, mcNewProp, mcPortProp, and
+         mcSystemProp, must be 100"
+    ::= { indMngrCnfgObjects 6 }
+
+mcSensitivity OBJECT-TYPE
+    SYNTAX Percentages
+--    Rsyntax Integer32(0..100)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Minimum sensitivity to weight updates.  This setting defines
+         when the manager should change its weighting for the server
+         based on external information"
+    ::= { indMngrCnfgObjects 7 }
+
+mcSmoothing OBJECT-TYPE
+    SYNTAX Percentages
+--    Rsyntax Integer32(0..100)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Index that smoothes the variations in weight when load balancing.
+         Smoothing can reduce the changes in weights from interval to
+         interval.  The higher the smoothing value the less the weight will
+         change from interval to interval.  1.5 is a typical value.  4, for
+         example, is a high smoothhing value and would reduce the change in
+         weight from interval to interval to almost nothing.
+        
+         The value is a percentage.  For example a value of 155 should be
+         treated as 1.55 by managing applications."
+    ::= { indMngrCnfgObjects 8 }
+
+mcVersion OBJECT-TYPE
+    SYNTAX DisplayString
+--    Rsyntax OCTET STRING(SIZE(0..255))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The version of the manager"
+    ::= { indMngrCnfgObjects 9 }
+
+indAllSrvrsCnfgTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF IndAllSrvrsCnfgEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "A list of all servers table entries.  The number of entries
+        equals the number of different servers configured."
+    ::= { indConfig 11 }
+
+indAllSrvrsCnfgEntry OBJECT-TYPE
+    SYNTAX IndAllSrvrsCnfgEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "An all servers table entry describing operational aspects of
+         servers.  This table is a list of all the servers currently
+         configured in Network Dispatcher.
+        
+         Rows in this table can not be created or deleted via SNMP"
+    INDEX { ascAddr }
+    ::= { indAllSrvrsCnfgTable 1 }
+
+IndAllSrvrsCnfgEntry ::= SEQUENCE {
+    ascAddr IpAddress,
+    ascQuiesced TruthValue,
+    ascInstances Gauge32
+    }
+
+ascAddr OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "The IP Address of the server in dotted decimal format"
+    ::= { indAllSrvrsCnfgEntry 1 }
+
+ascQuiesced OBJECT-TYPE
+    SYNTAX TruthValue
+--    Rsyntax INTEGER {
+--        true(1),
+--        false(2)
+--        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "True if this server has been quiesced, false otherwise.
+         When a server is quiesced, no more connections are sent
+         to the server.  A server can be quiesced via the
+         ndcontrol manager quiesce command.
+        
+         True=1, False=2."
+    ::= { indAllSrvrsCnfgEntry 2 }
+
+ascInstances OBJECT-TYPE
+    SYNTAX Gauge32
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The current number of times this server, ascAddr, is in the
+         configuration."
+    ::= { indAllSrvrsCnfgEntry 3 }
+
+indHighAvailStatus TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE dispatcherMib
+    VARIABLES {
+        hasState }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "This trap announces that the value of the high availability
+         status state (hasState) variable has changed.  The possible
+         values of hasState and their respective meanings are:
+          -idle,   (0) this machine is routing packets and is not trying
+                       to establish contact with its partner Network
+                       Dispatcher
+          -listen, (1) high availability has just started and
+                       network dispatcher is listening for partner,
+          -active, (2) this machine is routing packets.
+          -standby,(3) this machine is monitoring the active machine.
+          -preempt,(4) transitory state during switch from primary to backup
+          -elect,  (5) network dispatcher is negotiating with partner
+                       for who will primary or backup
+          -no_exec,(6) the executor is not running"
+    ::= 1
+
+indSrvrGoneDown TRAP-TYPE
+-- Reverse mappable trap
+    ENTERPRISE dispatcherMib
+    VARIABLES {
+        ssActiveConns }
+--  Status
+--    mandatory
+    DESCRIPTION
+        "This trap announces that the weight for the server specified
+         by the csAddr, psNum, ssAddr portion of the Object Identifier
+         has gone to zero, The last known number of active connections
+         for the server is sent in the trap.
+        
+         This trap indicates that, as far as Network Dispatcher can
+         determine, the specified server has gone down."
+    ::= 2
+
+indMibExecStatGroup OBJECT IDENTIFIER ::= { indMibStatGroups 1 }
+-- OBJECT-GROUP
+--  Status
+--    mandatory
+--  Descr
+--    ...
+--  objects
+--    esNonForAddr, esVersion, esNumClust, esTotalPkts, 
+--    esTooShortPkts, esNonForPkts, esClstrDscrdPkts, 
+--    esClstrErrPkts, esClstrLocalPkts, esClstrOwnAddrPkts, 
+--    esClstrForPkts, esForErrPkts, esNotClstrPkts, esHashBkts, 
+--    esStartTime
+
+indMibClstrStatGroup OBJECT IDENTIFIER ::= { indMibStatGroups 2 }
+-- OBJECT-GROUP
+--  Status
+--    mandatory
+--  Descr
+--    ...
+--  objects
+--    csNumPorts, csActiveSYNs, csDroppedFINs, csDroppedACKs, 
+--    csDroppedRSTs, csDroppedPKTs, csNonExistingPKTs
+
+indMibPortStatGroup OBJECT IDENTIFIER ::= { indMibStatGroups 3 }
+-- OBJECT-GROUP
+--  Status
+--    mandatory
+--  Descr
+--    ...
+--  objects
+--    psNumServers, psNumNodesDown
+
+indMibSrvrStatGroup OBJECT IDENTIFIER ::= { indMibStatGroups 4 }
+-- OBJECT-GROUP
+--  Status
+--    mandatory
+--  Descr
+--    ...
+--  objects
+--    ssActiveConns, ssNewConns, ssTotalConns, ssTotalTcpConns, 
+--    ssTotalUdpConns, ssFinConns, ssCompleteConns, ssWeight, 
+--    ssSavedWeight, ssPortLoad, ssSystemLoad, ssActiveConnsWeight, 
+--    ssNewConnsWeight, ssPortLoadWeight, ssSystemLoadWeight
+
+indMibRulesStatGroup OBJECT IDENTIFIER ::= { indMibStatGroups 5 }
+-- OBJECT-GROUP
+--  Status
+--    mandatory
+--  Descr
+--    ...
+--  objects
+--    rsTimesFired, rsNumSrvrs
+
+indMibHiAvailStatGroup OBJECT IDENTIFIER ::= { indMibStatGroups 6 }
+-- OBJECT-GROUP
+--  Status
+--    mandatory
+--  Descr
+--    ...
+--  objects
+--    hasPrimary, hasPort, hasState, hasSubState
+
+indMibReachStatGroup OBJECT IDENTIFIER ::= { indMibStatGroups 7 }
+-- OBJECT-GROUP
+--  Status
+--    mandatory
+--  Descr
+--    ...
+--  objects
+--    rsPingAble
+
+indMibRulesCnfgGroup OBJECT IDENTIFIER ::= { indMibCnfgGroups 5 }
+-- OBJECT-GROUP
+--  Status
+--    mandatory
+--  Descr
+--    ...
+--  objects
+--    rcName, rcType, rcBeginRange, rcEndRange, rcPriority, 
+--    rcSrvrList
+
+indMibHrtBeatCnfgGroup OBJECT IDENTIFIER ::= { indMibCnfgGroups 8 }
+-- OBJECT-GROUP
+--  Status
+--    mandatory
+--  Descr
+--    ...
+--  objects
+--    hbcNumber
+
+indMibAdvsrCnfgGroup OBJECT IDENTIFIER ::= { indMibCnfgGroups 9 }
+-- OBJECT-GROUP
+--  Status
+--    mandatory
+--  Descr
+--    ...
+--  objects
+--    acName, acVersion
+
+indMibMngrCnfgGroup OBJECT IDENTIFIER ::= { indMibCnfgGroups 10 }
+-- OBJECT-GROUP
+--  Status
+--    mandatory
+--  Descr
+--    ...
+--  objects
+--    mcInterval, mcRefresh, mcActiveProp, mcNewProp, mcPortProp, 
+--    mcSystemProp, mcSensitivity, mcSmoothing, mcVersion
+
+indMibAllSrvrsCnfgGroup OBJECT IDENTIFIER ::= { indMibCnfgGroups 11 }
+-- OBJECT-GROUP
+--  Status
+--    mandatory
+--  Descr
+--    ...
+--  objects
+--    ascQuiesced, ascInstances
+
+indMibCompliance OBJECT IDENTIFIER ::= { indMibCompliances 1 }
+-- MODULE-COMPLIANCE
+--  Status
+--    mandatory
+--  Descr
+--    The compliance statement for the Dispatcher MIB module.
+--  Module
+--    >>current<<
+--   MandGroup
+--    indMibExecStatGroup
+--   MandGroup
+--    indMibClstrStatGroup
+--   MandGroup
+--    indMibPortStatGroup
+--   MandGroup
+--    indMibSrvrStatGroup
+
+
+END
+

@@ -9,14 +9,14 @@ $rrd_options .= ' -b 1024';
 
 $iter = '1';
 
-$rrd_options .= " COMMENT:'                    Size      Free   % Used\\n'";
+$rrd_options .= " COMMENT:'                        Size      Free   % Used\\n'";
 
 $hostname = gethostbyid($storage['device_id']);
 
 $colour      = 'CC0000';
 $colour_area = 'ffaaaa';
 
-$descr = rrdtool_escape($storage['storage_descr'], 12);
+$descr = rrdtool_escape($storage['storage_descr'], 16);
 
 $percentage = round($storage['storage_perc'], 0);
 
@@ -33,7 +33,7 @@ $rrd_options .= ' GPRINT:free:LAST:%6.2lf%sB';
 $rrd_options .= " GPRINT:perc:LAST:%5.2lf%%\\n";
 
 if ($_GET['previous']) {
-    $descr = rrdtool_escape('Prev '.$storage['storage_descr'], 12);
+    $descr = rrdtool_escape('Prev '.$storage['storage_descr'], 16);
 
     $colour      = '99999999';
     $colour_area = '66666666';

@@ -5,7 +5,7 @@ path: blob/master/doc/
 
 Get the graph based on the group type.
 
-Route: `/api/v0/devices/portgroups/:group`
+Route: `/api/v0/portgroups/:group`
 
 - group is the type of port group graph you want, I.e Transit,
   Peering, etc. You can specify multiple types comma separated.

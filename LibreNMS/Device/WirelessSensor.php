@@ -156,6 +156,15 @@ class WirelessSensor extends Sensor
             'snr' => [
                 'icon' => 'signal',
             ],
+            'sinr' => [
+                'icon' => 'signal',
+            ],
+            'rsrp' => [
+                'icon' => 'signal',
+            ],
+            'rsrq' => [
+                'icon' => 'signal',
+            ],
             'ssr' => [
                 'icon' => 'signal',
             ],

@@ -1,7 +1,6 @@
 <?php
 
 use LibreNMS\Alerting\QueryBuilderParser;
-use LibreNMS\Authentication\LegacyAuth;
 
 $no_refresh = true;
 
@@ -54,6 +53,7 @@ require_once 'includes/html/modal/alert_rule_collection.inc.php';
 ?>
 <form method="post" action="" id="result_form">
 <?php
+echo csrf_field();
 if (isset($_POST['results_amount']) && $_POST['results_amount'] > 0) {
     $results = $_POST['results'];
 } else {
@@ -74,7 +74,7 @@ echo '<div class="table-responsive">
     </tr>';
 
 echo '<td colspan="7">';
-if (LegacyAuth::user()->hasGlobalAdmin()) {
+if (Auth::user()->hasGlobalAdmin()) {
     echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#create-alert" data-device_id="'.$device['device_id'].'"><i class="fa fa-plus"></i> Create new alert rule</button>';
     echo '<i> - OR - </i>';
     echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#search_rule_modal" data-device_id="'.$device['device_id'].'"><i class="fa fa-plus"></i> Create rule from collection</button>';
@@ -101,16 +101,29 @@ foreach ($result_options as $option) {
 
 echo '</select></td>';
 
-$query = 'FROM alert_rules';
-$where = '';
 $param = [];
 if (isset($device['device_id']) && $device['device_id'] > 0) {
-    $query .= ' LEFT JOIN alert_device_map ON alert_rules.id=alert_device_map.rule_id';
-    $where   = 'WHERE (device_id=? OR device_id IS NULL)';
+    //device selected
+
+    $global_rules = "SELECT ar1.* FROM alert_rules AS ar1 WHERE ar1.id NOT IN (SELECT agm1.rule_id FROM alert_group_map AS agm1 UNION DISTINCT SELECT adm1.rule_id FROM alert_device_map AS adm1)";
+
+    $device_rules = "SELECT ar2.* FROM alert_rules AS ar2 WHERE ar2.id IN (SELECT adm2.rule_id FROM alert_device_map AS adm2 WHERE adm2.device_id=?)";
     $param[] = $device['device_id'];
+
+    $device_group_rules = "SELECT ar3.* FROM alert_rules AS ar3 WHERE ar3.id IN (SELECT agm3.rule_id FROM alert_group_map AS agm3 LEFT JOIN device_group_device AS dgd3 ON agm3.group_id=dgd3.device_group_id WHERE dgd3.device_id=?)";
+    $param[] = $device['device_id'];
+
+    $full_query = '('. $global_rules .') UNION DISTINCT ('. $device_rules .') UNION DISTINCT ('. $device_group_rules .')';
+} else {
+    // no device selected
+    $full_query = 'SELECT alert_rules.* FROM alert_rules';
 }
 
-$count = dbFetchCell("SELECT COUNT(*) $query $where", $param);
+$full_query .= ' ORDER BY id ASC';
+
+$rule_list = dbFetchRows($full_query, $param);
+$count = count($rule_list);
+
 if (isset($_POST['page_number']) && $_POST['page_number'] > 0 && $_POST['page_number'] <= $count) {
     $page_number = $_POST['page_number'];
 } else {
@@ -118,9 +131,18 @@ if (isset($_POST['page_number']) && $_POST['page_number'] > 0 && $_POST['page_nu
 }
 
 $start = (($page_number - 1) * $results);
-$full_query = "SELECT alert_rules.* $query $where ORDER BY alert_rules.id ASC LIMIT $start,$results";
 
-foreach (dbFetchRows($full_query, $param) as $rule) {
+$index = 0;
+foreach ($rule_list as $rule) {
+    $index++;
+
+    if ($index < $start) {
+        continue;
+    }
+    if ($index > $start + $results) {
+        break;
+    }
+
     $sub   = dbFetchRows('SELECT * FROM alerts WHERE rule_id = ? ORDER BY `state` DESC, `id` DESC LIMIT 1', array($rule['id']));
     $ico   = 'check';
     $col   = 'success';
@@ -192,13 +214,13 @@ foreach (dbFetchRows($full_query, $param) as $rule) {
 
     echo '<td><small>Max: '.$rule_extra['count'].'<br />Delay: '.$rule_extra['delay'].'<br />Interval: '.$rule_extra['interval'].'</small></td>';
     echo '<td>';
-    if (LegacyAuth::user()->hasGlobalAdmin()) {
+    if (Auth::user()->hasGlobalAdmin()) {
         echo "<input id='".$rule['id']."' type='checkbox' name='alert-rule' data-orig_class='".$orig_class."' data-orig_colour='".$orig_col."' data-orig_state='".$orig_ico."' data-alert_id='".$rule['id']."' ".$alert_checked." data-size='small' data-content='".$popover_msg."' data-toggle='modal'>";
     }
 
     echo '</td>';
     echo '<td>';
-    if (LegacyAuth::user()->hasGlobalAdmin()) {
+    if (Auth::user()->hasGlobalAdmin()) {
         echo "<div class='btn-group btn-group-sm' role='group'>";
         echo "<button type='button' class='btn btn-primary' data-toggle='modal' data-target='#create-alert' data-rule_id='".$rule['id']."' name='edit-alert-rule' data-content='".$popover_msg."' data-container='body'><i class='fa fa-lg fa-pencil' aria-hidden='true'></i></button> ";
         echo "<button type='button' class='btn btn-danger' aria-label='Delete' data-toggle='modal' data-target='#confirm-delete' data-alert_id='".$rule['id']."' name='delete-alert-rule' data-content='".$popover_msg."' data-container='body'><i class='fa fa-lg fa-trash' aria-hidden='true'></i></button>";
@@ -221,10 +243,11 @@ echo '</table>
     </div>';
 
 if ($count < 1) {
-    if (LegacyAuth::user()->hasGlobalAdmin()) {
+    if (Auth::user()->hasGlobalAdmin()) {
         echo '<div class="row">
             <div class="col-sm-12">
             <form role="form" method="post">
+            ' . csrf_field() . '
             <p class="text-center">
             <button type="submit" class="btn btn-success btn-lg" id="create-default" name="create-default"><i class="fa fa-plus"></i> Click here to create the default alert rules!</button>
             </p>

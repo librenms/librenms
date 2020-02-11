@@ -1,6 +1,7 @@
 source: Support/Features.md
 path: blob/master/doc/
-### Features
+
+# Features
 
 Here's a brief list of supported features, some might be missing.
 If you think something is missing, feel free to ask us.
@@ -22,7 +23,8 @@ If you think something is missing, feel free to ask us.
 * API
 * Auto Updating
 
-### Vendors
+# Vendors
+
 Here's a brief list of supported vendors, some might be missing.
 If you are unsure of whether your device is supported or not, feel free to ask us.
 

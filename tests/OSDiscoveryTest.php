@@ -121,15 +121,16 @@ class OSDiscoveryTest extends TestCase
     {
         return [
             'device_id' => 1,
-            'hostname' => $this->snmpsim->getIP(),
+            'hostname' => $this->getSnmpsim()->getIP(),
             'snmpver' => 'v2c',
-            'port' => $this->snmpsim->getPort(),
+            'port' => $this->getSnmpsim()->getPort(),
             'timeout' => 3,
             'retries' => 0,
             'snmp_max_repeaters' => 10,
             'community' => $community,
             'os' => 'generic',
             'os_group' => '',
+            'attribs' => [],
         ];
     }
 

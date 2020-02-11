@@ -13,9 +13,8 @@
  */
 
 use LibreNMS\Alerting\QueryBuilderFilter;
-use LibreNMS\Authentication\LegacyAuth;
 
-if (LegacyAuth::user()->hasGlobalAdmin()) {
+if (Auth::user()->hasGlobalAdmin()) {
     $filters = json_encode(new QueryBuilderFilter('alert'));
 
     ?>
@@ -35,6 +34,7 @@ if (LegacyAuth::user()->hasGlobalAdmin()) {
                     </ul>
                     <br />
                     <form method="post" role="form" id="rules" class="form-horizontal alerts-form">
+                        <?php echo csrf_field() ?>
                         <input type="hidden" name="device_id" id="device_id" value="<?php echo isset($device['device_id']) ? $device['device_id'] : -1; ?>">
                         <input type="hidden" name="device_name" id="device_name" value="<?php echo format_hostname($device); ?>">
                         <input type="hidden" name="rule_id" id="rule_id" value="">

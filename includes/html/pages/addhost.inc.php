@@ -1,13 +1,12 @@
 <?php
 
-use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\HostUnreachableException;
 use LibreNMS\Util\IP;
 
 $no_refresh = true;
 
-if (!LegacyAuth::user()->hasGlobalAdmin()) {
+if (!Auth::user()->hasGlobalAdmin()) {
     include 'includes/html/error-no-perm.inc.php';
 
     exit;
@@ -27,7 +26,7 @@ if (!empty($_POST['hostname'])) {
         print_error("Invalid hostname or IP: $hostname");
     }
 
-    if (LegacyAuth::user()->hasGlobalRead()) {
+    if (Auth::user()->hasGlobalRead()) {
         // Settings common to SNMPv2 & v3
         if ($_POST['port']) {
             $port = clean($_POST['port']);
@@ -110,6 +109,7 @@ $pagetitle[] = 'Add host';
   </div>
   <div class="col-sm-6">
 <form name="form1" method="post" action="" class="form-horizontal" role="form">
+    <?php echo csrf_field() ?>
   <div><h2>Add Device</h2></div>
   <div class="alert alert-info">Devices will be checked for Ping/SNMP reachability before being probed.</div>
   <div class="well well-lg">
@@ -282,12 +282,9 @@ if (Config::get('distributed_poller') === true) {
 }//endif
 ?>
       <div class="form-group">
-          <div class="col-sm-offset-3 col-sm-9">
-              <div class="checkbox">
-                  <label>
-                      <input type="checkbox" name="force_add" id="force_add"> Force add - No ICMP or SNMP checks performed
-                  </label>
-              </div>
+          <label for="force_add" class="col-sm-3 control-label">Force add<br><small>(No ICMP or SNMP checks performed)</small></label>
+          <div class="col-sm-9">
+                  <input type="checkbox" name="force_add" id="force_add" data-size="small">
           </div>
       </div>
     <hr>
@@ -364,6 +361,7 @@ if (Config::get('distributed_poller') === true) {
     });
 
     $("[name='snmp']").bootstrapSwitch('offColor','danger');
+    $("[name='force_add']").bootstrapSwitch();
 <?php
 if (!$snmp_enabled) {
     echo '  $("[name=\'snmp\']").trigger(\'click\');';

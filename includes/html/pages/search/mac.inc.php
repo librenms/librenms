@@ -23,19 +23,19 @@ var grid = $("#mac-search").bootgrid({
         header: "<div id=\"{{ctx.id}}\" class=\"{{css.header}}\"><div class=\"row\">"+
                 "<div class=\"col-sm-9 actionBar\"><span class=\"pull-left\">"+
                 "<form method=\"post\" action=\"\" class=\"form-inline\" role=\"form\">"+
+                "<?php echo addslashes(csrf_field()) ?>"+
                 "<div class=\"form-group\">"+
                 "<select name=\"device_id\" id=\"device_id\" class=\"form-control input-sm\">"+
                 "<option value=\"\">All Devices</option>"+
 <?php
 
-use LibreNMS\Authentication\LegacyAuth;
-
 $sql = 'SELECT `devices`.`device_id`,`hostname`, `sysName` FROM `devices`';
+$param = [];
 
-if (!LegacyAuth::user()->hasGlobalRead()) {
-    $sql    .= ' LEFT JOIN `devices_perms` AS `DP` ON `devices`.`device_id` = `DP`.`device_id`';
-    $where  .= ' WHERE `DP`.`user_id`=?';
-    $param[] = LegacyAuth::id();
+if (!Auth::user()->hasGlobalRead()) {
+    $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
+    $where .= " WHERE `devices`.`device_id` IN " .dbGenPlaceholders(count($device_ids));
+    $param = array_merge($param, $device_ids);
 }
 
 $sql .= " $where ORDER BY `hostname`";

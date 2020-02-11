@@ -27033,78 +27033,6 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "state_name": null
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "temperature",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.6027.3.11.1.3.1.1.16.2103301",
-                    "sensor_index": "2103301",
-                    "sensor_type": "dnos",
-                    "sensor_descr": "Fo 1/49 40GBASE-CR4-7M",
-                    "group": "Transceivers",
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 0,
-                    "sensor_limit": 20,
-                    "sensor_limit_warn": null,
-                    "sensor_limit_low": -10,
-                    "sensor_limit_low_warn": null,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "state_name": null
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "temperature",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.6027.3.11.1.3.1.1.16.2105349",
-                    "sensor_index": "2105349",
-                    "sensor_type": "dnos",
-                    "sensor_descr": "Fo 1/53 40GBASE-CR4-0.5M",
-                    "group": "Transceivers",
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 0,
-                    "sensor_limit": 20,
-                    "sensor_limit_warn": null,
-                    "sensor_limit_low": -10,
-                    "sensor_limit_low_warn": null,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "state_name": null
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "temperature",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.6027.3.11.1.3.1.1.16.2105861",
-                    "sensor_index": "2105861",
-                    "sensor_type": "dnos",
-                    "sensor_descr": "Fo 1/54 40GBASE-CR4-0.5M",
-                    "group": "Transceivers",
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 0,
-                    "sensor_limit": 20,
-                    "sensor_limit_warn": null,
-                    "sensor_limit_low": -10,
-                    "sensor_limit_low_warn": null,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "state_name": null
                 }
             ],
             "state_indexes": [
@@ -27171,10 +27099,29 @@
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
-                    "mempool_perc_warn": 75
+                    "mempool_perc_warn": 90
                 }
             ]
         },
-        "poller": "matches discovery"
+        "poller": {
+            "mempools": [
+                {
+                    "mempool_index": "stack.1.1",
+                    "entPhysicalIndex": null,
+                    "hrDeviceIndex": null,
+                    "mempool_type": "dell-net",
+                    "mempool_precision": 0,
+                    "mempool_descr": "Memory Usage",
+                    "mempool_perc": 30,
+                    "mempool_used": 644245094,
+                    "mempool_free": 1503238554,
+                    "mempool_total": 2147483648,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 90
+                }
+            ]
+        }
     }
 }

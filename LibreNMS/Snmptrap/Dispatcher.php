@@ -27,6 +27,7 @@ namespace LibreNMS\Snmptrap;
 
 use LibreNMS\Config;
 use LibreNMS\Snmptrap\Handlers\Fallback;
+use LibreNMS\Alert\AlertRules;
 use Log;
 
 class Dispatcher
@@ -52,6 +53,9 @@ class Dispatcher
         $logging = Config::get('snmptraps.eventlog', 'unhandled');
         if ($logging == 'all' || ($fallback && $logging == 'unhandled')) {
             Log::event("SNMP trap received: " . $trap->getTrapOid(), $trap->getDevice(), 'trap');
+        } else {
+            $rules = new AlertRules;
+            $rules->runRules($trap->getDevice()->device_id);
         }
 
         return !$fallback;

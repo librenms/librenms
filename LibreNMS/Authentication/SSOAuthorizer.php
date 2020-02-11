@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Authentication;
 
+use Illuminate\Support\Arr;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\AuthenticationException;
 use LibreNMS\Exceptions\InvalidIpException;
@@ -120,12 +121,19 @@ class SSOAuthorizer extends MysqlAuthorizer
                     return false;
                 }
 
-                foreach (Config::get('sso.trusted_proxies') as $value) {
-                    $proxy = IP::parse($value);
+                $proxies = Config::get('sso.trusted_proxies');
 
-                    if ($source->innetwork((string) $proxy)) {
-                        // Proxy matches trusted subnet
-                        return true;
+                if (is_array($proxies)) {
+                    foreach ($proxies as $value) {
+                        $proxy = IP::parse($value);
+                        if ($proxies == '8.8.8.0/25') {
+                            dd($source->innetwork((string) $proxy));
+                        }
+
+                        if ($source->innetwork((string) $proxy)) {
+                            // Proxy matches trusted subnet
+                            return true;
+                        }
                     }
                 }
                 // No match, proxy is untrusted
@@ -182,7 +190,7 @@ class SSOAuthorizer extends MysqlAuthorizer
     public function authSSOParseGroups()
     {
         // Parse a delimited group list
-        $groups = explode(Config::get('sso.group_delimiter'), $this->authSSOGetAttr(Config::get('sso.group_attr')));
+        $groups = explode(Config::get('sso.group_delimiter', ';'), $this->authSSOGetAttr(Config::get('sso.group_attr')));
 
         $valid_groups = array();
 

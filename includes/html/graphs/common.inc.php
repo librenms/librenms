@@ -3,11 +3,11 @@
 use LibreNMS\Util\Clean;
 
 if ($_GET['from']) {
-    $from = preg_match('/(-\d+[hdm]|now)/', $_GET['from']) ? $_GET['from'] : (int)$_GET['from'];
+    $from = parse_at_time($_GET['from']);
 }
 
 if ($_GET['to']) {
-    $to = preg_match('/(-?\d+[hdm]|now)/', $_GET['to']) ? $_GET['to'] : (int)$_GET['to'];
+    $to = parse_at_time($_GET['to']);
 }
 
 if ($_GET['width']) {
@@ -82,7 +82,7 @@ if (isset($scale_rigid)) {
 }
 
 $rrd_options .= ' -E --start '.$from.' --end '.$to.' --width '.$width.' --height '.$height.' ';
-$rrd_options .= \LibreNMS\Config::get('rrdgraph_def_text') . ' -c FONT#' . \LibreNMS\Config::get('rrdgraph_def_text_color');
+$rrd_options .= \LibreNMS\Config::get('rrdgraph_def_text') . ' -c FONT#' . ltrim(\LibreNMS\Config::get('rrdgraph_def_text_color'), '#');
 
 if ($_GET['bg']) {
     $rrd_options .= ' -c CANVAS#' . Clean::alphaDash($_GET['bg']) . ' ';

@@ -1,14 +1,12 @@
 <?php
 
-use LibreNMS\Authentication\LegacyAuth;
-
 $no_refresh = true;
 
 $link_array = array('page'    => 'device',
     'device'  => $device['device_id'],
     'tab' => 'edit');
 
-if (!LegacyAuth::user()->hasGlobalAdmin()) {
+if (!Auth::user()->hasGlobalAdmin()) {
     print_error("Insufficient Privileges");
 } else {
     $panes['device']   = 'Device Settings';
@@ -56,6 +54,8 @@ if (!LegacyAuth::user()->hasGlobalAdmin()) {
     $panes['misc']     = 'Misc';
 
     $panes['component'] = 'Components';
+
+    $panes['customoid'] = 'Custom OID';
 
     print_optionbar_start();
 

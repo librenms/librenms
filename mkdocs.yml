@@ -30,10 +30,10 @@ nav:
   - Home: index.md
   - 1. General:
       - Acknowledgements: General/Acknowledgement.md
-      - General/Changelog.md
+      - Changelog: General/Changelog.md
       - Code of Conduct: General/CODE_OF_CONDUCT.md
-      - Support/Features.md
-      - General/Welcome-to-Observium-users.md
+      - Features: Support/Features.md
+      - Welcome to Observium users: General/Welcome-to-Observium-users.md
   - 2. Installing:
       - Installing LibreNMS: Installation/index.md
       - LibreNMS VMs: Installation/Images.md
@@ -49,118 +49,118 @@ nav:
       - Submitting stats: General/Callback-Stats-and-Privacy.md
       - Updating an install: General/Updating.md
   - 4. Basic Setup:
-      - Extensions/Applications.md
+      - Applications: Extensions/Applications.md
       - Check_MK Setup: Extensions/Agent-Setup.md
-      - Extensions/Billing-Module.md
-      - Extensions/Dell-OpenManage.md
-      - Extensions/World-Map.md
-      - Extensions/Interface-Description-Parsing.md
-      - Extensions/Network-Map.md
-      - Extensions/Syslog.md
-      - Extensions/Dashboards.md
+      - Billing Module: Extensions/Billing-Module.md
+      - Dell OpenManage: Extensions/Dell-OpenManage.md
+      - World Map: Extensions/World-Map.md
+      - Interface Description Parsing: Extensions/Interface-Description-Parsing.md
+      - Network Map: Extensions/Network-Map.md
+      - Syslog: Extensions/Syslog.md
+      - Dashboards: Extensions/Dashboards.md
   - 5. Advanced Setup:
-      - Support/1-Minute-Polling.md
+      - 1 Minute Polling: Support/1-Minute-Polling.md
       - Fast Ping Checking: Extensions/Fast-Ping-Check.md
-      - Support/Environment-Variables.md
-      - Configuration docs: Support/Configuration.md
+      - Environment Variables: Support/Environment-Variables.md
+      - Configuration Docs: Support/Configuration.md
       - Authentication Options: Extensions/Authentication.md
       - Two-Factor Auth: Extensions/Two-Factor-Auth.md
       - Auto-discovery Setup: Extensions/Auto-Discovery.md
       - Scaling LibreNMS: Extensions/Distributed-Poller.md
-      - Extensions/RRDCached.md
+      - RRDCached: Extensions/RRDCached.md
       - Sub-directory Support: Extensions/Sub-Directory.md
-      - Extensions/Varnish.md
+      - Varnish: Extensions/Varnish.md
       - Dispatcher Service (RC): Extensions/Dispatcher-Service.md
-      - Extensions/RRDTune.md
-      - Extensions/IRC-Bot.md
-      - Extensions/IRC-Bot-Extensions.md
-      - Extensions/SNMP-Proxy.md
-      - Extensions/SNMP-Trap-Handler.md
-      - Extensions/Customizing-the-Web-UI.md
-      - Support/Cleanup-options.md
+      - RRDTune: Extensions/RRDTune.md
+      - IRC Bot: Extensions/IRC-Bot.md
+      - IRC Bot Extensions: Extensions/IRC-Bot-Extensions.md
+      - SNMP Proxy: Extensions/SNMP-Proxy.md
+      - SNMP Trap Handler: Extensions/SNMP-Trap-Handler.md
+      - Customizing the Web UI: Extensions/Customizing-the-Web-UI.md
+      - Cleanup Options: Support/Cleanup-options.md
   - 6. 3rd Party Integration:
-      - Extensions/Gateone.md
-      - Extensions/Graylog.md
+      - Gateone: Extensions/Gateone.md
+      - Graylog: Extensions/Graylog.md
       - Nagios Plugins: Extensions/Services.md
-      - Extensions/NFSen.md
-      - Extensions/Oxidized.md
-      - Extensions/Rancid.md
-      - Extensions/PeeringDB.md
-      - Extensions/Proxmox.md
+      - NFSen: Extensions/NFSen.md
+      - Oxidized: Extensions/Oxidized.md
+      - Rancid: Extensions/Rancid.md
+      - PeeringDB: Extensions/PeeringDB.md
+      - Proxmox: Extensions/Proxmox.md
       - Storing Metrics:
           - Intro: Extensions/Metric-Storage.md
-          - Extensions/metrics/Graphite.md
-          - Extensions/metrics/InfluxDB.md
-          - Extensions/metrics/OpenTSDB.md
-          - Extensions/metrics/Prometheus.md
-      - Extensions/Smokeping.md
-      - Extensions/Weathermap.md
+          - Graphite: Extensions/metrics/Graphite.md
+          - InfluxDB: Extensions/metrics/InfluxDB.md
+          - OpenTSDB: Extensions/metrics/OpenTSDB.md
+          - Prometheus: Extensions/metrics/Prometheus.md
+      - Smokeping: Extensions/Smokeping.md
+      - Weathermap: Extensions/Weathermap.md
   - 7. API:
       - Using the API: API/index.md
-      - API/Devices.md
-      - API/DeviceGroups.md
-      - API/Ports.md
-      - API/PortGroups.md
-      - API/Alerts.md
-      - API/Routing.md
-      - API/Switching.md
-      - API/Inventory.md
-      - API/Bills.md
-      - API/ARP.md
-      - API/Services.md
-      - API/System.md
-      - API/Logs.md
+      - Devices: API/Devices.md
+      - DeviceGroups: API/DeviceGroups.md
+      - Ports: API/Ports.md
+      - PortGroups: API/PortGroups.md
+      - Alerts: API/Alerts.md
+      - Routing: API/Routing.md
+      - Switching: API/Switching.md
+      - Inventory: API/Inventory.md
+      - Bills: API/Bills.md
+      - ARP: API/ARP.md
+      - Services: API/Services.md
+      - System: API/System.md
+      - Logs: API/Logs.md
   - 8. Alerting:
       - Intro: Alerting/index.md
-      - Alerting/Introduction.md
-      - Alerting/Rules.md
-      - Alerting/Templates.md
-      - Alerting/Transports.md
-      - Alerting/Creating-Transport.md
-      - Alerting/Entities.md
-      - Alerting/Macros.md
-      - Alerting/Testing.md
-      - Alerting/Device-Dependencies.md
+      - Introduction: Alerting/Introduction.md
+      - Rules: Alerting/Rules.md
+      - Templates: Alerting/Templates.md
+      - Transports: Alerting/Transports.md
+      - Creating Transports: Alerting/Creating-Transport.md
+      - Entities: Alerting/Entities.md
+      - Macros: Alerting/Macros.md
+      - Testing: Alerting/Testing.md
+      - Device Dependencies: Alerting/Device-Dependencies.md
   - 9. Getting help:
       - How to get help: Support/index.md
-      - Support/FAQ.md
-      - Support/Install Validation.md
-      - Support/Performance.md
-      - Support/Discovery Support.md
-      - Support/Poller Support.md
-      - Support/Example-Hardware-Setup.md
-      - Support/Remote-Monitoring-VPN.md
-      - Support/SNMP-Configuration-Examples.md
-      - Support/SSL-Configuration.md
-      - Support/Device-Troubleshooting.md
-      - Support/Device-Sensors.md
+      - FAQ: Support/FAQ.md
+      - Install Validation: Support/Install Validation.md
+      - Performance: Support/Performance.md
+      - Discovery Support: Support/Discovery Support.md
+      - Poller Support: Support/Poller Support.md
+      - Example Hardware Setups: Support/Example-Hardware-Setup.md
+      - Remote Monitoring VPN: Support/Remote-Monitoring-VPN.md
+      - SNMP Configuration Examples: Support/SNMP-Configuration-Examples.md
+      - SSL Configuration: Support/SSL-Configuration.md
+      - Device Troubleshooting: Support/Device-Troubleshooting.md
+      - Device Sensors: Support/Device-Sensors.md
   - 10. Contributing + Developing:
       - Contributing: Developing/index.md
-      - Developing/Getting-Started.md
-      - Developing/Using-Git.md
-      - Developing/Code-Guidelines.md
-      - Developing/Style-Guidelines.md
-      - Developing/Validating-Code.md
-      - Developing/Code-Structure.md
-      - Developing/Creating-Documentation.md
-      - Developing/Licensing.md
-      - Extensions/Component.md
-      - Mib Based Polling (ALPHA): Extensions/MIB-based-polling.md
+      - Getting Started: Developing/Getting-Started.md
+      - Using Git: Developing/Using-Git.md
+      - Code Guidelines: Developing/Code-Guidelines.md
+      - Style Guidelines: Developing/Style-Guidelines.md
+      - Validating Code: Developing/Validating-Code.md
+      - Code Structure: Developing/Code-Structure.md
+      - Creating Documentation: Developing/Creating-Documentation.md
+      - Licensing: Developing/Licensing.md
+      - Component: Extensions/Component.md
+      - Mib Based Polling (Deprecated): Extensions/MIB-based-polling.md
       - Support for a new OS:
           - Intro: Developing/Support-New-OS.md
-          - Developing/os/Initial-Detection.md
-          - Developing/os/Mem-CPU-Information.md
-          - Developing/os/Test-Units.md
-          - Developing/os/Health-Information.md
-          - Developing/os/Wireless-Sensors.md
-          - Developing/os/Custom-Graphs.md
-          - Developing/os/Settings.md
-          - Developing/Sensor-State-Support.md
-      - Developing/SNMP-Traps.md
-      - Developing/Dynamic-Config.md
-      - Developing/Merging-Pull-Requests.md
-      - Developing/Creating-Release.md
-      - Extensions/Plugin-System.md
+          - Initial Detection: Developing/os/Initial-Detection.md
+          - Mem/CPU Information: Developing/os/Mem-CPU-Information.md
+          - Test Units: Developing/os/Test-Units.md
+          - Health Information: Developing/os/Health-Information.md
+          - Wireless Sensors: Developing/os/Wireless-Sensors.md
+          - Custom Graphs: Developing/os/Custom-Graphs.md
+          - Settings: Developing/os/Settings.md
+          - Sensor State Support: Developing/Sensor-State-Support.md
+      - SNMP Traps: Developing/SNMP-Traps.md
+      - Dynamic Config: Developing/Dynamic-Config.md
+      - Merging Pull Requests: Developing/Merging-Pull-Requests.md
+      - Creating Release: Developing/Creating-Release.md
+      - Plugin System: Extensions/Plugin-System.md
   - 11. Misc:
       - Security information: General/Security.md
       - CLI Scripts: Support/CLI-Tools.md

@@ -58,11 +58,11 @@ After you have saved your test data, you should run
 To run the full suite of tests enable database and snmpsim reliant
 tests: `./scripts/pre-commit.php --db --snmpsim -p -u`
 
-#### Specific OS
+### Specific OS
 
 `./scripts/pre-commit.php -p -o osname`
 
-#### Specific Module
+### Specific Module
 
 `./scripts/pre-commit.php -p -m modulename`
 
@@ -74,7 +74,7 @@ You can run snmpsim to access test data by running
 You may then run snmp queries against it using the os (and variant) as
 the community and 127.1.6.1:1161 as the host.
 
-```
+```bash
 snmpget -v 2c -c ios_c3560e 127.1.6.1:1161 sysDescr.0
 ```
 
@@ -84,7 +84,7 @@ Snmprec files are simple files that store the snmp data. The data
 format is simple with three columns: numeric oid, type code, and
 data. Here is an example snippet.
 
-```
+```snmp
 1.3.6.1.2.1.1.1.0|4|Pulse Secure,LLC,MAG-2600,8.0R14 (build 41869)
 1.3.6.1.2.1.1.2.0|6|1.3.6.1.4.1.12532.254.1.1
 ```
@@ -131,23 +131,22 @@ must use a variant to store your test data (-v).
 ### Add initial detection
 
 1. Add device to LibreNMS. It is generic and device_id = 42
-2. Run `./scripts/collect-snmp-data.php -h 42`, initial snmprec will
-   be created
-3. [Add initial detection](Initial-Detection.md) for `example-os`
-4. Run discovery to make sure it detects properly `./discovery.php -h 42`
-5. Add any additional os items like version, hardware, features, or serial.
-6. If there is additional snmp data required, run `./scripts/collect-snmp-data.php -h 42`
-7. Run `./scripts/save-test-data.php -o example-os` to update the dumped database data.
-7. Review data. If you modified the snmprec or code (don't modify json
-   manually) run `./scripts/save-test-data.php -o example-os -m os`
-8. Run `./scripts/pre-commit.php --db --snmpsim`
-9. If the tests succeed submit a pull request
+1. Run `./scripts/collect-snmp-data.php -h 42`, initial snmprec will be created
+1. [Add initial detection](Initial-Detection.md) for `example-os`
+1. Run discovery to make sure it detects properly `./discovery.php -h 42`
+1. Add any additional os items like version, hardware, features, or serial.
+1. If there is additional snmp data required, run `./scripts/collect-snmp-data.php -h 42`
+1. Run `./scripts/save-test-data.php -o example-os` to update the dumped database data.
+1. Review data. If you modified the snmprec or code (don't modify json manually) run `./scripts/save-test-data.php -o example-os -m os`
+1. Run `./scripts/pre-commit.php --db --snmpsim`
+1. If the tests succeed submit a pull request
 
 ### Additional module support or test data
+
 1. Add code to support module or support already exists.
-2. `./scripts/collect-snmp-data.php -h 42 -m <module>`, this will add
+1. `./scripts/collect-snmp-data.php -h 42 -m <module>`, this will add
    more data to the snmprec file
-3. Review data. If you modified the snmprec (don't modify json
+1. Review data. If you modified the snmprec (don't modify json
    manually) run `./scripts/save-test-data.php -o example-os -m <module>`
-4. Run `./scripts/pre-commit.php --db --snmpsim`
-5. If the tests succeed submit a pull request
+1. Run `./scripts/pre-commit.php --db --snmpsim`
+1. If the tests succeed submit a pull request

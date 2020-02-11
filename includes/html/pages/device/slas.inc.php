@@ -70,7 +70,7 @@ foreach ($slas as $sla) {
         continue;
     }
 
-    $opstatus = ($sla['opstatus'] === '0') ? 'up' : 'down';
+    $opstatus = ($sla['opstatus'] === 0) ? 'up' : 'down';
     d_echo("<br>Opstatus :: var: ".$vars['opstatus'].", db: ".$sla['opstatus'].", name: ".$opstatus."<br>");
     if ($vars['opstatus'] != 'all' && $vars['opstatus'] != $opstatus) {
         continue;

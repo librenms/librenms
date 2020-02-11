@@ -356,6 +356,7 @@ if ($format == "graph") {
         $(".devices-headers-table-menu").append(
             "<div class='pull-left'>" +
             "<form method='post' action='' class='form-inline devices-search-header' role='form'>" +
+            "<?php echo addslashes(csrf_field()) ?>"+
             "<div class='form-group'>" +
             "<input type='text' name='searchquery' id='searchquery' value=''<?php echo $vars['searchquery']; ?>'' class='form-control' placeholder='Search'>" +
             "</div>" +

@@ -51,15 +51,17 @@ been up for 30344 seconds`.
 - OS of the Device: `$alert->os`
 - Type of Device: `$alert->type`
 - IP of the Device: `$alert->ip`
-- hardware of the Device: `$alert->hardware`
+- Hardware of the Device: `$alert->hardware`
 - Software version of the Device: `$alert->version`
-- location of the Device: `$alert->location`
+- Features of the Device: `$alert->features`
+- Serial number of the Device: `$alert->serial`
+- Location of the Device: `$alert->location`
 - uptime of the Device (in seconds): `$alert->uptime`
-- short uptime of the Device (28d 22h 30m 7s): `$alert->uptime_short`
-- long uptime of the Device (28 days, 22h 30m 7s): `$alert->uptime_long`
-- description (purpose db field) of the Device: `$alert->description`
-- notes of the Device: `$alert->notes`
-- notes of the alert (ack notes): `$alert->alert_notes`
+- Short uptime of the Device (28d 22h 30m 7s): `$alert->uptime_short`
+- Long uptime of the Device (28 days, 22h 30m 7s): `$alert->uptime_long`
+- Description (purpose db field) of the Device: `$alert->description`
+- Notes of the Device: `$alert->notes`
+- Notes of the alert (ack notes): `$alert->alert_notes`
 - ping timestamp (if icmp enabled): `$alert->ping_timestamp`
 - ping loss (if icmp enabled): `$alert->ping_loss`
 - ping min (if icmp enabled): `$alert->ping_min`
@@ -84,6 +86,7 @@ been up for 30344 seconds`.
 - Severity: `$alert->severity`
 - Rule: `$alert->rule`
 - Rule-Name: `$alert->name`
+- Procedure URL: `$alert->proc`
 - Timestamp: `$alert->timestamp`
 - Transport type: `$alert->transport`
 - Transport name: `$alert->transport_name`

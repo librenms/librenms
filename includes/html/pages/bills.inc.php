@@ -1,11 +1,9 @@
 <?php
 
-use LibreNMS\Authentication\LegacyAuth;
-
 $no_refresh = true;
 
 if ($_POST['addbill'] == 'yes') {
-    if (!LegacyAuth::user()->hasGlobalAdmin()) {
+    if (!Auth::user()->hasGlobalAdmin()) {
         include 'includes/html/error-no-perm.inc.php';
         exit;
     }
@@ -116,7 +114,7 @@ include 'includes/html/modal/new_bill.inc.php';
     <div id="{{ctx.id}}" class="{{css.header}}">
         <div class="row">
             <div class="col-sm-4">
-            <?php if (LegacyAuth::user()->hasGlobalAdmin()) {  ?>
+            <?php if (Auth::user()->hasGlobalAdmin()) {  ?>
                 <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#create-bill"><i class="fa fa-plus"></i> Create Bill</button>
             <?php } ?>
             </div>

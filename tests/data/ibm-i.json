@@ -513,7 +513,7 @@
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
-                    "mempool_perc_warn": 75
+                    "mempool_perc_warn": 90
                 },
                 {
                     "mempool_index": "3",
@@ -529,7 +529,7 @@
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
-                    "mempool_perc_warn": 75
+                    "mempool_perc_warn": 90
                 },
                 {
                     "mempool_index": "4",
@@ -545,7 +545,7 @@
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
-                    "mempool_perc_warn": 75
+                    "mempool_perc_warn": 90
                 }
             ]
         },
@@ -565,7 +565,7 @@
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
-                    "mempool_perc_warn": 75
+                    "mempool_perc_warn": 90
                 },
                 {
                     "mempool_index": "3",
@@ -581,7 +581,7 @@
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
-                    "mempool_perc_warn": 75
+                    "mempool_perc_warn": 90
                 },
                 {
                     "mempool_index": "4",
@@ -597,7 +597,7 @@
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
-                    "mempool_perc_warn": 75
+                    "mempool_perc_warn": 90
                 }
             ]
         }

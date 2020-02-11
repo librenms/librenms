@@ -80,6 +80,9 @@
                                     "entPhysicalIndex": {
                                         "type": "string"
                                     },
+                                    "warn_percent": {
+                                        "type": "string"
+                                    },
                                     "snmp_flags": {
                                         "type": [
                                             "string",
@@ -254,6 +257,12 @@
                                                 "items": {
                                                     "type": "string"
                                                 }
+                                            },
+                                            "snmp_flags": {
+                                                "type": [
+                                                    "string",
+                                                    "array"
+                                                ]
                                             }
                                         },
                                         "additionalProperties": false,

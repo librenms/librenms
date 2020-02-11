@@ -3,12 +3,12 @@ path: blob/master/doc/
 
 # Creating a new Transport
 
-### File location
+## File location
 
 All transports are located in `LibreNMS\Alert\Transport` and the files
 are named after the Transport name. I.e `Discord.php` for Discord.
 
-### Transport structure
+## Transport structure
 
 The following functions are required for a new transport to pass the unit tests:
 
@@ -28,7 +28,7 @@ validated and how. Validation is done using [Laravel validation](https://laravel
 The following function is __not__ required for new Transports and is
 for legacy reasons only. `deliverAlertOld()`.
 
-### Documentation
+## Documentation
 
 Please don't forget to update the [Transport](Transports.md) file to
 include details of your new transport.
@@ -36,10 +36,8 @@ include details of your new transport.
 A table should be provided to indicate the form values that we ask for
 and examples. I.e:
 
-```
-**Example:**
-Config | Example
+|Config | Example|
 ------ | -------
-Discord URL | https://discordapp.com/api/webhooks/4515489001665127664/82-sf4385ysuhfn34u2fhfsdePGLrg8K7cP9wl553Fg6OlZuuxJGaa1d54fe
-Options | username=myname
-```
+Discord URL | <https://discordapp.com/api/webhooks/4515489001665127664/82-sf4385ysuhfn34u2fhfsdePGLrg8K7cP9wl553Fg6OlZuuxJGaa1d54fe>|
+Options | username=myname|
+

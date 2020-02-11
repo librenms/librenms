@@ -1,5 +1,5 @@
 <?php
-$unit_text     = 'Sync Speed (kB/s)';
+$unit_text     = 'Sync Speed (Byte/s)';
 $unitlen       = 20;
 $bigdescrlen   = 15;
 $smalldescrlen = 15;

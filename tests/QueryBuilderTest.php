@@ -29,7 +29,7 @@ use LibreNMS\Alerting\QueryBuilderFluentParser;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Config;
 
-class QueryBuilderTest extends LaravelTestCase
+class QueryBuilderTest extends TestCase
 {
     private $data_file = 'tests/data/misc/querybuilder.json';
 

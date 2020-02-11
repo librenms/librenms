@@ -42,7 +42,11 @@ if ($bill_data['bill_type'] == 'quota') {
 
 $total['ave'] = format_bytes_billing(($bill_data['total_data'] / $cur_days));
 $total['est'] = format_bytes_billing(($bill_data['total_data'] / $cur_days * $total_days));
-$total['per'] = round(($bill_data['total_data'] / $bill_data['bill_quota'] * 100), 2);
+if ($bill_data['bill_type'] == 'quota') {
+    $total['per'] = round(($bill_data['total_data'] / $bill_data['bill_quota'] * 100), 2);
+} else {
+    $total['per'] = round(($bill_data['total_data'] / ($bill_data['total_data'] / $cur_days * $total_days) * 100), 2);
+}
 $total['bg']  = get_percentage_colours($total['per']);
 
 $in['data']  = format_bytes_billing($bill_data['total_data_in']);

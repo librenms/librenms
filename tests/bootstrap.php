@@ -36,12 +36,6 @@ if (!getenv('SNMPSIM')) {
     $init_modules[] = 'mocksnmp';
 }
 
-if (getenv('DBTEST')) {
-    if (!is_file($install_dir . '/config.php')) {
-        exec("cp $install_dir/tests/config/config.test.php $install_dir/config.php");
-    }
-}
-
 require $install_dir . '/includes/init.php';
 chdir($install_dir);
 
@@ -61,53 +55,28 @@ if (getenv('SNMPSIM')) {
 }
 
 if (getenv('DBTEST')) {
-    global $schema, $sql_mode;
+    global $migrate_result, $migrate_output;
 
     // create testing table if needed
-    $db_config = Config::getDatabaseSettings();
-    $db_name = $db_config['db_name'];
-
-    $connection = new PDO("mysql:host={$db_config['db_host']}", $db_config['db_user'], $db_config['db_pass']);
-    $connection->query("CREATE DATABASE IF NOT EXISTS $db_name CHARACTER SET utf8 COLLATE utf8_unicode_ci");
+    $db_config = \config("database.connections.testing");
+    $connection = new PDO("mysql:host={$db_config['host']}", $db_config['username'], $db_config['password']);
+    $connection->query("CREATE DATABASE IF NOT EXISTS {$db_config['database']} CHARACTER SET utf8 COLLATE utf8_unicode_ci");
     unset($connection); // close connection
 
-    Eloquent::boot();
-    Eloquent::setStrictMode();
-
-    $empty_db = (dbFetchCell("SELECT count(*) FROM `information_schema`.`tables` WHERE `table_type` = 'BASE TABLE' AND `table_schema` = ?", [$db_name]) == 0);
-
-    $cmd = Config::get('install_dir') . '/build-base.php';
-    exec($cmd, $schema);
-
-    Config::load(); // reload the config including database config
-    load_all_os();
-
-    register_shutdown_function(function () use ($empty_db, $sql_mode) {
-        Eloquent::boot();
-
-        echo "Cleaning database...\n";
-
-        $db_name = dbFetchCell('SELECT DATABASE()');
-        if ($empty_db) {
-            dbQuery("DROP DATABASE $db_name");
-        } elseif (Config::get('test_db_name') == $db_name) {
-            // truncate tables
-            $tables = dbFetchColumn('SHOW TABLES');
-
-            $excluded = array(
-                'alert_templates',
-                'config', // not sure about this one
-                'dbSchema',
-                'migrations',
-                'widgets',
-            );
-            $truncate = array_diff($tables, $excluded);
-
-            dbQuery("SET FOREIGN_KEY_CHECKS = 0");
-            foreach ($truncate as $table) {
-                dbQuery("TRUNCATE TABLE $table");
-            }
-            dbQuery("SET FOREIGN_KEY_CHECKS = 1");
-        }
-    });
+    // try to avoid erasing people's primary databases
+    if ($db_config['database'] !== \config('database.connections.mysql.database', 'librenms')) {
+        echo "Refreshing database...";
+        $migrate_result = Artisan::call('migrate:fresh', ['--seed' => true, '--env' => 'testing', '--database' => 'testing']);
+        $migrate_output = Artisan::output();
+        echo "done\n";
+    } else {
+        echo "Info: Refusing to reset main database: {$db_config['database']}.  Running migrations.\n";
+        $migrate_result = Artisan::call('migrate', ['--seed' => true, '--env' => 'testing', '--database' => 'testing']);
+        $migrate_output = Artisan::output();
+    }
+    unset($db_config);
 }
+
+// reload the config including database config
+Config::reload();
+load_all_os();

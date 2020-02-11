@@ -1,5 +1,5 @@
 <div class="dashboard-graph">
-    <a href="graphs/{{ implode($params, '/') }}/type={{ $graph_type }}/from={{ $from }}">
+    <a href="graphs/{{ implode($params, '/') }}/type={{ $graph_type }}/from={{ $from }}/to={{ $to }}">
         <img class="minigraph-image"
              width="{{ $dimensions['x'] }}"
              height="{{ $dimensions['y'] }}"

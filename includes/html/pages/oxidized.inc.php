@@ -46,6 +46,7 @@ $pagetitle[] = 'Oxidized';
                 </div>
                 <div class="tab-pane fade" id="search">
                     <form class="form-horizontal" action="" method="post">
+                        <?php echo csrf_field() ?>
                         <br/>
                         <div class="input-group">
                             <input type="text" class="form-control" id="input-parameter"

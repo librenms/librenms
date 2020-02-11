@@ -430,7 +430,8 @@ class QueryBuilderParser implements \JsonSerializable
             }
 
             if (!$this->schema->columnExists($child, $child_key)) {
-                echo"FIXME: Could not make glue from $child to $parent\n";
+                $child_key = $this->schema->getPrimaryKey($child);
+                \Log::warning("QueryBuilderParser: Warning, guessing glue from $child.$child_key to $parent.$parent_key");
             }
         }
 

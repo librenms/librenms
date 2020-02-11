@@ -37,16 +37,16 @@ use Toastr;
 
 class Checks
 {
-    public static function preBoot()
+    public static function preAutoload()
     {
-        // check php extensions
-        if ($missing = self::missingPhpExtensions()) {
+        // Check PHP version otherwise it will just say server error
+        if (version_compare('7.1.3', PHP_VERSION, '>=')) {
             self::printMessage(
-                "Missing PHP extensions.  Please install and enable them on your LibreNMS server.",
-                $missing,
+                'PHP version 7.1.3 or newer is required to run LibreNMS',
+                null,
                 true
             );
-        }
+        };
     }
 
     /**
@@ -63,6 +63,18 @@ class Checks
         }
     }
 
+    public static function preBoot()
+    {
+        // check php extensions
+        if ($missing = self::missingPhpExtensions()) {
+            self::printMessage(
+                "Missing PHP extensions.  Please install and enable them on your LibreNMS server.",
+                $missing,
+                true
+            );
+        }
+    }
+
     /**
      * Post boot Toast messages
      */
@@ -73,7 +85,7 @@ class Checks
             return;
         }
 
-        Cache::put('checks_popup_timeout', true, Config::get('checks_popup_timer', 5));
+        Cache::put('checks_popup_timeout', true, Config::get('checks_popup_timer', 5) * 60);
 
         $user = Auth::user();
 
@@ -86,7 +98,7 @@ class Checks
             $warn_sec = Config::get('rrd.step', 300) * 3;
             if (Device::isUp()->where('last_polled', '<=', Carbon::now()->subSeconds($warn_sec))->exists()) {
                 $warn_min = $warn_sec / 60;
-                Toastr::warning('<a href="poll-log/filter=unpolled/">It appears as though you have some devices that haven\'t completed polling within the last ' . $warn_min . ' minutes, you may want to check that out :)</a>', 'Devices unpolled');
+                Toastr::warning('<a href="pollers/tab=log/filter=unpolled/">It appears as though you have some devices that haven\'t completed polling within the last ' . $warn_min . ' minutes, you may want to check that out :)</a>', 'Devices unpolled');
             }
 
             // Directory access checks

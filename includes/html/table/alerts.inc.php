@@ -13,10 +13,8 @@
  * @author     LibreNMS Contributors
 */
 
-use LibreNMS\Authentication\LegacyAuth;
-
 $where = ' `devices`.`disabled` = 0';
-
+$param = [];
 $alert_states = array(
     // divined from librenms/alerts.php
     'recovered' => 0,
@@ -24,16 +22,6 @@ $alert_states = array(
     'acknowledged' => 2,
     'worse' => 3,
     'better' => 4,
-);
-
-$alert_severities = array(
-    // alert_rules.status is enum('ok','warning','critical')
-    'ok' => 1,
-    'warning' => 2,
-    'critical' => 3,
-    'ok only' => 4,
-    'warning only' => 5,
-    'critical only' => 6,
 );
 
 $show_recovered = false;
@@ -59,14 +47,7 @@ if (is_numeric($vars['state'])) {
 }
 
 if (isset($vars['min_severity'])) {
-    if (is_numeric($vars['min_severity'])) {
-        $min_severity_id = $vars['min_severity'];
-    } elseif (!empty($vars['min_severity'])) {
-        $min_severity_id = $alert_severities[$vars['min_severity']];
-    }
-    if (isset($min_severity_id)) {
-        $where .= " AND `alert_rules`.`severity` " . ($min_severity_id > 3 ? "" : ">") . "= " . ($min_severity_id > 3 ? $min_severity_id - 3 : $min_severity_id);
-    }
+    $where .=  get_sql_filter_min_severity($vars['min_severity'], "alert_rules");
 }
 
 if (is_numeric($vars['group'])) {
@@ -84,10 +65,10 @@ if (isset($searchPhrase) && !empty($searchPhrase)) {
 
 $sql = ' FROM `alerts` LEFT JOIN `devices` ON `alerts`.`device_id`=`devices`.`device_id`';
 
-if (!LegacyAuth::user()->hasGlobalRead()) {
-    $sql .= ' LEFT JOIN `devices_perms` AS `DP` ON `devices`.`device_id` = `DP`.`device_id`';
-    $where .= ' AND `DP`.`user_id`=?';
-    $param[] = LegacyAuth::id();
+if (!Auth::user()->hasGlobalRead()) {
+    $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
+    $where .= " AND `D`.`device_id` IN " .dbGenPlaceholders(count($device_ids));
+    $param = array_merge($param, $device_ids);
 }
 
 $sql .= " LEFT JOIN `locations` ON `devices`.`location_id` = `locations`.`id`";
@@ -148,15 +129,9 @@ foreach (dbFetchRows($sql, $param) as $alert) {
         }
     }
 
+    $hostname = '<div class="incident">' . generate_device_link($alert, format_hostname($alert, shorthost($alert['hostname']))) . '<div id="incident' . ($alert['id']) . '" class="collapse">' . $fault_detail . '</div></div>';
+
     $severity = $alert['severity'];
-    if ($alert['state'] == 3) {
-        $severity .= ' <strong>+</strong>';
-    } elseif ($alert['state'] == 4) {
-        $severity .= ' <strong>-</strong>';
-    }
-
-    $hostname = '<div class="incident">' . generate_device_link($alert, shorthost($alert['hostname'])) . '<div id="incident' . ($rulei + 1) . '" class="collapse">' . $fault_detail . '</div></div>';
-
     switch ($severity) {
         case 'critical':
             $severity_ico = '<span class="alert-status label-danger">&nbsp;</span>';
@@ -170,6 +145,12 @@ foreach (dbFetchRows($sql, $param) as $alert) {
         default:
             $severity_ico = '<span class="alert-status label-info">&nbsp;</span>';
             break;
+    }
+
+    if ($alert['state'] == 3) {
+        $severity .= ' <strong>+</strong>';
+    } elseif ($alert['state'] == 4) {
+        $severity .= ' <strong>-</strong>';
     }
 
     if ((int)$alert['state'] === 2) {
@@ -196,8 +177,9 @@ foreach (dbFetchRows($sql, $param) as $alert) {
     $response[] = array(
         'id' => $rulei++,
         'rule' => '<i title="' . htmlentities($alert['rule']) . '"><a href="' . generate_url(array('page' => 'alert-rules')) . '">' . htmlentities($alert['name']) . '</a></i>',
-        'details' => '<a class="fa fa-plus incident-toggle" style="display:none" data-toggle="collapse" data-target="#incident' . ($rulei) . '" data-parent="#alerts"></a>',
+        'details' => '<a class="fa fa-plus incident-toggle" style="display:none" data-toggle="collapse" data-target="#incident' . ($alert['id']) . '" data-parent="#alerts"></a>',
         'hostname' => $hostname,
+        'location' => generate_link($alert['location'], array('page' => 'devices', 'location' => $alert['location'])),
         'timestamp' => ($alert['timestamp'] ? $alert['timestamp'] : 'N/A'),
         'severity' => $severity_ico,
         'state' => $alert['state'],

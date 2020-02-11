@@ -8,6 +8,7 @@ path: blob/master/doc/
 Create the file `resources/views/menu/custom.blade.php`
 
 Example contents:
+
 ```blade
 <li class="dropdown">
     <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-star fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i>
@@ -27,4 +28,20 @@ Example contents:
         @endadmin
     </ul>
 </li>
+```
+
+## Custom device menu entry
+
+You can add custom external links in the menu on the device page.
+
+This feature allows you to easily link applications to related
+systems, as shown in the example of Open-audIT.
+
+The Links value is parsed by Laravel Blade's templating engine so you
+can use Device variables such as `hostname`, `sysName` and more.
+
+`config.php:`
+
+```php
+$config['html']['device']['links'][] = ['url' => 'http://atssrv/open-audit/index/devices/{{ $device[\'sysName\'] }}', 'title' => 'Open-AudIT'];
 ```

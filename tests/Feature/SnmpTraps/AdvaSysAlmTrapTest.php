@@ -26,15 +26,11 @@
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use App\Models\Device;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
-use LibreNMS\Tests\LaravelTestCase;
 
-class AdvaSysAlmTrapTest extends LaravelTestCase
+class AdvaSysAlmTrapTest extends SnmpTrapTestCase
 {
-    use DatabaseTransactions;
-
     public function testCriticalAlarm()
     {
         $device = factory(Device::class)->create();

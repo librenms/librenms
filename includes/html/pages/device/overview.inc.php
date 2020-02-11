@@ -66,7 +66,7 @@ require 'overview/sensors/waterflow.inc.php';
 require 'overview/eventlog.inc.php';
 require 'overview/services.inc.php';
 require 'overview/syslog.inc.php';
-
+require 'overview/graylog.inc.php';
 echo('</div></div></div>');
 
 #require 'overview/current.inc.php");

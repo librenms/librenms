@@ -170,7 +170,52 @@ modules:
                         - { value: 4, descr: nonCritical, graph: 1, generic: 1 }
                         - { value: 5, descr: critical, graph: 1, generic: 2 }
                         - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
-
+                -
+                    oid: DELL-RAC-MIB::physicalDiskTable
+                    value: physicalDiskState
+                    num_oid: '.1.3.6.1.4.1.674.10892.2.6.1.20.130.4.1.4.{{ $index }}'
+                    descr: '{{ $physicalDiskName }} State'
+                    index: 'physicalDiskStatus.{{ $index }}'
+                    states:
+                        - { value: 1, descr: unknown, graph: 1, generic: 3 }
+                        - { value: 2, descr: ready, graph: 1, generic: 0 }
+                        - { value: 3, descr: online, graph: 1, generic: 0 }
+                        - { value: 4, descr: foreign, graph: 1, generic: 1 }
+                        - { value: 5, descr: offline, graph: 1, generic: 2 }
+                        - { value: 6, descr: blocked, graph: 1, generic: 2}
+                        - { value: 7, descr: failed, graph: 1, generic: 2 }
+                        - { value: 8, descr: nonraid, graph: 1, generic: 0 }
+                        - { value: 9, descr: nonrecoverable, graph: 1, generic: 2 }
+                        - { value: 10, descr: readonly, graph: 1, generic: 0 }
+                -
+                    oid: DELL-RAC-MIB::controllerTable
+                    value: controllerComponentStatus
+                    num_oid: '.1.3.6.1.4.1.674.10892.2.6.1.20.130.1.1.38.{{ $index }}'
+                    descr: '{{ $controllerName }} {{ $controllerDisplayName }}  State'
+                    index: 'controllerComponentStatus.{{ $index }}'
+                    states:
+                        - { value: 1, descr: other, graph: 1, generic: 3 }
+                        - { value: 2, descr: unknown, graph: 1, generic: 3  }
+                        - { value: 3, descr: ok, graph: 1, generic: 0 }
+                        - { value: 4, descr: nonCritical, graph: 1, generic: 1 }
+                        - { value: 5, descr: critical, graph: 1, generic: 2 }
+                        - { value: 6, descr: nonrecoverable, graph: 1, generic: 2}
+                -
+                    oid: drsCMCServerTable
+                    value: drsServerMonitoringCapable
+                    num_oid: '.1.3.6.1.4.1.674.10892.2.5.1.1.2.{{ $index }}'
+                    descr: 'Slot {{ $drsServerSlotNumber }} {{ $drsServerSlotName }} {{ $drsServerModel }} State'
+                    index: 'drsServerMonitoringCapable.{{ $index }}'
+                    skip_values:
+                        -
+                          oid: drsServerSlotName
+                          op: '=='
+                          value: 'N/A'
+                    states:
+                        - { value: 1, descr: absent, graph: 1, generic: 0 }
+                        - { value: 2, descr: none, graph: 1, generic: 0  }
+                        - { value: 3, descr: basic, graph: 1, generic: 0 }
+                        - { value: 4, descr: off l, graph: 1, generic: 1 }
         temperature:
             data:
                 -
@@ -210,6 +255,18 @@ modules:
                     value: drsPSUAmpsReading
                     num_oid: '.1.3.6.1.4.1.674.10892.2.4.2.1.6.{{ $index }}'
                     descr: 'Chassis {{ $drsPSUChassisIndex }} PS-{{ $drsPSUIndex }}'
+                -
+                    oid: amperageProbeTable
+                    value: amperageProbeReading
+                    divisor: 10
+                    num_oid: '.1.3.6.1.4.1.674.10892.5.4.600.30.1.6.{{ $index }}'
+                    descr: '{{ $amperageProbeLocationName }}'
+                    skip_values:
+                        -
+                            oid: amperageProbeType
+                            op: '!='
+                            value: 23
+ 
         power:
             data:
                 -
@@ -248,3 +305,13 @@ modules:
                     num_oid: '.1.3.6.1.4.1.674.10892.2.4.1.1.5.{{ $index }}'
                     index: 'drsPowerSurplus.{{ $index }}'
                     descr: 'Chassis {{ $drsChassisIndex }} Surplus Power'
+                -
+                    oid: amperageProbeTable
+                    value: amperageProbeReading
+                    num_oid: '.1.3.6.1.4.1.674.10892.5.4.600.30.1.6.{{ $index }}'
+                    descr: '{{ $amperageProbeLocationName }}'
+                    skip_values:
+                        -
+                            oid: amperageProbeType
+                            op: '!='
+                            value: 26

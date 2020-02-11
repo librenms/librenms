@@ -12,15 +12,11 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
 
+$mode = Session::get('map_view', 0);
 if (isset($settings['mode_select']) && $settings['mode_select'] !== '') {
     $mode = $settings['mode_select'];
-} elseif (isset($_SESSION["map_view"]) && is_numeric($_SESSION["map_view"])) {
-    $mode = $_SESSION["map_view"];
-} else {
-    $mode = 0;
 }
 
 $select_modes = array(
@@ -38,6 +34,7 @@ $show_disabled_ignored = $settings['show_disabled_and_ignored'];
 if (defined('SHOW_SETTINGS')) {
     $common_output[] = '
     <form class="form" onsubmit="widget_settings(this); return false;">
+        ' . csrf_field() . '
         <div class="form-group">
             <div class="col-sm-4">
                 <label for="title" class="control-label availability-map-widget-header">Widget title</label>
@@ -169,14 +166,14 @@ if (defined('SHOW_SETTINGS')) {
         // Only show devices if mode is 0 or 2 (Only Devices or both)
         if (Config::get('webui.availability_map_use_device_groups') != 0) {
             $device_group = 'SELECT `D`.`device_id` FROM `device_group_device` AS `D` WHERE `device_group_id` = ?';
-            $in_devices = dbFetchColumn($device_group, [$_SESSION['group_view']]);
+            $in_devices = dbFetchColumn($device_group, [Session::get('group_view')]);
         }
 
         $sql = 'SELECT `D`.`hostname`, `D`.`sysName`, `D`.`device_id`, `D`.`status`, `D`.`uptime`, `D`.`os`, `D`.`icon`, `D`.`ignore`, `D`.`disabled` FROM `devices` AS `D`';
 
-        if (!LegacyAuth::user()->hasGlobalRead()) {
+        if (!Auth::user()->hasGlobalRead()) {
             $sql .= ' , `devices_perms` AS P WHERE D.`device_id` = P.`device_id` AND P.`user_id` = ? AND ';
-            $param = [LegacyAuth::id()];
+            $param = [Auth::id()];
         } else {
             $sql .= ' WHERE ';
             $param = [];
@@ -254,12 +251,12 @@ if (defined('SHOW_SETTINGS')) {
     }
 
     if (($mode == 1 || $mode == 2) && (Config::get('show_services') != 0)) {
-        if (LegacyAuth::user()->hasGlobalRead()) {
+        if (Auth::user()->hasGlobalRead()) {
             $service_query = 'select `S`.`service_type`, `S`.`service_id`, `S`.`service_desc`, `S`.`service_status`, `D`.`hostname`, `D`.`sysName`, `D`.`device_id`, `D`.`os`, `D`.`icon` from services S, devices D where `S`.`device_id` = `D`.`device_id` ORDER BY '.$serviceOrderBy.';';
             $service_par = array();
         } else {
             $service_query = 'select `S`.`service_type`, `S`.`service_id`, `S`.`service_desc`, `S`.`service_status`, `D`.`hostname`, `D`.`sysName`, `D`.`device_id`, `D`.`os`, `D`.`icon` from services S, devices D, devices_perms P where `S`.`device_id` = `D`.`device_id` AND D.device_id = P.device_id AND P.user_id = ? ORDER BY '.$serviceOrderBy.';';
-            $service_par = array(LegacyAuth::id());
+            $service_par = array(Auth::id());
         }
         $services = dbFetchRows($service_query, $service_par);
         if (count($services) > 0) {
@@ -342,7 +339,7 @@ if (defined('SHOW_SETTINGS')) {
             $sql = 'SELECT `G`.`id`, `G`.`name` FROM `device_groups` AS `G`';
             $dev_groups = dbFetchRows($sql);
 
-            if ($_SESSION['group_view'] == 0) {
+            if (Session::get('group_view') == 0) {
                 $selected = 'selected';
             } else {
                 $selected = '';
@@ -354,7 +351,7 @@ if (defined('SHOW_SETTINGS')) {
                 <option value="0" ' . $selected . '>show all devices</option>';
 
             foreach ($dev_groups as $dev_group) {
-                if ($_SESSION['group_view'] == $dev_group['id']) {
+                if (Session::get('group_view') == $dev_group['id']) {
                     $selected = 'selected';
                 } else {
                     $selected = '';

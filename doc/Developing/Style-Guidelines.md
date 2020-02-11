@@ -23,8 +23,7 @@ about how to keep things responsive.
 - Ensure sub sections within the Navigation are separated correctly
   using `<li role="presentation" class="divider"></li>`.
 
-- Only use [Font Awesome icons](http://fontawesome.io/icons/) within
-the Navigation. It speeds up page load times quite considerably.
+- Only use [Font Awesome icons](http://fontawesome.io/icons/) within the Navigation. It speeds up page load times quite considerably.
 
 ### Buttons
 

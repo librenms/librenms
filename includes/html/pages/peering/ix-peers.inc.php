@@ -54,6 +54,7 @@ $status = $vars['status'];
                 "<div id=\"{{ctx.id}}\" class=\"{{css.header}}\"><div class=\"row\">"+
                 "<div class=\"col-sm-6 actionBar\"><span class=\"pull-left\">"+
                 "<form method=\"post\" action=\"\" class=\"form-inline\" role=\"form\">"+
+                "<?php echo addslashes(csrf_field()) ?>" +
                 "<div class=\"form-group\">"+
                 "<select name=\"status\" id=\"status\" class=\"form-control input-sm\">"+
                 "<option value=\"all\">All</option>"+

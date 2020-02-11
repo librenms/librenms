@@ -113,4 +113,23 @@ sdfsd <a href="ftp://192.168.1.1/help/me/now.php">ftp://192.168.1.1/help/me/now.
         $this->assertSame('Pickle', dynamic_discovery_get_value('singletable', 11, $data, $pre_cache));
         $this->assertSame('BBQ', dynamic_discovery_get_value('doubletable', 13, $data, $pre_cache));
     }
+
+    public function testParseAtTime()
+    {
+        $this->assertEquals(time(), parse_at_time('now'), 'now did not match');
+        $this->assertEquals(time()+180, parse_at_time('+3m'), '+3m did not match');
+        $this->assertEquals(time()+7200, parse_at_time('+2h'), '+2h did not match');
+        $this->assertEquals(time()+172800, parse_at_time('+2d'), '+2d did not match');
+        $this->assertEquals(time()+63115200, parse_at_time('+2y'), '+2y did not match');
+        $this->assertEquals(time()-180, parse_at_time('-3m'), '-3m did not match');
+        $this->assertEquals(time()-7200, parse_at_time('-2h'), '-2h did not match');
+        $this->assertEquals(time()-172800, parse_at_time('-2d'), '-2d did not match');
+        $this->assertEquals(time()-63115200, parse_at_time('-2y'), '-2y did not match');
+        $this->assertEquals(429929439, parse_at_time('429929439'));
+        $this->assertEquals(212334234, parse_at_time(212334234));
+        $this->assertEquals(time()-43, parse_at_time('-43'), '-43 did not match');
+        $this->assertEquals(0, parse_at_time('invalid'));
+        $this->assertEquals(606614400, parse_at_time('March 23 1989 UTC'));
+        $this->assertEquals(time()+86400, parse_at_time('+1 day'));
+    }
 }
