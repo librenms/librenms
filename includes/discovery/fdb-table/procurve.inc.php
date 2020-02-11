@@ -5,7 +5,7 @@
  * Discover ProCurve FDB data with Q-BRIDGE-MIB and BRIDGE-MIB
  * (based on bridge.inc.php). ProCurve indexes the dot1qTpFdbTable using
  * VLAN index numbers from dot1qVlanCurrentTable, rather than actual VLAN
- * IDs, so there needs to be further mapping to properly get the VLAN relating 
+ * IDs, so there needs to be further mapping to properly get the VLAN relating
  * to eachFDB entry.
  * 
  * This program is free software: you can redistribute it and/or modify
