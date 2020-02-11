@@ -989,7 +989,7 @@ function list_alerts(\Illuminate\Http\Request $request)
 
     $order = 'timestamp desc';
     
-    $alert_rule= $request->get('alert_rule');
+    $alert_rule = $request->get('alert_rule');
     if (isset($alert_rule)) {
         if (is_numeric($alert_rule)) {
             $param[] = $alert_rule;
