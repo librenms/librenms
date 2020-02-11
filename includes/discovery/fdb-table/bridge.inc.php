@@ -61,10 +61,11 @@ if (!empty($fdbPort_table)) {
                 continue;
             }
             $port_id = $portid_dict[$dot1dBasePort];
-            if ($device['os'] == 'procurve')
+            if ($device['os'] == 'procurve') {
                 $vlan_id = isset($vlans_by_id[$vlan]) ? $vlan : 0;
-            else
+            } else {
                 $vlan_id = isset($vlans_id[$vlan]) ? $vlans_id[$vlan] : 0;
+            }
             $insert[$vlan_id][$mac_address]['port_id'] = $port_id;
             d_echo("vlan $vlan mac $mac_address port ($dot1dBasePort) $port_id\n");
         }
