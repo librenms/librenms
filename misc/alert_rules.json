@@ -39,6 +39,11 @@
     "default": true
   },
   {
+    "rule": "devices.last_ping_timetaken > \"10\"",
+    "name": "Ping Latency",
+    "default": true
+  },
+  {
     "rule": "macros.port_usage_perc >= \"80\" && macros.port_up = \"1\"",
     "name": "Port utilisation over threshold",
     "default": true
