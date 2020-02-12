@@ -1023,6 +1023,7 @@ function add_edit_rule(\Illuminate\Http\Request $request)
     $rule_id = $data['rule_id'];
     $tmp_devices = (array)$data['devices'];
     $groups  = (array)$data['groups'];
+    $locations  = (array)$data['locations'];
     if (empty($tmp_devices) && !isset($rule_id)) {
         return api_error(400, 'Missing the devices or global device (-1)');
     }
@@ -1118,6 +1119,7 @@ function add_edit_rule(\Illuminate\Http\Request $request)
 
     dbSyncRelationship('alert_device_map', 'rule_id', $rule_id, 'device_id', $devices);
     dbSyncRelationship('alert_group_map', 'rule_id', $rule_id, 'group_id', $groups);
+    dbSyncRelationship('alert_location_map', 'rule_id', $rule_id, 'location_id', $locations);
     return api_success_noresult(200);
 }
 

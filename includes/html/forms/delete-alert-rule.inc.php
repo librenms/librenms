@@ -33,6 +33,7 @@ if (!is_numeric($vars['alert_id'])) {
     if (dbDelete('alert_rules', '`id` =  ?', array($vars['alert_id']))) {
         dbDelete('alert_device_map', 'rule_id=?', [$vars['alert_id']]);
         dbDelete('alert_group_map', 'rule_id=?', [$vars['alert_id']]);
+        dbDelete('alert_location_map', 'rule_id=?', [$vars['alert_id']]);
         dbDelete('alert_transport_map', 'rule_id=?', [$vars['alert_id']]);
         dbDelete('alert_template_map', 'alert_rule_id=?', [$vars['alert_id']]);
         echo $alert_msg_prefix . ' has been deleted.';
