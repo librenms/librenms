@@ -2265,21 +2265,15 @@ function del_parents_from_host(\Illuminate\Http\Request $request)
 {
     $device_id = $request->route('id');
     $data = json_decode($request->getContent(), true);
-    $device = Device::find($device_id);
     if (!validateDeviceIds(array($device_id))) {
         return api_error(400, "Check your device ID!");
     }
-    if (!empty($data['parent_ids'])) {
-        $parent_ids = explode(',', $data['parent_ids']);
-        if (!validateDeviceIds($parent_ids) || !Device::find($device_id)->parents()->detach($parent_ids)) {
-            return api_error(400, "Device dependency cannot be deleted check your parent IDs!");
-        }
-        return api_success_noresult(201, 'Device dependencies have been removed');
+    $device = Device::find($device_id);
+    $result = (empty($data['parent_ids']) ? $device->parents()->detach():(validateDeviceIds(explode(',', $data['parent_ids'])) ? $device->parents()->detach(explode(',', $data['parent_ids'])):false));
+    if($result) {
+        return api_success_noresult(201, 'All device dependencies have been removed');
     }
-    if (!$device->parents()->detach()) {
-        return api_error(400, 'Device dependency cannot be deleted');
-    }
-    return api_success_noresult(201, 'All device dependencies have been removed');
+    return api_error(400, 'Device dependency cannot be deleted check device and parents ids');
 }
 
 function validateDeviceIds($ids)
