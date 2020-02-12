@@ -18,7 +18,8 @@ use LibreNMS\Config;
  * Compare $t with the value of $vars[$v], if that exists
  * @param string $v Name of the var to test
  * @param string $t Value to compare $vars[$v] to
- * @return boolean true, if values are the same, false if $vars[$v] is unset or values differ
+ * @return boolean true, if values are the same, false if $vars[$v]
+ * is unset or values differ
  */
 function var_eq($v, $t)
 {
@@ -174,9 +175,6 @@ function generate_device_link($device, $text = null, $vars = array(), $start = 0
     }
 
     $class = devclass($device);
-    if (!$text) {
-        $text = $device['hostname'];
-    }
 
     $text = format_hostname($device, $text);
 

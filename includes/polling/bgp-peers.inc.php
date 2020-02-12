@@ -395,6 +395,8 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                         $vrpPrefixes = snmpwalk_cache_multi_oid($device, 'hwBgpPeerPrefixRcvCounter', $vrpPrefixes, 'HUAWEI-BGP-VPN-MIB', null, '-OQUs');
                         $vrpPrefixes = snmpwalk_cache_multi_oid($device, 'hwBgpPeerPrefixAdvCounter', $vrpPrefixes, 'HUAWEI-BGP-VPN-MIB', null, '-OQUs');
 
+                        // only works in global routing table, as the vpnInstanceId is not available
+                        // for now in the VRF discovery of VRP devices
                         $key = '0.'.$afi.'.'.$safi.'.ipv4.'.$peer['bgpPeerIdentifier'];
                         $cbgpPeerAcceptedPrefixes = $vrpPrefixes[$key]['hwBgpPeerPrefixRcvCounter'];
                         $cbgpPeerAdvertisedPrefixes  = $vrpPrefixes[$key]['hwBgpPeerPrefixAdvCounter'];

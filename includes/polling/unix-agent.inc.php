@@ -12,8 +12,8 @@ if ($device['os_group'] == 'unix') {
     }
 
     $agent_start = microtime(true);
-    $polling_target = Device::pollingTarget($device['hostname']);
-    $agent = fsockopen($polling_target, $agent_port, $errno, $errstr, \LibreNMS\Config::get('unix-agent.connection-timeout'));
+    $poller_target = Device::pollerTarget($device['hostname']);
+    $agent = fsockopen($poller_target, $agent_port, $errno, $errstr, \LibreNMS\Config::get('unix-agent.connection-timeout'));
 
     // Set stream timeout (for timeouts during agent  fetch
     stream_set_timeout($agent, \LibreNMS\Config::get('unix-agent.read-timeout'));
