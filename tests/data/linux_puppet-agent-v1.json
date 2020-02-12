@@ -1,0 +1,207 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.8072.3.2.10",
+                    "sysDescr": "Linux SERVERNAME 4.19.0-6-amd64 #1 SMP Debian 4.19.67-2 (2019-08-28) x86_64",
+                    "sysContact": null,
+                    "version": null,
+                    "hardware": null,
+                    "features": null,
+                    "os": "linux",
+                    "type": "server",
+                    "serial": null,
+                    "icon": "linux.svg",
+                    "location": null
+                }
+            ]
+        },
+        "poller": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.8072.3.2.10",
+                    "sysDescr": "Linux SERVERNAME 4.19.0-6-amd64 #1 SMP Debian 4.19.67-2 (2019-08-28) x86_64",
+                    "sysContact": "<private>",
+                    "version": "4.19.0-6-amd64",
+                    "hardware": "Generic x86 64-bit",
+                    "features": null,
+                    "os": "linux",
+                    "type": "server",
+                    "serial": null,
+                    "icon": "linux.svg",
+                    "location": "<private>"
+                }
+            ]
+        }
+    },
+    "applications": {
+        "discovery": {
+            "applications": [
+                {
+                    "app_type": "puppet-agent",
+                    "app_state": "UNKNOWN",
+                    "discovered": 1,
+                    "app_state_prev": null,
+                    "app_status": "",
+                    "app_instance": ""
+                }
+            ],
+            "application_metrics": []
+        },
+        "poller": {
+            "applications": [
+                {
+                    "app_type": "puppet-agent",
+                    "app_state": "OK",
+                    "discovered": 1,
+                    "app_state_prev": "UNKNOWN",
+                    "app_status": "",
+                    "app_instance": ""
+                }
+            ],
+            "application_metrics": [
+                {
+                    "metric": "changes-total",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "puppet-agent"
+                },
+                {
+                    "metric": "events_failure",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "puppet-agent"
+                },
+                {
+                    "metric": "events_success",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "puppet-agent"
+                },
+                {
+                    "metric": "events_total",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "puppet-agent"
+                },
+                {
+                    "metric": "last_run_last_run",
+                    "value": 17,
+                    "value_prev": null,
+                    "app_type": "puppet-agent"
+                },
+                {
+                    "metric": "resourcs_changed",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "puppet-agent"
+                },
+                {
+                    "metric": "resources_corrective_change",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "puppet-agent"
+                },
+                {
+                    "metric": "resources_failed",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "puppet-agent"
+                },
+                {
+                    "metric": "resources_failed_to_restart",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "puppet-agent"
+                },
+                {
+                    "metric": "resources_out_of_sync",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "puppet-agent"
+                },
+                {
+                    "metric": "resources_restarted",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "puppet-agent"
+                },
+                {
+                    "metric": "resources_scheduled",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "puppet-agent"
+                },
+                {
+                    "metric": "resources_skipped",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "puppet-agent"
+                },
+                {
+                    "metric": "resources_total",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "puppet-agent"
+                },
+                {
+                    "metric": "time_catalog_application",
+                    "value": 8.01,
+                    "value_prev": null,
+                    "app_type": "puppet-agent"
+                },
+                {
+                    "metric": "time_config_retrieval",
+                    "value": 4.25,
+                    "value_prev": null,
+                    "app_type": "puppet-agent"
+                },
+                {
+                    "metric": "time_convert_catalog",
+                    "value": 0.56,
+                    "value_prev": null,
+                    "app_type": "puppet-agent"
+                },
+                {
+                    "metric": "time_fact_generation",
+                    "value": 3.2,
+                    "value_prev": null,
+                    "app_type": "puppet-agent"
+                },
+                {
+                    "metric": "time_node_retrieval",
+                    "value": 0.11,
+                    "value_prev": null,
+                    "app_type": "puppet-agent"
+                },
+                {
+                    "metric": "time_plugin_sync",
+                    "value": 0.5,
+                    "value_prev": null,
+                    "app_type": "puppet-agent"
+                },
+                {
+                    "metric": "time_schedule",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "puppet-agent"
+                },
+                {
+                    "metric": "time_total",
+                    "value": 16.65,
+                    "value_prev": null,
+                    "app_type": "puppet-agent"
+                },
+                {
+                    "metric": "time_transaction_evaluation",
+                    "value": 7.75,
+                    "value_prev": null,
+                    "app_type": "puppet-agent"
+                }
+            ]
+        }
+    }
+}
