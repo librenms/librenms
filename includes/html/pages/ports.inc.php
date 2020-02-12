@@ -340,6 +340,16 @@ foreach ($vars as $var => $value) {
                     $ignore_filter = 1;
                 }
                 break;
+            case 'group':
+                if (is_numeric($value)) {
+                    $where .= " AND ( ";
+                    foreach (DB::table('device_group_device')->where('device_group_id', $vars['group'])->pluck('device_id') as $dev) {
+                        $where .= "D.device_id = $dev OR ";
+                    }
+                    $where = substr($where, 0, strlen($where) - 3);
+                    $where .= " )";
+                }
+                break;
             case 'ignore':
                 if ($value == 1 || $value == 'yes') {
                     $where .= " AND (I.ignore = 1 OR D.ignore = 1) AND I.deleted = 0";
@@ -413,6 +423,8 @@ if ($ignore_filter == 0 && $disabled_filter == 0) {
 
 $query = "SELECT * FROM `ports` AS I, `devices` AS D LEFT JOIN `locations` AS L ON D.location_id = L.id WHERE I.device_id = D.device_id" . $where . " " . $query_sort;
 $row = 1;
+
+#echo "$query<BR>";
 
 list($format, $subformat) = explode('_', basename($vars['format']));
 
