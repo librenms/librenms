@@ -981,6 +981,11 @@ function alert_details($details)
             $fallback = false;
         }
 
+        if ($tmp_alerts['last_ping_timetaken']) {
+            $fault_detail = 'Latency: ' . $tmp_alerts['last_ping_timetaken']. 'ms';
+            $fallback = false;
+        }
+
         if ($tmp_alerts['type'] && $tmp_alerts['label']) {
             if ($tmp_alerts['error'] == "") {
                 $fault_detail .= ' ' . $tmp_alerts['type'] . ' - ' . $tmp_alerts['label'] . ';&nbsp;';
