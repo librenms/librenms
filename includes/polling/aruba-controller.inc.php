@@ -72,7 +72,7 @@ if ($device['type'] == 'wireless' && $device['os'] == 'arubaos') {
             $name          = $value;
             $type          = $aruba_apstats[$key1][".1.3.6.1.4.1.14823.2.2.1.5.2.1.5.1.2.$radioid"];
             $channel       = ($aruba_apstats[$key1][".1.3.6.1.4.1.14823.2.2.1.5.2.1.5.1.3.$radioid"] + 0);
-            $txpow         = ($aruba_apstats[$key1][".1.3.6.1.4.1.14823.2.2.1.5.2.1.5.1.4.$radioid"] + 0);
+            $txpow         = ($aruba_apstats[$key1][".1.3.6.1.4.1.14823.2.2.1.5.2.1.5.1.4.$radioid"] + 0)/2;
             $radioutil     = ($aruba_apstats[$key1][".1.3.6.1.4.1.14823.2.2.1.5.2.1.5.1.6.$radioid"] + 0);
             $numasoclients = ($aruba_apstats[$key1][".1.3.6.1.4.1.14823.2.2.1.5.2.1.5.1.7.$radioid"] + 0);
             $nummonclients = ($aruba_apstats[$key1][".1.3.6.1.4.1.14823.2.2.1.5.2.1.5.1.8.$radioid"] + 0);
