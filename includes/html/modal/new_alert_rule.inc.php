@@ -110,7 +110,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                                     </div>
                                 </div>
                                 <div class="form-group form-inline">
-                                    <label for='maps' class='col-sm-3 col-md-2 control-label' title="Restricts this alert rule to the selected devices and groups.">Match devices and groups list: </label>
+                                    <label for='maps' class='col-sm-3 col-md-2 control-label' title="Restricts this alert rule to the selected devices, groups and locations.">Match devices, groups and locations list: </label>
                                     <div class="col-sm-7" style="width: 56%;">
                                         <select id="maps" name="maps[]" class="form-control" multiple="multiple"></select>
                                     </div>
