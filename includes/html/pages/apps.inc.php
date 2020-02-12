@@ -250,6 +250,13 @@ $graphs['certificate'] = array(
     'age',
     'remaining_days',
 );
+$graphs['puppet-agent'] = array(
+    'last_run',
+    'changes',
+    'events',
+    'resources',
+    'time',
+);
 $graphs['mdadm'] = array(
     'level',
     'size',
