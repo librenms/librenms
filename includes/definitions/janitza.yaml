@@ -4,6 +4,8 @@ type: power
 icon: janitza
 over:
     - { graph: device_power, text: 'Power' }
+mib_dir:
+    - janitza
 discovery_modules:
     storage: false
     mempools: false
