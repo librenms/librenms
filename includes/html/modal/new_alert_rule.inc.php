@@ -307,7 +307,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                 $maps.empty();
                 $maps.val(null).trigger('change');
                 setRuleDevice();// pre-populate device in the maps if this is a per-device rule
-                
+
                 var $transports = $("#transports");
                 $transports.empty();
                 $transports.val(null).trigger('change');
@@ -408,13 +408,13 @@ if (Auth::user()->hasGlobalAdmin()) {
 
         $("#maps").select2({
             width: '100%',
-            placeholder: "Devices or Groups",
+            placeholder: "Devices, Groups or Locations",
             ajax: {
                 url: 'ajax_list.php',
                 delay: 250,
                 data: function (params) {
                     return {
-                        type: 'devices_groups',
+                        type: 'devices_groups_locations',
                         search: params.term
                     };
                 }

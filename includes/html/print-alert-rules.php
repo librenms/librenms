@@ -133,7 +133,10 @@ if (isset($device['device_id']) && $device['device_id'] > 0) {
     $device_group_rules = "SELECT ar3.* FROM alert_rules AS ar3 WHERE ar3.id IN (SELECT agm3.rule_id FROM alert_group_map AS agm3 LEFT JOIN device_group_device AS dgd3 ON agm3.group_id=dgd3.device_group_id WHERE dgd3.device_id=?)";
     $param[] = $device['device_id'];
 
-    $full_query = '('. $global_rules .') UNION DISTINCT ('. $device_rules .') UNION DISTINCT ('. $device_group_rules .')';
+    $device_location_rules = "SELECT ar4.* FROM alert_rules AS ar4 WHERE ar4.id IN (SELECT alm4.rule_id FROM alert_location_map AS alm4 LEFT JOIN devices AS d4 ON alm4.location_id=d4.location_id WHERE d4.device_id=?)";
+    $param[] = $device['device_id'];
+
+    $full_query = '('. $global_rules .') UNION DISTINCT ('. $device_rules .') UNION DISTINCT ('. $device_group_rules .') UNION DISTINCT ('. $device_location_rules .')';
 } else {
     // no device selected
     $full_query = 'SELECT alert_rules.* FROM alert_rules';
@@ -220,22 +223,31 @@ foreach ($rule_list as $rule) {
 
     $device_count = dbFetchCell('SELECT COUNT(*) FROM alert_device_map WHERE rule_id=?', [$rule['id']]);
     $group_count = dbFetchCell('SELECT COUNT(*) FROM alert_group_map WHERE rule_id=?', [$rule['id']]);
+    $location_count = dbFetchCell('SELECT COUNT(*) FROM alert_location_map WHERE rule_id=?', [$rule['id']]);
+
+    $popover_msg_parts = [];
+
+    $icon_indicator = 'fa fa-globe fa-fw text-success';
+
     if ($device_count) {
-        $popover_msg = 'Device restricted rule #' . $rule['id'];
+        $popover_msg_parts[] = 'Device';
         $icon_indicator = 'fa fa-server fa-fw text-primary';
     }
     if ($group_count) {
-        $popover_msg = 'Group restricted rule #' . $rule['id'];
+        $popover_msg_parts[] = 'Group';
         $icon_indicator = 'fa fa-th fa-fw text-primary';
     }
-    if ($device_count && $group_count) {
-        $popover_msg = 'Device and Group restricted rule #' . $rule['id'];
-        $icon_indicator = 'fa fa-connectdevelop fa-fw text-primary';
+    if ($location_count) {
+        $popover_msg_parts[] = 'Location';
+        $icon_indicator = 'fa fa-th fa-fw text-primary';
     }
-    if (!$device_count && !$group_count) {
-        $popover_msg = 'Global alert rule #' . $rule['id'];
-        $icon_indicator = 'fa fa-globe fa-fw text-success';
+
+    if (count($popover_msg_parts)) {
+        $popover_msg = implode(', ', $popover_msg_parts);
+    } else {
+        $popover_msg = 'Global';
     }
+    $popover_msg .= ' alert Rule #' . $rule['id'];
 
     echo "<tr class='".$extra."' id='rule_id_".$rule['id']."'>";
 
@@ -261,38 +273,48 @@ foreach ($rule_list as $rule) {
         $except_device_or_group = '<strong><em>EXCEPT</em></strong> ';
     }
 
-    $devices_and_groups_popover='right';
+    $popover_position = 'right';
 
-    $groups=null;
+    $locations = null;
+    if ($location_count) {
+        $location_query = 'SELECT locations.location, locations.id FROM alert_location_map, locations WHERE alert_location_map.rule_id=? and alert_location_map.location_id = locations.id ORDER BY location';
+        $location_maps = dbFetchRows($location_query, [$rule['id']]);
+        foreach ($location_maps as $location_map) {
+            $locations .= "$except_device_or_group<a href=\"/devices\/location=".$location_map['id']."\" data-container='body' data-toggle='popover' data-placement='$popover_position' data-content='View Devices for Location' target=\"_blank\">".$location_map['location']."</a><br>";
+        }
+    }
+
+    $groups = null;
     if ($group_count) {
         $group_query = 'SELECT device_groups.name, device_groups.id FROM alert_group_map, device_groups WHERE alert_group_map.rule_id=? and alert_group_map.group_id = device_groups.id ORDER BY name';
         $group_maps = dbFetchRows($group_query, [$rule['id']]);
         foreach ($group_maps as $group_map) {
-            $groups .= "$except_device_or_group<a href=\"/device-groups/" . $group_map['id'] . "/edit\" data-container='body' data-toggle='popover' data-placement='$devices_and_groups_popover' data-content='Edit device group " . $group_map['name'] . "' title='$groups_msg' target=\"_blank\">" . $group_map['name'] . "</a><br>";
+            $groups .= "$except_device_or_group<a href=\"/device-groups/" . $group_map['id'] . "/edit\" data-container='body' data-toggle='popover' data-placement='$popover_position' data-content='" . $group_map['name'] . "' title='$groups_msg' target=\"_blank\">" . $group_map['name'] . "</a><br>";
         }
     }
 
-    $devices=null;
+    $devices = null;
     if ($device_count) {
         $device_query = 'SELECT devices.device_id,devices.hostname FROM alert_device_map, devices WHERE alert_device_map.rule_id=? and alert_device_map.device_id = devices.device_id ORDER BY hostname';
         $device_maps = dbFetchRows($device_query, [$rule['id']]);
         foreach ($device_maps as $device_map) {
-            $devices .= "$except_device_or_group<a href=\"/device/device=" . $device_map['device_id'] . "/tab=edit/\" data-container='body' data-toggle='popover' data-placement='$devices_and_groups_popover' data-content='Edit device " . $device_map['hostname'] . "' title='$devices_msg' target=\"_blank\">" . $device_map['hostname'] . "</a><br>";
+            $devices .= "$except_device_or_group<a href=\"/device/device=" . $device_map['device_id'] . "/tab=edit/\" data-container='body' data-toggle='popover' data-placement='$popover_position' data-content='" . $device_map['hostname'] . "' title='$devices_msg' target=\"_blank\">" . $device_map['hostname'] . "</a><br>";
         }
     }
 
     echo "<td colspan='2'>";
+    if ($locations) {
+        echo $locations;
+    }
     if ($groups) {
-        // Individual Groups first
         echo $groups;
     }
     if ($devices) {
-        // Individual Devices last
         echo $devices;
     }
-    if (!$devices && !$groups) {
+    if (!$devices && !$groups && !$locations) {
         // All Devices
-        echo "<a href=\"/devices\" data-container='body' data-toggle='popover' data-placement='$devices_and_groups_popover' data-content='View All Devices' target=\"_blank\">All Devices</a><br>";
+        echo "<a href=\"/devices\" data-container='body' data-toggle='popover' data-placement='$popover_position' data-content='View All Devices' target=\"_blank\">All Devices</a><br>";
     }
 
     echo "</td>";
