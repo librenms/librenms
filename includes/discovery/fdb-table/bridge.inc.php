@@ -64,7 +64,7 @@ if (!empty($fdbPort_table)) {
     // Collect data and populate $insert
     foreach ($fdbPort_table as $vlanIndex => $data) {
         // Look the dot1qVlanFdbId up to a real VLAN number; if undefined assume the
-        // index *is* the VLAN number. Code in fdb-table.inc.php to map to the 
+        // index *is* the VLAN number. Code in fdb-table.inc.php to map to the
         // device VLANs table should catch anything invalid.
         $vlan = isset($vlan_fdb_dict[$vlanIndex]) ? $vlan_fdb_dict[$vlanIndex] : $vlanIndex;
         
