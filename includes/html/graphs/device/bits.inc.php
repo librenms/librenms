@@ -8,6 +8,9 @@ foreach (dbFetchRows('SELECT * FROM `ports` WHERE `device_id` = ? AND `disabled`
     $ignore = 0;
     if (is_array(\LibreNMS\Config::get('device_traffic_iftype'))) {
         foreach (\LibreNMS\Config::get('device_traffic_iftype') as $iftype) {
+            if (is_null($iftype) || !is_string($iftype) || $iftype == '') {
+                continue; // or pgreg match may be a false positive
+            }
             if ($iftype == '/l2vlan/' && $device['os']=='asa') {
                 // ASA (at least in multicontext) reports all interfaces as l2vlan even if they are l3
                 // so every context has no graph displayed unless l2vlan are accepted for all.
@@ -22,6 +25,9 @@ foreach (dbFetchRows('SELECT * FROM `ports` WHERE `device_id` = ? AND `disabled`
 
     if (is_array(\LibreNMS\Config::get('device_traffic_descr'))) {
         foreach (\LibreNMS\Config::get('device_traffic_descr') as $ifdescr) {
+            if (is_null($ifdesc) || !is_string($ifdesc) || $ifdesc == '') {
+                continue; // or pgreg match may be a false positive
+            }
             if (preg_match($ifdescr.'i', $port['ifDescr']) || preg_match($ifdescr.'i', $port['ifName'])) {
                 $ignore = 1;
             }

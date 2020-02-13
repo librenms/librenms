@@ -7,6 +7,9 @@ foreach (dbFetchRows('SELECT * FROM `ports` AS P, `devices` AS D WHERE D.device_
     $ignore = 0;
     if (is_array(\LibreNMS\Config::get('device_traffic_iftype'))) {
         foreach (\LibreNMS\Config::get('device_traffic_iftype') as $iftype) {
+            if (is_null($iftype) || !is_string($iftype) || $iftype == '') {
+                continue; // or pgreg match may be a false positive
+            }
             if (preg_match($iftype.'i', $port['ifType'])) {
                 $ignore = 1;
             }
@@ -15,6 +18,9 @@ foreach (dbFetchRows('SELECT * FROM `ports` AS P, `devices` AS D WHERE D.device_
 
     if (is_array(\LibreNMS\Config::get('device_traffic_descr'))) {
         foreach (\LibreNMS\Config::get('device_traffic_descr') as $ifdescr) {
+            if (is_null($ifdesc) || !is_string($ifdesc) || $ifdesc == '') {
+                continue; // or pgreg match may be a false positive
+            }
             if (preg_match($ifdescr.'i', $port['ifDescr']) || preg_match($ifdescr.'i', $port['ifName'])) {
                 $ignore = 1;
             }
