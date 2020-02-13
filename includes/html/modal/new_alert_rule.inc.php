@@ -298,10 +298,11 @@ if (Auth::user()->hasGlobalAdmin()) {
                 $("#override_query").bootstrapSwitch('state', false);
                 $("#invert_map").bootstrapSwitch('state', false);
                 $(this).find("input[type=text]").val("");
-                $('#count').val('-1');
+                $('#count').val('1');
                 $('#delay').val('1m');
                 $('#interval').val('5m');
                 $('#adv_query').val('');
+                $('#severity').val('warning');
 
                 var $maps = $('#maps');
                 $maps.empty();
@@ -392,7 +393,7 @@ if (Auth::user()->hasGlobalAdmin()) {
 
                 $("[name='override_query']").bootstrapSwitch('state', extra.options.override_query);
             } else {
-                $('#count').val('-1');
+                $('#count').val('1');
             }
         }
 
