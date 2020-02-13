@@ -66,10 +66,9 @@ if (! isset($ipForwardNb['0']['inetCidrRouteNumber'])) {
     $tableRoute = array();
 
     $oid = '.1.3.6.1.2.1.4.21';
-    $ipRoute = snmpwalk_group($device, $oid, $mib, 1, []);
-    d_echo($res);
-    d_echo('Table routage');
-    d_echo($ipRoute);
+    $tableRoute = snmpwalk_group($device, $oid, $mib, 1, []);
+    d_echo('Routing table:');
+    d_echo($tableRoute);
         echo "RFC1213 ";
     foreach ($tableRoute as $ipRoute) {
         if (empty($ipRoute['ipRouteDest']) || $ipRoute['ipRouteDest'] == '') {
@@ -258,9 +257,9 @@ if ($mpls_skip != 1) {
                         $entry['inetCidrRouteNextHop'] = normalize_snmp_ip_address($inetCidrRouteNextHop);
                         $entry['context_name'] = $vpnId;
                         $entry['device_id'] = $device['device_id'];
+                        $entry['inetCidrRouteIfIndex'] = $entry['mplsL3VpnVrfRteInetCidrIfIndex'];
                         $entry['port_id'] = Device::find($device['device_id'])->ports()->where('ifIndex', '=', $entry['inetCidrRouteIfIndex'])->first()->port_id;
                         $entry['updated_at'] = $update_timestamp;
-                        $entry['inetCidrRouteIfIndex'] = $entry['mplsL3VpnVrfRteInetCidrIfIndex'];
                         $entry['inetCidrRouteType'] = $entry['mplsL3VpnVrfRteInetCidrType'];
                         $entry['inetCidrRouteProto'] = $entry['mplsL3VpnVrfRteInetCidrProto'];
                         $entry['inetCidrRouteMetric1'] = $entry['mplsL3VpnVrfRteInetCidrMetric1'];

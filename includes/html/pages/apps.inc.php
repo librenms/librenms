@@ -250,6 +250,13 @@ $graphs['certificate'] = array(
     'age',
     'remaining_days',
 );
+$graphs['puppet-agent'] = array(
+    'last_run',
+    'changes',
+    'events',
+    'resources',
+    'time',
+);
 $graphs['mdadm'] = array(
     'level',
     'size',
@@ -306,6 +313,7 @@ $graphs['asterisk'] = array(
     'calls',
     'channels',
     'sip',
+    'iax2',
 );
 echo '<div class="panel panel-default">';
 echo '<div class="panel-heading">';

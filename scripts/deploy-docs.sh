@@ -8,7 +8,7 @@ if [ "$EXECUTE_BUILD_DOCS" != "true" ]; then
 fi
 
 pip3 install --upgrade pip
-pip3 install --user mkdocs mkdocs-material pymdown-extensions
+pip3 install --user mkdocs mkdocs-material "pymdown-extensions" "markdown"
 pip3 install --user git+git://github.com/aleray/mdx_del_ins.git
 
 mkdir -p out

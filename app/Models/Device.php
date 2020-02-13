@@ -103,6 +103,24 @@ class Device extends BaseModel
         return static::where('hostname', $hostname)->first();
     }
 
+    /**
+     * Returns IP/Hostname where polling will be targeted to
+     *
+     * @param string $hostname hostname which will be triggered
+     * @return string IP/Hostname to which Device polling is targeted
+     */
+    public static function pollerTarget($hostname)
+    {
+        $ret = static::where('hostname', $hostname)->first(['hostname', 'overwrite_ip']);
+        if (empty($ret)) {
+            return $hostname;
+        }
+        $_overwrite_ip = $ret->overwrite_ip;
+        $_hostname = $ret->hostname;
+
+        return $_overwrite_ip ?: $_hostname;
+    }
+
     public static function findByIp($ip)
     {
         if (!IP::isValid($ip)) {
@@ -187,6 +205,13 @@ class Device extends BaseModel
                     $query->orWhere(function ($query) {
                         $query->where('alert_schedulable_type', 'device_group')
                             ->whereIn('alert_schedulable_id', $this->groups->pluck('id'));
+                    });
+                }
+
+                if ($this->location) {
+                    $query->orWhere(function ($query) {
+                        $query->where('alert_schedulable_type', 'location')
+                            ->where('alert_schedulable_id', $this->location->id);
                     });
                 }
             });

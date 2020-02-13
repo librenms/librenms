@@ -4,6 +4,9 @@ use LibreNMS\RRD\RrdDefinition;
 
 $name = 'asterisk';
 $app_id = $app['app_id'];
+
+echo "$name, app_id=$app_id ";
+
 if (!empty($agent_data[$name])) {
     $rawdata = $agent_data[$name];
 } else {
@@ -12,13 +15,17 @@ if (!empty($agent_data[$name])) {
     $rawdata = snmp_walk($device, $oid, $options);
     $rawdata  = str_replace("<<<asterisk>>>\n", '', $rawdata);
 }
+
 # Format Data
 $lines = explode("\n", $rawdata);
 $asterisk = array();
+$asterisk_metrics = array();
 foreach ($lines as $line) {
     list($var,$value) = explode('=', $line);
     $asterisk[$var] = $value;
 }
+unset($lines);
+
 # Asterisk stats
 $rrd_name =  array('app', $name, 'stats', $app_id);
 $rrd_def = RrdDefinition::make()
@@ -29,7 +36,8 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('sipmonoffline', 'GAUGE', 0, 10000)
     ->addDataset('sipunmononline', 'GAUGE', 0, 10000)
     ->addDataset('sipunmonoffline', 'GAUGE', 0, 10000);
-$fields = array(
+
+$sip_fields = array(
     'calls' => $asterisk['Calls'],
     'channels' => $asterisk['Channels'],
     'sipeers' => $asterisk['SipPeers'],
@@ -38,8 +46,34 @@ $fields = array(
     'sipunmononline' => $asterisk['SipUnMonOnline'],
     'sipunmonoffline' => $asterisk['SipUnMonOffline']
 );
-$tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
-data_update($device, 'app', $tags, $fields);
-update_application($app, $rawdata, $fields);
 
-unset($lines, $asterisk, $rrd_name, $rrd_def, $fields, $tags, $rawdata);
+$asterisk_metrics['stats'] = $sip_fields;
+$sip_tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
+data_update($device, 'app', $sip_tags, $sip_fields);
+
+unset($rrd_name, $rrd_def, $sip_fields, $sip_tags);
+
+# Additional iax2 stats
+$rrd_name =  array('app', $name, 'iax2', $app_id);
+$rrd_def = RrdDefinition::make()
+    ->addDataset('iax2peers', 'GAUGE', 0, 10000)
+    ->addDataset('iax2online', 'GAUGE', 0, 10000)
+    ->addDataset('iax2offline', 'GAUGE', 0, 10000)
+    ->addDataset('iax2unmonitored', 'GAUGE', 0, 10000);
+
+$iax2_fields = array(
+    'iax2peers' => $asterisk['Iax2Peers'],
+    'iax2online' => $asterisk['Iax2Online'],
+    'iax2offline' => $asterisk['Iax2Offline'],
+    'iax2unmonitored' => $asterisk['Iax2Unmonitored']
+);
+
+$asterisk_metrics['iax2'] = $iax2_fields;
+$iax2_tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
+data_update($device, 'app', $iax2_tags, $iax2_fields);
+
+update_application($app, $rawdata, $asterisk_metrics);
+
+unset($rrd_name, $rrd_def, $iax2_fields, $iax2_tags);
+
+unset($asterisk, $asterisk_metrics, $rawdata); // these are used for all rrds

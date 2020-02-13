@@ -209,7 +209,7 @@ echo 'Caching Oids: ';
 $port_stats = [];
 
 if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=') && version_compare($device['version'], '11.7', '<'))) {
-    require_once 'ports/f5.inc.php';
+    require 'ports/f5.inc.php';
 } else {
     if (Config::getOsSetting($device['os'], 'polling.selected_ports') || $device['attribs']['selected_ports'] == 'true') {
         echo 'Selected ports polling ';
@@ -307,36 +307,9 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
     }
 }
 
-if ($device['os'] == 'fabos') {
-    require_once 'ports/brocade.inc.php';
-}
-
-if ($device['os'] == 'procera') {
-    require_once 'ports/procera.inc.php';
-}
-
-if ($device['os'] == 'cxr-ts') {
-    require_once 'ports/cxr-ts.inc.php';
-}
-
-if ($device['os'] == 'cmm') {
-    require_once 'ports/cmm.inc.php';
-}
-
-if ($device['os'] == 'nokia-isam') {
-    require_once 'ports/nokia-isam.inc.php';
-}
-
-if ($device['os'] == 'timos') {
-    require_once 'ports/timos.inc.php';
-}
-
-if ($device['os'] == 'infinera-groove') {
-    require_once 'ports/infinera-groove.inc.php';
-}
-
-if ($device['os'] == 'junos') {
-    require_once 'ports/junos-vcp.inc.php';
+$os_file = base_path("includes/polling/ports/os/{$device['os']}.inc.php");
+if (file_exists($os_file)) {
+    require $os_file;
 }
 
 if (Config::get('enable_ports_adsl')) {
@@ -353,8 +326,18 @@ if (Config::get('enable_ports_poe')) {
 
     if ($device['os'] == 'ios' || $device['os'] == 'iosxe') {
         echo 'cpeExtPsePortEntry';
-        $port_stats_poe = snmpwalk_cache_oid($device, 'cpeExtPsePortEntry', array(), 'CISCO-POWER-ETHERNET-EXT-MIB');
-        $port_ent_to_if = snmpwalk_cache_oid($device, 'portIfIndex', array(), 'CISCO-STACK-MIB');
+        $port_stats_poe = snmpwalk_cache_oid($device, 'cpeExtPsePortEntry', [], 'CISCO-POWER-ETHERNET-EXT-MIB');
+        $port_ent_to_if = snmpwalk_cache_oid($device, 'portIfIndex', [], 'CISCO-STACK-MIB');
+
+        if (!$port_ent_to_if) {
+            $ifTable_ifDescr = snmpwalk_cache_oid($device, 'ifDescr', [], 'IF-MIB');
+            $port_ent_to_if = [];
+            foreach ($ifTable_ifDescr as $if_index => $if_descr) {
+                if (preg_match('/^[[:alpha:]]+ethernet([0-9\/.]+)$/i', $if_descr['ifDescr'], $matches)) {
+                    $port_ent_to_if[str_replace('/', '.', $matches[1])] = ['portIfIndex' => $if_index];
+                }
+            }
+        }
 
         foreach ($port_stats_poe as $p_index => $p_stats) {
             //We replace the ENTITY EntIndex by the IfIndex using the portIfIndex table (stored in $port_ent_to_if).
@@ -572,30 +555,6 @@ foreach ($ports as $port) {
 
         if ($port_association_mode != "ifIndex") {
             $port['update']['ifIndex'] = $ifIndex;
-        }
-
-        if ($device['os'] === 'airos-af' && $port['ifAlias'] === 'eth0') {
-            $airos_stats = snmpwalk_cache_oid($device, '.1.3.6.1.4.1.41112.1.3.3.1', array(), 'UBNT-AirFIBER-MIB');
-            $this_port['ifInOctets'] = $airos_stats[1]['rxOctetsOK'];
-            $this_port['ifOutOctets'] = $airos_stats[1]['txOctetsOK'];
-            $this_port['ifInErrors'] = $airos_stats[1]['rxErroredFrames'];
-            $this_port['ifOutErrors'] = $airos_stats[1]['txErroredFrames'];
-            $this_port['ifInBroadcastPkts'] = $airos_stats[1]['rxValidBroadcastFrames'];
-            $this_port['ifOutBroadcastPkts'] = $airos_stats[1]['txValidBroadcastFrames'];
-            $this_port['ifInMulticastPkts'] = $airos_stats[1]['rxValidMulticastFrames'];
-            $this_port['ifOutMulticastPkts'] = $airos_stats[1]['txValidMulticastFrames'];
-            $this_port['ifInUcastPkts'] = $airos_stats[1]['rxValidUnicastFrames'];
-            $this_port['ifOutUcastPkts'] = $airos_stats[1]['txValidUnicastFrames'];
-            $ports['update']['ifInOctets'] = $airos_stats[1]['rxOctetsOK'];
-            $ports['update']['ifOutOctets'] = $airos_stats[1]['txOctetsOK'];
-            $ports['update']['ifInErrors'] = $airos_stats[1]['rxErroredFrames'];
-            $ports['update']['ifOutErrors'] = $airos_stats[1]['txErroredFrames'];
-            $ports['update']['ifInBroadcastPkts'] = $airos_stats[1]['rxValidBroadcastFrames'];
-            $ports['update']['ifOutBroadcastPkts'] = $airos_stats[1]['txValidBroadcastFrames'];
-            $ports['update']['ifInMulticastPkts'] = $airos_stats[1]['rxValidMulticastFrames'];
-            $ports['update']['ifOutMulticastPkts'] = $airos_stats[1]['txValidMulticastFrames'];
-            $ports['update']['ifInUcastPkts'] = $airos_stats[1]['rxValidUnicastFrames'];
-            $ports['update']['ifOutUcastPkts'] = $airos_stats[1]['txValidUnicastFrames'];
         }
 
         // rewrite the ifPhysAddress
