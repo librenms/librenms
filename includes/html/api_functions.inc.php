@@ -2269,7 +2269,15 @@ function del_parents_from_host(\Illuminate\Http\Request $request)
         return api_error(400, "Check your device ID!");
     }
     $device = Device::find($device_id);
-    $result = (empty($data['parent_ids']) ? $device->parents()->detach():(validateDeviceIds(explode(',', $data['parent_ids'])) ? $device->parents()->detach(explode(',', $data['parent_ids'])):false));
+    if (!empty($data['parent_ids'])) {
+        $parents = explode(',', $data['parent_ids']);
+        //remove parents included in the request if they are valid device ids
+        $result = validateDeviceIds($parents)?$device->parents()->detach($parents):false;
+    }
+    if (is_null($result)) {
+        //$result doesn't exist so $data['parent_ids'] is empty
+        $result = $device->parents()->detach(); //remove all parents
+    }
     if ($result) {
         return api_success_noresult(201, 'All device dependencies have been removed');
     }
