@@ -981,6 +981,17 @@ function alert_details($details)
             $fallback = false;
         }
 
+        if ($tmp_alerts['last_ping_timetaken']) {
+            $fault_detail .= "Latency: <a href='" . generate_url(array('page' => 'graphs',
+                                                              'from' => '-24hour',
+                                                              'to' => 'now',
+                                                              'type' => 'device_ping_perf',
+                                                              'device' => $tmp_alerts['device_id'])) . "'>";
+            $fault_detail .= $tmp_alerts['last_ping_timetaken']. 'ms';
+            $fault_detail .= "</a>";
+            $fallback = false;
+        }
+
         if ($tmp_alerts['type'] && $tmp_alerts['label']) {
             if ($tmp_alerts['error'] == "") {
                 $fault_detail .= ' ' . $tmp_alerts['type'] . ' - ' . $tmp_alerts['label'] . ';&nbsp;';
