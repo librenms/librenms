@@ -15,8 +15,12 @@ foreach (dbFetchRows('SELECT * FROM `ports` AS P, `devices` AS D WHERE D.device_
 
     if (is_array(\LibreNMS\Config::get('device_traffic_descr'))) {
         foreach (\LibreNMS\Config::get('device_traffic_descr') as $ifdescr) {
-            if (is_null($ifdesc) || !is_string($ifdesc) || $ifdesc == '') {
-                continue; // or pgreg match may be a false positive
+            // continues to avoid potentential preg_match() false positives
+            if (!is_string($ifdesc)) {
+                continue; // preg_match() only accepts strings
+            }
+            if (empty($ifdesc) && $ifdesc != '0') {
+                continue; // be safe, in case some interface description actually is '0'
             }
             if (preg_match($ifdescr.'i', $port['ifDescr']) || preg_match($ifdescr.'i', $port['ifName'])) {
                 $ignore = 1;
