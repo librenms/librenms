@@ -115,11 +115,12 @@ class ObjectCache
     }
 
     /**
-     * @param int $device_id device id of the device to get counts for, 0 means all
      * @param array $fields array of counts to get. Valid options: total, up, down, ignored, shutdown, disabled, deleted, errored, pseudowire
+     * @param int $device_id device id of the device to get counts for, 0 means all
+     * @param int $group_id group id for the devices to get counts for
      * @return mixed
      */
-    public static function portCounts($fields = ['total'], $device_id = 0)
+    public static function portCounts($fields = ['total'], $device_id = 0, $group_id = null)
     {
         $result = [];
         foreach ($fields as $field) {
