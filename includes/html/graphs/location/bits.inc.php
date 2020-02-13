@@ -10,9 +10,6 @@ foreach ($devices as $device) {
         $ignore = 0;
         if (is_array(\LibreNMS\Config::get('device_traffic_iftype'))) {
             foreach (\LibreNMS\Config::get('device_traffic_iftype') as $iftype) {
-                if (is_null($iftype) || !is_string($iftype) || $iftype == '') {
-                    continue; // or pgreg match may be a false positive
-                }
                 if (preg_match($iftype.'i', $int['ifType'])) {
                     $ignore = 1;
                 }
