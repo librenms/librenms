@@ -33,6 +33,7 @@ if (!empty($dot1d)) {
             foreach($data2 as $portLocal => $data3)
                 foreach($data3 as $vlanLocal => $data4)
                     $fdbPort_table[$vlanLocal]=array('dot1qTpFdbPort' => array_combine(array_keys($data4[0]),array_fill(0,count($data4[0]),$portLocal)));
+
 } else {
     // nokia/ALCATEL-IND1-MAC-ADDRESS-MIB::slMacAddressDisposition
     $dot1d = snmpwalk_group($device, 'slMacAddressDisposition', 'ALCATEL-IND1-MAC-ADDRESS-MIB', 0,array(),'nokia');
@@ -44,3 +45,32 @@ if (!empty($dot1d)) {
 		$fdbPort_table[$vlanLocal]=array('dot1qTpFdbPort' => array_combine(array_keys($data2),array_fill(0,count($data2),$portLocal)));
     }
 }
+if (!empty($fdbPort_table)) {
+    // Build dot1dBasePort to port_id dictionary
+    $portid_dict = array();
+    $dot1dBasePortIfIndex = snmpwalk_group($device, 'dot1dBasePortIfIndex', 'BRIDGE-MIB');
+    foreach ($dot1dBasePortIfIndex as $portLocal => $data) {
+        $port = get_port_by_index_cache($device['device_id'], $data['dot1dBasePortIfIndex']);
+        $portid_dict[$portLocal] = $port['port_id'];
+    }
+    // Collect data and populate $insert
+    foreach ($fdbPort_table as $vlan_id => $data) {
+        foreach ($data[$data_oid] as $mac => $dot1dBasePort) {
+            if ($dot1dBasePort == 0) {
+                d_echo("No port known for $mac\n");
+                continue;
+            }
+            $mac_address = implode(array_map('zeropad', explode(':', $mac)));
+            if (strlen($mac_address) != 12) {
+                d_echo("MAC address padding failed for $mac\n");
+                continue;
+            }
+            $port_id = $portid_dict[$dot1dBasePort];
+            $insert[$vlan_id][$mac_address]['port_id'] = $port_id;
+            d_echo("vlan $vlan_id mac $mac_address port ($dot1dBasePort) $port_id\n");
+        }
+    }
+}
+
+echo PHP_EOL;
+

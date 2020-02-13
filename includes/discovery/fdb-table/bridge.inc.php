@@ -19,15 +19,14 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  LibreNMS contributors
+ * @copyright  2017 Tony Murray
+ * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
- * @author     cjwbath
  */
 
-if(empty($fdbPort_table)) {
-    // Try Q-BRIDGE-MIB::dot1qTpFdbPort first
-    $fdbPort_table = snmpwalk_group($device, 'dot1qTpFdbPort', 'Q-BRIDGE-MIB');
-}
+
+// Try Q-BRIDGE-MIB::dot1qTpFdbPort first
+$fdbPort_table = snmpwalk_group($device, 'dot1qTpFdbPort', 'Q-BRIDGE-MIB');
 if (!empty($fdbPort_table)) {
     echo 'Q-BRIDGE-MIB:';
     $data_oid = 'dot1qTpFdbPort';
@@ -49,28 +48,9 @@ if (!empty($fdbPort_table)) {
         $port = get_port_by_index_cache($device['device_id'], $data['dot1dBasePortIfIndex']);
         $portid_dict[$portLocal] = $port['port_id'];
     }
-    
-    // Build VLAN fdb index to real VLAN ID dictionary
-    $vlan_cur_table = snmpwalk_group($device, 'dot1qVlanFdbId', 'Q-BRIDGE-MIB', 2);
-    $vlan_fdb_dict = array();
 
-    // Indexed first by dot1qVlanTimeMark, which we ignore
-    foreach ($vlan_cur_table as $dot1qVlanTimeMark => $a) {
-        // Then by VLAN ID mapped to a single member array with the dot1qVlanFdbId
-        foreach ($a as $vid => $data) {
-            // Flip it round into the dictionary
-            $vlan_fdb_dict[$data['dot1qVlanFdbId']] = $vid;
-        }
-    }
-
-print_r($vlan_fdb_dict);
     // Collect data and populate $insert
-    foreach ($fdbPort_table as $vlanIndex => $data) {
-        // Look the dot1qVlanFdbId up to a real VLAN number; if undefined assume the
-        // index *is* the VLAN number. Code in fdb-table.inc.php to map to the
-        // device VLANs table should catch anything invalid.
-        $vlan = isset($vlan_fdb_dict[$vlanIndex]) ? $vlan_fdb_dict[$vlanIndex] : $vlanIndex;
-        
+    foreach ($fdbPort_table as $vlan => $data) {
         foreach ($data[$data_oid] as $mac => $dot1dBasePort) {
             if ($dot1dBasePort == 0) {
                 d_echo("No port known for $mac\n");
