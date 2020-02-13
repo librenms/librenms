@@ -387,8 +387,10 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                         }
                         if (empty($a_prefixes)) {
                             $a_prefixes = snmpwalk_cache_multi_oid($device, 'aristaBgp4V2PrefixInPrefixesAccepted', $a_prefixes, 'ARISTA-BGP4V2-MIB', null, '-OQUs');
+                            $out_prefixes = snmpwalk_cache_multi_oid($device, 'aristaBgp4V2PrefixOutPrefixes', $a_prefixes, 'ARISTA-BGP4V2-MIB', null, '-OQUs');
                         }
                         $cbgpPeerAcceptedPrefixes = $a_prefixes["1.$afi.$tmp_peer.$afi.$safi"]['aristaBgp4V2PrefixInPrefixesAccepted'];
+                        $cbgpPeerAdvertisedPrefixes = $out_prefixes["1.$afi.$tmp_peer.$afi.$safi"]['aristaBgp4V2PrefixOutPrefixes'];
                     }
 
                     if ($device['os_group'] === 'vrp') {
