@@ -51,6 +51,14 @@ alert_group_map:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     alert_group_map_rule_id_group_id_uindex: { Name: alert_group_map_rule_id_group_id_uindex, Columns: [rule_id, group_id], Unique: true, Type: BTREE }
+alert_location_map:
+  Columns:
+    - { Field: id, Type: 'int(10) unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: rule_id, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: location_id, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+    alert_location_map_rule_id_location_id_uindex: { Name: alert_location_map_rule_id_location_id_uindex, Columns: [rule_id, location_id], Unique: true, Type: BTREE }
 alert_log:
   Columns:
     - { Field: id, Type: 'int(10) unsigned', 'Null': false, Extra: auto_increment }

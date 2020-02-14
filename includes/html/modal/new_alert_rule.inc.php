@@ -44,9 +44,9 @@ if (Auth::user()->hasGlobalAdmin()) {
                         <div class="tab-content">
                             <div role="tabpanel" class="tab-pane active" id="main">
                                 <div class='form-group' title="The description of this alert rule.">
-                                    <label for='name' class='col-sm-3 col-md-2 control-label'>Rule name: </label>
+                                    <label for='rule_name' class='col-sm-3 col-md-2 control-label'>Rule name: </label>
                                     <div class='col-sm-9 col-md-10'>
-                                        <input type='text' id='name' name='name' class='form-control validation' maxlength='200' required>
+                                        <input type='text' id='rule_name' name='name' class='form-control validation' maxlength='200' required>
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -110,7 +110,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                                     </div>
                                 </div>
                                 <div class="form-group form-inline">
-                                    <label for='maps' class='col-sm-3 col-md-2 control-label' title="Restricts this alert rule to the selected devices and groups.">Match devices and groups list: </label>
+                                    <label for='maps' class='col-sm-3 col-md-2 control-label' title="Restricts this alert rule to the selected devices, groups and locations.">Match devices, groups and locations list: </label>
                                     <div class="col-sm-7" style="width: 56%;">
                                         <select id="maps" name="maps[]" class="form-control" multiple="multiple"></select>
                                     </div>
@@ -298,16 +298,17 @@ if (Auth::user()->hasGlobalAdmin()) {
                 $("#override_query").bootstrapSwitch('state', false);
                 $("#invert_map").bootstrapSwitch('state', false);
                 $(this).find("input[type=text]").val("");
-                $('#count').val('-1');
+                $('#count').val('1');
                 $('#delay').val('1m');
                 $('#interval').val('5m');
                 $('#adv_query').val('');
+                $('#severity').val('warning');
 
                 var $maps = $('#maps');
                 $maps.empty();
                 $maps.val(null).trigger('change');
                 setRuleDevice();// pre-populate device in the maps if this is a per-device rule
-                
+
                 var $transports = $("#transports");
                 $transports.empty();
                 $transports.val(null).trigger('change');
@@ -316,7 +317,7 @@ if (Auth::user()->hasGlobalAdmin()) {
         });
 
         function loadRule(rule) {
-            $('#name').val(rule.name);
+            $('#rule_name').val(rule.name);
             $('#proc').val(rule.proc);
             $('#builder').queryBuilder("setRules", rule.builder);
             $('#severity').val(rule.severity).trigger('change');
@@ -392,7 +393,7 @@ if (Auth::user()->hasGlobalAdmin()) {
 
                 $("[name='override_query']").bootstrapSwitch('state', extra.options.override_query);
             } else {
-                $('#count').val('-1');
+                $('#count').val('1');
             }
         }
 
@@ -408,13 +409,13 @@ if (Auth::user()->hasGlobalAdmin()) {
 
         $("#maps").select2({
             width: '100%',
-            placeholder: "Devices or Groups",
+            placeholder: "Devices, Groups or Locations",
             ajax: {
                 url: 'ajax_list.php',
                 delay: 250,
                 data: function (params) {
                     return {
-                        type: 'devices_groups',
+                        type: 'devices_groups_locations',
                         search: params.term
                     };
                 }

@@ -66,10 +66,9 @@ if (! isset($ipForwardNb['0']['inetCidrRouteNumber'])) {
     $tableRoute = array();
 
     $oid = '.1.3.6.1.2.1.4.21';
-    $ipRoute = snmpwalk_group($device, $oid, $mib, 1, []);
-    d_echo($res);
-    d_echo('Table routage');
-    d_echo($ipRoute);
+    $tableRoute = snmpwalk_group($device, $oid, $mib, 1, []);
+    d_echo('Routing table:');
+    d_echo($tableRoute);
         echo "RFC1213 ";
     foreach ($tableRoute as $ipRoute) {
         if (empty($ipRoute['ipRouteDest']) || $ipRoute['ipRouteDest'] == '') {

@@ -1268,3 +1268,49 @@ Output:
     "config": "DEVICE CONFIG HERE"
 }
 ```
+
+### `add_parents_to_host`
+
+Add one or more parents to a host.
+
+Route: `/api/v0/devices/:device_id/parents`
+
+Input (JSON):
+
+- parent_ids: one or more parent ids
+
+Example:
+```curl
+curl -X POST -d '{"parent_ids":"15,16,17"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/1/parents
+```
+
+Output:
+```json
+{
+    "status": "ok",
+    "message": "Device dependencies have been saved"
+}
+```
+
+### `delete_parents_from_host`
+
+Deletes some or all the parents from a host.
+
+Route: `/api/v0/devices/:device_id/parents`
+
+Input (JSON):
+
+- parent_ids: One or more parent ids, if not specified deletes all parents from host.
+
+Example:
+```curl
+curl -X DELETE -d '{"parent_ids":"15,16,17"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/1/parents
+```
+
+Output:
+```json
+{
+    "status": "ok",
+    "message": "All device dependencies have been removed"
+}
+```
