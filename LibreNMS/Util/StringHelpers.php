@@ -28,12 +28,23 @@ namespace LibreNMS\Util;
 class StringHelpers
 {
     /**
-     * Shorten text over 50 chars, if shortened, add ellipsis
+     * Check if $mixed is a true string value that's not empty
      *
-     * @param $string
-     * @param int $max
-     * @return string
+     * @param $mixed
+     * @return boolean
      */
+    public static function emptyString($mixed)
+    {
+        if (!is_string($mixed)) {
+            return true;
+        }
+        if (empty($mixed) && $mixed != '0') {
+            return true;
+        }
+
+        return false;
+    }
+
     public static function shortenText($string, $max = 30)
     {
         if (strlen($string) > 50) {
