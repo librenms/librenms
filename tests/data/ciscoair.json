@@ -26,7 +26,7 @@
                     "sysDescr": "Cisco IOS Software, C2700 Software (AP3G2-K9W7-M), Version 15.3(3)JG1, RELEASE SOFTWARE (fc1)\nTechnical Support: http://www.cisco.com/techsupport\r\nCopyright (c) 1986-2017 by Cisco Systems, Inc.\r\nCompiled Mon 11-Dec-17 11:02 by prod_rel_team",
                     "sysContact": "<private>",
                     "version": "15.3(3)JG1",
-                    "hardware": "AIR-CAP2702I-E-K9",
+                    "hardware": "enterprises.9.1.1938",
                     "features": "K9W7",
                     "os": "ciscoair",
                     "type": "wireless",
