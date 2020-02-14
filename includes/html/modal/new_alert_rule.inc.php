@@ -384,7 +384,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                 $("[name='mute']").bootstrapSwitch('state', extra.mute);
                 $("[name='invert']").bootstrapSwitch('state', extra.invert);
                 if (typeof extra.recovery == 'undefined') {
-                    extra.recovery = '<?php=$default_recovery_alerts?>';
+                    extra.recovery = '<?=$default_recovery_alerts?>';
                 }
 
                 if (typeof extra.options == 'undefined') {
@@ -403,7 +403,7 @@ if (Auth::user()->hasGlobalAdmin()) {
 
                 $("[name='override_query']").bootstrapSwitch('state', extra.options.override_query);
             } else {
-                $('#count').val('<?php=$default_max_alerts?>');
+                $('#count').val('<?=$default_max_alerts?>');
             }
         }
 
