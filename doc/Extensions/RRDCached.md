@@ -5,10 +5,6 @@ path: blob/master/doc/
 
 This document will explain how to setup RRDCached for LibreNMS.
 
-Since version 1.5, rrdtool / rrdcached now supports creating rrd files
-over rrdcached. If you have rrdcached 1.5.5 or above, you can also
-tune over rrdcached. To enable this set the following config:
-
 ```php
 $config['rrdtool_version'] = '1.5.5';
 ```
