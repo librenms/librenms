@@ -45,6 +45,13 @@ class StringHelpers
         return false;
     }
 
+    /**
+     * Shorten text over $max chars, if shortened, add ellipsis
+     *
+     * @param $string
+     * @param int $max
+     * @return string
+     */
     public static function shortenText($string, $max = 30)
     {
         if (strlen($string) > 50) {
