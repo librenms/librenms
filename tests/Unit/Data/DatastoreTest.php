@@ -26,14 +26,14 @@
 namespace LibreNMS\Tests\Unit\Data;
 
 use LibreNMS\Config;
-use LibreNMS\Tests\LaravelTestCase;
+use LibreNMS\Tests\TestCase;
 
 /**
  * @group datastores
  */
-class DatastoreTest extends LaravelTestCase
+class DatastoreTest extends TestCase
 {
-    public function setUp()
+    public function setUp() : void
     {
         parent::setUp();
 

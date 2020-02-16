@@ -28,16 +28,16 @@ namespace LibreNMS\Tests\Unit\Data;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
 use LibreNMS\Data\Store\OpenTSDB;
-use LibreNMS\Tests\LaravelTestCase;
+use LibreNMS\Tests\TestCase;
 
 /**
  * @group datastores
  */
-class OpenTSDBStoreTest extends LaravelTestCase
+class OpenTSDBStoreTest extends TestCase
 {
     protected $timestamp = 990464400;
 
-    public function setUp()
+    public function setUp() : void
     {
         parent::setUp();
 
@@ -45,7 +45,7 @@ class OpenTSDBStoreTest extends LaravelTestCase
         Carbon::setTestNow(Carbon::createFromTimestamp($this->timestamp));
     }
 
-    public function tearDown()
+    public function tearDown() : void
     {
         // restore Carbon:now() to normal
         Carbon::setTestNow();

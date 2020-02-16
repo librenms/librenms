@@ -27,16 +27,16 @@ namespace LibreNMS\Tests\Unit\Data;
 
 use Carbon\Carbon;
 use LibreNMS\Data\Store\Graphite;
-use LibreNMS\Tests\LaravelTestCase;
+use LibreNMS\Tests\TestCase;
 
 /**
  * @group datastores
  */
-class GraphiteStoreTest extends LaravelTestCase
+class GraphiteStoreTest extends TestCase
 {
     protected $timestamp = 997464400;
 
-    public function setUp()
+    public function setUp() : void
     {
         parent::setUp();
 
@@ -44,7 +44,7 @@ class GraphiteStoreTest extends LaravelTestCase
         Carbon::setTestNow(Carbon::createFromTimestamp($this->timestamp));
     }
 
-    public function tearDown()
+    public function tearDown() : void
     {
         // restore Carbon:now() to normal
         Carbon::setTestNow();

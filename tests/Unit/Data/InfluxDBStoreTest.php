@@ -27,12 +27,12 @@ namespace LibreNMS\Tests\Unit\Data;
 use InfluxDB\Point;
 use LibreNMS\Config;
 use LibreNMS\Data\Store\InfluxDB;
-use LibreNMS\Tests\LaravelTestCase;
+use LibreNMS\Tests\TestCase;
 
 /**
  * @group datastores
  */
-class InfluxDBStoreTest extends LaravelTestCase
+class InfluxDBStoreTest extends TestCase
 {
     public function testBadSettings()
     {

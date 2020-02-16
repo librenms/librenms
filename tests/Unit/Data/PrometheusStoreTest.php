@@ -34,14 +34,14 @@ use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use LibreNMS\Config;
 use LibreNMS\Data\Store\Prometheus;
-use LibreNMS\Tests\LaravelTestCase;
+use LibreNMS\Tests\TestCase;
 
 /**
  * @group datastores
  */
-class PrometheusStoreTest extends LaravelTestCase
+class PrometheusStoreTest extends TestCase
 {
-    public function setUp()
+    public function setUp() : void
     {
         parent::setUp();
 
