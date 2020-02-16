@@ -1008,7 +1008,7 @@ function alert_details($details)
                 if (in_array($k, ['device_id', 'sysObjectID', 'sysDescr', 'location_id'])) {
                     continue;
                 }
-                if (!empty($v) && (stristr($k, 'id') || stristr($k, 'desc') || stristr($k, 'msg') || stristr($k, 'last'))) {
+                if (!empty($v) && str_i_contains(['id', 'desc', 'msg', 'last'], $k)) {
                     $fault_detail_data[] = "$k => '$v'";
                 }
             }
