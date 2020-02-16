@@ -38,7 +38,8 @@ class StringHelpers
         if (!is_string($mixed)) {
             return true;
         }
-        if (empty($mixed) && $mixed != '0') {
+
+        if ($mixed === '') {
             return true;
         }
 
