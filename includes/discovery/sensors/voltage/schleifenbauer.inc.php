@@ -26,7 +26,7 @@ foreach ($pre_cache['sdbDevOutMtActualVoltage'] as $sdbDevOutMtIndex => $sdbDevO
     $descr            = $name ?: "$serial_input Voltage";
 
     // See includes/discovery/entity-physical/schleifenbauer.inc.php for an explanation why we set this as the entPhysicalIndex.
-    $entPhysicalIndex = $sdbMgmtCtrlDevUnitAddress * 1000000 + 100000 + $sdbDevOutMtIndex * 1000 + 110;
+    $entPhysicalIndex = $sdbMgmtCtrlDevUnitAddress * 1000000 + 200000 + $sdbDevOutMtIndex * 1000 + 110;
 
     discover_sensor($valid['sensor'], 'voltage', $device, $voltage_oid, $serial_input, 'schleifenbauer', $descr, $divisor, '1', null, null, null, null, $voltage, 'snmp', $entPhysicalIndex);
 }

@@ -30,7 +30,7 @@ foreach ($pre_cache['sdbDevOutMtActualCurrent'] as $sdbDevOutMtIndex => $sdbDevO
     $high_limit       = $pre_cache['sdbDevCfMaximumLoad'][$unit];
 
     // See includes/discovery/entity-physical/schleifenbauer.inc.php for an explanation why we set this as the entPhysicalIndex.
-    $entPhysicalIndex = $sdbMgmtCtrlDevUnitAddress * 1000000 + 100000 + $sdbDevOutMtIndex * 1000 + 120;
+    $entPhysicalIndex = $sdbMgmtCtrlDevUnitAddress * 1000000 + 200000 + $sdbDevOutMtIndex * 1000 + 120;
 
     discover_sensor($valid['sensor'], 'current', $device, $current_oid, $serial_output, 'schleifenbauer', $descr, $divisor, '1', null, null, $warn_limit, $high_limit, $current, 'snmp', $entPhysicalIndex);
 }
