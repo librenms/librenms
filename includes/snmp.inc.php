@@ -386,8 +386,7 @@ function snmp_walk($device, $oid, $options = null, $mib = null, $mibdir = null)
     $data = str_replace('"', '', $data);
     $data = str_replace('End of MIB', '', $data);
 
-
-    if (is_string($data) && (preg_match('/No Such (Object|Instance)/i', $data) || preg_match('/Wrong Type(.*)should be/',$data))) {
+    if (is_string($data) && (preg_match('/No Such (Object|Instance)/i', $data) || preg_match('/Wrong Type(.*)should be/', $data))) {
         d_echo("Invalid snmp_walk() data = " . print_r($data, true));
         $data = false;
     } else {
