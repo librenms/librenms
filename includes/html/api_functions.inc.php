@@ -2378,17 +2378,6 @@ function edit_service_for_host(\Illuminate\Http\Request $request)
     return api_error(500, "Failed to update the service with id $service_id");
 }
 
-function validateDeviceIds($ids)
-{
-    foreach ($ids as $id) {
-        $invalidId = !is_numeric($id) || $id < 1 || is_null(Device::find($id));
-        if ($invalidId) {
-            return false;
-        }
-    }
-    return true;
-}
-
 /**
  * Display Librenms Instance Info
  */
