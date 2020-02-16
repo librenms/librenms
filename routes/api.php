@@ -83,8 +83,6 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
         Route::delete('locations/{location}', 'LegacyApiController@del_location')->name('del_location');
         Route::delete('services/{id}', 'LegacyApiController@del_service_from_host')->name('del_service_from_host');
         Route::patch('services/{id}', 'LegacyApiController@edit_service_for_host')->name('edit_service_for_host');
-        Route::post('devices/{id}/parents', 'LegacyApiController@add_parents_to_host')->name('add_parents_to_host');
-        Route::delete('/devices/{id}/parents', 'LegacyApiController@del_parents_from_host')->name('del_parents_from_host');
     });
 
     // restricted by access
