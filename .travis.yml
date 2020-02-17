@@ -47,7 +47,7 @@ script:
 #  - php scripts/pre-commit.php -q -l
 #  - php scripts/pre-commit.php -q -s
 #  - php scripts/pre-commit.php -u --db --snmpsim --fail-fast
-  - php vendor/bin/phpunit tests/OSModulesTest.php
+  - DBTEST=1 SNMPSIM=1 php vendor/bin/phpunit tests/OSModulesTest.php --stop-on-failure --stop-on-error
   - test -z "$BROWSER_TEST" || php artisan dusk
   - bash -n daily.sh
   - pylint -E poller-wrapper.py discovery-wrapper.py
