@@ -2,7 +2,7 @@
   {
     "rule": "macros.device_down = \"1\"",
     "name": "Devices up/down",
-    "default": true
+    "default": false
   },
   {
     "rule": "macros.device_down = \"1\" && devices.status_reason = \"icmp\"",
@@ -36,6 +36,11 @@
     "rule": "macros.port_down = \"1\"",
     "name": "Port status up/down",
     "extra": "{\"count\": 1}",
+    "default": true
+  },
+  {
+    "rule": "devices.last_ping_timetaken > \"10\"",
+    "name": "Ping Latency",
     "default": true
   },
   {

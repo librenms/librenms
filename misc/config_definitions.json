@@ -163,6 +163,70 @@
                 "value": "integer|between:0,100"
             }
         },
+        "alert_rule.severity": {
+            "default": "warning",
+            "group": "alerting",
+            "section": "rules",
+            "order": 0,
+            "type": "select",
+            "options": {
+                "ok": "OK",
+                "warning": "Warning",
+                "critical": "Critical"
+            }
+        },
+        "alert_rule.max_alerts": {
+            "default": 1,
+            "units": "count",
+            "group": "alerting",
+            "section": "rules",
+            "order": 1,
+            "type": "integer"
+        },
+        "alert_rule.delay": {
+            "default": 1,
+            "units": "minutes",
+            "group": "alerting",
+            "section": "rules",
+            "order": 2,
+            "type": "integer"
+        },
+        "alert_rule.interval": {
+            "default": 5,
+            "units": "minutes",
+            "group": "alerting",
+            "section": "rules",
+            "order": 3,
+            "type": "integer"
+        },
+        "alert_rule.mute_alerts": {
+            "default": false,
+            "type": "boolean",
+            "group": "alerting",
+            "section": "rules",
+            "order": 4
+        },
+        "alert_rule.invert_rule_match": {
+            "default": false,
+            "type": "boolean",
+            "group": "alerting",
+            "section": "rules",
+            "order": 5
+        },
+        "alert_rule.recovery_alerts": {
+            "default": true,
+            "type": "boolean",
+            "group": "alerting",
+            "section": "rules",
+            "order": 6
+        },
+        "alert_rule.invert_map": {
+            "default": false,
+            "type": "boolean",
+            "group": "alerting",
+            "section": "rules",
+            "order": 7
+        },
         "allow_duplicate_sysName": {
             "default": false,
             "type": "boolean",
