@@ -18,6 +18,7 @@ return [
         'alerting' => [
             'general' => 'General Alert Settings',
             'email' => 'Email Options',
+            'rules' => 'Alert Rule Default Settings',
         ],
         'auth' => [
             'general' => 'General Authentication Settings',
@@ -72,6 +73,40 @@ return [
         'addhost_alwayscheckip' => [
             'description' => 'Check for duplicate IP when adding devices',
             'help' => 'If a host is added as an ip address it is checked to ensure the ip is not already present. If the ip is present the host is not added. If host is added by hostname this check is not performed. If the setting is true hostnames are resolved and the check is also performed. This helps prevents accidental duplicate hosts.'
+        ],
+        'alert_rule' => [
+            'severity' => [
+                'description' => 'Severity',
+                'help' => 'Severity for an Alert'
+            ],
+            'max_alerts' => [
+                'description' => 'Max Alerts',
+                'help' => 'Count of Alerts to be sent'
+            ],
+            'delay' => [
+                'description' => 'Delay',
+                'help' => 'Delay before an Alert will be sent'
+            ],
+            'interval' => [
+                'description' => 'Interval',
+                'help' => 'Interval to be checked for this Alert'
+            ],
+            'mute_alerts' => [
+                'description' => 'Mute Alerts',
+                'help' => 'Should Alert only be seen in WebUI'
+            ],
+            'invert_rule_match' => [
+                'description' => 'Invert Rule Match',
+                'help' => 'Alert only if rule doesn\'t match'
+            ],
+            'recovery_alerts' => [
+                'description' => 'Recovery Alerts',
+                'help' => 'Notify if Alert recovers'
+            ],
+            'invert_map' => [
+                'description' => 'All devices except in list',
+                'help' => 'Alert only for Devices which are not listed'
+            ]
         ],
         'alert' => [
             'ack_until_clear' => [

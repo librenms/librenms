@@ -24,6 +24,7 @@
  */
 
 use LibreNMS\Alerting\QueryBuilderParser;
+use LibreNMS\Config;
 
 header('Content-type: application/json');
 
@@ -40,19 +41,20 @@ if (is_numeric($template_id)) {
     $rules = get_rules_from_json();
     $rule = $rules[$template_id];
     $default_extra = [
-        'mute' => false,
-        'count' => '-1',
-        'delay' => 60,
-        'invert' => false,
-        'interval' => 300,
-        'recovery' => true,
+        'mute' => Config::get('alert_rule.mute_alerts'),
+        'count' => Config::get('alert_rule.max_alerts'),
+        'delay' => 60 * Config::get('alert_rule.delay'),
+        'invert' => Config::get('alert_rule.invert_rule_match'),
+        'interval' => 60 * Config::get('alert_rule.interval'),
+        'recovery' => Config::get('alert_rule.recovery_alerts'),
     ];
     $output = [
         'status' => 'ok',
         'name' => $rule['name'],
         'builder' => $rule['builder'] ?: QueryBuilderParser::fromOld($rule['rule'])->toArray(),
         'extra' => array_replace($default_extra, (array)$rule['extra']),
-        'severity' => $rule['severity'] ?: 'critical'
+        'severity' => $rule['severity'] ?: Config::get('alert_rule.severity'),
+        'invert_map' => Config::get('alert_rule.invert_map')
     ];
 } else {
     $output = [
