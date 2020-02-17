@@ -22,7 +22,7 @@ foreach (dbFetchRows('SELECT * FROM `ports` WHERE `device_id` = ? AND `disabled`
 
     if (is_array(\LibreNMS\Config::get('device_traffic_descr'))) {
         foreach (\LibreNMS\Config::get('device_traffic_descr') as $ifdescr) {
-            if (\LibreNMS\Util\StringHelpers::emptyString($ifdesc)) {
+            if (\LibreNMS\Util\StringHelpers::emptyString($ifdescr)) {
                 continue;
             }
             if (preg_match($ifdescr.'i', $port['ifDescr']) || preg_match($ifdescr.'i', $port['ifName'])) {

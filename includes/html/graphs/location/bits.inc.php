@@ -18,7 +18,7 @@ foreach ($devices as $device) {
 
         if (is_array(\LibreNMS\Config::get('device_traffic_descr'))) {
             foreach (\LibreNMS\Config::get('device_traffic_descr') as $ifdescr) {
-                if (\LibreNMS\Util\StringHelpers::emptyString($ifdesc)) {
+                if (\LibreNMS\Util\StringHelpers::emptyString($ifdescr)) {
                     continue;
                 }
                 if (preg_match($ifdescr.'i', $int['ifDescr']) || preg_match($ifdescr.'i', $int['ifName'])) {
