@@ -60,3 +60,66 @@
     }//End foreach $index
     unset($sensors_adva, $entry);
 // ************** End of Sensors for ADVA FSP150CC Series **********
+
+// FSP150 Pro Series SFP Current
+
+
+foreach ($pre_cache['adva_fsp150_netports'] as $index => $entry) {
+    if ($entry['cmEthernetNetPortMediaType'] == 'fiber' && $entry['cmEthernetNetPortOperationalState'] == 'normal' ) {
+        $oid = '.1.3.6.1.4.1.2544.1.12.5.1.5.1.32.' . $index . '.3';
+        $entPhysicalIndex = $entry['cmEthernetNetPortEntityIndex'];
+        $entPhysicalIndex_measured = 'ports';
+        $descr = dbFetchCell('SELECT `ifName` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', [$entry['cmEthernetNetPortIfIndex'], $device['device_id']]) . ' BIAS';
+        $currentBias = $entry['cmEthernetNetPortStatsLBC'];
+
+        discover_sensor(
+            $valid['sensor'],
+            'current',
+            $device,
+            $oid,
+            'cmEthernetNetPortStatsLBC.' . $index,
+            'adva_fsp150',
+            $descr,
+            $divisor,
+            $multiplier,
+            null,
+            null,
+            null,
+            null,
+            $currentBias,
+            'snmp',
+            $entPhysicalIndex,
+            $entPhysicalIndex_measured
+        );
+    }
+}
+
+foreach ($pre_cache['adva_fsp150_accports'] as $index => $entry) {
+    if ($entry['cmEthernetAccPortMediaType'] == 'fiber') {
+        $oid = '.1.3.6.1.4.1.2544.1.12.5.1.1.1.32.' . $index . '.3';
+        $entPhysicalIndex = $entry['cmEthernetAccPortEntityIndex'];
+        $entPhysicalIndex_measured = 'ports';
+        $descr = dbFetchCell('SELECT `ifName` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', [$entry['cmEthernetAccPortIfIndex'], $device['device_id']]) . ' BIAS';
+        $currentBias = $entry['cmEthernetAccPortStatsLBC'];
+
+        discover_sensor(
+            $valid['sensor'],
+            'current',
+            $device,
+            $oid,
+            'cmEthernetAccPortStatsLBC.' . $index,
+            'adva_fsp150',
+            $descr,
+            $divisor,
+            $multiplier,
+            null,
+            null,
+            null,
+            null,
+            $currentBias,
+            'snmp',
+            $entPhysicalIndex,
+            $entPhysicalIndex_measured
+        );
+    }
+}

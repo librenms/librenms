@@ -18,3 +18,5 @@
 
 // FSP150CC Series
 $pre_cache['adva_fsp150'] = snmpwalk_cache_multi_oid($device, 'cmEntityObjects', [], 'CM-ENTITY-MIB', null, '-OQUbs');
+$pre_cache['adva_fsp150_netports'] = snmpwalk_cache_multi_oid($device, 'cmEthernetNetPortTable', [], 'CM-FACILITY-MIB', null, '-OQUbs');
+$pre_cache['adva_fsp150_accports'] = snmpwalk_cache_multi_oid($device, 'cmEthernetAccPortTable', [], 'CM-FACILITY-MIB', null, '-OQUbs');
