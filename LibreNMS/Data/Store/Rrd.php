@@ -371,7 +371,7 @@ class Rrd implements DatastoreContract
             // don't care about the return of other commands, so send them to the faster async process
             $output = $this->async_process->sendCommand($cmd);
         } else {
-            throw new \Exception('rrdtool could not start');
+            Log::error('rrdtool could not start');
         }
 
         if ($vdebug) {
