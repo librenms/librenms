@@ -172,7 +172,7 @@ function gen_snmp_cmd($cmd, $device, $oids, $options = null, $mib = null, $mibdi
         array_push($cmd, '-r', $retries);
     }
 
-    $pollertarget = Device::pollerTarget($device['hostname']);
+    $pollertarget = Device::pollerTarget($device);
     $cmd[] = $device['transport'].':'.$pollertarget.':'.$device['port'];
     $cmd = array_merge($cmd, (array)$oids);
 
