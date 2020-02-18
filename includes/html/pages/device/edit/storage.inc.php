@@ -14,7 +14,7 @@
 
 ?>
 
-<h3>Storage settings</h3>
+<h3>Storage Settings</h3>
 
 <div class="table-responsive">
     <table id="storage" class="table table-hover table-condensed storage">
