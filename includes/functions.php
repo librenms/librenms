@@ -489,8 +489,8 @@ function delete_device($id)
 
     $db_name = dbFetchCell('SELECT DATABASE()');
     foreach ($fields as $field) {
-        foreach (dbFetch("SELECT table_name FROM information_schema.columns WHERE table_schema = ? AND column_name = ?", [$db_name, $field]) as $table) {
-            $table = $table['table_name'];
+        foreach (dbFetch("SELECT TABLE_NAME FROM information_schema.columns WHERE table_schema = ? AND column_name = ?", [$db_name, $field]) as $table) {
+            $table = $table['TABLE_NAME'];
             $entries = (int) dbDelete($table, "`$field` =  ?", array($id));
             if ($entries > 0 && $debug === true) {
                 $ret .= "$field@$table = #$entries\n";
