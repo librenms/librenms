@@ -22,6 +22,7 @@
         <tr>
             <th data-column-id="hostname">Device</th>
             <th data-column-id="storage_descr">Storage</th>
+            <th data-column-id="storage_size">Size</th>
             <th data-column-id="storage_perc">%</th>
             <th data-column-id="storage_perc_warn" data-formatter="perc_update" data-header-css-class="edit-storage-input">% Warn</th>
         </tr>
