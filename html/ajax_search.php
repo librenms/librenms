@@ -29,7 +29,7 @@ if (isset($_REQUEST['search'])) {
         }
 
         if ($_REQUEST['type'] == 'group') {
-            foreach (dbFetchRows("SELECT id, name FROM device_groups WHERE name LIKE ?", ["%$search%"]) as $group) {
+            foreach (dbFetchRows("SELECT id,name FROM device_groups WHERE name LIKE ?", ["%$search%"]) as $group) {
                 if ($_REQUEST['map']) {
                     $results[] = array(
                         'name'     => 'g:'.$group['name'],
@@ -50,23 +50,13 @@ if (isset($_REQUEST['search'])) {
         } elseif ($_REQUEST['type'] == 'device') {
             // Device search
             if (Auth::user()->hasGlobalRead()) {
-                if (\LibreNMS\Util\IPv4::isValid($search, false) || \LibreNMS\Util\IPv6::isValid($search, false)) {
-                    // Device search ip, overwrite_ip, or hostname by address; sort by ip
-                    $results = dbFetchRows(
-                        "SELECT *, inet6_ntoa(`ip`) as `ntoa_ip` FROM `devices` LEFT JOIN `locations` on `locations`.`id` = `devices`.`location_id` WHERE inet6_ntoa(`devices`.`ip`) LIKE ? OR `devices`.`overwrite_ip` LIKE ? OR `devices`.`hostname` LIKE ? ORDER BY `ip`, `hostname` LIMIT ?",
-                        ["$search%", "$search%", "$search%", $limit]
-                    );
-                } else {
-                    // Device search ip, overwrite_ip, hostname, location, sysname, purpose, or notes; sort by hostname
-                    $results = dbFetchRows(
-                        "SELECT *, inet6_ntoa(ip) as `ntoa_ip` FROM `devices` LEFT JOIN `locations` ON `locations`.`id` = `devices`.`location_id` WHERE inet6_ntoa(`devices`.`ip`) LIKE ? OR `devices`.`overwrite_ip` LIKE ? OR `devices`.`hostname` LIKE ? OR `locations`.`location` LIKE ? OR `devices`.`sysName` LIKE ? OR `devices`.`purpose` LIKE ? OR `devices`.`notes` LIKE ? ORDER BY `devices`.`hostname` LIMIT ?",
-                        ["%$search%", "%$search%", "%$search%", "%$search%", "%$search%", "%$search%", "%$search%", $limit]
-                    );
-                }
-            } else {
-                // Device search hostname, sysname, or location by non-address for users without global read access
                 $results = dbFetchRows(
-                    "SELECT *, inet6_ntoa(ip) as `ntoa_ip` FROM `devices` AS `D` LEFT JOIN `locations` ON `locations`.`id` = `D`.`location_id` WHERE $perms_sql AND (D.`hostname` LIKE ? OR D.`sysName` LIKE ? OR `locations`.`location` LIKE ?) ORDER BY hostname LIMIT ?",
+                    "SELECT * FROM `devices` LEFT JOIN `locations` ON `locations`.`id` = `devices`.`location_id` WHERE `devices`.`hostname` LIKE ? OR `locations`.`location` LIKE ? OR `devices`.`sysName` LIKE ? OR `devices`.`purpose` LIKE ? OR `devices`.`notes` LIKE ? ORDER BY `devices`.hostname LIMIT ?",
+                    ["%$search%", "%$search%", "%$search%", "%$search%", "%$search%", $limit]
+                );
+            } else {
+                $results = dbFetchRows(
+                    "SELECT * FROM `devices` AS `D` LEFT JOIN `locations` ON `locations`.`id` = `D`.`location_id` WHERE $perms_sql AND (D.`hostname` LIKE ? OR D.`sysName` LIKE ? OR `locations`.`location` LIKE ?) ORDER BY hostname LIMIT ?",
                     array_merge($device_ids, ["%$search%", "%$search%", "%$search%", $limit])
                 );
             }
@@ -92,6 +82,7 @@ if (isset($_REQUEST['search'])) {
 
                     $num_ports = dbFetchCell('SELECT COUNT(*) FROM `ports` AS `I`, `devices` AS `D` WHERE ' . $perms_sql . ' AND `I`.`device_id` = `D`.`device_id` AND `I`.`ignore` = 0 AND `I`.`deleted` = 0 AND `D`.`device_id` = ?', array_merge($device_ids, [$result['device_id']]));
 
+
                     $device[] = array(
                         'name'            => $name,
                         'device_id'       => $result['device_id'],
@@ -100,10 +91,9 @@ if (isset($_REQUEST['search'])) {
                         'device_ports'    => $num_ports,
                         'device_image'    => getIcon($result),
                         'device_hardware' => $result['hardware'],
-                        'device_os'       => \LibreNMS\Config::getOsSetting($result['os'], 'text'),
+                        'device_os' => \LibreNMS\Config::getOsSetting($result['os'], 'text'),
                         'version'         => $result['version'],
                         'location'        => $result['location'],
-                        'device_ip'       => $result['ntoa_ip']
                     );
                 }//end foreach
             }//end if
