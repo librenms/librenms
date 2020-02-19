@@ -46,7 +46,7 @@ foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
         $currRx = snmp_get($device, $oidRx, '-Oqv', 'CM-PERFORMANCE-MIB', '/opt/librenms/mibs/adva');
         $currTx = snmp_get($device, $oidTx, '-Oqv', 'CM-PERFORMANCE-MIB', '/opt/librenms/mibs/adva');
         if ($currRx != 0 || $currTx != 0) {
-            $entPhysicalIndex = $entry['cmEthernetNetPortEntityIndex'];
+            $entPhysicalIndex = $entry['cmEthernetNetPortIfIndex'];
             $entPhysicalIndex_measured = 'ports';
             $descrRx = dbFetchCell('SELECT `ifName` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', [$entry['cmEthernetNetPortIfIndex'], $device['device_id']]) . ' Rx Power';
             $currentRx = $entry['cmEthernetNetPortStatsOPR'];
@@ -105,7 +105,7 @@ foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
         $currRx = snmp_get($device, $oidRx, '-Oqv', 'CM-PERFORMANCE-MIB', '/opt/librenms/mibs/adva');
         $currTx = snmp_get($device, $oidTx, '-Oqv', 'CM-PERFORMANCE-MIB', '/opt/librenms/mibs/adva');
         if ($currRx != 0 || $currTx != 0) {
-            $entPhysicalIndex = $entry['cmEthernetAccPortEntityIndex'];
+            $entPhysicalIndex = $entry['cmEthernetAccPortIfIndex'];
             $entPhysicalIndex_measured = 'ports';
             $descrRx = dbFetchCell('SELECT `ifName` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', [$entry['cmEthernetAccPortIfIndex'], $device['device_id']]) . ' Rx Power';
             $currentRx = $entry['cmEthernetAccPortStatsOPR'];
@@ -162,7 +162,7 @@ foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
         $currRx = snmp_get($device, $oidRx, '-Oqv', 'CM-PERFORMANCE-MIB', '/opt/librenms/mibs/adva');
         $currTx = snmp_get($device, $oidTx, '-Oqv', 'CM-PERFORMANCE-MIB', '/opt/librenms/mibs/adva');
         if ($currRx != 0 || $currTx != 0) {
-            $entPhysicalIndex = $entry['cmEthernetTrafficPortEntityIndex'];
+            $entPhysicalIndex = $entry['cmEthernetTrafficPortIfIndex'];
             $entPhysicalIndex_measured = 'ports';
             $descrRx = dbFetchCell('SELECT `ifName` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', [$entry['cmEthernetTrafficPortIfIndex'], $device['device_id']]) . ' Rx Power';
             $currentRx = $entry['cmEthernetTrafficPortStatsOPR'];

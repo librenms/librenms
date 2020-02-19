@@ -68,7 +68,7 @@ foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
         $oid = '.1.3.6.1.4.1.2544.1.12.5.1.5.1.32.' . $index . '.3';
         $curr = snmp_get($device, $oid, '-Oqv', 'CM-PERFORMANCE-MIB', '/opt/librenms/mibs/adva');
         if ($curr != 0) {
-            $entPhysicalIndex = $entry['cmEthernetNetPortEntityIndex'];
+            $entPhysicalIndex = $entry['cmEthernetNetPortIfIndex'];
             $entPhysicalIndex_measured = 'ports';
             $descr = dbFetchCell('SELECT `ifName` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', [$entry['cmEthernetNetPortIfIndex'], $device['device_id']]) . ' BIAS';
             $currentBias = $entry['cmEthernetNetPortStatsLBC'];
@@ -99,7 +99,7 @@ foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
         $oid = '.1.3.6.1.4.1.2544.1.12.5.1.1.1.32.' . $index . '.3';
         $curr = snmp_get($device, $oid, '-Oqv', 'CM-PERFORMANCE-MIB', '/opt/librenms/mibs/adva');
         if ($curr != 0) {
-            $entPhysicalIndex = $entry['cmEthernetAccPortEntityIndex'];
+            $entPhysicalIndex = $entry['cmEthernetAccPortIfIndex'];
             $entPhysicalIndex_measured = 'ports';
             $descr = dbFetchCell('SELECT `ifName` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', [$entry['cmEthernetAccPortIfIndex'], $device['device_id']]) . ' BIAS';
             $currentBias = $entry['cmEthernetAccPortStatsLBC'];
@@ -130,7 +130,7 @@ foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
         $oid = '.1.3.6.1.4.1.2544.1.12.5.1.21.1.32.' . $index . '.3';
         $curr = snmp_get($device, $oid, '-Oqv', 'CM-PERFORMANCE-MIB', '/opt/librenms/mibs/adva');
         if ($curr != 0) {
-            $entPhysicalIndex = $entry['cmEthernetTrafficPortEntityIndex'];
+            $entPhysicalIndex = $entry['cmEthernetTrafficPortIfIndex'];
             $entPhysicalIndex_measured = 'ports';
             $descr = dbFetchCell('SELECT `ifName` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', [$entry['cmEthernetTrafficPortIfIndex'], $device['device_id']]) . ' BIAS';
             $currentBias = $entry['cmEthernetTrafficPortStatsLBC'];
