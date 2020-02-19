@@ -51,16 +51,16 @@ if (isset($_REQUEST['search'])) {
             // Device search
             if (Auth::user()->hasGlobalRead()) {
                 if (\LibreNMS\Util\IPv4::isValid($search, false) || \LibreNMS\Util\IPv6::isValid($search, false)) {
-                    // Device search ip, overwrite_ip, or hostname by address
+                    // Device search ip, overwrite_ip, or hostname by address; sort by ip
                     $results = dbFetchRows(
                         "SELECT *, inet6_ntoa(`ip`) as `ntoa_ip` FROM `devices` LEFT JOIN `locations` on `locations`.`id` = `devices`.`location_id` WHERE inet6_ntoa(`devices`.`ip`) LIKE ? OR `devices`.`overwrite_ip` LIKE ? OR `devices`.`hostname` LIKE ? ORDER BY `ip`, `hostname` LIMIT ?",
                         ["$search%", "$search%", "$search%", $limit]
                     );
                 } else {
-                    // Device search hostname, location, sysname, purpose, or notes by non-address
+                    // Device search ip, overwrite_ip, hostname, location, sysname, purpose, or notes; sort by hostname
                     $results = dbFetchRows(
-                        "SELECT *, inet6_ntoa(ip) as `ntoa_ip` FROM `devices` LEFT JOIN `locations` ON `locations`.`id` = `devices`.`location_id` WHERE `devices`.`hostname` LIKE ? OR `locations`.`location` LIKE ? OR `devices`.`sysName` LIKE ? OR `devices`.`purpose` LIKE ? OR `devices`.`notes` LIKE ? ORDER BY `devices`.`hostname` LIMIT ?",
-                        ["%$search%", "%$search%", "%$search%", "%$search%", "%$search%", $limit]
+                        "SELECT *, inet6_ntoa(ip) as `ntoa_ip` FROM `devices` LEFT JOIN `locations` ON `locations`.`id` = `devices`.`location_id` WHERE inet6_ntoa(`devices`.`ip`) LIKE ? OR `devices`.`overwrite_ip` LIKE ? OR `devices`.`hostname` LIKE ? OR `locations`.`location` LIKE ? OR `devices`.`sysName` LIKE ? OR `devices`.`purpose` LIKE ? OR `devices`.`notes` LIKE ? ORDER BY `devices`.`hostname` LIMIT ?",
+                        ["%$search%", "%$search%", "%$search%", "%$search%", "%$search%", "%$search%", "%$search%", $limit]
                     );
                 }
             } else {
