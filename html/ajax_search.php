@@ -51,21 +51,21 @@ if (isset($_REQUEST['search'])) {
             // Device search
             if (Auth::user()->hasGlobalRead()) {
                 if (\LibreNMS\Util\IPv4::isValid($search, false) || \LibreNMS\Util\IPv6::isValid($search, false)) {
-                    // Device ip, overwrite_ip, or hostname search by address
+                    // Device search ip, overwrite_ip, or hostname by address
                     $results = dbFetchRows(
                         "SELECT *,inet6_ntoa(`ip`) as `ntoa_ip` FROM `devices` LEFT JOIN `locations` on `locations`.`id` = `devices`.`location_id` WHERE inet6_ntoa(`devices`.`ip`) LIKE ? OR `devices`.`overwrite_ip` LIKE ? OR `devices`.`hostname` LIKE ? ORDER BY `ip`, `hostname` LIMIT ?",
                         ["$search%", "$search%", "$search%", $limit]
                     );
                 } else {
-                    // Device hostname, location, sysname, purpose, or notes search by non-address
+                    // Device search hostname, location, sysname, purpose, or notes by non-address
                     $results = dbFetchRows(
                         "SELECT *, inet6_ntoa(ip) as `ntoa_ip` FROM `devices` LEFT JOIN `locations` ON `locations`.`id` = `devices`.`location_id` WHERE `devices`.`hostname` LIKE ? OR `locations`.`location` LIKE ? OR `devices`.`sysName` LIKE ? OR `devices`.`purpose` LIKE ? OR `devices`.`notes` LIKE ? ORDER BY `devices`.`hostname` LIMIT ?",
                         ["%$search%", "%$search%", "%$search%", "%$search%", "%$search%", $limit]
                     );
                 }
             } else {
+                // Device search hostname, sysname, or location by non-address for users without global read access
                 $results = dbFetchRows(
-                    // Device hostname, sysname, or location search by non-address for users without global read access
                     "SELECT *, inet6_ntoa(ip) as `ntoa_ip` FROM `devices` AS `D` LEFT JOIN `locations` ON `locations`.`id` = `D`.`location_id` WHERE $perms_sql AND (D.`hostname` LIKE ? OR D.`sysName` LIKE ? OR `locations`.`location` LIKE ?) ORDER BY hostname LIMIT ?",
                     array_merge($device_ids, ["%$search%", "%$search%", "%$search%", $limit])
                 );
