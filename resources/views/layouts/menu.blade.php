@@ -582,6 +582,7 @@
                         device_image: device.device_image,
                         url: device.url,
                         name: device.name,
+                        device_ip: device.device_ip,
                         device_os: device.device_os,
                         version: device.version,
                         device_hardware: device.device_hardware,
@@ -662,7 +663,7 @@
             valueKey: 'name',
             templates: {
                 header: '<h5><strong>&nbsp;Devices</strong></h5>',
-                suggestion: Handlebars.compile('<p><a href="@{{url}}"><img src="@{{device_image}}" border="0"> <small><strong>@{{name}}</strong> | @{{device_os}} | @{{version}} | @{{device_hardware}} with @{{device_ports}} port(s) | @{{location}}</small></a></p>')
+                suggestion: Handlebars.compile('<p><a href="@{{url}}"><img src="@{{device_image}}" border="0"> <small><strong>@{{name}}</strong>@{{#if device_ip}} | <i>@{{device_ip}}</i>@{{/if}}@{{#if device_os}} | @{{device_os}}@{{/if}}@{{#if version}} @{{version}}@{{/if}}@{{#if device_hardware}} | @{{device_hardware}}@{{/if}}@{{#if device_ports}} with @{{device_ports}} port(s)@{{/if}}@{{#if location}} | @{{location}}@{{/if}}</small></a></p>')
             }
         },
         {
@@ -673,7 +674,7 @@
             valueKey: 'name',
             templates: {
                 header: '<h5><strong>&nbsp;Ports</strong></h5>',
-                suggestion: Handlebars.compile('<p><a href="@{{url}}"><small><i class="fa fa-link fa-sm icon-theme" aria-hidden="true"></i> <strong>@{{name}}</strong> – @{{hostname}}<br /><i>@{{description}}</i></small></a></p>')
+                suggestion: Handlebars.compile('<p><a href="@{{url}}"><small><i class="fa fa-link fa-sm icon-theme" aria-hidden="true"></i> <strong>@{{name}}</strong> - @{{hostname}}@{{#if description}} <i>@{{description}}</i>@{{/if}}</small></a></p>')
             }
         },
         {
@@ -684,7 +685,7 @@
             valueKey: 'name',
             templates: {
                 header: '<h5><strong>&nbsp;BGP Sessions</strong></h5>',
-                suggestion: Handlebars.compile('<p><a href="@{{url}}"><small><i class="@{{bgp_image}}" aria-hidden="true"></i> @{{name}} - @{{hostname}}<br />AS@{{localas}} -> AS@{{remoteas}}</small></a></p>')
+                suggestion: Handlebars.compile('<p><a href="@{{url}}"><small><i class="@{{bgp_image}}" aria-hidden="true"></i> @{{name}} - @{{hostname}} - AS@{{localas}} -> AS@{{remoteas}}</small></a></p>')
             }
         }).on('typeahead:select', function (ev, suggestion) {
             window.location.href = suggestion.url;
