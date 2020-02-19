@@ -43,14 +43,14 @@ $sensors_adva = [
     ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.19.1.6', 'sensor_name' => 'ethernet10x1GCardTemperature'],
     ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.21.1.6', 'sensor_name' => 'stuCardTemperature'],
     ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.22.1.5', 'sensor_name' => 'amiTemperature'],
-    ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.27.1.6', 'sensor_name' => ' ethernetNTEGE206VCardTemperature'],
+    ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.27.1.6', 'sensor_name' => 'ethernetNTEGE206VCardTemperature'],
     ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.41.1.6', 'sensor_name' => 'ethernetGE8SCCCardTemperature'],
     ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.47.1.5', 'sensor_name' => 'stuHighPerCardTemperature'],
     ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.48.1.5', 'sensor_name' => 'stiHighPerTemperature'],
     ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.49.1.6', 'sensor_name' => 'ethernetGE8ECCCardTemperature'],
     ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.53.1.6', 'sensor_name' => 'ethernetNTEGE112ProCardTemperature'],
     ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.57.1.6', 'sensor_name' => 'ethernetNTEGE114ProCardTemperature'],
-    ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.80.1.6', 'sensor_name' => ' ethernetNTEXG116PROCardTemperature'],
+    ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.80.1.6', 'sensor_name' => 'ethernetNTEXG116PROCardTemperature'],
 ];
 
 $multiplier = 1;

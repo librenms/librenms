@@ -25,8 +25,7 @@ IMPORTS
     TEXTUAL-CONVENTION,
     DateAndTime,
     TestAndIncr,
-    TimeStamp,
-    MacAddress
+    TimeStamp, MacAddress
                                         FROM  SNMPv2-TC
     SnmpAdminString
                                         FROM  SNMP-FRAMEWORK-MIB
@@ -37,7 +36,7 @@ IMPORTS
     
 
 advaMIB MODULE-IDENTITY
-    LAST-UPDATED "201409290000Z"  -- September 29, 2014
+    LAST-UPDATED "200802210000Z"  -- February 21, 2008
     ORGANIZATION "ADVA AG Optical Networking"
     CONTACT-INFO
         "ADVA AG Optical Networking
@@ -59,16 +58,8 @@ advaMIB MODULE-IDENTITY
         Fax:    +81 3 5408 5899
         e-mail: support-asia@advaoptical.com"
     DESCRIPTION
-        "The ADVA Common MIB version 2.3."
-
-    REVISION    "201409290000Z" -- October 07, 2003
-    DESCRIPTION
         "The ADVA Optical Networking base MIB."
 
-    REVISION    "201202070000Z"  -- February 7, 2012
-    DESCRIPTION
-        "Revised ADVA Common MIB version 2.1."
-        
     REVISION    "200802210000Z"  -- February 21, 2008
     DESCRIPTION
         "Revised ADVA Common MIB version 2.0."
@@ -126,6 +117,7 @@ admin           OBJECT IDENTIFIER ::= { common 2 }
 events          OBJECT IDENTIFIER ::= { common 3 }
 software        OBJECT IDENTIFIER ::= { common 4 }
 config          OBJECT IDENTIFIER ::= { common 5 }
+commonMibConformance OBJECT IDENTIFIER ::= {common 6}
 
 transportStandards 		 	OBJECT IDENTIFIER ::= { config 4 }
 inventoryMib   					OBJECT IDENTIFIER ::= { config 5 }
@@ -232,7 +224,7 @@ TrapCounter ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
         "The sequence number of sent notifications (traps)."
-    SYNTAX      Counter32
+    SYNTAX      Unsigned32
 
 Counter64String ::= TEXTUAL-CONVENTION
     DISPLAY-HINT "20a"
@@ -450,30 +442,17 @@ ApsDirection ::= TEXTUAL-CONVENTION
   STATUS        current
   DESCRIPTION
          "Bi-Directional | Unidirectional setup used in protection setup: Not to be used by others" 
-  SYNTAX        INTEGER
-                {
+  SYNTAX        INTEGER                {
                   undefined(0),
                   bidirectional(1),  --bidirectional
                   unidirectional(2)  --unidirectional
                 }
 
-ApsDirectionCaps ::= TEXTUAL-CONVENTION
-  STATUS        current
-  DESCRIPTION
-         "Bi-Directional | Unidirectional setup used in protection setup: Not to be used by others" 
-  SYNTAX        BITS
-                {
-                  capUndefined(0),
-                  capBidirectional(1),
-                  capUnidirectional(2)
-                }
-
 ApsHoldoffTime ::= TEXTUAL-CONVENTION
   STATUS        current
   DESCRIPTION
-         "Soak period before switch after trigger." 
-  SYNTAX        INTEGER
-                {
+         "Soak period before switching on trigger." 
+  SYNTAX        INTEGER                {
                   undefined(0),
                   none(1),
                   e20ms(2),
@@ -582,7 +561,7 @@ ApsHoldoffTime ::= TEXTUAL-CONVENTION
 ApsHoldoffTimeCaps ::= TEXTUAL-CONVENTION
   STATUS        current
   DESCRIPTION
-         "Soak period before switch after trigger." 
+         "Soak period before switching on trigger." 
   SYNTAX        BITS
                 {
                   capUndefined(0),
@@ -706,36 +685,25 @@ BootState ::= TEXTUAL-CONVENTION
   STATUS        current
   DESCRIPTION
          "Boot State. Every state change (excluding IDLE) does generate a corresponding transient condition." 
-  SYNTAX        INTEGER
-                {
+  SYNTAX        INTEGER                {
                   undefined(0),
                   complete(1),  --Booting has been completed successfully
                   started(2),  --Booting has just started
                   failed(3),  --Fail occurred during the booting operation
-                  reject(4),  --Booting operation has been rejected
-                  install(5),  --Installation has just started
-                  installFail(6),  --Fail occurred during the installation operation
-                  installComplete(7),  --Installation has been completed
-                  activate(8),  --Activation has just started
-                  activateFail(9),  --Fail occurred during the activation operation
-                  activateReject(10),  --Activation has been rejected
-                  activateComplete(11)  --Activation has been completed
+                  reject(4)  --Booting operation has been rejected
                 }
 
 CommandEqpt ::= TEXTUAL-CONVENTION
   STATUS        current
   DESCRIPTION
          "Update, Install and Reboot commands." 
-  SYNTAX        INTEGER
-                {
+  SYNTAX        INTEGER                {
                   undefined(0),
                   none(1),
                   install(2),  --New FWPREV will become STBY-FWPREV.
                   reboot(3),  --EQPT Reboot.
-                  activate(4),  --STBY-FWPREV will become active FWPREV.
-                  update(5),  --New FWPREV will become active FWPREV.
-                  installFromStby(6),  --New FWPREV-SYS-STBY will become active FWPREV-STBY.
-                  forceInstall(7)  --New FWPREV will become STBY-FWPREV. This is forced operation so will be executed for all modules specified by AIDE and TYPE__EQPT no matter what is an active running FWPREV.
+                  active(4),  --STBY-FWPREV will become active FWPREV.
+                  update(5)  --New FWPREV will become active FWPREV.
                 }
 
 CpWdmEntityClass ::= TEXTUAL-CONVENTION
@@ -752,8 +720,7 @@ CpWdmEntityClass ::= TEXTUAL-CONVENTION
                   pathElement(5),
                   logicalInterface(6),
                   remoteAlarm(7),
-                  portBinding(8),
-                  reservation(9)
+                  portBinding(8)
                 }
 
 EnableStateCaps ::= TEXTUAL-CONVENTION
@@ -831,26 +798,7 @@ EntityClass ::= TEXTUAL-CONVENTION
                   vs0Container(57),
                   virtualSubChannel(58),
                   bridge(59),
-                  queueOnBridge(60),
-                  backwardVirtualOptMux(61),
-                  forwardVirtualOptMux(62),
-                  optChannelTransportLane(63),
-                  virtualChannelN(64),
-                  externalChannel(65),
-                  virtualTerminationPoint(66),
-                  virtualConnection(67),
-                  virtualOptMux(68),
-                  optTransportLaneGroup(69),
-                  optWaveLengthGroup(70),
-                  crossConnectionChannel(71),
-                  crossOpticalLineChannel(72),
-                  versatilePort(73),
-                  system(74),
-                  crossConnectionDcn(75),
-                  protectionFfp(76),
-                  protectionCable(77),
-                  unidirectionalChannel(78),
-                  filterCable(79)
+                  queueOnBridge(60)
                 }
 
 EntityIndex ::= TEXTUAL-CONVENTION
@@ -883,8 +831,7 @@ EquipmentState ::= TEXTUAL-CONVENTION
   STATUS        current
   DESCRIPTION
          "" 
-  SYNTAX        INTEGER
-                {
+  SYNTAX        INTEGER                {
                   undefined(0),
                   equipped(1),
                   unequipped(2)
@@ -894,8 +841,7 @@ EthDuplexMode ::= TEXTUAL-CONVENTION
   STATUS        current
   DESCRIPTION
          "Duplex Mode Provision." 
-  SYNTAX        INTEGER
-                {
+  SYNTAX        INTEGER                {
                   undefined(0),
                   ethHalfDuplex(1),  --Half Duplex mode
                   ethFullDuplex(2)  --Full Duplex mode
@@ -919,22 +865,17 @@ FileArea ::= TEXTUAL-CONVENTION
   SYNTAX        INTEGER
                 {
                   undefined(0),
-                  activeArea(1), --Partition on a disk which is currently in use.
-                  standbyArea(2), --Partition on a disk which is currently not active.
-                  rDisk(3), --Partition on a disk, which is used in software download/upload procedure.
-                  backupDisk(4), --Disk/partition where backup files are stored.
-                  alpDisk(5), --Disk/partition where alarm profile files are stored.
-                  pDisk(6), --Disk/partition where external channel interface and module profile files are stored.
-                  cfDisk(7), --Partition on CF disk, which is used in software download/upload procedure.
-                  paDisk(8) --Disk/partition where Path Analazyer files are stored.
+                  activeArea(1), --Partition on a disk which is currently in use
+                  standbyArea(2), --Partition on a disk which is currently not active
+                  rDisk(3), --Partition on a disk, which is used in software download/upload procedure
+                  backupDisk(4) --Disk/partition where backup files are stored
                 }
 
 FileType ::= TEXTUAL-CONVENTION
   STATUS        current
   DESCRIPTION
          "Type of File" 
-  SYNTAX        INTEGER
-                {
+  SYNTAX        INTEGER                {
                   undefined(0),
                   pgm(1),  --Portable Gray Map image file (file containing a system image)
                   dbs(2),  --Database file type
@@ -942,19 +883,17 @@ FileType ::= TEXTUAL-CONVENTION
                   alp(4),  --Alarm profile file type
                   ncu(5),  --PGM image file with NCU-SW
                   fwps(6),  --PGM image file with FWPS
-                  con(7),  --Configuration file
-                  prf(8)  --Profile (ECH or MOD) file
+                  con(7)  --Configuration file
                 }
 
 FspR7AdminStateSnmpProxy ::= TEXTUAL-CONVENTION
   STATUS        current
   DESCRIPTION
-         "The Administrative State will be displayed in the GUI with full
+         "The Adminstrative State will be displayed in the GUI with full
          name values; it will be differently displayed in TL1 syntax according
          to TL1 display rules. The transaction into the UAS state requires
-         a special destroy/delete function" 
-  SYNTAX        INTEGER
-                {
+         a special destroy/delete function." 
+  SYNTAX        INTEGER                {
                   undefined(0),
                   is(2),
                   dsbld(6)
@@ -963,10 +902,10 @@ FspR7AdminStateSnmpProxy ::= TEXTUAL-CONVENTION
 FspR7AdminStateSnmpProxyCaps ::= TEXTUAL-CONVENTION
   STATUS        current
   DESCRIPTION
-         "The Administrative State will be displayed in the GUI with full
+         "The Adminstrative State will be displayed in the GUI with full
          name values; it will be differently displayed in TL1 syntax according
          to TL1 display rules. The transaction into the UAS state requires
-         a special destroy/delete function" 
+         a special destroy/delete function." 
   SYNTAX        BITS
                 {
                   capUndefined(0),
@@ -996,8 +935,7 @@ FspR7EquipmentType ::= TEXTUAL-CONVENTION
          "The TYPE of Equipment and the MODE setting determine uniquely
          the number and allowed TYPE's of the provisionable dependent
          entities (plugs, interfaces, modules)" 
-  SYNTAX        INTEGER
-                {
+  SYNTAX        INTEGER                {
                   undefined(0),
                   eqpSh1hu(1),
                   eqpSh1huDc(2),
@@ -1118,7 +1056,6 @@ FspR7EquipmentType ::= TEXTUAL-CONVENTION
                   eqp2Wca10g(130),
                   eqpNcuHp(131),
                   eqpNcu20085hu(132),  --deprecated
-                  eqp20Pca10G(133),
                   eqpXfpC(137),
                   eqpXfpD(138),
                   eqpWcc40gtd(140),
@@ -1155,68 +1092,10 @@ FspR7EquipmentType ::= TEXTUAL-CONVENTION
                   eqpEdfaD27(176),
                   eqp2Wcc10g(177),
                   eqp8RoadmC80(178),
-                  eqp2Wcc10gAes(180),  --deprecated
+                  eqp2Wcc10gAes(180),
                   eqp5tce10gtaesd(182),
-                  eqpSh1hupf(183),
-                  eqpFan1hu(185),
-                  eqp10tcc10g(186),
-                  eqpXfpOtnD(187),
-                  eqpNcu2p(188),
-                  eqpPsu9huac(190),
-                  eqp2Raman(192),
                   eqpEdfaS26(193),
-                  eqp5tces10gtd(194),
-                  eqpScuII(195),
-                  eqp11RoadmC96(196),
-                  eqp8AdmC96(197),
-                  eqp8CxmC96(198),
-                  eqp8Shm(199),
-                  eqpAmpShgcv(200),
-                  eqpAmpSlgcv(201),
-                  eqp2RamanC15(202),
-                  eqpWcc100gtD(203),
-                  eqpCfp4g(204),
-                  eqpCfp10g(205),
-                  eqpXfpTlnD(213),
-                  eqp5tces10gtaesd(214),
-                  eqp10tce100g(215),
-                  eqp96Csm4HuD(216),
-                  eqp4CfptD(217),
-                  eqp2psm(218),
-                  eqpWce100G(219),
-                  eqp10Wxc10g(220),
-                  eqp10tcc100gtbD(223),
-                  eqp9RoadmC96(224),
-                  eqp4Wce16g(225),
-                  eqpSfpBG(226),
-                  eqpSfpCdrG(227),
-                  eqp10tce100gGf(228),
-                  eqpSfpCdrC(229),
-                  eqp5tce10gaes(234),
-                  eqp5tce10g(235),
-                  eqp5tces10gaes(236),
-                  eqp5tces10g(237),
-                  eqp4roadmC96(239),
-                  eqpWcc100gtbD(240),
-                  eqpEdfaS20(241),
-                  eqp10tccSdi10g(242),
-                  eqp4roadmEC96(243),
-                  eqpSfptD(245),
-                  eqpSfp2TxG(246),
-                  eqpSfp2RxG(247),
-                  eqpSfp2Txe(248),
-                  eqpSfp2Rxe(249),
-                  eqp2EdfaS20S10(250),
-                  eqp10Tce100Gb(251),
-                  eqp10Tce100gAes(252),
-                  eqpSfpCdrD(253),
-                  eqpSh1huDcEtemp(254),
-                  eqp8psm(255),
-                  eqp9ccmC96(256),
-                  eqpWce100GB(257),
-                  eqp5wca16G(260),
-                  eqpCfptCd(261),
-                  eqpPtp(499)
+                  eqpXfpTlnD(213)
                 }
 
 FspR7EquipmentTypeCaps ::= TEXTUAL-CONVENTION
@@ -1347,7 +1226,6 @@ FspR7EquipmentTypeCaps ::= TEXTUAL-CONVENTION
                   capEqp2Wca10g(130),
                   capEqpNcuHp(131),
                   capEqpNcu20085hu(132),
-                  capEqp20Pca10G(133),
                   capEqpXfpC(137),
                   capEqpXfpD(138),
                   capEqpWcc40gtd(140),
@@ -1386,66 +1264,8 @@ FspR7EquipmentTypeCaps ::= TEXTUAL-CONVENTION
                   capEqp8RoadmC80(178),
                   capEqp2Wcc10gAes(180),
                   capEqp5tce10gtaesd(182),
-                  capEqpSh1hupf(183),
-                  capEqpFan1hu(185),
-                  capEqp10tcc10g(186),
-                  capEqpXfpOtnD(187),
-                  capEqpNcu2p(188),
-                  capEqpPsu9huac(190),
-                  capEqp2Raman(192),
                   capEqpEdfaS26(193),
-                  capEqp5tces10gtd(194),
-                  capEqpScuII(195),
-                  capEqp11RoadmC96(196),
-                  capEqp8AdmC96(197),
-                  capEqp8CxmC96(198),
-                  capEqp8Shm(199),
-                  capEqpAmpShgcv(200),
-                  capEqpAmpSlgcv(201),
-                  capEqp2RamanC15(202),
-                  capEqpWcc100gtD(203),
-                  capEqpCfp4g(204),
-                  capEqpCfp10g(205),
-                  capEqpXfpTlnD(213),
-                  capEqp5tces10gtaesd(214),
-                  capEqp10tce100g(215),
-                  capEqp96Csm4HuD(216),
-                  capEqp4CfptD(217),
-                  capEqp2psm(218),
-                  capEqpWce100G(219),
-                  capEqp10Wxc10g(220),
-                  capEqp10tcc100gtbD(223),
-                  capEqp9RoadmC96(224),
-                  capEqp4Wce16g(225),
-                  capEqpSfpBG(226),
-                  capEqpSfpCdrG(227),
-                  capEqp10tce100gGf(228),
-                  capEqpSfpCdrC(229),
-                  capEqp5tce10gaes(234),
-                  capEqp5tce10g(235),
-                  capEqp5tces10gaes(236),
-                  capEqp5tces10g(237),
-                  capEqp4roadmC96(239),
-                  capEqpWcc100gtbD(240),
-                  capEqpEdfaS20(241),
-                  capEqp10tccSdi10g(242),
-                  capEqp4roadmEC96(243),
-                  capEqpSfptD(245),
-                  capEqpSfp2TxG(246),
-                  capEqpSfp2RxG(247),
-                  capEqpSfp2Txe(248),
-                  capEqpSfp2Rxe(249),
-                  capEqp2EdfaS20S10(250),
-                  capEqp10Tce100Gb(251),
-                  capEqp10Tce100gAes(252),
-                  capEqpSfpCdrD(253),
-                  capEqpSh1huDcEtemp(254),
-                  capEqp8psm(255),
-                  capEqp9ccmC96(256),
-                  capEqpWce100GB(257),
-                  capEqp5wca16G(260),
-                  capEqpCfptCd(261),
-                  capEqpPtp(499)
+                  capEqpXfpTlnD(213)
                 }
 
 FspR7FalseTrue ::= TEXTUAL-CONVENTION
@@ -1453,7 +1273,6 @@ FspR7FalseTrue ::= TEXTUAL-CONVENTION
   DESCRIPTION
          "False True variable." 
   SYNTAX        INTEGER
-
                 {
                   undefined(0),
                   false(1),
@@ -1474,36 +1293,11 @@ FspR7Time ::= TEXTUAL-CONVENTION
          For example: 13-10-26" 
   SYNTAX        OCTET STRING (SIZE(3..3))
 
-FspR7YesNo ::= TEXTUAL-CONVENTION
-  STATUS        current
-  DESCRIPTION
-         "YesNo variable." 
-  SYNTAX        INTEGER
-
-                {
-                  undefined(0),
-                  yes(1),
-                  no(2)
-                }
-
-FspR7UsersDb ::= TEXTUAL-CONVENTION
-  STATUS        current
-  DESCRIPTION
-         "Users Database" 
-  SYNTAX        INTEGER
-                {
-                  undefined(0),
-                  yes(1),
-                  no(2),
-                  keepCurrent(3)
-                }
-
 Grade ::= TEXTUAL-CONVENTION
   STATUS        current
   DESCRIPTION
          "Used to distinguish between NCU capabilities (range of supported services or applications)" 
-  SYNTAX        INTEGER
-                {
+  SYNTAX        INTEGER                {
                   undefined(0),
                   gradeA(1),  --Supports: CWDM / WCA* and xTCA* (access type) modules
                   gradeB(2),  --Supports: same as Grade A and additionally DWDM /  WCE* and xTCE* (enterprise type) modules / WCC* and xTCC* (core type) modules / FC facilities
@@ -1515,8 +1309,7 @@ LoopConfig ::= TEXTUAL-CONVENTION
   STATUS        current
   DESCRIPTION
          "External or Facility Loopback" 
-  SYNTAX        INTEGER
-                {
+  SYNTAX        INTEGER                {
                   undefined(0),
                   noLoop(1),  --Loopback is not configured
                   lineLoop(2),  --Line loopback
@@ -1549,8 +1342,7 @@ NcuAutoActivation ::= TEXTUAL-CONVENTION
   STATUS        current
   DESCRIPTION
          "Enable scheduled activation of the standby PGM partition." 
-  SYNTAX        INTEGER
-                {
+  SYNTAX        INTEGER                {
                   undefined(0),
                   no(1),
                   yes(2)
@@ -1561,7 +1353,6 @@ NoYesNA ::= TEXTUAL-CONVENTION
   DESCRIPTION
          "Enumerator values no(1), yes(2), notApplicable(3)." 
   SYNTAX        INTEGER
-
                 {
                   undefined(0),
                   no(1),
@@ -1572,12 +1363,11 @@ NoYesNA ::= TEXTUAL-CONVENTION
 OhTerminationLevel ::= TEXTUAL-CONVENTION
   STATUS        current
   DESCRIPTION
-         "The entity is Addressable by Management [because its supporting entity is defined in the database and therefore its address existsSignal Tremination Level of Intrusive Access to Header Information.
+         "Signal Tremination Level of Intrusive Access to Header Information.
          Not used in 7.0, monitoring is one layer higher than TERM level,
          if applicable. All conditions detected on monitoring layer will not
          be reported (severity degradated to NR)." 
-  SYNTAX        INTEGER
-                {
+  SYNTAX        INTEGER                {
                   undefined(0),
                   phys(1),
                   otnOtu(2),
@@ -1593,7 +1383,7 @@ OhTerminationLevel ::= TEXTUAL-CONVENTION
 OhTerminationLevelCaps ::= TEXTUAL-CONVENTION
   STATUS        current
   DESCRIPTION
-         "The entity is Addressable by Management [because its supporting entity is defined in the database and therefore its address existsSignal Tremination Level of Intrusive Access to Header Information.
+         "Signal Tremination Level of Intrusive Access to Header Information.
          Not used in 7.0, monitoring is one layer higher than TERM level,
          if applicable. All conditions detected on monitoring layer will not
          be reported (severity degradated to NR)." 
@@ -1614,9 +1404,10 @@ OhTerminationLevelCaps ::= TEXTUAL-CONVENTION
 OtnPayloadType ::= TEXTUAL-CONVENTION
   STATUS        current
   DESCRIPTION
-         "The PAYLOAD defines the transport service type of the payload" 
-  SYNTAX        INTEGER
-                {
+         "The PAYLOAD defines the transport service type of the payload,
+         which may be transparent at this layer or with protocol-dependent
+         behaviour. (Only relevant where TYPE = OTU#)." 
+  SYNTAX        INTEGER                {
                   undefined(0),
                   ifType10GbE(3),
                   ifTypeOc192(4),
@@ -1624,31 +1415,18 @@ OtnPayloadType ::= TEXTUAL-CONVENTION
                   ifTypeStm16(6),
                   ifTypeStm64(7),
                   ifType10GFC(8),
-                  ifType1GFC(12),
                   ifTypeF9953(15),
                   ifTypeF10312(16),
                   ifTypeF10518(17),
-                  ifTypeF2488(18),
-                  ifType2GFC(39),
-                  ifType1GbE(41),
-                  ifTypeF4250(52),
-                  ifTypeStm1(85),
-                  ifTypeStm4(86),
-                  ifTypeOc3(87),
-                  ifTypeOc12(88),
-                  ifTypeF8500(110),
-                  ifTypeF10000(129),
-                  ifTypeF5000(150),
-                  ifTypeF14025(178),
-                  ifType40GbE(192),
-                  ifTypeF41250(194),
-                  ifTypeF103125(195)
+                  ifTypeF2488(18)
                 }
 
 OtnPayloadTypeCaps ::= TEXTUAL-CONVENTION
   STATUS        current
   DESCRIPTION
-         "The PAYLOAD defines the transport service type of the payload" 
+         "The PAYLOAD defines the transport service type of the payload,
+         which may be transparent at this layer or with protocol-dependent
+         behaviour. (Only relevant where TYPE = OTU#)." 
   SYNTAX        BITS
                 {
                   capUndefined(0),
@@ -1658,33 +1436,17 @@ OtnPayloadTypeCaps ::= TEXTUAL-CONVENTION
                   capIfTypeStm16(6),
                   capIfTypeStm64(7),
                   capIfType10GFC(8),
-                  capIfType1GFC(12),
                   capIfTypeF9953(15),
                   capIfTypeF10312(16),
                   capIfTypeF10518(17),
-                  capIfTypeF2488(18),
-                  capIfType2GFC(39),
-                  capIfType1GbE(41),
-                  capIfTypeF4250(52),
-                  capIfTypeStm1(85),
-                  capIfTypeStm4(86),
-                  capIfTypeOc3(87),
-                  capIfTypeOc12(88),
-                  capIfTypeF8500(110),
-                  capIfTypeF10000(129),
-                  capIfTypeF5000(150),
-                  capIfTypeF14025(178),
-                  capIfType40GbE(192),
-                  capIfTypeF41250(194),
-                  capIfTypeF103125(195)
+                  capIfTypeF2488(18)
                 }
 
 OtnTcmLevel ::= TEXTUAL-CONVENTION
   STATUS        current
   DESCRIPTION
          "Activation of Tandem Connection Monitoring Instance A. 6 Tandem Connection Monitoring levels are available." 
-  SYNTAX        INTEGER
-                {
+  SYNTAX        INTEGER                {
                   undefined(0),
                   tcm1(1),
                   tcm2(2),
@@ -1715,8 +1477,7 @@ PgmType ::= TEXTUAL-CONVENTION
   STATUS        current
   DESCRIPTION
          "Program Type" 
-  SYNTAX        INTEGER
-                {
+  SYNTAX        INTEGER                {
                   undefined(0),
                   null(1),
                   ncu(2),
@@ -1729,8 +1490,7 @@ ProtectionMech ::= TEXTUAL-CONVENTION
   STATUS        current
   DESCRIPTION
          "Port Based refers to HST Cards and Switches: Card Based refers to additional equipment protection" 
-  SYNTAX        INTEGER
-                {
+  SYNTAX        INTEGER                {
                   undefined(0),
                   pathProtection(1),  --Path protection
                   channelCardProtection(2),  --Channel card protection
@@ -1759,12 +1519,11 @@ RestoreActivation ::= TEXTUAL-CONVENTION
   STATUS        current
   DESCRIPTION
          "Shows whether the last activation was(will be) a database restore or a new software activation" 
-  SYNTAX        INTEGER
-                {
+  SYNTAX        INTEGER                {
                   undefined(0),
                   notRestore(1),  --ACT-DBS will not be affected.
                   restoreFromStdBy(2),  --STBY-DBS will become ACT-DBS and vice versa (ACT-DBS will become STBY-DBS).
-                  restoreToFactory(3),  --Reset to factory default.
+                  restoreToFactory(3),  --Reset to Factory default.
                   restoreFromEqpt(4),  --7.0.2 - see DBINIT
                   acceptDatabase(5)  --upon ACTIVATE or REBOOT as command (TL1 INIT-SYS) ACCEPT will cause the physical SERNO of SHELF-1 to override the SERNO of SHELF1 in the database oan activate the database in ACT
                 }
@@ -1786,43 +1545,38 @@ RestoreActivationCaps ::= TEXTUAL-CONVENTION
 ServiceAffecting ::= TEXTUAL-CONVENTION
   STATUS        current
   DESCRIPTION
-         "Service Affecting Change during FWP upgrade and Restart operation" 
-  SYNTAX        INTEGER
-                {
+         "Service Affecting Change during FWP upgrade." 
+  SYNTAX        INTEGER                {
                   undefined(0),
                   nsa(1),  --Change is not service affecting
                   sa(2),  --Change is service affecting
                   saActivate(3),  --Activation (reboot) is service affecting
-                  saInstall(4),  --Installation is service affecting
-                  none(5)  --Update is not needed
+                  saInstall(4)  --Installation is service affecting
                 }
 
 ServiceAffectingCaps ::= TEXTUAL-CONVENTION
   STATUS        current
   DESCRIPTION
-         "Service Affecting Change during FWP upgrade and Restart operation" 
+         "Service Affecting Change during FWP upgrade." 
   SYNTAX        BITS
                 {
                   capUndefined(0),
                   capNsa(1),
                   capSa(2),
                   capSaActivate(3),
-                  capSaInstall(4),
-                  capNone(5)
+                  capSaInstall(4)
                 }
 
 StandbyServiceAffecting ::= TEXTUAL-CONVENTION
   STATUS        current
   DESCRIPTION
          "Service Affecting Change during FWP upgrade after activation of STBY PGM partition." 
-  SYNTAX        INTEGER
-                {
+  SYNTAX        INTEGER                {
                   undefined(0),
                   nsa(1),  --Change is not service affecting
                   sa(2),  --Change is service affecting
                   saActivate(3),  --Activation (reboot) is service affecting
-                  saInstall(4),  --Installation is service affecting
-                  none(5)  --Update is not needed
+                  saInstall(4)  --Installation is service affecting
                 }
 
 SnmpProxySynchronizationState ::= TEXTUAL-CONVENTION
@@ -1855,7 +1609,6 @@ SonetSectSigDegThres ::= TEXTUAL-CONVENTION
   DESCRIPTION
          "The SONET signal degrade threshold as a bit error rate." 
   SYNTAX        INTEGER
-
                 {
                   undefined(0),
                   ber10exp5(1),   --Bit error rate given in 10^5 form
@@ -1870,7 +1623,6 @@ SonetSectSigDegThresCaps ::= TEXTUAL-CONVENTION
   DESCRIPTION
          "The SONET signal degrade threshold as a bit error rate." 
   SYNTAX        INTEGER
-
                 {
                   undefined(0),
                   capBer10exp5(1),
@@ -1884,8 +1636,7 @@ SonetTimingSource ::= TEXTUAL-CONVENTION
   STATUS        current
   DESCRIPTION
          "Interface Timing Source Selection" 
-  SYNTAX        INTEGER
-                {
+  SYNTAX        INTEGER                {
                   undefined(0),
                   loopTiming(1),  --Loop source
                   internal(2)  --Internal source
@@ -1906,8 +1657,7 @@ SonetTraceForm ::= TEXTUAL-CONVENTION
   STATUS        current
   DESCRIPTION
          "Byte-Length of Trace Compared to Expected" 
-  SYNTAX        INTEGER
-                {
+  SYNTAX        INTEGER                {
                   undefined(0),
                   form64CRLF(1),  --note: only 62 byte available for user
                   form16CRC7(2),  --note: only 15 byte available for user
@@ -1946,7 +1696,6 @@ SonetVcBundleAllocationCaps ::= TEXTUAL-CONVENTION
          of a free VC. Bit 0 = VC #1, and so on.
         " 
   SYNTAX        BITS
-
                 {
                   vc1(0),
                   vc2(1),
@@ -2018,12 +1767,11 @@ TimMode ::= TEXTUAL-CONVENTION
   STATUS        current
   DESCRIPTION
          "Detection of TIM-OTU Condition can be configured" 
-  SYNTAX        INTEGER
-                {
+  SYNTAX        INTEGER                {
                   undefined(0),
                   disabled(1),
-                  enableAisDisabled(2),
-                  enableAisEnabled(3)
+                  enableAisDisabled(2)
+                  -- enableAisEnabled(3)
                 }
 
 TimModeCaps ::= TEXTUAL-CONVENTION
@@ -2034,31 +1782,15 @@ TimModeCaps ::= TEXTUAL-CONVENTION
                 {
                   capUndefined(0),
                   capDisabled(1),
-                  capEnableAisDisabled(2),
-                  capEnableAisEnabled(3)
-                }
-
-FspR7TrapsinkLifetime ::= TEXTUAL-CONVENTION
-  STATUS        current
-  DESCRIPTION
-         "Lifetime of Trapsink" 
-  SYNTAX        INTEGER
-                {
-                  undefined(0),
-                  duration1hour(1),
-                  duration1day(2),
-                  duration3days(3),
-                  duration1week(4),
-                  duration1month(5),
-                  unlimited(6)
+                  capEnableAisDisabled(2)
+                  -- capEnableAisEnabled(3)
                 }
 
 VirtualContainerType ::= TEXTUAL-CONVENTION
   STATUS        current
   DESCRIPTION
          "Virtual Container Group Type" 
-  SYNTAX        INTEGER
-                {
+  SYNTAX        INTEGER                {
                   undefined(0),
                   vc4Type(1),  --Virtual Container-4; 149.76 Mbit bit rate
                   vc3Au4Type(2),  --Virtual Container-3; 48.384 Mbit bit rate
@@ -2075,8 +1807,7 @@ VirtualContainerType ::= TEXTUAL-CONVENTION
                   vs3c(13),
                   vs5c(14),
                   vs8c(15),
-                  vs6c(16),
-                  oduFlex(19)
+                  vs6c(16)
                 }
 
 VirtualContainerTypeCaps ::= TEXTUAL-CONVENTION
@@ -2101,21 +1832,7 @@ VirtualContainerTypeCaps ::= TEXTUAL-CONVENTION
                   capVs3c(13),
                   capVs5c(14),
                   capVs8c(15),
-                  capVs6c(16),
-                  capOduFlex(19)
-                }
-
-YesNoNA ::= TEXTUAL-CONVENTION
-  STATUS        current
-  DESCRIPTION
-         "Enumerator values yes(1), no(2), notApplicable(3)." 
-  SYNTAX        INTEGER
-
-                {
-                  undefined(0),
-                  yes(1),
-                  no(2),
-                  notApplicable(3)
+                  capVs6c(16)
                 }
 
 LogicalIfTransport ::= TEXTUAL-CONVENTION
@@ -2129,7 +1846,6 @@ LogicalIfTransportCaps ::= TEXTUAL-CONVENTION
   DESCRIPTION
          "" 
   SYNTAX        BITS
-
                 {
                   lif1(0),
                   lif2(1),
@@ -2147,18 +1863,6 @@ LogicalIfTransportCaps ::= TEXTUAL-CONVENTION
                   lif14(13),
                   lif15(14),
                   lif16(15)
-                }
-
-ModuleForm ::= TEXTUAL-CONVENTION
-  STATUS        current
-  DESCRIPTION
-         "Form of module" 
-  SYNTAX        INTEGER
-                {
-                  undefined(0),
-                  native(1),
-                  legacy(2),
-                  compatible(3)
                 }
 
 
@@ -2633,8 +2337,7 @@ NeTrapsinkEntry ::= SEQUENCE {
     neTrapsinkCommunity     DisplayString,
     neTrapsinkRowStatus     RowStatus,
     neTrapsinkVersion 			Unsigned32,
-    neTrapsinkUserName 			DisplayString,
-	neTrapsinkType 			FspR7TrapsinkLifetime
+    neTrapsinkUserName 			DisplayString
     }
 
 neTrapsinkAddress OBJECT-TYPE
@@ -2692,13 +2395,6 @@ neTrapsinkUserName OBJECT-TYPE
         "A human readable string representing the name of the user." 
     ::=  { neTrapsinkEntry 6 }
 
-neTrapsinkType OBJECT-TYPE
-    SYNTAX      FspR7TrapsinkLifetime
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "Lifetime of Trapsink." 
-    ::= { neTrapsinkEntry 7 }
 
 -- **************************************************************************
 -- *************************  System Software  ******************************
@@ -2784,28 +2480,22 @@ neSoftwareUpgrade OBJECT IDENTIFIER ::= { software 2 }
 
 neSwUpgradeRequest OBJECT-TYPE
     SYNTAX      INTEGER {
-        none (1),                          -- none
-        download (2),                      -- download new software
-        install (3),                       -- install new software
-        activate (4),                      -- enable installed software for next reboot
-        revertToPrevious (5),              -- activate previously installed software
-        reboot (6),                        -- run activated software
-        downloadInstallActivateReboot(7),  -- shortcut (NE is FTP client)
-        installActivateReboot (8),         -- shortcut (NE is FTP server)
-        revertToPreviousReboot (9),        -- shortcut (revert to previous)
-        activateAlp (10),                  -- activate alarm profile severities
-        activateDefaultAlp (11),           -- activate default alarm profile severities
-        upload (12),                       -- upload file from NE to remote location
-        autoDownloadInstall (13),          -- auto download and install from remote location
-        autoInstall (14),                  -- auto install from RDISK
-        encryptionFwpInstall (15),         -- install firmware package for encryption-capable module
-        encryptionFwpDownloadInstall (16), -- download and install firmware package for encryption-capable module
-        downloadCf (17),                   -- download file from remote location to CF Disk
-        uploadCf (18),                     -- upload file from CF Disk to remote location
-        installCf (19),                    -- install new software from CF Disk
-        autoInstallCf (20),                -- auto install from CF Disk
-        uploadPa (21),                     -- upload file to PA Disk
-        activateWithFwp (22)               -- activate with firmware
+        none (1),                         -- none
+        download (2),                     -- download new software
+        install (3),                      -- install new software
+        activate (4),                     -- enable installed software for next reboot
+        revertToPrevious (5),             -- activate previously installed software
+        reboot (6),                       -- run activated software
+        downloadInstallActivateReboot(7), -- shortcut (NE is FTP client)
+        installActivateReboot (8),        -- shortcut (NE is FTP server)
+        revertToPreviousReboot (9),       -- shortcut (revert to previous)
+        activateAlp (10),                 -- activate alarm profile severities
+        activateDefaultAlp (11),          -- activate default alarm profile severities
+        upload (12),                      -- upload file from NE to remote location
+        autoDownloadInstall (13),         -- auto download and install from remote location
+        autoInstall (14),                 -- auto install from RDISK
+        encryptionFwpInstall (15),        -- install firmware package for encryption-capable module
+        encryptionFwpDownloadInstall (16) -- download and install firmware package for encryption-capable module
     }
     MAX-ACCESS  read-write
     STATUS      current
@@ -2930,14 +2620,6 @@ neSwDownloadProgress OBJECT-TYPE
     DESCRIPTION
         "Operational progress in % i.e. file transfer"	
     ::=  { neSoftwareUpgrade 13 }
-    
-neSwUpgradeCommonIpSrv OBJECT-TYPE
-    SYNTAX      SnmpAdminString
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "IPv4/v6 Server Address"
-    ::=  { neSoftwareUpgrade 14 }
 
 -- **************************************************************************
 -- **************************  Configuration  *******************************
@@ -3169,13 +2851,6 @@ neF7AutomaticRemoteBackupTimeStamp OBJECT-TYPE
     DESCRIPTION
         "Add or omit the time stamp in the backuped filename."
     ::=  { neBackupRestore 12 }
-    
-neF7AutomaticRemoteBackupCommonIpSrv OBJECT-TYPE
-    SYNTAX      SnmpAdminString
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION   "Remote server IPv4/IPv6 as a backup destination address."
-    ::=  { neBackupRestore 13 }
 
 neF7AutomaticBackupTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF NeF7AutomaticBackupEntry
@@ -3439,7 +3114,7 @@ inventoryCleiCode OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "Common Language Equipment Identifier" 
+        "Common Lanuage Equipment Identifier" 
     ::=  { inventoryEntry 8 }
 
 inventoryVendorId OBJECT-TYPE
@@ -3903,206 +3578,6 @@ ptpEntityReferencedTo OBJECT-TYPE
     DESCRIPTION   ""
     ::=  { ptpEntityEntry 9 }
 
-vtpEntityTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF VtpEntityEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION   "Table for VTP existing addresses. Entities in this table are either
-         provisioned, equipped, both of these or neither of these. Containers
-         are always present in the table as long as their supporting entity
-         is provisioned or equipped."
-    ::=  { inventoryMib 11 }
-
-vtpEntityEntry OBJECT-TYPE
-    SYNTAX      VtpEntityEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION   ""
-    INDEX       {
-                  vtpEntityIndex
-                }
-    ::=  { vtpEntityTable 1 }
-
-VtpEntityEntry ::=  SEQUENCE
-  { vtpEntityIndex EntityIndex,
-    vtpEntityContainedIn EntityIndex,
-    vtpEntityClass EntityClass,
-    vtpEntityClassInstanceNumber Integer32,
-    vtpEntityIndexAid SnmpAdminString,
-    vtpEntityType EntityType,
-    vtpEntityAssignmentState AssignmentState,
-    vtpEntityEquipmentState EquipmentState,
-    vtpEntityReferencedTo EntityIndex }
-
-vtpEntityIndex OBJECT-TYPE
-    SYNTAX      EntityIndex
-    MAX-ACCESS  accessible-for-notify
-    STATUS      current
-    DESCRIPTION   "Existing adress index"
-    ::=  { vtpEntityEntry 1 }
-
-vtpEntityContainedIn OBJECT-TYPE
-    SYNTAX      EntityIndex
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "Contained in" 
-    ::=  { vtpEntityEntry 2 }
-
-vtpEntityClass OBJECT-TYPE
-    SYNTAX      EntityClass
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION   "See EntityClass"
-    ::=  { vtpEntityEntry 3 }
-
-vtpEntityClassInstanceNumber OBJECT-TYPE
-    SYNTAX      Integer32 (1..2000 | -2147483648)
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "The class instance number of this entity within the module(card)" 
-    ::=  { vtpEntityEntry 4 }
-
-vtpEntityIndexAid OBJECT-TYPE
-    SYNTAX      SnmpAdminString
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "Name" 
-    ::=  { vtpEntityEntry 5 }
-
-vtpEntityType OBJECT-TYPE
-    SYNTAX      EntityType
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION   "The type of FspR7 entity. Please refer to EntityType for further deails."
-    ::=  { vtpEntityEntry 6 }
-
-vtpEntityAssignmentState OBJECT-TYPE
-    SYNTAX      AssignmentState
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION   "See AssignmentState."
-    ::=  { vtpEntityEntry 7 }
-
-vtpEntityEquipmentState OBJECT-TYPE
-    SYNTAX      EquipmentState
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION   "See EquipmentState."
-    ::=  { vtpEntityEntry 8 }
-
-vtpEntityReferencedTo OBJECT-TYPE
-    SYNTAX      EntityIndex
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION   ""
-    ::=  { vtpEntityEntry 9 }
-
-controlPlaneOtnEntityTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF ControlPlaneOtnEntityEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION   "Table for all existing addresses. Entities in this table are either
-         provisioned, equipped, both of these or neither of these. Containers
-         are always present in the table as long as their supporting entity
-         is provisioned or equipped."
-    ::=  { inventoryMib 12 }
-
-controlPlaneOtnEntityEntry OBJECT-TYPE
-    SYNTAX      ControlPlaneOtnEntityEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION   "Entry for all existing addresses."
-    INDEX       {
-                  controlPlaneOtnEntityIndex
-                }
-    ::=  { controlPlaneOtnEntityTable 1 }
-
-ControlPlaneOtnEntityEntry ::=  SEQUENCE
-  { controlPlaneOtnEntityIndex EntityIndex,
-    controlPlaneOtnEntityContainedIn EntityIndex,
-    controlPlaneOtnEntityClass CpWdmEntityClass,
-    controlPlaneOtnEntityClassInstanceNumber Integer32,
-    controlPlaneOtnEntityIndexAid SnmpAdminString,
-    controlPlaneOtnEntityAssignmentState AssignmentState }
-
-controlPlaneOtnEntityIndex OBJECT-TYPE
-    SYNTAX      EntityIndex
-    MAX-ACCESS  accessible-for-notify
-    STATUS      current
-    DESCRIPTION   "Existing adress index"
-    ::=  { controlPlaneOtnEntityEntry 1 }
-
-controlPlaneOtnEntityContainedIn OBJECT-TYPE
-    SYNTAX      EntityIndex
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "Contained in" 
-    ::=  { controlPlaneOtnEntityEntry 2 }
-
-controlPlaneOtnEntityClass OBJECT-TYPE
-    SYNTAX      CpWdmEntityClass
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION   "See EntityClass"
-    ::=  { controlPlaneOtnEntityEntry 3 }
-
-controlPlaneOtnEntityClassInstanceNumber OBJECT-TYPE
-    SYNTAX      Integer32 (1..2000 | -2147483648)
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "The class instance number of this entity within the module(card)" 
-    ::=  { controlPlaneOtnEntityEntry 4 }
-
-controlPlaneOtnEntityIndexAid OBJECT-TYPE
-    SYNTAX      SnmpAdminString
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "Name" 
-    ::=  { controlPlaneOtnEntityEntry 5 }
-
-controlPlaneOtnEntityAssignmentState OBJECT-TYPE
-    SYNTAX      AssignmentState
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION   "See AssignmentState."
-    ::=  { controlPlaneOtnEntityEntry 6 }
-
-controlPlaneOtnContainsTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF ControlPlaneOtnContainsEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION   "Table for all existing addresses. Gives the index of the subtending
-         entity in the containment."
-    ::=  { inventoryMib 13 }
-
-controlPlaneOtnContainsEntry OBJECT-TYPE
-    SYNTAX      ControlPlaneOtnContainsEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION   ""
-    INDEX       {
-                  controlPlaneOtnEntityIndex,
-                  controlPlaneOtnContainsIndex
-                }
-    ::=  { controlPlaneOtnContainsTable 1 }
-
-ControlPlaneOtnContainsEntry ::=  SEQUENCE
-  { controlPlaneOtnContainsIndex EntityIndex }
-
-controlPlaneOtnContainsIndex OBJECT-TYPE
-    SYNTAX      EntityIndex
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "" 
-    ::=  { controlPlaneOtnContainsEntry 1 }
-
 sonetSectionConfigTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF SonetSectionConfigEntry
     MAX-ACCESS  not-accessible
@@ -4363,7 +3838,7 @@ OtuSectionDataEntry ::=  SEQUENCE
 
 otuSectionDataResultingTotalBitrate OBJECT-TYPE
     SYNTAX      Unsigned32 
-    UNITS       "Mbps"
+    UNITS       "Mbit/s"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION   "This interface bitrate is dependent on the type and the payload of the interface.
@@ -5053,7 +4528,7 @@ swDbFileFileName OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "File Name" 
+        "Filename" 
     ::=  { swDbFileEntry 9 }
 
 swDbFileRowStatus OBJECT-TYPE
@@ -5097,12 +4572,7 @@ FwDataEntry ::=  SEQUENCE
     fwDataFirmwarePackageRev SnmpAdminString,
     fwDataStandbyServiceImpairment StandbyServiceAffecting,
     fwDataFirmwareAvailable NoYesNA,
-    fwDataFirmwareApproved NoYesNA,
-    fwDataFirmwarePackageRevBackup SnmpAdminString,
-    fwDataReadyForActivation YesNoNA,
-    fwDataActivationReadyOnStandby YesNoNA,
-    fwDataProtectionPart FspR7YesNo,
-    fwDataForm ModuleForm }
+    fwDataFirmwareApproved NoYesNA }
 
 fwDataNewVersion OBJECT-TYPE
     SYNTAX      SnmpAdminString
@@ -5125,7 +4595,7 @@ fwDataServiceImpairment OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "Service Affecting Change during FWP upgrade and Restart operation" 
+        "Service Affecting Change during FWP upgrade." 
     ::=  { fwDataEntry 3 }
 
 fwDataBootStatus OBJECT-TYPE
@@ -5168,46 +4638,6 @@ fwDataFirmwareApproved OBJECT-TYPE
         "Firmware package update for Encryption module is approved by Crypto Officer" 
     ::=  { fwDataEntry 8 }
 
-fwDataFirmwarePackageRevBackup OBJECT-TYPE
-    SYNTAX      SnmpAdminString
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "Standbay Firmware Package Revision Number, Format XX.YY.ZZ (X,Y,Z are decimal characters, leading 0 are omitted)." 
-    ::=  { fwDataEntry 9 }
-
-fwDataReadyForActivation OBJECT-TYPE
-    SYNTAX      YesNoNA
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "FWPREV-STBY == FWPREV-SYS-ACT" 
-    ::=  { fwDataEntry 10 }
-
-fwDataActivationReadyOnStandby OBJECT-TYPE
-    SYNTAX      YesNoNA
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "FWPREV-STBY == FWPREV-SYS-STBY" 
-    ::=  { fwDataEntry 11 }
-
-fwDataProtectionPart OBJECT-TYPE
-    SYNTAX      FspR7YesNo
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "Module is active part of Channel Card Protection Group." 
-    ::=  { fwDataEntry 12 }
-
-fwDataForm OBJECT-TYPE
-    SYNTAX      ModuleForm
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "Form of module" 
-    ::=  { fwDataEntry 13 }
-
 coldRestartCapTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF ColdRestartCapEntry
     MAX-ACCESS  not-accessible
@@ -5233,7 +4663,7 @@ coldRestartCapServiceAffectingCap OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "Service Affecting Change during FWP upgrade and Restart operation" 
+        "Service Affecting Change during FWP upgrade." 
     ::=  { coldRestartCapEntry 1 }
 
 eqpFwUpgradeRequest OBJECT-TYPE
@@ -5249,7 +4679,7 @@ eqpFwServiceImpairment OBJECT-TYPE
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-        "Service Affecting Change during FWP upgrade and Restart operation"
+        "Service Affecting Change during FWP upgrade."
     ::=  { swAdmin 11 }
 
 eqpFwNextEqpForUpdate OBJECT-TYPE
@@ -5305,7 +4735,7 @@ selectedFile OBJECT-TYPE
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-        "File Name"
+        "Filename"
     ::=  { swAdmin 18 }
 
 ncuActivationDate OBJECT-TYPE
@@ -5313,7 +4743,7 @@ ncuActivationDate OBJECT-TYPE
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-        "Activation Date in local time. Format: YY-MM-DD"
+        "Activation Date. Format: YY-MM-DD"
     ::=  { swAdmin 19 }
 
 ncuActivationTime OBJECT-TYPE
@@ -5321,7 +4751,7 @@ ncuActivationTime OBJECT-TYPE
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-        "Activation Time in local time. Format HH-MM-SS"
+        "Activation Time. Format HH-MM-SS"
     ::=  { swAdmin 20 }
 
 ncuScheduledActivation OBJECT-TYPE
@@ -5347,75 +4777,6 @@ encryptionFwpFile OBJECT-TYPE
     DESCRIPTION
         "The name FWP for encryption capable modules."
     ::=  { swAdmin 23 }
-
-clearRdiskRequest OBJECT-TYPE
-    SYNTAX      INTEGER
-                {
-                  undefined(0),
-                  active(1),
-                  inactive(2)
-                }
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "This object initiate RDISK clearance."
-    ::=  { swAdmin 24 }
-
-ncuActivationDateUtc OBJECT-TYPE
-    SYNTAX      FspR7Date
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "Activation Date Format: YY-MM-DD"
-    ::=  { swAdmin 25 }
-
-ncuActivationTimeUtc OBJECT-TYPE
-    SYNTAX      FspR7Time
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "Activation Time Format: HH-MM-SS"
-    ::=  { swAdmin 26 }
-
-neBackupEncryption OBJECT-TYPE
-    SYNTAX      EnableState
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "Beckup Encryption"
-    ::=  { swAdmin 38 }
-
-neBackupPassword OBJECT-TYPE
-    SYNTAX      SnmpAdminString
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "Secret, case-sensitive password to for encryption"
-    ::=  { swAdmin 39 }
-
-neF7AutomaticRemoteBackupEncryption OBJECT-TYPE
-    SYNTAX      EnableState
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "Beckup Encryption"
-    ::=  { swAdmin 40 }
-
-neF7AutomaticRemoteBackupPassword OBJECT-TYPE
-    SYNTAX      SnmpAdminString
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "Secret, case-sensitive password to for encryption"
-    ::=  { swAdmin 41 }
-
-neBackupUsers OBJECT-TYPE
-    SYNTAX      FspR7UsersDb
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "Users Database"
-    ::=  { swAdmin 42 }
 
 neRestoreConfig OBJECT-TYPE
     SYNTAX      RestoreActivation
@@ -5451,14 +4812,7 @@ SwDbDataEntry ::=  SEQUENCE
     swDbDataRestoreConfig RestoreActivation,
     swDbDataFirmwareSetVersion SnmpAdminString,
     swDbDataNcuSoftwareVersion SnmpAdminString,
-    swDbDataStandbyPartitionStatus PartitionStatus,
-    swDbDataNumEqpt Unsigned32,
-    swDbDataNumLegacyEqpt Unsigned32,
-    swDbDataNumNativeSaUpdate Unsigned32,
-    swDbDataNumNativeNsaUpdate Unsigned32,
-    swDbDataNumLegacyUpdate Unsigned32,
-    swDbDataNumSaNotReady Unsigned32,
-    swDbDataNumNsaNotReady Unsigned32 }
+    swDbDataStandbyPartitionStatus PartitionStatus }
 
 swDbDataIndex OBJECT-TYPE
     SYNTAX      EntityIndex
@@ -5531,62 +4885,6 @@ swDbDataStandbyPartitionStatus OBJECT-TYPE
         "Partition State" 
     ::=  { swDbDataEntry 9 }
 
-swDbDataNumEqpt OBJECT-TYPE
-    SYNTAX      Unsigned32
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "Number of all provisioned and equipped equipment in system" 
-    ::=  { swDbDataEntry 10 }
-
-swDbDataNumLegacyEqpt OBJECT-TYPE
-    SYNTAX      Unsigned32
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "Number of all legacy provisioned and equipped modules in system," 
-    ::=  { swDbDataEntry 11 }
-
-swDbDataNumNativeSaUpdate OBJECT-TYPE
-    SYNTAX      Unsigned32
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "Number of all native modules which have to be updated (SA), both with already properly installed pak on standby image and those which need installation." 
-    ::=  { swDbDataEntry 12 }
-
-swDbDataNumNativeNsaUpdate OBJECT-TYPE
-    SYNTAX      Unsigned32
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "Number of all modules which have to be updated (NSA),both with already properly installed pak on standby image and those which need installation." 
-    ::=  { swDbDataEntry 13 }
-
-swDbDataNumLegacyUpdate OBJECT-TYPE
-    SYNTAX      Unsigned32
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "Number of all legacy modules which have to be updated." 
-    ::=  { swDbDataEntry 14 }
-
-swDbDataNumSaNotReady OBJECT-TYPE
-    SYNTAX      Unsigned32
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "Number of modules which have to be SA updated on which new pak need to be installed." 
-    ::=  { swDbDataEntry 15 }
-
-swDbDataNumNsaNotReady OBJECT-TYPE
-    SYNTAX      Unsigned32
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "Number of modules which have to be NSA updated on which new pak need to be installed." 
-    ::=  { swDbDataEntry 16 }
-
 swDbDataCapTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF SwDbDataCapEntry
     MAX-ACCESS  not-accessible
@@ -5627,13 +4925,7 @@ swDbDataCapUpgradeRequest OBJECT-TYPE
                   autoDownloadInstall(13),
                   autoInstall(14),
                   encryptionFwpInstall(15),
-                  encryptionFwpDownloadInstall(16),
-                  downloadCf(17),
-                  uploadCf(18),
-                  installCf(19),
-                  autoInstallCf(20),
-                  uploadPa(21),
-                  activateWithFwp(22)
+                  encryptionFwpDownloadInstall(16)
                 }
     MAX-ACCESS  not-accessible
     STATUS      current
@@ -5655,74 +4947,6 @@ swDbDataCapRestoreConfig OBJECT-TYPE
         "Shows whether the last activation was(will be) a database restore or a new software activation" 
     ::=  { swDbDataCapEntry 2 }
 
-swDbDataDefaultsTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF SwDbDataDefaultsEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION   ""
-    ::=  { dbAdmin 4 }
-
-swDbDataDefaultsEntry OBJECT-TYPE
-    SYNTAX      SwDbDataDefaultsEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION   ""
-    INDEX       {
-                  swDbDataDefaultsUpgradeRequest
-                }
-    ::=  { swDbDataDefaultsTable 1 }
-
-SwDbDataDefaultsEntry ::=  SEQUENCE
-  { swDbDataDefaultsUpgradeRequest INTEGER,
-    swDbDataDefaultsRestoreConfig RestoreActivation }
-
-swDbDataDefaultsUpgradeRequest OBJECT-TYPE
-    SYNTAX      INTEGER
-                {
-                  undefined(0),
-                  none(1),
-                  download(2),
-                  install(3),
-                  activate(4),
-                  revertToPrevious(5),
-                  reboot(6),
-                  downloadInstallActivateReboot(7),
-                  installActivateReboot(8),
-                  revertToPreviousReboot(9),
-                  activateAlp(10),
-                  activateDefaultAlp(11),
-                  upload(12),
-                  autoDownloadInstall(13),
-                  autoInstall(14),
-                  encryptionFwpInstall(15),
-                  encryptionFwpDownloadInstall(16),
-                  downloadCf(17),
-                  uploadCf(18),
-                  installCf(19),
-                  autoInstallCf(20),
-                  uploadPa(21),
-                  activateWithFwp(22)
-                }
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION   "Index value is a requested upgrade type from neSwUpgradeRequest object,
-         where following values are applicable:
-         - install(3)
-         - activate(4)
-         - reboot(6)
-         - activateAlp(10)
-         - activateDefaultAlp(11)
-        "
-    ::=  { swDbDataDefaultsEntry 1 }
-
-swDbDataDefaultsRestoreConfig OBJECT-TYPE
-    SYNTAX      RestoreActivation
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "Shows whether the last activation was(will be) a database restore or a new software activation" 
-    ::=  { swDbDataDefaultsEntry 2 }
-
 snmpServerPort OBJECT-TYPE
     SYNTAX      Integer32
     MAX-ACCESS  read-write
@@ -5736,10 +4960,10 @@ snmpProxyServerAdminState OBJECT-TYPE
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-        "The Administrative State will be displayed in the GUI with full
+        "The Adminstrative State will be displayed in the GUI with full
          name values; it will be differently displayed in TL1 syntax according
          to TL1 display rules. The transaction into the UAS state requires
-         a special destroy/delete function"
+         a special destroy/delete function."
     ::=  { snmpAgent 3 }
 
 snmpProxyServerPort OBJECT-TYPE
@@ -5841,10 +5065,10 @@ snmpProxyEntrySingleTargetOutAdminState OBJECT-TYPE
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-        "The Administrative State will be displayed in the GUI with full
+        "The Adminstrative State will be displayed in the GUI with full
          name values; it will be differently displayed in TL1 syntax according
          to TL1 display rules. The transaction into the UAS state requires
-         a special destroy/delete function" 
+         a special destroy/delete function." 
     ::=  { snmpProxyEntrySingleTargetOutEntry 6 }
 
 snmpProxyEntrySingleTargetOutUserName OBJECT-TYPE
@@ -5855,6 +5079,210 @@ snmpProxyEntrySingleTargetOutUserName OBJECT-TYPE
         "The name string for user authentication purposes" 
     ::=  { snmpProxyEntrySingleTargetOutEntry 7 }
 
+-- 
+--MIB conformance section 
+--
+commonMibCompliances  OBJECT IDENTIFIER ::= {commonMibConformance 1}
+commonMibObjectGroups OBJECT IDENTIFIER ::= {commonMibConformance 2}
+
+commonMibCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "Describes the requirements for conformance to the CM Facility
+             group."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+              neInfoGroup, adminGroup, eventsGroup,
+              softwareGroup, configGroup,
+              swAdminGroup, dbAdminGroup, snmpProxyGroup
+        }
+    ::= { commonMibCompliances 1 }
+
+neInfoGroup OBJECT-GROUP
+    OBJECTS {
+        neMibVariant, neManufacturer, neDateAndTime,
+        neMemorySizeTotal, neMemorySizeFree, 
+        neStorageIndex, neStorageDescr,
+        neStorageCapacity, neStorageAvailable, neAlarmStatus
+    }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects used to manage the Network Element 
+             Information function."
+    ::= { commonMibObjectGroups 1 }
+
+adminGroup OBJECT-GROUP
+    OBJECTS {
+        snmpWriteAccessRestriction, snmpWriteAccessNmsAddress,
+        snmpWriteAccessNmsName
+    }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects used to manage the Network Element 
+             Information function."
+    ::= { commonMibObjectGroups 2 }
+
+eventsGroup OBJECT-GROUP
+    OBJECTS {
+        neEventsLogged, neEventLogIndex, neEventLogTimeStamp,
+        neEventLogNotificationOID, neEventLogIdentityTranslation,
+
+        neEventLogVarIndex, neEventLogVarId, neEventLogVarType,
+        neEventLogVarInteger32Val, neEventLogVarIpAddressVal,
+        neEventLogVarOctetStringVal, neEventLogVarOidVal,
+        neEventLogVarCounter64Val, neEventLogVarUnsigned32Val,
+
+        neTrapsinkAddress, neTrapsinkPort, neTrapsinkCommunity,
+        neTrapsinkRowStatus, neTrapsinkVersion, neTrapsinkUserName
+    }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects used to manage the Network Element 
+             Events function."
+    ::= { commonMibObjectGroups 3 }
+
+softwareGroup OBJECT-GROUP
+    OBJECTS {
+        swVersionActiveApplSw, swVersionInactiveApplSw, swVersionActiveOperatingSw,
+        swVersionInactiveOperatingSw, swVersionNextBoot,
+        neSwUpgradeRequest,  neSwUpgradeState, neSwUpgradeServerAddress,
+        neSwUpgradeServerLogin, neSwUpgradeServerPasswd,
+        neSwUpgradeServerDirectory, neSwUpgradeFileName, neSwUpgradeNeDirectory,
+        neSwUpgradeTransferProtocol, sourceIpAddress, neSwInstallState,
+        neSwUpgradeType, neSwDownloadProgress
+    }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects used to manage the Network Element 
+             Software function."
+    ::= { commonMibObjectGroups 4 }
+
+configGroup OBJECT-GROUP
+    OBJECTS {
+      provAssignmentState, provEquipmentState,
+      neBackupRestoreRequest, neBackupRestoreState, neBackupRestoreFile,
+      neRestoreFileBackupDate, neF7AutomaticRemoteBackupSrvIp,
+      neF7AutomaticRemoteBackupSrvDir, neF7AutomaticRemoteBackupSrvLogin,
+      neF7AutomaticRemoteBackupSrvPass, neF7AutomaticRemoteBackupProtocol,
+      neF7AutomaticRemoteBackupSrcIp, neF7AutomaticRemoteBackupTimeStamp,
+      neF7AutomaticBackupIndex, neF7AutomaticBackupInterval,
+      neF7AutomaticBackupStartDate, neF7AutomaticBackupStartTime,
+      neF7AutomaticBackupNextDate, neF7AutomaticBackupRunState,
+      neF7AutomaticBackupTimeStamp, 
+      neAutoBackupConfig, neAutoBackupInterval, neAutoBackupNextActionAt,
+      neAutoBackupServerAddress, neAutoBackupServerLogin,
+      neAutoBackupServerPasswd, neAutoBackupServerDirectory,
+      inventoryUnitName, inventoryFirmwarePackageRev,
+      inventoryHardwareRev, inventorySoftwareRev,
+      inventoryFpgaRev, inventorySerialNum,
+      inventoryPartnumber, inventoryCleiCode,
+      inventoryVendorId, inventoryType,
+      inventoryUniversalSerialIdent, inventoryMacAddress,
+      inventoryGradeInventory,
+      entityIndex, entityContainedIn,
+      entityClass, entityClassInstanceNumber,
+      entityIndexAid, entityType, entityAssignmentState,
+      entityEquipmentState, containsIndex, 
+      controlPlaneWdmContainsIndex, controlPlaneEthEntityIndex,
+      controlPlaneEthEntityContainedIn, controlPlaneEthEntityClass,
+      controlPlaneEthEntityClassInstanceNumber, controlPlaneEthEntityIndexAid,
+      controlPlaneEthEntityAssignmentState, controlPlaneEthContainsIndex,
+      ptpEntityIndex, ptpEntityContainedIn, ptpEntityClass, 
+      ptpEntityClassInstanceNumber, ptpEntityIndexAid,
+      ptpEntityType, ptpEntityAssignmentState, ptpEntityEquipmentState,
+      ptpEntityReferencedTo, sonetSectionConfigTimingSource,
+      sonetSectionConfigSignalDegradeThreshhold, sonetSectionConfigSignalDegradePeriod,
+      sonetSectionConfigTraceForm, sonetSectionConfigTraceExpected,
+      sonetSectionConfigTraceTransmit, sonetSectionConfigTimMode,
+      sonetSectionDataTraceReceived, otuSectionConfigSignalDegradeThreshold,
+      otuSectionConfigSignalDegradePeriod, otuSectionConfigPayload,
+      otuSectionConfigStuffing, otuSectionConfigTraceExpected,
+      otuSectionConfigTraceTransmitSapi, otuSectionConfigTraceTransmitDapi,
+      otuSectionConfigTraceTransmitOpsp, otuSectionConfigTimMode,
+      otuSectionDataResultingTotalBitrate, otuSectionDataTraceReceivedSapi,
+      otuSectionDataTraceReceivedDapi, otuSectionDataTraceReceivedOpsp,
+      oduSectionConfigSignalDegradeThres, oduSectionConfigSignalDegradePeriod,
+      oduSectionConfigTraceExpected, oduSectionConfigTraceTransmitSapi,
+      oduSectionConfigTraceTransmitDapi, oduSectionConfigTraceTransmitOpsp,
+      oduSectionConfigTimMode, oduSectionDataTraceReceivedSapi,
+      oduSectionDataTraceReceivedDapi, oduSectionDataTraceReceivedOpsp,
+      oduTcmAConfigSignalDegradeThreshold, oduTcmAConfigSignalDegradePeriod,
+      oduTcmAConfigTcmLevel, oduTcmAConfigTraceExpected,
+      oduTcmAConfigTraceTransmitSapi, oduTcmAConfigTraceTransmitDapi,
+      oduTcmAConfigTraceTransmitOpsp, oduTcmAConfigTimMode,
+
+      oduTcmBConfigSignalDegradeThreshold, oduTcmBConfigSignalDegradePeriod,
+      oduTcmBConfigTcmLevel, oduTcmBConfigTraceExpected,
+      oduTcmBConfigTraceTransmitSapi, oduTcmBConfigTraceTransmitDapi,
+      oduTcmBConfigTraceTransmitOpsp, oduTcmBConfigTimMode,
+      oduTcmCConfigSignalDegradeThreshold, oduTcmCConfigSignalDegradePeriod,
+      oduTcmCConfigTcmLevel, oduTcmCConfigTraceExpected,
+      oduTcmCConfigTraceTransmitSapi, oduTcmCConfigTraceTransmitDapi,
+      oduTcmCConfigTraceTransmitOpsp, oduTcmCConfigTimMode,
+      oduTcmADataTraceReceivedSapi, oduTcmADataTraceReceivedDapi,
+      oduTcmADataTraceReceivedOpsp, oduTcmBDataTraceReceivedSapi,
+      oduTcmBDataTraceReceivedDapi, oduTcmBDataTraceReceivedOpsp,
+      oduTcmCDataTraceReceivedSapi, oduTcmCDataTraceReceivedDapi,
+      oduTcmCDataTraceReceivedOpsp
+    }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects used to manage the Network Element 
+             Configuration function."
+    ::= { commonMibObjectGroups 5 }
+
+swAdminGroup OBJECT-GROUP
+    OBJECTS {
+        swDbFileIndex, swDbFileArea, swDbFileType, swDbFileSize,
+        swDbFileCreationTime, swDbFileVersion, swDbFileGrade,
+        swDbFileComment, swDbFileFileName,
+        swDbFileRowStatus, swDbFilePgmType,
+        fwDataNewVersion, fwDataStandbyVersion,
+        fwDataServiceImpairment, fwDataBootStatus,
+        fwDataFirmwarePackageRev, fwDataStandbyServiceImpairment,
+        fwDataFirmwareAvailable, fwDataFirmwareApproved,
+        coldRestartCapServiceAffectingCap, 
+        eqpFwUpgradeRequest, eqpFwServiceImpairment,
+        eqpFwNextEqpForUpdate, eqpFwEqpType, eqpFwNcuServerBusy,
+        eqpFwEqpServerBusy, updateEqpt, installedEqpt,
+        selectedFile, ncuActivationDate, ncuActivationTime,
+        ncuScheduledActivation, ncuScheduledDbRestore, encryptionFwpFile
+    }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects used to manage the Network Element 
+             Software Administration function."
+    ::= { commonMibObjectGroups 6 }
+
+dbAdminGroup OBJECT-GROUP
+    OBJECTS {
+        neRestoreConfig, swDbDataIndex, swDbDataArea,
+        swDbDataProgramVersion, swDbDataDatabaseVersion,
+        swDbDataActivationTime, swDbDataRestoreConfig,
+        swDbDataFirmwareSetVersion, swDbDataNcuSoftwareVersion,
+        swDbDataStandbyPartitionStatus, swDbDataCapUpgradeRequest,
+        swDbDataCapRestoreConfig 
+    }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects used to manage the Network Element 
+             Database Administration function."
+    ::= { commonMibObjectGroups 7 }
+
+snmpProxyGroup OBJECT-GROUP
+    OBJECTS {
+        snmpServerPort, snmpProxyServerAdminState, snmpProxyServerPort,
+        snmpProxyServerSynchroState, snmpProxyServerSynchroStage,
+        snmpProxyEntrySingleTargetOutAddress, snmpProxyEntrySingleTargetOutPort,
+        snmpProxyEntrySingleTargetOutNodeAgentStatus, snmpProxyEntrySingleTargetOutContext,
+        snmpProxyEntrySingleTargetOutRowStatus, snmpProxyEntrySingleTargetOutAdminState,
+        snmpProxyEntrySingleTargetOutUserName
+    }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects used to manage the Network Element 
+             SNMP Proxy Server function."
+    ::= { commonMibObjectGroups 8 }
 
 END
 

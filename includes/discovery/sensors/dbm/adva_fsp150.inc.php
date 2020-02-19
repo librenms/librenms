@@ -38,10 +38,9 @@ $multiplier = 1;
 $divisor = 1;
 
 //Adva Network Port dBm
-foreach ($pre_cache['adva_fsp150_netports'] as $index => $entry) {
+foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
     if ($entry['cmEthernetNetPortMediaType'] == 'fiber') {
-
-        //Verify SFP is recording DOM
+        //Disover recieve power level
         $oidRx = '.1.3.6.1.4.1.2544.1.12.5.1.5.1.34.' . $index . '.3';
         $oidTx = '.1.3.6.1.4.1.2544.1.12.5.1.5.1.33.' . $index . '.3';
         $currRx = snmp_get($device, $oidRx, '-Oqv', 'CM-PERFORMANCE-MIB', '/opt/librenms/mibs/adva');
@@ -49,8 +48,6 @@ foreach ($pre_cache['adva_fsp150_netports'] as $index => $entry) {
         if ($currRx != 0 || $currTx != 0) {
             $entPhysicalIndex = $entry['cmEthernetNetPortEntityIndex'];
             $entPhysicalIndex_measured = 'ports';
-
-            //Discover Network Port Receive dBm
             $descrRx = dbFetchCell('SELECT `ifName` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', [$entry['cmEthernetNetPortIfIndex'], $device['device_id']]) . ' Rx Power';
             $currentRx = $entry['cmEthernetNetPortStatsOPR'];
 
@@ -74,7 +71,7 @@ foreach ($pre_cache['adva_fsp150_netports'] as $index => $entry) {
                 $entPhysicalIndex_measured
             );
 
-            //Disover Network Port transmit dBm
+            //Disover transmit power level
             $descrTx = dbFetchCell('SELECT `ifName` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', [$entry['cmEthernetNetPortIfIndex'], $device['device_id']]) . ' Tx Power';
             $currentTx = $entry['cmEthernetNetPortStatsOPT'];
 
@@ -99,17 +96,12 @@ foreach ($pre_cache['adva_fsp150_netports'] as $index => $entry) {
             );
         }
     }
-}
-
-unset($entry);
 
 //Adva Access Ports dBm
-foreach ($pre_cache['adva_fsp150_accports'] as $index => $entry) {
     if ($entry['cmEthernetAccPortMediaType'] == 'fiber') {
-
-        //Verify SFP is recording DOM
+        //Discover receivn power level
         $oidRx = '.1.3.6.1.4.1.2544.1.12.5.1.1.1.34.' . $index . '.3';
-        $oidTx = '.1.3.6.1.4.1.2544.1.12.5.1.1.1.33' . $index . '.3';
+        $oidTx = '.1.3.6.1.4.1.2544.1.12.5.1.1.1.33.' . $index . '.3';
         $currRx = snmp_get($device, $oidRx, '-Oqv', 'CM-PERFORMANCE-MIB', '/opt/librenms/mibs/adva');
         $currTx = snmp_get($device, $oidTx, '-Oqv', 'CM-PERFORMANCE-MIB', '/opt/librenms/mibs/adva');
         if ($currRx != 0 || $currTx != 0) {
@@ -118,7 +110,6 @@ foreach ($pre_cache['adva_fsp150_accports'] as $index => $entry) {
             $descrRx = dbFetchCell('SELECT `ifName` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', [$entry['cmEthernetAccPortIfIndex'], $device['device_id']]) . ' Rx Power';
             $currentRx = $entry['cmEthernetAccPortStatsOPR'];
 
-            //Discover Access Port receive dBm
             discover_sensor(
                 $valid['sensor'],
                 'dbm',
@@ -139,7 +130,6 @@ foreach ($pre_cache['adva_fsp150_accports'] as $index => $entry) {
                 $entPhysicalIndex_measured
             );
 
-            //Discover Access Port transmit dBm
             $descrTx = dbFetchCell('SELECT `ifName` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', [$entry['cmEthernetAccPortIfIndex'], $device['device_id']]) . ' Tx Power';
             $currentTx = $entry['cmEthernetAccPortStatsOPT'];
 
@@ -149,6 +139,63 @@ foreach ($pre_cache['adva_fsp150_accports'] as $index => $entry) {
                 $device,
                 $oidTx,
                 'cmEthernetAccPortStatsOPT.' . $index,
+                'adva_fsp150',
+                $descrTx,
+                $divisor,
+                $multiplier,
+                null,
+                null,
+                null,
+                null,
+                $currentTx,
+                'snmp',
+                $entPhysicalIndex,
+                $entPhysicalIndex_measured
+            );
+        }
+    }
+
+    if ($entry['cmEthernetTrafficPortMediaType'] == 'fiber') {
+        //Discover receivn power level
+        $oidRx = '.1.3.6.1.4.1.2544.1.12.5.1.21.1.34.' . $index . '.3';
+        $oidTx = '.1.3.6.1.4.1.2544.1.12.5.1.21.1.33.' . $index . '.3';
+        $currRx = snmp_get($device, $oidRx, '-Oqv', 'CM-PERFORMANCE-MIB', '/opt/librenms/mibs/adva');
+        $currTx = snmp_get($device, $oidTx, '-Oqv', 'CM-PERFORMANCE-MIB', '/opt/librenms/mibs/adva');
+        if ($currRx != 0 || $currTx != 0) {
+            $entPhysicalIndex = $entry['cmEthernetTrafficPortEntityIndex'];
+            $entPhysicalIndex_measured = 'ports';
+            $descrRx = dbFetchCell('SELECT `ifName` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', [$entry['cmEthernetTrafficPortIfIndex'], $device['device_id']]) . ' Rx Power';
+            $currentRx = $entry['cmEthernetTrafficPortStatsOPR'];
+
+            discover_sensor(
+                $valid['sensor'],
+                'dbm',
+                $device,
+                $oidRx,
+                'cmEthernetTrafficPortStatsOPR.' . $index,
+                'adva_fsp150',
+                $descrRx,
+                $divisor,
+                $multiplier,
+                null,
+                null,
+                null,
+                null,
+                $currentRx,
+                'snmp',
+                $entPhysicalIndex,
+                $entPhysicalIndex_measured
+            );
+
+            $descrTx = dbFetchCell('SELECT `ifName` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', [$entry['cmEthernetTrafficPortIfIndex'], $device['device_id']]) . ' Tx Power';
+            $currentTx = $entry['cmEthernetTrafficPortStatsOPT'];
+
+            discover_sensor(
+                $valid['sensor'],
+                'dbm',
+                $device,
+                $oidTx,
+                'cmEthernetTrafficPortStatsOPT.' . $index,
                 'adva_fsp150',
                 $descrTx,
                 $divisor,
