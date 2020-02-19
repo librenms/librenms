@@ -1119,11 +1119,11 @@ return [
             'min_graph_height' => [
                 'description' => 'Set the minimum graph height',
                 'help' => 'Minimum Graph Height (default: 300)'
-            ],
-            'device_location_map_open' => [
-                'description' => 'Location Map open',
-                'help' => 'Location Map is shown by default'
             ]
+        ],
+        'device_location_map_open' => [
+            'description' => 'Location Map open',
+            'help' => 'Location Map is shown by default'
         ],
         'whois' => [
             'description' => 'Path to whois'

@@ -178,7 +178,7 @@ if ($device['location_id']) {
             $("#toggle-map-button").find(".fa").removeClass("fa-map-o").addClass("fa-map");
             $("#toggle-map-button span").text("View")
         });';
-    if (Config::get('webui.device_location_map_open')) {
+    if (Config::get('device_location_map_open')) {
         echo '$("#toggle-map").collapse("show");';
     }
     echo '</script>

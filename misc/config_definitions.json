@@ -789,6 +789,13 @@
             "hidden": true,
             "type": "boolean"
         },
+        "device_location_map_open": {
+            "order": 0,
+            "group": "webui",
+            "section": "device",
+            "default": false,
+            "type": "boolean"
+        },
         "default_port_association_mode": {
             "default": "ifIndex",
             "type": "select",
@@ -4749,13 +4756,6 @@
             "validate": {
                 "value": "zero_or_exists:dashboards,dashboard_id"
             }
-        },
-        "webui.device_location_map_open": {
-            "order": 0,
-            "group": "webui",
-            "section": "device",
-            "default": false,
-            "type": "boolean"
         },
         "webui.dynamic_graphs": {
             "default": false,
