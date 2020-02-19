@@ -4750,6 +4750,13 @@
                 "value": "zero_or_exists:dashboards,dashboard_id"
             }
         },
+        "webui.device_location_map_open": {
+            "order": 0,
+            "group": "webui",
+            "section": "device",
+            "default": false,
+            "type": "boolean"
+        },
         "webui.dynamic_graphs": {
             "default": false,
             "group": "webui",
