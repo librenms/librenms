@@ -29,7 +29,7 @@ if (isset($_REQUEST['search'])) {
         }
 
         if ($_REQUEST['type'] == 'group') {
-            foreach (dbFetchRows("SELECT id,name FROM device_groups WHERE name LIKE ?", ["%$search%"]) as $group) {
+            foreach (dbFetchRows("SELECT id, name FROM device_groups WHERE name LIKE ?", ["%$search%"]) as $group) {
                 if ($_REQUEST['map']) {
                     $results[] = array(
                         'name'     => 'g:'.$group['name'],
@@ -53,7 +53,7 @@ if (isset($_REQUEST['search'])) {
                 if (\LibreNMS\Util\IPv4::isValid($search, false) || \LibreNMS\Util\IPv6::isValid($search, false)) {
                     // Device search ip, overwrite_ip, or hostname by address
                     $results = dbFetchRows(
-                        "SELECT *,inet6_ntoa(`ip`) as `ntoa_ip` FROM `devices` LEFT JOIN `locations` on `locations`.`id` = `devices`.`location_id` WHERE inet6_ntoa(`devices`.`ip`) LIKE ? OR `devices`.`overwrite_ip` LIKE ? OR `devices`.`hostname` LIKE ? ORDER BY `ip`, `hostname` LIMIT ?",
+                        "SELECT *, inet6_ntoa(`ip`) as `ntoa_ip` FROM `devices` LEFT JOIN `locations` on `locations`.`id` = `devices`.`location_id` WHERE inet6_ntoa(`devices`.`ip`) LIKE ? OR `devices`.`overwrite_ip` LIKE ? OR `devices`.`hostname` LIKE ? ORDER BY `ip`, `hostname` LIMIT ?",
                         ["$search%", "$search%", "$search%", $limit]
                     );
                 } else {
