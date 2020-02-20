@@ -62,7 +62,7 @@ class DatastoreServiceProvider extends ServiceProvider
 
             $app->tag($stores, ['datastore']);
 
-            return new Datastore($app->tagged('datastore'));
+            return new Datastore(iterator_to_array($app->tagged('datastore')));
         });
 
         // additional bindings
