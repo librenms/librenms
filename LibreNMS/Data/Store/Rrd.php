@@ -172,7 +172,7 @@ class Rrd implements DatastoreContract
             $fields = array_filter($fields, function ($key) use ($rrd_def) {
                 $valid = $rrd_def->isValidDataset($key);
                 if (!$valid) {
-                    d_echo("RRD warning: unused data sent $key");
+                    Log::warning("RRD warning: unused data sent $key");
                 }
                 return $valid;
             }, ARRAY_FILTER_USE_KEY);
