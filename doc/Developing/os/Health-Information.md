@@ -259,9 +259,9 @@ Create and populate new files for the sensor class in the following places:
 
 #### Advanced health sensor example
 
-This example shows how to build sensors for the Adva FSP150CC family MetroE devices. The goal is to collect optical reading from SFPs installed in the ports on the device. This example will assume an understanding of SNMP and MIBs.
+This example shows how to build sensors using the advanced method. In this example we will be collecting optical power level (dBm) from Adva FSP150CC family MetroE devices. This example will assume an understanding of SNMP and MIBs.
 
-First we setup `includes/discovery/sensors/pre_cache/adva_fsp150.inc` as shown below. The first line walks the cmEntityObject table to get information about the chassis and line cards. From this information we extract the model type as that will determine which tables in the Facility-Mib ports are populated in. Based on that information the program checks the appropriate table and builds an array inside of `$pre_cache` called `adva_fsp150_ports`. This array will have OID index vaules for each port, which we will use later to identify our sensor OIDs. 
+First we setup `includes/discovery/sensors/pre_cache/adva_fsp150.inc` as shown below. The first line walks the cmEntityObject table to get information about the chassis and line cards. From this information we extract the model type as that will determine which tables in the CM-Facility-Mib the ports are populated in. Based on that information the program checks the appropriate table and builds an array inside of `$pre_cache` called `adva_fsp150_ports`. This array will have OID index vaules for each port, which we will use later to identify our sensor OIDs. 
 
 ```
 $pre_cache['adva_fsp150'] = snmpwalk_cache_multi_oid($device, 'cmEntityObjects', [], 'CM-ENTITY-MIB', null, '-OQUbs');
@@ -336,19 +336,19 @@ foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
 }
 ```
 
-First we are going through a loop iterating on each port's index value. In the case of Advas, the ports are names Ethernet 1-1-1-1, 1-1-1-2, etc, and they are indexed as oid.1.1.1.1, oid.1.1.1.2, etc.
+First the program will loop through each port's index value. In the case of Advas, the ports are names Ethernet 1-1-1-1, 1-1-1-2, etc, and they are indexed as oid.1.1.1.1, oid.1.1.1.2, etc in the mib.
 
-Next we are checking which table the port exists in and that the connector type is 'fiber'. There are other port tables in the full code that were ommitted from the example for brevity. Copper media won't have optical readings, so if the media type isn't fiber we skip discovery for that port.
+Next the program checks which table the port exists in and that the connector type is 'fiber'. There are other port tables in the full code that were ommitted from the example for brevity. Copper media won't have optical readings, so if the media type isn't fiber we skip discovery for that port.
 
-If we have the correct port table and media type we are going to proceed gather our sensor information. The next two lines build the OIDs for getting the optical receive and transmit values using the `$index` for the port. Following that we get the current receive and transmit values ($currentRx and $currentTx repectively) to verify the values are not 0. Not all SFPs collect optical monitoring data, in which case the value of both transmit and recieve will be 0. While 0 is a valid value for optical power, its extremely unlikely that both will be 0. If digital optical monitoring (DOM) is not available, then we don't want to discover the sensor. Note, this is the case with Adva, other vendors may be different in how that handle optics that do not supply DOM.
+If we have the correct port table and media type we are going to proceed gather our sensor information. The next two lines build the OIDs for getting the optical receive and transmit values using the `$index` for the port. Following that we get the current receive and transmit values ($currentRx and $currentTx repectively) to verify the values are not 0. Not all SFPs collect digital optical monitoring (DOM) data, in the case of Adva the value of both transmit and recieve will be 0 if DOM is not available. While 0 is a valid value for optical power, its extremely unlikely that both will be 0 if DOM is present. If DOM is not available, then the program stops discovery for that port. Note that while this is the case with Adva, other vendors may be different in how that handle optics that do not supply DOM. Please check your vendor's mibs.
 
-Next we assign the values of $entPhysicalIndex and $entPhysicalIndex_measured. I'm setting $entPhysicalIndex to the value of the `cmEthernetTrafficPortIfIndex` so that it is associated with port. This will also allow the sensor graphs to show up on the associated port's page in the GUI.
+Next the program assigns the values of $entPhysicalIndex and $entPhysicalIndex_measured. In this case $entPhysicalIndex is set to the value of the `cmEthernetTrafficPortIfIndex` so that it is associated with port. This will also allow the sensor graphs to show up on the associated port's page in the GUI in addition to the Health page.
 
-Following that we are using a database call to get the description of the port, which will be used as the title for the graph in the GUI.
+Following that the program uses a database call to get the description of the port which will be used as the title for the graph in the GUI.
 
-Lastly we call the `discover_sensor()` function and pass it the information collected above. The `null` values are for low, low warning, high, and high warning values, which are not collected in the Adva's MIB.
+Lastly the program calls `discover_sensor()` and passes the information collected in the previous steps. The `null` values are for low, low warning, high, and high warning values, which are not collected in the Adva's MIB.
 
-You can check a sensor by running `./discovery.php -h $device_id -m sensors`. You can use `-v` to see what calls are being used during discovery, and `-d` to see debug output. In the section under `#### Load disco module sensors ####` you can see a list of sensors. If there is a `+` a sensor is added, if there is a `-` one was deleted, and a `.` means no change. If there is nothing next to the sensor then they sensor was not discovered. There is is also information about changes to the database and RRD files at the bottom.
+You can manually run discovery to verify the code works by running `./discovery.php -h $device_id -m sensors`. You can use `-v` to see what calls are being used during discovery and `-d` to see debug output. In the output under `#### Load disco module sensors ####` you can see a list of sensors types. If there is a `+` a sensor is added, if there is a `-` one was deleted, and a `.` means no change. If there is nothing next to the sensor type then the sensor was not discovered. There is is also information about changes to the database and RRD files at the bottom.
 
 ```
 [librenms@nms-test ~]$ ./discovery.php -h 2 -m sensors
