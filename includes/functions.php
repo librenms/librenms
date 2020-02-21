@@ -2063,8 +2063,9 @@ function initStats()
  */
 function printChangedStats($update_only = false)
 {
-    global $snmp_stats, $db_stats, $rrd_stats;
+    global $snmp_stats, $db_stats;
     global $snmp_stats_last, $db_stats_last, $rrd_stats_last;
+    $rrd_stats = Rrd::getStats();
 
     if (!$update_only) {
         printf(
