@@ -222,7 +222,7 @@ $rrd_def = new RrdDefinition();
 
 $fields = array();
 foreach ($mapping_status as $desc => $id) {
-    $fields[$desc] = (isset($map[$id]) && $map[$id] >= 0) ? $map[$id] : 'U';
+    $fields[$id] = (isset($map[$id]) && $map[$id] >= 0) ? $map[$id] : 'U';
     $rrd_def->addDataset($id, 'GAUGE', 0, 125000000000);
 }
 $metrics += $fields;
