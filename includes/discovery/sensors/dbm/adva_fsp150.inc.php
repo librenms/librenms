@@ -97,7 +97,7 @@ foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
 
 //Adva Access Ports dBm
     if ($entry['cmEthernetAccPortMediaType'] == 'fiber') {
-        //Discover receivn power level
+        //Discover receive power level
         $oidRx = '.1.3.6.1.4.1.2544.1.12.5.1.1.1.34.' . $index . '.3';
         $oidTx = '.1.3.6.1.4.1.2544.1.12.5.1.1.1.33.' . $index . '.3';
         $currentRx = snmp_get($device, $oidRx, '-Oqv', 'CM-PERFORMANCE-MIB', '/opt/librenms/mibs/adva');
