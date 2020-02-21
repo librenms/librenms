@@ -108,6 +108,14 @@ class RunAlerts
         $obj['proc']          = $alert['proc'];
         $obj['status']        = $device['status'];
         $obj['status_reason'] = $device['status_reason'];
+
+        $device_groups = dbFetchRows("SELECT name FROM device_groups dg INNER JOIN device_group_device dgd ON dgd.device_group_id=dg.id WHERE dgd.device_id = ? ORDER BY name ASC", array($alert['device_id']));
+        $obj['groups'] = "";
+        foreach ($device_groups as $group) {
+            $obj['groups'] .= $group['name'] . ',';
+        }
+        $obj['groups'] = substr($obj['groups'], 0, -1);
+        
         if (can_ping_device($attribs)) {
             $ping_stats = DevicePerf::where('device_id', $alert['device_id'])->latest('timestamp')->first();
             $obj['ping_timestamp'] = $ping_stats->template;
