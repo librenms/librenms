@@ -61,6 +61,7 @@ return [
             'dashboard' => 'Dashboard Settings',
             'search' => 'Search Settings',
             'style' => 'Style',
+            'device' => 'Device Settings',
         ]
     ],
     'settings' => [
@@ -1119,6 +1120,10 @@ return [
                 'description' => 'Set the minimum graph height',
                 'help' => 'Minimum Graph Height (default: 300)'
             ]
+        ],
+        'device_location_map_open' => [
+            'description' => 'Location Map open',
+            'help' => 'Location Map is shown by default'
         ],
         'whois' => [
             'description' => 'Path to whois'
