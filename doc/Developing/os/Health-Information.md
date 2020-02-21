@@ -261,7 +261,7 @@ Create and populate new files for the sensor class in the following places:
 
 This example shows how to build sensors using the advanced method. In this example we will be collecting optical power level (dBm) from Adva FSP150CC family MetroE devices. This example will assume an understanding of SNMP and MIBs.
 
-First we setup `includes/discovery/sensors/pre_cache/adva_fsp150.inc` as shown below. The first line walks the cmEntityObject table to get information about the chassis and line cards. From this information we extract the model type as that will determine which tables in the CM-Facility-Mib the ports are populated in. Based on that information the program checks the appropriate table and builds an array inside of `$pre_cache` called `adva_fsp150_ports`. This array will have OID index vaules for each port, which we will use later to identify our sensor OIDs. 
+First we setup `includes/discovery/sensors/pre_cache/adva_fsp150.inc` as shown below. The first line walks the cmEntityObject table to get information about the chassis and line cards. From this information we extract the model type which will identify which tables in the CM-Facility-Mib the ports are populated in. The program then reads the appropriate table into the `$pre_cache` array `adva_fsp150_ports`. This array will have OID indexies for each port, which we will use later to identify our sensor OIDs. 
 
 ```
 $pre_cache['adva_fsp150'] = snmpwalk_cache_multi_oid($device, 'cmEntityObjects', [], 'CM-ENTITY-MIB', null, '-OQUbs');
@@ -280,7 +280,7 @@ Next we are going to build our sensor discovery code. These are optical readings
 ```
 foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
     if ($entry['cmEthernetTrafficPortMediaType'] == 'fiber') {
-        //Discover receivn power level
+        //Discover received power level
         $oidRx = '.1.3.6.1.4.1.2544.1.12.5.1.21.1.34.' . $index . '.3';
         $oidTx = '.1.3.6.1.4.1.2544.1.12.5.1.21.1.33.' . $index . '.3';
         $currentRx = snmp_get($device, $oidRx, '-Oqv', 'CM-PERFORMANCE-MIB', '/opt/librenms/mibs/adva');
@@ -340,7 +340,7 @@ First the program will loop through each port's index value. In the case of Adva
 
 Next the program checks which table the port exists in and that the connector type is 'fiber'. There are other port tables in the full code that were ommitted from the example for brevity. Copper media won't have optical readings, so if the media type isn't fiber we skip discovery for that port.
 
-If we have the correct port table and media type we are going to proceed gather our sensor information. The next two lines build the OIDs for getting the optical receive and transmit values using the `$index` for the port. Following that we get the current receive and transmit values ($currentRx and $currentTx repectively) to verify the values are not 0. Not all SFPs collect digital optical monitoring (DOM) data, in the case of Adva the value of both transmit and recieve will be 0 if DOM is not available. While 0 is a valid value for optical power, its extremely unlikely that both will be 0 if DOM is present. If DOM is not available, then the program stops discovery for that port. Note that while this is the case with Adva, other vendors may be different in how that handle optics that do not supply DOM. Please check your vendor's mibs.
+The next two lines build the OIDs for getting the optical receive and transmit values using the `$index` for the port. Using the OIDs the program gets the current receive and transmit values ($currentRx and $currentTx repectively) to verify the values are not 0. Not all SFPs collect digital optical monitoring (DOM) data, in the case of Adva the value of both transmit and recieve will be 0 if DOM is not available. While 0 is a valid value for optical power, its extremely unlikely that both will be 0 if DOM is present. If DOM is not available, then the program stops discovery for that port. Note that while this is the case with Adva, other vendors may differ in how they handle optics that do not supply DOM. Please check your vendor's mibs.
 
 Next the program assigns the values of $entPhysicalIndex and $entPhysicalIndex_measured. In this case $entPhysicalIndex is set to the value of the `cmEthernetTrafficPortIfIndex` so that it is associated with port. This will also allow the sensor graphs to show up on the associated port's page in the GUI in addition to the Health page.
 
