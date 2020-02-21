@@ -1,0 +1,1798 @@
+CM-ALARM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP 
+             FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, Integer32
+             FROM SNMPv2-SMI
+    TimeStamp, DateAndTime, TruthValue, VariablePointer, DisplayString, 
+    TEXTUAL-CONVENTION 
+             FROM SNMPv2-TC
+    TrapAlarmSeverity
+             FROM ADVA-MIB
+    neIndex, shelfIndex, slotIndex
+             FROM  CM-ENTITY-MIB
+    cmEthernetAccPortIndex, cmEthernetNetPortIndex
+             FROM  CM-FACILITY-MIB
+    fsp150cm 
+             FROM  ADVA-MIB;
+
+
+cmAlarmMIB MODULE-IDENTITY
+    LAST-UPDATED    "201512210000Z"
+    ORGANIZATION    "ADVA Optical Networking"
+    CONTACT-INFO
+            "        Raghav Trivedi
+                     ADVA Optical Networking, Inc.
+                Tel: +1 972 759-1239
+             E-mail: rtrivedi@advaoptical.com
+             Postal: 2301 N. Greenville Ave. #300
+                     Richardson, TX USA 75082"
+    DESCRIPTION
+            "This module defines the Alarm Monitoring MIB definitions 
+             used by the F3 (FSP150CM/CC) product lines.  
+             Copyright (C) ADVA Optical Networking."
+    REVISION        "201512210000Z"
+    DESCRIPTION
+            "
+             Notes from release 201512210000Z
+               (1) Added new literal to CmConditionType (Release 8.1CC - XG210),
+                   erpRingSegmentation
+                   
+             Notes from release 201502040000Z
+               (1) added oneru-xg210c-shelf, eth-xg-210c-card, ge-8sc-cc to CmAlarmEntityType
+               (2) added macSecKeyExchangeFail, macSecPasswordMissing, macSecRamCleared, 
+                   noRouteResources to CmConditionType
+
+             Notes from release 201502010000Z
+             (i) Added literals to CmAlarmEntityType (Release 7.1sp - OSA5411),
+                 oneru-osa5411-shelf, eth-osa5411-card
+            
+             Notes from release 201408280000Z
+             (i) Added new literal trafficResourceLimitExceeded to CmConditionType
+             
+             Notes from release 201407180000Z,
+             (i) Added new CmLoopbackType literals,
+                 oduAis, opuAis, otuAis, otnProtMsmtch, otnProtPrtclFail, oduBdi,
+                 otuBdi, lossCharSync, berHigh, laserFail, laserCurrentAbnormal,
+                 oduLock, autoShutdown, localFault, otuLof, otuLom, oduOci, opuPlm,
+                 oduSd, otuSd, opuSf, optPowerHighRx, optPowerLowRx, optPowerHighTx,
+                 optPowerLowTx, oduTim, otuTim
+
+             (ii) Added new CmAlarmEntityType literals,
+                  oneru-otn210-shelf, eth-otn-210-card
+
+             Notes from release 201404170000Z
+             (i) Added new literal xfpWaveLengthMismatch to CmConditionType
+             
+             Notes from release 201205170000Z
+             (i) Alarm Entity Types for PWE3, PTP
+             (ii) Condition Types for PWE3, PTP, ELMI
+
+             Notes from release 201112070000Z
+             (i) Added f3EnvAlarmInputTable with objects 
+                 f3EnvAlarmInputIndex, f3EnvAlarmInputDescr, f3EnvAlarmInputCondType,
+                 f3EnvAlarmInputNotifCode, f3EnvAlarmInputMode
+
+             Notes from release 201012140000Z
+             (i) Added objects cmAlmTestAlarmEntity, cmAlmTestAlarmAction
+
+             Notes from release 201010270000Z
+             (i) Added objects cmSysAlmAdditionalInfoObject, cmSysAlmAdditionalInfoName,
+                 cmSysCondAdditionalInfoObject, cmSysCondAdditionalInfoName
+             (ii) Added objects cmNetworkElementAlmAdditionalInfoObject, 
+                  cmNetworkElementAlmAdditionalInfoName,
+                  cmNetworkElementCondAdditionalInfoObject, 
+                  cmNetworkElementCondAdditionalInfoName
+
+             Notes from release 201006070000Z
+             Added literals to CmConditionType TC (Release 4.3CC - GE201),
+                 syncreflck, syncreffrc, syncrefman,
+                 syncrefwtr, syncrefsw, lcpfail, lcploopback,
+                 authservernotreachable, excessiveinterrupts
+             Added literals to CmAlarmEntityType TC (Release 4.3CC - GE201),
+                 oneru-ge201-shelf, eth-ge-201-card, oneru-ge201se-shelf,
+                 eth-ge-201se-card
+
+            Notes from release 200903160000Z
+             This release is applicable to the FSP150CC Release 4.1 
+             devices GE101 and GE206.
+             (1)Textual Convention CmAlarmEntityType is updated with additional 
+                enumeration literals,
+                  1ru-h1-shelf, 1ru-f1-shelf, eth-ge-101-card, eth-ge-206-card,
+                  cfmmep, sync, bitsinport, bitsoutport
+             (2)Textual Convention CmConditionType is updated with additional 
+                enumeration literals,
+                 crossconnectccm, erroneousccm, someremotemepccm, somemacstatus,
+                 somerdi, ais, syncref, esmcfail, qlmismatch, freqoff, los, lof,
+                 qlsqlch, frngsync, fstsync, hldovrsync, losloc, wtr, allsyncref,
+                 qlinvalid, snmpdghostunresolved, snmpdghostresourcesbusy, 
+                 bwexceedednegspeed, shaperbtd, sfpnonqualified,
+                 avghldovrfrqnotrdy
+             (3)Added new objects cmSysAlmObject, cmSysAlmObjectName,
+                cmSysCondObject, cmSysCondObjectName
+
+             Notes from release 200803030000Z,
+             (1)MIB version ready for release FSP150CM 3.1." 
+    ::= {fsp150cm 6}    
+
+-- 
+-- OID definitions
+-- 
+alarmObjects        OBJECT IDENTIFIER ::= {cmAlarmMIB 1}
+alarmNotifications  OBJECT IDENTIFIER ::= {cmAlarmMIB 2}
+alarmConformance    OBJECT IDENTIFIER ::= {cmAlarmMIB 3}
+
+--
+-- Textual conventions.
+--
+
+CmServiceEffect ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Indicates whether a condition is service affecting or not."
+    SYNTAX       INTEGER {
+                   none(0),
+                   nonServiceAffecting(1),
+                   serviceAffecting(2)
+                 }
+
+
+CmLocation ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Identifies the location associated with the particular information."
+    SYNTAX       INTEGER {
+                   none(0),
+                   both(1),
+                   farEnd(2),
+                   nearEnd(3),
+                   notApplicable(4)
+                 }
+
+
+CmDirection ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Specifies the direction associated with the particular information."
+    SYNTAX       INTEGER {
+                   none(0),
+                   bidirectional(1),
+                   bothDirections(2),
+                   notApplicable(3),
+                   receiveDirectionOnly(4),
+                   transmitDirectionOnly(5),
+                   uniDirectional(6)
+                 }
+
+--
+-- New values may be added to future releases as long as existing
+-- values are preserved.
+--
+CmConditionType ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "Identifies the type of condition or alarm being reported."
+    SYNTAX     INTEGER {
+                 none(0),
+                 acoopr(1),
+                 hwinitedsysboot(2),
+                 userinitednemireboot(3),
+                 userinitedsysboot(4),
+                 userinitedsysbootdefaultdb(5),
+                 userinitedsysbootdbrestore (6),
+                 userinitedsysrebootswact(7),
+                 sysrecoveryfailed(8),
+                 primntpsvrFailed(9),
+                 bckupntpsvrFailed(10),
+                 swdl-ftip(11),
+                 swdl-ftfail(12),
+                 swdl-ftpass(13),
+                 swdl-instip(14),
+                 swdl-instfail(15),
+                 swdl-instpass(16),
+                 swdl-actip(17),
+                 swdl-actfail(18),
+                 swdl-actpass(19),
+                 swdl-valip(20),
+                 swdl-valfail(21),
+                 swdl-valpass(22),
+                 db-ftip(23),
+                 db-ftfail(24),
+                 db-ftpass(25),
+                 ctneqpt(26),
+                 eqptflt(27),
+                 forced(28),
+                 lockout(29),
+                 manualswitch(30),
+                 wkswtopr(31),
+                 wkswbk(32),
+                 mismatch(33),
+                 psu1fail(34),
+                 psu2fail(35),
+                 eqptremoved(36),
+                 autonegunknown(37),
+                 dyinggasp(38),
+                 efmfail(39),
+                 efmrce(40),
+                 efmrld(41),
+                 efmrls(42),
+                 lnkdeactivated(43),
+                 lnkdownunisolated(44),
+                 lnkdowncablefault(45),
+                 lnkdowncableremoved(46),
+                 lnkdownautonegfailed(47),
+                 lnkdownlpbkfault(48),
+                 lnkdowncabletestfault(49),
+                 lnkdown(50),
+                 rfi(51),
+                 rxjabber(52),
+                 sfpmismatch(53),
+                 sfpremoved(54),
+                 sfptxfault(55),
+                 sfpinserted(56),
+                 fan-a(57),
+                 fan-b(58),
+                 overtemp(59),
+                 undertemp(60),
+                 overvoltage(61),
+                 undervoltage(62),
+                 shelfrmvd(63),
+                 rmtefmlpbkfail(64),
+                 inpwrflt(65),
+                 --
+                 crossconnectccm(66),
+                 erroneousccm(67),
+                 someremotemepccm(68),
+                 somemacstatus(69),
+                 somerdi(70),
+                 ais(71),
+                 syncref(72),
+                 esmcfail(73),
+                 qlmismatch(74),
+                 freqoff(75),
+                 los(76),
+                 lof(77),
+                 qlsqlch(78),
+                 frngsync(79),
+                 fstsync(80),
+                 hldovrsync(81),
+                 losloc(82),
+                 wtr(83),
+                 allsyncref(84),
+                 qlinvalid(85),
+                 snmpdghostunresolved(86),
+                 snmpdghostresourcesbusy(87),
+                 bwexceedednegspeed(88),
+                 shaperbtd(89),
+                 sfpnonqualified(90),
+                 avghldovrfrqnotrdy(91),
+                 lnkdownmasterslavecfg(92),
+                 pwrnoinputunitfault(93),
+                 ipaddrconflict(94),
+                 nomoreresources(95),
+                 syncreflck(96), -- sync reference locked out
+                 syncreffrc(97), -- sync reference forced switch
+                 syncrefman(98), -- sync reference manual switch
+                 syncrefwtr(99), -- sync reference wait to restore
+                 syncrefsw(100), -- sync reference switch
+                 lcpfail(101),   -- link control protocol (PPP) failed
+                 lcploopback(102), -- link control protocol detected loopback
+                 authservernotreachable (103), -- authentications server not reachable
+                 excessiveinterrupts(104),   -- system detected abnormal, excessive interrupts
+                 dbdowngradeip(105),         -- database downgrade in progress 
+                 testalarm(106),             -- test alarm standing condition
+                 --
+                 gen-filexfer-ip(107),       -- generic file transfer in progress
+                 gen-filexfer-fail(108),     -- generic file transfer failed 
+                 gen-filexfer-pass(109),     -- generic file transfer pass 
+                 gen-oper-ip(110),           -- generic operation in progress
+                 gen-oper-fail(111),         -- generic operation fail
+                 gen-oper-pass(112),         -- generic operation pass
+                 --
+                 trafficfail(113),
+                 clockfail(114),
+                 rdncyswitchover(115),
+                 rdncyswvermismatch(116),
+                 rdncyoutofsync(117),
+                 rdncylockout(118),
+                 rdncymaintenance(119),
+                 xfptxfault(120),
+                 xfpmismatch(121),
+                 xfpnonqualified(122),
+                 xfpremoved(123),
+                 xfpinserted(124),
+                 lagmbrfail(125),
+                 swdl-proip(126),
+                 swdl-propass(127),
+                 swdl-profail(128),
+                 db-proip(129),
+                 db-propass(130),
+                 db-profail(131),
+                 swdl-rvtip(132),
+                 swdl-rvtpass(133),
+                 swdl-rvtfail(134),
+                 db-corruption(135),
+                 bpmismatch(136),
+                 --
+                 popr-oovar(137),   -- precision optical power out-of-variance
+                 popr-oorange(138), -- precision optical power out-of-range
+                 popr-genfail(139), -- precision optical power gen failure
+                 popr-sfpnqual(140),--precision optical power sfp non-qual
+                 popr-rta(141),     --precision optical power return-to-avg
+                 --
+                 modemmea(142),
+                 modemnonqualified(143),
+                 modemremoved(144),
+                 nosimcard(145),
+                 --
+                 env-genfail(146),                 -- environmental gen failure
+                 env-misc(147),                    -- environmental miscellaneous
+                 env-batterydischarge(148),        -- environmental battery discharge
+                 env-batteryfail(149),             -- environmental battery failure
+                 env-coolingfanfail(150),          -- environmental cooling fan failure
+                 env-enginefail(151),              -- environmental engine failure
+                 env-fusefail(152),                -- environmental fuse failure
+                 env-hightemp(153),                -- environmental high temperature
+                 env-intrusion(154),               -- environmental intrusion
+                 env-lowbatteryvoltage(155),       -- environmental low battery voltage
+                 env-lowtemp(156),                 -- environmental low temperature
+                 env-opendoor(157),                -- environmental open door
+                 env-powerfail(158),               -- environmental power failure
+                 --
+                 intctneqpt(159),                  -- inter-connect equipment failure
+                 syncnotready(160),                -- sync not ready
+                 --
+                 vcgfail(161),
+                 loa(162),
+                 plct(163),
+                 tlct(164),
+                 plcr(165),
+                 tlcr(166),
+                 sqnc(167),
+                 --
+                 ais-l(168),
+                 rfi-l(169),
+                 rei-l(170),
+                 exc-l(171),
+                 deg-l(172),
+                 tim-s(173),
+                 --
+                 ais-p(174),
+                 lop-p(175),
+                 tim-p(176),
+                 uneq-p(177),
+                 plm-p(178),
+                 lom-p(179),
+                 exc-p(180),
+                 deg-p(181),
+                 rei-p(182),
+                 rfi-p(183),
+                 lcascrc(184),
+                 sqm(185),
+                 lom(186),
+                 gidmismatch(187),
+                 mnd(188),
+                 ais-v(189),
+                 lop-v(190),
+                 tim-v(191),
+                 uneq-v(192),
+                 plm-v(193),
+                 exc-v(194),
+                 deg-v(195),
+                 rei-v(196),
+                 rfi-v(197),
+                 rmtinitlpbk(198),
+                 rai(199),
+                 rei(200),
+                 idle(201),
+                 csf(202),
+                 gfplfd(203),
+                 gfpuplmismatch(204),
+                 gfpexhmismatch(205),
+                 vcat-lom(206),
+                 fragileecc(207),
+                 --
+                 elmi-seqnummismatch(208), -- elmi, seq number mismatch
+                 elmi-notoper(209),        -- elmi, not operational
+                 --
+                 pw-rlofs(210), -- satop, remote loss of frame state                 
+                 pw-lof(211), -- satop, loss of frames 
+                 pw-latefrm(212), -- satop, late frames 
+                 pw-jbovrn(213), -- satop, jitter buffer overruns 
+                 --
+                 allsoocsfailed(214), -- ts, all soocs failed
+                 tsholdoverfrqnotready(215), -- ts, hold over freq not ready
+                 tsfreerun(216), -- ts, free run
+                 tsholdover(217),-- ts, hold over
+                 ptsflossofsync(218), --packet timing signal fail(sooc), loss of sync
+                 ptsflossofannounce(219), -- packet timing signal fail, loss of announce
+                 ptsfunusable(220), -- packet timing signal fail, unusable
+                 --
+                 unresolvedsatop(221),
+                 rdi-v(222),
+                 autonegBypass(223),
+                 forcedOffline(224),
+                 hwcfginconsistent(225),
+                 --
+                 sjmtiemaskcross(226),
+                 sjoffsetfail(227),
+                 sjnotimelock(228),
+                 sjnofreqlock(229),
+                 sjmtiemargincross(230),
+                 sjtestreferencefail(231),
+                 sjtestsourcefail(232),
+                 sjtestnotimestamp(233),
+                 sjtestnomessages(234),
+                 gpsantennafail(235),
+                 --
+                 ampNoPeer(236),        -- No Peer Available
+                 ampProvFail(237),      -- Provisioning Failure
+                 ampCfgFail(238),       -- Client Configuration Failure
+                 --
+                 ltpFailure(239),
+                 ltpInprogress(240),
+                 --
+                 pse-power-threshold-exceeded(241),
+                 pse-power-fail(242),
+                 pse-poweroff-overcurrent(243),
+                 pse-poweroff-overvoltage(244),
+                 pse-poweroff-overload(245),
+                 pse-poweroff-overtemp(246),
+                 pse-poweroff-short(247),
+                 --
+                 erpFoPPM(248),         -- Failure of Protocol, Protocol Mismatch
+                 erpFoPTO(249),         -- Failure of Protocol, Timeout
+                 erpBlockPort0RPL(250), -- Blocking Port 0 - Ring Protection Link
+                 erpBlockPort0SF(251),  -- Blocking Port 0 - Signal Fail
+                 erpBlockPort0MS(252),  -- Blocking Port 0 - Manual Switch
+                 erpBlockPort0FS(253),  -- Blocking Port 0 - Forced Switch
+                 erpBlockPort0WTR(254), -- Blocking Port 0 - Wait To Restore
+                 erpBlockPort1RPL(255), -- Blocking Port 1 - Ring Protection Link
+                 erpBlockPort1SF(256),  -- Blocking Port 1 - Signal Fail
+                 erpBlockPort1MS(257),  -- Blocking Port 1 - Manual Switch
+                 erpBlockPort1FS(258),  -- Blocking Port 1 - Forced Switch
+                 erpBlockPort1WTR(259), -- Blocking Port 1 - Wait To Restore
+                 --
+                 ipv6addr-conflict(260),
+                 macAddrlearntblFull(261),
+                 
+                 --
+                 timeClockNotLocked(262),
+                 timeNotTraceAble(263),
+                 timeFreqNotTraceAble(264),
+                 timeHoldOver(265),
+                 timeFreqLock(266),
+                 timeRefLock(267),
+                 timeRefUnavailable(268),
+                 timeRefDegraded(269),
+                 timeRefFrc(270),
+                 tsTimeFrun(271),
+                 tsTimeHoldOver(272),
+                 timeRefUnavailableWTR(273),
+                 timeRefDegradedWTR(274),
+                 rmtInitSat(275),
+                 lldpRemoteTblChg(276),
+                 soocLck(277),
+                 
+                 -- gap for alarms added in 5.6CC
+                 ampProvSuccess(278),
+                 ampCfgSuccess(279),
+                 soocSW(280),
+                 soocWTR(281),
+                 sjtealert(282),
+                 dataExportFtpFail(283),
+                 xfpWaveLengthMismatch(284),
+                 cpmrUpgrading(285),
+                 beaconLightFailure(286),
+                 manualSwitchClear(287),
+                 loopbackActive(288),
+                 loopbackRequest(289),
+                 trafficResourceLimitExceeded(290),
+                 --
+                 oduAis(291),
+                 opuAis(292),
+                 otuAis(293),
+                 otnProtMsmtch(294),
+                 otnProtPrtclFail(295),
+                 oduBdi(296),
+                 otuBdi(297),
+                 lossCharSync(298),
+                 berHigh(299),
+                 laserFail(300),
+                 laserCurrentAbnormal(301),
+                 oduLock(302),
+                 autoShutdown(303),
+                 localFault(304),
+                 otuLof(305),
+                 otuLom(306),
+                 oduOci(307),
+                 opuPlm(308),
+                 oduSd(309),
+                 otuSd(310),
+                 opuSf(311),
+                 optPowerHighRx(312),
+                 optPowerLowRx(313),
+                 optPowerHighTx(314),
+                 optPowerLowTx(315),
+                 oduTim(316),
+                 otuTim(317),
+                 sjConstTeThrshld(318),
+                 sjInstTeThrshld(319),
+                 timeRefSW(320),
+                 aadcfailed(321),
+                 ptpfreqfrun(322),
+                 ptptimefrun(323),
+                 ptpfreqhldovr(324),
+                 ptptimehldovr(325),
+                 ptptimenottraceable(326),
+                 ptpfreqnottraceable(327),
+                 synctimeout(328),
+                 announcetimeout(329),
+                 delayresptimeout(330),
+                 multiplepeers(331),
+                 wrongdomain(332),
+                 nosatellitercv(333),
+                 trafficipifoutage(334),
+                 ptpportstatechanged(335),
+                 physicalSelfLpbk(336),
+                 cfCardRWFail(337),
+                 maxexpectedslaves(338),
+                 external-alarm(339),
+                 maskcrossed(340),
+                 oof(341),
+                 signalfail(342),
+                 timenottai(343),
+                 perffuncfailure(344),
+                 ptpportnotoper(345),
+                 leapsecondexpected(346),
+                 keyExchangeFail(347),
+                 keyExchangeAuthPasswordMissing(348),
+                 secureRamCleared(349),
+                 noRouteResources(350),
+                 tamperSwitchOpen(351),
+                 bfdSessionDown(352),
+                 destinationUnresolved(353),
+                 sjmaxtethrshld(354),
+                 trafficArpTableFull(355),
+                 erpRingSegmentation(356), -- ERP Interconnect Ring Segmentation Alarm
+                 bweexceedsportspeed(362),
+                 servicediscarded(363)
+               }
+
+
+CmConditionDescr ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "A detailed text description of the condition or alarm being reported.
+
+        This string may contain any printable ASCII character."
+    SYNTAX     OCTET STRING (SIZE (1..64))
+
+
+CmAlarmEntityType ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "Identifies the type of alarm entity types."
+    SYNTAX     INTEGER {
+                 system(1),
+                 hubshelf(2),
+                 cpmrshelf(3),
+                 eth-10-100-1000-ntucard(4),
+                 eth-cpmr-card(5),
+                 nemi-card(6),
+                 scu-card(7),
+                 fan(8),
+                 powersupply(9),
+                 accessport(10),
+                 networkport(11),
+                 -- 
+                 oneru-ge101-shelf(12), 
+                 oneru-ge206-shelf(13), 
+                 eth-ge-101-card(14), 
+                 eth-ge-206-card(15),
+                 cfmmep(16), 
+                 sync(17), 
+                 bitsinport(18), 
+                 bitsoutport(19),
+                 cfmqosshaper(20),
+                 dcnport(21),
+                 --      
+                 oneru-ge201-shelf(22),
+                 eth-ge-201-card(23),
+                 oneru-ge201se-shelf(24),
+                 eth-ge-201se-card(25),
+                 --
+                 oneru-ge206f-shelf(26),
+                 eth-ge-206f-card(27),
+                 --
+                 lag(28),
+                 
+                 --eg-x specific condition types
+                 eth-1-10gcard(29),
+                 redundancygroup(30),
+                 protectiongroup(31),
+                 stucard(32),
+                 ethertrafficport(33),
+                 eth-10-gecard(34),
+                 swf-140gcard(35),
+                 aggregationshelf(36),
+                 sticard(37),
+                 amicard(38),
+
+                 --
+                 usb3gmodem(39),
+                 oneru-ge112-shelf(40),
+                 eth-ge-112-card(41),
+                 oneru-ge114-shelf(42),
+                 eth-ge-114-card(43),
+                 --
+                 oneru-ge206v-shelf(44),
+                 eth-ge-206v-card(45),
+                 ge-4e-cc(46),
+                 ge-4s-cc(47),
+                 oneru-xg210-shelf(48),
+                 eth-xg-210-card(49),
+                 xg-1x-cc(50),
+                 xg-1s-cc(51),
+                 scu-t-card(52),
+                 eth-10-100-1000-ntecard(53),
+                 slot(54),
+                 --
+                 ocnstmport(55),
+                 e1t1port(56),
+                 stsvcpath(57),
+                 vtvcpath(58),
+                 vcg(59),
+                 e3t3port(60),
+                 vc4(61),
+                 vc3(62),
+                 vc12(63),
+                 sts3c(64),
+                 sts1(65),
+                 vt15(66),
+                 t3(67),  -- facility
+                 e3(68),  -- facility
+                 t1(69),  -- facility
+                 e1(70),  -- facility
+                 stm1-4-et(71),
+                 eotdmtrafficport(72),
+                 -- 
+                 pwe3-ocnstm-card(73),
+                 pwe3-e1t1-card(74),
+                 satop(75),
+                 telecom-slave(76),
+                 sooc(77),    -- slave only ordinary clock
+                 eth-1-10ghcard(78),
+                 eth-10-gehcard(79),
+                 port-10mhz(80),
+                 ppsport(81),
+                 timeofdayport(82),
+                 --
+                 oneru-t1804-shelf(83),
+                 eth-t1804-card(84),
+                 oneru-t3204-shelf(85),
+                 eth-t3204-card(86),
+                 eotdmnetworkport(87),
+                 oneru-syncprobe-shelf(88),
+                 eth-ge-syncprobe-card(89),
+                 sj-clockprobe(90),
+                 sj-ptpclockprobe(91),
+                 sj-ptpnetworkprobe(92),
+                 gps-receiverport(93),
+                 ampConfig(94),
+                 ge-8s-cc(95),
+                 oneru-ge114h-shelf(96),
+                 eth-ge-114h-card(97),
+                 oneru-ge114ph-shelf(98),
+                 eth-ge-114ph-card(99),
+                 psegroup(100),
+                 pseport(101),
+                 erpGroup(102),
+                 eth-fe-36e-card(103),
+                 mpflow(104),
+                 oneru-ge114sh-shelf(105),
+                 eth-ge-114sh-card(106),
+                 oneru-ge114s-shelf(107),
+                 eth-ge-114s-card(108),
+                 timeclock(109),
+                 satResponderSession(110),
+                 stu-h-card(111),
+                 sti-h-card(112),
+                 ge-8e-cc(113),
+                 oneru-otn210-shelf(114),
+                 eth-otn-210-card(115),
+                 ptpclock(116),
+                 ptpport(117),
+                 oneru-osa5411-shelf(118),
+                 eth-osa5411-card(119),
+                 oneru-ge112pro-shelf(120),
+                 eth-ge-112pro-card(121),
+                 oneru-ge112pro-m-shelf(122),
+                 eth-ge-112pro-m-card(123),
+                 oneru-ge114pro-shelf(124),
+                 eth-ge-114pro-card(125),
+                 oneru-ge114pro-c-shelf(126),
+                 eth-ge-114pro-c-card(127),
+                 oneru-ge114pro-sh-shelf(128),
+                 eth-ge-114pro-sh-card(129),
+                 oneru-ge114pro-csh-shelf(130),
+                 eth-ge-114pro-csh-card(131),
+                 connectGuardFlow(132),
+                 trafficIpIF(133),
+                 vrf(134),
+                 oneru-ge114pro-he-shelf(135),
+                 eth-ge-114pro-he-card(136),
+                 oneru-ge112pro-h-shelf(137),
+                 eth-ge-112pro-h-card(138),
+                 dhcpRelayAgent(139),
+                 oneru-xg210c-shelf(140),
+                 eth-xg-210c-card(141),
+                 ge-8sc-cc(142),
+                 oneru-osa5420-shelf(143),
+                 eth-osa5420-card(144),
+                 oneru-osa5421-shelf(145),
+                 eth-osa5421-card(146),
+                 mci(147),
+                 bits-x16(148),	 
+                 bfdSession(149),
+                 eomplsPw(150),
+                 oneru-ge114g-shelf(151),
+                 eth-ge-114g-card(152),
+                 wifidongleport(153),
+                 oneru-xg116pro-shelf(161),
+                 eth-xg-116pro-card(162),
+                 oneru-xg120pro-shelf(163),
+                 eth-xg-120pro-card(164)
+               }
+
+CmCondEffectType ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "Identifies the type of condition effect types."
+    SYNTAX     INTEGER {
+                 sc(1),
+                 tc(2),
+                 cl(3)
+               }
+
+TestAlarmAction ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "Whether to raise/clear a test alarm."
+    SYNTAX     INTEGER {
+                 not-applicable(0),
+                 raise(1),
+                 clear(2)
+               }
+
+
+EnvAlarmInputMode ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "Identifies the environmental alarm input modes."
+    SYNTAX     INTEGER {
+                 disabled(1),   --env alarm disabled 
+                 alarmopen(2),  --env alarm raised when contact opened
+                 alarmclosed(3) --env alarm raised when contact closed
+               }
+
+--
+-- Scalar definitions.
+--
+cmAlarmScalars OBJECT IDENTIFIER ::= {alarmObjects 1}
+
+cmAlmLastChange OBJECT-TYPE
+    SYNTAX     TimeStamp
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "A snapshot of the value of sysUpTime when the alarm situation
+            last changed on the node (ie. there was a raise or clear).
+
+            This value is reset to zero when the agent initializes."
+    ::= { cmAlarmScalars 1 }
+
+
+cmAlmIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This value is assigned globally and sequentially to each new
+             trap that is sent from the device.  
+
+             When this value reaches a maximum of 65535, it is wrapped to
+             the value 1."
+    ::= { cmAlarmScalars 2 }
+
+cmAlmTestAlarmEntity OBJECT-TYPE
+    SYNTAX      VariablePointer
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object is used to specify the entity for which 
+             the test alarm is raised/cleared. This entity can be
+             OID of a card(unit) or a port (Ethernet Access or Ethernet
+             Network).
+             The test alarm is the trap cmNetworkElementAlmTrap with
+             condition type as testalarm.
+             If not specified, the value of this object is 0.0." 
+    ::= { cmAlarmScalars 3 }
+
+cmAlmTestAlarmAction OBJECT-TYPE
+    SYNTAX      TestAlarmAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object can be used to raise/clear the testalarm
+             on the entity specified by cmAlmTestAlarmEntity."
+    ::= { cmAlarmScalars 4 }
+
+--
+-- Table definitions.
+--
+
+--
+-- System Alarms table.
+--
+cmSysAlmTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF CmSysAlmEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "A list of entries corresponding to the standing conditions
+             that exist at the system level. 
+
+            Entries cannot be created in this table by management
+            application action."
+    ::= { alarmObjects 2 }
+
+
+cmSysAlmEntry OBJECT-TYPE
+    SYNTAX     CmSysAlmEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry containing information applicable to a particular
+             condition."
+    INDEX { cmAlmIndex }
+    ::= { cmSysAlmTable 1 }
+
+
+CmSysAlmEntry ::= SEQUENCE {
+    cmSysAlmNotifCode             TrapAlarmSeverity,
+    cmSysAlmType                  CmConditionType,
+    cmSysAlmSrvEff                CmServiceEffect,
+    cmSysAlmTime                  DateAndTime,
+    cmSysAlmLocation              CmLocation,
+    cmSysAlmDirection             CmDirection,
+    cmSysAlmDescr                 CmConditionDescr,
+    cmSysAlmObject                VariablePointer,
+    cmSysAlmObjectName            DisplayString,
+    cmSysAlmAdditionalInfoObject  VariablePointer,
+    cmSysAlmAdditionalInfoName    DisplayString
+}
+
+cmSysAlmNotifCode OBJECT-TYPE
+    SYNTAX     TrapAlarmSeverity
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object identifies the severity of the condition."
+     ::= { cmSysAlmEntry 1 }
+
+cmSysAlmType OBJECT-TYPE
+    SYNTAX     CmConditionType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object identifies the type of the condition."
+     ::= { cmSysAlmEntry 2 }
+
+
+cmSysAlmSrvEff OBJECT-TYPE
+    SYNTAX     CmServiceEffect
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object identifies whether the condition is service affecting
+         or not."
+     ::= { cmSysAlmEntry 3 }
+
+
+cmSysAlmTime OBJECT-TYPE
+    SYNTAX     DateAndTime
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object contains the system time when the condition occurred."
+     ::= { cmSysAlmEntry 4 }
+
+
+cmSysAlmLocation OBJECT-TYPE
+    SYNTAX     CmLocation
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object identifies the location of the condition. The value
+         none(0) should be used if location is not applicable."
+     ::= { cmSysAlmEntry 5 }
+
+cmSysAlmDirection OBJECT-TYPE
+    SYNTAX     CmDirection
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object identifies the direction of the condition. The value
+         none(0) should be used if direction is not applicable."
+     ::= { cmSysAlmEntry 6 }
+
+
+cmSysAlmDescr OBJECT-TYPE
+    SYNTAX     CmConditionDescr
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object contains a text description of the condition."
+     ::= { cmSysAlmEntry 7 }
+
+cmSysAlmObject OBJECT-TYPE
+    SYNTAX     VariablePointer
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "OID of the actual object that raised the alarm."
+     ::= { cmSysAlmEntry 8 }
+
+cmSysAlmObjectName OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Symbolic name of the managed object to which the condition
+         pertains."
+     ::= { cmSysAlmEntry 9 }
+
+cmSysAlmAdditionalInfoObject OBJECT-TYPE
+    SYNTAX     VariablePointer
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object provides OID of associated entity that caused the alarm.
+          If there is no associated entity, this value is 0.0."
+     ::= { cmSysAlmEntry 10 }
+
+cmSysAlmAdditionalInfoName OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..64))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object provides name of the associated entity to which the 
+          alarm pertains.  If there is no such entity, this value is empty."
+     ::= { cmSysAlmEntry 11 }
+
+--
+-- System Conditions table.
+--
+cmSysCondTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF CmSysCondEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "A list of entries corresponding to the standing conditions
+             that exist at the system level. 
+
+            Entries cannot be created in this table by management
+            application action."
+    ::= { alarmObjects 3 }
+
+
+cmSysCondEntry OBJECT-TYPE
+    SYNTAX     CmSysCondEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry containing information applicable to a particular
+             condition."
+    INDEX { cmSysCondIndex }
+    ::= { cmSysCondTable 1 }
+
+
+CmSysCondEntry ::= SEQUENCE {
+    cmSysCondIndex                 Integer32,
+    cmSysCondNotifCode             TrapAlarmSeverity,
+    cmSysCondType                  CmConditionType,
+    cmSysCondSrvEff                CmServiceEffect,
+    cmSysCondTime                  DateAndTime,
+    cmSysCondLocation              CmLocation,
+    cmSysCondDirection             CmDirection,
+    cmSysCondDescr                 CmConditionDescr,
+    cmSysCondEffType               CmCondEffectType,
+    cmSysCondObject                VariablePointer,
+    cmSysCondObjectName            DisplayString,
+    cmSysCondAdditionalInfoObject  VariablePointer,
+    cmSysCondAdditionalInfoName    DisplayString
+}
+
+cmSysCondIndex OBJECT-TYPE
+    SYNTAX     Integer32 (1..65535)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+          "An integer index value used to uniquely identify
+           a standing condition at the system level." 
+     ::= { cmSysCondEntry 1 }
+
+cmSysCondNotifCode OBJECT-TYPE
+    SYNTAX     TrapAlarmSeverity
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object identifies the severity of the condition."
+     ::= { cmSysCondEntry 2 }
+
+cmSysCondType OBJECT-TYPE
+    SYNTAX     CmConditionType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object identifies the type of the condition."
+     ::= { cmSysCondEntry 3 }
+
+
+cmSysCondSrvEff OBJECT-TYPE
+    SYNTAX     CmServiceEffect
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object identifies whether the condition is service affecting
+         or not."
+     ::= { cmSysCondEntry 4 }
+
+
+cmSysCondTime OBJECT-TYPE
+    SYNTAX     DateAndTime
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object contains the system time when the condition occurred."
+     ::= { cmSysCondEntry 5 }
+
+
+cmSysCondLocation OBJECT-TYPE
+    SYNTAX     CmLocation
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object identifies the location of the condition. The value
+         none(0) should be used if location is not applicable."
+     ::= { cmSysCondEntry 6 }
+
+
+cmSysCondDirection OBJECT-TYPE
+    SYNTAX     CmDirection
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object identifies the direction of the condition. The value
+         none(0) should be used if direction is not applicable."
+     ::= { cmSysCondEntry 7 }
+
+
+cmSysCondDescr OBJECT-TYPE
+    SYNTAX     CmConditionDescr
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object contains a text description of the condition."
+     ::= { cmSysCondEntry 8 }
+
+cmSysCondEffType OBJECT-TYPE
+    SYNTAX     CmCondEffectType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object contains the condition effect type."
+     ::= { cmSysCondEntry 9 }
+
+cmSysCondObject OBJECT-TYPE
+    SYNTAX     VariablePointer
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "OID of the actual object that raised the condition."
+     ::= { cmSysCondEntry 10 }
+
+cmSysCondObjectName OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Symbolic name of the managed object to which the condition
+         pertains."
+     ::= { cmSysCondEntry 11 }
+
+cmSysCondAdditionalInfoObject OBJECT-TYPE
+    SYNTAX     VariablePointer
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object provides OID of associated entity that caused 
+          the condition.  If there is no associated entity, this value is 0.0."
+     ::= { cmSysCondEntry 12 }
+
+cmSysCondAdditionalInfoName OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..64))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object provides name of the associated entity to which the 
+          condition pertains.  If there is no such entity, this value is empty."
+     ::= { cmSysCondEntry 13 }
+
+--
+-- Network Element Alarm table.
+--
+cmNetworkElementAlmTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF CmNetworkElementAlmEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "A list of entries corresponding to the standing conditions
+             that exist at the system level. 
+
+            Entries cannot be created in this table by management
+            application action."
+    ::= { alarmObjects 4 }
+
+cmNetworkElementAlmEntry OBJECT-TYPE
+    SYNTAX     CmNetworkElementAlmEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry containing information applicable to a particular
+             condition."
+    INDEX { neIndex, cmAlmIndex }
+    ::= { cmNetworkElementAlmTable 1 }
+
+
+CmNetworkElementAlmEntry ::= SEQUENCE {
+    cmNetworkElementAlmNotifCode                TrapAlarmSeverity,
+    cmNetworkElementAlmType                     CmConditionType,
+    cmNetworkElementAlmSrvEff                   CmServiceEffect,
+    cmNetworkElementAlmTime                     DateAndTime,
+    cmNetworkElementAlmLocation                 CmLocation,
+    cmNetworkElementAlmDirection                CmDirection,
+    cmNetworkElementAlmDescr                    CmConditionDescr,
+    cmNetworkElementAlmObject                   VariablePointer,
+    cmNetworkElementAlmObjectName               DisplayString,
+    cmNetworkElementAlmAdditionalInfoObject     VariablePointer,
+    cmNetworkElementAlmAdditionalInfoName       DisplayString
+}
+
+
+cmNetworkElementAlmNotifCode OBJECT-TYPE
+    SYNTAX     TrapAlarmSeverity
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object identifies the severity of the condition."
+     ::= { cmNetworkElementAlmEntry 1 }
+
+cmNetworkElementAlmType OBJECT-TYPE
+    SYNTAX     CmConditionType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object identifies the type of the condition."
+     ::= { cmNetworkElementAlmEntry 2 }
+
+
+cmNetworkElementAlmSrvEff OBJECT-TYPE
+    SYNTAX     CmServiceEffect
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object identifies whether the condition is service affecting
+         or not."
+     ::= { cmNetworkElementAlmEntry 3 }
+
+
+cmNetworkElementAlmTime OBJECT-TYPE
+    SYNTAX     DateAndTime
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object contains the system time when the condition occurred."
+     ::= { cmNetworkElementAlmEntry 4 }
+
+
+cmNetworkElementAlmLocation OBJECT-TYPE
+    SYNTAX     CmLocation
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object identifies the location of the condition. The value
+         none(0) should be used if location is not applicable."
+     ::= { cmNetworkElementAlmEntry 5 }
+
+cmNetworkElementAlmDirection OBJECT-TYPE
+    SYNTAX     CmDirection
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object identifies the direction of the condition. The value
+         none(0) should be used if direction is not applicable."
+     ::= { cmNetworkElementAlmEntry 6 }
+
+
+cmNetworkElementAlmDescr OBJECT-TYPE
+    SYNTAX     CmConditionDescr
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object contains a text description of the condition."
+     ::= { cmNetworkElementAlmEntry 7 }
+
+cmNetworkElementAlmObject OBJECT-TYPE
+    SYNTAX     VariablePointer
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "OID of the actual object that raised the alarm."
+     ::= { cmNetworkElementAlmEntry 8 }
+
+cmNetworkElementAlmObjectName OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Symbolic name of the managed object to which the condition
+         pertains.
+
+         This object can be any interface on this device or the system
+         object.  If this is an interface, this name will be same
+         as ifName (IF-MIB)."
+     ::= { cmNetworkElementAlmEntry 9 }
+
+cmNetworkElementAlmAdditionalInfoObject OBJECT-TYPE
+    SYNTAX     VariablePointer
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object provides OID of associated entity that caused the alarm.
+          If there is no associated entity, this value is 0.0."
+     ::= { cmNetworkElementAlmEntry 10 }
+
+cmNetworkElementAlmAdditionalInfoName OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..64))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object provides name of the associated entity to which the 
+          alarm pertains.  If there is no such entity, this value is empty."
+     ::= { cmNetworkElementAlmEntry 11 }
+
+--
+-- Network Element Conditions table.
+--
+cmNetworkElementCondTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF CmNetworkElementCondEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "A list of entries corresponding to the standing conditions
+             that exist at the system level. 
+
+            Entries cannot be created in this table by management
+            application action."
+    ::= { alarmObjects 5 }
+
+cmNetworkElementCondEntry OBJECT-TYPE
+    SYNTAX     CmNetworkElementCondEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry containing information applicable to a particular
+             condition."
+    INDEX { neIndex, cmNetworkElementCondIndex }
+    ::= { cmNetworkElementCondTable 1 }
+
+
+CmNetworkElementCondEntry ::= SEQUENCE {
+    cmNetworkElementCondIndex                 Integer32,
+    cmNetworkElementCondNotifCode             TrapAlarmSeverity,
+    cmNetworkElementCondType                  CmConditionType,
+    cmNetworkElementCondSrvEff                CmServiceEffect,
+    cmNetworkElementCondTime                  DateAndTime,
+    cmNetworkElementCondLocation              CmLocation,
+    cmNetworkElementCondDirection             CmDirection,
+    cmNetworkElementCondDescr                 CmConditionDescr,
+    cmNetworkElementCondObject                VariablePointer,
+    cmNetworkElementCondObjectName            DisplayString,
+    cmNetworkElementCondEffType               CmCondEffectType,
+    cmNetworkElementCondAdditionalInfoObject  VariablePointer,
+    cmNetworkElementCondAdditionalInfoName    DisplayString
+}
+
+cmNetworkElementCondIndex OBJECT-TYPE
+    SYNTAX     Integer32 (1..65535)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+          "An integer index value used to uniquely identify
+           a standing condition at a  Network Element level." 
+     ::= { cmNetworkElementCondEntry 1 }
+
+
+cmNetworkElementCondNotifCode OBJECT-TYPE
+    SYNTAX     TrapAlarmSeverity
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object identifies the severity of the condition."
+     ::= { cmNetworkElementCondEntry 2 }
+
+cmNetworkElementCondType OBJECT-TYPE
+    SYNTAX     CmConditionType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object identifies the type of the condition."
+     ::= { cmNetworkElementCondEntry 3 }
+
+
+cmNetworkElementCondSrvEff OBJECT-TYPE
+    SYNTAX     CmServiceEffect
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object identifies whether the condition is service affecting
+         or not."
+     ::= { cmNetworkElementCondEntry 4 }
+
+
+cmNetworkElementCondTime OBJECT-TYPE
+    SYNTAX     DateAndTime
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object contains the system time when the condition occurred."
+     ::= { cmNetworkElementCondEntry 5 }
+
+
+cmNetworkElementCondLocation OBJECT-TYPE
+    SYNTAX     CmLocation
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object identifies the location of the condition. The value
+         none(0) should be used if location is not applicable."
+     ::= { cmNetworkElementCondEntry 6 }
+
+cmNetworkElementCondDirection OBJECT-TYPE
+    SYNTAX     CmDirection
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object identifies the direction of the condition. The value
+         none(0) should be used if direction is not applicable."
+     ::= { cmNetworkElementCondEntry 7 }
+
+
+cmNetworkElementCondDescr OBJECT-TYPE
+    SYNTAX     CmConditionDescr
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object contains a text description of the condition."
+     ::= { cmNetworkElementCondEntry 8 }
+
+cmNetworkElementCondObject  OBJECT-TYPE
+    SYNTAX     VariablePointer
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Symbolic name of the managed object to which the condition
+         pertains.
+
+         This object can be any interface on this device or the system
+         object.  If this is an interface, this name will be same
+         as ifName (IF-MIB)."
+     ::= { cmNetworkElementCondEntry 9 }
+
+cmNetworkElementCondObjectName OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Symbolic name of the managed object to which the condition
+         pertains.
+
+         This object can be any interface on this device or the system
+         object.  If this is an interface, this name will be same
+         as ifName (IF-MIB)."
+     ::= { cmNetworkElementCondEntry 10 }
+
+cmNetworkElementCondEffType OBJECT-TYPE
+    SYNTAX     CmCondEffectType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object contains the condition effect type."
+     ::= { cmNetworkElementCondEntry 11 }
+
+cmNetworkElementCondAdditionalInfoObject OBJECT-TYPE
+    SYNTAX     VariablePointer
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object provides OID of associated entity that caused the alarm.
+          If there is no associated entity, this value is 0.0."
+     ::= { cmNetworkElementCondEntry 12 }
+
+cmNetworkElementCondAdditionalInfoName OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..64))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object provides name of the associated entity to which the 
+          alarm pertains.  If there is no such entity, this value is empty."
+     ::= { cmNetworkElementCondEntry 13 }
+
+--
+-- Alarm Severity Assignment Profile.
+--
+cmAlarmSeverityAssignmentTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF CmAlarmSeverityAssignmentEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A list of configurable alarm severity assignment entries for
+         Enterprise MIB Alarm Conditions."
+    ::= { alarmObjects 6 }
+
+cmAlarmSeverityAssignmentEntry OBJECT-TYPE
+    SYNTAX     CmAlarmSeverityAssignmentEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+     "A list of parameters that set up the alarm severity assignment profiles."
+    INDEX { cmAlarmSeverityAssignmentEntityType, 
+            cmAlarmSeverityAssignmentCondType,
+            cmAlarmSeverityAssignmentSrvEff }
+    ::= { cmAlarmSeverityAssignmentTable 1 }
+
+CmAlarmSeverityAssignmentEntry ::= SEQUENCE {
+    cmAlarmSeverityAssignmentEntityType       CmAlarmEntityType,
+    cmAlarmSeverityAssignmentCondType         CmConditionType,
+    cmAlarmSeverityAssignmentSrvEff           CmServiceEffect,
+    cmAlarmSeverityAssignmentLocation         CmLocation,
+    cmAlarmSeverityAssignmentNotifCode        TrapAlarmSeverity,
+    cmAlarmSeverityAssignmentDirection        CmDirection
+}
+
+cmAlarmSeverityAssignmentEntityType  OBJECT-TYPE
+    SYNTAX     CmAlarmEntityType 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Alarm Severity Assignment Entity Type."
+    ::= { cmAlarmSeverityAssignmentEntry 1}
+
+cmAlarmSeverityAssignmentCondType OBJECT-TYPE
+    SYNTAX     CmConditionType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object identifies the type of the condition."
+     ::= { cmAlarmSeverityAssignmentEntry 2 }
+
+cmAlarmSeverityAssignmentSrvEff OBJECT-TYPE
+    SYNTAX     CmServiceEffect
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object identifies whether the condition is service affecting
+          or not."
+     ::= { cmAlarmSeverityAssignmentEntry 3 }
+
+cmAlarmSeverityAssignmentLocation OBJECT-TYPE
+    SYNTAX     CmLocation
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object identifies the location of the condition. The value
+         none(0) is used if location is not applicable."
+     ::= { cmAlarmSeverityAssignmentEntry 4 }
+
+cmAlarmSeverityAssignmentNotifCode OBJECT-TYPE
+    SYNTAX     TrapAlarmSeverity
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object allows configuration of the severity of the condition."
+     ::= { cmAlarmSeverityAssignmentEntry 5 }
+
+cmAlarmSeverityAssignmentDirection OBJECT-TYPE
+    SYNTAX     CmDirection
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object identifies the direction of the condition. The value
+         none(0) should be used if direction is not applicable."
+     ::= { cmAlarmSeverityAssignmentEntry 6 }
+
+
+
+--
+-- Environmental Alarm Input Table 
+--
+f3EnvAlarmInputTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF F3EnvAlarmInputEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A list of configurable Environmental Alarm Inputs." 
+    ::= { alarmObjects 7 }
+
+f3EnvAlarmInputEntry OBJECT-TYPE
+    SYNTAX     F3EnvAlarmInputEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A list of parameters to manage the the environmental alarm inputs."
+    INDEX { neIndex, shelfIndex, f3EnvAlarmInputIndex }
+    ::= { f3EnvAlarmInputTable 1 }
+
+F3EnvAlarmInputEntry ::= SEQUENCE {
+    f3EnvAlarmInputIndex              Integer32,
+    f3EnvAlarmInputDescr              DisplayString,
+    f3EnvAlarmInputCondType           CmConditionType,
+    f3EnvAlarmInputNotifCode          TrapAlarmSeverity,
+    f3EnvAlarmInputMode               EnvAlarmInputMode,
+    f3EnvAlarmInputAlmHoldOffEnabled  TruthValue
+}
+
+f3EnvAlarmInputIndex  OBJECT-TYPE
+    SYNTAX     Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+        "Unique index for each environmental alarm input."
+    ::= { f3EnvAlarmInputEntry 1}
+
+f3EnvAlarmInputDescr OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..64))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object allows SNMP management entities to provide description to the
+          environmental alarm inputs." 
+     ::= { f3EnvAlarmInputEntry 2 }
+
+f3EnvAlarmInputCondType OBJECT-TYPE
+    SYNTAX     CmConditionType
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object allows SNMP management entities to provide the environmental alarm
+          condition associated with the environmental alarm input."
+     ::= { f3EnvAlarmInputEntry 3 }
+
+f3EnvAlarmInputNotifCode OBJECT-TYPE
+    SYNTAX     TrapAlarmSeverity
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object allows SNMP management entities to provide the notification code
+          for the environmental alarm input."
+     ::= { f3EnvAlarmInputEntry 4 }
+
+f3EnvAlarmInputMode OBJECT-TYPE
+    SYNTAX     EnvAlarmInputMode
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object allows specification of the environmental alarm input mode.
+          When 'disabled', environmental alarms are not raised.  Value of 'alarmopen' 
+          allows alarm to be raised when environmental alarm dry contacts are opened.
+          Value of 'alarmclosed' allows alarm to be raised when environmental alarm dry 
+          contacts are closed."
+     ::= { f3EnvAlarmInputEntry 5 }
+
+f3EnvAlarmInputAlmHoldOffEnabled OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object allows enabling/disabling of alarm hold off for this environmental
+          alarm.  When 'disabled', the standard alarm hold off (2.5seconds) does not hold, i.e.
+          alarms are raised immediately when conditions happen."
+     ::= { f3EnvAlarmInputEntry 6 }
+
+--
+-- Notifications, i.e., traps.
+--
+--
+-- System Alarm raise/clear trap.
+--
+cmSysAlmTrap NOTIFICATION-TYPE 
+    OBJECTS { cmAlmIndex,
+              cmSysAlmNotifCode,
+              cmSysAlmType,
+              cmSysAlmSrvEff,
+              cmSysAlmTime,
+              cmSysAlmLocation,
+              cmSysAlmDirection,
+              cmSysAlmDescr,
+              cmSysAlmObject,
+              cmSysAlmObjectName,
+              cmSysAlmAdditionalInfoObject,  
+              cmSysAlmAdditionalInfoName 
+              }
+    STATUS  current
+    DESCRIPTION
+            "This trap is sent each time an alarm condition is raised and
+             inserted into to the cmSysAlmTable. 
+             It is also sent each time an
+             alarm condition is cleared and removed from the 
+             cmSysAlmTable."
+  ::= { alarmNotifications 1 }
+
+cmNetworkElementAlmTrap NOTIFICATION-TYPE 
+    OBJECTS { cmAlmIndex,
+              cmNetworkElementAlmNotifCode,     
+              cmNetworkElementAlmType,
+              cmNetworkElementAlmSrvEff,
+              cmNetworkElementAlmTime,
+              cmNetworkElementAlmLocation,
+              cmNetworkElementAlmDirection,
+              cmNetworkElementAlmDescr,
+              cmNetworkElementAlmObject,
+              cmNetworkElementAlmObjectName,
+              cmNetworkElementAlmAdditionalInfoObject,  
+              cmNetworkElementAlmAdditionalInfoName
+            }
+    STATUS  current
+    DESCRIPTION
+            "This trap is sent each time an alarm condition is raised and
+             inserted into to the cmNetworkElementAlmTable. 
+             It is also sent each time an
+             alarm condition is cleared and removed from the 
+             cmNetworkElementAlmTable."
+  ::= { alarmNotifications 2 }
+
+cmSysEvent NOTIFICATION-TYPE 
+    OBJECTS { cmAlmIndex,
+              cmSysCondType,
+              cmSysCondTime,
+              cmSysCondLocation,
+              cmSysCondDirection,
+              cmSysCondDescr, 
+              cmSysCondEffType,
+              cmSysCondObject,
+              cmSysCondObjectName,       
+              cmSysCondAdditionalInfoObject,
+              cmSysCondAdditionalInfoName
+            }
+    STATUS  current
+    DESCRIPTION
+            "This trap is sent each time an event condition is raised and
+             inserted into to the cmSysCondTable. 
+             It is also sent each time an
+             event condition is cleared and removed from the 
+             cmSysCondTable. Standing conditions/transient conditions
+             are reported using this notification."
+  ::= { alarmNotifications 3 }
+
+cmNetworkElementEvent NOTIFICATION-TYPE 
+    OBJECTS { cmAlmIndex,
+              cmNetworkElementCondType,
+              cmNetworkElementCondTime,
+              cmNetworkElementCondLocation,
+              cmNetworkElementCondDirection,
+              cmNetworkElementCondDescr,
+              cmNetworkElementCondObject,
+              cmNetworkElementCondObjectName,
+              cmNetworkElementCondEffType,
+              cmNetworkElementCondAdditionalInfoObject,  
+              cmNetworkElementCondAdditionalInfoName
+            }
+    STATUS  current
+    DESCRIPTION
+            "This trap is sent each time an event condition is raised and
+             inserted into to the cmNetworkElementCondTable. 
+             It is also sent each time an
+             event condition is cleared and removed from the 
+             cmNetworkElementCondTable. Standing conditions/transient conditions
+             are reported using this notification."
+  ::= { alarmNotifications 4 }
+
+
+--
+-- Conformance
+--
+cmAlmCompliances OBJECT IDENTIFIER ::= {alarmConformance 1}
+cmAlmGroups      OBJECT IDENTIFIER ::= {alarmConformance 2}
+
+cmAlmCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "Describes the requirements for conformance to the Alarm
+             Condition Services."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+              cmAlmObjectGroup, cmAlmNotifGroup, f3EnvAlarmInputGroup
+        }
+    ::= { cmAlmCompliances 1 }
+
+cmAlmObjectGroup OBJECT-GROUP
+    OBJECTS {
+        cmAlmLastChange, cmAlmIndex, cmAlmTestAlarmEntity,
+        cmAlmTestAlarmAction,
+
+        cmSysAlmNotifCode, cmSysAlmType, cmSysAlmSrvEff,
+        cmSysAlmTime, cmSysAlmLocation, cmSysAlmDirection,
+        cmSysAlmDescr, cmSysAlmObject, cmSysAlmObjectName,
+        cmSysAlmAdditionalInfoObject,  cmSysAlmAdditionalInfoName,
+
+        cmSysCondIndex, cmSysCondNotifCode, cmSysCondType,
+        cmSysCondSrvEff, cmSysCondTime, cmSysCondLocation,
+        cmSysCondDirection, cmSysCondDescr, cmSysCondEffType,
+        cmSysCondObject, cmSysCondObjectName,
+        cmSysCondAdditionalInfoObject,  cmSysCondAdditionalInfoName,
+
+        cmNetworkElementAlmNotifCode, cmNetworkElementAlmType,
+        cmNetworkElementAlmSrvEff, cmNetworkElementAlmTime,
+        cmNetworkElementAlmLocation, cmNetworkElementAlmDirection,
+        cmNetworkElementAlmDescr, cmNetworkElementAlmObject,
+        cmNetworkElementAlmObjectName,
+        cmNetworkElementAlmAdditionalInfoObject,  
+        cmNetworkElementAlmAdditionalInfoName,
+    
+        cmNetworkElementCondIndex, cmNetworkElementCondNotifCode,
+        cmNetworkElementCondType, cmNetworkElementCondSrvEff,
+        cmNetworkElementCondTime, cmNetworkElementCondLocation,
+        cmNetworkElementCondDirection, cmNetworkElementCondDescr,
+        cmNetworkElementCondObject, cmNetworkElementCondObjectName,
+        cmNetworkElementCondEffType,
+        cmNetworkElementCondAdditionalInfoObject,  
+        cmNetworkElementCondAdditionalInfoName,
+
+        cmAlarmSeverityAssignmentEntityType,
+        cmAlarmSeverityAssignmentCondType,
+        cmAlarmSeverityAssignmentSrvEff,
+        cmAlarmSeverityAssignmentLocation,
+        cmAlarmSeverityAssignmentNotifCode,
+        cmAlarmSeverityAssignmentDirection
+    }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects used to manage the Alarm
+             conditions/threshold Services."
+    ::= { cmAlmGroups 1 }
+
+cmAlmNotifGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        cmSysAlmTrap, cmNetworkElementAlmTrap, cmSysEvent, cmNetworkElementEvent
+    }
+    STATUS  current
+    DESCRIPTION
+            "A collection of notifications related to alarm
+             conditions/threshold Services."
+    ::= { cmAlmGroups 2 }
+
+f3EnvAlarmInputGroup OBJECT-GROUP
+    OBJECTS {
+      f3EnvAlarmInputIndex, f3EnvAlarmInputDescr, f3EnvAlarmInputCondType,
+      f3EnvAlarmInputNotifCode, f3EnvAlarmInputMode, f3EnvAlarmInputAlmHoldOffEnabled
+    }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects related to environmental alarm
+             inputs."
+    ::= { cmAlmGroups 3 }
+
+END

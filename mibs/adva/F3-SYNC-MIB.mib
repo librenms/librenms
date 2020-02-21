@@ -1,0 +1,1079 @@
+F3-SYNC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP 
+             FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32
+             FROM SNMPv2-SMI
+    DisplayString, TruthValue, RowStatus, StorageType, VariablePointer,DateAndTime,
+    TEXTUAL-CONVENTION
+             FROM SNMPv2-TC
+    neIndex, shelfIndex, slotIndex
+             FROM  CM-ENTITY-MIB
+    fsp150cm
+             FROM  ADVA-MIB
+    AdminState, OperationalState, SecondaryState, F3DisplayString
+             FROM  CM-COMMON-MIB;
+
+f3SyncMIB MODULE-IDENTITY
+    LAST-UPDATED    "201304240000Z"
+    ORGANIZATION    "ADVA Optical Networking"
+    CONTACT-INFO
+            "        Raghav Trivedi
+                     ADVA Optical Networking, Inc.
+                Tel: +1 972 759-1239
+             E-mail: rtrivedi@advaoptical.com
+             Postal: 2301 N. Greenville Ave. #300
+                     Richardson, TX USA 75082"
+    DESCRIPTION
+            "This module defines the Synchronization MIB definitions used by 
+             the F3 (FSP150CM/CC) product lines.  
+             Copyright (C) ADVA Optical Networking."
+    REVISION        "201003250000Z"
+    DESCRIPTION
+         "
+          Notes from release 201304240000Z,
+           (1) New tables: f3TimeClockTable, f3TimeClockRefTable
+                    
+         Notes from release 201003250000Z,
+           (1)f3SyncTable has new objects 
+                f3SyncSelectionMode,
+                f3SyncWaitToRestoreTime, f3SyncOperationSyncRef,
+                f3SyncOperationType,
+           (2)f3SyncRefTable has new object
+                f3SyncRefOperationType
+
+         Notes from release 201002120000Z,
+           (1)f3SyncTable has new objects f3SyncAlias, f3SyncDomain
+           (2)f3SyncRefTable has new objects
+               f3SyncRefAlias, f3SyncRefEffectiveQL
+
+         Notes from release 200903190000Z,
+         (1)MIB version ready for release of FSP150CC devices GE101 and GE206." 
+    ::= {fsp150cm 12}    
+
+-- 
+-- OID definitions
+-- 
+f3SyncObjects       OBJECT IDENTIFIER ::= {f3SyncMIB 1}
+f3SyncConformance   OBJECT IDENTIFIER ::= {f3SyncMIB 2}
+
+-- 
+-- Textual Conventions 
+-- 
+NetworkClockType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumerations for Network Clock Type.
+             option1 - represents an SDH regional clock type,
+             option2 - represents a SONET regional clock type."
+    SYNTAX       INTEGER {
+                   option1 (1),
+                   option2 (2)
+                 }
+
+ClockMode ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumerations for Clock Mode. 
+             freerun    - Free Run,
+             holdover   - Hold over,
+             tracking   - Tracking,
+             lossoflock - Loss of Lock,
+             locked     - Locked,
+             bypass     - the frequency entity is not functioning and is being bypassed. One of its frequency inputs is externally selected to be used directly as the frequency output."
+    SYNTAX       INTEGER {
+                   notAvailable(0),
+                   freerun (1),
+                   holdover (2),
+                   tracking (3),
+                   lossoflock (4),
+                   locked (5),
+                   bypass(6)
+                 }
+
+SSMQualityLevel ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumerations for Sync Status Messages Quality Level"
+    SYNTAX       INTEGER {
+                   not-applicable(0),
+                   ql-dnu (1),
+                   ql-eec1 (2),
+                   ql-eec2 (3),
+                   ql-inv (4),
+                   ql-inv0 (5),
+                   ql-inv1 (6),
+                   ql-inv2 (7),
+                   ql-inv3 (8),
+                   ql-inv5 (9),
+                   ql-inv7 (10),
+                   ql-inv8 (11),
+                   ql-inv9 (12),
+                   ql-inv10 (13),
+                   ql-inv11 (14),
+                   ql-inv12 (15),
+                   ql-none (16),
+                   ql-nsupp (17),
+                   ql-prc (18),
+                   ql-prov (19),
+                   ql-prs (20),
+                   ql-smc (21),
+                   ql-ssu-a (22),
+                   ql-ssu-b (23),
+                   ql-st2 (24),
+                   ql-st3e (25),
+                   ql-stu (26),
+                   ql-tnc (27),
+                   ql-unc (28),
+                   --
+                   ql-failed(29),
+                   ql-inv6(30),
+                   ql-inv13(31),
+                   ql-inv14(32),
+                   ql-dus (33),
+                   ql-na (34)
+
+                 }
+
+SyncRefStatus ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+          "Enumerations for Sync Reference status,
+             ref-ok,
+             ref-failed."
+    SYNTAX   INTEGER {
+               not-applicable(0),
+               ref-ok(1),
+               ref-failed(2),
+               ref-freq-ok(3)
+             }
+
+SyncRefState ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+          "Enumerations for Sync Reference state,
+             active,
+             standby,
+             unavailable."
+    SYNTAX   INTEGER {
+               not-applicable(0),
+               active(1),
+               standby(2),
+               unavailable(3),
+               lockedout(4)
+             }
+
+SyncDomainType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+          "Enumerations for Sync Domain type,
+             chassis,
+             linecard."
+    SYNTAX   INTEGER {
+               chassis(1), -- applicable to Hub Shelf/Line Cards sync entities 
+               linecard(2) -- applicable for NIDs and Line Cards
+             }
+
+SyncOperationType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+          "Enumerations for Sync Operation Type,
+             none         - No action,
+             forcedswitch - can be used to override the currently selected reference, assuming
+                            the the chosen reference is not locked out.  A forced switch
+                            overrides a manual switch and subsequent forced switch preempts
+                            a previous forced switch.  A forced switch request to a reference
+                            which is in SF state or has a QL of DL-DNU when QL mode=Enabled
+                            will result in the clock selector entering holdover.
+             manualswitch - can be used to switch to a reference, overriding the currently
+                            selected reference assuming a forced switch is not active
+                            on a reference other than chosen reference; it is not locked out,
+                            not in SF state, has a QL not QL-DNU and has the highest
+                            available QL. A manual switch request can only be used to
+                            override the assigned reference priorities.  
+                            A manual switch request overrides a previous manual switch.
+             lockout      - sets the state of reference to locked-out, it is no longer
+                            considered available by the selection process,  
+             clearwtr     - causes any active Wait to Restore timer for the reference,
+             clearlockout - causes the reference to be considered available again by
+                            the selection process,
+             clearswitch."
+    SYNTAX   INTEGER {
+               none(1), 
+               forcedswitch(2), 
+               manualswitch(3),
+               lockout(4),
+               clearwtr(5),
+               clearlockout(6),
+               clearswitch(7)
+             }
+
+SyncSelectionMode ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+          "Enumerations for Sync Selection Mode,
+             ql-mode,
+             priority-mode."
+    SYNTAX   INTEGER {
+               ql-mode(1), 
+               priority-mode(2) 
+             }
+
+SquelchControl ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Describes the Squelch Control of the PTP ports."
+    SYNTAX   INTEGER {
+               never(1),
+               holdover (2),
+               lock (3),
+               squelch-ql(4)
+             }
+
+  
+TimeClockMode ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumerations for Time Clock Mode. 
+             freerun    - Free Run,
+             warmup     - Warm Up,
+             tracking   - Tracking,
+             transition - Transition,
+             holdover   - Holdover,             
+             locked     - Locked."
+    SYNTAX       INTEGER {
+                   freerun (1),
+                   warmup (2),
+                   tracking (3),
+                   transition (4),
+                   holdover (5),                   
+                   locked (6)
+                 }
+
+TimeTraceAbilityStatus ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Describes the time trace ability status."
+    SYNTAX   INTEGER {
+               notTraceAble (1),
+               timeLocked (2),
+               timeFreqLock (3),
+               timeHoldover (4)
+             }
+
+HoldoverAccuracy ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+          ""
+    SYNTAX   INTEGER {
+               time-500ns(1),
+               time-1000ns(2),
+               time-1500ns(3),
+               time-5000ns(4),
+               time-10000ns(5)
+             }
+
+TimeHoldoverPerformance ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+          ""
+    SYNTAX   INTEGER {
+               time-500ns(1),
+               time-1000ns(2),
+               time-1500ns(3),
+               time-5000ns(4),
+               time-10000ns(5),
+               time-0ns(6),
+               time-100ns(7)
+             }
+
+
+TimeSource ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+          "Enumerations for Time Source,
+             atomic, gps, ptp, 
+             internal, other."
+    SYNTAX   INTEGER {
+               atomic(1),
+               gps(2),
+               ptp(3),
+               internal(4),
+               other(5)
+             }
+
+--
+-- Sync Table 
+--
+f3SyncTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF F3SyncEntry 
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "A list of entries corresponding to the Sync entities."
+    ::= { f3SyncObjects 1 }
+
+f3SyncEntry OBJECT-TYPE
+    SYNTAX     F3SyncEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+          "An entry containing information applicable to a particular
+           Sync Entity."
+    INDEX { neIndex, shelfIndex, slotIndex, f3SyncIndex }
+    ::= { f3SyncTable 1 }
+
+
+F3SyncEntry ::= SEQUENCE {
+    f3SyncIndex               Integer32,
+
+    f3SyncAdminState          AdminState,
+    f3SyncOperationalState    OperationalState,
+    f3SyncSecondaryState      SecondaryState,
+
+    f3SyncNetworkClockType    NetworkClockType,
+    f3SyncSelectedReference   VariablePointer,
+    f3SyncClockMode           ClockMode,
+    f3SyncQL                  SSMQualityLevel,
+
+-- new columns added for R4.3CC
+    f3SyncAlias               DisplayString,
+    f3SyncDomain              SyncDomainType,
+    f3SyncSelectionMode       SyncSelectionMode,
+    f3SyncWaitToRestoreTime   Integer32,
+    f3SyncOperationSyncRef    VariablePointer,
+    f3SyncOperationType       SyncOperationType
+}
+
+f3SyncIndex OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only 
+    STATUS     current
+    DESCRIPTION
+         "Unique index value associated with the Synchronization Entity."
+     ::= { f3SyncEntry 1 }
+
+f3SyncAdminState OBJECT-TYPE
+    SYNTAX      AdminState 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object represents the Administrative State of the Sync 
+             Entity."
+    ::= { f3SyncEntry 2 }
+
+f3SyncOperationalState OBJECT-TYPE
+    SYNTAX      OperationalState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object represents the Operational State of the Sync 
+             Entity."
+    ::= { f3SyncEntry 3 }
+
+f3SyncSecondaryState OBJECT-TYPE
+    SYNTAX      SecondaryState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object represents the Secondary State of the Sync 
+             Entity."
+    ::= { f3SyncEntry 4 }
+
+f3SyncNetworkClockType OBJECT-TYPE
+    SYNTAX     NetworkClockType 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object represents the regional clock type for
+          the system.  This object determines which QL codes are 
+          supported."
+     ::= { f3SyncEntry 5 }
+
+f3SyncSelectedReference OBJECT-TYPE
+    SYNTAX     VariablePointer
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object provides the source of the currently selected
+          Sync reference. This would be the OID of the actual entity (bits port, traffic port etc.).
+          An OID value of {0 0} represents internal clock."
+     ::= { f3SyncEntry 6 }
+
+f3SyncClockMode OBJECT-TYPE
+    SYNTAX     ClockMode 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object provides the system clock mode."
+     ::= { f3SyncEntry 7 }
+
+f3SyncQL OBJECT-TYPE
+    SYNTAX     SSMQualityLevel 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object provides the QL of the system reference.
+          This is the value for each external reference’s Transmit 
+          QL attribute unless it should be transmitting QL-DNU."
+     ::= { f3SyncEntry 8 }
+
+f3SyncAlias    OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..256))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+         "This object allows SNMP management entities to provide an 
+          alias to the Sync entity."
+     ::= { f3SyncEntry 9 }
+
+f3SyncDomain OBJECT-TYPE
+    SYNTAX     SyncDomainType 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object represents the Sync entity's domain type. A Sync entity can be in
+          chassis (system) domain (applicable for HUB shelf and Aggregation shelf) 
+          or  line card domain (applicable for HUB shelf, Aggregation shelf as well as
+          NIDs)."
+     ::= { f3SyncEntry 10 }
+
+f3SyncSelectionMode OBJECT-TYPE
+    SYNTAX     SyncSelectionMode 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object represents the Sync entity's selection mode.
+          If this mode is configured as ql-mode, the selection of
+          which reference should be used shall be based upon the
+          reference's Quality Level.  The highest received
+          Quality Level shall be the selected reference.  The priority
+          shall only be used to distinguish between references with the
+          same received QL.  When multiple references have the same QL
+          and same priority, the behavior of selection process within
+          the group is non-revertive.
+          If this mode is configued as priority-mode, the selection
+          of which reference should be used shall be based upon
+          the reference's priority (i.e. QL is disabled).  When
+          multiple references have the same priority, the behavior of
+          selection process within the group is non-revertive."
+     ::= { f3SyncEntry 11 }
+
+f3SyncWaitToRestoreTime OBJECT-TYPE
+    SYNTAX     Integer32 (0..12) 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object allows configuration of the Sync entity's wait-to-restore 
+          time (in minutes).  A value of 0 disables WTR timers for all references."
+     ::= { f3SyncEntry 12 }
+
+f3SyncOperationSyncRef OBJECT-TYPE
+    SYNTAX     VariablePointer 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object allows configuration of the Object Identifier of the
+          Sync Reference Entity on which the f3SyncOperationType is performed.
+          A value of 0.0 denotes no sync reference is chosen for operation."
+     ::= { f3SyncEntry 13 }
+
+f3SyncOperationType OBJECT-TYPE
+    SYNTAX     SyncOperationType 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object allows to perform the specified operation on the Sync Reference
+          specified by f3SyncOperationSyncRef."
+     ::= { f3SyncEntry 14 }
+
+--
+-- Sync Reference Table 
+--
+f3SyncRefTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF F3SyncRefEntry 
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "A list of entries corresponding to the Sync Reference entities."
+    ::= { f3SyncObjects 2 }
+
+f3SyncRefEntry OBJECT-TYPE
+    SYNTAX     F3SyncRefEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+          "An entry containing information applicable to a particular
+           Sync Reference Entity."
+    INDEX { neIndex, shelfIndex, slotIndex, f3SyncIndex, f3SyncRefIndex }
+    ::= { f3SyncRefTable 1 }
+
+F3SyncRefEntry ::= SEQUENCE {
+    f3SyncRefIndex         Integer32,
+    f3SyncRefReference     VariablePointer,
+    f3SyncRefPriority      Integer32,
+    f3SyncRefStatus        SyncRefStatus,
+    f3SyncRefState         SyncRefState,
+    f3SyncRefReceivedQL    SSMQualityLevel,
+    f3SyncRefStorageType   StorageType,
+    f3SyncRefRowStatus     RowStatus,
+-- new columns added for R4.3CC
+    f3SyncRefAlias         DisplayString,
+    f3SyncRefEffectiveQL   SSMQualityLevel,
+    f3SyncRefOperationType SyncOperationType
+}
+
+f3SyncRefIndex OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only 
+    STATUS     current
+    DESCRIPTION
+         "Unique index value associated with the Sync Reference Entity."
+     ::= { f3SyncRefEntry 1 }
+
+f3SyncRefReference OBJECT-TYPE
+    SYNTAX     VariablePointer 
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object represents the external sync reference to be
+          used as system clock reference source." 
+     ::= { f3SyncRefEntry 2 }
+
+f3SyncRefPriority OBJECT-TYPE
+    SYNTAX     Integer32 (1..10)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object represents the priority of the external sync reference 
+          to be used as system clock reference source.  This value is
+          not mandatory when a single clock reference source is supported.
+          Lower priority value indicates higher priority." 
+     ::= { f3SyncRefEntry 3 }
+
+f3SyncRefStatus OBJECT-TYPE
+    SYNTAX     SyncRefStatus
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object provides the sync reference status." 
+     ::= { f3SyncRefEntry 4 }
+
+f3SyncRefState OBJECT-TYPE
+    SYNTAX     SyncRefState
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object provides the sync reference state." 
+     ::= { f3SyncRefEntry 5 }
+
+f3SyncRefReceivedQL OBJECT-TYPE
+    SYNTAX     SSMQualityLevel
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object provides the sync reference received QL." 
+     ::= { f3SyncRefEntry 6 }
+
+f3SyncRefStorageType OBJECT-TYPE
+    SYNTAX     StorageType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The type of storage configured for this entry."
+    ::= { f3SyncRefEntry 7 }
+
+f3SyncRefRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "The status of this row.  An entry MUST NOT exist in the 
+            active state unless all objects in the entry have an 
+            appropriate value, as described
+            in the description clause for each writable object.
+
+            The values of f3SyncRefRowStatus supported are
+            createAndGo(4) and destroy(6).  All mandatory attributes
+            must be specified in a single SNMP SET request with
+            f3SyncRefRowStatus value as createAndGo(4).
+            Upon successful row creation, this object has a
+            value of active(1).
+
+            The f3SyncRefRowStatus object may be modified if
+            the associated instance of this object is equal to active(1)."
+    ::= { f3SyncRefEntry 8 }
+
+f3SyncRefAlias    OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..256))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+         "This object allows SNMP management entities to provide an 
+          alias to the Sync Reference entity."
+     ::= { f3SyncRefEntry 9 }
+
+f3SyncRefEffectiveQL OBJECT-TYPE
+    SYNTAX     SSMQualityLevel
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object provides the sync reference effective QL." 
+     ::= { f3SyncRefEntry 10 }
+
+f3SyncRefOperationType OBJECT-TYPE
+    SYNTAX     SyncOperationType 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object provides information on the current/active operation 
+          on this sync reference."
+     ::= { f3SyncRefEntry 11 }
+
+
+--
+-- Time Clock Table 
+--
+f3TimeClockTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF F3TimeClockEntry 
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "A list of entries corresponding to the Time Clock entities."
+    ::= { f3SyncObjects 3 }
+
+f3TimeClockEntry OBJECT-TYPE
+    SYNTAX     F3TimeClockEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+          "An entry containing information applicable to a particular
+           Time Clock Entity."
+    INDEX { neIndex, shelfIndex, slotIndex, f3TimeClockIndex }
+    ::= { f3TimeClockTable 1 }
+
+
+F3TimeClockEntry ::= SEQUENCE {
+    f3TimeClockIndex                   Integer32,
+    f3TimeClockAlias                   F3DisplayString,    
+    f3TimeClockAdminState              AdminState,
+    f3TimeClockOperationalState        OperationalState,
+    f3TimeClockSecondaryState          SecondaryState,
+    f3TimeClockSelectedReference       VariablePointer,
+    f3TimeClockClockMode               TimeClockMode,
+    f3TimeClockClockClass              Unsigned32,
+    f3TimeClockSelectionMode           SyncSelectionMode,
+    f3TimeClockWaitToRestoreTime       Integer32,
+    f3TimeClockOperationTimeClockRef   VariablePointer,
+    f3TimeClockOperationType           SyncOperationType,
+    f3TimeClockLeap59                  TruthValue,
+    f3TimeClockLeap61                  TruthValue,
+    f3TimeClockTimeTraceAbilityStatus  TimeTraceAbilityStatus,
+    f3TimeClockExpectedQL              SSMQualityLevel,
+    f3TimeClockCurrentQL               SSMQualityLevel,
+    f3TimeClockSyncRefCandidate        TruthValue,
+    f3TimeClockTimeHoldoverPerformance TimeHoldoverPerformance,
+    f3TimeClockUtcOffset               Unsigned32,
+    f3TimeClockCurrentTimeOfDay        DateAndTime,
+    f3TimeClockFrequencyReference      VariablePointer, 
+    f3TimeClockFrequencyClockMode      ClockMode
+}
+
+f3TimeClockIndex OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "Unique index value associated with the Time Clock Entity."
+     ::= { f3TimeClockEntry 1 }
+
+f3TimeClockAlias    OBJECT-TYPE
+    SYNTAX      F3DisplayString (SIZE(0..256))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This object allows SNMP management entities to provide an 
+          alias to the Time Clock entity."
+     ::= { f3TimeClockEntry 2 }
+
+f3TimeClockAdminState OBJECT-TYPE
+    SYNTAX      AdminState 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object represents the Administrative State of the Time Clock 
+             Entity."
+    ::= { f3TimeClockEntry 3 }
+
+f3TimeClockOperationalState OBJECT-TYPE
+    SYNTAX      OperationalState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object represents the Operational State of the Time Clock 
+             Entity."
+    ::= { f3TimeClockEntry 4 }
+
+f3TimeClockSecondaryState OBJECT-TYPE
+    SYNTAX      SecondaryState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object represents the Secondary State of the Time Clock 
+             Entity."
+    ::= { f3TimeClockEntry 5 }
+
+f3TimeClockSelectedReference OBJECT-TYPE
+    SYNTAX     VariablePointer
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object provides the source of the currently selected
+          Time Clock reference. This would be the OID of the actual entity (GPS port, PPS port etc.).
+          An OID value of {0 0} represents internal clock."
+     ::= { f3TimeClockEntry 6 }
+
+f3TimeClockClockMode OBJECT-TYPE
+    SYNTAX     TimeClockMode 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object provides the Time Clock mode."
+     ::= { f3TimeClockEntry 7 }
+
+f3TimeClockClockClass OBJECT-TYPE
+    SYNTAX     Unsigned32   
+    MAX-ACCESS read-only
+    STATUS     deprecated
+    DESCRIPTION
+         "This object provides the Time Clock Clock Class"
+     ::= { f3TimeClockEntry 8 }
+
+f3TimeClockSelectionMode OBJECT-TYPE
+    SYNTAX     SyncSelectionMode 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "!! Currently Only Priority Mode is supported !!
+          This object represents the Time Clock entity's selection mode.
+          If this mode is configured as ql-mode, the selection of
+          which reference should be used shall be based upon the
+          reference's Quality Level.  The highest received
+          Quality Level shall be the selected reference.  The priority
+          shall only be used to distinguish between references with the
+          same received QL.  When multiple references have the same QL
+          and same priority, the behavior of selection process within
+          the group is non-revertive.
+          If this mode is configued as priority-mode, the selection
+          of which reference should be used shall be based upon
+          the reference's priority (i.e. QL is disabled).  When
+          multiple references have the same priority, the behavior of
+          selection process within the group is non-revertive."
+     ::= { f3TimeClockEntry 9 }
+
+f3TimeClockWaitToRestoreTime OBJECT-TYPE
+    SYNTAX     Integer32 (0..12) 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object allows configuration of the Time Clock entity's wait-to-restore 
+          time (in minutes).  A value of 0 disables WTR timers for all references."
+     ::= { f3TimeClockEntry 10 }
+
+f3TimeClockOperationTimeClockRef OBJECT-TYPE
+    SYNTAX     VariablePointer 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object allows configuration of the Object Identifier of the
+          TimeClock Reference Entity on which the f3TimeClockOperationType is performed.
+          A value of 0.0 denotes no Time Clock reference is chosen for operation."
+     ::= { f3TimeClockEntry 11 }
+
+f3TimeClockOperationType OBJECT-TYPE
+    SYNTAX     SyncOperationType 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object allows to perform the specified operation on the Time Clock Reference
+          specified by f3TimeClockOperationTimeClockRef."
+     ::= { f3TimeClockEntry 12 }
+
+f3TimeClockLeap59 OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+             "True if last minute of current UTC day contains 59 seconds, else false" 
+     ::= { f3TimeClockEntry 13 }
+
+f3TimeClockLeap61 OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+             "True if last minute of current UTC day contains 61 seconds, else false" 
+     ::= { f3TimeClockEntry 14 }
+
+f3TimeClockTimeTraceAbilityStatus OBJECT-TYPE
+    SYNTAX     TimeTraceAbilityStatus
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+             "This object describe the trace ability status." 
+     ::= { f3TimeClockEntry 15 }
+
+f3TimeClockExpectedQL OBJECT-TYPE
+    SYNTAX     SSMQualityLevel
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+             "This object describe the expected quality level." 
+     ::= { f3TimeClockEntry 16 }
+
+f3TimeClockCurrentQL OBJECT-TYPE
+    SYNTAX     SSMQualityLevel
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+             "This object describe the current quality level." 
+     ::= { f3TimeClockEntry 17 }
+
+f3TimeClockSyncRefCandidate OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+             "This object describe whether it is sync reference candiddate." 
+     ::= { f3TimeClockEntry 18 }
+
+f3TimeClockTimeHoldoverPerformance OBJECT-TYPE
+    SYNTAX     TimeHoldoverPerformance
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+             "This object describe the Holdover performance." 
+     ::= { f3TimeClockEntry 19 }
+
+f3TimeClockUtcOffset OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+             "This object describe the UTC offset." 
+     ::= { f3TimeClockEntry 20 }
+
+f3TimeClockCurrentTimeOfDay OBJECT-TYPE
+    SYNTAX     DateAndTime 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object allows specification of the Time Clock Current
+          Time of Day." 
+     ::= { f3TimeClockEntry 21 }
+
+f3TimeClockFrequencyReference OBJECT-TYPE 
+    SYNTAX     VariablePointer 
+    MAX-ACCESS read-write 
+    STATUS     current 
+    DESCRIPTION 
+         "This object provides the source of the currently selected frequency source for the Time Clock. 
+          This would be the OID of the actual entity (GNSS Receiver port, Input Frquency Port, Sync object). 
+          An OID value of {0.0} represents a state where the Time Clock does not use a dedicated frequency input." 
+     ::= { f3TimeClockEntry 22 } 
+  
+  
+f3TimeClockFrequencyClockMode   OBJECT-TYPE 
+    SYNTAX     TimeClockMode  
+    MAX-ACCESS read-only 
+    STATUS     current 
+    DESCRIPTION 
+         "This object provides the Frequency Clock mode determined according to the used f3TimeClockFrequencyReference. 
+            In Case the f3TimeClockFrequencyReference is not selected (0.0), a 'notAvailable' value shall be used here" 
+     ::= { f3TimeClockEntry 23 } 
+  
+--
+-- Time Clock Reference Table 
+--
+f3TimeClockRefTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF F3TimeClockRefEntry 
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "A list of entries corresponding to the Time Clock Reference entities."
+    ::= { f3SyncObjects 4 }
+
+f3TimeClockRefEntry OBJECT-TYPE
+    SYNTAX     F3TimeClockRefEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+          "An entry containing information applicable to a particular
+           Time Clock Reference Entity."
+    INDEX { neIndex, shelfIndex, slotIndex, f3TimeClockIndex, f3TimeClockRefIndex }
+    ::= { f3TimeClockRefTable 1 }
+
+F3TimeClockRefEntry ::= SEQUENCE {
+    f3TimeClockRefIndex         Integer32,
+    f3TimeClockRefAlias         F3DisplayString,
+    f3TimeClockRefReference     VariablePointer,
+    f3TimeClockRefPriority      Integer32,
+    f3TimeClockRefStatus        SyncRefStatus,
+    f3TimeClockRefState         SyncRefState,
+    f3TimeClockRefOperationType SyncOperationType,   
+    f3TimeClockRefStorageType   StorageType,
+    f3TimeClockRefRowStatus     RowStatus
+}
+
+f3TimeClockRefIndex OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "Unique index value associated with the Time Clock Reference Entity."
+     ::= { f3TimeClockRefEntry 1 }
+
+f3TimeClockRefAlias    OBJECT-TYPE
+    SYNTAX      F3DisplayString (SIZE(0..256))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+         "This object allows SNMP management entities to provide an 
+          alias to the Time Clock Reference entity."
+     ::= { f3TimeClockRefEntry 2 }
+
+f3TimeClockRefReference OBJECT-TYPE
+    SYNTAX     VariablePointer 
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object represents the external reference to be
+          used as system clock reference source." 
+     ::= { f3TimeClockRefEntry 3 }
+
+f3TimeClockRefPriority OBJECT-TYPE
+    SYNTAX     Integer32 (1..10)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object represents the priority of the external reference 
+          to be used as Time clock reference source.  This value is
+          not mandatory when a single clock reference source is supported.
+          Lower priority value indicates higher priority." 
+     ::= { f3TimeClockRefEntry 4 }
+
+f3TimeClockRefStatus OBJECT-TYPE
+    SYNTAX     SyncRefStatus
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object provides the Time Clock reference status." 
+     ::= { f3TimeClockRefEntry 5 }
+
+f3TimeClockRefState OBJECT-TYPE
+    SYNTAX     SyncRefState
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object provides the Time Clock reference state." 
+     ::= { f3TimeClockRefEntry 6 }
+     
+f3TimeClockRefOperationType OBJECT-TYPE
+    SYNTAX     SyncOperationType 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object provides information on the current/active operation 
+          on this Time Clock reference."
+     ::= { f3TimeClockRefEntry 7 }
+
+f3TimeClockRefStorageType OBJECT-TYPE
+    SYNTAX     StorageType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The type of storage configured for this entry."
+    ::= { f3TimeClockRefEntry 8 }
+
+f3TimeClockRefRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "The status of this row.  An entry MUST NOT exist in the 
+            active state unless all objects in the entry have an 
+            appropriate value, as described
+            in the description clause for each writable object.
+
+            The values of f3TimeClockRefRowStatus supported are
+            createAndGo(4) and destroy(6).  All mandatory attributes
+            must be specified in a single SNMP SET request with
+            f3TimeClockRefRowStatus value as createAndGo(4).
+            Upon successful row creation, this object has a
+            value of active(1).
+
+            The f3TimeClockRefRowStatus object may be modified if
+            the associated instance of this object is equal to active(1)."
+    ::= { f3TimeClockRefEntry 9 }
+
+ 
+--
+-- Conformance
+--
+f3SyncCompliances OBJECT IDENTIFIER ::= {f3SyncConformance 1}
+f3SyncGroups      OBJECT IDENTIFIER ::= {f3SyncConformance 2}
+
+f3SyncCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "Describes the requirements for conformance to the F3 Sync
+             group."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+              f3SyncObjectGroup 
+        }
+    ::= { f3SyncCompliances 1 }
+
+f3SyncObjectGroup OBJECT-GROUP
+    OBJECTS {
+      f3SyncIndex, f3SyncAdminState, f3SyncOperationalState,
+      f3SyncSecondaryState,
+      f3SyncNetworkClockType, f3SyncSelectedReference,
+      f3SyncClockMode, f3SyncQL,
+      f3SyncAlias, f3SyncDomain, f3SyncSelectionMode,
+      f3SyncWaitToRestoreTime, f3SyncOperationSyncRef,
+      f3SyncOperationType,
+
+      f3SyncRefIndex, f3SyncRefReference, f3SyncRefPriority,
+      f3SyncRefStatus, f3SyncRefState, f3SyncRefReceivedQL,
+      f3SyncRefStorageType, f3SyncRefRowStatus, f3SyncRefAlias,
+      f3SyncRefEffectiveQL, f3SyncRefOperationType
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects used to manage the F3 Sync Object group."
+    ::= { f3SyncGroups 1 }
+    
+f3TimeClockObjectGroup OBJECT-GROUP
+    OBJECTS {
+      f3TimeClockIndex, f3TimeClockAlias,
+      f3TimeClockAdminState, f3TimeClockOperationalState, f3TimeClockSecondaryState,
+      f3TimeClockSelectedReference, f3TimeClockClockMode, f3TimeClockClockClass,
+      f3TimeClockSelectionMode, f3TimeClockWaitToRestoreTime, f3TimeClockOperationTimeClockRef,
+      f3TimeClockOperationType, f3TimeClockLeap59, f3TimeClockLeap61,
+      f3TimeClockTimeTraceAbilityStatus,
+      f3TimeClockExpectedQL, f3TimeClockCurrentQL,
+      f3TimeClockSyncRefCandidate, f3TimeClockTimeHoldoverPerformance, f3TimeClockUtcOffset,f3TimeClockCurrentTimeOfDay,
+      
+      f3TimeClockRefIndex, f3TimeClockRefAlias, f3TimeClockRefReference, f3TimeClockRefPriority,
+      f3TimeClockRefStatus, f3TimeClockRefState, f3TimeClockRefOperationType,
+      f3TimeClockRefStorageType, f3TimeClockRefRowStatus
+    }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects used to manage the F3 TimeClock Object group." 
+    ::= { f3SyncGroups 2 }
+    
+
+END
