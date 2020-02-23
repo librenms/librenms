@@ -1,7 +1,7 @@
 <?php
 
-$class     = 'probes';
+$class     = 'percent';
 $unit      = '%';
-$unit_long = 'Probe loss percentage';
+$unit_long = 'Percentage';
 
 require 'includes/html/graphs/device/sensor.inc.php';

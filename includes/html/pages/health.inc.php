@@ -58,7 +58,7 @@ $type_text = [
     'ber' => 'Bit Error Rate',
     'eer' => 'Energy Efficiency Ratio',
     'waterflow' => 'Water Flow Rate',
-    'probes' => 'Probe Loss Percentage',
+    'percent' => 'Percentage',
 ];
 
 $active_metric = basename($vars['metric'] ?? 'processor');

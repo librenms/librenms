@@ -1,8 +1,8 @@
 <?php
 
-$graph_type   = 'sensor_probes';
-$sensor_class = 'probes';
+$graph_type   = 'sensor_percent';
+$sensor_class = 'percent';
 $sensor_unit  = '%';
-$sensor_type  = 'probes';
+$sensor_type  = 'percent';
 
 require 'includes/html/pages/device/overview/generic/sensor.inc.php';

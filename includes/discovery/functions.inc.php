@@ -451,11 +451,11 @@ function sensor_limit($class, $current)
         case 'snr':
         case 'frequency':
         case 'pressure':
-        case 'probes':
-            $limit = 5;
-            break;
         case 'cooling':
             $limit = $current * 1.05;
+            break;
+        case 'percent':
+            $limit = 50;
             break;
         default:
             return null;

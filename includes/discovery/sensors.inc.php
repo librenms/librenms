@@ -69,7 +69,7 @@ $run_sensors = array(
     'ber',
     'eer',
     'waterflow',
-    'probes',
+    'percent',
 );
 
 // filter submodules

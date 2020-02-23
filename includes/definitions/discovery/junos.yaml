@@ -118,7 +118,7 @@ modules:
                     divisor: 1000
                     descr: '{{ $ifDescr }} Tx Bias'
                     index: 'jnxPMCurTxLaserBiasCurrent.{{ $index }}'
-        probes:
+        percent:
             data:
                 -
                     oid: jnxRpmResultsSummaryTable
