@@ -25,6 +25,7 @@ class Sensor extends DeviceRelatedModel
         'power_consumed'       => 'plug',
         'power_factor'         => 'calculator',
         'pressure'             => 'thermometer-empty',
+        'probes'               => 'heartbeat',
         'quality_factor'       => 'arrows',
         'runtime'              => 'hourglass-half',
         'signal'               => 'wifi',
