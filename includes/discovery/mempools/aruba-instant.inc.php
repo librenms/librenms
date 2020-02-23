@@ -26,7 +26,7 @@ if ($device['os'] === 'aruba-instant') {
     echo 'aruba-instant-MEMORY-POOL: ';
 
     $mempool_data = snmpwalk_group($device, 'aiAPSerialNum', 'AI-AP-MIB');
-    $mempool_data = snmpwalk_group($device, 'aiAPName', 'AI-AP-MIB',1, $mempool_data);
+    $mempool_data = snmpwalk_group($device, 'aiAPName', 'AI-AP-MIB', 1, $mempool_data);
 
     $mempool_data = snmpwalk_group($device, 'aiAPTotalMemory', 'AI-AP-MIB', 1, $mempool_data);
     $mempool_data = snmpwalk_group($device, 'aiAPMemoryFree', 'AI-AP-MIB', 1, $mempool_data);
