@@ -13,6 +13,16 @@
  */
 
 use LibreNMS\Alerting\QueryBuilderFilter;
+use LibreNMS\Config;
+
+$default_severity = Config::get('alert_rule.severity');
+$default_max_alerts = Config::get('alert_rule.max_alerts');
+$default_delay = Config::get('alert_rule.delay') . 'm';
+$default_interval = Config::get('alert_rule.interval') . 'm';
+$default_mute_alerts = Config::get('alert_rule.mute_alerts');
+$default_invert_rule_match = Config::get('alert_rule.invert_rule_match');
+$default_recovery_alerts = Config::get('alert_rule.recovery_alerts');
+$default_invert_map = Config::get('alert_rule.invert_map');
 
 if (Auth::user()->hasGlobalAdmin()) {
     $filters = json_encode(new QueryBuilderFilter('alert'));
@@ -292,17 +302,17 @@ if (Auth::user()->hasGlobalAdmin()) {
                 $("#builder").queryBuilder("reset");
                 var $severity = $('#severity');
                 $severity.val($severity.find("option[selected]").val());
-                $("#mute").bootstrapSwitch('state', false);
-                $("#invert").bootstrapSwitch('state', false);
-                $("#recovery").bootstrapSwitch('state', true);
+                $("#mute").bootstrapSwitch('state', <?=$default_mute_alerts?>);
+                $("#invert").bootstrapSwitch('state', <?=$default_invert_rule_match?>);
+                $("#recovery").bootstrapSwitch('state', <?=$default_recovery_alerts?>);
                 $("#override_query").bootstrapSwitch('state', false);
-                $("#invert_map").bootstrapSwitch('state', false);
+                $("#invert_map").bootstrapSwitch('state', <?=$default_invert_map?>);
                 $(this).find("input[type=text]").val("");
-                $('#count').val('1');
-                $('#delay').val('1m');
-                $('#interval').val('5m');
+                $('#count').val('<?=$default_max_alerts?>');
+                $('#delay').val('<?=$default_delay?>');
+                $('#interval').val('<?=$default_interval?>');
                 $('#adv_query').val('');
-                $('#severity').val('warning');
+                $('#severity').val('<?=$default_severity?>');
 
                 var $maps = $('#maps');
                 $maps.empty();
@@ -374,7 +384,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                 $("[name='mute']").bootstrapSwitch('state', extra.mute);
                 $("[name='invert']").bootstrapSwitch('state', extra.invert);
                 if (typeof extra.recovery == 'undefined') {
-                    extra.recovery = true;
+                    extra.recovery = '<?=$default_recovery_alerts?>';
                 }
 
                 if (typeof extra.options == 'undefined') {
@@ -393,7 +403,7 @@ if (Auth::user()->hasGlobalAdmin()) {
 
                 $("[name='override_query']").bootstrapSwitch('state', extra.options.override_query);
             } else {
-                $('#count').val('1');
+                $('#count').val('<?=$default_max_alerts?>');
             }
         }
 

@@ -177,8 +177,11 @@ if ($device['location_id']) {
         }).on("hidden.bs.collapse", function () {
             $("#toggle-map-button").find(".fa").removeClass("fa-map-o").addClass("fa-map");
             $("#toggle-map-button span").text("View")
-        });
-    </script>
+        });';
+    if (Config::get('device_location_map_open')) {
+        echo '$("#toggle-map").collapse("show");';
+    }
+    echo '</script>
     ';
 }
 ?>
