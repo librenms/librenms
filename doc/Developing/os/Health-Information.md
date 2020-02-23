@@ -14,7 +14,7 @@ the values we expect to see the data in:
 | airflow                         | cfm                         |
 | ber                             | ratio                       |
 | charge                          | %                           |
-| chromatic_disperision           | ps/nm                       |
+| chromatic_dispersion            | ps/nm                       |
 | cooling                         | W                           |
 | count                           | #                           |
 | current                         | A                           |
