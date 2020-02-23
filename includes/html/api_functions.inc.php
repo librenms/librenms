@@ -2231,7 +2231,7 @@ function add_service_for_host(\Illuminate\Http\Request $request)
     $hostname = $request->route('hostname');
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     $data = json_decode($request->getContent(), true);
-    if (missing_fields(array('type', 'ip'), $data)) {
+    if (missing_fields(array('type'), $data)) {
         return api_error(400, 'Required fields missing (ip and type needed)');
     }
     if (!in_array($data['type'], list_available_services())) {
