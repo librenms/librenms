@@ -361,7 +361,7 @@ Template: CPU alert <br>
 @endif
 ```
 
-#### MS Teams formatted default template
+#### MS Teams template - Markdown
 
 ```
 [{{ $alert->title }}](https://your.librenms.url/device/device={{ $alert->device_id }}/)  
@@ -381,6 +381,58 @@ Template: CPU alert <br>
 **Faults:**@foreach ($alert->faults as $key => $value) {{ $key }}: {{ $value['string'] }}  
 @endforeach
 @endif
+```
+
+#### MS Teams template - JSON
+
+```
+{
+    "@context": "https://schema.org/extensions",
+    "@type": "MessageCard",
+    "title": "{{ $alert->title }}",
+@if ($alert->state === 0)
+    "themeColor": "00FF00",
+@elseif ($alert->state === 1)
+    "themeColor": "FF0000",
+@elseif ($alert->state === 2)
+    "themeColor": "337AB7",
+@elseif ($alert->state === 3)
+    "themeColor": "FF0000",
+@elseif ($alert->state === 4)
+    "themeColor": "F0AD4E",
+@else
+    "themeColor": "337AB7",
+@endif
+    "summary": "LibreNMS",
+    "sections": [
+        {
+@if ($alert->name)
+            "text": "**Rule:** [{{ $alert->name }}](https://your.librenms.url/device/device={{ $alert->device_id }}/tab=alert/)  
+@else
+            "text": "**Rule:** [{{ $alert->rule }}](https://your.librenms.url/device/device={{ $alert->device_id }}/tab=alert/)  
+@endif
+            **Severity:** {{ $alert->severity }}  
+            **Unique-ID:** {{ $alert->uid }}  
+            **Timestamp:** {{ $alert->timestamp }}  
+@if ($alert->state == 0)
+            **Time elapsed:** {{ $alert->elapsed }}  
+@endif
+            **Hostname:** [{{ $alert->hostname }}](https://your.librenms.url/device/device={{ $alert->device_id }}/)  
+            **Faults:**  
+@if ($alert->faults)
+@foreach ($alert->faults as $key => $value)
+            >**Port:** [{{ $value['ifName'] }}](https://your.librenms.url/device/device={{ $alert->device_id }}/tab=port/port={{ $value['port_id'] }}/)  
+            >**Description:** {{ $value['ifAlias'] }}  
+@if ($alert->state != 0)
+            >**Status:** down",
+@else
+            >**Status:** up",
+@endif
+@endforeach
+@endif
+        }
+    ]
+}
 ```
 
 ## Included
