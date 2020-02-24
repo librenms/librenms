@@ -165,4 +165,3 @@ class Ptp670 extends OS implements
         );
     }
 }
-
