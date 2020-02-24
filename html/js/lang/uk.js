@@ -5,6 +5,406 @@
 }(this, (function () { 'use strict';
     return {
     "uk": {
+        "auth": {
+            "failed": "Ці облікові дані не відповідають нашим записам.",
+            "throttle": "Перевищено кількість спроб входу. Будь ласка, спробуйте ще раз через {seconds} секунд."
+        },
+        "commands": {
+            "user{add}": {
+                "description": "Додати локального користувача, вхід доступний лише при використанні mysql автентифікації",
+                "arguments": {
+                    "username": "Ім'я користувача для входу"
+                },
+                "options": {
+                    "descr": "Опис користувача",
+                    "email": "Електронна пошта користувача",
+                    "password": "Пароль користувача, якщо не наданий, то буде запропоновано",
+                    "full-name": "Повне ім'я користувача",
+                    "role": "Користувачеві буде назначено роль {roles}"
+                },
+                "password-request": "Будь ласка, введіть пароль користувача",
+                "success": "Успішно додано користувача: {username}",
+                "wrong-auth": "Увага! Ви не зможете авторизуватися, оскільки не використовуєте MySQL авторизацію"
+            }
+        },
+        "pagination": {
+            "previous": "&laquo; Попередня",
+            "next": "Наступна &raquo;"
+        },
+        "passwords": {
+            "password": "Паролі мають бути щонайменш шість символів у довжину та співпадати з повтореним.",
+            "reset": "Ваш пароль було скинуто!",
+            "sent": "Ми надіслали посилання на скид паролю на вашу адресу електронної пошти!",
+            "token": "Цей токен скиду паролю не валідний.",
+            "user": "Ми не можемо знайти користувача з такою адресою електронної пошти."
+        },
+        "preferences": {
+            "lang": "Українська"
+        },
+        "sensors": {
+            "airflow": {
+                "short": "Повітряний потік",
+                "long": "Повітряний потік",
+                "unit": "cfm",
+                "unit_long": "Кубічний фут в хвилину"
+            },
+            "ber": {
+                "short": "BER",
+                "long": "Частота бітових помилок",
+                "unit": "",
+                "unit_long": ""
+            },
+            "charge": {
+                "short": "Заряд",
+                "long": "Процент заряду",
+                "unit": "%",
+                "unit_long": "процентів"
+            },
+            "chromatic_dispersion": {
+                "short": "Хроматична дисперсія",
+                "long": "Хроматична дисперсія",
+                "unit": "ps/nm/km",
+                "unit_long": "Пікосекунди на нанометри на кілометри"
+            },
+            "cooling": {
+                "short": "Охолодження",
+                "long": "",
+                "unit": "W",
+                "unit_long": "Ват"
+            },
+            "count": {
+                "short": "Лічильник",
+                "long": "Лічильник",
+                "unit": "",
+                "unit_long": ""
+            },
+            "current": {
+                "short": "Сила струму",
+                "long": "Сила струму",
+                "unit": "A",
+                "unit_long": "Ампер"
+            },
+            "dbm": {
+                "short": "dBm",
+                "long": "dBm",
+                "unit": "dBm",
+                "unit_long": "Децибел-мілівати"
+            },
+            "delay": {
+                "short": "Затримка",
+                "long": "Затримка",
+                "unit": "s",
+                "unit_long": "Секунди"
+            },
+            "eer": {
+                "short": "EER",
+                "long": "Коефіцієнт енергоефективності",
+                "unit": "",
+                "unit_long": ""
+            },
+            "fanspeed": {
+                "short": "Оберти вентилятора",
+                "long": "Швидкість обертів вентилятора",
+                "unit": "RPM",
+                "unit_long": "Обертів за хвилину"
+            },
+            "frequency": {
+                "short": "Частота",
+                "long": "Частота",
+                "unit": "Hz",
+                "unit_long": "Герц"
+            },
+            "humidity": {
+                "short": "Вологість",
+                "long": "Процент вологості повітря",
+                "unit": "%",
+                "unit_long": "Проценти"
+            },
+            "load": {
+                "short": "Навантаження",
+                "long": "Процент навантаження",
+                "unit": "%",
+                "unit_long": "Проценти"
+            },
+            "power": {
+                "short": "Потужність",
+                "long": "Потужність",
+                "unit": "W",
+                "unit_long": "Ват"
+            },
+            "power_consumed": {
+                "short": "Спожита потужність",
+                "long": "Спожита потужність",
+                "unit": "kWh",
+                "unit_long": "Кіловат-години"
+            },
+            "power_factor": {
+                "short": "Коефіцієнт потужності",
+                "long": "Коефіцієнт потужності",
+                "unit": "",
+                "unit_long": ""
+            },
+            "pressure": {
+                "short": "Тиск",
+                "long": "Тиск",
+                "unit": "kPa",
+                "unit_long": "Кілопаскалі"
+            },
+            "quality_factor": {
+                "short": "Добротність",
+                "long": "Добротність",
+                "unit": "",
+                "unit_long": ""
+            },
+            "runtime": {
+                "short": "Час роботи",
+                "long": "Час роботи",
+                "unit": "хвилини",
+                "unit_long": "Хвилини"
+            },
+            "signal": {
+                "short": "Сигнал",
+                "long": "Сигнал",
+                "unit": "dBm",
+                "unit_long": "Децибел-мілівати"
+            },
+            "snr": {
+                "short": "SNR",
+                "long": "Відношення сигналу до шуму",
+                "unit": "dB",
+                "unit_long": "Децибели"
+            },
+            "state": {
+                "short": "Стан",
+                "long": "Стан",
+                "unit": ""
+            },
+            "temperature": {
+                "short": "Температура",
+                "long": "Температура",
+                "unit": "°C",
+                "unit_long": "° Цельсія"
+            },
+            "voltage": {
+                "short": "Напруга",
+                "long": "Напруга",
+                "unit": "V",
+                "unit_long": "Вольт"
+            },
+            "waterflow": {
+                "short": "Потік води",
+                "long": "Потік води",
+                "unit": "l/m",
+                "unit_long": "Літри за хвилину"
+            }
+        },
+        "validation": {
+            "accepted": "{attribute} має бути прийнято.",
+            "active_url": "{attribute} не є дійсним URL.",
+            "after": "{attribute} має бути датою пізнішою за {date}.",
+            "after_or_equal": "{attribute} має бути датою не ранішою за {date}.",
+            "alpha": "{attribute} має містити лише літери.",
+            "alpha_dash": "{attribute} може містити лише літери, цифри, тире та підкреслення.",
+            "alpha_num": "{attribute} може містити лише літери та цифри.",
+            "array": "{attribute} має бути масивом.",
+            "before": "{attribute} має бути датою ранішою за {date}.",
+            "before_or_equal": "{attribute} має бути датою не пізнішою за {date}.",
+            "between": {
+                "numeric": "{attribute} має бути у проміжку між {min} та {max}.",
+                "file": "{attribute} має бути у проміжку між {min} та {max} кілобайт.",
+                "string": "{attribute} має містити від {min} до {max} символів.",
+                "array": "{attribute} має містити від {min} до {max} елементів."
+            },
+            "boolean": "{attribute} має бути true чи false.",
+            "confirmed": "Підтвердження {attribute} не співпадає.",
+            "date": "{attribute} не є коректною датою.",
+            "date_equals": "{attribute} має бути рівним {date}.",
+            "date_format": "{attribute} не співпадає з форматом {format}.",
+            "different": "{attribute} та {other} повинні мати різні значення.",
+            "digits": "{attribute} має містити {digits} цифр.",
+            "digits_between": "{attribute} має містити від {min} до {max} цифр.",
+            "dimensions": "{attribute} містить некоректні виміри зображення.",
+            "distinct": "Поле {attribute} містить однакове значення.",
+            "email": "{attribute} має бути дійсною адресою електронної пошти.",
+            "exists": "Обраний {attribute} не є валідним.",
+            "file": "{attribute} має бути файлом.",
+            "filled": "Поле {attribute} повинне мати значення.",
+            "gt": {
+                "numeric": "{attribute} має бути більшим за {value}.",
+                "file": "{attribute} має бути більшим за {value} кілобайт.",
+                "string": "{attribute} має бути довшим за {value} символів.",
+                "array": "{attribute} повинен містити більше ніж {value} елементів."
+            },
+            "gte": {
+                "numeric": "{attribute} має бути не меншим за {value}.",
+                "file": "{attribute} має бути не меншим за {value} кілобайт.",
+                "string": "{attribute} має бути не коротшим за {value} символів.",
+                "array": "{attribute} повинен містити не менше ніж {value} елементів."
+            },
+            "image": "{attribute} має бути зображенням.",
+            "in": "Обраний {attribute} не є валідним.",
+            "in_array": "Поле {attribute} не існує у {other}.",
+            "integer": "{attribute} має бути типу integer.",
+            "ip": "{attribute} має бути валідною IP адресою.",
+            "ipv4": "{attribute} має бути валідною IPv4.",
+            "ipv6": "{attribute} має бути валідною IPv6 адресою.",
+            "json": "{attribute} має бути валідним JSON.",
+            "lt": {
+                "numeric": "{attribute} має бути меншим за {value}.",
+                "file": "{attribute} має бути меншим за {value} кілобайт.",
+                "string": "{attribute} має бути коротшим за {value} символів.",
+                "array": "{attribute} повинен містити менше ніж {value} елементів."
+            },
+            "lte": {
+                "numeric": "{attribute} має бути не більшим за {value}.",
+                "file": "{attribute} має бути не більшим за {value} кілобайт.",
+                "string": "{attribute} має бути не довшим за {value} символів.",
+                "array": "{attribute} повинен містити не більше ніж {value} елементів."
+            },
+            "max": {
+                "numeric": "{attribute} не може бути більшим за {max}.",
+                "file": "{attribute} не може бути більшим за {max} кілобайт.",
+                "string": "{attribute} не може бути довшим за {max} символів.",
+                "array": "{attribute} не може мати більше ніж {max} елементів."
+            },
+            "mimes": "{attribute} має бути файлом типу: {values}.",
+            "mimetypes": "{attribute} має бути файлом типу: {values}.",
+            "min": {
+                "numeric": "{attribute} має бути щонайменше {min}.",
+                "file": "{attribute} має бути щонайменше {min} кілобайт.",
+                "string": "{attribute} має бути щонайменше {min} символів.",
+                "array": "{attribute} має містити щонайменше {min} елементів."
+            },
+            "not_in": "Обраний {attribute} не валідний.",
+            "not_regex": "Формат {attribute} не валідний.",
+            "numeric": "{attribute} має бути числом.",
+            "present": "Поле {attribute} має бути наявним.",
+            "regex": "Формат {attribute} не валідний.",
+            "required": "Необхідне поле {attribute}.",
+            "required_if": "Поле {attribute} необхідне коли {other} має значення {value}.",
+            "required_unless": "Поле {attribute} необхідне, окрім випадків коли {other} має значення {values}.",
+            "required_with": "Поле {attribute} необхідне при наявності одного з {values}.",
+            "required_with_all": "Поле {attribute} необхідне при наявності усіх перерахованих {values}.",
+            "required_without": "Поле {attribute} необхідне за відсутності одного з {values}.",
+            "required_without_all": "Поле {attribute} необхідне за відсутності усіх перерахованих {values}.",
+            "same": "{attribute} та {other} повинні співпадати.",
+            "size": {
+                "numeric": "{attribute} має бути {size}.",
+                "file": "{attribute} має бути {size} кілобайт.",
+                "string": "{attribute} повинен складати {size} символів.",
+                "array": "{attribute} повинен містити {size} елементів."
+            },
+            "starts_with": "{attribute} повинен починатися з одного з наступних: {values}",
+            "string": "{attribute} має бути типу string.",
+            "timezone": "{attribute} має бути валідною часовою зоною.",
+            "unique": "{attribute} вже призначений.",
+            "uploaded": "{attribute} не було завантажено успішно.",
+            "url": "Формат {attribute} є не валідним.",
+            "uuid": "{attribute} має бути валідним UUID.",
+            "custom": {
+                "attribute-name": {
+                    "rule-name": "custom-message"
+                }
+            },
+            "attributes": []
+        },
+        "wireless": {
+            "ap-count": {
+                "short": "AP",
+                "long": "Кількість точок доступу",
+                "unit": ""
+            },
+            "clients": {
+                "short": "Споживачі",
+                "long": "Кількість споживачів",
+                "unit": ""
+            },
+            "capacity": {
+                "short": "Ємність",
+                "long": "Ємність",
+                "unit": "%"
+            },
+            "ccq": {
+                "short": "CCQ",
+                "long": "Якість з'єднання споживача",
+                "unit": "%"
+            },
+            "errors": {
+                "short": "Помилки",
+                "long": "Кількість помилок",
+                "unit": ""
+            },
+            "error-ratio": {
+                "short": "Відсоток помилок",
+                "long": "Відсоток помилкових бітів/пакетів",
+                "unit": "%"
+            },
+            "error-rate": {
+                "short": "BER",
+                "long": "Частота бітових помилок",
+                "unit": "bps"
+            },
+            "frequency": {
+                "short": "Частота",
+                "long": "Частота",
+                "unit": "MHz"
+            },
+            "distance": {
+                "short": "Відстань",
+                "long": "Відстань",
+                "unit": "km"
+            },
+            "mse": {
+                "short": "MSE",
+                "long": "Середньоквадратична помилка",
+                "unit": "dB"
+            },
+            "noise-floor": {
+                "short": "Рівень шуму",
+                "long": "Рівень шуму",
+                "unit": "dBm/Hz"
+            },
+            "power": {
+                "short": "Сила сигналу",
+                "long": "TX/RX Сила сигналу",
+                "unit": "dBm"
+            },
+            "quality": {
+                "short": "Якість",
+                "long": "Якість",
+                "unit": "%"
+            },
+            "rate": {
+                "short": "Швидкість передачі даних",
+                "long": "Швидкість передачі даних TX/RX",
+                "unit": "bps"
+            },
+            "rssi": {
+                "short": "RSSI",
+                "long": "Індикатор потужності отриманого сигналу",
+                "unit": "dBm"
+            },
+            "snr": {
+                "short": "SNR",
+                "long": "Співвідношення сигнал/шум",
+                "unit": "dB"
+            },
+            "ssr": {
+                "short": "SSR",
+                "long": "Коефіцієнт потужності сигналу",
+                "unit": "dB"
+            },
+            "utilization": {
+                "short": "Використання",
+                "long": "Використання",
+                "unit": "%"
+            },
+            "xpi": {
+                "short": "XPI",
+                "long": "Крос-поляризаційні завади",
+                "unit": "dB"
+            }
+        },
         "Shutdown": "Shutdown",
         "Login": "Вхід",
         "Register": "Реєстрація",
@@ -308,407 +708,7 @@
         "Total traffic": "Спільний трафік",
         "Groups": "Групи",
         "Performance": "Продуктивність",
-        "History": "Історія",
-        "pagination": {
-            "previous": "&laquo; Попередня",
-            "next": "Наступна &raquo;"
-        },
-        "auth": {
-            "failed": "Ці облікові дані не відповідають нашим записам.",
-            "throttle": "Перевищено кількість спроб входу. Будь ласка, спробуйте ще раз через {seconds} секунд."
-        },
-        "validation": {
-            "accepted": "{attribute} має бути прийнято.",
-            "active_url": "{attribute} не є дійсним URL.",
-            "after": "{attribute} має бути датою пізнішою за {date}.",
-            "after_or_equal": "{attribute} має бути датою не ранішою за {date}.",
-            "alpha": "{attribute} має містити лише літери.",
-            "alpha_dash": "{attribute} може містити лише літери, цифри, тире та підкреслення.",
-            "alpha_num": "{attribute} може містити лише літери та цифри.",
-            "array": "{attribute} має бути масивом.",
-            "before": "{attribute} має бути датою ранішою за {date}.",
-            "before_or_equal": "{attribute} має бути датою не пізнішою за {date}.",
-            "between": {
-                "numeric": "{attribute} має бути у проміжку між {min} та {max}.",
-                "file": "{attribute} має бути у проміжку між {min} та {max} кілобайт.",
-                "string": "{attribute} має містити від {min} до {max} символів.",
-                "array": "{attribute} має містити від {min} до {max} елементів."
-            },
-            "boolean": "{attribute} має бути true чи false.",
-            "confirmed": "Підтвердження {attribute} не співпадає.",
-            "date": "{attribute} не є коректною датою.",
-            "date_equals": "{attribute} має бути рівним {date}.",
-            "date_format": "{attribute} не співпадає з форматом {format}.",
-            "different": "{attribute} та {other} повинні мати різні значення.",
-            "digits": "{attribute} має містити {digits} цифр.",
-            "digits_between": "{attribute} має містити від {min} до {max} цифр.",
-            "dimensions": "{attribute} містить некоректні виміри зображення.",
-            "distinct": "Поле {attribute} містить однакове значення.",
-            "email": "{attribute} має бути дійсною адресою електронної пошти.",
-            "exists": "Обраний {attribute} не є валідним.",
-            "file": "{attribute} має бути файлом.",
-            "filled": "Поле {attribute} повинне мати значення.",
-            "gt": {
-                "numeric": "{attribute} має бути більшим за {value}.",
-                "file": "{attribute} має бути більшим за {value} кілобайт.",
-                "string": "{attribute} має бути довшим за {value} символів.",
-                "array": "{attribute} повинен містити більше ніж {value} елементів."
-            },
-            "gte": {
-                "numeric": "{attribute} має бути не меншим за {value}.",
-                "file": "{attribute} має бути не меншим за {value} кілобайт.",
-                "string": "{attribute} має бути не коротшим за {value} символів.",
-                "array": "{attribute} повинен містити не менше ніж {value} елементів."
-            },
-            "image": "{attribute} має бути зображенням.",
-            "in": "Обраний {attribute} не є валідним.",
-            "in_array": "Поле {attribute} не існує у {other}.",
-            "integer": "{attribute} має бути типу integer.",
-            "ip": "{attribute} має бути валідною IP адресою.",
-            "ipv4": "{attribute} має бути валідною IPv4.",
-            "ipv6": "{attribute} має бути валідною IPv6 адресою.",
-            "json": "{attribute} має бути валідним JSON.",
-            "lt": {
-                "numeric": "{attribute} має бути меншим за {value}.",
-                "file": "{attribute} має бути меншим за {value} кілобайт.",
-                "string": "{attribute} має бути коротшим за {value} символів.",
-                "array": "{attribute} повинен містити менше ніж {value} елементів."
-            },
-            "lte": {
-                "numeric": "{attribute} має бути не більшим за {value}.",
-                "file": "{attribute} має бути не більшим за {value} кілобайт.",
-                "string": "{attribute} має бути не довшим за {value} символів.",
-                "array": "{attribute} повинен містити не більше ніж {value} елементів."
-            },
-            "max": {
-                "numeric": "{attribute} не може бути більшим за {max}.",
-                "file": "{attribute} не може бути більшим за {max} кілобайт.",
-                "string": "{attribute} не може бути довшим за {max} символів.",
-                "array": "{attribute} не може мати більше ніж {max} елементів."
-            },
-            "mimes": "{attribute} має бути файлом типу: {values}.",
-            "mimetypes": "{attribute} має бути файлом типу: {values}.",
-            "min": {
-                "numeric": "{attribute} має бути щонайменше {min}.",
-                "file": "{attribute} має бути щонайменше {min} кілобайт.",
-                "string": "{attribute} має бути щонайменше {min} символів.",
-                "array": "{attribute} має містити щонайменше {min} елементів."
-            },
-            "not_in": "Обраний {attribute} не валідний.",
-            "not_regex": "Формат {attribute} не валідний.",
-            "numeric": "{attribute} має бути числом.",
-            "present": "Поле {attribute} має бути наявним.",
-            "regex": "Формат {attribute} не валідний.",
-            "required": "Необхідне поле {attribute}.",
-            "required_if": "Поле {attribute} необхідне коли {other} має значення {value}.",
-            "required_unless": "Поле {attribute} необхідне, окрім випадків коли {other} має значення {values}.",
-            "required_with": "Поле {attribute} необхідне при наявності одного з {values}.",
-            "required_with_all": "Поле {attribute} необхідне при наявності усіх перерахованих {values}.",
-            "required_without": "Поле {attribute} необхідне за відсутності одного з {values}.",
-            "required_without_all": "Поле {attribute} необхідне за відсутності усіх перерахованих {values}.",
-            "same": "{attribute} та {other} повинні співпадати.",
-            "size": {
-                "numeric": "{attribute} має бути {size}.",
-                "file": "{attribute} має бути {size} кілобайт.",
-                "string": "{attribute} повинен складати {size} символів.",
-                "array": "{attribute} повинен містити {size} елементів."
-            },
-            "starts_with": "{attribute} повинен починатися з одного з наступних: {values}",
-            "string": "{attribute} має бути типу string.",
-            "timezone": "{attribute} має бути валідною часовою зоною.",
-            "unique": "{attribute} вже призначений.",
-            "uploaded": "{attribute} не було завантажено успішно.",
-            "url": "Формат {attribute} є не валідним.",
-            "uuid": "{attribute} має бути валідним UUID.",
-            "custom": {
-                "attribute-name": {
-                    "rule-name": "custom-message"
-                }
-            },
-            "attributes": []
-        },
-        "sensors": {
-            "airflow": {
-                "short": "Повітряний потік",
-                "long": "Повітряний потік",
-                "unit": "cfm",
-                "unit_long": "Кубічний фут в хвилину"
-            },
-            "ber": {
-                "short": "BER",
-                "long": "Частота бітових помилок",
-                "unit": "",
-                "unit_long": ""
-            },
-            "charge": {
-                "short": "Заряд",
-                "long": "Процент заряду",
-                "unit": "%",
-                "unit_long": "процентів"
-            },
-            "chromatic_dispersion": {
-                "short": "Хроматична дисперсія",
-                "long": "Хроматична дисперсія",
-                "unit": "ps/nm/km",
-                "unit_long": "Пікосекунди на нанометри на кілометри"
-            },
-            "cooling": {
-                "short": "Охолодження",
-                "long": "",
-                "unit": "W",
-                "unit_long": "Ват"
-            },
-            "count": {
-                "short": "Лічильник",
-                "long": "Лічильник",
-                "unit": "",
-                "unit_long": ""
-            },
-            "current": {
-                "short": "Сила струму",
-                "long": "Сила струму",
-                "unit": "A",
-                "unit_long": "Ампер"
-            },
-            "dbm": {
-                "short": "dBm",
-                "long": "dBm",
-                "unit": "dBm",
-                "unit_long": "Децибел-мілівати"
-            },
-            "delay": {
-                "short": "Затримка",
-                "long": "Затримка",
-                "unit": "s",
-                "unit_long": "Секунди"
-            },
-            "eer": {
-                "short": "EER",
-                "long": "Коефіцієнт енергоефективності",
-                "unit": "",
-                "unit_long": ""
-            },
-            "fanspeed": {
-                "short": "Оберти вентилятора",
-                "long": "Швидкість обертів вентилятора",
-                "unit": "RPM",
-                "unit_long": "Обертів за хвилину"
-            },
-            "frequency": {
-                "short": "Частота",
-                "long": "Частота",
-                "unit": "Hz",
-                "unit_long": "Герц"
-            },
-            "humidity": {
-                "short": "Вологість",
-                "long": "Процент вологості повітря",
-                "unit": "%",
-                "unit_long": "Проценти"
-            },
-            "load": {
-                "short": "Навантаження",
-                "long": "Процент навантаження",
-                "unit": "%",
-                "unit_long": "Проценти"
-            },
-            "power": {
-                "short": "Потужність",
-                "long": "Потужність",
-                "unit": "W",
-                "unit_long": "Ват"
-            },
-            "power_consumed": {
-                "short": "Спожита потужність",
-                "long": "Спожита потужність",
-                "unit": "kWh",
-                "unit_long": "Кіловат-години"
-            },
-            "power_factor": {
-                "short": "Коефіцієнт потужності",
-                "long": "Коефіцієнт потужності",
-                "unit": "",
-                "unit_long": ""
-            },
-            "pressure": {
-                "short": "Тиск",
-                "long": "Тиск",
-                "unit": "kPa",
-                "unit_long": "Кілопаскалі"
-            },
-            "quality_factor": {
-                "short": "Добротність",
-                "long": "Добротність",
-                "unit": "",
-                "unit_long": ""
-            },
-            "runtime": {
-                "short": "Час роботи",
-                "long": "Час роботи",
-                "unit": "хвилини",
-                "unit_long": "Хвилини"
-            },
-            "signal": {
-                "short": "Сигнал",
-                "long": "Сигнал",
-                "unit": "dBm",
-                "unit_long": "Децибел-мілівати"
-            },
-            "snr": {
-                "short": "SNR",
-                "long": "Відношення сигналу до шуму",
-                "unit": "dB",
-                "unit_long": "Децибели"
-            },
-            "state": {
-                "short": "Стан",
-                "long": "Стан",
-                "unit": ""
-            },
-            "temperature": {
-                "short": "Температура",
-                "long": "Температура",
-                "unit": "°C",
-                "unit_long": "° Цельсія"
-            },
-            "voltage": {
-                "short": "Напруга",
-                "long": "Напруга",
-                "unit": "V",
-                "unit_long": "Вольт"
-            },
-            "waterflow": {
-                "short": "Потік води",
-                "long": "Потік води",
-                "unit": "l/m",
-                "unit_long": "Літри за хвилину"
-            }
-        },
-        "commands": {
-            "user{add}": {
-                "description": "Додати локального користувача, вхід доступний лише при використанні mysql автентифікації",
-                "arguments": {
-                    "username": "Ім'я користувача для входу"
-                },
-                "options": {
-                    "descr": "Опис користувача",
-                    "email": "Електронна пошта користувача",
-                    "password": "Пароль користувача, якщо не наданий, то буде запропоновано",
-                    "full-name": "Повне ім'я користувача",
-                    "role": "Користувачеві буде назначено роль {roles}"
-                },
-                "password-request": "Будь ласка, введіть пароль користувача",
-                "success": "Успішно додано користувача: {username}",
-                "wrong-auth": "Увага! Ви не зможете авторизуватися, оскільки не використовуєте MySQL авторизацію"
-            }
-        },
-        "preferences": {
-            "lang": "Українська"
-        },
-        "passwords": {
-            "password": "Паролі мають бути щонайменш шість символів у довжину та співпадати з повтореним.",
-            "reset": "Ваш пароль було скинуто!",
-            "sent": "Ми надіслали посилання на скид паролю на вашу адресу електронної пошти!",
-            "token": "Цей токен скиду паролю не валідний.",
-            "user": "Ми не можемо знайти користувача з такою адресою електронної пошти."
-        },
-        "wireless": {
-            "ap-count": {
-                "short": "AP",
-                "long": "Кількість точок доступу",
-                "unit": ""
-            },
-            "clients": {
-                "short": "Споживачі",
-                "long": "Кількість споживачів",
-                "unit": ""
-            },
-            "capacity": {
-                "short": "Ємність",
-                "long": "Ємність",
-                "unit": "%"
-            },
-            "ccq": {
-                "short": "CCQ",
-                "long": "Якість з'єднання споживача",
-                "unit": "%"
-            },
-            "errors": {
-                "short": "Помилки",
-                "long": "Кількість помилок",
-                "unit": ""
-            },
-            "error-ratio": {
-                "short": "Відсоток помилок",
-                "long": "Відсоток помилкових бітів/пакетів",
-                "unit": "%"
-            },
-            "error-rate": {
-                "short": "BER",
-                "long": "Частота бітових помилок",
-                "unit": "bps"
-            },
-            "frequency": {
-                "short": "Частота",
-                "long": "Частота",
-                "unit": "MHz"
-            },
-            "distance": {
-                "short": "Відстань",
-                "long": "Відстань",
-                "unit": "km"
-            },
-            "mse": {
-                "short": "MSE",
-                "long": "Середньоквадратична помилка",
-                "unit": "dB"
-            },
-            "noise-floor": {
-                "short": "Рівень шуму",
-                "long": "Рівень шуму",
-                "unit": "dBm/Hz"
-            },
-            "power": {
-                "short": "Сила сигналу",
-                "long": "TX/RX Сила сигналу",
-                "unit": "dBm"
-            },
-            "quality": {
-                "short": "Якість",
-                "long": "Якість",
-                "unit": "%"
-            },
-            "rate": {
-                "short": "Швидкість передачі даних",
-                "long": "Швидкість передачі даних TX/RX",
-                "unit": "bps"
-            },
-            "rssi": {
-                "short": "RSSI",
-                "long": "Індикатор потужності отриманого сигналу",
-                "unit": "dBm"
-            },
-            "snr": {
-                "short": "SNR",
-                "long": "Співвідношення сигнал/шум",
-                "unit": "dB"
-            },
-            "ssr": {
-                "short": "SSR",
-                "long": "Коефіцієнт потужності сигналу",
-                "unit": "dB"
-            },
-            "utilization": {
-                "short": "Використання",
-                "long": "Використання",
-                "unit": "%"
-            },
-            "xpi": {
-                "short": "XPI",
-                "long": "Крос-поляризаційні завади",
-                "unit": "dB"
-            }
-        }
+        "History": "Історія"
     }
 }
 

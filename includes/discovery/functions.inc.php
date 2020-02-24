@@ -1482,3 +1482,29 @@ function find_port_id($description, $identifier = '', $device_id = 0, $mac_addre
 
     return (int)dbFetchCell($sql, $params);
 }
+
+
+/**
+ * Try to find a port by lldp port id
+ *
+ * @param string $lldpremportid matched against ports.lldpLocPortId
+ * @param int $device_id restrict search to ports on a specific device
+ * @return int
+ */
+function find_port_id_by_lldp_port_id($lldpremportid, $device_id)
+{
+    if (!$device_id) {
+        return 0;
+    }
+
+    $sql = "SELECT `port_id` FROM `ports` WHERE `device_id`=? AND `lldpLocPortId`=? LIMIT 1";
+    $params[] = $device_id;
+    $params[] = $lldpremportid;
+
+    $remote_port_id = (int)dbFetchCell($sql, $params);
+    if (!$remote_port_id) {
+        return 0;
+    } else {
+        return $remote_port_id;
+    }
+}

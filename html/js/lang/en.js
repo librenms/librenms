@@ -5,125 +5,60 @@
 }(this, (function () { 'use strict';
     return {
     "en": {
-        "pagination": {
-            "previous": "&laquo; Previous",
-            "next": "Next &raquo;"
-        },
         "auth": {
             "failed": "These credentials do not match our records.",
             "throttle": "Too many login attempts. Please try again in {seconds} seconds."
         },
-        "validation": {
-            "accepted": "The {attribute} must be accepted.",
-            "active_url": "The {attribute} is not a valid URL.",
-            "after": "The {attribute} must be a date after {date}.",
-            "after_or_equal": "The {attribute} must be a date after or equal to {date}.",
-            "alpha": "The {attribute} may only contain letters.",
-            "alpha_dash": "The {attribute} may only contain letters, numbers, dashes and underscores.",
-            "alpha_num": "The {attribute} may only contain letters and numbers.",
-            "alpha_space": "The {attribute} may only contain letters, numbers, underscores and spaces.",
-            "array": "The {attribute} must be an array.",
-            "before": "The {attribute} must be a date before {date}.",
-            "before_or_equal": "The {attribute} must be a date before or equal to {date}.",
-            "between": {
-                "numeric": "The {attribute} must be between {min} and {max}.",
-                "file": "The {attribute} must be between {min} and {max} kilobytes.",
-                "string": "The {attribute} must be between {min} and {max} characters.",
-                "array": "The {attribute} must have between {min} and {max} items."
-            },
-            "boolean": "The {attribute} field must be true or false.",
-            "confirmed": "The {attribute} confirmation does not match.",
-            "date": "The {attribute} is not a valid date.",
-            "date_equals": "The {attribute} must be a date equal to {date}.",
-            "date_format": "The {attribute} does not match the format {format}.",
-            "different": "The {attribute} and {other} must be different.",
-            "digits": "The {attribute} must be {digits} digits.",
-            "digits_between": "The {attribute} must be between {min} and {max} digits.",
-            "dimensions": "The {attribute} has invalid image dimensions.",
-            "distinct": "The {attribute} field has a duplicate value.",
-            "email": "The {attribute} must be a valid email address.",
-            "ends_with": "The {attribute} must end with one of the following: {values}",
-            "exists": "The selected {attribute} is invalid.",
-            "file": "The {attribute} must be a file.",
-            "filled": "The {attribute} field must have a value.",
-            "gt": {
-                "numeric": "The {attribute} must be greater than {value}.",
-                "file": "The {attribute} must be greater than {value} kilobytes.",
-                "string": "The {attribute} must be greater than {value} characters.",
-                "array": "The {attribute} must have more than {value} items."
-            },
-            "gte": {
-                "numeric": "The {attribute} must be greater than or equal {value}.",
-                "file": "The {attribute} must be greater than or equal {value} kilobytes.",
-                "string": "The {attribute} must be greater than or equal {value} characters.",
-                "array": "The {attribute} must have {value} items or more."
-            },
-            "image": "The {attribute} must be an image.",
-            "in": "The selected {attribute} is invalid.",
-            "in_array": "The {attribute} field does not exist in {other}.",
-            "integer": "The {attribute} must be an integer.",
-            "ip": "The {attribute} must be a valid IP address.",
-            "ipv4": "The {attribute} must be a valid IPv4 address.",
-            "ipv6": "The {attribute} must be a valid IPv6 address.",
-            "json": "The {attribute} must be a valid JSON string.",
-            "lt": {
-                "numeric": "The {attribute} must be less than {value}.",
-                "file": "The {attribute} must be less than {value} kilobytes.",
-                "string": "The {attribute} must be less than {value} characters.",
-                "array": "The {attribute} must have less than {value} items."
-            },
-            "lte": {
-                "numeric": "The {attribute} must be less than or equal {value}.",
-                "file": "The {attribute} must be less than or equal {value} kilobytes.",
-                "string": "The {attribute} must be less than or equal {value} characters.",
-                "array": "The {attribute} must not have more than {value} items."
-            },
-            "max": {
-                "numeric": "The {attribute} may not be greater than {max}.",
-                "file": "The {attribute} may not be greater than {max} kilobytes.",
-                "string": "The {attribute} may not be greater than {max} characters.",
-                "array": "The {attribute} may not have more than {max} items."
-            },
-            "mimes": "The {attribute} must be a file of type: {values}.",
-            "mimetypes": "The {attribute} must be a file of type: {values}.",
-            "min": {
-                "numeric": "The {attribute} must be at least {min}.",
-                "file": "The {attribute} must be at least {min} kilobytes.",
-                "string": "The {attribute} must be at least {min} characters.",
-                "array": "The {attribute} must have at least {min} items."
-            },
-            "not_in": "The selected {attribute} is invalid.",
-            "not_regex": "The {attribute} format is invalid.",
-            "numeric": "The {attribute} must be a number.",
-            "present": "The {attribute} field must be present.",
-            "regex": "The {attribute} format is invalid.",
-            "required": "The {attribute} field is required.",
-            "required_if": "The {attribute} field is required when {other} is {value}.",
-            "required_unless": "The {attribute} field is required unless {other} is in {values}.",
-            "required_with": "The {attribute} field is required when {values} is present.",
-            "required_with_all": "The {attribute} field is required when {values} are present.",
-            "required_without": "The {attribute} field is required when {values} is not present.",
-            "required_without_all": "The {attribute} field is required when none of {values} are present.",
-            "same": "The {attribute} and {other} must match.",
-            "size": {
-                "numeric": "The {attribute} must be {size}.",
-                "file": "The {attribute} must be {size} kilobytes.",
-                "string": "The {attribute} must be {size} characters.",
-                "array": "The {attribute} must contain {size} items."
-            },
-            "starts_with": "The {attribute} must start with one of the following: {values}",
-            "string": "The {attribute} must be a string.",
-            "timezone": "The {attribute} must be a valid zone.",
-            "unique": "The {attribute} has already been taken.",
-            "uploaded": "The {attribute} failed to upload.",
-            "url": "The {attribute} format is invalid.",
-            "uuid": "The {attribute} must be a valid UUID.",
-            "custom": {
-                "attribute-name": {
-                    "rule-name": "custom-message"
+        "commands": {
+            "config{get}": {
+                "description": "Get configuration value",
+                "arguments": {
+                    "setting": "setting to get value of in dot notation (example: snmp.community.0)"
+                },
+                "options": {
+                    "json": "Output setting or entire config as json"
                 }
             },
-            "attributes": []
+            "config{set}": {
+                "description": "Set configuration value (or unset)",
+                "arguments": {
+                    "setting": "setting to set in dot notation (example: snmp.community.0)",
+                    "value": "value to set, unset setting if this is omitted"
+                }
+            },
+            "user{add}": {
+                "description": "Add a local user, you can only log in with this user if auth is set to mysql",
+                "arguments": {
+                    "username": "The username the user will log in with"
+                },
+                "options": {
+                    "descr": "User description",
+                    "email": "Email to use for the user",
+                    "password": "Password for the user, if not given, you will be prompted",
+                    "full-name": "Full name for the user",
+                    "role": "Set the user to the desired role {roles}"
+                },
+                "password-request": "Please enter the user's password",
+                "success": "Successfully added user: {username}",
+                "wrong-auth": "Warning! You will not be able to log in with this user because you are not using MySQL auth"
+            },
+            "translation{generate}": {
+                "description": "Generate updated json language files for use in the web frontend"
+            }
+        },
+        "pagination": {
+            "previous": "&laquo; Previous",
+            "next": "Next &raquo;"
+        },
+        "passwords": {
+            "password": "Passwords must be at least eight characters and match the confirmation.",
+            "reset": "Your password has been reset!",
+            "sent": "We have e-mailed your password reset link!",
+            "token": "This password reset token is invalid.",
+            "user": "We can't find a user with that e-mail address."
+        },
+        "preferences": {
+            "lang": "English"
         },
         "sensors": {
             "airflow": {
@@ -282,43 +217,6 @@
                 "unit_long": "Liters Per Minute"
             }
         },
-        "commands": {
-            "config{get}": {
-                "description": "Get configuration value",
-                "arguments": {
-                    "setting": "setting to get value of in dot notation (example: snmp.community.0)"
-                },
-                "options": {
-                    "json": "Output setting or entire config as json"
-                }
-            },
-            "config{set}": {
-                "description": "Set configuration value (or unset)",
-                "arguments": {
-                    "setting": "setting to set in dot notation (example: snmp.community.0)",
-                    "value": "value to set, unset setting if this is omitted"
-                }
-            },
-            "user{add}": {
-                "description": "Add a local user, you can only log in with this user if auth is set to mysql",
-                "arguments": {
-                    "username": "The username the user will log in with"
-                },
-                "options": {
-                    "descr": "User description",
-                    "email": "Email to use for the user",
-                    "password": "Password for the user, if not given, you will be prompted",
-                    "full-name": "Full name for the user",
-                    "role": "Set the user to the desired role {roles}"
-                },
-                "password-request": "Please enter the user's password",
-                "success": "Successfully added user: {username}",
-                "wrong-auth": "Warning! You will not be able to log in with this user because you are not using MySQL auth"
-            },
-            "translation{generate}": {
-                "description": "Generate updated json language files for use in the web frontend"
-            }
-        },
         "syslog": {
             "severity": [
                 "Emergency",
@@ -357,8 +255,229 @@
                 "local use 7  (local7)"
             ]
         },
-        "preferences": {
-            "lang": "English"
+        "validation": {
+            "accepted": "The {attribute} must be accepted.",
+            "active_url": "The {attribute} is not a valid URL.",
+            "after": "The {attribute} must be a date after {date}.",
+            "after_or_equal": "The {attribute} must be a date after or equal to {date}.",
+            "alpha": "The {attribute} may only contain letters.",
+            "alpha_dash": "The {attribute} may only contain letters, numbers, dashes and underscores.",
+            "alpha_num": "The {attribute} may only contain letters and numbers.",
+            "alpha_space": "The {attribute} may only contain letters, numbers, underscores and spaces.",
+            "array": "The {attribute} must be an array.",
+            "before": "The {attribute} must be a date before {date}.",
+            "before_or_equal": "The {attribute} must be a date before or equal to {date}.",
+            "between": {
+                "numeric": "The {attribute} must be between {min} and {max}.",
+                "file": "The {attribute} must be between {min} and {max} kilobytes.",
+                "string": "The {attribute} must be between {min} and {max} characters.",
+                "array": "The {attribute} must have between {min} and {max} items."
+            },
+            "boolean": "The {attribute} field must be true or false.",
+            "confirmed": "The {attribute} confirmation does not match.",
+            "date": "The {attribute} is not a valid date.",
+            "date_equals": "The {attribute} must be a date equal to {date}.",
+            "date_format": "The {attribute} does not match the format {format}.",
+            "different": "The {attribute} and {other} must be different.",
+            "digits": "The {attribute} must be {digits} digits.",
+            "digits_between": "The {attribute} must be between {min} and {max} digits.",
+            "dimensions": "The {attribute} has invalid image dimensions.",
+            "distinct": "The {attribute} field has a duplicate value.",
+            "email": "The {attribute} must be a valid email address.",
+            "ends_with": "The {attribute} must end with one of the following: {values}",
+            "exists": "The selected {attribute} is invalid.",
+            "file": "The {attribute} must be a file.",
+            "filled": "The {attribute} field must have a value.",
+            "gt": {
+                "numeric": "The {attribute} must be greater than {value}.",
+                "file": "The {attribute} must be greater than {value} kilobytes.",
+                "string": "The {attribute} must be greater than {value} characters.",
+                "array": "The {attribute} must have more than {value} items."
+            },
+            "gte": {
+                "numeric": "The {attribute} must be greater than or equal {value}.",
+                "file": "The {attribute} must be greater than or equal {value} kilobytes.",
+                "string": "The {attribute} must be greater than or equal {value} characters.",
+                "array": "The {attribute} must have {value} items or more."
+            },
+            "image": "The {attribute} must be an image.",
+            "in": "The selected {attribute} is invalid.",
+            "in_array": "The {attribute} field does not exist in {other}.",
+            "integer": "The {attribute} must be an integer.",
+            "ip": "The {attribute} must be a valid IP address.",
+            "ipv4": "The {attribute} must be a valid IPv4 address.",
+            "ipv6": "The {attribute} must be a valid IPv6 address.",
+            "json": "The {attribute} must be a valid JSON string.",
+            "lt": {
+                "numeric": "The {attribute} must be less than {value}.",
+                "file": "The {attribute} must be less than {value} kilobytes.",
+                "string": "The {attribute} must be less than {value} characters.",
+                "array": "The {attribute} must have less than {value} items."
+            },
+            "lte": {
+                "numeric": "The {attribute} must be less than or equal {value}.",
+                "file": "The {attribute} must be less than or equal {value} kilobytes.",
+                "string": "The {attribute} must be less than or equal {value} characters.",
+                "array": "The {attribute} must not have more than {value} items."
+            },
+            "max": {
+                "numeric": "The {attribute} may not be greater than {max}.",
+                "file": "The {attribute} may not be greater than {max} kilobytes.",
+                "string": "The {attribute} may not be greater than {max} characters.",
+                "array": "The {attribute} may not have more than {max} items."
+            },
+            "mimes": "The {attribute} must be a file of type: {values}.",
+            "mimetypes": "The {attribute} must be a file of type: {values}.",
+            "min": {
+                "numeric": "The {attribute} must be at least {min}.",
+                "file": "The {attribute} must be at least {min} kilobytes.",
+                "string": "The {attribute} must be at least {min} characters.",
+                "array": "The {attribute} must have at least {min} items."
+            },
+            "not_in": "The selected {attribute} is invalid.",
+            "not_regex": "The {attribute} format is invalid.",
+            "numeric": "The {attribute} must be a number.",
+            "present": "The {attribute} field must be present.",
+            "regex": "The {attribute} format is invalid.",
+            "required": "The {attribute} field is required.",
+            "required_if": "The {attribute} field is required when {other} is {value}.",
+            "required_unless": "The {attribute} field is required unless {other} is in {values}.",
+            "required_with": "The {attribute} field is required when {values} is present.",
+            "required_with_all": "The {attribute} field is required when {values} are present.",
+            "required_without": "The {attribute} field is required when {values} is not present.",
+            "required_without_all": "The {attribute} field is required when none of {values} are present.",
+            "same": "The {attribute} and {other} must match.",
+            "size": {
+                "numeric": "The {attribute} must be {size}.",
+                "file": "The {attribute} must be {size} kilobytes.",
+                "string": "The {attribute} must be {size} characters.",
+                "array": "The {attribute} must contain {size} items."
+            },
+            "starts_with": "The {attribute} must start with one of the following: {values}",
+            "string": "The {attribute} must be a string.",
+            "timezone": "The {attribute} must be a valid zone.",
+            "unique": "The {attribute} has already been taken.",
+            "uploaded": "The {attribute} failed to upload.",
+            "url": "The {attribute} format is invalid.",
+            "uuid": "The {attribute} must be a valid UUID.",
+            "custom": {
+                "attribute-name": {
+                    "rule-name": "custom-message"
+                }
+            },
+            "attributes": []
+        },
+        "wireless": {
+            "ap-count": {
+                "short": "APs",
+                "long": "AP Count",
+                "unit": ""
+            },
+            "clients": {
+                "short": "Clients",
+                "long": "Client Count",
+                "unit": ""
+            },
+            "capacity": {
+                "short": "Capacity",
+                "long": "Capacity",
+                "unit": "%"
+            },
+            "ccq": {
+                "short": "CCQ",
+                "long": "Client Connection Quality",
+                "unit": "%"
+            },
+            "errors": {
+                "short": "Errors",
+                "long": "Error Count",
+                "unit": ""
+            },
+            "error-ratio": {
+                "short": "Error Ratio",
+                "long": "Bit/Packet Error Ratio",
+                "unit": "%"
+            },
+            "error-rate": {
+                "short": "BER",
+                "long": "Bit Error Rate",
+                "unit": "bps"
+            },
+            "frequency": {
+                "short": "Frequency",
+                "long": "Frequency",
+                "unit": "MHz"
+            },
+            "distance": {
+                "short": "Distance",
+                "long": "Distance",
+                "unit": "km"
+            },
+            "mse": {
+                "short": "MSE",
+                "long": "Mean Square Error",
+                "unit": "dB"
+            },
+            "noise-floor": {
+                "short": "Noise Floor",
+                "long": "Noise Floor",
+                "unit": "dBm/Hz"
+            },
+            "power": {
+                "short": "Power/Signal",
+                "long": "TX/RX Power or Signal",
+                "unit": "dBm"
+            },
+            "quality": {
+                "short": "Quality",
+                "long": "Quality",
+                "unit": "%"
+            },
+            "rate": {
+                "short": "Rate",
+                "long": "TX/RX Rate",
+                "unit": "bps"
+            },
+            "rssi": {
+                "short": "RSSI",
+                "long": "Received Signal Strength Indicator",
+                "unit": "dBm"
+            },
+            "snr": {
+                "short": "SNR",
+                "long": "Signal-to-Noise Ratio",
+                "unit": "dB"
+            },
+            "sinr": {
+                "short": "SINR",
+                "long": " Signal-to-Interference-plus-Noise Ratio",
+                "unit": "dB"
+            },
+            "rsrq": {
+                "short": "RSRQ",
+                "long": "Reference Signal Received Quality",
+                "unit": "dB"
+            },
+            "rsrp": {
+                "short": "RSRP",
+                "long": "Reference Signals Received Power",
+                "unit": "dBm"
+            },
+            "ssr": {
+                "short": "SSR",
+                "long": "Signal Strength Ratio",
+                "unit": "dB"
+            },
+            "utilization": {
+                "short": "Utilization",
+                "long": "utilization",
+                "unit": "%"
+            },
+            "xpi": {
+                "short": "XPI",
+                "long": "Cross Polar Interference",
+                "unit": "dB"
+            }
         },
         "settings": {
             "readonly": "Set in config.php, remove from config.php to enable.",
@@ -420,7 +539,8 @@
                     "graph": "Graph Settings",
                     "dashboard": "Dashboard Settings",
                     "search": "Search Settings",
-                    "style": "Style"
+                    "style": "Style",
+                    "device": "Device Settings"
                 }
             },
             "settings": {
@@ -1476,6 +1596,10 @@
                         "help": "Minimum Graph Height (default: 300)"
                     }
                 },
+                "device_location_map_open": {
+                    "description": "Location Map open",
+                    "help": "Location Map is shown by default"
+                },
                 "whois": {
                     "description": "Path to whois"
                 }
@@ -1498,125 +1622,6 @@
                 "select": "{value} is not an allowed value",
                 "text": "{value} is not allowed",
                 "array": "Invalid format"
-            }
-        },
-        "passwords": {
-            "password": "Passwords must be at least eight characters and match the confirmation.",
-            "reset": "Your password has been reset!",
-            "sent": "We have e-mailed your password reset link!",
-            "token": "This password reset token is invalid.",
-            "user": "We can't find a user with that e-mail address."
-        },
-        "wireless": {
-            "ap-count": {
-                "short": "APs",
-                "long": "AP Count",
-                "unit": ""
-            },
-            "clients": {
-                "short": "Clients",
-                "long": "Client Count",
-                "unit": ""
-            },
-            "capacity": {
-                "short": "Capacity",
-                "long": "Capacity",
-                "unit": "%"
-            },
-            "ccq": {
-                "short": "CCQ",
-                "long": "Client Connection Quality",
-                "unit": "%"
-            },
-            "errors": {
-                "short": "Errors",
-                "long": "Error Count",
-                "unit": ""
-            },
-            "error-ratio": {
-                "short": "Error Ratio",
-                "long": "Bit/Packet Error Ratio",
-                "unit": "%"
-            },
-            "error-rate": {
-                "short": "BER",
-                "long": "Bit Error Rate",
-                "unit": "bps"
-            },
-            "frequency": {
-                "short": "Frequency",
-                "long": "Frequency",
-                "unit": "MHz"
-            },
-            "distance": {
-                "short": "Distance",
-                "long": "Distance",
-                "unit": "km"
-            },
-            "mse": {
-                "short": "MSE",
-                "long": "Mean Square Error",
-                "unit": "dB"
-            },
-            "noise-floor": {
-                "short": "Noise Floor",
-                "long": "Noise Floor",
-                "unit": "dBm/Hz"
-            },
-            "power": {
-                "short": "Power/Signal",
-                "long": "TX/RX Power or Signal",
-                "unit": "dBm"
-            },
-            "quality": {
-                "short": "Quality",
-                "long": "Quality",
-                "unit": "%"
-            },
-            "rate": {
-                "short": "Rate",
-                "long": "TX/RX Rate",
-                "unit": "bps"
-            },
-            "rssi": {
-                "short": "RSSI",
-                "long": "Received Signal Strength Indicator",
-                "unit": "dBm"
-            },
-            "snr": {
-                "short": "SNR",
-                "long": "Signal-to-Noise Ratio",
-                "unit": "dB"
-            },
-            "sinr": {
-                "short": "SINR",
-                "long": " Signal-to-Interference-plus-Noise Ratio",
-                "unit": "dB"
-            },
-            "rsrq": {
-                "short": "RSRQ",
-                "long": "Reference Signal Received Quality",
-                "unit": "dB"
-            },
-            "rsrp": {
-                "short": "RSRP",
-                "long": "Reference Signals Received Power",
-                "unit": "dBm"
-            },
-            "ssr": {
-                "short": "SSR",
-                "long": "Signal Strength Ratio",
-                "unit": "dB"
-            },
-            "utilization": {
-                "short": "Utilization",
-                "long": "utilization",
-                "unit": "%"
-            },
-            "xpi": {
-                "short": "XPI",
-                "long": "Cross Polar Interference",
-                "unit": "dB"
             }
         }
     }
