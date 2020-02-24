@@ -11,10 +11,9 @@
 */
 
 $version = preg_replace("/.*Version (.*)$/", "\\1", $device['sysDescr']);
-$data = snmp_get_multi($device, ['masterSlaveMode.0', 'hardwareVersion.0'], '-OQU' , 'CAMBIUM-PTP670-MIB');
+$data = snmp_get_multi($device, ['masterSlaveMode.0', 'hardwareVersion.0'], '-OQU', 'CAMBIUM-PTP670-MIB');
 
 $masterSlaveMode = ucfirst($data[0]['CAMBIUM-PTP670-MIB::masterSlaveMode']);
 $hwversion = ucfirst($data[0]['CAMBIUM-PTP670-MIB::hardwareVersion']);
 
-
-$hardware = 'PTP 670 '. $masterSlaveMode . "($hwversion)";
+$hardware = 'PTP 670 ' . $masterSlaveMode . "($hwversion)";
