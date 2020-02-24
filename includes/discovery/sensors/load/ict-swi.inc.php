@@ -35,4 +35,3 @@ if (!empty($inverterLoad)) {
     
     discover_sensor($valid['sensor'], 'load', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $currentValue);
 }
-
