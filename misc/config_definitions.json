@@ -789,6 +789,13 @@
             "hidden": true,
             "type": "boolean"
         },
+        "device_location_map_open": {
+            "order": 0,
+            "group": "webui",
+            "section": "device",
+            "default": false,
+            "type": "boolean"
+        },
         "default_port_association_mode": {
             "default": "ifIndex",
             "type": "select",
