@@ -279,7 +279,7 @@ Percent Utilized: {{ $value['mempool_perc'] }}
 @endforeach
 ```
 
-#### MS Teams template - Markdown
+#### Microsoft Teams - Markdown
 
 ```
 [{{ $alert->title }}](https://your.librenms.url/device/device={{ $alert->device_id }}/)  
@@ -301,7 +301,7 @@ Percent Utilized: {{ $value['mempool_perc'] }}
 @endif
 ```
 
-#### MS Teams template - JSON
+#### Microsoft Teams - JSON
 
 ```
 {
