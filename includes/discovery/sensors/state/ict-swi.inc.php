@@ -23,57 +23,41 @@
  * @author     Lorenzo Zafra<zafra@ualberta.ca>
  */
 
-$inverterStatus = (int)(snmpget($device, 'inverterStatus.0', '-Oqv', 'ICT-SINE-WAVE-INVERTER-MIB'));
-if ($inverterStatus >= 0) {
-    ## Inverter Status
-    $index = 0;
-    $state_name = 'inverterStatus';
-    $states = [
-        ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'enabled'],
-        ['value' => 2, 'generic' => 1, 'graph' => 0, 'descr' => 'disabled'],
-    ];
-    create_state_index($state_name, $states);
-    $oid = '.1.3.6.1.4.1.39145.12.9.' . $index;
-    $descr = "Inverter Status";
-    $current_value = $inverterStatus;
+$oids = array(
+	"inverterStatus.0" => [
+		"oid" => ".1.3.6.1.4.1.39145.12.9.0",
+		"descr" => "Inverter Status",
+		"state_name" => "inverterStatus",
+		"states" => [
+        		['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'enabled'],
+		        ['value' => 2, 'generic' => 1, 'graph' => 0, 'descr' => 'disabled'],
+		]
+	],
+	"inverterControl.0" => [
+		"oid" => ".1.3.6.1.4.1.39145.12.10.0",
+		"descr" => "Inverter Control",
+		"state_name" => "inverterControl",
+		"states" => [
+        		['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'enabled'],
+		        ['value' => 2, 'generic' => 1, 'graph' => 0, 'descr' => 'disabled'],
+		]
+	],
+	"transferRelayStatus.0" => [
+		"oid" => ".1.3.6.1.4.1.39145.12.11.0",
+		"descr" => "Transfer Relay Status",
+		"state_name" => "transferRelayStatus",
+		"states" => [
+		        ['value' => 1, 'generic' => 1, 'graph' => 0, 'descr' => 'inverter'],
+        		['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'grid'],
+		]
+	]
+);
 
-    discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $current_value, 'snmp', $index);
-    create_sensor_to_state_index($device, $state_name, $index);
-}
-
-$inverterControl = (int)(snmpget($device, 'inverterControl.0', '-Oqv', 'ICT-SINE-WAVE-INVERTER-MIB'));
-if ($inverterControl >= 0) {
-    ## Inverter Control
-    $index = 0;
-    $state_name = 'inverterControl';
-    $states = [
-        ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'enabled'],
-        ['value' => 2, 'generic' => 1, 'graph' => 0, 'descr' => 'disabled'],
-    ];
-    create_state_index($state_name, $states);
-    $oid = '.1.3.6.1.4.1.39145.12.10.' . $index;
-    $descr = "Inverter Control";
-    $current_value = $inverterControl;
-
-    discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $current_value, 'snmp', $index);
-    create_sensor_to_state_index($device, $state_name, $index);
-}
-
-
-$transferRelayStatus = (int)(snmpget($device, 'transferRelayStatus.0', '-Oqv', 'ICT-SINE-WAVE-INVERTER-MIB'));
-if ($transferRelayStatus >= 0) {
-    ## Transfer Relay Status
-    $index = 0;
-    $state_name = 'transferRelayStatus';
-    $states = [
-        ['value' => 1, 'generic' => 1, 'graph' => 0, 'descr' => 'inverter'],
-        ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'grid'],
-    ];
-    create_state_index($state_name, $states);
-    $oid = '.1.3.6.1.4.1.39145.12.11.' . $index;
-    $descr = "Transfer Relay Status";
-    $current_value = $transferRelayStatus;
-
-    discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $current_value, 'snmp', $index);
-    create_sensor_to_state_index($device, $state_name, $index);
+foreach($oids as $oid=>$info) {
+	$data = (int)(snmpget($device, $oid, '-0qv', 'ICT-SINE-WAVE-INVERTER-MIB'));
+	if($data >= 0) {
+		create_state_index($info["state_name"], $info["states"]);
+    		discover_sensor($valid['sensor'], 'state', $device, $info["oid"], 0, $info["state_name"], $info["descr"], 1, 1, null, null, null, null, $data, 'snmp', 0);
+    		create_sensor_to_state_index($device, $info["state_name"], 0);
+	}
 }
