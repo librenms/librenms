@@ -278,12 +278,17 @@ if (($device['os'] == 'routeros') && Config::get('autodiscovery.xdp') === true) 
                     $lldp['lldpRemPortId'] = (string)($n_slot * 1000 + $n_port);
                 }
 
-                $remote_port_id = find_port_id(
-                    $lldp['lldpRemPortDesc'],
-                    $lldp['lldpRemPortId'],
-                    $remote_device_id,
-                    $remote_port_mac
-                );
+                //Try to match links via LLDP port ids, otherwise do it the old way
+                $remote_port_id = find_port_id_by_lldp_port_id($lldp['lldpRemPortId'], $remote_device_id);
+
+                if (!$remote_port_id) {
+                    $remote_port_id = find_port_id(
+                        $lldp['lldpRemPortDesc'],
+                        $lldp['lldpRemPortId'],
+                        $remote_device_id,
+                        $remote_port_mac
+                    );
+                }
 
                 if (empty($lldp['lldpRemSysName'])) {
                     $lldp['lldpRemSysName'] = $remote_device['sysName'] ?: $remote_device['hostname'];
