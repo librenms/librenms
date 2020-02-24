@@ -1462,13 +1462,6 @@ ports_fdb:
     ports_fdb_device_id_index: { Name: ports_fdb_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
     ports_fdb_port_id_index: { Name: ports_fdb_port_id_index, Columns: [port_id], Unique: false, Type: BTREE }
     ports_fdb_vlan_id_index: { Name: ports_fdb_vlan_id_index, Columns: [vlan_id], Unique: false, Type: BTREE }
-ports_lldp_loc_port_id_mappings:
-  Columns:
-    - { Field: device_id, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
-    - { Field: lldpLocPortId, Type: varchar(255), 'Null': false, Extra: '' }
-    - { Field: port_id, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
-  Indexes:
-    device_lldpLocPortId_Index: { Name: device_lldpLocPortId_Index, Columns: [device_id, lldpLocPortId], Unique: true, Type: BTREE }
 ports_nac:
   Columns:
     - { Field: ports_nac_id, Type: 'int(10) unsigned', 'Null': false, Extra: auto_increment }
