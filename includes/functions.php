@@ -108,6 +108,11 @@ function only_alphanumeric($string)
     return preg_replace('/[^a-zA-Z0-9]/', '', $string);
 }
 
+function replace_dot_space_to_underscore($string)
+{
+    return str_replace(array(" ","."), "_", $string);
+}
+
 /**
  * Parse cli discovery or poller modules and set config for this run
  *
