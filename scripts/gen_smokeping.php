@@ -17,7 +17,8 @@ require realpath(__DIR__ . '/..') . '/includes/init.php';
 function replace_dot_space($item)
 {
             return str_replace(array(" ","."), "_", $item);
-        }
+}
+
 ?>
 
 menu = Top
