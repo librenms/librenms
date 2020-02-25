@@ -14,6 +14,10 @@
 $init_modules = array();
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
+function replace_dot_space($item)
+{
+            return str_replace(array(" ","."), "_", $item);
+        }
 ?>
 
 menu = Top
@@ -22,13 +26,13 @@ title = Network Latency Grapher
 <?php
 
 foreach (dbFetchRows("SELECT `type` FROM `devices` WHERE `ignore` = 0 AND `disabled` = 0 AND `type` != '' GROUP BY `type`") as $groups) {
-    //Dot and space needs to be replaced, since smokeping doesn't accept it at this level
-    echo '+ ' . str_replace(array(" ","."), "_", $groups['type']) . PHP_EOL;
+    //Dot needs to be replaced, since smokeping doesn't accept it at this level
+    echo '+ ' . replace_dot_space($groups['type']) . PHP_EOL;
     echo 'menu = ' . $groups['type'] . PHP_EOL;
     echo 'title = ' . $groups['type'] . PHP_EOL;
     foreach (dbFetchRows("SELECT `hostname` FROM `devices` WHERE `type` = ? AND `ignore` = 0 AND `disabled` = 0", array($groups['type'])) as $devices) {
         //Dot needs to be replaced, since smokeping doesn't accept it at this level
-        echo '++ ' . str_replace(".", "_", $devices['hostname']) . PHP_EOL;
+        echo '++ ' . replace_dot_space($devices['hostname']) . PHP_EOL;
         echo 'menu = ' . $devices['hostname'] . PHP_EOL;
         echo 'title = ' . $devices['hostname'] . PHP_EOL;
         echo 'host = ' . $devices['hostname'] . PHP_EOL . PHP_EOL;
