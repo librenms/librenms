@@ -26,25 +26,21 @@
 // Battery Voltage
 $batteryVoltage = (int)(snmp_get($device, 'batteryVoltage.0', '-Oqv', 'ICT-SINE-WAVE-INVERTER-MIB'));
 if ($batteryVoltage >= 0) {
-    $divisor = 1;
     $index = 0;
     $oid = '.1.3.6.1.4.1.39145.12.6.0';
     $descr = 'Battery Voltage (VDC)';
     $type = 'ict-swi';
-    $currentValue = $batteryVoltage / $divisor;
     
-    discover_sensor($valid['sensor'], 'voltage', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $currentValue);
+    discover_sensor($valid['sensor'], 'voltage', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $batteryVoltage);
 }
 
 // Inverter Voltage
 $inverterVoltage = (int)(snmp_get($device, 'inverterVoltage.0', '-Oqv', 'ICT-SINE-WAVE-INVERTER-MIB'));
 if ($inverterVoltage >= 0) {
-    $divisor = 1;
     $index = 1;
     $oid = '.1.3.6.1.4.1.39145.12.7.0';
     $descr = 'Inverter Voltage (VAC)';
     $type = 'ict-swi';
-    $currentValue = $inverterVoltage / $divisor;
 
-    discover_sensor($valid['sensor'], 'voltage', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $currentValue);
+    discover_sensor($valid['sensor'], 'voltage', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $inverterVoltage);
 }
