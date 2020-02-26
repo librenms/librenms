@@ -125,6 +125,10 @@ class AppServiceProvider extends ServiceProvider
             return IP::isValid($ip) || Validate::hostname($value);
         }, __('The :attribute must a valid IP address/network or hostname.'));
 
+        Validator::extend('is_regex', function ($attribute, $value) {
+            return @preg_match($value, null) !== false;
+        }, __(':attribute is not a valid regular expression'));
+
         Validator::extend('zero_or_exists', function ($attribute, $value, $parameters, $validator) {
             if ($value === 0) {
                 return true;
