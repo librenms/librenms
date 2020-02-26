@@ -77,6 +77,7 @@ if (isset($_POST['create-default'])) {
 require_once 'includes/html/modal/new_alert_rule.inc.php';
 require_once 'includes/html/modal/delete_alert_rule.inc.php'; // Also dies if !Auth::user()->hasGlobalAdmin()
 require_once 'includes/html/modal/alert_rule_collection.inc.php'; // Also dies if !Auth::user()->hasGlobalAdmin()
+require_once 'includes/html/modal/alert_rule_list.inc.php'; // Also dies if !Auth::user()->hasGlobalAdmin()
 
 require_once 'includes/html/modal/edit_transport_group.inc.php';
 require_once 'includes/html/modal/edit_alert_transport.inc.php';
