@@ -3199,8 +3199,8 @@
             "type": "boolean"
         },
         "ignore_mount": {
-            "group": "system",
-            "section": "mountpoints_to_ignore",
+            "group": "discovery",
+            "section": "storage",
             "order": 3,
             "default": [
                 "/kern",
@@ -3213,22 +3213,22 @@
             "type": "array"
         },
         "ignore_mount_network": {
-            "group": "system",
-            "section": "mountpoints_to_ignore",
+            "group": "discovery",
+            "section": "storage",
             "order": 0,
             "default": true,
             "type": "boolean"
         },
         "ignore_mount_optical": {
-            "group": "system",
-            "section": "mountpoints_to_ignore",
+            "group": "discovery",
+            "section": "storage",
             "order": 1,
             "default": true,
             "type": "boolean"
         },
         "ignore_mount_regexp": {
-            "group": "system",
-            "section": "mountpoints_to_ignore",
+            "group": "discovery",
+            "section": "storage",
             "order": 5,
             "default": [
                 "/on: \\/packages/",
@@ -3243,18 +3243,21 @@
                 "/UMA/",
                 "/^\\/Volumes\\/OS X Base System/"
             ],
-            "type": "array"
+            "type": "array",
+            "validate": {
+                "value.*": "is_regex"
+            }
         },
         "ignore_mount_removable": {
-            "group": "system",
-            "section": "mountpoints_to_ignore",
+            "group": "discovery",
+            "section": "storage",
             "order": 2,
             "default": true,
             "type": "boolean"
         },
         "ignore_mount_string": {
-            "group": "system",
-            "section": "mountpoints_to_ignore",
+            "group": "discovery",
+            "section": "storage",
             "order": 4,
             "default": [
                 "packages",
