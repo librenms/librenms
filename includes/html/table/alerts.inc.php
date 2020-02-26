@@ -14,7 +14,7 @@
 */
 
 $where = ' `devices`.`disabled` = 0';
-
+$param = [];
 $alert_states = array(
     // divined from librenms/alerts.php
     'recovered' => 0,
@@ -22,16 +22,6 @@ $alert_states = array(
     'acknowledged' => 2,
     'worse' => 3,
     'better' => 4,
-);
-
-$alert_severities = array(
-    // alert_rules.status is enum('ok','warning','critical')
-    'ok' => 1,
-    'warning' => 2,
-    'critical' => 3,
-    'ok only' => 4,
-    'warning only' => 5,
-    'critical only' => 6,
 );
 
 $show_recovered = false;
@@ -57,14 +47,7 @@ if (is_numeric($vars['state'])) {
 }
 
 if (isset($vars['min_severity'])) {
-    if (is_numeric($vars['min_severity'])) {
-        $min_severity_id = $vars['min_severity'];
-    } elseif (!empty($vars['min_severity'])) {
-        $min_severity_id = $alert_severities[$vars['min_severity']];
-    }
-    if (isset($min_severity_id)) {
-        $where .= " AND `alert_rules`.`severity` " . ($min_severity_id > 3 ? "" : ">") . "= " . ($min_severity_id > 3 ? $min_severity_id - 3 : $min_severity_id);
-    }
+    $where .=  get_sql_filter_min_severity($vars['min_severity'], "alert_rules");
 }
 
 if (is_numeric($vars['group'])) {
@@ -83,9 +66,9 @@ if (isset($searchPhrase) && !empty($searchPhrase)) {
 $sql = ' FROM `alerts` LEFT JOIN `devices` ON `alerts`.`device_id`=`devices`.`device_id`';
 
 if (!Auth::user()->hasGlobalRead()) {
-    $sql .= ' LEFT JOIN `devices_perms` AS `DP` ON `devices`.`device_id` = `DP`.`device_id`';
-    $where .= ' AND `DP`.`user_id`=?';
-    $param[] = Auth::id();
+    $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
+    $where .= " AND `devices`.`device_id` IN " .dbGenPlaceholders(count($device_ids));
+    $param = array_merge($param, $device_ids);
 }
 
 $sql .= " LEFT JOIN `locations` ON `devices`.`location_id` = `locations`.`id`";

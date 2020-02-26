@@ -58,6 +58,7 @@ $invert       = mres(isset($_POST['invert']) ? $_POST['invert'] : null);
 $name         = mres($_POST['name']);
 $proc         = mres($_POST['proc']);
 $recovery     = ($vars['recovery']);
+$invert_map   = mres(isset($_POST['invert_map']) ? $_POST['invert_map'] : null);
 $severity     = mres($_POST['severity']);
 
 if (!is_numeric($count)) {
@@ -81,6 +82,12 @@ if ($invert == 'on') {
 
 $recovery = empty($recovery) ? $recovery = false : true;
 
+if ($invert_map == 'on') {
+    $invert_map = true;
+} else {
+    $invert_map = false;
+}
+
 $extra = array(
     'mute'     => $mute,
     'count'    => $count,
@@ -96,12 +103,13 @@ $extra_json = json_encode($extra);
 if (is_numeric($rule_id) && $rule_id > 0) {
     if (dbUpdate(
         array(
-        'severity' => $severity,
+            'severity' => $severity,
             'extra' => $extra_json,
             'name' => $name,
             'proc' => $proc,
             'query' => $query,
-            'builder' => $builder_json
+            'builder' => $builder_json,
+            'invert_map' => $invert_map
         ),
         'alert_rules',
         'id=?',
@@ -128,7 +136,8 @@ if (is_numeric($rule_id) && $rule_id > 0) {
             'name' => $name,
             'proc' => $proc,
             'query' => $query,
-            'builder' => $builder_json
+            'builder' => $builder_json,
+            'invert_map' => $invert_map
         ), 'alert_rules');
 
         if ($rule_id) {
@@ -148,8 +157,11 @@ if (is_numeric($rule_id) && $rule_id > 0) {
 if (is_numeric($rule_id) && $rule_id > 0) {
     $devices = [];
     $groups = [];
+    $locations = [];
     foreach ((array)$vars['maps'] as $item) {
-        if (starts_with($item, 'g')) {
+        if (starts_with($item, 'l')) {
+            $locations[] = (int)substr($item, 1);
+        } elseif (starts_with($item, 'g')) {
             $groups[] = (int)substr($item, 1);
         } else {
             $devices[] = (int)$item;
@@ -158,6 +170,7 @@ if (is_numeric($rule_id) && $rule_id > 0) {
 
     dbSyncRelationship('alert_device_map', 'rule_id', $rule_id, 'device_id', $devices);
     dbSyncRelationship('alert_group_map', 'rule_id', $rule_id, 'group_id', $groups);
+    dbSyncRelationship('alert_location_map', 'rule_id', $rule_id, 'location_id', $locations);
 
     //Update transport groups and transports - can't use dbSyncRelationship
     $transports = [];
@@ -169,7 +182,7 @@ if (is_numeric($rule_id) && $rule_id > 0) {
             $transports[] = (int)$item;
         }
     }
-    
+
     // Fetch transport/group mappings already in db
     $sql = "SELECT `transport_or_group_id` FROM `alert_transport_map` WHERE `target_type`='single' AND `rule_id`=?";
     $db_transports = dbFetchColumn($sql, [$rule_id]);

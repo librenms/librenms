@@ -405,6 +405,9 @@ function add_device(\Illuminate\Http\Request $request)
     } else {
         return api_error(400, 'You haven\'t specified an SNMP version to use');
     }
+
+    $additional['overwrite_ip'] = $data['overwrite_ip'] ?: null;
+
     try {
         $device_id = addHost($hostname, $snmpver, $port, $transport, $poller_group, $force_add, 'ifIndex', $additional);
     } catch (Exception $e) {
@@ -496,14 +499,19 @@ function list_bgp(\Illuminate\Http\Request $request)
     $sql_params = [];
     $hostname   = $request->get('hostname');
     $asn        = $request->get('asn');
+    $remote_asn = $request->get('remote_asn');
     $device_id  = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     if (is_numeric($device_id)) {
-        $sql        = ' AND `devices`.`device_id` = ?';
+        $sql        .= ' AND `devices`.`device_id` = ?';
         $sql_params[] = $device_id;
     }
     if (!empty($asn)) {
-        $sql = ' AND `devices`.`bgpLocalAs` = ?';
+        $sql .= ' AND `devices`.`bgpLocalAs` = ?';
         $sql_params[] = $asn;
+    }
+    if (!empty($remote_asn)) {
+        $sql .= ' AND `bgpPeers`.`bgpPeerRemoteAs` = ?';
+        $sql_params[] = $remote_asn;
     }
 
     $bgp_sessions       = dbFetchRows("SELECT `bgpPeers`.* FROM `bgpPeers` LEFT JOIN `devices` ON `bgpPeers`.`device_id` = `devices`.`device_id` WHERE `bgpPeerState` IS NOT NULL AND `bgpPeerState` != '' $sql", $sql_params);
@@ -985,7 +993,15 @@ function list_alerts(\Illuminate\Http\Request $request)
     }
 
     $order = 'timestamp desc';
-
+    
+    $alert_rule = $request->get('alert_rule');
+    if (isset($alert_rule)) {
+        if (is_numeric($alert_rule)) {
+            $param[] = $alert_rule;
+            $sql .= ' AND `R`.id=?';
+        }
+    }
+    
     if ($request->has('order')) {
         list($sort_column, $sort_order) = explode(' ', $request->get('order'), 2);
         if (($res = validate_column_list($sort_column, 'alerts')) !== true) {
@@ -1012,6 +1028,7 @@ function add_edit_rule(\Illuminate\Http\Request $request)
     $rule_id = $data['rule_id'];
     $tmp_devices = (array)$data['devices'];
     $groups  = (array)$data['groups'];
+    $locations  = (array)$data['locations'];
     if (empty($tmp_devices) && !isset($rule_id)) {
         return api_error(400, 'Missing the devices or global device (-1)');
     }
@@ -1107,6 +1124,7 @@ function add_edit_rule(\Illuminate\Http\Request $request)
 
     dbSyncRelationship('alert_device_map', 'rule_id', $rule_id, 'device_id', $devices);
     dbSyncRelationship('alert_group_map', 'rule_id', $rule_id, 'group_id', $groups);
+    dbSyncRelationship('alert_location_map', 'rule_id', $rule_id, 'location_id', $locations);
     return api_success_noresult(200);
 }
 
@@ -1209,6 +1227,21 @@ function get_inventory(\Illuminate\Http\Request $request)
 }
 
 
+function get_inventory_for_device(\Illuminate\Http\Request $request)
+{
+    $hostname = $request->route('hostname');
+    // use hostname as device_id if it's all digits
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    return check_device_permission($device_id, function ($device_id) use ($request) {
+        $params    = [];
+        $sql = 'SELECT * FROM `entPhysical` WHERE device_id = ?';
+        $params[] = $device_id;
+        $inventory = dbFetchRows($sql, $params);
+        return api_success($inventory, 'inventory');
+    });
+}
+
+
 function search_oxidized(\Illuminate\Http\Request $request)
 {
     $search_in_conf_textbox = $request->route('searchstring');
@@ -1279,6 +1312,7 @@ function list_oxidized(\Illuminate\Http\Request $request)
             'vyos'       => 'vyatta',
             'slms'       => 'zhoneolt',
             'fireware'   => 'firewareos',
+            'fortigate'  => 'fortios',
         ];
 
         $device['os'] = str_replace(array_keys($models), array_values($models), $device['os']);
@@ -2187,47 +2221,166 @@ function validate_column_list($columns, $tableName)
     return true;
 }
 
+function missing_fields($required_fields, $data)
+{
+    foreach ($required_fields as $required) {
+        if (empty($data[$required])) {
+            return true;
+        }
+    }
+    return false;
+}
+
 function add_service_for_host(\Illuminate\Http\Request $request)
 {
     $hostname = $request->route('hostname');
-    // use hostname as device_id if it's all digits
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-
     $data = json_decode($request->getContent(), true);
-    $missing_fields = [];
-
-    // Check if some required fields are empty
-    if (empty($data['type'])) {
-        $missing_fields[] = 'type';
+    if (missing_fields(array('type'), $data)) {
+        return api_error(400, 'Required fields missing (hostname and type needed)');
     }
-    if (empty($data['ip'])) {
-        $missing_fields[] = 'ip';
-    }
-
-    // Print error if required fields are missing
-    if (!empty($missing_fields)) {
-        return api_error(400, sprintf("Service field%s %s missing: %s.", ((sizeof($missing_fields)>1)?'s':''), ((sizeof($missing_fields)>1)?'are':'is'), implode(', ', $missing_fields)));
-    }
-
-    // Check if service type exists
     if (!in_array($data['type'], list_available_services())) {
         return api_error(400, "The service " . $data['type'] . " does not exist.\n Available service types: " . implode(', ', list_available_services()));
     }
-
-    // Get parameters
     $service_type = $data['type'];
     $service_ip   = $data['ip'];
     $service_desc = $data['desc'] ? $data['desc'] : '';
     $service_param = $data['param'] ? $data['param'] : '';
     $service_ignore = $data['ignore'] ? true : false; // Default false
-
-    // Set the service
     $service_id = add_service($device_id, $service_type, $service_desc, $service_ip, $service_param, (int)$service_ignore);
     if ($service_id != false) {
         return api_success_noresult(201, "Service $service_type has been added to device $hostname (#$service_id)");
     }
-
     return api_error(500, 'Failed to add the service');
+}
+
+function add_parents_to_host(\Illuminate\Http\Request $request)
+{
+    $data = json_decode($request->getContent(), true);
+    $device_id = $request->route('id');
+    $parent_ids = explode(',', $data['parent_ids']);
+    if (validateDeviceIds($parent_ids) && validateDeviceIds(array($device_id)) && (!in_array($device_id, $parent_ids))) {
+        Device::find($device_id)->parents()->sync($parent_ids);
+        return api_success_noresult(201, 'Device dependencies have been saved');
+    }
+    return api_error(400, "Check your parent and device IDs");
+}
+
+function del_parents_from_host(\Illuminate\Http\Request $request)
+{
+    $device_id = $request->route('id');
+    $data = json_decode($request->getContent(), true);
+    if (!validateDeviceIds(array($device_id))) {
+        return api_error(400, "Check your device ID!");
+    }
+    $device = Device::find($device_id);
+    if (!empty($data['parent_ids'])) {
+        $parents = explode(',', $data['parent_ids']);
+        //remove parents included in the request if they are valid device ids
+        $result = validateDeviceIds($parents)?$device->parents()->detach($parents):false;
+    }
+    if (is_null($result)) {
+        //$result doesn't exist so $data['parent_ids'] is empty
+        $result = $device->parents()->detach(); //remove all parents
+    }
+    if ($result) {
+        return api_success_noresult(201, 'All device dependencies have been removed');
+    }
+    return api_error(400, 'Device dependency cannot be deleted check device and parents ids');
+}
+
+function validateDeviceIds($ids)
+{
+    foreach ($ids as $id) {
+        $invalidId = !is_numeric($id) || $id < 1 || is_null(Device::find($id));
+        if ($invalidId) {
+            return false;
+        }
+    }
+    return true;
+}
+  
+function add_location(\Illuminate\Http\Request $request)
+{
+    $data = json_decode($request->getContent(), true);
+    if (missing_fields(array('location','lat', 'lng'), $data)) {
+        return api_error(400, 'Required fields missing (location, lat and lng needed)');
+    }
+    // Set the location
+    $timestamp = date("Y-m-d H:m:s");
+    $insert = array('location' => $data['location'], 'lat' => $data['lat'], 'lng' => $data['lng'], 'timestamp' => $timestamp);
+    $location_id = dbInsert($insert, 'locations');
+    if ($location_id != false) {
+        return api_success_noresult(201, "Location added with id #$location_id");
+    }
+    return api_error(500, 'Failed to add the location');
+}
+
+function edit_location(\Illuminate\Http\Request $request)
+{
+    $location = $request->route('location_id_or_name');
+    if (empty($location)) {
+        return api_error(400, 'No location has been provided to edit');
+    }
+    $location_id = ctype_digit($location) ? $location : get_location_id_by_name($location);
+    $data = json_decode($request->getContent(), true);
+    if (empty($location_id)) {
+        return api_error(400, "Failed to delete location");
+    }
+    $result = dbUpdate($data, 'locations', '`id` = ?', [$location_id]);
+    if ($result == 1) {
+        return api_success_noresult(201, "Location updated successfully");
+    }
+    return api_error(500, "Failed to update location");
+}
+
+function get_location_id_by_name($location)
+{
+    return dbFetchCell("SELECT id FROM locations WHERE location = ?", $location);
+}
+
+function del_location(\Illuminate\Http\Request $request)
+{
+    $location = $request->route('location');
+    if (empty($location)) {
+        return api_error(400, 'No location has been provided to delete');
+    }
+    $location_id = get_location_id_by_name($location);
+    if (empty($location_id)) {
+        return api_error(400, "Failed to delete $location (Does not exists)");
+    }
+    $data = [
+        'location_id' => 0
+    ];
+    dbUpdate($data, 'devices', '`location_id` = ?', [$location_id]);
+    $result = dbDelete('locations', '`location` = ? ', [$location]);
+    if ($result == 1) {
+        return api_success_noresult(201, "Location $location has been deleted successfully");
+    }
+    return api_error(500, "Failed to delete the location $location");
+}
+
+function del_service_from_host(\Illuminate\Http\Request $request)
+{
+    $service_id = $request->route('id');
+    if (empty($service_id)) {
+        return api_error(400, 'No service_id has been provided to delete');
+    }
+    $result = delete_service($service_id);
+    if ($result == 1) {
+        return api_success_noresult(201, "Service has been deleted successfully");
+    }
+    return api_error(500, "Failed to delete the service");
+}
+
+function edit_service_for_host(\Illuminate\Http\Request $request)
+{
+    $service_id = $request->route('id');
+    $data = json_decode($request->getContent(), true);
+    if (edit_service($data, $service_id) == 1) {
+        return api_success_noresult(201, "Service updated successfully");
+    }
+    return api_error(500, "Failed to update the service with id $service_id");
 }
 
 /**

@@ -1,12 +1,4 @@
 <table class="table table-condensed table-hover table-striped">
-    <tr bgcolor='$iftype'>
-        <th>Device</th>
-        <th>Interface</th>
-        <th>Speed</th>
-        <th>Circuit</th>
-        <th>Notes</th>
-    </tr>
-
 <?php
 
 if ($bg == '#ffffff') {

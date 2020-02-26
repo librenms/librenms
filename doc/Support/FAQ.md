@@ -30,7 +30,7 @@ path: blob/master/doc/
 - [Why is my EdgeRouter device not detected?](#faq25)
 - [Why are some of my disks not showing?](#faq26)
 - [Why are my disks reporting an incorrect size?](#faq27)
-- [What is the Difference between Disable Device and Ignore a Device?](#faq28)
+- [What does mean \"ignore alert tag\" on device, component, service and port?](#faq28)
 - [Why can't Normal and Global View users see Oxidized?](#faq29)
 - [What is the Demo User for?](#faq30)
 - [Why does modifying 'Default Alert Template' fail?](#faq31)
@@ -41,6 +41,7 @@ path: blob/master/doc/
 - [My alerts aren't being delivered on time](#my-alerts-aren't-being-delivered-on-time)
 - [My alert templates stopped working](#my-alert-templates-stopped-working)
 - [How do I use trend prediction in graphs](#how-do-i-use-trend-prediction-in-graphs)
+- [How do I move only the DB to another server](#move-db-to-another-server)
 
 # Developing
 
@@ -314,7 +315,7 @@ architecture then the following steps should be all that's needed:
 - Stop cron by commenting out all lines in `/etc/cron.d/librenms`
 - Dump the MySQL database `librenms` from your old server (`mysqldump
   librenms -u root -p > librenms.sql`)...
-- and import it into your new server (`mysql -u root -p < librenms.sql`).
+- and import it into your new server (`mysql -u root -p librenms < librenms.sql`).
 - Copy the `rrd/` folder to the new server.
 - Copy the `config.php` file to the new server.
 - Check for modified files (eg specific os, ...) with `git status` and 
@@ -366,10 +367,12 @@ adding to /etc/snmp/snmpd.conf :
 
 `realStorageUnits 0`
 
-## <a name="faq28"> What is the Difference between Disable Device and Ignore a Device?</a>
+## <a name="faq28"> What does mean \"ignore alert tag\" on device, component, service and port?</a>
 
-- Disable stops polling.
-- Ignore disables alerting.
+Tag device, component, service and port to ignore alerts. Alert checks will still run.
+However, ignore tag can be read in alert rules. For example on device, if `devices.ignore = 0` 
+or `macros.device = 1` condition is is set and ignore alert tag is on,
+the alert rule won't match. The alert rule is ignored.
 
 ## <a name="faq8"> How do I add support for a new OS?</a>
 
@@ -591,4 +594,25 @@ To view a prediction:
 - Click update
 
 You should now see a linear prediction line on the graph.
+## <a name='move-db-to-another-server'>How do I move only the DB to another server?</a>
 
+There is already a reference how to move your whole LNMS installation to another server. But the following steps will help you to split up an "All-in-one" installation to one LibreNMS installation with a seperate database install. 
+*Note: This section assumes you have a MySQL/MariaDB instance
+
+- Stop the apache and mysql service in you LibreNMS installation.
+- Edit out all the cron entries in `/etc/cron.d/librenms`. 
+- Dump your `librenms`database on your current install by issuing `mysqldump librenms -u root -p > librenms.sql`.
+- Stop and disable the MySQL server on your current install.
+- On your new server make sure you create a new database with the standard install command, no need to add a user for localhost though.
+- Copy this over to your new database server and import it with `mysql -u root -p librenms < librenms.sql`.
+- Enter to mysql and add permissions with the following two commands:
+```
+GRANT ALL PRIVILEGES ON librenms.* TO 'librenms'@'IP_OF_YOUR_LNMS_SERVER' IDENTIFIED BY 'PASSWORD' WITH GRANT OPTION;
+GRANT ALL PRIVILEGES ON librenms.* TO 'librenms'@'FQDN_OF_YOUR_LNMS_SERVER' IDENTIFIED BY 'PASSWORD' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
+exit;
+```
+- Enable and restart MySQL server.
+- Edit your `config.php` file to point the install to the new database server location.
+- **Very important**: On your LibreNMS server, inside your install directory is a `.env` file, in it you need to edit the `DBHOST` paramater to point to your new server location. 
+- After all this is done, enable all the cron entries again and start apache.

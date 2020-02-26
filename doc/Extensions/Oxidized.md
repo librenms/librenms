@@ -252,3 +252,10 @@ file content:
 ```
 git cat-file -p <object id>
 ```
+
+# Remove disabled/removed device
+If you want to purge saved config of a device that is not in LibreNMS anymore, you can run the following command: 
+
+```
+git rm --cached <object id>
+```

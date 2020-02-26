@@ -33,6 +33,8 @@ use App\Models\MplsSdp;
 use App\Models\MplsService;
 use App\Models\MplsSap;
 use App\Models\MplsSdpBind;
+use App\Models\MplsTunnelArHop;
+use App\Models\MplsTunnelCHop;
 use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Discovery\MplsDiscovery;
 use LibreNMS\Interfaces\Polling\MplsPolling;
@@ -147,6 +149,8 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
                 'mplsLspPathFailNodeAddr' => $value['vRtrMplsLspPathFailNodeAddr'],
                 'mplsLspPathMetric' => $value['vRtrMplsLspPathMetric'],
                 'mplsLspPathOperMetric' => $value['vRtrMplsLspPathOperMetric'],
+                'mplsLspPathTunnelARHopListIndex' => $value['vRtrMplsLspPathTunnelARHopListIndex'],
+                'mplsLspPathTunnelCHopListIndex' => $value['vRtrMplsLspPathTunnelCRHopListIndex'],
             ]));
         }
 
@@ -293,26 +297,110 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
             $svc_oid = hexdec(substr($bind_id, 9, 16));
             $sdp_id = $sdps->firstWhere('sdp_oid', $sdp_oid)->sdp_id;
             $svc_id = $svcs->firstWhere('svc_oid', $svcId)->svc_id;
-            $binds->push(new MplsSdpBind([
-                'sdp_id' => $sdp_id,
-                'svc_id' => $svc_id,
-                'sdp_oid' => $sdp_oid,
-                'svc_oid' => $svc_oid,
-                'device_id' => $this->getDeviceId(),
-                'sdpBindRowStatus' => $value['sdpBindRowStatus'],
-                'sdpBindAdminStatus' => $value['sdpBindAdminStatus'],
-                'sdpBindOperStatus' => $value['sdpBindOperStatus'],
-                'sdpBindLastMgmtChange' => round($value['sdpBindLastMgmtChange'] / 100),
-                'sdpBindLastStatusChange' => round($value['sdpBindLastStatusChange'] / 100),
-                'sdpBindType' => $value['sdpBindType'],
-                'sdpBindVcType' => $value['sdpBindVcType'],
-                'sdpBindBaseStatsIngFwdPackets' => $value['sdpBindBaseStatsIngressForwardedPackets'],
-                'sdpBindBaseStatsIngFwdOctets' => $value['sdpBindBaseStatsIngFwdOctets'],
-                'sdpBindBaseStatsEgrFwdPackets' => $value['sdpBindBaseStatsEgressForwardedPackets'],
-                'sdpBindBaseStatsEgrFwdOctets' => $value['sdpBindBaseStatsEgressForwardedOctets'],
-            ]));
+            if (isset($sdp_id, $svc_id, $sdp_oid, $svc_oid)) {
+                $binds->push(new MplsSdpBind([
+                    'sdp_id' => $sdp_id,
+                    'svc_id' => $svc_id,
+                    'sdp_oid' => $sdp_oid,
+                    'svc_oid' => $svc_oid,
+                    'device_id' => $this->getDeviceId(),
+                    'sdpBindRowStatus' => $value['sdpBindRowStatus'],
+                    'sdpBindAdminStatus' => $value['sdpBindAdminStatus'],
+                    'sdpBindOperStatus' => $value['sdpBindOperStatus'],
+                    'sdpBindLastMgmtChange' => round($value['sdpBindLastMgmtChange'] / 100),
+                    'sdpBindLastStatusChange' => round($value['sdpBindLastStatusChange'] / 100),
+                    'sdpBindType' => $value['sdpBindType'],
+                    'sdpBindVcType' => $value['sdpBindVcType'],
+                    'sdpBindBaseStatsIngFwdPackets' => $value['sdpBindBaseStatsIngressForwardedPackets'],
+                    'sdpBindBaseStatsIngFwdOctets' => $value['sdpBindBaseStatsIngFwdOctets'],
+                    'sdpBindBaseStatsEgrFwdPackets' => $value['sdpBindBaseStatsEgressForwardedPackets'],
+                    'sdpBindBaseStatsEgrFwdOctets' => $value['sdpBindBaseStatsEgressForwardedOctets'],
+                ]));
+            }
         }
         return $binds;
+    }
+
+    /**
+     * @return Collection MplsTunnelArHop objects
+     */
+    public function discoverMplsTunnelArHops($paths)
+    {
+        $mplsTunnelArHopCache = snmpwalk_cache_multi_oid($this->getDevice(), 'mplsTunnelARHopTable', [], 'MPLS-TE-MIB', 'nokia', '-OQUsbt');
+        $mplsTunnelArHopCache = snmpwalk_cache_multi_oid($this->getDevice(), 'vRtrMplsTunnelARHopTable', $mplsTunnelArHopCache, 'TIMETRA-MPLS-MIB', 'nokia', '-OQUsb');
+
+        // vRtrMplsTunnelARHopProtection Bits
+        $localAvailable     = 0b10000000;
+        $localInUse         = 0b01000000;
+        $bandwidthProtected = 0b00100000;
+        $nodeProtected      = 0b00010000;
+        $preemptionPending  = 0b00001000;
+        $nodeId             = 0b00000100;
+
+
+        $arhops = collect();
+        foreach ($mplsTunnelArHopCache as $key => $value) {
+            list($mplsTunnelARHopListIndex, $mplsTunnelARHopIndex) = explode('.', $key);
+            $lsp_path_id = $paths->firstWhere('mplsLspPathTunnelARHopListIndex', $mplsTunnelARHopListIndex)->lsp_path_id;
+            $protection = intval($value['vRtrMplsTunnelARHopProtection'], 16);
+
+            $localLinkProtection = ($protection & $localAvailable) ? "true" : "false";
+            $linkProtectionInUse = ($protection & $localInUse) ? "true" : "false";
+            $bandwidthProtection = ($protection & $bandwidthProtected) ? "true" : "false";
+            $nextNodeProtection  = ($protection & $nodeProtected) ? "true" : "false";
+
+            if (isset($mplsTunnelARHopListIndex, $mplsTunnelARHopIndex, $lsp_path_id)) {
+                $arhops->push(new MplsTunnelArHop([
+                    'mplsTunnelARHopListIndex' => $mplsTunnelARHopListIndex,
+                    'mplsTunnelARHopIndex' => $mplsTunnelARHopIndex,
+                    'lsp_path_id' => $lsp_path_id,
+                    'device_id' => $this->getDeviceId(),
+                    'mplsTunnelARHopAddrType' => $value['mplsTunnelARHopAddrType'],
+                    'mplsTunnelARHopIpv4Addr' => $value['mplsTunnelARHopIpv4Addr'],
+                    'mplsTunnelARHopIpv6Addr' => $value['mplsTunnelARHopIpv6Addr'],
+                    'mplsTunnelARHopAsNumber' => $value['mplsTunnelARHopAsNumber'],
+                    'mplsTunnelARHopStrictOrLoose' => $value['mplsTunnelARHopStrictOrLoose'],
+                    'mplsTunnelARHopRouterId' => $value['vRtrMplsTunnelARHopRouterId'],
+                    'localProtected' => $localLinkProtection,
+                    'linkProtectionInUse' => $linkProtectionInUse,
+                    'bandwidthProtected' => $bandwidthProtection,
+                    'nextNodeProtected' => $nextNodeProtection,
+                ]));
+            }
+        }
+        return $arhops;
+    }
+
+    /**
+     * @return Collection MplsTunnelCHop objects
+     */
+    public function discoverMplsTunnelCHops($paths)
+    {
+        $mplsTunnelCHopCache = snmpwalk_cache_multi_oid($this->getDevice(), 'vRtrMplsTunnelCHopTable', [], 'TIMETRA-MPLS-MIB', 'nokia', '-OQUsb');
+
+        $chops = collect();
+        d_echo($mplsTunnelCHopCache);
+        foreach ($mplsTunnelCHopCache as $key => $value) {
+            list($mplsTunnelCHopListIndex, $mplsTunnelCHopIndex) = explode('.', $key);
+            $lsp_path_id = $paths->firstWhere('mplsLspPathTunnelCHopListIndex', $mplsTunnelCHopListIndex)->lsp_path_id;
+            d_echo('mplsTunnelCHopListIndex: ' . $mplsTunnelCHopListIndex . '  mplsTunnelCHopIndex: ' . $mplsTunnelCHopIndex . '  path: ' . $paths->firstWhere('mplsLspPathTunnelCHopListIndex', $mplsTunnelCHopListIndex));
+
+#            if (isset($mplsTunnelCHopListIndex, $mplsTunnelCHopIndex, $lsp_path_id)) { 
+                $chops->push(new MplsTunnelCHop([
+                    'mplsTunnelCHopListIndex' => $mplsTunnelCHopListIndex,
+                    'mplsTunnelCHopIndex' => $mplsTunnelCHopIndex,
+                    'lsp_path_id' => $lsp_path_id,
+                    'device_id' => $this->getDeviceId(),
+                    'mplsTunnelCHopAddrType' => $value['vRtrMplsTunnelCHopAddrType'],
+                    'mplsTunnelCHopIpv4Addr' => $value['vRtrMplsTunnelCHopIpv4Addr'],
+                    'mplsTunnelCHopIpv6Addr' => $value['vRtrMplsTunnelCHopIpv6Addr'],
+                    'mplsTunnelCHopAsNumber' => $value['vRtrMplsTunnelCHopAsNumber'],
+                    'mplsTunnelCHopStrictOrLoose' => $value['vRtrMplsTunnelCHopStrictOrLoose'],
+                    'mplsTunnelCHopRouterId' => $value['vRtrMplsTunnelCHopRtrID'],
+                ]));
+#            }
+        }
+        return $chops;
     }
 
     /**
@@ -392,6 +480,8 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
                 'mplsLspPathTimeUp' => abs($value['vRtrMplsLspPathTimeUp']),
                 'mplsLspPathTimeDown' => abs($value['vRtrMplsLspPathTimeDown']),
                 'mplsLspPathTransitionCount' => $value['vRtrMplsLspPathTransitionCount'],
+                'mplsLspPathTunnelARHopListIndex' => $value['vRtrMplsLspPathTunnelARHopListIndex'],
+                'mplsLspPathTunnelCHopListIndex' => $value['vRtrMplsLspPathTunnelCRHopListIndex'],
             ]));
         }
 
@@ -537,26 +627,108 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
             $svc_oid = hexdec(substr($bind_id, 9, 16));
             $sdp_id = $sdps->firstWhere('sdp_oid', $sdp_oid)->sdp_id;
             $svc_id = $svcs->firstWhere('svc_oid', $svcId)->svc_id;
-            $binds->push(new MplsSdpBind([
-                'sdp_id' => $sdp_id,
-                'svc_id' => $svc_id,
-                'sdp_oid' => $sdp_oid,
-                'svc_oid' => $svc_oid,
-                'device_id' => $this->getDeviceId(),
-                'sdpBindRowStatus' => $value['sdpBindRowStatus'],
-                'sdpBindAdminStatus' => $value['sdpBindAdminStatus'],
-                'sdpBindOperStatus' => $value['sdpBindOperStatus'],
-                'sdpBindLastMgmtChange' => round($value['sdpBindLastMgmtChange'] / 100),
-                'sdpBindLastStatusChange' => round($value['sdpBindLastStatusChange'] / 100),
-                'sdpBindType' => $value['sdpBindType'],
-                'sdpBindVcType' => $value['sdpBindVcType'],
-                'sdpBindBaseStatsIngFwdPackets' => $value['sdpBindBaseStatsIngressForwardedPackets'],
-                'sdpBindBaseStatsIngFwdOctets' => $value['sdpBindBaseStatsIngFwdOctets'],
-                'sdpBindBaseStatsEgrFwdPackets' => $value['sdpBindBaseStatsEgressForwardedPackets'],
-                'sdpBindBaseStatsEgrFwdOctets' => $value['sdpBindBaseStatsEgressForwardedOctets'],
-            ]));
+            if (isset($sdp_id, $svc_id, $sdp_oid, $svc_oid)) {
+                $binds->push(new MplsSdpBind([
+                    'sdp_id' => $sdp_id,
+                    'svc_id' => $svc_id,
+                    'sdp_oid' => $sdp_oid,
+                    'svc_oid' => $svc_oid,
+                    'device_id' => $this->getDeviceId(),
+                    'sdpBindRowStatus' => $value['sdpBindRowStatus'],
+                    'sdpBindAdminStatus' => $value['sdpBindAdminStatus'],
+                    'sdpBindOperStatus' => $value['sdpBindOperStatus'],
+                    'sdpBindLastMgmtChange' => round($value['sdpBindLastMgmtChange'] / 100),
+                    'sdpBindLastStatusChange' => round($value['sdpBindLastStatusChange'] / 100),
+                    'sdpBindType' => $value['sdpBindType'],
+                    'sdpBindVcType' => $value['sdpBindVcType'],
+                    'sdpBindBaseStatsIngFwdPackets' => $value['sdpBindBaseStatsIngressForwardedPackets'],
+                    'sdpBindBaseStatsIngFwdOctets' => $value['sdpBindBaseStatsIngFwdOctets'],
+                    'sdpBindBaseStatsEgrFwdPackets' => $value['sdpBindBaseStatsEgressForwardedPackets'],
+                    'sdpBindBaseStatsEgrFwdOctets' => $value['sdpBindBaseStatsEgressForwardedOctets'],
+                ]));
+            }
         }
-
         return $binds;
     }
+
+    /**
+     * @return Collection MplsTunnelArHop objects
+     */
+    public function pollMplsTunnelArHops($paths)
+    {
+        $mplsTunnelArHopCache = snmpwalk_cache_multi_oid($this->getDevice(), 'mplsTunnelARHopTable', [], 'MPLS-TE-MIB', 'nokia', '-OQUsbt');
+        $mplsTunnelArHopCache = snmpwalk_cache_multi_oid($this->getDevice(), 'vRtrMplsTunnelARHopTable', $mplsTunnelArHopCache, 'TIMETRA-MPLS-MIB', 'nokia', '-OQUsb');
+
+        // vRtrMplsTunnelARHopProtection Bits
+        $localAvailable     = 0b10000000;
+        $localInUse         = 0b01000000;
+        $bandwidthProtected = 0b00100000;
+        $nodeProtected      = 0b00010000;
+        $preemptionPending  = 0b00001000;
+        $nodeId             = 0b00000100;
+
+
+        $arhops = collect();
+        foreach ($mplsTunnelArHopCache as $key => $value) {
+            list($mplsTunnelARHopListIndex, $mplsTunnelARHopIndex) = explode('.', $key);
+            $lsp_path_id = $paths->firstWhere('mplsLspPathTunnelARHopListIndex', $mplsTunnelARHopListIndex)->lsp_path_id;
+            $protection = intval($value['vRtrMplsTunnelARHopProtection'], 16);
+
+            $localLinkProtection = ($protection & $localAvailable) ? "true" : "false";
+            $linkProtectionInUse = ($protection & $localInUse) ? "true" : "false";
+            $bandwidthProtection = ($protection & $bandwidthProtected) ? "true" : "false";
+            $nextNodeProtection  = ($protection & $nodeProtected) ? "true" : "false";
+
+            if (isset($mplsTunnelARHopListIndex, $mplsTunnelARHopIndex, $lsp_path_id)) {
+                $arhops->push(new MplsTunnelArHop([
+                    'mplsTunnelARHopListIndex' => $mplsTunnelARHopListIndex,
+                    'mplsTunnelARHopIndex' => $mplsTunnelARHopIndex,
+                    'lsp_path_id' => $lsp_path_id,
+                    'device_id' => $this->getDeviceId(),
+                    'mplsTunnelARHopAddrType' => $value['mplsTunnelARHopAddrType'],
+                    'mplsTunnelARHopIpv4Addr' => $value['mplsTunnelARHopIpv4Addr'],
+                    'mplsTunnelARHopIpv6Addr' => $value['mplsTunnelARHopIpv6Addr'],
+                    'mplsTunnelARHopAsNumber' => $value['mplsTunnelARHopAsNumber'],
+                    'mplsTunnelARHopStrictOrLoose' => $value['mplsTunnelARHopStrictOrLoose'],
+                    'mplsTunnelARHopRouterId' => $value['vRtrMplsTunnelARHopRouterId'],
+                    'localProtected' => $localLinkProtection,
+                    'linkProtectionInUse' => $linkProtectionInUse,
+                    'bandwidthProtected' => $bandwidthProtection,
+                    'nextNodeProtected' => $nextNodeProtection,
+                ]));
+            }
+        }
+        return $arhops;
+    }
+
+    /**
+     * @return Collection MplsTunnelCHop objects
+     */
+    public function pollMplsTunnelCHops($paths)
+    {
+        $mplsTunnelCHopCache = snmpwalk_cache_multi_oid($this->getDevice(), 'vRtrMplsTunnelCHopTable', [], 'TIMETRA-MPLS-MIB', 'nokia', '-OQUsb');
+
+        $chops = collect();
+        foreach ($mplsTunnelCHopCache as $key => $value) {
+            list($mplsTunnelCHopListIndex, $mplsTunnelCHopIndex) = explode('.', $key);
+            $lsp_path_id = $paths->firstWhere('mplsLspPathTunnelCHopListIndex', $mplsTunnelCHopListIndex)->lsp_path_id;
+
+#            if (isset($mplsTunnelCHopListIndex, $mplsTunnelCHopIndex, $lsp_path_id)) { 
+                $chops->push(new MplsTunnelCHop([
+                    'mplsTunnelCHopListIndex' => $mplsTunnelCHopListIndex,
+                    'mplsTunnelCHopIndex' => $mplsTunnelCHopIndex,
+                    'lsp_path_id' => $lsp_path_id,
+                    'device_id' => $this->getDeviceId(),
+                    'mplsTunnelCHopAddrType' => $value['vRtrMplsTunnelCHopAddrType'],
+                    'mplsTunnelCHopIpv4Addr' => $value['vRtrMplsTunnelCHopIpv4Addr'],
+                    'mplsTunnelCHopIpv6Addr' => $value['vRtrMplsTunnelCHopIpv6Addr'],
+                    'mplsTunnelCHopAsNumber' => $value['vRtrMplsTunnelCHopAsNumber'],
+                    'mplsTunnelCHopStrictOrLoose' => $value['vRtrMplsTunnelCHopStrictOrLoose'],
+                    'mplsTunnelCHopRouterId' => $value['vRtrMplsTunnelCHopRtrID'],
+                ]));
+#            }
+        }
+        return $chops;
+    }
+// End Class Timos
 }

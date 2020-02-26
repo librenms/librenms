@@ -85,7 +85,7 @@ class GlobeController extends WidgetController
             } elseif ($data['markers'] == 'ports') {
                 foreach ($location->devices as $device) {
                     list($ports_down, $ports_up) = $device->ports->partition(function ($port) {
-                        return $port->ifOperStatus == 'down' && $port->ifAdminStatus == 'up';
+                        return $port->ifOperStatus != 'up' && $port->ifAdminStatus == 'up';
                     });
                     $count += $device->ports->count();
                     $up += $ports_up->count();

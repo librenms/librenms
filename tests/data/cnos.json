@@ -8,13 +8,13 @@
                     "sysDescr": "Lenovo ThinkSystem NE1072T RackSwitch",
                     "sysContact": null,
                     "version": null,
-                    "hardware": "",
+                    "hardware": null,
                     "features": null,
-                    "location": null,
                     "os": "cnos",
                     "type": "network",
                     "serial": null,
-                    "icon": "lenovo.svg"
+                    "icon": "lenovo.svg",
+                    "location": null
                 }
             ]
         },

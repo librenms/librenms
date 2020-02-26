@@ -13,6 +13,8 @@
  * @author     LibreNMS Contributors
 */
 
+use LibreNMS\Alert\AlertUtil;
+
 $pagetitle[] = "Devices";
 
 if (!isset($vars['format'])) {
@@ -165,7 +167,7 @@ if ($format == "graph") {
     if (!empty($vars['state'])) {
         $where .= " AND status= ?";
         $sql_param[] = $state;
-        $where .= " AND disabled='0' AND `ignore`='0'";
+        $where .= " AND disabled='0' AND `disable_notify`='0'";
         $sql_param[] = '';
     }
     if (!empty($vars['disabled'])) {
@@ -176,11 +178,19 @@ if ($format == "graph") {
         $where .= " AND `ignore`= ?";
         $sql_param[] = $vars['ignore'];
     }
+    if (!empty($vars['disable_notify'])) {
+        $where .= " AND `disable_notify`= ?";
+        $sql_param[] = $vars['disable_notify'];
+    }
     if (!empty($vars['location']) && $vars['location'] == "Unset") {
         $location_filter = '';
     }
     if (!empty($vars['location'])) {
         $location_filter = $vars['location'];
+    }
+    if (isset($vars['poller_group'])) {
+        $where .= " AND `poller_group`= ?";
+        $sql_param[] = $vars['poller_group'];
     }
     if (!empty($vars['group'])) {
         $where .= " AND ( ";
@@ -290,6 +300,7 @@ if ($format == "graph") {
                 <tr>
                     <th data-column-id="status" data-formatter="status" data-width="7px" data-searchable="false">&nbsp;</th>
                     <th data-column-id="icon" data-width="70px" data-searchable="false" data-formatter="icon" data-visible="<?php echo $detailed  ? 'true' : 'false'; ?>">Vendor</th>
+                    <th data-column-id="maintenance" data-width="5px" data-searchable="false" data-formatter="maintenance" data-visible="<?php echo $detailed  ? 'true' : 'false'; ?>"></th>
                     <th data-column-id="hostname" data-order="asc" <?php echo $detailed ? 'data-formatter="device"' : ''; ?>>Device</th>
                     <th data-column-id="metrics" data-width="<?php echo $detailed ? '100px' : '150px'; ?>" data-sortable="false" data-searchable="false" data-visible="<?php echo $detailed  ? 'true' : 'false'; ?>">Metrics</th>
                     <th data-column-id="hardware">Platform</th>
@@ -313,6 +324,12 @@ if ($format == "graph") {
                 },
                 "icon": function (column, row) {
                     return "<span class=\"device-table-icon\">" + row.icon + "</span>";
+                },
+                "maintenance": function (column, row) {
+                    if (row.maintenance) {
+                        return "<span title=\"Scheduled Maintenance\" class=\"glyphicon glyphicon-wrench\"></span>";
+                    }
+                    return '';
                 },
                 "device": function (column, row) {
                     return "<span>" + row.hostname + "</span>";
@@ -344,7 +361,9 @@ if ($format == "graph") {
                     state: '<?php echo mres($vars['state']); ?>',
                     disabled: '<?php echo mres($vars['disabled']); ?>',
                     ignore: '<?php echo mres($vars['ignore']); ?>',
+                    disable_notify: '<?php echo mres($vars['disable_notify']); ?>',
                     group: '<?php echo mres($vars['group']); ?>',
+                    poller_group: '<?php echo mres($vars['poller_group']); ?>',
                 };
             },
             url: "<?php echo url('/ajax/table/device') ?>"
@@ -368,7 +387,7 @@ if ($format == "graph") {
             "<div class='form-group'><select name='location' id='location' class='form-control'></select></div>" +
             "<div class='form-group'><select name='type' id='device-type' class='form-control'></select></div>" +
             "<input type='submit' class='btn btn-info' value='Search'>" +
-            "<a href='<?php echo generate_url($vars) ?>' title='Update the browser URL to reflect the search criteria.' class='btn btn-default'>Update URL</a>" +
+            "<a href='<?php echo generate_url(array_diff_key($vars, ['_token' => 1])) ?>' title='Update the browser URL to reflect the search criteria.' class='btn btn-default'>Update URL</a>" +
             "<a href='<?php echo generate_url(array('page' => 'devices', 'section' => $vars['section'], 'bare' => $vars['bare'])) ?>' title='Reset criteria to default.' class='btn btn-default'>Reset</a>" +
             "</form>" +
             "</div>"

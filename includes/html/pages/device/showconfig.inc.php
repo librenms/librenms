@@ -17,12 +17,15 @@ if (Auth::user()->hasGlobalAdmin()) {
 
             if (is_file($configs.$device['hostname'])) {
                 $file = $configs.$device['hostname'];
+                break;
             } elseif (is_file($configs.strtok($device['hostname'], '.'))) { // Strip domain
                 $file = $configs.strtok($device['hostname'], '.');
+                break;
             } else {
                 if (!empty(Config::get('mydomain'))) { // Try with domain name if set
                     if (is_file($configs.$device['hostname'].'.'.Config::get('mydomain'))) {
                         $file = $configs.$device['hostname'].'.'.Config::get('mydomain');
+                        break;
                     }
                 }
             } // end if

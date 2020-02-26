@@ -32,9 +32,18 @@ var grid = $("#routes").bootgrid({
         } else {
             var showAllRoutes = false;
         }
+
+        var list_showProtocols = document.getElementById('list_showProtocols');
+        if (list_showProtocols) {
+            var list_showProtocols = document.getElementById('list_showProtocols').value;
+        } else {
+            var list_showProtocols = 'all';
+        }
+
         return {
             device_id: "<?php echo $device['device_id']; ?>",
             showAllRoutes: showAllRoutes,
+            showProtocols: list_showProtocols
         };
     },
     url: "ajax/table/routes"
@@ -42,13 +51,23 @@ var grid = $("#routes").bootgrid({
 
 var add = $(".actionBar").append(
         '<div class="search form-group pull-left" style="width:auto">' +
-        '<?php echo csrf_field() ?>'+
+        '<?php echo csrf_field() ?>' +
+        '<select name="list_showProtocols" id="list_showProtocols" class="input-sm" onChange="updateTable();">' +
+        '<option value="all">all Protocols</option>' +
+        '<option value="ipv4">IPv4 only</option>' +
+        '<option value="ipv6">IPv6 only</option>' +
+        '</select>&nbsp;' +
         '<input type="checkbox" name="check_showAllRoutes" data-size="small" id="check_showAllRoutes">' +
-        '&nbsp;Include historical routes in the table.' +
+        '&nbsp;Include historical routes in the table' +
         '</div>');
+
 $("#check_showAllRoutes").bootstrapSwitch({
     'onSwitchChange': function(event, state){
-         $('#routes').bootgrid('reload');  
+         updateTable();
     }
 });
+
+function updateTable() {
+    $('#routes').bootgrid('reload');
+};
 </script>
