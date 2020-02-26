@@ -1,6 +1,6 @@
 os: e3meterdc
-text: 'E3 Meter'
-type: network
+text: 'E3 Meter DataConcentrator'
+type: power
 icon: riedo
 mib_dir:
     - riedo
