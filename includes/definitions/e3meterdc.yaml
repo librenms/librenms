@@ -1,0 +1,10 @@
+os: e3meterdc
+text: 'E3 Meter'
+type: network
+icon: riedo
+mib_dir:
+    - riedo
+discovery:
+    -
+      sysObjectID:
+          - '.1.3.6.1.4.1.21695'
