@@ -1483,6 +1483,40 @@ function find_port_id($description, $identifier = '', $device_id = 0, $mac_addre
     return (int)dbFetchCell($sql, $params);
 }
 
+/**
+ * Try to find a port by lldp port id
+ *
+ * @param string $lldpremportid matched against ports.lldpLocPortId
+ * @param int $device_id restrict search to ports on a specific device
+ * @return int
+ */
+function discover_lldp_loc_port_id($device)
+{
+
+    $port_stats = [];
+    $port_stats = snmpwalk_cache_oid($device, 'lldpLocPortId', $port_stats, 'LLDP-MIB');
+
+    foreach ($port_stats as $ifIndex => $snmp_data) {
+        $port = dbFetchRow('SELECT * from `ports` where `device_id` = ? AND `ifIndex` = ?', [$device['device_id'], $ifIndex]);
+        if ($port['port_id']) {
+
+            $data['device_id'] = $device['device_id'];
+            $data['lldpLocPortId'] = $snmp_data['lldpLocPortId'];
+            $data['port_id'] = $port['port_id'];
+
+            $lldpport = dbFetchRow('SELECT * from `ports_lldplocportid` where `device_id` = ? AND `lldpLocPortId` = ?', [$data['device_id'], $data['lldpLocPortId']]);
+            if (!$lldpport) {
+            //Insert
+            dbInsert($data, 'ports_lldplocportid');
+            } else {
+            //Update
+            dbUpdate($data, 'ports_lldplocportid', '`device_id` = ? and `lldpLocPortId` = ?', [$data['device_id'], $data['lldpLocPortId']]);
+            }
+        }
+        
+    
+    }
+}
 
 /**
  * Try to find a port by lldp port id
