@@ -34,10 +34,13 @@
         ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.17.1.5', 'sensor_name' => 'ethernetNTEGE206FCardVoltage'],
         ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.25.1.5', 'sensor_name' => 'ethernetNTEGE112CardVoltage'],
         ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.26.1.5', 'sensor_name' => 'ethernetNTEGE114CardVoltage'],
+        ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.27.1.5', 'sensor_name' => 'ethernetNTEGE206VCardVoltage'],
         ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.30.1.5', 'sensor_name' => 'ethernetNTEXG210CardVoltage'],
         ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.31.1.5', 'sensor_name' => 'ethernetXG1XCCCardVoltage'],
         ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.41.1.5', 'sensor_name' => 'ethernetGE8SCCCardVoltage'],
         ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.46.1.5', 'sensor_name' => 'ethernetNTEGE114SCardVoltage'],
+        ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.57.1.5', 'sensor_name' => 'ethernetNTEGE114ProCardVoltage'],
+        ['sensor_oid' => '.1.3.6.1.4.1.2544.1.12.3.1.80.1.5', 'sensor_name' => ' ethernetNTEXG116PROCardVoltage'],
     ];
 
     $multiplier = 1;
