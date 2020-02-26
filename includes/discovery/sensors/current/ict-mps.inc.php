@@ -24,14 +24,11 @@
  */
 
 // Output Current
-$outputCurrent = trim(snmp_get($device, 'outputCurrent.0', '-Oqv', 'ICTICT-MODULAR-POWER-SYSTEM-MIB'), '" ');
+$outputCurrent = trim(snmp_get($device, 'outputCurrent.0', '-Oqv', 'ICT-MODULAR-POWER-SYSTEM-MIB'), '" ');
 if (!empty($outputCurrent)) {
-    $divisor = 1;
-    $index = 0;
     $oid = '.1.3.6.1.4.1.39145.13.8.0';
     $descr = 'Output Current (A)';
     $type = 'ict-mps';
-    $currentValue = $outputCurrent / $divisor;
 
-    discover_sensor($valid['sensor'], 'current', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $currentValue);
+    discover_sensor($valid['sensor'], 'current', $device, $oid, 0, $type, $descr, 1, '1', null, null, null, null, $outputCurrent);
 }
