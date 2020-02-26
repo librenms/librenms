@@ -85,3 +85,4 @@ Output from the API currently is via two output types:
 - [Services](Services.md)
 - [Logs](Logs.md)
 - [System](System.md)
+- [Locations](Locations.md)

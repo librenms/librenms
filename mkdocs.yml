@@ -110,6 +110,7 @@ nav:
       - Services: API/Services.md
       - System: API/System.md
       - Logs: API/Logs.md
+      - Locations: API/Locations.md
   - 8. Alerting:
       - Intro: Alerting/index.md
       - Introduction: Alerting/Introduction.md

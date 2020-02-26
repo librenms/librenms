@@ -6,13 +6,14 @@ use App\Jobs\PingCheck;
 $init_modules = ['alerts', 'laravel', 'nodb'];
 require __DIR__ . '/includes/init.php';
 
-$options = getopt('hdvg:');
+$options = getopt('hdvrg:');
 
 if (isset($options['h'])) {
     echo <<<'END'
-ping.php: Usage ping.php [-d] [-v] [-g group(s)]
+ping.php: Usage ping.php [-d] [-v] [-r] [-g group(s)]
   -d enable debug output
   -v enable verbose debug output
+  -r do not create or update RRDs
   -g only ping devices for this poller group, may be comma separated list
 
 END;
@@ -24,6 +25,10 @@ set_debug(isset($options['d']));
 if (isset($options['v'])) {
     global $vdebug;
     $vdebug = true;
+}
+
+if (isset($options['r'])) {
+    Config::set('norrd', true);
 }
 
 if (isset($options['g'])) {

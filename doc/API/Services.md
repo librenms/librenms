@@ -144,3 +144,58 @@ Output:
     "message": "Service ping has been added to device 192.168.1.10 (#10)"
 }
 ```
+
+### `edit_service_from_host`
+
+Edits a service
+
+Route: `/api/v0/services/:service_id`
+
+- service id
+
+Input:
+
+- id: service id
+
+Example:
+
+```curl
+curl -X PATCH -d '{"service_disabled":"1"}' 'X-Auth-Token:YOUR-API-TOKEN' https://librenms.org/api/v0/services/5
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "message": "Service updated successfully"
+
+}
+```
+
+### `delete_service_from_host`
+
+Deletes service from device
+
+Route: `/api/v0/services/:service_id`
+
+- service id
+
+Input:
+
+- id: service id
+
+Example:
+
+```curl
+curl -X DELETE -H 'X-Auth-Token:YOUR-API-TOKEN' https://librenms.org/api/v0/services/35
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "message": "Service has been deleted successfully"
+}
+```

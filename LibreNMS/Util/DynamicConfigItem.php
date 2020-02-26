@@ -193,7 +193,7 @@ class DynamicConfigItem implements \ArrayAccess
     public function getValidationMessage($value)
     {
         return $this->validate
-            ? implode(" \n", $this->buildValidator($value)->messages()->get('value'))
+            ? implode(" \n", $this->buildValidator($value)->messages()->all())
             : __('settings.validate.' . $this->type, ['id' => $this->name, 'value' => json_encode($value)]);
     }
 
