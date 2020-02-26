@@ -2216,46 +2216,36 @@ function validate_column_list($columns, $tableName)
     return true;
 }
 
+function missing_fields($required_fields, $data)
+{
+    foreach ($required_fields as $required) {
+        if (empty($data[$required])) {
+            return true;
+        }
+    }
+    return false;
+}
+
 function add_service_for_host(\Illuminate\Http\Request $request)
 {
     $hostname = $request->route('hostname');
-    // use hostname as device_id if it's all digits
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-
     $data = json_decode($request->getContent(), true);
-    $missing_fields = [];
-
-    // Check if some required fields are empty
-    if (empty($data['type'])) {
-        $missing_fields[] = 'type';
+    if (missing_fields(array('type'), $data)) {
+        return api_error(400, 'Required fields missing (hostname and type needed)');
     }
-    if (empty($data['ip'])) {
-        $missing_fields[] = 'ip';
-    }
-
-    // Print error if required fields are missing
-    if (!empty($missing_fields)) {
-        return api_error(400, sprintf("Service field%s %s missing: %s.", ((sizeof($missing_fields)>1)?'s':''), ((sizeof($missing_fields)>1)?'are':'is'), implode(', ', $missing_fields)));
-    }
-
-    // Check if service type exists
     if (!in_array($data['type'], list_available_services())) {
         return api_error(400, "The service " . $data['type'] . " does not exist.\n Available service types: " . implode(', ', list_available_services()));
     }
-
-    // Get parameters
     $service_type = $data['type'];
     $service_ip   = $data['ip'];
     $service_desc = $data['desc'] ? $data['desc'] : '';
     $service_param = $data['param'] ? $data['param'] : '';
     $service_ignore = $data['ignore'] ? true : false; // Default false
-
-    // Set the service
     $service_id = add_service($device_id, $service_type, $service_desc, $service_ip, $service_param, (int)$service_ignore);
     if ($service_id != false) {
         return api_success_noresult(201, "Service $service_type has been added to device $hostname (#$service_id)");
     }
-
     return api_error(500, 'Failed to add the service');
 }
 
@@ -2303,6 +2293,89 @@ function validateDeviceIds($ids)
         }
     }
     return true;
+}
+  
+function add_location(\Illuminate\Http\Request $request)
+{
+    $data = json_decode($request->getContent(), true);
+    if (missing_fields(array('location','lat', 'lng'), $data)) {
+        return api_error(400, 'Required fields missing (location, lat and lng needed)');
+    }
+    // Set the location
+    $timestamp = date("Y-m-d H:m:s");
+    $insert = array('location' => $data['location'], 'lat' => $data['lat'], 'lng' => $data['lng'], 'timestamp' => $timestamp);
+    $location_id = dbInsert($insert, 'locations');
+    if ($location_id != false) {
+        return api_success_noresult(201, "Location added with id #$location_id");
+    }
+    return api_error(500, 'Failed to add the location');
+}
+
+function edit_location(\Illuminate\Http\Request $request)
+{
+    $location = $request->route('location_id_or_name');
+    if (empty($location)) {
+        return api_error(400, 'No location has been provided to edit');
+    }
+    $location_id = ctype_digit($location) ? $location : get_location_id_by_name($location);
+    $data = json_decode($request->getContent(), true);
+    if (empty($location_id)) {
+        return api_error(400, "Failed to delete location");
+    }
+    $result = dbUpdate($data, 'locations', '`id` = ?', [$location_id]);
+    if ($result == 1) {
+        return api_success_noresult(201, "Location updated successfully");
+    }
+    return api_error(500, "Failed to update location");
+}
+
+function get_location_id_by_name($location)
+{
+    return dbFetchCell("SELECT id FROM locations WHERE location = ?", $location);
+}
+
+function del_location(\Illuminate\Http\Request $request)
+{
+    $location = $request->route('location');
+    if (empty($location)) {
+        return api_error(400, 'No location has been provided to delete');
+    }
+    $location_id = get_location_id_by_name($location);
+    if (empty($location_id)) {
+        return api_error(400, "Failed to delete $location (Does not exists)");
+    }
+    $data = [
+        'location_id' => 0
+    ];
+    dbUpdate($data, 'devices', '`location_id` = ?', [$location_id]);
+    $result = dbDelete('locations', '`location` = ? ', [$location]);
+    if ($result == 1) {
+        return api_success_noresult(201, "Location $location has been deleted successfully");
+    }
+    return api_error(500, "Failed to delete the location $location");
+}
+
+function del_service_from_host(\Illuminate\Http\Request $request)
+{
+    $service_id = $request->route('id');
+    if (empty($service_id)) {
+        return api_error(400, 'No service_id has been provided to delete');
+    }
+    $result = delete_service($service_id);
+    if ($result == 1) {
+        return api_success_noresult(201, "Service has been deleted successfully");
+    }
+    return api_error(500, "Failed to delete the service");
+}
+
+function edit_service_for_host(\Illuminate\Http\Request $request)
+{
+    $service_id = $request->route('id');
+    $data = json_decode($request->getContent(), true);
+    if (edit_service($data, $service_id) == 1) {
+        return api_success_noresult(201, "Service updated successfully");
+    }
+    return api_error(500, "Failed to update the service with id $service_id");
 }
 
 /**
