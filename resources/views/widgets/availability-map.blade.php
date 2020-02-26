@@ -28,10 +28,14 @@
 @foreach($devices as $device)
     <a href="@deviceUrl($device)" title="{{ $device->displayName() }}@if($device->formatUptime(true)) - @endif{{ $device->formatUptime(true) }}">
         @if($type == 0)
-            @if($color_only_select)
+            @if($color_only_select == 1)
                 <span class="label {{ $device->labelClass }} widget-availability-fixed widget-availability label-font-border"> </span>
             @else
+            @if($color_only_select == 2)
+                <span class="label {{ $device->labelClass }} widget-availability label-font-border">@lang($device->hostname)</span>
+            @else
                 <span class="label {{ $device->labelClass }} widget-availability label-font-border">@lang($device->stateName)</span>
+            @endif
             @endif
         @else
             <div class="availability-map-oldview-box-{{ $device->stateName }}" style="width:{{ $tile_size }}px;height:{{ $tile_size }}px;"></div>
