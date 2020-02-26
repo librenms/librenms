@@ -3199,6 +3199,9 @@
             "type": "boolean"
         },
         "ignore_mount": {
+            "group": "system",
+            "section": "mountpoints_to_ignore",
+            "order": 3,
             "default": [
                 "/kern",
                 "/mnt/cdrom",
@@ -3210,14 +3213,23 @@
             "type": "array"
         },
         "ignore_mount_network": {
+            "group": "system",
+            "section": "mountpoints_to_ignore",
+            "order": 0,
             "default": true,
             "type": "boolean"
         },
         "ignore_mount_optical": {
+            "group": "system",
+            "section": "mountpoints_to_ignore",
+            "order": 1,
             "default": true,
             "type": "boolean"
         },
         "ignore_mount_regexp": {
+            "group": "system",
+            "section": "mountpoints_to_ignore",
+            "order": 5,
             "default": [
                 "/on: \\/packages/",
                 "/on: \\/dev/",
@@ -3234,10 +3246,16 @@
             "type": "array"
         },
         "ignore_mount_removable": {
+            "group": "system",
+            "section": "mountpoints_to_ignore",
+            "order": 2,
             "default": true,
             "type": "boolean"
         },
         "ignore_mount_string": {
+            "group": "system",
+            "section": "mountpoints_to_ignore",
+            "order": 4,
             "default": [
                 "packages",
                 "devfs",
