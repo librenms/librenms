@@ -659,7 +659,7 @@ $config['bad_if_regexp'][] = '/^lo[0-9].*/';    // loopback
 ```
 
 Numerous defaults exist for this array already (see
-includes/defaults.inc.php for the full list). You can expand this list
+misc/config_definitions.json for the full list). You can expand this list
 by continuing the array.
 
 `bad_if` is matched against the ifDescr value.
