@@ -30,7 +30,7 @@
                     "features": null,
                     "os": "aruba-instant",
                     "type": "wireless",
-                    "serial": null,
+                    "serial": "BT0490379",
                     "icon": "aruba.svg",
                     "location": "<private>"
                 }
