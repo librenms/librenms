@@ -499,14 +499,19 @@ function list_bgp(\Illuminate\Http\Request $request)
     $sql_params = [];
     $hostname   = $request->get('hostname');
     $asn        = $request->get('asn');
+    $remote_asn = $request->get('remote_asn');
     $device_id  = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     if (is_numeric($device_id)) {
-        $sql        = ' AND `devices`.`device_id` = ?';
+        $sql        .= ' AND `devices`.`device_id` = ?';
         $sql_params[] = $device_id;
     }
     if (!empty($asn)) {
-        $sql = ' AND `devices`.`bgpLocalAs` = ?';
+        $sql .= ' AND `devices`.`bgpLocalAs` = ?';
         $sql_params[] = $asn;
+    }
+    if (!empty($remote_asn)) {
+        $sql .= ' AND `bgpPeers`.`bgpPeerRemoteAs` = ?';
+        $sql_params[] = $remote_asn;
     }
 
     $bgp_sessions       = dbFetchRows("SELECT `bgpPeers`.* FROM `bgpPeers` LEFT JOIN `devices` ON `bgpPeers`.`device_id` = `devices`.`device_id` WHERE `bgpPeerState` IS NOT NULL AND `bgpPeerState` != '' $sql", $sql_params);
