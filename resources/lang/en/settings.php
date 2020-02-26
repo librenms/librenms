@@ -32,6 +32,7 @@ return [
             'general' => 'General Discovery Settings',
             'route' => 'Routes Discovery Module',
             'discovery_modules' => 'Discovery Modules',
+            'storage' => 'Storage Module'
         ],
         'external' => [
             'binaries' => 'Binary Locations',
@@ -54,7 +55,6 @@ return [
             'proxy' => 'Proxy',
             'updates' => 'Updates',
             'server' => 'Server',
-            'mountpoints_to_ignore' => 'Mountpoints to be ignored',
         ],
         'webui' => [
             'availability-map' => 'Availability Map Settings',
