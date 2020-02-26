@@ -681,7 +681,9 @@
                 "atmSubInterface",
                 "aal5",
                 "shdsl",
-                "mpls"
+                "mpls",
+                "macSecControlledIF",
+                "macSecUncontrolledIF"
             ]
         },
         "bad_ifoperstatus": {
