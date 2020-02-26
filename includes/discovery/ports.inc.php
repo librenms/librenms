@@ -9,9 +9,6 @@ $port_stats = snmpwalk_cache_oid($device, 'ifName', $port_stats, 'IF-MIB');
 $port_stats = snmpwalk_cache_oid($device, 'ifAlias', $port_stats, 'IF-MIB');
 $port_stats = snmpwalk_cache_oid($device, 'ifType', $port_stats, 'IF-MIB');
 $port_stats = snmpwalk_cache_oid($device, 'ifOperStatus', $port_stats, 'IF-MIB');
-if (Config::get('autodiscovery.xdp') === true) {
-    $port_stats = snmpwalk_cache_oid($device, 'lldpLocPortId', $port_stats, 'LLDP-MIB');
-}
 
 // End Building SNMP Cache Array
 d_echo($port_stats);
