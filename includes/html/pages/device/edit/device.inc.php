@@ -240,12 +240,13 @@ if (\LibreNMS\Config::get('distributed_poller') === true) {
        <label for="poller_group" class="col-sm-2 control-label">Poller Group</label>
        <div class="col-sm-6">
            <select name="poller_group" id="poller_group" class="form-control input-sm">
-               <option value="0"> Default poller group</option>
+           <option value="0">General<?=\LibreNMS\Config::get('distributed_poller_group') == 0 ? ' (default Poller)': ''?></option>
 <?php
 foreach (dbFetchRows('SELECT `id`,`group_name` FROM `poller_groups` ORDER BY `group_name`') as $group) {
-    echo '<option value="'.$group['id'].'"'.
-        ($device_model->poller_group == $group['id'] ? " selected": "").
-        '>'.$group['group_name'].'</option>';
+    echo ('<option value="'.$group['id'].'"'.
+        ($device_model->poller_group == $group['id'] ? " selected": "").'>'.$group['group_name']);
+    echo (\LibreNMS\Config::get('distributed_poller_group') == $group['id'] ? ' (default Poller)': '');
+    echo ('</option>');
 }
 ?>
            </select>

@@ -1,0 +1,20 @@
+mib: PICA-PRIVATE-MIB
+modules:
+    processors:
+          data:
+              -
+                  oid: cpuUsage
+                  num_oid: '.1.3.6.1.4.1.35098.1.1.{{ $index }}'
+    sensors:
+        fanspeed:
+            data:
+                -
+                    oid: rpsuFanSpeed
+                    num_oid: '.1.3.6.1.4.1.35098.1.11.1.5.{{ $index }}'
+                    descr: 'PSU {{ $index }} Fan Speed'
+                    index: 'psufanspeed{{ $index }}'
+                -
+                    oid: switchFanSpeed
+                    num_oid: '.1.3.6.1.4.1.35098.1.8.{{ $index }}'
+                    descr: 'Switch {{ $index }} Fan Speed'
+                    index: 'swfanspeed{{ $index }}'

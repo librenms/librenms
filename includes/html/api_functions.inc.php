@@ -988,7 +988,15 @@ function list_alerts(\Illuminate\Http\Request $request)
     }
 
     $order = 'timestamp desc';
-
+    
+    $alert_rule = $request->get('alert_rule');
+    if (isset($alert_rule)) {
+        if (is_numeric($alert_rule)) {
+            $param[] = $alert_rule;
+            $sql .= ' AND `R`.id=?';
+        }
+    }
+    
     if ($request->has('order')) {
         list($sort_column, $sort_order) = explode(' ', $request->get('order'), 2);
         if (($res = validate_column_list($sort_column, 'alerts')) !== true) {
@@ -1015,6 +1023,7 @@ function add_edit_rule(\Illuminate\Http\Request $request)
     $rule_id = $data['rule_id'];
     $tmp_devices = (array)$data['devices'];
     $groups  = (array)$data['groups'];
+    $locations  = (array)$data['locations'];
     if (empty($tmp_devices) && !isset($rule_id)) {
         return api_error(400, 'Missing the devices or global device (-1)');
     }
@@ -1110,6 +1119,7 @@ function add_edit_rule(\Illuminate\Http\Request $request)
 
     dbSyncRelationship('alert_device_map', 'rule_id', $rule_id, 'device_id', $devices);
     dbSyncRelationship('alert_group_map', 'rule_id', $rule_id, 'group_id', $groups);
+    dbSyncRelationship('alert_location_map', 'rule_id', $rule_id, 'location_id', $locations);
     return api_success_noresult(200);
 }
 
@@ -2247,6 +2257,52 @@ function add_service_for_host(\Illuminate\Http\Request $request)
     }
 
     return api_error(500, 'Failed to add the service');
+}
+
+function add_parents_to_host(\Illuminate\Http\Request $request)
+{
+    $data = json_decode($request->getContent(), true);
+    $device_id = $request->route('id');
+    $parent_ids = explode(',', $data['parent_ids']);
+    if (validateDeviceIds($parent_ids) && validateDeviceIds(array($device_id)) && (!in_array($device_id, $parent_ids))) {
+        Device::find($device_id)->parents()->sync($parent_ids);
+        return api_success_noresult(201, 'Device dependencies have been saved');
+    }
+    return api_error(400, "Check your parent and device IDs");
+}
+
+function del_parents_from_host(\Illuminate\Http\Request $request)
+{
+    $device_id = $request->route('id');
+    $data = json_decode($request->getContent(), true);
+    if (!validateDeviceIds(array($device_id))) {
+        return api_error(400, "Check your device ID!");
+    }
+    $device = Device::find($device_id);
+    if (!empty($data['parent_ids'])) {
+        $parents = explode(',', $data['parent_ids']);
+        //remove parents included in the request if they are valid device ids
+        $result = validateDeviceIds($parents)?$device->parents()->detach($parents):false;
+    }
+    if (is_null($result)) {
+        //$result doesn't exist so $data['parent_ids'] is empty
+        $result = $device->parents()->detach(); //remove all parents
+    }
+    if ($result) {
+        return api_success_noresult(201, 'All device dependencies have been removed');
+    }
+    return api_error(400, 'Device dependency cannot be deleted check device and parents ids');
+}
+
+function validateDeviceIds($ids)
+{
+    foreach ($ids as $id) {
+        $invalidId = !is_numeric($id) || $id < 1 || is_null(Device::find($id));
+        if ($invalidId) {
+            return false;
+        }
+    }
+    return true;
 }
 
 /**

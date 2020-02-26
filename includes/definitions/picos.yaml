@@ -1,0 +1,11 @@
+os: picos
+text: 'Pica8 OS'
+type: network
+over:
+    - { graph: device_bits, text: Traffic }
+    - { graph: device_processor, text: 'CPU Usage' }
+icon: picos
+discovery:
+    -
+      sysObjectID:
+          - .1.3.6.1.4.1.35098
