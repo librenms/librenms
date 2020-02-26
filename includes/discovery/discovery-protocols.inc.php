@@ -191,7 +191,7 @@ if (($device['os'] == 'routeros') && Config::get('autodiscovery.xdp') === true) 
     echo ' LLDP-MIB: ';
     $lldp_array = snmpwalk_group($device, 'lldpRemTable', 'LLDP-MIB', 3);
     if (!empty($lldp_array)) {
-discover_lldp_loc_port_id($device);
+        discover_lldp_loc_port_id($device);
         $lldp_remAddr_num = snmpwalk_cache_multi_oid($device, '.1.0.8802.1.1.2.1.4.2.1.3', [], 'LLDP-MIB', null, '-OQun');
         foreach ($lldp_remAddr_num as $key => $value) {
             $res = preg_match("/1\.0\.8802\.1\.1\.2\.1\.4\.2\.1\.3\.([^\.]*)\.([^\.]*)\.([^\.]*)\.([^\.]*)\.([^\.]*).(([^\.]*)(\.([^\.]*))+)/", $key, $matches);
@@ -280,7 +280,7 @@ discover_lldp_loc_port_id($device);
                 }
 
                 //Try to match links via LLDP port ids, otherwise do it the old way
-                //$remote_port_id = find_port_id_by_lldp_port_id($lldp['lldpRemPortId'], $remote_device_id);
+                $remote_port_id = find_port_id_by_lldp_port_id($lldp['lldpRemPortId'], $remote_device_id);
 
                 if (!$remote_port_id) {
                     $remote_port_id = find_port_id(

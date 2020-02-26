@@ -1499,22 +1499,19 @@ function discover_lldp_loc_port_id($device)
     foreach ($port_stats as $ifIndex => $snmp_data) {
         $port = dbFetchRow('SELECT * from `ports` where `device_id` = ? AND `ifIndex` = ?', [$device['device_id'], $ifIndex]);
         if ($port['port_id']) {
-
             $data['device_id'] = $device['device_id'];
             $data['lldpLocPortId'] = $snmp_data['lldpLocPortId'];
             $data['port_id'] = $port['port_id'];
 
             $lldpport = dbFetchRow('SELECT * from `ports_lldplocportid` where `device_id` = ? AND `lldpLocPortId` = ?', [$data['device_id'], $data['lldpLocPortId']]);
             if (!$lldpport) {
-            //Insert
-            dbInsert($data, 'ports_lldplocportid');
+                //Insert
+                dbInsert($data, 'ports_lldplocportid');
             } else {
-            //Update
-            dbUpdate($data, 'ports_lldplocportid', '`device_id` = ? and `lldpLocPortId` = ?', [$data['device_id'], $data['lldpLocPortId']]);
+                //Update
+                dbUpdate($data, 'ports_lldplocportid', '`device_id` = ? and `lldpLocPortId` = ?', [$data['device_id'], $data['lldpLocPortId']]);
             }
         }
-        
-    
     }
 }
 
@@ -1531,7 +1528,7 @@ function find_port_id_by_lldp_port_id($lldpremportid, $device_id)
         return 0;
     }
 
-    $sql = "SELECT `port_id` FROM `ports` WHERE `device_id`=? AND `lldpLocPortId`=? LIMIT 1";
+    $sql = "SELECT `port_id` FROM `ports_lldplocportid` WHERE `device_id`=? AND `lldpLocPortId`=? LIMIT 1";
     $params[] = $device_id;
     $params[] = $lldpremportid;
 
