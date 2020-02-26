@@ -279,80 +279,6 @@ Percent Utilized: {{ $value['mempool_perc'] }}
 @endforeach
 ```
 
-#### Microsoft Teams - Markdown
-
-```
-[{{ $alert->title }}](https://your.librenms.url/device/device={{ $alert->device_id }}/)  
-**Device name:** {{ $alert->sysName }}  
-**Severity:** {{ $alert->severity }}  
-@if ($alert->state == 0)
-**Time elapsed:** {{ $alert->elapsed }}  
-@endif
-**Timestamp:** {{ $alert->timestamp }}  
-**Unique-ID:** {{ $alert->uid }}  
-@if ($alert->name)
-**Rule:** {{ $alert->name }}  
-@else
-**Rule:** {{ $alert->rule }}  
-@endif
-@if ($alert->faults)
-**Faults:**@foreach ($alert->faults as $key => $value) {{ $key }}: {{ $value['string'] }}  
-@endforeach
-@endif
-```
-
-#### Microsoft Teams - JSON
-
-```
-{
-    "@context": "https://schema.org/extensions",
-    "@type": "MessageCard",
-    "title": "{{ $alert->title }}",
-@if ($alert->state === 0)
-    "themeColor": "00FF00",
-@elseif ($alert->state === 1)
-    "themeColor": "FF0000",
-@elseif ($alert->state === 2)
-    "themeColor": "337AB7",
-@elseif ($alert->state === 3)
-    "themeColor": "FF0000",
-@elseif ($alert->state === 4)
-    "themeColor": "F0AD4E",
-@else
-    "themeColor": "337AB7",
-@endif
-    "summary": "LibreNMS",
-    "sections": [
-        {
-@if ($alert->name)
-            "text": "**Rule:** [{{ $alert->name }}](https://your.librenms.url/device/device={{ $alert->device_id }}/tab=alert/)  
-@else
-            "text": "**Rule:** [{{ $alert->rule }}](https://your.librenms.url/device/device={{ $alert->device_id }}/tab=alert/)  
-@endif
-            **Severity:** {{ $alert->severity }}  
-            **Unique-ID:** {{ $alert->uid }}  
-            **Timestamp:** {{ $alert->timestamp }}  
-@if ($alert->state == 0)
-            **Time elapsed:** {{ $alert->elapsed }}  
-@endif
-            **Hostname:** [{{ $alert->hostname }}](https://your.librenms.url/device/device={{ $alert->device_id }}/)  
-            **Faults:**  
-@if ($alert->faults)
-@foreach ($alert->faults as $key => $value)
-            >**Port:** [{{ $value['ifName'] }}](https://your.librenms.url/device/device={{ $alert->device_id }}/tab=port/port={{ $value['port_id'] }}/)  
-            >**Description:** {{ $value['ifAlias'] }}  
-@if ($alert->state != 0)
-            >**Status:** down",
-@else
-            >**Status:** up",
-@endif
-@endforeach
-@endif
-        }
-    ]
-}
-```
-
 ### Advanced options
 
 #### Conditional formatting
@@ -447,3 +373,131 @@ The included templates apart from the default template are:
 - BGP Sessions
 - Ports
 - Temperature
+
+## Other Examples
+
+#### Microsoft Teams - Markdown
+
+```
+[{{ $alert->title }}](https://your.librenms.url/device/device={{ $alert->device_id }}/)  
+**Device name:** {{ $alert->sysName }}  
+**Severity:** {{ $alert->severity }}  
+@if ($alert->state == 0)
+**Time elapsed:** {{ $alert->elapsed }}  
+@endif
+**Timestamp:** {{ $alert->timestamp }}  
+**Unique-ID:** {{ $alert->uid }}  
+@if ($alert->name)
+**Rule:** {{ $alert->name }}  
+@else
+**Rule:** {{ $alert->rule }}  
+@endif
+@if ($alert->faults)
+**Faults:**@foreach ($alert->faults as $key => $value) {{ $key }}: {{ $value['string'] }}  
+@endforeach
+@endif
+```
+
+#### Microsoft Teams - JSON
+
+```
+{
+    "@context": "https://schema.org/extensions",
+    "@type": "MessageCard",
+    "title": "{{ $alert->title }}",
+@if ($alert->state === 0)
+    "themeColor": "00FF00",
+@elseif ($alert->state === 1)
+    "themeColor": "FF0000",
+@elseif ($alert->state === 2)
+    "themeColor": "337AB7",
+@elseif ($alert->state === 3)
+    "themeColor": "FF0000",
+@elseif ($alert->state === 4)
+    "themeColor": "F0AD4E",
+@else
+    "themeColor": "337AB7",
+@endif
+    "summary": "LibreNMS",
+    "sections": [
+        {
+@if ($alert->name)
+            "facts": [
+                {
+                    "name": "Rule:",
+                    "value": "[{{ $alert->name }}](https://your.librenms.url/device/device={{ $alert->device_id }}/tab=alert/)"
+                },
+@else
+                {
+                    "name": "Rule:",
+                    "value": "[{{ $alert->rule }}](https://your.librenms.url/device/device={{ $alert->device_id }}/tab=alert/)"
+                },
+@endif
+                {
+                    "name": "Severity:",
+                    "value": "{{ $alert->severity }}"
+                },
+                {
+                    "name": "Unique-ID:",
+                    "value": "{{ $alert->uid }}"
+                },
+                {
+                    "name": "Timestamp:",
+                    "value": "{{ $alert->timestamp }}"
+                },
+@if ($alert->state == 0)
+                {
+                    "name": "Time elapsed:",
+                    "value": "{{ $alert->elapsed }}"
+                },
+@endif
+                {
+                    "name": "Hostname:",
+                    "value": "[{{ $alert->hostname }}](https://your.librenms.url/device/device={{ $alert->device_id }}/)"
+                },
+                {
+                    "name": "Hardware:",
+                    "value": "{{ $alert->hardware }}"
+                },
+                {
+                    "name": "IP:",
+                    "value": "{{ $alert->ip }}"
+                },
+                {
+                    "name": "Faults:",
+                    "value": " "
+                }
+            ]
+@if ($alert->faults)
+@foreach ($alert->faults as $key => $value)
+        },
+        {
+            "facts": [
+                {
+                    "name": "Port:",
+                    "value": "[{{ $value['ifName'] }}](https://your.librenms.url/device/device={{ $alert->device_id }}/tab=port/port={{ $value['port_id'] }}/)"
+                },
+                {
+                    "name": "Description:",
+                    "value": "{{ $value['ifAlias'] }}"
+                },
+@if ($alert->state != 0)
+                {
+                    "name": "Status:",
+                    "value": "down"
+                }
+            ]
+@else
+                {
+                    "name": "Status:",
+                    "value": "up"
+                }
+            ]
+@endif
+@endforeach
+@endif
+        }
+    ]
+}
+```
+
