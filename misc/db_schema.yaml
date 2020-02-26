@@ -1419,7 +1419,6 @@ ports:
     - { Field: poll_time, Type: 'int(10) unsigned', 'Null': true, Extra: '' }
     - { Field: poll_prev, Type: 'int(10) unsigned', 'Null': true, Extra: '' }
     - { Field: poll_period, Type: 'int(10) unsigned', 'Null': true, Extra: '' }
-    - { Field: lldpLocPortId, Type: varchar(255), 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [port_id], Unique: true, Type: BTREE }
     device_ifIndex: { Name: device_ifIndex, Columns: [device_id, ifIndex], Unique: true, Type: BTREE }
@@ -1462,6 +1461,13 @@ ports_fdb:
     ports_fdb_device_id_index: { Name: ports_fdb_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
     ports_fdb_port_id_index: { Name: ports_fdb_port_id_index, Columns: [port_id], Unique: false, Type: BTREE }
     ports_fdb_vlan_id_index: { Name: ports_fdb_vlan_id_index, Columns: [vlan_id], Unique: false, Type: BTREE }
+ports_lldplocportid:
+  Columns:
+    - { Field: device_id, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: lldpLocPortId, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: port_id, Type: 'int(10) unsigned', 'Null': true, Extra: '' }
+  Indexes:
+    ports_lldplocportid_device_id_lldplocportid_unique: { Name: ports_lldplocportid_device_id_lldplocportid_unique, Columns: [device_id, lldpLocPortId], Unique: true, Type: BTREE }
 ports_nac:
   Columns:
     - { Field: ports_nac_id, Type: 'int(10) unsigned', 'Null': false, Extra: auto_increment }
