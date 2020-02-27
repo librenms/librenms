@@ -201,27 +201,10 @@ foreach ($rule_list as $rule) {
             $status_msg = "All devices matching " . $rule['name'] . "  are OK";
         }
         if ((int) $sub['state'] === 1 || (int) $sub['state'] === 2) {
-            switch ($severity) {
-                case 'critical':
-                    $ico   = 'exclamation';
-                    $col   = 'danger';
-                    $extra = 'danger';
-                    break;
-                case 'warning':
-                    $ico   = 'warning';
-                    $col   = 'warning';
-                    $extra = 'warning';
-                    break;
-                case 'ok':
-                    $ico   = 'check';
-                    $col   = 'success';
-                    $extra = 'success';
-                    break;
-                default:
-                    $ico   = 'exclamation';
-                    $col   = 'danger';
-                    $extra = 'danger';
-            }
+            $alert_style = alert_layout($severity);
+            $ico   = $alert_style['icon'];
+            $col   = $alert_style['icon_color'];
+            $extra = $alert_style['background_color'];
             $status_msg = "Some devices matching " . $rule['name'] . " are currently alerting";
         }
     }
