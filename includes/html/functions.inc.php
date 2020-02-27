@@ -331,7 +331,8 @@ function print_graph_tag($args)
     echo generate_graph_tag($args);
 }//end print_graph_tag()
 
-function alert_layout($severity) {
+function alert_layout($severity)
+{
     switch ($severity) {
         case 'critical':
             $icon = 'exclamation';
