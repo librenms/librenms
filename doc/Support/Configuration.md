@@ -372,7 +372,7 @@ $config['device_traffic_iftype'][] = '/loopback/';
 ```
 
 Interface types that aren't graphed in the WebUI. The default array
-contains more items, please see includes/defaults.inc.php for the full list.
+contains more items, please see misc/config_definitions.json for the full list.
 
 ```php
 $config['enable_clear_discovery'] = 1;
@@ -650,16 +650,33 @@ you don't need to configure full location within snmp.
 
 # Interfaces to be ignored
 
+Interfaces can automatically be ignored during discovery by adding bad_if\* 
+entries in either the OS specific definition (includes/definitions/_specific_os.yaml_) 
+or globally (config.php).
+
+
 Examples:
 
+**OS Specific**
+```yaml
+bad_iftype:
+    - aluGponOnu
+    - bridge
+    - ieee8023adLag
+    - l2vlan
+    - slip
+    - softwareLoopback
+```
+
+**Global**
 ```php
 $config['bad_if'][] = "voip-null";
 $config['bad_iftype'][] = "voiceEncap";
 $config['bad_if_regexp'][] = '/^lo[0-9].*/';    // loopback
 ```
 
-Numerous defaults exist for this array already (see
-includes/defaults.inc.php for the full list). You can expand this list
+Numerous defaults exist for these arrays already (see
+misc/config_definitions.json for the full list). You can expand this list
 by continuing the array.
 
 `bad_if` is matched against the ifDescr value.
