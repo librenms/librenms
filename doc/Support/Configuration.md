@@ -372,7 +372,7 @@ $config['device_traffic_iftype'][] = '/loopback/';
 ```
 
 Interface types that aren't graphed in the WebUI. The default array
-contains more items, please see includes/defaults.inc.php for the full list.
+contains more items, please see misc/config_definitions.json for the full list.
 
 ```php
 $config['enable_clear_discovery'] = 1;
@@ -650,17 +650,40 @@ you don't need to configure full location within snmp.
 
 # Interfaces to be ignored
 
+Interfaces can be automatically ignored during discovery by modifying 
+bad_if\* entries in a default array, unsetting a default array and 
+customizing it, or creating an OS specific array. The preferred method 
+for ignoring interfaces is to use an OS specific array. The default 
+arrays can be found in misc/config_definitions.json. OS specific 
+definitions (includes/definitions/_specific_os_.yaml) can contain 
+bad_if\* arrays, but should only be modified via pull-request as 
+manipulation of the definition files will block updating. 
+
 Examples:
 
+**Add entries to default arrays**
 ```php
 $config['bad_if'][] = "voip-null";
 $config['bad_iftype'][] = "voiceEncap";
 $config['bad_if_regexp'][] = '/^lo[0-9].*/';    // loopback
 ```
 
-Numerous defaults exist for this array already (see
-includes/defaults.inc.php for the full list). You can expand this list
-by continuing the array.
+**Unset and customize a default array**
+```php
+unset($config['bad_if']);
+$config['bad_if'][] = "voip-null";
+$config['bad_if'][] = "voiceEncap";
+$config['bad_if'][] = "voiceFXO";
+...
+```
+
+**Create an OS specific array**
+```php
+$config['os']['iosxe']['bad_iftype'][] = "macSecControlledIF";
+$config['os']['iosxe']['bad_iftype'][] = "macSecUncontrolledIF";
+```
+
+**Various bad_if\* selection options available**
 
 `bad_if` is matched against the ifDescr value.
 
