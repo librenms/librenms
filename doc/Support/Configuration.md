@@ -650,35 +650,40 @@ you don't need to configure full location within snmp.
 
 # Interfaces to be ignored
 
-Interfaces can automatically be ignored during discovery by adding bad_if\* 
-entries in either the OS specific definition (includes/definitions/_specific_os_.yaml) 
-or globally (config.php). The preferred method for ignoring interfaces is using
-the OS specific option.
-
+Interfaces can be automatically ignored during discovery by modifying 
+bad_if\* entries in a default array, unsetting a default array and 
+customizing it, or creating an OS specific array. The preferred method 
+for ignoring interfaces is to use an OS specific array. The default 
+arrays can be found in misc/config_definitions.json. OS specific 
+definitions (includes/definitions/_specific_os_.yaml) can contain 
+bad_if\* arrays, but should only be modified via pull-request as 
+manipulation of the definition files will block updating. 
 
 Examples:
 
-**OS Specific**
-```yaml
-bad_iftype:
-    - aluGponOnu
-    - bridge
-    - ieee8023adLag
-    - l2vlan
-    - slip
-    - softwareLoopback
-```
-
-**Global**
+**Add entries to default arrays**
 ```php
 $config['bad_if'][] = "voip-null";
 $config['bad_iftype'][] = "voiceEncap";
 $config['bad_if_regexp'][] = '/^lo[0-9].*/';    // loopback
 ```
 
-Numerous defaults exist for these arrays already (see
-misc/config_definitions.json for the full list). You can expand this list
-by continuing the array.
+**Unset and customize a default array**
+```php
+unset($config['bad_if']);
+$config['bad_if'][] = "voip-null";
+$config['bad_if'][] = "voiceEncap";
+$config['bad_if'][] = "voiceFXO";
+...
+```
+
+**Create an OS specific array**
+```php
+$config['os']['iosxe']['bad_iftype'][] = "macSecControlledIF";
+$config['os']['iosxe']['bad_iftype'][] = "macSecUncontrolledIF";
+```
+
+**Various bad_if\* selection options available**
 
 `bad_if` is matched against the ifDescr value.
 
