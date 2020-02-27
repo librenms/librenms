@@ -32,6 +32,7 @@ return [
             'general' => 'General Discovery Settings',
             'route' => 'Routes Discovery Module',
             'discovery_modules' => 'Discovery Modules',
+            'storage' => 'Storage Module'
         ],
         'external' => [
             'binaries' => 'Binary Locations',
@@ -61,6 +62,7 @@ return [
             'dashboard' => 'Dashboard Settings',
             'search' => 'Search Settings',
             'style' => 'Style',
+            'device' => 'Device Settings',
         ]
     ],
     'settings' => [
@@ -653,6 +655,30 @@ return [
             'description' => 'HTTP(S) Proxy',
             'help' => 'Set this as a fallback if http_proxy or https_proxy environment variable is not available.'
         ],
+        'ignore_mount' => [
+            'description' => 'Mountpoints to be ignored',
+            'help' => 'Don\'t monitor Disc Usage of this Mountpoints'
+        ],
+        'ignore_mount_network' => [
+            'description' => 'Ignore Network Mountpoints',
+            'help' => 'Don\'t monitor Disc Usage of Network Mountpoints'
+        ],
+        'ignore_mount_optical' => [
+            'description' => 'Ignore Optical Drives',
+            'help' => 'Don\'t monitor Disc Usage of optical Drives'
+        ],
+        'ignore_mount_removable' => [
+            'description' => 'Ignore Removable Drives',
+            'help' => 'Don\'t monitor Disc Usage of removable Devices'
+        ],
+        'ignore_mount_regexp' => [
+            'description' => 'Mountpoints matching Regex to be ignored',
+            'help' => 'Don\'t monitor Disc Usage of Mountpoints which are matching at least one of this Regular Expressions'
+        ],
+        'ignore_mount_string' => [
+            'description' => 'Mountpoints containing String to be ignored',
+            'help' => 'Don\'t monitor Disc Usage of Mountpoints which contains at least one of this Strings'
+        ],
         'ipmitool' => [
             'description' => 'Path to ipmtool'
         ],
@@ -1071,6 +1097,10 @@ return [
                 'release' => 'release'
             ]
         ],
+        'uptime_warning' => [
+            'description' => 'Show Device as warning if Uptime below (seconds)',
+            'help' => 'Shows Device as warning if Uptime is below this value. Default 24h'
+        ],
         'virsh' => [
             'description' => 'Path to virsh'
         ],
@@ -1119,6 +1149,10 @@ return [
                 'description' => 'Set the minimum graph height',
                 'help' => 'Minimum Graph Height (default: 300)'
             ]
+        ],
+        'device_location_map_open' => [
+            'description' => 'Location Map open',
+            'help' => 'Location Map is shown by default'
         ],
         'whois' => [
             'description' => 'Path to whois'

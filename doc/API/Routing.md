@@ -13,7 +13,13 @@ Input:
 
 **OR**
 
-- asn = The ASN you would like to filter by
+- asn = The local ASN you would like to filter by
+
+Then you can filter by remote ASN
+
+- remote_asn = The remote ASN
+
+
 
 Example:
 
@@ -21,6 +27,7 @@ Example:
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bgp
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bgp?hostname=host.example.com
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bgp?asn=1234
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/bgp?remote_asn=1234
 ```
 
 Output:

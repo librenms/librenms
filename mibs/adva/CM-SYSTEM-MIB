@@ -27,7 +27,7 @@ IMPORTS
              FROM LLDP-V2-MIB;
 
 cmSystemMIB MODULE-IDENTITY
-    LAST-UPDATED    "201601150000Z"
+    LAST-UPDATED    "201711270000Z"
     ORGANIZATION    "ADVA Optical Networking"
     CONTACT-INFO
             "        Raghav Trivedi
@@ -40,9 +40,19 @@ cmSystemMIB MODULE-IDENTITY
             "This module defines the System MIB definitions used by 
              the F3 (FSP150CM/CC) product lines.
              Copyright (C) ADVA Optical Networking."
-    REVISION        "201601150000Z"
+    REVISION        "201711270000Z"
     DESCRIPTION
-        " Notes from release 201601150000Z
+        " Notes from release 201803130000Z
+           a) added usbPortEnabled scalar variable
+
+        Notes from release 201801170000Z
+           a) added fileServicesDbFileName variable
+        
+        Notes from release 201711270000Z
+           a) added sysLogTimestampFormat scalar variable
+           b) added SysLogFormatType textual convention
+        
+        Notes from release 201601150000Z
            a) added  f3SnmpLongIfAlias scalar variable
 
           Notes from release 201307310000Z 
@@ -133,7 +143,7 @@ f3LldpV2ConfigurationADVAExtObjects    OBJECT IDENTIFIER ::= {cmSystemObjects 17
 snmpIPv6UDPDomain                      OBJECT IDENTIFIER ::= {cmSystemObjects 18}
 f3RawDataObjects                       OBJECT IDENTIFIER ::= {cmSystemObjects 19}
 f3LldpV2RemoteSystemsData              OBJECT IDENTIFIER ::= {cmSystemObjects 20}
-
+f3SimpleLtpObjects                     OBJECT IDENTIFIER ::= {cmSystemObjects 21}
 
 
 -- 
@@ -206,12 +216,14 @@ CmFileTransferMethod ::= TEXTUAL-CONVENTION
             ftp - FTP
             scp - SCP
             sftp- Secure FTP
-            web - WEB based, this is a read-only."
+            web - WEB based, this is a read-only.
+            tftp- TFTP."
     SYNTAX       INTEGER {
                    ftp (1),
                    scp (2),
                    sftp (3),
-                   web (4) -- This is a read-only enumeration
+                   web (4), -- This is a read-only enumeration
+                   tftp (5)
                  }
 
 CmVersionType ::= TEXTUAL-CONVENTION
@@ -351,7 +363,9 @@ CmRestartCauseType ::= TEXTUAL-CONVENTION
                  unrecoverablesysevent(4),
                  hwwatchdogexpired(5),
                  bustxntimeout(6),
-                 hardware(7)
+                 hardware(7),
+                 buttonReset(8),
+                 buttonFactoryDefaultReset(9)
                }
 
 F3ConfigFileAction ::= TEXTUAL-CONVENTION
@@ -449,6 +463,29 @@ ServerConfigType ::= TEXTUAL-CONVENTION
     SYNTAX     INTEGER {
                  dhcp (1),
                  userdefined (2)
+               }
+
+NtpAuthKeyType ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+            "Defines the NTP Authentication Key Type."
+             
+    SYNTAX     INTEGER {
+                 notApplicable (0),
+                 md5 (1),
+                 sha1 (2)
+               }
+
+SysLogFormatType ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+            "Defines the Syslog Timestamp Format Type.
+             ADVA - Adva Timestamp format
+             RFC3164 - RFC3164 Timestamp format."
+             
+    SYNTAX     INTEGER {
+                 adva (1),
+                 rfc3164 (2)
                }
 
 --
@@ -698,6 +735,24 @@ tftpEnabled OBJECT-TYPE
            on the system."
     ::= { cmAccessProtocols 9 }
 
+netconfOverSSHEnabled OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         " This provides ability to enable/disable the NETCONF over SSH
+           on the system."
+    ::= { cmAccessProtocols 10 }
+
+usbPortEnabled OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         " This provides ability to enable/disable the USB Host Port 
+           on the system."
+    ::= { cmAccessProtocols 11 }
+
 --
 --system Mode Objects
 --
@@ -769,6 +824,13 @@ sysUseUtcLeapOffsetEnable OBJECT-TYPE
             This attribute only works when PTP/TimeClock is configured as source of system time of day."
     ::= { cmSysModeObjects 6 }
 
+sysLogTimestampFormat OBJECT-TYPE
+    SYNTAX      SysLogFormatType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object describes the syslog server timestamp format type."
+    ::= { cmSysModeObjects 7 }
 
 --
 -- File Services functionality
@@ -914,6 +976,14 @@ fileServicesServerIpv6Addr OBJECT-TYPE
             "IPv6 address of the remote server.  The value of this
              object is cleared when fileServicesAction is set."
     ::= { cmFileServicesObjects 11 }
+
+fileServicesDbFileName OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..256))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Name of the upload unique database file."
+    ::= { cmFileServicesObjects 12 }
 
 
 --
@@ -1363,6 +1433,115 @@ ntpBackupServerIpv6Addr OBJECT-TYPE
             "This object describe the ipv6 adress of ntp backup server."
     ::= { cmTimeObjects 13 }
 
+ntpPrimaryServerAuthKey OBJECT-TYPE
+    SYNTAX      VariablePointer
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object specifies the authentication key for the primary NTP server."
+    ::= { cmTimeObjects 14 }
+
+ntpBackupServerAuthKey OBJECT-TYPE
+    SYNTAX      VariablePointer
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object specifies the authentication key for the backup NTP server."
+    ::= { cmTimeObjects 15 }
+
+--
+-- NTP Authentication Key Table
+--
+f3NtpAuthKeyTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF F3NtpAuthKeyEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "This table specifies the Keys used for NTP Authentication."
+    ::= { cmTimeObjects 16 }
+
+f3NtpAuthKeyEntry OBJECT-TYPE
+    SYNTAX     F3NtpAuthKeyEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "NTP Authentication Key Entry"
+    INDEX { f3NtpAuthKeyId }
+    ::= { f3NtpAuthKeyTable 1 }
+
+F3NtpAuthKeyEntry ::= SEQUENCE {
+    f3NtpAuthKeyId           Unsigned32,
+    f3NtpAuthKeyNumber       Unsigned32,
+    f3NtpAuthKeyType         NtpAuthKeyType,
+    f3NtpAuthKey             DisplayString,
+    f3NtpAuthKeyStorageType  StorageType,
+    f3NtpAuthKeyRowStatus    RowStatus
+}
+
+f3NtpAuthKeyId  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "This is the unique index for the NTP Authentication Key."
+    ::= { f3NtpAuthKeyEntry 1 }
+
+f3NtpAuthKeyNumber  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This is the identifier used by the NTP authentication protocol using
+         which the Client and Server identify the key."
+    ::= { f3NtpAuthKeyEntry 2 }
+
+f3NtpAuthKeyType  OBJECT-TYPE
+    SYNTAX      NtpAuthKeyType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "Authentication type, MD5 or SHA-1."
+    ::= { f3NtpAuthKeyEntry 3 }
+
+f3NtpAuthKey  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This is the key value and length depends on the authentication type used.
+          It is 16 character printable string for MD5 excluding whitespace and '#' and
+          for SHA-1 it is a 40 character hex-encoded string."
+    ::= { f3NtpAuthKeyEntry 4 }
+
+f3NtpAuthKeyStorageType OBJECT-TYPE
+    SYNTAX      StorageType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+              "The storage type for this conceptual row."
+   ::= { f3NtpAuthKeyEntry 5 }
+
+f3NtpAuthKeyRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The status of this row.  An entry MUST NOT exist in the 
+            active state unless all objects in the entry have an 
+            appropriate value, as described
+            in the description clause for each writable object.
+
+            The values of f3NtpAuthKeyRowStatus supported are
+            createAndGo(4) and destroy(6).  All mandatory attributes
+            must be specified in a single SNMP SET request with
+            f3NtpAuthKeyRowStatus value as createAndGo(4).
+            Upon successful row creation, this object has a
+            value of active(1).
+
+            The f3NtpAuthKeyRowStatus object may be modified if
+            the associated instance of this object is equal to active(1)."
+   ::= { f3NtpAuthKeyEntry 6 }
+
 --SNMP extensions
 f3SnmpTargetAddrExtTable OBJECT-TYPE
     SYNTAX     SEQUENCE OF F3SnmpTargetAddrExtEntry
@@ -1383,10 +1562,10 @@ f3SnmpTargetAddrExtEntry OBJECT-TYPE
     ::= {  f3SnmpTargetAddrExtTable 1 }
 
 F3SnmpTargetAddrExtEntry ::= SEQUENCE {
-        f3SnmpTargetAddrExtDyingGaspPort        VariablePointer,
-        f3SnmpTargetAddrExtDyingGaspEnabled     TruthValue,
-        f3SnmpTargetAddrExtDyingGaspActive      TruthValue,
-        f3SnmpTargetAddrExtBulkTrapsEnabled     TruthValue
+        f3SnmpTargetAddrExtDyingGaspPort      VariablePointer,
+        f3SnmpTargetAddrExtDyingGaspEnabled   TruthValue,
+        f3SnmpTargetAddrExtDyingGaspActive    TruthValue,
+        f3SnmpTargetAddrExtBulkTrapsEnabled   TruthValue
     }
 
 f3SnmpTargetAddrExtDyingGaspPort OBJECT-TYPE
@@ -1450,8 +1629,6 @@ f3SnmpLongIfAlias OBJECT-TYPE
      alias is longer than 64 characters the ifAlias will return a string that is truncated to 64 characters."
     ::= { cmSnmpObjects 3 }
 
-
-
 -- System Last Reset Cause Objects
 f3SysLastResetType    OBJECT-TYPE
     SYNTAX       RestartType
@@ -1501,6 +1678,15 @@ f3SysLastAbnormalResetTimestamp3    OBJECT-TYPE
            there were only two (f3SysLastAbnormalResetTimestamp1, 
            f3SysLastAbnormalResetTimestamp2) abnormal resets of the system."
     ::= { cmResetCauseObjects 5 }
+
+f3SysResetButtonControl    OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+          "Enable or disable the use of the push button reset swith."
+    ::= { cmResetCauseObjects 6 }
+
 
 ---
 --- Database Synchronization Trap Object
@@ -2093,6 +2279,66 @@ f3LldpV2RemTTL  OBJECT-TYPE
           with particular MSAP identifier to be valid"
     ::= { f3LldpV2RemExtEntry 1 }
 
+--
+-- simple ltp
+--
+f3SimpleLtpControl OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         " This provides ability to enable/disable the simple ltp on the
+           system."
+    ::= { f3SimpleLtpObjects 1 }
+
+f3SimpleLtpTransferProtocol OBJECT-TYPE
+    SYNTAX     CmFileTransferMethod
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         " Specifies the method of transferring the file."
+    ::= { f3SimpleLtpObjects 2 }
+
+f3SimpleLtpServerIpv4Addr OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         " IP address of the remote server."
+    ::= { f3SimpleLtpObjects 3 }
+
+f3SimpleLtpUserName OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         " User ID to use to authenticate the file transfer."
+    ::= { f3SimpleLtpObjects 4 }
+
+f3SimpleLtpPasswd OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         " Password to use to authenticate the file transfer."
+    ::= { f3SimpleLtpObjects 5 }
+
+f3SimpleLtpConfigFileName OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         " The configure file name used to LTP function."
+    ::= { f3SimpleLtpObjects 6 }
+
+f3SimpleLtpSoftwareFileName OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         " The software file name."
+    ::= { f3SimpleLtpObjects 7 }
+
 ---
 ---Notifications
 ---
@@ -2186,12 +2432,12 @@ cmSystemObjectGroup OBJECT-GROUP
         serialPortDisconnectAutoLogOff,
 
         telnetEnabled, sshEnabled, ftpEnabled, scpEnabled, serialPortEnabled,
-        httpEnabled, httpsEnabled, sftpEnabled, tftpEnabled,
+        httpEnabled, httpsEnabled, sftpEnabled, tftpEnabled, netconfOverSSHEnabled, usbPortEnabled,
         ntpMode, autoProvMode, sysTimeOfDayType, ntpServerConfigType,
-        sysLogServerConfigType,
+        sysLogServerConfigType, sysLogTimestampFormat,
         fileServicesAction, 
         fileServicesMethod, fileServicesServerIp, 
-        fileServicesUserId, fileServicesPassword, fileServicesRemoteFile,
+        fileServicesUserId, fileServicesPassword, fileServicesRemoteFile, fileServicesDbFileName,
         fileServicesStatus, fileServicesPercentComplete,
         fileServicesMode,
 
@@ -2282,12 +2528,20 @@ cmSystemObjectGroupCmHub OBJECT-GROUP
         ntpMode, autoProvMode, 
         fileServicesAction, 
         fileServicesMethod, fileServicesServerIp, 
-        fileServicesUserId, fileServicesPassword, fileServicesRemoteFile,
+        fileServicesUserId, fileServicesPassword, fileServicesRemoteFile, fileServicesDbFileName,
         fileServicesStatus, fileServicesPercentComplete,
         fileServicesMode,fileServicesServerType,
         fileServicesServerIpv6Addr, sysLogIpVersion, sysLogIpv6Addr,
         ntpPrimaryServerIpVersion, ntpPrimaryServerIpv6Addr,
         ntpBackupServerIpVersion, ntpBackupServerIpv6Addr,
+        ntpPrimaryServerAuthKey, ntpBackupServerAuthKey,
+        
+        f3NtpAuthKeyId,
+        f3NtpAuthKeyNumber,
+        f3NtpAuthKeyType,
+        f3NtpAuthKey,
+        f3NtpAuthKeyStorageType,
+        f3NtpAuthKeyRowStatus,
 
         databaseAction, databaseLastSaveTime,
         databaseIndex, databaseType, databaseVersion, 
@@ -2314,6 +2568,14 @@ cmSystemObjectGroupCmHub OBJECT-GROUP
         f3SysLastAbnormalResetTimestamp1,
         f3SysLastAbnormalResetTimestamp2,
         f3SysLastAbnormalResetTimestamp3,
+        f3SysResetButtonControl,
+        f3SimpleLtpControl,
+        f3SimpleLtpTransferProtocol,
+        f3SimpleLtpServerIpv4Addr,
+        f3SimpleLtpUserName,
+        f3SimpleLtpPasswd,
+        f3SimpleLtpConfigFileName,
+        f3SimpleLtpSoftwareFileName,
 
         f3DatabaseSyncTrapObject
     }
