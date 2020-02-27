@@ -651,8 +651,9 @@ you don't need to configure full location within snmp.
 # Interfaces to be ignored
 
 Interfaces can automatically be ignored during discovery by adding bad_if\* 
-entries in either the OS specific definition (includes/definitions/_specific_os.yaml_) 
-or globally (config.php).
+entries in either the OS specific definition (includes/definitions/_specific_os_.yaml) 
+or globally (config.php). The preferred method for ignoring interfaces is using
+the OS specific option.
 
 
 Examples:
