@@ -41,7 +41,7 @@ class Msteams extends Transport
             'Expect:'
         ));
         curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
-        if ($this->config['use-json'] === 'on' && $obj['name'] !== 'Test-Rule') {
+        if ($this->config['use-json'] === 'on' && $obj['id'] !== '000') {
             curl_setopt($curl, CURLOPT_POSTFIELDS, $obj['msg']);
         }
         $ret  = curl_exec($curl);
