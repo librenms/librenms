@@ -1,9 +1,9 @@
--- ============================================================================
+-- =============================================================================
 -- Copyright (C) 2019 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- Description: Huawei common OID MIB definition.
 -- Reference:
 -- Version: V5.43
--- ============================================================================
+-- =============================================================================
 
 HUAWEI-MIB DEFINITIONS ::= BEGIN
 
@@ -49,13 +49,13 @@ HUAWEI-MIB DEFINITIONS ::= BEGIN
 	
 	REVISION    "201901070000Z"
         DESCRIPTION  "V5.41, 
-            The object identifier of ce8861-4C-EI is added 
-            The object identifier of ce6875-48S4CQ-HI is added 
-            The object identifier of ce8868-4C-EI is added 
-            The object identifier of ce5880-48T6Q-EI is added 
-            The object identifier of cx930_100G is added 	    
-            The object identifier of cx930_BASE is added 
-            The object identifier of ce6857-48S6CQ-EI is added 
+            The object identifier of ce8861-4C-EI is added
+            The object identifier of ce6875-48S4CQ-HI is added
+            The object identifier of ce8868-4C-EI is added
+            The object identifier of ce5880-48T6Q-EI is added
+            The object identifier of cx930-100G is added
+            The object identifier of cx930-BASE is added
+            The object identifier of ce6857-48S6CQ-EI is added
 	             "
 	    
 	REVISION    "201812170000Z"
@@ -1761,8 +1761,8 @@ HUAWEI-MIB DEFINITIONS ::= BEGIN
             s6330-30L-HI-24S          OBJECT IDENTIFIER ::= { lanSw 668 }   --S6330-30L-HI-24S for LSW V2R13C99 
             s5720-28X-PWR-LI-ACF-740      OBJECT IDENTIFIER ::= { lanSw 669 }   --S5720-28X-PWR-LI-ACF  740W for LSW V2R13C00
             
-            --s6750-36L-HI-36S          OBJECT IDENTIFIER ::= { lanSw 670 }   --S6750-36L-HI-36S  for LSW V2R19C00
-            --s6350-36L-HI-36S          OBJECT IDENTIFIER ::= { lanSw 671 }   --S6350-36L-HI-36S  for LSW V2R19C00
+            s6750-36L-HI-36S          OBJECT IDENTIFIER ::= { lanSw 670 }   --S6750-36L-HI-36S  for LSW V2R19C00
+            s6350-36L-HI-36S          OBJECT IDENTIFIER ::= { lanSw 671 }   --S6350-36L-HI-36S  for LSW V2R19C00
             s2720S-12TP-EI-AC         OBJECT IDENTIFIER ::= { lanSw 672 }   --S2720S-12TP-EI-AC        for LSW V2R19C00
             s2720S-12TP-PWR-EI-AC     OBJECT IDENTIFIER ::= { lanSw 673 }   --S2720S-12TP-PWR-EI-AC    for LSW V2R19C00
             s2720S-52TP-EI-AC         OBJECT IDENTIFIER ::= { lanSw 674 }   --S2720S-52TP-EI-AC        for LSW V2R19C00
@@ -1770,7 +1770,7 @@ HUAWEI-MIB DEFINITIONS ::= BEGIN
             s2720S-28TP-PWR-EI-L-AC   OBJECT IDENTIFIER ::= { lanSw 676 }   --S2720S-28TP-PWR-EI-L-AC  for LSW V2R19C00
             s2720S-28TP-PWR-EI-AC     OBJECT IDENTIFIER ::= { lanSw 677 }   --S2720S-28TP-PWR-EI-AC    for LSW V2R19C00 
             s2720S-28TP-EI-AC         OBJECT IDENTIFIER ::= { lanSw 678 }   --S2720S-28TP-EI-AC        for LSW V2R19C00     
-            --s5730-32C-PWH-SI          OBJECT IDENTIFIER ::= { lanSw 679 }   --S5730-32C-PWH-SI         for LSW V2R19C00   
+            s5730-32C-PWH-SI          OBJECT IDENTIFIER ::= { lanSw 679 }   --S5730-32C-PWH-SI         for LSW V2R19C00   
             
         apon                    OBJECT IDENTIFIER ::= { hwProducts 24 }
             ma5101              OBJECT IDENTIFIER ::= { apon 1 }
@@ -2590,8 +2590,8 @@ HUAWEI-MIB DEFINITIONS ::= BEGIN
            ce8861-4C-EI            OBJECT IDENTIFIER ::= { dcswitch 51}
            ce8868-4C-EI            OBJECT IDENTIFIER ::= { dcswitch 53}
            ce5880-48T6Q-EI         OBJECT IDENTIFIER ::= { dcswitch 54}
-           cx930_100G              OBJECT IDENTIFIER ::= { dcswitch 55}
-           cx930_BASE              OBJECT IDENTIFIER ::= { dcswitch 56}
+           cx930-100G              OBJECT IDENTIFIER ::= { dcswitch 55}
+           cx930-BASE              OBJECT IDENTIFIER ::= { dcswitch 56}
            ce6857-48S6CQ-EI        OBJECT IDENTIFIER ::= { dcswitch 57}	   
            ce1800V                 OBJECT IDENTIFIER ::= { dcswitch 101}
 
