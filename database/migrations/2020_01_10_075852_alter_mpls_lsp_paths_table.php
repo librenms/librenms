@@ -13,6 +13,7 @@ class AlterMplsLspPathsTable extends Migration
      */
     public function up()
     {
+        DB::connection()->getDoctrineSchemaManager()->getDatabasePlatform()->registerDoctrineTypeMapping('enum', 'string');
         Schema::table('mpls_lsp_paths', function (Blueprint $table) {
             $table->unsignedInteger('mplsLspPathOperMetric')->nullable()->change();
         });
