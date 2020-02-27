@@ -350,7 +350,7 @@ function alert_layout($severity)
             $background = 'success';
             break;
         default:
-            $icon = 'exclamation';
+            $icon = 'info';
             $color = 'info';
             $background = 'info';
     }
