@@ -48,7 +48,7 @@ if ($device['os'] === 'aruba-instant') {
         $free      = $entry['aiAPMemoryFree'];
         $used      = $total - $free;
         $perc      = ($used / $total * 100);
-	
-	discover_mempool($valid_mempool, $device, $index, 'aruba-instant', $descr, '1', null, null);
+
+        discover_mempool($valid_mempool, $device, $index, 'aruba-instant', $descr, '1', null, null);
     } //end foreach
 } // end if
