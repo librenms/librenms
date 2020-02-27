@@ -351,8 +351,8 @@ function alert_layout($severity)
             break;
         default:
             $icon = 'exclamation';
-            $color = 'danger';
-            $background = 'danger';
+            $color = 'info';
+            $background = 'info';
     }
     return ['icon' => $icon,
             'icon_color' => $color,
