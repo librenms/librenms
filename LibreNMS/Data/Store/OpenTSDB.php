@@ -106,7 +106,7 @@ class OpenTSDB implements DatastoreContract
         }
     }
 
-    private function putData($measurement, $timestamp, $tags, $value)
+    private function putData($measurement, $timestamp, $value, $tags)
     {
         try {
             $line = sprintf('put net.%s %d %f %s', strtolower($measurement), $timestamp, $value, $tags);
@@ -114,6 +114,7 @@ class OpenTSDB implements DatastoreContract
             $this->connection->write("$line\n"); // send $line into OpenTSDB
         } catch (\Socket\Raw\Exception $e) {
             Log::error('OpenTSDB Error: ' . $e->getMessage());
+            exit;
         }
     }
 
