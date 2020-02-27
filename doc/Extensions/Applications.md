@@ -238,15 +238,15 @@ A small shell script that reports status of last backupninja backup.
 
 1: Download the [backupninja
 script](https://github.com/librenms/librenms-agent/blob/master/snmp/backupninja.py)
-to `/usr/local/src/backupninja.py` on your backuped server.
+to `/etc/snmp/backupninja.py` on your backuped server.
 ```
-wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/backupninja.py -O /usr/local/src/backupninja.py`
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/backupninja.py -O /etc/snmp/backupninja.py`
 ```
 
 2: Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
 
 ```
-extend .1.3.6.1.4.1.2021.220 backupninja /usr/bin/python /usr/local/src/backupninja.py
+extend .1.3.6.1.4.1.2021.220 backupninja /usr/bin/python /etc/snmp/backupninja.py
 ```
 
 3: Restart snmpd on your host
