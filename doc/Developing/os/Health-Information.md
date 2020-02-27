@@ -14,7 +14,7 @@ the values we expect to see the data in:
 | airflow                         | cfm                         |
 | ber                             | ratio                       |
 | charge                          | %                           |
-| chromatic_disperision           | ps/nm                       |
+| chromatic_dispersion            | ps/nm                       |
 | cooling                         | W                           |
 | count                           | #                           |
 | current                         | A                           |
@@ -78,7 +78,8 @@ At the top you can define one or more mibs to be used in the lookup of data:
 
 For `data:` you have the following options:
 
-The only sensor we have defined here is airflow. The available options are as follows:
+The only sensor we have defined here is airflow. The available options
+are as follows:
 
 - `oid` (required): This is the name of the table you want to do the snmp walk on.
 - `value` (optional): This is the key within the table that contains
@@ -262,6 +263,18 @@ Create and populate new files for the sensor class in the following places:
 
 - `includes/discovery/sensors/$class/`: create the folder where advanced php-based discovery
 files are stored. Not used for yaml discovery.
+=======
+- `includes/html/pages/device/health.inc.php`: add a dbFetchCell(), $datas[], and $type_text[] entry for the sensor class.
+- `includes/html/pages/device/overview.inc.php`: add `require 'overview/sensors/$class.inc.php'` in the desired
+order for the device overview page.
+- `includes/html/pages/health.inc.php`: add a $type_text[] entry for the sensor class.
+- `resources/lang/en/sensors.php`: add human-readable names and units for the sensor class in English, feel
+free to do so for other languages as well.
+
+Create and populate new files for the sensor class in the following places:
+
+- `includes/discovery/sensors/$class/`: create the folder where advanced php-based discovery files
+are stored. Not used for yaml discovery.
 - `includes/html/graphs/device/$class.inc.php`: define unit names used in RRDtool graphs.
 - `includes/html/graphs/sensor/$class.inc.php`: define various [parameters](https://oss.oetiker.ch/rrdtool/doc/rrdgraph_graph.en.html) for RRDtool graphs.
 - `includes/html/pages/device/health/$class.inc.php`

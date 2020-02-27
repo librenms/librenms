@@ -72,6 +72,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                                                 <li><a href="#" name="import-query" id="import-query">SQL Query</a></li>
                                                 <li><a href="#" name="import-old-format" id="import-old-format">Old Format</a></li>
                                                 <li><a href="#" name="import-collection" id="import-collection">Collection</a></li>
+                                                <li><a href="#" name="import-alert_rule" id="import-alert_rule">Alert Rule</a></li>
                                             </ul>
                                         </div>
                                     </div>
@@ -280,6 +281,11 @@ if (Auth::user()->hasGlobalAdmin()) {
         $('#import-collection').on('click', function (e) {
             e.preventDefault();
             $("#search_rule_modal").modal('show');
+        });
+
+        $('#import-alert_rule').on('click', function (e) {
+            e.preventDefault();
+            $("#search_alert_rule_modal").modal('show');
         });
 
         $('#create-alert').on('show.bs.modal', function(e) {

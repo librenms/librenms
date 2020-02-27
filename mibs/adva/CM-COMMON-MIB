@@ -24,7 +24,10 @@ cmCommonMIB MODULE-IDENTITY
              Copyright (C) ADVA Optical Networking."
     REVISION        "201607110000Z"
     DESCRIPTION
-            "Notes from release 201607110000Z
+            "Notes from release 201611100000Z
+             (1) add xg116Pro product
+             (2) add xg120Pro subproduct  
+             Notes from release 201607110000Z
              (1) renamed FlowSecureState to FlowSecState since it cannot be moved from fsp150cm-connectguard.mib
              Notes from release 201607080000Z
              (1)  moved FlowSecureState from fsp150cm-connectguard.mib
@@ -150,6 +153,40 @@ ge112ProH            OBJECT IDENTIFIER ::= { subproducts 28 }
 
 -- GE114G NID product (GE114G with 2 Access Ports with SFPs)
 ge114G            OBJECT IDENTIFIER ::= { subproducts 29 }
+
+-- GE114ProVMH NID product (GE114ProVMH with 4 Access Ports with SFPs)
+ge114ProVMH           OBJECT IDENTIFIER ::= { subproducts 30 }
+
+-- GE114ProVMCH NID product (GE114ProVMCH with 4 Access Ports with SFPs)
+ge114ProVMCH           OBJECT IDENTIFIER ::= { subproducts 31 }
+
+-- GE114ProVMCSH NID product (GE114ProVMCSH with 4 Access Ports with SFPs)
+ge114ProVMCSH           OBJECT IDENTIFIER ::= { subproducts 32 }
+
+-- GE112ProVM NID product (GE112ProVM with 2 Access Ports with SFPs)
+ge112ProVM           OBJECT IDENTIFIER ::= { subproducts 33 }
+
+-- GE101PRO NID product
+ge101Pro            OBJECT IDENTIFIER ::= { subproducts 34 }
+
+-- GO102PROS NID product
+go102ProS          OBJECT IDENTIFIER ::= { subproducts 35 }
+
+-- GO102PROSP NID product
+go102ProSP         OBJECT IDENTIFIER ::= { subproducts 36 }
+
+-- CX101PRO30A NID product
+cx101Pro30A         OBJECT IDENTIFIER ::= { subproducts 37 }
+
+-- CX102PRO30A NID product
+cx102Pro30A         OBJECT IDENTIFIER ::= { subproducts 38 }
+
+-- XG116Pro NID product
+xg116Pro           OBJECT IDENTIFIER ::= { subproducts 39 }
+
+-- XG120Pro NID product
+xg120Pro           OBJECT IDENTIFIER ::= { subproducts 40 }
+
 -- 
 -- Textual Conventions 
 -- 
@@ -292,7 +329,8 @@ SecondaryState ::= TEXTUAL-CONVENTION
                    mon-tx(17),
                    mir-rx(18),
                    cema(19),
-                   lkdo(20)
+                   lkdo(20),
+                   nomber(21)
                  } 
 
 EthernetPortSpeed ::= TEXTUAL-CONVENTION
@@ -416,7 +454,9 @@ PriorityMapMode ::= TEXTUAL-CONVENTION
                 priomap-tos(2),
                 priomap-dscp(3),
                 priomap-8021p(4), -- Outer
-                priomap-8021p-inner(5)
+                priomap-8021p-inner(5),
+                priomap-exp(6),
+                priomap-exp-inner(7)
               }
 
 SfpConnectorValue ::= TEXTUAL-CONVENTION
@@ -702,6 +742,6 @@ FlowSecState ::= TEXTUAL-CONVENTION
                    secureBlocked (2),
                    unsecureNormal (3),
                    unsecureBlocked (4)
-                 }
+                  }
 
 END

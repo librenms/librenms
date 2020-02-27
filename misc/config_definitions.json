@@ -17,14 +17,14 @@
             "default": false,
             "group": "alerting",
             "section": "general",
-            "order": 10,
+            "order": 11,
             "type": "boolean"
         },
         "alert.admins": {
             "default": true,
             "group": "alerting",
             "section": "general",
-            "order": 1,
+            "order": 2,
             "type": "boolean"
         },
         "alert_colour.ok": {
@@ -51,7 +51,7 @@
             "default": true,
             "group": "alerting",
             "section": "general",
-            "order": 6,
+            "order": 7,
             "type": "boolean"
         },
         "alert.default_if_none": {
@@ -66,42 +66,42 @@
             "default": false,
             "group": "alerting",
             "section": "general",
-            "order": 7,
+            "order": 8,
             "type": "email"
         },
         "alert.default_only": {
             "default": true,
             "group": "alerting",
             "section": "general",
-            "order": 5,
+            "order": 6,
             "type": "boolean"
         },
         "alert.disable": {
             "default": false,
             "group": "alerting",
             "section": "general",
-            "order": 0,
+            "order": 1,
             "type": "boolean"
         },
         "alert.fixed-contacts": {
             "default": true,
             "group": "alerting",
             "section": "general",
-            "order": 9,
+            "order": 10,
             "type": "boolean"
         },
         "alert.globals": {
             "default": true,
             "group": "alerting",
             "section": "general",
-            "order": 2,
+            "order": 3,
             "type": "boolean"
         },
         "alert.syscontact": {
             "default": true,
             "group": "alerting",
             "section": "general",
-            "order": 4,
+            "order": 5,
             "type": "boolean"
         },
         "alert.transports.mail": {
@@ -115,7 +115,7 @@
             "default": 5,
             "group": "alerting",
             "section": "general",
-            "order": 8,
+            "order": 9,
             "type": "integer",
             "units": "m"
         },
@@ -123,7 +123,7 @@
             "default": false,
             "group": "alerting",
             "section": "general",
-            "order": 3,
+            "order": 4,
             "type": "boolean"
         },
         "alert_graph_date_format": {
@@ -787,6 +787,13 @@
         "db_user": {
             "default": "librenms",
             "hidden": true,
+            "type": "boolean"
+        },
+        "device_location_map_open": {
+            "order": 0,
+            "group": "webui",
+            "section": "device",
+            "default": false,
             "type": "boolean"
         },
         "default_port_association_mode": {
@@ -3192,6 +3199,9 @@
             "type": "boolean"
         },
         "ignore_mount": {
+            "group": "discovery",
+            "section": "storage",
+            "order": 3,
             "default": [
                 "/kern",
                 "/mnt/cdrom",
@@ -3203,14 +3213,23 @@
             "type": "array"
         },
         "ignore_mount_network": {
+            "group": "discovery",
+            "section": "storage",
+            "order": 0,
             "default": true,
             "type": "boolean"
         },
         "ignore_mount_optical": {
+            "group": "discovery",
+            "section": "storage",
+            "order": 1,
             "default": true,
             "type": "boolean"
         },
         "ignore_mount_regexp": {
+            "group": "discovery",
+            "section": "storage",
+            "order": 5,
             "default": [
                 "/on: \\/packages/",
                 "/on: \\/dev/",
@@ -3224,13 +3243,22 @@
                 "/UMA/",
                 "/^\\/Volumes\\/OS X Base System/"
             ],
-            "type": "array"
+            "type": "array",
+            "validate": {
+                "value.*": "is_regex"
+            }
         },
         "ignore_mount_removable": {
+            "group": "discovery",
+            "section": "storage",
+            "order": 2,
             "default": true,
             "type": "boolean"
         },
         "ignore_mount_string": {
+            "group": "discovery",
+            "section": "storage",
+            "order": 4,
             "default": [
                 "packages",
                 "devfs",
@@ -4679,6 +4707,9 @@
             }
         },
         "uptime_warning": {
+            "group": "alerting",
+            "section": "general",
+            "order": 0,
             "default": 84600,
             "type": "integer",
             "validate": {
