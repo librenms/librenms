@@ -28,7 +28,7 @@
             <table class='table table-condensed table-hover'>
                 <tr>
                     <td><b>@lang('Version')</b></td>
-                    <td><a href='http://www.librenms.org/changelog.html'>{{ $version_local }}<span id='version_date' style="display: none;">{{ $git_date }}</span></a></td>
+                    <td><a target="_blank" href='http://www.librenms.org/changelog.html'>{{ $version_local }}<span id='version_date' style="display: none;">{{ $git_date }}</span></a></td>
                 </tr>
                 <tr>
                     <td><b>@lang('Database Schema')</b></td>
