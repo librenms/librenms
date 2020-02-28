@@ -114,11 +114,9 @@ class Datastore
             /** @var \LibreNMS\Interfaces\Data\Datastore $store */
             // rrdtool_data_update() will only use the tags it deems relevant, so we pass all of them.
             // However, influxdb saves all tags, so we filter out the ones beginning with 'rrd_'.
-            if (!$store->wantsRrdTags()) {
-                $tags = $this->rrdTagFilter($tags);
-            }
+            $temp_tags = $store->wantsRrdTags() ? $tags : $this->rrdTagFilter($tags);
 
-            $store->put($device, $measurement, $tags, $fields);
+            $store->put($device, $measurement, $temp_tags, $fields);
         }
     }
 
