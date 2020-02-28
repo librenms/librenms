@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * forcepoint.inc.php
  * LibreNMS mempool discovery module for forcepoint
  */
