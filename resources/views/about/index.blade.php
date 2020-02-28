@@ -63,7 +63,7 @@
               <a target="_blank" href="https://community.librenms.org">@lang('Community Forum')</a> |
               <a target="_blank" href="http://twitter.com/librenms">@lang('Twitter')</a> |
               <a target="_blank" href="http://www.librenms.org/changelog.html">@lang('Changelog')</a> |
-              <a target="_blank" href="#" data-toggle="modal" data-target="#git_log">@lang('Local git log')</a>
+              <a href="#" data-toggle="modal" data-target="#git_log">@lang('Local git log')</a>
           </p>
 
           <h3>@lang('Contributors')</h3>
