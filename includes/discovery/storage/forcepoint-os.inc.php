@@ -1,15 +1,11 @@
 <?php
-
 /**
  * forcepoint-os.inc.php
  * LibreNMS storage discovery module for forcepoint
  */
-
 if ($device['os'] == 'forcepoint-os') {
     $forcepoint_tmp = snmpwalk_cache_oid($device, 'fwDiskStatsEntry', array(), 'STONESOFT-FIREWALL-MIB');
-
     $fstype = "Forcepoint FixedDisk";
-
     foreach($forcepoint_tmp as $storage_index => $data) {
         $storage_descr = $data['fwMountPointName'];
         $storage_units = 1024;
