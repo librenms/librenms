@@ -50,12 +50,8 @@ class DatastoreServiceProvider extends ServiceProvider
 
         // bind the Datastore object
         $this->app->singleton('Datastore', function (Application $app, $options) {
-            // filter out manually disabled datastores
-            $disabled = array_keys(array_filter(empty($options['disabled']) ? [] : $options['disabled']));
-            $stores = array_diff($this->stores, $disabled);
-
             // only tag datastores enabled by config
-            $stores = array_filter($stores, function ($store) {
+            $stores = array_filter($this->stores, function ($store) {
                 /** @var DatastoreContract $store */
                 return $store::isEnabled();
             });

@@ -25,10 +25,11 @@
 
 namespace LibreNMS\Data\Store;
 
+use LibreNMS\Config;
+
 class Datastore
 {
     protected $stores;
-
 
     /**
      * Initialize and create the Datastore(s)
@@ -38,13 +39,19 @@ class Datastore
      */
     public static function init($options = [])
     {
-        $disabled = ['disabled' => [
-            'LibreNMS\Data\Store\Rrd' => isset($options['r']),
-            'LibreNMS\Data\Store\InfluxDB' => isset($options['f']),
-            'LibreNMS\Data\Store\Prometheus' => isset($options['p']),
-            'LibreNMS\Data\Store\Graphite' => isset($options['g'])
-        ]];
-        return app('Datastore', $disabled);
+        $opts = [
+            'r' => 'rrd.enable',
+            'f' => 'influxdb.enable',
+            'p' => 'prometheus.enable',
+            'g' => 'graphite.enable',
+        ];
+        foreach ($opts as $opt => $setting) {
+            if (isset($options[$opt])) {
+                Config::set($setting, false);
+            }
+        }
+
+        return app('Datastore');
     }
 
     public static function terminate()
