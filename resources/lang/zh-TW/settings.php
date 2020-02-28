@@ -24,7 +24,8 @@ return [
             'ldap' => 'LDAP 設定'
         ],
         'discovery' => [
-            'general' => '一般探索設定'
+            'general' => '一般探索設定',
+            'route' => '路由探索模組',
         ],
         'external' => [
             'binaries' => '執行檔位置',
@@ -132,11 +133,11 @@ return [
         ],
         'allow_unauth_graphs' => [
             'description' => '允許未登入存取圖表',
-            'help' => 'Allows any one to access graphs without login'
+            'help' => '允許在不登入情況下存取圖表'
         ],
         'allow_unauth_graphs_cidr' => [
-            'description' => 'Allow the given networks graph access',
-            'help' => 'Allow the given networks unauthenticated graph access (does not apply when unauthenticated graphs is enabled)'
+            'description' => '允許指定網路存取圖表',
+            'help' => '允許指定網路可以在未登入授權查看圖表 (若未啟用 允許未登入存取圖表 則忽略此設定)'
         ],
         'api_demo' => [
             'description' => '這是展示'
@@ -233,7 +234,7 @@ return [
             'description' => 'Group member attribute'
         ],
         'auth_ldap_groupmembertype' => [
-            'description' => 'Find group members by',
+            'description' => '以下列方式尋找群組成員',
             'options' => [
                 'username' => '使用者名稱',
                 'fulldn' => 'Full DN (using prefix and suffix)',
@@ -249,7 +250,7 @@ return [
             'help' => 'Port to connect to servers on. For LDAP it should be 389, for LDAPS it should be 636'
         ],
         'auth_ldap_prefix' => [
-            'description' => 'User prefix',
+            'description' => '使用者首碼',
             'help' => 'Used to turn a username into a distinguished name'
         ],
         'auth_ldap_server' => [
@@ -266,7 +267,7 @@ return [
             ]
         ],
         'auth_ldap_suffix' => [
-            'description' => 'User suffix',
+            'description' => '使用者尾碼',
             'help' => 'Used to turn a username into a distinguished name'
         ],
         'auth_ldap_timeout' => [
@@ -442,11 +443,11 @@ return [
             ],
             'device-page' => [
                 'loglevel' => [
-                    'description' => 'Device Overview Log Level',
+                    'description' => '裝置概觀記錄等級',
                     'help' => 'Sets the maximum log level shown on the device overview page.'
                 ],
                 'rowCount' => [
-                    'description' => 'Device Overview Row Count',
+                    'description' => '裝置概觀資料筆數',
                     'help' => 'Sets the number of rows show on the device overview page.'
                 ]
             ],
@@ -572,6 +573,12 @@ return [
                 'help' => 'Oxidized API url (For example: http://127.0.0.1:8888)'
             ]
         ],
+        'password' => [
+            'min_length' => [
+                'description' => '密碼最小長度',
+                'help' => 'Passwords shorter than the given length will be rejected'
+            ]
+        ],
         'peeringdb' => [
             'enabled' => [
                 'description' => '啟用 PeeringDB 反查',
@@ -596,6 +603,14 @@ return [
         'public_status' => [
             'description' => '公開狀態顯示',
             'help' => '允許不登入的情況下，顯示裝置的狀態資訊。'
+        ],
+        'routes_max_number' => [
+            'description' => '允許探索路由的最大路由數',
+            'help' => 'No route will be discovered if the size of the routing table is bigger than this number'
+        ],
+        'route_purge' => [
+            'description' => '路由記錄大於 (天)',
+            'help' => 'Cleanup done by daily.sh'
         ],
         'rrd' => [
             'heartbeat' => [

@@ -28,7 +28,7 @@ alerts:
     - { Field: alerted, Type: int(11), 'Null': false, Extra: '' }
     - { Field: open, Type: int(11), 'Null': false, Extra: '' }
     - { Field: note, Type: text, 'Null': true, Extra: '' }
-    - { Field: timestamp, Type: timestamp, 'Null': false, Extra: 'on update CURRENT_TIMESTAMP', Default: CURRENT_TIMESTAMP }
+    - { Field: timestamp, Type: timestamp, 'Null': false, Extra: '', Default: CURRENT_TIMESTAMP }
     - { Field: info, Type: text, 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
@@ -51,6 +51,14 @@ alert_group_map:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     alert_group_map_rule_id_group_id_uindex: { Name: alert_group_map_rule_id_group_id_uindex, Columns: [rule_id, group_id], Unique: true, Type: BTREE }
+alert_location_map:
+  Columns:
+    - { Field: id, Type: 'int(10) unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: rule_id, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: location_id, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+    alert_location_map_rule_id_location_id_uindex: { Name: alert_location_map_rule_id_location_id_uindex, Columns: [rule_id, location_id], Unique: true, Type: BTREE }
 alert_log:
   Columns:
     - { Field: id, Type: 'int(10) unsigned', 'Null': false, Extra: auto_increment }
@@ -451,9 +459,11 @@ dbSchema:
 devices:
   Columns:
     - { Field: device_id, Type: 'int(10) unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: inserted, Type: timestamp, 'Null': true, Extra: '', Default: CURRENT_TIMESTAMP }
     - { Field: hostname, Type: varchar(128), 'Null': false, Extra: '' }
     - { Field: sysName, Type: varchar(128), 'Null': true, Extra: '' }
     - { Field: ip, Type: varbinary(16), 'Null': true, Extra: '' }
+    - { Field: overwrite_ip, Type: varchar(40), 'Null': true, Extra: '' }
     - { Field: community, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: authlevel, Type: 'enum(''noAuthNoPriv'',''authNoPriv'',''authPriv'')', 'Null': true, Extra: '' }
     - { Field: authname, Type: varchar(64), 'Null': true, Extra: '' }

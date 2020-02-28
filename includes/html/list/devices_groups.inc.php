@@ -32,8 +32,8 @@ $groups = array_map(function ($group) {
 }, $groups);
 
 $data = [
-    ['text' => 'Devices', 'children' => $devices],
-    ['text' => 'Groups', 'children' => $groups]
+    ['text' => 'Groups', 'children' => $groups],
+    ['text' => 'Devices', 'children' => $devices]
 ];
 
 return [$data, $d_more || $g_more];

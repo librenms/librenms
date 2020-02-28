@@ -1080,7 +1080,7 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                         if (is_numeric($data[$limit])) {
                             $$limit = $data[$limit];
                         } else {
-                            $$limit = dynamic_discovery_get_value($limit, $index, $data, $pre_cache, 'null');
+                            $$limit = YamlDiscovery::getValueFromData($limit, $index, $data, $pre_cache, 'null');
                             if (is_numeric($$limit)) {
                                 $$limit = ($$limit / $divisor) * $multiplier;
                             }
@@ -1116,43 +1116,6 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
             }
         }
     }
-}
-
-/**
- * Helper function for dynamic discovery to search for data from pre_cached snmp data
- *
- * @param string $name The name of the field from the discovery data or just an oid
- * @param int $index The index of the current sensor
- * @param array $discovery_data The discovery data for the current sensor
- * @param array $pre_cache all pre-cached snmp data
- * @param mixed $default The default value to return if data is not found
- * @return mixed
- */
-function dynamic_discovery_get_value($name, $index, $discovery_data, $pre_cache, $default = null)
-{
-    if (isset($discovery_data[$name])) {
-        $name = $discovery_data[$name];
-    }
-
-    if (isset($pre_cache[$discovery_data['oid']][$index][$name])) {
-        return $pre_cache[$discovery_data['oid']][$index][$name];
-    }
-
-    if (isset($pre_cache[$name])) {
-        if (is_array($pre_cache[$name])) {
-            if (isset($pre_cache[$name][$index][$name])) {
-                return $pre_cache[$name][$index][$name];
-            } elseif (isset($pre_cache[$index][$name])) {
-                return $pre_cache[$index][$name];
-            } elseif (count($pre_cache[$name]) === 1) {
-                return current($pre_cache[$name]);
-            }
-        } else {
-            return $pre_cache[$name];
-        }
-    }
-
-    return $default;
 }
 
 /**
@@ -1199,6 +1162,7 @@ function build_bgp_peers($device, $data, $peer2)
     $peerlist = array();
     $ver = '';
     foreach (explode("\n", $peers) as $peer) {
+        $local_ip = null;
         if ($peer2 === true) {
             list($ver, $peer) = explode('.', $peer, 2);
         }
@@ -1223,9 +1187,10 @@ function build_bgp_peers($device, $data, $peer2)
         if ($peer && $peer_ip != '0.0.0.0') {
             d_echo("Found peer $peer_ip (AS$peer_as)\n");
             $peerlist[] = array(
-                'ip'  => $peer_ip,
-                'as'  => $peer_as,
-                'ver' => $ver,
+                'ip'      => $peer_ip,
+                'as'      => $peer_as,
+                'localip' => $local_ip ?: '0.0.0.0',
+                'ver'     => $ver,
             );
         }
     }
@@ -1248,10 +1213,10 @@ function build_cbgp_peers($device, $peer, $af_data, $peer2)
 
         $afisafi_tmp = explode('.', $k);
         if ($device['os_group'] === 'vrp') {
-            array_shift($afisafi_tmp); //remove 1st value, always 0 so far
+            $vpninst_id  = array_shift($afisafi_tmp);
             $afi         = array_shift($afisafi_tmp);
             $safi        = array_shift($afisafi_tmp);
-            array_shift($afisafi_tmp); //type, always ipv4 so far
+            $peertype    = array_shift($afisafi_tmp);
             $bgp_ip      = implode('.', $afisafi_tmp);
         } else {
             $safi        = array_pop($afisafi_tmp);
@@ -1284,7 +1249,7 @@ function add_bgp_peer($device, $peer)
             'astext' => $peer['astext'],
             'bgpPeerState' => 'idle',
             'bgpPeerAdminStatus' => 'stop',
-            'bgpLocalAddr' => '0.0.0.0',
+            'bgpLocalAddr' => $peer['localip'] ?: '0.0.0.0',
             'bgpPeerRemoteAddr' => '0.0.0.0',
             'bgpPeerInUpdates' => 0,
             'bgpPeerOutUpdates' => 0,

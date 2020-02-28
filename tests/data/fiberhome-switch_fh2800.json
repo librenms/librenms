@@ -8,13 +8,13 @@
                     "sysDescr": "S2800 FHN USP (R) Software, Version V210R220,Hw Version 1.0,Copyright (c) 2000-2012 by FiberHome Networks Co., Ltd",
                     "sysContact": null,
                     "version": null,
-                    "hardware": "",
+                    "hardware": null,
                     "features": null,
-                    "location": null,
                     "os": "fiberhome-switch",
                     "type": "network",
                     "serial": null,
-                    "icon": "fiberhome.svg"
+                    "icon": "fiberhome.svg",
+                    "location": null
                 }
             ]
         },
@@ -28,11 +28,11 @@
                     "version": "V210R220",
                     "hardware": "FHN S2800 V 1.0",
                     "features": null,
-                    "location": "<private>",
                     "os": "fiberhome-switch",
                     "type": "network",
                     "serial": null,
-                    "icon": "fiberhome.svg"
+                    "icon": "fiberhome.svg",
+                    "location": "<private>"
                 }
             ]
         }

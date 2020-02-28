@@ -32,6 +32,7 @@ use LibreNMS\Config;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Url;
 use LibreNMS\Util\Time;
+use LibreNMS\Alert\AlertUtil;
 
 class DeviceController extends TableController
 {
@@ -52,6 +53,7 @@ class DeviceController extends TableController
             'ignore' => 'nullable|in:0,1',
             'disable_notify' => 'nullable|in:0,1',
             'group' => 'nullable|int',
+            'poller_group' => 'nullable|int',
         ];
     }
 
@@ -88,6 +90,10 @@ class DeviceController extends TableController
             });
         }
 
+        if ($request->get('poller_group') !== null) {
+            $query->where('poller_group', $request->get('poller_group'));
+        }
+
         return $query;
     }
 
@@ -122,6 +128,7 @@ class DeviceController extends TableController
         return [
             'extra' => $this->getLabel($device),
             'status' => $this->getStatus($device),
+            'maintenance' => AlertUtil::isMaintenance($device->device_id),
             'icon' => '<img src="' . asset($device->icon) . '" title="' . pathinfo($device->icon, PATHINFO_FILENAME) . '">',
             'hostname' => $this->getHostname($device),
             'metrics' => $this->getMetrics($device),

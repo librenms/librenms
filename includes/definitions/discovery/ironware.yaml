@@ -1,0 +1,146 @@
+mib: FOUNDRY-SN-AGENT-MIB:FOUNDRY-SN-SWITCH-GROUP-MIB:FOUNDRY-SN-STACKING-MIB
+modules:
+    sensors:
+        pre-cache:
+            data:
+                - oid:
+                    - ifDescr
+        dbm:
+            data:
+                -
+                    oid: snIfOpticalMonitoringInfoTable
+                    value: snIfOpticalMonitoringRxPower
+                    num_oid: '.1.3.6.1.4.1.1991.1.1.3.3.6.1.3.{{ $index }}'
+                    descr: '{{ $ifDescr }} Rx Power'
+                    index: 'snIfOpticalMonitoringRxPower.{{ $index }}'
+                -
+                    oid: snIfOpticalMonitoringInfoTable
+                    value: snIfOpticalMonitoringTxPower
+                    num_oid: '.1.3.6.1.4.1.1991.1.1.3.3.6.1.2.{{ $index }}'
+                    descr: '{{ $ifDescr }} Tx Power'
+                    index: 'snIfOpticalMonitoringTxPower.{{ $index }}'
+        current:
+            options:
+                divisor: 1000
+            data:
+                -
+                    oid: snIfOpticalMonitoringInfoTable
+                    value: snIfOpticalMonitoringTxBiasCurrent
+                    num_oid: '.1.3.6.1.4.1.1991.1.1.3.3.6.1.4.{{ $index }}'
+                    descr: '{{ $ifDescr }} Tx Bias Current'
+                    index: 'snIfOpticalMonitoringTxBiasCurrent.{{ $index }}'
+        temperature:
+            data:
+                -
+                    oid: snAgentTempTable
+                    value: snAgentTempValue
+                    divisor: 2
+                    num_oid: '.1.3.6.1.4.1.1991.1.1.2.13.1.1.4.{{ $index }}'
+                    descr: snAgentTempSensorDescr
+                    index: '{{ $index }}'
+                    group: 'Module Temperatures'
+                -
+                    oid: snIfOpticalMonitoringInfoTable
+                    value: snIfOpticalMonitoringTemperature
+                    num_oid: '.1.3.6.1.4.1.1991.1.1.3.3.6.1.1.{{ $index }}'
+                    descr: '{{ $ifDescr }} Tx Laser'
+                    index: 'snIfOpticalMonitoringTemperature.{{ $index }}'
+                    group: 'Transceiver Temperatures'
+        state:
+            data:
+                -
+                    oid: snChasPwrSupplyTable
+                    value: snChasPwrSupplyOperStatus
+                    num_oid: '.1.3.6.1.4.1.1991.1.1.1.2.1.1.3.{{ $index }}'
+                    descr: 'Power Supply {{ $index }}'
+                    index: '{{ $index }}'
+                    skip_values: 1
+                    group: Power Supply Status
+                    state_name: snChasPwrSupplyOperStatus
+                    states:
+                        - { value: 1, descr: other, graph: 0, generic: 3 }
+                        - { value: 2, descr: normal, graph: 1, generic: 0 }
+                        - { value: 3, descr: failure, graph: 0, generic: 2 }
+                -
+                    oid: snChasFanTable
+                    value: snChasFanOperStatus
+                    num_oid: '.1.3.6.1.4.1.1991.1.1.1.3.1.1.3.{{ $index }}'
+                    descr: '{{ $snChasFanDescription }}'
+                    index: 'snChasFanOperStatus.{{ $index }}'
+                    group: Fan Status
+                    state_name: snChasFanOperStatus
+                    states:
+                        - { value: 1, descr: other, graph: 0, generic: 3 }
+                        - { value: 2, descr: normal, graph: 1, generic: 0 }
+                        - { value: 3, descr: failure, graph: 0, generic: 2 }
+                -
+                    oid: snStackingGlobalConfigState
+                    num_oid: '.1.3.6.1.4.1.1991.1.1.3.31.1.1.{{ $index }}'
+                    descr: 'Global Stack Config State'
+                    index: 'snStackingGlobalConfigState.{{ $index }}'
+                    group: Stacking Status
+                    state_name: snStackingGlobalConfigState
+                    states:
+                        - { value: 0, descr: none, graph: 0, generic: 3 }
+                        - { value: 1, descr: enabled, graph: 1, generic: 0 }
+                        - { value: 2, descr: disabled, graph: 0, generic: 0 }
+                -
+                    oid: snStackingOperUnitTable
+                    value: snStackingOperUnitState
+                    num_oid: '.1.3.6.1.4.1.1991.1.1.3.31.2.2.1.5.{{ $index }}'
+                    descr: 'Unit {{ $index }} Stack State'
+                    index: 'snStackingOperUnitState.{{ $index }}'
+                    skip_values:
+                        -
+                          oid: snStackingGlobalConfigState.0
+                          op: '!='
+                          value: 1
+                    group: Stacking Status
+                    state_name: snStackingOperUnitState
+                    states:
+                        - { value: 1, descr: local, graph: 0, generic: 0 }
+                        - { value: 2, descr: remote, graph: 1, generic: 0 }
+                        - { value: 3, descr: reserved, graph: 0, generic: 2 }
+                        - { value: 4, descr: empty, graph: 0, generic: 2 }
+                -
+                    oid: snStackingOperUnitTable
+                    value: snStackingOperUnitStackPort1State
+                    num_oid: '.1.3.6.1.4.1.1991.1.1.3.31.2.2.1.8.{{ $index }}'
+                    descr: 'Unit {{ $index }} Stack-port 1 to Unit {{ $snStackingOperUnitNeighbor1 }}'
+                    index: 'snStackingOperUnitStackPort1State.{{ $index }}'
+                    skip_values:
+                        -
+                          oid: snStackingGlobalConfigState.0
+                          op: '!='
+                          value: 1
+                        -
+                          oid: snStackingOperUnitStackPort1
+                          op: '='
+                          value: 0
+                    group: Stacking Status
+                    state_name: snStackingOperUnitStackPortState
+                    states:
+                        - { value: 1, descr: other, graph: 0, generic: 3 }
+                        - { value: 2, descr: up, graph: 1, generic: 0 }
+                        - { value: 3, descr: down, graph: 0, generic: 2 }
+                -
+                    oid: snStackingOperUnitTable
+                    value: snStackingOperUnitStackPort2State
+                    num_oid: '.1.3.6.1.4.1.1991.1.1.3.31.2.2.1.10.{{ $index }}'
+                    descr: 'Unit {{ $index }} Stack-port 2 to Unit {{ $snStackingOperUnitNeighbor2 }}'
+                    index: 'snStackingOperUnitStackPort2State.{{ $index }}'
+                    skip_values:
+                        -
+                          oid: snStackingGlobalConfigState.0
+                          op: '!='
+                          value: 1
+                        -
+                          oid: snStackingOperUnitStackPort2
+                          op: '='
+                          value: 0
+                    group: Stacking Status
+                    state_name: snStackingOperUnitStackPortState
+                    states:
+                        - { value: 1, descr: other, graph: 0, generic: 3 }
+                        - { value: 2, descr: up, graph: 1, generic: 0 }
+                        - { value: 3, descr: down, graph: 0, generic: 2 }

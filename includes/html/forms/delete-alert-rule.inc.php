@@ -22,15 +22,24 @@ if (!is_numeric($vars['alert_id'])) {
     echo 'ERROR: No alert selected';
     exit;
 } else {
+    $alert_name = dbFetchCell('SELECT name FROM alert_rules WHERE id=?', [$vars['alert_id']]);
+    $alert_msg_prefix = 'Alert rule';
+    if ($alert_name) {
+        $alert_msg_prefix .= ' ' . $alert_name;
+    }
+    if (!$alert_name) {
+        $alert_msg_prefix .= ' id ' . $vars['alert_id'];
+    }
     if (dbDelete('alert_rules', '`id` =  ?', array($vars['alert_id']))) {
         dbDelete('alert_device_map', 'rule_id=?', [$vars['alert_id']]);
         dbDelete('alert_group_map', 'rule_id=?', [$vars['alert_id']]);
+        dbDelete('alert_location_map', 'rule_id=?', [$vars['alert_id']]);
         dbDelete('alert_transport_map', 'rule_id=?', [$vars['alert_id']]);
         dbDelete('alert_template_map', 'alert_rule_id=?', [$vars['alert_id']]);
-        echo 'Alert rule has been deleted.';
+        echo $alert_msg_prefix . ' has been deleted.';
         exit;
     } else {
-        echo 'ERROR: Alert rule has not been deleted.';
+        echo 'ERROR: ' . $alert_msg_prefix . ' has not been deleted.';
         exit;
     }
 }

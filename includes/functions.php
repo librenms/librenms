@@ -11,6 +11,7 @@
  *
  */
 
+use App\Models\Device;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\HostExistsException;
 use LibreNMS\Exceptions\HostIpExistsException;
@@ -488,8 +489,8 @@ function delete_device($id)
 
     $db_name = dbFetchCell('SELECT DATABASE()');
     foreach ($fields as $field) {
-        foreach (dbFetch("SELECT table_name FROM information_schema.columns WHERE table_schema = ? AND column_name = ?", [$db_name, $field]) as $table) {
-            $table = $table['table_name'];
+        foreach (dbFetch("SELECT TABLE_NAME FROM information_schema.columns WHERE table_schema = ? AND column_name = ?", [$db_name, $field]) as $table) {
+            $table = $table['TABLE_NAME'];
             $entries = (int) dbDelete($table, "`$field` =  ?", array($id));
             if ($entries > 0 && $debug === true) {
                 $ret .= "$field@$table = #$entries\n";
@@ -542,8 +543,14 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
         throw new InvalidPortAssocModeException("Invalid port association_mode '$port_assoc_mode'. Valid modes are: " . join(', ', get_port_assoc_modes()));
     }
 
+    if ($additional['overwrite_ip']) {
+        $overwrite_ip = $additional['overwrite_ip'];
+    }
+
     // check if we have the host by IP
-    if (Config::get('addhost_alwayscheckip') === true) {
+    if (!empty($overwrite_ip)) {
+        $ip = $overwrite_ip;
+    } elseif (Config::get('addhost_alwayscheckip') === true) {
         $ip = gethostbyname($host);
     } else {
         $ip = $host;
@@ -560,7 +567,7 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
     // Test reachability
     if (!$force_add) {
         $address_family = snmpTransportToAddressFamily($transport);
-        $ping_result = isPingable($host, $address_family);
+        $ping_result = isPingable($ip, $address_family);
         if (!$ping_result['result']) {
             throw new HostUnreachablePingException("Could not ping $host");
         }
@@ -574,7 +581,7 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
     }
 
     if (isset($additional['snmp_disable']) && $additional['snmp_disable'] == 1) {
-        return createHost($host, '', $snmp_version, $port, $transport, array(), $poller_group, 1, true, $additional);
+        return createHost($host, '', $snmp_version, $port, $transport, array(), $poller_group, 1, true, $overwrite_ip, $additional);
     }
     $host_unreachable_exception = new HostUnreachableException("Could not connect to $host, please check the snmp details and snmp reachability");
     // try different snmp variables to add the device
@@ -584,7 +591,7 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
             foreach (Config::get('snmp.v3') as $v3) {
                 $device = deviceArray($host, null, $snmpver, $port, $transport, $v3, $port_assoc_mode);
                 if ($force_add === true || isSNMPable($device)) {
-                    return createHost($host, null, $snmpver, $port, $transport, $v3, $poller_group, $port_assoc_mode, $force_add);
+                    return createHost($host, null, $snmpver, $port, $transport, $v3, $poller_group, $port_assoc_mode, $force_add, $overwrite_ip);
                 } else {
                     $host_unreachable_exception->addReason("SNMP $snmpver: No reply with credentials " . $v3['authname'] . "/" . $v3['authlevel']);
                 }
@@ -595,7 +602,7 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
                 $device = deviceArray($host, $community, $snmpver, $port, $transport, null, $port_assoc_mode);
 
                 if ($force_add === true || isSNMPable($device)) {
-                    return createHost($host, $community, $snmpver, $port, $transport, array(), $poller_group, $port_assoc_mode, $force_add);
+                    return createHost($host, $community, $snmpver, $port, $transport, array(), $poller_group, $port_assoc_mode, $force_add, $overwrite_ip);
                 } else {
                     $host_unreachable_exception->addReason("SNMP $snmpver: No reply with community $community");
                 }
@@ -607,7 +614,7 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
     if (isset($additional['ping_fallback']) && $additional['ping_fallback'] == 1) {
         $additional['snmp_disable'] = 1;
         $additional['os'] = "ping";
-        return createHost($host, '', $snmp_version, $port, $transport, array(), $poller_group, 1, true, $additional);
+        return createHost($host, '', $snmp_version, $port, $transport, array(), $poller_group, 1, true, $overwrite_ip, $additional);
     }
     throw $host_unreachable_exception;
 }
@@ -751,6 +758,7 @@ function createHost(
     $poller_group = 0,
     $port_assoc_mode = 'ifIndex',
     $force_add = false,
+    $overwrite_ip = null,
     $additional = array()
 ) {
     $host = trim(strtolower($host));
@@ -765,6 +773,7 @@ function createHost(
 
     $device = array(
         'hostname' => $host,
+        'overwrite_ip' => $overwrite_ip,
         'sysName' => $additional['sysName'] ? $additional['sysName'] : $host,
         'os' => $additional['os'] ? $additional['os'] : 'generic',
         'hardware' => $additional['hardware'] ? $additional['hardware'] : null,
@@ -1042,7 +1051,7 @@ function include_dir($dir, $regex = "")
 
 /**
  * Check if port is valid to poll.
- * Settings: empty_ifdescr, good_if, bad_if, bad_if_regexp, bad_ifname_regexp, bad_ifalias_regexp, bad_iftype
+ * Settings: empty_ifdescr, good_if, bad_if, bad_if_regexp, bad_ifname_regexp, bad_ifalias_regexp, bad_iftype, bad_ifoperstatus
  *
  * @param array $port
  * @param array $device
@@ -1069,6 +1078,7 @@ function is_port_valid($port, $device)
     $ifName  = $port['ifName'];
     $ifAlias = $port['ifAlias'];
     $ifType  = $port['ifType'];
+    $ifOperStatus = $port['ifOperStatus'];
 
     if (str_i_contains($ifDescr, Config::getOsSetting($device['os'], 'good_if'))) {
         return true;
@@ -1095,7 +1105,6 @@ function is_port_valid($port, $device)
         }
     }
 
-
     foreach (Config::getCombined($device['os'], 'bad_ifalias_regexp') as $bar) {
         if (preg_match($bar ."i", $ifAlias)) {
             d_echo("ignored by ifName: $ifAlias (matched: $bar)\n");
@@ -1106,6 +1115,13 @@ function is_port_valid($port, $device)
     foreach (Config::getCombined($device['os'], 'bad_iftype') as $bt) {
         if (str_contains($ifType, $bt)) {
             d_echo("ignored by ifType: $ifType (matched: $bt )\n");
+            return false;
+        }
+    }
+
+    foreach (Config::getCombined($device['os'], 'bad_ifoperstatus') as $bos) {
+        if (str_contains($ifOperStatus, $bos)) {
+            d_echo("ignored by ifOperStatus: $ifOperStatus (matched: $bos)\n");
             return false;
         }
     }
@@ -2224,7 +2240,8 @@ function runTraceroute($device)
 function device_is_up($device, $record_perf = false)
 {
     $address_family = snmpTransportToAddressFamily($device['transport']);
-    $ping_response = isPingable($device['hostname'], $address_family, $device['attribs']);
+    $poller_target = Device::pollerTarget($device['hostname']);
+    $ping_response = isPingable($poller_target, $address_family, $device['attribs']);
     $device_perf              = $ping_response['db'];
     $device_perf['device_id'] = $device['device_id'];
     $device_perf['timestamp'] = array('NOW()');
@@ -2236,6 +2253,16 @@ function device_is_up($device, $record_perf = false)
         }
         $device_perf['debug'] = json_encode($trace_debug);
         dbInsert($device_perf, 'device_perf');
+
+        // if device_perf is inserted and the ping was successful then update device last_ping timestamp
+        if (!empty($ping_response['last_ping_timetaken']) && $ping_response['last_ping_timetaken'] != "0") {
+            dbUpdate(
+                array('last_ping' => NOW(), 'last_ping_timetaken' => $ping_response['last_ping_timetaken']),
+                'devices',
+                'device_id=?',
+                array($device['device_id'])
+            );
+        }
     }
     $response              = array();
     $response['ping_time'] = $ping_response['last_ping_timetaken'];
@@ -2509,17 +2536,6 @@ function get_device_oid_limit($device)
     // then global
     $global_max = Config::get('snmp.max_oid', 10);
     return $global_max > 0 ? $global_max : 10;
-}
-
-/**
- * Strip out non-numeric characters
- */
-function return_num($entry)
-{
-    if (!is_numeric($entry)) {
-        preg_match('/-?\d*\.?\d+/', $entry, $num_response);
-        return $num_response[0];
-    }
 }
 
 /**

@@ -8,6 +8,9 @@
     <a href="{{ url('devices/state=up') }}"><span class="label label-success label-font-border label-border">@lang('up'): {{ $device_totals['up'] }}</span></a>
     <span class="label label-warning label-font-border label-border">@lang('warn'): {{ $device_totals['warn'] }}</span>
     <a href="{{ url('devices/state=down') }}"><span class="label label-danger label-font-border label-border">@lang('down'): {{ $device_totals['down'] }}</span></a>
+    @if($device_totals['maintenance'])
+    <span class="label label-default label-font-border label-border">@lang('maintenance'): {{ $device_totals['maintenance'] }}</span>
+    @endif
 </div>
 @endif
 
@@ -25,10 +28,14 @@
 @foreach($devices as $device)
     <a href="@deviceUrl($device)" title="{{ $device->displayName() }}@if($device->formatUptime(true)) - @endif{{ $device->formatUptime(true) }}">
         @if($type == 0)
-            @if($color_only_select)
+            @if($color_only_select == 1)
                 <span class="label {{ $device->labelClass }} widget-availability-fixed widget-availability label-font-border"> </span>
             @else
+            @if($color_only_select == 2)
+                <span class="label {{ $device->labelClass }} widget-availability label-font-border">@lang($device->hostname)</span>
+            @else
                 <span class="label {{ $device->labelClass }} widget-availability label-font-border">@lang($device->stateName)</span>
+            @endif
             @endif
         @else
             <div class="availability-map-oldview-box-{{ $device->stateName }}" style="width:{{ $tile_size }}px;height:{{ $tile_size }}px;"></div>

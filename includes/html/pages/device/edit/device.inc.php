@@ -30,10 +30,12 @@ if ($_POST['editing']) {
 
         $device_model->override_sysLocation = $override_sysLocation;
         $device_model->purpose = $_POST['descr'];
+        $device_model->poller_group = $_POST['poller_group'];
         $device_model->ignore = (int)isset($_POST['ignore']);
         $device_model->disabled = (int)isset($_POST['disabled']);
         $device_model->disable_notify = (int)isset($_POST['disable_notify']);
         $device_model->type = $_POST['type'];
+        $device_model->overwrite_ip = $_POST['overwrite_ip'];
 
         if ($device_model->isDirty('type')) {
             set_dev_attrib($device, 'override_device_type', true);
@@ -121,6 +123,12 @@ $disable_notify             = get_dev_attrib($device, 'disable_notify');
         </div>
         <div class="col-sm-2">
             <button name="hostname-edit-button" id="hostname-edit-button" class="btn btn-danger"> <i class="fa fa-pencil"></i> </button>
+        </div>
+    </div>
+    <div class="form-group" data-toggle="tooltip" data-container="body" data-placement="bottom" title="Use this IP instead of resolved one for polling" >
+        <label for="edit-overwrite_ip-input" class="col-sm-2 control-label" >Overwrite IP:</label>
+        <div class="col-sm-6">
+            <input type="text" id="edit-overwrite_up-input" name="overwrite_ip" class="form-control" value=<?php echo($device_model->overwrite_ip); ?>>
         </div>
     </div>
      <div class="form-group">
@@ -225,6 +233,28 @@ $disable_notify             = get_dev_attrib($device, 'disable_notify');
             </select>
         </div>
     </div>
+<?php
+if (\LibreNMS\Config::get('distributed_poller') === true) {
+?>
+   <div class="form-group">
+       <label for="poller_group" class="col-sm-2 control-label">Poller Group</label>
+       <div class="col-sm-6">
+           <select name="poller_group" id="poller_group" class="form-control input-sm">
+           <option value="0">General<?=\LibreNMS\Config::get('distributed_poller_group') == 0 ? ' (default Poller)': ''?></option>
+<?php
+foreach (dbFetchRows('SELECT `id`,`group_name` FROM `poller_groups` ORDER BY `group_name`') as $group) {
+    echo ('<option value="'.$group['id'].'"'.
+        ($device_model->poller_group == $group['id'] ? " selected": "").'>'.$group['group_name']);
+    echo (\LibreNMS\Config::get('distributed_poller_group') == $group['id'] ? ' (default Poller)': '');
+    echo ('</option>');
+}
+?>
+           </select>
+       </div>
+   </div>
+<?php
+}//endif
+?>
     <div class="form-group">
         <label for="disabled" class="col-sm-2 control-label">Disable polling and alerting:</label>
         <div class="col-sm-6">
