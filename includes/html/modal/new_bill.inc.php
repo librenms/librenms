@@ -41,22 +41,10 @@ if (Auth::user()->hasGlobalAdmin()) {
                 <div class="form-group">
                     <label class="col-sm-4 control-label" for="device">Device</label>
                     <div class="col-sm-8">
-                        <select class="form-control input-sm" id="device" name="device" onchange="getInterfaceList(this)">
-                            <option value=''>Select a device</option>
-                            <?php
-                              $sort_field = 'hostname';
-
-                            if (\LibreNMS\Config::get('force_ip_to_sysname') === true) {
-                                $sort_field = 'sysName';
-                            }
-
-                              $devices = dbFetchRows('SELECT * FROM `devices` ORDER BY ?', array($sort_field));
-                            foreach ($devices as $device) {
-                                $selected = $device['device_id'] == $port_device_id ? " selected" : "";
-                                echo "<option value='${device['device_id']}' $selected>" . format_hostname($device) . "</option>\n";
-                            }
-                            ?>
-                        </select>
+                        <select class="form-control input-sm" id="device" name="device" onchange="getInterfaceList(this)"></select>
+                        <script type="text/javascript">
+                            init_select2('#device', 'device', {}, <?php echo "{id: $port_device_id, text: '" . format_hostname($device) . "'}"; ?>);
+                        </script>
                     </div>
                 </div>
                 <div class="form-group">
