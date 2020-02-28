@@ -15,5 +15,5 @@ if ($device['os'] == 'forcepoint-os') {
             discover_storage($valid_storage, $device, $storage_index, $fstype, 'forcepoint-os', $storage_descr, $storage_size, $storage_units, $storage_used);
         }
     }
-    unset ($forcepoint_tmp);
+unset ($forcepoint_tmp);
 }
