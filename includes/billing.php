@@ -20,13 +20,13 @@ function getDates($dayofmonth, $months = 0)
     $year       = date('Y');
     $month      = date('m');
 
-    if (date('d') > $dayofmonth) {
-        // Billing day is past, so it is next month
+    if (date('d') >= $dayofmonth) {
+        //Billing period starts on the $dayofmonth onwards, therefore period will end next month
         $date_end   = date_create($year.'-'.$month.'-'.$dayofmonth);
         $date_start = date_create($year.'-'.$month.'-'.$dayofmonth);
         date_add($date_end, date_interval_create_from_date_string('1 month'));
     } else {
-        // Billing day will happen this month, therefore started last month
+        // Billing day has not arrived, therefore period started last month
         $date_end   = date_create($year.'-'.$month.'-'.$dayofmonth);
         $date_start = date_create($year.'-'.$month.'-'.$dayofmonth);
         date_sub($date_start, date_interval_create_from_date_string('1 month'));
