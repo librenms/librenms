@@ -2,7 +2,7 @@
 
 /**
  * forcepoint-os.inc.php
- * LibreNMS mempool poller module for forcepoint
+ * LibreNMS storage discovery module for forcepoint
  */
 
 if ($device['os'] == 'forcepoint-os') {
