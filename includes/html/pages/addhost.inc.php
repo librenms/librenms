@@ -1,13 +1,12 @@
 <?php
 
-use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\HostUnreachableException;
 use LibreNMS\Util\IP;
 
 $no_refresh = true;
 
-if (!LegacyAuth::user()->hasGlobalAdmin()) {
+if (!Auth::user()->hasGlobalAdmin()) {
     include 'includes/html/error-no-perm.inc.php';
 
     exit;
@@ -27,7 +26,7 @@ if (!empty($_POST['hostname'])) {
         print_error("Invalid hostname or IP: $hostname");
     }
 
-    if (LegacyAuth::user()->hasGlobalRead()) {
+    if (Auth::user()->hasGlobalRead()) {
         // Settings common to SNMPv2 & v3
         if ($_POST['port']) {
             $port = clean($_POST['port']);
@@ -76,6 +75,9 @@ if (!empty($_POST['hostname'])) {
         } else {
             print_error('Unsupported SNMP Version. There was a dropdown menu, how did you reach this error ?');
         }//end if
+
+        $additional['overwrite_ip'] = $_POST['overwrite_ip'];
+
         $poller_group = clean($_POST['poller_group']);
         $force_add    = ($_POST['force_add'] == 'on');
 
@@ -110,6 +112,7 @@ $pagetitle[] = 'Add host';
   </div>
   <div class="col-sm-6">
 <form name="form1" method="post" action="" class="form-horizontal" role="form">
+    <?php echo csrf_field() ?>
   <div><h2>Add Device</h2></div>
   <div class="alert alert-info">Devices will be checked for Ping/SNMP reachability before being probed.</div>
   <div class="well well-lg">
@@ -117,6 +120,12 @@ $pagetitle[] = 'Add host';
           <label for="hostname" class="col-sm-3 control-label">Hostname</label>
           <div class="col-sm-9">
               <input type="text" id="hostname" name="hostname" class="form-control input-sm" placeholder="Hostname">
+          </div>
+      </div>
+      <div class="form-group">
+          <label for="overwrite_ip" class="col-sm-3 control-label">Overwrite IP</label>
+          <div class="col-sm-9">
+              <input type="text" id="overwrite_ip" name="overwrite_ip" class="form-control input-sm" placeholder="Overwrite IP">
           </div>
       </div>
       <div class='form-group'>
@@ -270,7 +279,7 @@ if (Config::get('distributed_poller') === true) {
                       <option value="0"> Default poller group</option>
     ';
 
-    foreach (dbFetchRows('SELECT `id`,`group_name` FROM `poller_groups`') as $group) {
+    foreach (dbFetchRows('SELECT `id`,`group_name` FROM `poller_groups` ORDER BY `group_name`') as $group) {
         echo '<option value="'.$group['id'].'">'.$group['group_name'].'</option>';
     }
 
@@ -282,12 +291,9 @@ if (Config::get('distributed_poller') === true) {
 }//endif
 ?>
       <div class="form-group">
-          <div class="col-sm-offset-3 col-sm-9">
-              <div class="checkbox">
-                  <label>
-                      <input type="checkbox" name="force_add" id="force_add"> Force add - No ICMP or SNMP checks performed
-                  </label>
-              </div>
+          <label for="force_add" class="col-sm-3 control-label">Force add<br><small>(No ICMP or SNMP checks performed)</small></label>
+          <div class="col-sm-9">
+                  <input type="checkbox" name="force_add" id="force_add" data-size="small">
           </div>
       </div>
     <hr>
@@ -364,6 +370,7 @@ if (Config::get('distributed_poller') === true) {
     });
 
     $("[name='snmp']").bootstrapSwitch('offColor','danger');
+    $("[name='force_add']").bootstrapSwitch();
 <?php
 if (!$snmp_enabled) {
     echo '  $("[name=\'snmp\']").trigger(\'click\');';

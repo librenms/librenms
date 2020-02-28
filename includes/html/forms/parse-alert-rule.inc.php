@@ -13,9 +13,8 @@
  */
 
 use LibreNMS\Alerting\QueryBuilderParser;
-use LibreNMS\Authentication\LegacyAuth;
 
-if (!LegacyAuth::user()->hasGlobalAdmin()) {
+if (!Auth::user()->hasGlobalAdmin()) {
     header('Content-type: text/plain');
     die('ERROR: You need to be admin');
 }
@@ -35,6 +34,10 @@ if (is_numeric($alert_id) && $alert_id > 0) {
     $groups = dbFetchRows('SELECT `group_id`, `name` FROM `alert_group_map` LEFT JOIN `device_groups` ON `device_groups`.`id`=`alert_group_map`.`group_id` WHERE `rule_id`=?', [$alert_id]);
     foreach ($groups as $group) {
         $maps[] = ['id' => 'g' . $group['group_id'], 'text' => $group['name']];
+    }
+    $locations = dbFetchRows('SELECT `location_id`, `location` FROM `alert_location_map` LEFT JOIN `locations` ON `locations`.`id`=`alert_location_map`.`location_id` WHERE `rule_id`=?', [$alert_id]);
+    foreach ($locations as $location) {
+        $maps[] = ['id' => 'l' . $location['location_id'], 'text' => $location['location']];
     }
 
     $transports = [];
@@ -78,5 +81,6 @@ if (is_array($rule)) {
         'builder'    => $builder,
         'severity'   => $rule['severity'],
         'adv_query'  => $rule['query'],
+        'invert_map'  => $rule['invert_map'],
     ]);
 }

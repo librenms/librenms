@@ -8,13 +8,13 @@
                     "sysDescr": "Linux coreos 4.14.48-coreos-r2 #1 SMP Thu Jun 14 08:23:03 UTC 2018 x86_64",
                     "sysContact": null,
                     "version": null,
-                    "hardware": "",
+                    "hardware": null,
                     "features": null,
-                    "location": null,
                     "os": "coreos",
                     "type": "server",
                     "serial": null,
-                    "icon": "coreos.svg"
+                    "icon": "coreos.svg",
+                    "location": null
                 }
             ]
         },

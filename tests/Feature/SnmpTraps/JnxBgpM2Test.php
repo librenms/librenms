@@ -31,11 +31,10 @@ use App\Models\BgpPeer;
 use App\Models\Device;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
-use Log;
+use LibreNMS\Tests\Feature\SnmpTraps\SnmpTrapTestCase;
 
-class JnxBgpM2Test extends LaravelTestCase
+class JnxBgpM2Test extends SnmpTrapTestCase
 {
-
     public function testBgpPeerUnknown()
     {
 

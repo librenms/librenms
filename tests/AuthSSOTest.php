@@ -34,7 +34,7 @@ class AuthSSOTest extends DBTestCase
     private $original_auth_mech = null;
     private $server;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -133,9 +133,7 @@ class AuthSSOTest extends DBTestCase
 
         // Retrieve it and validate
         $dbuser = $a->getUser($a->getUserid($user));
-        $this->assertFalse($a->authSSOGetAttr(Config::get('sso.realname_attr')) === $dbuser['realname']);
-        $this->assertFalse($dbuser['level'] === "0");
-        $this->assertFalse($a->authSSOGetAttr(Config::get('sso.email_attr')) === $dbuser['email']);
+        $this->assertNull($dbuser);
     }
 
     // Excercise general auth flow with creation enabled
@@ -470,7 +468,7 @@ class AuthSSOTest extends DBTestCase
         $this->assertTrue($a->authSSOParseGroups() === 10);
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         Config::set('auth_mechanism', $this->original_auth_mech);
         Config::forget('sso');

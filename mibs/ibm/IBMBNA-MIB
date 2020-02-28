@@ -1,0 +1,502 @@
+IBMBNA-MIB DEFINITIONS ::= BEGIN
+
+-- IMPORTS
+--    MODULE-IDENTITY, enterprises, Unsigned32, OBJECT-TYPE
+--          FROM SNMPv2-SMI
+--    OBJECT-GROUP, MODULE-COMPLIANCE
+--          FROM SNMPv2-CONF
+--    DisplayString, TruthValue
+--          FROM SNMPv2-TC;
+
+IMPORTS
+      enterprises, Gauge
+            FROM RFC1155-SMI
+      OBJECT-TYPE
+            FROM RFC-1212
+      DisplayString
+            FROM RFC1213-MIB;
+
+
+-- ibmBna MODULE-IDENTITY
+--    LAST-UPDATED "9612161600Z"
+--    ORGANIZATION "IBM"
+--    CONTACT-INFO "Bob Moore (remoore @ ralvm6)
+--                  IBM Corporation
+--                  800 Park Offices Drive
+--                  BJNA/664
+--                  P.O. Box 12195
+--                  Research Triangle Park, NC 27709, USA
+--                  Tel:    1 919 254 4436
+--                  E-mail: remoore@ralvm6.vnet.ibm.com"
+--
+--    DESCRIPTION
+--        "This MIB has two conformance groups providing complementary
+--        functions:
+--
+--           -  The ibmBnaLocalTgConfGroup allows an APPN node that
+--              implements the APPN Branch Network Architecture to
+--              identify its uplinks and downlinks, and to distinguish
+--              between downlinks that go to end nodes and those that go
+--              to cascaded branch network nodes.
+--
+--           -  The ibmBnaTopoConfGroup allows an APPN network node to
+--              relay two pieces of information from the shared network
+--              topology database for its topology subnet:
+--
+--                 - which network nodes in the subnet support branch
+--                   awareness;
+--                 - for TGs owned by network nodes with branch
+--                   awareness, which of them are branch TGs and which
+--                   ones are not.
+--
+--        In addition, the ibmBnaDirConfGroup provides an object for
+--        reporting APPN directory information related to an LU situated
+--        below a node that implements the APPN Branch Network
+--        Architecture."
+--
+--    ::= { ibmArchitecture 21 }
+--
+
+-- Added to satisfy textual conventions used in the MIB
+-- From RFC1903
+
+TruthValue ::=
+    INTEGER { true(1), false(2) }                            --@V9057
+
+ibm               OBJECT IDENTIFIER ::= { enterprises 2 }
+ibmArchitecture   OBJECT IDENTIFIER ::= { ibm 5 }
+ibmBna            OBJECT IDENTIFIER ::= { ibmArchitecture 21 }
+ibmBnaObjects     OBJECT IDENTIFIER ::= { ibmBna 1 }
+ibmBnaConformance OBJECT IDENTIFIER ::= { ibmBna 2 }
+
+-- ******************************************************************
+-- IBM Branch Network Architecture Local TG Table
+-- ******************************************************************
+
+ibmBnaLocalTgTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF IbmBnaLocalTgEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+          "Table of objects that identify the branch uplinks and
+          downlinks for an APPN node implementing the APPN Branch Network
+          Architecture.  This table is effectively an extension to the
+          appnLocalTgTable defined in the APPN MIB (RFC nnnn).
+
+          If an implementation that supports the architecture has its
+          branch network node support disabled, then this table is empty.
+          Conversely, if a Management Station determines that there are
+          entries present in this table, then by implication the agent
+          where the table resides currently has its branch network node
+          functionality enabled."
+
+      ::= { ibmBnaObjects 1 }
+
+ibmBnaLocalTgEntry OBJECT-TYPE
+      SYNTAX IbmBnaLocalTgEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+          "This table is indexed by the destination CP name and the TG
+          number."
+
+      INDEX { ibmBnaLocalTgDest,
+              ibmBnaLocalTgNum}
+
+      ::= { ibmBnaLocalTgTable 1 }
+
+IbmBnaLocalTgEntry ::= SEQUENCE
+      {
+      ibmBnaLocalTgDest     DisplayString,
+      ibmBnaLocalTgNum      INTEGER,
+      ibmBnaLocalTgLinkType INTEGER
+      }
+
+ibmBnaLocalTgDest OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (3..17))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "Administratively assigned name of the destination node for
+          this TG.  This is the fully qualified name of a network node,
+          end node, LEN node, or virtual routing node."
+
+      ::= { ibmBnaLocalTgEntry 1 }
+
+ibmBnaLocalTgNum OBJECT-TYPE
+      SYNTAX INTEGER (0..255)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "Number associated with this transmission group."
+
+      ::= { ibmBnaLocalTgEntry 2 }
+
+
+ibmBnaLocalTgLinkType OBJECT-TYPE
+      SYNTAX INTEGER {
+                     other(1),
+                     uplink(2),
+                     downlink(3),
+                     downlinkToBranchNetworkNode(4),
+                     unknown(255)
+                     }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "Branch link type of this TG:
+
+             other(1)             = the agent has determined the TG's
+                                    branch link type to be a value other
+                                    than branch uplink or branch
+                                    downlink.  This is the value used
+                                    for a connection network TG owned by
+                                    a node that implements the APPN
+                                    Branch Network Architecture.
+             uplink(2)            = the TG is a branch uplink.
+             downlink(3)          = the TG is a branch downlink to an
+                                    end node.
+             downlinkToBranchNetworkNode(4) = the TG is a branch
+                                    downlink to a cascaded branch
+                                    network node.
+             unknown(255)         = the agent cannot determine the
+                                    branch link type of the TG."
+
+      ::= { ibmBnaLocalTgEntry 3 }
+
+-- ******************************************************************
+-- IBM Branch Network Architecture Network Node Topology Table
+-- ******************************************************************
+
+ibmBnaNnTopologyFRTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF IbmBnaNnTopologyFREntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+          "Table of objects that identify which of the network nodes in
+          an APPN topology subnet support branch awareness.  This table
+          is effectively an extension to the appnNnTopologyFRTable
+          defined in the APPN MIB (RFC nnnn)."
+
+      ::= { ibmBnaObjects 2 }
+
+ibmBnaNnTopologyFREntry OBJECT-TYPE
+      SYNTAX IbmBnaNnTopologyFREntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+          "This table is indexed by FRSN and by fully qualified node
+          name."
+
+      INDEX { ibmBnaNnNodeFRFrsn,
+              ibmBnaNnNodeFRName }
+
+      ::= { ibmBnaNnTopologyFRTable 1 }
+
+IbmBnaNnTopologyFREntry ::= SEQUENCE
+      {
+      ibmBnaNnNodeFRFrsn                Gauge,
+      ibmBnaNnNodeFRName                DisplayString,
+      ibmBnaNnNodeFRBranchAwareness     TruthValue
+      }
+
+ibmBnaNnNodeFRFrsn OBJECT-TYPE
+      SYNTAX Gauge
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "Flow reduction sequence numbers (FRSNs) are associated with
+          Topology Database Updates (TDUs) and are unique only within
+          each APPN network node.  A TDU can be associated with multiple
+          APPN resources.  This FRSN indicates the last relative time
+          this resource was updated at the agent node."
+
+      ::= { ibmBnaNnTopologyFREntry 1 }
+
+ibmBnaNnNodeFRName OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (3..17))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "Administratively assigned network name that is locally defined
+          at each network node in the format NetId.CpName."
+
+      ::= { ibmBnaNnTopologyFREntry 2 }
+
+ibmBnaNnNodeFRBranchAwareness OBJECT-TYPE
+      SYNTAX TruthValue
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "Indicates whether this node supports branch awareness.
+
+           This object corresponds to cv4580, byte 8, bit 4."
+
+      ::= { ibmBnaNnTopologyFREntry 3 }
+
+
+-- ******************************************************************
+-- IBM Branch Network Architecture Network TG Topology Table
+-- ******************************************************************
+
+ibmBnaNnTgTopologyFRTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF IbmBnaNnTgTopologyFREntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+          "Table of objects that identify which of the TGs owned by
+          network nodes in an APPN topology subnet are branch TGs.
+          This table is effectively an extension to the
+          appnNnTgTopologyFRTable defined in the APPN MIB (RFC nnnn)."
+
+      ::= { ibmBnaObjects 3 }
+
+ibmBnaNnTgTopologyFREntry OBJECT-TYPE
+      SYNTAX IbmBnaNnTgTopologyFREntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+          "This table is indexed by four columns:  FRSN, TG owner fully
+          qualified node name, TG destination fully qualified node name,
+          and TG number."
+
+      INDEX
+             {ibmBnaNnTgFRFrsn,
+              ibmBnaNnTgFROwner,
+              ibmBnaNnTgFRDest,
+              ibmBnaNnTgFRNum}
+
+      ::= { ibmBnaNnTgTopologyFRTable 1 }
+
+IbmBnaNnTgTopologyFREntry ::= SEQUENCE {
+
+      ibmBnaNnTgFRFrsn           Gauge,
+      ibmBnaNnTgFROwner          DisplayString,
+      ibmBnaNnTgFRDest           DisplayString,
+      ibmBnaNnTgFRNum            INTEGER,
+      ibmBnaNnTgFRBranchTg       TruthValue
+}
+
+
+ibmBnaNnTgFRFrsn OBJECT-TYPE
+      SYNTAX Gauge
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "Flow reduction sequence numbers (FRSNs) are associated with
+          Topology Database Updates (TDUs) and are unique only within
+          each APPN network node.  A TDU can be associated with multiple
+          APPN resources.  This FRSN indicates the last time this
+          resource was updated at this node."
+
+      ::= { ibmBnaNnTgTopologyFREntry 1 }
+
+ibmBnaNnTgFROwner OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (3..17))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "Administratively assigned name for the originating node for
+          this TG.  The format is NetId.CpName and is the same name
+          specified in the node table."
+
+      ::= { ibmBnaNnTgTopologyFREntry 2 }
+
+ibmBnaNnTgFRDest OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (3..17))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "Administratively assigned fully qualified network name for the
+          destination node for this TG."
+
+      ::= { ibmBnaNnTgTopologyFREntry 3 }
+
+ibmBnaNnTgFRNum OBJECT-TYPE
+      SYNTAX INTEGER  (0..255)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "Number associated with this transmission group.  Range is
+          0-255."
+
+      ::= { ibmBnaNnTgTopologyFREntry 4 }
+
+ibmBnaNnTgFRBranchTg OBJECT-TYPE
+      SYNTAX TruthValue
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "Indicates whether the transmission group is a branch TG
+          (equivalently, whether the destination of the transmission
+          group is a node supporting the APPN Branch Network
+          Architecture).
+
+          This object corresponds to cv4680, byte m+1, bit 1."
+
+      ::= { ibmBnaNnTgTopologyFREntry 5 }
+
+-- ******************************************************************
+-- IBM Branch Network Architecture APPN Node Directory Table
+-- ******************************************************************
+
+ibmBnaDirTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF IbmBnaDirEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+          "Table of objects that identify the apparent owning control
+          point for an LU below a node that supports the APPN Branch
+          Network Architecture.
+
+          This table is effectively an extension to the appnDirTable
+          defined in the APPN MIB (RFC nnnn)."
+
+      ::= { ibmBnaObjects 4 }
+
+ibmBnaDirEntry OBJECT-TYPE
+      SYNTAX IbmBnaDirEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+          "This table is indexed by the LU name."
+
+      INDEX { ibmBnaDirLuName }
+
+      ::= { ibmBnaDirTable 1 }
+
+IbmBnaDirEntry ::= SEQUENCE {
+      ibmBnaDirLuName                   DisplayString,
+      ibmBnaDirApparentLuOwnerName      DisplayString
+                     }
+
+ibmBnaDirLuName OBJECT-TYPE
+      SYNTAX DisplayString  (SIZE (1..17))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "Fully qualified network LU name in the domain of the
+           serving network node.  Entries take one of three forms:
+
+              - Explicit entries do not contain the character '*'.
+              - Partial wildcard entries have the form 'ccc*', where
+                'c' represents a character in a legal SNA LuName.
+              - A full wildcard entry consists of the single
+                character '*'."
+
+      ::= { ibmBnaDirEntry 1 }
+
+ibmBnaDirApparentLuOwnerName OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0 | 3..17))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "Fully qualified CP name of the node at which the LU appears to
+          be located.  This object and the appnDirLuOwnerName object in
+          the APPN MIB are related as follows:
+
+          Implementations that support this object save in their
+          directory database information about an LU's owning control
+          point that was communicated in two control vectors:
+
+               -  an Associated Resource Entry (X'3C') CV with resource
+                  type X'00F4' (ENCP)
+
+               -  a Real Owning Control Point (X'4A') CV.
+
+          The X'4A' CV is created by a branch network node to preserve
+          the name of the real owning control point for an LU below the
+          branch network node, before it overwrites this name with its
+          own name in the X'3C' CV.  The X'4A' CV is not present for LUs
+          that are not below branch network nodes.
+
+          If the information a node has about an LU's owning CP came only
+          in a X'3C' CV, then the name from the X'3C' is returned in the
+          appnDirLuOwnerName object, and a null string is returned in
+          this object.
+
+          If the information a node has about an LU's owning CP came in
+          both X'3C' and X'4A' CVs, then the name from the X'4A' is
+          returned in the appnDirLuOwnerName object, and the name from
+          the X'3C' (which will be the branch network node's name) is
+          returned in this object."
+
+      ::= { ibmBnaDirEntry 2 }
+
+
+
+-- ******************************************************************
+-- IBM Branch Network Architecture conformance
+-- ******************************************************************
+
+ibmBnaCompliances OBJECT IDENTIFIER ::= {ibmBnaConformance 1 }
+ibmBnaConfGroups OBJECT IDENTIFIER  ::= {ibmBnaConformance 2 }
+
+
+-- ibmBnaCompliance MODULE-COMPLIANCE
+--    STATUS mandatory
+--    DESCRIPTION
+--        "The compliance statement for the SNMPv2 entities that
+--        implement the IBM Branch Network Architecture MIB."
+
+--    MODULE    this module
+
+--    Conditionally mandatory groups
+--       GROUP  ibmBnaLocalTgConfGroup
+--       DESCRIPTION
+--               "The ibmBnaLocalTgConfGroup is mandatory for nodes that
+--               support the APPN Branch Network Architecture."
+
+--       GROUP  ibmBnaTopoConfGroup
+--       DESCRIPTION
+--               "The ibmBnaTopoConfGroup is mandatory for APPN network
+--               nodes."
+
+--       GROUP  ibmBnaDirConfGroup
+--       DESCRIPTION
+--               "The ibmBnaDirConfGroup is mandatory for APPN network
+--               nodes and for nodes that support the APPN Branch Network
+--               Architecture."
+
+--    ::= { ibmBnaCompliances 1 }
+
+-- ibmBnaLocalTgConfGroup    OBJECT-GROUP
+--       OBJECTS {
+--               ibmBnaLocalTgLinkType
+--               }
+--       STATUS mandatory
+--       DESCRIPTION
+--               "An object used to identify the branch link type for
+--               each of the TGs owned by a node that implements the APPN
+--               Branch Network Architecture."
+
+--       ::= { ibmBnaConfGroups 1 }
+
+
+-- ibmBnaTopoConfGroup    OBJECT-GROUP
+--       OBJECTS {
+--               ibmBnaNnNodeFRBranchAwareness,
+--               ibmBnaNnTgFRBranchTg
+--               }
+--       STATUS  current
+--       DESCRIPTION
+--               "This conformance group contains two objects
+--               representing information in the APPN topology database
+--               related to the APPN Branch Network Architecture."
+
+--       ::= { ibmBnaConfGroups 2 }
+
+-- ibmBnaDirConfGroup    OBJECT-GROUP
+--       OBJECTS {
+--               ibmBnaDirApparentLuOwnerName
+--               }
+--       STATUS  current
+--       DESCRIPTION
+--               "This conformance group contains one object representing
+--               information in the APPN directory related to LUs
+--               situated below nodes implementing the APPN Branch
+--               Network Architecture."
+--
+--       ::= { ibmBnaConfGroups 3 }
+
+END

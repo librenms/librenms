@@ -40,7 +40,7 @@ class Slack extends Transport
         $host          = $api['url'];
         $curl          = curl_init();
         $slack_msg     = strip_tags($obj['msg']);
-        $color         = ($obj['state'] == 0 ? '#00FF00' : '#FF0000');
+        $color         = self::getColorForState($obj['state']);
         $data          = [
             'attachments' => [
                 0 => [
@@ -53,6 +53,8 @@ class Slack extends Transport
                 ],
             ],
             'channel' => $api['channel'],
+            'username' => $api['username'],
+            'icon_emoji' => ':' .$api['icon_emoji'].':',
         ];
         $alert_message = json_encode($data);
         curl_setopt($curl, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);

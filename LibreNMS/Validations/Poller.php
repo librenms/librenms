@@ -80,10 +80,11 @@ class Poller extends BaseValidation
 
     private function checkLastPolled(Validator $validator)
     {
+        $period = (int)Config::get('rrd.step', 300);
         // pollers table is only updated by poller-wrapper.py
         if (dbFetchCell('SELECT COUNT(*) FROM `pollers`')) {
             $dedupe_sql = "SELECT TRIM(TRAILING '\\n' FROM `poller_name`) AS `name`, MAX(`last_polled`) AS `polled` FROM `pollers` GROUP BY `name`";
-            $sql = "SELECT `name` FROM ($dedupe_sql) AS pt WHERE `polled` <= DATE_ADD(NOW(), INTERVAL - 5 MINUTE)";
+            $sql = "SELECT `name` FROM ($dedupe_sql) AS pt WHERE `polled` <= DATE_ADD(NOW(), INTERVAL - $period SECOND)";
 
             $pollers = dbFetchColumn($sql);
             if (count($pollers) > 0) {

@@ -165,8 +165,10 @@ class QueueManager:
                                              port=self.config.redis_port,
                                              db=self.config.redis_db,
                                              password=self.config.redis_pass,
-                                             unix_socket_path=self.config.redis_socket
-                                             )
+                                             unix_socket_path=self.config.redis_socket,
+                                             sentinel=self.config.redis_sentinel,
+                                             sentinel_service=self.config.redis_sentinel_service)
+
         except ImportError:
             if self.config.distributed:
                 critical("ERROR: Redis connection required for distributed polling")

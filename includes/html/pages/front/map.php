@@ -1,3 +1,9 @@
+<div class="row">
+    <div class="alert alert-info text-center" role="alert">
+        Overview pages have changed to a new format, this page will not be converted to the new format and will be removed in the next release (1.59).
+        <br>For more info, see: <a href="https://t.libren.ms/overview">https://t.libren.ms/overview</a>
+    </div>
+</div>
 <?php
 /* Copyright (C) 2014 Daniel Preussker <f0o@devilcode.org>
  * This program is free software: you can redistribute it and/or modify
@@ -22,7 +28,6 @@
  * @subpackage Frontpage
  */
 
-use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
 
 if (Config::get('map.engine') == 'leaflet') {
@@ -179,11 +184,11 @@ if (Config::get('enable_syslog')) {
     echo("</div>");
     echo("</div>");
 } else {
-    if (LegacyAuth::user()->hasGlobalAdmin()) {
+    if (Auth::user()->hasGlobalAdmin()) {
         $query = "SELECT *,DATE_FORMAT(datetime, '" . Config::get('dateformat.mysql.compact') . "') as humandate  FROM `eventlog` ORDER BY `datetime` DESC LIMIT 0,15";
     } else {
         $query = "SELECT *,DATE_FORMAT(datetime, '" . Config::get('dateformat.mysql.compact') . "') as humandate  FROM `eventlog` AS E, devices_perms AS P WHERE E.host =
-    P.device_id AND P.user_id = " . LegacyAuth::id() . " ORDER BY `datetime` DESC LIMIT 0,15";
+    P.device_id AND P.user_id = " . Auth::id() . " ORDER BY `datetime` DESC LIMIT 0,15";
     }
 
     echo('<div class="container-fluid">

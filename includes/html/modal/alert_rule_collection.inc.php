@@ -23,9 +23,7 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-use LibreNMS\Authentication\LegacyAuth;
-
-if (!LegacyAuth::user()->hasGlobalAdmin()) {
+if (!Auth::user()->hasGlobalAdmin()) {
     die('ERROR: You need to be admin');
 }
 
@@ -85,9 +83,11 @@ if (!LegacyAuth::user()->hasGlobalAdmin()) {
                                     dataType: "json",
                                     success: function (data) {
                                         if (data.status == 'ok') {
+                                            $("#search_rule_modal").one('hidden.bs.modal', function(event) {
+                                                loadRule(data);
+                                                $('#create-alert').modal('show');
+                                            });
                                             $("#search_rule_modal").modal('hide');
-                                            loadRule(data);
-                                            $('#create-alert').modal('show');
                                         } else {
                                             toastr.error(data.message);
                                         }

@@ -1,4 +1,5 @@
 <form>
+    <?php echo csrf_field() ?>
     <div class="modal fade" id="alert_notes_modal" tabindex="-1" role="dialog" aria-labelledby="alert_notes" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">

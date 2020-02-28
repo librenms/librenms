@@ -25,12 +25,26 @@
 
 namespace LibreNMS\Tests;
 
+use LibreNMS\Util\Snmpsim;
+
 trait SnmpsimHelpers
 {
+    /** @var Snmpsim snmpsim instance */
+    protected $snmpsim = null;
+
     public function requireSnmpsim()
     {
         if (!getenv('SNMPSIM')) {
             $this->markTestSkipped('Snmpsim required for this test.  Set SNMPSIM=1 to enable.');
         }
+    }
+
+    public function getSnmpsim()
+    {
+        if (!$this->snmpsim) {
+            global $snmpsim;
+            $this->snmpsim = $snmpsim;
+        }
+        return $this->snmpsim;
     }
 }

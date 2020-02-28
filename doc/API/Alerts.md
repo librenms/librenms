@@ -36,7 +36,7 @@ Output:
    "alerted": "1",
    "open": "1",
    "timestamp": "2014-12-11 14:40:02"
-  },
+  }]
 }
 ```
 
@@ -107,6 +107,7 @@ Input:
 
 - state: Filter the alerts by state, 0 = ok, 1 = alert, 2 = ack
 - severity: Filter the alerts by severity. Valid values are `ok`, `warning`, `critical`.
+- alert_rule: Filter alerts by alert rule ID.
 - order: How to order the output, default is by timestamp
   (descending). Can be appended by DESC or ASC to change the order.
 
@@ -122,6 +123,10 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/alerts?seve
 
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/alerts?order=timestamp%20ASC
+```
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/alerts?alert_rule=49
 ```
 
 Output:
@@ -140,7 +145,7 @@ Output:
    "alerted": "1",
    "open": "1",
    "timestamp": "2014-12-11 14:40:02"
-  }
+  }]
 }
 ```
 
@@ -247,7 +252,7 @@ Output:
    "extra": "{\"mute\":false,\"count\":\"15\",\"delay\":\"300\",\"invert\":false}",
    "disabled": "0",
    "name": "A test rule"
-  },
+  }]
 }
 ```
 
@@ -271,6 +276,9 @@ Input (JSON):
 - delay: Delay is when to start alerting and how frequently. The value
   is stored in seconds but you can specify minutes, hours or days by
   doing 5 m, 5 h, 5 d for each one.
+- interval: How often to re-issue notifications while this alert is active,0 means notify once.The value
+  is stored in seconds but you can specify minutes, hours or days by
+  doing 5 m, 5 h, 5 d for each one.
 - mute: If mute is enabled then an alert will never be sent but will
   show up in the Web UI (true or false).
 - invert: This would invert the rules check.
@@ -279,16 +287,14 @@ Input (JSON):
 Example:
 
 ```curl
-curl -X POST -d '{"device_id":[1,2,3], "name": "testrule", builder":"{\"condition\":\"AND\",\"rules\":[{\"id\":\"devices.hostname\",\"field\":\"devices.hostname\",\"type\":\"string\",\"input\":\"text\",\"operator\":\"equal\",\"value\":\"localhost\"}],\"valid\":true}","severity": "critical","count":15,"delay":"5 m","mute":false}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/rules
+curl -X POST -d '{"devices":[1,2,3], "name": "testrule", "builder":{"condition":"AND","rules":[{"id":"devices.hostname","field":"devices.hostname","type":"string","input":"text","operator":"equal","value":"localhost"}],"valid":true},"severity": "critical","count":15,"delay":"5 m","interval":"5 m","mute":false}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/rules
 ```
 
 Output:
 
 ```json
-rules
 {
- "status": "ok",
- "message": ""
+ "status": "ok"
 }
 ```
 
@@ -314,6 +320,9 @@ Input (JSON):
 - delay: Delay is when to start alerting and how frequently. The value
   is stored in seconds but you can specify minutes, hours or days by
   doing 5 m, 5 h, 5 d for each one.
+- interval: How often to re-issue notifications while this alert is active,0 means notify once.The value
+  is stored in seconds but you can specify minutes, hours or days by
+  doing 5 m, 5 h, 5 d for each one.
 - mute: If mute is enabled then an alert will never be sent but will
   show up in the Web UI (true or false).
 - invert: This would invert the rules check.
@@ -322,15 +331,13 @@ Input (JSON):
 Example:
 
 ```curl
-curl -X PUT -d '{"rule_id":1,"device_id":"-1", "name": "testrule", "builder":"{\"condition\":\"AND\",\"rules\":[{\"id\":\"devices.hostname\",\"field\":\"devices.hostname\",\"type\":\"string\",\"input\":\"text\",\"operator\":\"equal\",\"value\":\"localhost\"}],\"valid\":true}","severity": "critical","count":15,"delay":"5 m","mute":false}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/rules
+curl -X PUT -d '{"rule_id":1,"device_id":"-1", "name": "testrule", "builder":"{"condition":"AND","rules":[{"id":"devices.hostname","field":"devices.hostname","type":"string","input":"text","operator":"equal","value":"localhost"}],"valid":true}","severity": "critical","count":15,"delay":"5 m","interval":"5 m","mute":false}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/rules
 ```
 
 Output:
 
 ```json
-rules
 {
- "status": "ok",
- "message": ""
+ "status": "ok"
 }
 ```

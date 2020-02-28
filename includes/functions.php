@@ -11,8 +11,7 @@
  *
  */
 
-use Illuminate\Database\Events\QueryExecuted;
-use LibreNMS\Authentication\LegacyAuth;
+use App\Models\Device;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\HostExistsException;
 use LibreNMS\Exceptions\HostIpExistsException;
@@ -24,9 +23,9 @@ use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
 use LibreNMS\Util\IPv4;
 use LibreNMS\Util\IPv6;
 use LibreNMS\Util\MemcacheLock;
-use Symfony\Component\Process\Process;
-use PHPMailer\PHPMailer\PHPMailer;
 use LibreNMS\Util\Time;
+use PHPMailer\PHPMailer\PHPMailer;
+use Symfony\Component\Process\Process;
 
 if (!function_exists('set_debug')) {
     /**
@@ -314,12 +313,24 @@ function compare_var($a, $b, $comparison = '=')
             return $a < $b;
         case "contains":
             return str_contains($a, $b);
+        case "not_contains":
+            return !str_contains($a, $b);
         case "starts":
             return starts_with($a, $b);
+        case "not_starts":
+            return !starts_with($a, $b);
         case "ends":
             return ends_with($a, $b);
+        case "not_ends":
+            return !ends_with($a, $b);
         case "regex":
             return (bool)preg_match($b, $a);
+        case "not regex":
+            return !((bool)preg_match($b, $a));
+        case "in_array":
+            return in_array($a, $b);
+        case "not_in_array":
+            return !in_array($a, $b);
         default:
             return false;
     }
@@ -424,6 +435,24 @@ function renamehost($id, $new, $source = 'console')
     return "Renaming of $host failed\n";
 }
 
+function device_discovery_trigger($id)
+{
+    global $debug;
+
+    if (isCli() === false) {
+        ignore_user_abort(true);
+        set_time_limit(0);
+    }
+
+    $update = dbUpdate(array('last_discovered' => array('NULL')), 'devices', '`device_id` = ?', array($id));
+    if (!empty($update) || $update == '0') {
+        $message = 'Device will be rediscovered';
+    } else {
+        $message = 'Error rediscovering device';
+    }
+    return array('status'=> $update, 'message' => $message);
+}
+
 function delete_device($id)
 {
     global $debug;
@@ -460,8 +489,8 @@ function delete_device($id)
 
     $db_name = dbFetchCell('SELECT DATABASE()');
     foreach ($fields as $field) {
-        foreach (dbFetch("SELECT table_name FROM information_schema.columns WHERE table_schema = ? AND column_name = ?", [$db_name, $field]) as $table) {
-            $table = $table['table_name'];
+        foreach (dbFetch("SELECT TABLE_NAME FROM information_schema.columns WHERE table_schema = ? AND column_name = ?", [$db_name, $field]) as $table) {
+            $table = $table['TABLE_NAME'];
             $entries = (int) dbDelete($table, "`$field` =  ?", array($id));
             if ($entries > 0 && $debug === true) {
                 $ret .= "$field@$table = #$entries\n";
@@ -514,8 +543,14 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
         throw new InvalidPortAssocModeException("Invalid port association_mode '$port_assoc_mode'. Valid modes are: " . join(', ', get_port_assoc_modes()));
     }
 
+    if ($additional['overwrite_ip']) {
+        $overwrite_ip = $additional['overwrite_ip'];
+    }
+
     // check if we have the host by IP
-    if (Config::get('addhost_alwayscheckip') === true) {
+    if (!empty($overwrite_ip)) {
+        $ip = $overwrite_ip;
+    } elseif (Config::get('addhost_alwayscheckip') === true) {
         $ip = gethostbyname($host);
     } else {
         $ip = $host;
@@ -532,7 +567,7 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
     // Test reachability
     if (!$force_add) {
         $address_family = snmpTransportToAddressFamily($transport);
-        $ping_result = isPingable($host, $address_family);
+        $ping_result = isPingable($ip, $address_family);
         if (!$ping_result['result']) {
             throw new HostUnreachablePingException("Could not ping $host");
         }
@@ -546,7 +581,7 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
     }
 
     if (isset($additional['snmp_disable']) && $additional['snmp_disable'] == 1) {
-        return createHost($host, '', $snmp_version, $port, $transport, array(), $poller_group, 1, true, $additional);
+        return createHost($host, '', $snmp_version, $port, $transport, array(), $poller_group, 1, true, $overwrite_ip, $additional);
     }
     $host_unreachable_exception = new HostUnreachableException("Could not connect to $host, please check the snmp details and snmp reachability");
     // try different snmp variables to add the device
@@ -556,7 +591,7 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
             foreach (Config::get('snmp.v3') as $v3) {
                 $device = deviceArray($host, null, $snmpver, $port, $transport, $v3, $port_assoc_mode);
                 if ($force_add === true || isSNMPable($device)) {
-                    return createHost($host, null, $snmpver, $port, $transport, $v3, $poller_group, $port_assoc_mode, $force_add);
+                    return createHost($host, null, $snmpver, $port, $transport, $v3, $poller_group, $port_assoc_mode, $force_add, $overwrite_ip);
                 } else {
                     $host_unreachable_exception->addReason("SNMP $snmpver: No reply with credentials " . $v3['authname'] . "/" . $v3['authlevel']);
                 }
@@ -567,7 +602,7 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
                 $device = deviceArray($host, $community, $snmpver, $port, $transport, null, $port_assoc_mode);
 
                 if ($force_add === true || isSNMPable($device)) {
-                    return createHost($host, $community, $snmpver, $port, $transport, array(), $poller_group, $port_assoc_mode, $force_add);
+                    return createHost($host, $community, $snmpver, $port, $transport, array(), $poller_group, $port_assoc_mode, $force_add, $overwrite_ip);
                 } else {
                     $host_unreachable_exception->addReason("SNMP $snmpver: No reply with community $community");
                 }
@@ -579,7 +614,7 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
     if (isset($additional['ping_fallback']) && $additional['ping_fallback'] == 1) {
         $additional['snmp_disable'] = 1;
         $additional['os'] = "ping";
-        return createHost($host, '', $snmp_version, $port, $transport, array(), $poller_group, 1, true, $additional);
+        return createHost($host, '', $snmp_version, $port, $transport, array(), $poller_group, 1, true, $overwrite_ip, $additional);
     }
     throw $host_unreachable_exception;
 }
@@ -661,6 +696,11 @@ function isPingable($hostname, $address_family = 'ipv4', $attribs = [])
         $address_family
     );
 
+    if ($status['dup'] > 0) {
+        Log::event('Duplicate ICMP response detected! This could indicate a network issue.', getidbyname($hostname), 'icmp', 4);
+        $status['exitcode'] = 0;   // when duplicate is detected fping returns 1. The device is up, but there is another issue. Clue admins in with above event.
+    }
+
     return [
         'result' => ($status['exitcode'] == 0 && $status['loss'] < 100),
         'last_ping_timetaken' => $status['avg'],
@@ -718,6 +758,7 @@ function createHost(
     $poller_group = 0,
     $port_assoc_mode = 'ifIndex',
     $force_add = false,
+    $overwrite_ip = null,
     $additional = array()
 ) {
     $host = trim(strtolower($host));
@@ -732,6 +773,7 @@ function createHost(
 
     $device = array(
         'hostname' => $host,
+        'overwrite_ip' => $overwrite_ip,
         'sysName' => $additional['sysName'] ? $additional['sysName'] : $host,
         'os' => $additional['os'] ? $additional['os'] : 'generic',
         'hardware' => $additional['hardware'] ? $additional['hardware'] : null,
@@ -874,7 +916,7 @@ function log_event($text, $device = null, $type = null, $severity = 2, $referenc
         'datetime' => \Carbon\Carbon::now(),
         'severity' => $severity,
         'message' => $text,
-        'username'  => isset(LegacyAuth::user()->username) ? LegacyAuth::user()->username : '',
+        'username'  => Auth::user()->username ?? '',
     ], 'eventlog');
 }
 
@@ -917,7 +959,7 @@ function send_mail($emails, $subject, $message, $html = false)
                 $mail->addAddress($email, $email_name);
             }
             $mail->Subject = $subject;
-            $mail->XMailer = Config::get('project_name_version');
+            $mail->XMailer = Config::get('project_name');
             $mail->CharSet = 'utf-8';
             $mail->WordWrap = 76;
             $mail->Body = $message;
@@ -1009,7 +1051,7 @@ function include_dir($dir, $regex = "")
 
 /**
  * Check if port is valid to poll.
- * Settings: empty_ifdescr, good_if, bad_if, bad_if_regexp, bad_ifname_regexp, bad_ifalias_regexp, bad_iftype
+ * Settings: empty_ifdescr, good_if, bad_if, bad_if_regexp, bad_ifname_regexp, bad_ifalias_regexp, bad_iftype, bad_ifoperstatus
  *
  * @param array $port
  * @param array $device
@@ -1036,6 +1078,7 @@ function is_port_valid($port, $device)
     $ifName  = $port['ifName'];
     $ifAlias = $port['ifAlias'];
     $ifType  = $port['ifType'];
+    $ifOperStatus = $port['ifOperStatus'];
 
     if (str_i_contains($ifDescr, Config::getOsSetting($device['os'], 'good_if'))) {
         return true;
@@ -1062,7 +1105,6 @@ function is_port_valid($port, $device)
         }
     }
 
-
     foreach (Config::getCombined($device['os'], 'bad_ifalias_regexp') as $bar) {
         if (preg_match($bar ."i", $ifAlias)) {
             d_echo("ignored by ifName: $ifAlias (matched: $bar)\n");
@@ -1073,6 +1115,13 @@ function is_port_valid($port, $device)
     foreach (Config::getCombined($device['os'], 'bad_iftype') as $bt) {
         if (str_contains($ifType, $bt)) {
             d_echo("ignored by ifType: $ifType (matched: $bt )\n");
+            return false;
+        }
+    }
+
+    foreach (Config::getCombined($device['os'], 'bad_ifoperstatus') as $bos) {
+        if (str_contains($ifOperStatus, $bos)) {
+            d_echo("ignored by ifOperStatus: $ifOperStatus (matched: $bos)\n");
             return false;
         }
     }
@@ -1119,9 +1168,9 @@ function scan_new_plugins()
             if (is_dir(Config::get('plugin_dir') . '/' . $name)) {
                 if ($name != '.' && $name != '..') {
                     if (is_file(Config::get('plugin_dir') . '/' . $name . '/' . $name . '.php') && is_file(Config::get('plugin_dir') . '/' . $name . '/' . $name . '.inc.php')) {
-                        $plugin_id = dbFetchRow("SELECT `plugin_id` FROM `plugins` WHERE `plugin_name` = '$name'");
+                        $plugin_id = dbFetchRow("SELECT `plugin_id` FROM `plugins` WHERE `plugin_name` = ?", [$name]);
                         if (empty($plugin_id)) {
-                            if (dbInsert(array('plugin_name' => $name, 'plugin_active' => '0'), 'plugins')) {
+                            if (dbInsert(['plugin_name' => $name, 'plugin_active' => '0'], 'plugins')) {
                                 $installed++;
                             }
                         }
@@ -1131,7 +1180,27 @@ function scan_new_plugins()
         }
     }
 
-    return( $installed );
+    return $installed;
+}
+
+function scan_removed_plugins()
+{
+    $removed = 0; # Track how many plugins will be removed from database
+
+    if (file_exists(Config::get('plugin_dir'))) {
+        $plugin_files = scandir(Config::get('plugin_dir'));
+        $installed_plugins = dbFetchColumn("SELECT `plugin_name` FROM `plugins`");
+        foreach ($installed_plugins as $name) {
+            if (in_array($name, $plugin_files)) {
+                continue;
+            }
+            if (dbDelete('plugins', "`plugin_name` = ?", $name)) {
+                $removed++;
+            }
+        }
+    }
+
+    return( $removed );
 }
 
 function validate_device_id($id)
@@ -1288,6 +1357,14 @@ function convert_delay($delay)
     return($delay_sec);
 }
 
+function normalize_snmp_ip_address($data)
+{
+    // $data is received from snmpwalk, can be ipv4 xxx.xxx.xxx.xxx or ipv6 xx:xx:...:xx (16 chunks)
+    // ipv4 is returned unchanged, ipv6 is returned with one ':' removed out of two, like
+    //  xxxx:xxxx:...:xxxx (8 chuncks)
+    return (preg_replace('/([0-9a-fA-F]{2}):([0-9a-fA-F]{2})/', '\1\2', explode('%', $data, 2)[0]));
+}
+
 function guidv4($data)
 {
     // http://stackoverflow.com/questions/2040240/php-function-to-generate-v4-uuid#15875555
@@ -1415,26 +1492,29 @@ function fping($host, $count = 3, $interval = 1000, $timeout = 500, $address_fam
 {
     // Default to ipv4
     $fping_name = $address_family == 'ipv6' ? 'fping6' : 'fping';
-    $fping_path = Config::get($fping_name, $fping_name);
-
-    // build the parameters
-    $params = '-e -q -c ' . max($count, 1);
-
     $interval = max($interval, 20);
-    $params .= ' -p ' . $interval;
 
-    $params .= ' -t ' . max($timeout, $interval);
+    // build the command
+    $cmd = [
+        Config::get($fping_name, $fping_name),
+        '-e',
+        '-q',
+        '-c',
+        max($count, 1),
+        '-p',
+        $interval,
+        '-t',
+        max($timeout, $interval),
+        $host
+    ];
 
-    $cmd = "$fping_path $params $host";
-
-    d_echo("[FPING] $cmd\n");
-
-    $process = new Process($cmd);
+    $process = app()->make(Process::class, ['command' => $cmd]);
+    d_echo('[FPING] ' . $process->getCommandLine() . PHP_EOL);
     $process->run();
     $output = $process->getErrorOutput();
 
-    preg_match('#= (\d+)/(\d+)/(\d+)%, min/avg/max = ([\d.]+)/([\d.]+)/([\d.]+)$#', $output, $parsed);
-    list(, $xmt, $rcv, $loss, $min, $avg, $max) = $parsed;
+    preg_match('#= (\d+)/(\d+)/(\d+)%(, min/avg/max = ([\d.]+)/([\d.]+)/([\d.]+))?$#', $output, $parsed);
+    list(, $xmt, $rcv, $loss, , $min, $avg, $max) = array_pad($parsed, 8, 0);
 
     if ($loss < 0) {
         $xmt = 1;
@@ -1443,12 +1523,13 @@ function fping($host, $count = 3, $interval = 1000, $timeout = 500, $address_fam
     }
 
     $response = [
-        'xmt'  => set_numeric($xmt),
-        'rcv'  => set_numeric($rcv),
-        'loss' => set_numeric($loss),
-        'min'  => set_numeric($min),
-        'max'  => set_numeric($max),
-        'avg'  => set_numeric($avg),
+        'xmt'  => (int)$xmt,
+        'rcv'  => (int)$rcv,
+        'loss' => (int)$loss,
+        'min'  => (float)$min,
+        'max'  => (float)$max,
+        'avg'  => (float)$avg,
+        'dup'  => substr_count($output, 'duplicate'),
         'exitcode' => $process->getExitCode(),
     ];
     d_echo($response);
@@ -2159,7 +2240,8 @@ function runTraceroute($device)
 function device_is_up($device, $record_perf = false)
 {
     $address_family = snmpTransportToAddressFamily($device['transport']);
-    $ping_response = isPingable($device['hostname'], $address_family, $device['attribs']);
+    $poller_target = Device::pollerTarget($device['hostname']);
+    $ping_response = isPingable($poller_target, $address_family, $device['attribs']);
     $device_perf              = $ping_response['db'];
     $device_perf['device_id'] = $device['device_id'];
     $device_perf['timestamp'] = array('NOW()');
@@ -2171,6 +2253,16 @@ function device_is_up($device, $record_perf = false)
         }
         $device_perf['debug'] = json_encode($trace_debug);
         dbInsert($device_perf, 'device_perf');
+
+        // if device_perf is inserted and the ping was successful then update device last_ping timestamp
+        if (!empty($ping_response['last_ping_timetaken']) && $ping_response['last_ping_timetaken'] != "0") {
+            dbUpdate(
+                array('last_ping' => NOW(), 'last_ping_timetaken' => $ping_response['last_ping_timetaken']),
+                'devices',
+                'device_id=?',
+                array($device['device_id'])
+            );
+        }
     }
     $response              = array();
     $response['ping_time'] = $ping_response['last_ping_timetaken'];
@@ -2343,7 +2435,7 @@ function dump_db_schema()
             $output[$table]['Columns'][] = $def;
         }
 
-        foreach (dbFetchRows("SHOW INDEX FROM `$table`") as $key) {
+        foreach (array_sort_by_column(dbFetchRows("SHOW INDEX FROM `$table`"), 'Key_name') as $key) {
             $key_name = $key['Key_name'];
             if (isset($output[$table]['Indexes'][$key_name])) {
                 $output[$table]['Indexes'][$key_name]['Columns'][] = $key['Column_name'];
@@ -2431,8 +2523,8 @@ function get_db_schema()
 function get_device_oid_limit($device)
 {
     // device takes priority
-    if ($device['snmp_max_oid'] > 0) {
-        return $device['snmp_max_oid'];
+    if ($device['attribs']['snmp_max_oid'] > 0) {
+        return $device['attribs']['snmp_max_oid'];
     }
 
     // then os
@@ -2444,17 +2536,6 @@ function get_device_oid_limit($device)
     // then global
     $global_max = Config::get('snmp.max_oid', 10);
     return $global_max > 0 ? $global_max : 10;
-}
-
-/**
- * Strip out non-numeric characters
- */
-function return_num($entry)
-{
-    if (!is_numeric($entry)) {
-        preg_match('/-?\d*\.?\d+/', $entry, $num_response);
-        return $num_response[0];
-    }
 }
 
 /**
@@ -2485,6 +2566,36 @@ function lock_and_purge($table, $sql)
         echo $e->getMessage() . PHP_EOL;
         return -1;
     }
+}
+
+/**
+ * If Distributed, create a lock, then purge the mysql table according to the sql query
+ *
+ * @param string $table
+ * @param string $sql
+ * @param string $msg
+ * @return int exit code
+ */
+function lock_and_purge_query($table, $sql, $msg)
+{
+    $purge_name = $table . '_purge';
+
+    if (Config::get('distributed_poller')) {
+        MemcacheLock::lock($purge_name, 0, 86000);
+    }
+    $purge_duration = Config::get($purge_name);
+    if (!(is_numeric($purge_duration) && $purge_duration > 0)) {
+        return -2;
+    }
+    try {
+        if (dbQuery($sql, array($purge_duration))) {
+            printf($msg, $purge_duration);
+        }
+    } catch (LockException $e) {
+        echo $e->getMessage() . PHP_EOL;
+        return -1;
+    }
+    return 0;
 }
 
 /**

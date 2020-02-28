@@ -1,0 +1,667 @@
+IBM3172-MIB DEFINITIONS ::= BEGIN                                               
+                                                                                
+IMPORTS                                                                         
+    MODULE-IDENTITY, OBJECT-TYPE,                                               
+    Counter32, Integer32, enterprises                                           
+    FROM SNMPv2-SMI                                                             
+                                                                                
+    DisplayString                                                               
+    FROM SNMPv2-TC                   -- RFC1903                                 
+                                                                                
+    MODULE-COMPLIANCE, OBJECT-GROUP                                             
+    FROM SNMPv2-CONF                                                            
+                                                                                
+    ifIndex                                                                     
+    FROM IF-MIB;                                                                
+                                                                                
+ibm3172MIB MODULE-IDENTITY                                                      
+    LAST-UPDATED "9704070000Z"                                                  
+    ORGANIZATION "OS/390 TCP/IP OpenEdition Development"                        
+    CONTACT-INFO                                                                
+        "   Kenneth White                                                       
+                                                                                
+            Postal: International Business Machines Corporation                 
+                    P.O. Box 12195                                              
+                    Dept. G80/Bldg. 503                                         
+                    Research Triangle Park, NC 27709                            
+                    USA                                                         
+            Tel: +1 919 254 0102                                                
+            Fax: +1 919 254 4027                                                
+            E-mail: kennethw@vnet.ibm.com"                                      
+    DESCRIPTION                                                                 
+            "The MIB module for managing an IBM 3172 Device                     
+            that has is running ICP."                                           
+    ::= { ibm3172 8 }                                                           
+                                                                                
+ibm OBJECT IDENTIFIER ::= { enterprises 2 }                                     
+ibmProd OBJECT IDENTIFIER ::= { ibm 6 }                                         
+ibm3172 OBJECT IDENTIFIER ::= { ibmProd 1}                                      
+                                                                                
+--        ifIndex ::= INTEGER                                                   
+--                                                                              
+-- IBM 3172 System Table                                                        
+--                                                                              
+ibm3172SystemTable OBJECT-TYPE                                                  
+   SYNTAX SEQUENCE OF Ibm3172SystemTableEntry                                   
+   MAX-ACCESS not-accessible                                                    
+   STATUS current                                                               
+   DESCRIPTION                                                                  
+      "Descriptive information about units of 3172s."                           
+   ::= { ibm3172 1 }                                                            
+                                                                                
+ibm3172SystemTableEntry OBJECT-TYPE                                             
+   SYNTAX Ibm3172SystemTableEntry                                               
+   MAX-ACCESS not-accessible                                                    
+   STATUS current                                                               
+   DESCRIPTION                                                                  
+      "Descriptive information about a 3172."                                   
+   INDEX { ifIndex }                                                            
+   ::= { ibm3172SystemTable 1 }                                                 
+                                                                                
+Ibm3172SystemTableEntry ::=                                                     
+   SEQUENCE                                                                     
+      {                                                                         
+        ibm3172Descr    DisplayString,                                          
+        ibm3172Contact  DisplayString,                                          
+        ibm3172Location DisplayString,                                          
+        ibm3172ifNumber Integer32                                               
+      }                                                                         
+                                                                                
+ibm3172Descr OBJECT-TYPE                                                        
+   SYNTAX DisplayString (SIZE(0..253))                                          
+   MAX-ACCESS read-only                                                         
+   STATUS current                                                               
+   DESCRIPTION                                                                  
+      "Text Description of the 3172. Contains information on                    
+       the hardware and software of the 3172.                                   
+       The format of the ibm3172Descr variable is :                             
+                                                                                
+       ttttxMODELxmmm,xSERIALxNUMBERxsssssssss,xiiiiiiiiiix                     
+              111111,xPROGRAMxNUMBERxpppppp                                     
+                                                                                
+       where :                                                                  
+         x represents a blank character                                         
+         upper case letters are hardcoded characters                            
+         , represents a comma                                                   
+         the remaining lower case letters represent variable data               
+       as follows:                                                              
+            t - machine type                                                    
+            m - model number                                                    
+            s - serial number                                                   
+            i - software program name                                           
+            l - software level numbers                                          
+            p - software program product number.                                
+       An example of the information sent with this attribute would             
+       be :                                                                     
+         '3172 MODEL 001, SERIAL NUMBER 000001234,                              
+          3172 Interconnect Ctlr Program 020100, 5601433'"                      
+   ::= { ibm3172SystemTableEntry 1 }                                            
+                                                                                
+ibm3172Contact OBJECT-TYPE                                                      
+   SYNTAX DisplayString (SIZE(0..32))                                           
+   MAX-ACCESS read-only                                                         
+   STATUS current                                                               
+   DESCRIPTION                                                                  
+      "The textual identification of the contact person                         
+       for this 3172, together with information on                              
+       how to contact this person.  This information is                         
+       provided by the 3172 Operator Facility."                                 
+   ::= { ibm3172SystemTableEntry 2 }                                            
+                                                                                
+ibm3172Location OBJECT-TYPE                                                     
+   SYNTAX DisplayString (SIZE(0..32))                                           
+   MAX-ACCESS read-only                                                         
+   STATUS current                                                               
+   DESCRIPTION                                                                  
+      "The physical location of this node.  This                                
+       information is provided by the 3172 Operator Facility."                  
+   ::= { ibm3172SystemTableEntry 3 }                                            
+                                                                                
+ibm3172ifNumber OBJECT-TYPE                                                     
+   SYNTAX  Integer32                                                            
+   MAX-ACCESS read-only                                                         
+   STATUS current                                                               
+   DESCRIPTION                                                                  
+      "The number of interfaces (regardless of their                            
+       current state) on which this 3172 can send data."                        
+   ::= { ibm3172SystemTableEntry 4 }                                            
+                                                                                
+--                                                                              
+--  IBM 3172 Trap Table                                                         
+--                                                                              
+ibm3172ifTrapTable OBJECT-TYPE                                                  
+   SYNTAX SEQUENCE OF Ibm3172ifTrapTableEntry                                   
+   MAX-ACCESS not-accessible                                                    
+   STATUS current                                                               
+   DESCRIPTION                                                                  
+      "Table of objects at the interface level pertaining to the                
+       trap function."                                                          
+   ::= { ibm3172 2 }                                                            
+                                                                                
+ibm3172ifTrapTableEntry OBJECT-TYPE                                             
+   SYNTAX Ibm3172ifTrapTableEntry                                               
+   MAX-ACCESS not-accessible                                                    
+   STATUS current                                                               
+   DESCRIPTION                                                                  
+      "Objects at the interface level pertaining to the                         
+       trap function."                                                          
+   INDEX { ifIndex }                                                            
+   ::= { ibm3172ifTrapTable 1}                                                  
+                                                                                
+Ibm3172ifTrapTableEntry ::=                                                     
+   SEQUENCE                                                                     
+      {                                                                         
+        ibm3172ifTrapEnable INTEGER                                             
+      }                                                                         
+                                                                                
+ibm3172ifTrapEnable OBJECT-TYPE                                                 
+   SYNTAX INTEGER { disabled(1), enabled(2) }                                   
+   MAX-ACCESS read-only                                                         
+   STATUS current                                                               
+   DESCRIPTION                                                                  
+      "Flag to indicate whether the 3172 should send traps                      
+       for this interface to the SNMP proxy agent.  '0'                         
+       indicates the trap function of the 3172 is                               
+       disabled, '1' indicates that it is enabled."                             
+   ::= { ibm3172ifTrapTableEntry 1 }                                            
+                                                                                
+--                                                                              
+--  IBM 3172 Channel Counters                                                   
+--                                                                              
+ibm3172ifChanCountersTable OBJECT-TYPE                                          
+   SYNTAX SEQUENCE OF Ibm3172ifChanCountersTableEntry                           
+   MAX-ACCESS not-accessible                                                    
+   STATUS current                                                               
+   DESCRIPTION                                                                  
+      "Table of objects at the subnetwork layer and below                       
+       pertaining to a particular subchannel of the 3172."                      
+   ::= { ibm3172 3 }                                                            
+                                                                                
+ibm3172ifChanCountersTableEntry OBJECT-TYPE                                     
+   SYNTAX Ibm3172ifChanCountersTableEntry                                       
+   MAX-ACCESS not-accessible                                                    
+   STATUS current                                                               
+   DESCRIPTION                                                                  
+      "Objects at the subnetwork layer and below                                
+       pertaining to a particular subchannel of the 3172."                      
+   INDEX { ifIndex }                                                            
+   ::= { ibm3172ifChanCountersTable 1 }                                         
+                                                                                
+Ibm3172ifChanCountersTableEntry ::=                                             
+   SEQUENCE                                                                     
+      {                                                                         
+        ibm3172ifInChanOctets Counter32,                                        
+        ibm3172ifOutChanOctets Counter32,                                       
+        ibm3172ifInChanBlocks Counter32,                                        
+        ibm3172ifOutChanBlocks Counter32                                        
+      }                                                                         
+                                                                                
+ibm3172ifInChanOctets OBJECT-TYPE                                               
+   SYNTAX Counter32                                                             
+   MAX-ACCESS read-only                                                         
+   STATUS current                                                               
+   DESCRIPTION                                                                  
+      "The number of inbound octets which were transmitted                      
+       to the host by the 3172, including all headers."                         
+   ::= { ibm3172ifChanCountersTableEntry 1 }                                    
+                                                                                
+ibm3172ifOutChanOctets OBJECT-TYPE                                              
+   SYNTAX Counter32                                                             
+   MAX-ACCESS read-only                                                         
+   STATUS current                                                               
+   DESCRIPTION                                                                  
+      "The number of outbound octets which were received                        
+       from the host by the 3172, including all headers."                       
+   ::= { ibm3172ifChanCountersTableEntry 2 }                                    
+                                                                                
+ibm3172ifInChanBlocks OBJECT-TYPE                                               
+   SYNTAX Counter32                                                             
+   MAX-ACCESS read-only                                                         
+   STATUS current                                                               
+   DESCRIPTION                                                                  
+      "The number of inbound blocks which were                                  
+       transmitted to the host by the 3172."                                    
+   ::= { ibm3172ifChanCountersTableEntry 3 }                                    
+                                                                                
+ibm3172ifOutChanBlocks OBJECT-TYPE                                              
+   SYNTAX Counter32                                                             
+   MAX-ACCESS read-only                                                         
+   STATUS current                                                               
+   DESCRIPTION                                                                  
+      "The number of outbound blocks which were received                        
+       from the host by the 3172."                                              
+   ::= { ibm3172ifChanCountersTableEntry 4 }                                    
+                                                                                
+--                                                                              
+--  LAN Counters Table                                                          
+--                                                                              
+ibm3172ifLANCountersTable OBJECT-TYPE                                           
+   SYNTAX SEQUENCE OF Ibm3172ifLANCountersTableEntry                            
+   MAX-ACCESS not-accessible                                                    
+   STATUS current                                                               
+   DESCRIPTION                                                                  
+      "Table of objects at the subnetwork layer and below                       
+       pertaining to a particular LAN of the 3172."                             
+   ::= { ibm3172 4 }                                                            
+                                                                                
+ibm3172ifLANCountersTableEntry OBJECT-TYPE                                      
+   SYNTAX Ibm3172ifLANCountersTableEntry                                        
+   MAX-ACCESS not-accessible                                                    
+   STATUS current                                                               
+   DESCRIPTION                                                                  
+      "Objects at the subnetwork layer and below                                
+       pertaining to a particular LAN of the 3172."                             
+   INDEX { ifIndex }                                                            
+   ::= { ibm3172ifLANCountersTable 1 }                                          
+                                                                                
+Ibm3172ifLANCountersTableEntry ::=                                              
+   SEQUENCE                                                                     
+      {                                                                         
+        ibm3172ifInLANOctets    Counter32,                                      
+        ibm3172ifOutLANOctets   Counter32,                                      
+        ibm3172ifInLANFrames    Counter32,                                      
+        ibm3172ifOutLANFrames   Counter32,                                      
+        ibm3172ifInLANErrors    Counter32,                                      
+        ibm3172ifOutLANErrors   Counter32,                                      
+        ibm3172ifInLANDiscards  Counter32,                                      
+        ibm3172ifOutLANDiscards Counter32                                       
+      }                                                                         
+                                                                                
+ibm3172ifInLANOctets OBJECT-TYPE                                                
+   SYNTAX Counter32                                                             
+   MAX-ACCESS read-only                                                         
+   STATUS current                                                               
+   DESCRIPTION                                                                  
+      "The number of inbound octets which were received                         
+       from the LAN by the 3172, including all headers."                        
+   ::= { ibm3172ifLANCountersTableEntry 1 }                                     
+                                                                                
+ibm3172ifOutLANOctets OBJECT-TYPE                                               
+   SYNTAX Counter32                                                             
+   MAX-ACCESS read-only                                                         
+   STATUS current                                                               
+   DESCRIPTION                                                                  
+      "The number of outbound octets which were                                 
+       transmitted to the LAN by the 3172, including all                        
+       headers."                                                                
+   ::= { ibm3172ifLANCountersTableEntry 2 }                                     
+                                                                                
+ibm3172ifInLANFrames OBJECT-TYPE                                                
+   SYNTAX Counter32                                                             
+   MAX-ACCESS read-only                                                         
+   STATUS current                                                               
+   DESCRIPTION                                                                  
+      "The number of inbound frames which were received                         
+       from the LAN by the 3172."                                               
+   ::= { ibm3172ifLANCountersTableEntry 3 }                                     
+                                                                                
+ibm3172ifOutLANFrames OBJECT-TYPE                                               
+   SYNTAX Counter32                                                             
+   MAX-ACCESS read-only                                                         
+   STATUS current                                                               
+   DESCRIPTION                                                                  
+      "The number of outbound frames which were                                 
+       transmitted to the LAN by the 3172."                                     
+   ::= { ibm3172ifLANCountersTableEntry 4 }                                     
+                                                                                
+ibm3172ifInLANErrors OBJECT-TYPE                                                
+   SYNTAX Counter32                                                             
+   MAX-ACCESS read-only                                                         
+   STATUS current                                                               
+   DESCRIPTION                                                                  
+      "The number of inbound frames received from the                           
+       LAN by the 3172 that contained errors                                    
+       preventing them from being deliverable to                                
+       a higher layer protocol.  This variable, when                            
+       combined with ibm3172ifInBlkErrors, reflects the                         
+       total number of inbound frames not forwarded from                        
+       the LAN to the host because of errors."                                  
+   ::= { ibm3172ifLANCountersTableEntry 5 }                                     
+                                                                                
+ibm3172ifOutLANErrors OBJECT-TYPE                                               
+   SYNTAX Counter32                                                             
+   MAX-ACCESS read-only                                                         
+   STATUS current                                                               
+   DESCRIPTION                                                                  
+      "The number of outbound frames that could not be                          
+       transmitted to the LAN because of transmission                           
+       failures. This variable, when combined with                              
+       ibm3172ifOutDblkErrors, reflects the total number                        
+       of outbound frames not transmitted to the LAN                            
+       because of transmission errors."                                         
+   ::= { ibm3172ifLANCountersTableEntry 6 }                                     
+                                                                                
+ibm3172ifInLANDiscards OBJECT-TYPE                                              
+   SYNTAX Counter32                                                             
+   MAX-ACCESS read-only                                                         
+   STATUS current                                                               
+   DESCRIPTION                                                                  
+      "The number of inbound frames received from the LAN                       
+       that were discarded by the 3172, even though no                          
+       errors had been detected to prevent their being                          
+       deliverable to a higher layer protocol.  One                             
+       possible reason for discarding such a frame could                        
+       be because of insufficient buffer space.                                 
+       This variable, when combined with                                        
+       ibm3172ifInBlkDiscards, reflects the total                               
+       number of inbound frames not forwarded from the                          
+       LAN when no error was detected."                                         
+   ::= { ibm3172ifLANCountersTableEntry 7 }                                     
+                                                                                
+ibm3172ifOutLANDiscards OBJECT-TYPE                                             
+   SYNTAX Counter32                                                             
+   MAX-ACCESS read-only                                                         
+   STATUS current                                                               
+   DESCRIPTION                                                                  
+      "The number of outbound frames that are discarded."                       
+   ::= { ibm3172ifLANCountersTableEntry 8 }                                     
+                                                                                
+--                                                                              
+--  IBM 3172 Interfaces Blocker task Table                                      
+--                                                                              
+ibm3172ifBlkCountersTable OBJECT-TYPE                                           
+   SYNTAX SEQUENCE OF Ibm3172ifBlkCountersTableEntry                            
+   MAX-ACCESS not-accessible                                                    
+   STATUS current                                                               
+   DESCRIPTION                                                                  
+      "Table of objects at the Subnetwork layer and below                       
+       pertaining to a particular Blocker Task of the                           
+       3172."                                                                   
+   ::= { ibm3172 5 }                                                            
+                                                                                
+ibm3172ifBlkCountersTableEntry OBJECT-TYPE                                      
+   SYNTAX Ibm3172ifBlkCountersTableEntry                                        
+   MAX-ACCESS not-accessible                                                    
+   STATUS current                                                               
+   DESCRIPTION                                                                  
+      "Objects at the Subnetwork layer and below                                
+       pertaining to a particular Blocker Task of the                           
+       3172."                                                                   
+   INDEX { ifIndex }                                                            
+   ::= { ibm3172ifBlkCountersTable 1 }                                          
+                                                                                
+Ibm3172ifBlkCountersTableEntry ::=                                              
+   SEQUENCE                                                                     
+      {                                                                         
+        ibm3172ifBlkRcvOctets  Counter32,                                       
+        ibm3172ifBlkXmitOctets Counter32,                                       
+        ibm3172ifBlkRcvFrames  Counter32,                                       
+        ibm3172ifBlkXmitBlocks Counter32,                                       
+        ibm3172ifInBlkErrors   Counter32,                                       
+        ibm3172ifInBlkDiscards Counter32                                        
+      }                                                                         
+                                                                                
+ibm3172ifBlkRcvOctets OBJECT-TYPE                                               
+   SYNTAX Counter32                                                             
+   MAX-ACCESS read-only                                                         
+   STATUS current                                                               
+   DESCRIPTION                                                                  
+      "The number of inbound octets which were received                         
+       by the Blocker from the LAN, including all headers."                     
+   ::= { ibm3172ifBlkCountersTableEntry 1 }                                     
+                                                                                
+ibm3172ifBlkXmitOctets OBJECT-TYPE                                              
+   SYNTAX Counter32                                                             
+   MAX-ACCESS read-only                                                         
+   STATUS current                                                               
+   DESCRIPTION                                                                  
+      "The number of inbound octets which were                                  
+       transmitted to the channel adapter by the Blocker,                       
+       including all headers."                                                  
+   ::= { ibm3172ifBlkCountersTableEntry 2 }                                     
+                                                                                
+ibm3172ifBlkRcvFrames OBJECT-TYPE                                               
+   SYNTAX Counter32                                                             
+   MAX-ACCESS read-only                                                         
+   STATUS current                                                               
+   DESCRIPTION                                                                  
+      "The number of inbound frames which were received                         
+       from the LAN adapter by the Blocker Task."                               
+   ::= { ibm3172ifBlkCountersTableEntry 3 }                                     
+                                                                                
+ibm3172ifBlkXmitBlocks OBJECT-TYPE                                              
+   SYNTAX Counter32                                                             
+   MAX-ACCESS read-only                                                         
+   STATUS current                                                               
+   DESCRIPTION                                                                  
+      "The number of inbound blocks which were                                  
+       transmitted to the channel adapter by the blocker                        
+       task."                                                                   
+   ::= { ibm3172ifBlkCountersTableEntry 4 }                                     
+                                                                                
+ibm3172ifInBlkErrors OBJECT-TYPE                                                
+   SYNTAX Counter32                                                             
+   MAX-ACCESS read-only                                                         
+   STATUS current                                                               
+   DESCRIPTION                                                                  
+      "The number of inbound frames transmitted by the LAN                      
+       adapter to the Blocker Task which contained errors                       
+       preventing them from being deliverable to a higher                       
+       layer protocol.  This variable, when combined with                       
+       ibm3172ifInLANErrors, reflects the total number                          
+       of inbound frames discarded by the 3172 because of                       
+       errors."                                                                 
+   ::= { ibm3172ifBlkCountersTableEntry 5 }                                     
+                                                                                
+ibm3172ifInBlkDiscards OBJECT-TYPE                                              
+   SYNTAX Counter32                                                             
+   MAX-ACCESS read-only                                                         
+   STATUS current                                                               
+   DESCRIPTION                                                                  
+      "The number of inbound frames transmitted by the LAN                      
+       adapter to the Blocker Task which were discarded                         
+       by the 3172, even though no errors had been                              
+       detected to prevent their being deliverable to                           
+       a higher layer protocol.  One possible reason                            
+       for discarding such a frame could be because                             
+       of insufficient buffer space.  This variable,                            
+       when combined with ibm3172ifInLANDiscards,                               
+       reflects the total number of inbound frames                              
+       discarded by the 3172 when no error was detected."                       
+   ::= { ibm3172ifBlkCountersTableEntry 6 }                                     
+                                                                                
+--                                                                              
+--  IBM 3172  Deblocker task Table                                              
+--                                                                              
+ibm3172ifDblkCountersTable OBJECT-TYPE                                          
+   SYNTAX SEQUENCE OF Ibm3172ifDblkCountersTableEntry                           
+   MAX-ACCESS not-accessible                                                    
+   STATUS current                                                               
+   DESCRIPTION                                                                  
+      "Table of objects at the subnetwork layer and below                       
+       pertaining to a particular Deblocker Task of the                         
+       3172."                                                                   
+   ::= { ibm3172 6 }                                                            
+                                                                                
+ibm3172ifDblkCountersTableEntry OBJECT-TYPE                                     
+   SYNTAX Ibm3172ifDblkCountersTableEntry                                       
+   MAX-ACCESS not-accessible                                                    
+   STATUS current                                                               
+   DESCRIPTION                                                                  
+      "Objects at the subnetwork layer and below                                
+       pertaining to a particular Deblocker Task of the                         
+       3172."                                                                   
+   INDEX { ifIndex }                                                            
+   ::= { ibm3172ifDblkCountersTable 1}                                          
+                                                                                
+Ibm3172ifDblkCountersTableEntry ::=                                             
+   SEQUENCE                                                                     
+      {                                                                         
+        ibm3172ifDblkRcvOctets   Counter32,                                     
+        ibm3172ifDblkXmitOctets  Counter32,                                     
+        ibm3172ifDblkRcvBlocks   Counter32,                                     
+        ibm3172ifDblkXmitFrames  Counter32,                                     
+        ibm3172ifOutDblkErrors   Counter32,                                     
+        ibm3172ifOutDblkDiscards Counter32                                      
+      }                                                                         
+                                                                                
+ibm3172ifDblkRcvOctets OBJECT-TYPE                                              
+   SYNTAX Counter32                                                             
+   MAX-ACCESS read-only                                                         
+   STATUS current                                                               
+   DESCRIPTION                                                                  
+      "The number of outbound octets which were received                        
+       by the Deblocker from the channel adapter,                               
+       including all headers."                                                  
+   ::= { ibm3172ifDblkCountersTableEntry 1 }                                    
+                                                                                
+ibm3172ifDblkXmitOctets OBJECT-TYPE                                             
+   SYNTAX Counter32                                                             
+   MAX-ACCESS read-only                                                         
+   STATUS current                                                               
+   DESCRIPTION                                                                  
+      "The number of outbound octets which were                                 
+       transmitted to the LAN adapter by the Deblocker,                         
+       including all headers."                                                  
+   ::= { ibm3172ifDblkCountersTableEntry 2 }                                    
+                                                                                
+ibm3172ifDblkRcvBlocks OBJECT-TYPE                                              
+   SYNTAX Counter32                                                             
+   MAX-ACCESS read-only                                                         
+   STATUS current                                                               
+   DESCRIPTION                                                                  
+      "The number of outbound blocks which were                                 
+       received from the channel adapter by the deblocker                       
+       task."                                                                   
+   ::= { ibm3172ifDblkCountersTableEntry 3 }                                    
+                                                                                
+ibm3172ifDblkXmitFrames OBJECT-TYPE                                             
+   SYNTAX Counter32                                                             
+   MAX-ACCESS read-only                                                         
+   STATUS current                                                               
+   DESCRIPTION                                                                  
+      "The number of outbound frames which were                                 
+       transmitted to the LAN adapter by the Deblocker                          
+       Task."                                                                   
+   ::= { ibm3172ifDblkCountersTableEntry 4 }                                    
+                                                                                
+ibm3172ifOutDblkErrors OBJECT-TYPE                                              
+   SYNTAX Counter32                                                             
+   MAX-ACCESS read-only                                                         
+   STATUS current                                                               
+   DESCRIPTION                                                                  
+      "The number of outbound frames transmitted by the                         
+       channel adapter to the Deblocker Task which                              
+       contained errors preventing them from being                              
+       deliverable to a higher layer protocol.  This                            
+       variable, when combined with                                             
+       ibm3172ifOutLANErrors, reflects the total number                         
+       of outbound frames discarded by the 3172 because                         
+       of errors."                                                              
+   ::= { ibm3172ifDblkCountersTableEntry 5 }                                    
+                                                                                
+ibm3172ifOutDblkDiscards OBJECT-TYPE                                            
+   SYNTAX Counter32                                                             
+   MAX-ACCESS read-only                                                         
+   STATUS current                                                               
+   DESCRIPTION                                                                  
+      "The number of outbound frames transmitted                                
+       by the channel adapter to the                                            
+       Deblocker Task which were discarded by the 3172,                         
+       even though no errors had been detected to prevent                       
+       their being deliverable to a higher layer protocol           .           
+       One possible reason for discarding such a frame                          
+       could be because of insufficient buffer space.                           
+       This variable reflects the total number of                               
+       outbound frames discarded by the 3172 when no                            
+       error was detected."                                                     
+   ::= { ibm3172ifDblkCountersTableEntry 6 }                                    
+                                                                                
+--                                                                              
+--   IBM 3172   device Table                                                    
+--                                                                              
+ibm3172ifDeviceTable OBJECT-TYPE                                                
+   SYNTAX SEQUENCE OF Ibm3172ifDeviceTableEntry                                 
+   MAX-ACCESS not-accessible                                                    
+   STATUS current                                                               
+   DESCRIPTION                                                                  
+        ""                                                                      
+   ::= { ibm3172 7 }                                                            
+                                                                                
+ibm3172ifDeviceTableEntry OBJECT-TYPE                                           
+   SYNTAX Ibm3172ifDeviceTableEntry                                             
+   MAX-ACCESS not-accessible                                                    
+   STATUS current                                                               
+   DESCRIPTION                                                                  
+        ""                                                                      
+   INDEX { ifIndex }                                                            
+   ::= { ibm3172ifDeviceTable 1}                                                
+                                                                                
+Ibm3172ifDeviceTableEntry ::=                                                   
+   SEQUENCE                                                                     
+      {                                                                         
+        ibm3172ifDeviceNumber Integer32                                         
+      }                                                                         
+                                                                                
+ibm3172ifDeviceNumber OBJECT-TYPE                                               
+   SYNTAX Integer32                                                             
+   MAX-ACCESS read-only                                                         
+   STATUS current                                                               
+   DESCRIPTION                                                                  
+      "The instance number, used to reference the                               
+       ibm3172SystemTable, for the device associated with                       
+       this interface."                                                         
+   ::= { ibm3172ifDeviceTableEntry 1 }                                          
+                                                                                
+-- conformance information                                                      
+                                                                                
+ibm3172MIBConformance OBJECT IDENTIFIER ::= { ibm3172MIB 2 }                    
+                                                                                
+ibm3172MIBCompliances OBJECT IDENTIFIER                                         
+   ::= { ibm3172MIBConformance 1 }                                              
+ibm3172MIBGroups      OBJECT IDENTIFIER                                         
+   ::= { ibm3172MIBConformance 2 }                                              
+                                                                                
+-- compliance statements                                                        
+                                                                                
+ibm3172MIBCompliance MODULE-COMPLIANCE                                          
+    STATUS  current                                                             
+    DESCRIPTION                                                                 
+            "The compliance statement for SNMPv2 entities which                 
+            implement the IBM3172 MIB."                                         
+    MODULE  -- this module                                                      
+        MANDATORY-GROUPS { ibm3172Group }                                       
+    ::= { ibm3172MIBCompliances 1 }                                             
+                                                                                
+-- units of conformance                                                         
+                                                                                
+ibm3172Group OBJECT-GROUP                                                       
+    OBJECTS   {                                                                 
+                ibm3172Descr,                                                   
+                ibm3172Contact,                                                 
+                ibm3172Location,                                                
+                ibm3172ifNumber,                                                
+                ibm3172ifTrapEnable,                                            
+                ibm3172ifInChanOctets,                                          
+                ibm3172ifOutChanOctets,                                         
+                ibm3172ifInChanBlocks,                                          
+                ibm3172ifOutChanBlocks,                                         
+                ibm3172ifInLANOctets,                                           
+                ibm3172ifOutLANOctets,                                          
+                ibm3172ifInLANFrames,                                           
+                ibm3172ifOutLANFrames,                                          
+                ibm3172ifInLANErrors,                                           
+                ibm3172ifOutLANErrors,                                          
+                ibm3172ifInLANDiscards,                                         
+                ibm3172ifOutLANDiscards,                                        
+                ibm3172ifBlkRcvOctets,                                          
+                ibm3172ifBlkXmitOctets,                                         
+                ibm3172ifBlkRcvFrames,                                          
+                ibm3172ifBlkXmitBlocks,                                         
+                ibm3172ifInBlkErrors,                                           
+                ibm3172ifInBlkDiscards,                                         
+                ibm3172ifDblkRcvOctets,                                         
+                ibm3172ifDblkXmitOctets,                                        
+                ibm3172ifDblkRcvBlocks,                                         
+                ibm3172ifDblkXmitFrames,                                        
+                ibm3172ifOutDblkErrors,                                         
+                ibm3172ifOutDblkDiscards,                                       
+                ibm3172ifDeviceNumber                                           
+              }                                                                 
+    STATUS    current                                                           
+    DESCRIPTION                                                                 
+            "The ibm3172 group of objects providing for basic                   
+             management of of an IBM 3172 device running ICP."                  
+    ::= { ibm3172MIBGroups 1 }                                                  
+                                                                                
+END                                                                             

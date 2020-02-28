@@ -43,7 +43,7 @@ use Cache;
 
 class ObjectCache
 {
-    private static $cache_time = 5;
+    private static $cache_time = 300;
 
     public static function applications()
     {
@@ -184,6 +184,8 @@ class ObjectCache
                     return $query->isIgnored()->count();
                 case 'disabled':
                     return $query->isDisabled()->count();
+                case 'disable_notify':
+                    return $query->isDisableNotify()->count();
                 case 'total':
                 default:
                     return $query->count();

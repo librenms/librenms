@@ -1,0 +1,43 @@
+--*************************************************************************
+-- ATTENTION!
+-- This MIB is provided for use in the event that a down-level IBM
+-- private MIB needs to be temporarily loaded.  The latest level of each
+-- IBM private MIB should now be independently defined beginning at the
+-- "enterprises" node of the tree.  The nodes required by down-level
+-- MIB's that are dependent on IBM-MIB are defined in this file.
+-- Please obtain the product's latest MIB soon and use it.
+-- Because of its intended use, this file is also down-level with
+-- regard to some object names.  However, the OID's are all current.
+--*************************************************************************
+
+IBM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+       enterprises
+            FROM RFC1155-SMI;
+
+-- EXPORTS
+--        ibm, ibmResearch, ibmAgents, ibmArchitecture, alert, fddi,
+--        topology, tokenRing, ibmProd, ibm3172, ibm6611, netView6000,
+--        netView6000SubAgent, systemsMonitor6000;
+
+-- Actual definition of MIB Subtree:
+
+ibm                           OBJECT IDENTIFIER ::= { enterprises 2 }
+ibmResearch                   OBJECT IDENTIFIER ::= { ibm 2 }
+ibmAgents                     OBJECT IDENTIFIER ::= { ibm 3 }
+ibmArchitecture               OBJECT IDENTIFIER ::= { ibm 5 }
+  alert                       OBJECT IDENTIFIER ::= { ibmArchitecture 1 }
+  fddi                        OBJECT IDENTIFIER ::= { ibmArchitecture 2 }
+  topology                    OBJECT IDENTIFIER ::= { ibmArchitecture 3 }
+  tokenRing                   OBJECT IDENTIFIER ::= { ibmArchitecture 4 }
+ibmProd                       OBJECT IDENTIFIER ::= { ibm 6 }
+  ibm3172                     OBJECT IDENTIFIER ::= { ibmProd 1 }
+  ibm6611                     OBJECT IDENTIFIER ::= { ibmProd 2 }
+  netView6000                 OBJECT IDENTIFIER ::= { ibmProd 3 }
+  netView6000SubAgent         OBJECT IDENTIFIER ::= { ibmProd 4 }
+  systemsMonitor6000          OBJECT IDENTIFIER ::= { ibmProd 12 }
+
+-- End definition of MIB Subtree
+
+END

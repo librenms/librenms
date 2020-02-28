@@ -117,6 +117,7 @@ if ($device['os'] == 'saf-cfm') {
 }
 
 foreach ($entity_array as $entPhysicalIndex => $entry) {
+    unset($ifIndex);
     if ($device['os'] == 'junos') {
         // Juniper's MIB doesn't have the same objects as the Entity MIB, so some values
         // are made up here.
@@ -190,6 +191,12 @@ foreach ($entity_array as $entPhysicalIndex => $entry) {
         $entPhysicalIsFRU        = $entry['entPhysicalIsFRU'];
         $entPhysicalAlias        = $entry['entPhysicalAlias'];
         $entPhysicalAssetID      = $entry['entPhysicalAssetID'];
+
+        //VRP devices seems to use LogicalEntity '1' instead of '0' like the default code checks.
+        //Standard code is still run after anyway.
+        if (isset($entry['1']['entAliasMappingIdentifier'])) {
+            $ifIndex = preg_replace('/ifIndex\.(\d+).*/', '$1', $entry['1']['entAliasMappingIdentifier']);
+        }
     } else {
         $entPhysicalDescr        = array_key_exists('entPhysicalDescr', $entry)        ? $entry['entPhysicalDescr']        : '';
         $entPhysicalContainedIn  = array_key_exists('entPhysicalContainedIn', $entry)  ? $entry['entPhysicalContainedIn']  : '';
@@ -210,14 +217,13 @@ foreach ($entity_array as $entPhysicalIndex => $entry) {
 
     if (isset($entity_array[$entPhysicalIndex]['0']['entAliasMappingIdentifier'])) {
         $ifIndex = $entity_array[$entPhysicalIndex]['0']['entAliasMappingIdentifier'];
-    }
-
-    if (!strpos($ifIndex, 'fIndex') || $ifIndex == '') {
-        unset($ifIndex);
-    } else {
-        $ifIndex_array = explode('.', $ifIndex);
-        $ifIndex       = $ifIndex_array[1];
-        unset($ifIndex_array);
+        if (!strpos($ifIndex, 'fIndex') || $ifIndex == '') {
+            unset($ifIndex);
+        } else {
+            $ifIndex_array = explode('.', $ifIndex);
+            $ifIndex       = $ifIndex_array[1];
+            unset($ifIndex_array);
+        }
     }
 
     // List of real names for cisco entities

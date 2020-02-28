@@ -15,7 +15,6 @@
  * @author     LibreNMS Contributors
 */
 
-use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
 
 $graph_type = mres($vars['graph_type']);
@@ -24,16 +23,13 @@ $class      = mres($vars['class']);
 
 $sql = " FROM `$table` AS S, `devices` AS D";
 
-if (!LegacyAuth::user()->hasGlobalRead()) {
-    $sql .= ', devices_perms as P';
-}
-
 $sql .= " WHERE S.sensor_class=? AND S.device_id = D.device_id ";
 $param[] = mres($vars['class']);
 
-if (!LegacyAuth::user()->hasGlobalRead()) {
-    $sql .= " AND D.device_id = P.device_id AND P.user_id = ?";
-    $param[] = LegacyAuth::id();
+if (!Auth::user()->hasGlobalRead()) {
+    $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
+    $sql .= " AND `D`.`device_id` IN " .dbGenPlaceholders(count($device_ids));
+    $param = array_merge($param, $device_ids);
 }
 
 if (isset($searchPhrase) && !empty($searchPhrase)) {
@@ -93,7 +89,7 @@ foreach (dbFetchRows($sql, $param) as $sensor) {
     unset($link_array['height'], $link_array['width'], $link_array['legend']);
     $link_graph = generate_url($link_array);
 
-    $link = generate_url(array('page' => 'device', 'device' => $sensor['device_id'], 'tab' => $tab, 'metric' => $sensor['sensor_class']));
+    $link = generate_url(array('page' => 'device', 'device' => $sensor['device_id'], 'tab' => $group, 'metric' => $sensor['sensor_class']));
 
     $overlib_content = '<div style="width: 580px;"><span class="overlib-text">'.$sensor['hostname'].' - '.$sensor['sensor_descr'].'</span>';
     foreach (array('day', 'week', 'month', 'year') as $period) {
@@ -112,18 +108,7 @@ foreach (dbFetchRows($sql, $param) as $sensor) {
 
     $sensor['sensor_descr'] = substr($sensor['sensor_descr'], 0, 48);
 
-    if ($graph_type == 'sensor_state') {
-        // If we have a state, let's display a label with textual state translation
-        $state_translation = array();
-        $state_translation = dbFetchRows('SELECT * FROM state_translations as ST, sensors_to_state_indexes as SSI WHERE ST.state_index_id=SSI.state_index_id AND SSI.sensor_id = ? AND ST.state_value = ? ', array($sensor['sensor_id'], $sensor['sensor_current']));
-
-        //$current_label = get_state_label_color($sensor);
-        $sensor_current = get_state_label($state_translation['0']['state_generic_value'], (!empty($state_translation['0']['state_descr'])) ? $state_translation[0]['state_descr'] . " (".$sensor['sensor_current'].")" : $sensor['sensor_current']);
-    } else {
-        // we have another sensor
-        $current_label = get_sensor_label_color($sensor);
-        $sensor_current = "<span class='label $current_label'>".format_si($sensor['sensor_current']).$unit."</span>";
-    }
+    $sensor_current = $graph_type == 'sensor_state' ? get_state_label($sensor) : get_sensor_label_color($sensor, $translations);
 
     $response[] = array(
         'hostname'         => generate_device_link($sensor),

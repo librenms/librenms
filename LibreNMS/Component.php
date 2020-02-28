@@ -112,11 +112,11 @@ class Component
                 // Only add valid fields to the query
                 if (in_array($field, $validFields)) {
                     if ($array[0] == 'LIKE') {
-                        $SQL .= "`".$field."` LIKE ? AND ";
+                        $SQL .= "`C`.`".$field."` LIKE ? AND ";
                         $array[1] = "%".$array[1]."%";
                     } else {
                         // Equals operator is the default
-                        $SQL .= "`".$field."` = ? AND ";
+                        $SQL .= "`C`.`".$field."` = ? AND ";
                     }
                     array_push($PARAM, $array[1]);
                 }
@@ -157,14 +157,6 @@ class Component
             $component_device_id = (int)$COMPONENT['device_id'];
             foreach ($this->reserved as $k => $v) {
                 $RESULT[$component_device_id][$COMPONENT['id']][$k] = $COMPONENT[$k];
-            }
-
-            // Sort each component array so the attributes are in order.
-            if (is_array($RESULT[$RESULT[$component_device_id][$COMPONENT['id']]])) {
-                ksort($RESULT[$RESULT[$component_device_id][$COMPONENT['id']]]);
-            }
-            if (is_array($RESULT[$RESULT[$component_device_id]])) {
-                ksort($RESULT[$RESULT[$component_device_id]]);
             }
         }
 
@@ -362,7 +354,7 @@ class Component
                     dbUpdate($DATA, 'component_prefs', '`component` = ? AND `attribute` = ?', array($COMPONENT, $ATTR));
 
                     // Add the modification to the Eventlog.
-                    log_event("Component: " . $AVP[$COMPONENT]['type'] . "(" . $COMPONENT . "). Attribute: " . $ATTR . ", was modified from: " . $OLD[$COMPONENT][$ATTR] . ", to: " . $VALUE, $device_id, 'component', 3, $COMPONENT);
+                    log_event("Component: " . $AVP[$COMPONENT]['type'] . "(" . $COMPONENT . "). Attribute: " . $ATTR . ", was modified from: " . $OLD[$device_id][$COMPONENT][$ATTR] . ", to: " . $VALUE, $device_id, 'component', 3, $COMPONENT);
                 }
             } // End Foreach AVP
 

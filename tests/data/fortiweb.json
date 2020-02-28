@@ -8,13 +8,13 @@
                     "sysDescr": "FortiwebAz",
                     "sysContact": null,
                     "version": null,
-                    "hardware": "",
+                    "hardware": null,
                     "features": null,
-                    "location": null,
                     "os": "fortiweb",
                     "type": "firewall",
                     "serial": null,
-                    "icon": "fortinet.svg"
+                    "icon": "fortinet.svg",
+                    "location": null
                 }
             ]
         },
@@ -28,11 +28,11 @@
                     "version": "5.91,build1618,180425",
                     "hardware": "fwbAZURE",
                     "features": null,
-                    "location": "<private>",
                     "os": "fortiweb",
                     "type": "firewall",
                     "serial": "FVVM123456789012",
-                    "icon": "fortinet.svg"
+                    "icon": "fortinet.svg",
+                    "location": "<private>"
                 }
             ]
         }
@@ -54,7 +54,7 @@
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
                     "ifHighSpeed": null,
-                    "ifOperStatus": null,
+                    "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
                     "ifAdminStatus_prev": null,
@@ -159,7 +159,7 @@
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
                     "ifHighSpeed": null,
-                    "ifOperStatus": null,
+                    "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
                     "ifAdminStatus_prev": null,
@@ -269,7 +269,7 @@
                     "ifPromiscuousMode": "false",
                     "ifHighSpeed": 0,
                     "ifOperStatus": "up",
-                    "ifOperStatus_prev": null,
+                    "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
                     "ifAdminStatus_prev": null,
                     "ifDuplex": "0",
@@ -374,7 +374,7 @@
                     "ifPromiscuousMode": "false",
                     "ifHighSpeed": 0,
                     "ifOperStatus": "up",
-                    "ifOperStatus_prev": null,
+                    "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
                     "ifAdminStatus_prev": null,
                     "ifDuplex": "0",

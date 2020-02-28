@@ -1,0 +1,206 @@
+-- MIB created 5/06/99 21:06:04, by
+--   SMIC (the next generation) version 1.6.29, November 22, 1994.
+
+IBMIROCDIALOUT-MIB DEFINITIONS ::= BEGIN
+
+-- From file: "ibmdialOut.mi2"
+-- Compile options "G A T M"
+
+IMPORTS
+    Counter32, Gauge32, Integer32, TimeTicks, IpAddress
+            FROM SNMPv2-SMI-v1
+    OBJECT-TYPE
+            FROM RFC-1212
+    TRAP-TYPE
+            FROM RFC-1215
+    DisplayString, PhysAddress, TruthValue, RowStatus, 
+    AutonomousType, TestAndIncr
+            FROM SNMPv2-TC-v1
+    enterprises
+            FROM RFC1155-SMI
+    ifIndex
+            FROM IF-MIB;
+
+ibmIROCroutingDialOut OBJECT IDENTIFIER ::= { ibmIROCrouting 6 }
+-- MODULE-IDENTITY
+--  LastUpdated
+--    9712150900Z
+--  OrgName
+--    IBM
+--  ContactInfo
+--    David D. Chen
+--     Sam Henderson
+--     IBM Corporation
+--     800 Park, Highway 54
+--     Research Triangle Park, NC 27709-9990
+--     Tel:    1 919 254 6182
+--     E-mail: dchen@vnet.ibm.com
+--  Descr
+--    DIALOUT
+
+ibm             OBJECT IDENTIFIER ::= { enterprises 2 }
+ibmProd         OBJECT IDENTIFIER ::= { ibm 6 }
+ibm2210         OBJECT IDENTIFIER ::= { ibmProd 72 }
+ibmIROC         OBJECT IDENTIFIER ::= { ibmProd 119 }
+ibmIROCrouting  OBJECT IDENTIFIER ::= { ibmIROC 4 }
+ibmDialOutTraps OBJECT IDENTIFIER ::= { ibmIROCroutingDialOut 0 }
+ibmDialOutMIB   OBJECT IDENTIFIER ::= { ibmIROCroutingDialOut 1 }
+ibmDialOutDomains OBJECT IDENTIFIER ::= { ibmIROCroutingDialOut 2 }
+ibmDialOutConformance OBJECT IDENTIFIER ::= { ibmIROCroutingDialOut 3 }
+ibmDialOutGeneral OBJECT IDENTIFIER ::= { ibmDialOutMIB 1 }
+dialOutCompliances OBJECT IDENTIFIER ::= { ibmDialOutConformance 1 }
+dialOutGroups   OBJECT IDENTIFIER ::= { ibmDialOutConformance 2 }
+
+dialOutIfTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF DialOutIfEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    ::= { ibmDialOutMIB 2 }
+
+dialOutIfEntry OBJECT-TYPE
+    SYNTAX DialOutIfEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    INDEX { ifIndex }
+    ::= { dialOutIfTable 1 }
+
+DialOutIfEntry ::= SEQUENCE {
+    dialOutIfUserName DisplayString,
+    dialOutIfTimeRemaining INTEGER,
+    dialOutIfInactivityTimer INTEGER,
+    dialOutIfDTRState INTEGER,
+    dialOutIfProtocol INTEGER,
+    dialOutEnableComport TruthValue,
+    dialOutSendBinary TruthValue,
+    dialOutSupressGoAhead TruthValue,
+    dialOutDisableEcho TruthValue,
+    dialOutPortName DisplayString
+    }
+
+dialOutIfUserName OBJECT-TYPE
+    SYNTAX DisplayString(SIZE(0..253))
+--    Rsyntax OCTET STRING(SIZE(0..253))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "could be null."
+    ::= { dialOutIfEntry 1 }
+
+dialOutIfTimeRemaining OBJECT-TYPE
+    SYNTAX INTEGER(0..2147483647)
+--  Units
+--    seconds
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The amount of time the connection allowed.
+         Zero means no limits."
+    ::= { dialOutIfEntry 2 }
+
+dialOutIfInactivityTimer OBJECT-TYPE
+    SYNTAX INTEGER(0..2147483647)
+--  Units
+--    seconds
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The amount of time the connection is in inactivity state."
+    ::= { dialOutIfEntry 3 }
+
+dialOutIfDTRState OBJECT-TYPE
+    SYNTAX INTEGER {
+        noChange(0),
+        on(1),
+        off(2)
+        }
+    ACCESS read-only
+    STATUS mandatory
+    ::= { dialOutIfEntry 4 }
+
+dialOutIfProtocol OBJECT-TYPE
+    SYNTAX INTEGER {
+        undefined(1),
+        hose(2),
+        telnet(3)
+        }
+    ACCESS read-only
+    STATUS mandatory
+    ::= { dialOutIfEntry 5 }
+
+dialOutEnableComport OBJECT-TYPE
+    SYNTAX TruthValue
+--    Rsyntax INTEGER {
+--        true(1),
+--        false(2)
+--        }
+    ACCESS read-only
+    STATUS mandatory
+    ::= { dialOutIfEntry 6 }
+
+dialOutSendBinary OBJECT-TYPE
+    SYNTAX TruthValue
+--    Rsyntax INTEGER {
+--        true(1),
+--        false(2)
+--        }
+    ACCESS read-only
+    STATUS mandatory
+    ::= { dialOutIfEntry 7 }
+
+dialOutSupressGoAhead OBJECT-TYPE
+    SYNTAX TruthValue
+--    Rsyntax INTEGER {
+--        true(1),
+--        false(2)
+--        }
+    ACCESS read-only
+    STATUS mandatory
+    ::= { dialOutIfEntry 8 }
+
+dialOutDisableEcho OBJECT-TYPE
+    SYNTAX TruthValue
+--    Rsyntax INTEGER {
+--        true(1),
+--        false(2)
+--        }
+    ACCESS read-only
+    STATUS mandatory
+    ::= { dialOutIfEntry 9 }
+
+dialOutPortName OBJECT-TYPE
+    SYNTAX DisplayString(SIZE(0..30))
+--    Rsyntax OCTET STRING(SIZE(0..30))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "By setting the value to a string of zero length will
+         reset the value of this obejct to the node default value,
+         usuallly is 'ALL_PORTS'."
+    ::= { dialOutIfEntry 10 }
+
+dialOutIfGroup OBJECT IDENTIFIER ::= { dialOutGroups 1 }
+-- OBJECT-GROUP
+--  Status
+--    mandatory
+--  Descr
+--    Conformance group for DIALOUT general information.
+--  objects
+--    dialOutIfUserName, dialOutIfTimeRemaining, 
+--    dialOutIfInactivityTimer, dialOutIfDTRState, 
+--    dialOutIfProtocol, dialOutEnableComport, dialOutSendBinary, 
+--    dialOutSupressGoAhead, dialOutDisableEcho, dialOutPortName
+
+dialOutCoreCompliance OBJECT IDENTIFIER ::= { dialOutCompliances 1 }
+-- MODULE-COMPLIANCE
+--  Status
+--    mandatory
+--  Descr
+--    The core compliance statement for all DIALOUT nodes.
+--  Module
+--    >>current<<
+--   MandGroup
+--    dialOutIfGroup
+
+
+END
+

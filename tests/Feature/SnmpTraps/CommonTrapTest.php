@@ -34,7 +34,7 @@ use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
 use Log;
 
-class CommonTrapTest extends LaravelTestCase
+class CommonTrapTest extends DBTestCase
 {
     use DatabaseTransactions;
 

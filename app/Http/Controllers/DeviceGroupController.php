@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Device;
 use App\Models\DeviceGroup;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
@@ -25,8 +26,13 @@ class DeviceGroupController extends Controller
     {
         $this->authorize('manage', DeviceGroup::class);
 
+        $ungrouped_devices = Device::orderBy('hostname')->whereNotIn('device_id', function ($query) {
+            $query->select('device_id')->from('device_group_device');
+        })->get();
+
         return view('device-group.index', [
             'device_groups' => DeviceGroup::orderBy('name')->withCount('devices')->get(),
+            'ungrouped_devices' => $ungrouped_devices,
         ]);
     }
 
@@ -131,7 +137,11 @@ class DeviceGroupController extends Controller
         $devices_updated = false;
         if ($deviceGroup->type == 'static') {
             // sync device_ids from input
-            $devices_updated = array_sum($deviceGroup->devices()->sync($request->get('devices', [])));
+            $updated = $deviceGroup->devices()->sync($request->get('devices', []));
+            // check for attached/detached/updated
+            $devices_updated = array_sum(array_map(function ($device_ids) {
+                return count($device_ids);
+            }, $updated)) > 0;
         } else {
             $deviceGroup->rules = json_decode($request->rules);
         }

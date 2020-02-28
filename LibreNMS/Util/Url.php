@@ -46,8 +46,16 @@ class Url
      */
     public static function deviceLink($device, $text = null, $vars = [], $start = 0, $end = 0, $escape_text = 1, $overlib = 1)
     {
+        if (is_null($device)) {
+            return '';
+        }
+
+        if (!$device->canAccess(Auth::user())) {
+            return $device->displayName();
+        }
+
         if (!$start) {
-            $start = Carbon::now()->subDay(1)->timestamp;
+            $start = Carbon::now()->subDay()->timestamp;
         }
 
         if (!$end) {
@@ -107,11 +115,7 @@ class Url
             $link = Url::overlibLink($url, $text, $contents, $class);
         }
 
-        if ($device->canAccess(Auth::user())) {
-            return $link;
-        } else {
-            return $device->displayName();
-        }
+        return $link;
     }
 
     /**
@@ -358,7 +362,7 @@ class Url
             return "interface-admindown";
         }
 
-        if ($port->ifAdminStatus == "up" && $port->ifOperStatus == "down") {
+        if ($port->ifAdminStatus == "up" && $port->ifOperStatus != "up") {
             return "interface-updown";
         }
 
@@ -378,9 +382,18 @@ class Url
 
         if ($os) {
             if ($os == "linux") {
+                // first, prefer the first word of $feature
                 $distro = Str::before(strtolower(trim($feature)), ' ');
                 $possibilities[] = "$distro.svg";
                 $possibilities[] = "$distro.png";
+
+                // second, prefer the first two words of $feature (i.e. 'Red Hat' becomes 'redhat')
+                if (strpos($feature, ' ') !== false) {
+                    $distro = Str::replaceFirst(' ', null, strtolower(trim($feature)));
+                    $distro = Str::before($distro, ' ');
+                    $possibilities[] = "$distro.svg";
+                    $possibilities[] = "$distro.png";
+                }
             }
             $os_icon = Config::getOsSetting($os, 'icon', $os);
             $possibilities[] = "$os_icon.svg";

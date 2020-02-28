@@ -58,6 +58,6 @@ class NotesController extends WidgetController
 
     public function getSettingsView(Request $request)
     {
-        return view('widgets.settings.notes', $this->getSettings());
+        return view('widgets.settings.notes', $this->getSettings(true));
     }
 }

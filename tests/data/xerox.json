@@ -8,13 +8,13 @@
                     "sysDescr": "Xerox AltaLink C8045; SS 100.002.057.09608, NC 100.002.09608, UI 100.002.09608, ME 063.022.000, CC 100.002.09608, DF 007.019.000, FI ------, FA 003.012.013, CCOS 100.007.09608, NCOS 100.007.09608, SC 013.014.002, SU 100.002.09608",
                     "sysContact": null,
                     "version": null,
-                    "hardware": "",
+                    "hardware": null,
                     "features": null,
-                    "location": null,
                     "os": "xerox",
                     "type": "printer",
                     "serial": null,
-                    "icon": "xerox.svg"
+                    "icon": "xerox.svg",
+                    "location": null
                 }
             ]
         },
@@ -28,11 +28,11 @@
                     "version": null,
                     "hardware": "Xerox AltaLink C8045",
                     "features": null,
-                    "location": "<private>",
                     "os": "xerox",
                     "type": "printer",
                     "serial": null,
-                    "icon": "xerox.svg"
+                    "icon": "xerox.svg",
+                    "location": "<private>"
                 }
             ]
         }

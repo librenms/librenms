@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\PortsNac;
-use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
 
 if (!is_numeric($vars['device'])) {
@@ -18,6 +17,7 @@ if (device_permitted($vars['device']) || $permitted_by_port) {
     }
     $select = array($tab => 'class="active"');
 
+    DeviceCache::setPrimary($vars['device']);
     $device = device_by_id_cache($vars['device']);
     $attribs = get_dev_attribs($device['device_id']);
     $device['attribs'] = $attribs;
@@ -32,7 +32,7 @@ if (device_permitted($vars['device']) || $permitted_by_port) {
     $component_count = $component->getComponentCount($device['device_id']);
 
     $alert_class = '';
-    if ($device['disabled'] == '1' || $device['ignore'] == '1') {
+    if ($device['disabled'] == '1') {
         $alert_class = 'alert-info';
     } elseif ($device['status'] == '0') {
         $alert_class = 'alert-danger';
@@ -269,6 +269,11 @@ if (device_permitted($vars['device']) || $permitted_by_port) {
             $routing_tabs[] = 'cisco-otv';
         }
 
+        $device_routing_count['routes'] = dbFetchCell('SELECT COUNT(*) FROM `route` WHERE `device_id` = ?', array($device['device_id']));
+        if ($device_routing_count['routes']) {
+            $routing_tabs[] = 'routes';
+        }
+
         if (is_array($routing_tabs)) {
             echo '<li role="presentation" '.$select['routing'].'>
                 <a href="'.generate_device_url($device, array('tab' => 'routing')).'">
@@ -346,7 +351,7 @@ if (device_permitted($vars['device']) || $permitted_by_port) {
             </li>';
 
         echo '<li role="presentation" '.$select['alerts'].'>
-            <a href="'.generate_device_url($device, array('tab' => 'alerts')).'">
+            <a href="'.generate_device_url($device, array('tab' => 'alert')).'">
             <i class="fa fa-exclamation-circle fa-lg icon-theme"  aria-hidden="true"></i> Alerts
             </a>
             </li>';
@@ -357,7 +362,7 @@ if (device_permitted($vars['device']) || $permitted_by_port) {
             </a>
             </li>';
 
-        if (LegacyAuth::user()->hasGlobalAdmin()) {
+        if (Auth::user()->hasGlobalAdmin()) {
             foreach ((array)Config::get('rancid_configs', []) as $configs) {
                 if ($configs[(strlen($configs) - 1)] != '/') {
                     $configs .= '/';
@@ -382,7 +387,7 @@ if (device_permitted($vars['device']) || $permitted_by_port) {
         }
 
         if ($device_config_file) {
-            if (!get_dev_attrib($device, 'override_Oxidized_disable', 'true')) {
+            if (!get_dev_attrib($device, 'override_Oxidized_disable') == 'true') {
                 echo '<li class="'.$select['showconfig'].'">
                     <a href="'.generate_device_url($device, array('tab' => 'showconfig')).'">
                     <i class="fa fa-align-justify fa-lg icon-theme"  aria-hidden="true"></i> Config
@@ -455,9 +460,15 @@ if (device_permitted($vars['device']) || $permitted_by_port) {
                   <span class="caret"></span></button>
                   <ul class="dropdown-menu">
                     <li><a href="https://'.$device['hostname'].'" onclick="http_fallback(this); return false;" target="_blank" rel="noopener"><i class="fa fa-globe fa-lg icon-theme"  aria-hidden="true"></i> Web</a></li>';
+
+        foreach (Config::get('html.device.links') as $links) {
+            $html_link = view(['template' => $links['url']], ['device' => $device])->__toString();
+            echo '<li><a href="'.$html_link.'" onclick="http_fallback(this); return false;" target="_blank" rel="noopener"><i class="fa fa-globe fa-lg icon-theme" aria-hidden="true"></i> '.$links['title'].'</a></li>';
+        }
+
         if (Config::has('gateone.server')) {
             if (Config::get('gateone.use_librenms_user') == true) {
-                echo '<li><a href="' . Config::get('gateone.server') . '?ssh=ssh://' . LegacyAuth::user()->username . '@' . $device['hostname'] . '&location=' . $device['hostname'] . '" target="_blank" rel="noopener"><i class="fa fa-lock fa-lg icon-theme" aria-hidden="true"></i> SSH</a></li>';
+                echo '<li><a href="' . Config::get('gateone.server') . '?ssh=ssh://' . Auth::user()->username . '@' . $device['hostname'] . '&location=' . $device['hostname'] . '" target="_blank" rel="noopener"><i class="fa fa-lock fa-lg icon-theme" aria-hidden="true"></i> SSH</a></li>';
             } else {
                 echo '<li><a href="' . Config::get('gateone.server') . '?ssh=ssh://' . $device['hostname'] . '&location=' . $device['hostname'] . '" target="_blank" rel="noopener"><i class="fa fa-lock fa-lg icon-theme" aria-hidden="true"></i> SSH</a></li>';
             }
@@ -467,7 +478,7 @@ if (device_permitted($vars['device']) || $permitted_by_port) {
         }
             echo '<li><a href="telnet://'.$device['hostname'].'" target="_blank" rel="noopener"><i class="fa fa-terminal fa-lg icon-theme"  aria-hidden="true"></i> Telnet</a></li>';
 
-        if (LegacyAuth::user()->hasGlobalAdmin()) {
+        if (Auth::user()->hasGlobalAdmin()) {
             echo '<li>
                 <a href="'.generate_device_url($device, array('tab' => 'edit')).'">
                 <i class="fa fa-pencil fa-lg icon-theme"  aria-hidden="true"></i> Edit </a>

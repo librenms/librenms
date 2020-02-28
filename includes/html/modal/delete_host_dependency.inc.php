@@ -11,9 +11,7 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Authentication\LegacyAuth;
-
-if (!LegacyAuth::user()->hasGlobalAdmin()) {
+if (!Auth::user()->hasGlobalAdmin()) {
     die('ERROR: You need to be admin');
 }
 
@@ -31,6 +29,7 @@ if (!LegacyAuth::user()->hasGlobalAdmin()) {
             </div>
             <div class="modal-footer">
                 <form role="form" class="remove_token_form">
+                    <?php echo csrf_field() ?>
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-danger danger" id="hostdep-removal" data-target="hostdep-removal">Delete</button>
                     <input type="hidden" name="row_id" id="delete-row_id" value="">
@@ -61,6 +60,7 @@ $('#hostdep-removal').click('', function(event) {
                 $("#confirm-delete").modal('hide');
                 // Clear the host association from html
                 $('[data-row-id=' + row_id + ']').find('.parenthost').text('None');
+                $('#hostdeps').bootgrid('reload');
             } else {
                 toastr.error(output.message);
             }

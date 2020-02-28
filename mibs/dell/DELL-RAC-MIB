@@ -1,10 +1,19 @@
 -- 
--- Dell Remote Access Controller (RAC) Management Information Base
--- Copyright (c) 2013  Dell Inc
+-- Dell Remote Access Controller (RAC) and Chassis Management Controller (CMC)
+-- Management Information Base
 --
--- Last Changed Revision: 15
--- Last Changed Date: 2013-08-29 12:25:06 -0500 (Thu, 29 Aug 2013)
--- Text Last Updated: 2013-08-29 12:25:06 -0500 (Thu, 29 Aug 2013)
+-- This MIB is the legacy iDRAC MIB.  Changes are no longer made to this MIB
+-- for iDRACs.  iDRACs don't support all of the objects and traps defined
+-- in this MIB.  There is a new and more extensive iDRAC MIB available for
+-- newer iDRACs (iDRAC7 and newer).
+--
+-- This MIB is also the CMC MIB.  Changes are made to this MIB only for CMCs now.
+--
+-- Copyright (c) 2017 Dell Inc.
+--
+-- Last Changed Revision: 19
+-- Last Changed Date: 2017-07-13 03:46:06 -0530 (Thu, 13 Jul 2017)
+-- Text Last Updated: 2017-07-13 03:46:06 -0530 (Thu, 13 Jul 2017)
 --
 
 DELL-RAC-MIB DEFINITIONS ::= BEGIN
@@ -40,8 +49,12 @@ IMPORTS
 		drac5MC(7),             -- Drac 5/MC
 		cmc(8),                 -- CMC
 		idrac(9),               -- iDRAC
+		idrac7monolithic(16),   -- iDRAC7 Monolithic
+		idrac7modular(17),      -- iDRAC7 Modular
 		vrtxCMC(18),            -- VRTX CMC
-		fx2CMC(19)              -- FX2 Family CMC
+		fx2CMC(19),             -- FX2 Family CMC
+		idrac8monolithic(32),   -- iDRAC8 Monolithic
+		idrac8modular(33)       -- iDRAC8 Modular
 	}
 
 	DellStatus ::= INTEGER
@@ -119,6 +132,23 @@ IMPORTS
 		off(4)          -- server is powered off
 	}
 
+	DellCMCServerStorageMode ::= INTEGER
+	{
+		notApplicable(1),    -- not applicable to server
+		joined(2),           -- storage mode is Joined
+		splitDualHost(3),    -- storage mode is Split Dual Host
+		splitSingleHost(4),  -- storage mode is Split Single Host
+		unknown(99)          -- storage mode is unknown
+	}
+
+	DellCMCServerIntrusionState ::= INTEGER
+	{
+		notApplicable(1),    -- not applicable to server
+		closed(2),           -- intrusion state is Closed
+		open(3),             -- intrusion state is Open
+		unknown(99)          -- intrusion state is unknown
+	}
+
 
 -- MIB Objects and Tables --------------------------------------------------------
 
@@ -171,13 +201,49 @@ IMPORTS
 
 		DrsCMCServerTableEntry ::= SEQUENCE
 		{
-			drsServerIndex					DellCMCServerIndexRange,
-			drsServerMonitoringCapable DellCMCServerCapable,
+			drsServerIndex				DellCMCServerIndexRange,
+			drsServerMonitoringCapable  DellCMCServerCapable,
 			drsServerServiceTag			DellString,
-			drsServerSlotName				DellString,
+			drsServerSlotName			DellString,
 			drsServerSlotNumber			DellString,
-			drsServerNodeID				DellString
+			drsServerNodeID				DellString,
+			drsServerModel				DellString,
+			drsServerAssetTag			DellString,
+			drsServerNumStorageControllers	INTEGER,
+			drsServerStorageMode        DellCMCServerStorageMode,
+			drsServerIntrusionState     DellCMCServerIntrusionState,
+			drsServerAssignedServerSlots  DellString
 		}
+
+-- Storage details start
+storageDetailsGroup             OBJECT IDENTIFIER ::= { drsOutofBandGroup 6      }
+software                        OBJECT IDENTIFIER ::= { storageDetailsGroup 1 }
+storageManagement               OBJECT IDENTIFIER ::= { software 20           }
+physicalDevices                 OBJECT IDENTIFIER ::= { storageManagement 130 }
+logicalDevices                  OBJECT IDENTIFIER ::= { storageManagement 140 }
+
+
+------------------------------------------------------------------------------
+-- Textual Conventions
+------------------------------------------------------------------------------
+
+FQDDString                      ::= DisplayString (SIZE (0..512))
+
+ObjectStatusEnum        ::= INTEGER {
+    other(1),           -- the status of the object is not one of the
+                        --  following:
+    unknown(2),         -- the status of the object is unknown
+                        --  (not known or monitored)
+    ok(3),              -- the status of the object is ok
+    nonCritical(4),     -- the status of the object is warning, non-critical
+    critical(5),        -- the status of the object is critical (failure)
+    nonRecoverable(6)   -- the status of the object is non-recoverable (dead)
+}
+BooleanType                     ::= INTEGER (0..1)    -- 0 = FALSE, 1 = TRUE
+
+
+-- Storage details end
+
 
 	drsCMCAlertGroup              OBJECT IDENTIFIER ::= { drsOutofBandGroup    20 }
 	drsChassisAlertVariables      OBJECT IDENTIFIER ::= { drsCMCAlertGroup     10 }
@@ -912,6 +978,2825 @@ IMPORTS
 							for the server."
 			::= { drsCMCServerTableEntry 6 }
 
+	drsServerModel OBJECT-TYPE
+		SYNTAX			DellString
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"0005.0001.0001.0007 This attribute defines the Model
+							of the CMC server."
+			::= { drsCMCServerTableEntry 7 }
+
+	drsServerAssetTag OBJECT-TYPE
+		SYNTAX			DellString
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"0005.0001.0001.0008 This attribute defines the Asset Tag
+							of the CMC server."
+			::= { drsCMCServerTableEntry 8 }
+
+	drsServerNumStorageControllers OBJECT-TYPE
+		SYNTAX			INTEGER
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"0005.0001.0001.0009 This attribute defines the number of
+							storage controllers on the storage sled.  The value
+							will be zero if this is not a storage sled."
+			::= { drsCMCServerTableEntry 9 }
+
+	drsServerStorageMode OBJECT-TYPE
+		SYNTAX			DellCMCServerStorageMode
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"0005.0001.0001.0010 This attribute defines the Storage
+							Mode of the storage sled."
+			::= { drsCMCServerTableEntry 10 }
+
+	drsServerIntrusionState OBJECT-TYPE
+		SYNTAX			DellCMCServerIntrusionState
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"0005.0001.0001.0011 This attribute defines the Intrusion
+							State of the CMC server if supported by the server."
+			::= { drsCMCServerTableEntry 11 }
+
+	drsServerAssignedServerSlots OBJECT-TYPE
+		SYNTAX			DellString
+		ACCESS			read-only
+		STATUS			mandatory
+		DESCRIPTION		"0005.0001.0001.0012 This attribute defines the the server
+							slots to which a storage sled is assigned.  If this is
+							a storage sled that is assigned to one more or more
+							server slots, the value will be a comma-separated list
+							of one or more server slot names.  If the storage sled
+							is not assigned to a server slot, the value will be an
+							empty string.  If this is not a storage sled, the value
+							will be N/A."
+			::= { drsCMCServerTableEntry 12 }
+
+-------------------------------------------------------------------------------
+-- Storage Details Group
+--
+-- OID Format: 1.3.6.1.4.1.674.10892.5.5
+-------------------------------------------------------------------------------
+
+
+-------------------------------------------------------------------------------
+-- Battery Table
+--
+-- OID Format:.1.3.6.1.4.1.674.10892.2.6.1.20.130.15.1.<a>.<i1>
+-------------------------------------------------------------------------------
+
+BatteryTableEntry                               ::=SEQUENCE { 
+    batteryNumber                               INTEGER,
+    batteryState                                INTEGER,
+    batteryComponentStatus                      ObjectStatusEnum,
+    batteryPredictedCapacity                    INTEGER,
+    batteryFQDD                                 DisplayString,
+    batteryDisplayName                          DisplayString
+}
+
+batteryTable OBJECT-TYPE
+    SYNTAX         SEQUENCE OF BatteryTableEntry
+    ACCESS         not-accessible
+    STATUS         mandatory
+    DESCRIPTION
+        "A table of managed batteries. The number of 
+        entries is related to number of Batteries
+        discovered in the system.  The maximum number of entries 
+        is implementation dependent.
+        Note: The properties in this table may not be applicable to all 
+        entries.
+        "
+    ::= { physicalDevices 15 }
+
+batteryTableEntry OBJECT-TYPE
+    SYNTAX         BatteryTableEntry
+    ACCESS         not-accessible
+    STATUS         mandatory
+    DESCRIPTION
+        "An entry in the battery table. A row in this table cannot be
+        created or deleted by SNMP operations on columns of the table.
+        "
+        INDEX { batteryNumber }
+    ::= { batteryTable 1 }
+
+batteryNumber OBJECT-TYPE
+    SYNTAX         INTEGER (1..255)
+    ACCESS         read-only
+    STATUS         mandatory
+    DESCRIPTION
+        "Instance number of this battery entry.
+        "
+    ::= { batteryTableEntry 1 }
+
+batteryState OBJECT-TYPE
+    SYNTAX         INTEGER
+		   {
+		   unknown(1),
+		   ready(2),
+		   failed(3),
+		   degraded(4),
+		   missing(5),
+		   charging(6),
+		   belowThreshold(7)
+		   }
+    ACCESS         read-only
+    STATUS         mandatory
+    DESCRIPTION
+        "Current state of battery.
+        Possible values:
+        1: The current state could not be determined.
+        2: The battery is operating normally.
+        3: The battery has failed and needs to be replaced.
+        4: The battery temperature is high or charge level is depleting.
+        5: The battery is missing or not detected. 
+        6: The battery is undergoing the re-charge phase.
+        7: The battery voltage or charge level is below the threshold.
+        "
+    ::= { batteryTableEntry 4 }
+
+batteryComponentStatus OBJECT-TYPE
+    SYNTAX         ObjectStatusEnum
+    ACCESS         read-only
+    STATUS         mandatory
+    DESCRIPTION
+        "The status of the battery itself without the 
+        propagation of any contained component status.
+        Possible values:
+        1: Other
+        2: Unknown
+        3: OK 
+        4: Non-critical 
+        5: Critical
+        6: Non-recoverable"
+    ::= { batteryTableEntry 6 }
+
+batteryPredictedCapacity OBJECT-TYPE
+    SYNTAX          INTEGER
+                    {
+                    unknown(1),
+                    failed(2),
+                    ready(3)
+                    }
+    ACCESS          read-only
+    STATUS          obsolete
+    DESCRIPTION
+        "This entry is obsolete. Use the batteryComponentStatus or 
+        batteryState instead.
+        "
+    ::= { batteryTableEntry 10 }
+
+batteryFQDD OBJECT-TYPE
+    SYNTAX         DisplayString
+    ACCESS         read-only
+    STATUS         mandatory
+    DESCRIPTION
+        "The battery's Fully Qualified Device Descriptor (FQDD) as 
+        represented in Storage Management.
+        "
+    ::= { batteryTableEntry 20 }
+
+batteryDisplayName OBJECT-TYPE
+    SYNTAX         DisplayString
+    ACCESS         read-only
+    STATUS         mandatory
+    DESCRIPTION
+        "The battery's friendly FQDD as represented in Storage Management."
+    ::= { batteryTableEntry 21 }
+
+
+
+
+-------------------------------------------------------------------------------
+-- Controller Table
+--
+-- OID Format:.1.3.6.1.4.1.674.10892.2.6.1.20.130.1.1.<a>.<i1>
+-------------------------------------------------------------------------------
+
+ControllerTableEntry                            ::=SEQUENCE { 
+    controllerNumber                            INTEGER,
+    controllerName                              DisplayString,
+    controllerRebuildRate                       INTEGER,
+    controllerFWVersion                         DisplayString,
+    controllerCacheSizeInMB                     INTEGER,
+    controllerRollUpStatus                      ObjectStatusEnum,
+    controllerComponentStatus                   ObjectStatusEnum,
+    controllerDriverVersion                     DisplayString,
+    controllerPCISlot                           DisplayString,
+    controllerReconstructRate                   INTEGER,
+    controllerPatrolReadRate                    INTEGER,
+    controllerBGIRate                           INTEGER,
+    controllerCheckConsistencyRate              INTEGER,
+    controllerPatrolReadMode                    INTEGER,
+    controllerPatrolReadState                   INTEGER,
+    controllerPersistentHotSpare                BooleanType,
+    controllerSpinDownUnconfiguredDrives        BooleanType,
+    controllerSpinDownHotSpareDrives            BooleanType,
+    controllerSpinDownTimeInterval              INTEGER,
+    controllerPreservedCache                    BooleanType,
+    controllerCheckConsistencyMode              INTEGER,
+    controllerCopyBackMode                      INTEGER,
+    controllerSecurityStatus                    INTEGER,
+    controllerEncryptionKeyPresent              BooleanType,
+    controllerEncryptionCapability              INTEGER,
+    controllerLoadBalanceSetting                INTEGER,    
+    controllerMaxCapSpeed                       INTEGER,
+    controllerSASAddress                        DisplayString,
+    controllerFQDD                              FQDDString,
+    controllerDisplayName                       DisplayString,
+    controllerT10PICapability                   INTEGER,
+    controllerRAID10UnevenSpansSupported        BooleanType,
+    controllerEnhancedAutoImportForeignConfigMode INTEGER,  
+    controllerBootModeSupported                 BooleanType,
+    controllerBootMode                          INTEGER,
+    controllerHighAvailabilityMode              INTEGER,
+    controllerPeerController                    FQDDString,
+    controllerEncryptionKeyIdentifier           DisplayString
+}
+
+controllerTable OBJECT-TYPE
+    SYNTAX         SEQUENCE OF ControllerTableEntry
+    ACCESS         not-accessible
+    STATUS         mandatory
+    DESCRIPTION
+        "A table of managed RAID controllers. The number of entries
+        is related to number of RAID controllers discovered in the
+        system. The maximum number of entries is implementation dependent.
+        Note: The properties in this table may not be applicable to all 
+        entries.
+        "
+    ::= { physicalDevices 1 }
+
+controllerTableEntry OBJECT-TYPE
+    SYNTAX         ControllerTableEntry
+    ACCESS         not-accessible
+    STATUS         mandatory
+    DESCRIPTION
+        "An entry in the table of RAID controllers. A row in this table 
+        cannot be created or deleted by SNMP operations on columns of 
+        the table."
+    INDEX         { controllerNumber }
+    ::= { controllerTable 1 }
+
+controllerNumber OBJECT-TYPE
+    SYNTAX         INTEGER (1..255)
+    ACCESS         read-only
+    STATUS         mandatory
+    DESCRIPTION
+        "Instance number of this controller entry."
+    ::= { controllerTableEntry 1 }
+
+
+controllerName OBJECT-TYPE
+    SYNTAX         DisplayString
+    ACCESS         read-only
+    STATUS         mandatory
+    DESCRIPTION
+        "The controller's name as represented in Storage Management.
+        "
+    ::= { controllerTableEntry 2 }
+
+controllerRebuildRate OBJECT-TYPE
+    SYNTAX         INTEGER (0..100)
+    ACCESS         read-only
+    STATUS         mandatory
+    DESCRIPTION
+        "The rebuild rate is the percentage of the controller's 
+        resources dedicated to rebuilding a failed disk when a rebuild 
+        is necessary.
+        "
+    ::= { controllerTableEntry 7 }
+
+controllerFWVersion OBJECT-TYPE
+    SYNTAX         DisplayString
+    ACCESS         read-only
+    STATUS         mandatory
+    DESCRIPTION
+        "The controller's current firmware version.
+        "
+    ::= { controllerTableEntry 8 }
+
+controllerCacheSizeInMB OBJECT-TYPE
+    SYNTAX         INTEGER
+    ACCESS         read-only
+    STATUS         mandatory
+    DESCRIPTION
+        "The controller's current amount of cache memory in megabytes.  
+        "
+    ::= { controllerTableEntry 9 }
+
+controllerRollUpStatus OBJECT-TYPE
+    SYNTAX         ObjectStatusEnum
+    ACCESS         read-only
+    STATUS         mandatory
+    DESCRIPTION
+        "Severity of the controller state.  
+        This is the combined status of the controller and its components.
+        Possible values:
+        1: Other.
+        2: Unknown.
+        3: OK 
+        4: Non-critical 
+        5: Critical.
+        6: Non-recoverable.
+        "
+    ::= { controllerTableEntry 37 }
+
+controllerComponentStatus OBJECT-TYPE
+    SYNTAX          ObjectStatusEnum
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The status of the controller itself without the 
+        propagation of any contained component status.
+        Possible values:
+        1: Other
+        2: Unknown
+        3: OK 
+        4: Non-critical 
+        5: Critical
+        6: Non-recoverable"
+    ::= { controllerTableEntry 38 }
+
+controllerDriverVersion OBJECT-TYPE
+    SYNTAX          DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Currently installed driver version for this controller on the host.
+        "
+    ::= { controllerTableEntry 41 }
+
+controllerPCISlot OBJECT-TYPE
+    SYNTAX         DisplayString
+    ACCESS         read-only
+    STATUS         mandatory
+    DESCRIPTION
+        "The PCI slot on the server where the controller is seated. This 
+        data is not reported for embedded or integrated controllers, 
+        "
+    ::= { controllerTableEntry 42 }
+
+controllerReconstructRate OBJECT-TYPE
+    SYNTAX         INTEGER (0..100)
+    ACCESS         read-only
+    STATUS         mandatory
+    DESCRIPTION
+        "The reconstruct rate is the percentage of the controller's resources 
+        dedicated to reconstructing a disk group after adding a physical disk 
+        or changing the RAID level of a virtual disk residing on the disk 
+        group.
+        "
+    ::= { controllerTableEntry 48 }
+
+controllerPatrolReadRate OBJECT-TYPE
+    SYNTAX         INTEGER (0..100)
+    ACCESS         read-only
+    STATUS         mandatory
+    DESCRIPTION
+        "The patrol read rate is the percentage of the controller's 
+        resources dedicated to perform a patrol read on disks participating
+        in a virtual disk or hot spares.
+        "
+    ::= { controllerTableEntry 49 }
+
+controllerBGIRate OBJECT-TYPE
+    SYNTAX         INTEGER (0..100)
+    ACCESS         read-only
+    STATUS         mandatory
+    DESCRIPTION
+        "The background initialization (BGI) rate is the percentage of the 
+        controller's resources dedicated to performing the background 
+        initialization of a redundant virtual disk after it is created.
+        "
+    ::= { controllerTableEntry 50 }
+
+controllerCheckConsistencyRate OBJECT-TYPE
+    SYNTAX         INTEGER (0..100)
+    ACCESS         read-only
+    STATUS         mandatory
+    DESCRIPTION
+        "The check consistency rate is the percentage of the 
+        controller's resources dedicated to performing a check consistency 
+        on a redundant virtual disk.
+        "
+    ::= { controllerTableEntry 51 }
+
+controllerPatrolReadMode OBJECT-TYPE
+    SYNTAX         INTEGER
+           {
+           other(1),
+           notSupported(2),
+           disabled(3),
+           auto(4),
+           manual(5)
+           }
+    ACCESS         read-only
+    STATUS         mandatory
+    DESCRIPTION
+        "Identifies the patrol read mode setting for the controller.
+        Possible values:
+        1: Not one of the following or could not be determined.
+        2: Not Supported on this controller. 
+        3: Disabled.
+        4: Automatic.
+        5: Manual.
+        "
+    ::= { controllerTableEntry 52 }
+    
+controllerPatrolReadState OBJECT-TYPE
+    SYNTAX          INTEGER
+                    {
+                    other(1),
+                    stopped(2),
+                    active(3)
+                    }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "This property displays the current state of the patrol read process.
+         Possible values:
+        1: Not one of the following or could not be determined.
+        2: Patrol read is not running.
+        3: Patrol read is running.
+        "
+    ::= { controllerTableEntry 53 }
+
+controllerPersistentHotSpare OBJECT-TYPE
+    SYNTAX          BooleanType
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates whether hot spare drives would be restored on insertion 
+        into the same slot.
+        "
+    ::= { controllerTableEntry 59 }
+
+controllerSpinDownUnconfiguredDrives OBJECT-TYPE
+    SYNTAX          BooleanType
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates whether un-configured drives would be put in power
+        save mode by the controller.
+        "
+    ::= { controllerTableEntry 60 }
+
+controllerSpinDownHotSpareDrives OBJECT-TYPE
+    SYNTAX          BooleanType
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates whether hot spare drives would be put in power
+        save mode by the controller.
+        "
+    ::= { controllerTableEntry 61 }
+
+controllerSpinDownTimeInterval OBJECT-TYPE
+    SYNTAX          INTEGER (30..1440)
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The duration in minutes after which, the unconfigured or hot 
+        spare drives will be spun down to power save mode.
+        "
+    ::= { controllerTableEntry 62 }
+
+controllerPreservedCache OBJECT-TYPE
+    SYNTAX          BooleanType
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates whether preserved cache or pinned cache is 
+        present on the controller.
+        "
+    ::= { controllerTableEntry 69 }
+
+controllerCheckConsistencyMode OBJECT-TYPE
+    SYNTAX          INTEGER
+                    {
+                    other(1),
+                    unsupported(2),
+                    normal(3),
+                    stopOnError(4)
+                    }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The current check consistency mode setting 
+        for the controller.
+        Possible values:
+        1: Not one of the following.
+        2: Not supported on this controller.
+        3: Normal check consistency operation.
+        4: Check consistency operation will stop on encountering 
+        an error.
+        "
+    ::= { controllerTableEntry 70 }
+
+controllerCopyBackMode OBJECT-TYPE
+    SYNTAX          INTEGER
+                    {
+                    other(1),
+                    unsupported(2),
+                    on(3),
+                    onWithSmart(4),
+                    off(5)
+                    }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The current copy back mode setting 
+        for the controller.
+        Possible values:
+        1: Not one of the following.
+        2: Not supported on this controller.
+        3: Disks assigned as spares could revert back to spare status.
+        4: Data from physical disk participating in a 
+        virtual disk could be automatically copied to the assigned 
+        hot spare in case former has a predictive failure event. 
+        5: Copyback mode is disabled. 
+        "
+    ::= { controllerTableEntry 71 }
+
+controllerSecurityStatus OBJECT-TYPE
+    SYNTAX          INTEGER
+                    {
+                    unknown(1),
+                    none(2),
+                    lkm(3)
+                    }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The controller's current security/encryption status..
+        Possible values:
+        1: The current status could not be determined.
+        2: Controller is not operating in an encryption mode.
+        3: Controller is operating in the Local Key Management
+        (LKM) encryption mode.
+        "
+    ::= { controllerTableEntry 72 }
+
+controllerEncryptionKeyPresent OBJECT-TYPE
+    SYNTAX          BooleanType
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates whether encryption key is assigned for the controller.
+        "
+    ::= { controllerTableEntry 73 }
+
+controllerEncryptionCapability OBJECT-TYPE
+    SYNTAX          INTEGER
+                    {
+                    other(1),
+                    none(2),
+                    lkm(3)
+                    }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+    "The type of encryption supported by the controller.
+    Possible values:
+    1: Not one of the following.
+    2: No encryption supported, 
+    3: Local Key Management,
+    "
+    ::= { controllerTableEntry 74 }
+
+controllerLoadBalanceSetting OBJECT-TYPE
+    SYNTAX          INTEGER
+                    {
+                    other(1),
+                    unsupported(2),
+                    auto(3),
+                    none(4)
+                    }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The ability of the controller to automatically use both 
+        controller ports (or connectors) connected to the same enclosure in 
+        order to route I/O requests.
+        Possible values:
+        1: Not one of the following.
+        2: Not supported.
+        3: Automatic load balancing is active.
+        4: Load balancing is inactive.
+        "
+    ::= { controllerTableEntry 75 }
+
+controllerMaxCapSpeed OBJECT-TYPE
+    SYNTAX          INTEGER
+                    {
+                    unknown(1),
+                    oneDotFiveGbps(2),
+                    threeGbps(3),
+                    sixGbps(4),
+                    twelveGbps(5)
+                    }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The maximum speed of the controller.in 
+        Gigbits per second (Gbps).
+        Possible values:
+        1: The speed could not be determined.
+        2. 1.5 Gbps
+        3: 3.0 Gbps
+        4: 6.0 Gbps
+        5: 12.0 Gbps
+        "
+    ::= { controllerTableEntry 76 }
+
+controllerSASAddress OBJECT-TYPE
+    SYNTAX         DisplayString
+    ACCESS         read-only
+    STATUS         mandatory
+    DESCRIPTION
+        "The SAS address of the controller.
+        "
+    ::= { controllerTableEntry 77 }
+
+controllerFQDD OBJECT-TYPE
+    SYNTAX         FQDDString
+    ACCESS         read-only
+    STATUS         mandatory
+    DESCRIPTION
+        "The controller's Fully Qualified Device Descriptor (FQDD) as 
+        represented in Storage Management.
+        "
+    ::= { controllerTableEntry 78 }
+
+controllerDisplayName OBJECT-TYPE
+    SYNTAX         DisplayString
+    ACCESS         read-only
+    STATUS         mandatory
+    DESCRIPTION
+        "The controller's friendly FQDD as represented in Storage 
+    Management."
+    ::= { controllerTableEntry 79 }
+
+controllerT10PICapability OBJECT-TYPE
+    SYNTAX          INTEGER
+                    {
+                    other(1),
+                    capable(2),
+                    notCapable(3)
+                    }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates whether the controller supports the T10 PI (Protection 
+        Information). These protection fields are known as DIF
+        (Data Integrity Fields).
+        Possible values:
+        1: Not one of the following.
+        2: Capable of supporting T10 PI.
+        3: Not capable of supporting T10 PI.
+        "
+    ::= { controllerTableEntry 80 }
+
+controllerRAID10UnevenSpansSupported OBJECT-TYPE
+    SYNTAX          BooleanType
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates whether uneven spans for RAID 10 virtual disk 
+        is supported on the controller.
+        "
+    ::= { controllerTableEntry 81 }
+
+controllerEnhancedAutoImportForeignConfigMode OBJECT-TYPE
+    SYNTAX          INTEGER
+                    {
+                    other(1),
+                    notSupported(2),
+                    disabled(3),
+                    enabled(4)
+                    }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates the status of enhanced auto-import of foreign 
+        configuration property of the controller.
+        1: Not one of the following.
+        2: Not Supported.
+        3: Disabled.
+        4: Enabled.
+        "
+    ::= { controllerTableEntry 82 }
+
+controllerBootModeSupported OBJECT-TYPE
+    SYNTAX          BooleanType
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates whether headless boot mode settings are supported 
+        on the controller.
+        "
+    ::= { controllerTableEntry 83 }
+
+controllerBootMode OBJECT-TYPE
+    SYNTAX          INTEGER
+                    {
+                    notApplicable(1),
+                    user(2),
+                    contOnError(3),
+                    headlessContOnError(4),
+                    headlessSafe(5)
+                    }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates the boot mode of the controller.
+        Possible values:
+        1: Not applicable for this controller.
+        2: User mode: User interaction required for all boot messages (not 
+        applicable for uEFI environments).
+        3: Continue Boot On Error. User interaction only required for 
+        critical messages.
+        4: Headless Mode Continue On Error. User interaction is not required.
+        Controller boot may halt on Error.
+        5: Headless Safe Mode. Controller shall boot to safe mode on critical
+        errors.
+        "
+    ::= { controllerTableEntry 84 }
+
+controllerHighAvailabilityMode OBJECT-TYPE
+    SYNTAX          INTEGER
+                    {
+                    none (1),
+                    faultTolerantActivePassive (2),
+                    faultTolerantActiveActive (3),
+                    degraded (4)
+                    }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates the fault-tolerant mode of the controller.
+        Possible values:
+        1: None
+        2: Fault Tolerant(Active/Passive)
+        3: Fault Tolerant(Active/Active)
+        4: Degraded
+        "
+    ::= { controllerTableEntry 85 }
+
+controllerPeerController OBJECT-TYPE
+    SYNTAX         FQDDString
+    ACCESS         read-only
+    STATUS         mandatory
+    DESCRIPTION
+        "The peer controller's Fully Qualified Device Descriptor (FQDD) as 
+        represented in Storage Management.
+        "
+    ::= { controllerTableEntry 86 }
+
+controllerEncryptionKeyIdentifier OBJECT-TYPE
+    SYNTAX         DisplayString
+    ACCESS         read-only
+    STATUS         mandatory
+    DESCRIPTION
+        "Displays the encryption security key identifier of the controller, if the
+        controller is encryption enabled and a security key is configured for the
+        controller."
+    ::= { controllerTableEntry 87 }
+
+
+
+
+-------------------------------------------------------------------------------
+-- Physical Disk Table
+--
+-- OID Format:.1.3.6.1.4.1.674.10892.2.6.1.20.130.4.1.<a>.<i1>
+-------------------------------------------------------------------------------
+
+PhysicalDiskTableEntry                          ::=SEQUENCE { 
+    physicalDiskNumber                          INTEGER,
+    physicalDiskName                            DisplayString,
+    physicalDiskManufacturer                    DisplayString,    
+    physicalDiskState                           INTEGER,
+    physicalDiskProductID                       DisplayString,
+    physicalDiskSerialNo                        DisplayString,
+    physicalDiskRevision                        DisplayString,
+    physicalDiskCapacityInMB                    INTEGER,
+    physicalDiskUsedSpaceInMB                   INTEGER,
+    physicalDiskFreeSpaceInMB                   INTEGER,
+    physicalDiskBusType                         INTEGER,
+    physicalDiskSpareState                      INTEGER,
+    physicalDiskComponentStatus                 ObjectStatusEnum,    
+    physicalDiskPartNumber                      DisplayString,
+    physicalDiskSASAddress                      DisplayString,
+    physicalDiskNegotiatedSpeed                 INTEGER,
+    physicalDiskCapableSpeed                    INTEGER,
+    physicalDiskSmartAlertIndication            BooleanType,
+    physicalDiskManufactureDay                  DisplayString,
+    physicalDiskManufactureWeek                 DisplayString,
+    physicalDiskManufactureYear                 DisplayString,
+    physicalDiskMediaType                       INTEGER,
+    physicalDiskPowerState                      INTEGER,
+    physicalDiskRemainingRatedWriteEndurance    INTEGER,
+    physicalDiskOperationalState                INTEGER,
+    physicalDiskProgress                        INTEGER,
+    physicalDiskSecurityStatus                  INTEGER,
+    physicalDiskFormFactor                      INTEGER,
+    physicalDiskFQDD                            FQDDString,
+    physicalDiskDisplayName                     DisplayString,
+    physicalDiskT10PICapability                 INTEGER,
+    physicalDiskBlockSizeInBytes                INTEGER,
+    physicalDiskProtocolVersion                 DisplayString,
+    physicalDiskPCIeNegotiatedLinkWidth         INTEGER,
+    physicalDiskPCIeCapableLinkWidth            INTEGER,
+    physicalDiskCurrentActiveController         FQDDString,
+    physicalDiskFailoverController              FQDDString,
+    physicalDiskForeignKeyIdentifier            DisplayString
+ }
+
+physicalDiskTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF PhysicalDiskTableEntry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION
+        "A table of managed physical disks. The number of entries is 
+        related to number of physical Disks discovered in the system.
+        The maximum number of entries is implementation dependent.
+        Note: The properties in this table may not be applicable to 
+        all entries.
+        "
+    ::= { physicalDevices 4 }
+
+physicalDiskTableEntry OBJECT-TYPE
+    SYNTAX          PhysicalDiskTableEntry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION
+        "An entry in the physical Disk table. A row in this table cannot be
+        created or deleted by SNMP operations on columns of the table.
+        "
+    INDEX         { physicalDiskNumber }
+    ::= { physicalDiskTable 1 }
+
+physicalDiskNumber OBJECT-TYPE
+    SYNTAX          INTEGER (1..1000000000)
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Instance number of this physical disk entry.
+        "
+    ::= { physicalDiskTableEntry 1 }
+
+physicalDiskName OBJECT-TYPE
+    SYNTAX          DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The physical disk's name as represented in Storage Management.
+        "
+    ::= { physicalDiskTableEntry 2 }
+
+physicalDiskManufacturer OBJECT-TYPE    
+    SYNTAX          DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The name of the physical disk's manufacturer.
+        "
+    ::= { physicalDiskTableEntry 3 }
+
+physicalDiskState OBJECT-TYPE
+    SYNTAX          INTEGER
+                    {
+                    unknown(1),
+                    ready(2),
+                    online(3),
+                    foreign(4),
+                    offline(5),
+                    blocked(6),
+                    failed(7),
+                    nonraid(8),
+                    removed(9),
+                    readonly(10)
+                    }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The current state of this physical disk.
+        Possible states:
+        1: The current state could not be determined.
+        2: The physical disk is available for use, but no RAID configuration 
+        has been assigned. 
+        3: A RAID configuration has been assigned to the physical disk.
+        4: The physical disk has been moved from another
+        controller and contains all or some portion of a virtual disk.
+        5: The physical disk is not available to the RAID
+        controller. 
+        6: The physical disk is currently blocked by
+        controller.
+        7: The physical disk is not operational.
+        8: The physical disk is not a RAID capable disk 
+        9: The physical disk has been removed.
+        10:The physical disk media has been placed in read only mode.
+        "
+    ::= { physicalDiskTableEntry 4 }
+
+physicalDiskProductID OBJECT-TYPE
+    SYNTAX          DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The model number of the physical disk.
+        "
+    ::= { physicalDiskTableEntry 6 }
+
+physicalDiskSerialNo OBJECT-TYPE
+    SYNTAX          DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The physical disk's unique identification number 
+        from the manufacturer.
+        "
+    ::= { physicalDiskTableEntry 7 }
+
+physicalDiskRevision OBJECT-TYPE
+    SYNTAX          DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The firmware version of the physical disk.
+        "
+    ::= { physicalDiskTableEntry 8 }
+
+physicalDiskCapacityInMB OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The size of the physical disk in megabytes.
+        "        
+    ::= { physicalDiskTableEntry 11 }
+
+physicalDiskUsedSpaceInMB OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The amount of used space in megabytes on the physical
+        disk. This is not applicable for NVMe devices.
+        "
+    ::= { physicalDiskTableEntry 17 }
+
+physicalDiskFreeSpaceInMB OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The amount of free space in megabytes on the physical
+        disk. This is not applicable for NVMe devices.
+        "
+    ::= { physicalDiskTableEntry 19 }    
+
+physicalDiskBusType OBJECT-TYPE
+    SYNTAX          INTEGER
+                    {
+                    unknown(1),
+                    scsi(2),
+                    sas(3),
+                    sata(4),
+                    fibre(5),
+                    pcie(6)
+                    }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The bus type of the physical disk.
+        Possible values:
+        1: The bus type could not be determined.
+        2: Small Computer System Interface (SCSI).
+        3: Serial Attached SCSI (SAS).
+        4: Serial Advanced Technology Attachment (SATA).
+        5: Fibre channel.
+        6: PCIe.
+        "
+    ::= { physicalDiskTableEntry 21 }    
+
+physicalDiskSpareState OBJECT-TYPE
+    SYNTAX          INTEGER
+                    {
+                    notASpare(1),
+                    dedicatedHotSpare(2),
+                    globalHotSpare(3)
+                    }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The status of the disk as a spare.
+        Possible values:
+        1: Physical disk is not a spare.
+        2: Physical disk is a dedicated hot spare.
+        3: Physical disk is a global hot spare.
+        "
+    ::= { physicalDiskTableEntry 22 }
+
+physicalDiskComponentStatus OBJECT-TYPE
+    SYNTAX          ObjectStatusEnum
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The status of the physical disk itself without the 
+        propagation of any contained component status.
+        Possible values:
+        1: Other
+        2: Unknown
+        3: OK 
+        4: Non-critical 
+        5: Critical
+        6: Non-recoverable
+        "
+    ::= { physicalDiskTableEntry 24 }
+
+physicalDiskPartNumber OBJECT-TYPE
+    SYNTAX          DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The part number of the disk.
+        "
+    ::= { physicalDiskTableEntry 27 }
+
+physicalDiskSASAddress OBJECT-TYPE
+    SYNTAX          DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The SAS address of the physical disk.
+        "
+    ::= { physicalDiskTableEntry 28 }
+
+physicalDiskNegotiatedSpeed OBJECT-TYPE
+    SYNTAX          INTEGER
+                    {
+                    unknown(1),
+                    oneDotFiveGbps(2),
+                    threeGbps(3),
+                    sixGbps(4),
+                    twelveGbps(5),
+                    fiveGTps(6),
+                    eightGTps(7)
+                    }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The data transfer speed that the disk negotiated while spinning up 
+        in Gigbits per second (Gbps).
+        Possible values:
+        1: The speed could not be determined.
+        2. 1.5 Gbps
+        3: 3.0 Gbps
+        4: 6.0 Gbps
+        5: 12.0 Gbps
+        6: 5 GT/s (applicable for NVMe devices).
+        7: 8 GT/s (applicable for NVMe devices).
+        "
+    ::= { physicalDiskTableEntry 29 }
+
+physicalDiskCapableSpeed OBJECT-TYPE
+    SYNTAX          INTEGER
+                    {
+                    unknown(1),
+                    oneDotFiveGbps(2),
+                    threeGbps(3),
+                    sixGbps(4),
+                    twelveGbps(5),
+                    fiveGTps(6),
+                    eightGTps(7)
+
+                    }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The maximum data transfer speed supported by the disk 
+        in Gigbits per second (Gbps).
+        Possible values:
+        1: The speed could not be determined.
+        2. 1.5 Gbps
+        3: 3.0 Gbps
+        4: 6.0 Gbps
+        5: 12.0 Gbps
+        6: 5 GT/s (applicable for NVMe devices).
+        7: 8 GT/s (applicable for NVMe devices).
+        "
+    ::= { physicalDiskTableEntry 30 }
+
+physicalDiskSmartAlertIndication OBJECT-TYPE
+    SYNTAX          BooleanType
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates whether the physical disk has received a predictive 
+        failure alert.
+        "
+    ::= { physicalDiskTableEntry 31 }
+
+physicalDiskManufactureDay OBJECT-TYPE
+    SYNTAX          DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The day of the week (1=Sunday thru 7=Saturday) 
+        on which the physical disk was manufactured.
+        "
+    ::= { physicalDiskTableEntry 32 }
+
+physicalDiskManufactureWeek OBJECT-TYPE
+    SYNTAX          DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The week (1 thru 53) in which the physical disk 
+        was manufactured.
+        "
+    ::= { physicalDiskTableEntry 33 }
+
+physicalDiskManufactureYear OBJECT-TYPE    
+    SYNTAX          DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The four digit year in which the physical disk was manufactured.
+        "
+    ::= { physicalDiskTableEntry 34 }
+
+physicalDiskMediaType OBJECT-TYPE
+    SYNTAX          INTEGER
+                    {
+                    unknown(1),
+                    hdd(2),
+                    ssd(3)
+                    }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The media type of the physical disk.
+        Possible Values:
+        1: The media type could not be determined.
+        2: Hard Disk Drive (HDD).
+        3: Solid State Device (SSD).
+        "
+    ::= { physicalDiskTableEntry 35 }
+
+physicalDiskPowerState OBJECT-TYPE
+    SYNTAX          INTEGER
+                    {
+                    other(1),
+                    spunUp(2),
+                    spunDown(3),
+                    transition(4),
+                    on(5)
+                    }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The power state of the physical disk.
+        Possible Values:
+        1: Not one of the following.
+        2: The physical disk is in the spun up state.
+        3: The physical disk is in the spun down state.
+        4: The physical disk is changing from spun down state
+        to spun up state or vice versa.
+        5: The Solid State Device (SSD) is powered on.
+        "
+    ::= { physicalDiskTableEntry 42 }
+
+physicalDiskRemainingRatedWriteEndurance OBJECT-TYPE
+    SYNTAX          INTEGER (0..255)
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "This property is applicable to SSD media type only. This indicates 
+        the wear-out percentage of the SSD. Typically it is a value between 
+        0 to 100. However, if the value is not available or not applicable 
+        (in the case of HDD media type) the value will be 255.
+        "
+    ::= { physicalDiskTableEntry 49 }    
+
+physicalDiskOperationalState OBJECT-TYPE
+    SYNTAX          INTEGER
+                    {
+                    notApplicable(1),
+                    rebuild(2),
+                    clear(3),
+                    copyback(4)
+                    }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The state of the physical disk when there are progressive
+        operations ongoing.
+        Possible values:
+        1: There is no active operation running.
+        2: Data from a redundant virtual disk is 
+        currently being rebuilt onto the physical disk.
+        3: Data on the disk is being erased.
+        4: Data is being copied from a hot spare disk to 
+        the physical disk or vice versa.
+         "
+    ::= { physicalDiskTableEntry 50 }
+
+physicalDiskProgress OBJECT-TYPE
+    SYNTAX          INTEGER (0..100)
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The progress percentage of the operation that is being 
+        performed on the physical disk. This is applicable 
+        only if there is a progressive operations ongoing
+        "
+    ::= { physicalDiskTableEntry 51 }
+
+physicalDiskSecurityStatus OBJECT-TYPE
+    SYNTAX          INTEGER
+                    {
+                    supported(1),
+                    notSupported(2),
+                    secured(3),
+                    locked(4),
+                    foreign(5)
+                    }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The security/encryption status of the physical disk.
+        Possible Values:
+        1: The physical disk supports encryption.
+        2: The physical disk does not support encryption
+        3: The physical disk is encrypted.
+        4: The physical disk is locked by a key.
+        5: The physical disk is locked by a foreign key.
+        "
+    ::= { physicalDiskTableEntry 52 }
+
+physicalDiskFormFactor OBJECT-TYPE
+    SYNTAX          INTEGER
+                    {
+                    unknown(1),
+                    oneDotEight(2),
+                    twoDotFive(3),
+                    threeDotFive(4)
+                    }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The form factor of the physical disk.
+        Possible values:
+        1: The form factor could not be determined.
+        2: 1.8 inch.
+        3: 2.5 inch.
+        4: 3.5 inch.
+        "
+    ::= { physicalDiskTableEntry 53 }
+
+physicalDiskFQDD OBJECT-TYPE
+    SYNTAX          FQDDString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The physical disk's Fully Qualified Device Descriptor (FQDD) 
+        as represented in Storage Management.
+        "
+    ::= { physicalDiskTableEntry 54 }
+
+physicalDiskDisplayName OBJECT-TYPE
+    SYNTAX          DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The physical disk's friendly FQDD as represented in Storage 
+        Management.
+        "
+    ::= { physicalDiskTableEntry 55 }
+
+physicalDiskT10PICapability OBJECT-TYPE
+    SYNTAX          INTEGER
+                    {
+                    other(1),
+                    capable(2),
+                    notCapable(3)
+                    }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates whether the physical disk supports the T10 PI (Protection 
+        Information). These protection fields are known as DIF 
+        (Data Integrity Fields).
+        Possible values:
+        1: Not one of the following.
+        2: Capable of supporting T10 PI.
+        3: Not capable of supporting T10 PI.
+        "
+    ::= { physicalDiskTableEntry 57 }
+
+physicalDiskBlockSizeInBytes OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The block size (in bytes) of the physical disk. This is not 
+        applicable for NVMe devices.
+        Possible values:
+        1: 512.
+        2: 4096
+        "
+    ::= { physicalDiskTableEntry 58 }
+    
+physicalDiskProtocolVersion OBJECT-TYPE
+    SYNTAX          DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Applicable for NVMe devices only. The NVMe protocol version supported 
+        by the device.
+        "
+    ::= { physicalDiskTableEntry 59 }
+
+physicalDiskPCIeNegotiatedLinkWidth OBJECT-TYPE
+    SYNTAX          INTEGER
+                    {
+                    other(1),
+                    notApplicable(2),
+                    byOne(3),
+                    byTwp(4),
+                    byFour(5),
+                    byEight(6),
+                    bySixteen(7),
+                    byThirtyTwp(8)
+                    }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Applicable for NVMe devices  only. The PCIe link width negotiated with the host
+        during device initialization.
+        "
+    ::= { physicalDiskTableEntry 60 }
+
+physicalDiskPCIeCapableLinkWidth OBJECT-TYPE
+    SYNTAX          INTEGER
+                    {
+                    other(1),
+                    notApplicable(2),
+                    byOne(3),
+                    byTwp(4),
+                    byFour(5),
+                    byEight(6),
+                    bySixteen(7),
+                    byThirtyTwp(8)
+                    }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Applicable for NVMe devices only. The PCIe link widths the device is capable of 
+        supporting.
+        "
+    ::= { physicalDiskTableEntry 61 }
+
+physicalDiskCurrentActiveController  OBJECT-TYPE
+    SYNTAX          FQDDString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates the Fully Qualified Device Descriptor (FQDD) of 
+        the current active controller.
+        "
+    ::= { physicalDiskTableEntry 62 }
+
+physicalDiskFailoverController    OBJECT-TYPE
+    SYNTAX          FQDDString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates the Fully Qualified Device Descriptor (FQDD) of 
+        the failover controller.
+        "
+    ::= { physicalDiskTableEntry 63 }
+
+physicalDiskForeignKeyIdentifier  OBJECT-TYPE
+    SYNTAX          DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Displays the encryption key identifier of the physical disk if it is in
+        locked or foreign state."
+
+    ::= { physicalDiskTableEntry 64 }
+
+
+
+-------------------------------------------------------------------------------
+-- Virtual Disk Table
+--
+-- OID Format:.1.3.6.1.4.1.674.10892.2.6.1.20.140.1.1.<a>.<i1>
+-------------------------------------------------------------------------------
+VirtualDiskTableEntry                          ::=SEQUENCE { 
+    virtualDiskNumber                           INTEGER,
+    virtualDiskName                             DisplayString,
+    virtualDiskState                            INTEGER,
+    virtualDiskSizeInMB                         INTEGER,
+    virtualDiskWritePolicy                      INTEGER,
+    virtualDiskReadPolicy                       INTEGER,
+    virtualDiskLayout                           INTEGER,
+    virtualDiskStripeSize                       INTEGER,
+    virtualDiskComponentStatus                  ObjectStatusEnum,        
+    virtualDiskBadBlocksDetected                BooleanType,
+    virtualDiskSecured                          BooleanType,
+    virtualDiskIsCacheCade                      BooleanType,
+    virtualDiskDiskCachePolicy                  INTEGER,
+    virtualDiskOperationalState                 INTEGER,
+    virtualDiskProgress                         INTEGER,
+    virtualDiskAvailableProtocols               DisplayString,
+    virtualDiskMediaType                        DisplayString,
+    virtualDiskRemainingRedundancy              INTEGER,
+    virtualDiskFQDD                             FQDDString,
+    virtualDiskDisplayName                      DisplayString,
+    virtualDiskT10PIStatus                      INTEGER,
+    virtualDiskBlockSizeInBytes                 INTEGER,
+    virtualDiskAdapter1AccessPolicy             INTEGER,
+    virtualDiskAdapter2AccessPolicy             INTEGER,
+    virtualDiskAdapter3AccessPolicy             INTEGER,
+    virtualDiskAdapter4AccessPolicy             INTEGER,
+    virtualDiskCurrentActiveController          FQDDString,
+    virtualDiskFailoverController               FQDDString
+}
+
+virtualDiskTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF VirtualDiskTableEntry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION
+        "A table of managed virtual disks. The number of entries is related
+        to number of virtual disks discovered in the system. 
+        The maximum number of entries is implementation dependent.
+        Note: The properties in this table may not be applicable to all
+        entries.
+        "
+    ::= { logicalDevices 1 }
+
+virtualDiskTableEntry OBJECT-TYPE
+    SYNTAX          VirtualDiskTableEntry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION
+        "An entry in the virtual disk table. A row in this table cannot be
+        created or deleted by SNMP operations on columns of the table.
+        "
+    INDEX         { virtualDiskNumber }
+    ::= { virtualDiskTable 1 }
+    
+virtualDiskNumber OBJECT-TYPE
+    SYNTAX          INTEGER (1..100000000)
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Instance number of this virtual disk entry.
+        "
+        ::= { virtualDiskTableEntry 1 }
+
+virtualDiskName OBJECT-TYPE    
+    SYNTAX          DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The virtual disk's label as entered by the user.
+        "
+    ::= { virtualDiskTableEntry 2 }
+
+virtualDiskState OBJECT-TYPE
+    SYNTAX          INTEGER
+                    {
+                    unknown(1),
+                    online(2),
+                    failed(3),
+                    degraded(4)
+                    }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The current state of this virtual disk
+        (which includes any member physical disks.)
+        Possible states:
+        1: The current state could not be determined.
+        2: The virtual disk is operating normally or optimally.
+        3: The virtual disk has encountered a failure. The data on disk 
+        is lost or is about to be lost.
+        4: The virtual disk encounterd a failure with one or all of the 
+        constituent redundant physical disks. The data on the virtual 
+        disk might no longer be fault tolerant.
+        "
+    ::= { virtualDiskTableEntry 4 }
+
+virtualDiskSizeInMB OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The size of the virtual disk in megabytes.
+        "
+    ::= { virtualDiskTableEntry 6 }
+
+virtualDiskWritePolicy OBJECT-TYPE           
+    SYNTAX          INTEGER
+                    {
+                    writeThrough(1),
+                    writeBack(2),
+                    writeBackForce(3)
+                    }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The write policy used by the controller for write operations on 
+        this virtual disk.
+        Possible values:
+        1: Write Through.
+        2: Write Back.
+        3: Force Write Back.
+        "
+    ::= { virtualDiskTableEntry 10 }
+
+virtualDiskReadPolicy OBJECT-TYPE        
+    SYNTAX          INTEGER
+                    {
+                    noReadAhead(1),
+                    readAhead(2),
+                    adaptiveReadAhead(3)
+                    }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The read policy used by the controller for read operations on 
+        this virtual disk.
+        Possible values:
+        1: No Read Ahead.
+        2: Read Ahead.
+        3: Adaptive Read Ahead.
+        "
+    ::= { virtualDiskTableEntry 11 }
+
+virtualDiskLayout OBJECT-TYPE            
+    SYNTAX          INTEGER
+                    {
+                    other(1),
+                    r0(2),
+                    r1(3),
+                    r5(4),
+                    r6(5),
+                    r10(6),
+                    r50(7),
+                    r60(8),
+                    concatRaid1(9),
+                    concatRaid5(10)
+                    }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The virtual disk's RAID type.
+         Possible values:
+         1: Not one of the following
+         2: RAID-0
+         3: RAID-1
+         4: RAID-5
+         5: RAID-6
+         6: RAID-10
+         7: RAID-50
+         8: RAID-60
+         9: Concatenated RAID 1
+        10: Concatenated RAID 5
+        "
+    ::= { virtualDiskTableEntry 13 }
+
+virtualDiskStripeSize OBJECT-TYPE        
+    SYNTAX          INTEGER
+                    {
+                    other(1),
+                    default(2),
+                    fiveHundredAndTwelvebytes(3),
+                    oneKilobytes(4),
+                    twoKilobytes(5),
+                    fourKilobytes(6),
+                    eightKilobytes(7),
+                    sixteenKilobytes(8),
+                    thirtyTwoKilobytes(9),
+                    sixtyFourKilobytes(10),
+                    oneTwentyEightKilobytes(11),
+                    twoFiftySixKilobytes(12),
+                    fiveOneTwoKilobytes(13),
+                    oneMegabye(14),
+                    twoMegabytes(15),
+                    fourMegabytes(16),
+                    eightMegabytes(17),
+                    sixteenMegabytes(18)
+                    }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The stripe size of this virtual disk.
+        Possible values:
+        1: Not one of the following
+        2: Default.
+        3: 512 bytes
+        4: 1 kB,
+        5: 2 kB,
+        6: 4 kB,
+        7: 8 kB,
+        8: 16 kB,
+        9: 32 kB,
+        10: 64 kB,
+        11: 128 kB,
+        12: 256 kB,
+        13: 512 kB,
+        14: 1 MB,
+        15: 2 MB,
+        16: 4 MB,
+        17: 8 MB,
+        18: 16 MB
+        "
+    ::= { virtualDiskTableEntry 14 }
+
+virtualDiskComponentStatus OBJECT-TYPE
+    SYNTAX          ObjectStatusEnum
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The status of the virtual disk itself without the 
+        propagation of any contained component status.
+        Possible values:
+        1: Other.
+        2: Unknown.
+        3: OK.
+        4: Non-critical .
+        5: Critical.
+        6: Non-recoverable.
+        "
+    ::= { virtualDiskTableEntry 20 }
+
+virtualDiskBadBlocksDetected OBJECT-TYPE    
+    SYNTAX          BooleanType
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates whether the virtual disk has bad blocks.
+        "
+    ::= { virtualDiskTableEntry 23 }
+
+virtualDiskSecured OBJECT-TYPE            
+    SYNTAX          BooleanType
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates whether the virtual disk is secured or not.
+        "
+    ::= { virtualDiskTableEntry 24 }
+
+virtualDiskIsCacheCade OBJECT-TYPE        
+    SYNTAX          BooleanType
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates whether the virtual disk is being used as a secondary 
+        cache by the controller.
+        "
+    ::= { virtualDiskTableEntry 25 }
+
+virtualDiskDiskCachePolicy OBJECT-TYPE        
+    SYNTAX          INTEGER
+                    {
+                    enabled(1),
+                    disabled(2),
+                    defullt(3)
+                    }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The cache policy of the physical disks that are 
+        part of this virtual disk 
+        Possible values:
+        1: Enabled.
+        2: Disabled.
+        3: Default.
+        "
+    ::= { virtualDiskTableEntry 26 }
+
+virtualDiskOperationalState OBJECT-TYPE
+    SYNTAX          INTEGER
+                    {
+                    notApplicable(1),
+                    reconstructing(2),
+                    resynching(3),
+                    initializing(4),
+                    backgroundInit(5)
+                    }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The state of the virtual disk when there are progressive
+        operations ongoing.
+        Possible values:
+        1: There is no active operation running.
+        2: The virtual disk configuration has changed.
+        The physical disks included in the virtual disk are being 
+        modified to support the new configuration.
+        3: A Consistency Check (CC) is being performed 
+        on the virtual disk.
+        4: The virtual disk is being initialized.
+        5: BackGround Initialization (BGI) is being performed 
+        on the virtual disk.
+        "
+    ::= { virtualDiskTableEntry 30 }
+
+virtualDiskProgress OBJECT-TYPE
+    SYNTAX          INTEGER (0..100)
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The progress percentage of the operation that is being 
+        performed on the virtual disk. This is applicable 
+        only if there is a progressive operations ongoing
+        "
+    ::= { virtualDiskTableEntry 31 }
+
+virtualDiskAvailableProtocols OBJECT-TYPE    
+    SYNTAX          DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "List of protocols support by physical disks part of this virtual
+        disk. For e.g. SAS for Serial Attached SCSI or SATA for 
+        Serial Advanced Technology Attachment.
+        "
+    ::= { virtualDiskTableEntry 32 }
+
+virtualDiskMediaType OBJECT-TYPE        
+    SYNTAX          DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "List of media types of the physical disks part of this virtual
+        disk. For e.g. HDD for Hard Disk Drive or SSD for Solid State Device.
+        "
+    ::= { virtualDiskTableEntry 33 }
+
+virtualDiskRemainingRedundancy OBJECT-TYPE    
+    SYNTAX          INTEGER (0..2)
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The number of physical disks which can be lost before the
+        virtual disk loses its redundancy.
+        "
+    ::= { virtualDiskTableEntry 34 }
+
+virtualDiskFQDD OBJECT-TYPE   
+    SYNTAX          FQDDString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The virtual disk's Fully Qualified Device Descriptor (FQDD) as 
+        represented in Storage Management.
+        "
+    ::= { virtualDiskTableEntry 35 }
+
+virtualDiskDisplayName OBJECT-TYPE
+    SYNTAX          DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The virtual disk's friendly FQDD as represented in Storage 
+        Management.
+        "
+    ::= { virtualDiskTableEntry 36 }
+
+virtualDiskT10PIStatus OBJECT-TYPE
+    SYNTAX          INTEGER
+                    {
+                    other(1),
+                    enabled(2),
+                    disabled(3)
+                    }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates whether the virtual disk supports the T10 PI (Protection 
+        Information). These protection fields are known as DIF 
+        (Data Integrity Fields).
+        Possible values:
+        1: Not one of the following.
+        2: Enabled.
+        3: Disabled.
+        "
+    ::= { virtualDiskTableEntry 37 }
+
+virtualDiskBlockSizeInBytes OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The block size (in bytes) of the physical disk part of the virtual disk.
+        Possible values:
+        1: 512.
+        2: 4096
+        "
+    ::= { virtualDiskTableEntry 38 }
+
+virtualDiskAdapter1AccessPolicy OBJECT-TYPE
+    SYNTAX          INTEGER
+                    {
+                    noAccess (1),
+                    fullAccess (2)
+                    }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates the access policy of the virtual disk with the virtual
+        adapters.
+        Possible values:
+        1: No Access.
+        2: Full Access
+        "
+    ::= { virtualDiskTableEntry 39 }
+
+virtualDiskAdapter2AccessPolicy OBJECT-TYPE
+    SYNTAX          INTEGER
+                    {
+                    noAccess (1),
+                    fullAccess (2)
+                    }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates the access policy of the virtual disk with the virtual
+        adapters.
+        Possible values:
+        1: No Access.
+        2: Full Access
+        "
+    ::= { virtualDiskTableEntry 40 }
+
+virtualDiskAdapter3AccessPolicy OBJECT-TYPE
+    SYNTAX          INTEGER
+                    {
+                    noAccess (1),
+                    fullAccess (2)
+                    }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates the access policy of the virtual disk with the virtual
+        adapters.
+        Possible values:
+        1: No Access.
+        2: Full Access
+        "
+    ::= { virtualDiskTableEntry 41 }
+
+virtualDiskAdapter4AccessPolicy OBJECT-TYPE
+    SYNTAX          INTEGER
+                    {
+                    noAccess (1),
+                    fullAccess (2)
+                    }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates the access policy of the virtual disk with the virtual
+        adapters.
+        Possible values:
+        1: No Access.
+        2: Full Access
+        "
+    ::= { virtualDiskTableEntry 42 }
+
+virtualDiskCurrentActiveController OBJECT-TYPE   
+    SYNTAX          FQDDString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates the Fully Qualified Device Descriptor (FQDD) of 
+        the current active controller.
+        "
+    ::= { virtualDiskTableEntry 43 }
+
+virtualDiskFailoverController OBJECT-TYPE
+    SYNTAX          FQDDString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates the Fully Qualified Device Descriptor (FQDD) of 
+        the failover controller.
+        "
+    ::= { virtualDiskTableEntry 44 }
+
+
+-------------------------------------------------------------------------------
+-- Enclosure Table
+--
+-- OID Format:.1.3.6.1.4.1.674.10892.2.6.1.20.130.3.1.<a>.<i1>
+-------------------------------------------------------------------------------
+
+EnclosureTableEntry                             ::=SEQUENCE { 
+    enclosureNumber                             INTEGER,
+    enclosureName                               DisplayString,
+    enclosureState                              INTEGER,
+    enclosureServiceTag                         DisplayString,
+    enclosureAssetTag                           DisplayString,
+    enclosureConnectedPort                      DisplayString,
+    enclosureRollUpStatus                       ObjectStatusEnum,    
+    enclosureComponentStatus                    ObjectStatusEnum, 
+    enclosureFirmwareVersion                    DisplayString,
+    enclosureSASAddress                         DisplayString,
+    enclosureDriveCount                         INTEGER,
+    enclosureTotalSlots                         INTEGER,
+    enclosureFanCount                           DisplayString,
+    enclosurePSUCount                           DisplayString,
+    enclosureEMMCount                           DisplayString,
+    enclosureTempProbeCount                     DisplayString,
+    enclosureRedundantPath                      DisplayString,
+    enclosurePosition                           DisplayString,
+    enclosureBackplaneBayID                     DisplayString,
+    enclosureFQDD                               FQDDString,
+    enclosureDisplayName                        DisplayString,
+    enclosureType	                        INTEGER
+}
+
+enclosureTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF EnclosureTableEntry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION
+        "A table of managed enclosures/backplanes. The number of entries is 
+        related to number of internal backplane(s) discovered in the system 
+        and external storage enclosure(s) attached to the system..
+        The maximum number of entries is implementation dependent.
+        Note: The properties in this table may not be applicable to all 
+        entries.
+        "
+    ::= { physicalDevices 3 }
+
+enclosureTableEntry OBJECT-TYPE
+    SYNTAX          EnclosureTableEntry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION
+        "An entry in the enclosure table. A row in this table cannot be
+        created or deleted by SNMP operations on columns of the table.
+        "
+    INDEX { enclosureNumber }
+    ::= { enclosureTable 1 }
+
+enclosureNumber OBJECT-TYPE    
+    SYNTAX          INTEGER (1..255)
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Instance number of this enclossre/backplane.
+        "
+    ::= { enclosureTableEntry 1 }
+
+enclosureName OBJECT-TYPE        
+    SYNTAX          DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The enclosure/backplane's name as represented in Storage Management.
+        "
+    ::= { enclosureTableEntry 2 }
+
+enclosureState OBJECT-TYPE        
+    SYNTAX          INTEGER
+                    {
+                    unknown(1),
+                    ready(2),
+                    failed(3),
+                    missing(4),
+                    degraded(5),
+                    foreign(6),
+                    offline(7),
+                    online(8),
+                    blocked(9)
+                    }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The current state of this enclosure/backplane.
+        Possible states:
+        1: The current state could not be determined.
+        2: The enclosure is operating normally.
+        3: The enclosure has encountered a hardware problem or is not 
+        responding.
+        4: The enclosure is no longer connected to the controller or 
+        there exists a problem communicating to the enclosure.
+        5: The enclosure is unstable.
+        6: The enclosure is inactive due to being configured by another
+        controller.
+        7: The enclosure is offline and inaccessible. 
+        8: The enclosure is online and accessible.
+        9: The enclosure is currently blocked by another controller.
+        "
+    ::= { enclosureTableEntry 4 }
+
+enclosureServiceTag OBJECT-TYPE    
+    SYNTAX          DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Enclosure identification used when consulting customer support.
+        "
+    ::= { enclosureTableEntry 8 }
+
+enclosureAssetTag OBJECT-TYPE        
+    SYNTAX          DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The asset tag information for the enclosure."
+    ::= { enclosureTableEntry 9 }
+
+enclosureConnectedPort OBJECT-TYPE    
+    SYNTAX          DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The port on the controller to which the 
+        storage enclosure is connected.
+        "
+    ::= { enclosureTableEntry 19 }
+
+enclosureRollUpStatus OBJECT-TYPE    
+    SYNTAX          ObjectStatusEnum
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Severity of the enclosure/backplane state.
+        This is the combined status of the enclosure and its sub-components.
+        Possible values:
+        1: Other.
+        2: Unknown.
+        3: OK.
+        4: Non-critical.
+        5: Critical.
+        6: Non-recoverable.
+        "
+    ::= { enclosureTableEntry 23 }
+
+enclosureComponentStatus OBJECT-TYPE    
+    SYNTAX          ObjectStatusEnum
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The status of the enclosure/backplane.itself without the 
+        propagation of any contained component status.
+        Possible values:
+        1: Other.
+        2: Unknown.
+        3: OK.
+        4: Non-critical .
+        5: Critical.
+        6: Non-recoverable.
+        "
+    ::= { enclosureTableEntry 24 }
+
+enclosureFirmwareVersion OBJECT-TYPE    
+    SYNTAX          DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The firmware information for the enclosure/backplane.
+        "
+    ::= { enclosureTableEntry 26 }
+
+enclosureSASAddress OBJECT-TYPE
+    SYNTAX          DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The SAS address of the enclosure/backplane.
+        "
+    ::= { enclosureTableEntry 30 }
+
+enclosureDriveCount OBJECT-TYPE        
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The number of disks present in the enclosure/backplane.
+        "    
+    ::= { enclosureTableEntry 31 }
+
+enclosureTotalSlots OBJECT-TYPE    
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The total physical drive slots in a storage enclosure 
+        or server backplane.
+        "
+    ::= { enclosureTableEntry 32 }
+
+enclosureFanCount OBJECT-TYPE        
+    SYNTAX          DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The number of fans present in the storage enclosure.
+        "    
+    ::= { enclosureTableEntry 40 }
+
+enclosurePSUCount OBJECT-TYPE        
+    SYNTAX          DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The number of Power Supply Units (PSU) present 
+        in the storage enclosure.
+        "    
+    ::= { enclosureTableEntry 41 }
+
+enclosureEMMCount OBJECT-TYPE        
+    SYNTAX          DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The number of Enclosure Management Modules (EMM) 
+        present in the storage enclosure.
+        "    
+    ::= { enclosureTableEntry 42 }
+
+enclosureTempProbeCount OBJECT-TYPE
+    SYNTAX          DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The number of temperature sensing devices 
+        present in the storage enclosure.
+        "
+    ::= { enclosureTableEntry 43 }
+
+enclosureRedundantPath OBJECT-TYPE    
+    SYNTAX          DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates whether the controller has multiply paths to 
+        reach the storage enclosure.
+        "
+    ::= { enclosureTableEntry 44 }
+
+enclosurePosition OBJECT-TYPE        
+     SYNTAX         DisplayString
+     ACCESS         read-only
+     STATUS         mandatory
+     DESCRIPTION
+         "The possition of the storage enclosure within a daisy chain.
+         "
+    ::= { enclosureTableEntry 45 }
+
+enclosureBackplaneBayID OBJECT-TYPE    
+    SYNTAX          DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The unique bay ID of the backplane.
+        "
+    ::= { enclosureTableEntry 46 }
+
+enclosureFQDD OBJECT-TYPE        
+    SYNTAX          FQDDString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The enclosure/backplane's Fully Qualified Device Descriptor (FQDD) 
+        as represented in Storage Management.
+        "
+    ::= { enclosureTableEntry 47 }
+    
+enclosureDisplayName OBJECT-TYPE    
+    SYNTAX          DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The enclosure/backplane's friendly FQDD as represented in 
+        Storage Management.
+        "
+    ::= { enclosureTableEntry 48 }
+
+enclosureType OBJECT-TYPE        
+    SYNTAX          INTEGER
+                    {
+                    other(1),
+                    notApplicable(2),
+                    sassata(3),
+                    pcie(4),
+                    universal(5)
+                    }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The protocol supported by the backplane.
+        Possible states:
+        1: Not one of the following or could not be determined.
+        2: Not applicable (i.e. object is not a backplane).
+        3: Supports SAS/SATA.
+        4: Supports PCIe.
+        5: Both SAS/SATA and PCIe.
+        "
+    ::= { enclosureTableEntry 49 }
+
+
+-------------------------------------------------------------------------------
+-- Enclosure Management Module Table
+--
+-- OID Format:.1.3.6.1.4.1.674.10892.2.6.1.20.130.13.1.<a>.<i1>
+-------------------------------------------------------------------------------
+
+EnclosureManagementModuleTableEntry             ::=SEQUENCE { 
+    enclosureManagementModuleNumber             INTEGER,
+    enclosureManagementModuleName               DisplayString,
+    enclosureManagementModuleState              INTEGER,
+    enclosureManagementModulePartNumber         DisplayString,
+    enclosureManagementModuleFWVersion          DisplayString,
+    enclosureManagementModuleComponentStatus    ObjectStatusEnum, 
+    enclosureManagementModuleFQDD               FQDDString,
+    enclosureManagementModuleDisplayName        DisplayString
+}
+
+enclosureManagementModuleTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF EnclosureManagementModuleTableEntry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION
+        "A table of managed Enclosure Management Modules (EMM) 
+        in the external storage enclosure(s). The number of 
+        entries is related to number of enclosure management modules
+        discovered in the enclosure(s). The maximum number of entries 
+        is implementation dependent.
+        Note: The properties in this table may not be applicable to all 
+        entries.
+        "
+    ::= { physicalDevices 13 }
+
+enclosureManagementModuleTableEntry OBJECT-TYPE
+    SYNTAX          EnclosureManagementModuleTableEntry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION
+        "An entry in the enclosure management module table. A row in 
+        this table cannot be created or deleted by SNMP operations 
+        on columns of the table.
+        "
+    INDEX { enclosureManagementModuleNumber }
+    ::= { enclosureManagementModuleTable 1 }
+
+enclosureManagementModuleNumber OBJECT-TYPE
+    SYNTAX          INTEGER (1..255)
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Instance number of this enclosure management module.
+        "
+    ::= { enclosureManagementModuleTableEntry 1 }
+
+enclosureManagementModuleName OBJECT-TYPE        
+    SYNTAX          DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The enclosure management module's name as 
+        represented in Storage Management.
+        "
+    ::= { enclosureManagementModuleTableEntry 2 }
+ 
+enclosureManagementModuleState OBJECT-TYPE    
+    SYNTAX          INTEGER
+                    {
+                    unknown(1),
+                    ready(2),
+                    failed(3),
+                    missing(4),
+                    degraded(5)
+                    }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The current state of this enclosure management module.
+        Possible states:
+        1: The current state could not be determined.
+        2: The enclosure management module is operating normally.
+        3: The enclosure management module has encountered a 
+        hardware problem or is not responding.
+        4: The enclosure management module is no longer connected
+        to the enclosure or there exists a problem communicating to it.
+        5: The enclosure management module is unstable.
+        "
+    ::= { enclosureManagementModuleTableEntry 4 }
+
+enclosureManagementModulePartNumber OBJECT-TYPE        
+    SYNTAX          DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The part number of the enclosure management module.
+        "
+    ::= { enclosureManagementModuleTableEntry 6 }
+ 
+enclosureManagementModuleFWVersion OBJECT-TYPE        
+    SYNTAX          DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Firmware version of the enclosure management module.
+        "    
+    ::= { enclosureManagementModuleTableEntry 8 }
+
+enclosureManagementModuleComponentStatus OBJECT-TYPE
+    SYNTAX          ObjectStatusEnum
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The status of the enclosure management module.itself without the 
+        propagation of any contained component status.
+        Possible values:
+        1: Other.
+        2: Unknown.
+        3: OK.
+        4: Non-critical .
+        5: Critical.
+        6: Non-recoverable.
+        "
+    ::= { enclosureManagementModuleTableEntry 11 }
+
+enclosureManagementModuleFQDD OBJECT-TYPE        
+    SYNTAX          FQDDString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The enclosure management module's Fully Qualified Device 
+        Descriptor (FQDD) as represented in Storage Management.
+        "
+    ::= { enclosureManagementModuleTableEntry 15 }
+
+enclosureManagementModuleDisplayName OBJECT-TYPE    
+    SYNTAX          DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The enclosure management module's friendly FQDD as represented in 
+        Storage Management.
+        "
+    ::= { enclosureManagementModuleTableEntry 16 }
+
+
+
+-------------------------------------------------------------------------------
+-- Enclosure Fan Table
+--
+-- OID Format:.1.3.6.1.4.1.674.10892.2.6.1.20.130.7.1.<a>.<i1>
+-------------------------------------------------------------------------------
+
+EnclosureFanTableEntry                          ::=SEQUENCE { 
+    enclosureFanNumber                          INTEGER,
+    enclosureFanName                            DisplayString,
+    enclosureFanState                           INTEGER,
+    enclosureFanSpeed                           INTEGER,
+    enclosureFanComponentStatus                 ObjectStatusEnum, 
+    enclosureFanFQDD                            FQDDString,
+    enclosureFanDisplayName                     DisplayString
+}
+
+enclosureFanTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF EnclosureFanTableEntry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION
+        "A table of managed fans in the external storage enclosure(s). 
+        The number of entries is related to number of fans discovered in 
+        the enclosure(s). The maximum number of entries is implementation 
+        dependent.
+        Note: The properties in this table may not be applicable to all 
+        entries.
+        "
+    ::= { physicalDevices 7 }
+    
+enclosureFanTableEntry OBJECT-TYPE
+    SYNTAX          EnclosureFanTableEntry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION
+        "An entry in the fan table. A row in this table cannot be
+        created or deleted by SNMP operations on columns of the table.
+        "
+    INDEX { enclosureFanNumber }
+    ::= { enclosureFanTable 1 }
+
+enclosureFanNumber OBJECT-TYPE
+    SYNTAX          INTEGER (1..255)
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Instance number of this fan.
+        "
+    ::= { enclosureFanTableEntry 1 }
+
+enclosureFanName OBJECT-TYPE        
+    SYNTAX          DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The fan's name as represented in Storage Management.
+        "
+    ::= { enclosureFanTableEntry 2 }
+
+enclosureFanState OBJECT-TYPE
+    SYNTAX          INTEGER
+                    {
+                    unknown(1),
+                    ready(2),
+                    failed(3),
+                    missing(4),
+                    degraded(5)
+                    }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The current state of this fan.
+        Possible states:
+        1: The current state could not be determined.
+        2: The fan is operating normally.
+        3: The fan has encountered a hardware problem or is not 
+        responding.
+        4: The fan is no longer connected to the enclosure or 
+        there exists a problem communicating to it.
+        5: The fan is unstable.
+        "
+    ::= { enclosureFanTableEntry 4 }
+
+enclosureFanSpeed OBJECT-TYPE            
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates the current relative speed of the fan in RPMs.
+        "
+    ::= { enclosureFanTableEntry 11 }
+
+enclosureFanComponentStatus OBJECT-TYPE    
+    SYNTAX          ObjectStatusEnum
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The status of the fan itself without the 
+        propagation of any contained component status.
+        Possible values:
+        1: Other.
+        2: Unknown.
+        3: OK.
+        4: Non-critical .
+        5: Critical.
+        6: Non-recoverable.
+        "
+    ::= { enclosureFanTableEntry 15 }
+
+enclosureFanFQDD OBJECT-TYPE
+    SYNTAX          FQDDString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The fan's Fully Qualified Device Descriptor (FQDD) 
+        as represented in Storage Management.
+        "
+    ::= { enclosureFanTableEntry 20 }
+
+enclosureFanDisplayName OBJECT-TYPE
+    SYNTAX          DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The fan's friendly FQDD as represented in 
+        Storage Management.
+        "
+    ::= { enclosureFanTableEntry 21 }
+
+
+
+
+-------------------------------------------------------------------------------
+-- Enclosure Power Supply Table
+--
+-- OID Format:.1.3.6.1.4.1.674.10892.2.6.1.20.130.9.1.<a>.<i1>
+-------------------------------------------------------------------------------
+EnclosurePowerSupplyTableEntry                 ::=SEQUENCE { 
+    enclosurePowerSupplyNumber                  INTEGER,
+    enclosurePowerSupplyName                    DisplayString,
+    enclosurePowerSupplyState                   INTEGER,
+    enclosurePowerSupplyPartNumber              DisplayString,
+    enclosurePowerSupplyComponentStatus         ObjectStatusEnum, 
+    enclosurePowerSupplyFQDD                    FQDDString,
+    enclosurePowerSupplyDisplayName             DisplayString
+}
+
+enclosurePowerSupplyTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF EnclosurePowerSupplyTableEntry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION
+        "A table of managed Power Supply Units(PSU) in the external 
+        storage enclosure(s). The number of entries is related to number 
+        of power supply unit(s) discovered in the enclosure(s). The 
+        maximum number of entries is implementation 
+        dependent.
+        Note: The properties in this table may not be applicable to all 
+        entries.
+        "
+    ::= { physicalDevices 9 }
+    
+enclosurePowerSupplyTableEntry OBJECT-TYPE
+    SYNTAX          EnclosurePowerSupplyTableEntry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION
+        "An entry in the power supply unit table. A row in this table cannot 
+        be created or deleted by SNMP operations on columns of the table.
+        "
+    INDEX { enclosurePowerSupplyNumber }
+    ::= { enclosurePowerSupplyTable 1 }
+
+enclosurePowerSupplyNumber OBJECT-TYPE
+    SYNTAX          INTEGER (1..255)
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Instance number of this power supply unit.
+        "
+    ::= { enclosurePowerSupplyTableEntry 1 }
+
+enclosurePowerSupplyName OBJECT-TYPE        
+    SYNTAX          DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The power supply unit's name as represented in 
+        Storage Management.
+        "
+    ::= { enclosurePowerSupplyTableEntry 2 }
+
+enclosurePowerSupplyState OBJECT-TYPE        
+    SYNTAX          INTEGER
+                    {
+                    unknown(1),
+                    ready(2),
+                    failed(3),
+                    missing(4),
+                    degraded(5)
+                    }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The current state of this power supply unit.
+        Possible states:
+        1: The current state could not be determined.
+        2: The power supply unit is operating normally.
+        3: The power supply unit has encountered a hardware problem 
+        or is not responding.
+        4: The power supply unit is no longer connected to the enclosure 
+        or there exists a problem communicating to it.
+        5: The power supply unit is unstable.
+        "
+    ::= { enclosurePowerSupplyTableEntry 4 }
+
+enclosurePowerSupplyPartNumber OBJECT-TYPE        
+    SYNTAX          DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The part number of the power supply unit. 
+        "
+    ::= { enclosurePowerSupplyTableEntry 7 }
+
+enclosurePowerSupplyComponentStatus OBJECT-TYPE     
+    SYNTAX          ObjectStatusEnum
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The status of the power supply unit itself without the 
+        propagation of any contained component status.
+        Possible values:
+        1: Other.
+        2: Unknown.
+        3: OK.
+        4: Non-critical .
+        5: Critical.
+        6: Non-recoverable.
+        "
+    ::= { enclosurePowerSupplyTableEntry 9 }
+
+enclosurePowerSupplyFQDD OBJECT-TYPE        
+    SYNTAX          FQDDString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The power supply unit's Fully Qualified Device Descriptor (FQDD)
+        as represented in Storage Management.
+        "
+    ::= { enclosurePowerSupplyTableEntry 15 }
+
+enclosurePowerSupplyDisplayName OBJECT-TYPE    
+    SYNTAX          DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The power supply unit's friendly FQDD as represented in 
+        Storage Management.
+        "
+    ::= { enclosurePowerSupplyTableEntry 16 }
+
+
+-------------------------------------------------------------------------------
+-- Enclosure Temperature Probe Table
+--
+-- OID Format:.1.3.6.1.4.1.674.10892.2.6.1.20.130.11.1.<a>.<i1>
+-------------------------------------------------------------------------------
+EnclosureTemperatureProbeTableEntry             ::=SEQUENCE { 
+    enclosureTemperatureProbeNumber             INTEGER,
+    enclosureTemperatureProbeName               DisplayString,
+    enclosureTemperatureProbeState              INTEGER,
+    enclosureTemperatureProbeMinWarningValue    INTEGER,
+    enclosureTemperatureProbeMinCriticalValue   INTEGER,
+    enclosureTemperatureProbeMaxWarningValue    INTEGER,
+    enclosureTemperatureProbeMaxCriticalValue   INTEGER,
+    enclosureTemperatureProbeCurValue           INTEGER,
+    enclosureTemperatureProbeComponentStatus    ObjectStatusEnum, 
+    enclosureTemperatureProbeFQDD               FQDDString,
+    enclosureTemperatureProbeDisplayName        DisplayString
+}
+
+enclosureTemperatureProbeTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF EnclosureTemperatureProbeTableEntry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION
+        "A table of managed temperature probes in the external storage
+        enclosure(s). The number of entries is related to number of 
+        temperature probes discovered in the enclosure(s). The maximum 
+        number of entries is implementation dependent.
+        Note: The properties in this table may not be applicable to all 
+        entries.
+        "
+    ::= { physicalDevices 11 }
+    
+enclosureTemperatureProbeTableEntry OBJECT-TYPE
+    SYNTAX          EnclosureTemperatureProbeTableEntry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION
+        "An entry in the temperature probe table. A row in this table cannot be
+        created or deleted by SNMP operations on columns of the table.
+        "
+    INDEX { enclosureTemperatureProbeNumber }
+    ::= { enclosureTemperatureProbeTable 1 }
+
+enclosureTemperatureProbeNumber OBJECT-TYPE
+    SYNTAX          INTEGER (1..255)
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Instance number of this temperature probe.
+        "
+    ::= { enclosureTemperatureProbeTableEntry 1 }
+
+enclosureTemperatureProbeName OBJECT-TYPE        
+    SYNTAX          DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The temperature probe's name as represented in 
+        Storage Management.
+        "
+    ::= { enclosureTemperatureProbeTableEntry 2 }
+
+enclosureTemperatureProbeState OBJECT-TYPE    
+    SYNTAX          INTEGER
+                    {
+                    unknown(1),
+                    ready(2),
+                    failed(3),
+                    missing(4),
+                    degraded(5),
+                    overWarning(6),
+                    underWarning(7)
+                    }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The current state of this temperature probe.
+        Possible states:
+        1: The current state could not be determined.
+        2: The temperature probe is operating normally.
+        3: The temperature probe has encountered a hardware problem 
+        or is not responding.
+        4: The temperature probe is no longer connected to the enclosure 
+        or there exists a problem communicating to it.
+        5: The temperature probe is unstable.
+        6: The temperature probe is Over Warning Temperature.
+        7: The temperature probe is Under Warning Temperature.
+        "
+    ::= { enclosureTemperatureProbeTableEntry 4 }
+
+enclosureTemperatureProbeMinWarningValue OBJECT-TYPE    
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The minimum temperature that will force the probe into
+        a warning state.
+        "
+    ::= { enclosureTemperatureProbeTableEntry 7 }
+
+enclosureTemperatureProbeMinCriticalValue OBJECT-TYPE    
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The minimum temperature that will force the probe into
+        a error state.
+        "
+    ::= { enclosureTemperatureProbeTableEntry 8 }
+
+enclosureTemperatureProbeMaxWarningValue OBJECT-TYPE    
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The maximum temperature that will force the probe into
+        a warning state.
+        "
+    ::= { enclosureTemperatureProbeTableEntry 9 }
+
+enclosureTemperatureProbeMaxCriticalValue OBJECT-TYPE    
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The maximum temperature that will force the probe into
+        a warning state.
+        "
+    ::= { enclosureTemperatureProbeTableEntry 10 }
+    
+enclosureTemperatureProbeCurValue OBJECT-TYPE        
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The maximum temperature that will force the probe into
+        a warning state.
+        "
+    ::= { enclosureTemperatureProbeTableEntry 11 }
+
+enclosureTemperatureProbeComponentStatus OBJECT-TYPE
+    SYNTAX          ObjectStatusEnum
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The status of the enclosure management module.itself without the 
+        propagation of any contained component status.
+        Possible values:
+        1: Other.
+        2: Unknown.
+        3: OK.
+        4: Non-critical .
+        5: Critical.
+        6: Non-recoverable.
+        "
+    ::= { enclosureTemperatureProbeTableEntry 13 }    
+    
+enclosureTemperatureProbeFQDD OBJECT-TYPE
+    SYNTAX          FQDDString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The temperature probe's Fully Qualified Device Descriptor (FQDD)
+        as represented in Storage Management.
+        "
+    ::= { enclosureTemperatureProbeTableEntry 15 }
+    
+enclosureTemperatureProbeDisplayName OBJECT-TYPE    
+    SYNTAX          DisplayString
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "The temperature probe's friendly FQDD as represented 
+        in Storage Management.
+        "
+    ::= { enclosureTemperatureProbeTableEntry 16 }
+
+
 	-------------------------------------------------------------------------------
 	-- group: Chassis Alerts 1
 	-------------------------------------------------------------------------------
@@ -1106,7 +3991,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Status Events"
         --#STATE      OPERATIONAL
         --#STATUS     MANDATORY
@@ -1131,7 +4016,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Status Events"
         --#STATE      DEGRADED
         --#STATUS     MANDATORY
@@ -1156,7 +4041,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Error Events"
         --#STATE      DEGRADED
         --#STATUS     MANDATORY
@@ -1189,7 +4074,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Status Events"
         --#STATE      OPERATIONAL
         --#STATUS     MANDATORY
@@ -1214,7 +4099,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Status Events"
         --#STATE      DEGRADED
         --#STATUS     MANDATORY
@@ -1239,7 +4124,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Error Events"
         --#STATE      DEGRADED
         --#STATUS     MANDATORY
@@ -1271,7 +4156,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Error Events"
         --#STATE      DEGRADED
         --#STATUS     MANDATORY
@@ -1303,7 +4188,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Status Events"
         --#STATE      DEGRADED
         --#STATUS     MANDATORY
@@ -1328,7 +4213,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Error Events"
         --#STATE      DEGRADED
         --#STATUS     MANDATORY
@@ -1360,7 +4245,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Status Events"
         --#STATE      OPERATIONAL
         --#STATUS     MANDATORY
@@ -1385,7 +4270,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Status Events"
         --#STATE      DEGRADED
         --#STATUS     MANDATORY
@@ -1410,7 +4295,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Error Events"
         --#STATE      DEGRADED
         --#STATUS     MANDATORY
@@ -1442,7 +4327,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Status Events"
         --#STATE      OPERATIONAL
         --#STATUS     MANDATORY
@@ -1467,7 +4352,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Status Events"
         --#STATE      DEGRADED
         --#STATUS     MANDATORY
@@ -1492,7 +4377,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Error Events"
         --#STATE      DEGRADED
         --#STATUS     MANDATORY
@@ -1524,7 +4409,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Status Events"
         --#STATE      OPERATIONAL
         --#STATUS     MANDATORY
@@ -1549,7 +4434,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Status Events"
         --#STATE      DEGRADED
         --#STATUS     MANDATORY
@@ -1574,7 +4459,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Error Events"
         --#STATE      DEGRADED
         --#STATUS     MANDATORY
@@ -1606,7 +4491,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Status Events"
         --#STATE      OPERATIONAL
         --#STATUS     MANDATORY
@@ -1631,7 +4516,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Status Events"
         --#STATE      DEGRADED
         --#STATUS     MANDATORY
@@ -1656,7 +4541,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Error Events"
         --#STATE      DEGRADED
         --#STATUS     MANDATORY
@@ -1688,7 +4573,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Status Events"
         --#STATE      OPERATIONAL
         --#STATUS     MANDATORY
@@ -1713,7 +4598,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Status Events"
         --#STATE      DEGRADED
         --#STATUS     MANDATORY
@@ -1738,7 +4623,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Error Events"
         --#STATE      DEGRADED
         --#STATUS     MANDATORY
@@ -1770,7 +4655,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Status Events"
         --#STATE      OPERATIONAL
         --#STATUS     MANDATORY
@@ -1795,7 +4680,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Status Events"
         --#STATE      DEGRADED
         --#STATUS     MANDATORY
@@ -1820,11 +4705,36 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Error Events"
         --#STATE      DEGRADED
         --#STATUS     MANDATORY
         ::= 2185
+
+    alert2PowerSupplyRedundancyPolicyChanged TRAP-TYPE
+        ENTERPRISE  drsCMCAlert2Group
+        VARIABLES { drsCA2MessageID,
+                    drsCA2Message,
+                    drsCA2MessageArgs,
+                    drsCA2AlertStatus,
+                    drsCA2FQDD,
+                    drsProductChassisName,
+                    drsProductChassisLocation,
+                    drsChassisServiceTag,
+                    drsGlobalCurrStatus }
+        DESCRIPTION
+             "PSU redundancy policy changed."
+        --#TYPE       "System: Power Supply Redundancy policy changed"
+        --#SEVERITY   INFORMATIONAL
+        --#SUMMARY    "Message ID: %s, Message: %s,"
+        --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
+        --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
+        --#SUMMARY    "Chassis Location: %s, Global Status: %d"
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
+        --#CATEGORY   "Status Events"
+        --#STATE      OPERATIONAL
+        --#STATUS     MANDATORY
+        ::= 8331
 
     ------------------------------------------------------------------------------
     -- Chassis Alerts 2: System: Power Supply Absent Traps
@@ -1852,7 +4762,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Error Events"
         --#STATE      DEGRADED
         --#STATUS     MANDATORY
@@ -1884,7 +4794,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Status Events"
         --#STATE      OPERATIONAL
         --#STATUS     MANDATORY
@@ -1909,11 +4819,36 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Status Events"
         --#STATE      DEGRADED
         --#STATUS     MANDATORY
         ::= 2274
+
+    alert2PowerUsageFailure TRAP-TYPE
+        ENTERPRISE  drsCMCAlert2Group
+        VARIABLES { drsCA2MessageID,
+                    drsCA2Message,
+                    drsCA2MessageArgs,
+                    drsCA2AlertStatus,
+                    drsCA2FQDD,
+                    drsProductChassisName,
+                    drsProductChassisLocation,
+                    drsChassisServiceTag,
+                    drsGlobalCurrStatus }
+        DESCRIPTION
+            "Power usage failure."
+        --#TYPE       "System: Power Usage Failure"
+        --#SEVERITY   CRITICAL
+        --#SUMMARY    "Message ID: %s, Message: %s,"
+        --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
+        --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
+        --#SUMMARY    "Chassis Location: %s, Global Status: %d"
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
+        --#CATEGORY   "Error Events"
+        --#STATE      DEGRADED
+        --#STATUS     MANDATORY
+        ::= 2273
 
     ------------------------------------------------------------------------------
     -- Chassis Alerts 2: System: Redundancy Traps
@@ -1941,7 +4876,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Status Events"
         --#STATE      OPERATIONAL
         --#STATUS     MANDATORY
@@ -1966,7 +4901,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Status Events"
         --#STATE      DEGRADED
         --#STATUS     MANDATORY
@@ -1991,7 +4926,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Error Events"
         --#STATE      DEGRADED
         --#STATUS     MANDATORY
@@ -2023,7 +4958,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Status Events"
         --#STATE      OPERATIONAL
         --#STATUS     MANDATORY
@@ -2048,7 +4983,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Status Events"
         --#STATE      OPERATIONAL
         --#STATUS     MANDATORY
@@ -2073,7 +5008,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Error Events"
         --#STATE      OPERATIONAL
         --#STATUS     MANDATORY
@@ -2105,7 +5040,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Status Events"
         --#STATE      OPERATIONAL
         --#STATUS     MANDATORY
@@ -2130,7 +5065,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Status Events"
         --#STATE      DEGRADED
         --#STATUS     MANDATORY
@@ -2155,7 +5090,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Error Events"
         --#STATE      OPERATIONAL
         --#STATUS     MANDATORY
@@ -2187,7 +5122,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Status Events"
         --#STATE      OPERATIONAL
         --#STATUS     MANDATORY
@@ -2212,11 +5147,36 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Status Events"
         --#STATE      DEGRADED
         --#STATUS     MANDATORY
         ::= 2338
+
+    alert2SoftwareConfigurationFailure TRAP-TYPE
+        ENTERPRISE  drsCMCAlert2Group
+        VARIABLES { drsCA2MessageID,
+                    drsCA2Message,
+                    drsCA2MessageArgs,
+                    drsCA2AlertStatus,
+                    drsCA2FQDD,
+                    drsProductChassisName,
+                    drsProductChassisLocation,
+                    drsChassisServiceTag,
+                    drsGlobalCurrStatus }
+        DESCRIPTION
+            "Software configuration failure."
+        --#TYPE       "System: Software Configuration Failure"
+        --#SEVERITY   CRITICAL
+        --#SUMMARY    "Message ID: %s, Message: %s,"
+        --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
+        --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
+        --#SUMMARY    "Chassis Location: %s, Global Status: %d"
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
+        --#CATEGORY   "Error Events"
+        --#STATE      DEGRADED
+        --#STATUS     MANDATORY
+        ::= 2337
 
     ------------------------------------------------------------------------------
     -- Chassis Alerts 2: System: Temperature Probe Traps
@@ -2244,7 +5204,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Status Events"
         --#STATE      OPERATIONAL
         --#STATUS     MANDATORY
@@ -2269,7 +5229,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Status Events"
         --#STATE      DEGRADED
         --#STATUS     MANDATORY
@@ -2294,11 +5254,61 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Error Events"
         --#STATE      DEGRADED
         --#STATUS     MANDATORY
         ::= 2161
+
+    alert2IOMTemperatureExceeded TRAP-TYPE
+        ENTERPRISE  drsCMCAlert2Group
+        VARIABLES { drsCA2MessageID,
+                    drsCA2Message,
+                    drsCA2MessageArgs,
+                    drsCA2AlertStatus,
+                    drsCA2FQDD,
+                    drsProductChassisName,
+                    drsProductChassisLocation,
+                    drsChassisServiceTag,
+                    drsGlobalCurrStatus }
+        DESCRIPTION
+            "I/O Module <iom slot name> temperature exceeded operating range."
+        --#TYPE       "System: Temperature Failure"
+        --#SEVERITY   CRITICAL
+        --#SUMMARY    "Message ID: %s, Message: %s,"
+        --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
+        --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
+        --#SUMMARY    "Chassis Location: %s, Global Status: %d"
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
+        --#CATEGORY   "Error Events"
+        --#STATE      DEGRADED
+        --#STATUS     MANDATORY
+        ::= 8305
+
+    alert2Unable2ReadTemperatureSensors TRAP-TYPE
+        ENTERPRISE  drsCMCAlert2Group
+        VARIABLES { drsCA2MessageID,
+                    drsCA2Message,
+                    drsCA2MessageArgs,
+                    drsCA2AlertStatus,
+                    drsCA2FQDD,
+                    drsProductChassisName,
+                    drsProductChassisLocation,
+                    drsChassisServiceTag,
+                    drsGlobalCurrStatus }
+        DESCRIPTION
+            "Unable to read planar board temperature sensors. The cooling has been increased to safeguard the system."
+        --#TYPE       "System: Temperature Failure"
+        --#SEVERITY   MINOR
+        --#SUMMARY    "Message ID: %s, Message: %s,"
+        --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
+        --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
+        --#SUMMARY    "Chassis Location: %s, Global Status: %d"
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
+        --#CATEGORY   "Error Events"
+        --#STATE      DEGRADED
+        --#STATUS     MANDATORY
+        ::= 8306
 
     ------------------------------------------------------------------------------
     -- Chassis Alerts 2: System: Voltage Probe Traps
@@ -2326,7 +5336,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Status Events"
         --#STATE      OPERATIONAL
         --#STATUS     MANDATORY
@@ -2351,7 +5361,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Status Events"
         --#STATE      DEGRADED
         --#STATUS     MANDATORY
@@ -2376,7 +5386,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Error Events"
         --#STATE      DEGRADED
         --#STATUS     MANDATORY
@@ -2408,7 +5418,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Error Events"
         --#STATE      OPERATIONAL
         --#STATUS     MANDATORY
@@ -2433,7 +5443,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Error Events"
         --#STATE      DEGRADED
         --#STATUS     MANDATORY
@@ -2458,7 +5468,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Error Events"
         --#STATE      FAILED
         --#STATUS     MANDATORY
@@ -2490,7 +5500,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Error Events"
         --#STATE      OPERATIONAL
         --#STATUS     MANDATORY
@@ -2515,7 +5525,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Error Events"
         --#STATE      DEGRADED
         --#STATUS     MANDATORY
@@ -2540,7 +5550,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Error Events"
         --#STATE      FAILED
         --#STATUS     MANDATORY
@@ -2572,7 +5582,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Error Events"
         --#STATE      OPERATIONAL
         --#STATUS     MANDATORY
@@ -2597,7 +5607,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Error Events"
         --#STATE      DEGRADED
         --#STATUS     MANDATORY
@@ -2622,7 +5632,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Error Events"
         --#STATE      FAILED
         --#STATUS     MANDATORY
@@ -2654,7 +5664,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Error Events"
         --#STATE      OPERATIONAL
         --#STATUS     MANDATORY
@@ -2679,7 +5689,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Status Events"
         --#STATE      DEGRADED
         --#STATUS     MANDATORY
@@ -2704,7 +5714,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Error Events"
         --#STATE      FAILED
         --#STATUS     MANDATORY
@@ -2736,7 +5746,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Error Events"
         --#STATE      OPERATIONAL
         --#STATUS     MANDATORY
@@ -2761,7 +5771,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Error Events"
         --#STATE      DEGRADED
         --#STATUS     MANDATORY
@@ -2786,7 +5796,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Error Events"
         --#STATE      FAILED
         --#STATUS     MANDATORY
@@ -2818,7 +5828,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Error Events"
         --#STATE      OPERATIONAL
         --#STATUS     MANDATORY
@@ -2843,7 +5853,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Error Events"
         --#STATE      DEGRADED
         --#STATUS     MANDATORY
@@ -2868,11 +5878,93 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Error Events"
         --#STATE      FAILED
         --#STATUS     MANDATORY
         ::= 4233
+
+    ------------------------------------------------------------------------------
+    -- Chassis Alerts 2: Storage: Security Event Traps
+    --
+    -- Category: Storage/2
+    -- Subcategory: SEC/42
+    ------------------------------------------------------------------------------
+
+    alert2StorageSecurityInformation TRAP-TYPE
+        ENTERPRISE  drsCMCAlert2Group
+        VARIABLES { drsCA2MessageID,
+                    drsCA2Message,
+                    drsCA2MessageArgs,
+                    drsCA2AlertStatus,
+                    drsCA2FQDD,
+                    drsProductChassisName,
+                    drsProductChassisLocation,
+                    drsChassisServiceTag,
+                    drsGlobalCurrStatus }
+        DESCRIPTION
+            "Storage Security information."
+        --#TYPE       "Storage: Security Information"
+        --#SEVERITY   INFORMATIONAL
+        --#SUMMARY    "Message ID: %s, Message: %s,"
+        --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
+        --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
+        --#SUMMARY    "Chassis Location: %s, Global Status: %d"
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
+        --#CATEGORY   "Status Events"
+        --#STATE      OPERATIONAL
+        --#STATUS     MANDATORY
+        ::= 4435
+
+    alert2StorageSecurityWarning TRAP-TYPE
+        ENTERPRISE  drsCMCAlert2Group
+        VARIABLES { drsCA2MessageID,
+                    drsCA2Message,
+                    drsCA2MessageArgs,
+                    drsCA2AlertStatus,
+                    drsCA2FQDD,
+                    drsProductChassisName,
+                    drsProductChassisLocation,
+                    drsChassisServiceTag,
+                    drsGlobalCurrStatus }
+        DESCRIPTION
+            "Storage Security warning."
+        --#TYPE       "Storage: Security Warning"
+        --#SEVERITY   MINOR
+        --#SUMMARY    "Message ID: %s, Message: %s,"
+        --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
+        --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
+        --#SUMMARY    "Chassis Location: %s, Global Status: %d"
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
+        --#CATEGORY   "Status Events"
+        --#STATE      OPERATIONAL
+        --#STATUS     MANDATORY
+        ::= 4434
+
+    alert2StorageSecurityFailure TRAP-TYPE
+        ENTERPRISE  drsCMCAlert2Group
+        VARIABLES { drsCA2MessageID,
+                    drsCA2Message,
+                    drsCA2MessageArgs,
+                    drsCA2AlertStatus,
+                    drsCA2FQDD,
+                    drsProductChassisName,
+                    drsProductChassisLocation,
+                    drsChassisServiceTag,
+                    drsGlobalCurrStatus }
+        DESCRIPTION
+            "Storage Security failure or critical event."
+        --#TYPE       "Storage: Security Failure"
+        --#SEVERITY   CRITICAL
+        --#SUMMARY    "Message ID: %s, Message: %s,"
+        --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
+        --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
+        --#SUMMARY    "Chassis Location: %s, Global Status: %d"
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
+        --#CATEGORY   "Error Events"
+        --#STATE      OPERATIONAL
+        --#STATUS     MANDATORY
+        ::= 4433
 
     ------------------------------------------------------------------------------
     -- Chassis Alerts 2: Storage: Storage Management Status Traps
@@ -2901,7 +5993,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Error Events"
         --#STATE      OPERATIONAL
         --#STATUS     MANDATORY
@@ -2928,7 +6020,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Error Events"
         --#STATE      DEGRADED
         --#STATUS     MANDATORY
@@ -2954,7 +6046,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Error Events"
         --#STATE      FAILED
         --#STATUS     MANDATORY
@@ -2986,7 +6078,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Error Events"
         --#STATE      OPERATIONAL
         --#STATUS     MANDATORY
@@ -3011,7 +6103,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Error Events"
         --#STATE      DEGRADED
         --#STATUS     MANDATORY
@@ -3036,7 +6128,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Error Events"
         --#STATE      FAILED
         --#STATUS     MANDATORY
@@ -3068,7 +6160,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Error Events"
         --#STATE      OPERATIONAL
         --#STATUS     MANDATORY
@@ -3093,7 +6185,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Error Events"
         --#STATE      DEGRADED
         --#STATUS     MANDATORY
@@ -3118,11 +6210,43 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Error Events"
         --#STATE      FAILED
         --#STATUS     MANDATORY
         ::= 4353
+
+    ------------------------------------------------------------------------------
+    -- Chassis Alerts 2: Updates: Software Change Traps
+    --
+    -- Category: Updates/3
+    -- Subcategory: SWU/21
+    ------------------------------------------------------------------------------
+
+    alert2SoftwareChangeUpdateWarning TRAP-TYPE
+        ENTERPRISE  drsCMCAlert2Group
+        VARIABLES { drsCA2MessageID,
+                    drsCA2Message,
+                    drsCA2MessageArgs,
+                    drsCA2AlertStatus,
+                    drsCA2FQDD,
+                    drsProductChassisName,
+                    drsProductChassisLocation,
+                    drsChassisServiceTag,
+                    drsGlobalCurrStatus }
+        DESCRIPTION
+            "Software change update warning."
+        --#TYPE       "Updates: Software Change Warning"
+        --#SEVERITY   MINOR
+        --#SUMMARY    "Message ID: %s, Message: %s,"
+        --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
+        --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
+        --#SUMMARY    "Chassis Location: %s, Global Status: %d"
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
+        --#CATEGORY   "Status Events"
+        --#STATE      DEGRADED
+        --#STATUS     MANDATORY
+        ::= 6314
 
     ------------------------------------------------------------------------------
     -- Chassis Alerts 2: Audit: CMC Traps
@@ -3150,7 +6274,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Status Events"
         --#STATE      OPERATIONAL
         --#STATUS     MANDATORY
@@ -3175,7 +6299,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Status Events"
         --#STATE      DEGRADED
         --#STATUS     MANDATORY
@@ -3200,7 +6324,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Error Events"
         --#STATE      DEGRADED
         --#STATUS     MANDATORY
@@ -3232,7 +6356,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Status Events"
         --#STATE      DEGRADED
         --#STATUS     MANDATORY
@@ -3264,7 +6388,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Status Events"
         --#STATE      OPERATIONAL
         --#STATUS     MANDATORY
@@ -3289,7 +6413,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Status Events"
         --#STATE      DEGRADED
         --#STATUS     MANDATORY
@@ -3314,7 +6438,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Error Events"
         --#STATE      DEGRADED
         --#STATUS     MANDATORY
@@ -3346,7 +6470,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Status Events"
         --#STATE      DEGRADED
         --#STATUS     MANDATORY
@@ -3378,7 +6502,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Status Events"
         --#STATE      DEGRADED
         --#STATUS     MANDATORY
@@ -3403,7 +6527,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Error Events"
         --#STATE      DEGRADED
         --#STATUS     MANDATORY
@@ -3415,6 +6539,31 @@ IMPORTS
     -- Category: Audit/4
     -- Subcategory: PWR/28
     ------------------------------------------------------------------------------
+
+    alert2PowerUsageAuditInformation TRAP-TYPE
+        ENTERPRISE  drsCMCAlert2Group
+        VARIABLES { drsCA2MessageID,
+                    drsCA2Message,
+                    drsCA2MessageArgs,
+                    drsCA2AlertStatus,
+                    drsCA2FQDD,
+                    drsProductChassisName,
+                    drsProductChassisLocation,
+                    drsChassisServiceTag,
+                    drsGlobalCurrStatus }
+        DESCRIPTION
+            "Power usage audit information."
+        --#TYPE       "Audit: Power Usage Information"
+        --#SEVERITY   INFORMATIONAL
+        --#SUMMARY    "Message ID: %s, Message: %s,"
+        --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
+        --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
+        --#SUMMARY    "Chassis Location: %s, Global Status: %d"
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
+        --#CATEGORY   "Status Events"
+        --#STATE      OPERATIONAL
+        --#STATUS     MANDATORY
+        ::= 8419
 
     alert2PowerUsageAuditWarning TRAP-TYPE
         ENTERPRISE  drsCMCAlert2Group
@@ -3435,7 +6584,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Status Events"
         --#STATE      DEGRADED
         --#STATUS     MANDATORY
@@ -3460,7 +6609,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Error Events"
         --#STATE      DEGRADED
         --#STATUS     MANDATORY
@@ -3492,7 +6641,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Error Events"
         --#STATE      DEGRADED
         --#STATUS     MANDATORY
@@ -3524,7 +6673,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Status Events"
         --#STATE      OPERATIONAL
         --#STATUS     MANDATORY
@@ -3549,7 +6698,7 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Status Events"
         --#STATE      DEGRADED
         --#STATUS     MANDATORY
@@ -3581,11 +6730,68 @@ IMPORTS
         --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
         --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
         --#SUMMARY    "Chassis Location: %s, Global Status: %d"
-        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 8}
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
         --#CATEGORY   "Status Events"
         --#STATE      OPERATIONAL
         --#STATUS     MANDATORY
         ::= 10611
+
+    ------------------------------------------------------------------------------
+    -- Chassis Alerts 2: Configuration: Software Configuration Traps
+    --
+    -- Category: Configuration/5
+    -- Subcategory: SWC/36
+    ------------------------------------------------------------------------------
+
+    alert2SWCConfigurationWarning TRAP-TYPE
+        ENTERPRISE  drsCMCAlert2Group
+        VARIABLES { drsCA2MessageID,
+                    drsCA2Message,
+                    drsCA2MessageArgs,
+                    drsCA2AlertStatus,
+                    drsCA2FQDD,
+                    drsProductChassisName,
+                    drsProductChassisLocation,
+                    drsChassisServiceTag,
+                    drsGlobalCurrStatus }
+        DESCRIPTION
+            "Software configuration warning."
+        --#TYPE       "Configuration: Software Configuration Warning"
+        --#SEVERITY   MINOR
+        --#SUMMARY    "Message ID: %s, Message: %s,"
+        --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
+        --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
+        --#SUMMARY    "Chassis Location: %s, Global Status: %d"
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
+        --#CATEGORY   "Status Events"
+        --#STATE      DEGRADED
+        --#STATUS     MANDATORY
+        ::= 10530
+
+    alert2SWCConfigurationFailure TRAP-TYPE
+        ENTERPRISE  drsCMCAlert2Group
+        VARIABLES { drsCA2MessageID,
+                    drsCA2Message,
+                    drsCA2MessageArgs,
+                    drsCA2AlertStatus,
+                    drsCA2FQDD,
+                    drsProductChassisName,
+                    drsProductChassisLocation,
+                    drsChassisServiceTag,
+                    drsGlobalCurrStatus }
+        DESCRIPTION
+            "Software configuration failure."
+        --#TYPE       "Configuration: Software Configuration Failure"
+        --#SEVERITY   CRITICAL
+        --#SUMMARY    "Message ID: %s, Message: %s,"
+        --#SUMMARY    "Device Status: %d, Device FQDD: %s,"
+        --#SUMMARY    "Chassis Service Tag: %s, Chassis Name: %s,"
+        --#SUMMARY    "Chassis Location: %s, Global Status: %d"
+        --#ARGUMENTS  {0, 1, 3, 4, 7, 5, 6, 8}
+        --#CATEGORY   "Error Events"
+        --#STATE      DEGRADED
+        --#STATUS     MANDATORY
+        ::= 10529
 
     ------------------------------------------------------------------------------
     -- Chassis Alerts 2: Configuration: Test Traps

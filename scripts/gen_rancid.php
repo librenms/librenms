@@ -41,6 +41,7 @@ $rancid_map['pfsense']    = 'pfsense';
 $rancid_map['procurve']   = 'hp';
 $rancid_map['nxos']       = 'cisco-nx';
 $rancid_map['mikrotik']   = 'mikrotik';
+$rancid_map['routeros']   = 'mikrotik';
 $rancid_map['screenos']   = 'netscreen';
 $rancid_map['xos']        = 'extreme';
 $rancid_map['ciscosb']    = 'cisco-sb';

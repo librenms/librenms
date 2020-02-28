@@ -138,7 +138,7 @@ function snmp_translate_number($oid, $mib = null, $mibdir = null)
         return ltrim($oid, '.');
     }
 
-    $cmd = "snmptranslate -IR -On $oid";
+    $cmd = "snmptranslate -IR -On '$oid'";
     $cmd .= ' -M ' . (isset($mibdir) ? Config::get('mib_dir') . ":" . Config::get('mib_dir') . "/$mibdir" : Config::get('mib_dir'));
     if (isset($mib) && $mib) {
         $cmd .= " -m $mib";

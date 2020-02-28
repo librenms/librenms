@@ -232,13 +232,10 @@ function poll_device($device, $force_module = false)
 
     $device_start = microtime(true);
 
-    $attribs = get_dev_attribs($device['device_id']);
+    $attribs = DeviceCache::getPrimary()->getAttribs();
     $device['attribs'] = $attribs;
 
     load_os($device);
-
-    $device['snmp_max_repeaters'] = $attribs['snmp_max_repeaters'];
-    $device['snmp_max_oid'] = $attribs['snmp_max_oid'];
 
     unset($array);
 
@@ -246,11 +243,20 @@ function poll_device($device, $force_module = false)
     echo 'Hostname:    ' . $device['hostname'] . PHP_EOL;
     echo 'Device ID:   ' . $device['device_id'] . PHP_EOL;
     echo 'OS:          ' . $device['os'] . PHP_EOL;
-    $ip = dnslookup($device);
+
+    if (empty($device['overwrite_ip'])) {
+        $ip = dnslookup($device);
+    } else {
+        $ip = $device['overwrite_ip'];
+    }
 
     $db_ip = null;
     if (!empty($ip)) {
-        echo 'Resolved IP: '.$ip.PHP_EOL;
+        if (empty($device['overwrite_ip'])) {
+            echo 'Resolved IP: '.$ip.PHP_EOL;
+        } else {
+            echo 'Assigned IP: '.$ip.PHP_EOL;
+        }
         $db_ip = inet_pton($ip);
     }
 

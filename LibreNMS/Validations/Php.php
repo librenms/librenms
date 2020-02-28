@@ -79,7 +79,7 @@ class Php extends BaseValidation
 
     private function checkExtensions(Validator $validator)
     {
-        $required_modules = ['mysqlnd', 'mbstring', 'pcre', 'curl', 'session', 'xml', 'gd'];
+        $required_modules = ['mysqlnd', 'mbstring', 'pcre', 'curl', 'session', 'xml', 'gd', 'sockets'];
 
         if (Config::get('distributed_poller')) {
             $required_modules[] = 'memcached';

@@ -47,6 +47,8 @@ return [
         'JUNIPER-LDP-MIB::jnxLdpLspUp' => \LibreNMS\Snmptrap\Handlers\JnxLdpLspUp::class,
         'JUNIPER-LDP-MIB::jnxLdpSesDown' => \LibreNMS\Snmptrap\Handlers\JnxLdpSesDown::class,
         'JUNIPER-LDP-MIB::jnxLdpSesUp' => \LibreNMS\Snmptrap\Handlers\JnxLdpSesUp::class,
+        'JUNIPER-MIB::jnxPowerSupplyFailure' => \LibreNMS\Snmptrap\Handlers\JnxPowerSupplyFailure::class,
+        'JUNIPER-MIB::jnxPowerSupplyOk' => \LibreNMS\Snmptrap\Handlers\JnxPowerSupplyOk::class,
         'JUNIPER-VPN-MIB::jnxVpnIfDown' => \LibreNMS\Snmptrap\Handlers\JnxVpnIfDown::class,
         'JUNIPER-VPN-MIB::jnxVpnIfUp' => \LibreNMS\Snmptrap\Handlers\JnxVpnIfUp::class,
         'JUNIPER-VPN-MIB::jnxVpnPwDown' => \LibreNMS\Snmptrap\Handlers\JnxVpnPwDown::class,
@@ -70,5 +72,10 @@ return [
         'RUCKUS-SZ-EVENT-MIB::ruckusSZClusterBackToInServiceTrap' => \LibreNMS\Snmptrap\Handlers\RuckusSzClusterInService::class,
         'SNMPv2-MIB::authenticationFailure' => \LibreNMS\Snmptrap\Handlers\AuthenticationFailure::class,
         'SNMPv2-MIB::coldStart' => \LibreNMS\Snmptrap\Handlers\ColdBoot::class,
+        'VMWARE-VMINFO-MIB::vmwVmHBDetected' => \LibreNMS\Snmptrap\Handlers\VmwVmHBDetected::class,
+        'VMWARE-VMINFO-MIB::vmwVmHBLost' => \LibreNMS\Snmptrap\Handlers\VmwVmHBLost::class,
+        'VMWARE-VMINFO-MIB::vmwVmPoweredOn' => \LibreNMS\Snmptrap\Handlers\VmwVmPoweredOn::class,
+        'VMWARE-VMINFO-MIB::vmwVmPoweredOff' => \LibreNMS\Snmptrap\Handlers\VmwVmPoweredOff::class,
+        'VMWARE-VMINFO-MIB::vmwVmSuspended' => \LibreNMS\Snmptrap\Handlers\VmwVmSuspended::class,
     ]
 ];

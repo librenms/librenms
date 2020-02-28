@@ -4,7 +4,7 @@ $snmpdata = snmp_get_multi_oid($device, ['sysName.0', 'sysObjectID.0', 'sysDescr
 
 $core_update = array(
     'sysObjectID' => $snmpdata['.1.3.6.1.2.1.1.2.0'],
-    'sysName' => strtolower($snmpdata['.1.3.6.1.2.1.1.5.0']),
+    'sysName' => strtolower(trim($snmpdata['.1.3.6.1.2.1.1.5.0'])),
     'sysDescr' => $snmpdata['.1.3.6.1.2.1.1.1.0'],
 );
 

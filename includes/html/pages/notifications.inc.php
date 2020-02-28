@@ -22,7 +22,7 @@
  * @subpackage Notifications
  */
 
-use LibreNMS\Authentication\LegacyAuth;
+use App\Models\User;
 use LibreNMS\ObjectCache;
 
 $notifications = new ObjectCache('notifications');
@@ -35,7 +35,7 @@ $notifications = new ObjectCache('notifications');
 <?php
 echo '<strong class="count-notif">' . $notifications['count'] . '</strong> Unread Notifications ';
 
-if (LegacyAuth::user()->hasGlobalAdmin()) {
+if (Auth::user()->hasGlobalAdmin()) {
     echo '<button class="btn btn-success pull-right fa fa-plus new-notif" data-toggle="tooltip" data-placement="bottom" title="Create new notification" style="margin-top:-10px;"></button>';
 }
 
@@ -52,6 +52,7 @@ if ($notifications['count'] > 0 && !isset($vars['archive'])) {
   <div class="row">
     <div class="col-md-12">
       <form class="form-horizontal new-notif-form">
+        <?php echo csrf_field() ?>
         <div class="form-group">
           <label for="notif_title" class="col-sm-2 control-label">Title</label>
           <div class="col-sm-10">
@@ -87,9 +88,9 @@ foreach ($notifications['sticky'] as $notif) {
     echo "<strong><i class='fa fa-bell-o'></i>&nbsp;${notif['title']}</strong>";
     echo "<span class='pull-right'>";
 
-    if ($notif['user_id'] != LegacyAuth::id()) {
-        $sticky_user = LegacyAuth::get()->getUser($notif['user_id']);
-        echo "<code>Sticky by ${sticky_user['username']}</code>";
+    if ($notif['user_id'] != Auth::id()) {
+        $sticky_user = User::find($notif['user_id']);
+        echo "<code>Sticky by {$sticky_user->username}</code>";
     } else {
         echo '<button class="btn btn-primary fa fa-bell-slash-o unstick-notif" data-toggle="tooltip" data-placement="bottom" title="Remove Sticky" style="margin-top:-10px;"></button>';
     }
@@ -114,8 +115,8 @@ foreach ($notifications['sticky'] as $notif) {
 <?php
 foreach ($notifications['unread'] as $notif) {
     if (is_numeric($notif['source'])) {
-        $source_user = LegacyAuth::get()->getUser($notif['source']);
-        $notif['source'] = $source_user['username'];
+        $source_user = User::find($notif['source']);
+        $notif['source'] = $source_user->username;
     }
     echo '<div class="well"><div class="row"> <div class="col-md-12">';
     d_echo($notif);
@@ -127,7 +128,7 @@ foreach ($notifications['unread'] as $notif) {
     }
     echo "<h4 class='$class' id='${notif['notifications_id']}'>${notif['title']}<span class='pull-right'>";
 
-    if (LegacyAuth::user()->hasGlobalAdmin()) {
+    if (Auth::user()->hasGlobalAdmin()) {
         echo '<button class="btn btn-primary fa fa-bell-o stick-notif" data-toggle="tooltip" data-placement="bottom" title="Mark as Sticky" style="margin-top:-10px;"></button>';
     }
 ?>
@@ -170,7 +171,7 @@ foreach ($notifications['read'] as $notif) {
     }
     echo  " id='${notif['notifications_id']}'>${notif['title']}";
 
-    if (LegacyAuth::user()->isAdmin()) {
+    if (Auth::user()->isAdmin()) {
         echo '<span class="pull-right"><button class="btn btn-primary fa fa-bell-o stick-notif" data-toggle="tooltip" data-placement="bottom" title="Mark as Sticky" style="margin-top:-10px;"></button></span>';
     }
 ?>

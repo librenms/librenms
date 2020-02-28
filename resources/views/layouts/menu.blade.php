@@ -28,16 +28,30 @@
                         <li><a href="{{ url('overview') }}"><i class="fa fa-tv fa-fw fa-lg"
                                                                aria-hidden="true"></i> @lang('Dashboard')</a></li>
                         <li class="dropdown-submenu">
-                            <a href="{{ url('overview') }}"><i class="fa fa-map fa-fw fa-lg"
+                            <a><i class="fa fa-map fa-fw fa-lg"
                                                                aria-hidden="true"></i> @lang('Maps')</a>
                             <ul class="dropdown-menu">
                                 <li><a href="{{ url('availability-map') }}"><i class="fa fa-arrow-circle-up fa-fw fa-lg"
                                                                                aria-hidden="true"></i> @lang('Availability')
                                     </a></li>
+                                <li><a href="{{ url('maps/devicedependency') }}"><i class="fa fa-chain fa-fw fa-lg"
+                                                                  aria-hidden="true"></i> @lang('Device Dependency')</a></li>
+                                @if($device_groups->isNotEmpty())
+                                    <li class="dropdown-submenu"><a><i class="fa fa-chain fa-fw fa-lg"
+                                                                                aria-hidden="true"></i> @lang('Device Groups Dependencies')
+                                        </a>
+                                        <ul class="dropdown-menu scrollable-menu">
+                                        @foreach($device_groups as $group)
+                                            <li><a href="{{ url("maps/devicedependency?group=$group->id") }}" title="{{ $group->desc }}"><i class="fa fa-chain fa-fw fa-lg" aria-hidden="true"></i>
+                                                {{ ucfirst($group->name) }}
+                                            </a></li>
+                                        @endforeach
+                                    </ul></li>
+                                @endif
                                 <li><a href="{{ url('map') }}"><i class="fa fa-sitemap fa-fw fa-lg"
                                                                   aria-hidden="true"></i> @lang('Network')</a></li>
                                 @if($device_groups->isNotEmpty())
-                                    <li class="dropdown-submenu"><a href="#"><i class="fa fa-th fa-fw fa-lg"
+                                    <li class="dropdown-submenu"><a><i class="fa fa-th fa-fw fa-lg"
                                                                                 aria-hidden="true"></i> @lang('Device Groups Maps')
                                         </a>
                                         <ul class="dropdown-menu scrollable-menu">
@@ -71,7 +85,7 @@
                         </li>
                         @endif
                         <li class="dropdown-submenu">
-                            <a href="{{ url('overview') }}"><i class="fa fa-wrench fa-fw fa-lg"
+                            <a><i class="fa fa-wrench fa-fw fa-lg"
                                                                aria-hidden="true"></i> @lang('Tools')</a>
                             <ul class="dropdown-menu">
                                 <li><a href="{{ url('ripenccapi') }}"><i class="fa fa-star fa-fw fa-lg"
@@ -147,7 +161,7 @@
                     @endif
 
                     @if($device_groups->isNotEmpty())
-                            <li class="dropdown-submenu"><a href="#"><i class="fa fa-th fa-fw fa-lg"
+                            <li class="dropdown-submenu"><a><i class="fa fa-th fa-fw fa-lg"
                                                                         aria-hidden="true"></i> @lang('Device Groups')
                                 </a>
                             <ul class="dropdown-menu scrollable-menu">
@@ -161,7 +175,7 @@
                     @if($locations->isNotEmpty())
                         <li role="presentation" class="divider"></li>
                         <li class="dropdown-submenu">
-                            <a href="#"><i class="fa fa-map-marker fa-fw fa-lg" aria-hidden="true"></i> @lang('Geo Locations')</a>
+                            <a href="{{ url('locations') }}"><i class="fa fa-map-marker fa-fw fa-lg" aria-hidden="true"></i> @lang('Geo Locations')</a>
                             <ul class="dropdown-menu scrollable-menu">
                                 <li><a href="{{ url('locations') }}"><i class="fa fa-map-marker fa-fw fa-lg" aria-hidden="true"></i> @lang('All Locations')</a></li>
                             @foreach($locations as $location)
@@ -462,16 +476,20 @@
 
 {{-- User --}}
             <form role="search" class="navbar-form navbar-right global-search">
+                @csrf
                 <div class="form-group">
                     <input class="form-control typeahead" type="search" id="gsearch" name="gsearch"
-                           placeholder="Global Search" autocomplete="off">
+                           placeholder="@lang('Global Search')" autocomplete="off">
                 </div>
             </form>
             <ul class="nav navbar-nav navbar-right">
                 <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-user fa-fw fa-lg fa-nav-icons" aria-hidden="true"></i>
-                        <span class="visible-xs-inline-block">@lang('User')</span><span
-                            class="badge badge-navbar-user count-notif {{ $notification_count ? 'badge-danger' : 'badge-default' }}">{{ $notification_count }}</span></a>
+                    <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown">
+                        <i class="fa fa-user fa-fw fa-lg fa-nav-icons" aria-hidden="true"></i>
+                        <span class="badge badge-navbar-user count-notif {{ $notification_count ? 'badge-danger' : 'badge-default' }}">{{ $notification_count ?: '' }}</span>
+                        <span class="hidden-sm"><small>{{ Auth::user()->username }}</small></span>
+                        <span class="visible-xs-inline-block">@lang('User')</span>
+                    </a>
                     <ul class="dropdown-menu">
                         <li><a href="{{ url('preferences') }}"><i class="fa fa-cog fa-fw fa-lg"
                                                                   aria-hidden="true"></i> @lang('My Settings')</a></li>
@@ -666,7 +684,7 @@
             valueKey: 'name',
             templates: {
                 header: '<h5><strong>&nbsp;BGP Sessions</strong></h5>',
-                suggestion: Handlebars.compile('<p><a href="@{{url}}"><small>@{{bgp_image}} @{{name}} - @{{hostname}}<br />AS@{{localas}} -> AS@{{remoteas}}</small></a></p>')
+                suggestion: Handlebars.compile('<p><a href="@{{url}}"><small><i class="@{{bgp_image}}" aria-hidden="true"></i> @{{name}} - @{{hostname}}<br />AS@{{localas}} -> AS@{{remoteas}}</small></a></p>')
             }
         }).on('typeahead:select', function (ev, suggestion) {
             window.location.href = suggestion.url;

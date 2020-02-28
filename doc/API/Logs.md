@@ -7,7 +7,7 @@ Retrieve all logs or logs for a specific device.
 
 - id or hostname is the specific device
 
-nput:
+Input:
 
 - start: The page number to request.
 - limit: The limit of results to be returned.

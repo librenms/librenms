@@ -1,0 +1,177 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.8072.3.2.10",
+                    "sysDescr": "Linux SERVERNAME 4.19.0-6-amd64 #1 SMP Debian 4.19.67-2 (2019-08-28) x86_64",
+                    "sysContact": null,
+                    "version": null,
+                    "hardware": null,
+                    "features": null,
+                    "os": "linux",
+                    "type": "server",
+                    "serial": null,
+                    "icon": "linux.svg",
+                    "location": null
+                }
+            ]
+        },
+        "poller": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.8072.3.2.10",
+                    "sysDescr": "Linux SERVERNAME 4.19.0-6-amd64 #1 SMP Debian 4.19.67-2 (2019-08-28) x86_64",
+                    "sysContact": "<private>",
+                    "version": "4.19.0-6-amd64",
+                    "hardware": "Generic x86 64-bit",
+                    "features": null,
+                    "os": "linux",
+                    "type": "server",
+                    "serial": null,
+                    "icon": "linux.svg",
+                    "location": "<private>"
+                }
+            ]
+        }
+    },
+    "applications": {
+        "discovery": {
+            "applications": [
+                {
+                    "app_type": "seafile",
+                    "app_state": "UNKNOWN",
+                    "discovered": 1,
+                    "app_state_prev": null,
+                    "app_status": "",
+                    "app_instance": ""
+                }
+            ],
+            "application_metrics": []
+        },
+        "poller": {
+            "applications": [
+                {
+                    "app_type": "seafile",
+                    "app_state": "OK",
+                    "discovered": 1,
+                    "app_state_prev": "UNKNOWN",
+                    "app_status": "",
+                    "app_instance": ""
+                }
+            ],
+            "application_metrics": [
+                {
+                    "metric": "2.2.1_cltver_version",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "seafile"
+                },
+                {
+                    "metric": "6.1.5_cltver_version",
+                    "value": 2,
+                    "value_prev": null,
+                    "app_type": "seafile"
+                },
+                {
+                    "metric": "devices_sysinfo_connected",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "seafile"
+                },
+                {
+                    "metric": "groups_grp_count",
+                    "value": 3,
+                    "value_prev": null,
+                    "app_type": "seafile"
+                },
+                {
+                    "metric": "test os 1_cltos_platform",
+                    "value": 4,
+                    "value_prev": null,
+                    "app_type": "seafile"
+                },
+                {
+                    "metric": "test os 2_cltos_platform",
+                    "value": 7,
+                    "value_prev": null,
+                    "app_type": "seafile"
+                },
+                {
+                    "metric": "test_user_1_acc_enabled",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "seafile"
+                },
+                {
+                    "metric": "test_user_1_acc_libraries",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "seafile"
+                },
+                {
+                    "metric": "test_user_1_acc_size_consumption",
+                    "value": 311296,
+                    "value_prev": null,
+                    "app_type": "seafile"
+                },
+                {
+                    "metric": "test_user_1_acc_trashed_librarie",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "seafile"
+                },
+                {
+                    "metric": "test_user_2_acc_enabled",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "seafile"
+                },
+                {
+                    "metric": "test_user_2_acc_libraries",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "seafile"
+                },
+                {
+                    "metric": "test_user_2_acc_size_consumption",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "seafile"
+                },
+                {
+                    "metric": "test_user_2_acc_trashed_librarie",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "seafile"
+                },
+                {
+                    "metric": "test_user_3_acc_enabled",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "seafile"
+                },
+                {
+                    "metric": "test_user_3_acc_libraries",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "seafile"
+                },
+                {
+                    "metric": "test_user_3_acc_size_consumption",
+                    "value": 311296,
+                    "value_prev": null,
+                    "app_type": "seafile"
+                },
+                {
+                    "metric": "test_user_3_acc_trashed_librarie",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "seafile"
+                }
+            ]
+        }
+    }
+}

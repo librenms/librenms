@@ -40,7 +40,7 @@ $response[] = array(
     'ifAdminStatus' => '',
     'ifOperStatus' => "<button type='submit' value='Alerted' class='btn btn-default btn-sm' id='alerted-toggle' title='Toggle alerting on all currently-alerted ports'>Alerted</button><button type='submit' value='Down' class='btn btn-default btn-sm' id='down-select' title='Disable alerting on all currently-down ports'>Down</button>",
     'disabled' => "<button type='submit' value='Toggle' class='btn btn-default btn-sm' id='disable-toggle' title='Toggle polling for all ports'>Toggle</button><button type='submit' value='Select' class='btn btn-default btn-sm' id='disable-select' title='Disable polling on all ports'>Select All</button>",
-    'ignore' => "<button type='submit' value='Toggle' class='btn btn-default btn-sm' id='ignore-toggle' title='Toggle alerting for all ports'>Toggle</button><button type='submit' value='Select' class='btn btn-default btn-sm' id='ignore-select' title='Disable alerting on all ports'>Select All</button>",
+    'ignore' => "<button type='submit' value='Toggle' class='btn btn-default btn-sm' id='ignore-toggle' title='Toggle alert tag for all ports'>Toggle</button><button type='submit' value='Select' class='btn btn-default btn-sm' id='ignore-select' title='Disable alert tag on all ports'>Select All</button>",
     'ifAlias' => ''
 );
 
@@ -50,8 +50,7 @@ foreach (dbFetchRows($sql, $param) as $port) {
     // Mark interfaces which are OperDown (but not AdminDown) yet not ignored or disabled, or up yet ignored or disabled
     // - as to draw the attention to a possible problem.
 
-
-    $isportbad = ($port['ifOperStatus'] == 'down' && $port['ifAdminStatus'] != 'down') ? 1 : 0;
+    $isportbad = ($port['ifOperStatus'] != 'up' && $port['ifAdminStatus'] != 'down') ? 1 : 0;
     $dowecare  = ($port['ignore'] == 0 && $port['disabled'] == 0) ? $isportbad : !$isportbad;
     $outofsync = $dowecare ? " class='red'" : '';
     $checked = '';
@@ -65,9 +64,9 @@ foreach (dbFetchRows($sql, $param) as $port) {
         'ifName'           => $port['label'],
         'ifAdminStatus'    => $port['ifAdminStatus'],
         'ifOperStatus'     => '<span name="operstatus_'.$port['port_id'].'"'.$outofsync.'>'.$port['ifOperStatus'].'</span>',
-        'disabled'         => '<input type="checkbox" class="disable-check" name="disabled_'.$port['port_id'].'"'.($port['disabled'] ? 'checked' : '').'>
+        'disabled'         => '<input type="checkbox" class="disable-check" data-size="small" name="disabled_'.$port['port_id'].'"'.($port['disabled'] ? 'checked' : '').'>
                                <input type="hidden" name="olddis_'.$port['port_id'].'" value="'.($port['disabled'] ? 1 : 0).'"">',
-        'ignore'           => '<input type="checkbox" class="ignore-check" name="ignore_'.$port['port_id'].'"'.($port['ignore'] ? 'checked' : '').'>
+        'ignore'           => '<input type="checkbox" class="ignore-check" data-size="small" name="ignore_'.$port['port_id'].'"'.($port['ignore'] ? 'checked' : '').'>
                                <input type="hidden" name="oldign_'.$port['port_id'].'" value="'.($port['ignore'] ? 1 : 0).'"">',
         'port_tune'        => '<input type="checkbox" id="override_config" name="override_config" data-attrib="ifName_tune:'.$port['ifName'].'" data-device_id="'.$port['device_id'].'" data-size="small" '.$checked.'>',
         'ifAlias'          => '<div class="form-group"><input class="form-control input-sm" id="if-alias" name="if-alias" data-device_id="'.$port['device_id'].'" data-port_id="'.$port['port_id'].'" data-ifName="'.$port['ifName'].'" value="'.$port['ifAlias'].'"><span class="form-control-feedback"><i class="fa" aria-hidden="true"></i></span></div>',

@@ -62,7 +62,10 @@
                                                                     "$ref": "#/definitions/comparison"
                                                                 },
                                                                 "value": {
-                                                                    "type": ["integer", "string"]
+                                                                    "type": ["integer", "string", "array"],
+                                                                    "items": {
+                                                                        "type": ["integer", "string"]
+                                                                    }
                                                                 }
                                                             },
                                                             "additionalProperties": false,
@@ -78,6 +81,9 @@
                                         ]
                                     },
                                     "entPhysicalIndex": {
+                                        "type": "string"
+                                    },
+                                    "warn_percent": {
                                         "type": "string"
                                     },
                                     "snmp_flags": {
@@ -198,7 +204,10 @@
                                                                     "$ref": "#/definitions/comparison"
                                                                 },
                                                                 "value": {
-                                                                    "type": ["integer", "string"]
+                                                                    "type": ["integer", "string", "array"],
+                                                                    "items": {
+                                                                        "type": ["integer", "string"]
+                                                                    }
                                                                 }
                                                             },
                                                             "required": [
@@ -254,6 +263,12 @@
                                                 "items": {
                                                     "type": "string"
                                                 }
+                                            },
+                                            "snmp_flags": {
+                                                "type": [
+                                                    "string",
+                                                    "array"
+                                                ]
                                             }
                                         },
                                         "additionalProperties": false,
@@ -370,7 +385,10 @@
                                     "$ref": "#/definitions/comparison"
                                 },
                                 "value": {
-                                    "type": ["integer", "string"]
+                                    "type": ["integer", "string", "array"],
+                                    "items": {
+                                        "type": ["integer", "string"]
+                                    }
                                 }
                             },
                             "additionalProperties": false,
@@ -444,7 +462,13 @@
                 "starts",
                 "ends",
                 "contains",
-                "regex"
+                "regex",
+                "not_starts",
+                "not_ends",
+                "not_contains",
+                "not_regex",
+                "in_array",
+                "not_in_array"
             ]
         }
     }

@@ -9,6 +9,7 @@
                   class="form-horizontal device-group-form col-md-10 col-md-offset-1 col-sm-12">
                 <legend>@lang('Edit Device Group'): {{ $device_group->name }}</legend>
                 {{ method_field('PUT') }}
+                @csrf
 
                 @include('device-group.form')
 

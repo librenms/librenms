@@ -1,0 +1,65 @@
+mib: OG-STATUSv2-MIB
+modules:
+    sensors:
+        pre-cache:
+            data:
+                - oid:
+                    - ogCellModemTable
+                    - ogEmdTemperatureTable
+        temperature:
+            data:
+                -
+                    oid: ogEmdTemperatureTable
+                    value: ogEmdTemperatureValue
+                    num_oid: '.1.3.6.1.4.1.25049.17.9.1.5.{{ $index }}'
+                    descr: ogEmdTemperatureName
+                    index: 'ogEmdTemperatureValue.{{ $index }}'
+        signal:
+            data:
+                -
+                    oid: ogCellModemTable
+                    value: ogCellModem3gRssi
+                    num_oid: '.1.3.6.1.4.1.25049.17.17.1.11.{{ $index }}'
+                    descr: 'Cellular 3G Modem RSSI'
+                    index: '11.{{ $index }}'
+                -
+                    oid: ogCellModemTable
+                    value: ogCellModem4gRssi
+                    num_oid: '.1.3.6.1.4.1.25049.17.17.1.12.{{ $index }}'
+                    descr: 'Cellular 4G Modem RSSI'
+                    index: '12.{{ $index }}'
+        count:
+            data:
+                -
+                    oid: ogCellModemTable
+                    value: ogCellModemSelectedSimCard
+                    num_oid: '.1.3.6.1.4.1.25049.17.17.1.14.{{ $index }}'
+                    descr: 'Selected Active SIM Card'
+                    index: 'ogCellModemSelectedSimCard.{{ $index }}'
+        state:
+            data:
+                -
+                    oid: ogCellModemTable
+                    value: ogCellModemConnected
+                    num_oid: '.1.3.6.1.4.1.25049.17.17.1.5.{{ $index }}'
+                    descr: 'Modem Connection State'
+                    index: 'ogCellModemConnected.{{ $index }}'
+                    state_name: ogCellModemConnected
+                    states:
+                        - { value: 1, descr: Connected, graph: 1, generic: 0 }
+                        - { value: 2, descr: Disconnected, graph: 2, generic: 2 }
+                -
+                    oid: ogCellModemTable
+                    value: ogCellModemRadioTechnology
+                    num_oid: '.1.3.6.1.4.1.25049.17.17.1.9.{{ $index }}'
+                    descr: 'Radio Access Technology'
+                    index: 'ogCellModemRadioTechnology.{{ $index }}'
+                    skip_values: 1
+                    state_name: ogCellModemRadioTechnology
+                    states:
+                        - { value: 1, descr: Unavailable, graph: 1, generic: 3 }
+                        - { value: 2, descr: CDMA, graph: 2, generic: 0 }
+                        - { value: 3, descr: EVDO, graph: 3, generic: 0 }
+                        - { value: 4, descr: GSM, graph: 4, generic: 0 }
+                        - { value: 5, descr: UMTS, graph: 5, generic: 0 }
+                        - { value: 6, descr: LTE, graph: 6, generic: 0 }

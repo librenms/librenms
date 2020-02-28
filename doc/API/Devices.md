@@ -72,6 +72,37 @@ Output:
 }
 ```
 
+### `discover_device`
+
+Trigger a discovery of given device.
+
+Route: `/api/v0/devices/:hostname/discover`
+
+- hostname can be either the device hostname or id
+
+Input:
+
+  -
+
+Example:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/discover
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "result": {
+        "status": 0,
+        "message": "Device will be rediscovered"
+    },
+    "count": 2
+}
+```
+
 ### `get_graphs`
 
 Get a list of available graphs for a device, this does not include ports.
@@ -927,6 +958,7 @@ Input:
   - ipv4: search by IPv4 address
   - ipv6: search by IPv6 address (compressed or uncompressed)
   - location: search by location
+  - hostname: search by hostname
 - query: If searching by, then this will be used as the input.
 
 Example:
@@ -986,6 +1018,7 @@ Route: `/api/v0/devices`
 Input (JSON):
 
 - hostname: device hostname
+- overwrite_ip: alternate polling IP. Will be use instead of hostname (optional)
 - port: SNMP port (defaults to port defined in config).
 - transport: SNMP protocol (defaults to transport defined in config).
 - version: SNMP version to use, v1, v2c or v3. Defaults to v2c.
@@ -1173,4 +1206,111 @@ Output:
         ]
     }
 ]
+```
+
+
+### `search_oxidized`
+
+search all oxidized device configs for a string.
+
+Route: `api/v0/oxidized/config/search/:searchstring`
+
+  - searchstring is the specific string you would like to search for.
+  
+Input:
+
+-
+
+Example:
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/oxidized/config/search/vlan10
+```
+
+Output:
+```json
+{
+    "status": "ok",
+    "nodes": [
+        {
+            "node": "asr9k.librenms.org",
+            "full_name": "cisco\/ASR9K.Librenms.org"
+        },
+        {
+            "node": "ios.Librenms.org",
+            "full_name": "cisco\/ios.Librenms.org"
+        }
+    ],
+    "count": 2
+}
+```
+
+### `get_oxidized_config`
+
+Returns a specific device's config from oxidized.
+
+Route: `api/v0/oxidized/config/:device_name`
+
+  - device_name is the full dns name of the device used when adding the device to librenms.
+  
+Input:
+
+-
+
+Example:
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/oxidized/config/router.corp.com
+```
+
+Output:
+```json
+{
+    "status": "ok",
+    "config": "DEVICE CONFIG HERE"
+}
+```
+
+### `add_parents_to_host`
+
+Add one or more parents to a host.
+
+Route: `/api/v0/devices/:device_id/parents`
+
+Input (JSON):
+
+- parent_ids: one or more parent ids
+
+Example:
+```curl
+curl -X POST -d '{"parent_ids":"15,16,17"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/1/parents
+```
+
+Output:
+```json
+{
+    "status": "ok",
+    "message": "Device dependencies have been saved"
+}
+```
+
+### `delete_parents_from_host`
+
+Deletes some or all the parents from a host.
+
+Route: `/api/v0/devices/:device_id/parents`
+
+Input (JSON):
+
+- parent_ids: One or more parent ids, if not specified deletes all parents from host.
+
+Example:
+```curl
+curl -X DELETE -d '{"parent_ids":"15,16,17"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/1/parents
+```
+
+Output:
+```json
+{
+    "status": "ok",
+    "message": "All device dependencies have been removed"
+}
 ```

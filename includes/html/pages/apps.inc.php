@@ -45,6 +45,11 @@ $graphs['powerdns-recursor'] = array(
     'cache_performance',
     'outqueries'
 );
+$graphs['pureftpd'] = array(
+    'bitrate',
+    'connections',
+    'users'
+);
 $graphs['rrdcached'] = array(
     'queue_length',
     'events',
@@ -162,6 +167,16 @@ $graphs['nvidia'] = array(
     'sbecc',
     'dbecc',
 );
+$graphs['seafile'] = array(
+    'connected',
+    'enabled',
+    'libraries',
+    'trashed_libraries',
+    'size_consumption',
+    'groups',
+    'version',
+    'platform',
+);
 $graphs['squid'] = array(
     'memory',
     'clients',
@@ -231,6 +246,17 @@ $graphs['smart'] = array(
     'id231',
     'id233',
 );
+$graphs['certificate'] = array(
+    'age',
+    'remaining_days',
+);
+$graphs['puppet-agent'] = array(
+    'last_run',
+    'changes',
+    'events',
+    'resources',
+    'time',
+);
 $graphs['mdadm'] = array(
     'level',
     'size',
@@ -287,6 +313,7 @@ $graphs['asterisk'] = array(
     'calls',
     'channels',
     'sip',
+    'iax2',
 );
 echo '<div class="panel panel-default">';
 echo '<div class="panel-heading">';

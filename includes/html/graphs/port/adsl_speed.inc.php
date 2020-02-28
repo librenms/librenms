@@ -4,11 +4,11 @@ $rrd_filename = get_port_rrdfile_path($device['hostname'], $port['port_id'], 'ad
 
 $rrd_list[0]['filename'] = $rrd_filename;
 $rrd_list[0]['descr']    = 'Downstream';
-$rrd_list[0]['ds']       = 'AturChanCurrTxRate';
+$rrd_list[0]['ds']       = 'AtucChanCurrTxRate';
 
 $rrd_list[1]['filename'] = $rrd_filename;
 $rrd_list[1]['descr']    = 'Upstream';
-$rrd_list[1]['ds']       = 'AtucChanCurrTxRate';
+$rrd_list[1]['ds']       = 'AturChanCurrTxRate';
 
 $unit_text = 'Bits/sec';
 

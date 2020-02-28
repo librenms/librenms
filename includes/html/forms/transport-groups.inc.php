@@ -23,11 +23,9 @@
  * @author     Vivia Nguyen-Tran <vivia@ualberta.ca>
  */
 
-use LibreNMS\Authentication\LegacyAuth;
-
 header('Content-type: application/json');
 
-if (!LegacyAuth::user()->hasGlobalAdmin()) {
+if (!Auth::user()->hasGlobalAdmin()) {
     die(json_encode([
         'status' => 'error',
         'message' => 'You need to be admin'

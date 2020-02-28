@@ -1,0 +1,633 @@
+ALCATEL-IND1-APP-FINGERPRINT-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE,
+        Integer32, Counter32, Unsigned32, IpAddress, NOTIFICATION-TYPE
+            FROM SNMPv2-SMI
+
+        RowStatus, MacAddress
+            FROM SNMPv2-TC
+
+        MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+            FROM SNMPv2-CONF
+
+        SnmpAdminString        FROM SNMP-FRAMEWORK-MIB
+
+        InterfaceIndex
+            FROM IF-MIB
+
+        InetAddressType, InetAddress, InetPortNumber
+                               FROM INET-ADDRESS-MIB  -- [RFC4001]
+
+        softentIND1AppFingerPrintMIB
+            FROM ALCATEL-IND1-BASE
+    ;
+
+    alcatelIND1AppFPMIB MODULE-IDENTITY
+        LAST-UPDATED  "201209110000Z"
+        ORGANIZATION  "Alcatel-Lucent"
+        CONTACT-INFO
+            "Please consult with Customer Service to ensure the most appropriate
+             version of this document is used with the products in question:
+
+                      Alcatel-Lucent, Enterprise Solutions Division
+                    (Formerly Alcatel Internetworking, Incorporated)
+                               26801 West Agoura Road
+                            Agoura Hills, CA  91301-5122
+                              United States Of America
+
+            Telephone:               North America  +1 800 995 2696
+                                     Latin America  +1 877 919 9526
+                                     Europe         +31 23 556 0100
+                                     Asia           +65 394 7933
+                                     All Other      +1 818 878 4507
+
+            Electronic Mail:         support@ind.alcatel.com
+            World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+            File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+        DESCRIPTION
+            "This module describes an authoritative enterprise-specific Simple
+             Network Management Protocol (SNMP) Management Information Base (MIB):
+
+             Fingerprint Application for OS10K Product Line.
+
+             The right to make changes in specification and other information
+             contained in this document without prior notice is reserved.
+
+             No liability shall be assumed for any incidental, indirect, special, or
+             consequential damages whatsoever arising from or related to this
+             document or the information contained herein.
+
+             Vendors, end-users, and other interested parties are granted
+             non-exclusive license to use this specification in connection with
+             management of the products for which it is intended to be used.
+
+                         Copyright (C) 2013 Alcatel-Lucent
+                             ALL RIGHTS RESERVED WORLDWIDE"
+
+        REVISION      "201301090000Z"
+        DESCRIPTION
+            "The latest version of this MIB Module."
+        ::= { softentIND1AppFingerPrintMIB 1 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- Hook into the Alcatel Tree
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+alcatelIND1AppFPMIBObjects OBJECT-IDENTITY
+       STATUS current
+       DESCRIPTION
+         " Alcatel-Lucent Application Fingerprint/ Application signature Subsystem Managed Objects.
+           MIB to characterrize application using thier defined finger print and /or signature."
+       ::= { alcatelIND1AppFPMIB 1 }
+
+alaAppFPMIBNotifications OBJECT IDENTIFIER ::= { alcatelIND1AppFPMIBObjects 0 }
+alaAppFPGlobalMIBConfigObjects OBJECT IDENTIFIER ::= { alcatelIND1AppFPMIBObjects 1 }
+alaAppFPMIBObjects OBJECT IDENTIFIER ::= { alcatelIND1AppFPMIBObjects 2 }
+
+  
+alaAppFPGlobalAdminState OBJECT-TYPE
+     SYNTAX INTEGER {
+           enable (1),
+           disable(2)
+     }
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION
+        " Alcatel-Lucent App Fingerprint Config mode."
+     DEFVAL { enable }
+     ::= { alaAppFPGlobalMIBConfigObjects 1 }
+  
+alaAppFPGlobalSignatureFile OBJECT-TYPE
+     SYNTAX      SnmpAdminString (SIZE(1..64))
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION
+        " Alcatel-Lucent App Fingerprint Signature Filename."
+     ::= { alaAppFPGlobalMIBConfigObjects 2 }
+
+alaAppFPGlobalReloadSignatureFile OBJECT-TYPE
+     SYNTAX INTEGER {
+           none(0),
+           reload(1)
+     }
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION
+        " Alcatel-Lucent App Fingerprint Signature filename to reload."
+     DEFVAL { none }
+     ::= { alaAppFPGlobalMIBConfigObjects 3 }
+
+alaAppFPGlobalTrapConfig OBJECT-TYPE
+     SYNTAX INTEGER {
+           enable (1),
+           disable(2)
+     }
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION
+        " Alcatel-Lucent App Fingerprint Trap Config mode."
+     DEFVAL { disable }
+     ::= { alaAppFPGlobalMIBConfigObjects 4 }
+
+-- Application Fingerprint Port Table
+
+alaAppFPPortTable OBJECT-TYPE
+     SYNTAX SEQUENCE OF AlaAppFPPortEntry
+     MAX-ACCESS not-accessible
+     STATUS current
+     DESCRIPTION
+         "This table contains one row for each port."
+  ::= { alaAppFPMIBObjects 1 }
+
+alaAppFPPortEntry OBJECT-TYPE
+          SYNTAX AlaAppFPPortEntry
+          MAX-ACCESS not-accessible
+          STATUS current
+          DESCRIPTION
+            "Information about the App Fingerprint Port Mode.
+             Port modes are as defined below "
+          INDEX { alaAppFPPort, alaAppFPGroupNameOrPolicyList }
+  ::= { alaAppFPPortTable 1 }
+  
+
+AlaAppFPPortEntry ::= SEQUENCE
+       {
+           alaAppFPPort                        InterfaceIndex,
+           alaAppFPGroupNameOrPolicyList       SnmpAdminString,
+           alaAppFPPortOperationMode           INTEGER,
+           alaAppFPPortStatus                  INTEGER,
+           alaAppFPPortRowStatus               RowStatus
+       }
+
+alaAppFPPort  OBJECT-TYPE
+          SYNTAX     InterfaceIndex
+          MAX-ACCESS  not-accessible
+          STATUS  current
+          DESCRIPTION
+              "The ifIndex component of this instance."
+        ::= {alaAppFPPortEntry 1}
+
+alaAppFPGroupNameOrPolicyList OBJECT-TYPE
+      SYNTAX      SnmpAdminString (SIZE(0..255))
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+       "App Group name or QoS Policy List name associated with the alaAppFPPort.
+        If the alaAppFPPortOperationMode is unp(3), this should be set to 'UNP'.
+        The 0 length string is allowed only in SNMP SET destroy operation.
+        It is used when all the assigned groups for that port are wished to deleted.
+        This feature is provided for user firendly support.
+        SNMP Get with 0 length string will be rejected"
+      ::= { alaAppFPPortEntry 2 }
+
+alaAppFPPortOperationMode OBJECT-TYPE
+       SYNTAX INTEGER {
+           monitoring(1),
+           qos(2),
+           unp(3)
+      }
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+       "It indicates the operation mode of the app-fingerprint feature running on the port.
+        If the operation mode is set to unp(3), the alaAppFPGroupNameOrPolicyList value 
+        should be 'UNP'."
+      ::= { alaAppFPPortEntry 3 }
+
+alaAppFPPortStatus OBJECT-TYPE
+       SYNTAX INTEGER {
+           active(1),
+           inactive(2)
+      }
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+       "It indicates that the Group Name or Policy List Name associated 
+        with the port is valid or invalid.
+        If it is invalid, then the specified Group Name or Policy List Name
+        is inactive at the moment."
+      ::= { alaAppFPPortEntry 4 }
+
+alaAppFPPortRowStatus OBJECT-TYPE
+      SYNTAX RowStatus
+      MAX-ACCESS read-create
+      STATUS     current
+      DESCRIPTION
+       " "
+      ::= { alaAppFPPortEntry 5 }
+
+-- Application Fingerprint Profile Table
+-- Read and Create permission for the user to create and delete profiles and modify thier contents
+
+alaAppFPAppNameTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AlaAppFPAppNameEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+         "This table contains one row for each App signature."
+  ::= { alaAppFPMIBObjects 2 }
+  
+  
+alaAppFPAppNameEntry OBJECT-TYPE
+          SYNTAX AlaAppFPAppNameEntry
+          MAX-ACCESS not-accessible
+          STATUS current
+          DESCRIPTION
+            "Information about the App Name and its Signature. "
+          INDEX { alaAppFPAppName }
+  ::= { alaAppFPAppNameTable 1 }
+  
+
+AlaAppFPAppNameEntry ::= SEQUENCE
+       {
+           alaAppFPAppName             SnmpAdminString,
+           alaAppFPAppDescription      SnmpAdminString,
+           alaAppFPAppSignature        SnmpAdminString
+       }
+
+alaAppFPAppName OBJECT-TYPE
+      SYNTAX      SnmpAdminString (SIZE(1..24))
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+       " "
+      ::= { alaAppFPAppNameEntry 1 }
+
+alaAppFPAppDescription OBJECT-TYPE
+      SYNTAX      SnmpAdminString (SIZE(0..64))
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION " "
+       ::= { alaAppFPAppNameEntry 2 }
+
+alaAppFPAppSignature OBJECT-TYPE
+      SYNTAX      SnmpAdminString (SIZE(0..256))
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION " "
+       ::= { alaAppFPAppNameEntry 3 }
+
+-- App Info Multi-Tuple Classifier - a.k.a App Info Classifier Database Table
+-- Created by the software - read only by the user
+
+alaAppFPDatabaseTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AppFPDatabaseEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+         "This table contains one row for each multi-tuple classifier."
+  ::= { alaAppFPMIBObjects 3 }
+  
+alaAppFPDatabaseEntry OBJECT-TYPE
+          SYNTAX AppFPDatabaseEntry
+          MAX-ACCESS not-accessible
+          STATUS current
+          DESCRIPTION
+            "Information about the App Info database as gathered from monitoring each configured port. "
+          INDEX { alaAppFPDbPort, alaAppFPDbAppGroupName, alaAppFPDbAppName,
+                  alaAppFPDbSrcMacAddr, alaAppFPDbVlanId, alaAppFPDbSrcIpAddrType, alaAppFPDbSrcIpAddr,
+                  alaAppFPDbSrcPort}
+  ::= { alaAppFPDatabaseTable 1 }
+  
+AppFPDatabaseEntry ::= SEQUENCE
+       {
+           alaAppFPDbPort               InterfaceIndex,
+           alaAppFPDbAppGroupName       SnmpAdminString,
+           alaAppFPDbAppName            SnmpAdminString,
+           alaAppFPDbSrcMacAddr         MacAddress,
+           alaAppFPDbVlanId             Unsigned32,
+           alaAppFPDbSrcIpAddrType      InetAddressType,
+           alaAppFPDbSrcIpAddr          InetAddress,
+           alaAppFPDbSrcPort            InetPortNumber,
+           alaAppFPDbDstIpAddrType      InetAddressType,
+           alaAppFPDbDstIpAddr          InetAddress,
+           alaAppFPDbDstPort            InetPortNumber,
+           alaAppFPDbDstMacAddr         MacAddress
+       }
+
+alaAppFPDbPort OBJECT-TYPE
+     SYNTAX      InterfaceIndex
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+              " "
+     ::= { alaAppFPDatabaseEntry 1 }
+
+alaAppFPDbAppGroupName OBJECT-TYPE
+     SYNTAX      SnmpAdminString (SIZE (1..24))
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+              " "
+     ::= { alaAppFPDatabaseEntry 2 }
+
+alaAppFPDbAppName OBJECT-TYPE
+     SYNTAX      SnmpAdminString (SIZE (1..24))
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+              " "
+     ::= { alaAppFPDatabaseEntry 3 }
+
+alaAppFPDbSrcMacAddr OBJECT-TYPE
+     SYNTAX      MacAddress
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+             " "
+     ::= { alaAppFPDatabaseEntry 4 }
+
+alaAppFPDbVlanId OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+             " "
+     ::= { alaAppFPDatabaseEntry 5 }
+
+alaAppFPDbSrcIpAddrType OBJECT-TYPE
+     SYNTAX      InetAddressType
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+              " "
+     ::= { alaAppFPDatabaseEntry 6 }
+
+alaAppFPDbSrcIpAddr OBJECT-TYPE
+     SYNTAX      InetAddress (SIZE (0|4|8|16|20))
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+              " "
+     ::= { alaAppFPDatabaseEntry 7 }
+
+alaAppFPDbSrcPort OBJECT-TYPE
+     SYNTAX      InetPortNumber
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+              " "
+     ::= { alaAppFPDatabaseEntry 8 }
+
+alaAppFPDbDstIpAddrType OBJECT-TYPE
+       SYNTAX      InetAddressType
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               " "
+       ::= { alaAppFPDatabaseEntry 9 }
+
+alaAppFPDbDstIpAddr OBJECT-TYPE
+       SYNTAX      InetAddress (SIZE (0|4|8|16|20))
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               " "
+       ::= { alaAppFPDatabaseEntry 10 }
+  
+  alaAppFPDbDstPort OBJECT-TYPE
+       SYNTAX      InetPortNumber
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               " "
+       ::= { alaAppFPDatabaseEntry 11 }
+
+ alaAppFPDbDstMacAddr OBJECT-TYPE
+       SYNTAX      MacAddress
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               " "
+       ::= { alaAppFPDatabaseEntry 12 }
+
+
+-- App Fingerprint Application Group Name Table
+ 
+alaAppFPAppGrpNameTable OBJECT-TYPE
+     SYNTAX SEQUENCE OF AppFPAppGrpNameEntry
+     MAX-ACCESS not-accessible
+     STATUS current
+     DESCRIPTION
+          "This table contains one row for group name and description. "
+     ::= { alaAppFPMIBObjects 4 }
+
+appFPAppGrpNameEntry OBJECT-TYPE
+     SYNTAX AppFPAppGrpNameEntry
+     MAX-ACCESS not-accessible
+     STATUS current
+     DESCRIPTION
+          "Information about the App Name. "
+
+     INDEX { alaAppFPAppGroupName, alaAppFPGrpAppName }
+     ::= { alaAppFPAppGrpNameTable 1 }
+
+AppFPAppGrpNameEntry ::= SEQUENCE
+{
+     alaAppFPAppGroupName    SnmpAdminString,
+     alaAppFPGrpAppName      SnmpAdminString
+}
+
+alaAppFPAppGroupName OBJECT-TYPE
+     SYNTAX      SnmpAdminString (SIZE (1..24))
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+          " "
+     ::= { appFPAppGrpNameEntry 1 }
+
+ alaAppFPGrpAppName OBJECT-TYPE
+      SYNTAX      SnmpAdminString (SIZE (1..24))
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+           " "
+      ::= { appFPAppGrpNameEntry 2 }
+ 
+
+-- App Info Per Port Grand Total Statistic
+-- Read Only Table
+
+alaAppFPStatsTable OBJECT-TYPE
+     SYNTAX SEQUENCE OF AlaAppFPStatsEntry
+     MAX-ACCESS not-accessible
+     STATUS current
+     DESCRIPTION
+         "This table contains total captured packets for all multi-tuple classifiers."
+
+  ::= { alaAppFPMIBObjects 5 }
+  
+alaAppFPStatsEntry OBJECT-TYPE
+     SYNTAX AlaAppFPStatsEntry
+     MAX-ACCESS not-accessible
+     STATUS current
+     DESCRIPTION
+            "Information about the App Info database for all packets captured. "
+     INDEX { alaAppFPStatsPort, alaAppFPStatsGroupName, alaAppFPStatsAppName }
+
+  ::= { alaAppFPStatsTable 1 }
+  
+AlaAppFPStatsEntry ::= SEQUENCE
+       {
+           alaAppFPStatsPort           InterfaceIndex,
+           alaAppFPStatsGroupName                  SnmpAdminString, 
+           alaAppFPStatsAppName                 SnmpAdminString,
+           alaAppFPTotalMatchedLast1Hour         Counter32,
+           alaAppFPTotalMatchedLast1Day          Counter32
+       }
+
+alaAppFPStatsPort OBJECT-TYPE
+     SYNTAX      InterfaceIndex
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+             " "
+     ::= { alaAppFPStatsEntry 1 }
+
+alaAppFPStatsGroupName OBJECT-TYPE
+      SYNTAX      SnmpAdminString (SIZE(1..24))
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+       " "
+      ::= { alaAppFPStatsEntry 2 }
+
+alaAppFPStatsAppName OBJECT-TYPE
+      SYNTAX      SnmpAdminString (SIZE(1..24))
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+       " "
+      ::= { alaAppFPStatsEntry 3 }
+
+alaAppFPTotalMatchedLast1Hour OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             " "
+     ::= { alaAppFPStatsEntry 4 }
+
+alaAppFPTotalMatchedLast1Day OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             " "
+     ::= { alaAppFPStatsEntry 5 }
+
+
+-- App Fingerprint sub-system Traps
+  
+appFPSignatureMatchTrap NOTIFICATION-TYPE
+ OBJECTS {
+             alaAppFPPort,
+             alaAppFPDbAppGroupName,
+             alaAppFPDbAppName,
+             alaAppFPDbSrcMacAddr,
+             alaAppFPDbVlanId,
+             alaAppFPDbSrcIpAddrType,
+             alaAppFPDbSrcIpAddr,
+             alaAppFPDbSrcPort
+        }
+
+     STATUS        current
+     DESCRIPTION
+           "A Software Trouble report is sent by whatever application
+            encountering a problem during its execution and would
+            want to make the user aware of problem for maintenance purpose. "
+     ::= { alaAppFPMIBNotifications 1 }
+
+-- Application Fingerprint MIB Conformance and Compliances
+
+alcatelIND1AppFPMIBConformance OBJECT-IDENTITY
+     STATUS current
+     DESCRIPTION
+                " Alcatel-Lucent Fingerprint Subsystem Conformance Information."
+     ::= { alcatelIND1AppFPMIB 2 }
+  
+alcatelIND1AppFPMIBGroups OBJECT-IDENTITY
+     STATUS current
+     DESCRIPTION
+        "Branch For ALU Fingerprint MIB Subsystem Units Of Conformance."
+     ::= { alcatelIND1AppFPMIBConformance 1 }
+
+alcatelIND1AppFPMIBCompliances OBJECT-IDENTITY
+     STATUS current
+     DESCRIPTION
+        "Branch For ALU Fingerprint MIB Subsystem Compliance Statements."
+     ::= { alcatelIND1AppFPMIBConformance 2 }
+  
+
+alaAppFPMIBCompliance MODULE-COMPLIANCE
+     STATUS  current
+     DESCRIPTION
+        "Compliance statement for App Fingerprint."
+     MODULE -- This module
+     ::= { alcatelIND1AppFPMIBCompliances 1 }
+
+alaAppFPModuleConfigGroup OBJECT-GROUP
+     OBJECTS
+     {
+       alaAppFPGlobalAdminState,
+       alaAppFPGlobalReloadSignatureFile,
+       alaAppFPGlobalSignatureFile,
+       alaAppFPGlobalTrapConfig
+     }
+     STATUS  current
+     DESCRIPTION
+        "App Fingerprint Control Modules Group."
+     ::= { alcatelIND1AppFPMIBGroups 1 }
+
+alaAppFPModulePortModeGroup OBJECT-GROUP
+     OBJECTS
+     {
+         alaAppFPAppDescription,
+         alaAppFPAppSignature,
+         alaAppFPPortOperationMode,
+         alaAppFPPortStatus,
+         alaAppFPPortRowStatus
+     }
+     STATUS  current
+     DESCRIPTION
+        "App Fingerprint Control Modules Group."
+     ::= { alcatelIND1AppFPMIBGroups 2 }
+
+alaAppFPModulePortDBGroup OBJECT-GROUP
+     OBJECTS
+     {
+         alaAppFPDbDstIpAddrType,
+         alaAppFPDbDstIpAddr,
+         alaAppFPDbDstPort,
+         alaAppFPDbDstMacAddr,
+         alaAppFPGrpAppName
+     }
+     STATUS  current
+     DESCRIPTION
+        "App Fingerprint Control Modules Group."
+     ::= { alcatelIND1AppFPMIBGroups 3 }
+
+alaAppFPModulePortStatsGroup OBJECT-GROUP
+     OBJECTS
+     {
+          alaAppFPTotalMatchedLast1Hour,
+          alaAppFPTotalMatchedLast1Day
+
+     }
+     STATUS  current
+     DESCRIPTION
+        "App Fingerprint Control Modules Group."
+     ::= { alcatelIND1AppFPMIBGroups 4 }
+
+alaAppFPNotificationsGroup NOTIFICATION-GROUP
+     NOTIFICATIONS {
+        appFPSignatureMatchTrap
+     }
+     STATUS  current
+     DESCRIPTION
+        "Collection of Notifications for management of App Fingerprint."
+     ::= { alcatelIND1AppFPMIBGroups 5 }
+
+END

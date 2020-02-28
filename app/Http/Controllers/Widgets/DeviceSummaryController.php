@@ -47,16 +47,14 @@ abstract class DeviceSummaryController extends WidgetController
 
     public function getSettingsView(Request $request)
     {
-        $settings = $this->getSettings();
-
-        return view('widgets.settings.device-summary', $settings);
+        return view('widgets.settings.device-summary', $this->getSettings(true));
     }
 
     protected function getData(Request $request)
     {
         $data = $this->getSettings();
 
-        $data['devices'] = ObjectCache::deviceCounts(['total', 'up', 'down', 'ignored', 'disabled']);
+        $data['devices'] = ObjectCache::deviceCounts(['total', 'up', 'down', 'ignored', 'disabled', 'disable_notify']);
 
         $data['ports'] = $data['summary_errors'] ?
             ObjectCache::portCounts(['total', 'up', 'down', 'ignored', 'shutdown', 'errored']) :

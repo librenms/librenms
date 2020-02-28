@@ -11,9 +11,7 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Authentication\LegacyAuth;
-
-if (!LegacyAuth::user()->hasGlobalAdmin()) {
+if (!Auth::user()->hasGlobalAdmin()) {
     die('ERROR: You need to be admin');
 }
 
@@ -31,9 +29,11 @@ if (!LegacyAuth::user()->hasGlobalAdmin()) {
             </div>
             <div class="modal-footer">
                 <form role="form" class="remove_token_form">
+                    <?php echo csrf_field() ?>
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-danger danger" id="alert-rule-removal" data-target="alert-rule-removal">Delete</button>
                     <input type="hidden" name="alert_id" id="alert_id" value="">
+                    <input type="hidden" name="alert_name" id="alert_name" value="">
                     <input type="hidden" name="confirm" id="confirm" value="yes">
                 </form>
             </div>
@@ -44,12 +44,16 @@ if (!LegacyAuth::user()->hasGlobalAdmin()) {
 <script>
 $('#confirm-delete').on('show.bs.modal', function(event) {
     alert_id = $(event.relatedTarget).data('alert_id');
+    alert_name = $(event.relatedTarget).data('alert_name');
     $("#alert_id").val(alert_id);
+    $("#alert_name").val(alert_name);
+    $( "p" ).first().text( 'If you would like to remove the alert rule named \''+alert_name+'\' then please click Delete.' );
 });
 
 $('#alert-rule-removal').click('', function(event) {
     event.preventDefault();
     var alert_id = $("#alert_id").val();
+    var alert_name = $("#alert_name").val();
     $.ajax({
         type: 'POST',
         url: 'ajax_form.php',
@@ -57,13 +61,15 @@ $('#alert-rule-removal').click('', function(event) {
         dataType: "html",
         success: function(msg) {
             if(msg.indexOf("ERROR:") <= -1) {
-                $("#row_"+alert_id).remove();
+                $("#rule_id_"+alert_id).remove();
+                toastr.success(msg);
+            } else {
+                toastr.error(msg);
             }
-            $("#message").html('<div class="alert alert-info">'+msg+'</div>');
             $("#confirm-delete").modal('hide');
         },
         error: function() {
-            $("#message").html('<div class="alert alert-info">The alert rule could not be deleted.</div>');
+            toastr.error('ERROR: ajax post failed; unable to delete alert rule');
             $("#confirm-delete").modal('hide');
         }
     });

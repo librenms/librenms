@@ -17,6 +17,9 @@
                         <th data-column-id="level" data-formatter="level" data-type="numeric">@lang('Access')</th>
                         <th data-column-id="auth_type" data-visible="{{ $multiauth ? 'true' : 'false' }}">@lang('Auth')</th>
                         <th data-column-id="email">@lang('Email')</th>
+                        @if(\LibreNMS\Authentication\LegacyAuth::getType() == 'mysql')
+                        <th data-column-id="enabled" data-formatter="enabled">@lang('Enabled')</th>
+                        @endif
                         <th data-column-id="descr">@lang('Description')</th>
                         <th data-column-id="action" data-formatter="actions" data-sortable="false" data-searchable="false">@lang('Actions')</th>
                     </tr>
@@ -30,6 +33,9 @@
                                 <td>{{ $user->level }}</td>
                                 <td>{{ $user->auth_type }}</td>
                                 <td>{{ $user->email }}</td>
+                                @if(\LibreNMS\Authentication\LegacyAuth::getType() == 'mysql')
+                                <td>{{ $user->enabled }}</td>
+                                @endif
                                 <td>{{ $user->descr }}</td>
                                 <td></td>
                             </tr>
@@ -48,8 +54,16 @@
             var user_grid = $("#users");
             user_grid.bootgrid({
                 formatters: {
+                    enabled: function (column, row) {
+                        if (row['enabled'] == 1) {
+                            return '<span class="fa fa-fw fa-check text-success"></span>';
+                        } else {
+                            return '<span class="fa fa-fw fa-close text-danger"></span>';
+                        }
+                    },
                     actions: function (column, row) {
                         var edit_button = '<form action="{{ route('users.edit', ':user_id') }}'.replace(':user_id', row['user_id']) + '" method="GET">' +
+                            '@csrf' +
                             '<button type="submit" title="@lang('Edit')" class="btn btn-sm btn-warning"><i class="fa fa-pencil"></i></button>' +
                             '</form> ';
 
@@ -62,7 +76,7 @@
                             manage_button += ' style="visibility:hidden;"'
                         }
 
-                        manage_button += '><input type="hidden" name="user_id" value="' + row['user_id'] +
+                        manage_button += '>@csrf<input type="hidden" name="user_id" value="' + row['user_id'] +
                             '"><button type="submit" title="@lang('Manage Access')" class="btn btn-sm btn-primary"><i class="fa fa-tasks"></i></button>' +
                             '</form> ';
 

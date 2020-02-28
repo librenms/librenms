@@ -5,8 +5,9 @@ namespace App\Models;
 use DB;
 use Illuminate\Database\Eloquent\Builder;
 use LibreNMS\Util\Rewrite;
+use Permissions;
 
-class Port extends BaseModel
+class Port extends DeviceRelatedModel
 {
     public $timestamps = false;
     protected $primaryKey = 'port_id';
@@ -62,7 +63,7 @@ class Port extends BaseModel
     /**
      * Check if user can access this port.
      *
-     * @param User $user
+     * @param User|int $user
      * @return bool
      */
     public function canAccess($user)
@@ -75,15 +76,7 @@ class Port extends BaseModel
             return true;
         }
 
-        $port_query = DB::table('ports_perms')
-            ->where('user_id', $user->user_id)
-            ->where('port_id', $this->port_id);
-
-        $device_query = DB::table('devices_perms')
-            ->where('user_id', $user->user_id)
-            ->where('device_id', $this->device_id);
-
-        return $port_query->union($device_query)->exists();
+        return Permissions::canAccessDevice($this->device_id, $user) || Permissions::canAccessPort($this->port_id, $user);
     }
 
     // ---- Accessors/Mutators ----
@@ -144,7 +137,7 @@ class Port extends BaseModel
             ['deleted', '=', 0],
             ['ignore', '=', 0],
             ['disabled', '=', 0],
-            ['ifOperStatus', '=', 'down'],
+            ['ifOperStatus', '!=', 'up'],
             ['ifAdminStatus', '=', 'up'],
         ]);
     }
@@ -210,11 +203,6 @@ class Port extends BaseModel
     }
 
     // ---- Define Relationships ----
-
-    public function device()
-    {
-        return $this->belongsTo('App\Models\Device', 'device_id', 'device_id');
-    }
 
     public function events()
     {

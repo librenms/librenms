@@ -1,7 +1,7 @@
 -- ====================================================================
 -- = OG-SMI-MIB: Enterprise structure of management information =
 -- =                                                                  =
--- = (c) Copyright 2005-2014 Opengear Inc.                       =
+-- = (c) Copyright 2005-2018 Opengear Inc.                       =
 -- ====================================================================
 
 OG-SMI-MIB DEFINITIONS ::= BEGIN
@@ -14,7 +14,7 @@ IMPORTS
 -- Top Level for Opengear Enterprise
 
 opengear MODULE-IDENTITY
-	LAST-UPDATED "201311150000Z"
+	LAST-UPDATED "201806150000Z"
 	ORGANIZATION "Opengear Inc."
 	CONTACT-INFO
 		"Opengear Inc.
@@ -23,6 +23,10 @@ opengear MODULE-IDENTITY
 		 support@opengear.com"
 	DESCRIPTION
 		"Opengear Structure of Management Information MIB"
+	REVISION "201806150000Z"
+	DESCRIPTION
+		"Add a new OID root for Lighthouse 5 and newer
+		management platform specifics."
 	REVISION "201311150000Z"
 	DESCRIPTION
 		"Re-structured MIB adding more information
@@ -118,5 +122,12 @@ ogModules OBJECT-IDENTITY
                 "ogModules provides a root object identifier
                 from which MODULE-IDENTITY values may be assigned."
         ::= { opengear 11 }
+
+ogSpecific OBJECT-IDENTITY
+	STATUS  current
+	DESCRIPTION
+		"ogSpecific provides a root object identifier
+		from Lighthouse version 5 and later."
+	::= { opengear 18 }
 
 END

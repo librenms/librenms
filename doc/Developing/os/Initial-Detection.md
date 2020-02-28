@@ -47,7 +47,7 @@ is the preferred method for detection.  Other options are available:
 
 ```yaml
 discovery:
-    - 
+    -
       sysObjectID:
           - .1.3.6.1.4.1.12532.
       sysDescr_except:
@@ -59,7 +59,7 @@ instance ios, nx-os, iosxr are all within a group called cisco.
 
 `bad_ifXEntry`: This is a list of models for which to tell LibreNMS
 that the device doesn't support ifXEntry and to ignore it:
- 
+
 ```yaml
  bad_ifXEntry:
      - cisco1941
@@ -97,15 +97,14 @@ discovery_modules:
      cisco-mac-accounting: false
 ```
 
-
 ##### Discovery Logic
 
 YAML is converted to an array in PHP.  Consider the following YAML:
 
 ```yaml
-discovery: 
+discovery:
   - sysObjectID: foo
-  - 
+  -
     sysDescr: [ snafu, exodar ]
     sysObjectID: bar
 
@@ -128,18 +127,18 @@ This is how the discovery array would look in PHP:
 ]
 ```
 
-
 The logic for the discovery is as follows:
+
 1. One of the first level items must match
-2. ALL of the second level items must match (sysObjectID, sysDescr)
-3. One of the third level items (foo, [snafu,exodar], bar) must match
+1. ALL of the second level items must match (sysObjectID, sysDescr)
+1. One of the third level items (foo, [snafu,exodar], bar) must match
 
 So, considering the example:
 
 - `sysObjectID: foo, sysDescr: ANYTHING` matches
 - `sysObjectID: bar, sysDescr: ANYTHING` does not match
-- `sysObjectID: bar, sysDescr: exodar` matches 
-- `sysObjectID: bar, sysDescr: snafu` matches 
+- `sysObjectID: bar, sysDescr: exodar` matches
+- `sysObjectID: bar, sysDescr: snafu` matches
 
 #### Discovery helpers
 
@@ -152,13 +151,10 @@ Within the discovery code base if you are using php then the following helpers a
 ### Poller
 
 OS polling is done within `includes/polling/os/$os.inc.php` and is where we detect certain values.
- 
-```php
-<?php
 
+```php
 $version = preg_replace('/[\r\n\"]+/', ' ', snmp_get($device, "productVersion.0", "-OQv", "PULSESECURE-PSG-MIB"));
 $hardware = "Juniper " . preg_replace('/[\r\n\"]+/', ' ', snmp_get($device, "productName.0", "-OQv", "PULSESECURE-PSG-MIB"));
-
 ```
 
 `$version`: The version of the OS running on the device.
@@ -171,13 +167,13 @@ $hardware = "Juniper " . preg_replace('/[\r\n\"]+/', ' ', snmp_get($device, "pro
 
 ### MIBs
 
-If the device has MIBs available and you use it in the detection then you can add these in. It is highly 
-recommended that you add mibs to a vendor specific directory. For instance HP mibs are in `mibs/hp`. Please 
+If the device has MIBs available and you use it in the detection then you can add these in. It is highly
+recommended that you add mibs to a vendor specific directory. For instance HP mibs are in `mibs/hp`. Please
  ensure that these directories are specified in the yaml detection file, see `mib_dir` above.
 
 ### Icon and Logo
 
-It is highly recommended to use SVG images where possible, these scale and provide a nice visual image for users 
+It is highly recommended to use SVG images where possible, these scale and provide a nice visual image for users
 with HiDPI screens. If you can't find SVG images then please use png.
 
 Create an SVG image of the icon and logo.  Legacy PNG bitmaps are also supported but look bad on HiDPI.

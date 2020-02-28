@@ -12,3 +12,5 @@ over:
 discovery:
     - sysObjectID:
         - .1.3.6.1.4.1.1916.2.
+      sysObjectID_except:
+        - .1.3.6.1.4.1.1916.2.302 #exclude VSP-7432CQ from xos and identify as "voss" OS

@@ -52,6 +52,7 @@ return [
         'token' => [
             'driver' => 'token_driver',
             'provider' => 'token_provider',
+            'hash' => false,
         ],
     ],
 

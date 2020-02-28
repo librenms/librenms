@@ -6,7 +6,7 @@ $scale_max = '100';
 require 'includes/html/graphs/common.inc.php';
 
 $iter         = '1';
-$rrd_options .= " COMMENT:'                    Size      Used    %age\\l'";
+$rrd_options .= " COMMENT:'                        Size      Used    % Used\\l'";
 
 foreach (dbFetchRows('SELECT * FROM storage where device_id = ?', array($device['device_id'])) as $storage) {
     // FIXME generic colour function
@@ -27,7 +27,7 @@ foreach (dbFetchRows('SELECT * FROM storage where device_id = ?', array($device[
         $iter   = '0';
     }
 
-    $descr        = rrdtool_escape($storage['storage_descr'], 12);
+    $descr        = rrdtool_escape($storage['storage_descr'], 16);
     $rrd          = rrd_name($device['hostname'], array('storage', $storage['storage_mib'], $storage['storage_descr']));
     $rrd_options .= " DEF:{$storage['storage_id']}used=$rrd:used:AVERAGE";
     $rrd_options .= " DEF:{$storage['storage_id']}free=$rrd:free:AVERAGE";

@@ -23,9 +23,7 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-use LibreNMS\Authentication\LegacyAuth;
-
-if (!LegacyAuth::user()->hasGlobalAdmin()) {
+if (!Auth::user()->hasGlobalAdmin()) {
     $status = array('status' => 1, 'message' => 'You need to be admin');
 } else {
     $device_id = $_POST['device_id'];

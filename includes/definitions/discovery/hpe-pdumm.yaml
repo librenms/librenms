@@ -1,0 +1,59 @@
+mib: CPQPOWER-MIB
+modules:
+    sensors:
+        current:
+            data:
+                -
+                    oid: pduOutputBreakerTable
+                    value: breakerCurrent
+                    num_oid: '.1.3.6.1.4.1.232.165.2.3.2.1.3.{{ $index }}'
+                    index: 'breakerCurrent.{{ $index }}'
+                    descr: 'PDU {{ $subindex0 }} Phase {{ $subindex1 }}'
+                    skip_values: -1
+        load:
+            data:
+                -
+                    oid: pduOutputBreakerTable
+                    value: breakerPercentLoad
+                    num_oid: '.1.3.6.1.4.1.232.165.2.3.2.1.4.{{ $index }}'
+                    index: 'breakerPercentLoad.{{ $index }}'
+                    descr: 'PDU {{ $subindex0 }} Phase {{ $subindex1 }}'
+                    skip_values: -1
+                -
+                    oid: pduOutputTable
+                    value: pduOutputLoad
+                    num_oid: '.1.3.6.1.4.1.232.165.2.3.1.1.2.{{ $index }}'
+                    index: 'pduOutputLoad.{{ $index }}'
+                    descr: 'PDU {{ $index }}'
+                    skip_values: -1
+
+        voltage:
+            data:
+                -
+                    oid: pduOutputBreakerTable
+                    value: breakerVoltage
+                    num_oid: '.1.3.6.1.4.1.232.165.2.3.2.1.2.{{ $index }}'
+                    index: 'breakerVoltage.{{ $index }}'
+                    descr: 'PDU {{ $subindex0 }} Phase {{ $subindex1 }}'
+                    skip_values: -1
+        power:
+            data:
+                -
+                    oid: pduOutputTable
+                    value: pduOutputPower
+                    num_oid: '.1.3.6.1.4.1.232.165.2.3.1.1.4.{{ $index }}'
+                    index: 'pduOutputPower.{{ $index }}'
+                    descr: 'PDU {{ $index }}'
+                    skip_values: -1
+        state:
+            data:
+                -
+                    oid: pduIdentTable
+                    value: pduStatus
+                    num_oid: '.1.3.6.1.4.1.232.165.2.1.2.1.8.{{ $index }}'
+                    descr: 'PDU {{ $index }}'
+                    states:
+                        - { value: 1, generic: 3, descr: other, graph: 0 }
+                        - { value: 2, generic: 0, descr: ok, graph: 0 }
+                        - { value: 3, generic: 1, descr: degraded, graph: 0 }
+                        - { value: 4, generic: 2, descr: failed, graph: 0 }

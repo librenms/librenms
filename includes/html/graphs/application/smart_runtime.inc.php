@@ -1,5 +1,5 @@
 <?php
-$name = 'smart';
+$name = 'smart_id9';
 $app_id = $app['app_id'];
 $unit_text     = '';
 $unitlen       = 20;

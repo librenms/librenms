@@ -23,10 +23,11 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
+use LibreNMS\Alert\AlertDB;
+use LibreNMS\Alert\AlertUtil;
 use LibreNMS\Alerting\QueryBuilderParser;
-use LibreNMS\Authentication\LegacyAuth;
 
-if (!LegacyAuth::user()->hasGlobalAdmin()) {
+if (!Auth::user()->hasGlobalAdmin()) {
     echo("Insufficient Privileges");
     exit();
 }
@@ -39,12 +40,12 @@ switch ($type) {
         $filename = "alerts-$hostname.txt";
         $device_id = getidbyname($hostname);
         $device = device_by_id_cache($device_id);
-        $rules = GetRules($device_id);
+        $rules = AlertUtil::getRules($device_id);
         $output = '';
         $results = array();
         foreach ($rules as $rule) {
             if (empty($rule['query'])) {
-                $rule['query'] = GenSQL($rule['rule'], $rule['builder']);
+                $rule['query'] = AlertDB::genSQL($rule['rule'], $rule['builder']);
             }
             $sql = $rule['query'];
             $qry = dbFetchRow($sql, array($device_id));
@@ -74,7 +75,7 @@ switch ($type) {
             $output .= 'Rule match: ' . $response . PHP_EOL . PHP_EOL;
         }
         if (\LibreNMS\Config::get('alert.transports.mail') === true) {
-            $contacts = GetContacts($results);
+            $contacts = AlertUtil::getContacts($results);
             if (count($contacts) > 0) {
                 $output .= 'Found ' . count($contacts) . ' contacts to send alerts to.' . PHP_EOL;
             }

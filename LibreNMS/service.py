@@ -71,6 +71,8 @@ class ServiceConfig:
     redis_db = 0
     redis_pass = None
     redis_socket = None
+    redis_sentinel = None
+    redis_sentinel_service = None
 
     db_host = 'localhost'
     db_port = 0
@@ -122,6 +124,10 @@ class ServiceConfig:
         self.redis_pass = os.getenv('REDIS_PASSWORD', config.get('redis_pass', ServiceConfig.redis_pass))
         self.redis_port = int(os.getenv('REDIS_PORT', config.get('redis_port', ServiceConfig.redis_port)))
         self.redis_socket = os.getenv('REDIS_SOCKET', config.get('redis_socket', ServiceConfig.redis_socket))
+        self.redis_sentinel = os.getenv('REDIS_SENTINEL', config.get('redis_sentinel', ServiceConfig.redis_sentinel))
+        self.redis_sentinel_service = os.getenv('REDIS_SENTINEL_SERVICE',
+                                                config.get('redis_sentinel_service',
+                                                           ServiceConfig.redis_sentinel_service))
 
         self.db_host = os.getenv('DB_HOST', config.get('db_host', ServiceConfig.db_host))
         self.db_name = os.getenv('DB_DATABASE', config.get('db_name', ServiceConfig.db_name))
@@ -363,7 +369,9 @@ class Service:
                                       port=self.config.redis_port,
                                       db=self.config.redis_db,
                                       password=self.config.redis_pass,
-                                      unix_socket_path=self.config.redis_socket)
+                                      unix_socket_path=self.config.redis_socket,
+                                      sentinel=self.config.redis_sentinel,
+                                      sentinel_service=self.config.redis_sentinel_service)
         except ImportError:
             if self.config.distributed:
                 critical("ERROR: Redis connection required for distributed polling")

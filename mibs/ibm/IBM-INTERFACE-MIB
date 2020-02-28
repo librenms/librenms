@@ -1,0 +1,291 @@
+-- MIB created 10/11/99 20:28:35, by
+--   SMIC (the next generation) version 1.6.29, November 22, 1994.
+
+IBM-INTERFACE-MIB DEFINITIONS ::= BEGIN
+
+-- From file: "ibminterface.mi2"
+-- Compile options "G A T M"
+
+IMPORTS
+    Counter32, IpAddress
+            FROM SNMPv2-SMI-v1
+    OBJECT-TYPE
+            FROM RFC-1212
+    DisplayString
+            FROM SNMPv2-TC-v1
+    enterprises
+            FROM RFC1155-SMI
+    ifIndex
+            FROM RFC1213-MIB;
+
+ibmIROCroutinginterface OBJECT IDENTIFIER ::= { enterprises ibm(2) ibmProd(6) ibmIROC(119) ibmIROCrouting(4) 17 }
+-- MODULE-IDENTITY
+--  LastUpdated
+--    9902171200Z
+--  OrgName
+--    IBM
+--  ContactInfo
+--    Randy Worzella
+--     IBM Corporation
+--     800 Park Offices Drive
+--     FBWA/664
+--     P.O. Box 12195
+--     Research Triangle Park, NC 27709, USA
+--     Tel:    1 919 254 2202
+--     E-mail: worzella@us.ibm.com
+--  Descr
+--    This MIB module contains enterprise specific definitions for
+--     generic interface management.
+
+ibminterfaceClearTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF IbminterfaceClearEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "A table allowing interface counters to be cleared."
+    ::= { ibmIROCroutinginterface 1 }
+
+ibminterfaceClearEntry OBJECT-TYPE
+    SYNTAX IbminterfaceClearEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Entry identifying a particular interface whose counters
+         are to be cleared."
+    INDEX { ifIndex }
+    ::= { ibminterfaceClearTable 1 }
+
+IbminterfaceClearEntry ::= SEQUENCE {
+    ibminterfaceClearInOctets INTEGER,
+    ibminterfaceClearInUcastPkts INTEGER,
+    ibminterfaceClearInMulticastPkts INTEGER,
+    ibminterfaceClearInErrors INTEGER,
+    ibminterfaceClearInAll INTEGER,
+    ibminterfaceClearOutOctets INTEGER,
+    ibminterfaceClearOutUcastPkts INTEGER,
+    ibminterfaceClearOutMulticastPkts INTEGER,
+    ibminterfaceClearOutErrors INTEGER,
+    ibminterfaceClearOutAll INTEGER,
+    ibminterfaceClearMaintTest INTEGER,
+    ibminterfaceClearDeviceSpecific INTEGER,
+    ibminterfaceClearAll INTEGER
+    }
+
+ibminterfaceClearInOctets OBJECT-TYPE
+    SYNTAX INTEGER {
+        noaction(0),
+        clear(1)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "When SET to a value of clear(1), the counter of bytes
+         received over this interface is reset.
+        
+         When READ, this object always returns a value of noaction(0),
+         since this object is intended as a trigger, rather than
+         providing information."
+    ::= { ibminterfaceClearEntry 1 }
+
+ibminterfaceClearInUcastPkts OBJECT-TYPE
+    SYNTAX INTEGER {
+        noaction(0),
+        clear(1)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "When SET to a value of clear(1), the counter of unicast
+         packets received over this interface is reset.
+        
+         When READ, this object always returns a value of noaction(0),
+         since this object is intended as a trigger, rather than
+         providing information."
+    ::= { ibminterfaceClearEntry 2 }
+
+ibminterfaceClearInMulticastPkts OBJECT-TYPE
+    SYNTAX INTEGER {
+        noaction(0),
+        clear(1)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "When SET to a value of clear(1), the counter of multicast
+         packets received over this interface is reset.
+        
+         When READ, this object always returns a value of noaction(0),
+         since this object is intended as a trigger, rather than
+         providing information."
+    ::= { ibminterfaceClearEntry 3 }
+
+ibminterfaceClearInErrors OBJECT-TYPE
+    SYNTAX INTEGER {
+        noaction(0),
+        clear(1)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "When SET to a value of clear(1), the counters for all
+         types of input errors are reset.
+        
+         When READ, this object always returns a value of noaction(0),
+         since this object is intended as a trigger, rather than
+         providing information."
+    ::= { ibminterfaceClearEntry 4 }
+
+ibminterfaceClearInAll OBJECT-TYPE
+    SYNTAX INTEGER {
+        noaction(0),
+        clear(1)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "When SET to a value of clear(1), the counters for all
+         input counters (byte, packet, error) are reset.
+        
+         When READ, this object always returns a value of noaction(0),
+         since this object is intended as a trigger, rather than
+         providing information."
+    ::= { ibminterfaceClearEntry 5 }
+
+ibminterfaceClearOutOctets OBJECT-TYPE
+    SYNTAX INTEGER {
+        noaction(0),
+        clear(1)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "When SET to a value of clear(1), the counter of bytes
+         sent over this interface is reset.
+        
+         When READ, this object always returns a value of noaction(0),
+         since this object is intended as a trigger, rather than
+         providing information."
+    ::= { ibminterfaceClearEntry 6 }
+
+ibminterfaceClearOutUcastPkts OBJECT-TYPE
+    SYNTAX INTEGER {
+        noaction(0),
+        clear(1)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "When SET to a value of clear(1), the counter of unicast
+         packets sent over this interface is reset.
+        
+         When READ, this object always returns a value of noaction(0),
+         since this object is intended as a trigger, rather than
+         providing information."
+    ::= { ibminterfaceClearEntry 7 }
+
+ibminterfaceClearOutMulticastPkts OBJECT-TYPE
+    SYNTAX INTEGER {
+        noaction(0),
+        clear(1)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "When SET to a value of clear(1), the counter of multicast
+         packets sent over this interface is reset.
+        
+         When READ, this object always returns a value of noaction(0),
+         since this object is intended as a trigger, rather than
+         providing information."
+    ::= { ibminterfaceClearEntry 8 }
+
+ibminterfaceClearOutErrors OBJECT-TYPE
+    SYNTAX INTEGER {
+        noaction(0),
+        clear(1)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "When SET to a value of clear(1), the counters for all
+         types of output errors are reset.
+        
+         When READ, this object always returns a value of noaction(0),
+         since this object is intended as a trigger, rather than
+         providing information."
+    ::= { ibminterfaceClearEntry 9 }
+
+ibminterfaceClearOutAll OBJECT-TYPE
+    SYNTAX INTEGER {
+        noaction(0),
+        clear(1)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "When SET to a value of clear(1), the counters for all
+         output counters (byte, packet, error) are reset.
+        
+         When READ, this object always returns a value of noaction(0),
+         since this object is intended as a trigger, rather than
+         providing information."
+    ::= { ibminterfaceClearEntry 10 }
+
+ibminterfaceClearMaintTest OBJECT-TYPE
+    SYNTAX INTEGER {
+        noaction(0),
+        clear(1)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "When SET to a value of clear(1), the counters for
+         self test pass, self test fail and maintenance
+         fail are reset.
+        
+         When READ, this object always returns a value of noaction(0),
+         since this object is intended as a trigger, rather than
+         providing information."
+    ::= { ibminterfaceClearEntry 11 }
+
+ibminterfaceClearDeviceSpecific OBJECT-TYPE
+    SYNTAX INTEGER {
+        noaction(0),
+        clear(1)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "When SET to a value of clear(1), all the device specific
+         counters are reset. For example, for an Ethernet
+         interface, all the counters provided in the
+         dot3StatsTable are reset.
+        
+         When READ, this object always returns a value of noaction(0),
+         since this object is intended as a trigger, rather than
+         providing information."
+    ::= { ibminterfaceClearEntry 12 }
+
+ibminterfaceClearAll OBJECT-TYPE
+    SYNTAX INTEGER {
+        noaction(0),
+        clear(1)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "When SET to a value of clear(1), all the reset actions
+         performed by the MIB objects defined above are executed
+         at once.
+        
+         This action has the same behavior as executing the
+         CLEAR command from the T5 console prompt (+).
+        
+         When READ, this object always returns a value of noaction(0),
+         since this object is intended as a trigger, rather than
+         providing information."
+    ::= { ibminterfaceClearEntry 13 }
+
+
+END
+

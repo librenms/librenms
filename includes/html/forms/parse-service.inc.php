@@ -12,9 +12,7 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Authentication\LegacyAuth;
-
-if (!LegacyAuth::user()->hasGlobalAdmin()) {
+if (!Auth::user()->hasGlobalAdmin()) {
     die('ERROR: You need to be admin');
 }
 
@@ -27,7 +25,9 @@ if (is_numeric($service_id) && $service_id > 0) {
         'stype'     => $service[0]['service_type'],
         'ip'        => $service[0]['service_ip'],
         'desc'      => $service[0]['service_desc'],
-        'param'     => $service[0]['service_param']
+        'param'     => $service[0]['service_param'],
+        'ignore'    => $service[0]['service_ignore'],
+        'disabled'   => $service[0]['service_disabled']
     );
 
     header('Content-Type: application/json');

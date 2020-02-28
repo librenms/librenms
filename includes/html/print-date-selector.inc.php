@@ -8,6 +8,7 @@ echo "<div style='text-align: center;'>
         <form class='form-inline' id='customrange'>
         <input type=hidden id='selfaction' value='$request_uri'>
 ";
+echo csrf_field();
 
 echo '
         <div class="form-group">

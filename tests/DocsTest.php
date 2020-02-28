@@ -45,6 +45,8 @@ class DocTest extends TestCase
         'General/Changelogs/2014.md',
         'General/Changelogs/2015.md',
         'General/Changelogs/2016.md',
+        'General/Changelogs/2017.md',
+        'General/Changelogs/2018.md',
         'General/Contributing.md',
         'General/Credits.md',
         'Installation/Installation-(Debian-Ubuntu).md',

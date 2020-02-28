@@ -16,11 +16,10 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Authentication\LegacyAuth;
+use App\Models\Device;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\Git;
-use LibreNMS\Util\Html;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Laravel;
 
@@ -241,23 +240,6 @@ function get_port_by_ifIndex($device_id, $ifIndex)
     return dbFetchRow("SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?", array($device_id, $ifIndex));
 }
 
-function get_all_devices()
-{
-    global $cache;
-    $devices = array();
-
-    // FIXME needs access control checks!
-    // FIXME respect $type (server, network, etc) -- needs an array fill in topnav.
-
-    if (isset($cache['devices']['hostname'])) {
-        $devices = array_keys($cache['devices']);
-    } else {
-        $devices = dbFetchRows("SELECT * FROM `devices` ORDER BY hostname");
-    }
-
-    return $devices;
-}
-
 function table_from_entity_type($type)
 {
     // Fuck you, english pluralisation.
@@ -349,10 +331,9 @@ function ifclass($ifOperStatus, $ifAdminStatus)
     return \LibreNMS\Util\Url::portLinkDisplayClass((object) ['ifOperStatus' => $ifOperStatus, 'ifAdminStatus' => $ifAdminStatus]);
 }
 
-function device_by_name($name, $refresh = 0)
+function device_by_name($name)
 {
-    // FIXME - cache name > id too.
-    return device_by_id_cache(getidbyname($name), $refresh);
+    return device_by_id_cache(getidbyname($name));
 }
 
 
@@ -367,29 +348,15 @@ function accesspoint_by_id($ap_id, $refresh = '0')
 
 function device_by_id_cache($device_id, $refresh = false)
 {
-    global $cache;
+    $model = $refresh ? DeviceCache::refresh($device_id) : DeviceCache::get($device_id);
 
-    if (!$refresh && isset($cache['devices']['id'][$device_id]) && is_array($cache['devices']['id'][$device_id])) {
-        $device = $cache['devices']['id'][$device_id];
-    } else {
-        $device = dbFetchRow("SELECT `devices`.*, `location`, `lat`, `lng` FROM `devices` LEFT JOIN locations ON `devices`.location_id=`locations`.`id` WHERE `device_id` = ?", [$device_id]);
-        $device['attribs'] = get_dev_attribs($device['device_id']);
-        load_os($device);
+    $device = $model->toArray();
+    $device['location'] = $model->location->location;
+    $device['lat'] = $model->location->lat;
+    $device['lng'] = $model->location->lng;
+    $device['attribs'] = $model->getAttribs();
+    $device['vrf_lite_cisco'] = $model->vrfLites->keyBy('context_name')->toArray();
 
-        //order vrf_lite_cisco with context, this will help to get the vrf_name and instance_name all the time
-        $vrfs_lite_cisco = dbFetchRows("SELECT * FROM `vrf_lite_cisco` WHERE `device_id` = ?", array($device_id));
-        if (!empty($vrfs_lite_cisco)) {
-            $device['vrf_lite_cisco'] = array();
-            foreach ($vrfs_lite_cisco as $vrf) {
-                $device['vrf_lite_cisco'][$vrf['context_name']] = $vrf;
-            }
-        }
-
-        if (!empty($device['ip'])) {
-            $device['ip'] = inet6_ntop($device['ip']);
-        }
-        $cache['devices']['id'][$device_id] = $device;
-    }
     return $device;
 }
 
@@ -421,17 +388,9 @@ function getifhost($id)
     return dbFetchCell("SELECT `device_id` from `ports` WHERE `port_id` = ?", array($id));
 }
 
-function gethostbyid($id)
+function gethostbyid($device_id)
 {
-    global $cache;
-
-    if (isset($cache['devices']['id'][$id]['hostname'])) {
-        $hostname = $cache['devices']['id'][$id]['hostname'];
-    } else {
-        $hostname = dbFetchCell("SELECT `hostname` FROM `devices` WHERE `device_id` = ?", array($id));
-    }
-
-    return $hostname;
+    return DeviceCache::get($device_id)->hostname;
 }
 
 function strgen($length = 16)
@@ -472,28 +431,7 @@ function getifdescrbyid($id)
 
 function getidbyname($hostname)
 {
-    global $cache;
-
-    if (isset($cache['devices']['hostname'][$hostname])) {
-        $id = $cache['devices']['hostname'][$hostname];
-    } else {
-        $id = dbFetchCell("SELECT `device_id` FROM `devices` WHERE `hostname` = ?", array($hostname));
-    }
-
-    return $id;
-}
-
-function gethostosbyid($id)
-{
-    global $cache;
-
-    if (isset($cache['devices']['id'][$id]['os'])) {
-        $os = $cache['devices']['id'][$id]['os'];
-    } else {
-        $os = dbFetchCell("SELECT `os` FROM `devices` WHERE `device_id` = ?", array($id));
-    }
-
-    return $os;
+    return DeviceCache::getByHostname($hostname)->device_id;
 }
 
 function safename($name)
@@ -518,21 +456,12 @@ function zeropad($num, $length = 2)
 
 function set_dev_attrib($device, $attrib_type, $attrib_value)
 {
-    if (dbFetchCell("SELECT COUNT(*) FROM devices_attribs WHERE `device_id` = ? AND `attrib_type` = ?", array($device['device_id'],$attrib_type))) {
-        $return = dbUpdate(array('attrib_value' => $attrib_value), 'devices_attribs', 'device_id=? and attrib_type=?', array($device['device_id'], $attrib_type));
-    } else {
-        $return = dbInsert(array('device_id' => $device['device_id'], 'attrib_type' => $attrib_type, 'attrib_value' => $attrib_value), 'devices_attribs');
-    }
-    return $return;
+    return DeviceCache::get($device['device_id'])->setAttrib($attrib_type, $attrib_value);
 }
 
-function get_dev_attribs($device)
+function get_dev_attribs($device_id)
 {
-    $attribs = array();
-    foreach (dbFetchRows("SELECT * FROM devices_attribs WHERE `device_id` = ?", array($device)) as $entry) {
-        $attribs[$entry['attrib_type']] = $entry['attrib_value'];
-    }
-    return $attribs;
+    return DeviceCache::get($device_id)->getAttribs();
 }
 
 function get_dev_entity_state($device)
@@ -545,36 +474,14 @@ function get_dev_entity_state($device)
     return $state;
 }
 
-function get_dev_attrib($device, $attrib_type, $attrib_value = '')
+function get_dev_attrib($device, $attrib_type)
 {
-    $sql = '';
-    $params = array($device['device_id'], $attrib_type);
-    if (!empty($attrib_value)) {
-        $sql = " AND `attrib_value`=?";
-        array_push($params, $attrib_value);
-    }
-    if ($row = dbFetchRow("SELECT attrib_value FROM devices_attribs WHERE `device_id` = ? AND `attrib_type` = ? $sql", $params)) {
-        return $row['attrib_value'];
-    } else {
-        return null;
-    }
-}
-
-function is_dev_attrib_enabled($device, $attrib, $default = true)
-{
-    $val = get_dev_attrib($device, $attrib);
-    if ($val != null) {
-        // attribute is set
-        return ($val != 0);
-    } else {
-        // attribute not set
-        return $default;
-    }
+    return DeviceCache::get($device['device_id'])->getAttrib($attrib_type);
 }
 
 function del_dev_attrib($device, $attrib_type)
 {
-    return dbDelete('devices_attribs', "`device_id` = ? AND `attrib_type` = ?", array($device['device_id'], $attrib_type));
+    return DeviceCache::get($device['device_id'])->forgetAttrib($attrib_type);
 }
 
 function formatRates($value, $round = '2', $sf = '3')
@@ -954,6 +861,13 @@ function is_custom_graph($type, $subtype, $device)
     return false;
 } // is_custom_graph
 
+function is_customoid_graph($type, $subtype)
+{
+    if (!empty($subtype) && $type == 'customoid') {
+        return true;
+    }
+    return false;
+} // is_customoid_graph
 
 /*
  * FIXME: Dummy implementation
@@ -1143,7 +1057,7 @@ function version_info($remote = false)
         Config::get('rrdtool', 'rrdtool') . ' --version |head -n1'
     )), 1, 1)));
     $output['netsnmp_ver'] = str_replace('version: ', '', rtrim(shell_exec(
-        Config::get('snmpget', 'snmpget') . ' --version 2>&1'
+        Config::get('snmpget', 'snmpget') . ' -V 2>&1'
     )));
 
     return $output;
@@ -1417,6 +1331,36 @@ function str_i_contains($haystack, $needles)
     return false;
 }
 
+    /**
+     * Get alert_rules sql filter by minimal severity
+     *
+     * @param  string|int $min_severity
+     * @param  string $alert_rules_name
+     * @return string
+     */
+
+function get_sql_filter_min_severity($min_severity, $alert_rules_name)
+{
+    $alert_severities = array(
+        // alert_rules.status is enum('ok','warning','critical')
+        'ok' => 1,
+        'warning' => 2,
+        'critical' => 3,
+        'ok only' => 4,
+        'warning only' => 5,
+        'critical only' => 6,
+    );
+    if (is_numeric($min_severity)) {
+        $min_severity_id = $min_severity;
+    } elseif (!empty($min_severity)) {
+        $min_severity_id = $alert_severities[$min_severity];
+    }
+    if (isset($min_severity_id)) {
+        return " AND `$alert_rules_name`.`severity` " . ($min_severity_id > 3 ? "" : ">") . "= " . ($min_severity_id > 3 ? $min_severity_id - 3 : $min_severity_id);
+    }
+    return "";
+}
+
 if (!function_exists('ends_with')) {
     /**
      * Determine if a given string ends with a given substring.
@@ -1553,37 +1497,7 @@ function load_os(&$device)
  */
 function load_all_os($existing = false, $cached = true)
 {
-    $install_dir = Config::get('install_dir');
-    $cache_file = $install_dir . '/cache/os_defs.cache';
-
-    if ($cached && is_file($cache_file) && (time() - filemtime($cache_file) < Config::get('os_def_cache_time'))) {
-        // Cached
-        $os_defs = unserialize(file_get_contents($cache_file));
-
-        if ($existing) {
-            // remove unneeded os
-            $os_defs = array_diff_key($os_defs, dbFetchColumn('SELECT DISTINCT(`os`) FROM `devices`'));
-        }
-
-        Config::set('os', array_replace_recursive($os_defs, Config::get('os')));
-    } else {
-        // load from yaml
-        if ($existing) {
-            $os_list = array_map(function ($os) use ($install_dir) {
-                return $install_dir . '/includes/definitions/' . $os . '.yaml';
-            }, dbFetchColumn('SELECT DISTINCT(`os`) FROM `devices`'));
-        } else {
-            $os_list = glob($install_dir . '/includes/definitions/*.yaml');
-        }
-
-        foreach ($os_list as $file) {
-            if (is_readable($file)) {
-                $tmp = Symfony\Component\Yaml\Yaml::parse(file_get_contents($file));
-
-                Config::set("os.{$tmp['os']}", array_replace_recursive($tmp, Config::get("os.{$tmp['os']}", [])));
-            }
-        }
-    }
+    Device::loadAllOs($existing, $cached);
 }
 
 /**
@@ -1628,6 +1542,22 @@ function fahrenheit_to_celsius($value, $scale = 'fahrenheit')
 {
     if ($scale === 'fahrenheit') {
         $value = ($value - 32) / 1.8;
+    }
+    return sprintf('%.02f', $value);
+}
+
+/**
+ * Converts celsius to fahrenheit (with 2 decimal places)
+ * if $scale is not celsius, it assumes celsius and  returns the value
+ *
+ * @param float $value
+ * @param string $scale fahrenheit or celsius
+ * @return string (containing a float)
+ */
+function celsius_to_fahrenheit($value, $scale = 'celsius')
+{
+    if ($scale === 'celsius') {
+        $value = ($value * 1.8) + 32;
     }
     return sprintf('%.02f', $value);
 }
@@ -1704,7 +1634,7 @@ function get_user_pref($name, $default = null, $user_id = null)
     }
 
     if (is_null($user_id)) {
-        $user_id = LegacyAuth::id();
+        $user_id = Auth::id();
     }
 
     $pref = dbFetchCell(
@@ -1733,7 +1663,7 @@ function set_user_pref($name, $value, $user_id = null)
 {
     global $user_prefs;
     if (is_null($user_id)) {
-        $user_id = LegacyAuth::id();
+        $user_id = Auth::id();
     }
 
     $pref = array(

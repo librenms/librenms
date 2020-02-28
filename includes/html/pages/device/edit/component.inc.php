@@ -1,6 +1,7 @@
 <span id="message"><small><div class="alert alert-danger">n.b For the first time, please click any button twice.</div></small></span>
 
 <form id='components' class='form-inline' method='POST'>
+    <?php echo csrf_field() ?>
     <table id='table' class='table table-condensed table-responsive table-striped'>
         <thead>
             <tr>
@@ -9,7 +10,7 @@
                 <th data-column-id='label'>Label</th>
                 <th data-column-id='status'>Status</th>
                 <th data-column-id='disable' data-sortable='false'>Disable</th>
-                <th data-column-id='ignore' data-sortable='false'>Ignore</th>
+                <th data-column-id='ignore' data-sortable='false'>Ignore alert tag</th>
             </tr>
         </thead>
     </table>

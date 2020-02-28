@@ -1,0 +1,1143 @@
+
+NBS-EFM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+    Counter32, Counter64,
+    OBJECT-TYPE, MODULE-IDENTITY, OBJECT-IDENTITY
+        FROM SNMPv2-SMI
+
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+
+    InterfaceIndex
+        FROM IF-MIB
+
+    nbs, Unsigned16TC
+        FROM NBS-MIB
+
+    ;
+
+
+nbsEfmMib  MODULE-IDENTITY
+    LAST-UPDATED "201610190000Z" -- October 19, 2016
+    ORGANIZATION "NBS"
+    CONTACT-INFO
+        "For technical support, please contact your service channel"
+    DESCRIPTION
+        "Private MRV MIB for representing 802.3ah (Ethernet in the
+         First Mile) information"
+
+    ::= { nbs 300 }
+
+
+-- *******************************************************************
+-- NBS-EFM-MIB Objects Identifier Definition
+-- *******************************************************************
+
+nbsEfmProduct          OBJECT IDENTIFIER ::= { nbsEfmMib 2 }
+nbsEfmNc316Nm          OBJECT IDENTIFIER ::= { nbsEfmProduct  1 }
+
+nbsEfmObjects  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "all MIB objects in nbsEfm MIB."
+::= { nbsEfmMib 1 }
+
+-- *******************************************************************
+-- Groups in NBS-EFM-MIB - all under nbsEfmObjects
+-- *******************************************************************
+
+
+-- nbsEfmDteMacGrp  OBJECT-IDENTITY
+--     STATUS current
+--     DESCRIPTION
+--         "All DTE MAC Objects."
+-- ::= { nbsEfmObjects 1 }
+
+-- nbsEfmMauGrp  OBJECT-IDENTITY
+--     STATUS current
+--     DESCRIPTION
+--         "All MAU objects."
+-- ::= { nbsEfmObjects 2 }
+
+nbsEfmOamGrp  OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "All OAM objects."
+::= { nbsEfmObjects 3 }
+
+-- nbsEfmOmpGrp  OBJECT-IDENTITY
+--     STATUS  current
+--     DESCRIPTION
+--         "All OMP objects."
+-- ::= { nbsEfmObjects 4 }
+
+-- nbsOsTraps OBJECT-IDENTITY
+--     STATUS current
+--     DESCRIPTION
+--         "All Defined Specific Traps."
+-- ::= { nbsOsMIBObjects 5 }
+
+
+
+-- *******************************************************************
+-- Objects in the OAM Group.
+-- *******************************************************************
+
+
+
+nbsEfmOamTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NbsEfmOamEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Operations, Administration, and Management information"
+    ::= { nbsEfmOamGrp 1 }
+
+nbsEfmOamEntry      OBJECT-TYPE
+    SYNTAX  NbsEfmOamEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Contains a desription of a particular Oam.  There are two
+        entries for each OAM link, one entry for the local side,
+        one for the remote."
+    INDEX { nbsEfmPhysicalIfIndex }
+    ::= { nbsEfmOamTable 1 }
+
+
+NbsEfmOamEntry ::= SEQUENCE {
+    nbsEfmPhysicalIfIndex            InterfaceIndex,
+    nbsEfmOamIfIndex                 InterfaceIndex,
+    nbsEfmOamPeerIfIndex             InterfaceIndex,
+    nbsEfmOamMode                    INTEGER,
+    nbsEfmOamCfg                     OCTET STRING,
+    nbsEfmOamPduCfg                  Unsigned16TC,
+    nbsEfmOamFlagsField              OCTET STRING,
+    nbsEfmOamState                   OCTET STRING,
+    nbsEfmOamVendorOUI               OCTET STRING,
+    nbsEfmOamVendorDeviceId          Unsigned16TC,
+    nbsEfmOamVendorDeviceVersion     Unsigned16TC,
+    nbsEfmOamPDUTx                   Counter32,
+    nbsEfmOamPDURx                   Counter32,
+    nbsEfmOamUnsupportedCodesRx      Counter32,
+    nbsEfmOamInformationTx           Counter32,
+    nbsEfmOamInformationRx           Counter32,
+    nbsEfmOamEventNotificationTx     Counter32,
+    nbsEfmOamUniEventNotificationRx  Counter32,
+    nbsEfmOamDupEventNotificationRx  Counter32,
+    nbsEfmOamLoopbackControlTx       Counter32,
+    nbsEfmOamLoopbackControlRx       Counter32,
+    nbsEfmOamVariableRequestTx       Counter32,
+    nbsEfmOamVariableRequestRx       Counter32,
+    nbsEfmOamVariableResponseTx      Counter32,
+    nbsEfmOamVariableResponseRx      Counter32,
+    nbsEfmOamOrganizationSpecificTx  Counter32,
+    nbsEfmOamOrganizationSpecificRx  Counter32,
+    nbsEfmOamErrSymPerCfgDuration    Counter64,
+    nbsEfmOamErrSymPerCfgThreshld    Counter32,
+    nbsEfmOamErrSymPerEvtTime        Unsigned16TC,
+    nbsEfmOamErrSymPerEvtWindow      Counter64,
+    nbsEfmOamErrSymPerEvtThreshld    Counter64,
+    nbsEfmOamErrSymPerEvtCount       Counter64,
+    nbsEfmOamErrFrmCfgDuration       Counter32,
+    nbsEfmOamErrFrmCfgThreshld       Counter32,
+    nbsEfmOamErrFrmEvtTime           Unsigned16TC,
+    nbsEfmOamErrFrmEvtWindow         Unsigned16TC,
+    nbsEfmOamErrFrmEvtThreshld       Counter32,
+    nbsEfmOamErrFrmEvtCount          Counter64,
+    nbsEfmOamErrFrmPerCfgDuration    Counter32,
+    nbsEfmOamErrFrmPerCfgThreshld    Counter32,
+    nbsEfmOamErrFrmPerEvtTime        Unsigned16TC,
+    nbsEfmOamErrFrmPerEvtWindow      Counter32,
+    nbsEfmOamErrFrmPerEvtThreshld    Counter32,
+    nbsEfmOamErrFrmPerEvtCount       Counter64,
+    nbsEfmOamErrFrmSecSumCfgDuration Unsigned16TC,
+    nbsEfmOamErrFrmSecSumCfgThreshld Unsigned16TC,
+    nbsEfmOamErrFrmSecSumEvtTime     Unsigned16TC,
+    nbsEfmOamErrFrmSecSumEvtWindow   Unsigned16TC,
+    nbsEfmOamErrFrmSecSumEvtThreshld Unsigned16TC,
+    nbsEfmOamErrFrmSecSumEvtCount    Counter32,
+    nbsEfmOamFramesLostDueToOamError Counter32,
+    nbsEfmOamAdminState              INTEGER,
+    nbsEfmOamOperState               OCTET STRING
+}
+
+nbsEfmPhysicalIfIndex  OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "ifIndex from the MIB-II Interface Table for the physical
+        port on which this OAM traffic flows."
+    ::= { nbsEfmOamEntry 1 }
+
+nbsEfmOamIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "ifIndex from the MIB-II Interface Table for this OAM
+         interface."
+    ::= {nbsEfmOamEntry  2 }
+
+nbsEfmOamPeerIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "ifIndex from the MIB-II Interface Table for the physical
+        port on the other side of the OAM link.  For
+        example, if this table entry corresponds to a local
+        OAM device, this object would hold the ifIndex of the
+        remote port."
+    ::= { nbsEfmOamEntry 3 }
+
+nbsEfmOamMode  OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notSupported    (1),
+        passive         (2),
+        active          (3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A GET operation returns the current mode of the OAM
+        sublayer entity (see 57.2.6), either passive or
+        active. A SET operation changes the mode of operation
+        of the OAM entity to the indicated value. A SET
+        operation shall have no effect on a device whose mode
+        cannot be changed through management or that can only
+        operate in a single mode."
+    REFERENCE   "IEEE 802.3ah, Clause 57"
+    ::= {nbsEfmOamEntry  4 }
+
+
+-- nbsEfmOamRemoteMACAddress OBJECT-TYPE
+--     SYNTAX  MacAddress
+--     ACCESS  read-only
+--     STATUS  mandatory
+--     DESCRIPTION
+--         "The value of the source-address parameter of the last
+--         OAMPDU passed by the OAM subordinate sublayer to the OAM
+--         sublayer. This value is updated on reception of a valid
+--         frame with (1) a destinationField equal to the reserved
+--         multicast address for Slow-Protocols specified in CROSS
+--         REF Table 43B-1, (2) lengthOrType field value equal to
+--         the reserved Type for Slow-Protocols as specified in
+--         CROSS REF Table 43B-2, (3) a Slow-Protocols subtype
+--         value equal to the subtype reserved for OAM as specified
+--         in Table 43B-3."
+--     ::= {nbsEfmOamEntry  4 }
+
+nbsEfmOamCfg OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A string of three bits corresponding to the OAM
+        Configuration field (see Table 57-7) in the most recently
+        received Information OAMPDU. The first bit corresponds to
+        the OAM Mode bit in the OAM Configuration field. The
+        second bit corresponds to the Unidirectional Support bit
+        in the OAM Configuration field. The third bit corresponds
+        to the Loopback Support bit in the OAM Configuration
+        field.
+        This value is updated on reception of a valid frame, with
+        (1) destinationField equal to the reserved multicast
+        address for Slow_Protocols specified in CROSS REF Table
+        43B-1, (2) lengthOrType field value equal to the reserved
+        Type for Slow_Protocols as specified in CROSS REF Table
+        43B-2, (3) a Slow_Protocols subtype value equal to the
+        subtype reserved for OAM as specified in Table 43B-3, (4)
+        the OAM code equals the OAM Information code."
+    REFERENCE   "IEEE 802.3ah, Clause 57"
+    ::= { nbsEfmOamEntry 5 }
+
+nbsEfmOamPduCfg OBJECT-TYPE
+    SYNTAX      Unsigned16TC
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An eleven bit value corresponding to the Maximum PDU Size
+        value within the OAMPDU Configuration field (see Table
+        57-8) in the most recently sent Information OAMPDU.
+        This value is updated on reception of a valid frame, with
+        (1) destinationField equal to the reserved multicast
+        address for Slow_Protocols specified in CROSS REF Table
+        43B-1, (2) lengthOrType field value equal to the reserved
+        Type for Slow_Protocols as specified in CROSS REF Table
+        43B-2, (3) a Slow_Protocols subtype value equal to the
+        subtype reserved for OAM as specified in Table 43B-3, (4)
+        the OAM code equals the OAM Information code."
+    REFERENCE   "IEEE 802.3ah, Clause 57"
+    ::= { nbsEfmOamEntry 6 }
+
+nbsEfmOamFlagsField OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A string of five bits corresponding to the Flags field
+        (see Table 57-3) in the most recently transmitted OAMPDU.
+        The first bit corresponds to the Link Fault bit in the
+        Flags field. The second bit corresponds to the Dying Gasp
+        bit in the Flags field. The third bit corresponds to the
+        Critical Event bit in the Flags field. The fourth bit
+        corresponds to the Remote Stable bit in the Flags field.
+        The fifth bit corresponds to the Local Stable bit in the
+        Flags field."
+    REFERENCE   "IEEE 802.3ah, Clause 57"
+    ::= { nbsEfmOamEntry 7 }
+
+
+nbsEfmOamState OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A string of three bits corresponding to the State field
+        (see Table 57-6) of the most recently sent Information
+        OAMPDU. The first and second bits corresponds to the
+        Parser Action bits in the State field. The third bit
+        corresponds to the Multiplexer Action bit in the State
+        field.
+        This value is updated on reception of a valid frame, with
+        (1) destinationField equal to the reserved multicast
+        address for Slow_Protocols specified in CROSS REF Table
+        43B-1, (2) lengthOrType field value equal to the reserved
+        Type for Slow_Protocols as specified in CROSS REF Table
+        43B-2, (3) a Slow_Protocols subtype value equal to the
+        subtype reserved for OAM as specified in Table 43B-3, (4)
+        a OAMPDU code equal to the Information code as specified
+        in Table 57-4."
+    REFERENCE   "IEEE 802.3ah, Clause 57"
+    ::= { nbsEfmOamEntry 8 }
+
+nbsEfmOamVendorOUI  OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(3))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the OUI variable in the Vendor Identifier
+        field (see Table 57-9) of the most recently sent
+        Information OAMPDU.
+        This value is updated on reception of a valid frame, with
+        (1) destinationField equal to the reserved multicast
+        address for Slow_Protocols specified in CROSS REF Table
+        43B-1, (2) lengthOrType field value equal to the reserved
+        Type for Slow_Protocols as specified in CROSS REF Table
+        43B-2, (3) a Slow_Protocols subtype value equal to the
+        subtype reserved for OAM as specified in Table 43B-3, (4)
+        a OAMPDU code equal to the Information code as specified
+        in Table 57-4."
+    REFERENCE   "IEEE 802.3ah, Clause 57"
+    ::= { nbsEfmOamEntry 9 }
+
+nbsEfmOamVendorDeviceId OBJECT-TYPE
+    SYNTAX      Unsigned16TC
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the Device Identifier variable in the Vendor
+        Identifier field (see Table 57-9) of the most recently
+        sent Information OAMPDU.
+        This value is updated on reception of a valid frame, with
+        (1) destinationField equal to the reserved multicast
+        address for Slow_Protocols specified in CROSS REF Table
+        43B-1, (2) lengthOrType field value equal to the reserved
+        Type for Slow_Protocols as specified in CROSS REF Table
+        43B-2, (3) a Slow_Protocols subtype value equal to the
+        subtype reserved for OAM as specified in Table 43B-3, (4)
+        a OAMPDU code equal to the Information code as specified
+        in Table 57-4."
+    REFERENCE   "IEEE 802.3ah, Clause 57"
+    ::= { nbsEfmOamEntry 10 }
+
+nbsEfmOamVendorDeviceVersion  OBJECT-TYPE
+    SYNTAX      Unsigned16TC
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the Version Identifier variable in the
+        Vendor Identifier field (see Table 57-9) of the most
+        recently sent Information OAMPDU.
+        This value is updated on reception of a valid frame, with
+        (1) destinationField equal to the reserved multicast
+        address for Slow_Protocols specified in CROSS REF Table
+        43B-1, (2) lengthOrType field value equal to the reserved
+        Type for Slow_Protocols as specified in CROSS REF Table
+        43B-2, (3) a Slow_Protocols subtype value equal to the
+        subtype reserved for OAM as specified in Table 43B-3, (4)
+        a OAMPDU code equal to the Information code as specified
+        in Table 57-4."
+    REFERENCE   "IEEE 802.3ah, Clause 57"
+    ::= { nbsEfmOamEntry 11 }
+
+nbsEfmOamPDUTx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A count of OAMPDUs passed to the OAM subordinate sublayer
+        for transmission. This counter is incremented when a
+        OAM:MA_DATA.request service service primitive is generated
+        within the OAM sublayer."
+    REFERENCE   "IEEE 802.3ah, Clause 57"
+    ::= { nbsEfmOamEntry 12 }
+
+nbsEfmOamPDURx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A count of OAMPDUs passed by the OAM subordinate sublayer
+        to the OAM sublayer. This counter is incremented on
+        reception of a valid frame with (1) a destinationField
+        equal to the reserved multicast address for Slow_Protocols
+        specified in CROSS REF Table 43B-1, (2) lengthOrType field
+        value equal to the reserved Type for Slow_Protocols as
+        specified in CROSS REF Table 43B-2, (3) a Slow_Protocols
+        subtype value equal to the subtype reserved for OAM as
+        specified in Table 43B-3."
+    REFERENCE   "IEEE 802.3ah, Clause 57"
+    ::= { nbsEfmOamEntry 13 }
+
+nbsEfmOamUnsupportedCodesRx  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A count of OAMPDUs received that contain an OAM code from
+        Table 57-4 that are not supported by the device. This
+        counter is incremented on reception of a valid frame with
+        (1) destinationField equal to the reserved multicast
+        address for Slow_Protocols specified in CROSS REF Table
+        43B-1, (2) lengthOrType field value equal to the reserved
+        Type for Slow_Protocols as specified in CROSS REF Table
+        43B-2, (3) a Slow_Protocols subtype value equal to the
+        subtype reserved for OAM as specified in Table 43B-3, (4)
+        an OAM code for a function that is not supported by the
+        device."
+    REFERENCE   "IEEE 802.3ah, Clause 57"
+    ::= { nbsEfmOamEntry 14 }
+
+nbsEfmOamInformationTx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A count of OAMPDUs passed to the OAM subordinate sublayer
+        for transmission that contain the OAM Information code
+        specified in Table CROSS REF 57-4. This counter is
+        incremented when a OAM:MA_DATA.request service primitive
+        is generated within the OAM sublayer with an OAM code
+        indicating an OAM Information operation."
+    REFERENCE   "IEEE 802.3ah, Clause 57"
+    ::= { nbsEfmOamEntry 15 }
+
+nbsEfmOamInformationRx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A count of OAMPDUs received that contain the OAM
+        Information code specified in Table 57-4. This
+        counter is incremented on reception of a valid frame with
+        (1) destinationField equal to the reserved multicast
+        address for Slow_Protocols specified in CROSS REF Table
+        43B-1, (2) lengthOrType field value equal to the reserved
+        Type for Slow_Protocols as specified in CROSS REF Table
+        43B-2, (3) a Slow_Protocols subtype value equal to the
+        subtype reserved for OAM as specified in Table 43B-3, (4)
+        an OAM code for a function that is not supported by the
+        device."
+    REFERENCE   "IEEE 802.3ah, Clause 57"
+    ::= { nbsEfmOamEntry 16 }
+
+nbsEfmOamEventNotificationTx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A count of OAMPDUs passed to the OAM subordinate sublayer
+        for transmission that contain the Event Notification code
+        specified in Table 57-4. This counter is incremented when
+        a OAM:MA_DATA.request service primitive is generated
+        within the OAM sublayer with an OAM code indicating an
+        Event Notification operation."
+    REFERENCE   "IEEE 802.3ah, Clause 57"
+    ::= { nbsEfmOamEntry 17 }
+
+
+nbsEfmOamUniEventNotificationRx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A count of the OAMPDUs received that contain the Event
+        Notification code specified in Table 57-4. This counter is
+        incremented on reception of a valid frame, with (1)
+        destinationField equal to the reserved multicast address
+        for Slow_Protocols specified in CROSS REF Table 43B-1, (2)
+        lengthOrType field value equal to the reserved Type for
+        Slow_Protocols as specified in CROSS REF Table 43B-2, (3)
+        a Slow_Protocols subtype value equal to the subtype
+        reserved for OAM as specified in CROSS REF Table 43B-3,
+        (4) the OAM code equals the Event Notification code, (5)
+        the Sequence Number field is not equal to the Sequence
+        Number field of the last received Event Notification
+        OAMPDU and is supported by the device."
+    REFERENCE   "IEEE 802.3ah, Clause 57"
+    ::= { nbsEfmOamEntry 18 }
+
+nbsEfmOamDupEventNotificationRx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A count of the OAMPDUs received that contain the Event
+        Notification code specified in Table 57-4. This counter is
+        incremented on reception of a valid frame, with (1)
+        destinationField equal to the reserved multicast address
+        for Slow_Protocols specified in CROSS REF Table 43B-1, (2)
+        lengthOrType field value equal to the reserved Type for
+        Slow_Protocols as specified in CROSS REF Table 43B-2, (3)
+        a Slow_Protocols subtype value equal to the subtype
+        reserved for OAM as specified in CROSS REF Table 43B-3,
+        (4) the OAM code equals the Event Notification code, (5)
+        the Sequence Number field is equal to the Sequence
+        Number field of the last received Event Notification
+        OAMPDU."
+    REFERENCE   "IEEE 802.3ah, Clause 57"
+    ::= { nbsEfmOamEntry 19 }
+
+nbsEfmOamLoopbackControlTx  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A count of OAMPDUs passed to the OAM subordinate
+        sublayer for transmission that contain the Loopback
+        Control code specified in Table 57-4. This counter is
+        incremented when a OAM:MA_DATA.request service primitive
+        is generated within the OAM sublayer with an OAM code
+        indicating a Loopback Control operation."
+    REFERENCE   "IEEE 802.3ah, Clause 57"
+    ::= { nbsEfmOamEntry 20 }
+
+
+nbsEfmOamLoopbackControlRx  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A count of OAMPDUs received that contain the Loopback
+        Control code specified in Table 57-4. This counter is
+        incremented on reception of a valid frame, with (1)
+        destinationField equal to the reserved multicast address
+        for Slow_Protocols specified in CROSS REF Table 43B-1, (2)
+        lengthOrType field value equal to the reserved Type for
+        Slow_Protocols as specified in CROSS REF Table 43B-2, (3)
+        a Slow_Protocols subtype value equal to the subtype
+        reserved for OAM as specified in Table 43B-3, (4) the OAM
+        code equals the Loopback Control code and is supported by
+        the device."
+    REFERENCE   "IEEE 802.3ah, Clause 57"
+    ::= { nbsEfmOamEntry 21 }
+
+nbsEfmOamVariableRequestTx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A count of OAMPDUs passed to the OAM subordinate sublayer
+        for transmission that contain the Variable Request code
+        specified in Table 57-4. This counter is incremented when
+        a OAM:MA_DATA.request service primitive is generated
+        within the OAM sublayer with an OAM code indicating a
+        Variable Request operation."
+    REFERENCE   "IEEE 802.3ah, Clause 57"
+    ::= { nbsEfmOamEntry 22 }
+
+nbsEfmOamVariableRequestRx  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A count of OAMPDUs received that contain the Variable
+        Request code specified in Table 57-4.  This counter is
+        incremented on reception of a valid frame, with (1)
+        destinationField equal to the reserved multicast address
+        for Slow_Protocols specified in CROSS REF Table 43B-1, (2)
+        lengthOrType field value equal to the reserved Type for
+        Slow_Protocols as specified in CROSS REF Table 43B-2, (3)
+        a Slow_Protocols subtype value equal to the subtype
+        reserved for OAM as specified in Table 43B-3, (4) the OAM
+        code equals the Variable Request code and is supported by
+        the device."
+    REFERENCE   "IEEE 802.3ah, Clause 57"
+    ::= { nbsEfmOamEntry 23 }
+
+nbsEfmOamVariableResponseTx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A count of OAMPDUs passed to the OAM subordinate sublayer
+        for transmission that contain the Variable Response code
+        specified in Table 57-4. This counter is incremented when
+        a OAM:MA_DATA.request service primitive is generated
+        within the OAM sublayer with an OAM code indicating a
+        Variable Response operation."
+    REFERENCE   "IEEE 802.3ah, Clause 57"
+    ::= { nbsEfmOamEntry 24 }
+
+nbsEfmOamVariableResponseRx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A count of OAMPDUs received that contain the Variable
+        Response code specified in Table 57-4. This counter is
+        incremented on reception of a valid frame, with (1)
+        destinationField equal to the reserved multicast address
+        for Slow_Protocols specified in CROSS REF Table 43B-1, (2)
+        lengthOrType field value equal to the reserved Type for
+        Slow_Protocols as specified in CROSS REF Table 43B-2, (3)
+        a Slow_Protocols subtype value equal to the subtype
+        reserved for OAM as specified in Table 43B-3, (4) the OAM
+        code equals the Variable Response code and is supported by
+        the device."
+    REFERENCE   "IEEE 802.3ah, Clause 57"
+    ::= { nbsEfmOamEntry 25 }
+
+nbsEfmOamOrganizationSpecificTx  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A count of Organization Specific OAMPDUs passed to the
+        OAM subordinate sublayer for transmission that contain the
+        Organization Specific code specified in Table 57-4. This
+        counter is incremented when a OAM:MA_DATA.request service
+        primitive is generated within the OAM sublayer with an OAM
+        code indicating a Organization Specific operation."
+    REFERENCE   "IEEE 802.3ah, Clause 57"
+    ::= { nbsEfmOamEntry 26 }
+
+nbsEfmOamOrganizationSpecificRx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A count of OAMPDUs received that contain the Organization
+        Specific code specified in Table 57-4. This counter is
+        incremented on reception of a valid frame, with (1)
+        destinationField equal to the reserved multicast address
+        for Slow_Protocols specified in CROSS REF Table 43B-1, (2)
+        lengthOrType field value equal to the reserved Type for
+        Slow_Protocols as specified in CROSS REF Table 43B-2, (3)
+        a Slow_Protocols subtype value equal to the subtype
+        reserved for OAM as specified in Table 43B-3, (4) the OAM
+        code equals the Organization Specific code and is
+        supported by the device."
+    REFERENCE   "IEEE 802.3ah, Clause 57"
+    ::= { nbsEfmOamEntry 27 }
+
+nbsEfmOamErrSymPerCfgDuration OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An eight-octet value indicating the duration of the
+        Errored Symbol Period Event (see 57.5.3.1) window, in
+        terms of symbols."
+    REFERENCE   "IEEE 802.3ah, Clause 57"
+    ::= { nbsEfmOamEntry 28 }
+
+nbsEfmOamErrSymPerCfgThreshld OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A four-octet value indicating the number of errored
+        symbols in the period that must be exceeded in order for
+        the Errored Symbol Period Event to be generated."
+    REFERENCE   "IEEE 802.3ah, Clause 57"
+    ::= { nbsEfmOamEntry 29 }
+
+nbsEfmOamErrSymPerEvtTime OBJECT-TYPE
+    SYNTAX      Unsigned16TC
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An integer corresponding to the Event Time Stamp field in
+        the most recently transmitted Errored Symbol Period Event
+        TLV in an Event Notification OAMPDU (see 57.4.3.2).
+        This integer is updated when a OAM:MA_DATA.request
+        service primitive is generated within the OAM sublayer
+        with an OAMPDU Code field value equal to the Event
+        Notification code as specified in Table 57-4 and Event TLV
+        Type field equal to the Errored Symbol Period Event value
+        as specified in Table 57-10."
+    REFERENCE   "IEEE 802.3ah, Clause 57"
+    ::= {nbsEfmOamEntry  30 }
+
+nbsEfmOamErrSymPerEvtWindow OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An integer corresponding to the Errored Symbol Window
+        field in the most recently transmitted Errored Symbol
+        Period Event TLV in an Event Notification OAMPDU (see
+        57.4.3.2).
+        This integer is updated when a OAM:MA_DATA.request
+        service primitive is generated within the OAM sublayer
+        with an OAMPDU Code field value equal to the Event
+        Notification code as specified in Table 57-4 and Event TLV
+        Type field equal to the Errored Symbol Period Event value
+        as specified in Table 57-10."
+    REFERENCE   "IEEE 802.3ah, Clause 57"
+    ::= {nbsEfmOamEntry  31 }
+
+nbsEfmOamErrSymPerEvtThreshld OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An integer corresponding to the Errored Symbol Threshold
+        field in the most recently transmitted Errored Symbol
+        Period Event TLV in an Event Notification OAMPDU (see
+        57.4.3.2).
+        This integer is updated when a OAM:MA_DATA.request
+        service primitive is generated within the OAM sublayer
+        with an OAMPDU Code field value equal to the Event
+        Notification code as specified in Table 57-4 and Event TLV
+        Type field equal to the Errored Symbol Period Event value
+        as specified in Table 57-10."
+    REFERENCE   "IEEE 802.3ah, Clause 57"
+    ::= {nbsEfmOamEntry  32 }
+
+nbsEfmOamErrSymPerEvtCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An integer corresponding to the Error Running Total field
+        in the most recently transmitted Errored Symbol Period
+        Event TLV in an Event Notification OAMPDU (see 57.4.3.2).
+        This integer is updated when a OAM:MA_DATA.request
+        service primitive is generated within the OAM sublayer
+        with an OAMPDU Code field value equal to the Event
+        Notification code as specified in Table 57-4 and Event TLV
+        Type field equal to the Errored Symbol Period Event value
+        as specified in Table 57-10."
+    REFERENCE   "IEEE 802.3ah, Clause 57"
+    ::= {nbsEfmOamEntry  33 }
+
+nbsEfmOamErrFrmCfgDuration  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A four-octet value indicating the duration of the Errored
+        Frame Event (see 57.5.3.2) window, in terms of number of
+        100ms intervals."
+    REFERENCE   "IEEE 802.3ah, Clause 57"
+    ::= { nbsEfmOamEntry 34 }
+
+nbsEfmOamErrFrmCfgThreshld OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A four-octet field indicating the number of errored
+        frames in the period that must be exceeded in order for
+        the Errored Frame Event to be generated."
+    REFERENCE   "IEEE 802.3ah, Clause 57"
+    ::= { nbsEfmOamEntry 35 }
+
+nbsEfmOamErrFrmEvtTime  OBJECT-TYPE
+    SYNTAX      Unsigned16TC
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An integer corresponding to the Event Time Stamp field in
+        the most recently transmitted Errored Frame Event TLV in
+        an Event Notification OAMPDU (see 57.4.3.2). This integer
+        is updated when a OAM:MA_DATA.request service primitive is
+        generated within the OAM sublayer with an OAMPDU Code
+        field value equal to the Event Notification code as
+        specified in Table 57-4 and Event TLV Type field equal to
+        the Errored Frame Event value as specified in Table 57-10."
+    REFERENCE   "IEEE 802.3ah, Clause 57"
+    ::= {nbsEfmOamEntry  36 }
+
+nbsEfmOamErrFrmEvtWindow OBJECT-TYPE
+    SYNTAX      Unsigned16TC
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An integer corresponding to the Errored Frame Window
+        field in the most recently transmitted Errored Frame
+        Event TLV in an Event Notification OAMPDU (see
+        57.4.3.2).
+        This integer is updated when a OAM:MA_DATA.request
+        service primitive is generated within the OAM sublayer
+        with an OAMPDU Code field value equal to the Event
+        Notification code as specified in Table 57-4 and Event TLV
+        Type field equal to the Errored Frame Event value as
+        specified in Table 57-10."
+    REFERENCE   "IEEE 802.3ah, Clause 57"
+    ::= {nbsEfmOamEntry  37 }
+
+nbsEfmOamErrFrmEvtThreshld OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An integer corresponding to the Errored Frame Threshold
+        field in the most recently transmitted Errored Frame Event
+        TLV in an Event Notification OAMPDU (see 57.4.3.2).
+        This integer is updated when a OAM:MA_DATA.request
+        service primitive is generated within the OAM sublayer
+        with an OAMPDU Code field value equal to the Event
+        Notification code as specified in Table 57-4 and Event TLV
+        Type field equal to the Errored Frame Event value as
+        specified in Table 57-10."
+    REFERENCE   "IEEE 802.3ah, Clause 57"
+    ::= {nbsEfmOamEntry  38 }
+
+nbsEfmOamErrFrmEvtCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An integer corresponding to the Error Running Total field
+        in the most recently transmitted Errored Frame Event TLV
+        in an Event Notification OAMPDU (see 57.4.3.2).
+        This integer is updated when a OAM:MA_DATA.request
+        service primitive is generated within the OAM sublayer
+        with an OAMPDU Code field value equal to the Event
+        Notification code as specified in Table 57-4 and Event TLV
+        Type field equal to the Errored Frame Event value as
+        specified in Table 57-10."
+    REFERENCE   "IEEE 802.3ah, Clause 57"
+    ::= {nbsEfmOamEntry  39 }
+
+nbsEfmOamErrFrmPerCfgDuration  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A four-octet value indicating the duration of the Errored
+        Frame Period Event (see 57.5.3.3) window, in terms of the
+        number of minFrameSize frames that can be transmitted on
+        the underlying physical layer."
+    REFERENCE   "IEEE 802.3ah, Clause 57"
+    ::= {nbsEfmOamEntry  40 }
+
+nbsEfmOamErrFrmPerCfgThreshld OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A four-octet value indicating the number of errored
+        frames in the period that must be exceeded in order for
+        the Errored Frame Period Event to be generated."
+    REFERENCE   "IEEE 802.3ah, Clause 57"
+    ::= {nbsEfmOamEntry  41 }
+
+nbsEfmOamErrFrmPerEvtTime OBJECT-TYPE
+    SYNTAX      Unsigned16TC
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An integer corresponding to the Event Time Stamp field
+        in the most recently transmitted Errored Frame Period
+        Event TLV in an Event Notification OAMPDU (see 57.4.3.2).
+        This integer is updated when a OAM:MA_DATA.request
+        service primitive is generated within the OAM sublayer
+        with an OAMPDU Code field value equal to the Event
+        Notification code as specified in Table 57-4 and Event TLV
+        Type field equal to the Errored Frame Period Event value
+        as specified in Table 57-10."
+    REFERENCE   "IEEE 802.3ah, Clause 57"
+    ::= {nbsEfmOamEntry  42 }
+
+nbsEfmOamErrFrmPerEvtWindow OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An integer corresponding to the Errored Frame Window field
+        in the most recently transmitted Errored Frame Period
+        Event TLV in an Event Notification OAMPDU (see 57.4.3.2).
+        This integer is updated when a OAM:MA_DATA.request
+        service primitive is generated within the OAM sublayer
+        with an OAMPDU Code field value equal to the Event
+        Notification code as specified in Table 57-4 and Event TLV
+        Type field equal to the Errored Frame Period Event value
+        as specified in Table 57-10."
+    REFERENCE   "IEEE 802.3ah, Clause 57"
+    ::= {nbsEfmOamEntry  43 }
+
+nbsEfmOamErrFrmPerEvtThreshld OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An integer corresponding to the Errored Frame Threshold field
+        in the most recently transmitted Errored Frame Period
+        Event TLV in an Event Notification OAMPDU (see 57.4.3.2).
+        This integer is updated when a OAM:MA_DATA.request
+        service primitive is generated within the OAM sublayer
+        with an OAMPDU Code field value equal to the Event
+        Notification code as specified in Table 57-4 and Event TLV
+        Type field equal to the Errored Frame Period Event value
+        as specified in Table 57-10."
+    REFERENCE   "IEEE 802.3ah, Clause 57"
+    ::= {nbsEfmOamEntry  44 }
+
+nbsEfmOamErrFrmPerEvtCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An integer corresponding to the Error Running Total field
+        in the most recently transmitted Errored Frame Period
+        Event TLV in an Event Notification OAMPDU (see 57.4.3.2).
+        This integer is updated when a OAM:MA_DATA.request
+        service primitive is generated within the OAM sublayer
+        with an OAMPDU Code field value equal to the Event
+        Notification code as specified in Table 57-4 and Event TLV
+        Type field equal to the Errored Frame Period Event value
+        as specified in Table 57-10."
+    REFERENCE   "IEEE 802.3ah, Clause 57"
+    ::= {nbsEfmOamEntry  45 }
+
+nbsEfmOamErrFrmSecSumCfgDuration OBJECT-TYPE
+    SYNTAX      Unsigned16TC
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A two-octet value indicating the duration of the Errored
+        Frame Seconds Summary Event (see 57.5.3.4) window, in
+        terms of number of 100ms intervals."
+    REFERENCE   "IEEE 802.3ah, Clause 57"
+    ::= {nbsEfmOamEntry  46 }
+
+nbsEfmOamErrFrmSecSumCfgThreshld OBJECT-TYPE
+    SYNTAX      Unsigned16TC
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A two-octet value indicating the number of errored frame
+        seconds in the period that must be exceeded in order for
+        the Errored Frame Seconds Summary Event to be generated."
+    REFERENCE   "IEEE 802.3ah, Clause 57"
+    ::= {nbsEfmOamEntry  47 }
+
+nbsEfmOamErrFrmSecSumEvtTime  OBJECT-TYPE
+    SYNTAX      Unsigned16TC
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An integer corresponding to the Event Time Stamp field
+        in the most recently transmitted Errored Frame Seconds
+        Summary Event TLV in an Event Notification OAMPDU (see
+        57.4.3.2). This integer is updated when a
+        OAM:MA_DATA.request service primitive is generated within
+        the OAM sublayer with an OAMPDU Code field value equal to
+        the Event Notification code as specified in Table 57-4 and
+        Event TLV Type field equal to the Errored Frame Seconds
+        Summary Event value as specified in Table 57-10."
+    REFERENCE   "IEEE 802.3ah, Clause 57"
+    ::= {nbsEfmOamEntry  48 }
+
+nbsEfmOamErrFrmSecSumEvtWindow OBJECT-TYPE
+    SYNTAX      Unsigned16TC
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An integer corresponding to the Errored Frame Seconds
+        Window field in the most recently transmitted Errored
+        Frame Seconds Summary Event TLV in an Event Notification
+        OAMPDU (see 57.4.3.2). This integer is updated when a
+        OAM:MA_DATA.request service primitive is generated within
+        the OAM sublayer with an OAMPDU Code field value equal to
+        the Event Notification code as specified in Table 57-4 and
+        Event TLV Type field equal to the Errored Frame Seconds
+        Summary Event value as specified in Table 57-10."
+    REFERENCE   "IEEE 802.3ah, Clause 57"
+    ::= {nbsEfmOamEntry  49 }
+
+nbsEfmOamErrFrmSecSumEvtThreshld OBJECT-TYPE
+    SYNTAX      Unsigned16TC
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An integer corresponding to the Errored Frame Seconds
+        Threshold field in the most recently transmitted Errored
+        Frame Seconds Summary Event TLV in an Event Notification
+        OAMPDU (see 57.4.3.2). This integer is updated when a
+        OAM:MA_DATA.request service primitive is generated within
+        the OAM sublayer with an OAMPDU Code field value equal to
+        the Event Notification code as specified in Table 57-4 and
+        Event TLV Type field equal to the Errored Frame Seconds
+        Summary Event value as specified in Table 57-10."
+    REFERENCE   "IEEE 802.3ah, Clause 57"
+    ::= {nbsEfmOamEntry  50 }
+
+nbsEfmOamErrFrmSecSumEvtCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An integer corresponding to the Error Running Total field
+        in the most recently transmitted Errored Frame Seconds
+        Summary Event TLV in an Event Notification OAMPDU (see
+        57.4.3.2). This integer is updated when a
+        OAM:MA_DATA.request service primitive is generated within
+        the OAM sublayer with an OAMPDU Code field value equal to
+        the Event Notification code as specified in Table 57-4 and
+        Event TLV Type field equal to the Errored Frame Seconds
+        Summary Event value as specified in Table 57-10."
+    REFERENCE   "IEEE 802.3ah, Clause 57"
+    ::= {nbsEfmOamEntry  51 }
+
+nbsEfmOamFramesLostDueToOamError OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A count of frames that would otherwise be transmitted by
+        the OAM sublayer, but could not be due to an internal OAM
+        sublayer transmit error. If this counter is incremented,
+        then none of the other counters in this section are
+        incremented. The exact meaning and mechanism for
+        incrementing this counter is implementation dependent."
+    REFERENCE   "IEEE 802.3ah, Clause 57"
+    ::= { nbsEfmOamEntry 52 }
+
+nbsEfmOamAdminState  OBJECT-TYPE
+     SYNTAX  INTEGER {
+         notSupported    (1),
+         disable         (2),
+         enable          (3)
+     }
+     MAX-ACCESS read-write
+     STATUS     current
+     DESCRIPTION
+         "A value that identifies the operational state of the OAM
+         sublayer. An interface which can provide the OAM sublayer
+         functions specified in Clause 57 will be enabled to do so
+         when this attribute has the enumeration enable(3). When
+         this attribute has the enumeration disable(2) the interface
+         will act as it would if it had no OAM sublayer."
+        DEFVAL { enable }
+     ::= {nbsEfmOamEntry  53 }
+
+nbsEfmOamOperState OBJECT-TYPE
+
+     SYNTAX      OCTET STRING(SIZE(1))
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "This object declares configurable (*) and operational reasons for
+         disabling OAM service. The reason applies only if the bit is set.
+         Multiple bits may be set concurrently. OAM service is enabled
+         when no bits are set.
+
+         Bit  Reason to disable
+         --- ----------------------------------------------
+         0  reserved
+         1  reserved
+         2  reserved
+         3  reserved
+         4  reserved
+         5  Temporarily disabled for download processing
+         6  Administratively disabled (*)
+         7  OAM service is not available
+
+         OCTET STRING bitmasks count the leftmost bit (MSB) as 0."
+
+     ::= {nbsEfmOamEntry  54 }
+
+
+
+
+
+-- ***********************************************************************
+-- Conformance information.
+-- ***********************************************************************
+nbsEfmConformance OBJECT IDENTIFIER ::= { nbsEfmMib 3 }
+nbsEfmGroups      OBJECT IDENTIFIER ::= { nbsEfmConformance 1 }
+
+-- units of conformance
+nbsEfmOamGroup  OBJECT-GROUP
+OBJECTS {
+    nbsEfmPhysicalIfIndex,
+    nbsEfmOamIfIndex,
+    nbsEfmOamPeerIfIndex,
+    nbsEfmOamMode,
+    nbsEfmOamCfg,
+    nbsEfmOamPduCfg,
+    nbsEfmOamFlagsField,
+    nbsEfmOamState,
+    nbsEfmOamVendorOUI,
+    nbsEfmOamVendorDeviceId,
+    nbsEfmOamVendorDeviceVersion,
+    nbsEfmOamPDUTx,
+    nbsEfmOamPDURx,
+    nbsEfmOamUnsupportedCodesRx,
+    nbsEfmOamInformationTx,
+    nbsEfmOamInformationRx,
+    nbsEfmOamEventNotificationTx,
+    nbsEfmOamUniEventNotificationRx,
+    nbsEfmOamDupEventNotificationRx,
+    nbsEfmOamLoopbackControlTx,
+    nbsEfmOamLoopbackControlRx,
+    nbsEfmOamVariableRequestTx,
+    nbsEfmOamVariableRequestRx,
+    nbsEfmOamVariableResponseTx,
+    nbsEfmOamVariableResponseRx,
+    nbsEfmOamOrganizationSpecificTx,
+    nbsEfmOamOrganizationSpecificRx,
+    nbsEfmOamErrSymPerCfgDuration,
+    nbsEfmOamErrSymPerCfgThreshld,
+    nbsEfmOamErrSymPerEvtTime,
+    nbsEfmOamErrSymPerEvtWindow,
+    nbsEfmOamErrSymPerEvtThreshld,
+    nbsEfmOamErrSymPerEvtCount,
+    nbsEfmOamErrFrmCfgDuration,
+    nbsEfmOamErrFrmCfgThreshld,
+    nbsEfmOamErrFrmEvtTime,
+    nbsEfmOamErrFrmEvtWindow,
+    nbsEfmOamErrFrmEvtThreshld,
+    nbsEfmOamErrFrmEvtCount,
+    nbsEfmOamErrFrmPerCfgDuration,
+    nbsEfmOamErrFrmPerCfgThreshld,
+    nbsEfmOamErrFrmPerEvtTime,
+    nbsEfmOamErrFrmPerEvtWindow,
+    nbsEfmOamErrFrmPerEvtThreshld,
+    nbsEfmOamErrFrmPerEvtCount,
+    nbsEfmOamErrFrmSecSumCfgDuration,
+    nbsEfmOamErrFrmSecSumCfgThreshld,
+    nbsEfmOamErrFrmSecSumEvtTime,
+    nbsEfmOamErrFrmSecSumEvtWindow,
+    nbsEfmOamErrFrmSecSumEvtThreshld,
+    nbsEfmOamErrFrmSecSumEvtCount,
+    nbsEfmOamFramesLostDueToOamError,
+    nbsEfmOamAdminState,
+    nbsEfmOamOperState
+}
+STATUS  current
+DESCRIPTION
+    "OAM attributes."
+::= { nbsEfmGroups 3 }
+
+END

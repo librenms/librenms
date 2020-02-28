@@ -11,9 +11,7 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Authentication\LegacyAuth;
-
-if (!LegacyAuth::user()->hasGlobalAdmin()) {
+if (!Auth::user()->hasGlobalAdmin()) {
     die('ERROR: You need to be admin');
 }
 
@@ -31,6 +29,7 @@ if (!LegacyAuth::user()->hasGlobalAdmin()) {
             </div>
             <div class="modal-footer">
                 <form role="form" class="remove_alert_templet_form">
+                    <?php echo csrf_field() ?>
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-danger danger" id="alert-template-removal" data-target="alert-template-removal">Delete</button>
                     <input type="hidden" name="template_id" id="template_id" value="">

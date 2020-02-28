@@ -19,7 +19,8 @@ foreach ($sql_result as $entry) {
 $insert = []; // populate $insert with database entries
 if (file_exists(Config::get('install_dir') . "/includes/discovery/fdb-table/{$device['os']}.inc.php")) {
     require Config::get('install_dir') . "/includes/discovery/fdb-table/{$device['os']}.inc.php";
-} elseif ($device['os'] == 'ios' || $device['os'] == 'iosxe') {
+} elseif ($device['os'] == 'ios' || $device['os'] == 'iosxe'|| $device['os'] == 'nxos') {
+    //ios,iosxe,nxos are all Cisco
     include Config::get('install_dir') . '/includes/discovery/fdb-table/ios.inc.php';
 }
 
@@ -29,6 +30,8 @@ if (empty($insert)) {
 }
 
 if (!empty($insert)) {
+    $update_time_only = [];
+    $now = \Carbon\Carbon::now();
     // synchronize with the database
     foreach ($insert as $vlan_id => $mac_address_table) {
         echo " {$vlans_by_id[$vlan_id]}: ";
@@ -36,43 +39,48 @@ if (!empty($insert)) {
         foreach ($mac_address_table as $mac_address_entry => $entry) {
             if ($existing_fdbs[$vlan_id][$mac_address_entry]) {
                 $new_port = $entry['port_id'];
+                $port_fdb_id = $existing_fdbs[$vlan_id][$mac_address_entry]['ports_fdb_id'];
 
-                if ($existing_fdbs[$vlan_id][$mac_address_entry]['port_id'] != $new_port) {
-                    $port_fdb_id = $existing_fdbs[$vlan_id][$mac_address_entry]['ports_fdb_id'];
-                    dbUpdate(
-                        array('port_id' => $new_port, 'updated_at' => array('NOW()'),),
-                        'ports_fdb',
-                        '`device_id` = ? AND `vlan_id` = ? AND `mac_address` = ?',
-                        array($device['device_id'], $vlan_id, $mac_address_entry)
-                    );
+                // Sometimes new_port ends up as 0 if we didn't get a complete dot1dBasePort
+                // dictionary from BRIDGE-MIB - don't write a 0 over a previously known port
+                if ($existing_fdbs[$vlan_id][$mac_address_entry]['port_id'] != $new_port && $new_port != 0) {
+                    DB::table('ports_fdb')
+                        ->where('ports_fdb_id', $port_fdb_id)
+                        ->update([
+                            'port_id' => $new_port,
+                            'updated_at' => $now,
+                        ]);
                     echo 'U';
                 } else {
-                    dbUpdate(
-                        array('updated_at' => array('NOW()'),), //we need to do this unless we use Eloquent "update" method
-                        'ports_fdb',
-                        '`device_id` = ? AND `vlan_id` = ? AND `mac_address` = ?',
-                        array($device['device_id'], $vlan_id, $mac_address_entry)
-                    );
+                    $update_time_only[] = $port_fdb_id;
                     echo '.';
                 }
                 unset($existing_fdbs[$vlan_id][$mac_address_entry]);
             } else {
-                $new_entry = array(
+                if (is_null($entry['port_id'])) {
+                    // fix SQLSTATE[23000]: Integrity constraint violation: 1048 Column 'port_id' cannot be null
+                    // If $entry['port_id'] truly is null then  Illuminate throws a fatal errory and all subsequent processing stops.
+                    // Cisco ISO (and others) may have null ids. We still want them inserted as new
+                    // strings work with DB::table->insert().
+                    $entry['port_id']='';
+                }
+
+                DB::table('ports_fdb')->insert([
                     'port_id' => $entry['port_id'],
                     'mac_address' => $mac_address_entry,
                     'vlan_id' => $vlan_id,
                     'device_id' => $device['device_id'],
-                    'created_at' => array('NOW()'), //we need to do this unless we use Eloquent "create" method
-                    'updated_at' => array('NOW()'), //we need to do this unless we use Eloquent "update" method
-                );
-
-                dbInsert($new_entry, 'ports_fdb');
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ]);
                 echo '+';
             }
         }
 
         echo PHP_EOL;
     }
+
+    DB::table('ports_fdb')->whereIn('ports_fdb_id', $update_time_only)->update(['updated_at' => $now]);
 
     //We do not delete anything here, as daily.sh will take care of the cleaning.
 
@@ -90,5 +98,7 @@ unset(
     $vlans,
     $port,
     $fdbPort_table,
-    $entries
+    $entries,
+    $update_time_only,
+    $now
 );

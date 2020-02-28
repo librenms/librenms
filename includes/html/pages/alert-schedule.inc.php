@@ -12,11 +12,9 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Authentication\LegacyAuth;
-
 $pagetitle[] = 'Alert Schedule';
 $no_refresh  = true;
-if (LegacyAuth::user()->hasGlobalAdmin()) {
+if (Auth::user()->hasGlobalAdmin()) {
     include_once 'includes/html/modal/alert_schedule.inc.php';
     include_once 'includes/html/modal/remove_alert_schedule.inc.php';
 

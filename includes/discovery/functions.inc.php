@@ -126,9 +126,8 @@ function discover_device(&$device, $force_module = false)
 
     $valid = array();
     // Reset $valid array
-    $attribs = get_dev_attribs($device['device_id']);
+    $attribs = DeviceCache::getPrimary()->getAttribs();
     $device['attribs'] = $attribs;
-    $device['snmp_max_repeaters'] = $attribs['snmp_max_repeaters'];
 
     $device_start = microtime(true);
     // Start counting device poll time
@@ -227,6 +226,9 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
 
     if (!is_numeric($divisor)) {
         $divisor  = 1;
+    }
+    if (can_skip_sensor($device, $type, $descr)) {
+        return false;
     }
 
     d_echo("Discover sensor: $oid, $index, $type, $descr, $poller_type, $divisor, $multiplier, $entPhysicalIndex, $current, (limits: LL: $low_limit, LW: $low_warn_limit, W: $warn_limit, H: $high_limit)\n");
@@ -654,12 +656,12 @@ function discover_processor(&$valid, $device, $oid, $index, $type, $descr, $prec
 
 //end discover_processor()
 
-function discover_mempool(&$valid, $device, $index, $type, $descr, $precision = '1', $entPhysicalIndex = null, $hrDeviceIndex = null)
+function discover_mempool(&$valid, $device, $index, $type, $descr, $precision = '1', $entPhysicalIndex = null, $hrDeviceIndex = null, $perc_warn = '90')
 {
 
     $descr = substr($descr, 0, 64);
 
-    d_echo("Discover Mempool: $index, $type, $descr, $precision, $entPhysicalIndex, $hrDeviceIndex\n");
+    d_echo("Discover Mempool: $index, $type, $descr, $precision, $entPhysicalIndex, $hrDeviceIndex, $perc_warn\n");
 
     // FIXME implement the mempool_perc, mempool_used, etc.
     if ($descr) {
@@ -674,6 +676,7 @@ function discover_mempool(&$valid, $device, $index, $type, $descr, $precision = 
                 'mempool_used' => 0,
                 'mempool_free' => 0,
                 'mempool_total' => 0,
+                'mempool_perc_warn' => $perc_warn,
             );
 
             if (is_numeric($entPhysicalIndex)) {
@@ -783,6 +786,7 @@ function discover_entity_physical(&$valid, $device, $entPhysicalIndex, $entPhysi
                 'entPhysicalIsFRU'        => $entPhysicalIsFRU,
                 'entPhysicalAlias'        => $entPhysicalAlias,
                 'entPhysicalAssetID'      => $entPhysicalAssetID,
+                'ifIndex'                 => $ifIndex,
             );
             dbUpdate($update_data, 'entPhysical', '`device_id`=? AND `entPhysicalIndex`=?', array($device['device_id'], $entPhysicalIndex));
         }//end if
@@ -818,8 +822,11 @@ function discover_process_ipv6(&$valid, $ifIndex, $ipv6_address, $ipv6_prefixlen
                 echo 'n';
             }
 
-            $ipv6_network_id = dbFetchCell('SELECT `ipv6_network_id` FROM `ipv6_networks` WHERE `ipv6_network` = ? AND `context_name` = ?', array($ipv6_network, $context_name));
-
+            if ($context_name == null) {
+                $ipv6_network_id = dbFetchCell('SELECT `ipv6_network_id` FROM `ipv6_networks` WHERE `ipv6_network` = ? AND `context_name` IS NULL', array($ipv6_network));
+            } else {
+                $ipv6_network_id = dbFetchCell('SELECT `ipv6_network_id` FROM `ipv6_networks` WHERE `ipv6_network` = ? AND `context_name` = ?', array($ipv6_network, $context_name));
+            }
             if (dbFetchCell('SELECT COUNT(*) FROM `ipv6_addresses` WHERE `ipv6_address` = ? AND `ipv6_prefixlen` = ? AND `port_id` = ?', array($ipv6_address, $ipv6_prefixlen, $port_id)) == '0') {
                 dbInsert(array(
                     'ipv6_address' => $ipv6_address,
@@ -831,6 +838,15 @@ function discover_process_ipv6(&$valid, $ifIndex, $ipv6_address, $ipv6_prefixlen
                     'context_name' => $context_name
                 ), 'ipv6_addresses');
                 echo '+';
+            } else if (dbFetchCell('SELECT COUNT(*) FROM `ipv6_addresses` WHERE `ipv6_address` = ? AND `ipv6_prefixlen` = ? AND `port_id` = ? AND `ipv6_network_id` = ""', [$ipv6_address, $ipv6_prefixlen, $port_id]) == '1') {
+                // Update IPv6 network ID if not set
+                if ($context_name == null) {
+                    $ipv6_network_id = dbFetchCell('SELECT `ipv6_network_id` FROM `ipv6_networks` WHERE `ipv6_network` = ? AND `context_name` IS NULL', [$ipv6_network]);
+                } else {
+                    $ipv6_network_id = dbFetchCell('SELECT `ipv6_network_id` FROM `ipv6_networks` WHERE `ipv6_network` = ? AND `context_name` = ?', [$ipv6_network, $context_name]);
+                }
+                dbUpdate(['ipv6_network_id' => $ipv6_network_id], 'ipv6_addresses', '`ipv6_address` = ? AND `ipv6_prefixlen` = ? AND `port_id` = ?', [$ipv6_address, $ipv6_prefixlen, $port_id]);
+                echo 'u';
             } else {
                 //Update Context
                 dbUpdate(array('context_name' => $device['context_name']), 'ipv6_addresses', '`ipv6_address` = ? AND `ipv6_prefixlen` = ? AND `port_id` = ?', array($ipv6_address, $ipv6_prefixlen, $port_id));
@@ -897,6 +913,9 @@ function get_device_divisor($device, $os_version, $sensor_type, $oid)
         }
     } elseif ($device['os'] == 'huaweiups') {
         if ($sensor_type == 'frequency') {
+            if (starts_with($device['hardware'], "UPS2000")) {
+                return 10;
+            }
             return 100;
         }
     } elseif ($device['os'] == 'hpe-rtups') {
@@ -990,7 +1009,7 @@ function ignore_storage($os, $descr)
  */
 function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
 {
-    if ($device['dynamic_discovery']['modules']['sensors'][$sensor_type]) {
+    if ($device['dynamic_discovery']['modules']['sensors'][$sensor_type] && ! can_skip_sensor($device, $sensor_type, '')) {
         $sensor_options = array();
         if (isset($device['dynamic_discovery']['modules']['sensors'][$sensor_type]['options'])) {
             $sensor_options = $device['dynamic_discovery']['modules']['sensors'][$sensor_type]['options'];
@@ -1040,8 +1059,12 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
 
                 d_echo("Final sensor value: $value\n");
 
-                if (YamlDiscovery::canSkipItem($value, $index, $data, $sensor_options, $pre_cache) === false && is_numeric($value)) {
+                $skippedFromYaml = YamlDiscovery::canSkipItem($value, $index, $data, $sensor_options, $pre_cache);
+                if ($skippedFromYaml === false && is_numeric($value)) {
                     $oid = str_replace('{{ $index }}', $index, $data['num_oid']);
+                    // if index is a string, we need to convert it to OID
+                    // strlen($index) as first number, and each letter converted to a number, separated by dots
+                    $oid = str_replace('{{ $index_string }}', strlen($index) . '.' . implode(".", unpack("c*", $index)), $oid);
 
                     // process the description
                     $descr = YamlDiscovery::replaceValues('descr', $index, null, $data, $pre_cache);
@@ -1057,7 +1080,7 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                         if (is_numeric($data[$limit])) {
                             $$limit = $data[$limit];
                         } else {
-                            $$limit = dynamic_discovery_get_value($limit, $index, $data, $pre_cache, 'null');
+                            $$limit = YamlDiscovery::getValueFromData($limit, $index, $data, $pre_cache, 'null');
                             if (is_numeric($$limit)) {
                                 $$limit = ($$limit / $divisor) * $multiplier;
                             }
@@ -1096,52 +1119,15 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
 }
 
 /**
- * Helper function for dynamic discovery to search for data from pre_cached snmp data
- *
- * @param string $name The name of the field from the discovery data or just an oid
- * @param int $index The index of the current sensor
- * @param array $discovery_data The discovery data for the current sensor
- * @param array $pre_cache all pre-cached snmp data
- * @param mixed $default The default value to return if data is not found
- * @return mixed
- */
-function dynamic_discovery_get_value($name, $index, $discovery_data, $pre_cache, $default = null)
-{
-    if (isset($discovery_data[$name])) {
-        $name = $discovery_data[$name];
-    }
-
-    if (isset($pre_cache[$discovery_data['oid']][$index][$name])) {
-        return $pre_cache[$discovery_data['oid']][$index][$name];
-    }
-
-    if (isset($pre_cache[$name])) {
-        if (is_array($pre_cache[$name])) {
-            if (isset($pre_cache[$name][$index][$name])) {
-                return $pre_cache[$name][$index][$name];
-            } elseif (isset($pre_cache[$index][$name])) {
-                return $pre_cache[$index][$name];
-            } elseif (count($pre_cache[$name]) === 1) {
-                return current($pre_cache[$name]);
-            }
-        } else {
-            return $pre_cache[$name];
-        }
-    }
-
-    return $default;
-}
-
-/**
  * @param $types
  * @param $device
  * @param array $pre_cache
  */
 function sensors($types, $device, $valid, $pre_cache = array())
 {
-    foreach ((array)$types as $sensor_type) {
-        echo ucfirst($sensor_type) . ': ';
-        $dir = Config::get('install_dir') . '/includes/discovery/sensors/' . $sensor_type .'/';
+    foreach ((array)$types as $sensor_class) {
+        echo ucfirst($sensor_class) . ': ';
+        $dir = Config::get('install_dir') . '/includes/discovery/sensors/' . $sensor_class .'/';
 
         if (is_file($dir . $device['os_group'] . '.inc.php')) {
             include $dir . $device['os_group'] . '.inc.php';
@@ -1154,9 +1140,9 @@ function sensors($types, $device, $valid, $pre_cache = array())
                 include $dir . '/rfc1628.inc.php';
             }
         }
-        discovery_process($valid, $device, $sensor_type, $pre_cache);
-        d_echo($valid['sensor'][$sensor_type]);
-        check_valid_sensors($device, $sensor_type, $valid['sensor']);
+        discovery_process($valid, $device, $sensor_class, $pre_cache);
+        d_echo($valid['sensor'][$sensor_class]);
+        check_valid_sensors($device, $sensor_class, $valid['sensor']);
         echo "\n";
     }
 }
@@ -1176,6 +1162,7 @@ function build_bgp_peers($device, $data, $peer2)
     $peerlist = array();
     $ver = '';
     foreach (explode("\n", $peers) as $peer) {
+        $local_ip = null;
         if ($peer2 === true) {
             list($ver, $peer) = explode('.', $peer, 2);
         }
@@ -1200,9 +1187,10 @@ function build_bgp_peers($device, $data, $peer2)
         if ($peer && $peer_ip != '0.0.0.0') {
             d_echo("Found peer $peer_ip (AS$peer_as)\n");
             $peerlist[] = array(
-                'ip'  => $peer_ip,
-                'as'  => $peer_as,
-                'ver' => $ver,
+                'ip'      => $peer_ip,
+                'as'      => $peer_as,
+                'localip' => $local_ip ?: '0.0.0.0',
+                'ver'     => $ver,
             );
         }
     }
@@ -1225,10 +1213,10 @@ function build_cbgp_peers($device, $peer, $af_data, $peer2)
 
         $afisafi_tmp = explode('.', $k);
         if ($device['os_group'] === 'vrp') {
-            array_shift($afisafi_tmp); //remove 1st value, always 0 so far
+            $vpninst_id  = array_shift($afisafi_tmp);
             $afi         = array_shift($afisafi_tmp);
             $safi        = array_shift($afisafi_tmp);
-            array_shift($afisafi_tmp); //type, always ipv4 so far
+            $peertype    = array_shift($afisafi_tmp);
             $bgp_ip      = implode('.', $afisafi_tmp);
         } else {
             $safi        = array_pop($afisafi_tmp);
@@ -1261,7 +1249,7 @@ function add_bgp_peer($device, $peer)
             'astext' => $peer['astext'],
             'bgpPeerState' => 'idle',
             'bgpPeerAdminStatus' => 'stop',
-            'bgpLocalAddr' => '0.0.0.0',
+            'bgpLocalAddr' => $peer['localip'] ?: '0.0.0.0',
             'bgpPeerRemoteAddr' => '0.0.0.0',
             'bgpPeerInUpdates' => 0,
             'bgpPeerOutUpdates' => 0,
@@ -1313,6 +1301,27 @@ function add_cbgp_peer($device, $peer, $afi, $safi)
         dbInsert($cbgp, 'bgpPeers_cbgp');
     }
 }
+
+/**
+ * check if we should skip this sensor from discovery
+ * @param $device
+ * @param string $sensor_type
+ * @param string $sensor_descr
+ * @return bool
+ */
+function can_skip_sensor($device, $sensor_type = '', $sensor_descr = '')
+{
+    if (! empty($sensor_type) && Config::getCombined($device['os'], "disabled_sensors.$sensor_type", false)) {
+        return true;
+    }
+    foreach (Config::getCombined($device['os'], "disabled_sensors_regex", []) as $skipRegex) {
+        if (! empty($sensor_descr) && preg_match($skipRegex, $sensor_descr)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 
 /**
  * check if we should skip this device from discovery

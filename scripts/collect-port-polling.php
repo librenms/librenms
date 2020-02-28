@@ -30,6 +30,8 @@ if (isset($options['help'])) {
     exit(0);
 }
 
+$where = '';
+$params = [];
 if (isset($options['h'])) {
     if (is_numeric($options['h'])) {
         $where = "AND `device_id` = ?";
@@ -43,10 +45,8 @@ if (isset($options['h'])) {
         $where = "AND `hostname` LIKE ?";
         $params = array(str_replace('*', '%', mres($options['h'])));
     }
-    $devices = dbFetch("SELECT * FROM `devices` WHERE status = 1 AND disabled = 0 $where ORDER BY `hostname` ASC", $params);
-} else {
-    $devices = get_all_devices();
 }
+$devices = dbFetchRows("SELECT * FROM `devices` WHERE status = 1 AND disabled = 0 $where ORDER BY `hostname` ASC", $params);
 
 if (isset($options['e'])) {
     if (!is_numeric($options['e']) || $options['e'] < 0) {

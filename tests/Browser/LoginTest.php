@@ -56,7 +56,7 @@ class LoginTest extends DuskTestCase
             $user = factory(User::class)->create([
                 'password' => password_hash($password, PASSWORD_DEFAULT)
             ]);
-            Config::set('twofactor', true, true); // set to db
+            Config::persist('twofactor', true); // set to db
             UserPref::setPref($user, 'twofactor', [
                 'key' => '5P3FLXBX7NU3ZBFOTWZL2GL5MKFEWBOA', // known key: 634456, 613687, 064292
                 'fails' => 0,

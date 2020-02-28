@@ -1,0 +1,132 @@
+ IBM-NetFinity-Text-Alert-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+                enterprises
+                        FROM RFC1155-SMI
+                TRAP-TYPE
+                        FROM RFC1215
+                OBJECT-TYPE
+                        FROM RFC1212;
+
+ ibm                    OBJECT IDENTIFIER ::= { enterprises 2 }
+
+ ibmProd                OBJECT IDENTIFIER ::= { ibm 6 }
+
+ netFinity              OBJECT IDENTIFIER ::= { ibmProd 71 }
+
+
+ --
+ --
+ -- the trap description objects
+ --
+ --
+
+ trapDesc1               OBJECT-TYPE
+                         SYNTAX OCTET STRING
+                         ACCESS read-only
+                         STATUS mandatory
+                         DESCRIPTION
+                              "The text of the Netfinity generated alert"
+                         ::= { netFinity 1 }
+
+ trapSystemName          OBJECT-TYPE
+                         SYNTAX OCTET STRING
+                         ACCESS read-only
+                         STATUS mandatory
+                         DESCRIPTION
+                              "The NetFinity System Name where the trap occurred"
+                         ::= { netFinity 2 }
+
+ trapTime                OBJECT-TYPE
+                         SYNTAX OCTET STRING
+                         ACCESS read-only
+                         STATUS mandatory
+                         DESCRIPTION
+                              "The time the alert was generated"
+                         ::= { netFinity 3 }
+
+ trapDate                OBJECT-TYPE
+                         SYNTAX OCTET STRING
+                         ACCESS read-only
+                         STATUS mandatory
+                         DESCRIPTION
+                              "The date the alert was generated"
+                         ::= { netFinity 4 }
+
+ trapSeverity            OBJECT-TYPE
+                         SYNTAX INTEGER
+                         ACCESS read-only
+                         STATUS mandatory
+                         DESCRIPTION
+                              "The NetFinity severity"
+                         ::= { netFinity 5 }
+
+ trapType                OBJECT-TYPE
+                         SYNTAX OCTET STRING
+                         ACCESS read-only
+                         STATUS mandatory
+                         DESCRIPTION
+                              "The NetFinity Alert Type"
+                         ::= { netFinity 6 }
+
+ trapApplicationID       OBJECT-TYPE
+                         SYNTAX OCTET STRING
+                         ACCESS read-only
+                         STATUS mandatory
+                         DESCRIPTION
+                              "The NetFinity Application ID"
+                         ::= { netFinity 7 }
+
+ trapAppType             OBJECT-TYPE
+                         SYNTAX INTEGER
+                         ACCESS read-only
+                         STATUS mandatory
+                         DESCRIPTION
+                              "The NetFinity Application Alert Type"
+                         ::= { netFinity 8 }
+
+ trapRecFrom             OBJECT-TYPE
+                         SYNTAX OCTET STRING
+                         ACCESS read-only
+                         STATUS mandatory
+                         DESCRIPTION
+                              "The NetFinity network name of the machine that generated the alert"
+                         ::= { netFinity 9 }
+
+--
+--  NetFinity SNMP trap
+--
+
+ trapText1              TRAP-TYPE
+                        ENTERPRISE      netFinity
+                        VARIABLES       {
+                                        trapDesc1,
+                                        trapSystemName,
+                                        trapTime,
+                                        trapDate,
+                                        trapSeverity,
+                                        trapType,
+                                        trapApplicationID,
+                                        trapAppType,
+                                        trapRecFrom
+                                        }
+                        DESCRIPTION
+                                 "Converted Netfinity Alert"
+                         --#TYPE "NetFinity Alert Trap Information"
+                         --#SUMMARY "%s "
+                         --#SUMMARY "System %s "
+                         --#SUMMARY "%s %s "
+                         --#SUMMARY "Severity %d "
+                         --#SUMMARY "Type of Alert %s "
+                         --#SUMMARY "Application ID %s "
+                         --#SUMMARY "Application Alert Type %d"
+                         --#SUMMARY "Received From %s"
+                         --#ARGUMENTS {0,1,2,3,4,5,6,7,8}
+                         --#SEVERITY INFORMATIONAL
+                         --#TIMEINDEX 1
+                         --#STATE   OPERATIONAL
+                        ::= 1
+
+ END
+
+

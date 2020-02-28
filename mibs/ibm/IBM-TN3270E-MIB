@@ -1,0 +1,206 @@
+-- MIB created 10/11/99 20:28:43, by
+--   SMIC (the next generation) version 1.6.29, November 22, 1994.
+
+IBM-TN3270E-MIB DEFINITIONS ::= BEGIN
+
+-- From file: "ibmtn3270e.mi2"
+-- Compile options "G A T M"
+
+IMPORTS
+    IpAddress
+            FROM SNMPv2-SMI-v1
+    OBJECT-TYPE
+            FROM RFC-1212
+    DisplayString
+            FROM SNMPv2-TC-v1
+    enterprises
+            FROM RFC1155-SMI;
+
+ibmtn3270eMIB OBJECT IDENTIFIER ::= { enterprises ibm(2) ibmProd(6) ibmIROC(119) ibmIROCrouting(4) ibmIROCroutingtn3270e(18) 1 }
+-- MODULE-IDENTITY
+--  LastUpdated
+--    9905261200Z
+--  OrgName
+--    IBM
+--  ContactInfo
+--    Randy Worzella
+--     IBM Corporation
+--     800 Park Offices Drive
+--     FBWA/664
+--     P.O. Box 12195
+--     Research Triangle Park, NC 27709, USA
+--     Tel:    1 919 254 2202
+--     E-mail: worzella@us.ibm.com
+--  Descr
+--    This MIB module contains definitions for TN3270E
+
+ibmtn3270eConnRejectTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Ibmtn3270eConnRejectEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "A table of information about TN3270E connection rejections.
+         This table does not contain information for connections that
+         were successfully established, but terminated abnormally."
+    ::= { ibmtn3270eMIB 1 }
+
+ibmtn3270eConnRejectEntry OBJECT-TYPE
+    SYNTAX Ibmtn3270eConnRejectEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Information indicating why a particular client connection
+         was rejected."
+    INDEX { ibmtn3270eConnRejectIndex }
+    ::= { ibmtn3270eConnRejectTable 1 }
+
+Ibmtn3270eConnRejectEntry ::= SEQUENCE {
+    ibmtn3270eConnRejectIndex INTEGER,
+    ibmtn3270eConnRejectAddrType INTEGER,
+    ibmtn3270eConnRejectClient OCTET STRING,
+    ibmtn3270eConnRejectReason INTEGER,
+    ibmtn3270eConnRejectTime DisplayString
+    }
+
+ibmtn3270eConnRejectIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "A unique identifier of a row in the connection rejection table."
+    ::= { ibmtn3270eConnRejectEntry 1 }
+
+ibmtn3270eConnRejectAddrType OBJECT-TYPE
+    SYNTAX INTEGER {
+        unknown(0),
+        ipv4(1),
+        ipv6(2)
+        }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "A indication of the type of client address provided in
+         ibmtn3270eConnRejectClient."
+    ::= { ibmtn3270eConnRejectEntry 2 }
+
+ibmtn3270eConnRejectClient OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE(0..255))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The IP address of the client whose connection was rejected."
+    ::= { ibmtn3270eConnRejectEntry 3 }
+
+ibmtn3270eConnRejectReason OBJECT-TYPE
+    SYNTAX INTEGER {
+        noportinfo(1),
+        cliunknown(2),
+        clinoauth(3),
+        sockblock(4),
+        nodeterm(5),
+        createfail(6),
+        seqnum(7),
+        negfailed(8),
+        notelquale(9),
+        termtypefail(10),
+        notypeprtgen(11),
+        clirplyfail(12),
+        valtelquale(13),
+        clisendfail(14),
+        failtelquale(15),
+        termtypagain(16),
+        noportagain(17),
+        prtnoluname(18),
+        clinoauthent(19),
+        clinoauthflt(20),
+        noluconf(21),
+        noportmore(22),
+        noresource(23),
+        nameresource(24),
+        prtnoluagain(25),
+        noimplu(26),
+        lunotfound(27),
+        valluprt(28),
+        vallu(29),
+        prtlunofind(30),
+        nameinuse(31),
+        reqlunofind(32),
+        valprtagain(33),
+        valluagain(34),
+        luprtnofind(35),
+        poolluinuse(36),
+        poollunofind(37),
+        restypnofind(38),
+        poolluconf(39),
+        lucapreach(40),
+        noappnmem(41),
+        nomoreconn(42),
+        pooldep(43),
+        termnorsp(44)
+        }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The reason the connection was rejected. Some of the values sound
+         similar, but represent different failure points within the TN3270E
+         server software. Also, some values are very specific to the TN3270E
+         server software internals, so they may seem a bit cryptic to the user.
+        
+           noportinfo   (1)  // GetPortInfo failed to retrieve Port information
+           cliunknown   (2)  // HostName filter failure - client_hostname unknown
+           clinoauth    (3)  // Client is not authorized by  FilterUser
+           sockblock    (4)  // Could not make socket nonblocking
+           nodeterm     (5)  // Node is terminating
+           createfail   (6)  // TN3270Create failed to create session environment
+           seqnum       (7)  // 0xFF seq number not doubled
+           negfailed    (8)  // Negotiation failed
+           notelquale   (9)  // Not TELQUALE_REQUEST
+           termtypefail (10) // Verification of terminal type failed
+           notypeprtgen (11) // TELQUALE_ASSOCIATE req but not TYPE_PRINTER_GENERIC
+           clirplyfail  (12) // Sending reply to client failed.
+           valtelquale  (13) // Validation of TELQUALE_REQUEST failed
+           clisendfail  (14) // Send to client failed
+           failtelquale (15) // Verification of TELQUAL_IS failed
+           termtypagain (16) // Received invalid terminal type for 2nd time
+           noportagain  (17) // GetPortInfo failed to retrieve Port information
+           prtnoluname  (18) // Associated printer req. with no LU name specified
+           clinoauthent (19) // Client is not authorized by Filter entries
+           clinoauthflt (20) // Client not authorized by Filter entries after retry
+           noluconf     (21) // REJECT_UNSUPP_REQ:  No LUs configured.
+           noportmore   (22) // GetPortInfo failed to retrieve Port information
+           noresource   (23) // No resource spe+cified on Port & no name requested
+           nameresource (24) // Resource specified on Port doesn't match name requested
+           prtnoluagain (25) // Associated printer req. with no LU name specified
+           noimplu      (26) // No implicit LUs are available
+           lunotfound   (27) // Specified LU not found/available
+           valluprt     (28) // Validation of LU type failed for assoc. printer
+           vallu        (29) // Validation of LU type failed
+           prtlunofind  (30) // LU for associated printer not found
+           nameinuse    (31) // LU name requested currently in use
+           reqlunofind  (32) // LU requested not found
+           valprtagain  (33) // Validation of LU type failed for assoc. printer
+           valluagain   (34) // Validation of LU type failed
+           luprtnofind  (35) // LU for associated printer not found
+           poolluinuse  (36) // Requested pooled LU is already in use
+           poollunofind (37) // Requested pooled LU is not found for assoc. printer
+           restypnofind (38) // Requested type of resource is not found
+           poolluconf   (39) // Requested pooled LU is not found in config. list
+           lucapreach   (40) // LU capping value reached for this client address
+           noappnmem    (41) // APPN memory above the constrained threashold
+           nomoreconn   (42) // Max. number of TN3270 connection reached
+           pooldep      (43) // The pool from which the resource was requested has been depleted
+           termnorsp    (44) // The session was terminated before receiving a response from APPN "
+    ::= { ibmtn3270eConnRejectEntry 4 }
+
+ibmtn3270eConnRejectTime OBJECT-TYPE
+    SYNTAX DisplayString
+--    Rsyntax OCTET STRING(SIZE(0..255))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "A string providing the date and time the connection was rejected."
+    ::= { ibmtn3270eConnRejectEntry 5 }
+
+
+END
+
