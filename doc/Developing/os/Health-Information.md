@@ -37,7 +37,7 @@ the values we expect to see the data in:
 | temperature                     | C                           |
 | voltage                         | V                           |
 | waterflow                       | l/m                         |
-| probes                          | %                           |
+| percent                         | %                           |
 
 #### Simple health discovery
 
