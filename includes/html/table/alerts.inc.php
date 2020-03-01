@@ -132,20 +132,7 @@ foreach (dbFetchRows($sql, $param) as $alert) {
     $hostname = '<div class="incident">' . generate_device_link($alert, format_hostname($alert, shorthost($alert['hostname']))) . '<div id="incident' . ($alert['id']) . '" class="collapse">' . $fault_detail . '</div></div>';
 
     $severity = $alert['severity'];
-    switch ($severity) {
-        case 'critical':
-            $severity_ico = '<span class="alert-status label-danger">&nbsp;</span>';
-            break;
-        case 'warning':
-            $severity_ico = '<span class="alert-status label-warning">&nbsp;</span>';
-            break;
-        case 'ok':
-            $severity_ico = '<span class="alert-status label-success">&nbsp;</span>';
-            break;
-        default:
-            $severity_ico = '<span class="alert-status label-info">&nbsp;</span>';
-            break;
-    }
+    $severity_ico = '<span class="alert-status label-' . alert_layout($severity)['background_color'] . '">&nbsp;</span>';
 
     if ($alert['state'] == 3) {
         $severity .= ' <strong>+</strong>';
