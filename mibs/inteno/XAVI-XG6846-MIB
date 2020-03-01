@@ -458,7 +458,7 @@ speed OBJECT-TYPE
 		"port speed duplex mode status."
 			::= { portStatEntry 13 }
 
-vendor_name OBJECT-TYPE
+vendorName OBJECT-TYPE
 	SYNTAX DisplayString
 	ACCESS read-only
 	STATUS current
@@ -466,7 +466,7 @@ vendor_name OBJECT-TYPE
 		"DDM Vendor Name."
 			::= { ddminfo 1 }
 
-vendor_oui OBJECT-TYPE
+vendorOui OBJECT-TYPE
 	SYNTAX DisplayString
 	ACCESS read-only
 	STATUS current
@@ -474,7 +474,7 @@ vendor_oui OBJECT-TYPE
 		"DDM Vendor OUI."
 			::= { ddminfo 2 }
 
-vendor_pn OBJECT-TYPE
+vendorPn OBJECT-TYPE
 	SYNTAX DisplayString
 	ACCESS read-only
 	STATUS current
@@ -482,7 +482,7 @@ vendor_pn OBJECT-TYPE
 		"DDM Vendor PN."
 			::= { ddminfo 3 }
 
-vendor_rev OBJECT-TYPE
+vendorRev OBJECT-TYPE
 	SYNTAX DisplayString
 	ACCESS read-only
 	STATUS current
@@ -514,7 +514,7 @@ bias OBJECT-TYPE
 		"DDM Bias."
 			::= { ddminfo 7 }
 
-tx_power OBJECT-TYPE
+txPower OBJECT-TYPE
 	SYNTAX DisplayString
 	ACCESS read-only
 	STATUS current
@@ -522,7 +522,7 @@ tx_power OBJECT-TYPE
 		"DDM TX Power."
 			::= { ddminfo 8 }
 
-rx_power OBJECT-TYPE
+rxPower OBJECT-TYPE
 	SYNTAX DisplayString
 	ACCESS read-only
 	STATUS current
