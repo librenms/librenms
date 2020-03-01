@@ -13,7 +13,7 @@ if (!empty($oids)) {
 
     $num_oid = '.1.3.6.1.4.1.6666.2.1.1.1.4.';
     foreach ($oids as $index => $entry) {
-        $name='Voice If ' . hex2bin(strtr($entry['voiceIfName'], [' '=>'']));
+        $name = 'Voice If ' . hex2bin(strtr($entry['voiceIfName'], [' '=>'']));
         //Discover Sensors
         discover_sensor($valid['sensor'], 'state', $device, $num_oid.$index, $index, $state_name, $name, '1', '1', null, null, null, null, $entry['voiceIfState'], 'snmp', $index);
 
