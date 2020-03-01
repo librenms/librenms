@@ -3,8 +3,6 @@ text: 'Inteno GW'
 type: network
 over:
     - { graph: device_bits, text: Traffic }
-    - { graph: device_processor, text: 'CPU Usage' }
-    - { graph: device_mempool, text: 'Memory Usage' }
 icon: inteno
 mib_dir:
     - inteno
