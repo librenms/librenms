@@ -188,6 +188,7 @@ foreach ($rule_list as $rule) {
     }
 
     $sub   = dbFetchRows('SELECT * FROM alerts WHERE rule_id = ? ORDER BY `state` DESC, `id` DESC LIMIT 1', array($rule['id']));
+    $severity = dbFetchCell('SELECT severity FROM alert_rules where id = ?', array($rule['id']));
     $ico   = 'check';
     $col   = 'success';
     $extra = '';
@@ -200,9 +201,10 @@ foreach ($rule_list as $rule) {
             $status_msg = "All devices matching " . $rule['name'] . "  are OK";
         }
         if ((int) $sub['state'] === 1 || (int) $sub['state'] === 2) {
-            $ico   = 'exclamation';
-            $col   = 'danger';
-            $extra = 'danger';
+            $alert_style = alert_layout($severity);
+            $ico   = $alert_style['icon'];
+            $col   = $alert_style['icon_color'];
+            $extra = $alert_style['background_color'];
             $status_msg = "Some devices matching " . $rule['name'] . " are currently alerting";
         }
     }

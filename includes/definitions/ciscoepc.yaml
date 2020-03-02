@@ -3,6 +3,8 @@ group: cisco
 text: 'Cisco EPC'
 type: network
 icon: cisco
+mib_dir:
+    - cisco
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_storage, text: 'Storage Usage' }
