@@ -4,6 +4,8 @@ text: 'Cisco IOS-XR'
 type: network
 ifXmcbc: true
 icon: cisco
+mib_dir:
+    - cisco
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
