@@ -19,7 +19,8 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2018 Tony Murray
+ * @copyright  2020 Tony Murray
+ * @copyright  2017 Yacine Benamsili <https://github.com/yac01/librenms.git>
  * @author     Tony Murray <murraytony@gmail.com>
  */
 

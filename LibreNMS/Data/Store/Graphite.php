@@ -19,7 +19,8 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2018 Tony Murray
+ * @copyright  2020 Tony Murray
+ * @copyright  2017 Falk Stern <https://github.com/fstern/>
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
