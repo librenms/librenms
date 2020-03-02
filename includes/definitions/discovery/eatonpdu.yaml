@@ -1,4 +1,4 @@
-mib: PDU-MIB
+mib: PDU-MIB:EATON-EPDU-MIB
 modules:
     sensors:
         power:
@@ -10,6 +10,11 @@ modules:
                     multiplier: 1
                     descr: 'S{{ $index }} {{ $outletLabel }} Output'
                     index: 'outletActivePower.{{ $index }}'
+                -
+                    oid: inputTotalWatts
+                    num_oid: '.1.3.6.1.4.1.534.6.6.7.3.5.1.4.{{ $index }}'
+                    index: '0.1'
+                    descr: 'Input power'
         current:
             data:
                 -
@@ -21,6 +26,16 @@ modules:
                     index: 'outletCurrent.{{ $index }}'
                     high_limit: outletCurrentUpperCritical
                     warn_limit: outletCurrentUpperWarning
+                -
+                    oid: inputCurrent
+                    num_oid: '.1.3.6.1.4.1.534.6.6.7.3.3.1.4.{{ $index }}'
+                    index: '0.1.1'
+                    descr: 'Input current'
+                    divisor: 1000
+                    low_warn_limit: '.1.3.6.1.4.1.534.6.6.7.3.3.1.6.{{ $index }}'
+                    low_limit: '.1.3.6.1.4.1.534.6.6.7.3.3.1.7.{{ $index }}'
+                    warn_limit: '.1.3.6.1.4.1.534.6.6.7.3.3.1.8.{{ $index }}'
+                    high_limit: '.1.3.6.1.4.1.534.6.6.7.3.3.1.9.{{ $index }}'
         voltage:
             data:
                 -
@@ -29,4 +44,37 @@ modules:
                     num_oid: '.1.3.6.1.4.1.534.6.6.6.1.2.2.1.6.{{ $index }}'
                     descr: 'S{{ $index }} {{ $outletLabel }} Voltage'
                     index: 'outletVoltage.{{ $index }}'
+                -
+                    oid: inputVoltage
+                    num_oid: '.1.3.6.1.4.1.534.6.6.7.3.2.1.3.{{ $index }}'
+                    index: '0.1.1'
+                    descr: 'Input voltage'
+                    divisor: 1000
+                    low_warn_limit: '.1.3.6.1.4.1.534.6.6.7.3.2.1.5.{{ $index }}'
+                    low_limit: '.1.3.6.1.4.1.534.6.6.7.3.2.1.6.{{ $index }}'
+                    warn_limit: '.1.3.6.1.4.1.534.6.6.7.3.2.1.7.{{ $index }}'
+                    high_limit: '.1.3.6.1.4.1.534.6.6.7.3.2.1.8.{{ $index }}'
+        power_consumed:
+            data:
+                -
+                    oid: inputTotalWh
+                    num_oid: '.1.3.6.1.4.1.534.6.6.7.3.5.1.5.{{ $index }}'
+                    index: '0.1'
+                    descr: 'Input energy'
+                    divisor: 1000
+        power_factor:
+            data:
+                -
+                    oid: inputTotalPowerFactor
+                    num_oid: '.1.3.6.1.4.1.534.6.6.7.3.4.1.7.{{ $index }}'
+                    index: '0.1.1'
+                    descr: 'Power factor'
+                    divisor: 1000
+        load:
+            data:
+                -
+                    oid: inputCurrentPercentLoad
+                    num_oid: '.1.3.6.1.4.1.534.6.6.7.3.3.1.11.{{ $index }}'
+                    index: '0.1.1'
+                    descr: 'Input load'
 
