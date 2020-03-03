@@ -35,7 +35,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\OS;
 
-class Ray extends OS implements
+class Ray3 extends OS implements
     ProcessorDiscovery,
     WirelessFrequencyDiscovery,
     WirelessPowerDiscovery,
@@ -43,7 +43,6 @@ class Ray extends OS implements
     WirelessRateDiscovery,
     WirelessSnrDiscovery
 {
-
     /**
      * Discover wireless frequency.  This is in GHz. Type is frequency.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
@@ -54,9 +53,9 @@ class Ray extends OS implements
     {
         return array(
             // RAY-MIB::txFreq.0
-            new WirelessSensor('frequency', $this->getDeviceId(), '.1.3.6.1.4.1.33555.1.2.1.4.0', 'racom-tx', 1, 'TX Frequency', null, 1, 1000),
+            new WirelessSensor('frequency', $this->getDeviceId(), '.1.3.6.1.4.1.33555.4.2.1.4.0', 'racom3-tx', 1, 'TX Frequency', null, 1, 1000),
             // RAY-MIB::rxFreq.0
-            new WirelessSensor('frequency', $this->getDeviceId(), '.1.3.6.1.4.1.33555.1.2.1.3.0', 'racom-rx', 1, 'RX Frequency', null, 1, 1000),
+            new WirelessSensor('frequency', $this->getDeviceId(), '.1.3.6.1.4.1.33555.4.2.1.3.0', 'racom3-rx', 1, 'RX Frequency', null, 1, 1000),
         );
     }
 
@@ -70,9 +69,9 @@ class Ray extends OS implements
     {
         return array(
             // RAY-MIB::rfPowerCurrent.0
-            new WirelessSensor('power', $this->getDeviceId(), '.1.3.6.1.4.1.33555.1.2.1.17.0', 'racom-pow-cur', 1, 'Tx Power Current'),
+            new WirelessSensor('power', $this->getDeviceId(), '.1.3.6.1.4.1.33555.4.2.1.17.0', 'racom3-pow-cur', 1, 'Tx Power Current'),
             //RAY-MIB::rfPowerConfigured.0
-            new WirelessSensor('power', $this->getDeviceId(), '.1.3.6.1.4.1.33555.1.2.1.12.0', 'racom-pow-conf', 1, 'Tx Power Configured'),
+            new WirelessSensor('power', $this->getDeviceId(), '.1.3.6.1.4.1.33555.4.2.1.12.0', 'racom3-pow-conf', 1, 'Tx Power Configured'),
         );
     }
 
@@ -84,9 +83,9 @@ class Ray extends OS implements
      */
     public function discoverWirelessRssi()
     {
-        $oid = '.1.3.6.1.4.1.33555.1.3.2.1.0'; // RAY-MIB::rss.0
+        $oid = '.1.3.6.1.4.1.33555.4.3.2.1.0'; // RAY-MIB::rss.0
         return array(
-            new WirelessSensor('rssi', $this->getDeviceId(), $oid, 'racom', 1, 'RSSI', null, 1, 10),
+            new WirelessSensor('rssi', $this->getDeviceId(), $oid, 'racom3', 1, 'RSSI', null, 1, 10),
         );
     }
 
@@ -98,9 +97,9 @@ class Ray extends OS implements
      */
     public function discoverWirelessSnr()
     {
-        $oid = '.1.3.6.1.4.1.33555.1.3.2.2.0'; // RAY-MIB::snr.0
+        $oid = '.1.3.6.1.4.1.33555.4.3.2.2.0'; // RAY-MIB::snr.0
         return array(
-            new WirelessSensor('snr', $this->getDeviceId(), $oid, 'racom', 1, 'CINR', null, 1, 10),
+            new WirelessSensor('snr', $this->getDeviceId(), $oid, 'racom3', 1, 'CINR', null, 1, 10),
         );
     }
     /**
@@ -111,11 +110,11 @@ class Ray extends OS implements
      */
     public function discoverWirelessRate()
     {
-        $oid_bitrate = '.1.3.6.1.4.1.33555.1.2.1.13.0'; // RAY-MIB::netBitrate.0
-        $oid_maxbitrate = '.1.3.6.1.4.1.33555.1.2.1.14.0'; // RAY-MIB::maxNetBitrate.0
+        $oid_bitrate = '.1.3.6.1.4.1.33555.4.2.1.13.0'; // RAY-MIB::netBitrate.0
+        $oid_maxbitrate = '.1.3.6.1.4.1.33555.4.2.1.14.0'; // RAY-MIB::maxNetBitrate.0
         return array(
-            new WirelessSensor('rate', $this->getDeviceId(), $oid_bitrate, 'racom-netBitrate', 1, 'Net Bitrate', null, 1000, 1),
-            new WirelessSensor('rate', $this->getDeviceId(), $oid_maxbitrate, 'racom-maxNetBitrate', 2, 'Max Net Bitrate', null, 1000000, 1),
+            new WirelessSensor('rate', $this->getDeviceId(), $oid_bitrate, 'racom3-netBitrate', 1, 'Net Bitrate', null, 1000, 1),
+            new WirelessSensor('rate', $this->getDeviceId(), $oid_maxbitrate, 'racom3-maxNetBitrate', 2, 'Max Net Bitrate', null, 1000000, 1),
         );
     }
 }

@@ -1,70 +1,89 @@
 RAY-MIB DEFINITIONS ::= BEGIN
     IMPORTS
-    	enterprises, IpAddress, Gauge
-        	FROM RFC1155-SMI
 	MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
-	Unsigned32, TimeTicks, Counter32, Gauge32, Integer32, Counter64
-		FROM SNMPv2-SMI
-	DateAndTime, TEXTUAL-CONVENTION
-	FROM SNMPv2-TC
-	MODULE-COMPLIANCE, OBJECT-GROUP
-		FROM SNMPv2-CONF
-	mib-2 FROM SNMPv2-SMI
-	snmpTraps  
-		FROM SNMPv2-MIB;
+	Unsigned32, TimeTicks, Counter32, Gauge32, Integer32, Counter64, IpAddress,
+	mib-2, enterprises FROM SNMPv2-SMI
+	DateAndTime, TEXTUAL-CONVENTION FROM SNMPv2-TC
+	snmpTraps FROM SNMPv2-MIB;
 
-ray 	MODULE-IDENTITY
-    	LAST-UPDATED 	"201610040000Z"
-    	ORGANIZATION 	"Racom s.r.o"
-    	CONTACT-INFO
+racom	 	MODULE-IDENTITY
+    		LAST-UPDATED 	"201905130000Z"
+    		ORGANIZATION 	"Racom s.r.o"
+    		CONTACT-INFO
 		    	"Racom s.r.o
 			Mirova 1283
 			592 31 Nove Mesto na Morave
 			Czech Republic
-			Tel: +420 565 659 511
+			Tel: +420 722 937 522
 			Fax: +420 565 659 512
 			E-mail: racom@racom.eu"
-    	DESCRIPTION	"The MIB module defines management objects for RAy product series. Revision 201610040000Z."
-    	REVISION 	"201610040000Z"
-    	DESCRIPTION	"Latest version of this MIB module"
-	::= { racom 1 }
+    		DESCRIPTION	"The MIB module defines management objects for RAy product series."
+    		REVISION 	"201905130000Z"
+    		DESCRIPTION	"Latest version of this MIB module"    	
+::= { enterprises 33555 }
 
-DisplayString ::= OCTET STRING
+Tenths 		::= TEXTUAL-CONVENTION
+		DISPLAY-HINT 	"d-1"
+		STATUS		current
+		DESCRIPTION	"Numeric 32-bit type with 0.1 precision without subtyping."
+		SYNTAX 		Integer32
 
-PhysAddress ::= OCTET STRING
+Hundredths 	::= TEXTUAL-CONVENTION
+		DISPLAY-HINT 	"d-2"
+		STATUS 		current
+		DESCRIPTION	"Numeric 32-bit type with 0.01 precision without subtyping."
+		SYNTAX 		Integer32
 
-ServiceState ::= TEXTUAL-CONVENTION
-      	STATUS      	current
-      	DESCRIPTION	"System service or device state."
-      	SYNTAX      	INTEGER {
+Thousandths	::= TEXTUAL-CONVENTION
+		DISPLAY-HINT	"d-3"
+		STATUS 		current
+		DESCRIPTION 	"Numeric 32-bit type with 0.001 precision without subtyping."
+		SYNTAX		Integer32
+
+DisplayStringRaw ::= TEXTUAL-CONVENTION
+		DISPLAY-HINT 	"1t"
+		STATUS 		current
+		DESCRIPTION 	"Unlimited display string - UTF8 encoding."
+		SYNTAX 		OCTET STRING
+
+PhysAddressRaw 	::= TEXTUAL-CONVENTION
+		DISPLAY-HINT 	"1x"
+		STATUS 		current
+		DESCRIPTION 	"Unlimited physic address - hexadecimal encoding for each octet."
+		SYNTAX 		OCTET STRING
+
+ServiceState 	::= TEXTUAL-CONVENTION
+      		STATUS  	current
+      		DESCRIPTION	"System service or device state."
+      		SYNTAX  	INTEGER {
 				na (0),	-- service/device state not available
-                  		up (1), -- service is running or device is up
-                  		down (2)  -- service is not running or device is down
-                  		}
+                		up (1), -- service is running or device is up
+                		down (2)  -- service is not running or device is down
+        			}
 
-AlarmState ::= TEXTUAL-CONVENTION
-      	STATUS      	current
-      	DESCRIPTION	"Alarm status."
-      	SYNTAX      	INTEGER {
+AlarmState 	::= TEXTUAL-CONVENTION
+      		STATUS  	current
+      		DESCRIPTION	"Alarm status."
+      		SYNTAX  	INTEGER {
 				na (0),	-- alarm state not available
-                  		up (1), -- alarm up
-                  		down (2), -- alarm down
+                		up (1), -- alarm up
+                		down (2), -- alarm down
 				ack (3) -- alarm up and acknowledged
-                  		}
+        			}
 
-OptionSetting ::= TEXTUAL-CONVENTION
-	STATUS		current
-	DESCRIPTION	"Setting of some options."
-	SYNTAX		INTEGER {
+OptionSetting 	::= TEXTUAL-CONVENTION
+		STATUS		current
+		DESCRIPTION	"Setting of some options."
+		SYNTAX		INTEGER {
 				na (0),
 				on (1),
 				off (2)
 				}
 
 ModulationList ::= TEXTUAL-CONVENTION
-	STATUS		current
-	DESCRIPTION	"Radio channel modulations numerical list"
-	SYNTAX		INTEGER {
+		STATUS		current
+		DESCRIPTION	"Radio channel modulations numerical list"
+		SYNTAX		INTEGER {
 				na (0),
 				qpsk (1),
 				qam16 (2),
@@ -75,11 +94,12 @@ ModulationList ::= TEXTUAL-CONVENTION
 				}
 
 
-racom 		OBJECT IDENTIFIER ::= { enterprises 33555 }
+ray 		OBJECT IDENTIFIER ::= { racom 1 }
 
 station		OBJECT IDENTIFIER ::= {ray 1}
 interface	OBJECT IDENTIFIER ::= {ray 2}
 statistic	OBJECT IDENTIFIER ::= {ray 3}
+switch		OBJECT IDENTIFIER ::= {ray 4}
 rayTraps 	OBJECT IDENTIFIER ::= {ray 10}
 ray2Traps 	OBJECT IDENTIFIER ::= {ray 11}
 
@@ -97,7 +117,7 @@ alarm		OBJECT IDENTIFIER ::= {station 8}
 -- product MIB
 
 productName OBJECT-TYPE
-        SYNTAX          DisplayString (SIZE(0..16))
+        SYNTAX          DisplayStringRaw (SIZE(0..16))
         MAX-ACCESS	read-only
         STATUS          current
         DESCRIPTION     "Product name."
@@ -111,7 +131,7 @@ serialNumber OBJECT-TYPE
         ::= { product 2 }
 
 unitType OBJECT-TYPE
-        SYNTAX          DisplayString (SIZE(0..4))
+        SYNTAX          DisplayStringRaw (SIZE(0..4))
         MAX-ACCESS	read-only
         STATUS          current
         DESCRIPTION     "Station type (L or H) and number of the Ethernet ports (1 or 2)."
@@ -120,21 +140,21 @@ unitType OBJECT-TYPE
 -- info MIB
 
 deviceName OBJECT-TYPE
-        SYNTAX          DisplayString (SIZE(0..16))
+        SYNTAX         DisplayStringRaw (SIZE(0..16))
         MAX-ACCESS	read-only
         STATUS          current
         DESCRIPTION     "Station name."
         ::= { info 1 }
 
 swVer OBJECT-TYPE
-        SYNTAX          DisplayString (SIZE(0..16))
+        SYNTAX          DisplayStringRaw (SIZE(0..16))
         MAX-ACCESS	read-only
         STATUS          current
         DESCRIPTION     "Firmware version."
         ::= { info 2 }
 
 swVerRadio OBJECT-TYPE
-        SYNTAX          DisplayString (SIZE(0..16))
+        SYNTAX          DisplayStringRaw (SIZE(0..16))
         MAX-ACCESS	read-only
         STATUS          current
         DESCRIPTION     "Radio firmware version."
@@ -144,10 +164,10 @@ swVerRadio OBJECT-TYPE
 systemStatus OBJECT-TYPE
         SYNTAX		INTEGER {
 				na (0),
-                            	ok (1),
-			    	warning (2),
-                            	alarm (3)
-                        	}
+                		ok (1),
+				warning (2),
+        	       		alarm (3)
+        			}	
         MAX-ACCESS	read-only
         STATUS          current
         DESCRIPTION     "Unit status."
@@ -156,18 +176,18 @@ systemStatus OBJECT-TYPE
 lineStatus OBJECT-TYPE
         SYNTAX          INTEGER {
 				na (0),
-			    	ok (1),
-			    	analyzer (2),
-			    	connecting (3),
-                            	searching (4)
-                        	}
+				ok (1),
+				analyzer (2),
+				connecting (3),
+				searching (4)
+        			}
         MAX-ACCESS	read-only
         STATUS          current
         DESCRIPTION     "Radio link status. Supported by RAy10 only."
         ::= { status 2 }
 
 peerNumber OBJECT-TYPE
-        SYNTAX          Gauge32
+        SYNTAX      	Gauge32
         MAX-ACCESS	read-only
         STATUS          current
         DESCRIPTION     "Peer station serial number."
@@ -237,24 +257,27 @@ eth2Link OBJECT-TYPE
 
 -- chassis mib
 temperatureModem OBJECT-TYPE
-        SYNTAX         	Integer32
-        MAX-ACCESS	read-only
+        SYNTAX         	Hundredths (-10000..10000)
+        UNITS		"deg C"        
+        MAX-ACCESS	read-only 
         STATUS         	current
-        DESCRIPTION    	"Modem temperature in hundredths of Celsius (C)."
+        DESCRIPTION    	"Modem temperature in hundredths of Celsius."
         ::= { chassis 1 }
 
 temperatureRadio OBJECT-TYPE
-        SYNTAX          Integer32
+        SYNTAX          Hundredths (-10000..10000)
+        UNITS		"deg C"        
         MAX-ACCESS	read-only
         STATUS          current
-        DESCRIPTION     "Radio temperature in hundredths of Celsius (C)."
-        ::= { chassis 2}
+        DESCRIPTION     "Radio temperature in hundredths of Celsius."      
+        ::= { chassis 2 }
 
 voltageUnit OBJECT-TYPE
-        SYNTAX          Integer32
+        SYNTAX          Tenths (0..1000)
+        UNITS		"V"        
         MAX-ACCESS	read-only
         STATUS          current
-        DESCRIPTION     "Power supply voltage in tenths of Volts (V)."
+        DESCRIPTION     "Power supply voltage in tenths of Volts."
         ::= { chassis 3 }
 
 voltageSource OBJECT-TYPE
@@ -271,21 +294,24 @@ voltageSource OBJECT-TYPE
 
 -- system mib
 useCpu OBJECT-TYPE
-        SYNTAX          INTEGER
+        SYNTAX          Integer32 (0..100)
+        UNITS		"%"         
         MAX-ACCESS	read-only
         STATUS          current
         DESCRIPTION     "System use CPU in %."
         ::= { system 1 }
 
 useMemory OBJECT-TYPE
-        SYNTAX          INTEGER
+        SYNTAX          Integer32 (0..100)
+        UNITS		"%"         
         MAX-ACCESS	read-only
         STATUS          current
-        DESCRIPTION     "System use memory in %."
+        DESCRIPTION     "System use memory in %."      
         ::= { system 2 }
 
 useLogStorage OBJECT-TYPE
-        SYNTAX          INTEGER
+        SYNTAX          Integer32 (0..100)
+        UNITS		"%"        
         MAX-ACCESS	read-only
         STATUS          current
         DESCRIPTION     "Use storage for log in %."
@@ -293,7 +319,7 @@ useLogStorage OBJECT-TYPE
 
 -- access mib
 sshd OBJECT-TYPE
-        SYNTAX          INTEGER {
+        SYNTAX  	INTEGER {
 				on (1),
 				onlykey (2),
 				off (3)
@@ -325,7 +351,7 @@ ip OBJECT-TYPE
 	::= { access 4 }
 
 mac OBJECT-TYPE
-	SYNTAX		PhysAddress
+	SYNTAX		PhysAddressRaw
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION	"Management interface: MAC address."
@@ -346,10 +372,15 @@ managementVlanId OBJECT-TYPE
 	::= { access 7 }
 
 wifiHAP OBJECT-TYPE
-        SYNTAX          OptionSetting
+        SYNTAX          INTEGER {
+				na (0),
+				disabled (1),
+                            	enabled-on-air-link-loss (2),
+                            	force-enabled (3)
+                        	}
         MAX-ACCESS	read-only
         STATUS          current
-        DESCRIPTION     "Management interface: WiFi Host Access Point."
+        DESCRIPTION     "Management interface: WiFi Host Access Point. Supported by RAy2 only."
         ::= { access 8 }
 
 
@@ -369,13 +400,12 @@ keyEntry OBJECT-TYPE
 	INDEX		{ keyName }
 	::= { keyTable 1 }
 
-KeyEntry ::=
-	SEQUENCE {
-		keyName	DisplayString
+KeyEntry ::= SEQUENCE {
+		keyName	DisplayStringRaw
 		}
 
 keyName OBJECT-TYPE
-	SYNTAX		DisplayString(SIZE(1..64))
+	SYNTAX		DisplayStringRaw (SIZE(1..64))
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION	"Product key name. Supported by RAy10 only."
@@ -463,7 +493,7 @@ alarmWifiOn OBJECT-TYPE
 	SYNTAX		AlarmState
 	MAX-ACCESS	read-only
 	STATUS		current
-	DESCRIPTION	"WiFi Host Access Oint on. Supported by RAy2 only."
+	DESCRIPTION	"WiFi Host Access Point on. Supported by RAy2 only."
 	::= { alarm 12 }
 
 
@@ -473,14 +503,14 @@ ifEth		OBJECT IDENTIFIER ::= {interface 2}
 
 -- radio mib
 rxChannel OBJECT-TYPE
-        SYNTAX          DisplayString (SIZE(0..8))
+        SYNTAX          DisplayStringRaw (SIZE(0..8))
         MAX-ACCESS	read-only
         STATUS          current
         DESCRIPTION     "Receiver channel ID."
         ::= { ifRadio 1 }
 
 txChannel OBJECT-TYPE
-        SYNTAX          DisplayString (SIZE(0..8))
+        SYNTAX          DisplayStringRaw (SIZE(0..8))
         MAX-ACCESS	read-only
         STATUS          current
         DESCRIPTION     "Transceiver channel ID."
@@ -488,6 +518,7 @@ txChannel OBJECT-TYPE
 
 rxFreq OBJECT-TYPE
         SYNTAX          Gauge32
+        UNITS		"kHz"
         MAX-ACCESS	read-only
         STATUS          current
         DESCRIPTION     "Receiver frequency in kHz."
@@ -495,20 +526,21 @@ rxFreq OBJECT-TYPE
 
 txFreq OBJECT-TYPE
         SYNTAX          Gauge32
+        UNITS		"kHz"
         MAX-ACCESS	read-only
         STATUS          current
         DESCRIPTION     "Transceiver frequency in kHz."
         ::= { ifRadio 4 }
 
 rxModulation OBJECT-TYPE
-        SYNTAX          DisplayString
+        SYNTAX          DisplayStringRaw
         MAX-ACCESS	read-only
         STATUS          current
         DESCRIPTION     "Rx modulation text ID."
         ::= { ifRadio 5 }
 
 txModulation OBJECT-TYPE
-        SYNTAX          DisplayString
+        SYNTAX          DisplayStringRaw
         MAX-ACCESS	read-only
         STATUS          current
         DESCRIPTION     "Tx modulation text ID."
@@ -543,9 +575,9 @@ bandwidth OBJECT-TYPE
 coding OBJECT-TYPE
         SYNTAX          INTEGER {
 				na (0),
-                            	low (1),
-                            	hi (2)
-                        	}
+                		low (1),
+                		hi (2)
+        			}
         MAX-ACCESS	read-only
         STATUS          current
         DESCRIPTION     "Channel coding level. Supported by RAy10 only."
@@ -560,6 +592,7 @@ matching OBJECT-TYPE
 
 rfPowerConfigured OBJECT-TYPE
 	SYNTAX		Integer32
+	UNITS		"dBm"	
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION	"Configured RF Power in dBm."
@@ -567,6 +600,7 @@ rfPowerConfigured OBJECT-TYPE
 
 netBitrate OBJECT-TYPE
 	SYNTAX		Integer32
+	UNITS		"kbps"	
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION	"Current net bitrate in kbps."
@@ -574,6 +608,7 @@ netBitrate OBJECT-TYPE
 
 maxNetBitrate OBJECT-TYPE
 	SYNTAX		Integer32
+	UNITS		"Mbps"	
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION	"Maximum net bitrate in Mbps."
@@ -581,18 +616,19 @@ maxNetBitrate OBJECT-TYPE
 
 bandwidthKHz OBJECT-TYPE
 	SYNTAX		Integer32
+	UNITS		"kHz"	
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION	"Radio channel bandwidth in kHz. Not supported by RAy10."
 	::= { ifRadio 15 }
 
 channelArrangement OBJECT-TYPE
-        SYNTAX          INTEGER {
-				na (0),
-                            	accp (1),
-                            	acap (2),
-				ccdp (3)
-                        	}
+	SYNTAX 	INTEGER {
+			na (0),
+                	accp (1),
+                	acap (2),
+			ccdp (3)
+    			}
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION	"Channel arrangement. Not supported by RAy10."
@@ -600,10 +636,33 @@ channelArrangement OBJECT-TYPE
 
 rfPowerCurrent OBJECT-TYPE
 	SYNTAX		Integer32
+	UNITS		"dBm"	
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION	"Current RF Power in dBm. Not supported by RAy10."
 	::= { ifRadio 17 }
+
+acm	OBJECT-TYPE
+	SYNTAX		OptionSetting
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"ACM option. Supported by RAy2 only."
+	::= { ifRadio 18 }
+
+atpc	OBJECT-TYPE
+	SYNTAX		OptionSetting
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"ATPC option. Supported by RAy2 only."
+	::= { ifRadio 19 }
+
+frequencyTable OBJECT-TYPE
+        SYNTAX          DisplayStringRaw (SIZE(0..128))
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "Current frequency table name. Supported by RAy2 only."
+	::= { ifRadio 20 }
+
 
 -- ifEth mib
 
@@ -633,74 +692,75 @@ IfEthEntry ::=
 		}
 		
 speed OBJECT-TYPE
-        SYNTAX          Integer32(1..1000000000)
+        SYNTAX          Integer32 (1..1000000000)
         MAX-ACCESS	read-only
         STATUS          current
         DESCRIPTION     "Ethernet speed."
-        ::= { ifEthEntry 1 }
+	::= { ifEthEntry 1 }
+
 duplex OBJECT-TYPE
-        SYNTAX          INTEGER {
+        SYNTAX  	INTEGER {
 				na (0),
-                            	full (1),
-		            	half (2)
-                        	}
+        			full (1),
+		    		half (2)
+        			}
         MAX-ACCESS	read-only
         STATUS          current
         DESCRIPTION    	"Ethernet duplex."
-        ::= { ifEthEntry 2 }
+	::= { ifEthEntry 2 }
 
 mdix OBJECT-TYPE
-        SYNTAX          INTEGER {
+        SYNTAX  	INTEGER {
 				na (0),
-                            	mdi (1),
-		            	mdi-x (2)
-                        	}
+                		mdi (1),
+		        	mdi-x (2)
+        			}
         MAX-ACCESS	read-only
         STATUS          current
         DESCRIPTION    	"Ethernet MDI-X / MDI."
-        ::= { ifEthEntry 3 }
+	::= { ifEthEntry 3 }
 
 autonego OBJECT-TYPE
         SYNTAX          OptionSetting
         MAX-ACCESS	read-only
         STATUS          current
         DESCRIPTION     "Ethernet autonego."
-        ::= { ifEthEntry 4 }
+	::= { ifEthEntry 4 }
 
 pause OBJECT-TYPE
         SYNTAX          OptionSetting
         MAX-ACCESS	read-only
         STATUS          current
         DESCRIPTION     "Ethernet pause."
-        ::= { ifEthEntry 5 }
+	::= { ifEthEntry 5 }
 
 asymPause OBJECT-TYPE
         SYNTAX          OptionSetting
         MAX-ACCESS	read-only
         STATUS          current
         DESCRIPTION     "Ethernet asymmetric pause."
-        ::= { ifEthEntry 6 }
+	::= { ifEthEntry 6 }
 
 prioritized OBJECT-TYPE
         SYNTAX          OptionSetting
         MAX-ACCESS	read-only
         STATUS          current
         DESCRIPTION     "Ethernet prioritized VLAN support. Supported by RAy10 only."
-        ::= { ifEth 2 }
+	::= { ifEth 2 }
 
 vlanId OBJECT-TYPE
         SYNTAX          Integer32
         MAX-ACCESS	read-only
         STATUS          current
         DESCRIPTION     "Ethernet prioritized VLAN ID. Supported by RAy10 only."
-        ::= { ifEth 3 }
+	::= { ifEth 3 }
 
 serviceVlanId OBJECT-TYPE
         SYNTAX          Integer32
         MAX-ACCESS	read-only
         STATUS          current
         DESCRIPTION     "Ethernet service VLAN ID between local and remote station. Not supported by RAy2."
-        ::= { ifEth 4 }
+	::= { ifEth 4 }
 
 
 -- statistic mib
@@ -711,6 +771,7 @@ ethernet		OBJECT IDENTIFIER ::= {statistic 3}
  -- statistic radiomodem ethernet mib
 rxPauseFrames OBJECT-TYPE
         SYNTAX          Counter32
+        UNITS		"frames"        
         MAX-ACCESS	read-only
         STATUS          current
         DESCRIPTION     "Number of received Control frames with a valid PAUSE op-code. Supported by RAy10 only."
@@ -718,6 +779,7 @@ rxPauseFrames OBJECT-TYPE
 
 rxControlFrames OBJECT-TYPE
         SYNTAX          Counter32
+        UNITS		"frames"        
         MAX-ACCESS	read-only
         STATUS          current
         DESCRIPTION     "Number of received Control frames. Supported by RAy10 only."
@@ -725,6 +787,7 @@ rxControlFrames OBJECT-TYPE
 
 rxBroadcast OBJECT-TYPE
         SYNTAX          Counter32
+        UNITS		"packets"        
         MAX-ACCESS	read-only
         STATUS          current
         DESCRIPTION     "Number of received packets with a broadcast destination address. Supported by RAy10 only."
@@ -732,6 +795,7 @@ rxBroadcast OBJECT-TYPE
 
 rxMulticast OBJECT-TYPE
         SYNTAX          Counter32
+        UNITS		"packets"        
         MAX-ACCESS	read-only
         STATUS          current
         DESCRIPTION     "Number of received packets with a multicast destination address. Supported by RAy10 only."
@@ -739,6 +803,7 @@ rxMulticast OBJECT-TYPE
 
 rxDones OBJECT-TYPE
         SYNTAX          Counter32
+        UNITS		"packets"        
         MAX-ACCESS	read-only
         STATUS          current
         DESCRIPTION     "Number of successfully received packets. Supported by RAy10 only."
@@ -746,6 +811,7 @@ rxDones OBJECT-TYPE
 
 rxOutOfRangeErrors OBJECT-TYPE
         SYNTAX          Counter32
+        UNITS		"frames"        
         MAX-ACCESS	read-only
         STATUS          current
         DESCRIPTION     "Number of received frames larger than 1518 bytes (the frame Type/Length field is indicating a value larger than 1518 bytes). Supported by RAy10 only."
@@ -753,6 +819,7 @@ rxOutOfRangeErrors OBJECT-TYPE
 
 rxCrcErrors OBJECT-TYPE
         SYNTAX          Counter32
+        UNITS		"frames"        
         MAX-ACCESS	read-only
         STATUS          current
         DESCRIPTION     "Number of received frames with the CRC which does not match the internally generated CRC. Supported by RAy10 only."
@@ -760,6 +827,7 @@ rxCrcErrors OBJECT-TYPE
 
 rxCodeErrors OBJECT-TYPE
         SYNTAX          Counter32
+        UNITS		"packets"        
         MAX-ACCESS	read-only
         STATUS          current
         DESCRIPTION     "Number of received packets with one or more erroneous nibbles. Supported by RAy10 only."
@@ -767,6 +835,7 @@ rxCodeErrors OBJECT-TYPE
 
 rxFalseCarrierErrors OBJECT-TYPE
         SYNTAX          Counter32
+        UNITS		"errors"        
         MAX-ACCESS	read-only
         STATUS          current
         DESCRIPTION     "Rx false carrier errors. Supported by RAy10 only."
@@ -774,6 +843,7 @@ rxFalseCarrierErrors OBJECT-TYPE
 
 rxDroppedPkts OBJECT-TYPE
         SYNTAX          Counter32
+        UNITS		"packets"        
         MAX-ACCESS	read-only
         STATUS          current
         DESCRIPTION     "Number of dropped packets. Supported by RAy10 only."
@@ -781,6 +851,7 @@ rxDroppedPkts OBJECT-TYPE
 
 rxHCBytes OBJECT-TYPE
         SYNTAX          Counter64
+        UNITS		"bytes"        
         MAX-ACCESS	read-only
         STATUS          current
         DESCRIPTION     "Number of received bytes. Supported by RAy10 only."
@@ -788,6 +859,7 @@ rxHCBytes OBJECT-TYPE
 
 txPauseFrames OBJECT-TYPE
         SYNTAX          Counter32
+        UNITS		"frames"
         MAX-ACCESS	read-only
         STATUS          current
         DESCRIPTION     "Number of transmitted Control frames with a valid PAUSE op-code. Supported by RAy10 only."
@@ -795,6 +867,7 @@ txPauseFrames OBJECT-TYPE
 
 txControlFrames OBJECT-TYPE
         SYNTAX          Counter32
+        UNITS		"frames"
         MAX-ACCESS	read-only
         STATUS          current
         DESCRIPTION     "Number of transmitted Control frames. Supported by RAy10 only."
@@ -802,6 +875,7 @@ txControlFrames OBJECT-TYPE
 
 txBroadcast OBJECT-TYPE
         SYNTAX          Counter32
+        UNITS		"packets"
         MAX-ACCESS	read-only
         STATUS          current
         DESCRIPTION     "Number of transmitted packets with a broadcast destination address. Supported by RAy10 only."
@@ -809,6 +883,7 @@ txBroadcast OBJECT-TYPE
 
 txMulticast OBJECT-TYPE
         SYNTAX          Counter32
+        UNITS		"packets"
         MAX-ACCESS	read-only
         STATUS          current
         DESCRIPTION     "Number of transmitted packets with a multicast destination address. Supported by RAy10 only."
@@ -816,6 +891,7 @@ txMulticast OBJECT-TYPE
 
 txDones OBJECT-TYPE
         SYNTAX          Counter32
+        UNITS		"packets"
         MAX-ACCESS	read-only
         STATUS          current
         DESCRIPTION     "Number of successfully transmitted packets. Supported by RAy10 only."
@@ -823,6 +899,7 @@ txDones OBJECT-TYPE
 
 txLengthCheckErrors OBJECT-TYPE
         SYNTAX          Counter32
+        UNITS		"packets"
         MAX-ACCESS	read-only
         STATUS          current
         DESCRIPTION     "Number of transmitted packets with the frame Length field (not a Type field) value that does not match the actual data byte length. Supported by RAy10 only."
@@ -830,6 +907,7 @@ txLengthCheckErrors OBJECT-TYPE
 
 txCrcErrors OBJECT-TYPE
         SYNTAX          Counter32
+        UNITS		"frames"
         MAX-ACCESS	read-only
         STATUS          current
         DESCRIPTION     "Number of transmitted frames with the CRC which does not match the internally generated CRC. Supported by RAy10 only."
@@ -837,6 +915,7 @@ txCrcErrors OBJECT-TYPE
 
 txCollisions OBJECT-TYPE
         SYNTAX          Counter32
+        UNITS		"collisions"
         MAX-ACCESS	read-only
         STATUS          current
         DESCRIPTION     "Tx collisions. Supported by RAy10 only."
@@ -844,6 +923,7 @@ txCollisions OBJECT-TYPE
 
 txHCBytes OBJECT-TYPE
         SYNTAX          Counter64
+        UNITS		"bytes"
         MAX-ACCESS	read-only
         STATUS          current
         DESCRIPTION     "Number of transmitted bytes. Supported by RAy10 only."
@@ -852,17 +932,19 @@ txHCBytes OBJECT-TYPE
 -- statistic radio mib
 
 rss OBJECT-TYPE
-        SYNTAX          Integer32
+        SYNTAX          Tenths (-1000..-150)
+        UNITS		"dBm"        
         MAX-ACCESS	read-only
         STATUS          current
-        DESCRIPTION     "Receiving RSS indicator in decimal dBm (-39 -> -3,9)."
+        DESCRIPTION     "Receiving RSS indicator in tenths of dBm."
         ::= { radio 1 }
 
 snr OBJECT-TYPE
-        SYNTAX          Integer32
+        SYNTAX          Tenths (0..1000)
+        UNITS		"dB"        
         MAX-ACCESS	read-only
         STATUS          current
-        DESCRIPTION     "Receiving SNR indicator in decimal dB (39 -> 3,9)."
+        DESCRIPTION     "Receiving SNR indicator in tenths of dB."
         ::= { radio 2 }
 
 fecBlockCounter OBJECT-TYPE
@@ -908,18 +990,19 @@ numDisconnect OBJECT-TYPE
         ::= { radio 8 }
 
 reliability OBJECT-TYPE
-	SYNTAX		Integer32
+	SYNTAX		Thousandths (0..100000)
+	UNITS		"%"	
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION	"Reliability in thousandths of %."
 	::= { radio 9 }
 
 linkUptime OBJECT-TYPE
-        SYNTAX          TimeTicks
-        MAX-ACCESS	read-only
-        STATUS          current
-        DESCRIPTION     "Current radio link uptime. Not supported by RAy10."
-        ::= { radio 10 }
+    	SYNTAX          TimeTicks
+    	MAX-ACCESS	read-only
+    	STATUS          current
+    	DESCRIPTION     "Current radio link uptime. Not supported by RAy10."
+    	::= { radio 10 }
 
 ber OBJECT-TYPE
 	SYNTAX		Integer32
@@ -932,6 +1015,7 @@ ber OBJECT-TYPE
 
 ethInThroughput OBJECT-TYPE
         SYNTAX          Integer32
+	UNITS		"kbps"	
         MAX-ACCESS	read-only
         STATUS          current
         DESCRIPTION     "Input Ethernet 1 data port throughput in kbps. Not supported by RAy10."
@@ -939,6 +1023,7 @@ ethInThroughput OBJECT-TYPE
 
 ethOutThroughput OBJECT-TYPE
         SYNTAX          Integer32
+	UNITS		"kbps"	
         MAX-ACCESS	read-only
         STATUS          current
         DESCRIPTION     "Output Ethernet 1 data port throughput in kbps. Not supported by RAy10."
@@ -946,6 +1031,7 @@ ethOutThroughput OBJECT-TYPE
 
 eth2InThroughput OBJECT-TYPE
         SYNTAX          Integer32
+	UNITS		"kbps"	
         MAX-ACCESS	read-only
         STATUS          current
         DESCRIPTION     "Input Ethernet 2 data port throughput in kbps. Supported by RAy2 only."
@@ -953,196 +1039,196 @@ eth2InThroughput OBJECT-TYPE
 
 eth2OutThroughput OBJECT-TYPE
         SYNTAX          Integer32
+	UNITS		"kbps"	
         MAX-ACCESS	read-only
         STATUS          current
         DESCRIPTION     "Output Ethernet 2 data port throughput in kbps. Supported by RAy2 only."
         ::= { ethernet 4 }
 
 
+-- switch mib
+egressQueue		OBJECT IDENTIFIER ::= { switch 3 }
+
+ -- switch egress mib
+
+speedGuard OBJECT-TYPE
+	SYNTAX		OptionSetting
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Speed guard feature on/off. Supported by RAy2 only."
+	::= { egressQueue 2 }
+
+
 -- definition  traps
 
+rayTrapsPrefix OBJECT IDENTIFIER ::= { rayTraps 0 }
+
 airDisconnect NOTIFICATION-TYPE
-    OBJECTS { lineStatus }
-    STATUS  current
-    DESCRIPTION
-            "Air line disconnected. Not supported by RAy2."
-    ::= { rayTraps 1 }
+    	OBJECTS 	{ lineStatus }
+    	STATUS  	current
+    	DESCRIPTION 	"Air line disconnected. Not supported by RAy2."
+    	::= { rayTrapsPrefix 1 }
 
 airConnect NOTIFICATION-TYPE
-    OBJECTS { lineStatus }
-    STATUS  current
-    DESCRIPTION
-            "Air line connected after being disconnected. Not supported by RAy2."
-    ::= { rayTraps 2 }
+	OBJECTS 	{ lineStatus }
+	STATUS  	current
+	DESCRIPTION 	"Air line connected after being disconnected. Not supported by RAy2."
+    	::= { rayTrapsPrefix 2 }
 
 airWdog NOTIFICATION-TYPE
-    OBJECTS { lineStatus }
-    STATUS  current
-    DESCRIPTION
-            "Air watch dog. Supported by RAy10 only."
-    ::= { rayTraps 3 }
+    	OBJECTS 	{ lineStatus }
+    	STATUS  	current
+    	DESCRIPTION	"Air watch dog. Supported by RAy10 only."
+    	::= { rayTrapsPrefix 3 }
 
 tempAlarm NOTIFICATION-TYPE
-    OBJECTS { temperatureModem }
-    STATUS  current
-    DESCRIPTION
-            "Temperature exceeded the threshold. Not supported by RAy2."
-    ::= { rayTraps 4 }
+    	OBJECTS 	{ temperatureModem }
+    	STATUS  	current
+    	DESCRIPTION	"Temperature exceeded the threshold. Not supported by RAy2."
+    	::= { rayTrapsPrefix 4 }
 
 powerAlarm NOTIFICATION-TYPE
-    OBJECTS { voltageUnit }
-    STATUS  current
-    DESCRIPTION
-            "Power voltage is out of the thresholds. Not supported by RAy2."
-    ::= { rayTraps 5 }
+    	OBJECTS 	{ voltageUnit }
+    	STATUS  	current
+    	DESCRIPTION	"Power voltage is out of the thresholds. Not supported by RAy2."
+    	::= { rayTrapsPrefix 5 }
 
 memoryAlarm NOTIFICATION-TYPE
-    OBJECTS { useMemory }
-    STATUS  current
-    DESCRIPTION
-            "Memory use exceeded the threshold. Supported by RAy10 only."
-    ::= { rayTraps 6 }
+    	OBJECTS 	{ useMemory }
+    	STATUS  	current
+    	DESCRIPTION	"Memory use exceeded the threshold. Supported by RAy10 only."
+    	::= { rayTrapsPrefix 6 }
 
 rssAlarm NOTIFICATION-TYPE
-    OBJECTS { rss }
-    STATUS  current
-    DESCRIPTION
-            "RSS exceeded the threshold. Not supported by RAy2."
-    ::= { rayTraps 7 }
+    	OBJECTS 	{ rss }
+    	STATUS  	current
+    	DESCRIPTION	"RSS exceeded the threshold. Not supported by RAy2."
+    	::= { rayTrapsPrefix 7 }
 
 snrAlarm NOTIFICATION-TYPE
-    OBJECTS { snr }
-    STATUS  current
-    DESCRIPTION
-            "SNR exceeded the threshold. Not supported by RAy2."
-    ::= { rayTraps 8 }
+    	OBJECTS 	{ snr }
+    	STATUS  	current
+    	DESCRIPTION	"SNR exceeded the threshold. Not supported by RAy2."
+    	::= { rayTrapsPrefix 8 }
 
 berAlarm NOTIFICATION-TYPE
-    OBJECTS { fecUncorrectBlockCounter, fecBlockCounter }
-    STATUS  current
-    DESCRIPTION
-            "BER exceeded the threshold. Not supported by RAy2."
-    ::= { rayTraps 9 }
+    	OBJECTS 	{ fecUncorrectBlockCounter, fecBlockCounter }
+    	STATUS  	current
+    	DESCRIPTION	"BER exceeded the threshold. Not supported by RAy2."
+    	::= { rayTrapsPrefix 9 }
 
 rfPowerFail NOTIFICATION-TYPE
-    OBJECTS { rfPowerStatus }
-    STATUS  current
-    DESCRIPTION
-            "RF Power amplifier failure. Not supported."
-    ::= { rayTraps 10 }
+    	OBJECTS 	{ rfPowerStatus }
+    	STATUS  	current
+    	DESCRIPTION	"RF Power amplifier failure. Not supported."
+    	::= { rayTrapsPrefix 10 }
 
 peerEthLinkDown NOTIFICATION-TYPE
-    OBJECTS { ethPeer }
-    STATUS  current
-    DESCRIPTION
-            "Peer station Ethernet link Up/Down. Not supported by RAy2."
-    ::= { rayTraps 11 }
+    	OBJECTS 	{ ethPeer }
+    	STATUS  	current
+    	DESCRIPTION	"Peer station Ethernet link Up/Down. Not supported by RAy2."
+    	::= { rayTrapsPrefix 11 }
 
 
 -- RAy2 trap definitions
+
+ray2TrapsPrefix OBJECT IDENTIFIER ::= { ray2Traps 0 }
     	
 tr2TemperatureAlarm NOTIFICATION-TYPE
-    OBJECTS { 	temperatureModem,
-    		alarmTemperature }
-    STATUS  current
-    DESCRIPTION
-            "Temperature exceeded the threshold. Supported by RAy2 only."
-    ::= { ray2Traps 1 }
+    	OBJECTS 	{ temperatureModem,
+    			alarmTemperature }
+    	STATUS  	current
+    	DESCRIPTION 	"Temperature exceeded the threshold. Supported by RAy2 only."
+    	::= { ray2TrapsPrefix 1 }
 
 tr2VoltageLowAlarm NOTIFICATION-TYPE
-    OBJECTS { 	voltageUnit,
-    		alarmVoltageLow }
-    STATUS  current
-    DESCRIPTION
-            "Supply voltage below minimal threshold. Supported by RAy2 only."
-    ::= { ray2Traps 2 }
+    	OBJECTS 	{ voltageUnit,
+    			alarmVoltageLow }
+    	STATUS 	 	current
+    	DESCRIPTION	"Supply voltage below minimal threshold. Supported by RAy2 only."
+    	::= { ray2TrapsPrefix 2 }
 
 tr2VoltageHighAlarm NOTIFICATION-TYPE
-    OBJECTS { 	voltageUnit,
-    		alarmVoltageHigh }
-    STATUS  current
-    DESCRIPTION
-            "Supply voltage above maximal threshold. Supported by RAy2 only."
-    ::= { ray2Traps 3 }
+    	OBJECTS 	{ voltageUnit,
+    			alarmVoltageHigh }
+    	STATUS  	current
+    	DESCRIPTION	"Supply voltage above maximal threshold. Supported by RAy2 only."
+   	::= { ray2TrapsPrefix 3 }
 
 tr2RssAlarm NOTIFICATION-TYPE
-    OBJECTS { 	rss,
-    		alarmRss }
-    STATUS  current
-    DESCRIPTION
-            "RSS exceeded the threshold. Supported by RAy2 only."
-    ::= { ray2Traps 4 }
+    	OBJECTS 	{ rss,
+    			alarmRss }
+    	STATUS  	current
+    	DESCRIPTION	"RSS exceeded the threshold. Supported by RAy2 only."
+    	::= { ray2TrapsPrefix 4 }
 
 tr2SnrAlarm NOTIFICATION-TYPE
-    OBJECTS { 	snr,
-    		alarmSnr }
-    STATUS  current
-    DESCRIPTION
-            "SNR exceeded the threshold. Supported by RAy2 only."
-    ::= { ray2Traps 5 }
+    	OBJECTS 	{ snr,
+    			alarmSnr }
+    	STATUS  	current
+    	DESCRIPTION	"SNR exceeded the threshold. Supported by RAy2 only."
+    	::= { ray2TrapsPrefix 5 }
 
 tr2BerAlarm NOTIFICATION-TYPE
-    OBJECTS { 	ber,
-		alarmBer }
-    STATUS  current
-    DESCRIPTION
-            "BER exceeded the threshold. Supported by RAy2 only."
-    ::= { ray2Traps 6 }
+    	OBJECTS		{ ber,
+			alarmBer }
+    	STATUS  	current
+    	DESCRIPTION	"BER exceeded the threshold. Supported by RAy2 only."
+    	::= { ray2TrapsPrefix 6 }
 
 tr2AirDisconnect NOTIFICATION-TYPE
-    OBJECTS { 	lineStatusII,
-    		alarmPeerDisconnected }
-    STATUS  current
-    DESCRIPTION
-            "Air line disconnected. Supported by RAy2 only."
-    ::= { ray2Traps 7 }
+    	OBJECTS 	{ lineStatusII,
+    			alarmPeerDisconnected }
+    	STATUS  	current
+    	DESCRIPTION 	"Air line disconnected. Supported by RAy2 only."
+    	::= { ray2TrapsPrefix 7 }
 
 tr2AirConnect NOTIFICATION-TYPE
-    OBJECTS { 	lineStatusII,
-    		alarmPeerDisconnected }
-    STATUS  current
-    DESCRIPTION
-            "Air line connected after being disconnected. Supported by RAy2 (up to fw 2.1.7.0) only."
-    ::= { ray2Traps 8 }
+    	OBJECTS 	{ lineStatusII,
+    			alarmPeerDisconnected }
+    	STATUS  	current
+    	DESCRIPTION 	"Air line connected after being disconnected. Supported by RAy2 (up to fw 2.1.7.0) only."
+    	::= { ray2TrapsPrefix 8 }
 
 tr2Eth1LinkDown NOTIFICATION-TYPE
-    OBJECTS { 	eth1Link,
-    		alarmEth1Down }
-    STATUS  current
-    DESCRIPTION
-            "Local station Ethernet 1 link Up/Down. Supported by RAy2 only."
-    ::= { ray2Traps 9 }
+    	OBJECTS 	{ eth1Link,
+    			alarmEth1Down }
+    	STATUS  	current
+    	DESCRIPTION	"Local station Ethernet 1 link Up/Down. Supported by RAy2 only."
+    	::= { ray2TrapsPrefix 9 }
 
 tr2Eth21LinkDown NOTIFICATION-TYPE
-    OBJECTS { 	eth2Link,
-    		alarmEth2Down }
-    STATUS  current
-    DESCRIPTION
-            "Local station Ethernet 2 link Up/Down. Supported by RAy2 only."
-    ::= { ray2Traps 10 }
+    	OBJECTS 	{ eth2Link,
+    			alarmEth2Down }
+    	STATUS  	current
+    	DESCRIPTION	"Local station Ethernet 2 link Up/Down. Supported by RAy2 only."
+    	::= { ray2TrapsPrefix 10 }
 
 tr2RfPowerFail NOTIFICATION-TYPE
-    OBJECTS { 	rfPowerStatus,
-    		alarmRfPowerFail }
-    STATUS  current
-    DESCRIPTION
-            "RF Power amplifier failure. Supported by RAy2 only."
-    ::= { ray2Traps 11 }
+    	OBJECTS 	{ rfPowerStatus,
+    			alarmRfPowerFail }
+    	STATUS  	current
+    	DESCRIPTION	"RF Power amplifier failure. Supported by RAy2 only."
+    	::= { ray2TrapsPrefix 11 }
 
 tr2NetBitrate NOTIFICATION-TYPE
-    OBJECTS { 	netBitrate,
-    		alarmNetBitrate }
-    STATUS  current
-    DESCRIPTION
-            "Air speed below threshold. Supported by RAy2 only."
-    ::= { ray2Traps 12 }
+    	OBJECTS 	{ netBitrate,
+    			alarmNetBitrate }
+    	STATUS  	current
+    	DESCRIPTION	"Air speed below threshold. Supported by RAy2 only."
+    	::= { ray2TrapsPrefix 12 }
 
 tr2WifiOn NOTIFICATION-TYPE
-    OBJECTS { 	wifiHAP,
-    		alarmWifiOn }
-    STATUS  current
-    DESCRIPTION
-            "WiFi Host Access Point is on. Supported by RAy2 only."
-    ::= { ray2Traps 13 }
+    	OBJECTS 	{ wifiHAP,
+    			alarmWifiOn }
+    	STATUS 	 	current
+    	DESCRIPTION	"WiFi Host Access Point is on. Supported by RAy2 only."
+    	::= { ray2TrapsPrefix 13 }
+
+tr2AirCapacity NOTIFICATION-TYPE
+    	OBJECTS 	{ netBitrate }
+    	STATUS 	 	current
+    	DESCRIPTION	"Event - Air Capacity changed. Supported by RAy2 only."
+    	::= { ray2TrapsPrefix 101 }
 
 END
