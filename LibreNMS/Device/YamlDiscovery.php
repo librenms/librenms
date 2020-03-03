@@ -155,6 +155,7 @@ class YamlDiscovery
      */
     public static function getValueFromData($name, $index, $discovery_data, $pre_cache, $default = null)
     {
+        //create the sub-index values in order to try to match them with precache
         foreach (explode('.', $index) as $pos => $sindex) {
             $subindex[$pos] = $sindex;
         }
