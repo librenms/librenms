@@ -90,17 +90,17 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                             foreach ($bgpPeersCache as $key => $value) {
                                 $oid = explode(".", $key,5);
                                 $vrfInstance = $oid[0];
-                                //$afi = $oid[1];
-                                //$safi = $oid[2];
-                                //$transp = $oid[3];
+                                $afi = $oid[1];
+                                $safi = $oid[2];
+                                $transp = $oid[3];
                                 $address = $oid[4];
                                 if (strlen($address) > 15) {
                                     $address = IP::fromHexString($address)->compressed();
                                 }
-                                if (!isset($bgpPeers[$vrfInstance][$address])) {
-                                    $bgpPeers[$vrfInstance][$address] = [];
+                                if (!isset($bgpPeers[$address][$vrfInstance])) {
+                                    $bgpPeers[$address][$vrfInstance] = [];
                                 }
-                                $bgpPeers[$vrfInstance][$address] = array_merge($bgpPeers[$vrfInstance][$address], $value);
+                                $bgpPeers[$address][$vrfInstance] = array_merge($bgpPeers[$address][$vrfInstance], $value);
                                 //d_echo("$vrfInstance -- $address \t-- $value");
                             }
                             foreach ($bgpPeersStats as $key => $value) {
@@ -110,7 +110,7 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                                 if ($oid[2] > 4) { //ipv6 so we have to translate
                                     $address = IP::fromSnmpString($oid[3])->compressed();
                                 }
-                                $bgpPeers[$vrfInstance][$address] = array_merge($bgpPeers[$vrfInstance][$address], $value);
+                                $bgpPeers[$address][$vrfInstance] = array_merge($bgpPeers[$address][$vrfInstance], $value);
                                 //d_echo("$vrfInstance -- $address \t-- $value");
                                 //d_echo($value);
                             }
@@ -119,11 +119,18 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                         }
                         //d_echo($bgpPeers);
                         $address = (string)$peer_ip;
+                        $bgpPeer = $bgpPeers[$address];
                         $peer_data = [];
-                        $peer_data['bgpPeerState'] = $bgpPeers[$vrfInstance][$address]['hwBgpPeerState'];
-                        $peer_data['bgpPeerInTotalMessages'] = $bgpPeers[$vrfInstance][$address]['hwBgpPeerInUpdateMsgs'];
-                        $peer_data['bgpPeerOutTotalMessages'] = $bgpPeers[$vrfInstance][$address]['hwBgpPeerOutUpdateMsgs'];
-                        $peer_data['bgpPeerFsmEstablishedTime'] = $bgpPeers[$vrfInstance][$address]['hwBgpPeerFsmEstablishedTime'];
+                        if (count(array_keys($bgpPeer))==1) { // We have only one vrf with a peer with this IP
+                            $vrfInstance = array_keys($bgpPeer)[0];
+                            $peer_data['bgpPeerState'] = $bgpPeers[$address][$vrfInstance]['hwBgpPeerState'];
+                            $peer_data['bgpPeerInUpdates'] = $bgpPeers[$address][$vrfInstance]['hwBgpPeerInUpdateMsgs'];
+                            $peer_data['bgpPeerOutUpdates'] = $bgpPeers[$address][$vrfInstance]['hwBgpPeerOutUpdateMsgs'];
+                            $peer_data['bgpPeerInTotalMessages'] = $bgpPeers[$address][$vrfInstance]['hwBgpPeerInTotalMsgs'];
+                            $peer_data['bgpPeerOutTotalMessages'] = $bgpPeers[$address][$vrfInstance]['hwBgpPeerOutTotalMsgs'];
+                            $peer_data['bgpPeerFsmEstablishedTime'] = $bgpPeers[$address][$vrfInstance]['hwBgpPeerFsmEstablishedTime'];
+                        }
+                        d_echo("VPN : $vrfInstance for $address :");
                         d_echo($peer_data);
                     } elseif ($device['os'] == 'timos') {
                         if (!isset($bgpPeers)) {
@@ -441,8 +448,9 @@ if (\LibreNMS\Config::get('enable_bgp')) {
 
                         // only works in global routing table, as the vpnInstanceId is not available
                         // for now in the VRF discovery of VRP devices
-                        $key4 = '0.'.$afi.'.'.$safi.'.ipv4.'.$peer['bgpPeerIdentifier'];
-                        $key6 = '0.'.$afi.'.'.$safi.'.ipv6.'.$peer['bgpPeerIdentifier'];
+                        $key4 = $vrfInstance.'.'.$afi.'.'.$safi.'.ipv4.'.$peer['bgpPeerIdentifier'];
+                        $key6 = $vrfInstance.'.'.$afi.'.'.$safi.'.ipv6.'.$peer['bgpPeerIdentifier'];
+
                         if (isset($vrpPrefixes[$key4])) {
                             $cbgpPeerAcceptedPrefixes = $vrpPrefixes[$key4]['hwBgpPeerPrefixRcvCounter'];
                             $cbgpPeerAdvertisedPrefixes  = $vrpPrefixes[$key4]['hwBgpPeerPrefixAdvCounter'];
