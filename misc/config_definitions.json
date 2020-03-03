@@ -2964,11 +2964,27 @@
             },
             "type": "graph"
         },
+        "graph_types.device.ucd_cpu_steal": {
+            "default": {
+                "section": "system",
+                "order": 0,
+                "descr": "CPU Steal"
+            },
+            "type": "graph"
+        },
         "graph_types.device.ucd_interrupts": {
             "default": {
                 "section": "system",
                 "order": 0,
                 "descr": "Interrupts"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.ucd_io_wait": {
+            "default": {
+                "section": "system",
+                "order": 0,
+                "descr": "I/0 Wait"
             },
             "type": "graph"
         },
