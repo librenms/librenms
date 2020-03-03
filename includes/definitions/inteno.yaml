@@ -3,9 +3,9 @@ text: 'Inteno GW'
 type: network
 over:
     - { graph: device_bits, text: Traffic }
-icon: inteno
 mib_dir:
     - inteno
+icon: inteno
 discovery:
     -
       sysObjectID:
