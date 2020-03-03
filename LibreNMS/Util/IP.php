@@ -74,6 +74,20 @@ abstract class IP
     }
 
     /**
+     * Convert a decimal-string to an IP address. For example: "192 168 1 154" -> 192.168.1.254
+     * @param string $snmpOid
+     * @param bool $ignore_errors Do not throw exceptions, instead return null on error.
+     * @return IP|null
+     * @throws InvalidIpException
+     */
+    public static function fromSnmpString($snmpOid, $ignore_errors = false)
+    {
+        $snmpOid = str_replace(['.', '"'], ' ', $snmpOid);
+        $hex = implode(":", array_map(function($dec) { return sprintf('%02x', $dec); }, explode(" ", (string)$snmpOid)));
+        return IP::fromHexString($hex, $ignore_errors);
+    }
+
+    /**
      * Parse an IP or IP Network into an IP object. Works with IPv6 and IPv4 addresses.
      * @param string $ip
      * @param bool $ignore_errors Do not throw exceptions, instead return null on error.
