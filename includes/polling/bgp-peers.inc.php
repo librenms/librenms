@@ -88,7 +88,7 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                             $bgpPeersCache = snmpwalk_cache_oid($device, 'hwBgpPeerEntry', [], 'HUAWEI-BGP-VPN-MIB', 'huawei');
                             $bgpPeersStats = snmpwalk_cache_oid($device, 'hwBgpPeerStatisticTable', [], 'HUAWEI-BGP-VPN-MIB', 'huawei', '-OQUbs');
                             foreach ($bgpPeersCache as $key => $value) {
-                                $oid = explode(".", $key,5);
+                                $oid = explode(".", $key, 5);
                                 $vrfInstance = $oid[0];
                                 $afi = $oid[1];
                                 $safi = $oid[2];
@@ -104,7 +104,7 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                                 //d_echo("$vrfInstance -- $address \t-- $value");
                             }
                             foreach ($bgpPeersStats as $key => $value) {
-                                $oid = explode(".", $key,4);
+                                $oid = explode(".", $key, 4);
                                 $vrfInstance = $oid[1];
                                 $address = $oid[3];
                                 if ($oid[2] > 4) { //ipv6 so we have to translate
