@@ -1,6 +1,8 @@
 <?php
-
-/* Copyright (C) 2014 Nicolas Armando <nicearma@yahoo.com> and Mathieu Millet <htam-net@github.net>
+/* Copyright (C) 2014 Nicolas Armando <nicearma@yahoo.com>
+ * Copyright (C) 2014 Mathieu Millet <htam-net@github.net>
+ * Copyright (C) 2019 PipoCanaja <pipocanaja@github.net>
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -12,12 +14,14 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>. */
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 //We can use RFC1213 or IP-FORWARD-MIB or MPLS-L3VPN-STD-MIB
 
 use App\Models\Device;
 use LibreNMS\Util\IPv4;
+use LibreNMS\Config;
 
 $ipForwardMibRoutesNumber = snmp_get($device, 'IP-FORWARD-MIB::inetCidrRouteNumber.0', '-Osqn');
 
@@ -62,10 +66,9 @@ if (! isset($ipForwardNb['0']['inetCidrRouteNumber'])) {
     $tableRoute = array();
 
     $oid = '.1.3.6.1.2.1.4.21';
-    $ipRoute = snmpwalk_group($device, $oid, $mib, 1, []);
-    d_echo($res);
-    d_echo('Table routage');
-    d_echo($ipRoute);
+    $tableRoute = snmpwalk_group($device, $oid, $mib, 1, []);
+    d_echo('Routing table:');
+    d_echo($tableRoute);
         echo "RFC1213 ";
     foreach ($tableRoute as $ipRoute) {
         if (empty($ipRoute['ipRouteDest']) || $ipRoute['ipRouteDest'] == '') {
@@ -254,9 +257,9 @@ if ($mpls_skip != 1) {
                         $entry['inetCidrRouteNextHop'] = normalize_snmp_ip_address($inetCidrRouteNextHop);
                         $entry['context_name'] = $vpnId;
                         $entry['device_id'] = $device['device_id'];
+                        $entry['inetCidrRouteIfIndex'] = $entry['mplsL3VpnVrfRteInetCidrIfIndex'];
                         $entry['port_id'] = Device::find($device['device_id'])->ports()->where('ifIndex', '=', $entry['inetCidrRouteIfIndex'])->first()->port_id;
                         $entry['updated_at'] = $update_timestamp;
-                        $entry['inetCidrRouteIfIndex'] = $entry['mplsL3VpnVrfRteInetCidrIfIndex'];
                         $entry['inetCidrRouteType'] = $entry['mplsL3VpnVrfRteInetCidrType'];
                         $entry['inetCidrRouteProto'] = $entry['mplsL3VpnVrfRteInetCidrProto'];
                         $entry['inetCidrRouteMetric1'] = $entry['mplsL3VpnVrfRteInetCidrMetric1'];

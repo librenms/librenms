@@ -4,15 +4,15 @@ require 'includes/html/graphs/common.inc.php';
 $i               = 0;
 $scale_min       = 0;
 $nototal         = 1;
-$unit_text       = 'Peers';
+$unit_text       = 'SIP Peers';
 $rrd_filename    = rrd_name($device['hostname'], array('app', 'asterisk', 'stats', $app['app_id']));
 
 $astsip_access_array = array(
-    'sippeers' => 'Total Sip Peers',
-    'sipmononline' => 'Sip Mon Online',
-    'sipmonoffline'=> 'Sip Mon Offline',
-    'sipunmononline' => 'Sip Unmon Online',
-    'sipunmonoffline' => 'Sip Unmon Offline'
+    'sippeers' => 'Total Peers',
+    'sipmononline' => 'Online (Monitored)',
+    'sipmonoffline'=> 'Offline (Monitored)',
+    'sipunmononline' => 'Online (Unmonitored)',
+    'sipunmonoffline' => 'Offline (Unmonitored)'
 );
 
 $colours      = 'mixed';

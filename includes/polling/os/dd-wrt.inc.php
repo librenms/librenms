@@ -25,7 +25,7 @@
 
 // dd-wrt, cannot use exec with OID specified. Options are extend (w/OID), or exec (w/o OID)
 // -> extend seems to be the recommended approach, so use that (changes OID, which "spells out" name)
-list($ignore, $version) = explode(' ', snmp_get($device, '.1.3.6.1.4.1.8072.1.3.2.3.1.1.6.100.105.115.116.114.111', '-Osqnv'));
-$hardware = snmp_get($device, '.1.3.6.1.4.1.8072.1.3.2.3.1.1.8.104.97.114.100.119.97.114.101', '-Osqnv');
+list($ignore, $version) = explode(' ', snmp_get($device, 'NET-SNMP-EXTEND-MIB::nsExtendOutput1Line."distro"', '-Osqnv'));
+$hardware = snmp_get($device, 'NET-SNMP-EXTEND-MIB::nsExtendOutput1Line."hardware"', '-Osqnv');
 
 unset($ignore);

@@ -1,16 +1,16 @@
 -- ============================================================================
--- Copyright (C) 2017 by HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2018 by HUAWEI TECHNOLOGIES. All rights reserved.
 -- Description:	The MIB module defines MIB objects which provide device
 --              management NMS interfaces.
 -- Reference:   
--- Version:     V4.72
+-- Version:     V4.92
 -- ============================================================================
 	HUAWEI-DEVICE-MIB DEFINITIONS ::= BEGIN 
 	
 	IMPORTS      
         MODULE-COMPLIANCE, NOTIFICATION-GROUP, OBJECT-GROUP
                 FROM SNMPv2-CONF
-		TimeTicks, IpAddress, Integer32, Unsigned32, OBJECT-TYPE, MODULE-IDENTITY,
+		TimeTicks, IpAddress, Integer32, Unsigned32, Counter64,OBJECT-TYPE, MODULE-IDENTITY,
 		NOTIFICATION-TYPE
 			FROM SNMPv2-SMI
 		DisplayString, DateAndTime, TruthValue, RowStatus
@@ -23,11 +23,11 @@
                         FROM HCNUM-TC   
 		huaweiUtility
                     FROM HUAWEI-MIB
-		InetAddressType, InetAddress
+		InetAddressType, InetAddress, InetAddressPrefixLength
                     FROM INET-ADDRESS-MIB;
 
     hwDev MODULE-IDENTITY
-        LAST-UPDATED "201708170000Z"
+        LAST-UPDATED "201809050000Z"
             ORGANIZATION
                   "Huawei Technologies Co.,Ltd."
             CONTACT-INFO
@@ -44,6 +44,127 @@
                     management NMS interfaces.
                     "
 --  Revision history
+                REVISION "201809050000Z"
+                DESCRIPTION "V4.85, Added the following nodes: 
+                             hwDevRtuLicCapacityExceedFaultTrap
+                             hwDevRtuLicCapacityExceedRestoreTrap
+                             hwRtuRunCapacity
+                             hwRtuLicenseCapcity
+                             "
+							 
+                REVISION "201808300000Z"
+                DESCRIPTION "V4.84, Added the following nodes: 
+                             hwConfigLockUserInetAddressType
+                             hwConfigLockUserInetAddress
+                             "
+			     
+                REVISION "201808170000Z"
+		DESCRIPTION "V4.90,
+		             Added the following node:
+			     hwSysIpv6Addr
+			     hwSysIpv6Mask
+			     "
+
+
+                REVISION "201806250000Z"
+                DESCRIPTION "V4.89, 
+                             Added the following node: 
+                             hwVsManageMode
+                             "
+
+                REVISION "201806130000Z"
+                DESCRIPTION "V4.88, Added the following nodes:
+                             hwBrokenFileName
+                             hwDevImportantFileBrokenTrap.
+                             hwDevImportantFileBrokenRestoreTrap.
+                             "
+							 
+                REVISION "201804230000Z"
+                DESCRIPTION "V4.87, 
+                             Add one enum number for hwConfigLockUserType:netconf(7) .
+	           				 Modify the SYNTAX to 0~255 for hwConfigUnlockInterval.
+	           				"
+
+				REVISION "201804130000Z"
+                DESCRIPTION "V4.86, Added the following nodes: 
+                             hwDevicePktStatTable          
+                             hwDevicePktStatEntry
+							 hwDevicePktStatReset
+							 hwDevicePktStatVlanMismatch
+							 "
+
+                REVISION "201804040000Z"
+                DESCRIPTION "V4.85, 
+                             Add hwFrameFanAlarm in hwFrameTable table."
+
+				REVISION "201803200000Z"
+                DESCRIPTION "V4.84, 
+                             Add hwXponWorkMode in hwSystemPara table."
+							 
+                REVISION "201802060000Z"
+                DESCRIPTION "V4.83, Added the following nodes: 
+                             hwDevPowerPortInputUnderVolFaultTrap          
+                             hwDevPowerPortInputUnderVolRecoverTrap
+							 "
+
+                REVISION "201801310000Z"
+                DESCRIPTION "V4.82,
+                             Added the following nodes:
+                             hwFrameMacAddress, the remote frame mac address
+			                "
+			                
+                REVISION "201801160000Z"
+                DESCRIPTION "V4.81, 
+				             Added the following nodes:
+                             hwDevSubBoardActStdInconsistentTrap
+							 hwDevSubBoardActStdInconsistentRestoreTrap
+							 "
+				
+                REVISION "201801150000Z"
+                DESCRIPTION "V4.80, Modify the description "
+
+                REVISION "201712150000Z"
+                DESCRIPTION "V4.79, 
+                             1.Add hwSysDeviceNameMode in hwSystemPara table.
+							 2.Added the following nodes:
+                             hwDevSystemDeviceNameChangeTrap
+                             "
+							 
+                REVISION "201712060000Z"
+                DESCRIPTION "V4.78, 
+                             Delete the description of hwFrameTable.
+                             Delete the description of hwFrameIndex.
+                             Delete the description of hwSlotIndex.
+                             "
+
+                REVISION "201711140000Z"
+                DESCRIPTION "V4.77, 
+                             Add hwDeviceCountryCode in hwSystemPara table.
+                             "
+
+                REVISION    "201710190000Z"
+                DESCRIPTION "V4.76, Added alarm parameters to node hwDevBoardInputFaultTrap,hwDevBoardInputRecoverTrap,hwDevPowerLackVoltageFaultTrap and hwDevPowerLackVolitageRecoverTrap.
+                             Added enumerated value channelvoltage(6) to hwSlotInputType's value list."
+						
+                REVISION "201709270000Z"
+                DESCRIPTION "V4.75, Added the following node: 
+                             hwSlotPortNumWorkMode
+                             "
+                             
+                REVISION "201709230000Z"
+                DESCRIPTION "V4.74,
+                             Modify the string length of hwOntRemoteHttpChnlPassword.
+                             "
+
+                REVISION "201708220000Z"
+                DESCRIPTION "V4.73, Changed node's DESCRIPTION: 
+                             hwOntRemoteHttpChnlVlan
+                             hwOntRemoteHttpChnlHttpPort 
+                             hwOntRemoteHttpChnlUserName
+                             hwOntRemoteHttpChnlPassword
+                             hwOntRemoteHttpProxyPort
+                             hwOntRemoteHttpChnlDuration
+                            "
                 REVISION "201708170000Z"
                 DESCRIPTION "V4.72, Changed node's DESCRIPTION: 
                              hwCpuDevIndex
@@ -1542,7 +1663,103 @@
 				2. enterprise(2) -Device work in enterprise scene.
 				Default: carrier(1)
                 "
-            ::= { hwSystemPara 43 }			
+            ::= { hwSystemPara 43 }
+            			
+        -- 1.3.6.1.4.1.2011.6.3.1.44
+        hwDeviceCountryCode OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                china(1),
+                oversea(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                1. china(1) -Device of china.
+                2. oversea(2) -Device of oversea.
+                Default: oversea(2)
+                "
+            ::= { hwSystemPara 44 }
+			
+	-- 1.3.6.1.4.1.2011.6.3.1.45
+        hwSysDeviceNameMode OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                simple(1),
+                detail(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                1. simple(1) -Simplified device name.
+                2. detail(2) -Detailed device name.
+                Default: simple(1)
+                "
+            ::= { hwSystemPara 45 }	
+	
+        -- 1.3.6.1.4.1.2011.6.3.1.46
+        hwXponWorkMode OBJECT-TYPE
+            SYNTAX INTEGER
+				{
+				gpon(1),
+				combopon(2),
+				invalid(3)
+				}
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+				The gpon work mode.
+				Options:
+				1. gpon(1) -gpon workmode
+				2. combopon(2) -combopon workmode
+				3. invalid(3) -invalid value
+				Default is combopon.
+                "
+            ::= { hwSystemPara 46 }	
+
+        -- 1.3.6.1.4.1.2011.6.3.1.47
+        hwVsManageMode OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                multiIP(1),
+                singleIP(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                Virtual system management mode.
+                Options:
+                1. multiIP(1)   -Set the virtual system multi-ip mode.
+                2. singleIP(2)  -Set the virtual system single-ip mode.
+                The default value multi-ip(1).
+                "
+            ::= { hwSystemPara 47 }
+
+        -- 1.3.6.1.4.1.2011.6.3.1.48
+        hwSysIpv6Addr OBJECT-TYPE  
+            SYNTAX InetAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                IPV6 address of the system.
+                "
+            ::= { hwSystemPara 48 }
+        
+        -- 1.3.6.1.4.1.2011.6.3.1.49
+        hwSysIpv6Mask OBJECT-TYPE
+            SYNTAX InetAddressPrefixLength
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                IPV6 Mask of the system.
+                "
+            ::= { hwSystemPara 49 }
 			
         -- 1.3.6.1.4.1.2011.6.3.1.999
         hwSysVersionVrcb OBJECT-TYPE
@@ -1787,10 +2004,7 @@
             STATUS current
             DESCRIPTION
                 "
-                The index of this table is hwFrameTable.
-                Shelf description table that describes basic information of a shelf.
-                You can obtain the shelf information, including the shelf type,
-                number of slots, and the shelf running status, and the shelf management status.
+                This table describes basic chassis information.
                 "
             ::= { hwSlotConf 1 }
 
@@ -1852,6 +2066,10 @@
                 hwFrameGponDeviceSn
                     OCTET STRING,
                 hwFramePhySerialNum
+                    OCTET STRING,
+                hwFrameFanAlarm 
+                    BITS,  
+                hwFrameMacAddress
                     OCTET STRING,
                 hwFrameQueryAssit
                     Integer32
@@ -2033,8 +2251,6 @@
                 "
             ::= { hwFrameEntry 10 }
 
-
---  1.3.6.1.4.1.2011.6.3.3.1.1.11
         -- 1.3.6.1.4.1.2011.6.3.3.1.1.11
         hwFrameCLEICode OBJECT-TYPE
             SYNTAX OCTET STRING (SIZE (0..640))
@@ -2159,7 +2375,46 @@
                 on the component itself.
                 "
             ::= { hwFrameEntry 20 }
-
+              
+        -- 1.3.6.1.4.1.2011.6.3.3.1.1.21 
+        hwFrameFanAlarm OBJECT-TYPE 
+            SYNTAX BITS 
+            { 
+              faSupportQuery(0), 
+              faFanState(1), 
+              faFanBlockState(2), 
+              faFansBlockState(3) 
+            }                  
+            MAX-ACCESS read-only 
+            STATUS current 
+            DESCRIPTION 
+                " 
+                This MIB node is used to query the alarm status of the fan in the extended frame, which is represented by bits.  
+                Functions of each bit are as follows: 
+                1: faSupportQuery(0)   - indicates whether query of the alarm status of the fan in the extended frame is supported. 
+                                         If this bit is 0, the query is supported. If this bit is 1, the query is not supported. When the extended frame  
+                                         is normal and reports the fan alarm status to the main frame, the query is supported. In other cases, the query is not supported.   
+                2: faFanState(1)       - indicates the communication status of the fan in the extended frame. If this bit is 0, the communication is normal.  
+                                         If this bit is 1, the communication is abnormal. If the communication is abnormal, the value of faFanBlockState(2) and faFansBlockState(3) are invalid,  
+                                         user do not have to pay attention to them. 
+                3: faFanBlockState(2)  - indicates whether a single fan in the extended frame is blocked. If this bit is 0, no single fan is blocked.  
+                                         If this bit is 1, a single fan is blocked.   
+                4: faFansBlockState(3) - indicates whether multiple fans in the extended frame are blocked. If this bit is 0, no multiple fans are blocked.  
+                                         If this bit is 1, multiple fans are blocked.  
+                " 
+            ::= { hwFrameEntry 21 } 
+                   
+        -- 1.3.6.1.4.1.2011.6.3.3.1.1.22
+        hwFrameMacAddress OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..20))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The remote frame mac address, and its format is XX-XX-XX-XX-XX-XX.
+                For local frame, the value is invalid.
+                "
+            ::= { hwFrameEntry 22 }
             
         -- 1.3.6.1.4.1.2011.6.3.3.1.1.65536
         hwFrameQueryAssit OBJECT-TYPE
@@ -2179,12 +2434,7 @@
             STATUS current
             DESCRIPTION
                 "
-                The board description table, used to manage the running status of
-                boards and board information, such as description of boards,
-                daughter board quantity and board type.
-                The indexes of this table are hwFrameIndex and hwSlotIndex.
-                For the hwFrameIndex object, refer to hwFrameTable.
-                For example, 0.2 indicates that the board is in slot 2, shelf 0.
+                This table describes board information.
                 "
             ::= { hwSlotConf 2 }
 
@@ -2256,7 +2506,9 @@
                 hwSlotSecondaryStatus
                     BITS,
                 hwSlotCreateTime
-                    DateAndTime
+                    DateAndTime,
+                hwSlotPortNumWorkMode
+                    INTEGER
              }
 
         -- 1.3.6.1.4.1.2011.6.3.3.2.1.1
@@ -2808,7 +3060,37 @@
                 "
                 This object is used for getting the time of adding or creating a board.
                 "
-            ::= { hwSlotEntry 24 }
+            ::= { hwSlotEntry 24 }            
+        
+            
+        -- 1.3.6.1.4.1.2011.6.3.3.2.1.25
+        hwSlotPortNumWorkMode OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                portnumworkmode8(1),
+                portnumworkmode16(2),
+                portnumworkmode24(3),
+                portnumworkmode32(4),
+                portnumworkmode48(5),
+                other(255)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                Indicates the port number working mode of a board.
+                The default value is portnumworkmode48(5).  
+                Options:
+                1. portnumworkmode8(1)             - Indicates that the board is in 8-channel port number working mode.  
+                2. portnumworkmode16(2)            - Indicates that the board is in 16-channel port number working mode.
+                3. portnumworkmode24(3)            - Indicates that the board is in 24-channel port number working mode.
+                4. portnumworkmode32(4)            - Indicates that the board is in 32-channel port number working mode.
+                5. portnumworkmode48(5)            - Indicates that the board is in 48-channel port number working mode.
+                6. other(255)                      - Indicates that the board is in invalid port working mode.            
+                Setting port working mode of a board triggers system restarts. 
+                Therefore, this node cannot be set concurrently with hwSlotAdminStatus, hwSlotRowStatus, and hwSlotWorkMode nodes.
+                "
+            ::= { hwSlotEntry 25 }
 
 
         -- 1.3.6.1.4.1.2011.6.3.3.3
@@ -4093,8 +4375,7 @@
             STATUS current
             DESCRIPTION
                 "
-                The indexes of this table are hwFrameIndex, hwSlotIndex and hwCpuDevIndex.
-                A table of CPU statistics.
+                This table describes the CPU usage, including the average CPU usage and periodic CPU usage.
                 "
             ::= { hwDev 4 }
 
@@ -4253,8 +4534,7 @@
             STATUS current
             DESCRIPTION
                 "
-                The index of this table is hwFrameIndex, hwSlotIndex or hwMemoryDevModuleIndex.
-                This table contains memory information.
+                This table describes memory usage statistics, including the total memory, idle memory, and occupied memory.
                 "
             ::= { hwMemoryDev 1 }
 
@@ -4302,7 +4582,7 @@
             STATUS current
             DESCRIPTION
                 "
-                Index of hwMemoryDevTable.
+                This object is only used for extension. For a single-CPU device, the value of this object is 0.
                 "
             ::= { hwMemoryDevEntry 1 }
 
@@ -4314,8 +4594,8 @@
             STATUS current
             DESCRIPTION
                 "
-                Indicates the total size of the memory module
-                which is on the managed object. Its unit is byte.
+                This object indicates the total memory size of a managed object, in bytes. It includes the free memory size and occupied memory size, that is, the sum of hwMemoryDevFree and hwMemoryDevRawSliceUsed. 
+                Each board has a memory. The memory size varies with products.
                 "
             ::= { hwMemoryDevEntry 2 }
 
@@ -4327,7 +4607,7 @@
             STATUS current
             DESCRIPTION
                 "
-                Indicates the free size of the memory, in the unit of byte.
+                This object indicates the idle memory size of the main control board, in bytes. The value of this object is always less than hwMemoryDevSize.
                 "
             ::= { hwMemoryDevEntry 3 }
 
@@ -4339,7 +4619,7 @@
             STATUS current
             DESCRIPTION
                 "
-                Indicates the used size of the raw slice memory, in the unit of byte.
+                This object indicates the total size of occupied raw slice memory, in bytes. The value of this object is always less than hwMemoryDevSize.
                 "
             ::= { hwMemoryDevEntry 4 }
 
@@ -4351,7 +4631,7 @@
             STATUS current
             DESCRIPTION
                 "
-                The maximum size of the memory that can be currently used, in the unit of byte.
+                This object indicates the maximum number of consecutive bytes that are not occupied on a managed object. It is the maximum memory size that can be allocated by the system. The value of this object is always less than hwMemoryDevSize.
                 "
             ::= { hwMemoryDevEntry 5 }
 
@@ -4363,7 +4643,7 @@
             STATUS current
             DESCRIPTION
                 "
-                Count of memory allocation failures.
+                This object indicates the number of memory allocation failures. The default value is 0.
                 "
             ::= { hwMemoryDevEntry 6 }
 
@@ -4375,7 +4655,7 @@
             STATUS current
             DESCRIPTION
                 "
-                Count of the memory allocation
+                This object indicates the number of memory allocation failures due to the lack of idle memory. The default value is 0.
                 "
             ::= { hwMemoryDevEntry 7 }
 
@@ -4388,8 +4668,7 @@
             STATUS current
             DESCRIPTION
                 "
-                Indicates the total size of the memory module incase of excessing 4G
-                which is on the managed object.Its unit is byte.
+                This object indicates the total size of memory modules on the managed object that exceeds 4 GB, in bytes.
                 "
             ::= { hwMemoryDevEntry 8 }
 
@@ -4402,7 +4681,7 @@
             STATUS current
             DESCRIPTION
                 "
-                Indicates the free size of the memory incase of excessing 4G, in the unit of byte.
+                This object indicates the idle memory size when the total size of memory modules on the managed object exceeds 4 GB, in bytes.
                 "
             ::= { hwMemoryDevEntry 9 }
 
@@ -5228,7 +5507,8 @@
                 localdc(2),
                 remoteac(3),
                 remotedc(4),
-                pd(5)
+                pd(5),
+                channelvoltage(6)
                 }
             MAX-ACCESS accessible-for-notify
             STATUS current
@@ -5241,6 +5521,7 @@
                 3. remoteac(3)  -remote ac type.
                 4. remotedc(4)  -remote dc type.
                 5. pd(5)        -pd type.
+                6. channelvoltage(6) - channel voltage type.
                 "
             ::= { hwDevTrapVbOids 30 }
 
@@ -5452,6 +5733,61 @@
                 The index ID of sub board.
                 "
             ::= { hwDevTrapVbOids 48 }
+                                    
+        -- 1.3.6.1.4.1.2011.6.3.8.1.49
+        hwPowerSupplyChannelVoltage OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+            	"
+            	The value of power supply channel voltage.
+            	"
+            ::= { hwDevTrapVbOids 49 }
+                                    
+        -- 1.3.6.1.4.1.2011.6.3.8.1.50
+        hwPowerSupplyDescription OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+            	"
+            	The description of power supply.
+            	"
+            ::= { hwDevTrapVbOids 50 }
+			
+        -- 1.3.6.1.4.1.2011.6.3.8.1.51      
+        hwBrokenFileName OBJECT-TYPE           
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "
+                The name of broken file.
+                "
+            ::= { hwDevTrapVbOids 51 }
+			
+		-- 1.3.6.1.4.1.2011.6.3.8.1.52
+        hwRtuRunCapacity OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+			STATUS current
+            DESCRIPTION
+                "
+                The run capacity of system.
+                "
+            ::= { hwDevTrapVbOids 52 }
+			
+		-- 1.3.6.1.4.1.2011.6.3.8.1.53
+        hwRtuLicenseCapcity OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "
+                The run capacity of license.
+                "
+            ::= { hwDevTrapVbOids 53 }
 			
         -- 1.3.6.1.4.1.2011.6.3.8.2
         hwDevCommonTraps OBJECT IDENTIFIER ::= { hwDevTraps 2 }
@@ -5686,6 +6022,15 @@
                 This trap message is reported when the auto-deployment fails.
                 "
             ::= { hwDevSystemTrapsPrefix 8 }
+			
+		-- 1.3.6.1.4.1.2011.6.3.8.3.1.0.9
+        hwDevSystemDeviceNameChangeTrap NOTIFICATION-TYPE
+            STATUS current
+            DESCRIPTION
+                "
+                This trap message is reported when the device name is changed.
+                "
+            ::= { hwDevSystemTrapsPrefix 9 }
 
 
         -- 1.3.6.1.4.1.2011.6.3.8.3.2
@@ -5812,7 +6157,7 @@
 	    STATUS current
 	    DESCRIPTION 
 		"
-		This trap message is reported when the data link changes to down.
+		This object indicates that when the data link goes Down, the device sends a trap.
 		"
 	    ::= { hwDevFrameTrapsPrefix 10 }
 
@@ -5823,7 +6168,7 @@
 	    STATUS current
 	    DESCRIPTION 
 		"
-		This trap message is reported when the data link changes to up.
+		This object indicates that when the data link goes Up, the device sends a trap.
 		"
 	    ::= { hwDevFrameTrapsPrefix 11 }
 
@@ -5834,7 +6179,7 @@
 	    STATUS current
 	    DESCRIPTION 
 		"
-		This trap message is reported when the data channel changes to down.
+		This object indicates that when the data channel is down, the device sends a trap.
 		"
 	    ::= { hwDevFrameTrapsPrefix 12 }
 
@@ -5845,7 +6190,7 @@
 	    STATUS current
 	    DESCRIPTION 
 		"
-		This trap message is reported when the data channel changes to up.
+		This object indicates that when the data channel goes Up, the device sends a trap.
 		"
 	    ::= { hwDevFrameTrapsPrefix 13 }
 
@@ -6139,7 +6484,7 @@
 
         -- 1.3.6.1.4.1.2011.6.3.8.3.3.0.26
         hwDevBoardInputFaultTrap NOTIFICATION-TYPE
-            OBJECTS { hwFrameIndex, hwSlotIndex, hwSlotInputIdIndex, hwSlotInputType }
+            OBJECTS { hwFrameIndex, hwSlotIndex, hwSlotInputIdIndex, hwSlotInputType, hwPowerSupplyDescription }
             STATUS current
             DESCRIPTION
                 "
@@ -6149,7 +6494,7 @@
 
         -- 1.3.6.1.4.1.2011.6.3.8.3.3.0.27
         hwDevBoardInputRecoverTrap NOTIFICATION-TYPE
-            OBJECTS { hwFrameIndex, hwSlotIndex, hwSlotInputIdIndex, hwSlotInputType }
+            OBJECTS { hwFrameIndex, hwSlotIndex, hwSlotInputIdIndex, hwSlotInputType, hwPowerSupplyDescription }
             STATUS current
             DESCRIPTION
                 "
@@ -6159,7 +6504,7 @@
 
         -- 1.3.6.1.4.1.2011.6.3.8.3.3.0.28
         hwDevPowerLackVoltageFaultTrap NOTIFICATION-TYPE
-            OBJECTS { hwFrameIndex }
+            OBJECTS { hwFrameIndex, hwSlotInputIdIndex, hwPowerSupplyChannelVoltage, hwPowerSupplyDescription }
             STATUS current
             DESCRIPTION
                 "
@@ -6170,7 +6515,7 @@
 
         -- 1.3.6.1.4.1.2011.6.3.8.3.3.0.29
         hwDevPowerLackVolitageRecoverTrap NOTIFICATION-TYPE
-            OBJECTS { hwFrameIndex }
+            OBJECTS { hwFrameIndex, hwSlotInputIdIndex, hwPowerSupplyChannelVoltage, hwPowerSupplyDescription }
             STATUS current
             DESCRIPTION
                 "
@@ -6207,7 +6552,67 @@
                 This trap message is reported when the power input of the local shelf Recovers.
                 "
             ::= { hwDevBoardTrapsPrefix 32 }
-            
+         
+        -- 1.3.6.1.4.1.2011.6.3.8.3.3.0.33
+        hwDevPowerPortInputUnderVolFaultTrap NOTIFICATION-TYPE
+            OBJECTS { hwFrameIndex, hwSlotIndex, hwTrapPowerPortIndex }
+            STATUS current
+            DESCRIPTION
+                "
+                This trap message is reported when the input power of the subrack is undervoltage.
+                "
+            ::= { hwDevBoardTrapsPrefix 33 }
+
+        -- 1.3.6.1.4.1.2011.6.3.8.3.3.0.34
+        hwDevPowerPortInputUnderVolRecoverTrap NOTIFICATION-TYPE
+            OBJECTS { hwFrameIndex, hwSlotIndex, hwTrapPowerPortIndex }
+            STATUS current
+            DESCRIPTION
+                "
+                This trap message is reported when the undervoltage power input of the subrack recovers.
+                "
+            ::= { hwDevBoardTrapsPrefix 34 }
+	    
+        -- 1.3.6.1.4.1.2011.6.3.8.3.3.0.35
+        hwDevImportantFileBrokenTrap NOTIFICATION-TYPE
+            OBJECTS { hwFrameIndex, hwSlotIndex, hwBrokenFileName }
+            STATUS current
+            DESCRIPTION
+                "
+                This trap message is reported when the important file is broken.
+                "
+            ::= { hwDevBoardTrapsPrefix 35 }
+			
+        -- 1.3.6.1.4.1.2011.6.3.8.3.3.0.36
+        hwDevImportantFileBrokenRestoreTrap NOTIFICATION-TYPE
+            OBJECTS { hwFrameIndex, hwSlotIndex, hwBrokenFileName }
+            STATUS current
+            DESCRIPTION
+                "
+                This trap message is reported when the important file is recovery.
+                "
+            ::= { hwDevBoardTrapsPrefix 36 }
+			
+		-- 1.3.6.1.4.1.2011.6.3.8.3.3.0.37
+        hwDevRtuLicCapacityExceedFaultTrap NOTIFICATION-TYPE
+            OBJECTS { hwFrameIndex, hwSlotIndex, hwRtuRunCapacity, hwRtuLicenseCapcity}
+            STATUS current
+            DESCRIPTION
+                "
+                This trap message is reported when the running Rtu capacity exceed the license resource.
+                "
+            ::= { hwDevBoardTrapsPrefix 37 }
+			
+		-- 1.3.6.1.4.1.2011.6.3.8.3.3.0.38
+        hwDevRtuLicCapacityExceedRestoreTrap NOTIFICATION-TYPE
+            OBJECTS { hwFrameIndex, hwSlotIndex, hwRtuRunCapacity, hwRtuLicenseCapcity}
+            STATUS current
+            DESCRIPTION
+                "
+                This trap message is reported when the running Rtu capacity restore to the same the license resource.
+                "
+            ::= { hwDevBoardTrapsPrefix 38 }
+			
         -- 1.3.6.1.4.1.2011.6.3.8.3.4
         hwDevSubBoardTraps OBJECT IDENTIFIER ::= { hwDevAlarmTraps 4 }
 
@@ -6293,6 +6698,25 @@
                 "
             ::= { hwDevSubBoardTrapsPrefix 7 }	
 			
+        -- 1.3.6.1.4.1.2011.6.3.8.3.4.0.8
+        hwDevSubBoardActStdInconsistentTrap NOTIFICATION-TYPE
+            OBJECTS { hwFrameIndex, hwSlotIndex, hwSubslotTypeName , hwSubslotTypeName}
+            STATUS current
+            DESCRIPTION
+                "
+                This trap message is reported when the subboards on the active and standby control boards are inconsistent.
+                "
+            ::= { hwDevSubBoardTrapsPrefix 8 }
+			
+	-- 1.3.6.1.4.1.2011.6.3.8.3.4.0.9
+        hwDevSubBoardActStdInconsistentRestoreTrap NOTIFICATION-TYPE
+            OBJECTS { hwFrameIndex, hwSlotIndex, hwSubslotTypeName , hwSubslotTypeName}
+            STATUS current
+            DESCRIPTION
+                "
+                This trap message is reported when the subboards on the active and standby control boards recover consistent.
+                "
+            ::= { hwDevSubBoardTrapsPrefix 9 }
 			
         -- 1.3.6.1.4.1.2011.6.3.8.3.5
         hwDevDiagTraps OBJECT IDENTIFIER ::= { hwDevAlarmTraps 5 }
@@ -6766,7 +7190,7 @@
             STATUS current
             DESCRIPTION
                 "
-                The compatible SYSOID of new network element.
+                This object indicates the compatible SYSOID of the new NE.
                 "
             ::= { hwDevCompatibleTable 1 }
 
@@ -6778,7 +7202,7 @@
             STATUS current
             DESCRIPTION
                 "
-                The compatible version of new network element.
+                This object indicates the compatible version of the new NE.
                 "
             ::= { hwDevCompatibleTable 2 }
 
@@ -6802,7 +7226,7 @@
             STATUS current
             DESCRIPTION
                 "
-                The compatible product name of new network element.
+                This object indicates the name of the compatible product of the new NE.
                 "
             ::= { hwDevCompatibleTable 4 }
 
@@ -6899,6 +7323,15 @@
             DESCRIPTION
                 "hwDevGeneralTraps."
             ::= { hwDevGroups 8 }
+			
+		--  1.3.6.1.4.1.2011.6.3.101.2.9
+		hwDevPacketStatisticsGroup OBJECT-GROUP
+            OBJECTS { hwDevicePktStatReset, hwDevicePktStatVlanMismatch }
+            STATUS current
+            DESCRIPTION
+                "hwDevPacketStatisticsGroup."
+            ::= { hwDevGroups 9 }
+			
         -- 1.3.6.1.4.1.2011.6.3.13
         hwSysRegister OBJECT IDENTIFIER ::= { hwDev 13 }
 
@@ -7800,7 +8233,7 @@
 
         -- 1.3.6.1.4.1.2011.6.3.24.2
         hwConfigUnlockInterval OBJECT-TYPE
-            SYNTAX Integer32 (1..255)
+            SYNTAX Integer32 (0..255)
             MAX-ACCESS read-write
             STATUS current
             DESCRIPTION
@@ -7811,6 +8244,8 @@
                 If a user unlocks the system configuration within the automatic unlock interval,
                 automatic unlock is not necessary. If the system configuration keeps locked,
                 after the interval elapses, the system automatically unlocks it.
+				If a NETCONF user successfully locks the system configuration,
+				the system configuration will not be unlocked automatically,the automatic unlock interval is set as 0.
                 Default: 5
                 "
             ::= { hwConfigLock 2 }
@@ -7826,7 +8261,8 @@
                 telnet(3),
                 web(4),
                 xml(5),
-                ssh(6)
+                ssh(6),
+                netconf(7)
                 }
             MAX-ACCESS read-only
             STATUS current
@@ -7840,7 +8276,8 @@
                 4. telnet(3)       -the user who access through telnet
                 5. web(4)          -the user who access through the web user interface
                 6. xml(5)          -the user who access through the XML interface
-                7. ssh(6)          -the user who access through SSH 
+                7. ssh(6)          -the user who access through SSH
+                8. netconf(7)      -the user who access through NETCONF 
                 "
             ::= { hwConfigLock 3 }
 
@@ -7895,7 +8332,41 @@
                 "
             ::= { hwConfigLock 6 }
 
-
+        -- 1.3.6.1.4.1.2011.6.3.24.7
+        hwConfigLockUserInetAddressType OBJECT-TYPE
+            SYNTAX  InetAddressType
+                {
+                unknown(0),
+                ipv4(1),
+                ipv6(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The type of address in hwConfigLockUserInetAddress.
+                Options:
+                1. unknown(0) -If a user who accesses through the serial port locks the configuration platform,
+                               the IP address type is unknown(0).	
+                2. ipv4(1)    -indicates that the IP address type is ipv4.
+                3. ipv6(2)    -indicates that the IP address type is ipv6.  
+                "
+            ::= { hwConfigLock 7 }
+			
+        -- 1.3.6.1.4.1.2011.6.3.24.8
+        hwConfigLockUserInetAddress OBJECT-TYPE
+            SYNTAX  InetAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The IP address of the user who locks the configuration platform.
+                If a user who accesses through the serial port locks the configuration platform,
+                the IP address is default value.	
+                DEFVAL { zero-length }
+                "
+            ::= { hwConfigLock 8 }
+			
         -- 1.3.6.1.4.1.2011.6.3.25
         hwIntelligentPhoneParaTable OBJECT IDENTIFIER ::= { hwDev 25 }
 
@@ -8824,7 +9295,7 @@
 
         -- 1.3.6.1.4.1.2011.6.3.34.1.1
         hwOntRemoteHttpChnlVlan OBJECT-TYPE
-            SYNTAX Integer32 (1..4096)
+            SYNTAX Integer32 (1..4094)
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
@@ -8853,7 +9324,7 @@
             STATUS current
             DESCRIPTION
                 "
-                 Indicates the web server port of the ONT. If this parameter is not specified, port 80 is used by default.
+                 Indicates the web server port of the ONT. If this parameter is not specified, port 7017 is used by default.
                 "
             ::= { hwOntRemoteHttpChnlCfgEntry 3 }
 
@@ -8874,7 +9345,7 @@
 
         -- 1.3.6.1.4.1.2011.6.3.34.1.5
         hwOntRemoteHttpChnlUserName OBJECT-TYPE
-            SYNTAX OCTET STRING  (SIZE (0..32))
+            SYNTAX OCTET STRING  (SIZE (1..32))
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
@@ -8886,20 +9357,19 @@
 
         -- 1.3.6.1.4.1.2011.6.3.34.1.6
         hwOntRemoteHttpChnlPassword OBJECT-TYPE
-            SYNTAX OCTET STRING  (SIZE (0..32))
+            SYNTAX OCTET STRING  (SIZE (6..32))
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
                 "
                  Indicates the password used for a temporary user to log in to the web server of the ONT, 
                  which can consist of numbers, uppercase letters, lowercase letters, and special characters.
-                 And use at least 6 characters.
                 "
             ::= { hwOntRemoteHttpChnlCfgEntry 6 } 
 
         -- 1.3.6.1.4.1.2011.6.3.34.1.7
         hwOntRemoteHttpProxyPort OBJECT-TYPE
-            SYNTAX Integer32 (0..65528)
+            SYNTAX Integer32
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
@@ -8910,7 +9380,7 @@
 
         -- 1.3.6.1.4.1.2011.6.3.34.1.8
         hwOntRemoteHttpChnlDuration OBJECT-TYPE
-            SYNTAX Integer32 (0..120)
+            SYNTAX Integer32 (1..120)
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
@@ -8951,5 +9421,62 @@
                 3. destroy(6)     -delete the instances associated with an existing conceptual row.
                 "
             ::= { hwOntRemoteHttpChnlCfgEntry 10 }
+		hwDevicePktStatTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwDevicePktStatEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                This table is used to query statistics collected on some packets of a device.
+                "
+            ::= { hwDev 35 }
+
+        -- 1.3.6.1.4.1.2011.6.3.35.1
+        hwDevicePktStatEntry OBJECT-TYPE
+            SYNTAX HwDevicePktStatEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                The indexes of this entry are hwFrameIndex and hwSlotIndex.
+                "
+            INDEX { hwFrameIndex,  hwSlotIndex}
+            ::= { hwDevicePktStatTable 1 }
+
+            HwDevicePktStatEntry ::=
+            SEQUENCE {
+                hwDevicePktStatReset
+                    INTEGER,
+                hwDevicePktStatVlanMismatch
+                    Counter64
+             }
+
+        -- 1.3.6.1.4.1.2011.6.3.35.1.1
+        hwDevicePktStatReset OBJECT-TYPE
+            SYNTAX INTEGER { reset(1) }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                Reset the counter. Statistics can be cleared by setting the object to 1. Reading the value of the object is useless.
+                "
+            ::= { hwDevicePktStatEntry 1 }
+
+        -- 1.3.6.1.4.1.2011.6.3.35.1.2
+        hwDevicePktStatVlanMismatch OBJECT-TYPE
+            SYNTAX Counter64 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+               	Number of packets whose VLAN tag does not match the interface configuration.
+                "
+            ::= { hwDevicePktStatEntry 2 }
 
     END
+
+
+
+
+
+

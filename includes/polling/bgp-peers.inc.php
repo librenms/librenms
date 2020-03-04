@@ -385,16 +385,19 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                         } else {
                             $tmp_peer = $peer['bgpPeerIdentifier'];
                         }
-                        if (empty($a_prefixes)) {
-                            $a_prefixes = snmpwalk_cache_multi_oid($device, 'aristaBgp4V2PrefixInPrefixesAccepted', $a_prefixes, 'ARISTA-BGP4V2-MIB', null, '-OQUs');
-                        }
+                        $a_prefixes = snmpwalk_cache_multi_oid($device, 'aristaBgp4V2PrefixInPrefixesAccepted', $a_prefixes, 'ARISTA-BGP4V2-MIB', null, '-OQUs');
+                        $out_prefixes = snmpwalk_cache_multi_oid($device, 'aristaBgp4V2PrefixOutPrefixes', $out_prefixes, 'ARISTA-BGP4V2-MIB', null, '-OQUs');
+                        
                         $cbgpPeerAcceptedPrefixes = $a_prefixes["1.$afi.$tmp_peer.$afi.$safi"]['aristaBgp4V2PrefixInPrefixesAccepted'];
+                        $cbgpPeerAdvertisedPrefixes = $out_prefixes["1.$afi.$tmp_peer.$afi.$safi"]['aristaBgp4V2PrefixOutPrefixes'];
                     }
 
                     if ($device['os_group'] === 'vrp') {
                         $vrpPrefixes = snmpwalk_cache_multi_oid($device, 'hwBgpPeerPrefixRcvCounter', $vrpPrefixes, 'HUAWEI-BGP-VPN-MIB', null, '-OQUs');
                         $vrpPrefixes = snmpwalk_cache_multi_oid($device, 'hwBgpPeerPrefixAdvCounter', $vrpPrefixes, 'HUAWEI-BGP-VPN-MIB', null, '-OQUs');
-                        
+
+                        // only works in global routing table, as the vpnInstanceId is not available
+                        // for now in the VRF discovery of VRP devices
                         $key = '0.'.$afi.'.'.$safi.'.ipv4.'.$peer['bgpPeerIdentifier'];
                         $cbgpPeerAcceptedPrefixes = $vrpPrefixes[$key]['hwBgpPeerPrefixRcvCounter'];
                         $cbgpPeerAdvertisedPrefixes  = $vrpPrefixes[$key]['hwBgpPeerPrefixAdvCounter'];

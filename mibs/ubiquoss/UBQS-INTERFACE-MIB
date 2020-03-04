@@ -1,0 +1,2193 @@
+-- *****************************************************************
+-- UBQS-INTERFACE-MIB
+--   
+-- May 2009,  Park Hyung Eun
+--
+-- Copyright (c) 2009 by Ubiquoss, Corp.
+--   
+-- All rights reserved.
+-- ***************************************************************
+
+UBQS-INTERFACE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Counter32,
+    Gauge32,
+    Unsigned32,
+    Integer32,
+    NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP,
+    NOTIFICATION-GROUP
+        FROM SNMPv2-CONF     
+    RowStatus,
+    TruthValue,                                             
+    TimeStamp,
+    DisplayString,
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    ifIndex,
+    InterfaceIndexOrZero,
+    ifName,
+    ifType,
+    ifAdminStatus,
+    ifOperStatus
+        FROM IF-MIB
+    entPhysicalIndex
+        FROM ENTITY-MIB
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB       
+    VlanIndex,
+    	FROM Q-BRIDGE-MIB    
+    UbiPortList,    
+    UbiBridgeId,
+    Unsigned64,
+    IfOperStatusReason
+        FROM UBQS-TC     
+    ubiMgmtv2
+        FROM UBQS-SMI;
+
+
+ubiInterfaceMIB MODULE-IDENTITY
+        LAST-UPDATED    "200905260000Z"
+        ORGANIZATION 	"Ubiquoss Corp."
+	    CONTACT-INFO
+		"	Ubiquoss
+			Customer Service
+
+		 Postal: 24F Milennium B/D,
+		 	467-12, Dogok-Dong,
+			GangNam-Gu, Seoul 135-270
+			Korea
+
+		   Tel: 82-2-2190-3100"   
+    DESCRIPTION
+        "A MIB module for the physical interface 
+        in IF-MIB (RFC2863)."
+     ::= { ubiMgmtv2 4 }
+
+
+
+-- ***********************************************************
+-- Textual Conventions
+-- ***********************************************************          
+ 
+PortType  			::= TEXTUAL-CONVENTION
+        STATUS  current
+        DESCRIPTION
+                "Represents the port type."
+        SYNTAX  INTEGER { 
+                            other(1),      						-- none of the following (no transceiver, bad eeprom and so on)     
+                                                
+                        -- 10/100 Ethernet      
+                            e100BaseUnknown(10),				-- Unknown Fiber Fast Ethernet
+                            e10BaseT(11),   					-- UTP Ethernet
+                            e10BaseF(12),   					-- Multi Mode fiber Ethernet     
+                            e100BaseTX(13),						-- UTP Fast Ethernet (Cat 5)
+                            e100BaseT4(14),						-- UTP Fast Ethernet (Cat 3)      
+                            e100BaseF(15), 						-- Multi Mode fiber Fast Ethernet     
+                            e100BaseLX(16),  					-- Long Wave fiber Fast Ethernet                            
+                            e100BaseFsm(17), 					-- Single Mode fiber Fast Ethernet
+                            e10a100BaseTX(18), 					-- 10/100 UTP Ethernet(Cat 3/5)
+ 	       					e100BaseBX10(19),
+                       		e100BaseBX10D(20),					-- Fiber Fast Ethernet bi-directional 
+                       											-- 10km Downlink over SMF
+                       		e100BaseBX10U(21),					-- Fiber Fast Ethernet bi-directional 
+                       											-- 10km Uplink over SMF                 
+                            e100BaseSX(22),						-- Short Wave Fiber Fast Ethernet
+ 
+                                                                                                                               
+                         -- Gigabit Ethernet            
+                            e1000BaseUnknown(100),				-- Unknown Giga Ethernet                          
+                            e1000BaseLX(101), 					-- Long Wave fiber Giga Ethernet
+                            e1000BaseSX(102), 					-- Short Wave fiber Giga Ethernet
+                            e1000BaseCX(103), 					-- Copper Gigabit Ethernet
+                            e1000BaseLH(104), 					-- Long Haul fiber Giga Ethernet
+                            e1000BaseT(105),  					-- Twisted Pair Giga Ethernet       
+                            e10a100a1000BaseT(106), 			-- 10/100/1000 BaseT
+                            e1000BaseZX(107), 					-- Extended Reach Giga Ethernet   
+                              
+                            e1000BaseBX(108),					-- ubiquoss   
+                            e1000BaseBX10D(109),				-- Giga Ethernet bi-directional 10km
+                                 								-- Downlink over SMF
+                            e1000BaseBX10U(110),				-- Giga Ethernet bi-directional 10km
+                                 								-- Uplink over SMF     			
+                            e1000BasePX(111),					-- ubiquoss   
+                            e1000BaseBT(112), 					-- BT Giga Ethernet
+                            e1000BaseSvc(113), 					-- Service Module Giga Ethernet
+                            e1000BasePXPon(114),    			-- Unknown Pon         
+						    e1000BasePX20(115),     			-- Pon 20km
+							e1000BasePX30(116),     			-- Pon 30km
+   								
+                  
+                         -- 10 Gigabit Ethernet                             
+                            e10GBaseUnknown(1000),    			-- Unknown 10G
+                            e10GBaseCPX(1001), 					--10GE Parallel 860nm Laser
+                            e10GBaseLX4(1002), 					-- 10GE Wide-WDM 1310nm Laser
+                            e10GBaseEX4(1003), 					-- 10GE Wide-WDM 1550 Laser
+                            e10GBaseLR(1004),  					-- 10GE Serial 1310nm Laser
+                            e10GBaseSX4(1005), 					-- 10GE Wide-WDM 850nm Laser
+                            e10GBaseER(1006),  					-- 10GE Serial 1550nm Laser     
+                            e10GBaseSR(1007),  					-- 10GE Serial 850nm Laser
+                            e10GBaseCX4(1008), 					-- 10GE XAUI Copper
+                            e10GBaseSW(1009),  					-- 10GE Laser
+                            e10GBaseLW(1010),  					-- 10GE Laser
+                            e10GBaseEW(1011),  					-- 10GE Laser
+                            e10GBaseSvc(1012),  				-- Service Module 10G Ethernet  
+                            e10GBaseZR(1013),     				-- 10GE Laser
+                            e100BaseEX(1014),					-- Fiber Fast Ethernet
+                            e100BaseZX(1015),					-- Extended Reach Fiber Fast Ethernet
+                            e10GBaseLRM(1016),					-- 10GE Laser 300m over 50um Multi Mode Fiber
+                            e10GBaseT(1017),					-- 10GE Laser twisted pair
+                            e10GBaseSfpPlus(1018),				-- 10GE SFP PLUS
+                            e10GBaseEPON(1019),					-- 10GE EPON
+                            
+                         -- 40 Gigabit Ethernet
+                            e40GBaseUnknown(2000),    			-- Unknown 40G
+                            e40GBaseCR4(2001), 					-- 40GE Twin-ax copper cable
+                            e40GBaseSR4(2002), 					-- 40GE Serial 850nm Laser
+                            e40GBaseLR4(2003), 					-- 40GE Serial 1300nm Laser
+                            e40GXLPPI(2004)  					-- 40GE Active Cable
+                       }
+                            
+PortGBICTypeList     	::= TEXTUAL-CONVENTION
+        STATUS  current
+        DESCRIPTION
+                "Represents the type of slot."
+        SYNTAX  INTEGER {
+                        none(0),       		-- unequipped
+                        other(1),           -- equipped, none of the following list
+                        sfp(2),   
+                       	xfp(3),
+                       	sfp-plus(4),
+                       	qsfp-plus(5)
+         }		
+
+UbiSwitchportType      	::= TEXTUAL-CONVENTION
+	    	STATUS  current
+	    	DESCRIPTION
+        "A port type.  The possible port types are:
+             customerVlanPort(0) - Indicates a port is a C-tag
+                 aware port of an enterprise VLAN aware bridge.
+
+             providerNetworkPort(1) - Indicates a port is an S-tag
+                 aware port of a Provider Bridge or Backbone Edge
+                 Bridge used for connections within a PBN or PBBN.
+
+             customerNetworkPort(2) - Indicates a port is an S-tag
+                 aware port of a Provider Bridge or Backbone Edge
+                 Bridge used for connections to the exterior of a
+                 PBN or PBBN.
+
+             customerEdgePort(3) - Indicates a port is a C-tag
+                 aware port of a Provider Bridge used for connections
+                 to the exterior of a PBN or PBBN.
+
+             customerBackbonePort(4) - Indicates a port is a I-tag
+                 aware port of a Backbone Edge Bridge's B-component.
+
+             virtualInstancePort(5) - Indicates a port is a virtual
+                 S-tag aware port within a Backbone Edge Bridge's
+                 I-component which is responsible for handling
+                 S-tagged traffic for a specific backbone service
+                 instance.
+
+             dBridgePort(6) - Indicates a port is a VLAN-unaware
+                 member of an 802.1D bridge.             
+             access(7)
+             trunk(8)
+             hybrid(9)  "
+
+          SYNTAX  BITS {   
+                     customerVlanPort(0),
+                     providerNetworkPort(1),
+                     customerNetworkPort(2),
+                     customerEdgePort(3),
+                     customerBackbonePort(4),
+                     virtualInstancePort(5),
+                     dBridgePort(6),
+                     access(7),
+                     trunk(8),
+                     hybrid(9)          
+          }
+
+UbiFlowctrlWatermark      	::= TEXTUAL-CONVENTION
+	    	STATUS  current
+	    	DESCRIPTION
+			"represent flowcontrol watermark value :
+			
+				'3d 3d'                  
+				
+				--------------------------
+				first value		= wmpause(0-255)
+				second value	= wmcancel(0-255)"
+			SYNTAX	OCTET STRING (SIZE(7))
+				 
+-- ***************************************************************
+--   ubiInterfaceMIB
+-- ***************************************************************
+ubiInterfaceMIBNotificationPrefix  	OBJECT IDENTIFIER		::= { ubiInterfaceMIB 0 } 
+ubiInterfaceMIBObjects  			OBJECT IDENTIFIER		::= { ubiInterfaceMIB 1 }     
+ubiInterfaceMIBConformance  		OBJECT IDENTIFIER		::= { ubiInterfaceMIB 2 }
+   
+
+
+ubiIfNotificationEnables  			OBJECT IDENTIFIER		::= { ubiInterfaceMIBObjects 1 }      
+ubiPortExt							OBJECT IDENTIFIER		::= { ubiInterfaceMIBObjects 3 }
+ubiSwitchPort  						OBJECT IDENTIFIER		::= { ubiInterfaceMIBObjects 4 }   
+ubiPortTrafficControl 				OBJECT IDENTIFIER		::= { ubiInterfaceMIBObjects 5 }   
+ubiIfStatistics	 					OBJECT IDENTIFIER		::= { ubiInterfaceMIBObjects 6 }  
+ubiPortControl						OBJECT IDENTIFIER		::= { ubiInterfaceMIBObjects 7 }  
+ubiIfErps							OBJECT IDENTIFIER		::= { ubiInterfaceMIBObjects 8 }  
+
+
+-- subtable of ubiIfNotificationEnables 
+ubiGrp1	 							OBJECT IDENTIFIER		::= { ubiIfNotificationEnables 1 }  
+ubiGrp2		 						OBJECT IDENTIFIER		::= { ubiIfNotificationEnables 2 } 
+      
+                                                                                              
+-- ***********************************************************
+-- ubiInterfaceMIBNotificationPrefix
+-- ***********************************************************       
+ubiInterfaceNotifications  			OBJECT IDENTIFIER		::= { ubiInterfaceMIBNotificationPrefix 0 }  
+ubiTrafficControlNotifications  	OBJECT IDENTIFIER		::= { ubiInterfaceMIBNotificationPrefix 1 }  
+  
+         
+	ubiPortAutoNegoFault NOTIFICATION-TYPE
+    	OBJECTS         { 
+    					  ubiPortName,       
+    					  ubiPortAutoNegoFaultState    			        
+    	}
+    	STATUS          current
+    	DESCRIPTION
+        	"A ubiPortAutoNegoFault notification is sent 
+        	at auto negotiation failure for a particular physical 
+        	port."
+   	::= { ubiInterfaceNotifications 1 }
+                                 
+	ubiLoadMonitorRisingAlarm NOTIFICATION-TYPE
+    	OBJECTS         { 
+    					  ubiPortName,       
+    					  ubiLoadMonitorType,
+    					  ubiLoadMonitorVariable, 
+    			          ubiLoadMonitorValue,     
+    			          ubiLoadMonitorAlarmType,
+    			          ubiLoadMonitorCriticalThreshold,     
+    			          ubiLoadMonitorMajorThreshold,
+    			          ubiLoadMonitorUnit,
+    			          ubiLoadMonitorAlarmZone 
+    			        }
+    	STATUS          current
+    	DESCRIPTION
+        	"A ubiLoadMonitorRisingAlarm notification is sent 
+        	when the ubiLoadMonitorValue crosses its rising threshold."
+   	::= { ubiTrafficControlNotifications 1 }
+                                         
+	ubiLoadMonitorFallingAlarm NOTIFICATION-TYPE
+    	OBJECTS         { 
+    					  ubiPortName,       
+    					  ubiLoadMonitorType,
+    					  ubiLoadMonitorVariable, 
+    			          ubiLoadMonitorValue,
+    			          ubiLoadMonitorAlarmType,  
+    			          ubiLoadMonitorCriticalThreshold,
+    			          ubiLoadMonitorMajorThreshold,
+    			          ubiLoadMonitorUnit,
+    			          ubiLoadMonitorAlarmZone
+    					}
+    	STATUS          current
+    	DESCRIPTION
+        	"A ubiLoadMonitorRisingAlarm notification is sent 
+        	when the ubiLoadMonitorValue crosses its falling threshold."
+   	::= { ubiTrafficControlNotifications 2 }
+                                         
+   	ubiTrafficControlRisingAlarm	NOTIFICATION-TYPE
+   		OBJECTS
+   		{
+   			ubiPortName,
+   			ubiTrafficControlBaseType,
+   			ubiTrafficControlType,
+   			ubiTrafficControlDirection,
+   			ubiTrafficControlStatus,
+			ubiTrafficControlHighThreshold,
+			ubiTrafficControlLowThreshold,
+			ubiTrafficControlAverageRate,
+			ubiTrafficControlOneMinRate,
+			ubiTrafficControlAlarmCount
+		}
+
+
+		STATUS		current
+		DESCRIPTION
+			"A ubiTrafficControlRisingAlarm is sent
+			 when ubiTrafficControlOneMinRate is greater than current threshold."
+		::= { ubiTrafficControlNotifications 3 }
+
+	ubiTrafficControlFallingAlarm	NOTIFICATION-TYPE
+   		OBJECTS
+   		{
+   			ubiPortName,
+   			ubiTrafficControlBaseType,
+   			ubiTrafficControlType,
+   			ubiTrafficControlDirection,
+   			ubiTrafficControlStatus,
+			ubiTrafficControlHighThreshold,
+			ubiTrafficControlLowThreshold,
+			ubiTrafficControlAverageRate,
+			ubiTrafficControlOneMinRate,
+			ubiTrafficControlAlarmCount
+		}
+		STATUS		current
+		DESCRIPTION
+			"A ubiTrafficControlFallingAlarm is sent
+			 when ubiTrafficControlOneMinRate is less than current threshold."
+		::= { ubiTrafficControlNotifications 4 }
+
+
+-- ***********************************************************
+-- ubiIfNotificationEnables
+-- ***********************************************************
+
+  ubiLinkUpDownEnabled OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+               "This variable  indicates  whether  the  system
+                produces the notification of linkup/down."
+        DEFVAL { false }
+    ::= { ubiGrp1 1 }
+
+
+  ubiPortAutoNegoFaultEnabled OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+               "This variable  indicates  whether  the  system
+                produces the notification of the auto negotiation 
+                failure for a particular physical port."
+        DEFVAL { false }
+    ::= { ubiGrp2 1 }  
+
+   ubiLoadMonitorAlarmEnabled OBJECT-TYPE
+        SYNTAX      BITS
+        {   
+			 input(0), 
+			 crc(1), 
+			 error(2),
+			 drop(3),
+			 output(4)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+               "This variable  indicates  whether  the  system
+                produces the notification of ubiLoadMonitorRisingAlarm 
+                and ubiLoadMonitorFallingAlarm."
+    ::= { ubiGrp2 2 }  
+    
+  ubiTrafficControlAlarmEnabled OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+               "This variable  indicates  whether  the  system
+                produces the notification of ubiTrafficControlRisingAlarm 
+                and ubiTrafficControlFallingAlarm."
+        DEFVAL { false }
+    ::= { ubiGrp2 3 }
+
+  
+-- ***********************************************************
+-- ubiIfPortTable
+-- ***********************************************************
+  
+	ubiPortTable OBJECT-TYPE
+    	SYNTAX          SEQUENCE OF UbiPortEntry 
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"This table contains objects which provide
+        	more information about physical interface."
+    	::= { ubiInterfaceMIBObjects 2 }
+
+	ubiPortEntry OBJECT-TYPE
+    	SYNTAX          UbiPortEntry
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"An entry containing management information 
+        	applicable to a particular physical interface."
+    	INDEX           { ifIndex } 
+    	::= { ubiPortTable 1 }
+
+	UbiPortEntry ::= SEQUENCE {       
+			ubiPortName							DisplayString,    
+			ubiPortType                         PortType,
+			ubiPortOperStatus					INTEGER,      
+		--	ubiPortGBICStatus           		INTEGER,
+		--	ubiPortGBICType						PortGBICTypeList,
+			ubiPortDuplex						INTEGER,   
+			ubiPortSpeed						INTEGER,     
+			ubiPortAdminDuplex					INTEGER,
+			ubiPortAdminSpeed					INTEGER,    
+	       	ubiPortMtu                        	Integer32,    
+	       	ubiPortL2L3IfState					INTEGER,
+	       	ubiPortAutoNegoFaultState			INTEGER,
+	       	ubiPortReset						INTEGER,
+	       	ubiPortGBICSerialNumber				DisplayString,
+	       	ubiPortLocalSwitching				INTEGER
+	}
+  
+ 	ubiPortName OBJECT-TYPE
+    	SYNTAX          DisplayString
+    	MAX-ACCESS      read-only
+    	STATUS          current    
+    	DESCRIPTION
+        	"The physical port name."
+	   	::= { ubiPortEntry 1 }   
+  
+  	ubiPortType OBJECT-TYPE
+    	SYNTAX          PortType
+    	MAX-ACCESS      read-only
+    	STATUS          current
+   		DESCRIPTION
+        	"The type of the physical port." 
+    	::= { ubiPortEntry 2 }    
+  
+   	ubiPortOperStatus OBJECT-TYPE
+        SYNTAX	INTEGER {  
+				down(1),
+				up(2),          -- status ok
+				disable(3)		-- disable		
+		}
+    	MAX-ACCESS      read-only
+    	STATUS          current
+   		DESCRIPTION
+        	"The current operational status of the port.
+        	    down(1) is down
+        	    up(2) is up 
+        	    disable(3) is administratively down"
+       	::= { ubiPortEntry 3 }
+                                    
+  --	ubiPortGBICStatus OBJECT-TYPE
+  --  	SYNTAX          INTEGER
+  --  	{       
+  -- 			none(0),     
+  -- 			in(1),
+  -- 			out(2)
+  --  	}
+  --  	MAX-ACCESS      read-only
+  --  	STATUS          current
+  --  	DESCRIPTION
+  --      	"The current operational status of the equipped slot." 
+  --  	::= { ubiPortEntry 4 }    
+    
+  
+  --	ubiPortGBICType OBJECT-TYPE      
+  --  	SYNTAX          PortGBICTypeList
+  --  	MAX-ACCESS      read-only
+  --  	STATUS          current
+  --  	DESCRIPTION
+  --      	"The current GBIC Type of the equipped slot." 
+ --   	::= { ubiPortEntry 5 }
+ 
+ 
+  	ubiPortDuplex OBJECT-TYPE
+    	SYNTAX          INTEGER
+    	{   
+   			half(1),     
+   			full(2),
+   			auto(3)
+    	}
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"Indicates whether the port is operating in half-
+ 			 duplex, full-duplex or auto negotiation mode." 
+    	::= { ubiPortEntry 4 }
+
+ 
+  	ubiPortSpeed OBJECT-TYPE
+    	SYNTAX          INTEGER
+    	{
+			auto(0),  
+			speed_10(10),    
+			speed_100(100),  
+			speed_1000(1000),   
+			speed_2500(2500),
+			speed_10000(10000),
+			speed_40000(40000)
+    	}                   
+    	UNITS			"Mbps"
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION                                                                        
+        	"The current operational speed of the port." 
+    	::= { ubiPortEntry 5 }  
+
+ 
+  	ubiPortAdminDuplex OBJECT-TYPE
+    	SYNTAX          INTEGER
+    	{   
+   			half(1),     
+   			full(2),
+   			auto(3)
+    	}
+    	MAX-ACCESS      read-write
+    	STATUS          current 
+       	DESCRIPTION
+        	"The desired duplex of the port." 
+    	::= { ubiPortEntry 6 }
+
+  	ubiPortAdminSpeed OBJECT-TYPE
+    	SYNTAX          INTEGER
+    	{
+			auto(0),  
+			speed_10(10),    
+			speed_100(100),  
+			speed_1000(1000),
+			speed_2500(2500),
+			speed_10000(10000),
+			speed_40000(40000)
+    	}     
+    	UNITS			"Mbps"
+    	MAX-ACCESS      read-write
+    	STATUS          current  
+    	DESCRIPTION
+        	"The desired speed of the port." 
+    	::= { ubiPortEntry 7 }  
+
+  	ubiPortMtu OBJECT-TYPE
+    	SYNTAX          Integer32 (1500..10218 )
+    	MAX-ACCESS      read-write
+    	STATUS          current    
+    	DESCRIPTION
+        	"The MTU value of the port."
+    	DEFVAL          { 1500 } 
+    	::= { ubiPortEntry 8 } 
+                                     
+  	ubiPortL2L3IfState OBJECT-TYPE
+    	SYNTAX          INTEGER {      
+ 				routed(1), 
+ 				switchport(2)    	
+ 		}
+    	MAX-ACCESS      read-write
+    	STATUS          current    
+    	DESCRIPTION
+        	"The operational mode of the port whether the port 
+        	is layer 2 or layer 3."
+    	::= { ubiPortEntry 9 } 
+                                                                                  
+   
+   	ubiPortAutoNegoFaultState    OBJECT-TYPE
+   		SYNTAX			INTEGER {   
+   			ok(1),
+   			fail(2)
+   		}   
+   		MAX-ACCESS		accessible-for-notify
+		STATUS			current
+		DESCRIPTION
+			"The link is down due to auto negotiation failure.
+			 This state indicates the state of auto negotiation 
+			 failure for a particular port. But it's used for 
+			 notification only."
+   	    ::= { ubiPortEntry 10 } 		
+   	    
+   	ubiPortReset    OBJECT-TYPE
+   		SYNTAX			INTEGER {      
+   			none(0),
+   			reset(1)
+  		}   
+   		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+			"Reset the physical port."
+   	    ::= { ubiPortEntry 11 }    
+   	    
+   	ubiPortLocalSwitching		OBJECT-TYPE
+   		SYNTAX		INTEGER
+   		{
+   			disable(0),
+   			enable(1)
+   		}            
+   		MAX-ACCESS	read-write
+   		STATUS		current
+   		DESCRIPTION
+   			"Port local-switching"
+   		::= { ubiPortEntry 12 }
+ 
+
+  
+-- ***********************************************************
+-- ubiPortExtTable
+-- ***********************************************************
+  
+	ubiPortExtTable OBJECT-TYPE
+    	SYNTAX          SEQUENCE OF UbiPortExtEntry 
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"This table contains objects which provide
+        	more information about physical interface."
+    	::= { ubiPortExt 1 }
+
+	ubiPortExtEntry OBJECT-TYPE
+    	SYNTAX          UbiPortExtEntry
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"An entry containing management information 
+        	applicable to a particular physical interface."
+    	INDEX           { ifIndex } 
+    	::= { ubiPortExtTable 1 }
+
+	UbiPortExtEntry ::= SEQUENCE {       
+			ubiPortGBICStatus           		INTEGER,
+			ubiPortGBICType						PortGBICTypeList,
+	       	ubiPortGBICSerialNumber				DisplayString
+	}
+
+  	ubiPortGBICStatus OBJECT-TYPE
+    	SYNTAX          INTEGER
+    	{       
+   			none(0),     
+   			in(1),
+   			out(2)
+    	}
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"The current operational status of the equipped slot." 
+    	::= { ubiPortExtEntry 1 }    
+    
+  
+  	ubiPortGBICType OBJECT-TYPE      
+    	SYNTAX          PortGBICTypeList
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"The current GBIC Type of the equipped slot.
+                none(0): unequipped
+                other(1) : equipped, none of the following list
+                sfp(2)  
+                xfp(3)
+                sfp-plus(4) " 
+    	::= { ubiPortExtEntry 2 }
+                                          
+                                          
+   	ubiPortGBICSerialNumber    OBJECT-TYPE
+   		SYNTAX			DisplayString
+   		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"The serial number of this GBIC."
+   	    ::= { ubiPortExtEntry 3 }   
+ 
+
+ 
+-- ***********************************************************
+-- ubiSwitchPortTable
+-- ***********************************************************
+
+  	ubiSwitchportTable OBJECT-TYPE
+		SYNTAX     SEQUENCE OF UbiSwitchportEntry
+		MAX-ACCESS not-accessible
+		STATUS     current
+		DESCRIPTION
+			"A table contains the information for switchport."
+		::=  {  ubiSwitchPort 1 }
+                                   
+  	ubiSwitchportEntry OBJECT-TYPE
+		SYNTAX     UbiSwitchportEntry
+		MAX-ACCESS not-accessible
+		STATUS     current
+		DESCRIPTION                                 
+			"A list of information for each switchport."
+		INDEX   { ifIndex }
+		::= { ubiSwitchportTable 1 }
+ 
+ 
+	UbiSwitchportEntry ::= SEQUENCE
+    {
+		ubiSwitchportName					DisplayString,   
+		ubiSwitchportMode					UbiSwitchportType,
+		ubiSwitchportBridgeId				UbiBridgeId,
+		ubiSwitchportVlanNative				VlanIndex,
+		ubiSwitchportVlanDefault			VlanIndex   		  
+	}     
+    
+	ubiSwitchportName OBJECT-TYPE
+		SYNTAX     DisplayString
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"A textual string containing information about 
+			the interface."
+		::= { ubiSwitchportEntry 1 }
+
+	ubiSwitchportMode OBJECT-TYPE
+		SYNTAX     	UbiSwitchportType
+		MAX-ACCESS  read-write
+		STATUS     	current
+		DESCRIPTION
+ 			"A port type.  The possible port types are:
+             customerVlanPort(0) - Indicates a port is a C-tag
+                 aware port of an enterprise VLAN aware bridge.
+
+             providerNetworkPort(1) - Indicates a port is an S-tag
+                 aware port of a Provider Bridge or Backbone Edge
+                 Bridge used for connections within a PBN or PBBN.
+
+             customerNetworkPort(2) - Indicates a port is an S-tag
+                 aware port of a Provider Bridge or Backbone Edge
+                 Bridge used for connections to the exterior of a
+                 PBN or PBBN.
+
+             customerEdgePort(3) - Indicates a port is a C-tag
+                 aware port of a Provider Bridge used for connections
+                 to the exterior of a PBN or PBBN.
+
+             customerBackbonePort(4) - Indicates a port is a I-tag
+                 aware port of a Backbone Edge Bridge's B-component.
+
+             virtualInstancePort(5) - Indicates a port is a virtual
+                 S-tag aware port within a Backbone Edge Bridge's
+                 I-component which is responsible for handling
+                 S-tagged traffic for a specific backbone service
+                 instance.
+
+             dBridgePort(6) - Indicates a port is a VLAN-unaware
+                 member of an 802.1D bridge.             
+             access(7)
+             trunk(8)
+             hybrid(9)         		
+             "                   
+		::= { ubiSwitchportEntry 2 } 
+ 
+	ubiSwitchportBridgeId OBJECT-TYPE
+		SYNTAX     UbiBridgeId
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"This object is used to allocate the bridge 
+			 group id."
+		::= { ubiSwitchportEntry 3 }
+
+	ubiSwitchportVlanNative OBJECT-TYPE
+		SYNTAX      VlanIndex    		
+		MAX-ACCESS  read-write
+		STATUS     	current
+		DESCRIPTION
+ 			"The native vlan of a switchport."
+		::= { ubiSwitchportEntry 4 } 
+
+	ubiSwitchportVlanDefault OBJECT-TYPE
+		SYNTAX     	VlanIndex 
+		MAX-ACCESS  read-write
+		STATUS     	current
+		DESCRIPTION
+ 			"The default vlan of a switchport."
+		::= { ubiSwitchportEntry 5 } 
+
+ 
+-- ***********************************************************
+-- ubiSwitchPortVlanControlTable
+-- ***********************************************************
+
+  	ubiSwitchPortVlanControlTable OBJECT-TYPE
+		SYNTAX     SEQUENCE OF UbiSwitchPortVlanControlEntry
+		MAX-ACCESS not-accessible
+		STATUS     current
+		DESCRIPTION
+			"This table contains the control information 
+			of vlan for switchport."
+		::=  {  ubiSwitchPort 2 }
+                                   
+  	ubiSwitchPortVlanControlEntry OBJECT-TYPE
+		SYNTAX     UbiSwitchPortVlanControlEntry
+		MAX-ACCESS not-accessible
+		STATUS     current
+		DESCRIPTION                                 
+			"A list of vlan control for each switchport."
+		INDEX   { ifIndex, ubiVlanIndex }
+		::= { ubiSwitchPortVlanControlTable 1 }
+ 
+ 
+	UbiSwitchPortVlanControlEntry ::= SEQUENCE
+    {   
+		ubiSwitchportVlanTaggedSet			INTEGER,   
+		ubiSwitchportVlanUntaggedSet		INTEGER,
+		ubiSwitchportVlanEgressTaggedSet	INTEGER 
+    }     
+    
+	ubiSwitchportVlanTaggedSet OBJECT-TYPE
+		SYNTAX     INTEGER {    
+			other(0), -- none of the following     
+			add(1),
+			delete(2),
+			except(3),
+			all(4),
+			none(5)
+		}
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"The operational set of the switchport for a specific 
+			 tagged vlan.
+			
+			 If a value of set is all(4), the vlan index 
+			 should be a zero. 			
+			"
+		::= { ubiSwitchPortVlanControlEntry 1 }
+
+	ubiSwitchportVlanUntaggedSet OBJECT-TYPE
+		SYNTAX     	INTEGER {         
+			other(0), -- none of the following       
+			add(1),
+			delete(2)
+		}
+		MAX-ACCESS  read-write
+		STATUS     	current
+		DESCRIPTION
+ 			"The operational set of the switchport for a specific 
+ 			 untagged vlan. 
+
+			 If a value of set is all(4), the vlan index 
+			 should be a zero. 
+			"
+		::= { ubiSwitchPortVlanControlEntry 2 } 
+ 
+	ubiSwitchportVlanEgressTaggedSet OBJECT-TYPE
+		SYNTAX     INTEGER {          
+			enable(1),
+			disable(2)
+		}
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION
+			"The operational set of the switchport for a egress 
+			 tagged vlan."
+		::= { ubiSwitchPortVlanControlEntry 3 }
+
+-- ***********************************************************
+-- ubiSwitchVlanStackingTable
+-- ***********************************************************  
+
+ 	ubiSwitchVlanStackingTable OBJECT-TYPE
+		SYNTAX     SEQUENCE OF UbiSwitchVlanStackingEntry
+		MAX-ACCESS not-accessible
+		STATUS     current
+		DESCRIPTION
+			"This table contains the stacking information 
+			of vlan for switchport."
+		::=  {  ubiSwitchPort 3 }
+                                   
+  	ubiSwitchVlanStackingEntry OBJECT-TYPE
+		SYNTAX     UbiSwitchVlanStackingEntry
+		MAX-ACCESS not-accessible
+		STATUS     current
+		DESCRIPTION                                 
+			"A list of vlan stacking for each switchport."
+		INDEX   { ifIndex }
+		::= { ubiSwitchVlanStackingTable 1 }
+ 
+ 
+	UbiSwitchVlanStackingEntry ::= SEQUENCE
+    {   
+		ubiVlanStackingMode				INTEGER,   
+		ubiVlanStackingEthertype		DisplayString,
+    }     
+    
+    ubiVlanStackingMode			OBJECT-TYPE	
+    	SYNTAX			INTEGER
+    	{
+    		disable(0),
+    		customerEdgePort (1),
+    		providerPort (2)
+    	}                   
+    	MAX-ACCESS		read-write
+    	STATUS			current
+    	DESCRIPTION
+    		"vlan-stacking mode"
+    	::= { ubiSwitchVlanStackingEntry 1 }
+    	
+    ubiVlanStackingEthertype	OBJECT-TYPE	
+    	SYNTAX			DisplayString 
+       	MAX-ACCESS		read-write
+    	STATUS			current
+    	DESCRIPTION                             
+    		"vlan-stacking ethertype (format : 0xhhhh)"
+    	::= { ubiSwitchVlanStackingEntry 2 }
+    	
+-- ***********************************************************
+-- ubiLoadMonitorTable
+-- ***********************************************************
+
+  	ubiLoadMonitorTable OBJECT-TYPE
+		SYNTAX     SEQUENCE OF UbiLoadMonitorEntry
+		MAX-ACCESS not-accessible
+		STATUS     current
+		DESCRIPTION
+			"This table contains the information of load monitoring."
+		::=  {  ubiPortTrafficControl 1 }
+                                                
+                                                
+  	ubiLoadMonitorEntry OBJECT-TYPE
+		SYNTAX     UbiLoadMonitorEntry
+		MAX-ACCESS not-accessible
+		STATUS     current
+		DESCRIPTION                                 
+			"A list of load monitoring configuration."
+		INDEX   { ifIndex, ubiLoadMonitorType }
+		::= { ubiLoadMonitorTable 1 }
+ 
+ 
+	UbiLoadMonitorEntry ::= SEQUENCE
+    {       
+    	ubiLoadMonitorType                      INTEGER,
+    	ubiLoadMonitorInterval					Integer32,                
+    	ubiLoadMonitorVariable				    OBJECT IDENTIFIER,
+    	ubiLoadMonitorValue						Counter64,
+		ubiLoadMonitorCriticalThreshold			Integer32,   
+		ubiLoadMonitorMajorThreshold			Integer32, 
+		ubiLoadMonitorUnit						DisplayString,
+		ubiLoadMonitorAlarmType					INTEGER,		
+		ubiLoadMonitorRowStatus					RowStatus,
+		ubiLoadMonitorAlarmZone					INTEGER,				
+    }     
+
+	ubiLoadMonitorType OBJECT-TYPE
+		SYNTAX     	INTEGER {      
+			 input(1), 
+			 crc(2), 
+			 error(3),
+			 drop(4),
+			 output(5),
+			 storm-control-discard(6)
+		}
+		MAX-ACCESS 	read-only
+		STATUS     	current
+		DESCRIPTION
+			"This object specifies the type of load monitoring.
+			For example, If type is input, ubiLoadMonitorVariable 
+			should be the particular variable related to the input 
+			statistics."
+		::= { ubiLoadMonitorEntry 1 }
+
+	ubiLoadMonitorInterval OBJECT-TYPE
+		SYNTAX     	Integer32
+		UNITS		"seconds"
+		MAX-ACCESS 	read-create
+		STATUS     	current
+		DESCRIPTION
+			"The monitoring interval."
+		::= { ubiLoadMonitorEntry 2 }
+ 
+ 	ubiLoadMonitorVariable OBJECT-TYPE
+		SYNTAX     	OBJECT IDENTIFIER
+		MAX-ACCESS 	read-only
+		STATUS     	current
+		DESCRIPTION
+			"The object identifier of the particular variable 
+			 to be sampled for load monitoring. 
+			 this variable is decided by ubiLoadMonitorType.
+			 
+			 variable mapping information for load monitoring:   
+			  	type                object identifier
+			  ---------------     -------------------------
+			 	INPUT               ifHCInOctets   (64bit)
+			 	OUTPUT              ifHCOutOctets   (64bit)
+			 	CRC                 ubiIfStatsInCRCErrors (64bit)
+			 	DISCARD             ifInDiscards  (32bit)
+			 	ERROR               ifInErrors  (32bit)
+			 	STORM-DISCARD       ubiStormTotalDiscards (64bit)
+			"
+		::= { ubiLoadMonitorEntry 3 }
+ 
+  	ubiLoadMonitorValue OBJECT-TYPE
+		SYNTAX     	Counter64
+		MAX-ACCESS 	read-only
+		STATUS     	current
+		DESCRIPTION
+			"The sampling value of the statistic for the 
+			particular variable."
+		::= { ubiLoadMonitorEntry 4 }
+ 
+	ubiLoadMonitorCriticalThreshold OBJECT-TYPE
+		SYNTAX     	Integer32
+		MAX-ACCESS  read-create
+		STATUS     	current
+		DESCRIPTION
+ 			"The critical threshold for the sampled statistics."
+		::= { ubiLoadMonitorEntry 5 } 
+ 
+	ubiLoadMonitorMajorThreshold OBJECT-TYPE
+		SYNTAX     	Integer32	 
+		MAX-ACCESS  read-create
+		STATUS     	current
+		DESCRIPTION
+ 			"The major threshold for the sampled statistics."
+		::= { ubiLoadMonitorEntry 6 } 
+
+	ubiLoadMonitorUnit OBJECT-TYPE
+		SYNTAX     	DisplayString
+		MAX-ACCESS 	read-only
+		STATUS     	current
+		DESCRIPTION
+			"The unit of the sampled statistics and 
+			threshold value."
+		::= { ubiLoadMonitorEntry 7 }
+ 
+
+	ubiLoadMonitorAlarmType OBJECT-TYPE
+		SYNTAX     	INTEGER {    
+			none(0),
+			critical(1),
+			major(2)
+		}
+		MAX-ACCESS 	accessible-for-notify
+		STATUS     	current
+		DESCRIPTION
+			"The alarm type. This object is used 
+			for notification only."
+		::= { ubiLoadMonitorEntry 8 }
+ 
+	ubiLoadMonitorRowStatus OBJECT-TYPE
+		SYNTAX     	RowStatus		
+		MAX-ACCESS  read-create
+		STATUS     	current
+		DESCRIPTION
+ 			"The row status of this entry."
+		::= { ubiLoadMonitorEntry 9} 
+       
+ 	ubiLoadMonitorAlarmZone OBJECT-TYPE
+		SYNTAX     	INTEGER {    
+			normal(0),     
+			critical(1),
+			major(2)
+		}
+		MAX-ACCESS 	accessible-for-notify
+		STATUS     	current
+		DESCRIPTION
+			"This object indicates the current alarm zone. "
+		::= { ubiLoadMonitorEntry 10 }
+      
+            
+-- ***********************************************************
+-- ubiTrafficControl
+-- ***********************************************************  
+
+	ubiTrafficControl			OBJECT IDENTIFIER ::= { ubiPortTrafficControl 2 }
+	ubiTrafficControlConfig 	OBJECT IDENTIFIER ::= { ubiTrafficControl 1 }
+	
+	ubiTrafficControlReportInterval		OBJECT-TYPE
+		SYNTAX		INTEGER
+		{
+			default(1)
+		}(1..1440)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"Interval when alarm is up/down according to traffic count"
+		::= { ubiTrafficControlConfig 1 }
+		
+	ubiTrafficControlObservingPeriod	OBJECT-TYPE
+		SYNTAX		INTEGER
+		{
+			default(1)
+		}(1..1440)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"Period for counting traffic"
+		::= { ubiTrafficControlConfig 2 }
+		
+	ubiTrafficControlHighAlarmMode		OBJECT-TYPE
+		SYNTAX		INTEGER
+		{  
+			repeatable(0),
+			once(1),
+			disable(2)
+		}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"Action that is operated when traffic is over high-threshold"
+		::= { ubiTrafficControlConfig 3 }
+		
+	ubiTrafficControlLowAlarmMode		OBJECT-TYPE
+		SYNTAX		INTEGER
+		{ 
+			once(1),
+			disable(2)
+		}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"Action that is operated when traffic is below low-threshold"
+		::= { ubiTrafficControlConfig 4 }
+		
+-- ***********************************************************
+-- ubiTrafficControlTable
+-- ***********************************************************	
+--	
+--	ubiTrafficControlTable	OBJECT-TYPE
+--		SYNTAX		SEQUENCE OF UbiTrafficControlEntry
+--		MAX-ACCESS	not-accessible
+--		STATUS		current
+--		DESCRIPTION
+--			"The table for traffic-control configuration"
+--		::= { ubiTrafficControl 2 }
+--		
+--	ubiTrafficControlEntry	OBJECT-TYPE
+--		SYNTAX		UbiTrafficControlEntry
+--		MAX-ACCESS	not-accessible
+--		STATUS		current
+--		DESCRIPTION
+--			"The entry representing traffic-control config.
+--			 Index description
+--			 	a) ifindex : interface index
+--			 	b) trafficBaseType : base type of traffic
+--			 		value - pps(1), kbps(2)
+--			 	c) trafficType : type of traffic
+--			 		value - all(1), unicast(2), broadcast(3), multicast(4)
+--			 	d) trafficDirection : direction of traffic
+--			 		value - inbound(1), outbound(2)"
+--		INDEX	
+--		{ 
+--			ifindex,
+--			trafficBaseType,
+--			trafficType,
+--			trafficDirection
+--		}
+--		::= { ubiTrafficControlTable 1 }
+--		
+--	UbiTrafficControlEntry ::= SEQUENCE {
+--		ubiTrafficControlHighThreshold	Integer32,
+--		ubiTrafficControlLowThreshold	Integer32,
+--		ubiTrafficControlAction			INTEGER,
+--		ubiTrafficControlRowStatus		RowStatus		
+--	}                                             
+--	
+--	ubiTrafficControlHighThreshold	OBJECT-TYPE
+--		SYNTAX		Integer32(1..1500000)
+--		MAX-ACCESS	read-create
+--		STATUS		current
+--		DESCRIPTION
+--			"traffic high-threshold.
+--			 kbps could has threshold less than 1000000."
+--		::= { ubiTrafficControlEntry 1 }
+--		
+--	ubiTrafficControlLowThreshold	OBJECT-TYPE
+--		SYNTAX		Integer32(1..1500000)
+--		MAX-ACCESS	read-create
+--		STATUS		current
+--		DESCRIPTION
+--			"traffic low-threshold.
+--			 kbps could has threshold less than 1000000."
+--		::= { ubiTrafficControlEntry 2 }
+--		
+--	ubiTrafficControlAction			OBJECT-TYPE
+--		SYNTAX		INTEGER
+--		{
+--			alarmOnly(1),
+--			blockMode(2)		
+--		}
+--		MAX-ACCESS	read-create
+--		STATUS		current
+--		DESCRIPTION
+--			"traffic action type"
+--		::= { ubiTrafficControlEntry 3 }
+--	
+--	ubiTrafficControlRowStatus		OBJECT-TYPE
+--		SYNTAX		RowStatus
+--		MAX-ACCESS	read-create
+--		STATUS		current
+--		DESCRIPTION
+--			"row status"
+--		::= { ubiTrafficControlEntry 4 }
+--
+-- ***********************************************************
+-- ubiTrafficStatisticsTable
+-- ***********************************************************
+--
+--	ubiTrafficStatisticsTable	OBJECT-TYPE
+--		SYNTAX		SEQUENCE OF UbiTrafficStatisticsEntry
+--		MAX-ACCESS	not-accessible
+--		STATUS		current
+--		DESCRIPTION
+--			"The table of traffic statistices per interface"
+--		::= { ubiTrafficControl 3 }
+--		
+--	ubiTrafficStatisticsEntry	OBJECT-TYPE
+--		SYNTAX		UbiTrafficStatisticsEntry
+--		MAX-ACCESS	not-accessible
+--		STATUS		current
+--		DESCRIPTION
+--			"The entry representing intreface traffic statistics.
+--			 Index description
+--				a) ifindex : interface index
+--			 	b) trafficBaseType : base type of traffic
+--			 		value - pps(0), kbps(1)
+--			 	c) trafficType : type of traffic
+--			 		value - all(0), unicast(1), broadcast(2), multicast(3)
+--			 	d) trafficDirection : direction of traffic
+--			 		value - inbound(0), outbound(1)"
+--		INDEX	
+--		{ 
+--			ifindex,
+--			trafficBaseType,
+--			TrafficType,
+--			trafficDirection			
+--		}
+--		::= { ubiTrafficStatisticsTable 1 }
+--		
+--	UbiTrafficStatisticsEntry ::= SEQUENCE {
+--		ubiTrafficStatisticsStatus				INTEGER,
+--		ubiTrafficStatisticsHighThreshold		Integer32,
+--		ubiTrafficStatisticsLowThreshold		Integer32,
+--		ubiTrafficStatisticsAverageRate			DisplayString,
+--		ubiTrafficStatisticsAlarmCount			Integer32,
+--		ubiTrafficStatisticsLastAlarmTime		DisplayString				
+--	}                                                
+--
+--	ubiTrafficStatisticsStatus				OBJECT-TYPE
+--		SYNTAX		INTEGER
+--		{
+--			normal(0),
+--			alarmed(1)
+--		}
+--		MAX-ACCESS	read-only
+--		STATUS		current
+--		DESCRIPTION
+--			"traffic status"
+--		::= { ubiTrafficStatisticsEntry 1 }
+--			
+--	ubiTrafficStatisticsHighThreshold		OBJECT-TYPE
+--		SYNTAX		Integer32(1..1500000)
+--		MAX-ACCESS	read-only
+--		STATUS		current
+--		DESCRIPTION
+--			"high threshold"
+--		::= { ubiTrafficStatisticsEntry 2 }
+--		
+--	ubiTrafficStatisticsLowThreshold		OBJECT-TYPE
+--		SYNTAX		Integer32(1..1500000)
+--		MAX-ACCESS	read-only
+--		STATUS		current
+--		DESCRIPTION
+--			"low threshold"
+--		::= { ubiTrafficStatisticsEntry 3 }
+--		
+--	ubiTrafficStatisticsAverageRate		OBJECT-TYPE
+--		SYNTAX		DisplayString
+--		MAX-ACCESS	read-only
+--		STATUS		current
+--		DESCRIPTION
+--			"average rate"
+--		::= { ubiTrafficStatisticsEntry 4 }
+--		
+--	ubiTrafficStatisticsAlarmCount			OBJECT-TYPE
+--		SYNTAX		Integer32
+--		MAX-ACCESS	read-only
+--		STATUS		current
+--		DESCRIPTION
+--			"alarm count"
+--		::= { ubiTrafficStatisticsEntry 5 }
+--		
+--	ubiTrafficStatisticsLastAlarmTime		OBJECT-TYPE
+--		SYNTAX		DisplayString
+--		MAX-ACCESS	read-only
+--		STATUS		current
+--		DESCRIPTION
+--			"last alarm time"
+--		::= { ubiTrafficStatisticsEntry 6 }
+--
+
+-- ***********************************************************
+-- ubiTrafficControlTable
+-- ***********************************************************	
+	
+	ubiTrafficControlTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE OF UbiTrafficControlEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"The table for traffic-control configuration"
+		::= { ubiTrafficControl 2 }
+		
+	ubiTrafficControlEntry	OBJECT-TYPE
+		SYNTAX		UbiTrafficControlEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"The entry representing traffic-control config.
+			 Index description
+			 	a) ubiTrafficControlIfindex : interface index
+			 	b) ubiTrafficControlBaseType : base type of traffic
+			 		value - pps(1), kbps(2)
+			 	c) ubiTrafficControlTrafficType : type of traffic
+			 		value - all(1), unicast(2), broadcast(3), multicast(4)
+			 	d) ubiTrafficControlDirection : direction of traffic
+			 		value - inbound(1), outbound(2)"
+		INDEX	
+		{ 
+			ubiTrafficControlIfindex,
+			ubiTrafficControlBaseType,
+			ubiTrafficControlType,
+			ubiTrafficControlDirection
+		}
+		::= { ubiTrafficControlTable 1 }
+		
+	UbiTrafficControlEntry ::= SEQUENCE {
+		ubiTrafficControlIfindex		Integer32,
+		ubiTrafficControlBaseType		INTEGER,
+		ubiTrafficControlType			INTEGER,
+		ubiTrafficControlDirection		INTEGER,
+		ubiTrafficControlHighThreshold	Integer32,
+		ubiTrafficControlLowThreshold	Integer32,
+		ubiTrafficControlAction			INTEGER,
+		ubiTrafficControlStatus			INTEGER,
+		ubiTrafficControlAverageRate	DisplayString,
+		ubiTrafficControlOneMinRate		DisplayString,
+		ubiTrafficControlAlarmCount		Integer32,
+		ubiTrafficControlLastAlarmTime	DisplayString,
+		ubiTrafficControlRowStatus		RowStatus
+	}
+	
+	ubiTrafficControlIfindex	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"A unique value, greater than zero, for each interface.
+			It is recommended that values are assigned contiguously
+			starting from 1. The value for each interface sub-layer
+			must remain constant at least from one re-initialization of
+			the entity's network management system to the next re-initialization."
+		::= { ubiTrafficControlEntry 1 }
+	
+	ubiTrafficControlBaseType	OBJECT-TYPE
+		SYNTAX		INTEGER
+		{
+			pps(1),
+			kbps(2)
+		}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"Base type of traffic."
+		::= { ubiTrafficControlEntry 2 }
+	
+	ubiTrafficControlType	OBJECT-TYPE
+		SYNTAX		INTEGER
+		{
+			all(1),
+			broadcast(2),
+			multicast(3),
+			unicast(4)
+		}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"Type of traffic.
+			 Type based on KBPS must be only all(0). remains are only for pps."
+		::= { ubiTrafficControlEntry 3 }
+	
+	ubiTrafficControlDirection	OBJECT-TYPE
+		SYNTAX		INTEGER
+		{
+			inbound(1),
+			outbound(2)
+		}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"Direction of traffic."
+		::= { ubiTrafficControlEntry 4 }
+
+	ubiTrafficControlHighThreshold	OBJECT-TYPE
+		SYNTAX		Integer32(1..1500000)
+		MAX-ACCESS	read-create
+		STATUS		current
+		DESCRIPTION
+			"Traffic high-threshold.
+		 	Type based on KBPS could has threshold less than 1000000."
+		::= { ubiTrafficControlEntry 5 }
+
+	ubiTrafficControlLowThreshold	OBJECT-TYPE
+		SYNTAX		Integer32(1..1500000)
+		MAX-ACCESS	read-create
+		STATUS		current
+		DESCRIPTION
+			"Traffic low-threshold.
+			 Type based on KBPS could has threshold less than 1000000."
+		::= { ubiTrafficControlEntry 6 }
+		
+	ubiTrafficControlAction			OBJECT-TYPE
+		SYNTAX		INTEGER
+		{
+			alarmOnly(1),
+			blockMode(2)
+		}
+		MAX-ACCESS	read-create
+		STATUS		current
+		DESCRIPTION
+			"Traffic action type."
+		::= { ubiTrafficControlEntry 7 }
+		
+	ubiTrafficControlStatus			OBJECT-TYPE
+		SYNTAX		INTEGER
+		{
+			normal(1),
+			alarm(2),
+			block(3)
+		}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"Interface's current status."
+		::= { ubiTrafficControlEntry 8 }
+		
+	ubiTrafficControlAverageRate		OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"Average rate of controlled traffic."
+		::= { ubiTrafficControlEntry 9 }
+		
+	ubiTrafficControlOneMinRate		OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"Rate of controlled traffic per 1 minute."
+		::= { ubiTrafficControlEntry 10 }
+	
+	ubiTrafficControlAlarmCount			OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"Number of alarmed times."
+		::= { ubiTrafficControlEntry 11 }
+		
+	ubiTrafficControlLastAlarmTime		OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"Last alarmed time"
+		::= { ubiTrafficControlEntry 12 }
+
+	
+	ubiTrafficControlRowStatus		OBJECT-TYPE
+		SYNTAX		RowStatus
+		MAX-ACCESS	read-create
+		STATUS		current
+		DESCRIPTION
+			"Row Status"
+		::= { ubiTrafficControlEntry 13 }
+
+-- ***********************************************************
+-- ubiClearTrafficControl
+-- ***********************************************************
+
+	ubiClearTrafficControl		OBJECT IDENTIFIER ::= { ubiTrafficControl 3 }
+	
+	ubiClearTrafficControlInterface		OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION	
+			"If value is 0, clear all interface.
+			 If value is ifindex, clear specific interface (only physical interface)"
+		::= { ubiClearTrafficControl 1 }
+		
+	ubiClearTrafficControlBaseType		OBJECT-TYPE
+		SYNTAX		INTEGER
+		{
+			none(0),
+			pps(1),
+			kbps(2)
+		}	
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"Traffic-control base type.
+			 'none' value means all base type."
+		::= { ubiClearTrafficControl 2 }
+		
+	ubiClearTrafficControlType			OBJECT-TYPE
+		SYNTAX		INTEGER
+		{
+			none(0),
+			all(1),
+			unicast(2),
+			broadcast(3),
+			multicast(4)
+		}               
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"Traffic-control type.
+			 Type based on KBPS must be all.
+			 'none' value means all traffic type."
+		::= { ubiClearTrafficControl 3 }
+		
+	ubiClearTrafficControlDirection		OBJECT-TYPE
+		SYNTAX		INTEGER
+		{
+			none(0),
+			inbound(1),
+			outbound(2)
+		}             
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"Traffic-control direction.
+			 'none' value means all direction."
+		::= { ubiClearTrafficControl 4 }
+		
+	ubiClearTrafficControlOperate		OBJECT-TYPE
+		SYNTAX		INTEGER
+		{
+			none(0),
+			excute(1)
+		}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"clear excute"
+		::= { ubiClearTrafficControl 5 }
+			       
+			            
+-- ***********************************************************
+-- ubiIfClassStatsTable
+-- ***********************************************************
+
+  	ubiIfEgressQueueStatsTable OBJECT-TYPE
+		SYNTAX     SEQUENCE OF UbiIfEgressQueueStatsEntry
+		MAX-ACCESS not-accessible
+		STATUS     current
+		DESCRIPTION
+			"This table contains the information for egress 
+			queue statistics."
+		::=  {  ubiIfStatistics 1 }
+                                                
+                                                
+  	ubiIfEgressQueueStatsEntry OBJECT-TYPE
+		SYNTAX     UbiIfEgressQueueStatsEntry
+		MAX-ACCESS not-accessible
+		STATUS     current
+		DESCRIPTION                                 
+			"A list of the port that configure cos feild. 
+			that port collects the pass and drop statistics 
+			for egress queue."		
+		INDEX   { ifIndex, ubiIfEqStatsQueueId }
+		::= { ubiIfEgressQueueStatsTable 1 }
+ 
+ 
+	UbiIfEgressQueueStatsEntry ::= SEQUENCE
+    {       
+    	ubiIfEqStatsQueueId            	Integer32,  
+    	ubiIfEqStatsPassOctets			Counter64,
+    	ubiIfEqStatsDropOctets			Counter64,
+      	ubiIfEqStatsPassPkts			Counter,
+    	ubiIfEqStatsDropPkts			Counter, 
+    	ubiIfEqStatsQueueDescr			DisplayString
+    }     
+
+	ubiIfEqStatsQueueId OBJECT-TYPE
+		SYNTAX     	Integer32    (0..7)
+		MAX-ACCESS 	not-accessible
+		STATUS     	current
+		DESCRIPTION
+			"The queue identifier."
+		::= { ubiIfEgressQueueStatsEntry 1 }
+ 
+	ubiIfEqStatsPassOctets OBJECT-TYPE
+		SYNTAX     	Counter64
+		MAX-ACCESS 	read-only
+		STATUS     	current
+		DESCRIPTION
+			"The pass counter for bytes."
+		::= { ubiIfEgressQueueStatsEntry 2 }
+ 
+	ubiIfEqStatsDropOctets OBJECT-TYPE
+		SYNTAX     	Counter64
+		MAX-ACCESS 	read-only
+		STATUS     	current
+		DESCRIPTION
+			"The drop counter for bytes."
+		::= { ubiIfEgressQueueStatsEntry 3 }
+
+	ubiIfEqStatsPassPkts OBJECT-TYPE
+		SYNTAX     	Counter
+		MAX-ACCESS 	read-only
+		STATUS     	current
+		DESCRIPTION
+			"The pass counter for packets."
+		::= { ubiIfEgressQueueStatsEntry 4 }
+
+	ubiIfEqStatsDropPkts OBJECT-TYPE
+		SYNTAX     	Counter
+		MAX-ACCESS 	read-only
+		STATUS     	current
+		DESCRIPTION
+			"The drop counter for packets."
+		::= { ubiIfEgressQueueStatsEntry 5 }  
+	
+    ubiIfEqStatsQueueDescr   OBJECT-TYPE
+		SYNTAX     	DisplayString
+		MAX-ACCESS 	read-write
+		STATUS     	current
+		DESCRIPTION
+			"A textual string containing information 
+			about the interface's each queue."
+		::= { ubiIfEgressQueueStatsEntry 6 }  
+ 
+
+                                     
+-- ***********************************************************
+-- ubiIfStatsTable
+-- ***********************************************************
+
+  	ubiIfStatsTable OBJECT-TYPE
+		SYNTAX     SEQUENCE OF UbiIfStatsEntry
+		MAX-ACCESS not-accessible
+		STATUS     current
+		DESCRIPTION
+			"This table contains the statistics for physical port."
+		::=  {  ubiIfStatistics 2 }
+                                   
+  	ubiIfStatsEntry OBJECT-TYPE
+		SYNTAX     UbiIfStatsEntry
+		MAX-ACCESS not-accessible
+		STATUS     current
+		DESCRIPTION
+			"A Entry contains the statistics of a particular 
+			physical port."
+		INDEX   { ifIndex }
+		::= { ubiIfStatsTable 1 }
+ 
+ 
+	UbiIfStatsEntry ::= SEQUENCE
+    {
+		ubiIfStatsInPkts					Counter64,
+		ubiIfStatsOutPkts					Counter64,
+		ubiIfStatsInCRCErrors				Counter64,   
+		ubiIfStatsCounterClear				INTEGER,   
+		ubiIfStatsSnmpClear					INTEGER
+    }     
+    
+	ubiIfStatsInPkts OBJECT-TYPE
+		SYNTAX     Counter64
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"The number of input packets for a given 
+			 physical port."
+		::= { ubiIfStatsEntry 1 }
+                
+	ubiIfStatsOutPkts OBJECT-TYPE
+		SYNTAX     Counter64
+		MAX-ACCESS  read-only
+		STATUS     current
+		DESCRIPTION
+ 			"The number of output packets for a given 
+ 			physical interface."
+		::= { ubiIfStatsEntry 2 }  
+                                    
+	ubiIfStatsInCRCErrors OBJECT-TYPE
+		SYNTAX     Counter64
+		MAX-ACCESS  read-only
+		STATUS     current
+		DESCRIPTION
+ 			"The number of input CRC errors for a given 
+ 			interface."
+		::= { ubiIfStatsEntry 3 } 
+                          
+	ubiIfStatsCounterClear OBJECT-TYPE
+		SYNTAX     INTEGER {
+			none(0),
+			clear(1)
+		}
+		MAX-ACCESS  read-write
+		STATUS     current
+		DESCRIPTION
+ 			"Initialize the counter"
+		::= { ubiIfStatsEntry 14 }
+		                          
+	ubiIfStatsSnmpClear OBJECT-TYPE
+		SYNTAX     INTEGER {
+			none(0),
+			clear(1)
+		}
+		MAX-ACCESS  read-write
+		STATUS     current
+		DESCRIPTION
+ 			"Initialize the statistics in this table."
+		::= { ubiIfStatsEntry 15 }           
+		
+-- ***********************************************************
+-- ubiIfTrafficRateTable
+-- ***********************************************************
+
+	ubiTrafficRateTable		OBJECT-TYPE
+		SYNTAX		SEQUENCE OF UbiTrafficRateEntry
+		ACCESS		not-accessible     
+		STATUS		current
+		DESCRIPTION
+			"traffic rate per interface"
+		::= { ubiIfStatistics 3 }
+		
+	ubiTrafficRateEntry		OBJECT-TYPE
+		SYNTAX		UbiTrafficRateEntry  
+		ACCESS		not-accessible     
+		STATUS		current
+		DESCRIPTION
+			"traffic rate per interface"
+		INDEX { ifindex }              
+		::= { ubiTrafficRateTable 1 }
+		
+	UbiTrafficRateEntry ::= SEQUENCE {
+		ubiIfStatsInTrafficRate		Counter64,
+		ubiIfStatsOutTrafficRate	Counter64
+	}
+		
+ 	ubiIfStatsInTrafficRate OBJECT-TYPE
+		SYNTAX     Counter64
+		MAX-ACCESS  read-only
+		STATUS     current
+		DESCRIPTION
+ 			""
+		::= { ubiTrafficRateEntry 1 }
+
+	ubiIfStatsOutTrafficRate OBJECT-TYPE
+		SYNTAX     Counter64
+		MAX-ACCESS  read-only
+		STATUS     current
+		DESCRIPTION
+ 			""
+		::= { ubiTrafficRateEntry 2 }                            
+                              
+-- ***********************************************************
+-- ubiFlowControlTable
+-- ***********************************************************
+    
+    ubiFlowControlTable	OBJECT-TYPE
+    	SYNTAX		SEQUENCE OF UbiFlowControlEntry
+    	MAX-ACCESS	not-accessible
+    	STATUS		current
+    	DESCRIPTION
+    		"The table of flowcontrol information on physical ports."
+    	::= { ubiPortControl 1 }
+    
+    ubiFlowControlEntry	OBJECT-TYPE
+    	SYNTAX		UbiFlowControlEntry
+    	MAX-ACCESS	not-accessible
+    	STATUS		current
+    	DESCRIPTION
+    		"An entry of flowcontrol information on physical port."
+    	INDEX { ifIndex }
+    	::= { ubiFlowControlTable 1 }
+    
+    UbiFlowControlEntry ::= SEQUENCE 
+    {
+    	ubiFlowctrlReceive	    INTEGER,
+    	ubiFlowctrlSend			INTEGER,
+    	ubiFlowctrlWatermark	UbiFlowctrlWatermark
+    }
+    
+    ubiFlowctrlReceive	OBJECT-TYPE
+   		SYNTAX		INTEGER
+   		{
+   			off(0),
+   			on(1)
+   		}
+   		MAX-ACCESS	read-write
+   		STATUS		current
+   		DESCRIPTION
+   			"flowcontrol on receive."
+   		::= { ubiFlowControlEntry 1 }
+   		
+   	ubiFlowctrlSend		OBJECT-TYPE
+   		SYNTAX		INTEGER
+   		{
+   			off(0),
+   			on(1)
+   		}
+   		MAX-ACCESS	read-write
+   		STATUS		current
+   		DESCRIPTION
+   			"flowcontrol on send"
+   		::= { ubiFlowControlEntry 2 }
+   		
+   	ubiFlowctrlWatermark	OBJECT-TYPE
+   		SYNTAX		UbiFlowctrlWatermark
+   		MAX-ACCESS	read-write
+   		STATUS		current
+   		DESCRIPTION
+   			"flowcontrol watermark value"
+   		::= { ubiFlowControlEntry 3 }
+
+-- ***********************************************************                 
+-- ubiRateLimit
+-- ***********************************************************
+	ubiRateLimit		OBJECT IDENTIFIER ::= { ubiPortControl 2 }
+  	
+   	ubiRateLimitTable	OBJECT-TYPE
+   		SYNTAX		SEQUENCE OF UbiRateLimitEntry
+   		MAX-ACCESS	not-accessible
+   		STATUS		current
+   		DESCRIPTION             
+   			"The table of rate-limit information on physical ports"							
+   		::= { ubiRateLimit 1 }
+   		
+   	ubiRateLimitEntry	OBJECT-TYPE
+   		SYNTAX		UbiRateLimitEntry
+   		MAX-ACCESS	not-accessible
+   		STATUS		current
+   		DESCRIPTION
+   			"An entry of rate-limit information on physical port" 
+   		INDEX	{ ifIndex }
+   		::= { ubiRateLimitTable 1 }
+   		
+   	UbiRateLimitEntry ::= SEQUENCE
+   	{
+   		ubiEgressTrafficRate	Integer32,
+   		ubiEgressBucketSize		Integer32,
+   		ubiIngressLevel			DisplayString
+   	}
+   	
+   	ubiEgressTrafficRate	OBJECT-TYPE
+   		SYNTAX		Integer32(1..10000000)
+   		MAX-ACCESS	read-write
+   		STATUS		current
+   		DESCRIPTION
+   			"egress traffic rate"
+   		::= { ubiRateLimitEntry 1 }
+   		
+   	ubiEgressBucketSize		OBJECT-TYPE
+   		SYNTAX		Integer32(1..4095)
+   		MAX-ACCESS	read-write
+   		STATUS		current
+   		DESCRIPTION
+   			"egress bucket size"
+   		::= { ubiRateLimitEntry 2 }
+   		
+   	ubiIngressLevel			OBJECT-TYPE
+   		SYNTAX		DisplayString
+   		MAX-ACCESS	read-write
+   		STATUS		current
+   		DESCRIPTION
+   			"ingress level, range from 0.01 to 100.00"
+   		::= { ubiRateLimitEntry 3 }
+   		     
+   		     
+   	ubiRateLimitQueueEgressTable	OBJECT-TYPE
+   		SYNTAX		SEQUENCE OF UbiRateLimitQueueEgressEntry
+   		MAX-ACCESS	not-accessible
+   		STATUS		current
+   		DESCRIPTION
+   			"The table of rate-limit q-egress information on physical ports"
+   		::= { ubiRateLimit 2 }
+   		
+   	ubiRateLimitQueueEgressEntry	OBJECT-TYPE
+   		SYNTAX		UbiRateLimitQueueEgressEntry
+   		MAX-ACCESS	not-accessible
+   		STATUS		current
+   		DESCRIPTION
+   			"An entry of rate-limit q-egress information on physical port"
+   		INDEX	{ ifIndex, ubiQueueId }
+   		::= { ubiRateLimitQueueEgressTable 1 }
+   	
+   	
+   	UbiRateLimitQueueEgressEntry ::= SEQUENCE
+   	{
+   		ubiQueueId					Integer32,
+   		ubiQueueEgressTrafficRate   Integer32,
+   		ubiQueueEgressBucketSize	Integer32
+   	}
+   	
+   	ubiQueueId				OBJECT-TYPE
+   		SYNTAX		Integer32(0..7)
+   		MAX-ACCESS	not-accessible
+   		STATUS		current
+   		DESCRIPTION
+   			"queue id"
+   		::= { ubiRateLimitQueueEgressEntry 1 }
+   		
+   	ubiQueueEgressTrafficRate	OBJECT-TYPE
+   		SYNTAX		Integer32(1..10000000)
+   		MAX-ACCESS	read-write
+   		STATUS		current
+   		DESCRIPTION
+   			"q-egress traffic rate"
+   		::= { ubiRateLimitQueueEgressEntry 2 }
+   		
+   	ubiQueueEgressBucketSize	OBJECT-TYPE
+   		SYNTAX		Integer32(1..4095)
+   		MAX-ACCESS	read-write
+   		STATUS		current
+   		DESCRIPTION
+   			"q-egress bucket size"
+   		::= { ubiRateLimitQueueEgressEntry 3 }
+                                                
+                                                
+-- ***********************************************************                 
+-- ubiStormControlTable
+-- ***********************************************************
+
+	ubiStormControlTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE OF UbiStormControlEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"The table of storm-control information on physical ports"
+		::= { ubiPortControl 3 }
+		
+	ubiStormControlEntry	OBJECT-TYPE
+		SYNTAX		UbiStormControlEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"An entry of storm-control information on physical port"
+		INDEX	{ ifIndex }
+		::= { ubiStormControlTable 1 }
+		
+	UbiStormControlEntry ::= SEQUENCE
+	{
+		ubiBroadcastLevel		DisplayString,
+		ubiMulticastLevel		DisplayString,
+		ubiUnicastLevel			DisplayString
+	}
+	
+	ubiBroadcastLevel		OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"broadcast control level, range from 0.01 to 100.00"
+		::= { ubiStormControlEntry 1 }
+		
+	ubiMulticastLevel		OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"multicast control level, range from 0.01 to 100.00"
+		::= { ubiStormControlEntry 2 }
+		
+	ubiUnicastLevel		OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"unicast control level, range from 0.01 to 100.00"
+		::= { ubiStormControlEntry 3 }   		
+
+
+-- ***********************************************************
+-- ubiStormControlStatisticsTable
+-- ***********************************************************
+
+	ubiStormDiscardStats		OBJECT IDENTIFIER ::= { ubiPortControl 4 }
+	
+	ubiStormDiscardStatsClear		OBJECT-TYPE
+		SYNTAX     INTEGER {
+			none(0),
+			clear(1)
+		}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"Initialize the counters for discarded packet by Storm-Control."
+		::= { ubiStormDiscardStats 1 }
+
+	ubiStormDiscardStatsTable		OBJECT-TYPE
+		SYNTAX		SEQUENCE OF UbiStormDiscardStatsEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"This table contains the statistics of discarded packets by Storm-control on physical ports"
+		::= { ubiStormDiscardStats 2 }
+
+	ubiStormDiscardStatsEntry	OBJECT-TYPE
+		SYNTAX		UbiStormDiscardStatsEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"An entry of storm-control discard statistics on physical port"
+		INDEX	{ ifIndex }
+		::= { ubiStormDiscardStatsTable 1 }
+
+	UbiStormDiscardStatsEntry ::= SEQUENCE
+	{
+		ubiStormUnicastDiscards		Counter64,
+		ubiStormMulticastDiscards	Counter64,
+		ubiStormBroadcastDiscards	Counter64,
+		ubiStormTotalDiscards		Counter64,
+--		ubiStormStatsClear			INTEGER
+	}
+
+	ubiStormUnicastDiscards		OBJECT-TYPE
+		SYNTAX		Counter64
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The number of discarded Unicast packets by Storm-control for a given interface."
+		::= { ubiStormDiscardStatsEntry 1 }
+
+	ubiStormMulticastDiscards		OBJECT-TYPE
+		SYNTAX		Counter64
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The number of discarded Multicast packets by Storm-control for a given interface."
+		::= { ubiStormDiscardStatsEntry 2 }
+
+	ubiStormBroadcastDiscards		OBJECT-TYPE
+		SYNTAX		Counter64
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The number of discarded Broadcast packets by Storm-control for a given interface."
+		::= { ubiStormDiscardStatsEntry 3 }
+
+	ubiStormTotalDiscards		OBJECT-TYPE
+		SYNTAX		Counter64
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The Total number of discarded packets by Storm-control for a given interface."
+		::= { ubiStormDiscardStatsEntry 4 }
+	
+--	ubiStormStatsClear		OBJECT-TYPE
+--		SYNTAX     INTEGER {
+--			none(0),
+--			clear(1)
+--		}
+--		MAX-ACCESS	read-write
+--		STATUS		current
+--		DESCRIPTION
+--			"Initialize the counters for discarded packet by Storm-Control."
+--		::= { ubiStormControlStatsEntry 5 }
+
+-- ***********************************************************
+-- ubiIfErpsTable
+-- ***********************************************************
+
+  	ubiIfErpsTable OBJECT-TYPE
+		SYNTAX     SEQUENCE OF UbiIfErpsEntry
+		MAX-ACCESS not-accessible
+		STATUS     current
+		DESCRIPTION
+			"The table of ERPS information on interface."
+		::=  {  ubiIfErps 1 }
+                                                
+                                                
+  	ubiIfErpsEntry OBJECT-TYPE
+		SYNTAX     UbiIfErpsEntry
+		MAX-ACCESS not-accessible
+		STATUS     current
+		DESCRIPTION                                 
+			"The entry of ERPS information on interface."		
+		INDEX   { ifIndex }
+		::= { ubiIfErpsTable 1 }
+ 
+ 
+	UbiIfErpsEntry ::= SEQUENCE
+    {       
+    	ubiIfErpsAggMinLink			Integer32
+    }     
+
+	ubiIfErpsAggMinLink OBJECT-TYPE
+		SYNTAX     	Integer32 (1..8)
+		MAX-ACCESS 	read-write
+		STATUS     	current
+		DESCRIPTION
+			"Minmum Link count to activate Port-channel in ERPS.
+			   - To activate Port-channel, actived members of port-channel 
+			     must be minmum link count at least."
+		::= { ubiIfErpsEntry 1 }
+ 
+
+                           
+-- ***********************************************************
+-- ubiIfMIBConformance
+-- ***********************************************************
+ubiInterfaceMIBCompliances  OBJECT IDENTIFIER		::= { ubiInterfaceMIBConformance 1 }
+ubiInterfaceMIBGroups  	 OBJECT IDENTIFIER			::= { ubiInterfaceMIBConformance 2 }
+-- Compliance
+
+	ubiInterfaceMIBCompliance MODULE-COMPLIANCE
+    	STATUS          current
+    	DESCRIPTION
+        	"The compliance statement for entities which
+        	implement the UBQS-INTERFACE-MIB"
+   	 	MODULE          -- this module
+    	MANDATORY-GROUPS {              
+                        ubiPortGroup,
+                        ubiIfStatsGroup,
+                        ubiSwitchportGroup,
+                        ubiTrafficMonitoringGroup,
+                        ubiExtIfStatsGroup,
+                     } 
+    	::= { ubiInterfaceMIBCompliances 1 }
+
+
+	ubiPortGroup OBJECT-GROUP
+    	OBJECTS         {    
+    					ubiLinkUpDownEnable,
+    					ubiPortMediaDescr,
+    					ubiPortGBICState,
+    					ubiPortGBICType,
+    					ubiPortDuplex,     
+    				    ubiPortMtu
+                     	}   
+
+    	STATUS          current
+    	DESCRIPTION
+        	"A collection of objects containing
+        	information about physical port."
+    	::= { ubiInterfaceMIBGroups 1 }
+
+	
+	ubiIfStatsGroup OBJECT-GROUP
+    	OBJECTS         {        
+ 						ubiIfStatsInPkts,						
+ 						ubiIfStatsOutPkts,						
+ 						ubiIfStatsInCRCErrors	
+                    }
+    	STATUS          current
+    	DESCRIPTION
+        	"A collection of objects containing packet
+        	statistics for a given port."
+    	::= { ubiInterfaceMIBGroups 2 }     
+    	
+	ubiSwitchportGroup OBJECT-GROUP
+    	OBJECTS         {             
+			ubiPortL2L3IfState,    	
+			ubiSwitchportName,   
+			ubiSwitchportMode,
+			ubiSwitchportBridgeId,
+			ubiSwitchportVlanNative,
+			ubiSwitchportVlanDefault,         
+			ubiSwitchportVlanTaggedSet,   
+			ubiSwitchportVlanUntaggedSet 
+		}
+    	STATUS          current
+    	DESCRIPTION
+        	"A collection of objects containing 
+        	the switchport information."
+    	::= { ubiInterfaceMIBGroups 3 }
+    	
+END

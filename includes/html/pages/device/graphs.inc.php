@@ -37,7 +37,11 @@ foreach ($graph_enable as $section => $nothing) {
             echo '<span class="pagemenu-selected">';
         }
 
-        echo generate_link(ucwords($type), $link_array, array('group' => $type));
+        if ($type == 'customoid') {
+            echo generate_link(ucwords('Custom OID'), $link_array, array('group' => $type));
+        } else {
+            echo generate_link(ucwords($type), $link_array, array('group' => $type));
+        }
         if ($vars['group'] == $type) {
             echo '</span>';
         }
@@ -55,10 +59,22 @@ $graph_enable = $graph_enable[$vars['group']];
 foreach ($graph_enable as $graph => $entry) {
     $graph_array = array();
     if ($graph_enable[$graph]) {
-        $graph_title = \LibreNMS\Config::get("graph_types.device.$graph.descr");
-        $graph_array['type'] = 'device_'.$graph;
-
-        include 'includes/html/print-device-graph.php';
+        if ($graph == 'customoid') {
+            foreach (dbFetchRows('SELECT * FROM `customoids` WHERE `device_id` = ? ORDER BY `customoid_descr`', array($device['device_id'])) as $graph_entry) {
+                $graph_title = \LibreNMS\Config::get("graph_types.device.$graph.descr").": ".$graph_entry['customoid_descr'];
+                $graph_array['type'] = 'customoid_' . $graph_entry['customoid_descr'];
+                if (!empty($graph_entry['customoid_unit'])) {
+                    $graph_array['unit'] = $graph_entry['customoid_unit'];
+                } else {
+                    $graph_array['unit'] = 'value';
+                }
+                include 'includes/html/print-device-graph.php';
+            }
+        } else {
+            $graph_title = \LibreNMS\Config::get("graph_types.device.$graph.descr");
+            $graph_array['type'] = 'device_'.$graph;
+            include 'includes/html/print-device-graph.php';
+        }
     }
 }
 

@@ -40,7 +40,7 @@
         });
 
         @foreach($devices as $device)
-            var title = '<a href="{{ \LibreNMS\Util\Url::deviceUrl($device) }}"><img src="{{ $device->icon }}" width="32" height="32" alt=""> {{ $device->displayName() }}</a>';
+            var title = '<a href="@deviceUrl($device)"><img src="{{ $device->icon }}" width="32" height="32" alt=""> {{ $device->displayName() }}</a>';
             var tooltip = '{{ $device->displayName() }}';
             var marker = L.marker(new L.LatLng('{{ $device->location->lat }}', '{{ $device->location->lng }}'), {title: tooltip, icon: {{ $device->markerIcon }}, zIndexOffset: {{ $device->zOffset }}});
             marker.bindPopup(title);

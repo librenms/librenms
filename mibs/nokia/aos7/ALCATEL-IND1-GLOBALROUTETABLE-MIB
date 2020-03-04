@@ -9,11 +9,14 @@ IMPORTS
     MODULE-COMPLIANCE, OBJECT-GROUP
         FROM SNMPv2-CONF
     routingIND1GlobalRouteTable
-        FROM ALCATEL-IND1-BASE ;
+        FROM ALCATEL-IND1-BASE
+    Ipv6Address, Ipv6IfIndex
+        FROM IPV6-TC ;
+
 
 alcatelIND1GRTMIB MODULE-IDENTITY
 
-    LAST-UPDATED  "201212010000Z"
+    LAST-UPDATED  "201402070000Z"
     ORGANIZATION  "Alcatel-Lucent"
     CONTACT-INFO
         "Please consult with Customer Service to ensure the most appropriate
@@ -56,9 +59,9 @@ alcatelIND1GRTMIB MODULE-IDENTITY
                      Copyright (C) 1995-2011 Alcatel-Lucent
                          ALL RIGHTS RESERVED WORLDWIDE"
 
-    REVISION      "201104280000Z"
+    REVISION      "201402070000Z"
     DESCRIPTION
-        "The latest version of this MIB Module."
+        "Add IPv6 Global Route Table"
 
     ::= { routingIND1GlobalRouteTable 1 }
 
@@ -77,14 +80,14 @@ AlaGrtRouteDistinguisher ::= TEXTUAL-CONVENTION
     SYNTAX  OCTET STRING(SIZE (0..256))
 
 
---  Global Route Table
+--  Global IPv4 Route Table
 
 alaGrtRouteTable OBJECT-TYPE
     SYNTAX   SEQUENCE OF AlaGrtRouteEntry
     MAX-ACCESS not-accessible
     STATUS   current
     DESCRIPTION
-       "The Global Routing Table."
+       "The Global IPv4 Routing Table."
     ::= { alaGrtConfig 1 }
 
 alaGrtRouteEntry OBJECT-TYPE
@@ -103,22 +106,14 @@ alaGrtRouteEntry OBJECT-TYPE
 
 AlaGrtRouteEntry ::=
     SEQUENCE {
-        alaGrtRouteDistinguisher
-            AlaGrtRouteDistinguisher,
-        alaGrtRouteDest
-            IpAddress,
-        alaGrtRouteMaskLen
-            Unsigned32,
-        alaGrtRouteNextHop
-            IpAddress,
-        alaGrtRouteMetric
-            Unsigned32,
-        alaGrtRouteTag
-            Unsigned32,
-        alaGrtRouteVrfName
-            OCTET STRING,    
-        alaGrtRouteIsid
-            Unsigned32
+        alaGrtRouteDistinguisher AlaGrtRouteDistinguisher,
+        alaGrtRouteDest          IpAddress,
+        alaGrtRouteMaskLen       Unsigned32,
+        alaGrtRouteNextHop       IpAddress,
+        alaGrtRouteMetric        Unsigned32,
+        alaGrtRouteTag           Unsigned32,
+        alaGrtRouteVrfName       OCTET STRING,    
+        alaGrtRouteIsid          Unsigned32
     }
 
 alaGrtRouteDistinguisher OBJECT-TYPE
@@ -185,6 +180,111 @@ alaGrtRouteIsid OBJECT-TYPE
         "The isid number this route came from"
     ::= { alaGrtRouteEntry 8 }
 
+
+--  Global IPv6 Route Table
+
+alaGrt6RouteTable OBJECT-TYPE
+    SYNTAX   SEQUENCE OF AlaGrt6RouteEntry
+    MAX-ACCESS not-accessible
+    STATUS   current
+    DESCRIPTION
+       "The IPv6 Global Routing Table."
+    ::= { alaGrtConfig 2 }
+
+alaGrt6RouteEntry OBJECT-TYPE
+    SYNTAX   AlaGrt6RouteEntry
+    MAX-ACCESS not-accessible
+    STATUS   current
+    DESCRIPTION
+       "A particular route in the IPv6 Global Route Table"
+    INDEX {
+        alaGrt6RouteDistinguisher,
+        alaGrt6RouteDest,
+        alaGrt6RouteMaskLen,
+        alaGrt6RouteNextHop,
+        alaGrt6RouteIfIndex
+        }
+    ::= { alaGrt6RouteTable 1 }
+
+AlaGrt6RouteEntry ::=
+    SEQUENCE {
+        alaGrt6RouteDistinguisher AlaGrtRouteDistinguisher,
+        alaGrt6RouteDest          Ipv6Address,
+        alaGrt6RouteMaskLen       Unsigned32,
+        alaGrt6RouteNextHop       Ipv6Address,
+        alaGrt6RouteIfIndex       Ipv6IfIndex,
+        alaGrt6RouteMetric        Unsigned32,
+        alaGrt6RouteTag           Unsigned32,
+        alaGrt6RouteVrfName       OCTET STRING    
+    }
+
+alaGrt6RouteDistinguisher OBJECT-TYPE
+    SYNTAX   AlaGrtRouteDistinguisher
+    MAX-ACCESS not-accessible
+    STATUS   current
+    DESCRIPTION
+       "The route distinguisher of an IPv6 global route."
+    ::= { alaGrt6RouteEntry 1 }
+
+alaGrt6RouteDest OBJECT-TYPE
+    SYNTAX   Ipv6Address
+    MAX-ACCESS not-accessible
+    STATUS   current
+    DESCRIPTION
+       "The destination address of this route."
+    ::= { alaGrt6RouteEntry 2 }
+
+alaGrt6RouteMaskLen OBJECT-TYPE
+    SYNTAX   Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS   current
+    DESCRIPTION
+        "The destination mask length of this route"
+    ::= { alaGrt6RouteEntry 3 }
+
+alaGrt6RouteNextHop OBJECT-TYPE
+    SYNTAX   Ipv6Address
+    MAX-ACCESS not-accessible
+    STATUS   current
+    DESCRIPTION
+        "The gateway for this route"
+    ::= { alaGrt6RouteEntry 4 }
+
+alaGrt6RouteIfIndex OBJECT-TYPE
+    SYNTAX   Ipv6IfIndex
+    MAX-ACCESS not-accessible
+    STATUS   current
+    DESCRIPTION
+       "The index value which uniquely identifies the local
+        interface through which the next hop of this
+        route should be reached."
+    ::= { alaGrt6RouteEntry 5 }
+
+alaGrt6RouteMetric OBJECT-TYPE
+    SYNTAX   Unsigned32
+    MAX-ACCESS read-only
+    STATUS   current
+    DESCRIPTION
+        "The metric for this route"
+    ::= { alaGrt6RouteEntry 6 }
+
+alaGrt6RouteTag OBJECT-TYPE
+    SYNTAX   Unsigned32
+    MAX-ACCESS read-only
+    STATUS   current
+    DESCRIPTION
+        "The tag for this route"
+    ::= { alaGrt6RouteEntry 7 }
+
+alaGrt6RouteVrfName OBJECT-TYPE
+    SYNTAX  OCTET STRING(SIZE (0..20))
+    MAX-ACCESS read-only
+    STATUS   current
+    DESCRIPTION
+        "The name of the VRF this route came from"
+    ::= { alaGrt6RouteEntry 8 }
+
+
 -- conformance information
 
 alcatelIND1GRTMIBConformance OBJECT IDENTIFIER ::= { alcatelIND1GRTMIB 2 }
@@ -210,7 +310,9 @@ alaGrtCompliance MODULE-COMPLIANCE
 
 alaGrtConfigMIBGroup OBJECT-GROUP
     OBJECTS { alaGrtRouteMetric, alaGrtRouteTag,
-              alaGrtRouteVrfName, alaGrtRouteIsid
+              alaGrtRouteVrfName, alaGrtRouteIsid,
+              alaGrt6RouteMetric, alaGrt6RouteTag,
+              alaGrt6RouteVrfName
             }
     STATUS  current
     DESCRIPTION

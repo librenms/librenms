@@ -8,6 +8,8 @@ over:
     - { graph: device_processor, text: 'CPU Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }
 icon: cisco
+mib_dir:
+    - cisco
 poller_modules:
     cisco-ace-serverfarms: true
     cisco-ace-loadbalancer: true
@@ -37,5 +39,9 @@ register_mibs:
 discovery:
     - sysDescr:
         - IOS-XE
+        - IOSXE
         - LINUX_IOSD
         - CAT3K_CAA
+bad_iftype:
+    - macSecControlledIF
+    - macSecUncontrolledIF

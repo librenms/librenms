@@ -28,9 +28,9 @@ $where = [];
 $params = [];
 
 if (!Auth::user()->hasGlobalRead()) {
-    $query .= ' LEFT JOIN `devices_perms` USING (`device_id`)';
-    $where = '`devices_perms`.`user_id`=?';
-    $params[] = Auth::id();
+    $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
+    $where[] = " `devices`.`device_id` IN " .dbGenPlaceholders(count($device_ids));
+    $params = array_merge($params, $device_ids);
 }
 
 if (!empty($_REQUEST['search'])) {

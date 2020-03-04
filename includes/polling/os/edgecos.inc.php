@@ -12,11 +12,14 @@ if (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.259.6.')) {              /
     $tmp_mib = 'ECS4210-MIB';
 } elseif (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.259.10.1.27.')) {  //ECS3510
     $tmp_mib = 'ECS3510-MIB';
-} elseif (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.259.10.')) {       //ECS4120
+} elseif (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.259.10.1.45.')) {       //ECS4120
     $tmp_mib = 'ECS4120-MIB';
 } elseif (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.259.8.1.11')) {    //ES3510MA
     $tmp_mib = 'ES3510MA-MIB';
-}
+} elseif (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.259.10.1.43.')) { //ECS2100
+    $tmp_mib = 'ECS2100-MIB';
+};
+
 
 $tmp_edgecos = snmp_get_multi($device, ['swOpCodeVer.1', 'swProdName.0', 'swSerialNumber.1', 'swHardwareVer.1'], '-OQUs', $tmp_mib);
 

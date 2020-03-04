@@ -22,7 +22,7 @@ IMPORTS
     NOTIFICATION-TYPE, OBJECT-TYPE,
     Unsigned32
                                                          FROM SNMPv2-SMI
-    RowPointer, RowStatus,
+    DisplayString, RowPointer, RowStatus,
     TEXTUAL-CONVENTION, TestAndIncr,
     TimeInterval, TimeStamp, TruthValue
                                                          FROM SNMPv2-TC
@@ -35,9 +35,12 @@ IMPORTS
     TPolicyStatementNameOrEmpty,
     TmnxActionType, TmnxAdminState,
     TmnxCBFClasses, TmnxEnabledDisabled,
+    TmnxMplsLabel, TmnxMplsLabelOrZero,
+    TmnxMplsLspBandwidth,
     TmnxMplsTpGlobalID, TmnxMplsTpNodeID,
-    TmnxOperState, TmnxRsvpDSTEClassType,
-    TmnxTimeInterval, TmnxVRtrMplsLspID
+    TmnxNhgDownReason, TmnxOperState,
+    TmnxRsvpDSTEClassType, TmnxTimeInterval,
+    TmnxVRtrMplsLspID
                                                          FROM TIMETRA-TC-MIB
     vRtrID, vRtrIfIndex
                                                          FROM TIMETRA-VRTR-MIB
@@ -53,7 +56,7 @@ timetraMplsMIBModule             MODULE-IDENTITY
         "This document is the SNMP MIB module to manage and provision the MPLS
          extensions for the Nokia SROS device.
 
-         Copyright 2003-2017 Nokia. All rights reserved. Reproduction of this
+         Copyright 2003-2018 Nokia. All rights reserved. Reproduction of this
          document is authorized on the condition that the foregoing copyright
          notice is included.
 
@@ -210,7 +213,15 @@ TmnxMplsLspFailCode              ::= TEXTUAL-CONVENTION
         pccError                   (48),
         pceDown                    (49),
         pceError                   (50),
-        pceUpdateWithEmptyEro      (51)
+        pceUpdateWithEmptyEro      (51),
+        pceInitLspDisabled         (52),
+        adminDown                  (53),
+        sidHopsInRsvpLsp           (54),
+        ipv6HopsInRsvpLsp          (55),
+        ipv4HopsInIpv6Lsp          (56),
+        ipv6HopsInIpv4Lsp          (57),
+        sidHopsInIpv6Lsp           (58),
+        srlgPathWithSidHops        (59)
     }
 
 TmnxMplsLabelOwner               ::= TEXTUAL-CONVENTION
@@ -237,12 +248,14 @@ TmnxMplsOperDownReasonCode       ::= TEXTUAL-CONVENTION
         "TmnxMplsOperDownReasonCode is an enumerated integer that specifies the
          reason that the MPLS instance is operationally down."
     SYNTAX      INTEGER {
-        operUp       (0),
-        adminDown    (1),
-        noResources  (2),
-        systemIpDown (3),
-        iomFailure   (4),
-        clearDown    (5)
+        operUp               (0),
+        adminDown            (1),
+        noResources          (2),
+        systemIpDown         (3),
+        iomFailure           (4),
+        clearDown            (5),
+        ipv6TeRtrDown        (6),
+        ipv6TeRtrAddrChanged (7)
     }
 
 TmnxMplsMBBType                  ::= TEXTUAL-CONVENTION
@@ -322,8 +335,10 @@ TmnxMplsLspAddrType              ::= TEXTUAL-CONVENTION
         "TmnxMplsLspAddrType is an enumerated integer that specifies the
          address type for an MPLS LSP."
     SYNTAX      INTEGER {
-        ipv4   (1),
-        nodeId (2)
+        unknown (0),
+        ipv4    (1),
+        nodeId  (2),
+        ipv6    (3)
     }
 
 tmnxMplsObjs                     OBJECT IDENTIFIER ::= { tmnxSRObjs 6 }
@@ -429,7 +444,9 @@ VRtrMplsLspEntry                 ::= SEQUENCE
     vRtrMplsLspFC                    TmnxCBFClasses,
     vRtrMplsLspBfdTemplateName       TNamedItemOrEmpty,
     vRtrMplsLspBfdEnable             TruthValue,
-    vRtrMplsLspBfdPingIntvl          Unsigned32
+    vRtrMplsLspBfdPingIntvl          Unsigned32,
+    vRtrMplsLspNgFromAddr            InetAddress,
+    vRtrMplsLspNgToAddr              InetAddress
 }
 
 vRtrMplsLspIndex                 OBJECT-TYPE
@@ -520,23 +537,27 @@ vRtrMplsLspToAddr                OBJECT-TYPE
         "The vRtrMplsLspToAddr specifies the destination address of this LSP.
 
          When vRtrMplsLspToAddrType is 'ipv4', vRtrMplsLspToAddr should also be
-         specified."
+         specified.
+
+         When vRtrMplsLspToAddrType is 'ipv6', vRtrMplsLspNgToAddr should also
+         be specified."
     ::= { vRtrMplsLspEntry 8 }
 
 vRtrMplsLspType                  OBJECT-TYPE
     SYNTAX      INTEGER {
-        unknown       (1),
-        dynamic       (2),
-        static        (3),
-        bypassOnly    (4),
-        p2mpLsp       (5),
-        p2mpAuto      (6),
-        mplsTp        (7),
-        meshP2p       (8),
-        oneHopP2p     (9),
-        srTe          (10),
-        meshP2pSrTe   (11),
-        oneHopP2pSrTe (12)
+        unknown        (1),
+        dynamic        (2),
+        static         (3),
+        bypassOnly     (4),
+        p2mpLsp        (5),
+        p2mpAuto       (6),
+        mplsTp         (7),
+        meshP2p        (8),
+        oneHopP2p      (9),
+        srTe           (10),
+        meshP2pSrTe    (11),
+        oneHopP2pSrTe  (12),
+        pceInitP2pSrTe (13)
     }
     MAX-ACCESS  read-create
     STATUS      current
@@ -585,7 +606,12 @@ vRtrMplsLspType                  OBJECT-TYPE
          dynamically by the system and the row entry is dynamically created by
          the system using onehopP2PSrTe LSP Template values configured in the
          associated row entry of vRtrMplsLspTemplateTable.
-                                 "
+
+         When value of the vRtrMplsLspType is 'pceInitP2pSrTe', it specifies
+         that the point-to-point segment routing LSP is created dynamically on
+         receiving a PCE-Initiated Message from PCC, using pceInitP2pSrTe LSP
+         Template values configured in the associated row entry of
+         vRtrMplsLspTemplateTable."
     DEFVAL      { dynamic }
     ::= { vRtrMplsLspEntry 9 }
 
@@ -721,7 +747,7 @@ vRtrMplsLspFRHopLimit            OBJECT-TYPE
 
 vRtrMplsLspFRBandwidth           OBJECT-TYPE
     SYNTAX      Unsigned32
-    UNITS       "megabits per second"
+    UNITS       "megabps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -826,7 +852,7 @@ vRtrMplsLspPreference            OBJECT-TYPE
 
 vRtrMplsLspBandwidth             OBJECT-TYPE
     SYNTAX      Integer32
-    UNITS       "megabits per second"
+    UNITS       "megabps"
     MAX-ACCESS  read-create
     STATUS      obsolete
     DESCRIPTION
@@ -1430,7 +1456,7 @@ vRtrMplsLspToAddrType            OBJECT-TYPE
 
          The value of 'nodeId' specifies an MPLS-TP node id and
          vRtrMplsLspToNodeId should be configured."
-    DEFVAL      { ipv4 }
+    DEFVAL      { unknown }
     ::= { vRtrMplsLspEntry 61 }
 
 vRtrMplsLspFromAddrType          OBJECT-TYPE
@@ -1444,9 +1470,12 @@ vRtrMplsLspFromAddrType          OBJECT-TYPE
          When the value of vRtrMplsLspFromAddrType is 'ipv4', it specifies an
          IPv4 address type and vRtrMplsLspFromAddr should be configured.
 
+         When the value of vRtrMplsLspFromAddrType is 'ipv6', it specifies an
+         IPv6 address type and vRtrMplsLspNgFromAddr should be configured.
+
          When the value of vRtrMplsLspFromAddrType is 'nodeId', it specifies an
          MPLS-TP node id type."
-    DEFVAL      { ipv4 }
+    DEFVAL      { unknown }
     ::= { vRtrMplsLspEntry 62 }
 
 vRtrMplsLspToNodeId              OBJECT-TYPE
@@ -1629,10 +1658,31 @@ vRtrMplsLspBfdPingIntvl          OBJECT-TYPE
         "The value of vRtrMplsLspBfdPingIntvl specifies the time interval for
          periodic LSP ping for BFD bootstrapping.
 
+         The object vRtrMplsLspBfdPingIntvl is applicable to LSPs with
+         vRtrMplsLspType set to 'dynamic'.
+
          When the value of vRtrMplsLspBfdPingIntvl is set to '0', it disables
          LSP pings for BFD bootstrapping."
     DEFVAL      { 60 }
     ::= { vRtrMplsLspEntry 76 }
+
+vRtrMplsLspNgFromAddr            OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (4|16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspNgFromAddr specifices the source address of
+         this LSP."
+    ::= { vRtrMplsLspEntry 77 }
+
+vRtrMplsLspNgToAddr              OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (4|16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspNgToAddr specifices the destination address of
+         this LSP."
+    ::= { vRtrMplsLspEntry 78 }
 
 vRtrMplsLspStatTable             OBJECT-TYPE
     SYNTAX      SEQUENCE OF VRtrMplsLspStatEntry
@@ -1671,7 +1721,8 @@ VRtrMplsLspStatEntry             ::= SEQUENCE
     vRtrMplsLspStandbyPaths          Integer32,
     vRtrMplsLspOperationalPaths      Integer32,
     vRtrMplsLspConfP2mpInstances     Gauge32,
-    vRtrMplsLspStatsEgrIndexUnAvail  TruthValue
+    vRtrMplsLspStatsEgrIndexUnAvail  TruthValue,
+    vRtrMplsLspSelfPingTimeouts      Counter32
 }
 
 vRtrMplsLspOctets                OBJECT-TYPE
@@ -1820,6 +1871,15 @@ vRtrMplsLspStatsEgrIndexUnAvail  OBJECT-TYPE
          statistics."
     ::= { vRtrMplsLspStatEntry 15 }
 
+vRtrMplsLspSelfPingTimeouts      OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspSelfPingTimeouts indicate the number of times
+         self-ping has timed out for paths in this LSP."
+    ::= { vRtrMplsLspStatEntry 16 }
+
 vRtrMplsLspPathTableSpinlock     OBJECT-TYPE
     SYNTAX      TestAndIncr
     MAX-ACCESS  read-write
@@ -1935,7 +1995,13 @@ VRtrMplsLspPathEntry             ::= SEQUENCE
     vRtrMplsLspPathLastUpdateTime    TimeStamp,
     vRtrMplsLspPathLastUpdateId      Unsigned32,
     vRtrMplsLspPathLastUpdateState   INTEGER,
-    vRtrMplsLspPathLastUpdFailCode   TmnxMplsLspFailCode
+    vRtrMplsLspPathLastUpdFailCode   TmnxMplsLspFailCode,
+    vRtrMplsLspPathBfdUpWaitTimer    Unsigned32,
+    vRtrMplsLspPathBfdUpWaitTmLeft   Unsigned32,
+    vRtrMplsLspPathBfdState          INTEGER,
+    vRtrMplsLspPathBfdStartFailRsn   DisplayString,
+    vRtrMplsLspPathBfdOperUpWaitTmr  Unsigned32,
+    vRtrMplsLspPathSelfPingOprState  TmnxOperState
 }
 
 vRtrMplsLspPathRowStatus         OBJECT-TYPE
@@ -2006,8 +2072,8 @@ vRtrMplsLspPathProperties        OBJECT-TYPE
     ::= { vRtrMplsLspPathEntry 5 }
 
 vRtrMplsLspPathBandwidth         OBJECT-TYPE
-    SYNTAX      Integer32
-    UNITS       "megabits per second"
+    SYNTAX      Integer32 (0..6400000)
+    UNITS       "megabps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -2389,7 +2455,7 @@ vRtrMplsLspPathNextOptimize      OBJECT-TYPE
 
 vRtrMplsLspPathOperBandwidth     OBJECT-TYPE
     SYNTAX      Integer32
-    UNITS       "megabits per second"
+    UNITS       "megabps"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -2859,6 +2925,9 @@ vRtrMplsLspPathBfdPingIntvl      OBJECT-TYPE
         "The value of vRtrMplsLspPathBfdPingIntvl specifies the time interval
          for periodic LSP ping for BFD bootstrapping.
 
+         The object vRtrMplsLspPathBfdPingIntvl is applicable to LSPs with
+         vRtrMplsLspType set to 'dynamic'.
+
          When the value of vRtrMplsLspPathBfdPingIntvl is set to '0', it
          disables LSP pings for BFD bootstrapping."
     DEFVAL      { 60 }
@@ -2910,6 +2979,89 @@ vRtrMplsLspPathLastUpdFailCode   OBJECT-TYPE
 
          A value of 'none' indicates that no failure has occurred."
     ::= { vRtrMplsLspPathEntry 72 }
+
+vRtrMplsLspPathBfdUpWaitTimer    OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..60)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspPathBfdUpWaitTimer specifies the time in
+         seconds the software will wait for the BFD session to come up.
+
+         The timer object is applicable for LSPs with vRtrMplsLspType set to
+         'srTe'.
+
+         The timer is started when BFD is first enabled on a path or BFD
+         transitions from up to down. When this timer expires and if BFD
+         session has  not yet come up, the path is torn down by removing it
+         from TTM and  the IOM and the retry timer is started."
+    DEFVAL      { 4 }
+    ::= { vRtrMplsLspPathEntry 73 }
+
+vRtrMplsLspPathBfdUpWaitTmLeft   OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..60)
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspPathBfdUpWaitTmLeft indicates the time in
+         seconds remaining in the vRtrMplsLspPathBfdUpWaitTimer."
+    ::= { vRtrMplsLspPathEntry 74 }
+
+vRtrMplsLspPathBfdState          OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notApplicable (0),
+        down          (1),
+        up            (2),
+        awaitToUp     (3),
+        failToStart   (4)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspPathBfdState indicates state of the BFD
+         session  on the LSP path."
+    ::= { vRtrMplsLspPathEntry 75 }
+
+vRtrMplsLspPathBfdStartFailRsn   OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..80))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspPathBfdStartFailRsn indicates the failure
+         reason when vRtrMplsLspPathBfdState is value 'failToStart'."
+    ::= { vRtrMplsLspPathEntry 76 }
+
+vRtrMplsLspPathBfdOperUpWaitTmr  OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..60)
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspPathBfdOperUpWaitTmr indicates operational
+         value of the time in seconds the software will wait for the BFD
+         session to come up.
+
+         When value of vRtrMplsLspPathBfdEnable to 'true',
+         vRtrMplsLspPathBfdOperUpWaitTmr  will be set to
+         vRtrMplsLspPathBfdUpWaitTimer.
+
+         When value of vRtrMplsLspBfdEnable to 'true',
+         vRtrMplsLspPathBfdOperUpWaitTmr  will be set to
+         vRtrMplsLspExtBfdUpWaitTimer.
+
+         When vRtrMplsLspPathBfdEnable and vRtrMplsLspBfdEnable are set to
+         'false',  the value of vRtrMplsLspPathBfdOperUpWaitTmr is set to 0."
+    ::= { vRtrMplsLspPathEntry 77 }
+
+vRtrMplsLspPathSelfPingOprState  OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current operational state for self-ping for this LSP path."
+    ::= { vRtrMplsLspPathEntry 78 }
 
 vRtrMplsLspPathStatTable         OBJECT-TYPE
     SYNTAX      SEQUENCE OF VRtrMplsLspPathStatEntry
@@ -3172,7 +3324,17 @@ VRtrMplsGeneralEntry             ::= SEQUENCE
     vRtrMplsGeneralNewLspSRIndex     TestAndIncr,
     vRtrMplsGeneralPceReport         BITS,
     vRtrMplsGeneralEntropyLblRsvpTe  INTEGER,
-    vRtrMplsGeneralEntropyLblSrTe    INTEGER
+    vRtrMplsGeneralEntropyLblSrTe    INTEGER,
+    vRtrMplsGeneralAuxStats          BITS,
+    vRtrMplsGenSrTeResignalTimer     Unsigned32,
+    vRtrMplsGenMaxBypassPlrAssoc     Unsigned32,
+    vRtrMplsGenLspSelfPingInterval   TimeInterval,
+    vRtrMplsGenLspSelfPingTimeout    TimeInterval,
+    vRtrMplsGenLspSelfPingRsvpTe     INTEGER,
+    vRtrMplsGenSrTeResigOnIgpEvent   TruthValue,
+    vRtrMplsGeneralV6OperState       TmnxOperState,
+    vRtrMplsGeneralV6OperDownReason  TmnxMplsOperDownReasonCode,
+    vRtrMplsGenSrteNextResignal      Unsigned32
 }
 
 vRtrMplsGeneralLastChange        OBJECT-TYPE
@@ -3858,6 +4020,141 @@ vRtrMplsGeneralEntropyLblSrTe    OBJECT-TYPE
     DEFVAL      { enable }
     ::= { vRtrMplsGeneralEntry 48 }
 
+vRtrMplsGeneralAuxStats          OBJECT-TYPE
+    SYNTAX      BITS {
+        sr (0)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsGeneralAuxStats specifies  which types of labeled
+         traffic are counted in the MPLS auxiliary statistics table.
+
+         By default, all labeled traffic is counted in the default MPLS
+         statistics table.
+
+         If the 'sr' bit is set,  Segment Routing traffic is counted in the
+         MPLS auxiliary statistics table."
+    DEFVAL      { {} }
+    ::= { vRtrMplsGeneralEntry 49 }
+
+vRtrMplsGenSrTeResignalTimer     OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 30..10080)
+    UNITS       "minutes"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsGenSrTeResignalTimer specifies the value for the
+         SR-TE LSPs resignal timer, that is the time, in minutes, the software
+         will wait before attempting to resignal the SR-TE LSPs.
+
+         When the resignal timer expires, if the new recorded hop list (RRO)
+         for an SR-TE LSP has a better metric than the current recorded hop
+         list, an attempt will be made to resignal that LSP using the
+         make-before-break mechanism. If the attempt to resignal an SR-TE LSP
+         fails, the LSP will continue to use the existing path and a resignal
+         will be attempted the next time the timer expires.
+
+         A value of 0 for the resignal timer indicates that timer-based SR-TE
+         LSP resignalling has been disabled."
+    DEFVAL      { 0 }
+    ::= { vRtrMplsGeneralEntry 50 }
+
+vRtrMplsGenMaxBypassPlrAssoc     OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..16)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsGenMaxBypassPlrAssoc specifies the maxiumum
+         bypass PLR assocations."
+    DEFVAL      { 16 }
+    ::= { vRtrMplsGeneralEntry 51 }
+
+vRtrMplsGenLspSelfPingInterval   OBJECT-TYPE
+    SYNTAX      TimeInterval (1..10)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsGenLspSelfPingInterval specifies the interval
+         duration at which LSP self ping packets are sent until a reply is
+         received from the far end of the session ID."
+    DEFVAL      { 1 }
+    ::= { vRtrMplsGeneralEntry 52 }
+
+vRtrMplsGenLspSelfPingTimeout    OBJECT-TYPE
+    SYNTAX      TimeInterval (3..3600)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsGenLspSelfPingTimeout specifies the value of
+         timeout expiry duration up to which the lsp-self-ping packets will be
+         sent. If the timeout expires before an LSP self ping has been
+         received, then the system should tear down the path and go back to
+         CSPF for a new path"
+    DEFVAL      { 300 }
+    ::= { vRtrMplsGeneralEntry 53 }
+
+vRtrMplsGenLspSelfPingRsvpTe     OBJECT-TYPE
+    SYNTAX      INTEGER {
+        enable  (1),
+        disable (2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsGenLspSelfPingRsvpTe specifies whether the
+         application takes into account the value of Self Ping in the label
+         stack of RSVP-TE LSPs.
+
+         When the value of vRtrMplsGenLspSelfPingRsvpTe is set to 'enable', the
+         application will take into consideration the values of
+         vRtrMplsGenLspSelfPingInterval and vRtrMplsGenLspSelfPingTimeout.
+
+         When the value of vRtrMplsGenLspSelfPingRsvpTe is set to 'disable',
+         the application will not take into consideration the values of
+         vRtrMplsGenLspSelfPingInterval and vRtrMplsGenLspSelfPingTimeout."
+    DEFVAL      { disable }
+    ::= { vRtrMplsGeneralEntry 54 }
+
+vRtrMplsGenSrTeResigOnIgpEvent   OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsGenSrTeResigOnIgpEvent specifies re-optimization
+         of SR-TE LSPs triggered by IGP events is enabled or disabled."
+    DEFVAL      { false }
+    ::= { vRtrMplsGeneralEntry 55 }
+
+vRtrMplsGeneralV6OperState       OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "vRtrMplsGeneralV6OperState indicates the current operating state of
+         MPLS protocol instance on this router for srte ipv6."
+    ::= { vRtrMplsGeneralEntry 56 }
+
+vRtrMplsGeneralV6OperDownReason  OBJECT-TYPE
+    SYNTAX      TmnxMplsOperDownReasonCode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsGeneralV6OperDownReason indicates the reason due
+         to which the MPLS instance is operationally down for srte ipv6."
+    ::= { vRtrMplsGeneralEntry 57 }
+
+vRtrMplsGenSrteNextResignal      OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsGenSrteNextResignal indicates the time remaining,
+         in minutes, for the vRtrMplsGenSrTeResignalTimer to expire."
+    ::= { vRtrMplsGeneralEntry 58 }
+
 vRtrMplsGeneralStatTable         OBJECT-TYPE
     SYNTAX      SEQUENCE OF VRtrMplsGeneralStatEntry
     MAX-ACCESS  not-accessible
@@ -3905,7 +4202,9 @@ VRtrMplsGeneralStatEntry         ::= SEQUENCE
     vRtrMplsGeneralOneHopP2pOrigin   Gauge32,
     vRtrMplsGeneralSrTeLspOriginate  Gauge32,
     vRtrMplsGenMeshP2PSrTeLspOrig    Gauge32,
-    vRtrMplsGenOneHopP2PSrTeLspOrig  Gauge32
+    vRtrMplsGenOneHopP2PSrTeLspOrig  Gauge32,
+    vRtrMplsGenPceInitP2PSrTeLspOrig Gauge32,
+    vRtrMplsGenLspSelfPingTimeouts   Counter32
 }
 
 vRtrMplsGeneralStaticLspOriginate OBJECT-TYPE
@@ -4136,6 +4435,25 @@ vRtrMplsGenOneHopP2PSrTeLspOrig  OBJECT-TYPE
          virtual router."
     ::= { vRtrMplsGeneralStatEntry 25 }
 
+vRtrMplsGenPceInitP2PSrTeLspOrig OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsGenPceInitP2PSrTeLspOrig indicates the number of
+         PCE Init P2P Segment Routing TE LSPs that are originating at this
+         virtual router."
+    ::= { vRtrMplsGeneralStatEntry 26 }
+
+vRtrMplsGenLspSelfPingTimeouts   OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsGenLspSelfPingTimeouts indicate the number of LSP
+         self-ping timeouts for LSPs originating at this virtual router."
+    ::= { vRtrMplsGeneralStatEntry 27 }
+
 vRtrMplsIfTable                  OBJECT-TYPE
     SYNTAX      SEQUENCE OF VRtrMplsIfEntry
     MAX-ACCESS  not-accessible
@@ -4169,7 +4487,8 @@ VRtrMplsIfEntry                  ::= SEQUENCE
     vRtrMplsIfAdminState             TmnxAdminState,
     vRtrMplsIfOperState              TmnxOperState,
     vRtrMplsIfAdminGroup             Unsigned32,
-    vRtrMplsIfTeMetric               Unsigned32
+    vRtrMplsIfTeMetric               Unsigned32,
+    vRtrMplsIfV6OperState            TmnxOperState
 }
 
 vRtrMplsIfAdminState             OBJECT-TYPE
@@ -4221,6 +4540,18 @@ vRtrMplsIfTeMetric               OBJECT-TYPE
     DEFVAL      { 0 }
     ::= { vRtrMplsIfEntry 4 }
 
+vRtrMplsIfV6OperState            OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates the current status of the MPLS protocol
+         running on this MPLS interface for srte ipv6. When the
+         TIMETRA-VRTR-MIB::vRtrIfPortID object of this interface is set to a
+         loopback port identifier, the operational state is not relevant and an
+         SNMP GET request on this object will return 'unknown'."
+    ::= { vRtrMplsIfEntry 5 }
+
 vRtrMplsIfStatTable              OBJECT-TYPE
     SYNTAX      SEQUENCE OF VRtrMplsIfStatEntry
     MAX-ACCESS  not-accessible
@@ -4247,7 +4578,11 @@ VRtrMplsIfStatEntry              ::= SEQUENCE
     vRtrMplsIfTxPktCount             Counter64,
     vRtrMplsIfRxPktCount             Counter64,
     vRtrMplsIfTxOctetCount           Counter64,
-    vRtrMplsIfRxOctetCount           Counter64
+    vRtrMplsIfRxOctetCount           Counter64,
+    vRtrMplsIfAltTxPktCount          Counter64,
+    vRtrMplsIfAltRxPktCount          Counter64,
+    vRtrMplsIfAltTxOctetCount        Counter64,
+    vRtrMplsIfAltRxOctetCount        Counter64
 }
 
 vRtrMplsIfTxPktCount             OBJECT-TYPE
@@ -4285,6 +4620,42 @@ vRtrMplsIfRxOctetCount           OBJECT-TYPE
          interface."
     ::= { vRtrMplsIfStatEntry 4 }
 
+vRtrMplsIfAltTxPktCount          OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of SR-MPLS labeled packets transmitted from this
+         interface."
+    ::= { vRtrMplsIfStatEntry 5 }
+
+vRtrMplsIfAltRxPktCount          OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of SR-MPLS labeled packets received on this
+         interface."
+    ::= { vRtrMplsIfStatEntry 6 }
+
+vRtrMplsIfAltTxOctetCount        OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of bytes in SR-MPLS labeled packets transmitted on
+         this interface."
+    ::= { vRtrMplsIfStatEntry 7 }
+
+vRtrMplsIfAltRxOctetCount        OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of bytes in SR-MPLS labeled packets received on this
+         interface."
+    ::= { vRtrMplsIfStatEntry 8 }
+
 vRtrMplsTunnelARHopTable         OBJECT-TYPE
     SYNTAX      SEQUENCE OF VRtrMplsTunnelARHopEntry
     MAX-ACCESS  not-accessible
@@ -4311,7 +4682,8 @@ VRtrMplsTunnelARHopEntry         ::= SEQUENCE
     vRtrMplsTunnelARHopRecordLabel   MplsLabel,
     vRtrMplsTunnelARHopRouterId      IpAddress,
     vRtrMplsTunnelARHopUnnumIfID     Unsigned32,
-    vRtrMplsTunnelARHopSIDType       INTEGER
+    vRtrMplsTunnelARHopSIDType       INTEGER,
+    vRtrMplsTunnelARHopNgRouterId    InetAddress
 }
 
 vRtrMplsTunnelARHopProtection    OBJECT-TYPE
@@ -4406,6 +4778,20 @@ vRtrMplsTunnelARHopSIDType       OBJECT-TYPE
          an Adjacency SID."
     ::= { vRtrMplsTunnelARHopEntry 5 }
 
+vRtrMplsTunnelARHopNgRouterId    OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTunnelARHopNgRouterId indicates the Router ID of
+         the node corresponding to this hop. Currently IPV6 Router ID is
+         supported by this object.
+
+         The IP address type of vRtrMplsTunnelARHopNgRouterId is specified by
+         the value of mplsTunnelARHopAddrType. Currently value of 'ipv6' is
+         supported."
+    ::= { vRtrMplsTunnelARHopEntry 6 }
+
 vRtrMplsTunnelCHopTable          OBJECT-TYPE
     SYNTAX      SEQUENCE OF VRtrMplsTunnelCHopEntry
     MAX-ACCESS  not-accessible
@@ -4472,6 +4858,7 @@ vRtrMplsTunnelCHopIndex          OBJECT-TYPE
 
 vRtrMplsTunnelCHopAddrType       OBJECT-TYPE
     SYNTAX      INTEGER {
+        unknown  (0),
         ipV4     (1),
         ipV6     (2),
         asNumber (3),
@@ -4962,7 +5349,8 @@ vRtrMplsLspPathMbbReasonCode     OBJECT-TYPE
         restartingMbb       (4),
         mbbAlreadyInProg    (5),
         lspPceControlled    (6),
-        lspNotPceControlled (7)
+        lspNotPceControlled (7),
+        lspTypeNotSupported (8)
     }
     MAX-ACCESS  accessible-for-notify
     STATUS      current
@@ -5509,7 +5897,7 @@ VRtrMplsP2mpInstEntry            ::= SEQUENCE
     vRtrMplsP2mpInstName             TNamedItemOrEmpty,
     vRtrMplsP2mpInstType             INTEGER,
     vRtrMplsP2mpInstProperties       BITS,
-    vRtrMplsP2mpInstBandwidth        Unsigned32,
+    vRtrMplsP2mpInstBandwidth        TmnxMplsLspBandwidth,
     vRtrMplsP2mpInstState            INTEGER,
     vRtrMplsP2mpInstSetupPriority    Unsigned32,
     vRtrMplsP2mpInstHoldPriority     Unsigned32,
@@ -5614,8 +6002,8 @@ vRtrMplsP2mpInstProperties       OBJECT-TYPE
     ::= { vRtrMplsP2mpInstEntry 6 }
 
 vRtrMplsP2mpInstBandwidth        OBJECT-TYPE
-    SYNTAX      Unsigned32
-    UNITS       "megabits per second"
+    SYNTAX      TmnxMplsLspBandwidth
+    UNITS       "megabps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -5861,7 +6249,7 @@ vRtrMplsP2mpInstAdaptive         OBJECT-TYPE
 
 vRtrMplsP2mpInstOperBandwidth    OBJECT-TYPE
     SYNTAX      Integer32
-    UNITS       "megabits per second"
+    UNITS       "megabps"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -6116,7 +6504,7 @@ vRtrMplsP2mpInstStatS2lChanges   OBJECT-TYPE
 
 vRtrMplsP2mpInstStatLastS2lChange OBJECT-TYPE
     SYNTAX      TimeInterval
-    UNITS       "10-milliseconds"
+    UNITS       "centiseconds"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -6145,7 +6533,7 @@ vRtrMplsP2mpInstStatOperationalS2ls OBJECT-TYPE
 
 vRtrMplsP2mpInstStatLastS2lTimeUp OBJECT-TYPE
     SYNTAX      TimeInterval
-    UNITS       "10-milliseconds"
+    UNITS       "centiseconds"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -6164,7 +6552,7 @@ vRtrMplsP2mpInstStatLastS2lTimeDown OBJECT-TYPE
 
 vRtrMplsP2mpInstStatTimeUp       OBJECT-TYPE
     SYNTAX      TimeInterval
-    UNITS       "10-milliseconds"
+    UNITS       "centiseconds"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -6407,7 +6795,7 @@ vRtrMplsS2lSubLspId              OBJECT-TYPE
 
 vRtrMplsS2lSubLspRetryTimeRemain OBJECT-TYPE
     SYNTAX      Unsigned32
-    UNITS       "10-milliseconds"
+    UNITS       "centiseconds"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -6468,7 +6856,7 @@ vRtrMplsS2lSubLspFailNodeAddr    OBJECT-TYPE
 
 vRtrMplsS2lSubLspOperBandwidth   OBJECT-TYPE
     SYNTAX      Integer32
-    UNITS       "megabits per second"
+    UNITS       "megabps"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -6739,7 +7127,7 @@ VRtrMplsS2lSubLspStatEntry       ::= SEQUENCE
 
 vRtrMplsS2lSubLspTimeUp          OBJECT-TYPE
     SYNTAX      TimeInterval
-    UNITS       "10-milliseconds"
+    UNITS       "centiseconds"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -6751,7 +7139,7 @@ vRtrMplsS2lSubLspTimeUp          OBJECT-TYPE
 
 vRtrMplsS2lSubLspTimeDown        OBJECT-TYPE
     SYNTAX      TimeInterval
-    UNITS       "10-milliseconds"
+    UNITS       "centiseconds"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -7088,8 +7476,9 @@ VRtrMplsLspStatsEntry            ::= SEQUENCE
 
 vRtrMplsLspStatsType             OBJECT-TYPE
     SYNTAX      INTEGER {
-        egress  (0),
-        ingress (1)
+        egress     (0),
+        ingress    (1),
+        srTeEgress (2)
     }
     MAX-ACCESS  not-accessible
     STATUS      current
@@ -7107,7 +7496,7 @@ vRtrMplsLspStatsSenderAddrType   OBJECT-TYPE
     ::= { vRtrMplsLspStatsEntry 2 }
 
 vRtrMplsLspStatsSenderAddr       OBJECT-TYPE
-    SYNTAX      InetAddress (SIZE (4|16))
+    SYNTAX      InetAddress (SIZE (0|4))
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
@@ -8192,18 +8581,22 @@ vRtrMplsLspStatsTpOnly           OBJECT-TYPE
 
 vRtrMplsLspStatsLspType          OBJECT-TYPE
     SYNTAX      INTEGER {
-        unknown  (0),
-        p2p      (1),
-        p2mp     (2),
-        autoP2p  (3),
-        autoP2mp (4),
-        tpLsp    (5)
+        unknown     (0),
+        p2p         (1),
+        p2mp        (2),
+        autoP2p     (3),
+        autoP2mp    (4),
+        tpLsp       (5),
+        srTe        (6),
+        autoSrTe    (7),
+        pceInitSrTe (8)
     }
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The value of vRtrMplsLspStatsLspType indicates whether the statistics
-         apply to MPLS-TP, P2P, P2MP, Auto P2P or Auto P2MP LSP.
+         apply to MPLS-TP, P2P, P2MP, SR-TE, PCE-INIT SR-TE, Auto P2P, Auto
+         SR-TE  or Auto P2MP LSP.
 
          When the value of vRtrMplsLspStatsTpOnly is 'true', the statistics
          apply for MPLS-TP LSP only and vRtrMplsLspStatsLspType is set to
@@ -8211,8 +8604,8 @@ vRtrMplsLspStatsLspType          OBJECT-TYPE
 
          When the value of vRtrMplsLspStatsTpOnly is 'false', the statistics
          apply for regular RSVP-TE signalled terminating LSP and the value of
-         vRtrMplsLspStatsLspType can be set to either p2p, p2mp, autoP2p or
-         autoP2mp."
+         vRtrMplsLspStatsLspType can be set to either p2p, p2mp, srTE,
+         pceInitSrTe, autoP2p, autoSrTe or autoP2mp."
     ::= { vRtrMplsLspStatisticsEntry 99 }
 
 vRtrMplsLspAggregatePkts         OBJECT-TYPE
@@ -8337,7 +8730,14 @@ VRtrMplsLspTemplateEntry         ::= SEQUENCE
     vRtrMplsLspTempFrrOverheadLabel  Unsigned32,
     vRtrMplsLspTempBfdFailureAction  INTEGER,
     vRtrMplsLspTempCbfFwdingPlcy     TNamedItemOrEmpty,
-    vRtrMplsLspTempCbfFwdingSet      Unsigned32
+    vRtrMplsLspTempCbfFwdingSet      Unsigned32,
+    vRtrMplsLspTemplateId            Unsigned32,
+    vRtrMplsLspTempPathCompMeth      INTEGER,
+    vRtrMplsLspTempMetricType        INTEGER,
+    vRtrMplsLspTempLocalSrProt       INTEGER,
+    vRtrMplsLspTempLabelStackRed     TruthValue,
+    vRtrMplsLspTempBfdUpWaitTimer    Unsigned32,
+    vRtrMplsLspTempSelfPing          INTEGER
 }
 
 vRtrMplsLspTemplateName          OBJECT-TYPE
@@ -8380,12 +8780,13 @@ vRtrMplsLspTemplateAdminState    OBJECT-TYPE
 
 vRtrMplsLspTemplateType          OBJECT-TYPE
     SYNTAX      INTEGER {
-        unknown       (0),
-        p2mp          (1),
-        onehopP2P     (2),
-        meshP2P       (3),
-        onehopP2PSrTe (4),
-        meshP2PSrTe   (5)
+        unknown        (0),
+        p2mp           (1),
+        onehopP2P      (2),
+        meshP2P        (3),
+        onehopP2PSrTe  (4),
+        meshP2PSrTe    (5),
+        pceInitP2PSrTe (6)
     }
     MAX-ACCESS  read-create
     STATUS      current
@@ -8398,7 +8799,8 @@ vRtrMplsLspTemplateType          OBJECT-TYPE
          'onehopP2P (2)'    - auto creation of one-Hop P2P LSPs.
          'meshP2P (3)'      - auto creation of mesh P2P LSPs.
          'onehopP2PSrTe (4)'- auto creation of one-Hop P2P SrTe LSPs.
-         'meshP2PSrTe (5)'  - auto creation of mesh P2P SrTe LSPs."
+         'meshP2PSrTe (5)'  - auto creation of mesh P2P SrTe LSPs.
+         'pceInitP2PSrTe (6)'- auto creation of PCE-Initiated P2P SR-Te LSPs."
     DEFVAL      { unknown }
     ::= { vRtrMplsLspTemplateEntry 5 }
 
@@ -8418,8 +8820,8 @@ vRtrMplsLspTemplateAdaptive      OBJECT-TYPE
     ::= { vRtrMplsLspTemplateEntry 6 }
 
 vRtrMplsLspTemplateBandwidth     OBJECT-TYPE
-    SYNTAX      Integer32 (0..100000)
-    UNITS       "megabits per second"
+    SYNTAX      Integer32 (0..6400000)
+    UNITS       "megabps"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -9099,6 +9501,9 @@ vRtrMplsLspTempBfdPingIntvl      OBJECT-TYPE
         "The value of vRtrMplsLspTempBfdPingIntvl specifies the time interval
          for periodic LSP ping for BFD bootstrapping.
 
+         The object vRtrMplsLspTempBfdPingIntvl is applicable to LSP templates
+         with  vRtrMplsLspTemplateType set to 'oneHopP2P' or 'meshP2P'.
+
          When the value of vRtrMplsLspTempBfdPingIntvl is set to '0', it
          disables LSP pings for BFD bootstrapping."
     DEFVAL      { 60 }
@@ -9160,7 +9565,9 @@ vRtrMplsLspTempMaxSrLabels       OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The value of vRtrMplsLspTempMaxSrLabels specifies maximum segment
-         routing label stack size for this LSP template."
+         routing label stack size for this LSP template.
+
+          The default IXR platform is 3 and maximum value supported is 5."
     DEFVAL      { 6 }
     ::= { vRtrMplsLspTemplateEntry 55 }
 
@@ -9176,8 +9583,9 @@ vRtrMplsLspTempFrrOverheadLabel  OBJECT-TYPE
 
 vRtrMplsLspTempBfdFailureAction  OBJECT-TYPE
     SYNTAX      INTEGER {
-        none (0),
-        down (1)
+        none           (0),
+        down           (1),
+        failoverOrDown (2)
     }
     MAX-ACCESS  read-create
     STATUS      current
@@ -9186,7 +9594,12 @@ vRtrMplsLspTempBfdFailureAction  OBJECT-TYPE
          be taken when this LSP template session fails.
 
          When vRtrMplsLspTempBfdFailureAction is set to down, it prevents the
-         LSP template from being made available as a transport for any user."
+         LSP template from being made available as a transport for any user.
+
+         When vRtrMplsLspTempBfdFailureAction is set to failoverOrDown, and the
+         BFD session associated with the active-path of a related LSP goes
+         down, the LSP will switch  to the standby-path if applicable. When the
+         LSP cannot switchover, the LSP will  go operationally down."
     DEFVAL      { none }
     ::= { vRtrMplsLspTemplateEntry 57 }
 
@@ -9201,14 +9614,142 @@ vRtrMplsLspTempCbfFwdingPlcy     OBJECT-TYPE
     ::= { vRtrMplsLspTemplateEntry 58 }
 
 vRtrMplsLspTempCbfFwdingSet      OBJECT-TYPE
-    SYNTAX      Unsigned32 (0..4)
+    SYNTAX      Unsigned32 (0..6)
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
         "The value of vRtrMplsLspTempCbfFwdingSet specifies the Class
-         Forwarding Set ID for this LSP Template instance."
+         Forwarding Set ID for this LSP Template instance. If system profile is
+         profile-b then valid range is 0..6 else 0..4"
     DEFVAL      { 0 }
     ::= { vRtrMplsLspTemplateEntry 59 }
+
+vRtrMplsLspTemplateId            OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 1..4294967295)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspTemplateId specifies the identifier
+         for pce-init LSPs using this template are setup."
+    DEFVAL      { 0 }
+    ::= { vRtrMplsLspTemplateEntry 60 }
+
+vRtrMplsLspTempPathCompMeth      OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none      (1),
+        localCspf (2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspTempPathCompMeth specifies LSP path
+         computation method.
+
+         If the value of vRtrMplsLspTempPathCompMeth is 'localCspf' for an LSP
+         the path uses local CSPF.
+
+
+         The default value for vRtrMplsLspTempPathCompMeth is 'none'."
+    DEFVAL      { none }
+    ::= { vRtrMplsLspTemplateEntry 61 }
+
+vRtrMplsLspTempMetricType        OBJECT-TYPE
+    SYNTAX      INTEGER {
+        igp (1),
+        te  (2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspTempMetricType specifies metric type.
+
+         If the value of vRtrMplsLspTempMetricType is 'igp', the metric used is
+         IGP.
+
+         If the value of vRtrMplsLspTempMetricType is 'te', the metric used is
+         TE.
+
+         The default value for vRtrMplsLspTempMetricType is 'igp'."
+    DEFVAL      { igp }
+    ::= { vRtrMplsLspTemplateEntry 62 }
+
+vRtrMplsLspTempLocalSrProt       OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none      (1),
+        preferred (2),
+        mandatory (3)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspTempLocalSrProt specifies the local SR
+         protection.
+
+         If the value of vRtrMplsLspTempLocalSrProt is 'none', there is no
+         protection.
+
+         If the value of vRtrMplsLspTempLocalSrProt is 'preferred', the
+         protection is preferred.
+
+         If the value of vRtrMplsLspTempLocalSrProt is 'mandatory', the
+         protection is mandatory.
+
+         The default value for vRtrMplsLspTempLocalSrProt is 'none'."
+    DEFVAL      { preferred }
+    ::= { vRtrMplsLspTemplateEntry 63 }
+
+vRtrMplsLspTempLabelStackRed     OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspTempLabelStackRed specifies whether label
+         stack reduction is enabled."
+    DEFVAL      { false }
+    ::= { vRtrMplsLspTemplateEntry 64 }
+
+vRtrMplsLspTempBfdUpWaitTimer    OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..60)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspTempBfdUpWaitTimer specifies the time in
+         seconds the software will wait for BFD to come up.
+
+         The timer object is applicable only when
+         vRtrMplsLspTempBfdFailureAction  is set to 'failoverOrDown'.
+
+         The timer object is applicable for LSP templates with
+         vRtrMplsLspTemplateType set to 'oneHopP2PSrTe', 'meshP2PSrTe' or
+         pceInitP2PSrte'.
+
+         The timer is started when BFD is first enabled on a path or BFD
+         transitions from up to down. When this timer expires and if BFD has
+         not yet come up, the path is torn down by removing it from TTM and
+         the IOM and the retry timer is started."
+    DEFVAL      { 4 }
+    ::= { vRtrMplsLspTemplateEntry 65 }
+
+vRtrMplsLspTempSelfPing          OBJECT-TYPE
+    SYNTAX      INTEGER {
+        enable  (1),
+        disable (2),
+        inherit (3)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspTempSelfPing specifies whether to override the
+         global configuration of Self Ping.
+
+         If the value of vRtrMplsLspTempSelfPing is 'disabled' for an LSP
+         template entry either due to inheritance or due to lsp template level
+         configuration, the value of vRtrMplsLspTempSelfPing has no affect.
+
+         The default value for vRtrMplsLspTempSelfPing is 'inherit'."
+    DEFVAL      { inherit }
+    ::= { vRtrMplsLspTemplateEntry 66 }
 
 vRtrMplsLspAutoBWTableLastChg    OBJECT-TYPE
     SYNTAX      TimeStamp
@@ -9252,16 +9793,16 @@ VRtrMplsLspAutoBandwidthEntry    ::= SEQUENCE
     vRtrMplsLspAutoBWLspName         TLNamedItem,
     vRtrMplsLspAutoBWLastChange      TimeStamp,
     vRtrMplsLspAutoBWAdjDNPercent    Unsigned32,
-    vRtrMplsLspAutoBWAdjDNMbps       Unsigned32,
+    vRtrMplsLspAutoBWAdjDNMbps       TmnxMplsLspBandwidth,
     vRtrMplsLspAutoBWAdjMultiplier   Unsigned32,
     vRtrMplsLspAutoBWAdjUPPercent    Unsigned32,
-    vRtrMplsLspAutoBWAdjUPMbps       Unsigned32,
-    vRtrMplsLspAutoBWMaxBW           Unsigned32,
-    vRtrMplsLspAutoBWMinBW           Unsigned32,
+    vRtrMplsLspAutoBWAdjUPMbps       TmnxMplsLspBandwidth,
+    vRtrMplsLspAutoBWMaxBW           TmnxMplsLspBandwidth,
+    vRtrMplsLspAutoBWMinBW           TmnxMplsLspBandwidth,
     vRtrMplsLspAutoBWMonitorBW       TruthValue,
     vRtrMplsLspAutoBWOverFlow        Unsigned32,
     vRtrMplsLspAutoBWOvrFlwThreshold Unsigned32,
-    vRtrMplsLspAutoBWOvrFlwBW        Unsigned32,
+    vRtrMplsLspAutoBWOvrFlwBW        TmnxMplsLspBandwidth,
     vRtrMplsLspAutoBWSampMultiplier  Unsigned32,
     vRtrMplsLspAutoBWSampTime        Unsigned32,
     vRtrMplsLspAutoBWLastAdj         TimeStamp,
@@ -9287,9 +9828,12 @@ VRtrMplsLspAutoBandwidthEntry    ::= SEQUENCE
     vRtrMplsLspAutoBWNcWeight        Unsigned32,
     vRtrMplsLspAutoBWUnderFlow       Unsigned32,
     vRtrMplsLspAutoBWUndFlwThreshold Unsigned32,
-    vRtrMplsLspAutoBWUndFlwBW        Unsigned32,
+    vRtrMplsLspAutoBWUndFlwBW        TmnxMplsLspBandwidth,
     vRtrMplsLspAutoBWUndFlwCount     Counter32,
-    vRtrMplsLspAutoBWMaxUndFlwBw     Unsigned32
+    vRtrMplsLspAutoBWMaxUndFlwBw     Unsigned32,
+    vRtrMplsLspAutoBWUseLastAdjBW    TruthValue,
+    vRtrMplsLspAutoBWSecRetryLimit   Unsigned32,
+    vRtrMplsLspAutoBWLastAdjBW       Integer32
 }
 
 vRtrMplsLspAutoBWLspName         OBJECT-TYPE
@@ -9333,8 +9877,8 @@ vRtrMplsLspAutoBWAdjDNPercent    OBJECT-TYPE
     ::= { vRtrMplsLspAutoBandwidthEntry 3 }
 
 vRtrMplsLspAutoBWAdjDNMbps       OBJECT-TYPE
-    SYNTAX      Unsigned32 (0..100000)
-    UNITS       "Mbps"
+    SYNTAX      TmnxMplsLspBandwidth
+    UNITS       "megabps"
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -9379,8 +9923,8 @@ vRtrMplsLspAutoBWAdjUPPercent    OBJECT-TYPE
     ::= { vRtrMplsLspAutoBandwidthEntry 6 }
 
 vRtrMplsLspAutoBWAdjUPMbps       OBJECT-TYPE
-    SYNTAX      Unsigned32 (0..100000)
-    UNITS       "Mbps"
+    SYNTAX      TmnxMplsLspBandwidth
+    UNITS       "megabps"
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -9392,8 +9936,8 @@ vRtrMplsLspAutoBWAdjUPMbps       OBJECT-TYPE
     ::= { vRtrMplsLspAutoBandwidthEntry 7 }
 
 vRtrMplsLspAutoBWMaxBW           OBJECT-TYPE
-    SYNTAX      Unsigned32 (0..100000)
-    UNITS       "Mbps"
+    SYNTAX      TmnxMplsLspBandwidth
+    UNITS       "megabps"
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -9403,8 +9947,8 @@ vRtrMplsLspAutoBWMaxBW           OBJECT-TYPE
     ::= { vRtrMplsLspAutoBandwidthEntry 8 }
 
 vRtrMplsLspAutoBWMinBW           OBJECT-TYPE
-    SYNTAX      Unsigned32 (0..100000)
-    UNITS       "Mbps"
+    SYNTAX      TmnxMplsLspBandwidth
+    UNITS       "megabps"
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -9415,7 +9959,7 @@ vRtrMplsLspAutoBWMinBW           OBJECT-TYPE
 
 vRtrMplsLspAutoBWMonitorBW       OBJECT-TYPE
     SYNTAX      TruthValue
-    UNITS       "Mbps"
+    UNITS       "megabps"
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -9453,8 +9997,8 @@ vRtrMplsLspAutoBWOvrFlwThreshold OBJECT-TYPE
     ::= { vRtrMplsLspAutoBandwidthEntry 12 }
 
 vRtrMplsLspAutoBWOvrFlwBW        OBJECT-TYPE
-    SYNTAX      Unsigned32 (0..100000)
-    UNITS       "Mbps"
+    SYNTAX      TmnxMplsLspBandwidth
+    UNITS       "megabps"
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -9515,7 +10059,7 @@ vRtrMplsLspAutoBWNextAdj         OBJECT-TYPE
 
 vRtrMplsLspAutoBWMaxAvgRate      OBJECT-TYPE
     SYNTAX      Unsigned32
-    UNITS       "Mbps"
+    UNITS       "megabps"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -9525,7 +10069,7 @@ vRtrMplsLspAutoBWMaxAvgRate      OBJECT-TYPE
 
 vRtrMplsLspAutoBWLastAvgRate     OBJECT-TYPE
     SYNTAX      Unsigned32
-    UNITS       "Mbps"
+    UNITS       "megabps"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -9561,7 +10105,7 @@ vRtrMplsLspAutoBWInheritance     OBJECT-TYPE
 
 vRtrMplsLspAutoBWCurrentBW       OBJECT-TYPE
     SYNTAX      Unsigned32
-    UNITS       "Mbps"
+    UNITS       "megabps"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -9737,8 +10281,8 @@ vRtrMplsLspAutoBWUndFlwThreshold OBJECT-TYPE
     ::= { vRtrMplsLspAutoBandwidthEntry 38 }
 
 vRtrMplsLspAutoBWUndFlwBW        OBJECT-TYPE
-    SYNTAX      Unsigned32 (0..100000)
-    UNITS       "Mbps"
+    SYNTAX      TmnxMplsLspBandwidth
+    UNITS       "megabps"
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -9760,13 +10304,55 @@ vRtrMplsLspAutoBWUndFlwCount     OBJECT-TYPE
 
 vRtrMplsLspAutoBWMaxUndFlwBw     OBJECT-TYPE
     SYNTAX      Unsigned32
-    UNITS       "Mbps"
+    UNITS       "megabps"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The value of vRtrMplsLspAutoBWMaxUndFlwBw indicates the maximum
          sampled bandwidth in the most recent consecutive underflow samples."
     ::= { vRtrMplsLspAutoBandwidthEntry 41 }
+
+vRtrMplsLspAutoBWUseLastAdjBW    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspAutoBWUseLastAdjBW specifies whether use of
+         last adjusted bandwidth is enabled or diabled.
+
+         When the value is 'true' the use of last adjusted bandwidth is
+         enabled, and LSP paths will be signalled with the last adjusted
+         bandwidth of the LSP and not the configured bandwidth."
+    DEFVAL      { false }
+    ::= { vRtrMplsLspAutoBandwidthEntry 42 }
+
+vRtrMplsLspAutoBWSecRetryLimit   OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..10000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspAutoBWSecRetryLimit specifies the max number
+         of retry attempts that will be made to signal the secondary path with
+         the last adjusted bandwidth. After the number of retry attempts is
+         exceeded, no more attempts will be made to resignal the secondary path
+         and the path will remain operationally down. A value of zero(0)
+         specifies that the retry limit is infinite.
+
+         This variable is valid only if vRtrMplsLspAutoBWUseLastAdjBW is set to
+         'enabled'."
+    DEFVAL      { 5 }
+    ::= { vRtrMplsLspAutoBandwidthEntry 43 }
+
+vRtrMplsLspAutoBWLastAdjBW       OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "megabps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspAutoBWLastAdjBW indicates the last adjusted
+         bandwidth for the LSP. A value of -1 indicates that this value is
+         invalid"
+    ::= { vRtrMplsLspAutoBandwidthEntry 44 }
 
 vRtrMplsLspPathOperTable         OBJECT-TYPE
     SYNTAX      SEQUENCE OF VRtrMplsLspPathOperEntry
@@ -9811,7 +10397,13 @@ VRtrMplsLspPathOperEntry         ::= SEQUENCE
     vRtrMplsLspPathOperPropAdminGrp  TruthValue,
     vRtrMplsLspPathOperFRHopLimit    Unsigned32,
     vRtrMplsLspPathOperFRPropAdmGrp  TruthValue,
-    vRtrMplsLspPathOperInterArea     TruthValue
+    vRtrMplsLspPathOperInterArea     TruthValue,
+    vRtrMplsLspPathOperCompMeth      INTEGER,
+    vRtrMplsLspPathOperMetricType    INTEGER,
+    vRtrMplsLspPathOperLocalSrProt   INTEGER,
+    vRtrMplsLspPathOperLabelStackRed INTEGER,
+    vRtrMplsLspPathNgFNAddrType      InetAddressType,
+    vRtrMplsLspPathNgFNAddr          InetAddress
 }
 
 vRtrMplsLspPathOperSetupPriority OBJECT-TYPE
@@ -10138,6 +10730,92 @@ vRtrMplsLspPathOperInterArea     OBJECT-TYPE
          operational LSP path is either inter-area or intra-area."
     ::= { vRtrMplsLspPathOperEntry 16 }
 
+vRtrMplsLspPathOperCompMeth      OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notApplicable (0),
+        none          (1),
+        localCspf     (2),
+        pce           (3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspPathOperCompMeth indicates the path
+         computation method that was used for the  currently operational LSP
+         path.
+
+         A value of 'notApplicable' indicates that the LSP path is
+         operationally down or path list is SID."
+    ::= { vRtrMplsLspPathOperEntry 17 }
+
+vRtrMplsLspPathOperMetricType    OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notApplicable (0),
+        igp           (1),
+        te            (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspPathOperMetricType indicates the metric type
+         used for the currently operational  LSP path.
+
+         A value of 'notApplicable' indicates that the LSP path is
+         operationally down."
+    ::= { vRtrMplsLspPathOperEntry 18 }
+
+vRtrMplsLspPathOperLocalSrProt   OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notApplicable (0),
+        none          (1),
+        preferred     (2),
+        mandatory     (3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspPathOperLocalSrProt indicates the local SR
+         protection used for the currently operational  LSP path.
+
+         A value of 'notApplicable' indicates that the LSP path is
+         operationally down."
+    ::= { vRtrMplsLspPathOperEntry 19 }
+
+vRtrMplsLspPathOperLabelStackRed OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notApplicable (0),
+        true          (1),
+        false         (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspPathOperLabelStackRed indicates whether label
+         stack reduction is used for the  currently operational LSP path.
+
+         A value of 'notApplicable' indicates that the LSP path is
+         operationally down."
+    ::= { vRtrMplsLspPathOperEntry 20 }
+
+vRtrMplsLspPathNgFNAddrType      OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsLspPathNgFNAddrType object is an  enumerated value that
+         specifies the destination address type  of the node in the LSP path at
+         which the LSP path failed."
+    ::= { vRtrMplsLspPathOperEntry 21 }
+
+vRtrMplsLspPathNgFNAddr          OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspPathNgFNAddr indicates the IP address of the
+         node in the LSP path at which the LSP path failed."
+    ::= { vRtrMplsLspPathOperEntry 22 }
+
 vRtrMplsLabelObjs                OBJECT IDENTIFIER ::= { tmnxMplsObjs 45 }
 
 vRtrMplsLabelMaxStaticLspLabels  OBJECT-TYPE
@@ -10199,7 +10877,7 @@ vRtrMplsLabelBgpLabelsHoldTimer  OBJECT-TYPE
     ::= { vRtrMplsLabelObjs 3 }
 
 vRtrMplsLabelSegRouteStartLabel  OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 | 32..524287)
+    SYNTAX      TmnxMplsLabelOrZero
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -10212,7 +10890,7 @@ vRtrMplsLabelSegRouteStartLabel  OBJECT-TYPE
     ::= { vRtrMplsLabelObjs 4 }
 
 vRtrMplsLabelSegRouteEndLabel    OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 | 32..524287)
+    SYNTAX      TmnxMplsLabelOrZero
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -10225,21 +10903,22 @@ vRtrMplsLabelSegRouteEndLabel    OBJECT-TYPE
     ::= { vRtrMplsLabelObjs 5 }
 
 vRtrMplsLabelStaticLabelRange    OBJECT-TYPE
-    SYNTAX      Unsigned32 (0..262112)
+    SYNTAX      Unsigned32 (0..1048544)
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of vRtrMplsLabelStaticLabelRange specifies the range of the
          Static labels available on the system.
 
-         vRtrMplsLabelStaticLabelRange maximum value can be 131040 or 262112
-         depending on the system.
+         vRtrMplsLabelStaticLabelRange maximum value can be 524256 or 1048544
+         depending on the system profile value (tmnxChassisSystemProfile).
 
-         The maximum value of vRtrMplsLabelStaticLabelRange for most systems is
-         131040 labels (128 * 1024 less 32 reserved labels).
+         For a system configured with system profile as 'profileB', the maximum
+         value of  vRtrMplsLabelStaticLabelRange is 1048544 labels (1024 * 1024
+         less 32 reserved labels).
 
-         The maximum value of vRtrMplsLabelStaticLabelRange for chassis mode D
-         systems is 262112 labels (256 * 1024 less 32 reserved labels)."
+         Otherwise, the maximum value of vRtrMplsLabelStaticLabelRange
+          is 524256 labels (512 * 1024 less 32 reserved labels). "
     DEFVAL      { 18400 }
     ::= { vRtrMplsLabelObjs 6 }
 
@@ -10285,16 +10964,16 @@ VRtrMplsLspTempAutoBWEntry       ::= SEQUENCE
 {
     vRtrMplsLspTempAutoBWLastChg     TimeStamp,
     vRtrMplsLspTempAutoBWAdjDNPer    Unsigned32,
-    vRtrMplsLspTempAutoBWAdjDNMbps   Unsigned32,
+    vRtrMplsLspTempAutoBWAdjDNMbps   TmnxMplsLspBandwidth,
     vRtrMplsLspTempAutoBWAdjUPPer    Unsigned32,
-    vRtrMplsLspTempAutoBWAdjUPMbps   Unsigned32,
-    vRtrMplsLspTempAutoBWMaxBW       Unsigned32,
-    vRtrMplsLspTempAutoBWMinBW       Unsigned32,
+    vRtrMplsLspTempAutoBWAdjUPMbps   TmnxMplsLspBandwidth,
+    vRtrMplsLspTempAutoBWMaxBW       TmnxMplsLspBandwidth,
+    vRtrMplsLspTempAutoBWMinBW       TmnxMplsLspBandwidth,
     vRtrMplsLspTempAutoBWMntrBW      TruthValue,
     vRtrMplsLspTempAutoBWAdjMult     Unsigned32,
     vRtrMplsLspTempAutoBWOverFlow    Unsigned32,
     vRtrMplsLspTempAutoBWOvrFlwThr   Unsigned32,
-    vRtrMplsLspTempAutoBWOvrFlwBW    Unsigned32,
+    vRtrMplsLspTempAutoBWOvrFlwBW    TmnxMplsLspBandwidth,
     vRtrMplsLspTempAutoBWSampMult    Unsigned32,
     vRtrMplsLspTempAutoBWSampTime    Unsigned32,
     vRtrMplsLspTempAutoBWInherit     Unsigned32,
@@ -10308,7 +10987,7 @@ VRtrMplsLspTempAutoBWEntry       ::= SEQUENCE
     vRtrMplsLspTempAutoBWNcWeight    Unsigned32,
     vRtrMplsLspTempAutoBWUnderFlow   Unsigned32,
     vRtrMplsLspTempAutoBWUndFlwThr   Unsigned32,
-    vRtrMplsLspTempAutoBWUndFlwBW    Unsigned32
+    vRtrMplsLspTempAutoBWUndFlwBW    TmnxMplsLspBandwidth
 }
 
 vRtrMplsLspTempAutoBWLastChg     OBJECT-TYPE
@@ -10341,8 +11020,8 @@ vRtrMplsLspTempAutoBWAdjDNPer    OBJECT-TYPE
     ::= { vRtrMplsLspTempAutoBWEntry 2 }
 
 vRtrMplsLspTempAutoBWAdjDNMbps   OBJECT-TYPE
-    SYNTAX      Unsigned32 (0..100000)
-    UNITS       "Mbps"
+    SYNTAX      TmnxMplsLspBandwidth
+    UNITS       "megabps"
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -10376,8 +11055,8 @@ vRtrMplsLspTempAutoBWAdjUPPer    OBJECT-TYPE
     ::= { vRtrMplsLspTempAutoBWEntry 4 }
 
 vRtrMplsLspTempAutoBWAdjUPMbps   OBJECT-TYPE
-    SYNTAX      Unsigned32 (0..100000)
-    UNITS       "Mbps"
+    SYNTAX      TmnxMplsLspBandwidth
+    UNITS       "megabps"
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -10390,8 +11069,8 @@ vRtrMplsLspTempAutoBWAdjUPMbps   OBJECT-TYPE
     ::= { vRtrMplsLspTempAutoBWEntry 5 }
 
 vRtrMplsLspTempAutoBWMaxBW       OBJECT-TYPE
-    SYNTAX      Unsigned32 (0..100000)
-    UNITS       "Mbps"
+    SYNTAX      TmnxMplsLspBandwidth
+    UNITS       "megabps"
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -10401,8 +11080,8 @@ vRtrMplsLspTempAutoBWMaxBW       OBJECT-TYPE
     ::= { vRtrMplsLspTempAutoBWEntry 6 }
 
 vRtrMplsLspTempAutoBWMinBW       OBJECT-TYPE
-    SYNTAX      Unsigned32 (0..100000)
-    UNITS       "Mbps"
+    SYNTAX      TmnxMplsLspBandwidth
+    UNITS       "megabps"
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -10413,7 +11092,7 @@ vRtrMplsLspTempAutoBWMinBW       OBJECT-TYPE
 
 vRtrMplsLspTempAutoBWMntrBW      OBJECT-TYPE
     SYNTAX      TruthValue
-    UNITS       "Mbps"
+    UNITS       "megabps"
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -10465,8 +11144,8 @@ vRtrMplsLspTempAutoBWOvrFlwThr   OBJECT-TYPE
     ::= { vRtrMplsLspTempAutoBWEntry 11 }
 
 vRtrMplsLspTempAutoBWOvrFlwBW    OBJECT-TYPE
-    SYNTAX      Unsigned32 (0..100000)
-    UNITS       "Mbps"
+    SYNTAX      TmnxMplsLspBandwidth
+    UNITS       "megabps"
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -10636,8 +11315,8 @@ vRtrMplsLspTempAutoBWUndFlwThr   OBJECT-TYPE
     ::= { vRtrMplsLspTempAutoBWEntry 25 }
 
 vRtrMplsLspTempAutoBWUndFlwBW    OBJECT-TYPE
-    SYNTAX      Unsigned32 (0..100000)
-    UNITS       "Mbps"
+    SYNTAX      TmnxMplsLspBandwidth
+    UNITS       "megabps"
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -10993,7 +11672,13 @@ VRtrMplsLspExtEntry              ::= SEQUENCE
     vRtrMplsLspExtNegEntropyLbl      INTEGER,
     vRtrMplsLspExtBfdFailureAction   INTEGER,
     vRtrMplsLspExtCbfFwdingPlcy      TNamedItemOrEmpty,
-    vRtrMplsLspExtCbfFwdingSet       Unsigned32
+    vRtrMplsLspExtCbfFwdingSet       Unsigned32,
+    vRtrMplsLspExtPathCompMeth       INTEGER,
+    vRtrMplsLspExtMetricType         INTEGER,
+    vRtrMplsLspExtLocalSrProt        INTEGER,
+    vRtrMplsLspExtLabelStackRed      TruthValue,
+    vRtrMplsLspExtBfdUpWaitTimer     Unsigned32,
+    vRtrMplsLspExtSelfPing           INTEGER
 }
 
 vRtrMplsLspExtPceCompute         OBJECT-TYPE
@@ -11055,7 +11740,9 @@ vRtrMplsLspExtMaxSrLabels        OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The value of vRtrMplsLspExtMaxSrLabels specifies maximum segment
-         routing label stack size for this LSP."
+         routing label stack size for this LSP.
+
+         The default IXR platform is 3 and maximum value supported is 5."
     DEFVAL      { 6 }
     ::= { vRtrMplsLspExtEntry 5 }
 
@@ -11139,9 +11826,10 @@ vRtrMplsLspExtNegEntropyLbl      OBJECT-TYPE
 
 vRtrMplsLspExtBfdFailureAction   OBJECT-TYPE
     SYNTAX      INTEGER {
-        none     (0),
-        down     (1),
-        failover (2)
+        none           (0),
+        down           (1),
+        failover       (2),
+        failoverOrDown (3)
     }
     MAX-ACCESS  read-create
     STATUS      current
@@ -11152,8 +11840,13 @@ vRtrMplsLspExtBfdFailureAction   OBJECT-TYPE
          When vRtrMplsLspExtBfdFailureAction is set to down, it prevents the
          LSP from being made available as a transport for any user.
 
-             When vRtrMplsLspExtBfdFailureAction is set to failover, the Lsp is always
-             marked as usable, regardless of the BFD session state."
+         When vRtrMplsLspExtBfdFailureAction is set to failover, the Lsp is
+         always  marked as usable, regardless of the BFD session state.
+
+         When vRtrMplsLspExtBfdFailureAction is set to failoverOrDown and the
+         BFD session  associated with the active-path of the LSP goes down, the
+         LSP will switch to the  standby-path if applicable. When the LSP
+         cannot switchover, the LSP will go  operationally down."
     DEFVAL      { none }
     ::= { vRtrMplsLspExtEntry 11 }
 
@@ -11168,14 +11861,134 @@ vRtrMplsLspExtCbfFwdingPlcy      OBJECT-TYPE
     ::= { vRtrMplsLspExtEntry 12 }
 
 vRtrMplsLspExtCbfFwdingSet       OBJECT-TYPE
-    SYNTAX      Unsigned32 (0..4)
+    SYNTAX      Unsigned32 (0..6)
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
         "The value of vRtrMplsLspExtCbfFwdingSet specifies the Class Forwarding
-         Set ID for this LSP instance."
+         Set ID for this LSP instance. If system profile is profile-b then
+         valid range is 0..6 else 0..4"
     DEFVAL      { 0 }
     ::= { vRtrMplsLspExtEntry 13 }
+
+vRtrMplsLspExtPathCompMeth       OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none      (1),
+        localCspf (2),
+        pce       (3)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspExtPathCompMeth specifies LSP path
+         computation method.
+
+         If the value of vRtrMplsLspExtPathCompMeth is 'localCspf' for an LSP
+         the path uses local CSPF.
+
+         If the value of vRtrMplsLspExtPathCompMeth is 'pce' for an LSP the
+         path uses PCE;
+
+         The default value for vRtrMplsLspExtPathCompMeth is 'none'."
+    DEFVAL      { none }
+    ::= { vRtrMplsLspExtEntry 14 }
+
+vRtrMplsLspExtMetricType         OBJECT-TYPE
+    SYNTAX      INTEGER {
+        igp (1),
+        te  (2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspExtMetricType specifies metric type.
+
+         If the value of vRtrMplsLspExtMetricType is 'igp', the metric used is
+         IGP.
+
+         If the value of vRtrMplsLspExtMetricType is 'te', the metric used is
+         TE.
+
+         The default value for vRtrMplsLspExtPceReport is 'igp'."
+    DEFVAL      { igp }
+    ::= { vRtrMplsLspExtEntry 15 }
+
+vRtrMplsLspExtLocalSrProt        OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none      (1),
+        preferred (2),
+        mandatory (3)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspExtLocalSrProt specifies the local SR
+         protection.
+
+         If the value of vRtrMplsLspExtLocalSrProt is 'none', there is no
+         protection.
+
+         If the value of vRtrMplsLspExtLocalSrProt is 'preferred', the
+         protection is preferred.
+
+         If the value of vRtrMplsLspExtLocalSrProt is 'mandatory', the
+         protection is mandatory.
+
+         The default value for vRtrMplsLspExtLocalSrProt is 'none'."
+    DEFVAL      { preferred }
+    ::= { vRtrMplsLspExtEntry 16 }
+
+vRtrMplsLspExtLabelStackRed      OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspExtLabelStackRed specifies whether label stack
+         reduction is enabled."
+    DEFVAL      { false }
+    ::= { vRtrMplsLspExtEntry 17 }
+
+vRtrMplsLspExtBfdUpWaitTimer     OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..60)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspExtBfdUpWaitTimer specifies the time in
+         seconds the software will wait for BFD to come up.
+
+         The timer object is applicable only when
+         vRtrMplsLspExtBfdFailureAction  is set to 'failoverOrDown'.
+
+         The timer object is applicable for LSPs with vRtrMplsLspType set to
+         'srTe'.
+
+         The timer is started when BFD is first enabled on a path or BFD
+         transitions from up to down. When this timer expires and if BFD has
+         not yet come up, the path is torn down by removing it from TTM and
+         the IOM and the retry timer is started."
+    DEFVAL      { 4 }
+    ::= { vRtrMplsLspExtEntry 18 }
+
+vRtrMplsLspExtSelfPing           OBJECT-TYPE
+    SYNTAX      INTEGER {
+        enable  (1),
+        disable (2),
+        inherit (3)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspExtSelfPing specifies whether to override the
+         global configuration of Self Ping.
+
+         If the value of vRtrMplsLspExtSelfPing is 'disabled' for an LSP either
+         due to inheritance or due to LSP level configuration, the value of
+         vRtrMplsLspExtSelfPing has no affect.
+
+         The default value for vRtrMplsLspExtSelfPing is 'inherit'."
+    DEFVAL      { inherit }
+    ::= { vRtrMplsLspExtEntry 19 }
 
 vRtrMplsLspPathProfTblLstChg     OBJECT-TYPE
     SYNTAX      TimeStamp
@@ -11329,13 +12142,14 @@ vRtrMplsClassFwdPlcyLastChanged  OBJECT-TYPE
     ::= { vRtrMplsClassFwdPlcyEntry 3 }
 
 vRtrMplsClassFwdPlcyDefSetId     OBJECT-TYPE
-    SYNTAX      Unsigned32 (1..4)
+    SYNTAX      Unsigned32 (1..6)
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
         "The value of vRtrMplsClassFwdPlcyDefSetId specifies default forwarding
          set ID when no forwarding class is specified for Lsp or Lsp Template
-         instance."
+         instance. If system profile is profile-b then valid range is 1..6 else
+         1..4"
     DEFVAL      { 1 }
     ::= { vRtrMplsClassFwdPlcyEntry 4 }
 
@@ -11401,15 +12215,2425 @@ vRtrMplsClassFwdPlcyFC           OBJECT-TYPE
     ::= { vRtrMplsClassFwdPlcyFCEntry 1 }
 
 vRtrMplsClassFwdPlcyFCSetId      OBJECT-TYPE
-    SYNTAX      Unsigned32 (1..4)
+    SYNTAX      Unsigned32 (1..6)
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
         "The value of vRtrMplsClassFwdPlcyFCSetId specifies the forwarding set
          ID to which forwarding class specified by vRtrMplsClassFwdPlcyFC is
-         mapped to."
+         mapped to. If system profile is profile-b then valid range is 1..6
+         else 1..4"
     DEFVAL      { 1 }
     ::= { vRtrMplsClassFwdPlcyFCEntry 2 }
+
+vRtrMplsReservedLblBlkTblLastChg OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsReservedLblBlkTblLastChg indicates the sysUpTime
+         at the time of the last modification of an entry in the
+         vRtrMplsReservedLblBlkTable."
+    ::= { tmnxMplsObjs 59 }
+
+vRtrMplsReservedLblBlkTable      OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrMplsReservedLblBlkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsReservedLblBlkTable has an entry for each reserved label
+         block."
+    ::= { tmnxMplsObjs 60 }
+
+vRtrMplsReservedLblBlkEntry      OBJECT-TYPE
+    SYNTAX      VRtrMplsReservedLblBlkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a configuration of a reserved label block in
+         the MPLS protocol for a virtual router in the system.
+
+         Entries can be created and deleted via SNMP SET operations."
+    INDEX       { vRtrMplsReservedLblBlkName }
+    ::= { vRtrMplsReservedLblBlkTable 1 }
+
+VRtrMplsReservedLblBlkEntry      ::= SEQUENCE
+{
+    vRtrMplsReservedLblBlkName       TLNamedItem,
+    vRtrMplsReservedLblBlkRowStatus  RowStatus,
+    vRtrMplsReservedLblBlkLastChg    TimeStamp,
+    vRtrMplsReservedLblBlkStartLbl   TmnxMplsLabelOrZero,
+    vRtrMplsReservedLblBlkEndLbl     TmnxMplsLabelOrZero
+}
+
+vRtrMplsReservedLblBlkName       OBJECT-TYPE
+    SYNTAX      TLNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsReservedLblBlkName specifies the name identifying
+         the reserved label block."
+    ::= { vRtrMplsReservedLblBlkEntry 1 }
+
+vRtrMplsReservedLblBlkRowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The row status used for creation, deletion, or control of
+         vRtrMplsReservedLblBlkTable entries."
+    ::= { vRtrMplsReservedLblBlkEntry 2 }
+
+vRtrMplsReservedLblBlkLastChg    OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsReservedLblBlkLastChg indicates the sysUpTime
+         when this row was last modified."
+    ::= { vRtrMplsReservedLblBlkEntry 3 }
+
+vRtrMplsReservedLblBlkStartLbl   OBJECT-TYPE
+    SYNTAX      TmnxMplsLabelOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsReservedLblBlkStartLbl specifies the start value
+         of the reserved label available on the system.
+
+         vRtrMplsReservedLblBlkStartLbl must be set along with
+         vRtrMplsReservedLblBlkEndLbl."
+    ::= { vRtrMplsReservedLblBlkEntry 4 }
+
+vRtrMplsReservedLblBlkEndLbl     OBJECT-TYPE
+    SYNTAX      TmnxMplsLabelOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsReservedLblBlkEndLbl specifies the end value of
+         the reserved label available on the system.
+
+         vRtrMplsReservedLblBlkEndLbl must be set along with
+         vRtrMplsReservedLblBlkStartLbl."
+    ::= { vRtrMplsReservedLblBlkEntry 5 }
+
+vRtrMplsLspAdminTagTblLastChg    OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspAdminTagTblLastChg indicates the sysUpTime at
+         the time of the last modification of an entry in the
+         vRtrMplsLspAdminTagTable."
+    ::= { tmnxMplsObjs 61 }
+
+vRtrMplsLspAdminTagTable         OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrMplsLspAdminTagEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsLspAdminTagTable has an entry for each admin-tag
+         configured in the system."
+    ::= { tmnxMplsObjs 62 }
+
+vRtrMplsLspAdminTagEntry         OBJECT-TYPE
+    SYNTAX      VRtrMplsLspAdminTagEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a configuration of an admin-tag name in LSP
+         for a virtual router in the system.
+
+         Entries can be created and deleted via SNMP SET operations."
+    INDEX       {
+        vRtrID,
+        vRtrMplsLspIndex,
+        vRtrMplsLspAdminTagName
+    }
+    ::= { vRtrMplsLspAdminTagTable 1 }
+
+VRtrMplsLspAdminTagEntry         ::= SEQUENCE
+{
+    vRtrMplsLspAdminTagName          TNamedItem,
+    vRtrMplsLspAdminTagRowStatus     RowStatus,
+    vRtrMplsLspAdminTagLastChanged   TimeStamp
+}
+
+vRtrMplsLspAdminTagName          OBJECT-TYPE
+    SYNTAX      TNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspAdminTagName specifies the name of the admin
+         tag."
+    ::= { vRtrMplsLspAdminTagEntry 1 }
+
+vRtrMplsLspAdminTagRowStatus     OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The row status used for creation, deletion, or control of
+         vRtrMplsLspAdminTagTable entries."
+    ::= { vRtrMplsLspAdminTagEntry 2 }
+
+vRtrMplsLspAdminTagLastChanged   OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspAdminTagLastChanged indicates the sysUpTime
+         when this row was last modified."
+    ::= { vRtrMplsLspAdminTagEntry 3 }
+
+vRtrMplsLspTempAdminTagTblLstChg OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspTempAdminTagTblLstChg indicates the sysUpTime
+         at the time of the last modification of an entry in the
+         vRtrMplsLspTempAdminTagTable."
+    ::= { tmnxMplsObjs 63 }
+
+vRtrMplsLspTempAdminTagTable     OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrMplsLspTempAdminTagEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsLspTempAdminTagTable has an entry for each admin-tag
+         configured in the system."
+    ::= { tmnxMplsObjs 64 }
+
+vRtrMplsLspTempAdminTagEntry     OBJECT-TYPE
+    SYNTAX      VRtrMplsLspTempAdminTagEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a configuration of an admin-tag name in LSP
+         for a virtual router in the system.
+
+         Entries can be created and deleted via SNMP SET operations."
+    INDEX       {
+        vRtrID,
+        vRtrMplsLspTemplateName,
+        vRtrMplsLspTempAdminTagName
+    }
+    ::= { vRtrMplsLspTempAdminTagTable 1 }
+
+VRtrMplsLspTempAdminTagEntry     ::= SEQUENCE
+{
+    vRtrMplsLspTempAdminTagName      TNamedItem,
+    vRtrMplsLspTempAdminTagRowStatus RowStatus,
+    vRtrMplsLspTempAdminTagLastChg   TimeStamp
+}
+
+vRtrMplsLspTempAdminTagName      OBJECT-TYPE
+    SYNTAX      TNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspTempAdminTagName specifies the name of the
+         admin tag."
+    ::= { vRtrMplsLspTempAdminTagEntry 1 }
+
+vRtrMplsLspTempAdminTagRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The row status used for creation, deletion, or control of
+         vRtrMplsLspTempAdminTagTable entries."
+    ::= { vRtrMplsLspTempAdminTagEntry 2 }
+
+vRtrMplsLspTempAdminTagLastChg   OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspTempAdminTagLastChg indicates the sysUpTime
+         when this row was last modified."
+    ::= { vRtrMplsLspTempAdminTagEntry 3 }
+
+vRtrMplsFwdPlcyTblLastChg        OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsFwdPlcyTblLastChg indicates the sysUpTime at the
+         time of the last modification of an entry in the vRtrMplsFwdPlcyTable."
+    ::= { tmnxMplsObjs 65 }
+
+vRtrMplsFwdPlcyTable             OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrMplsFwdPlcyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsFwdPlcyTable has an entry for each Forwarding Policy
+         configured for a virtual router in the system."
+    ::= { tmnxMplsObjs 66 }
+
+vRtrMplsFwdPlcyEntry             OBJECT-TYPE
+    SYNTAX      VRtrMplsFwdPlcyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a configuration of a Forwarding Policy in
+         the MPLS protocol for a virtual router in the system.
+
+         Entries can be created and deleted via SNMP SET operations."
+    INDEX       {
+        vRtrID,
+        vRtrMplsFwdPlcyName
+    }
+    ::= { vRtrMplsFwdPlcyTable 1 }
+
+VRtrMplsFwdPlcyEntry             ::= SEQUENCE
+{
+    vRtrMplsFwdPlcyName              TLNamedItem,
+    vRtrMplsFwdPlcyRowStatus         RowStatus,
+    vRtrMplsFwdPlcyLastChanged       TimeStamp,
+    vRtrMplsFwdPlcyAdminState        TmnxAdminState,
+    vRtrMplsFwdPlcyOperState         TmnxOperState,
+    vRtrMplsFwdPlcyBindingLabel      TmnxMplsLabelOrZero,
+    vRtrMplsFwdPlcyEndpointAddrType  InetAddressType,
+    vRtrMplsFwdPlcyEndpointAddr      InetAddress,
+    vRtrMplsFwdPlcyRevertTimer       Unsigned32,
+    vRtrMplsFwdPlcyPreference        Unsigned32,
+    vRtrMplsFwdPlcyMetric            Unsigned32,
+    vRtrMplsFwdPlcyTtmPreference     Unsigned32
+}
+
+vRtrMplsFwdPlcyName              OBJECT-TYPE
+    SYNTAX      TLNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of the vRtrMplsFwdPlcyName specifies the name for the
+         forwarding policy."
+    ::= { vRtrMplsFwdPlcyEntry 1 }
+
+vRtrMplsFwdPlcyRowStatus         OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsFwdPlcyRowStatus controls the creation and
+         deletion of rows in the table."
+    ::= { vRtrMplsFwdPlcyEntry 2 }
+
+vRtrMplsFwdPlcyLastChanged       OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsFwdPlcyLastChanged indicates the sysUpTime when
+         this row was last modified."
+    ::= { vRtrMplsFwdPlcyEntry 3 }
+
+vRtrMplsFwdPlcyAdminState        OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsFwdPlcyAdminState specifies the current
+         administrative state of the forwarding policy."
+    DEFVAL      { outOfService }
+    ::= { vRtrMplsFwdPlcyEntry 4 }
+
+vRtrMplsFwdPlcyOperState         OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsFwdPlcyOperState indicates the current
+         operational state of the forwarding policy."
+    ::= { vRtrMplsFwdPlcyEntry 5 }
+
+vRtrMplsFwdPlcyBindingLabel      OBJECT-TYPE
+    SYNTAX      TmnxMplsLabelOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsFwdPlcyBindingLabel specifies the binding label
+         for the forwarding policy."
+    DEFVAL      { 0 }
+    ::= { vRtrMplsFwdPlcyEntry 6 }
+
+vRtrMplsFwdPlcyEndpointAddrType  OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsFwdPlcyEndpointAddrType specifies the type of
+         vRtrMplsFwdPlcyEndpointAddr."
+    DEFVAL      { unknown }
+    ::= { vRtrMplsFwdPlcyEntry 7 }
+
+vRtrMplsFwdPlcyEndpointAddr      OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsFwdPlcyEndpointAddr specifies the endpoint
+         address for the forwarding policy."
+    DEFVAL      { ''H }
+    ::= { vRtrMplsFwdPlcyEntry 8 }
+
+vRtrMplsFwdPlcyRevertTimer       OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..600)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsFwdPlcyRevertTimer specifies the revert timer for
+         the forwarding policy."
+    DEFVAL      { 0 }
+    ::= { vRtrMplsFwdPlcyEntry 9 }
+
+vRtrMplsFwdPlcyPreference        OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsFwdPlcyPreference specifies the forwarding policy
+         preference number."
+    DEFVAL      { 255 }
+    ::= { vRtrMplsFwdPlcyEntry 10 }
+
+vRtrMplsFwdPlcyMetric            OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..16777215)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This value of vRtrMplsFwdPlcyMetric specifies the metric of this
+         tunnel in the tunnel table."
+    DEFVAL      { 0 }
+    ::= { vRtrMplsFwdPlcyEntry 11 }
+
+vRtrMplsFwdPlcyTtmPreference     OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This value of vRtrMplsFwdPlcyTtmPreference specifies the preference of
+         this tunnel in the tunnel table."
+    DEFVAL      { 255 }
+    ::= { vRtrMplsFwdPlcyEntry 12 }
+
+vRtrMplsFwdPlcyNHGrpTblLastChg   OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsFwdPlcyNHGrpTblLastChg indicates the sysUpTime at
+         the time of the last modification of an entry in the
+         vRtrMplsFwdPlcyNHGrpTable."
+    ::= { tmnxMplsObjs 67 }
+
+vRtrMplsFwdPlcyNHGrpTable        OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrMplsFwdPlcyNHGrpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsFwdPlcyNHGrpTable has an entry for each Forwarding Policy
+         next-hop group configured for a virtual router in the system."
+    ::= { tmnxMplsObjs 68 }
+
+vRtrMplsFwdPlcyNHGrpEntry        OBJECT-TYPE
+    SYNTAX      VRtrMplsFwdPlcyNHGrpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a configuration of a Forwarding Policy
+         next-hop group in the MPLS protocol for a virtual router in the
+         system.
+
+         Entries can be created and deleted via SNMP SET operations."
+    INDEX       {
+        vRtrID,
+        vRtrMplsFwdPlcyName,
+        vRtrMplsFwdPlcyNHGrpIdx
+    }
+    ::= { vRtrMplsFwdPlcyNHGrpTable 1 }
+
+VRtrMplsFwdPlcyNHGrpEntry        ::= SEQUENCE
+{
+    vRtrMplsFwdPlcyNHGrpIdx          Unsigned32,
+    vRtrMplsFwdPlcyNHGrpRowStatus    RowStatus,
+    vRtrMplsFwdPlcyNHGrpLastChanged  TimeStamp,
+    vRtrMplsFwdPlcyNHGrpAdminState   TmnxAdminState,
+    vRtrMplsFwdPlcyNHGrpOperState    TmnxOperState,
+    vRtrMplsFwdPlcyNHGrpResType      INTEGER,
+    vRtrMplsFwdPlcyNHGrpLoadBalWt    Unsigned32
+}
+
+vRtrMplsFwdPlcyNHGrpIdx          OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..32)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of the vRtrMplsFwdPlcyNHGrpIdx specifies the index for the
+         next-hop group."
+    ::= { vRtrMplsFwdPlcyNHGrpEntry 1 }
+
+vRtrMplsFwdPlcyNHGrpRowStatus    OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsFwdPlcyNHGrpRowStatus controls the creation and
+         deletion of rows in the table."
+    ::= { vRtrMplsFwdPlcyNHGrpEntry 2 }
+
+vRtrMplsFwdPlcyNHGrpLastChanged  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsFwdPlcyNHGrpLastChanged indicates the sysUpTime
+         when this row was last modified."
+    ::= { vRtrMplsFwdPlcyNHGrpEntry 3 }
+
+vRtrMplsFwdPlcyNHGrpAdminState   OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsFwdPlcyNHGrpAdminState specifies the current
+         administrative state of the next-hop group."
+    DEFVAL      { outOfService }
+    ::= { vRtrMplsFwdPlcyNHGrpEntry 4 }
+
+vRtrMplsFwdPlcyNHGrpOperState    OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsFwdPlcyNHGrpOperState indicates the current
+         operational state of the next-hop group."
+    ::= { vRtrMplsFwdPlcyNHGrpEntry 5 }
+
+vRtrMplsFwdPlcyNHGrpResType      OBJECT-TYPE
+    SYNTAX      INTEGER {
+        direct   (1),
+        indirect (2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsFwdPlcyNHGrpResType specifies the resolution
+         type of the next-hop group.
+
+         When the value of vRtrMplsFwdPlcyNHGrpResType is set to 'direct', the
+         next-hops in this group must resolve to direct routes for for them to
+         be operational.
+
+         When the value of vRtrMplsFwdPlcyNHGrpResType is set to 'indirect',
+         the next-hops in this group must resolve to indirect routes for for
+         them to be operational."
+    ::= { vRtrMplsFwdPlcyNHGrpEntry 6 }
+
+vRtrMplsFwdPlcyNHGrpLoadBalWt    OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 1..4294967295)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsFwdPlcyNHGrpLoadBalWt specifies the load
+         balancing weight for this next-hop group."
+    DEFVAL      { 0 }
+    ::= { vRtrMplsFwdPlcyNHGrpEntry 7 }
+
+vRtrMplsFwdPlcyNhgNHTblLastChg   OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsFwdPlcyNhgNHTblLastChg indicates the sysUpTime at
+         the time of the last modification of an entry in the
+         vRtrMplsFwdPlcyNhgNHTable."
+    ::= { tmnxMplsObjs 69 }
+
+vRtrMplsFwdPlcyNhgNHTable        OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrMplsFwdPlcyNhgNHEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsFwdPlcyNhgNHTable has an entry for each next-hop
+         configured in a Forwarding Policy next-hop group."
+    ::= { tmnxMplsObjs 70 }
+
+vRtrMplsFwdPlcyNhgNHEntry        OBJECT-TYPE
+    SYNTAX      VRtrMplsFwdPlcyNhgNHEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a configuration of a next-hop in a
+         Forwarding Policy next-hop group.
+
+         Entries can be created and deleted via SNMP SET operations."
+    INDEX       {
+        vRtrID,
+        vRtrMplsFwdPlcyName,
+        vRtrMplsFwdPlcyNHGrpIdx,
+        vRtrMplsFwdPlcyNhgNHType
+    }
+    ::= { vRtrMplsFwdPlcyNhgNHTable 1 }
+
+VRtrMplsFwdPlcyNhgNHEntry        ::= SEQUENCE
+{
+    vRtrMplsFwdPlcyNhgNHType         INTEGER,
+    vRtrMplsFwdPlcyNhgNHRowStatus    RowStatus,
+    vRtrMplsFwdPlcyNhgNHLastChanged  TimeStamp,
+    vRtrMplsFwdPlcyNhgNHOperState    TmnxOperState,
+    vRtrMplsFwdPlcyNhgNHAddrType     InetAddressType,
+    vRtrMplsFwdPlcyNhgNHAddr         InetAddress
+}
+
+vRtrMplsFwdPlcyNhgNHType         OBJECT-TYPE
+    SYNTAX      INTEGER {
+        primary (1),
+        backup  (2)
+    }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsFwdPlcyNhgNHType specifies the type of next-hop.
+
+         When the value of vRtrMplsFwdPlcyNhgNHType is set to 'primary', this
+         next-hop will be the primary next-hop in the next-hop group.
+
+         When the value of vRtrMplsFwdPlcyNhgNHType is set to 'backup', this
+         next-hop will be the backup next-hop in the next-hop group."
+    ::= { vRtrMplsFwdPlcyNhgNHEntry 1 }
+
+vRtrMplsFwdPlcyNhgNHRowStatus    OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsFwdPlcyNhgNHRowStatus controls the creation and
+         deletion of rows in the table."
+    ::= { vRtrMplsFwdPlcyNhgNHEntry 2 }
+
+vRtrMplsFwdPlcyNhgNHLastChanged  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsFwdPlcyNhgNHLastChanged indicates the sysUpTime
+         when this row was last modified."
+    ::= { vRtrMplsFwdPlcyNhgNHEntry 3 }
+
+vRtrMplsFwdPlcyNhgNHOperState    OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsFwdPlcyNhgNHOperState indicates the current
+         operational state of the next-hop."
+    ::= { vRtrMplsFwdPlcyNhgNHEntry 4 }
+
+vRtrMplsFwdPlcyNhgNHAddrType     OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsFwdPlcyNhgNHAddrType specifies the type of
+         vRtrMplsFwdPlcyNhgNHAddr."
+    DEFVAL      { unknown }
+    ::= { vRtrMplsFwdPlcyNhgNHEntry 5 }
+
+vRtrMplsFwdPlcyNhgNHAddr         OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsFwdPlcyNhgNHAddr specifies the next-hop address."
+    DEFVAL      { ''H }
+    ::= { vRtrMplsFwdPlcyNhgNHEntry 6 }
+
+vRtrMplsFwdPlcyGenTblLastChg     OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsFwdPlcyGenTblLastChg indicates the sysUpTime at
+         the time of the last modification of an entry in the
+         vRtrMplsFwdPlcyGenTable."
+    ::= { tmnxMplsObjs 71 }
+
+vRtrMplsFwdPlcyGenTable          OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrMplsFwdPlcyGenEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsFwdPlcyGenTable contains objects for general control and
+         management of MPLS Forwarding Policies within a virtual router."
+    ::= { tmnxMplsObjs 72 }
+
+vRtrMplsFwdPlcyGenEntry          OBJECT-TYPE
+    SYNTAX      VRtrMplsFwdPlcyGenEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry contains objects for general control and management of
+         MPLS Forwarding Policies within a virtual router.
+
+         Entries can be created and deleted via SNMP SET operations."
+    INDEX       { vRtrID }
+    ::= { vRtrMplsFwdPlcyGenTable 1 }
+
+VRtrMplsFwdPlcyGenEntry          ::= SEQUENCE
+{
+    vRtrMplsFwdPlcyGenRowStatus      RowStatus,
+    vRtrMplsFwdPlcyGenLastChanged    TimeStamp,
+    vRtrMplsFwdPlcyGenAdminState     TmnxAdminState,
+    vRtrMplsFwdPlcyGenOperState      TmnxOperState,
+    vRtrMplsFwdPlcyGenOperDownReason INTEGER,
+    vRtrMplsFwdPlcyGenReservedLblBlk TLNamedItemOrEmpty
+}
+
+vRtrMplsFwdPlcyGenRowStatus      OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsFwdPlcyGenRowStatus controls the creation and
+         deletion of rows in the table."
+    ::= { vRtrMplsFwdPlcyGenEntry 1 }
+
+vRtrMplsFwdPlcyGenLastChanged    OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsFwdPlcyGenLastChanged indicates the sysUpTime
+         when this row was last modified."
+    ::= { vRtrMplsFwdPlcyGenEntry 2 }
+
+vRtrMplsFwdPlcyGenAdminState     OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsFwdPlcyGenAdminState specifies the current
+         administrative state for Forwarding Policies configuration."
+    DEFVAL      { outOfService }
+    ::= { vRtrMplsFwdPlcyGenEntry 3 }
+
+vRtrMplsFwdPlcyGenOperState      OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsFwdPlcyGenOperState indicates the current
+         operational state of Forwarding Policies."
+    ::= { vRtrMplsFwdPlcyGenEntry 4 }
+
+vRtrMplsFwdPlcyGenOperDownReason OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notApplicable (0),
+        adminDown     (1),
+        mplsOperDown  (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsFwdPlcyGenOperDownReason indicates the reason due
+         to which Forwarding Policies is operationally down."
+    ::= { vRtrMplsFwdPlcyGenEntry 5 }
+
+vRtrMplsFwdPlcyGenReservedLblBlk OBJECT-TYPE
+    SYNTAX      TLNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsFwdPlcyGenReservedLblBlk identifies the reserved
+         label block used by Forwarding Policies."
+    DEFVAL      { "" }
+    ::= { vRtrMplsFwdPlcyGenEntry 6 }
+
+vRtrMplsFwdPlcyStatsTblLastChg   OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsFwdPlcyStatsTblLastChg indicates the sysUpTime at
+         the time of the last modification of an entry in the
+         vRtrMplsFwdPlcyStatsTable."
+    ::= { tmnxMplsObjs 73 }
+
+vRtrMplsFwdPlcyStatsTable        OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrMplsFwdPlcyStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsFwdPlcyStatsTable contains objects for general control and
+          management of Statistics for MPLS Forwarding Policies within a
+         virtual router."
+    ::= { tmnxMplsObjs 74 }
+
+vRtrMplsFwdPlcyStatsEntry        OBJECT-TYPE
+    SYNTAX      VRtrMplsFwdPlcyStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry contains objects for general control and management of
+         Statistics for MPLS Forwarding Policies within a virtual router.
+
+         Entries can be created and deleted via SNMP SET operations."
+    INDEX       {
+        vRtrID,
+        vRtrMplsFwdPlcyName,
+        vRtrMplsFwdPlcyStatsType
+    }
+    ::= { vRtrMplsFwdPlcyStatsTable 1 }
+
+VRtrMplsFwdPlcyStatsEntry        ::= SEQUENCE
+{
+    vRtrMplsFwdPlcyStatsType         INTEGER,
+    vRtrMplsFwdPlcyStatsRowStatus    RowStatus,
+    vRtrMplsFwdPlcyStatsLastChanged  TimeStamp,
+    vRtrMplsFwdPlcyStatsAdminState   TmnxAdminState
+}
+
+vRtrMplsFwdPlcyStatsType         OBJECT-TYPE
+    SYNTAX      INTEGER {
+        ingress (1),
+        egress  (2)
+    }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsFwdPlcyStatsType specifies whether the type of
+         statistics is ingress or egress."
+    ::= { vRtrMplsFwdPlcyStatsEntry 1 }
+
+vRtrMplsFwdPlcyStatsRowStatus    OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsFwdPlcyStatsRowStatus controls the creation and
+         deletion of rows in the table."
+    ::= { vRtrMplsFwdPlcyStatsEntry 2 }
+
+vRtrMplsFwdPlcyStatsLastChanged  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsFwdPlcyStatsLastChanged indicates the sysUpTime
+         when this row was last modified."
+    ::= { vRtrMplsFwdPlcyStatsEntry 3 }
+
+vRtrMplsFwdPlcyStatsAdminState   OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsFwdPlcyStatsAdminState specifies the current
+         administrative state for Forwarding Policy statistics configuration."
+    DEFVAL      { outOfService }
+    ::= { vRtrMplsFwdPlcyStatsEntry 4 }
+
+vRtrMplsBindLblPathTable         OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrMplsBindLblPathEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsBindLblPathTable has an entry for each forwarding path
+         associated with a binding label for a virtual router in the system."
+    ::= { tmnxMplsObjs 75 }
+
+vRtrMplsBindLblPathEntry         OBJECT-TYPE
+    SYNTAX      VRtrMplsBindLblPathEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a forwarding path associated with a binding
+         label.
+
+         Entries cannot be created and deleted via SNMP SET operations."
+    INDEX       {
+        vRtrMplsBindLblPathOwner,
+        vRtrID,
+        vRtrMplsBindLbl,
+        vRtrMplsBindLblPathId
+    }
+    ::= { vRtrMplsBindLblPathTable 1 }
+
+VRtrMplsBindLblPathEntry         ::= SEQUENCE
+{
+    vRtrMplsBindLbl                  TmnxMplsLabel,
+    vRtrMplsBindLblPathId            Unsigned32,
+    vRtrMplsBindLblPathOwner         INTEGER,
+    vRtrMplsBindLblPathName          TLNamedItem,
+    vRtrMplsBindLblPathOperState     TmnxOperState,
+    vRtrMplsBindLblPathLastOperChg   TimeStamp,
+    vRtrMplsBindLblOperDownReason    INTEGER,
+    vRtrMplsBindLblPathNumNHGrpCnt   Unsigned32,
+    vRtrMplsBindLblPathRetryCount    Counter32,
+    vRtrMplsBindLblPathRetryTimeRem  Unsigned32,
+    vRtrMplsBindLblPathRevertTimer   Unsigned32,
+    vRtrMplsBindLblPathIngStatsEnabl TruthValue,
+    vRtrMplsBindLblPathPref          Unsigned32,
+    vRtrMplsBLPathIngStatOperState   TmnxOperState,
+    vRtrMplsBindLblPathEgrStatsEnabl TruthValue,
+    vRtrMplsBLPathEgrStatOperState   TmnxOperState
+}
+
+vRtrMplsBindLbl                  OBJECT-TYPE
+    SYNTAX      TmnxMplsLabel
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsBindLbl specifies the binding label for the
+         forwarding path."
+    ::= { vRtrMplsBindLblPathEntry 1 }
+
+vRtrMplsBindLblPathId            OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsBindLblPathId specifies the path ID for the
+         forwarding path. Path ID will be unique amongst path associated with
+         the same binding label."
+    ::= { vRtrMplsBindLblPathEntry 2 }
+
+vRtrMplsBindLblPathOwner         OBJECT-TYPE
+    SYNTAX      INTEGER {
+        mplsFwdPlcy (1)
+    }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsBindLblPathOwner indicates the owner for this
+         path."
+    ::= { vRtrMplsBindLblPathEntry 3 }
+
+vRtrMplsBindLblPathName          OBJECT-TYPE
+    SYNTAX      TLNamedItem
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsBindLblPathName indicates the name for this path."
+    ::= { vRtrMplsBindLblPathEntry 4 }
+
+vRtrMplsBindLblPathOperState     OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsBindLblPathOperState indicates the operational
+         state for this path."
+    ::= { vRtrMplsBindLblPathEntry 5 }
+
+vRtrMplsBindLblPathLastOperChg   OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsBindLblPathLastOperChg indicates the timestamp
+         when the operational state last changed."
+    ::= { vRtrMplsBindLblPathEntry 6 }
+
+vRtrMplsBindLblOperDownReason    OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notApplicable       (0),
+        memAllocFailed      (1),
+        invEndPointAddr     (2),
+        invBindingLbl       (3),
+        duplicatePlcy       (4),
+        invalidNextHop      (5),
+        iomPgmFailed        (6),
+        backpressured       (7),
+        higherPrefPlcyPgmed (8),
+        lblNotAvailable     (9),
+        statsAllocFailed    (10),
+        maxPlcyExceeded     (11)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsBindLblOperDownReason indicates the reason for
+         the path being operationally down."
+    ::= { vRtrMplsBindLblPathEntry 7 }
+
+vRtrMplsBindLblPathNumNHGrpCnt   OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..32)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsBindLblPathNumNHGrpCnt indicates the number of
+         next-hop groups for this path."
+    ::= { vRtrMplsBindLblPathEntry 8 }
+
+vRtrMplsBindLblPathRetryCount    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsBindLblPathRetryCount indicates the number of
+         retry attempts to bring up this path."
+    ::= { vRtrMplsBindLblPathEntry 9 }
+
+vRtrMplsBindLblPathRetryTimeRem  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsBindLblPathRetryTimeRem indicates the time
+         remaining till the next retry to bring up this path."
+    ::= { vRtrMplsBindLblPathEntry 10 }
+
+vRtrMplsBindLblPathRevertTimer   OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..600)
+    UNITS       "minutes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsBindLblPathRevertTimer indicates the revert timer
+         for the path."
+    ::= { vRtrMplsBindLblPathEntry 11 }
+
+vRtrMplsBindLblPathIngStatsEnabl OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsBindLblPathIngStatsEnabl indicates whether
+         ingress statistics are enabled for this path."
+    ::= { vRtrMplsBindLblPathEntry 12 }
+
+vRtrMplsBindLblPathPref          OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsBindLblPathPref indicates the preference for this
+         path."
+    ::= { vRtrMplsBindLblPathEntry 13 }
+
+vRtrMplsBLPathIngStatOperState   OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsBLPathIngStatOperState indicates the operational
+         state of ingress statistics for this path."
+    ::= { vRtrMplsBindLblPathEntry 14 }
+
+vRtrMplsBindLblPathEgrStatsEnabl OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsBindLblPathEgrStatsEnabl indicates whether egress
+         statistics are enabled for this path."
+    ::= { vRtrMplsBindLblPathEntry 15 }
+
+vRtrMplsBLPathEgrStatOperState   OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsBLPathEgrStatOperState indicates the operational
+         state of egress statistics for this path."
+    ::= { vRtrMplsBindLblPathEntry 16 }
+
+vRtrMplsBindLblPathNhgTable      OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrMplsBindLblPathNhgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsBindLblPathNhgTable has an entry for each  next-hop group
+         associated with a binding label path."
+    ::= { tmnxMplsObjs 76 }
+
+vRtrMplsBindLblPathNhgEntry      OBJECT-TYPE
+    SYNTAX      VRtrMplsBindLblPathNhgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a next-hop group associated with a binding
+         label path.
+
+         Entries cannot be created and deleted via SNMP SET operations."
+    INDEX       {
+        vRtrMplsBindLblPathOwner,
+        vRtrID,
+        vRtrMplsBindLbl,
+        vRtrMplsBindLblPathId,
+        vRtrMplsBindLblPathNhgIndex
+    }
+    ::= { vRtrMplsBindLblPathNhgTable 1 }
+
+VRtrMplsBindLblPathNhgEntry      ::= SEQUENCE
+{
+    vRtrMplsBindLblPathNhgIndex      Unsigned32,
+    vRtrMplsBindLblPathNhgOperState  TmnxOperState,
+    vRtrMplsBindLblPathNHgResType    INTEGER,
+    vRtrMplsBindLblPathNhgLoadBalWt  Unsigned32,
+    vRtrMplsBindLblPathNhgFailovrCnt Counter32,
+    vRtrMplsBindLblPathNhgRevertCnt  Counter32,
+    vRtrMplsBindLblPathNhgRevTimeRem Counter32,
+    vRtrMplsBindLblPathNhgDownReason INTEGER,
+    vRtrMplsBindLblPathNhgWeights    Unsigned32
+}
+
+vRtrMplsBindLblPathNhgIndex      OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..32)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsBindLblPathNhgIndex indicates the next-hop group
+         index."
+    ::= { vRtrMplsBindLblPathNhgEntry 1 }
+
+vRtrMplsBindLblPathNhgOperState  OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsBindLblPathNhgOperState indicates the operational
+         state of this next-hop group."
+    ::= { vRtrMplsBindLblPathNhgEntry 2 }
+
+vRtrMplsBindLblPathNHgResType    OBJECT-TYPE
+    SYNTAX      INTEGER {
+        direct   (1),
+        indirect (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsBindLblPathNHgResType indicates the resolution
+         type of next-hop group.
+
+         When the value of vRtrMplsBindLblPathNHgResType is 'direct', the
+         next-hops in this group must resolve to direct routes for for them to
+         be operational.
+
+         When the value of vRtrMplsBindLblPathNHgResType is 'indirect', the
+         next-hops in this group must resolve to indirect routes for for them
+         to be operational."
+    ::= { vRtrMplsBindLblPathNhgEntry 3 }
+
+vRtrMplsBindLblPathNhgLoadBalWt  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsBindLblPathNhgLoadBalWt indicates the
+         load-balancing weight for this next-hop group."
+    ::= { vRtrMplsBindLblPathNhgEntry 4 }
+
+vRtrMplsBindLblPathNhgFailovrCnt OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsBindLblPathNhgFailovrCnt indicates the number of
+         failovers from primary to backup next-hop for this next-hop group"
+    ::= { vRtrMplsBindLblPathNhgEntry 5 }
+
+vRtrMplsBindLblPathNhgRevertCnt  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsBindLblPathNhgRevertCnt indicates the number of
+         reverts from backup to primary next-hop for this next-hop group."
+    ::= { vRtrMplsBindLblPathNhgEntry 6 }
+
+vRtrMplsBindLblPathNhgRevTimeRem OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsBindLblPathNhgRevTimeRem indicates the time
+         remaining to revert from backup to primary  next-hop."
+    ::= { vRtrMplsBindLblPathNhgEntry 7 }
+
+vRtrMplsBindLblPathNhgDownReason OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notApplicable      (0),
+        nextHopNotResolved (1),
+        nextHopIsLocal     (3),
+        nextHopIsMcast     (4),
+        resTypeMismatch    (5)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsBindLblPathNhgDownReason indicates the reason for
+         the path NHG being operationally down."
+    ::= { vRtrMplsBindLblPathNhgEntry 8 }
+
+vRtrMplsBindLblPathNhgWeights    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsBindLblPathNhgWeights indicates the weights for
+         the path next hop group."
+    ::= { vRtrMplsBindLblPathNhgEntry 9 }
+
+vRtrMplsBindLblPathNhgNHTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrMplsBindLblPathNhgNHEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsBindLblPathNhgNHTable has an entry for each next-hop in a
+         next-hop group associated with a binding  label path."
+    ::= { tmnxMplsObjs 77 }
+
+vRtrMplsBindLblPathNhgNHEntry    OBJECT-TYPE
+    SYNTAX      VRtrMplsBindLblPathNhgNHEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a next-hop for a next-hop  group associated
+         with a binding label path.
+
+         Entries cannot be created and deleted via SNMP SET operations."
+    INDEX       {
+        vRtrMplsBindLblPathOwner,
+        vRtrID,
+        vRtrMplsBindLbl,
+        vRtrMplsBindLblPathId,
+        vRtrMplsBindLblPathNhgIndex,
+        vRtrMplsBindLblPathNhgNHType
+    }
+    ::= { vRtrMplsBindLblPathNhgNHTable 1 }
+
+VRtrMplsBindLblPathNhgNHEntry    ::= SEQUENCE
+{
+    vRtrMplsBindLblPathNhgNHType     INTEGER,
+    vRtrMplsBindLblPathNhgNHAddrType InetAddressType,
+    vRtrMplsBindLblPathNhgNHAddr     InetAddress,
+    vRtrMplsBindLblPathNhgNHResolved TruthValue,
+    vRtrMplsBindLblPathNhgNHOutIf    InterfaceIndexOrZero,
+    vRtrMplsBindLblPathNhgNHDownCode INTEGER,
+    vRtrMplsBindLblPathNhgNHEgrOper  TmnxOperState
+}
+
+vRtrMplsBindLblPathNhgNHType     OBJECT-TYPE
+    SYNTAX      INTEGER {
+        primary (1),
+        backup  (2)
+    }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsBindLblPathNhgNHType specifies the type of
+         next-hop.
+
+         When the value of vRtrMplsBindLblPathNhgNHType is set to 'primary',
+         this next-hop will be the primary next-hop in the next-hop group.
+
+         When the value of vRtrMplsBindLblPathNhgNHType is set to 'backup',
+         this next-hop will be the backup next-hop in the next-hop group."
+    ::= { vRtrMplsBindLblPathNhgNHEntry 1 }
+
+vRtrMplsBindLblPathNhgNHAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsBindLblPathNhgNHAddrType indicates the address
+         type of the next-hop."
+    ::= { vRtrMplsBindLblPathNhgNHEntry 2 }
+
+vRtrMplsBindLblPathNhgNHAddr     OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsBindLblPathNhgNHAddr indicates the address of the
+         next-hop."
+    ::= { vRtrMplsBindLblPathNhgNHEntry 3 }
+
+vRtrMplsBindLblPathNhgNHResolved OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsBindLblPathNhgNHResolved indicates if next-hop is
+         resolved or not."
+    ::= { vRtrMplsBindLblPathNhgNHEntry 4 }
+
+vRtrMplsBindLblPathNhgNHOutIf    OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsBindLblPathNhgNHOutIf indicates the index of the
+         outgoing interface that the next-hop resolved to if it is a direct
+         next-hop.
+
+         A value of 0 indicates that either the next-hop is not resolved or
+         that the next-hop is indirect."
+    ::= { vRtrMplsBindLblPathNhgNHEntry 5 }
+
+vRtrMplsBindLblPathNhgNHDownCode OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notApplicable      (0),
+        nextHopNotResolved (1),
+        nextHopIsLocal     (3),
+        nextHopIsMcast     (4),
+        resTypeMismatch    (5)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsBindLblPathNhgNHDownCode indicates the reason for
+         the path NHG NH being not resolved."
+    ::= { vRtrMplsBindLblPathNhgNHEntry 6 }
+
+vRtrMplsBindLblPathNhgNHEgrOper  OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsBindLblPathNhgNHEgrOper indicates the operational
+         state of the egress stats in this next-hop group next hop."
+    ::= { vRtrMplsBindLblPathNhgNHEntry 7 }
+
+vRtrMplsBindLblIngrStatsTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrMplsBindLblIngrStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsBindLblIngrStatsTable has an entry for ingress statistics
+         associated with a binding label path."
+    ::= { tmnxMplsObjs 78 }
+
+vRtrMplsBindLblIngrStatsEntry    OBJECT-TYPE
+    SYNTAX      VRtrMplsBindLblIngrStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents ingress statistics collected for a binding
+         label path.
+
+         Entries cannot be created and deleted via SNMP SET operations."
+    INDEX       {
+        vRtrID,
+        vRtrMplsBindLblPathOwner,
+        vRtrMplsBindLbl
+    }
+    ::= { vRtrMplsBindLblIngrStatsTable 1 }
+
+VRtrMplsBindLblIngrStatsEntry    ::= SEQUENCE
+{
+    vRtrMplsBindLblIngrAggPkts       Counter64,
+    vRtrMplsBindLblIngrAggOctets     Counter64
+}
+
+vRtrMplsBindLblIngrAggPkts       OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total of number of ingress packets for this binding label path."
+    ::= { vRtrMplsBindLblIngrStatsEntry 1 }
+
+vRtrMplsBindLblIngrAggOctets     OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total of number of ingress octets for this binding label path.."
+    ::= { vRtrMplsBindLblIngrStatsEntry 2 }
+
+vRtrMplsEndptPathTable           OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrMplsEndptPathEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsEndptPathTable has an entry for each forwarding path
+         associated with an endpoint address for a virtual router in the
+         system."
+    ::= { tmnxMplsObjs 79 }
+
+vRtrMplsEndptPathEntry           OBJECT-TYPE
+    SYNTAX      VRtrMplsEndptPathEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a forwarding path associated  with an
+         endpoint path.
+
+         Entries cannot be created and deleted via SNMP SET operations."
+    INDEX       {
+        vRtrMplsEndptPathOwner,
+        vRtrID,
+        vRtrMplsEndptAddrType,
+        vRtrMplsEndptAddress,
+        vRtrMplsEndptPathId
+    }
+    ::= { vRtrMplsEndptPathTable 1 }
+
+VRtrMplsEndptPathEntry           ::= SEQUENCE
+{
+    vRtrMplsEndptAddrType            InetAddressType,
+    vRtrMplsEndptAddress             InetAddress,
+    vRtrMplsEndptPathId              Unsigned32,
+    vRtrMplsEndptPathOwner           INTEGER,
+    vRtrMplsEndptPathName            TLNamedItem,
+    vRtrMplsEndptPathOperState       TmnxOperState,
+    vRtrMplsEndptPathLastOperChg     TimeStamp,
+    vRtrMplsEndptPathOperDownReason  INTEGER,
+    vRtrMplsEndptPathNHGrpCnt        Unsigned32,
+    vRtrMplsEndptPathRetryCount      Counter32,
+    vRtrMplsEndptPathRetryTimeRem    Unsigned32,
+    vRtrMplsEndptPathRevertTimer     Unsigned32,
+    vRtrMplsEndptPathPref            Unsigned32,
+    vRtrMplsEndptPathTTMPref         Unsigned32,
+    vRtrMplsEndptPathMetric          Unsigned32,
+    vRtrMplsEndptPathEgrStatsEnabl   TruthValue,
+    vRtrMplsEndptPathEgrStatsOper    TmnxOperState
+}
+
+vRtrMplsEndptAddrType            OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsEndptAddrType indicates the  address type of the
+         endpoint."
+    ::= { vRtrMplsEndptPathEntry 1 }
+
+vRtrMplsEndptAddress             OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsEndptAddress indicates the address of the
+         endpoint."
+    ::= { vRtrMplsEndptPathEntry 2 }
+
+vRtrMplsEndptPathId              OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsEndptPathId indicates the path ID for the
+         forwarding path. Path ID will be unique amongst path associated with
+         the same endpoint address."
+    ::= { vRtrMplsEndptPathEntry 3 }
+
+vRtrMplsEndptPathOwner           OBJECT-TYPE
+    SYNTAX      INTEGER {
+        mplsFwdPlcy (1)
+    }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsEndptPathOwner indicates the owner for this path."
+    ::= { vRtrMplsEndptPathEntry 4 }
+
+vRtrMplsEndptPathName            OBJECT-TYPE
+    SYNTAX      TLNamedItem
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsEndptPathName indicates the name for this path."
+    ::= { vRtrMplsEndptPathEntry 5 }
+
+vRtrMplsEndptPathOperState       OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsEndptPathOperState indicates the operational
+         state for this path."
+    ::= { vRtrMplsEndptPathEntry 6 }
+
+vRtrMplsEndptPathLastOperChg     OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsEndptPathLastOperChg indicates the timestamp when
+         the operational state last changed."
+    ::= { vRtrMplsEndptPathEntry 7 }
+
+vRtrMplsEndptPathOperDownReason  OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notApplicable       (0),
+        memAllocFailed      (1),
+        invEndPointAddr     (2),
+        duplicatePlcy       (3),
+        invalidNextHop      (4),
+        iomPgmFailed        (5),
+        backpressured       (6),
+        higherPrefPlcyPgmed (7),
+        statsAllocFailed    (8),
+        maxPlcyExceeded     (9),
+        noNextHops          (10)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsEndptPathOperDownReason indicates the reason for
+         the path being operationally down."
+    ::= { vRtrMplsEndptPathEntry 8 }
+
+vRtrMplsEndptPathNHGrpCnt        OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..32)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsEndptPathNHGrpCnt indicates the number of
+         next-hop groups for this path."
+    ::= { vRtrMplsEndptPathEntry 9 }
+
+vRtrMplsEndptPathRetryCount      OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsEndptPathRetryCount indicates the number of retry
+         attempts to bring up this path."
+    ::= { vRtrMplsEndptPathEntry 10 }
+
+vRtrMplsEndptPathRetryTimeRem    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsEndptPathRetryTimeRem indicates the time
+         remaining till the next retry to bring up this path."
+    ::= { vRtrMplsEndptPathEntry 11 }
+
+vRtrMplsEndptPathRevertTimer     OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..600)
+    UNITS       "minutes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsEndptPathRevertTimer indicates the revert timer
+         for the path."
+    ::= { vRtrMplsEndptPathEntry 12 }
+
+vRtrMplsEndptPathPref            OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsEndptPathPref indicates the preference for this
+         path."
+    ::= { vRtrMplsEndptPathEntry 13 }
+
+vRtrMplsEndptPathTTMPref         OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsEndptPathTTMPref indicates the TTM preference for
+         endpoint config."
+    ::= { vRtrMplsEndptPathEntry 14 }
+
+vRtrMplsEndptPathMetric          OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..16777215)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This value of vRtrMplsEndptPathMetric indicates the metric for
+         endpoint config."
+    ::= { vRtrMplsEndptPathEntry 15 }
+
+vRtrMplsEndptPathEgrStatsEnabl   OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsEndptPathEgrStatsEnabl indicates whether egress
+         statistics are enabled for endpoint config."
+    ::= { vRtrMplsEndptPathEntry 16 }
+
+vRtrMplsEndptPathEgrStatsOper    OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsEndptPathEgrStatsOper indicates the operational
+         state of egress statistics for endpoint config."
+    ::= { vRtrMplsEndptPathEntry 17 }
+
+vRtrMplsEndptPathNhgTable        OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrMplsEndptPathNhgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsEndptPathNhgTable has an entry for each next-hop group
+         associated with an endpoint path."
+    ::= { tmnxMplsObjs 80 }
+
+vRtrMplsEndptPathNhgEntry        OBJECT-TYPE
+    SYNTAX      VRtrMplsEndptPathNhgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a next-hop group associated with an endpoint
+         path.
+
+         Entries cannot be created and deleted via SNMP SET operations."
+    INDEX       {
+        vRtrMplsEndptPathOwner,
+        vRtrID,
+        vRtrMplsEndptAddrType,
+        vRtrMplsEndptAddress,
+        vRtrMplsEndptPathId,
+        vRtrMplsEndptPathNhgIndex
+    }
+    ::= { vRtrMplsEndptPathNhgTable 1 }
+
+VRtrMplsEndptPathNhgEntry        ::= SEQUENCE
+{
+    vRtrMplsEndptPathNhgIndex        Unsigned32,
+    vRtrMplsEndptPathNhgOperState    TmnxOperState,
+    vRtrMplsEndptPathNhgResType      INTEGER,
+    vRtrMplsEndptPathNhgLoadBalWt    Unsigned32,
+    vRtrMplsEndptPathNhgFailovrCnt   Counter32,
+    vRtrMplsEndptPathNhgRevertCnt    Counter32,
+    vRtrMplsEndptPathNhgRevTimeRem   Counter32,
+    vRtrMplsEndptPathNhgDownReason   TmnxNhgDownReason,
+    vRtrMplsEndptPathNhgWeights      Unsigned32
+}
+
+vRtrMplsEndptPathNhgIndex        OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..32)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsEndptPathNhgIndex indicates the next-hop group
+         index."
+    ::= { vRtrMplsEndptPathNhgEntry 1 }
+
+vRtrMplsEndptPathNhgOperState    OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsEndptPathNhgOperState indicates the operational
+         state of this next-hop group."
+    ::= { vRtrMplsEndptPathNhgEntry 2 }
+
+vRtrMplsEndptPathNhgResType      OBJECT-TYPE
+    SYNTAX      INTEGER {
+        direct   (1),
+        indirect (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsEndptPathNhgResType indicates the resolution type
+         of next-hop group.
+
+         When the value of vRtrMplsEndptPathNhgResType is 'direct', the
+         next-hops in this group must resolve to direct routes for for them to
+         be operational.
+
+         When the value of vRtrMplsEndptPathNhgResType is 'indirect', the
+         next-hops in this group must resolve to indirect routes for for them
+         to be operational."
+    ::= { vRtrMplsEndptPathNhgEntry 3 }
+
+vRtrMplsEndptPathNhgLoadBalWt    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsEndptPathNhgLoadBalWt indicates the
+         load-balancing weight for this next-hop group."
+    ::= { vRtrMplsEndptPathNhgEntry 4 }
+
+vRtrMplsEndptPathNhgFailovrCnt   OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsEndptPathNhgFailovrCnt indicates the number of
+         failovers from primary to backup next-hop for this next-hop group"
+    ::= { vRtrMplsEndptPathNhgEntry 5 }
+
+vRtrMplsEndptPathNhgRevertCnt    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsEndptPathNhgRevertCnt indicates the number of
+         reverts from backup to primary next-hop for this next-hop group."
+    ::= { vRtrMplsEndptPathNhgEntry 6 }
+
+vRtrMplsEndptPathNhgRevTimeRem   OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsEndptPathNhgRevTimeRem indicates the time
+         remaining to revert from backup to primary  next-hop."
+    ::= { vRtrMplsEndptPathNhgEntry 7 }
+
+vRtrMplsEndptPathNhgDownReason   OBJECT-TYPE
+    SYNTAX      TmnxNhgDownReason
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsEndptPathNhgDownReason indicates the reason for
+         the path NHG being operationally down."
+    ::= { vRtrMplsEndptPathNhgEntry 8 }
+
+vRtrMplsEndptPathNhgWeights      OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsEndptPathNhgWeights indicates the weights for the
+         path next hop group."
+    ::= { vRtrMplsEndptPathNhgEntry 9 }
+
+vRtrMplsEndptPathNhgNHTable      OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrMplsEndptPathNhgNHEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsEndptPathNhgNHTable has an entry for each next-hop in a
+         next-hop group associated with an endpoint path."
+    ::= { tmnxMplsObjs 81 }
+
+vRtrMplsEndptPathNhgNHEntry      OBJECT-TYPE
+    SYNTAX      VRtrMplsEndptPathNhgNHEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a next-hop for a next-hop  group associated
+         with an endpoint path.
+
+         Entries cannot be created and deleted via SNMP SET operations."
+    INDEX       {
+        vRtrMplsEndptPathOwner,
+        vRtrID,
+        vRtrMplsEndptAddrType,
+        vRtrMplsEndptAddress,
+        vRtrMplsEndptPathId,
+        vRtrMplsEndptPathNhgIndex,
+        vRtrMplsEndptPathNhgNHType
+    }
+    ::= { vRtrMplsEndptPathNhgNHTable 1 }
+
+VRtrMplsEndptPathNhgNHEntry      ::= SEQUENCE
+{
+    vRtrMplsEndptPathNhgNHType       INTEGER,
+    vRtrMplsEndptPathNhgNHAddrType   InetAddressType,
+    vRtrMplsEndptPathNhgNHAddr       InetAddress,
+    vRtrMplsEndptPathNhgNHResolved   TruthValue,
+    vRtrMplsEndptPathNhgNHOutIf      InterfaceIndexOrZero,
+    vRtrMplsEndptPathNhgNHDownCode   TmnxNhgDownReason,
+    vRtrMplsEndptPathNhgNHEgrOper    TmnxOperState
+}
+
+vRtrMplsEndptPathNhgNHType       OBJECT-TYPE
+    SYNTAX      INTEGER {
+        primary (1),
+        backup  (2)
+    }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsEndptPathNhgNHType specifies the type of
+         next-hop.
+
+         When the value of vRtrMplsEndptPathNhgNHType is set to 'primary', this
+         next-hop will be the primary next-hop in the next-hop group.
+
+         When the value of vRtrMplsEndptPathNhgNHType is set to 'backup', this
+         next-hop will be the backup next-hop in the next-hop group."
+    ::= { vRtrMplsEndptPathNhgNHEntry 1 }
+
+vRtrMplsEndptPathNhgNHAddrType   OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsEndptPathNhgNHAddrType indicates the address type
+         of the next-hop."
+    ::= { vRtrMplsEndptPathNhgNHEntry 2 }
+
+vRtrMplsEndptPathNhgNHAddr       OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsEndptPathNhgNHAddr indicates the address of the
+         next-hop."
+    ::= { vRtrMplsEndptPathNhgNHEntry 3 }
+
+vRtrMplsEndptPathNhgNHResolved   OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsEndptPathNhgNHResolved indicates if next-hop is
+         resolved or not."
+    ::= { vRtrMplsEndptPathNhgNHEntry 4 }
+
+vRtrMplsEndptPathNhgNHOutIf      OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsEndptPathNhgNHOutIf indicates the index of the
+         outgoing interface that the next-hop resolved to if it is a direct
+         next-hop.
+
+         A value of 0 indicates that either the next-hop is not resolved or
+         that the next-hop is indirect."
+    ::= { vRtrMplsEndptPathNhgNHEntry 5 }
+
+vRtrMplsEndptPathNhgNHDownCode   OBJECT-TYPE
+    SYNTAX      TmnxNhgDownReason
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsEndptPathNhgNHDownCode indicates the reason for
+         the path NHG NH being not resolved."
+    ::= { vRtrMplsEndptPathNhgNHEntry 6 }
+
+vRtrMplsEndptPathNhgNHEgrOper    OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsEndptPathNhgNHEgrOper indicates the operational
+         state of the egress stats in this next-hop group next hop."
+    ::= { vRtrMplsEndptPathNhgNHEntry 7 }
+
+vRtrMplsFwdPlcyNhgNHPushLblTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrMplsFwdPlcyNhgNHPushLblEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsFwdPlcyNhgNHPushLblTable has an entry for each label to be
+         pushed onto the packet on the nexthop configured in the system. This
+         table augments the vRtrMplsFwdPlcyNhgNHTable."
+    ::= { tmnxMplsObjs 82 }
+
+vRtrMplsFwdPlcyNhgNHPushLblEntry OBJECT-TYPE
+    SYNTAX      VRtrMplsFwdPlcyNhgNHPushLblEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a label to be pushed onto the packet  on the
+         nexthop configured for a virtual router in the system.
+
+         Entries can be created and deleted via SNMP SET operations."
+    AUGMENTS    { vRtrMplsFwdPlcyNhgNHEntry }
+    ::= { vRtrMplsFwdPlcyNhgNHPushLblTable 1 }
+
+VRtrMplsFwdPlcyNhgNHPushLblEntry ::= SEQUENCE
+{
+    vRtrMplsFwdPlcyNhgNHPushLabel1   Unsigned32,
+    vRtrMplsFwdPlcyNhgNHPushLabel2   Unsigned32,
+    vRtrMplsFwdPlcyNhgNHPushLabel3   Unsigned32,
+    vRtrMplsFwdPlcyNhgNHPushLabel4   Unsigned32,
+    vRtrMplsFwdPlcyNhgNHPushLabel5   Unsigned32,
+    vRtrMplsFwdPlcyNhgNHPushLabel6   Unsigned32,
+    vRtrMplsFwdPlcyNhgNHPushLabel7   Unsigned32,
+    vRtrMplsFwdPlcyNhgNHPushLabel8   Unsigned32,
+    vRtrMplsFwdPlcyNhgNHPushLabel9   Unsigned32,
+    vRtrMplsFwdPlcyNhgNHPushLabel10  Unsigned32
+}
+
+vRtrMplsFwdPlcyNhgNHPushLabel1   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsFwdPlcyNhgNHPushLabel1 indicates the 10th label
+         to be pushed onto the packet on this nexthop."
+    DEFVAL      { 0 }
+    ::= { vRtrMplsFwdPlcyNhgNHPushLblEntry 1 }
+
+vRtrMplsFwdPlcyNhgNHPushLabel2   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsFwdPlcyNhgNHPushLabel2 indicates the 9th label to
+         be pushed onto the packet on this nexthop."
+    DEFVAL      { 0 }
+    ::= { vRtrMplsFwdPlcyNhgNHPushLblEntry 2 }
+
+vRtrMplsFwdPlcyNhgNHPushLabel3   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsFwdPlcyNhgNHPushLabel3 indicates the 8th label to
+         be pushed onto the packet on this nexthop."
+    DEFVAL      { 0 }
+    ::= { vRtrMplsFwdPlcyNhgNHPushLblEntry 3 }
+
+vRtrMplsFwdPlcyNhgNHPushLabel4   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsFwdPlcyNhgNHPushLabel4 indicates the 7th label to
+         be pushed onto the packet on this nexthop."
+    DEFVAL      { 0 }
+    ::= { vRtrMplsFwdPlcyNhgNHPushLblEntry 4 }
+
+vRtrMplsFwdPlcyNhgNHPushLabel5   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsFwdPlcyNhgNHPushLabel5 indicates the 6th label to
+         be pushed onto the packet on this nexthop."
+    DEFVAL      { 0 }
+    ::= { vRtrMplsFwdPlcyNhgNHPushLblEntry 5 }
+
+vRtrMplsFwdPlcyNhgNHPushLabel6   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsFwdPlcyNhgNHPushLabel6 indicates the 5th label to
+         be pushed onto the packet on this nexthop."
+    DEFVAL      { 0 }
+    ::= { vRtrMplsFwdPlcyNhgNHPushLblEntry 6 }
+
+vRtrMplsFwdPlcyNhgNHPushLabel7   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsFwdPlcyNhgNHPushLabel7 indicates the 4th label to
+         be pushed onto the packet on this nexthop."
+    DEFVAL      { 0 }
+    ::= { vRtrMplsFwdPlcyNhgNHPushLblEntry 7 }
+
+vRtrMplsFwdPlcyNhgNHPushLabel8   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsFwdPlcyNhgNHPushLabel8 indicates the 3rd label to
+         be pushed onto the packet on this nexthop."
+    DEFVAL      { 0 }
+    ::= { vRtrMplsFwdPlcyNhgNHPushLblEntry 8 }
+
+vRtrMplsFwdPlcyNhgNHPushLabel9   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsFwdPlcyNhgNHPushLabel9 indicates the 2nd label to
+         be pushed onto the packet on this nexthop."
+    DEFVAL      { 0 }
+    ::= { vRtrMplsFwdPlcyNhgNHPushLblEntry 9 }
+
+vRtrMplsFwdPlcyNhgNHPushLabel10  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsFwdPlcyNhgNHPushLabel10 indicates the 1st label
+         to be pushed onto the packet on this nexthop."
+    DEFVAL      { 0 }
+    ::= { vRtrMplsFwdPlcyNhgNHPushLblEntry 10 }
+
+vRtrMplsBindLblPathNhgNHPLTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrMplsBindLblPathNhgNHPLEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsBindLblPathNhgNHPLTable has an entry for each push label
+         for a next-hop type associated with next-hop group with a binding
+         label path configured in the system."
+    ::= { tmnxMplsObjs 83 }
+
+vRtrMplsBindLblPathNhgNHPLEntry  OBJECT-TYPE
+    SYNTAX      VRtrMplsBindLblPathNhgNHPLEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a push label for a next-hop type associated
+         with next-hop group with a binding label path, configured for a
+         virtual router in the system."
+    INDEX       {
+        vRtrMplsBindLblPathOwner,
+        vRtrID,
+        vRtrMplsBindLbl,
+        vRtrMplsBindLblPathId,
+        vRtrMplsBindLblPathNhgIndex,
+        vRtrMplsBindLblPathNhgNHType,
+        vRtrMplsBindLblPathNHgNHPLIndex
+    }
+    ::= { vRtrMplsBindLblPathNhgNHPLTable 1 }
+
+VRtrMplsBindLblPathNhgNHPLEntry  ::= SEQUENCE
+{
+    vRtrMplsBindLblPathNHgNHPLIndex  Unsigned32,
+    vRtrMplsBindLblPathNHgNHPLabel   Unsigned32
+}
+
+vRtrMplsBindLblPathNHgNHPLIndex  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsBindLblPathNHgNHPLIndex specifies  the index
+         associated with the push label."
+    ::= { vRtrMplsBindLblPathNhgNHPLEntry 1 }
+
+vRtrMplsBindLblPathNHgNHPLabel   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsBindLblPathNHgNHPLabel specifies  the label
+         number for push label."
+    ::= { vRtrMplsBindLblPathNhgNHPLEntry 2 }
+
+vRtrMplsEndptPathNhgNHPLlbTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrMplsEndptPathNhgNHPLlbEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsEndptPathNhgNHPLlbTable has an entry for each push label
+         for a next-hop type associated with next-hop group with an endpoint
+         address configured in the system."
+    ::= { tmnxMplsObjs 84 }
+
+vRtrMplsEndptPathNhgNHPLlbEntry  OBJECT-TYPE
+    SYNTAX      VRtrMplsEndptPathNhgNHPLlbEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a push label for a next-hop type associated
+         with next-hop group with an endpoint address, configured for a virtual
+         router in the system."
+    INDEX       {
+        vRtrMplsEndptPathOwner,
+        vRtrID,
+        vRtrMplsEndptAddrType,
+        vRtrMplsEndptAddress,
+        vRtrMplsEndptPathId,
+        vRtrMplsEndptPathNhgIndex,
+        vRtrMplsEndptPathNhgNHType,
+        vRtrMplsEndptPathNhgNHPLblIndex
+    }
+    ::= { vRtrMplsEndptPathNhgNHPLlbTable 1 }
+
+VRtrMplsEndptPathNhgNHPLlbEntry  ::= SEQUENCE
+{
+    vRtrMplsEndptPathNhgNHPLblIndex  Unsigned32,
+    vRtrMplsEndptPathNhgNHPLabel     Unsigned32
+}
+
+vRtrMplsEndptPathNhgNHPLblIndex  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsEndptPathNhgNHPLblIndex specifies  the index
+         associated with the push label."
+    ::= { vRtrMplsEndptPathNhgNHPLlbEntry 1 }
+
+vRtrMplsEndptPathNhgNHPLabel     OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsEndptPathNhgNHPLabel specifies  the label number
+         for push label."
+    ::= { vRtrMplsEndptPathNhgNHPLlbEntry 2 }
+
+vRtrMplsPceInitGenTblLastChg     OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsPceInitGenTblLastChg indicates the sysUpTime at
+         the time of the last modification of an entry in the
+         vRtrMplsPceInitGenTable."
+    ::= { tmnxMplsObjs 85 }
+
+vRtrMplsPceInitGenTable          OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrMplsPceInitGenEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsPceInitGenTable has an entry for per router instance  for
+         PCE initiated LSPs on the system."
+    ::= { tmnxMplsObjs 86 }
+
+vRtrMplsPceInitGenEntry          OBJECT-TYPE
+    SYNTAX      VRtrMplsPceInitGenEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry represents paramters for PCE initiated LSPs on  the system.
+
+         Entries can be created and deleted via SNMP SET operations."
+    INDEX       { vRtrID }
+    ::= { vRtrMplsPceInitGenTable 1 }
+
+VRtrMplsPceInitGenEntry          ::= SEQUENCE
+{
+    vRtrMplsPceInitGenRowStatus      RowStatus,
+    vRtrMplsPceInitGenSrte           TruthValue,
+    vRtrMplsPceInitGenSrteAdminState TmnxAdminState,
+    vRtrMplsPceInitGenSrteOperState  TmnxOperState,
+    vRtrMplsPceInitGenSrteOperDnRsn  INTEGER
+}
+
+vRtrMplsPceInitGenRowStatus      OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The row status used for creation, deletion, or control of
+         vRtrMplsPceInitGenTable entries."
+    ::= { vRtrMplsPceInitGenEntry 1 }
+
+vRtrMplsPceInitGenSrte           OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsPceInitGenSrte specifies if PCE initiated  SR-TE
+         LSPs are supported on the system"
+    DEFVAL      { false }
+    ::= { vRtrMplsPceInitGenEntry 2 }
+
+vRtrMplsPceInitGenSrteAdminState OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsPceInitGenSrteAdminState specifies the
+         administrative state of PCE initiated SR-TE LSPs on the system.
+
+         The value of vRtrMplsPceInitGenSrteAdminState is valid only if the
+         value of vRtrMplsPceInitGenSrte is set to 'true'."
+    DEFVAL      { outOfService }
+    ::= { vRtrMplsPceInitGenEntry 3 }
+
+vRtrMplsPceInitGenSrteOperState  OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsPceInitGenSrteOperState indicates  the
+         operational state of PCE initiated SR-TE LSPs on the system.
+
+         The value of vRtrMplsPceInitGenSrteOperState is valid only if the
+         value of vRtrMplsPceInitGenSrte is set to 'true'."
+    ::= { vRtrMplsPceInitGenEntry 4 }
+
+vRtrMplsPceInitGenSrteOperDnRsn  OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notApplicable (0),
+        adminDown     (1),
+        mplsOperDown  (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsPceInitGenSrteOperDnRsn indicates the reason due
+         to which PCE Init SRTE LSP are operationally down."
+    ::= { vRtrMplsPceInitGenEntry 5 }
+
+vRtrMplsBindLblNHEgrStatsTable   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrMplsBindLblNHEgrStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsBindLblNHEgrStatsTable has an entry for egress statistics
+         for each next-hop in a next-hop group associated with a binding label
+         path."
+    ::= { tmnxMplsObjs 87 }
+
+vRtrMplsBindLblNHEgrStatsEntry   OBJECT-TYPE
+    SYNTAX      VRtrMplsBindLblNHEgrStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a next-hop for a next-hop  group associated
+         with a binding label path.
+
+         Entries cannot be created and deleted via SNMP SET operations."
+    AUGMENTS    { vRtrMplsBindLblPathNhgNHEntry }
+    ::= { vRtrMplsBindLblNHEgrStatsTable 1 }
+
+VRtrMplsBindLblNHEgrStatsEntry   ::= SEQUENCE
+{
+    vRtrMplsBindLblEgrStatsAggPkts   Counter64,
+    vRtrMplsBindLblEgrStatsAggOctets Counter64
+}
+
+vRtrMplsBindLblEgrStatsAggPkts   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total of number of egress packets for this binding label path
+         next-hop group next-hop."
+    ::= { vRtrMplsBindLblNHEgrStatsEntry 1 }
+
+vRtrMplsBindLblEgrStatsAggOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total of number of egress octets for this binding label path
+         next-hop group next-hop"
+    ::= { vRtrMplsBindLblNHEgrStatsEntry 2 }
+
+vRtrMplsEndptNHEgrStatsTable     OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrMplsEndptNHEgrStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsEndptNHEgrStatsTable has an entry for egress statistics
+         for each next-hop in a next-hop group associated with an endpoint
+         path."
+    ::= { tmnxMplsObjs 88 }
+
+vRtrMplsEndptNHEgrStatsEntry     OBJECT-TYPE
+    SYNTAX      VRtrMplsEndptNHEgrStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a next-hop for a next-hop  group associated
+         with an endpoint path.
+
+         Entries cannot be created and deleted via SNMP SET operations."
+    AUGMENTS    { vRtrMplsEndptPathNhgNHEntry }
+    ::= { vRtrMplsEndptNHEgrStatsTable 1 }
+
+VRtrMplsEndptNHEgrStatsEntry     ::= SEQUENCE
+{
+    vRtrMplsEndptEgrStatsAggPkts     Counter64,
+    vRtrMplsEndptEgrStatsAggOctets   Counter64
+}
+
+vRtrMplsEndptEgrStatsAggPkts     OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total of number of egress packets for this endpoint path next-hop
+         group next-hop."
+    ::= { vRtrMplsEndptNHEgrStatsEntry 1 }
+
+vRtrMplsEndptEgrStatsAggOctets   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total of number of egress octets for this endpoint path next-hop
+         group next-hop"
+    ::= { vRtrMplsEndptNHEgrStatsEntry 2 }
+
+vRtrMplsLspPathEgressStatsTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrMplsLspPathEgressStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsLspPathEgressStatsTable has an entry for egress statistics
+         associated with an LSP path."
+    ::= { tmnxMplsObjs 89 }
+
+vRtrMplsLspPathEgressStatsEntry  OBJECT-TYPE
+    SYNTAX      VRtrMplsLspPathEgressStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a collection of egress statistics for an LSP
+         path.
+
+         Entries cannot be created and deleted via SNMP SET operations. Entries
+         in this table are created when egress statistics is  enabled for an
+         LSP which supports per path egress statistics."
+    INDEX       {
+        vRtrID,
+        vRtrMplsLspIndex,
+        mplsTunnelIndex,
+        mplsTunnelInstance,
+        mplsTunnelIngressLSRId
+    }
+    ::= { vRtrMplsLspPathEgressStatsTable 1 }
+
+VRtrMplsLspPathEgressStatsEntry  ::= SEQUENCE
+{
+    vRtrMplsLspPathEgrStatsOperState TmnxOperState,
+    vRtrMplsLspEgressStatsAggrPkts   Counter64,
+    vRtrMplsLspEgressStatsAggrOctets Counter64
+}
+
+vRtrMplsLspPathEgrStatsOperState OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspPathEgrStatsOperState indicates the
+         operational state of egress statistics for the LSP path."
+    ::= { vRtrMplsLspPathEgressStatsEntry 1 }
+
+vRtrMplsLspEgressStatsAggrPkts   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspEgressStatsAggrPkts indicates the total number
+         of egress packets for this LSP path"
+    ::= { vRtrMplsLspPathEgressStatsEntry 2 }
+
+vRtrMplsLspEgressStatsAggrOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspEgressStatsAggrOctets indicates the total
+         number of egress octets for this LSP path"
+    ::= { vRtrMplsLspPathEgressStatsEntry 3 }
+
+vRtrMplsPathHopTableLastChg      OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsPathHopTableLastChg indicates the sysUpTime at
+         the time of the last modification of an entry in the
+         vRtrMplsPathHopTable."
+    ::= { tmnxMplsObjs 90 }
+
+vRtrMplsPathHopTable             OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrMplsPathHopEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsPathHopTable has an entry to indicate the hops, strict or
+         loose, for an MPLS tunnel."
+    ::= { tmnxMplsObjs 91 }
+
+vRtrMplsPathHopEntry             OBJECT-TYPE
+    SYNTAX      VRtrMplsPathHopEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a hop, strict or loose, for an MPLS tunnel
+         configured for a virtual router in the system.
+
+         Entries can be created and deleted via SNMP SET operations."
+    INDEX       {
+        vRtrID,
+        vRtrMplsPathIndex,
+        vRtrMplsPathHopIndex
+    }
+    ::= { vRtrMplsPathHopTable 1 }
+
+VRtrMplsPathHopEntry             ::= SEQUENCE
+{
+    vRtrMplsPathIndex                Unsigned32,
+    vRtrMplsPathHopIndex             Unsigned32,
+    vRtrMplsPathHopRowStatus         RowStatus,
+    vRtrMplsPathHopLastChange        TimeStamp,
+    vRtrMplsPathHopAddrType          InetAddressType,
+    vRtrMplsPathHopAddr              InetAddress,
+    vRtrMplsPathHopStrictOrLoose     INTEGER,
+    vRtrMplsPathHopSidLabel          Unsigned32
+}
+
+vRtrMplsPathIndex                OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsPathIndex indicates the primary index  to
+         identify a particular explicit route object."
+    ::= { vRtrMplsPathHopEntry 1 }
+
+vRtrMplsPathHopIndex             OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsPathHopIndex indicates the secondary index to
+         identify a particular hop."
+    ::= { vRtrMplsPathHopEntry 2 }
+
+vRtrMplsPathHopRowStatus         OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The row status used for creation, deletion, or control of
+         vRtrMplsPathHopTable entries."
+    ::= { vRtrMplsPathHopEntry 3 }
+
+vRtrMplsPathHopLastChange        OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sysUpTime when this row was last modified."
+    ::= { vRtrMplsPathHopEntry 4 }
+
+vRtrMplsPathHopAddrType          OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsPathHopAddrType specifies the type of
+         vRtrMplsPathHopAddr."
+    DEFVAL      { unknown }
+    ::= { vRtrMplsPathHopEntry 5 }
+
+vRtrMplsPathHopAddr              OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsPathHopAddr specifies the hop address."
+    DEFVAL      { ''H }
+    ::= { vRtrMplsPathHopEntry 6 }
+
+vRtrMplsPathHopStrictOrLoose     OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notApplicable (0),
+        strict        (1),
+        loose         (2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsPathHopStrictOrLoose indicates whether this
+         tunnel hop is routed in a strict or loose fashion."
+    DEFVAL      { notApplicable }
+    ::= { vRtrMplsPathHopEntry 7 }
+
+vRtrMplsPathHopSidLabel          OBJECT-TYPE
+    SYNTAX      Unsigned32 (32..1048575 | 4294967295)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsPathHopSidLabel indicates the SID for this hop."
+    DEFVAL      { 4294967295 }
+    ::= { vRtrMplsPathHopEntry 8 }
 
 tmnxMplsConformance              OBJECT IDENTIFIER ::= { tmnxSRConfs 6 }
 
@@ -11971,6 +15195,44 @@ tmnxMplsV15v0Compliance          MODULE-COMPLIANCE
             tmnxMplsEntropyLabelSrteGroup
         }
     ::= { tmnxMplsCompliances 15 }
+
+tmnxMplsV16v0Compliance          MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of extended MPLS on Nokia SROS
+         series systems 16.0 Release."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxMplsReservedLblBlkGroup,
+            tmnxMplsIfAltStatsGroup,
+            vRtrMplsLspAdminTagGroup,
+            vRtrMplsFwdPlcyV16v0Group,
+            vRtrMplsFwdPlcyNhgNHPushLblGroup,
+            vRtrMplsPceInitSrteGroup,
+            vRtrMplsAutoBwUseLastAdjBWGroup
+        }
+    ::= { tmnxMplsCompliances 16 }
+
+tmnxMplsV19v0Compliance          MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of extended MPLS on Nokia SROS
+         series systems 19.0 Release."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxMplsGeneralSrTeLspGroup,
+            tmnxMplsFwdPlcyEgressStatsGroup,
+            tmnxMplsSrteSBfdGroup,
+            tmnxMplsGenMaxBypassPlrGroup,
+            tmnxMplsLspPathEgressStatsGroup,
+            tmnxMplsLspSelfPingGroup,
+            tmnxMplsLspNgAddrGroup,
+            tmnxMplsLspSrTeIpv6Group,
+            tmnxMplsPathHopGroup,
+            tmnxMplsLspSelfPingOperGroup,
+            tmnxMplsNotificationIPv6Group
+        }
+    ::= { tmnxMplsCompliances 17 }
 
 tmnxMplsGroups                   OBJECT IDENTIFIER ::= { tmnxMplsConformance 2 }
 
@@ -14031,6 +17293,354 @@ tmnxMplsEntropyLabelSrteGroup    OBJECT-GROUP
          Nokia SROS series systems 15.0 release."
     ::= { tmnxMplsGroups 93 }
 
+tmnxMplsReservedLblBlkGroup      OBJECT-GROUP
+    OBJECTS     {
+        vRtrMplsReservedLblBlkTblLastChg,
+        vRtrMplsReservedLblBlkRowStatus,
+        vRtrMplsReservedLblBlkLastChg,
+        vRtrMplsReservedLblBlkStartLbl,
+        vRtrMplsReservedLblBlkEndLbl
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects in MPLS supporting management of  reserved label
+         blocks on Nokia SROS series systems 16.0 release."
+    ::= { tmnxMplsGroups 94 }
+
+tmnxMplsIfAltStatsGroup          OBJECT-GROUP
+    OBJECTS     {
+        vRtrMplsIfAltTxPktCount,
+        vRtrMplsIfAltRxPktCount,
+        vRtrMplsIfAltTxOctetCount,
+        vRtrMplsIfAltRxOctetCount,
+        vRtrMplsGeneralAuxStats
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of extended MPLS
+         capabilities on Nokia SROS series systems release 16.0."
+    ::= { tmnxMplsGroups 95 }
+
+vRtrMplsLspAdminTagGroup         OBJECT-GROUP
+    OBJECTS     {
+        vRtrMplsLspAdminTagTblLastChg,
+        vRtrMplsLspAdminTagRowStatus,
+        vRtrMplsLspAdminTagLastChanged,
+        vRtrMplsLspTempAdminTagTblLstChg,
+        vRtrMplsLspTempAdminTagRowStatus,
+        vRtrMplsLspTempAdminTagLastChg
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects in MPLS supporting management of administrative
+         tags in LSP on Nokia SROS series systems 16.0 release."
+    ::= { tmnxMplsGroups 96 }
+
+vRtrMplsFwdPlcyV16v0Group        OBJECT-GROUP
+    OBJECTS     {
+        vRtrMplsFwdPlcyTblLastChg,
+        vRtrMplsFwdPlcyRowStatus,
+        vRtrMplsFwdPlcyLastChanged,
+        vRtrMplsFwdPlcyAdminState,
+        vRtrMplsFwdPlcyOperState,
+        vRtrMplsFwdPlcyBindingLabel,
+        vRtrMplsFwdPlcyEndpointAddrType,
+        vRtrMplsFwdPlcyEndpointAddr,
+        vRtrMplsFwdPlcyRevertTimer,
+        vRtrMplsFwdPlcyPreference,
+        vRtrMplsFwdPlcyNHGrpTblLastChg,
+        vRtrMplsFwdPlcyNHGrpRowStatus,
+        vRtrMplsFwdPlcyNHGrpLastChanged,
+        vRtrMplsFwdPlcyNHGrpAdminState,
+        vRtrMplsFwdPlcyNHGrpOperState,
+        vRtrMplsFwdPlcyNHGrpResType,
+        vRtrMplsFwdPlcyNHGrpLoadBalWt,
+        vRtrMplsFwdPlcyNhgNHTblLastChg,
+        vRtrMplsFwdPlcyNhgNHRowStatus,
+        vRtrMplsFwdPlcyNhgNHLastChanged,
+        vRtrMplsFwdPlcyNhgNHOperState,
+        vRtrMplsFwdPlcyNhgNHAddrType,
+        vRtrMplsFwdPlcyNhgNHAddr,
+        vRtrMplsFwdPlcyGenTblLastChg,
+        vRtrMplsFwdPlcyGenRowStatus,
+        vRtrMplsFwdPlcyGenLastChanged,
+        vRtrMplsFwdPlcyGenAdminState,
+        vRtrMplsFwdPlcyGenOperState,
+        vRtrMplsFwdPlcyGenOperDownReason,
+        vRtrMplsFwdPlcyGenReservedLblBlk,
+        vRtrMplsFwdPlcyStatsTblLastChg,
+        vRtrMplsFwdPlcyStatsRowStatus,
+        vRtrMplsFwdPlcyStatsLastChanged,
+        vRtrMplsFwdPlcyStatsAdminState,
+        vRtrMplsBindLblPathName,
+        vRtrMplsBindLblPathOperState,
+        vRtrMplsBindLblPathLastOperChg,
+        vRtrMplsBindLblOperDownReason,
+        vRtrMplsBindLblPathNumNHGrpCnt,
+        vRtrMplsBindLblPathRetryCount,
+        vRtrMplsBindLblPathRetryTimeRem,
+        vRtrMplsBindLblPathRevertTimer,
+        vRtrMplsBindLblPathIngStatsEnabl,
+        vRtrMplsBindLblPathPref,
+        vRtrMplsBLPathIngStatOperState,
+        vRtrMplsBindLblPathNhgOperState,
+        vRtrMplsBindLblPathNHgResType,
+        vRtrMplsBindLblPathNhgLoadBalWt,
+        vRtrMplsBindLblPathNhgFailovrCnt,
+        vRtrMplsBindLblPathNhgRevertCnt,
+        vRtrMplsBindLblPathNhgRevTimeRem,
+        vRtrMplsBindLblPathNhgNHAddrType,
+        vRtrMplsBindLblPathNhgNHAddr,
+        vRtrMplsBindLblPathNhgNHResolved,
+        vRtrMplsBindLblPathNhgNHOutIf,
+        vRtrMplsBindLblPathNhgDownReason,
+        vRtrMplsBindLblPathNhgNHDownCode,
+        vRtrMplsBindLblIngrAggPkts,
+        vRtrMplsBindLblIngrAggOctets,
+        vRtrMplsEndptPathName,
+        vRtrMplsEndptPathOperState,
+        vRtrMplsEndptPathLastOperChg,
+        vRtrMplsEndptPathOperDownReason,
+        vRtrMplsEndptPathNHGrpCnt,
+        vRtrMplsEndptPathRetryCount,
+        vRtrMplsEndptPathRetryTimeRem,
+        vRtrMplsEndptPathRevertTimer,
+        vRtrMplsEndptPathPref,
+        vRtrMplsEndptPathTTMPref,
+        vRtrMplsEndptPathNhgOperState,
+        vRtrMplsEndptPathNhgResType,
+        vRtrMplsEndptPathNhgLoadBalWt,
+        vRtrMplsEndptPathNhgFailovrCnt,
+        vRtrMplsEndptPathNhgRevertCnt,
+        vRtrMplsEndptPathNhgRevTimeRem,
+        vRtrMplsEndptPathNhgDownReason,
+        vRtrMplsEndptPathNhgNHAddrType,
+        vRtrMplsEndptPathNhgNHAddr,
+        vRtrMplsEndptPathNhgNHResolved,
+        vRtrMplsEndptPathNhgNHOutIf,
+        vRtrMplsEndptPathNhgNHDownCode,
+        vRtrMplsEndptPathMetric,
+        vRtrMplsBindLblPathNHgNHPLabel,
+        vRtrMplsEndptPathNhgNHPLabel,
+        vRtrMplsBindLblPathNhgWeights,
+        vRtrMplsEndptPathNhgWeights
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects in MPLS supporting management of Forwarding
+         Policies on Nokia SROS series systems 16.0 release."
+    ::= { tmnxMplsGroups 97 }
+
+vRtrMplsFwdPlcyNhgNHPushLblGroup OBJECT-GROUP
+    OBJECTS     {
+        vRtrMplsFwdPlcyNhgNHPushLabel1,
+        vRtrMplsFwdPlcyNhgNHPushLabel2,
+        vRtrMplsFwdPlcyNhgNHPushLabel3,
+        vRtrMplsFwdPlcyNhgNHPushLabel4,
+        vRtrMplsFwdPlcyNhgNHPushLabel5,
+        vRtrMplsFwdPlcyNhgNHPushLabel6,
+        vRtrMplsFwdPlcyNhgNHPushLabel7,
+        vRtrMplsFwdPlcyNhgNHPushLabel8,
+        vRtrMplsFwdPlcyNhgNHPushLabel9,
+        vRtrMplsFwdPlcyNhgNHPushLabel10,
+        vRtrMplsFwdPlcyMetric,
+        vRtrMplsFwdPlcyTtmPreference
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects in MPLS supporting management of
+          Pushed-Labels on Nokia SROS series systems 16.0 release."
+    ::= { tmnxMplsGroups 98 }
+
+vRtrMplsPceInitSrteGroup         OBJECT-GROUP
+    OBJECTS     {
+        vRtrMplsLspTemplateId,
+        vRtrMplsPceInitGenTblLastChg,
+        vRtrMplsPceInitGenRowStatus,
+        vRtrMplsPceInitGenSrte,
+        vRtrMplsPceInitGenSrteAdminState,
+        vRtrMplsPceInitGenSrteOperState,
+        vRtrMplsGenPceInitP2PSrTeLspOrig,
+        vRtrMplsPceInitGenSrteOperDnRsn
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects in MPLS supporting management of PCE INIT LSPs on
+         Nokia SROS series systems 16.0 release."
+    ::= { tmnxMplsGroups 99 }
+
+vRtrMplsAutoBwUseLastAdjBWGroup  OBJECT-GROUP
+    OBJECTS     {
+        vRtrMplsLspAutoBWUseLastAdjBW,
+        vRtrMplsLspAutoBWSecRetryLimit,
+        vRtrMplsLspAutoBWLastAdjBW
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notification supporting MPLS Auto-Bandwidth last
+         adjusted use bandwidth on Nokia SROS series systems 16.0 Release."
+    ::= { tmnxMplsGroups 100 }
+
+tmnxMplsGeneralSrTeLspGroup      OBJECT-GROUP
+    OBJECTS     {
+        vRtrMplsGenSrTeResignalTimer,
+        vRtrMplsLspExtPathCompMeth,
+        vRtrMplsLspExtMetricType,
+        vRtrMplsLspExtLocalSrProt,
+        vRtrMplsLspExtLabelStackRed,
+        vRtrMplsLspTempPathCompMeth,
+        vRtrMplsLspTempMetricType,
+        vRtrMplsLspTempLocalSrProt,
+        vRtrMplsLspTempLabelStackRed,
+        vRtrMplsLspPathOperCompMeth,
+        vRtrMplsLspPathOperMetricType,
+        vRtrMplsLspPathOperLocalSrProt,
+        vRtrMplsLspPathOperLabelStackRed,
+        vRtrMplsGenSrTeResigOnIgpEvent,
+        vRtrMplsGenSrteNextResignal
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects in MPLS supporting management of SR-TE LSP
+         resignal timers on Nokia SROS series systems 19.0 release."
+    ::= { tmnxMplsGroups 101 }
+
+tmnxMplsFwdPlcyEgressStatsGroup  OBJECT-GROUP
+    OBJECTS     {
+        vRtrMplsBindLblPathNhgNHEgrOper,
+        vRtrMplsBindLblEgrStatsAggPkts,
+        vRtrMplsBindLblEgrStatsAggOctets,
+        vRtrMplsBindLblPathEgrStatsEnabl,
+        vRtrMplsBLPathEgrStatOperState,
+        vRtrMplsEndptPathNhgNHEgrOper,
+        vRtrMplsEndptEgrStatsAggPkts,
+        vRtrMplsEndptEgrStatsAggOctets,
+        vRtrMplsEndptPathEgrStatsEnabl,
+        vRtrMplsEndptPathEgrStatsOper
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects in MPLS supporting management of Forwarding
+         Policy Egress Statistics on Nokia SROS  series systems 19.0 release."
+    ::= { tmnxMplsGroups 102 }
+
+tmnxMplsSrteSBfdGroup            OBJECT-GROUP
+    OBJECTS     {
+        vRtrMplsLspExtBfdUpWaitTimer,
+        vRtrMplsLspPathBfdUpWaitTimer,
+        vRtrMplsLspPathBfdUpWaitTmLeft,
+        vRtrMplsLspPathBfdState,
+        vRtrMplsLspPathBfdStartFailRsn,
+        vRtrMplsLspTempBfdUpWaitTimer,
+        vRtrMplsLspPathBfdOperUpWaitTmr
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects in MPLS supporting management of SR-TE SBFD on
+         Nokia SROS series systems 19.0 release."
+    ::= { tmnxMplsGroups 103 }
+
+tmnxMplsGenMaxBypassPlrGroup     OBJECT-GROUP
+    OBJECTS     {
+        vRtrMplsGenMaxBypassPlrAssoc
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects in MPLS supporting management of Max Bypass PLR
+         Associations on Nokia SROS series systems 19.0 release."
+    ::= { tmnxMplsGroups 104 }
+
+tmnxMplsLspPathEgressStatsGroup  OBJECT-GROUP
+    OBJECTS     {
+        vRtrMplsLspPathEgrStatsOperState,
+        vRtrMplsLspEgressStatsAggrPkts,
+        vRtrMplsLspEgressStatsAggrOctets
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects in MPLS supporting management of LSP egress
+         statistics on Nokia SROS series  systems 19.0 release."
+    ::= { tmnxMplsGroups 105 }
+
+tmnxMplsLspSelfPingGroup         OBJECT-GROUP
+    OBJECTS     {
+        vRtrMplsGenLspSelfPingInterval,
+        vRtrMplsGenLspSelfPingTimeout,
+        vRtrMplsGenLspSelfPingRsvpTe,
+        vRtrMplsLspTempSelfPing,
+        vRtrMplsLspExtSelfPing
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects in MPLS supporting management of SR-TE SBFD on
+         Nokia SROS series systems 19.0 release."
+    ::= { tmnxMplsGroups 106 }
+
+tmnxMplsLspSrTeIpv6Group         OBJECT-GROUP
+    OBJECTS     {
+        vRtrMplsGeneralV6OperState,
+        vRtrMplsGeneralV6OperDownReason,
+        vRtrMplsIfV6OperState
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects in MPLS supporting management of SR-TE IPV6
+         address on Nokia SROS series systems 19.0 release."
+    ::= { tmnxMplsGroups 107 }
+
+tmnxMplsPathHopGroup             OBJECT-GROUP
+    OBJECTS     {
+        vRtrMplsPathHopTableLastChg,
+        vRtrMplsPathHopRowStatus,
+        vRtrMplsPathHopLastChange,
+        vRtrMplsPathHopAddrType,
+        vRtrMplsPathHopAddr,
+        vRtrMplsPathHopStrictOrLoose,
+        vRtrMplsPathHopSidLabel
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects in MPLS supporting management of MPLS hops on
+         Nokia SROS series systems 19.0 release."
+    ::= { tmnxMplsGroups 108 }
+
+tmnxMplsLspNgAddrGroup           OBJECT-GROUP
+    OBJECTS     {
+        vRtrMplsLspNgFromAddr,
+        vRtrMplsLspNgToAddr,
+        vRtrMplsTunnelARHopNgRouterId,
+        vRtrMplsLspPathNgFNAddrType,
+        vRtrMplsLspPathNgFNAddr
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects in MPLS supporting management of Ng to/from
+         address on Nokia SROS series systems 19.0 release."
+    ::= { tmnxMplsGroups 109 }
+
+tmnxMplsLspSelfPingOperGroup     OBJECT-GROUP
+    OBJECTS     {
+        vRtrMplsGenLspSelfPingTimeouts,
+        vRtrMplsLspSelfPingTimeouts,
+        vRtrMplsLspPathSelfPingOprState
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of operational objects in MPLS supporting management of
+         SR-TE SBFD on Nokia SROS series systems 19.0 release."
+    ::= { tmnxMplsGroups 110 }
+
+tmnxMplsNotificationIPv6Group    NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        vRtrMplsIPv6StateChange,
+        vRtrMplsIfIPv6StateChange
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notifications supporting the MPLS IPv6 on Nokia SROS
+         series systems 19.10 Release."
+    ::= { tmnxMplsGroups 111 }
+
 tmnxMplsNotifyPrefix             OBJECT IDENTIFIER ::= { tmnxSRNotifyPrefix 6 }
 
 tmnxMplsNotifications            OBJECT IDENTIFIER ::= { tmnxMplsNotifyPrefix 0 }
@@ -14407,5 +18017,38 @@ vRtrMplsNodeInIgpOverload        NOTIFICATION-TYPE
 
          [RECOVERY] There is no recovery required for this notification."
     ::= { tmnxMplsNotifications 24 }
+
+vRtrMplsIPv6StateChange          NOTIFICATION-TYPE
+    OBJECTS     {
+        vRtrID,
+        vRtrMplsGeneralAdminState,
+        vRtrMplsGeneralV6OperState
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The vRtrMplsIPv6StateChange notification is generated when
+         MPLS protocol instance changes state.
+
+         [EFFECT] The SR-TE LSPs with IPv6 addresses transition state.
+
+         [RECOVERY] There is no recovery required for this notification."
+    ::= { tmnxMplsNotifications 25 }
+
+vRtrMplsIfIPv6StateChange        NOTIFICATION-TYPE
+    OBJECTS     {
+        vRtrID,
+        vRtrIfIndex,
+        vRtrMplsIfAdminState,
+        vRtrMplsIfV6OperState
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The vRtrMplsIPv6StateChange notification is generated when
+         MPLS interface changes state.
+
+         [EFFECT] The SR-TE LSPs with IPv6 addresses transition state.
+
+         [RECOVERY] There is no recovery required for this notification."
+    ::= { tmnxMplsNotifications 26 }
 
 END

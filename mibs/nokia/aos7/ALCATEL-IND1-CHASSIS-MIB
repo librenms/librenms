@@ -66,6 +66,10 @@ alcatelIND1ChassisMIB MODULE-IDENTITY
                    Copyright (C) 1995-2007 Alcatel-Lucent
                        ALL RIGHTS RESERVED WORLDWIDE"
 
+        REVISION      "201409020000Z"
+        DESCRIPTION
+            "Added chasEntPhysFanSpeed object."
+
         REVISION      "201110310000Z"
         DESCRIPTION
             "Added changes for virtual chassis."
@@ -202,8 +206,21 @@ alcatelIND1ChassisMIB MODULE-IDENTITY
                 {
                     bpsPsPlugged                 (1),
                     bpsPsUnPlugged               (2),
-                    notApplicable                (3)
+                    bpsModeChanged               (3),
+                    notApplicable                (4)
                }
+
+        ChasTrapsBPSFwType ::= TEXTUAL-CONVENTION
+        STATUS   current
+        DESCRIPTION
+        "Textual convention for BPS FW upgrade requirment alert"
+        SYNTAX  INTEGER 
+                {
+                    bpsFwCmcu             (1),
+                    bpsFwMmcu             (2),
+                    bpsFwCpld             (3),
+                    notApplicable         (4)
+                }
 
 
 -- CONTROL MODULE TABLE
@@ -598,7 +615,8 @@ ChasChassisEntry ::= SEQUENCE
         chasNI6HardwareBoardTemp    Integer32,
         chasNI7HardwareBoardTemp    Integer32,
         chasNI8HardwareBoardTemp    Integer32,
-        chasPowerSupplyRedundancy   INTEGER
+        chasPowerSupplyRedundancy   INTEGER,
+        chasPowerSupplyRedundancyReserve  INTEGER
     }
 
 
@@ -877,9 +895,44 @@ chasPowerSupplyRedundancy       OBJECT-TYPE
          efficient use of the power supplies, with 1 extra power supply
          in case of a power supply failure. Unneeded power supplies are
          powered off. It can be set to off(2) to disable redundancy mode.
-         In this mode all power supplies are powered on."
+         In this mode all power supplies are powered on.
+         This object is applicable only to OS10K devices."
     DEFVAL   { on }
 ::= { chasChassisEntry 24 }
+
+chasPowerSupplyRedundancyReserve       OBJECT-TYPE
+    SYNTAX INTEGER
+    {
+       on(1),
+       off(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When chasPowerSupplyRedundancyReserve is enabled, N+1 power supply 
+         redundancy reserve holds the wattage of one power supply in reserve 
+         such that the user cannot insert NIs or configure power over Ethernet (POE)
+         that will use the reserved power from that supply. There are two main advantages 
+         to enabling chasPowerSupplyRedundancyReserve. The first advantage is that 
+         it provides resiliency to avoid POE drawing power from the four main power supplies
+         in the OS9900 chassis to the extent that POE sinks much more wattage than 
+         the CMM, CFM, and NI board logic combined. (Note: The power management functions 
+         on the OS9900 are complicated by the presence of the controllers on the GNI-P48 boards. 
+         Unlike other chassis supporting POE, like OS6860, there is no separate power supply 
+         for the POE front-panel ports.) This is not to be confused with chasPowerSupplyRedundancy 
+         which switches off unneeded power supplies - on the OS9900, all inserted power supplies
+         are always switched on and enabled. The second advantage of enabling 
+         chasPowerSupplyRedundancyReserve is to avoid 'brown-outs'. 
+         (A brown-out may happen when a system running at full POE capacity without the N+1 redundancy reserve
+         enabled suffers a power supply failure causing the POE hardware to immediately
+         disable power over Ethernet on the basis of port priority as soon as it detects the failure.
+         Then, if there is still insufficient power available to run the logic and fan trays,
+         the power supplies will 'crowbar' and the system will be power cycled. The software can 
+         do little in this scenario since there is insufficient power to keep the CPU chips running.
+         When the system reboots the chassis supervisor will only power-up NI slots based 
+         upon the power available from the remaining power supplies.)"
+    DEFVAL   { on }
+::= { chasChassisEntry 25 }
 
 -- Extension of the Entity physical table
 
@@ -953,7 +1006,8 @@ ChasEntPhysicalEntry ::= SEQUENCE
         chasEntPhysMacAddress                 MacAddress,
         chasEntPhysCpuModel                   SnmpAdminString,
         chasEntPhysAirflow                    INTEGER,
-        chasEntPhysPowerUsed                  Integer32
+        chasEntPhysPowerUsed                  Integer32,
+        chasEntPhysPowerType                  INTEGER
     }
 
 
@@ -1343,6 +1397,21 @@ chasEntPhysPowerUsed            OBJECT-TYPE
         ::= { chasEntPhysicalEntry 34 }
 
 
+chasEntPhysPowerType OBJECT-TYPE
+SYNTAX     INTEGER{
+    notApplicable(0),
+        ac(1),
+        dc(2),
+        bps(3)
+}
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object is the type of the power supply, It corresponds to AC,
+	     DC or BPS. This value is only intended for Alcatel internal use."
+        ::= { chasEntPhysicalEntry 35 }
+
 -- Extension of the Entity physical table
 
 chasEntTemperatureTable OBJECT-TYPE
@@ -1717,7 +1786,8 @@ AlaChasEntPhysFanEntry ::= SEQUENCE
         {
             alaChasEntPhysFanLocalIndex    Integer32,
             alaChasEntPhysFanStatus        INTEGER,
-            alaChasEntPhysFanAirflow       INTEGER
+            alaChasEntPhysFanAirflow       INTEGER,
+            alaChasEntPhysFanSpeed         Unsigned32
         }
 
 alaChasEntPhysFanLocalIndex OBJECT-TYPE
@@ -1754,6 +1824,14 @@ alaChasEntPhysFanAirflow OBJECT-TYPE
             "Chassis fan airflow direction"
         ::={alaChasEntPhysFanEntry 3}
 
+alaChasEntPhysFanSpeed OBJECT-TYPE
+        SYNTAX      Unsigned32
+        UNITS       "rpm"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Chassis fan speed."
+        ::={alaChasEntPhysFanEntry 4}
 
 -- CHASSIS SUPERVISION RFS COMMANDS
 
@@ -1997,7 +2075,9 @@ chasGlobalControlUpdateFirmware OBJECT-TYPE
                 fpgaNi(7),
                 fpgaNiDaughterBoard1(8),
                 fpgaNiDaughterBoard2(9),
-		fpgaCmmAll(10)
+                fpgaCmmAll(10),
+                fpgaCmmPower(11),
+                fpgaNiPower(12)
         }
         MAX-ACCESS read-write
         STATUS current
@@ -2108,9 +2188,9 @@ alaChasBpsObjects OBJECT IDENTIFIER ::= { alcatelIND1ChassisMIBObjects 14 }
     {
             alaChasBpsShelfId           AlaChasBpsShelfId,
             alaChasBpsUpdateFirmware    INTEGER, 
-            alaChasBpsCpldRev           SnmpAdminString,
-            alaChasBpsMmcuRev           SnmpAdminString,
-            alaChasBpsCmcuRev           SnmpAdminString
+            alaChasBpsCpldRev           Integer32,
+            alaChasBpsMmcuRev           Integer32,
+            alaChasBpsCmcuRev           Integer32
     }
 
   alaChasBpsShelfId OBJECT-TYPE
@@ -2135,7 +2215,7 @@ alaChasBpsObjects OBJECT IDENTIFIER ::= { alcatelIND1ChassisMIBObjects 14 }
        ::= { alaChasBpsFwEntry 2 }
 
     alaChasBpsCpldRev               OBJECT-TYPE
-        SYNTAX          SnmpAdminString (SIZE(0..14))
+        SYNTAX          Integer32(0..100)
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
@@ -2143,7 +2223,7 @@ alaChasBpsObjects OBJECT IDENTIFIER ::= { alcatelIND1ChassisMIBObjects 14 }
         ::= { alaChasBpsFwEntry 3 }
 
     alaChasBpsMmcuRev OBJECT-TYPE
-        SYNTAX          SnmpAdminString (SIZE(0..14))
+        SYNTAX          Integer32(0..100)
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
@@ -2151,7 +2231,7 @@ alaChasBpsObjects OBJECT IDENTIFIER ::= { alcatelIND1ChassisMIBObjects 14 }
         ::= { alaChasBpsFwEntry 4 }
 
     alaChasBpsCmcuRev OBJECT-TYPE
-        SYNTAX          SnmpAdminString (SIZE(0..14))
+        SYNTAX          Integer32(0..100)
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
@@ -2184,7 +2264,7 @@ alaChasBpsObjects OBJECT IDENTIFIER ::= { alcatelIND1ChassisMIBObjects 14 }
         alaChasBpsChassisId           Integer32,
         alaChasBpsConnectorShelfId    AlaChasBpsShelfId,
         alaChasBpsConnectorPriority   Integer32,
-        alaChasBpsConnectorNum        SnmpAdminString, 
+        alaChasBpsConnectorNum        Integer32, 
         alaChasBpsSerialNum           SnmpAdminString
     }
   alaChasBpsChassisId OBJECT-TYPE
@@ -2214,7 +2294,7 @@ alaChasBpsObjects OBJECT IDENTIFIER ::= { alcatelIND1ChassisMIBObjects 14 }
     ::= { alaChasBpsConnectorPriorityEntry 3 }
 
   alaChasBpsConnectorNum OBJECT-TYPE
-    SYNTAX          SnmpAdminString (SIZE(1..8)) 
+    SYNTAX          Integer32(0..7)
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION "This object specifies the bps connector num."
@@ -2314,7 +2394,7 @@ alaChasBpsObjects OBJECT IDENTIFIER ::= { alcatelIND1ChassisMIBObjects 14 }
 
 
   alaChasBpsPowerSupplyIndex OBJECT-TYPE
-    SYNTAX          Integer32(1..5)
+    SYNTAX          Integer32(1..6)
     MAX-ACCESS      not-accessible
     STATUS          current
     DESCRIPTION
@@ -2326,8 +2406,8 @@ alaChasBpsObjects OBJECT IDENTIFIER ::= { alcatelIND1ChassisMIBObjects 14 }
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-     "This object hold name of BPS power supply"
-            ::= { alaChasBpsPowerSupplyEntry 3 }
+    "This object hold name of BPS power supply"
+    ::= { alaChasBpsPowerSupplyEntry 3 }
 
   alaChasBpsPowerSupplyDescr OBJECT-TYPE
     SYNTAX          SnmpAdminString(SIZE(0..63))
@@ -2373,7 +2453,7 @@ alaChasBpsObjects OBJECT IDENTIFIER ::= { alcatelIND1ChassisMIBObjects 14 }
 
   alaChasBpsPowerSupplySerialNum OBJECT-TYPE
     SYNTAX      SnmpAdminString (SIZE (0..32))
-    MAX-ACCESS  read-write
+    MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
     "The vendor-specific serial number string for the
@@ -2754,6 +2834,17 @@ chassisTrapsStateChange NOTIFICATION-TYPE
     "BPS power supplies FET state change  trap"
     ::= { alcatelIND1ChassisMIBNotifications 6 }
 
+  chasTrapsBPSFwUpgradeAlert NOTIFICATION-TYPE
+    OBJECTS 
+    {
+            chasTrapBPSShelfId, 
+            chasTrapsBPSFwType,
+            chasTrapsBPSFwVersion
+    }
+    STATUS        current
+    DESCRIPTION
+    "BPS FW upgrade requirment alert trap"
+    ::= { alcatelIND1ChassisMIBNotifications 7 }
 
 -- BPS related traps  end
 
@@ -2943,6 +3034,22 @@ physicalIndex             OBJECT-TYPE
     "enumerated value which indicate Fet state"
     ::= { chassisTrapsObj 20 }
 
+  chasTrapsBPSFwVersion OBJECT-TYPE
+    SYNTAX          Integer32(1..99) 
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+    "enumerated value which indicate the FW that require upgrade"
+    ::= { chassisTrapsObj 21 }
+
+  chasTrapsBPSFwType OBJECT-TYPE
+    SYNTAX          ChasTrapsBPSFwType
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION
+    "value which indicate Fet state"
+    ::= { chassisTrapsObj 22 }
+
 --BPS Traps objects End
 
 -- END Trap Objects
@@ -3060,7 +3167,8 @@ physicalIndex             OBJECT-TYPE
             chasNI6HardwareBoardTemp,
             chasNI7HardwareBoardTemp,
             chasNI8HardwareBoardTemp,
-            chasPowerSupplyRedundancy
+            chasPowerSupplyRedundancy,
+            chasPowerSupplyRedundancyReserve
         }
         STATUS  current
         DESCRIPTION
@@ -3102,7 +3210,8 @@ physicalIndex             OBJECT-TYPE
             chassisTrapsAlert,
             chasTrapsBPSLessAllocSysPwr,
             chasTrapsBPSStateChange, 
-            chasTrapsNiBPSFETStateChange 
+            chasTrapsNiBPSFETStateChange,
+            chasTrapsBPSFwUpgradeAlert 
         }
         STATUS  current
         DESCRIPTION
@@ -3113,7 +3222,8 @@ physicalIndex             OBJECT-TYPE
         OBJECTS
         {
             alaChasEntPhysFanStatus,
-            alaChasEntPhysFanAirflow
+            alaChasEntPhysFanAirflow,
+            alaChasEntPhysFanSpeed
         }
         STATUS  current
         DESCRIPTION
@@ -3142,7 +3252,9 @@ physicalIndex             OBJECT-TYPE
             chasTrapsBPSPowerSupply,
             chasTrapsBPSEventAlert,
             chasTrapsBPSSystemFETChange,
-            chasTrapsBPSPoeFETChange
+            chasTrapsBPSPoeFETChange,
+            chasTrapsBPSFwVersion,
+            chasTrapsBPSFwType
         }
         STATUS  current
         DESCRIPTION
@@ -3323,7 +3435,8 @@ physicalIndex             OBJECT-TYPE
             chasEntPhysMacAddress                 ,
             chasEntPhysCpuModel                   ,
             chasEntPhysAirflow                    ,
-            chasEntPhysPowerUsed
+            chasEntPhysPowerUsed                  ,
+            chasEntPhysPowerType
 
         }
         STATUS  current

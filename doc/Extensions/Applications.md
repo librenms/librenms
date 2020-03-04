@@ -120,8 +120,11 @@ by following the steps under the `SNMP Extend` heading.
 1. [PowerDNS Recursor](#powerdns-recursor) - Direct, SNMP extend, Agent
 1. [PowerDNS dnsdist](#powerdns-dnsdist) - SNMP extend
 1. [Proxmox](#proxmox) - SNMP extend
+1. [Puppet Agent](#puppet_agent) - SNMP extend
+1. [PureFTPd](#pureftpd) - SNMP extend
 1. [Raspberry PI](#raspberry-pi) - SNMP extend
 1. [SDFS info](#sdfs-info) - SNMP extend
+1. [Seafile](#seafile) - SNMP extend
 1. [SMART](#smart) - SNMP extend
 1. [Squid](#squid) - SNMP proxy
 1. [TinyDNS/djbdns](#tinydns-aka-djbdns) - Agent
@@ -913,8 +916,8 @@ $mysql_port = 3306;
 
 Note that depending on your MySQL installation (chrooted install for example),
 you may have to specify 127.0.0.1 instead of localhost. Localhost make
-a MySQL connexion via the mysql socket, while 127.0.0.1 make a standard
-IP connexion to mysql.
+a MySQL connection via the mysql socket, while 127.0.0.1 make a standard
+IP connection to mysql.
 
 5: Edit your snmpd.conf file and add:
 
@@ -1438,6 +1441,83 @@ snmp ALL=(ALL) NOPASSWD: /usr/local/bin/proxmox
 
 6: Restart snmpd on your host
 
+# Puppet Agent
+
+SNMP extend script to get your Puppet Agent data into your host.
+
+## SNMP Extend
+
+1: Download the script onto the desired host. `wget
+   https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/puppet_agent.py
+   -O /etc/snmp/puppet_agent.py`
+
+2: Make the script executable: `chmod +x /etc/snmp/puppet_agent.py`
+
+3: Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
+
+```
+extend puppet-agent /etc/snmp/puppet_agent.py
+```
+
+The Script needs `python3-yaml` package to be installed.
+
+Per default script searches for on of this files:
+
+* /var/cache/puppet/state/last_run_summary.yaml
+* /opt/puppetlabs/puppet/cache/state/last_run_summary.yaml
+
+optionally you can add a specific summary file with creating `/etc/snmp/puppet.json`
+```
+{
+     "agent": {
+        "summary_file": "/my/custom/path/to/summary_file"
+     }
+}
+```
+custom summary file has highest priority
+
+4: Restart snmpd on the host
+
+# PureFTPd
+
+SNMP extend script to monitor PureFTPd.
+
+## SNMP Extend
+
+1: Download the script onto the desired host. `wget
+   https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/pureftpd.py
+   -O /etc/snmp/pureftpd.py`
+
+2: Make the script executable: `chmod +x /etc/snmp/pureftpd.py`
+
+3: Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
+
+```
+extend pureftpd /etc/snmp/pureftpd.py
+```
+
+4: Edit your sudo users (usually `visudo`) and add at the bottom:
+
+```
+snmp ALL=(ALL) NOPASSWD: /usr/sbin/pure-ftpwho
+```
+or the path where your pure-ftpwho is located
+
+
+5: If pure-ftpwho is not located in /usr/sbin
+
+you will also need to create a config file, which is named
+
+pureftpd.json. The file has to be located in /etc/snmp/.
+
+
+```
+{"pureftpwho_cmd": "/usr/sbin/pure-ftpwho"
+}
+```
+
+5: Restart snmpd on your host
+
 # Raspberry PI
 
 SNMP extend script to get your PI data into your host.
@@ -1459,7 +1539,7 @@ extend raspberry /etc/snmp/raspberry.sh
 4: Edit your sudo users (usually `visudo`) and add at the bottom:
 
 ```
-snmp ALL=(ALL) NOPASSWD: /etc/snmp/raspberry.sh, /usr/bin/vcgencmd*
+snmp ALL=(ALL) NOPASSWD: /etc/snmp/raspberry.sh, /usr/bin/vcgencmd
 ```
 
 **Note:** If you are using Raspian, the default user is
@@ -1469,6 +1549,8 @@ the user snmpd is using with `ps aux | grep snmpd`
 5: Restart snmpd on PI host
 
 # Seafile
+
+SNMP extend script to monitor your Seafile Server
 
 ## SNMP Extend
 
@@ -1508,12 +1590,13 @@ username = Login to Seafile Server.
            It is important that used Login has admin privileges.
            Otherwise most API calls will be denied.
 password = Password to the configured login.
-        the device name. 1 is the default. 0 will use the device name.
-account_identifier = Defines how accounts are listed.
+account_identifier = Defines how user accounts are listed in RRD Graph.
                      Options are: name, email
 hide_monitoring_account = With this Boolean you can hide the Account which you
                           use to access Seafile API
 ```
+
+**Note:**It is recommended to use a dedicated Administrator account for monitoring.
 
 # SMART
 

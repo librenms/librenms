@@ -126,7 +126,10 @@ if ($sub_type == 'new-maintenance') {
 
             foreach ($_POST['maps'] as $target) {
                 $type = 'device';
-                if (starts_with($target, 'g')) {
+                if (starts_with($target, 'l')) {
+                    $type = 'location';
+                    $target = substr($target, 1);
+                } elseif (starts_with($target, 'g')) {
                     $type = 'device_group';
                     $target = substr($target, 1);
                 }
@@ -170,7 +173,10 @@ if ($sub_type == 'new-maintenance') {
     $items       = [];
     foreach (dbFetchRows('SELECT `alert_schedulable_type`, `alert_schedulable_id` FROM `alert_schedulables` WHERE `schedule_id`=?', [$schedule_id]) as $target) {
         $id = $target['alert_schedulable_id'];
-        if ($target['alert_schedulable_type'] == 'device_group') {
+        if ($target['alert_schedulable_type'] == 'location') {
+            $text = dbFetchCell('SELECT location FROM locations WHERE id = ?', [$id]);
+            $id = 'l' . $id;
+        } elseif ($target['alert_schedulable_type'] == 'device_group') {
             $text = dbFetchCell('SELECT name FROM device_groups WHERE id = ?', [$id]);
             $id = 'g' . $id;
         } else {
@@ -197,8 +203,8 @@ if ($sub_type == 'new-maintenance') {
     );
 } elseif ($sub_type == 'del-maintenance') {
     $schedule_id = mres($_POST['del_schedule_id']);
-    dbDelete('alert_schedule_items', '`schedule_id`=?', array($schedule_id));
     dbDelete('alert_schedule', '`schedule_id`=?', array($schedule_id));
+    dbDelete('alert_schedulables', '`schedule_id`=?', array($schedule_id));
     $status   = 'ok';
     $message  = 'Maintenance schedule has been removed';
     $response = array(

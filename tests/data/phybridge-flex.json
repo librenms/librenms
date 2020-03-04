@@ -8,13 +8,13 @@
                     "sysDescr": "Phybridge FLEX 24 Switch 7.0.0",
                     "sysContact": null,
                     "version": null,
-                    "hardware": "",
+                    "hardware": null,
                     "features": null,
-                    "location": null,
                     "os": "phybridge-flex",
                     "type": "network",
                     "serial": null,
-                    "icon": "phybridge.svg"
+                    "icon": "phybridge.svg",
+                    "location": null
                 }
             ]
         },
@@ -26,13 +26,13 @@
                     "sysDescr": "Phybridge FLEX 24 Switch 7.0.0",
                     "sysContact": "<private>",
                     "version": null,
-                    "hardware": "",
+                    "hardware": null,
                     "features": null,
-                    "location": "<private>",
                     "os": "phybridge-flex",
                     "type": "network",
                     "serial": null,
-                    "icon": "phybridge.svg"
+                    "icon": "phybridge.svg",
+                    "location": "<private>"
                 }
             ]
         }

@@ -193,6 +193,18 @@ class Rewrite
             }
         }
 
+        if ($device['os'] == "iosxe") {
+            if ($device['hardware']) {
+                if (preg_match('/CAT9K/', $device['sysDescr'], $matches) && preg_match("/^C(9[A-Za-z0-9]+)/", $device['hardware'], $matches2)) {
+                    if (!$short) {
+                        $device['hardware'] = "Catalyst " . $matches2[1] . " (" . $device['hardware'] . ")";
+                    } else {
+                        $device['hardware'] = "Catalyst " . $matches2[1];
+                    }
+                }
+            }
+        }
+
         return $device['hardware'];
     }
 

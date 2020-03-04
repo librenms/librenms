@@ -21,12 +21,19 @@
 
 use LibreNMS\Config;
 
+$language = \config('app.locale');
+$settings = (include Config::get('install_dir').'/resources/lang/'.$language.'/settings.php')['settings'];
+
+$poller_module_names = $settings['poller_modules'];
+$discovery_module_names = $settings['discovery_modules'];
+
 $poller_modules = Config::get('poller_modules');
 ksort($poller_modules);
 foreach ($poller_modules as $module => $module_status) {
+    $module_name = $poller_module_names[$module]['description'] ?: $module;
     echo('
       <tr>
-        <td><strong>'.$module.'</strong></td>
+        <td><strong>'.$module_name.'</strong></td>
         <td>
         ');
 
@@ -107,10 +114,11 @@ foreach ($poller_modules as $module => $module_status) {
 $discovery_modules = Config::get('discovery_modules');
 ksort($discovery_modules);
 foreach ($discovery_modules as $module => $module_status) {
+    $module_name = $discovery_module_names[$module]['description'] ?: $module;
     echo('
       <tr>
         <td>
-          <strong>'.$module.'</strong>
+          <strong>'.$module_name.'</strong>
         </td>
         <td>
         ');

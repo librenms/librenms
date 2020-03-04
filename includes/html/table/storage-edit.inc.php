@@ -37,12 +37,15 @@ $sql = "SELECT * $sql";
 foreach (dbFetchRows($sql, $param) as $drive) {
     $perc = round($drive['storage_perc'], 0);
     $perc_warn = round($drive['storage_perc_warn'], 0);
+    $size = formatStorage($drive['storage_size']);
     $response[] = array(
         'storage_id' => $drive['storage_id'],
         'hostname' => generate_device_link($drive),
         'storage_descr' => $drive['storage_descr'],
         'storage_perc' => $perc . "%",
-        'storage_perc_warn' => $perc_warn);
+        'storage_perc_warn' => $perc_warn,
+        'storage_size' => $size
+    );
 }
 
 $output = array('current'=>$current,'rowCount'=>$rowCount,'rows'=>$response,'total'=>$total);
