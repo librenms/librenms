@@ -83,11 +83,14 @@ abstract class IP
     public static function fromSnmpString($snmpOid, $ignore_errors = false)
     {
         $snmpOid = str_replace(['.', '"'], ' ', $snmpOid);
-        $hex = implode(":", array_map(
-            function ($dec) {
-                return sprintf('%02x', $dec);
-            }
-            , explode(" ", (string)$snmpOid))
+        $hex = implode(
+            ":",
+            array_map(
+                function ($dec) {
+                    return sprintf('%02x', $dec);
+                },
+                explode(" ", (string)$snmpOid)
+            )
         );
         return IP::fromHexString($hex, $ignore_errors);
     }
