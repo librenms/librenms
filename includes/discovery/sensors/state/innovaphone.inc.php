@@ -1,5 +1,25 @@
 <?php
-$oids = snmpwalk_group($device, 'voiceIfTable', 'INNO-MIB');
+/**
+ * LibreNMS sensors state discovery module for HP Procurve
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package    LibreNMS
+ * @link       http://librenms.org
+ */
+
+$oids = snmpwalk_cache_oid($device, 'voiceIfTable', [], 'INNO-MIB');
 
 if (!empty($oids)) {
     //Create State Index
@@ -11,7 +31,11 @@ if (!empty($oids)) {
     create_state_index($state_name, $states);
     $num_oid = '.1.3.6.1.4.1.6666.2.1.1.1.4.';
     foreach ($oids as $index => $entry) {
-        $name = 'Voice If ' . hex2bin(strtr($entry['voiceIfName'], [' '=>'']));
+        $ifname = hex2bin(str_replace(" ", "", $entry['voiceIfName']));
+        if (empty($ifname)) {
+            $ifname = $entry['voiceIfName'];
+        }
+        $name = 'Interface ' . $ifname;
         //Discover Sensors
         discover_sensor($valid['sensor'], 'state', $device, $num_oid.$index, $index, $state_name, $name, '1', '1', null, null, null, null, $entry['voiceIfState'], 'snmp', $index);
 
