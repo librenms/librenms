@@ -1,0 +1,36 @@
+mib: UBNT-EdgeMAX-MIB
+modules:
+    processors:
+          data:
+              -
+                  oid: ubntHostCpuLoad
+                  num_oid: '.1.3.6.1.4.1.41112.1.4.8.3.{{ $index }}'
+                  precision: 100
+    sensors:
+        count:
+            data:
+                -
+                    oid: ubntPsuBaysNumber
+                    num_oid: '.1.3.6.1.4.1.41112.1.5.3.1.0'
+                    descr: Number of PSU's
+        voltage:
+            data:
+                -
+                    oid: ubntPowerOutVoltage
+                    divisor: 1000
+                    num_oid: '.1.3.6.1.4.1.41112.1.5.2.2.1.2.{{ $index }}'
+                    descr: Output Voltage
+        current:
+            data:
+                -
+                    oid: ubntPowerOutCurrent
+                    divisor: 1000
+                    num_oid: '.1.3.6.1.4.1.41112.1.5.2.2.1.3.{{ $index }}'
+                    descr: Output Current
+        power:
+            data:
+                -
+                    oid: ubntPowerOutPower
+                    divisor: 1000
+                    num_oid: '.1.3.6.1.4.1.41112.1.5.2.2.1.4.{{ $index }}'
+                    descr: Output power

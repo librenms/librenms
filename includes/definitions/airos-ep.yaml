@@ -1,0 +1,8 @@
+os: airos-ep
+text: 'Ubiquiti Edgepower'
+type: power
+icon: ubiquiti
+nobulk: true
+group: ubnt
+over:
+    - { graph: device_processor, text: 'CPU Usage' }

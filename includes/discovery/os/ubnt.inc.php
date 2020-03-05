@@ -9,6 +9,8 @@ if (starts_with($device['sysDescr'], 'Linux') || starts_with($device['sysObjectI
             $os = 'unifi';
         } elseif (snmp_get($device, 'fwVersion.1', '-Osqnv', 'UBNT-AirFIBER-MIB', 'ubnt') !== false) {
             $os = 'airos-af';
+        } elseif (str_contains(snmp_walk($device, 'ubntModel', '-Osqnv', 'UBNT-EdgeMAX-MIB'), 'EP')) {
+            $os = 'airos-ep';
         }
     } elseif (snmp_get($device, 'afLTUFirmwareVersion.0', '-Osqnv', 'UBNT-AFLTU-MIB', 'ubnt') !== false) {
         $os = 'airos-af-ltu';
