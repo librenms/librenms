@@ -1,5 +1,4 @@
 <?php
-
 $oids = snmpwalk_group($device, 'voiceIfTable', 'INNO-MIB');
 
 if (!empty($oids)) {
@@ -10,7 +9,6 @@ if (!empty($oids)) {
         ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'up'],
     ];
     create_state_index($state_name, $states);
-
     $num_oid = '.1.3.6.1.4.1.6666.2.1.1.1.4.';
     foreach ($oids as $index => $entry) {
         $name = 'Voice If ' . hex2bin(strtr($entry['voiceIfName'], [' '=>'']));
