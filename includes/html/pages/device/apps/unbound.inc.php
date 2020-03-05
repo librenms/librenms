@@ -3,7 +3,9 @@
 $graphs = array(
     'unbound_queries' => 'Unbound - Queries',
     'unbound_cache'   => 'Unbound - Cache',
-    'unbound_operations'   => 'Unbound - Operations'
+    'unbound_operations'   => 'Unbound - Operations',
+    'unbound_requestlist'   => 'Unbound - Request list',
+    'unbound_recursiontime'   => 'Unbound - Recursion time'
     );
 foreach ($graphs as $key => $text) {
     $graph_type            = $key;
