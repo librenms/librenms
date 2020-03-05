@@ -75,6 +75,7 @@ modules:
 At the top you can define one or more mibs to be used in the lookup of data:
 
 `mib: NETBOTZV2-MIB`
+For use of multiple MIB files separate them with a colon: `mib: NETBOTZV2-MIB:SECOND-MIB`
 
 For `data:` you have the following options:
 
