@@ -28,16 +28,17 @@ namespace LibreNMS\Data\Store;
 
 use Carbon\Carbon;
 use LibreNMS\Config;
-use LibreNMS\Interfaces\Data\Datastore as DatastoreContract;
+use LibreNMS\Data\Measure\Measurement;
 use Log;
 
-class OpenTSDB implements DatastoreContract
+class OpenTSDB extends BaseDatastore
 {
     /** @var \Socket\Raw\Socket $connection */
     protected $connection;
 
     public function __construct(\Socket\Raw\Factory $socketFactory)
     {
+        parent::__construct();
         $host = Config::get('opentsdb.host');
         $port = Config::get('opentsdb.port', 2181);
         try {
@@ -51,6 +52,11 @@ class OpenTSDB implements DatastoreContract
         } else {
             Log::error('Connection to OpenTSDB has failed!');
         }
+    }
+
+    public function getName()
+    {
+        return 'OpenTSDB';
     }
 
     /**
@@ -110,9 +116,13 @@ class OpenTSDB implements DatastoreContract
     private function putData($measurement, $timestamp, $value, $tags)
     {
         try {
+            $stat = Measurement::start('put');
+
             $line = sprintf('put net.%s %d %f %s', strtolower($measurement), $timestamp, $value, $tags);
             Log::debug("Sending to OpenTSDB: $line\n");
             $this->connection->write("$line\n"); // send $line into OpenTSDB
+
+            $this->recordStatistic($stat->end());
         } catch (\Socket\Raw\Exception $e) {
             Log::error('OpenTSDB Error: ' . $e->getMessage());
             exit;

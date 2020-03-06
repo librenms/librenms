@@ -28,10 +28,10 @@ namespace LibreNMS\Data\Store;
 
 use Carbon\Carbon;
 use LibreNMS\Config;
-use LibreNMS\Interfaces\Data\Datastore as DatastoreContract;
+use LibreNMS\Data\Measure\Measurement;
 use Log;
 
-class Graphite implements DatastoreContract
+class Graphite extends BaseDatastore
 {
     protected $connection;
 
@@ -39,6 +39,7 @@ class Graphite implements DatastoreContract
 
     public function __construct(\Socket\Raw\Factory $socketFactory)
     {
+        parent::__construct();
         $host = Config::get('graphite.host');
         $port = Config::get('graphite.port', 2003);
         try {
@@ -54,6 +55,11 @@ class Graphite implements DatastoreContract
         }
 
         $this->prefix = Config::get('graphite.prefix', '');
+    }
+
+    public function getName()
+    {
+        return 'Graphite';
     }
 
     public static function isEnabled()
@@ -119,24 +125,18 @@ class Graphite implements DatastoreContract
     private function writeData($metric, $value, $timestamp)
     {
         try {
+            $stat = Measurement::start('write');
+
             // Further sanitize the full metric before sending, whitespace isn't allowed
             $metric = preg_replace('/\s+/', '_', $metric);
 
             $line = implode(" ", [$metric, $value, $timestamp]);
             Log::debug("Sending to Graphite: $line\n");
             $this->connection->write("$line\n");
+
+            $this->recordStatistic($stat->end());
         } catch (\Socket\Raw\Exception $e) {
             Log::error('Graphite write error: ' . $e->getMessage());
         }
-    }
-
-    /**
-     * Checks if the datastore wants rrdtags to be sent when issuing put()
-     *
-     * @return boolean
-     */
-    public function wantsRrdTags()
-    {
-        return true;
     }
 }

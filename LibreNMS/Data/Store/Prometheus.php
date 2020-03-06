@@ -28,10 +28,10 @@ namespace LibreNMS\Data\Store;
 
 use GuzzleHttp\Exception\GuzzleException;
 use LibreNMS\Config;
-use LibreNMS\Interfaces\Data\Datastore as DatastoreContract;
+use LibreNMS\Data\Measure\Measurement;
 use Log;
 
-class Prometheus implements DatastoreContract
+class Prometheus extends BaseDatastore
 {
     private $client;
     private $base_uri;
@@ -40,7 +40,7 @@ class Prometheus implements DatastoreContract
 
     public function __construct(\GuzzleHttp\Client $client)
     {
-
+        parent::__construct();
         $this->client = $client;
 
         $url = Config::get('prometheus.url');
@@ -57,6 +57,11 @@ class Prometheus implements DatastoreContract
         $this->enabled = self::isEnabled();
     }
 
+    public function getName()
+    {
+        return 'Prometheus';
+    }
+
     public static function isEnabled()
     {
         return Config::get('prometheus.enable', false);
@@ -64,6 +69,7 @@ class Prometheus implements DatastoreContract
 
     public function put($device, $measurement, $tags, $fields)
     {
+        $stat = Measurement::start('put');
         // skip if needed
         if (!$this->enabled) {
             return;
@@ -98,6 +104,8 @@ class Prometheus implements DatastoreContract
             ]);
 
             $result = $this->client->request('POST', $promurl, $options);
+
+            $this->recordStatistic($stat->end());
 
             if ($result->getStatusCode() !== 200) {
                 Log::error('Prometheus Error: ' . $result->getReasonPhrase());

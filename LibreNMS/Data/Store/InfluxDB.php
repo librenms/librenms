@@ -29,16 +29,17 @@ namespace LibreNMS\Data\Store;
 use InfluxDB\Client;
 use InfluxDB\Driver\UDP;
 use LibreNMS\Config;
-use LibreNMS\Interfaces\Data\Datastore as DatastoreContract;
+use LibreNMS\Data\Measure\Measurement;
 use Log;
 
-class InfluxDB implements DatastoreContract
+class InfluxDB extends BaseDatastore
 {
     /** @var \InfluxDB\Database $connection */
     private $connection;
 
     public function __construct(\InfluxDB\Database $influx)
     {
+        parent::__construct();
         $this->connection = $influx;
 
         // if the database doesn't exist, create it.
@@ -49,6 +50,11 @@ class InfluxDB implements DatastoreContract
         } catch (\Exception $e) {
             Log::warning('InfluxDB: Could not create database');
         }
+    }
+
+    public function getName()
+    {
+        return 'InfluxDB';
     }
 
     public static function isEnabled()
@@ -73,6 +79,7 @@ class InfluxDB implements DatastoreContract
      */
     public function put($device, $measurement, $tags, $fields)
     {
+        $stat = Measurement::start('write');
         $tmp_fields = [];
         $tmp_tags['hostname'] = $device['hostname'];
         foreach ($tags as $k => $v) {
@@ -109,6 +116,7 @@ class InfluxDB implements DatastoreContract
             ];
 
             $this->connection->writePoints($points);
+            $this->recordStatistic($stat->end());
         } catch (\Exception $e) {
             Log::error('InfluxDB exception: ' . $e->getMessage());
             Log::debug($e->getTraceAsString());

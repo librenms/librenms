@@ -2064,25 +2064,28 @@ function initStats()
 function printChangedStats($update_only = false)
 {
     global $snmp_stats, $db_stats;
-    global $snmp_stats_last, $db_stats_last, $rrd_stats_last;
-    $rrd_stats = Rrd::getStats();
+    global $snmp_stats_last, $db_stats_last;
+    $output = sprintf(
+        ">> SNMP: [%d/%.2fs] MySQL: [%d/%.2fs]",
+        array_sum($snmp_stats['ops']) - array_sum($snmp_stats_last['ops']),
+        array_sum($snmp_stats['time']) - array_sum($snmp_stats_last['time']),
+        array_sum($db_stats['ops']) - array_sum($db_stats_last['ops']),
+        array_sum($db_stats['time']) - array_sum($db_stats_last['time'])
+    );
+
+    foreach(app('Datastore')->getStats() as $datastore => $stats) {
+        /** @var \LibreNMS\Data\Measure\MeasurementCollection $stats */
+        $output .= sprintf(" %s: [%d/%.2fs]", $datastore, $stats->getCountDiff(), $stats->getDurationDiff());
+        $stats->checkpoint();
+    }
 
     if (!$update_only) {
-        printf(
-            ">> SNMP: [%d/%.2fs] MySQL: [%d/%.2fs] RRD: [%d/%.2fs]\n",
-            array_sum($snmp_stats['ops']) - array_sum($snmp_stats_last['ops']),
-            array_sum($snmp_stats['time']) - array_sum($snmp_stats_last['time']),
-            array_sum($db_stats['ops']) - array_sum($db_stats_last['ops']),
-            array_sum($db_stats['time']) - array_sum($db_stats_last['time']),
-            array_sum($rrd_stats['ops']) - array_sum($rrd_stats_last['ops']),
-            array_sum($rrd_stats['time']) - array_sum($rrd_stats_last['time'])
-        );
+        echo $output . PHP_EOL;
     }
 
     // make a new checkpoint
     $snmp_stats_last = $snmp_stats;
     $db_stats_last = $db_stats;
-    $rrd_stats_last = $rrd_stats;
 }
 
 /**
@@ -2128,19 +2131,15 @@ function printStats()
         );
     }
 
-    $rrd_stats = Rrd::getStats();
-    if ($rrd_stats) {
-        printf(
-            "RRD [%d/%.2fs]: Update[%d/%.2fs] Create [%d/%.2fs] Other[%d/%.2fs]\n",
-            array_sum($rrd_stats['ops']),
-            array_sum($rrd_stats['time']),
-            $rrd_stats['ops']['update'],
-            $rrd_stats['time']['update'],
-            $rrd_stats['ops']['create'],
-            $rrd_stats['time']['create'],
-            $rrd_stats['ops']['other'],
-            $rrd_stats['time']['other']
-        );
+    foreach(app('Datastore')->getStats() as $datastore => $stats) {
+        /** @var \LibreNMS\Data\Measure\MeasurementCollection $stats */
+        printf("%s [%d/%.2fs]:", $datastore, $stats->getTotalCount(), $stats->getTotalDuration());
+
+        foreach ($stats as $stat) {
+            /** @var \LibreNMS\Data\Measure\MeasurementSummary $stat */
+            printf(" %s[%d/%.2fs]", ucfirst($stat->getType()), $stat->getCount(), $stat->getDuration());
+        }
+        echo PHP_EOL;
     }
 }
 

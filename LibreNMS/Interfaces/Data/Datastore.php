@@ -42,6 +42,20 @@ interface Datastore
     public function wantsRrdTags();
 
     /**
+     * The name of this datastore
+     *
+     * @return string
+     */
+    public function getName();
+
+    /**
+     * Array of stats should be [type => [count => n, time => s]]
+     *
+     * @return array
+     */
+    public function getStats();
+
+    /**
      * Datastore-independent function which should be used for all polled metrics.
      *
      * RRD Tags:

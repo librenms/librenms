@@ -26,6 +26,7 @@
 namespace LibreNMS\Data\Store;
 
 use LibreNMS\Config;
+use LibreNMS\Interfaces\Data\Datastore as DatastoreContract;
 
 class Datastore
 {
@@ -35,7 +36,7 @@ class Datastore
      * Initialize and create the Datastore(s)
      *
      * @param array $options
-     * @return \LibreNMS\Interfaces\Data\Datastore
+     * @return DatastoreContract
      */
     public static function init($options = [])
     {
@@ -111,7 +112,7 @@ class Datastore
         }
 
         foreach ($this->stores as $store) {
-            /** @var \LibreNMS\Interfaces\Data\Datastore $store */
+            /** @var DatastoreContract $store */
             // rrdtool_data_update() will only use the tags it deems relevant, so we pass all of them.
             // However, influxdb saves all tags, so we filter out the ones beginning with 'rrd_'.
             $temp_tags = $store->wantsRrdTags() ? $tags : $this->rrdTagFilter($tags);
@@ -146,5 +147,13 @@ class Datastore
     public function getStores()
     {
         return $this->stores;
+    }
+
+    public function getStats()
+    {
+        return array_reduce($this->stores, function ($result, DatastoreContract $store) {
+            $result[$store->getName()] = $store->getStats();
+            return $result;
+        }, []);
     }
 }

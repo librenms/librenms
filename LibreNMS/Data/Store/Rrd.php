@@ -26,15 +26,14 @@
 namespace LibreNMS\Data\Store;
 
 use LibreNMS\Config;
+use LibreNMS\Data\Measure\Measurement;
 use LibreNMS\Exceptions\FileExistsException;
-use LibreNMS\Interfaces\Data\Datastore as DatastoreContract;
 use LibreNMS\Proc;
 use Log;
 
-class Rrd implements DatastoreContract
+class Rrd extends BaseDatastore
 {
     private $disabled = false;
-    private $stats;
 
     /** @var Proc $sync_process */
     private $sync_process;
@@ -48,6 +47,7 @@ class Rrd implements DatastoreContract
 
     public function __construct()
     {
+        parent::__construct();
         $this->rrdcached = Config::get('rrdcached', false);
 
         $this->init();
@@ -61,19 +61,11 @@ class Rrd implements DatastoreContract
             ' RRA:LAST:0.5:1:1440 '
         );
         $this->version = Config::get('rrdtool_version', '1.4');
+    }
 
-        $this->stats = [
-            'ops' => [
-                'update' => 0,
-                'create' => 0,
-                'other' => 0,
-            ],
-            'time' => [
-                'update' => 0.0,
-                'create' => 0.0,
-                'other' => 0.0,
-            ],
-        ];
+    public function getName()
+    {
+        return 'RRD';
     }
 
     public static function isEnabled()
@@ -341,9 +333,8 @@ class Rrd implements DatastoreContract
      */
     private function command($command, $filename, $options)
     {
-        global $debug, $vdebug;
-
-        $start_time = microtime(true);
+        global $vdebug;
+        $stat = Measurement::start($this->coalesceStatisticType($command));
 
         try {
             $cmd = self::buildCommand($command, $filename, $options);
@@ -380,7 +371,7 @@ class Rrd implements DatastoreContract
             echo $output[1];
         }
 
-        $this->recordStats($command, $start_time);
+        $this->recordStatistic($stat->end());
         return $output;
     }
 
@@ -424,25 +415,6 @@ class Rrd implements DatastoreContract
         return "$command $filename $options";
     }
 
-
-    /**
-     * Update statistics for rrd operations
-     *
-     * @param string $stat create, update, and other
-     * @param float $start_time The time the operation started with 'microtime(true)'
-     * @return float  The calculated run time
-     */
-    public function recordStats($stat, $start_time)
-    {
-        $stat = ($stat == 'update' || $stat == 'create') ? $stat : 'other';
-
-        $runtime = microtime(true) - $start_time;
-        $this->stats['ops'][$stat]++;
-        $this->stats['time'][$stat] += $runtime;
-
-        return $runtime;
-    }
-
     /**
      * Checks if the rrd file exists on the server
      * This will perform a remote check if using rrdcached and rrdtool >= 1.5
@@ -484,24 +456,9 @@ class Rrd implements DatastoreContract
         }
     }
 
-    public function getStats()
-    {
-        return $this->stats;
-    }
-
     public function __destruct()
     {
         $this->close();
-    }
-
-    /**
-     * Checks if the datastore wants rrdtags to be sent when issuing put()
-     *
-     * @return boolean
-     */
-    public function wantsRrdTags()
-    {
-        return true;
     }
 
     /**
@@ -524,5 +481,16 @@ class Rrd implements DatastoreContract
     public static function safeDescr($descr)
     {
         return (string)preg_replace('/[^a-zA-Z0-9,._\-\/\ ]/', ' ', $descr);
+    }
+
+    /**
+     * Only track update and create primarily, just put all others in an "other" bin
+     *
+     * @param $type
+     * @return string
+     */
+    private function coalesceStatisticType($type)
+    {
+        return ($type == 'update' || $type == 'create') ? $type : 'other';
     }
 }
