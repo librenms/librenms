@@ -344,26 +344,6 @@ function percent_colour($perc)
     return sprintf('#%02x%02x%02x', $r, $b, $b);
 }
 
-// Returns the last in/out errors value in RRD
-function interface_errors($rrd_file, $period = '-1d')
-{
-    $errors = array();
-
-    $cmd = Config::get('rrdtool') . " fetch -s $period -e -300s $rrd_file AVERAGE | grep : | cut -d\" \" -f 4,5";
-    $data = trim(shell_exec($cmd));
-    $in_errors = 0;
-    $out_errors = 0;
-    foreach (explode("\n", $data) as $entry) {
-        list($in, $out) = explode(" ", $entry);
-        $in_errors += ($in * 300);
-        $out_errors += ($out * 300);
-    }
-    $errors['in'] = round($in_errors);
-    $errors['out'] = round($out_errors);
-
-    return $errors;
-}
-
 /**
  * @param $device
  * @return string the logo image path for this device. Images are often wide, not square.
@@ -1637,50 +1617,6 @@ function dnslookup($device, $type = false, $return = false)
     $record = dns_get_record($device['hostname'], $type);
     return $record[0][$return];
 }//end dnslookup
-
-
-
-
-/**
- * Run rrdtool info on a file path
- *
- * @param string $path Path to pass to rrdtool info
- * @param string $stdOutput Variable to recieve the output of STDOUT
- * @param string $stdError Variable to recieve the output of STDERR
- *
- * @return int exit code
- *
-**/
-
-function rrdtest($path, &$stdOutput, &$stdError)
-{
-    //rrdtool info <escaped rrd path>
-    $command = Config::get('rrdtool') . ' info ' . escapeshellarg($path);
-    $process = proc_open(
-        $command,
-        array (
-            0 => array('pipe', 'r'),
-            1 => array('pipe', 'w'),
-            2 => array('pipe', 'w'),
-        ),
-        $pipes
-    );
-
-    if (!is_resource($process)) {
-        throw new \RuntimeException('Could not create a valid process');
-    }
-
-    $status = proc_get_status($process);
-    while ($status['running']) {
-        usleep(2000); // Sleep 2000 microseconds or 2 milliseconds
-        $status = proc_get_status($process);
-    }
-
-    $stdOutput = stream_get_contents($pipes[1]);
-    $stdError  = stream_get_contents($pipes[2]);
-    proc_close($process);
-    return $status['exitcode'];
-}
 
 /**
  * Create a new state index.  Update translations if $states is given.
