@@ -49,48 +49,51 @@ if (isset($_REQUEST['search'])) {
             die(json_encode($results));
         } elseif ($_REQUEST['type'] == 'device') {
             // Device search
-            $args_list = ["%$search%", "%$search%", "%$search%", "%$search%",
-                          "%$search%", "%$search%", "%$search%", "%$search%", $limit];
-            if (Auth::user()->hasGlobalRead()) {
-                $results = dbFetchRows(
-                    "SELECT * FROM `devices` as `D`
-                    LEFT JOIN `locations` AS `L` ON `L`.`id` = `D`.`location_id`
-                    LEFT JOIN `ports` AS `P` ON `P`.`device_id` = `D`.`device_id`
-                    LEFT JOIN `ipv4_addresses` AS `V4` ON `V4`.`port_id` = `P`.`port_id`
-                    LEFT JOIN `ipv6_addresses` AS `V6` ON `V6`.`port_id` = `P`.`port_id`
-                    WHERE `D`.`hostname` LIKE ?
-                    OR `L`.`location` LIKE ?
-                    OR `D`.`sysName` LIKE ?
-                    OR `D`.`purpose` LIKE ?
-                    OR `D`.`notes` LIKE ?
-                    OR `D`.`overwrite_ip` LIKE ?
-                    OR `V4`.`ipv4_address` LIKE ?
-                    OR `V6`.`ipv6_address` LIKE ?
-                    GROUP BY `D`.`hostname`
-                    ORDER BY `D`.`hostname` LIMIT ?",
-                    $args_list
-                );
+
+            $query = "SELECT * FROM `devices` as `D`
+                      LEFT JOIN `locations` AS `L` ON `L`.`id` = `D`.`location_id`";
+
+            // user depending limitation
+            if ( ! Auth::user()->hasGlobalRead()) {
+                $query_args_list = $device_ids;
+                $query_filter = $perms_sql;
             } else {
-                $results = dbFetchRows(
-                    "SELECT * FROM `devices` AS `D`
-                    LEFT JOIN `locations` AS `L` ON `L`.`id` = `D`.`location_id`
-                    LEFT JOIN `ports` AS `P` ON `P`.`device_id` = `D`.`device_id`
-                    LEFT JOIN `ipv4_addresses` AS `V4` ON `V4`.`port_id` = `P`.`port_id`
-                    LEFT JOIN `ipv6_addresses` AS `V6` ON `V6`.`port_id` = `P`.`port_id`
-                    WHERE $perms_sql AND
-                    (`D`.`hostname` LIKE ?
-                    OR `L`.`location` LIKE ?
-                    OR `D`.`sysName` LIKE ?
-                    OR `D`.`purpose` LIKE ?
-                    OR `D`.`notes` LIKE ?
-                    OR `D`.`overwrite_ip` LIKE ?
-                    OR `V4`.`ipv4_address` LIKE ?
-                    OR `V6`.`ipv6_address` LIKE ?)
-                    GROUP BY `D`.`hostname`
-                    ORDER BY `D`.`hostname` LIMIT ?",
-                    array_merge($device_ids, $args_list)
-                );
+                $query_args_list = [];
+                $query_filter = '';
             }
+
+            // search filter
+            $query_filter .= "`D`.`hostname` LIKE ?
+                              OR `L`.`location` LIKE ?
+                              OR `D`.`sysName` LIKE ?
+                              OR `D`.`purpose` LIKE ?
+                              OR `D`.`notes` LIKE ?";
+            $query_args_list = array_merge($query_args_list, ["%$search%", "%$search%", "%$search%",
+                                                              "%$search%", "%$search%"]);
+
+            if (\LibreNMS\Util\IPv4::isValid($search, false)) {
+                    $query .= " LEFT JOIN `ports` AS `P` ON `P`.`device_id` = `D`.`device_id`
+                                LEFT JOIN `ipv4_addresses` AS `V4` ON `V4`.`port_id` = `P`.`port_id`";
+                    $query_filter .= " OR `V4`.`ipv4_address` LIKE ?
+                                       OR `D`.`overwrite_ip` LIKE ?
+                                       OR `D`.`ip` = ? ";
+                    $query_args_list = array_merge($query_args_list, ["%$search%", "%$search%", inet_pton($search)]);
+
+            } elseif (\LibreNMS\Util\IPv6::isValid($search, false)) {
+                    $query .= " LEFT JOIN `ports` AS `P` ON `P`.`device_id` = `D`.`device_id`
+                                LEFT JOIN `ipv6_addresses` AS `V6` ON `V6`.`port_id` = `P`.`port_id`";
+                    $query_filter .= " OR `V6`.`ipv6_address` LIKE ?
+                                       OR `D`.`overwrite_ip` LIKE ?
+                                       OR `D`.`ip` = ? ";
+                    $query_args_list = array_merge($query_args_list, ["%$search%", "%$search%", inet_pton($search)]);
+            }
+
+            // result limitation
+            $query_args_list[] = $limit;
+            $results = dbFetchRows($query .
+                                   " WHERE " . $query_filter .
+                                   " GROUP BY `D`.`hostname`
+                                     ORDER BY `D`.`hostname` LIMIT ?", $query_args_list);
 
             if (count($results)) {
                 $found   = 1;
