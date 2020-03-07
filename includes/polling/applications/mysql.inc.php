@@ -219,10 +219,12 @@ $mapping_status = array(
 
 $rrd_name = array('app', $name, $app_id, 'status');
 $rrd_def = new RrdDefinition();
+// because this sends different names for rrd and compared to other datastores, disable $fields name checks
+$rrd_def->disableNameChecking();
 
 $fields = array();
 foreach ($mapping_status as $desc => $id) {
-    $fields[$id] = (isset($map[$id]) && $map[$id] >= 0) ? $map[$id] : 'U';
+    $fields[$desc] = (isset($map[$id]) && $map[$id] >= 0) ? $map[$id] : 'U';
     $rrd_def->addDataset($id, 'GAUGE', 0, 125000000000);
 }
 $metrics += $fields;

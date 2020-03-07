@@ -32,6 +32,7 @@ class RrdDefinition
 {
     private static $types = ['GAUGE', 'DERIVE', 'COUNTER', 'ABSOLUTE', 'DCOUNTER', 'DDERIVE'];
     private $dataSets = [];
+    private $skipNameCheck = false;
 
     /**
      * Make a new empty RrdDefinition
@@ -90,7 +91,12 @@ class RrdDefinition
      */
     public function isValidDataset($name)
     {
-        return isset($this->dataSets[$name]);
+        return $this->skipNameCheck || isset($this->dataSets[$name]);
+    }
+
+    public function disableNameChecking()
+    {
+        $this->skipNameCheck = true;
     }
 
     /**
