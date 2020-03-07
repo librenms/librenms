@@ -61,6 +61,8 @@ class QueryBuilderParser implements \JsonSerializable
         'is_not_null' => "IS NOT NULL",
         'regex' => 'REGEXP',
         'not_regex' => 'NOT REGEXP',
+        'in' => 'IN',
+        'not_in' => 'NOT IN',
     ];
 
     protected static $values = [
