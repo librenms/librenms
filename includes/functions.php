@@ -2038,7 +2038,7 @@ function get_toner_levels($device, $raw_value, $capacity)
  */
 function initStats()
 {
-    global $snmp_stats;
+    global $snmp_stats, $snmp_stats_last;
 
     if (!isset($snmp_stats)) {
         $snmp_stats = array(
@@ -2053,6 +2053,7 @@ function initStats()
                 'snmpwalk' => 0.0,
             )
         );
+        $snmp_stats_last = $snmp_stats;
     }
 }
 
@@ -2141,27 +2142,6 @@ function printStats()
         }
         echo PHP_EOL;
     }
-}
-
-/**
- * Update statistics for rrd operations
- *
- * @param string $stat create, update, and other
- * @param float $start_time The time the operation started with 'microtime(true)'
- * @return float  The calculated run time
- */
-function recordRrdStatistic($stat, $start_time)
-{
-    global $rrd_stats;
-    initStats();
-
-    $stat = ($stat == 'update' || $stat == 'create') ? $stat : 'other';
-
-    $runtime = microtime(true) - $start_time;
-    $rrd_stats['ops'][$stat]++;
-    $rrd_stats['time'][$stat] += $runtime;
-
-    return $runtime;
 }
 
 /**
