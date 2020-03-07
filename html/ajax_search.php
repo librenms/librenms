@@ -54,7 +54,7 @@ if (isset($_REQUEST['search'])) {
                       LEFT JOIN `locations` AS `L` ON `L`.`id` = `D`.`location_id`";
 
             // user depending limitation
-            if ( ! Auth::user()->hasGlobalRead()) {
+            if (! Auth::user()->hasGlobalRead()) {
                 $query_args_list = $device_ids;
                 $query_filter = $perms_sql;
             } else {
@@ -78,7 +78,6 @@ if (isset($_REQUEST['search'])) {
                                        OR `D`.`overwrite_ip` LIKE ?
                                        OR `D`.`ip` = ? ";
                     $query_args_list = array_merge($query_args_list, ["%$search%", "%$search%", inet_pton($search)]);
-
             } elseif (\LibreNMS\Util\IPv6::isValid($search, false)) {
                     $query .= " LEFT JOIN `ports` AS `P` ON `P`.`device_id` = `D`.`device_id`
                                 LEFT JOIN `ipv6_addresses` AS `V6` ON `V6`.`port_id` = `P`.`port_id`";
