@@ -93,10 +93,15 @@ class InfluxDB extends BaseDatastore
             if ($k == 'time') {
                 $k = 'rtime';
             }
-            $tmp_fields[$k] = $this->forceType($v);
-            if ($tmp_fields[$k] === null) {
-                unset($tmp_fields[$k]);
+
+            if (($value = $this->forceType($v)) !== null) {
+                $tmp_fields[$k] = $value;
             }
+        }
+
+        if (empty($tmp_fields)) {
+            Log::warning('All fields empty, skipping update', ['orig_fields' => $fields]);
+            return;
         }
 
         Log::debug('InfluxDB data: ', [
@@ -167,9 +172,9 @@ class InfluxDB extends BaseDatastore
             } else {
                 return floatval($data);
             }
-        } else {
-            return $data;
         }
+
+        return $data === 'U' ? null : $data;
     }
 
     /**
