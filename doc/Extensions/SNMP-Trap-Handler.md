@@ -156,10 +156,6 @@ When you send a trap, it must of course conform to a set of standards. Every tra
 
 So what value should you type in the commands below? Oddly enough, simply supplying no value by using two single quotes '' will instruct the command to obtain the value from the operating system you are executing this on.
 
-For those who dig deeper and look at the spooled trap before it's processed will want to understand what type of format it is. Here is an example:
-`DISMAN-EVENT-MIB::sysUpTimeInstance 36:2:40:51.67`
-This correspond to 36 days, 2 hours, 40 minutes and 51.67 seconds.
-
 ### Event logging
 
 You can configure generic event logging for snmp traps.  This will log
