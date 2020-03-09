@@ -90,7 +90,7 @@ There is a list of snmptrapd options:
 Good practice is to avoid `-m ALL` because then it will try to load all the MIBs in DIRLIST, which
 will typically fail (snmptrapd cannot load that many mibs). Better is to specify the
 exact MIB files defining the traps you are interested in, for example for LinkDown and LinkUp
-traps `-m IF-MIB`. Multiple files can be added, separated with `:`.
+as well as BGP traps, use `-m IF-MIB:BGP4-MIB`. Multiple files can be added, separated with `:`.
 
 If you want to test or store original TRAPS in log then:
 
@@ -158,7 +158,7 @@ So what value should you type in the commands below? Oddly enough, simply supply
 
 For those who dig deeper and look at the spooled trap before it's processed will want to understand what type of format it is. Here is an example:
 `DISMAN-EVENT-MIB::sysUpTimeInstance 36:2:40:51.67`
-This equates to 36 days, 2 hours, 40 minutes and 51.67 seconds.
+This correspond to 36 days, 2 hours, 40 minutes and 51.67 seconds.
 
 ### Event logging
 
