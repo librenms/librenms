@@ -3,10 +3,13 @@ path: blob/master/doc/
 
 # SNMP trap handling
 
-Currently, LibreNMS supports a lot of trap handlers. You can check them on GitHub [there](https://github.com/librenms/librenms/tree/master/LibreNMS/Snmptrap/Handlers). To add more see [Adding new SNMP Trap handlers](../Developing/SNMP-Traps.md). Traps are handled via snmptrapd. 
+Currently, LibreNMS supports a lot of trap handlers. You can check them on 
+GitHub [there](https://github.com/librenms/librenms/tree/master/LibreNMS/Snmptrap/Handlers).
+To add more see [Adding new SNMP Trap handlers](../Developing/SNMP-Traps.md). Traps are handled via snmptrapd. 
 
 snmptrapd is an SNMP application that receives and logs SNMP TRAP and INFORM messages.
-> The default is to listen on UDP port 162 on all IPv4 interfaces. Since 162 is a privileged port, snmptrapd must typically be run as root.
+> The default is to listen on UDP port 162 on all IPv4 interfaces. Since 162 is a
+privileged port, snmptrapd must typically be run as root.
 
 ## Configure snmptrapd
 
@@ -80,10 +83,13 @@ There is a list of snmptrapd options:
 |   -a   | Ignore authenticationFailure traps. [OPTIONAL]                                                   |
 |   -f   | Do not fork from the shell                                                                       |
 |   -n   | Use numeric addresses instead of attempting hostname lookups (no DNS) [OPTIONAL]                 |
-|   -m   | MIBLIST: use MIBLIST instead of the default MIB list (ALL = All MIBS in DIR).                    |                   
-|   -M   | DIRLIST: use DIRLIST as the list of locations to look for MIBs. Option is not recursive, so you need to specify each DIR individually. (For example: /opt/librenms/mibs:/opt/librenms/mibs/cisco:/opt/librenms/mibs/edgecos)|                                            
+|   -m   | MIBLIST: use MIBLIST (`FILE1-MIB:FILE2-MIB`). ALL = All MIBS in DIRLIST.                         |
+|   -M   | DIRLIST: use DIRLIST as the list of locations to look for MIBs. Option is not recursive, so you need to specify each DIR individually, separated by `:`. (For example: /opt/librenms/mibs:/opt/librenms/mibs/cisco:/opt/librenms/mibs/edgecos)|                                            
 
-Good practice for advanced users is to don't use option `-M` for example for all MIBs like `/opt/librenms/mibs` with  `-m ALL` beacuse then it's checking all of the MIBs in DIR. Better is to specify for example MIB for LinkDown and LinkUp Traps `-m IF-MIB` and so on separated with `:`. Then you will have specified MIBS for what are you really looking for.
+Good practice is to avoid `-m ALL` because then it will try to load all the MIBs in DIRLIST, which
+will typically fail (snmptrapd cannot load that many mibs). Better is to specify the
+exact MIB files defining the traps you are interested in, for example for LinkDown and LinkUp
+traps `-m IF-MIB`. Multiple files can be added, separated with `:`.
 
 If you want to test or store original TRAPS in log then:
 
