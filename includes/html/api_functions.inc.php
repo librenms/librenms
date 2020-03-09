@@ -957,14 +957,13 @@ function list_alert_rules(\Illuminate\Http\Request $request)
     $sql    = '';
     $param  = [];
     if ($id > 0) {
-        $sql     = 'WHERE id=?';
+        $sql     = 'WHERE alert_rules.id=?';
         $param   = [$id];
     }
 
-    $rules = dbFetchRows("SELECT * FROM `alert_rules` $sql", $param);
+    $rules = dbFetchRows("SELECT alert_rules.*, GROUP_CONCAT(alert_device_map.device_id) AS devices FROM `alert_rules` INNER JOIN alert_device_map ON alert_rules.id = alert_device_map.rule_id $sql", $param);
     return api_success($rules, 'rules');
 }
-
 
 function list_alerts(\Illuminate\Http\Request $request)
 {
