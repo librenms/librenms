@@ -45,8 +45,12 @@ return [
         ],
         'poller' => [
             'distributed' => 'Distributed Poller',
+            'graphite' => 'Datastore: Graphite',
+            'influxdb' => 'Datastore: InfluxDB',
+            'opentsdb' => 'Datastore: OpenTSDB',
             'ping' => 'Ping',
-            'rrdtool' => 'RRDTool Setup',
+            'prometheus' => 'Datastore: Prometheus',
+            'rrdtool' => 'Datastore: RRDTool',
             'snmp' => 'SNMP',
             'poller_modules' => 'Poller Modules',
         ],
@@ -611,6 +615,24 @@ return [
                 ]
             ]
         ],
+        'graphite' => [
+            'enable' => [
+                'description' => 'Enable',
+                'help' => 'Exports metrics to Graphite'
+            ],
+            'host' => [
+                'description' => 'Server',
+                'help' => 'The IP or hostname of the Graphite server to send data to'
+            ],
+            'port' => [
+                'description' => 'Port',
+                'help' => 'The port to use to connect to the Graphite server'
+            ],
+            'prefix' => [
+                'description' => 'Prefix (Optional)',
+                'help' => 'Will add the prefix to the start of all metrics.  Must be alphanumeric separated by dots'
+            ]
+        ],
         'graylog' => [
             'base_uri' => [
                 'description' => 'Base URI',
@@ -679,6 +701,49 @@ return [
             'description' => 'Mountpoints containing String to be ignored',
             'help' => 'Don\'t monitor Disc Usage of Mountpoints which contains at least one of this Strings'
         ],
+        'influxdb' => [
+            'db' => [
+                'description' => 'Database',
+                'help' => 'Name of the InfluxDB database to store metrics'
+            ],
+            'enable' => [
+                'description' => 'Enable',
+                'help' => 'Exports metrics to InfluxDB'
+            ],
+            'host' => [
+                'description' => 'Server',
+                'help' => 'The IP or hostname of the InfluxDB server to send data to'
+            ],
+            'password' => [
+                'description' => 'Password',
+                'help' => 'Password to connect to InfluxDB, if required'
+            ],
+            'port' => [
+                'description' => 'Port',
+                'help' => 'The port to use to connect to the InfluxDB server'
+            ],
+            'timeout' => [
+                'description' => 'Timeout',
+                'help' => 'How long to wait for InfluxDB server, 0 means default timeout'
+            ],
+            'transport' => [
+                'description' => 'Transport',
+                'help' => 'The port to use to connect to the InfluxDB server',
+                'options' => [
+                    'http' => 'HTTP',
+                    'https' => 'HTTPS',
+                    'udp' => 'UDPRRRRRRR'
+                ]
+            ],
+            'username' => [
+                'description' => 'Username',
+                'help' => 'Username to connect to InfluxDB, if required'
+            ],
+            'verifySSL' => [
+                'description' => 'Verify SSL',
+                'help' => 'Verify the SSL certificate is valid and trusted'
+            ]
+        ],
         'ipmitool' => [
             'description' => 'Path to ipmtool'
         ],
@@ -743,6 +808,20 @@ return [
         ],
         'nmap' => [
             'description' => 'Path to nmap'
+        ],
+        'opentsdb' => [
+            'enable' => [
+                'description' => 'Enable',
+                'help' => 'Exports metrics to OpenTSDB'
+            ],
+            'host' => [
+                'description' => 'Server',
+                'help' => 'The IP or hostname of the OpenTSDB server to send data to'
+            ],
+            'port' => [
+                'description' => 'Port',
+                'help' => 'The port to use to connect to the OpenTSDB server'
+            ]
         ],
         'own_hostname' => [
             'description' => 'LibreNMS hostname',
@@ -942,6 +1021,20 @@ return [
         'ports_purge' => [
             'description' => 'Ports older than (days)',
             'help' => 'Cleanup done by daily.sh'
+        ],
+        'prometheus' => [
+            'enable' => [
+                'description' => 'Enable',
+                'help' => 'Exports metrics to Prometheus Push Gateway'
+            ],
+            'host' => [
+                'description' => 'Server',
+                'help' => 'The IP or hostname of the Prometheus Push Gateway to send data to'
+            ],
+            'port' => [
+                'description' => 'Job',
+                'help' => 'Job label for exported metrics'
+            ]
         ],
         'public_status' => [
             'description' => 'Show status publicly',
