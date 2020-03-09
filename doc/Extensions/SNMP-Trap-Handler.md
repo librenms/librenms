@@ -38,17 +38,18 @@ the file `/etc/systemd/system/snmptrapd.service.d/mibs.conf` and add
 the following content. 
 
 You may want to tweak to add vendor directories
-for devices you care about (in addition to or instead of cisco).
+for devices you care about. In the example below, standard and cisco
+directories are defined, and only IF-MIB is loaded. 
 
 ```ini
 [Service]
 Environment=MIBDIRS=+/opt/librenms/mibs:/opt/librenms/mibs/cisco
-Environment=MIBS=+ALL
+Environment=MIBS=+IF-MIB
 ```
 
 For non-systemd systems, you can edit TRAPDOPTS in the init script in /etc/init.d/snmptrapd.
 
-`TRAPDOPTS="-Lsd  -M /opt/librenms/mibs -m ALL -f -p $TRAPD_PID"`
+`TRAPDOPTS="-Lsd  -M /opt/librenms/mibs -m IF-MIB -f -p $TRAPD_PID"`
 
 Along with any necessary configuration to receive the traps from your
 devices (community, etc.)
@@ -66,9 +67,9 @@ After=network.target
 ConditionPathExists=/etc/snmp/snmptrapd.conf
 
 [Service]
-Environment="MIBSDIR=/usr/share/snmp/mibs:/usr/share/snmp/mibs/iana:/usr/share/snmp/mibs/ietf:/usr/share/mibs/site:/usr/share/snmp/mibs:/usr/share/mibs/iana:/usr/share/mibs/ietf:/usr/share/mibs/netsnmp"
+Environment="MIBSDIR=/opt/librenms/mibs"
 Type=simple
-ExecStart=/usr/sbin/snmptrapd -f -m ALL -M /opt/librenms/mibs
+ExecStart=/usr/sbin/snmptrapd -f -m IF-MIB -M /opt/librenms/mibs
 ExecReload=/bin/kill -HUP $MAINPID
 
 [Install]
@@ -83,7 +84,7 @@ There is a list of snmptrapd options:
 |   -a   | Ignore authenticationFailure traps. [OPTIONAL]                                                   |
 |   -f   | Do not fork from the shell                                                                       |
 |   -n   | Use numeric addresses instead of attempting hostname lookups (no DNS) [OPTIONAL]                 |
-|   -m   | MIBLIST: use MIBLIST (`FILE1-MIB:FILE2-MIB`). ALL = All MIBS in DIRLIST.                         |
+|   -m   | MIBLIST: use MIBLIST (`FILE1-MIB:FILE2-MIB`). `ALL` = Load all MIBS in DIRLIST. (usually fails) |
 |   -M   | DIRLIST: use DIRLIST as the list of locations to look for MIBs. Option is not recursive, so you need to specify each DIR individually, separated by `:`. (For example: /opt/librenms/mibs:/opt/librenms/mibs/cisco:/opt/librenms/mibs/edgecos)|                                            
 
 Good practice is to avoid `-m ALL` because then it will try to load all the MIBs in DIRLIST, which
@@ -117,18 +118,10 @@ sudo systemctl restart snmptrapd
 
 ## Testing 
 
-You can test if your snmptrapd are working correctly very easily, but you need to understand few things.
+The easiest test is to generate a trap from your device. Usually, changing the configuration on a network device, or
+plugging/unplugging a network cable (LinkUp, LinkDown) will generate a trap. You can confirm it using a with `tcpdump`, `tshark` or `wireshark`.
 
-### Why we need Uptime
-
-When you send a trap, it must of course conform to a set of standards. Every trap needs an uptime value. Uptime is how long the system has been running since boot. Sometimes this is the operating system, other devices might use the SNMP engine uptime. Regardless, a value will be sent.
-
-So what value should you type in the commands below? Oddly enough, simply supplying no value by using two single quotes '' will instruct the command to obtain the value from the operating system you are executing this on.
-
-For those who dig deeper and look at the spooled trap before it's processed will want to understand what type of format it is. Here is an example:
-`DISMAN-EVENT-MIB::sysUpTimeInstance 36:2:40:51.67`
-This equates to 36 days, 2 hours, 40 minutes and 51.67 seconds.
-The key point to this section is that you now know why the commands below have two single quotes '' for the uptime value.
+You can also generate a trap using the `snmptrap` command from the LibreNMS server itself (if and only if the LibreNMS server is monitored).
 
 ### How to send SNMP v2 Trap
 
@@ -156,6 +149,16 @@ and in LibreNMS your localhost device eventlog like:
 ```
 2020-03-09 16:22:59		SNMP trap received: SNMPv2-SMI::enterprises.8072.2.3.0.1
 ```
+
+### Why we need Uptime
+
+When you send a trap, it must of course conform to a set of standards. Every trap needs an uptime value. Uptime is how long the system has been running since boot. Sometimes this is the operating system, other devices might use the SNMP engine uptime. Regardless, a value will be sent.
+
+So what value should you type in the commands below? Oddly enough, simply supplying no value by using two single quotes '' will instruct the command to obtain the value from the operating system you are executing this on.
+
+For those who dig deeper and look at the spooled trap before it's processed will want to understand what type of format it is. Here is an example:
+`DISMAN-EVENT-MIB::sysUpTimeInstance 36:2:40:51.67`
+This equates to 36 days, 2 hours, 40 minutes and 51.67 seconds.
 
 ### Event logging
 
