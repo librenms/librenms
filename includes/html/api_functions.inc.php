@@ -951,17 +951,18 @@ function get_port_stack(\Illuminate\Http\Request $request)
     });
 }
 
+
 function list_alert_rules(\Illuminate\Http\Request $request)
 {
     $id = $request->route('id');
     $sql    = '';
     $param  = [];
     if ($id > 0) {
-        $sql     = 'WHERE alert_rules.id=?';
+        $sql     = 'WHERE id=?';
         $param   = [$id];
     }
 
-    $rules = dbFetchRows("SELECT alert_rules.*, GROUP_CONCAT(alert_device_map.device_id) AS devices FROM `alert_rules` INNER JOIN alert_device_map ON alert_rules.id = alert_device_map.rule_id $sql", $param);
+    $rules = dbFetchRows("SELECT id, rule, severity, extra, disabled, name, query, builder, proc, invert_map, GROUP_CONCAT(device_id) AS devices FROM (SELECT alert_rules.*, alert_device_map.device_id FROM  alert_rules INNER JOIN alert_device_map ON alert_rules.id = alert_device_map.rule_id UNION ALL SELECT alert_rules.*, devices.device_id FROM alert_rules INNER JOIN alert_location_map ON alert_rules.id = alert_location_map.rule_id INNER JOIN devices ON  alert_location_map.location_id = devices.location_id UNION ALL SELECT alert_rules.*, device_group_device.device_id FROM alert_rules INNER JOIN alert_group_map ON alert_rules.id = alert_group_map.rule_id INNER JOIN device_group_device ON  alert_group_map.group_id = device_group_device.device_group_id ) alertdevices $sql GROUP BY id", $param);
     return api_success($rules, 'rules');
 }
 
