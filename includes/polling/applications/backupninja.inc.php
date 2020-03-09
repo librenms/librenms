@@ -5,6 +5,7 @@ use LibreNMS\RRD\RrdDefinition;
 
 $name = 'backupninja';
 $app_id = $app['app_id'];
+
 if (!empty($agent_data['app'][$name])) {
     $backupninja = $agent_data['app'][$name];
 } else {
@@ -15,7 +16,11 @@ if (!empty($agent_data['app'][$name])) {
 
 echo ' backupninja';
 
-list ($last_actions, $last_fatal, $last_error, $last_warning) = explode(" ", $backupninja);
+$datas = json_decode($backupninja);
+$last_actions = $datas->actions;
+$last_fatal = $datas->fatal;
+$last_error = $datas->error;
+$last_warning = $datas->warning;
 
 $rrd_name = array('app', $name, $app_id);
 $rrd_def = RrdDefinition::make()
