@@ -1,0 +1,137 @@
+-- ************************************************************
+-- SILVERPEAK-TC.txt:   Silver Peak Systems, Inc.
+--                        MIB Textual Conventions
+--
+-- Copyright (c) 2011 Silver Peak Systems, Inc.
+-- All rights reserved.
+--
+-- ************************************************************
+--
+
+SILVERPEAK-TC DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION,
+    DisplayString
+        FROM SNMPv2-TC
+    silverpeakModules
+        FROM SILVERPEAK-SMI;
+
+
+silverpeakTextualConventions MODULE-IDENTITY
+    LAST-UPDATED    "201101240000Z"
+    ORGANIZATION    "Silver Peak Systems, Inc."
+    CONTACT-INFO
+            "  URL: http://www.silver-peak.com/contact
+            E-mail: support@silver-peak.com "
+    DESCRIPTION
+        "This module defines the textual conventions used throughout
+        Silverpeak Systems enterprise mibs."
+    ::= { silverpeakModules 1 }
+
+--
+-- General TCs for all Sub-systems
+--
+
+SilverpeakDescription ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Represents a string description used for any MIB object.
+         "
+    SYNTAX DisplayString (SIZE(0..255))
+
+SilverpeakYesNo   ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Textual convention for yes/no enum.
+        "
+    SYNTAX INTEGER
+    { 
+        no(0),
+        yes(1)
+    }
+
+--
+-- TCs for Alarm Sub-system
+--
+
+SilverpeakSeqNum ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Represents the unique sequence number associated with each
+         generated trap.
+         "
+    SYNTAX INTEGER (1..2147483647)
+
+SilverpeakAlarmSeverity ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Represents the perceived alarm condition associated with a
+        service affecting condition and/or event.
+
+            indeterminate(8) -
+                Indicates that the severity level cannot be
+                determined. 
+
+            unacknowledged(7) -
+                Indicates that the severity level cannot be
+                determined. 
+
+            acknowledged(6) -
+                Indicates that the severity level cannot be
+                determined. 
+
+            cleared(5) -
+                Indicates a previous alarm condition has been
+                cleared.  It is not required (unless specifically
+                stated elsewhere on a case by case basis) that an
+                alarm condition that has been cleared will produce
+                a notification or other event containing an
+                alarm severity with this value.
+
+            critical(4) -
+                Indicates that a service or safety affecting
+                condition has occurred and an immediate
+                corrective action is required.
+
+            major(3) -
+                Indicates that a service affecting condition has
+                occurred and an urgent corrective action is
+                required.
+
+            minor(2) -
+                Indicates the existence of a non-service affecting
+                condition and that corrective action should be
+                taken in order to prevent a more serious (for
+                example, service or safety affecting) condition.
+
+            warning(1) -
+                Indicates the detection of a potential or impending
+                service or safety affecting condition, before any
+                significant effects have been felt.
+
+            info(0) -
+                Indicates an alarm condition that does not
+                meet any other severity definition.  This can
+                include important, but non-urgent, notices or
+                informational events.
+         "
+    REFERENCE
+        "ITU-X.733"
+    SYNTAX INTEGER
+    {
+        info(0),
+        warning(1),
+        minor(2),
+        major(3),
+        critical(4),
+        cleared(5),
+        acknowledged(6),
+        unacknowledged(7),
+        indeterminate(8)
+    }
+
+
+END
