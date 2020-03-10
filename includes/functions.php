@@ -2010,7 +2010,7 @@ function printChangedStats($update_only = false)
         array_sum($db_stats['time']) - array_sum($db_stats_last['time'])
     );
 
-    foreach(app('Datastore')->getStats() as $datastore => $stats) {
+    foreach (app('Datastore')->getStats() as $datastore => $stats) {
         /** @var \LibreNMS\Data\Measure\MeasurementCollection $stats */
         $output .= sprintf(" %s: [%d/%.2fs]", $datastore, $stats->getCountDiff(), $stats->getDurationDiff());
         $stats->checkpoint();
@@ -2068,7 +2068,7 @@ function printStats()
         );
     }
 
-    foreach(app('Datastore')->getStats() as $datastore => $stats) {
+    foreach (app('Datastore')->getStats() as $datastore => $stats) {
         /** @var \LibreNMS\Data\Measure\MeasurementCollection $stats */
         printf("%s [%d/%.2fs]:", $datastore, $stats->getTotalCount(), $stats->getTotalDuration());
 
