@@ -59,7 +59,7 @@ foreach (dbFetchRows($sql, array()) as $device) {
         'hostname'              => "<a class='list-device' href='".generate_device_url($device, array('tab' => 'graphs', 'group' => 'poller'))."'>".format_hostname($device).'</a>',
         'last_polled'           => $device['last_polled'],
         'poller_group'          => $device['group_name'],
-        'last_polled_timetaken' => $device['last_polled_timetaken'],
+        'last_polled_timetaken' => round($device['last_polled_timetaken'], 2),
     );
 }
 
