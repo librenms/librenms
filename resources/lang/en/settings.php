@@ -63,6 +63,7 @@ return [
             'search' => 'Search Settings',
             'style' => 'Style',
             'device' => 'Device Settings',
+            'worldmap' => 'World Map Settings'
         ]
     ],
     'settings' => [
@@ -695,6 +696,10 @@ return [
         'mydomain' => [
             'description' => 'Primary Domain',
             'help' => 'This domain is used for network auto-discovery and other processes. LibreNMS will attempt to append it to unqualified hostnames.'
+        ],
+        'network_map_show_on_worldmap' => [
+            'description' => 'Display network links on the map',
+            'help' => 'Show the networks links between the different location on the worldmap (weathermap-like)'
         ],
         'nfsen_enable' => [
             'description' => 'Enable NfSen',
