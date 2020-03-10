@@ -1492,27 +1492,55 @@ function find_port_id($description, $identifier = '', $device_id = 0, $mac_addre
  */
 function discover_lldp_loc_port_id($device)
 {
+    d_echo('Store lldpLocPortId');
+    $module_start = microtime(true);
 
-    $port_stats = [];
-    $port_stats = snmpwalk_cache_oid($device, 'lldpLocPortId', $port_stats, 'LLDP-MIB');
+    $live_ports = [];
+    $live_ports = snmpwalk_cache_oid($device, 'lldpLocPortId', $port_stats, 'LLDP-MIB');
+    $db_lldp_ports = [];
+    $db_lldp_ports = dbFetchRows('SELECT * from `ports_lldplocportid` where `device_id` = ?', $device['device_id']);
+    $db_ports = [];
+    $db_ports = dbFetchRows('SELECT * from `ports` where `device_id` = ?', $device['device_id']);
 
-    foreach ($port_stats as $ifIndex => $snmp_data) {
-        $port = dbFetchRow('SELECT * from `ports` where `device_id` = ? AND `ifIndex` = ?', [$device['device_id'], $ifIndex]);
-        if ($port['port_id']) {
-            $data['device_id'] = $device['device_id'];
-            $data['lldpLocPortId'] = $snmp_data['lldpLocPortId'];
-            $data['port_id'] = $port['port_id'];
 
-            $lldpport = dbFetchRow('SELECT * from `ports_lldplocportid` where `device_id` = ? AND `lldpLocPortId` = ?', [$data['device_id'], $data['lldpLocPortId']]);
-            if (!$lldpport) {
-                //Insert
-                dbInsert($data, 'ports_lldplocportid');
-            } else {
-                //Update
+    foreach ($live_ports as $ifIndex => $snmp_data) {
+        $db_lldp_index = array_search($snmp_data['lldpLocPortId'], array_column($db_lldp_ports, 'lldpLocPortId'));
+        $port_index = array_search($ifIndex, array_column($db_ports, 'ifIndex'));
+
+        if (is_int($port_index)) {
+            $port_id = $db_ports[$port_index]['port_id'];
+        } else {
+            $port_id = NULL;
+        }
+        $data['device_id'] = $device['device_id'];
+        $data['lldpLocPortId'] = $snmp_data['lldpLocPortId'];
+        $data['port_id'] = $port_id;
+
+        if (!is_int($db_lldp_index)) {
+            d_echo('Adding:    ' . $snmp_data['lldpLocPortId']);
+            dbInsert($data, 'ports_lldplocportid');
+        } else {
+            if ($port_id != $db_lldp_ports[$db_lldp_index]['port_id']) {
+                d_echo('Updating:  ' . $snmp_data['lldpLocPortId'] . ' port_id ' . $db_lldp_ports[$db_lldp_index]['port_id'] . ' to ' . $port_id);
                 dbUpdate($data, 'ports_lldplocportid', '`device_id` = ? and `lldpLocPortId` = ?', [$data['device_id'], $data['lldpLocPortId']]);
+            } else {
+                d_echo('No Change: ' . $snmp_data['lldpLocPortId']);
             }
         }
     }
+    foreach($db_lldp_ports as $db_data) {
+        $db_lldp_ports_index = array_search($db_data['lldpLocPortId'], array_column($live_ports, 'lldpLocPortId'));
+        if (!is_int($db_lldp_ports_index)) {
+            d_echo('Deleting:  ' . $db_data['lldpLocPortId']);
+            dbDelete('ports_lldplocportid', '`device_id` = ? and `lldpLocPortId` = ?', [$device['device_id'], $db_data['lldpLocPortId']]);
+        }
+    }
+    $module_time = microtime(true) - $module_start;
+    $module_time = substr($module_time, 0, 5);
+    d_echo($module_time . ' seconds');
+
+//dd('debug stop');
+
 }
 
 /**
@@ -1527,7 +1555,7 @@ function find_port_id_by_lldp_port_id($lldpremportid, $device_id)
     if (!$device_id) {
         return 0;
     }
-
+d_echo($lldpremportid . ':' . $device_id);
     $sql = "SELECT `port_id` FROM `ports_lldplocportid` WHERE `device_id`=? AND `lldpLocPortId`=? LIMIT 1";
     $params[] = $device_id;
     $params[] = $lldpremportid;
