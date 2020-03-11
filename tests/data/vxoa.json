@@ -3621,7 +3621,6 @@
         "discovery": {
             "route": [
                 {
-                    "port_id": 11,
                     "context_name": "",
                     "inetCidrRouteIfIndex": 11,
                     "inetCidrRouteType": 3,
