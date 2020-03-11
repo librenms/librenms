@@ -1,6 +1,2 @@
-1.3.6.1.2.1.1.1.0|4|Linux mbx01 4.15.0-76-generic #86-Ubuntu SMP Fri Jan 17 17:24:28 UTC 2020 x86_64
-1.3.6.1.2.1.1.2.0|6|1.3.6.1.4.1.8072.3.2.10
 1.3.6.1.4.1.8072.1.3.2.2.1.21.15.109.97.105.108.99.111.119.45.112.111.115.116.102.105.120|2|1
-1.3.6.1.4.1.8072.1.3.2.3.1.2.15.109.97.105.108.99.111.119.45.112.111.115.116.102.105.120|4|{\"data\":{\"received\":\"8\",\"delivered\":\"15\",\"forwarded\":\"0\",\"deferred\":\"0\",\"bounced\":\"0\",\"rejected\":\"0\",\"rejectwarnings\":\"0\",\"held\":\"0\",\"discarded\":\"0\",\"bytesreceived\":7188480,\"bytesdelivered\":7225344,\"senders\":\"4\",\"sendinghostsdomains\":\"4\",\"recipients\":\"5\",\"recipienthostsdomains\":\"4\"},\"error\":\"0\",\"errorString\":\"\",\"version\":\"1\"}
-1.3.6.1.4.1.8072.1.3.2.4.1.2.8.111.115.117.112.100.97.116.101.1|4|11
-1.3.6.1.6.3.10.2.1.3.0|2|193291
+1.3.6.1.4.1.8072.1.3.2.3.1.2.15.109.97.105.108.99.111.119.45.112.111.115.116.102.105.120|4|{"data":{"received":"2","delivered":"2","forwarded":"0","deferred":"0","bounced":"0","rejected":"2","rejectwarnings":"0","held":"0","discarded":"0","bytesreceived":"4239","bytesdelivered":"8478","senders":"1","sendinghostsdomains":"1","recipients":"2","recipienthostsdomains":"2"},"error":"0","errorString":"","version":"1"}
