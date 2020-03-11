@@ -23,6 +23,7 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
 
     // pages
     Route::resource('device-groups', 'DeviceGroupController');
+    Route::resource('poller-groups', 'PollerGroupController');
     Route::get('locations', 'LocationController@index');
     Route::resource('preferences', 'UserPreferencesController', ['only' => ['index', 'store']]);
     Route::resource('users', 'UserController');
@@ -42,7 +43,7 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
     });
 
     // old route redirects
-    Route::permanentRedirect('poll-log', 'pollers/tab=log/');
+    Route::permanentRedirect('poll-log', 'poller-groups?tab=log');
     Route::get('settings/sub={tab}', function ($tab) {
         return redirect("settings/$tab");
     });

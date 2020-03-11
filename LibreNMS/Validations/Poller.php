@@ -117,7 +117,7 @@ class Poller extends BaseValidation
                 $result->setFix('Check your poll log and see: http://docs.librenms.org/Support/Performance/');
             } else {
                 $base_url = $validator->getBaseURL();
-                $result->setFix("Check $base_url/pollers/tab=log and see: http://docs.librenms.org/Support/Performance/");
+                $result->setFix("Check $base_url/poller-groups?tab=log and see: http://docs.librenms.org/Support/Performance/");
             }
 
             $validator->result($result);
@@ -136,7 +136,7 @@ class Poller extends BaseValidation
                 $result->setFix('Check your poll log and see: http://docs.librenms.org/Support/Performance/');
             } else {
                 $base_url = $validator->getBaseURL();
-                $result->setFix("Check $base_url/pollers/tab=log/ and see: http://docs.librenms.org/Support/Performance/");
+                $result->setFix("Check $base_url/poller-groups?tab=log/ and see: http://docs.librenms.org/Support/Performance/");
             }
 
             $validator->result($result);
