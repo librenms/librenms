@@ -21,6 +21,7 @@ use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Validator;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Config;
+use LibreNMS\Data\Store\Datastore;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IPv4;
 
@@ -83,9 +84,8 @@ function api_get_graph(array $vars)
 
     ob_start();
 
-    rrdtool_initialize(false);
     include 'includes/html/graphs/graph.inc.php';
-    rrdtool_close();
+    Datastore::terminate();
 
     $image = ob_get_contents();
     ob_end_clean();
