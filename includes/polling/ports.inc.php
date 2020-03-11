@@ -839,10 +839,14 @@ foreach ($ports as $port) {
                 Rrd::tune('port', $rrdfile, $this_port['ifSpeed']);
             }
 
-            $port_descr_type = $port['port_descr_type'];
-            $ifName = $port['ifName'];
-            $ifAlias = $port['ifAlias'];
-            $tags = compact('ifName', 'ifAlias', 'port_descr_type', 'rrd_name', 'rrd_def');
+            $tags = [
+                'ifName' => $port['ifName'],
+                'ifAlias' => $port['ifAlias'],
+                'ifIndex' => $port['ifIndex'],
+                'port_descr_type' => $port['port_descr_type'],
+                'rrd_name' => $rrd_name,
+                'rrd_def' => $rrd_def,
+            ];
             app('Datastore')->put($device, 'ports', $tags, $fields);
 
             // End Update IF-MIB

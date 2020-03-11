@@ -92,7 +92,7 @@ class OpenTSDB extends BaseDatastore
             }
         }
 
-        if ($measurement == 'port') {
+        if ($measurement == 'ports') {
             foreach ($fields as $k => $v) {
                 $measurement = $k;
                 if ($flag == true) {
@@ -125,7 +125,6 @@ class OpenTSDB extends BaseDatastore
             $this->recordStatistic($stat->end());
         } catch (\Socket\Raw\Exception $e) {
             Log::error('OpenTSDB Error: ' . $e->getMessage());
-            exit;
         }
     }
 

@@ -91,6 +91,10 @@ class Graphite extends BaseDatastore
 
         $timestamp = Carbon::now()->timestamp;
 
+        if($measurement == 'ports') {
+            $measurement = 'ports|' . $tags['ifName'];
+        }
+
         // metrics will be built as prefix.hostname.measurement.field value timestamp
         // metric fields can not contain . as this is used by graphite as a field separator
         $hostname = preg_replace('/\./', '_', $device['hostname']);
