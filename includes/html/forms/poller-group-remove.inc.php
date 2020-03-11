@@ -25,6 +25,8 @@ if (!is_numeric($_POST['group_id'])) {
     if ($_POST['confirm'] == 'yes') {
         $delete = dbDelete('poller_groups', '`id` = ?', array($_POST['group_id']));
         if ($delete > '0') {
+            $default_poller_id = Config::get('distributed_poller_group');
+            dbUpdate(array('poller_group' => $default_poller_id), 'devices', 'poller_group = ?', array($_POST['group_id']));
             echo 'Poller group has been removed';
             exit;
         } else {
