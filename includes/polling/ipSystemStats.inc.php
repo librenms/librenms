@@ -105,7 +105,7 @@ if ($data) {
             if (strstr($stats[$oid], 'No') || strstr($stats[$oid], 'd') || strstr($stats[$oid], 's')) {
                 $stats[$oid] = '0';
             }
-            $fields[$oid_ds] = $stats[$oid];
+            $fields[$oid] = $stats[$oid];
         }
 
         $tags = compact('af', 'rrd_name', 'rrd_def');

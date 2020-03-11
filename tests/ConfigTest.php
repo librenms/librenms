@@ -200,22 +200,4 @@ class ConfigTest extends TestCase
         $function($config);
         $this->config->setValue($config);
     }
-
-    public function testForget()
-    {
-        Config::set('forget.me', 'now');
-        $this->assertTrue(Config::has('forget.me'));
-
-        Config::forget('forget.me');
-        $this->assertFalse(Config::has('forget.me'));
-    }
-
-    public function testForgetSubtree()
-    {
-        Config::set('forget.me.sub', 'yep');
-        $this->assertTrue(Config::has('forget.me.sub'));
-
-        Config::forget('forget.me');
-        $this->assertFalse(Config::has('forget.me.sub'));
-    }
 }

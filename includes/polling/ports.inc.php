@@ -823,7 +823,16 @@ foreach ($ports as $port) {
                 'OUTMULTICASTPKTS' => $this_port['ifOutMulticastPkts'],
             );
 
-            // non rrd stats (will be filtered)
+            if ($tune_port === true) {
+                rrdtool_tune('port', $rrdfile, $this_port['ifSpeed']);
+            }
+
+            $port_descr_type = $port['port_descr_type'];
+            $ifName = $port['ifName'];
+            $ifAlias = $port['ifAlias'];
+            $tags = compact('ifName', 'ifAlias', 'port_descr_type', 'rrd_name', 'rrd_def');
+            rrdtool_data_update($device, 'ports', $tags, $fields);
+
             $fields['ifInUcastPkts_rate'] = $port['ifInUcastPkts_rate'];
             $fields['ifOutUcastPkts_rate'] = $port['ifOutUcastPkts_rate'];
             $fields['ifInErrors_rate'] = $port['ifInErrors_rate'];
@@ -835,16 +844,10 @@ foreach ($ports as $port) {
             $fields['ifInBits_rate'] = $port['stats']['ifInBits_rate'];
             $fields['ifOutBits_rate'] = $port['stats']['ifOutBits_rate'];
 
-            if ($tune_port === true) {
-                Rrd::tune('port', $rrdfile, $this_port['ifSpeed']);
-            }
-
-            $port_descr_type = $port['port_descr_type'];
-            $ifName = $port['ifName'];
-            $ifAlias = $port['ifAlias'];
-            $tags = compact('ifName', 'ifAlias', 'port_descr_type', 'rrd_name', 'rrd_def');
-            app('Datastore')->put($device, 'ports', $tags, $fields);
-
+            prometheus_push($device, 'ports', rrd_array_filter($tags), $fields);
+            influx_update($device, 'ports', rrd_array_filter($tags), $fields);
+            graphite_update($device, 'ports|' . $ifName, $tags, $fields);
+            opentsdb_update($device, 'port', array('ifName' => $this_port['ifName'], 'ifIndex' => getPortRrdName($port_id)), $fields);
             // End Update IF-MIB
             // Update PAgP
             if ($this_port['pagpOperationMode'] || $port['pagpOperationMode']) {

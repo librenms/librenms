@@ -344,6 +344,26 @@ function percent_colour($perc)
     return sprintf('#%02x%02x%02x', $r, $b, $b);
 }
 
+// Returns the last in/out errors value in RRD
+function interface_errors($rrd_file, $period = '-1d')
+{
+    $errors = array();
+
+    $cmd = Config::get('rrdtool') . " fetch -s $period -e -300s $rrd_file AVERAGE | grep : | cut -d\" \" -f 4,5";
+    $data = trim(shell_exec($cmd));
+    $in_errors = 0;
+    $out_errors = 0;
+    foreach (explode("\n", $data) as $entry) {
+        list($in, $out) = explode(" ", $entry);
+        $in_errors += ($in * 300);
+        $out_errors += ($out * 300);
+    }
+    $errors['in'] = round($in_errors);
+    $errors['out'] = round($out_errors);
+
+    return $errors;
+}
+
 /**
  * @param $device
  * @return string the logo image path for this device. Images are often wide, not square.
@@ -1522,6 +1542,30 @@ function function_check($function)
     return function_exists($function);
 }
 
+function force_influx_data($data)
+{
+   /*
+    * It is not trivial to detect if something is a float or an integer, and
+    * therefore may cause breakages on inserts.
+    * Just setting every number to a float gets around this, but may introduce
+    * inefficiencies.
+    * I've left the detection statement in there for a possible change in future,
+    * but currently everything just gets set to a float.
+    */
+
+    if (is_numeric($data)) {
+        // If it is an Integer
+        if (ctype_digit($data)) {
+            return floatval($data);
+        // Else it is a float
+        } else {
+            return floatval($data);
+        }
+    } else {
+        return $data;
+    }
+}// end force_influx_data
+
 /**
  * Try to determine the address family (IPv4 or IPv6) associated with an SNMP
  * transport specifier (like "udp", "udp6", etc.).
@@ -1617,6 +1661,50 @@ function dnslookup($device, $type = false, $return = false)
     $record = dns_get_record($device['hostname'], $type);
     return $record[0][$return];
 }//end dnslookup
+
+
+
+
+/**
+ * Run rrdtool info on a file path
+ *
+ * @param string $path Path to pass to rrdtool info
+ * @param string $stdOutput Variable to recieve the output of STDOUT
+ * @param string $stdError Variable to recieve the output of STDERR
+ *
+ * @return int exit code
+ *
+**/
+
+function rrdtest($path, &$stdOutput, &$stdError)
+{
+    //rrdtool info <escaped rrd path>
+    $command = Config::get('rrdtool') . ' info ' . escapeshellarg($path);
+    $process = proc_open(
+        $command,
+        array (
+            0 => array('pipe', 'r'),
+            1 => array('pipe', 'w'),
+            2 => array('pipe', 'w'),
+        ),
+        $pipes
+    );
+
+    if (!is_resource($process)) {
+        throw new \RuntimeException('Could not create a valid process');
+    }
+
+    $status = proc_get_status($process);
+    while ($status['running']) {
+        usleep(2000); // Sleep 2000 microseconds or 2 milliseconds
+        $status = proc_get_status($process);
+    }
+
+    $stdOutput = stream_get_contents($pipes[1]);
+    $stdError  = stream_get_contents($pipes[2]);
+    proc_close($process);
+    return $status['exitcode'];
+}
 
 /**
  * Create a new state index.  Update translations if $states is given.
@@ -1974,9 +2062,10 @@ function get_toner_levels($device, $raw_value, $capacity)
  */
 function initStats()
 {
-    global $snmp_stats, $snmp_stats_last;
+    global $snmp_stats, $rrd_stats;
+    global $snmp_stats_last, $rrd_stats_last;
 
-    if (!isset($snmp_stats)) {
+    if (!isset($snmp_stats, $rrd_stats)) {
         $snmp_stats = array(
             'ops' => array(
                 'snmpget' => 0,
@@ -1990,6 +2079,20 @@ function initStats()
             )
         );
         $snmp_stats_last = $snmp_stats;
+
+        $rrd_stats = array(
+            'ops' => array(
+                'update' => 0,
+                'create' => 0,
+                'other' => 0,
+            ),
+            'time' => array(
+                'update' => 0.0,
+                'create' => 0.0,
+                'other' => 0.0,
+            ),
+        );
+        $rrd_stats_last = $rrd_stats;
     }
 }
 
@@ -2000,29 +2103,25 @@ function initStats()
  */
 function printChangedStats($update_only = false)
 {
-    global $snmp_stats, $db_stats;
-    global $snmp_stats_last, $db_stats_last;
-    $output = sprintf(
-        ">> SNMP: [%d/%.2fs] MySQL: [%d/%.2fs]",
-        array_sum($snmp_stats['ops']) - array_sum($snmp_stats_last['ops']),
-        array_sum($snmp_stats['time']) - array_sum($snmp_stats_last['time']),
-        array_sum($db_stats['ops']) - array_sum($db_stats_last['ops']),
-        array_sum($db_stats['time']) - array_sum($db_stats_last['time'])
-    );
-
-    foreach (app('Datastore')->getStats() as $datastore => $stats) {
-        /** @var \LibreNMS\Data\Measure\MeasurementCollection $stats */
-        $output .= sprintf(" %s: [%d/%.2fs]", $datastore, $stats->getCountDiff(), $stats->getDurationDiff());
-        $stats->checkpoint();
-    }
+    global $snmp_stats, $db_stats, $rrd_stats;
+    global $snmp_stats_last, $db_stats_last, $rrd_stats_last;
 
     if (!$update_only) {
-        echo $output . PHP_EOL;
+        printf(
+            ">> SNMP: [%d/%.2fs] MySQL: [%d/%.2fs] RRD: [%d/%.2fs]\n",
+            array_sum($snmp_stats['ops']) - array_sum($snmp_stats_last['ops']),
+            array_sum($snmp_stats['time']) - array_sum($snmp_stats_last['time']),
+            array_sum($db_stats['ops']) - array_sum($db_stats_last['ops']),
+            array_sum($db_stats['time']) - array_sum($db_stats_last['time']),
+            array_sum($rrd_stats['ops']) - array_sum($rrd_stats_last['ops']),
+            array_sum($rrd_stats['time']) - array_sum($rrd_stats_last['time'])
+        );
     }
 
     // make a new checkpoint
     $snmp_stats_last = $snmp_stats;
     $db_stats_last = $db_stats;
+    $rrd_stats_last = $rrd_stats;
 }
 
 /**
@@ -2030,7 +2129,7 @@ function printChangedStats($update_only = false)
  */
 function printStats()
 {
-    global $snmp_stats, $db_stats;
+    global $snmp_stats, $db_stats, $rrd_stats;
 
     if ($snmp_stats) {
         printf(
@@ -2068,16 +2167,40 @@ function printStats()
         );
     }
 
-    foreach (app('Datastore')->getStats() as $datastore => $stats) {
-        /** @var \LibreNMS\Data\Measure\MeasurementCollection $stats */
-        printf("%s [%d/%.2fs]:", $datastore, $stats->getTotalCount(), $stats->getTotalDuration());
-
-        foreach ($stats as $stat) {
-            /** @var \LibreNMS\Data\Measure\MeasurementSummary $stat */
-            printf(" %s[%d/%.2fs]", ucfirst($stat->getType()), $stat->getCount(), $stat->getDuration());
-        }
-        echo PHP_EOL;
+    if ($rrd_stats) {
+        printf(
+            "RRD [%d/%.2fs]: Update[%d/%.2fs] Create [%d/%.2fs] Other[%d/%.2fs]\n",
+            array_sum($rrd_stats['ops']),
+            array_sum($rrd_stats['time']),
+            $rrd_stats['ops']['update'],
+            $rrd_stats['time']['update'],
+            $rrd_stats['ops']['create'],
+            $rrd_stats['time']['create'],
+            $rrd_stats['ops']['other'],
+            $rrd_stats['time']['other']
+        );
     }
+}
+
+/**
+ * Update statistics for rrd operations
+ *
+ * @param string $stat create, update, and other
+ * @param float $start_time The time the operation started with 'microtime(true)'
+ * @return float  The calculated run time
+ */
+function recordRrdStatistic($stat, $start_time)
+{
+    global $rrd_stats;
+    initStats();
+
+    $stat = ($stat == 'update' || $stat == 'create') ? $stat : 'other';
+
+    $runtime = microtime(true) - $start_time;
+    $rrd_stats['ops'][$stat]++;
+    $rrd_stats['time'][$stat] += $runtime;
+
+    return $runtime;
 }
 
 /**

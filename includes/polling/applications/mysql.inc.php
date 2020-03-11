@@ -219,8 +219,6 @@ $mapping_status = array(
 
 $rrd_name = array('app', $name, $app_id, 'status');
 $rrd_def = new RrdDefinition();
-// because this sends different names for rrd and compared to other datastores, disable $fields name checks
-$rrd_def->disableNameChecking();
 
 $fields = array();
 foreach ($mapping_status as $desc => $id) {
