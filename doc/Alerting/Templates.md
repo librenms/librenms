@@ -287,7 +287,7 @@ Conditional formatting example, will display a link to the host in
 email or just the hostname in any other transport:
 
 ```text
-@if ($alert->transport == mail)<a href="https://my.librenms.install/device/device={{ $alert->hostname }}/">{{ $alert->hostname }}</a>
+@if ($alert->transport == 'mail')<a href="https://my.librenms.install/device/device={{ $alert->hostname }}/">{{ $alert->hostname }}</a>
 @else
 {{ $alert->hostname }}
 @endif
