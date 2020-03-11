@@ -30,7 +30,6 @@
         "ext-session": "*",
         "ext-xml": "*",
         "amenadiel/jpgraph": "^3.6",
-        "clue/socket-raw": "^1.4",
         "dapphp/radius": "^2.0",
         "darkghosthunter/larapoke": "^3.1",
         "doctrine/dbal": "^2.9",

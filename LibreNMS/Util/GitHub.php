@@ -367,10 +367,7 @@ GRAPHQL;
         }
 
         if (!isset($previous_release['published_at'])) {
-            throw new Exception(
-                $previous_release['message'] ??
-                "Could not find previous release tag. ($this->from)"
-            );
+            throw new Exception("Could not find previous release tag.");
         }
 
         $this->getPullRequests($previous_release['published_at']);
