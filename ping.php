@@ -37,4 +37,14 @@ if (isset($options['g'])) {
     $groups = [];
 }
 
+if (Config::get('base_url') !== true && \LibreNMS\Config::get('influxdb.enable') === true) {
+    $influxdb = influxdb_connect();
+} else {
+    $influxdb = false;
+}
+
+rrdtool_initialize();
+
 PingCheck::dispatch($groups);
+
+rrdtool_close();

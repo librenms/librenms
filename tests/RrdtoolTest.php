@@ -26,7 +26,6 @@
 namespace LibreNMS\Tests;
 
 use LibreNMS\Config;
-use LibreNMS\Data\Store\Rrd;
 
 class RrdtoolTest extends TestCase
 {
@@ -37,26 +36,25 @@ class RrdtoolTest extends TestCase
         Config::set('rrdtool_version', '1.4');
         Config::set('rrd_dir', '/opt/librenms/rrd');
 
-        $cmd = $this->buildCommandProxy('create', '/opt/librenms/rrd/f', 'o');
+        $cmd = rrdtool_build_command('create', '/opt/librenms/rrd/f', 'o');
         $this->assertEquals('create /opt/librenms/rrd/f o', $cmd);
 
-        $cmd = $this->buildCommandProxy('tune', '/opt/librenms/rrd/f', 'o');
+        $cmd = rrdtool_build_command('tune', '/opt/librenms/rrd/f', 'o');
         $this->assertEquals('tune /opt/librenms/rrd/f o', $cmd);
 
-        $cmd = $this->buildCommandProxy('update', '/opt/librenms/rrd/f', 'o');
+        $cmd = rrdtool_build_command('update', '/opt/librenms/rrd/f', 'o');
         $this->assertEquals('update /opt/librenms/rrd/f o', $cmd);
 
 
-        $this->app->forgetInstance(Rrd::class);
         Config::set('rrdtool_version', '1.6');
 
-        $cmd = $this->buildCommandProxy('create', '/opt/librenms/rrd/f', 'o');
+        $cmd = rrdtool_build_command('create', '/opt/librenms/rrd/f', 'o');
         $this->assertEquals('create /opt/librenms/rrd/f o -O', $cmd);
 
-        $cmd = $this->buildCommandProxy('tune', '/opt/librenms/rrd/f', 'o');
+        $cmd = rrdtool_build_command('tune', '/opt/librenms/rrd/f', 'o');
         $this->assertEquals('tune /opt/librenms/rrd/f o', $cmd);
 
-        $cmd = $this->buildCommandProxy('update', '/opt/librenms/rrd/f', 'o');
+        $cmd = rrdtool_build_command('update', '/opt/librenms/rrd/f', 'o');
         $this->assertEquals('update /opt/librenms/rrd/f o', $cmd);
     }
 
@@ -66,25 +64,25 @@ class RrdtoolTest extends TestCase
         Config::set('rrdtool_version', '1.4');
         Config::set('rrd_dir', '/opt/librenms/rrd');
 
-        $cmd = $this->buildCommandProxy('create', '/opt/librenms/rrd/f', 'o');
+        $cmd = rrdtool_build_command('create', '/opt/librenms/rrd/f', 'o');
         $this->assertEquals('create /opt/librenms/rrd/f o', $cmd);
 
-        $cmd = $this->buildCommandProxy('tune', '/opt/librenms/rrd/f', 'o');
+        $cmd = rrdtool_build_command('tune', '/opt/librenms/rrd/f', 'o');
         $this->assertEquals('tune /opt/librenms/rrd/f o', $cmd);
 
-        $cmd = $this->buildCommandProxy('update', '/opt/librenms/rrd/f', 'o');
+        $cmd = rrdtool_build_command('update', '/opt/librenms/rrd/f', 'o');
         $this->assertEquals('update f o --daemon server:42217', $cmd);
 
-        $this->app->forgetInstance(Rrd::class);
+
         Config::set('rrdtool_version', '1.6');
 
-        $cmd = $this->buildCommandProxy('create', '/opt/librenms/rrd/f', 'o');
+        $cmd = rrdtool_build_command('create', '/opt/librenms/rrd/f', 'o');
         $this->assertEquals('create f o -O --daemon server:42217', $cmd);
 
-        $cmd = $this->buildCommandProxy('tune', '/opt/librenms/rrd/f', 'o');
+        $cmd = rrdtool_build_command('tune', '/opt/librenms/rrd/f', 'o');
         $this->assertEquals('tune f o --daemon server:42217', $cmd);
 
-        $cmd = $this->buildCommandProxy('update', '/opt/librenms/rrd/f', 'o');
+        $cmd = rrdtool_build_command('update', '/opt/librenms/rrd/f', 'o');
         $this->assertEquals('update f o --daemon server:42217', $cmd);
     }
 
@@ -95,16 +93,6 @@ class RrdtoolTest extends TestCase
 
         $this->expectException('LibreNMS\Exceptions\FileExistsException');
         // use this file, since it is guaranteed to exist
-        $this->buildCommandProxy('create', __FILE__, 'o');
-    }
-
-    private function buildCommandProxy($command, $filename, $options)
-    {
-        // todo better tests
-        $reflection = new \ReflectionClass(Rrd::class);
-        $method = $reflection->getMethod('buildCommand');
-        $method->setAccessible(true);
-
-        return $method->invokeArgs($this->app->make(Rrd::class), func_get_args());
+        rrdtool_build_command('create', __FILE__, 'o');
     }
 }

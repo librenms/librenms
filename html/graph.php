@@ -9,9 +9,6 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
-use LibreNMS\Authentication\LegacyAuth;
-use LibreNMS\Data\Store\Datastore;
-
 $start = microtime(true);
 
 $init_modules = array('web', 'graphs', 'auth');
@@ -25,9 +22,11 @@ if (!$auth) {
 
 set_debug(isset($_GET['debug']));
 
+rrdtool_initialize(false);
+
 require \LibreNMS\Config::get('install_dir') . '/includes/html/graphs/graph.inc.php';
 
-Datastore::terminate();
+rrdtool_close();
 
 if ($debug) {
     echo '<br />';
