@@ -33,13 +33,13 @@
                 },
                 {
                     "metric": "bytesdelivered",
-                    "value": 8478,
+                    "value": 128364,
                     "value_prev": null,
                     "app_type": "mailcow-postfix"
                 },
                 {
                     "metric": "bytesreceived",
-                    "value": 4239,
+                    "value": 64182,
                     "value_prev": null,
                     "app_type": "mailcow-postfix"
                 },
@@ -51,7 +51,7 @@
                 },
                 {
                     "metric": "delivered",
-                    "value": 2,
+                    "value": 4,
                     "value_prev": null,
                     "app_type": "mailcow-postfix"
                 },
@@ -93,7 +93,7 @@
                 },
                 {
                     "metric": "rejected",
-                    "value": 2,
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "mailcow-postfix"
                 },
@@ -105,13 +105,13 @@
                 },
                 {
                     "metric": "senders",
-                    "value": 1,
+                    "value": 2,
                     "value_prev": null,
                     "app_type": "mailcow-postfix"
                 },
                 {
                     "metric": "sendinghostsdomains",
-                    "value": 1,
+                    "value": 2,
                     "value_prev": null,
                     "app_type": "mailcow-postfix"
                 }
