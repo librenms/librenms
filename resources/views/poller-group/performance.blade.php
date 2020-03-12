@@ -12,7 +12,7 @@
         <h3 class="panel-title">Total Poller Time</h3>
     </div>
     <div class="panel-body">
-      <?php \LibreNMS\Util\Html::graphRow(['type' => 'global_poller_perf',
+        <?php \LibreNMS\Util\Html::graphRow(['type' => 'global_poller_perf',
                                            'legend' => 'yes', 'height' => 100], true); ?>
     </div>
 </div>
@@ -21,7 +21,7 @@
         <h3 class="panel-title">Total Poller Time Per Module</h3>
     </div>
     <div class="panel-body">
-      <?php \LibreNMS\Util\Html::graphRow(['type' => 'global_poller_modules_perf',
+        <?php \LibreNMS\Util\Html::graphRow(['type' => 'global_poller_modules_perf',
                                            'legend' => 'yes', 'height' => 100], true); ?>
     </div>
 </div>

@@ -42,20 +42,20 @@ class PollerGroupController extends Controller
 
         switch ($current_tab) {
             case 'poller':
-                $data = $this->poller_tab();
+                $data = $this->pollerTab();
                 break;
             case 'groups':
-                $data = $this->groups_tab();
+                $data = $this->groupsTab();
                 break;
             case 'performance':
                 $data = [];
                 break;
             case 'log':
-                $data = $this->log_tab($request);
+                $data = $this->logTab($request);
                 break;
             default:
                 $current_tab = $this->default_poller_tab;
-                $data = $this->poller_tab();
+                $data = $this->pollerTab();
                 break;
         }
 
@@ -131,18 +131,13 @@ class PollerGroupController extends Controller
         return $tabs;
     }
 
-    public function performance_tab()
-    {
-//        return view('poller-group.performance', []);
-    }
-
-    public function log_tab($request)
+    public function logTab($request)
     {
         return ['filter' => $request['filter'] ?: 'active'];
     }
 
     // output for poller groups
-    public function groups_tab()
+    public function groupsTab()
     {
         $group_list = PollerGroups::get();
 
@@ -165,13 +160,13 @@ class PollerGroupController extends Controller
     }
 
     // data output for poller view
-    public function poller_tab()
+    public function pollerTab()
     {
         return ['pollers' => $this->poller(),
-                'poller_cluster' => $this->poller_cluster()];
+                'poller_cluster' => $this->pollerCluster()];
     }
 
-    protected function poller_status($poller)
+    protected function pollerStatus($poller)
     {
         $old = $poller['now'] - strtotime($poller['last_polled']);
 
@@ -196,11 +191,10 @@ class PollerGroupController extends Controller
 
         $groups = [];
 
-        foreach ($rows as $poller)
-        {
-            $poller['now'] = time();
+        foreach ($rows as $poller) {
+            $poller['now'] = $time;
 
-            $poller = $this->poller_status($poller);
+            $poller = $this->pollerStatus($poller);
 
             $groups[] = $poller;
         }
@@ -208,15 +202,14 @@ class PollerGroupController extends Controller
         return $groups;
     }
 
-    private function poller_cluster()
+    private function pollerCluster()
     {
         $rows = PollerCluster::orderBy('poller_name')->get();
 
         $cluster = [];
 
-        foreach ($rows as $poller)
-        {
-            $poller = $this->poller_status($poller);
+        foreach ($rows as $poller) {
+            $poller = $this->pollerStatus($poller);
 
             $cluster[] = $poller;
         }
