@@ -533,7 +533,7 @@
                                 <li><a href="{{ url('poller-groups?tab=groups') }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> @lang('Groups')</a></li>
                                 @endconfig
                                 <li><a href="{{ url('poller-groups?tab=performance') }}"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> @lang('Performance')</a></li>
-                                <li><a href="{{ url('poller-groups?tab=log') }}"><i class="fa fa-file-text fa-fw fa-lg" aria-hidden="true"></i> @lang('History')</a></li>
+                                <li><a href="{{ url('poller-groups?tab=log') }}"><i class="fa fa-file-text fa-fw fa-lg" aria-hidden="true"></i> @lang('Log')</a></li>
                             </ul>
                         </li>
                         <li role="presentation" class="divider"></li>

@@ -59,46 +59,7 @@ class PollerGroupController extends Controller
                 break;
         }
 
-        $navbar_tab_data = [
-            'navbar' => $this->navbar(),
-            'current_tab' => $current_tab,
-        ];
-
-        return view('poller-group.'.$current_tab, array_merge($data, $navbar_tab_data));
-    }
-
-    public function navbar()
-    {
-        $_tabs = [];
-        $_tabs[] = [
-            'name' => 'Poller',
-            'icon' => 'fa-th-large',
-        ];
-
-        if ($this->isDistributedPoller) {
-            $_tabs[] = [
-                'name' => 'Groups',
-                'icon' => 'fa-th',
-            ];
-        }
-
-        $_tabs[] = [
-            'name' => 'Performance',
-            'icon' => 'fa-line-chart',
-        ];
-
-        $_tabs[] = [
-            'name' => 'Log',
-            'icon' => 'fa-file-text',
-        ];
-
-        // inject taburl string out of name
-        $tabs = [];
-        foreach ($_tabs as $t) {
-            $t['taburl'] = strtolower($t['name']);
-            $tabs[] = $t;
-        }
-        return $tabs;
+        return view('poller-group.'.$current_tab, array_merge($data, ['current_tab' => $current_tab]));
     }
 
     public function logTab($request)
