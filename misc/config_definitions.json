@@ -3068,9 +3068,38 @@
             },
             "type": "graph"
         },
+        "graphite.enable": {
+            "default": false,
+            "type": "boolean",
+            "group": "poller",
+            "section": "graphite",
+            "order": 0
+        },
+        "graphite.host": {
+            "default": "127.0.0.1",
+            "type": "text",
+            "group": "poller",
+            "section": "graphite",
+            "order": 1,
+            "validate": {
+                "value": "ip_or_hostname"
+            }
+        },
         "graphite.port": {
             "default": 2003,
-            "type": "integer"
+            "type": "integer",
+            "group": "poller",
+            "section": "graphite",
+            "order": 2
+        },
+        "graphite.prefix": {
+            "type": "text",
+            "group": "poller",
+            "section": "graphite",
+            "order": 3,
+            "validate": {
+                "value": "nullable|regex:/^[.a-zA-Z0-9]*$/"
+            }
         },
         "graphs.mini.normal": {
             "default": {
@@ -3290,13 +3319,74 @@
             "default": false,
             "type": "boolean"
         },
+        "influxdb.enable": {
+            "default": false,
+            "type": "boolean",
+            "group": "poller",
+            "section": "influxdb",
+            "order": 0
+        },
+        "influxdb.transport": {
+            "default": "http",
+            "type": "select",
+            "options": {
+                "http": "HTTP",
+                "https": "HTTPS",
+                "udp": "UDP"
+            },
+            "group": "poller",
+            "section": "influxdb",
+            "order": 1
+        },
+        "influxdb.host": {
+            "default": "127.0.0.1",
+            "type": "text",
+            "group": "poller",
+            "section": "influxdb",
+            "order": 2,
+            "validate": {
+                "value": "ip_or_hostname"
+            }
+        },
+        "influxdb.port": {
+            "default": 8086,
+            "type": "integer",
+            "group": "poller",
+            "section": "influxdb",
+            "order": 3
+        },
+        "influxdb.db": {
+            "default": "librenms",
+            "type": "text",
+            "group": "poller",
+            "section": "influxdb",
+            "order": 4
+        },
+        "influxdb.username": {
+            "type": "text",
+            "group": "poller",
+            "section": "influxdb",
+            "order": 5
+        },
+        "influxdb.password": {
+            "type": "password",
+            "group": "poller",
+            "section": "influxdb",
+            "order": 6
+        },
         "influxdb.timeout": {
             "default": 0,
-            "type": "integer"
+            "type": "integer",
+            "group": "poller",
+            "section": "influxdb",
+            "order": 7
         },
         "influxdb.verifySSL": {
             "default": false,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "poller",
+            "section": "influxdb",
+            "order": 8
         },
         "install_dir": {
             "type": "text"
@@ -3707,6 +3797,30 @@
         "old_graphs": {
             "default": true,
             "type": "boolean"
+        },
+        "opentsdb.enable": {
+            "default": false,
+            "type": "boolean",
+            "group": "poller",
+            "section": "opentsdb",
+            "order": 0
+        },
+        "opentsdb.host": {
+            "default": "127.0.0.1",
+            "type": "text",
+            "group": "poller",
+            "section": "opentsdb",
+            "order": 1,
+            "validate": {
+                "value": "ip_or_hostname"
+            }
+        },
+        "opentsdb.port": {
+            "default": 4242,
+            "type": "integer",
+            "group": "poller",
+            "section": "opentsdb",
+            "order": 2
         },
         "os.default.over": {
             "default": [
@@ -4233,9 +4347,29 @@
             "default": "LibreNMS",
             "type": "text"
         },
+        "prometheus.enable": {
+            "default": false,
+            "type": "boolean",
+            "group": "poller",
+            "section": "prometheus",
+            "order": 0
+        },
+        "prometheus.url": {
+            "default": "http://127.0.0.1:9091",
+            "type": "text",
+            "group": "poller",
+            "section": "prometheus",
+            "order": 1,
+            "validate": {
+                "value": "url"
+            }
+        },
         "prometheus.job": {
             "default": "librenms",
-            "type": "text"
+            "type": "text",
+            "group": "poller",
+            "section": "prometheus",
+            "order": 2
         },
         "public_status": {
             "default": false,
