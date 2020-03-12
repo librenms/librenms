@@ -16,29 +16,29 @@ use Toastr;
 class PollerGroupController extends Controller
 {
     public $rrdstep;
-    public $is_distributed_poller;
-    public $default_poller_id;
+    public $isDistributedPoller;
+    public $defaultPollerId;
 
-    public $default_poller_tab = 'poller';
+    public $defaultPollerTab = 'poller';
 
-    public $default_group = ['id' => 0,
+    public $defaultGroup = ['id' => 0,
                              'group_name' => 'General',
                              'descr' => ''];
-    public $default_poller_marker = '(default Poller)';
+    public $defaultPollerMarker = '(default Poller)';
 
     public function __construct()
     {
         $this->authorizeResource(PollerGroup::class, 'poller_groups');
 
-        $this->rrdstep = \LibreNMS\Config::get('rrd.step', 300);
+        $this->rrdstep = \LibreNMS\Config::get('rrd.step');
 
-        $this->is_distributed_poller = \LibreNMS\Config::get('distributed_poller');
-        $this->default_poller_id = \LibreNMS\Config::get('distributed_poller_group');
+        $this->isDistributedPoller = \LibreNMS\Config::get('distributed_poller');
+        $this->defaultPollerId = \LibreNMS\Config::get('distributed_poller_group');
     }
 
     public function index(Request $request)
     {
-        $current_tab = $request['tab'] ?: $this->default_poller_tab;
+        $current_tab = $request['tab'] ?: $this->defaultPollerTab;
 
         switch ($current_tab) {
             case 'poller':
@@ -54,7 +54,7 @@ class PollerGroupController extends Controller
                 $data = $this->logTab($request);
                 break;
             default:
-                $current_tab = $this->default_poller_tab;
+                $current_tab = $this->defaultPollerTab;
                 $data = $this->pollerTab();
                 break;
         }
@@ -67,36 +67,6 @@ class PollerGroupController extends Controller
         return view('poller-group.'.$current_tab, array_merge($data, $navbar_tab_data));
     }
 
-    public function create()
-    {
-        return redirect()->route('poller-groups.index');
-    }
-
-    public function store(Request $request)
-    {
-        return redirect()->route('poller-groups.index');
-    }
-
-    public function show(PollerGroup $pollerGroup)
-    {
-        return redirect()->route('poller-groups.index');
-    }
-
-    public function edit(PollerGroup $pollerGroup)
-    {
-        return redirect()->route('poller-groups.index');
-    }
-
-    public function update(Request $request, PollerGroup $pollerGroup)
-    {
-        return redirect()->route('poller-groups.index');
-    }
-
-    public function destroy(PollerGroup $pollerGroup)
-    {
-        return redirect()->route('poller-groups.index');
-    }
-
     public function navbar()
     {
         $_tabs = [];
@@ -105,7 +75,7 @@ class PollerGroupController extends Controller
             'icon' => 'fa-th-large',
         ];
 
-        if ($this->is_distributed_poller) {
+        if ($this->isDistributedPoller) {
             $_tabs[] = [
                 'name' => 'Groups',
                 'icon' => 'fa-th',
@@ -142,21 +112,21 @@ class PollerGroupController extends Controller
         $group_list = PollerGroups::get();
 
         # default poller_group
-        $default_group = $this->default_group;
-        $default_group['devices'] = Device::where('poller_group', $default_group['id'])->get();
-        $default_group['is_default_poller'] = ($default_group['id'] == $this->default_poller_id) ? true : false;
+        $defaultGroup = $this->defaultGroup;
+        $defaultGroup['devices'] = Device::where('poller_group', $defaultGroup['id'])->get();
+        $defaultGroup['is_default_poller'] = ($defaultGroup['id'] == $this->defaultPollerId) ? true : false;
 
         # poller_groups
         $poller_group_list = [];
         foreach ($group_list as $group) {
-            $group['is_default_poller'] = ($group['id'] == $this->default_poller_id) ? true : false;
+            $group['is_default_poller'] = ($group['id'] == $this->defaultPollerId) ? true : false;
 
             $poller_group_list[] = $group;
         }
 
-        return ['default_poller_marker' => $this->default_poller_marker,
+        return ['default_poller_marker' => $this->defaultPollerMarker,
                 'poller_groups' => $poller_group_list,
-                'default_poller_group' => $default_group];
+                'default_poller_group' => $defaultGroup];
     }
 
     // data output for poller view
