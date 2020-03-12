@@ -46,7 +46,9 @@ if ($device['os_group'] == 'cisco') {
             ->addDataset('svc', 'GAUGE', 0)
             ->addDataset('webvpn', 'GAUGE', 0);
 
-	if (!is_numeric($data['crasEmailNumSessions'])) { $data['crasEmailNumSessions'] = 0; }
+	if (!is_numeric($data['crasEmailNumSessions'])) { 
+	    $data['crasEmailNumSessions'] = 0;
+	}
 
         $fields = array(
             'email'   => $data['crasEmailNumSessions'],
