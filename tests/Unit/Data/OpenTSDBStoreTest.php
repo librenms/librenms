@@ -97,14 +97,14 @@ class OpenTSDBStoreTest extends TestCase
         $opentsdb = $this->mockOpenTSDB($mockSocket);
 
         $device = ['hostname' => 'testhost'];
-        $measurement = 'port';
+        $measurement = 'ports';
         $tags = ['ifName' => 'testifname', 'type' => 'testtype'];
         $fields = ['ifIn' => 897238, 'ifOut' => 2342];
 
         $mockSocket->shouldReceive('write')
-            ->with("put net.port.ifin $this->timestamp 897238\n");
+            ->with("put net.port.ifin $this->timestamp 897238.000000 hostname=testhost ifName=testifname type=testtype\n");
         $mockSocket->shouldReceive('write')
-            ->with("put net.port.ifout $this->timestamp 2342\n");
+            ->with("put net.port.ifout $this->timestamp 2342.000000 hostname=testhost ifName=testifname type=testtype\n");
         $opentsdb->put($device, $measurement, $tags, $fields);
     }
 
