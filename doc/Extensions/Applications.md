@@ -99,6 +99,7 @@ by following the steps under the `SNMP Extend` heading.
 1. [FreeRADIUS](#freeradius) - SNMP extend, Agent
 1. [Freeswitch](#freeswitch) - SNMP extend, Agent
 1. [GPSD](#gpsd) - SNMP extend, Agent
+1. [Mailcow-dockerized postfix](#mailcow-dockerized-postfix) - SNMP extend
 1. [Mailscanner](#mailscanner) - SNMP extend
 1. [Mdadm](#mdadm) - SNMP extend
 1. [Memcached](#memcached) - SNMP extend
@@ -738,6 +739,30 @@ and copy the `gpsd` script to `/usr/lib/check_mk_agent/local/`
 You may need to configure `$server` or `$port`.
 
 Verify it is working by running `/usr/lib/check_mk_agent/local/gpsd`
+
+# mailcow-dockerized postfix
+
+## SNMP Extend
+
+1: Download the script into the desired host.
+
+```
+wget https://github.com/librenms/librenms-agent/master/snmp/mailcow-dockerized-postfix -O /etc/snmp/mailcow-dockerized-postfix
+```
+
+2: Run `chmod +x /etc/snmp/mailcow-dockerized-postfix`
+
+3: Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+
+```
+extend mailcow-postfix /etc/snmp/mailcow-dockerized-postfix
+```
+
+4: Restart snmpd on your host
+
+The application should be auto-discovered as described at the top of
+the page. If it is not, please follow the steps set out under `SNMP
+Extend` heading top of page.
 
 # Mailscanner
 
