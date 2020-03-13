@@ -99,6 +99,9 @@ elif config['db_socket']:
 elif ':' in config['db_host']:
     db_server = config['db_host'].rsplit(':')[0]
     db_port = int(config['db_host'].rsplit(':')[1])
+elif 'db_port' in config:
+    db_server = config['db_host']
+    db_port = config['db_port']
 else:
     db_server = config['db_host']
     db_port = 0
