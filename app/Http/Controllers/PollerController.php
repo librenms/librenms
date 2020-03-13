@@ -13,7 +13,7 @@ use LibreNMS\Alerting\QueryBuilderFluentParser;
 use LibreNMS\Config;
 use Toastr;
 
-class PollerGroupController extends Controller
+class PollerController extends Controller
 {
     public $rrdstep;
     public $isDistributedPoller;
@@ -59,12 +59,13 @@ class PollerGroupController extends Controller
                 break;
         }
 
-        return view('poller-group.'.$current_tab, array_merge($data, ['current_tab' => $current_tab]));
+        return view('poller.'.$current_tab, array_merge($data, ['current_tab' => $current_tab]));
     }
 
     public function logTab($request)
     {
-        return ['filter' => $request['filter'] ?: 'active'];
+//        return ['filter' => $request['filter'] ?: 'active'];
+        return ['filter' => $request->input('filter', 'active')];
     }
 
     // output for poller groups

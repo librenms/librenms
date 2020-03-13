@@ -23,7 +23,7 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
 
     // pages
     Route::resource('device-groups', 'DeviceGroupController');
-    Route::get('poller-groups/{tab?}', 'PollerGroupController@index');
+    Route::get('poller/{tab?}', 'PollerController@index');
     Route::get('locations', 'LocationController@index');
     Route::resource('preferences', 'UserPreferencesController', ['only' => ['index', 'store']]);
     Route::resource('users', 'UserController');

@@ -1,4 +1,4 @@
-@extends('poller-group.index')
+@extends('poller.index')
 
 @section('title', __('Pollers'))
 
