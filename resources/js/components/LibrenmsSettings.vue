@@ -173,7 +173,7 @@
                 let sorted = {};
                 Object.keys(groups).sort((a, b) => this.translatedCompare('settings.groups.', a, b)).forEach(group_key => {
                     sorted[group_key] = {};
-                    Object.keys(groups[group_key]).sort((a, b) => this.translatedCompare('settings.sections.', a , b)).forEach(section_key => {
+                    Object.keys(groups[group_key]).sort((a, b) => this.translatedCompare('settings.sections.' + group_key + '.', a , b)).forEach(section_key => {
                         sorted[group_key][section_key] = _.sortBy(groups[group_key][section_key], 'order').map(a => a.name);
                     });
                 });
