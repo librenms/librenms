@@ -4,68 +4,35 @@ namespace App\Http\Controllers;
 
 use App\Models\Device;
 use App\Models\Poller;
-use App\Models\PollerGroups;
 use App\Models\PollerCluster;
-use Illuminate\Validation\Rule;
+use App\Models\PollerGroups;
 use Illuminate\Http\Request;
-use LibreNMS\Alerting\QueryBuilderFilter;
-use LibreNMS\Alerting\QueryBuilderFluentParser;
-use LibreNMS\Config;
-use Toastr;
 
 class PollerController extends Controller
 {
     public $rrdstep;
-    public $isDistributedPoller;
     public $defaultPollerId;
 
-    public $defaultPollerTab = 'poller';
-
-    public $defaultGroup = ['id' => 0,
-                             'group_name' => 'General',
-                             'descr' => ''];
+    public $defaultGroup = [
+        'id' => 0,
+        'group_name' => 'General',
+        'descr' => ''
+    ];
     public $defaultPollerMarker = '(default Poller)';
 
     public function __construct()
     {
-        $this->authorizeResource(PollerGroup::class, 'poller_groups');
-
+        $this->authorizeResource(PollerGroups::class, 'poller_groups'); // FIXME is this correct? not a resource anymore
         $this->rrdstep = \LibreNMS\Config::get('rrd.step');
-
-        $this->isDistributedPoller = \LibreNMS\Config::get('distributed_poller');
         $this->defaultPollerId = \LibreNMS\Config::get('distributed_poller_group');
     }
 
-    public function index(Request $request)
+    public function logTab(Request $request)
     {
-        $current_tab = $request['tab'] ?: $this->defaultPollerTab;
-
-        switch ($current_tab) {
-            case 'poller':
-                $data = $this->pollerTab();
-                break;
-            case 'groups':
-                $data = $this->groupsTab();
-                break;
-            case 'performance':
-                $data = [];
-                break;
-            case 'log':
-                $data = $this->logTab($request);
-                break;
-            default:
-                $current_tab = $this->defaultPollerTab;
-                $data = $this->pollerTab();
-                break;
-        }
-
-        return view('poller.'.$current_tab, array_merge($data, ['current_tab' => $current_tab]));
-    }
-
-    public function logTab($request)
-    {
-//        return ['filter' => $request['filter'] ?: 'active'];
-        return ['filter' => $request->input('filter', 'active')];
+        return view('poller.log', [
+            'current_tab' => 'log',
+            'filter' => $request->input('filter', 'active')
+        ]);
     }
 
     // output for poller groups
@@ -86,16 +53,27 @@ class PollerController extends Controller
             $poller_group_list[] = $group;
         }
 
-        return ['default_poller_marker' => $this->defaultPollerMarker,
-                'poller_groups' => $poller_group_list,
-                'default_poller_group' => $defaultGroup];
+        return view('poller.groups', [
+            'current_tab' => 'groups',
+            'default_poller_marker' => $this->defaultPollerMarker,
+            'poller_groups' => $poller_group_list,
+            'default_poller_group' => $defaultGroup,
+        ]);
     }
 
     // data output for poller view
     public function pollerTab()
     {
-        return ['pollers' => $this->poller(),
-                'poller_cluster' => $this->pollerCluster()];
+        return view('poller.poller', [
+            'current_tab' => 'poller',
+            'pollers' => $this->poller(),
+            'poller_cluster' => $this->pollerCluster(),
+        ]);
+    }
+
+    public function performanceTab()
+    {
+        return view('poller.performance', ['current_tab' => 'performance']);
     }
 
     protected function pollerStatus($poller)

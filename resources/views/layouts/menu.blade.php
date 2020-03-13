@@ -528,7 +528,7 @@
                         <li class="dropdown-submenu">
                             <a href="{{ url('poller') }}"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> @lang('Poller')</a>
                             <ul class="dropdown-menu">
-                                <li><a href="{{ url('poller/poller') }}"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> @lang('Poller')</a></li>
+                                <li><a href="{{ url('poller') }}"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> @lang('Poller')</a></li>
                                 @config('distributed_poller')
                                 <li><a href="{{ url('poller/groups') }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> @lang('Groups')</a></li>
                                 @endconfig
