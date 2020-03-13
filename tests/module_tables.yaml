@@ -63,7 +63,7 @@ ports:
         order_by: ports.ifIndex, ports.ifDescr, ports.ifName
 route:
     route:
-        excluded_fields: [device_id, route_id, created_at, updated_at]
+        excluded_fields: [port_id, device_id, route_id, created_at, updated_at]
         order_by: inetCidrRouteDest
 nac:
     ports_nac:
