@@ -752,6 +752,8 @@ wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/mailc
 
 2: Run `chmod +x /etc/snmp/mailcow-dockerized-postfix`
 
+> Maybe you will be neeed to install `pflogsumm` on debian based OS. Please check if you have package installed. 
+
 3: Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 
 ```
