@@ -747,10 +747,12 @@ Verify it is working by running `/usr/lib/check_mk_agent/local/gpsd`
 1: Download the script into the desired host.
 
 ```
-wget https://github.com/librenms/librenms-agent/master/snmp/mailcow-dockerized-postfix -O /etc/snmp/mailcow-dockerized-postfix
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/mailcow-dockerized-postfix -O /etc/snmp/mailcow-dockerized-postfix
 ```
 
 2: Run `chmod +x /etc/snmp/mailcow-dockerized-postfix`
+
+> Maybe you will be neeed to install `pflogsumm` on debian based OS. Please check if you have package installed. 
 
 3: Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 
