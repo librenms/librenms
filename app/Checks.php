@@ -98,7 +98,7 @@ class Checks
             $warn_sec = Config::get('rrd.step', 300) * 3;
             if (Device::isUp()->where('last_polled', '<=', Carbon::now()->subSeconds($warn_sec))->exists()) {
                 $warn_min = $warn_sec / 60;
-                Toastr::warning('<a href="pollers/tab=log/filter=unpolled/">It appears as though you have some devices that haven\'t completed polling within the last ' . $warn_min . ' minutes, you may want to check that out :)</a>', 'Devices unpolled');
+                Toastr::warning('<a href="poller/log?filter=unpolled/">It appears as though you have some devices that haven\'t completed polling within the last ' . $warn_min . ' minutes, you may want to check that out :)</a>', 'Devices unpolled');
             }
 
             // Directory access checks
