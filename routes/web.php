@@ -43,7 +43,7 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
     });
 
     // old route redirects
-    Route::permanentRedirect('poll-log', 'poller-groups/log');
+    Route::permanentRedirect('poll-log', 'poller/log');
     Route::get('settings/sub={tab}', function ($tab) {
         return redirect("settings/$tab");
     });
