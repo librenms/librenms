@@ -89,16 +89,16 @@ class Poller extends BaseValidation
             $pollers = dbFetchColumn($sql);
             if (count($pollers) > 0) {
                 foreach ($pollers as $poller) {
-                    $validator->fail("The poller ($poller) has not completed within the last 5 minutes, check the cron job.");
+                    $validator->fail("The poller ($poller) has not completed within the last $period seconds, check the cron job.");
                 }
             }
         } elseif (dbFetchCell('SELECT COUNT(*) FROM `poller_cluster`')) {
-            $sql = "SELECT `node_id` FROM `poller_cluster` WHERE `last_report` <= DATE_ADD(NOW(), INTERVAL - 5 MINUTE)";
+            $sql = "SELECT `node_id` FROM `poller_cluster` WHERE `last_report` <= DATE_ADD(NOW(), INTERVAL - $period SECOND)";
 
             $pollers = dbFetchColumn($sql);
             if (count($pollers) > 0) {
                 foreach ($pollers as $poller) {
-                    $validator->fail("The poller cluster member ($poller) has not checked in within the last 5 minutes, check that it is running and healthy.");
+                    $validator->fail("The poller cluster member ($poller) has not checked in within the last $period seconds, check that it is running and healthy.");
                 }
             }
         } else {
