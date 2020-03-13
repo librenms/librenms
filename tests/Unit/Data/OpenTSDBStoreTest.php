@@ -85,9 +85,9 @@ class OpenTSDBStoreTest extends TestCase
         $fields = ['ifIn' => 234234, 'ifOut' => 53453];
 
         $mockSocket->shouldReceive('write')
-            ->with("put net.testmeasure $this->timestamp 0.000000 234234\n");
+            ->with("put net.testmeasure $this->timestamp 234234.000000 hostname=testhost ifName=testifname type=testtype key=ifIn\n");
         $mockSocket->shouldReceive('write')
-            ->with("put net.testmeasure $this->timestamp 0.000000 53453\n");
+            ->with("put net.testmeasure $this->timestamp 53453.000000 hostname=testhost ifName=testifname type=testtype key=ifOut\n");
         $opentsdb->put($device, $measurement, $tags, $fields);
     }
 
@@ -102,9 +102,9 @@ class OpenTSDBStoreTest extends TestCase
         $fields = ['ifIn' => 897238, 'ifOut' => 2342];
 
         $mockSocket->shouldReceive('write')
-            ->with("put net.port.ifin $this->timestamp 0.000000 897238\n");
+            ->with("put net.port.ifin $this->timestamp 897238\n");
         $mockSocket->shouldReceive('write')
-            ->with("put net.port.ifout $this->timestamp 0.000000 2342\n");
+            ->with("put net.port.ifout $this->timestamp 2342\n");
         $opentsdb->put($device, $measurement, $tags, $fields);
     }
 
