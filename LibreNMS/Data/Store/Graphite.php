@@ -91,7 +91,7 @@ class Graphite extends BaseDatastore
 
         $timestamp = Carbon::now()->timestamp;
 
-        if($measurement == 'ports') {
+        if ($measurement == 'ports') {
             $measurement = 'ports|' . $tags['ifName'];
         }
 
