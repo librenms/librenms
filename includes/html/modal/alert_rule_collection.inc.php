@@ -23,8 +23,6 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-use LibreNMS\Alerting\QueryBuilderParser;
-
 if (!Auth::user()->hasGlobalAdmin()) {
     die('ERROR: You need to be admin');
 }
