@@ -41,21 +41,21 @@ class Html
     public static function graphRow($graph_array, $print = false)
     {
         if (session('widescreen')) {
-            if (!$graph_array['height']) {
+            if (!array_key_exists('height', $graph_array)) {
                 $graph_array['height'] = '110';
             }
 
-            if (!$graph_array['width']) {
+            if (!array_key_exists('width', $graph_array)) {
                 $graph_array['width'] = '215';
             }
 
             $periods = Config::get('graphs.mini.widescreen');
         } else {
-            if (!$graph_array['height']) {
+            if (!array_key_exists('height', $graph_array)) {
                 $graph_array['height'] = '100';
             }
 
-            if (!$graph_array['width']) {
+            if (!array_key_exists('width', $graph_array)) {
                 $graph_array['width'] = '215';
             }
 
