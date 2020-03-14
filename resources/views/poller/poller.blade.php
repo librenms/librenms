@@ -7,7 +7,7 @@
 @parent
 
 <br />
-@if( $pollers )
+@if( $pollers->isNotEmpty() )
 <div class="panel panel-default">
     <div class="panel-heading">
         <h3 class="panel-title">@lang('Standard Pollers')</h3>
@@ -37,7 +37,7 @@
 </div>
 @endif
 
-@if( $poller_cluster )
+@if( $poller_cluster->isNotEmpty() )
 <div class="panel panel-default">
     <div class="panel-heading">
         <h3 class="panel-title">@lang('Poller Cluster Health')</h3>
@@ -60,26 +60,26 @@
                     <th>@lang('Actions')</th>
                 </tr>
                 @foreach($poller_cluster as $poller)
-                @foreach($poller['stats'] as $stats)
-                <tr class="{{ $poller['row_class'] }}" id="row_{{ $poller['id'] }}">
-                @if( $loop->first )
-                    <td rowspan="{{ $poller['stats']->count() }}">{{ $poller['poller_name'] }}</td>
-                    <td rowspan="{{ $poller['stats']->count() }}"@if($poller['node_id'] == '') ' class="danger"' @endif>{{ $poller['node_id'] }}</td>
-                    <td rowspan="{{ $poller['stats']->count() }}">{{ $poller['poller_version'] }}</td>
-                    <td rowspan="{{ $poller['stats']->count() }}">{{ $poller['poller_groups'] }}</td>
-                    <td rowspan="{{ $poller['stats']->count() }}">{{ $poller['last_report'] }}</td>
-                    <td rowspan="{{ $poller['stats']->count() }}">@if( $poller['master'] ) "@lang('Yes')" @else "@lang('No')" @endif</td>
-                @endif
-                    <td>{{ $stats['poller_type'] }}</td>
-                    <td>{{ $stats['workers'] }}</td>
-                    <td>{{ $stats['devices'] }}</td>
-                    <td>{{ $stats['depth'] }}</td>
-                    <td>{{ $stats['worker_seconds'] }} / {{ $stats['frequency'] * $stats['workers'] }}</td>
-                @if( $loop->first )
-                    <td rowspan="{{ $poller['stats']->count() }}">@if( $poller['long_not_polled'] )<button type='button' class='btn btn-danger btn-sm' aria-label=@lang('Delete') data-toggle='modal' data-target='#confirm-delete' data-id='{{ $poller['id'] }}' data-pollertype='delete-cluster-poller' name='delete-cluster-poller'><i class='fa fa-trash' aria-hidden='true'></i></button>@endif</td>
-                @endif
-                </tr>
-                @endforeach
+                    @foreach($poller->stats as $stat)
+                    <tr class="{{ $poller['row_class'] }}" id="row_{{ $poller->id }}">
+                    @if( $loop->first )
+                        <td rowspan="{{ $poller->stats->count() }}">{{ $poller->poller_name }}</td>
+                        <td rowspan="{{ $poller->stats->count() }}" @if($poller->node_id == '') class="danger" @endif>{{ $poller->node_id }}</td>
+                        <td rowspan="{{ $poller->stats->count() }}">{{ $poller->poller_version }}</td>
+                        <td rowspan="{{ $poller->stats->count() }}">{{ $poller->poller_groups }}</td>
+                        <td rowspan="{{ $poller->stats->count() }}">{{ $poller->last_report }}</td>
+                        <td rowspan="{{ $poller->stats->count() }}">@lang($poller->master ? 'Yes' : 'No')</td>
+                    @endif
+                        <td>{{ $stat->poller_type }}</td>
+                        <td>{{ $stat->workers }}</td>
+                        <td>{{ $stat->devices }}</td>
+                        <td>{{ $stat->depth }}</td>
+                        <td>{{ $stat->worker_seconds }} / {{ $stat->frequency * $stat->workers }}</td>
+                    @if( $loop->first )
+                        <td rowspan="{{ $poller->stats->count() }}">@if($poller->long_not_polled)<button type='button' class='btn btn-danger btn-sm' aria-label=@lang('Delete') data-toggle='modal' data-target='#confirm-delete' data-id='{{ $poller->id }}' data-pollertype='delete-cluster-poller' name='delete-cluster-poller'><i class='fa fa-trash' aria-hidden='true'></i></button>@endif</td>
+                    @endif
+                    </tr>
+                    @endforeach
                 @endforeach
             </table>
             <small>

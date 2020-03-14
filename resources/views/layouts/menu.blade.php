@@ -528,12 +528,12 @@
                         <li class="dropdown-submenu">
                             <a href="{{ url('poller') }}"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> @lang('Poller')</a>
                             <ul class="dropdown-menu">
-                                <li><a href="{{ url('poller') }}"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> @lang('Poller')</a></li>
+                                <li><a href="{{ route('poller') }}"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> @lang('Poller')</a></li>
                                 @config('distributed_poller')
-                                <li><a href="{{ url('poller/groups') }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> @lang('Groups')</a></li>
+                                <li><a href="{{ route('poller.groups') }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> @lang('Groups')</a></li>
                                 @endconfig
-                                <li><a href="{{ url('poller/performance') }}"><i class="fa fa-line-chart fa-fw fa-lg" aria-hidden="true"></i> @lang('Performance')</a></li>
-                                <li><a href="{{ url('poller/log') }}"><i class="fa fa-file-text fa-fw fa-lg" aria-hidden="true"></i> @lang('Log')</a></li>
+                                <li><a href="{{ route('poller.performance') }}"><i class="fa fa-line-chart fa-fw fa-lg" aria-hidden="true"></i> @lang('Performance')</a></li>
+                                <li><a href="{{ route('poller.log') }}"><i class="fa fa-file-text fa-fw fa-lg" aria-hidden="true"></i> @lang('Log')</a></li>
                             </ul>
                         </li>
                         <li role="presentation" class="divider"></li>
