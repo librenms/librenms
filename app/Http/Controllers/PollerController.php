@@ -16,7 +16,7 @@ class PollerController extends Controller
 
     public function __construct()
     {
-        $this->rrdstep = \LibreNMS\Config::get('rrd.step');
+        $this->rrdstep = Config::get('rrd.step');
     }
 
     public function logTab(Request $request)
