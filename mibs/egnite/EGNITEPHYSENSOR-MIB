@@ -1,1 +1,415 @@
+EGNITEPHYSENSOR-MIB DEFINITIONS ::= BEGIN
 
+IMPORTS
+        enterprises, IpAddress, Gauge, TimeTicks FROM RFC1155-SMI
+        DisplayString FROM RFC1213-MIB
+        TRAP-TYPE FROM RFC-1215
+        MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32, mib-2 FROM SNMPv2-SMI;
+
+egniteSensorMIB MODULE-IDENTITY
+    LAST-UPDATED    "201606150000Z"
+    ORGANIZATION    "egnite GmbH"
+    CONTACT-INFO    "http://www.egnite.de"
+    DESCRIPTION
+            "This module defines Querx MIB for physical sensors.
+
+             Copyright (C) 2014-2016 by egnite GmbH. This version
+             is based on RFC 3433; see the RFC itself for full legal notices."
+
+    REVISION        "201410080000Z"
+    DESCRIPTION
+            "Updated version of the Querx Sensor MIB module."
+    ::= { querx 1 }
+
+egnite OBJECT IDENTIFIER ::= { enterprises 3444 }
+products OBJECT IDENTIFIER ::= { egnite 1 }
+querx OBJECT IDENTIFIER ::= { products 14 }
+querxSensorObjects OBJECT IDENTIFIER ::= { querx 1 }
+querxSensorTraps OBJECT IDENTIFIER ::= { querx 2 }
+
+--
+-- Textual Conventions
+--
+
+QuerxSensorIndex ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+            "A unique value, greater than zero, for each sensor
+            in the managed system."
+    SYNTAX       Integer32 (1..2147483647)
+
+
+QuerxSensorDataType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+            "An object using this data type represents the Querx Sensor
+            measurement data type associated with a physical sensor
+            value. The actual data units are determined by examining an
+            object of this type together with the associated
+            QuerxSensorDataScale object.
+
+            An object of this type SHOULD be defined together with
+            objects of type QuerxSensorDataScale and
+            QuerxSensorPrecision.  Together, associated objects of
+            these three types are used to identify the semantics of an
+            object of type QuerxSensorValue.
+
+            Valid values are:
+
+               other(1):        a measure other than those listed below
+               unknown(2):      unknown measurement, or arbitrary,
+                                relative numbers
+               voltsAC(3):      electric potential
+               voltsDC(4):      electric potential
+               amperes(5):      electric current
+               watts(6):        power
+               hertz(7):        frequency
+               celsius(8):      temperature
+               percentRH(9):    percent relative humidity
+               rpm(10):         shaft revolutions per minute
+               cmm(11),:        cubic meters per minute (airflow)
+               truthvalue(12):  value takes { true(1), false(2) }
+
+            "
+    SYNTAX INTEGER {
+        other(1),
+        unknown(2),
+        voltsAC(3),
+        voltsDC(4),
+        amperes(5),
+        watts(6),
+        hertz(7),
+        celsius(8),
+        percentRH(9),
+        rpm(10),
+        cmm(11),
+        truthvalue(12)
+    }
+
+QuerxSensorDataScale ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+            "An object using this data type represents a data scaling
+            factor, represented with an International System of Units
+            (SI) prefix.  The actual data units are determined by
+            examining an object of this type together with the
+            associated QuerxSensorDataType object.
+
+            An object of this type SHOULD be defined together with
+            objects of type QuerxSensorDataType and
+            QuerxSensorPrecision.  Together, associated objects of
+            these three types are used to identify the semantics of an
+            object of type QuerxSensorValue."
+    REFERENCE
+            "The International System of Units (SI),
+
+
+
+            National Institute of Standards and Technology,
+            Spec. Publ. 330, August 1991."
+    SYNTAX INTEGER {
+        yocto(1),   -- 10^-24
+        zepto(2),   -- 10^-21
+        atto(3),    -- 10^-18
+        femto(4),   -- 10^-15
+        pico(5),    -- 10^-12
+        nano(6),    -- 10^-9
+        micro(7),   -- 10^-6
+        milli(8),   -- 10^-3
+        units(9),   -- 10^0
+        kilo(10),   -- 10^3
+        mega(11),   -- 10^6
+        giga(12),   -- 10^9
+        tera(13),   -- 10^12
+        exa(14),    -- 10^15
+        peta(15),   -- 10^18
+        zetta(16),  -- 10^21
+        yotta(17)   -- 10^24
+    }
+
+QuerxSensorPrecision ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+            "An object using this data type represents a sensor
+            precision range.
+
+            An object of this type SHOULD be defined together with
+            objects of type QuerxSensorDataType and
+            QuerxSensorDataScale.  Together, associated objects of
+            these three types are used to identify the semantics of an
+            object of type QuerxSensorValue.
+
+            If an object of this type contains a value in the range 1 to
+            9, it represents the number of decimal places in the
+            fractional part of an associated QuerxSensorValue fixed-
+            point number.
+
+            If an object of this type contains a value in the range -8
+            to -1, it represents the number of accurate digits in the
+            associated QuerxSensorValue fixed-point number.
+
+            The value zero indicates the associated QuerxSensorValue
+            object is not a fixed-point number.
+
+            Agent implementors must choose a value for the associated
+            QuerxSensorPrecision object so that the precision and
+
+
+
+            accuracy of the associated QuerxSensorValue object is
+            correctly indicated.
+
+            For example, a physical entity representing a temperature
+            sensor that can measure 0 degrees to 100 degrees C in 0.1
+            degree increments, +/- 0.05 degrees, would have an
+            QuerxSensorPrecision value of '1', an QuerxSensorDataScale
+            value of 'units(9)', and an QuerxSensorValue ranging from
+            '0' to '1000'.  The QuerxSensorValue would be interpreted
+            as 'degrees C * 10'."
+    SYNTAX Integer32 (-8..9)
+
+QuerxSensorValue ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+            "An object using this data type represents an Querx Sensor
+            value.
+            An object of this type SHOULD be defined together with
+            objects of type QuerxSensorDataType, QuerxSensorDataScale
+            and QuerxSensorPrecision.  Together, associated objects of
+            those three types are used to identify the semantics of an
+            object of this data type.
+
+            The semantics of an object using this data type are
+            determined by the value of the associated
+            QuerxSensorDataType object.
+
+            If the associated QuerxSensorDataType object is equal to
+            'voltsAC(3)', 'voltsDC(4)', 'amperes(5)', 'watts(6),
+            'hertz(7)', 'celsius(8)', or 'cmm(11)', then an object of
+            this type MUST contain a fixed point number ranging from
+            -999,999,999 to +999,999,999.  The value -1000000000
+            indicates an underflow error. The value +1000000000
+            indicates an overflow error.  The QuerxSensorPrecision
+            indicates how many fractional digits are represented in the
+            associated QuerxSensorValue object.
+
+            If the associated QuerxSensorDataType object is equal to
+            'percentRH(9)', then an object of this type MUST contain a
+            number ranging from 0 to 100.
+
+            If the associated QuerxSensorDataType object is equal to
+            'rpm(10)', then an object of this type MUST contain a number
+            ranging from -999,999,999 to +999,999,999.
+
+            If the associated QuerxSensorDataType object is equal to
+            'truthvalue(12)', then an object of this type MUST contain
+            either the value 'true(1)' or the value 'false(2)'.
+
+
+
+            If the associated QuerxSensorDataType object is equal to
+            'other(1)' or unknown(2)', then an object of this type MUST
+            contain a number ranging from -1000000000 to 1000000000."
+    SYNTAX Integer32 (-1000000000..1000000000)
+
+QuerxSensorStatus ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+            "An object using this data type represents the operational
+            status of a physical sensor.
+
+            The value 'ok(1)' indicates that the agent can obtain the
+            sensor value.
+
+            The value 'unavailable(2)' indicates that the agent
+            presently cannot obtain the sensor value.
+
+            The value 'nonoperational(3)' indicates that the agent
+            believes the sensor is broken.  The sensor could have a hard
+            failure (disconnected wire), or a soft failure such as out-
+            of-range, jittery, or wildly fluctuating readings."
+    SYNTAX INTEGER {
+        ok(1),
+        unavailable(2),
+        nonoperational(3)
+    }
+
+querxPhySensorNumber OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of sensors present on this system."
+    ::= { querxSensorObjects 1 }
+
+--
+-- Querx Sensor Table
+--
+
+querxPhySensorTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF QuerxPhySensorEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+            "This table contains one row per physical sensor."
+    ::= { querxSensorObjects 2 }
+
+querxPhySensorEntry OBJECT-TYPE
+    SYNTAX        QuerxPhySensorEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+            "Information about a particular physical sensor.
+
+            An entry in this table describes the present reading of a
+            sensor, the measurement units and scale, and sensor
+            operational status.
+
+            Entries are created in this table by the agent."
+    INDEX  { querxPhySensorIndex }    -- SPARSE-AUGMENTS
+    ::= { querxPhySensorTable 1 }
+
+QuerxPhySensorEntry ::= SEQUENCE {
+        querxPhySensorIndex           QuerxSensorIndex,
+        querxPhySensorType            QuerxSensorDataType,
+        querxPhySensorScale           QuerxSensorDataScale,
+        querxPhySensorPrecision       QuerxSensorPrecision,
+        querxPhySensorValue           QuerxSensorValue,
+        querxPhySensorOperStatus      QuerxSensorStatus,
+        querxPhySensorUnitsDisplay    DisplayString,
+        querxPhySensorValueTimeStamp  TimeStamp,
+        querxPhySensorValueUpdateRate Unsigned32
+}
+
+querxPhySensorIndex OBJECT-TYPE
+    SYNTAX      QuerxSensorIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A unique value, greater than zero, for each sensor."
+    ::= { querxPhySensorEntry 1 }
+
+querxPhySensorType OBJECT-TYPE
+    SYNTAX        QuerxSensorDataType
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+            "The type of data returned by the associated
+            querxPhySensorValue object.
+
+            This object SHOULD be set by the agent during entry
+            creation, and the value SHOULD NOT change during operation."
+    ::= { querxPhySensorEntry 2 }
+
+querxPhySensorScale OBJECT-TYPE
+    SYNTAX        QuerxSensorDataScale
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+            "The exponent to apply to values returned by the associated
+            querxPhySensorValue object."
+    ::= { querxPhySensorEntry 3 }
+
+querxPhySensorPrecision OBJECT-TYPE
+    SYNTAX        QuerxSensorPrecision
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+            "The number of decimal places of precision in fixed-point
+            sensor values returned by the associated querxPhySensorValue
+            object.
+
+            This object SHOULD be set to '0' when the associated
+            querxPhySensorType value is not a fixed-point type: e.g.,
+            'percentRH(9)', 'rpm(10)', 'cmm(11)', or 'truthvalue(12)'.
+
+            This object SHOULD be set by the agent during entry
+            creation, and the value SHOULD NOT change during operation."
+    ::= { querxPhySensorEntry 4 }
+
+querxPhySensorValue OBJECT-TYPE
+    SYNTAX        QuerxSensorValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+            "The most recent measurement obtained by the agent for this
+            sensor.
+
+            To correctly interpret the value of this object, the
+            associated querxPhySensorType, querxPhySensorScale, and
+            querxPhySensorPrecision objects must also be examined."
+    ::= { querxPhySensorEntry 5 }
+
+querxPhySensorOperStatus OBJECT-TYPE
+    SYNTAX        QuerxSensorStatus
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+            "The operational status of the sensor."
+    ::= { querxPhySensorEntry 6 }
+
+querxPhySensorUnitsDisplay OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A textual description of the data units that should be used
+            in the display of querxPhySensorValue."
+    ::= { querxPhySensorEntry 7 }
+
+querxPhySensorValueTimeStamp OBJECT-TYPE
+    SYNTAX        TimeStamp
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+            "The value of sysUpTime at the time the status and/or value
+            of this sensor was last obtained by the agent."
+    ::= { querxPhySensorEntry 8 }
+
+querxPhySensorValueUpdateRate  OBJECT-TYPE
+    SYNTAX        Unsigned32
+    UNITS         "milliseconds"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+            "An indication of the frequency that the agent updates the
+            associated querxPhySensorValue object, representing in
+            milliseconds.
+
+            The value zero indicates:
+
+                - the sensor value is updated on demand (e.g.,
+                  when polled by the agent for a get-request),
+                - the sensor value is updated when the sensor
+                  value changes (event-driven),
+                - the agent does not know the update rate.
+
+            "
+    ::= { querxPhySensorEntry 9 }
+
+querxPhySensorName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..31))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The textual name of the physical sensor.
+
+            If there is no local name, or if this object is otherwise
+            not applicable, then this object contains a zero-length
+            string."
+    ::= { querxPhySensorEntry 10 }
+
+
+querxPhySensorNormal TRAP-TYPE
+        ENTERPRISE querxSensorTraps
+        VARIABLES { querxPhySensorIndex, querxPhySensorValue }
+        DESCRIPTION "Sensor state changed back to normal."
+        ::= 101
+
+querxPhySensorAlert TRAP-TYPE
+        ENTERPRISE querxSensorTraps
+        VARIABLES { querxPhySensorIndex, querxPhySensorValue }
+        DESCRIPTION "Sensor in critical state after value reached limit."
+        ::= 102
+
+END
