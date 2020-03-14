@@ -128,7 +128,7 @@ $('#group-removal').click('', function(e) {
         success: function(msg) {
             toastr.success('@lang('Poller Group deleted')');
             $("#confirm-delete").modal('hide');
-            $("#"+group_id).remove();
+            location.reload(1);
         },
         error: function(e) {
             toastr.error('@lang('Failed to delete Poller Group'): ' + e.statusText)
