@@ -10,10 +10,11 @@ class PollerGroupController extends Controller
 {
     public function destroy(Request $request, PollerGroups $pollergroup)
     {
-        $this->authorize('admin', $request->user());
-
-        $pollergroup->delete();
-
-        return response()->json(['status' => 'success']);
+        if ($request->user()->isAdmin()) {
+            $pollergroup->delete();
+            return response()->json(['status' => 'success']);
+        } else {
+            return response()->json(['status' => 'failure']);
+        }
     }
 }
