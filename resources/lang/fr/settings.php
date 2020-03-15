@@ -21,7 +21,7 @@ return [
             'rules' => 'Réglages généraux des Règles d\'Alertes',
         ],
         'auth' => [
-            'general' => 'Réglages généraux d\'Autorisation',
+            'general' => 'Réglages généraux d\'Accès',
             'ad' => 'Réglages Active Directory',
             'ldap' => 'Réglages LDAP'
         ],
