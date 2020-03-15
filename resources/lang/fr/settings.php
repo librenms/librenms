@@ -772,6 +772,10 @@ return [
             'description' => 'Afficher le status publiquement',
             'help' => 'Afficher le status de certains équipements sans authentification'
         ],
+        'routes_max_number' => [
+            'description' => 'Nombre max de routes pour la Découverte',
+            'help' => 'Aucune route ne sera découverte si la taille de la table de routage est supérieure à ce nombre'
+        ],
         'rrd' => [
             'heartbeat' => [
                 'description' => 'Changer la valeur `heartbeat` rrd (défaut 600)'
