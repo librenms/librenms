@@ -29,7 +29,10 @@ return [
             'device-group' => 'Réglages de Groupes d\'équipements'
         ],
         'discovery' => [
-            'general' => 'Réglages généraux de Découverte'
+            'general' => 'Réglages généraux de Découverte',
+            'route' => 'Module: Routes',
+            'discovery_modules' => 'Activation des Modules de Découverte',
+            'storage' => 'Module: Stockage'
         ],
         'external' => [
             'binaries' => 'Emplacements des Exécutables',
@@ -351,6 +354,135 @@ return [
         'device_perf_purge' => [
             'description' => 'Stats de performances plus anciennes que (jours)',
             'help' => 'Statistiques de performances des équipements. Le nettoyage effectué par daily.sh'
+        ],
+        'discovery_modules' => [
+            'arp-table' => [
+                'description' => 'ARP Table'
+            ],
+            'applications' => [
+                'description' => 'Applications'
+            ],
+            'bgp-peers' => [
+                'description' => 'BGP Peers'
+            ],
+            'cisco-cbqos' => [
+                'description' => 'Cisco CBQOS'
+            ],
+            'cisco-cef' => [
+                'description' => 'Cisco CEF'
+            ],
+            'cisco-mac-accounting' => [
+                'description' => 'Cisco MAC Accounting'
+            ],
+            'cisco-otv' => [
+                'description' => 'Cisco OTV'
+            ],
+            'cisco-qfp' => [
+                'description' => 'Cisco QFP'
+            ],
+            'cisco-sla' => [
+                'description' => 'Cisco SLA'
+            ],
+            'cisco-pw' => [
+                'description' => 'Cisco PW'
+            ],
+            'cisco-vrf-lite' => [
+                'description' => 'Cisco VRF Lite'
+            ],
+            'discovery-arp' => [
+                'description' => 'Discovery ARP'
+            ],
+            'discovery-protocols' => [
+                'description' => 'Discovery Protocols'
+            ],
+            'entity-physical' => [
+                'description' => 'Entity Physical'
+            ],
+            'entity-state' => [
+                'description' => 'Entity State'
+            ],
+            'fdb-table' => [
+                'description' => 'FDB Table'
+            ],
+            'hr-device' => [
+                'description' => 'HR Device'
+            ],
+            'ipv4-addresses' => [
+                'description' => 'IPv4 Addresses'
+            ],
+            'ipv6-addresses' => [
+                'description' => 'IPv6 Addresses'
+            ],
+            'junose-atm-vp' => [
+                'description' => 'Junose ATM VP'
+            ],
+            'libvirt-vminfo' => [
+                'description' => 'Libvirt VMInfo'
+            ],
+            'loadbalancers' => [
+                'description' => 'Loadbalancers'
+            ],
+            'mef' => [
+                'description' => 'MEF'
+            ],
+            'mempools' => [
+                'description' => 'Mempools'
+            ],
+            'mpls' => [
+                'description' => 'MPLS'
+            ],
+            'ntp' => [
+                'description' => 'NTP'
+            ],
+            'os' => [
+                'description' => 'OS'
+            ],
+            'ports' => [
+                'description' => 'Ports'
+            ],
+            'ports-stack' => [
+                'description' => 'Ports Stack'
+            ],
+            'processors' => [
+                'description' => 'Processors'
+            ],
+
+            'route' => [
+                'description' => 'Route'
+            ],
+
+            'sensors' => [
+                'description' => 'Sensors'
+            ],
+
+            'services' => [
+                'description' => 'Services'
+            ],
+            'storage' => [
+                'description' => 'Storage'
+            ],
+
+            'stp' => [
+                'description' => 'STP'
+            ],
+            'toner' => [
+                'description' => 'Toner'
+            ],
+            'ucd-diskio' => [
+                'description' => 'UCD DiskIO'
+            ],
+            'vlans' => [
+                'description' => 'VLans'
+            ],
+            'vmware-vminfo' => [
+                'description' => 'VMWare VMInfo'
+            ],
+            'vrf' => [
+                'description' => 'VRF'
+            ],
+            'wireless' => [
+                'description' => 'Wireless'
+            ],
         ],
         'distributed_poller' => [
             'description' => 'Activation des sondeurs distribués (`Distributed Pollers`, nécessite des configurations additionnelles)',
