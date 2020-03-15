@@ -17,6 +17,7 @@ return [
         'alerting' => [
             'general' => 'Réglages généraux d\'Alertes',
             'email' => 'Options des emails',
+            'rules' => 'Réglages généraux des Règles',
         ],
         'auth' => [
             'general' => 'Réglages généraux d\'Autorisation',
@@ -65,6 +66,40 @@ return [
         'addhost_alwayscheckip' => [
             'description' => 'Vérifier les adresses IP déjà connues avant d\'ajouter un équipement',
             'help' => 'Si un équipement est ajouté via son adresse IP, une vérification sera faite pour contrôler que l\'IP n\'est pas déjà connue. Si c\'est le cas, l\'équipement ne sera pas ajouté. Si l\'équipement est ajouté par son nom DNS, cette vérification n\'est pas effectuée. Si ce réglage est actif, les noms DNS sont résolus et la vérification sera bien effectuée. Ceci permet d\'éviter les duplications accidentelles d\'équipements.'
+        ],
+        'alert_rule' => [
+            'severity' => [
+                'description' => 'Sévérité',
+                'help' => 'Séverité par défault de l\'alerte'
+            ],
+            'max_alerts' => [
+                'description' => 'Répétitions',
+                'help' => 'Nombre d\'Alertes à envoyer'
+            ],
+            'delay' => [
+                'description' => 'Delai avant notification',
+                'help' => 'Delai avant de déclencher l\'envoi des notifications'
+            ],
+            'interval' => [
+                'description' => 'Intervalle de répétition',
+                'help' => 'Intervalle avant de déclencher à nouveau une alerte'
+            ],
+            'mute_alerts' => [
+                'description' => 'Silence',
+                'help' => 'Désactiver l\'envoi des notifications et conserver seulement l\'affichage GUI'
+            ],
+            'invert_rule_match' => [
+                'description' => 'Inverser la condition',
+                'help' => 'Alerter seulement si la règle est fausse'
+            ],
+            'recovery_alerts' => [
+                'description' => 'Notifier le rétablissement',
+                'help' => 'Générer une notification quand l\'alerte est désactivée'
+            ],
+            'invert_map' => [
+                'description' => 'Tous les équipements sauf liste',
+                'help' => 'L\'alerte s\'appliquera à tous les équipements sauf ceux spécifiés dans la liste'
+            ]
         ],
         'alert' => [
             'ack_until_clear' => [
@@ -731,6 +766,10 @@ return [
                 'master' => 'master',
                 'release' => 'release'
             ]
+        ],
+        'uptime_warning' => [
+            'description' => 'Warning si l\'uptime est inférieur à (seconds)',
+            'help' => 'Afficher un Warning sur l\'équipement si l\'uptime est inférieur à la durée indiquée. Default 24h'
         ],
         'virsh' => [
             'description' => 'Chemin vers `virsh`'
