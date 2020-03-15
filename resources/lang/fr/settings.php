@@ -25,6 +25,9 @@ return [
             'ad' => 'Réglages Active Directory',
             'ldap' => 'Réglages LDAP'
         ],
+        'authorization' => [
+            'device-group' => 'Réglages de Groupes d\'équipements'
+        ],
         'discovery' => [
             'general' => 'Réglages généraux de Découverte'
         ],
