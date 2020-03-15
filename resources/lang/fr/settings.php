@@ -4,6 +4,7 @@ return [
     'readonly' => 'Dejà configuré dans config.php, le supprimer avant de pouvoir l\'éditer ici',
     'groups' => [
         'alerting' => 'Alertes',
+        'authorization' => 'Autorisation',
         'auth' => 'Comptes et Utilisateurs',
         'external' => 'Modules Externes',
         'global' => 'Liste Globale',
@@ -17,7 +18,7 @@ return [
         'alerting' => [
             'general' => 'Réglages généraux d\'Alertes',
             'email' => 'Options des emails',
-            'rules' => 'Réglages généraux des Règles',
+            'rules' => 'Réglages généraux des Règles d\'Alertes',
         ],
         'auth' => [
             'general' => 'Réglages généraux d\'Autorisation',
@@ -613,6 +614,13 @@ return [
         'perf_times_purge' => [
             'description' => 'Journaux de performances des sondeurs (jours)',
             'help' => 'Nettoyage effectué par daily.sh'
+        ],
+        'permission' => [
+            'device_group' => [
+                'allow_dynamic' => [
+                    'description' => 'Activer les permissions par groupes d\'équipements dynamiques',
+                ]
+            ]
         ],
         'ping' => [
             'description' => 'Chemin vers `ping`'
