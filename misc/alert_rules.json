@@ -172,7 +172,7 @@
     "name": "APC UPS Battery Needs Replacement"
   },
   {
-    "rule": "sensors.sensor_current = \"3\" && sensors.sensor_type = \"upsBasicOutputStatus\"",
+    "builder": {"condition":"AND","rules":[{"condition":"AND","rules":[{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"3"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"upsBasicOutputStatus"}]},{"condition":"AND","rules":[{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"4"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"upsAdvTestDiagnosticsResults"}]}],"valid":true},
     "name": "APC UPS Switched to Battery Power"
   },
   {
