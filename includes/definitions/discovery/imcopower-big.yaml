@@ -52,7 +52,17 @@ modules:
                     oid: imPm1Power1OutputPowerW
                     num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.3.27.{{ $index }}'
                     index: imPm1Power1OutputPowerW.{{index}}
-                    descr: 'Output Power'
+                    descr: 'Output Power1'
+                -
+                    oid: imPm1Power2OutputPowerW
+                    num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.4.27.{{ $index }}'
+                    index: imPm1Power2OutputPowerW.{{index}}
+                    descr: 'Output Power2'
+                -
+                    oid: imPm1Power3OutputPowerW
+                    num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.5.27.{{ $index }}'
+                    index: imPm1Power3OutputPowerW.{{index}}
+                    descr: 'Output Power3'
 
         runtime:
             data:
