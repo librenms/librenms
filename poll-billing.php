@@ -11,6 +11,8 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
+use LibreNMS\Data\Store\Datastore;
+
 $init_modules = array();
 require __DIR__ . '/includes/init.php';
 
@@ -22,14 +24,13 @@ if (isset($argv[1]) && is_numeric($argv[1])) {
 }
 
 set_debug(isset($options['d']));
+Datastore::init();
 
 // Wait for schema update, as running during update can break update
 if (get_db_schema() < 107) {
     logfile("BILLING: Cannot continue until the database schema update to >= 107 is complete");
     exit(1);
 }
-
-rrdtool_initialize();
 
 $poller_start = microtime(true);
 echo "Starting Polling Session ... \n\n";
@@ -164,4 +165,4 @@ if ($poller_time > 300) {
 }
 echo "\nCompleted in $poller_time sec\n";
 
-rrdtool_close();
+Datastore::terminate();

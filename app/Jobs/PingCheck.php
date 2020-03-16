@@ -260,7 +260,7 @@ class PingCheck implements ShouldQueue
             $rules->runRules($device->device_id);
 
             // add data to rrd
-            data_update($device->toArray(), 'ping-perf', $this->rrd_tags, ['ping' => $device->last_ping_timetaken]);
+            app('Datastore')->put($device->toArray(), 'ping-perf', $this->rrd_tags, ['ping' => $device->last_ping_timetaken]);
 
             // done with this device
             $this->complete($device->hostname);

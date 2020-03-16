@@ -13,31 +13,19 @@
  * the source code distribution for details.
  */
 
+use LibreNMS\Data\Store\Datastore;
+
 $init_modules = array();
 require __DIR__ . '/includes/init.php';
 
-$options = getopt('d::h:f:;');
+$options = getopt('drfpgh:');
 if (set_debug(isset($options['d']))) {
     echo "DEBUG!\n";
 }
 
-if (isset($options['f'])) {
-    \LibreNMS\Config::set('noinfluxdb', true);
-}
-
-if (isset($options['p'])) {
-    $prometheus = false;
-}
-
-if (\LibreNMS\Config::get('noinfluxdb') !== true && \LibreNMS\Config::get('influxdb.enable') === true) {
-    $influxdb = influxdb_connect();
-} else {
-    $influxdb = false;
-}
-
 $poller_start = microtime(true);
 
-rrdtool_initialize();
+$datastore = Datastore::init($options);
 
 echo "Starting service polling run:\n\n";
 $polled_services = 0;
@@ -96,4 +84,4 @@ $string = $argv[0] . " " . date(\LibreNMS\Config::get('dateformat.compact'))
     ." - $polled_services services polled in $poller_time secs";
 d_echo("$string\n");
 
-rrdtool_close();
+Datastore::terminate();
