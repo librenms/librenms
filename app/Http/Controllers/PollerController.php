@@ -75,7 +75,8 @@ class PollerController extends Controller
         });
     }
 
-    private function checkTimeSinceLastPoll($seconds) {
+    private function checkTimeSinceLastPoll($seconds)
+    {
         if ($seconds >= $this->rrdstep) {
             return 'danger';
         } elseif ($seconds >= ($this->rrdstep * 0.95)) {
