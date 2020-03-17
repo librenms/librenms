@@ -30,6 +30,6 @@
 
 @section('javascript')
     <script type="text/javascript">
-        init_select2('#device-{{ $id }}', 'device', {}, '{{ $device ? $device->device_id : '' }}');
+        init_select2('#device-{{ $id }}', 'device', {}, '{{ $device ? $device->displayName() : '' }}');
     </script>
 @endsection
