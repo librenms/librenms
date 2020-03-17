@@ -68,7 +68,6 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
         // page ajax controllers
         Route::resource('location', 'LocationController', ['only' => ['update', 'destroy']]);
         Route::resource('pollergroup', 'PollerGroupController', ['only' => ['destroy']]);
-
         // misc ajax controllers
         Route::group(['namespace' => 'Ajax'], function () {
             Route::post('set_map_group', 'AvailabilityMapController@setGroup');
