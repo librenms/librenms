@@ -9,7 +9,7 @@ if (Config::get('enable_bgp')) {
 
     $bgpPeersCache = snmpwalk_cache_oid($device, 'hwBgpPeers', [], 'HUAWEI-BGP-VPN-MIB');
 
-    if (count($bgpPeersCache == 0)) {
+    if (count($bgpPeersCache) == 0) {
         //Either we have no BGP peer, or this VRP device does not support Huawei's own BGP MIB
         //Let's compare with standard BGP4-MIB.
         $bgpPeersCache_ietf = snmpwalk_cache_oid($device, 'bgpPeerRemoteAs', [], 'BGP4-MIB');
