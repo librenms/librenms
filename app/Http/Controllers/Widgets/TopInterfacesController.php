@@ -26,7 +26,6 @@
 namespace App\Http\Controllers\Widgets;
 
 use App\Models\Port;
-use App\Models\DeviceGroup;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -48,11 +47,6 @@ class TopInterfacesController extends WidgetController
     public function getView(Request $request)
     {
         $data = $this->getSettings();
-
-        if (array_key_exists('device_group', $data) && !empty($data['device_group'])) {
-            $dg = DeviceGroup::find($data['device_group']);
-            $this->title .= ' (' . $dg->name . ')';
-        }
 
         $query = Port::hasAccess($request->user())->with(['device' => function ($query) {
             $query->select('device_id', 'hostname', 'sysName', 'status');
