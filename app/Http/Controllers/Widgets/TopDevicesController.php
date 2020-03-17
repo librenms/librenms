@@ -26,6 +26,7 @@
 namespace App\Http\Controllers\Widgets;
 
 use App\Models\Device;
+use App\Models\DeviceGroup;
 use App\Models\Mempool;
 use App\Models\Port;
 use App\Models\Processor;
@@ -67,6 +68,11 @@ class TopDevicesController extends WidgetController
     {
         $settings = $this->getSettings();
         $sort = $settings['sort_order'];
+
+        if (array_key_exists('device_group', $settings) && ! empty($settings['device_group'])) {
+            $dg = DeviceGroup::find($settings['device_group']);
+            $this->title .= ' (' . $dg->name . ')';
+        }
 
         switch ($settings['top_query']) {
             case 'traffic':
