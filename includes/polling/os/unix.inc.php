@@ -1,9 +1,5 @@
 <?php
 
-echo "---------------------";
-var_export($device);
-echo "---------------------";
-
 if (in_array($device['os'], array("linux", "endian", "proxmox", "recoveryos"))) {
     list(,,$version) = explode(" ", $device['sysDescr']);
     if (preg_match('/[3-6]86/', $device['sysDescr'])) {
