@@ -1,5 +1,8 @@
 <?php
 
+$pkgs_id= array();
+$pkgs_db_id= array();
+
 // RPM
 if (!empty($agent_data['rpm'])) {
     echo "\nRPM Packages: ";
