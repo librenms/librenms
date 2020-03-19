@@ -387,7 +387,7 @@ class Rrd extends BaseDatastore
      * @return string returns a full command ready to be piped to rrdtool
      * @throws FileExistsException if rrdtool <1.4.3 and the rrd file exists locally
      */
-    private function buildCommand($command, $filename, $options)
+    public function buildCommand($command, $filename, $options)
     {
         if ($command == 'create') {
             // <1.4.3 doesn't support -O, so make sure the file doesn't exist
