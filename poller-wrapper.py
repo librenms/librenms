@@ -157,20 +157,20 @@ if ('distributed_poller' in config and
         import uuid
         memc = memcache.Client([config['distributed_poller_memcached_host'] + ':' +
             str(config['distributed_poller_memcached_port'])])
-        if str(memc.get(master_tag)) == config['distributed_poller_name']:
-            print "This system is already joined as the poller master."
-            sys.exit(2)
         if memc_alive():
-            if memc.get(master_tag) is None:
+            distpoll = True
+            memc.add(nodes_tag, 0, step)
+            if memc.add(master_tag, config['distributed_poller_name'], 10):
                 print "Registered as Master"
-                memc.set(master_tag, config['distributed_poller_name'], 10)
-                memc.set(nodes_tag, 0, step)
                 IsNode = False
             else:
-                print "Registered as Node joining Master %s" % memc.get(master_tag)
-                IsNode = True
-                memc.incr(nodes_tag)
-            distpoll = True
+                if str(memc.get(master_tag)) == config['distributed_poller_name']:
+                    print "This system is already joined as the poller master."
+                    sys.exit(2)
+                else:
+                    print "Registered as Node joining Master %s" % memc.get(master_tag)
+                    memc.incr(nodes_tag)
+                    IsNode = True
         else:
             print "Could not connect to memcached, disabling distributed poller."
             distpoll = False
