@@ -28,7 +28,6 @@ poller_modules:
     ucd-mib: false
 discovery_modules:
     fdb-table: false
-    mpls: false
     storage: false
     bgp-peers: false
     cisco-cef: false
