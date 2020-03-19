@@ -24904,7 +24904,7 @@
                     "bgpPeerFsmEstablishedTime": 2078608,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
-                    "bgpLocalAs": null,
+                    "bgpLocalAs": 1,
                     "vrfLocalAs": null
                 }
             ],
@@ -24953,7 +24953,7 @@
                     "bgpPeerFsmEstablishedTime": 2078608,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
-                    "bgpLocalAs": null,
+                    "bgpLocalAs": 1,
                     "vrfLocalAs": null
                 }
             ],
