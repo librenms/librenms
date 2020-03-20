@@ -24,6 +24,8 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
+use LibreNMS\Config;
+
 /**
  * Generates a graph file at $graph_file using $options
  * Opens its own rrdtool pipe.
