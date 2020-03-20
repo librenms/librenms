@@ -38,7 +38,7 @@ foreach (dbFetchRows("SELECT * FROM `customoids` WHERE `customoid_passed` = 1 AN
     echo $oid_value.' '.$customoid['customoid_unit']."\n";
 
     $fields = array(
-        'oid' => $oid_value,
+        'oid_value' => $oid_value,
     );
 
     $rrd_name = array('customoid', $customoid['customoid_descr']);

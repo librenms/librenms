@@ -30,8 +30,9 @@ use LibreNMS\Exceptions\InvalidRrdTypeException;
 
 class RrdDefinition
 {
-    private static $types = array('GAUGE', 'DERIVE', 'COUNTER', 'ABSOLUTE', 'DCOUNTER', 'DDERIVE');
-    private $dataSets = array();
+    private static $types = ['GAUGE', 'DERIVE', 'COUNTER', 'ABSOLUTE', 'DCOUNTER', 'DDERIVE'];
+    private $dataSets = [];
+    private $skipNameCheck = false;
 
     /**
      * Make a new empty RrdDefinition
@@ -58,14 +59,14 @@ class RrdDefinition
             d_echo("DS must be set to a non-empty string.");
         }
 
-        $ds = array();
-        $ds[] = $this->escapeName($name);
-        $ds[] = $this->checkType($type);
-        $ds[] = is_null($heartbeat) ? Config::get('rrd.heartbeat') : $heartbeat;
-        $ds[] = is_null($min) ? 'U' : $min;
-        $ds[] = is_null($max) ? 'U' : $max;
-
-        $this->dataSets[] = $ds;
+        $name = $this->escapeName($name);
+        $this->dataSets[$name] = [
+            $name,
+            $this->checkType($type),
+            is_null($heartbeat) ? Config::get('rrd.heartbeat') : $heartbeat,
+            is_null($min) ? 'U' : $min,
+            is_null($max) ? 'U' : $max,
+        ];
 
         return $this;
     }
@@ -80,6 +81,22 @@ class RrdDefinition
         return array_reduce($this->dataSets, function ($carry, $ds) {
             return $carry . 'DS:' . implode(':', $ds) . ' ';
         }, '');
+    }
+
+    /**
+     * Check if the give dataset name is valid for this definition
+     *
+     * @param $name
+     * @return bool
+     */
+    public function isValidDataset($name)
+    {
+        return $this->skipNameCheck || isset($this->dataSets[$name]);
+    }
+
+    public function disableNameChecking()
+    {
+        $this->skipNameCheck = true;
     }
 
     /**
