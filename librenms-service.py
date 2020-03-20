@@ -25,6 +25,8 @@ if __name__ == '__main__':
     else:
         logging.basicConfig(format='%(threadName)s(%(levelname)s):%(message)s')
 
+    logging.getLogger().setLevel(logging.ERROR)
+
     if args.verbose:
         logging.getLogger().setLevel(logging.INFO)
 

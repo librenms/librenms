@@ -68,7 +68,7 @@ class Laravel
 
     public static function isBooted()
     {
-        return !empty(app()->isAlias('Illuminate\Foundation\Application')) && app()->isBooted();
+        return function_exists('app') && !empty(app()->isAlias('Illuminate\Foundation\Application')) && app()->isBooted();
     }
 
     public static function enableQueryDebug()
