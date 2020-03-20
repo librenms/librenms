@@ -1,5 +1,12 @@
 <?php
 
+echo "***********************\n";
+var_export($agent_data);
+echo "***********************\n";
+
+$pkgs_id= array();
+$pkgs_db_id= array();
+
 // RPM
 if (!empty($agent_data['rpm'])) {
     echo "\nRPM Packages: ";
