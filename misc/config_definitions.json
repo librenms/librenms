@@ -4672,7 +4672,7 @@
                 }
             ],
             "validate": {
-                "value.*.authalgo": "in:MD5,AES"
+                "value.*.authalgo": "in:MD5,SHA"
             }
         },
         "snmp.version": {
