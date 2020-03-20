@@ -38,6 +38,7 @@ class TopInterfacesController extends WidgetController
         'time_interval' => 15,
         'interface_filter' => null,
         'device_group' => null,
+        'hide_lo' => 0,
     ];
 
     /**
@@ -58,6 +59,9 @@ class TopInterfacesController extends WidgetController
                 $query->inDeviceGroup($data['device_group']);
             }, function ($query) {
                 $query->has('device');
+            })
+            ->when(!empty($data['hide_lo']), function($query) {
+                $query->where('ifType', '<>', 'softwareLoopback');
             })
             ->orderByRaw('SUM(LEAST(ifInOctets_rate, 9223372036854775807) + LEAST(ifOutOctets_rate, 9223372036854775807)) DESC')
             ->limit($data['interface_count']);

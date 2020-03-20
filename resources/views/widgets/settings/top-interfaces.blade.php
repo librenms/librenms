@@ -25,6 +25,13 @@
             @endif
         </select>
     </div>
+    <div class="form-group">
+        <label for="hide_lo-{{ $id }}" class="control-label">@lang('Ignore Loopback Interfaces')</label>
+        <select class="form-control" name="hide_lo" id="hide_lo-{{ $id }}" data-placeholder="@lang('No')">
+            <option value="0" @if($hide_lo==0) selected @endif>@lang('No')</option>
+            <option value="1" @if($hide_lo==1) selected @endif>@lang('Yes')</option>
+        </select>
+    </div>
 @endsection
 
 @section('javascript')
