@@ -404,7 +404,7 @@ return [
                 'description' => 'Cisco PW'
             ],
             'cisco-vrf-lite' => [
-                'description' => 'Cisco VRF List'
+                'description' => 'Cisco VRF Lite'
             ],
             'discovery-arp' => [
                 'description' => 'Discovery ARP'
