@@ -34,3 +34,6 @@ discovery_modules:
 discovery:
     - sysDescr_regex:
         - '/^Cisco Adaptive Security Appliance/'
+device_traffic_good_iftype:
+    - "l2vlan"
+

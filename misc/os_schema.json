@@ -407,6 +407,24 @@
         "bad_hrSystemUptime": {
             "type": "boolean"
         },
+        "device_traffic_good_ifalias": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "device_traffic_good_ifdescr": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "device_traffic_good_iftype": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
         "icons": {
             "type": "array",
             "items": {

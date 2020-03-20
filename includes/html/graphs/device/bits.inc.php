@@ -6,19 +6,15 @@ $ds_out = 'OUTOCTETS';
 
 foreach (dbFetchRows('SELECT * FROM `ports` WHERE `device_id` = ? AND `disabled` = 0', array($device['device_id'])) as $port) {
     $ignore = 0;
+
     if (is_array(\LibreNMS\Config::get('device_traffic_iftype'))) {
         foreach (\LibreNMS\Config::get('device_traffic_iftype') as $iftype) {
-            if ($iftype == '/l2vlan/' && $device['os']=='asa') {
-                // ASA (at least in multicontext) reports all interfaces as l2vlan even if they are l3
-                // so every context has no graph displayed unless l2vlan are accepted for all.
-                // This patch will ignore l2vlan for ASA.
-                continue;
-            }
             if (preg_match($iftype.'i', $port['ifType'])) {
                 $ignore = 1;
             }
         }
     }
+    unset($iftype);
 
     if (is_array(\LibreNMS\Config::get('device_traffic_descr'))) {
         foreach (\LibreNMS\Config::get('device_traffic_descr') as $ifdescr) {
@@ -27,6 +23,34 @@ foreach (dbFetchRows('SELECT * FROM `ports` WHERE `device_id` = ? AND `disabled`
             }
         }
     }
+    unset($ifdescr);
+
+    if (is_array(\LibreNMS\Config::getCombined($device['os'], 'device_traffic_good_ifalias'))) {
+        foreach (\LibreNMS\Config::getCombined($device['os'], 'device_traffic_good_ifalias') as $good_ifalias) {
+            if (str_contains(strtolower($port['ifAlias']), strtolower($good_ifalias))) {
+                $ignore = 0;
+            }
+        }
+    }
+    unset($good_ifalias);
+
+    if (is_array(\LibreNMS\Config::getCombined($device['os'], 'device_traffic_good_ifdescr'))) {
+        foreach (\LibreNMS\Config::getCombined($device['os'], 'device_traffic_good_ifdescr') as $good_ifdescr) {
+            if (str_contains(strtolower($port['ifDescr']), strtolower($good_ifdescr)) || str_contains(strtolower($port['ifName']), strtolower($good_ifdescr))) {
+                $ignore = 0;
+            }
+        }
+    }
+    unset($good_ifdescr);
+
+    if (is_array(\LibreNMS\Config::getCombined($device['os'], 'device_traffic_good_iftype'))) {
+        foreach (\LibreNMS\Config::getCombined($device['os'], 'device_traffic_good_iftype') as $good_iftype) {
+            if (str_contains(strtolower($port['ifType']), strtolower($good_iftype))) {
+                $ignore = 0;
+            }
+        }
+    }
+    unset($good_iftype);
 
     $rrd_filename = get_port_rrdfile_path($device['hostname'], $port['port_id']);
     if ($ignore != 1 && rrdtool_check_rrd_exists($rrd_filename)) {

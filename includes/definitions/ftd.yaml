@@ -21,3 +21,6 @@ discovery_modules:
     ucd-diskio: false
     services: false
     wireless: false
+device_traffic_good_ifdescr:
+    - "adaptive security appliance"
+

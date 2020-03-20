@@ -824,6 +824,21 @@
             ],
             "type": "array"
         },
+        "device_traffic_good_ifalias": {
+            "default": [
+            ],
+            "type": "array"
+        },
+        "device_traffic_good_ifdescr": {
+            "default": [
+            ],
+            "type": "array"
+        },
+        "device_traffic_good_iftype": {
+            "default": [
+            ],
+            "type": "array"
+        },
         "device_traffic_iftype": {
             "default": [
                 "/loopback/",
