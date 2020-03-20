@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "206e47998ed4d125251600e26fe67462",
+    "content-hash": "2338365a2a722060b58077360cfe46d9",
     "packages": [
         {
             "name": "amenadiel/jpgraph",
@@ -2846,6 +2846,7 @@
                 "request",
                 "spatie"
             ],
+            "abandoned": "laravel/framework",
             "time": "2019-02-27T07:56:32+00:00"
         },
         {
@@ -7337,25 +7338,24 @@
         },
         {
             "name": "staudenmeir/dusk-updater",
-            "version": "v1.1.3",
+            "version": "v1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/staudenmeir/dusk-updater.git",
-                "reference": "f3450cb8dbb9fdbc1a1aee144c666a44983394c2"
+                "reference": "8e5fd6ba81146cce4f055056b9f4455f22325f6b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/staudenmeir/dusk-updater/zipball/f3450cb8dbb9fdbc1a1aee144c666a44983394c2",
-                "reference": "f3450cb8dbb9fdbc1a1aee144c666a44983394c2",
+                "url": "https://api.github.com/repos/staudenmeir/dusk-updater/zipball/8e5fd6ba81146cce4f055056b9f4455f22325f6b",
+                "reference": "8e5fd6ba81146cce4f055056b9f4455f22325f6b",
                 "shasum": ""
             },
             "require": {
-                "ext-openssl": "*",
-                "ext-zip": "*",
-                "php": ">=5.6.4"
+                "php": "^7.1.3",
+                "symfony/process": "^4.2 || ^5.0"
             },
             "require-dev": {
-                "orchestra/testbench": "^4.0"
+                "orchestra/testbench": "^5.0"
             },
             "type": "library",
             "extra": {
@@ -7381,7 +7381,7 @@
                 }
             ],
             "description": "Updater for Laravel Dusk ChromeDriver binaries",
-            "time": "2019-09-16T12:22:08+00:00"
+            "time": "2020-01-31T13:18:36+00:00"
         },
         {
             "name": "symfony/filesystem",
@@ -7544,5 +7544,6 @@
         "ext-session": "*",
         "ext-xml": "*"
     },
-    "platform-dev": []
+    "platform-dev": [],
+    "plugin-api-version": "1.1.0"
 }

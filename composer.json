@@ -67,7 +67,7 @@
         "nunomaduro/collision": "^3.0",
         "phpunit/phpunit": "^7.5",
         "squizlabs/php_codesniffer": "^2.9.1",
-        "staudenmeir/dusk-updater": "^1.0"
+        "staudenmeir/dusk-updater": "^1.1"
     },
     "suggest": {
         "ext-memcached": "Required if you utilize distributed polling",
