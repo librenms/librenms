@@ -368,13 +368,6 @@ option would allow you to make use of the SNMP sysName instead as the
 preferred reference to the device.
 
 ```php
-$config['device_traffic_iftype'][] = '/loopback/';
-```
-
-Interface types that aren't graphed in the WebUI. The default array
-contains more items, please see misc/config_definitions.json for the full list.
-
-```php
 $config['enable_clear_discovery'] = 1;
 ```
 
@@ -414,6 +407,84 @@ You can enable dynamic graphs within the WebUI under Global Settings
 
 Graphs will be movable/scalable without reloading the page:
 ![Example dynamic graph usage](img/dynamic-graph-usage.gif)
+
+## Overall Traffic
+
+By default, numerous interface types and descriptions are excluded
+from this graph. The excluded defaults can be found in the
+misc/config_definitions.json file under device_traffic_descr and 
+device_traffic_iftype:
+
+```json
+        "device_traffic_descr": {
+            "default": [
+                "/loopback/",
+                "/vlan/",
+                "/tunnel/",
+                "/bond/",
+                "/null/",
+                "/dummy/"
+            ],
+            "type": "array"
+        },
+        ...
+        "device_traffic_iftype": {
+            "default": [
+                "/loopback/",
+                "/tunnel/",
+                "/virtual/",
+                "/mpls/",
+                "/ieee8023adLag/",
+                "/l2vlan/",
+                "/ppp/"
+            ],
+            "type": "array"
+        },
+```
+
+There are several options to re-include an interface that would otherwise be
+excluded by the default arrays:
+
+`device_traffic_good_ifalias` matches on the ifAlias value.
+
+`device_traffic_good_ifdescr` matches on either the ifDescr or ifName value.
+
+`device_traffic_good_iftype` matches on the ifType value.
+
+These options can be configured as OS specific or globally. The preferred 
+method is to create an OS specific array in either config.php or in the 
+definition file (includes/definitions/_specific_os_.yaml) as configuring it 
+globally may inadvertently include undesired interfaces. The definition
+file should only be modified via pull-request as manipulation of the 
+definition files will block updating.
+
+OS specific:
+
+```php
+$config['os']['asa']['device_traffic_good_ifdescr'][] = "l2vlan";
+```
+
+Globally:
+
+```php
+$config['device_traffic_good_ifdescr'][] = "l2vlan";
+```
+
+The legacy method was to unset() the default array and recreate it without
+the value that was preventing an interface from being included. This method is 
+not ideal as it may inadvertently include undesired interfaces:
+
+Legacy Method:
+
+```php
+unset($config['device_traffic_iftype']);
+$config['device_traffic_iftype'][] = '/loopback/';
+$config['device_traffic_iftype'][] = '/tunnel/';
+$config['device_traffic_iftype'][] = '/virtual/';
+$config['device_traffic_iftype'][] = '/mpls/';
+$config['device_traffic_iftype'][] = '/ieee8023adLag/';
+$config['device_traffic_iftype'][] = '/ppp/';
+```
 
 ## Stacked Graphs
 
@@ -661,14 +732,16 @@ manipulation of the definition files will block updating.
 
 Examples:
 
-**Add entries to default arrays**
+Add entries to default arrays:
+
 ```php
 $config['bad_if'][] = "voip-null";
 $config['bad_iftype'][] = "voiceEncap";
 $config['bad_if_regexp'][] = '/^lo[0-9].*/';    // loopback
 ```
 
-**Unset and customize a default array**
+Unset and customize a default array:
+
 ```php
 unset($config['bad_if']);
 $config['bad_if'][] = "voip-null";
@@ -677,13 +750,14 @@ $config['bad_if'][] = "voiceFXO";
 ...
 ```
 
-**Create an OS specific array**
+Create an OS specific array:
+
 ```php
 $config['os']['iosxe']['bad_iftype'][] = "macSecControlledIF";
 $config['os']['iosxe']['bad_iftype'][] = "macSecUncontrolledIF";
 ```
 
-**Various bad_if\* selection options available**
+Various bad_if\* selection options available:
 
 `bad_if` is matched against the ifDescr value.
 

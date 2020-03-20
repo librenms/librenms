@@ -267,38 +267,12 @@ do so by setting `$config['uptime_warning'] = '84600';` in
 
 ## <a name="faq23"> Why do I not see all interfaces in the Overall traffic graph for a device?</a>
 
-By default numerous interface types and interface descriptions are
-excluded from this graph. The excluded defailts are:
-
-```php
-$config['device_traffic_iftype'][] = '/loopback/';
-$config['device_traffic_iftype'][] = '/tunnel/';
-$config['device_traffic_iftype'][] = '/virtual/';
-$config['device_traffic_iftype'][] = '/mpls/';
-$config['device_traffic_iftype'][] = '/ieee8023adLag/';
-$config['device_traffic_iftype'][] = '/l2vlan/';
-$config['device_traffic_iftype'][] = '/ppp/';
-
-$config['device_traffic_descr'][] = '/loopback/';
-$config['device_traffic_descr'][] = '/vlan/';
-$config['device_traffic_descr'][] = '/tunnel/';
-$config['device_traffic_descr'][] = '/bond/';
-$config['device_traffic_descr'][] = '/null/';
-$config['device_traffic_descr'][] = '/dummy/';
-```
-
-If you would like to re-include l2vlan interfaces for instance, you
-first need to `unset` the config array and set your options:
-
-```php
-unset($config['device_traffic_iftype']);
-$config['device_traffic_iftype'][] = '/loopback/';
-$config['device_traffic_iftype'][] = '/tunnel/';
-$config['device_traffic_iftype'][] = '/virtual/';
-$config['device_traffic_iftype'][] = '/mpls/';
-$config['device_traffic_iftype'][] = '/ieee8023adLag/';
-$config['device_traffic_iftype'][] = '/ppp/';
-```
+By default, numerous interface types and descriptions are excluded
+from this graph. The excluded defaults can be found in the
+misc/config_definitions.json file under device_traffic_descr and 
+device_traffic_iftype. Refer to the LibreNMS [Configuration](https://docs.librenms.org/Support/Configuration/)
+page for available configuration options to either exclude or
+include interfaces in the Overall Traffic graph.
 
 ## <a name="faq24"> How do I move my LibreNMS install to another server?</a>
 
