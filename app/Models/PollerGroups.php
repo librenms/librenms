@@ -33,6 +33,20 @@ class PollerGroups extends Model
     protected $primaryKey = 'id';
     protected $fillable = ['group_name', 'descr'];
 
+    /**
+     * Initialize this class
+     */
+    public static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function (PollerGroups $pollergroup) {
+            // handle device pollergroup fallback to default poller
+            $default_poller_id = \LibreNMS\Config::get('distributed_poller_group');
+            $pollergroup->devices()->update(['poller_group' => $default_poller_id]);
+        });
+    }
+
     public function devices()
     {
         return $this->hasMany('App\Models\Device', 'poller_group', 'id');

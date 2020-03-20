@@ -121,18 +121,17 @@ $('#confirm-delete').on('show.bs.modal', function(e) {
 
 $('#group-removal').click('', function(e) {
     e.preventDefault();
-    group_id = $("#group_id").val();
+    groupId = $("#group_id").val();
     $.ajax({
-        type: "POST",
-        url: "ajax_form.php",
-        data: $('form.remove_group_form').serialize() ,
+        type: 'DELETE',
+        url: "ajax/pollergroup/" + groupId,
         success: function(msg) {
-            $("#thanks").html('<div class="alert alert-info">'+msg+'</div>');
+            toastr.success('@lang('Poller Group deleted')');
             $("#confirm-delete").modal('hide');
-            $("#"+group_id).remove();
+            location.reload(1);
         },
-        error: function() {
-            $("#thanks").html('<div class="alert alert-info">An error occurred removing the token.</div>');
+        error: function(e) {
+            toastr.error('@lang('Failed to delete Poller Group'): ' + e.statusText)
             $("#confirm-delete").modal('hide');
         }
     });
