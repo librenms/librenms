@@ -1355,14 +1355,19 @@ function list_bills(\Illuminate\Http\Request $request)
     }
 
     if ($period === 'previous') {
-        $select = "SELECT bills.bill_name, bills.bill_notes, bill_history.*, bill_history.traf_total as total_data, bill_history.traf_in as total_data_in, bill_history.traf_out as total_data_out ";
+        $select = "SELECT bills.bill_autoadded, bills.bill_cdr, bills.bill_custid, bills.bill_day, bills.bill_name,
+            bills.bill_notes, bills.bill_quota, bills.bill_ref, bill_history.*, bill_history.traf_total as total_data,
+            bill_history.traf_in as total_data_in, bill_history.traf_out as total_data_out, bill_history.updated as bill_last_calc
+        ";
         $query = 'FROM `bills`
-            INNER JOIN (SELECT bill_id, MAX(bill_hist_id) AS bill_hist_id FROM bill_history WHERE bill_dateto < NOW() AND bill_dateto > subdate(NOW(), 40) GROUP BY bill_id) qLastBills ON bills.bill_id = qLastBills.bill_id
+            INNER JOIN (SELECT bill_id, MAX(bill_hist_id) AS bill_hist_id FROM bill_history
+                        WHERE bill_dateto < NOW() AND bill_dateto > subdate(NOW(), 40)
+                        GROUP BY bill_id) qLastBills ON bills.bill_id = qLastBills.bill_id
             INNER JOIN bill_history ON qLastBills.bill_hist_id = bill_history.bill_hist_id
-    ';
+        ';
     } else {
         $select = "SELECT bills.*,
-            IF(bills.bill_type = 'CDR', bill_cdr, bill_quota) AS bill_allowed
+            IF(bills.bill_type = 'cdr', bill_cdr, bill_quota) AS bill_allowed
         ";
         $query = "FROM `bills`\n";
     }
@@ -1374,13 +1379,13 @@ function list_bills(\Illuminate\Http\Request $request)
         $percent = '';
         $overuse = '';
 
-        if ($bill['bill_type'] == "cdr") {
+        if (strtolower($bill['bill_type']) == "cdr") {
             $allowed = format_si($bill['bill_cdr'])."bps";
             $used    = format_si($rate_data['rate_95th'])."bps";
             $percent = round(($rate_data['rate_95th'] / $bill['bill_cdr']) * 100, 2);
             $overuse = $rate_data['rate_95th'] - $bill['bill_cdr'];
             $overuse = (($overuse <= 0) ? "-" : format_si($overuse));
-        } elseif ($bill['bill_type'] == "quota") {
+        } elseif (strtolower($bill['bill_type']) == "quota") {
             $allowed = format_bytes_billing($bill['bill_quota']);
             $used    = format_bytes_billing($rate_data['total_data']);
             $percent = round(($rate_data['total_data'] / ($bill['bill_quota'])) * 100, 2);
