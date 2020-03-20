@@ -1,4 +1,4 @@
-os: airos-ep
+os: edgeos-ep
 text: 'Ubiquiti Edgepower'
 type: power
 icon: ubiquiti
