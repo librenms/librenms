@@ -442,6 +442,10 @@ device_traffic_iftype:
         },
 ```
 
+`device_traffic_descr` matches on either the ifDescr or ifName value.
+
+`device_traffic_iftype` matches on the ifType value.
+
 There are several options to re-include an interface that would otherwise be
 excluded by the default arrays:
 
