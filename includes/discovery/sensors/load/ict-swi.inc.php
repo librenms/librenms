@@ -25,10 +25,10 @@
 
 // Inverter Load
 $inverterLoad = (int)(snmp_get($device, 'inverterPower.0', '-Oqv', 'ICT-SINE-WAVE-INVERTER-MIB'));
-if (!empty($inverterLoad)) {
+if (is_int($inverterLoad)) {
     $oid = '.1.3.6.1.4.1.39145.12.8.0';
     $descr = 'Inverter Load';
     $type = 'ict-swi';
-    
-    discover_sensor($valid['sensor'], 'load', $device, $oid, 0, $type, $descr, 1, '1', null, null, null, null, $inverterLoad);
+
+    discover_sensor($valid['sensor'], 'load', $device, $oid, 0, $type, $descr, 1, 1, null, null, null, null, $inverterLoad);
 }
