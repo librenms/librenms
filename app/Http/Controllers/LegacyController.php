@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Checks;
+use App\Models\UserPref;
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -76,6 +77,7 @@ class LegacyController extends Controller
         return response()->view('layouts.legacy_page', [
             'content' => $html,
             'refresh' => $no_refresh ? 0 : Config::get('page_refresh'),
+            'hide_dashboard_editor' => UserPref::getPref(auth()->user(), 'hide_dashboard_editor'),
         ]);
     }
 }

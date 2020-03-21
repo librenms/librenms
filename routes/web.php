@@ -33,6 +33,9 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
     Route::get('about', 'AboutController@index');
     Route::get('authlog', 'UserController@authlog');
 
+    // Dashboard toggle
+    Route::get('toggle_dashboard_editor', 'UserPreferencesController@toggleDashboardEditor');
+
     // Maps
     Route::group(['prefix' => 'maps', 'namespace' => 'Maps'], function () {
         Route::get('devicedependency', 'DeviceDependencyController@dependencyMap');

@@ -20,6 +20,7 @@ use LibreNMS\Config;
 
 $no_refresh   = true;
 $default_dash = get_user_pref('dashboard', 0);
+$hide_dashboard_editor = get_user_pref('hide_dashboard_editor');
 
 require_once 'includes/html/modal/alert_notes.inc.php';
 require_once 'includes/html/modal/alert_ack.inc.php';
@@ -89,7 +90,7 @@ $dash_config = unserialize(stripslashes($data));
 
 if (empty($vars['bare']) || $vars['bare'] == "no") {
     ?>
-<div class="row">
+<div class="row" <?=$hide_dashboard_editor ? 'style="display:none;"' : ''?>>
   <div class="col-md-6">
     <div class="btn-group btn-lg">
       <button class="btn btn-default disabled" style="min-width:160px;"><span class="pull-left">Dashboards</span></button>

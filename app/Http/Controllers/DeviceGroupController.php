@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Device;
 use App\Models\DeviceGroup;
+use App\Models\UserPref;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use LibreNMS\Alerting\QueryBuilderFilter;
 use LibreNMS\Alerting\QueryBuilderFluentParser;
 use Toastr;
+use Auth;
 
 class DeviceGroupController extends Controller
 {
@@ -33,6 +35,8 @@ class DeviceGroupController extends Controller
         return view('device-group.index', [
             'device_groups' => DeviceGroup::orderBy('name')->withCount('devices')->get(),
             'ungrouped_devices' => $ungrouped_devices,
+            # FIXME: this shouldn't be needed here
+            'hide_dashboard_editor' => UserPref::getPref(Auth::user(), 'hide_dashboard_editor') ?? 0,
         ]);
     }
 
@@ -46,6 +50,8 @@ class DeviceGroupController extends Controller
         return view('device-group.create', [
             'device_group' => new DeviceGroup(),
             'filters' => json_encode(new QueryBuilderFilter('group')),
+            # FIXME: this shouldn't be needed here
+            'hide_dashboard_editor' => UserPref::getPref(Auth::user(), 'hide_dashboard_editor') ?? 0,
         ]);
     }
 
@@ -106,6 +112,8 @@ class DeviceGroupController extends Controller
         return view('device-group.edit', [
             'device_group' => $deviceGroup,
             'filters' => json_encode(new QueryBuilderFilter('group')),
+            # FIXME: this shouldn't be needed here
+            'hide_dashboard_editor' => UserPref::getPref(Auth::user(), 'hide_dashboard_editor') ?? 0,
         ]);
     }
 

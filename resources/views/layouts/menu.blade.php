@@ -498,6 +498,18 @@
                             </a></li>
                         <li role="presentation" class="divider"></li>
                         <li>
+                            <a href="{{ url('toggle_dashboard_editor') }}">
+                            <i class="fa fa-bar-chart fa-fw fa-lg" aria-hidden="true"></i>
+                            @if ($hide_dashboard_editor) @lang('Show Dashboard Editor')
+                            @else @lang('Hide Dashboard Editor')
+                            @endif</a>
+                            <form id="toggle_dashboard_editor-form" action="{{ url('toggle_dashboard_editor') }}" method="POST" style="display: none;">
+                                {{ csrf_field() }}
+                            </form>
+
+                        </li>
+                        <li role="presentation" class="divider"></li>
+                        <li>
                             <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                                 <i class="fa fa-sign-out fa-fw fa-lg" aria-hidden="true"></i> @lang('Logout')
                             </a>
