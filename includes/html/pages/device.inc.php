@@ -48,7 +48,7 @@ if (device_permitted($vars['device']) || $permitted_by_port) {
     if (device_permitted($device['device_id'])) {
         echo '<ul class="nav nav-tabs">';
 
-        if (Config::get('show_overview_tab')) {
+        if (Config::get('show_overview_tab', true)) {
             echo '
                 <li role="presentation" '.$select['overview'].'>
                 <a href="'.generate_device_url($device, array('tab' => 'overview')).'">

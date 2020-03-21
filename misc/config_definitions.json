@@ -4503,10 +4503,6 @@
             "default": true,
             "type": "boolean"
         },
-        "show_overview_tab": {
-            "default": true,
-            "type": "boolean"
-        },
         "show_services": {
             "default": false,
             "type": "boolean"
