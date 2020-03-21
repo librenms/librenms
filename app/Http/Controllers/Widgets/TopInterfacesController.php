@@ -60,7 +60,7 @@ class TopInterfacesController extends WidgetController
             }, function ($query) {
                 $query->has('device');
             })
-            ->when(!empty($data['hide_lo']), function($query) {
+            ->when(!empty($data['hide_lo']), function ($query) {
                 $query->where('ifType', '<>', 'softwareLoopback');
             })
             ->orderByRaw('SUM(LEAST(ifInOctets_rate, 9223372036854775807) + LEAST(ifOutOctets_rate, 9223372036854775807)) DESC')
