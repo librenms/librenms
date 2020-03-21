@@ -54,7 +54,7 @@ $oids = array(
 );
 
 foreach ($oids as $oid => $info) {
-    $data = (int)(snmpget($device, $oid, '-0qv', 'ICT-SINE-WAVE-INVERTER-MIB'));
+    $data = (int)(snmp_get($device, $oid, '-0qv', 'ICT-SINE-WAVE-INVERTER-MIB'));
     if ($data >= 0) {
         create_state_index($info["state_name"], $info["states"]);
         discover_sensor($valid['sensor'], 'state', $device, $info["oid"], 0, $info["state_name"], $info["descr"], 1, 1, null, null, null, null, $data, 'snmp', 0);
