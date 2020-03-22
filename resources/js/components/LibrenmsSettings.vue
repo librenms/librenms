@@ -61,7 +61,7 @@
             prefix: String,
             initialTab: {type: String, default: 'alerting'},
             initialSection: String,
-            tabs: {type: Object}
+            tabs: {type: Array}
         },
         data() {
             return {
