@@ -2,6 +2,16 @@
 
 echo 'Alcatel-Lucent Device: ';
 
+$temps=snmpwalk_cache_index($device,'chasCPMAHardwareBoardTemp',[],'ALCATEL-IND1-CHASSIS-MIB','nokia/aos7');
+
+echo "********************* Temps **\n";
+print_r ($temps);
+
+/*
+1.3.6.1.4.1.6486.800.1.1.1.3.1.1.3.1.4 -> AOS6
+1.3.6.1.4.1.6486.801.1.1.1.3.1.1.3.1.8 -> AOS 7 (or 8)
+*/
+
 $descr       = 'Chassis Temperature';
 $temperature = snmp_get($device, '.1.3.6.1.4.1.6486.800.1.2.1.16.1.1.1.17.0', '-Oqv');
 
