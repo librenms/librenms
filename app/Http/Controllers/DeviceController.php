@@ -7,12 +7,48 @@ use App\Models\Device;
 use App\Models\Vminfo;
 use Carbon\Carbon;
 use DB;
-use \LibreNMS\Config;
-use Illuminate\Http\Request;
+use LibreNMS\Config;
 
 class DeviceController extends Controller
 {
-    public function index($device_id, $tab = 'overview') {
+    private $tabs = [
+        'overview' => \App\Http\Controllers\Device\Tabs\OverviewController::class,
+        'graphs' => \App\Http\Controllers\Device\Tabs\GraphsController::class,
+        'health' => \App\Http\Controllers\Device\Tabs\HealthController::class,
+        'apps' => \App\Http\Controllers\Device\Tabs\AppsController::class,
+        'processes' => \App\Http\Controllers\Device\Tabs\ProcessesController::class,
+        'collectd' => \App\Http\Controllers\Device\Tabs\CollectdController::class,
+        'ports' => \App\Http\Controllers\Device\Tabs\PortsController::class,
+        'slas' => \App\Http\Controllers\Device\Tabs\SlasController::class,
+        'wireless' => \App\Http\Controllers\Device\Tabs\WirelessController::class,
+        'accesspoints' => \App\Http\Controllers\Device\Tabs\AccessPointsController::class,
+        'latency' => \App\Http\Controllers\Device\Tabs\LatencyController::class,
+        'vlans' => \App\Http\Controllers\Device\Tabs\VlansController::class,
+        'vm' => \App\Http\Controllers\Device\Tabs\VmInfoController::class,
+        'mef' => \App\Http\Controllers\Device\Tabs\MefController::class,
+        'tnmsne' => \App\Http\Controllers\Device\Tabs\TnmsneController::class,
+        'loadbalancer' => \App\Http\Controllers\Device\Tabs\LoadBalancerController::class,
+        'routing' => \App\Http\Controllers\Device\Tabs\RoutingController::class,
+        'pseudowires' => \App\Http\Controllers\Device\Tabs\PseudowiresController::class,
+        'neighbours' => \App\Http\Controllers\Device\Tabs\NeighboursController::class,
+        'stp' => \App\Http\Controllers\Device\Tabs\StpController::class,
+        'packages' => \App\Http\Controllers\Device\Tabs\PackagesController::class,
+        'inventory' => \App\Http\Controllers\Device\Tabs\InventoryController::class,
+        'services' => \App\Http\Controllers\Device\Tabs\ServicesController::class,
+        'printer' => \App\Http\Controllers\Device\Tabs\PrinterController::class,
+        'logs' => \App\Http\Controllers\Device\Tabs\LogsController::class,
+        'alerts' => \App\Http\Controllers\Device\Tabs\AlertsController::class,
+        'alert-stats' => \App\Http\Controllers\Device\Tabs\AlertStatsController::class,
+        'showconfig' => \App\Http\Controllers\Device\Tabs\ShowConfigController::class,
+        'netflow' => \App\Http\Controllers\Device\Tabs\NetflowController::class,
+        'performance' => \App\Http\Controllers\Device\Tabs\PerformanceController::class,
+        'nac' => \App\Http\Controllers\Device\Tabs\NacController::class,
+        'notes' => \App\Http\Controllers\Device\Tabs\NotesController::class,
+        'mib' => \App\Http\Controllers\Device\Tabs\MibController::class,
+    ];
+
+    public function index($device_id, $current_tab = 'overview')
+    {
         $device_id = (int)str_replace('device=', '', $device_id);
         DeviceCache::setPrimary($device_id);
         $device = DeviceCache::getPrimary();
@@ -21,16 +57,18 @@ class DeviceController extends Controller
         $parent_id = Vminfo::query()->whereIn('vmwVmDisplayName', [$device->hostname, $device->hostname . '.' . Config::get('mydomain')])->first(['device_id']);
         $overview_graphs = $this->buildDeviceGraphArrays($device);
 
-        $show_health_tab = $device->storage()->exists() || $device->sensors()->exists() || $device->mempools()->exists() || $device->processors()->exists();
-        $show_apps_tab = $device->applications()->exists();
-        $show_processes_tab = DB::table('processes')->where('device_id', $device_id)->exists();
-        $show_collectd_tab = Config::has('collectd_dir') && is_dir(Config::get('collectd_dir') . '/' . $device->hostname . '/');
-        $show_munin_tab = $device->muninPlugins()->exists();
-        $show_ports_tab = $device->ports()->exists();
+        $tabs = array_map(function ($class) {
+            return new $class;
+        }, array_filter($this->tabs, 'class_exists')); // TODO remove filter
+        $title = $tabs[$current_tab]->name();
+        $data = $tabs[$current_tab]->data($device);
 
-        $tab_content = $this->renderLegacyTab($tab, $device);
+        if (view()->exists('device.tabs.' . $current_tab)) {
+            return view('device.tabs.' . $current_tab, get_defined_vars());
+        }
 
-        return view('device.' . $tab, get_defined_vars());
+        $tab_content = $this->renderLegacyTab($current_tab, $device);
+        return view('device.tabs.legacy', get_defined_vars());
     }
 
     private function renderLegacyTab($tab, Device $device)
