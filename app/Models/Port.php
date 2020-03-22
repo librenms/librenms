@@ -184,6 +184,27 @@ class Port extends DeviceRelatedModel
      * @param Builder $query
      * @return Builder
      */
+    public function scopeIsActive($query)
+    {
+        return $query->where([
+            ['ignore', '=', 0],
+            ['disabled', '=', 0],
+        ]);
+    }
+
+    /**
+     * @param Builder $query
+     * @return Builder
+     */
+    public function scopeIsNotLoopback($query)
+    {
+        return $query->where('ifType', '<>', 'softwareLoopback');
+    }
+
+    /**
+     * @param Builder $query
+     * @return Builder
+     */
     public function scopeHasErrors($query)
     {
         return $query->where([

@@ -55,14 +55,14 @@ class TopInterfacesController extends WidgetController
             ->select('port_id', 'device_id', 'ifName', 'ifDescr', 'ifAlias')
             ->groupBy('port_id', 'device_id', 'ifName', 'ifDescr', 'ifAlias')
             ->where('poll_time', '>', Carbon::now()->subMinutes($data['time_interval'])->timestamp)
-            ->where([['ignore', '=', 0], ['disabled', '=', 0]])
+            ->IsActive()
             ->when($data['device_group'], function ($query) use ($data) {
                 $query->inDeviceGroup($data['device_group']);
             }, function ($query) {
                 $query->has('device');
             })
             ->when(!empty($data['hide_lo']), function ($query) {
-                $query->where('ifType', '<>', 'softwareLoopback');
+                $query->IsNotLoopback();
             })
             ->orderByRaw('SUM(LEAST(ifInOctets_rate, 9223372036854775807) + LEAST(ifOutOctets_rate, 9223372036854775807)) DESC')
             ->limit($data['interface_count']);
