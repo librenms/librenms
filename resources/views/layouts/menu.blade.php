@@ -25,8 +25,24 @@
                                                  aria-hidden="true"></i> <span
                             class="hidden-sm">@lang('Overview')</span></a>
                     <ul class="dropdown-menu multi-level" role="menu">
-                        <li><a href="{{ url('overview') }}"><i class="fa fa-tv fa-fw fa-lg"
-                                                               aria-hidden="true"></i> @lang('Dashboard')</a></li>
+                        <li class="dropdown-submenu">
+                            <a href="{{ url('overview') }}"><i class="fa fa-tv fa-fw fa-lg"
+                                                                   aria-hidden="true"></i> @lang('Dashboard')</a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a href="{{ url('toggle_dashboard_editor') }}">
+                                    <i class="fa fa-bar-chart fa-fw fa-lg" aria-hidden="true"></i>
+                                    @if ($hide_dashboard_editor) @lang('Show Dashboard Editor')
+                                    @else @lang('Hide Dashboard Editor')
+                                    @endif</a>
+                                    <form id="toggle_dashboard_editor-form" action="{{ url('toggle_dashboard_editor') }}" method="POST" style="display: none;">
+                                        {{ csrf_field() }}
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                        <li role="presentation" class="divider"></li>
+
                         <li class="dropdown-submenu">
                             <a><i class="fa fa-map fa-fw fa-lg"
                                                                aria-hidden="true"></i> @lang('Maps')</a>
@@ -496,18 +512,6 @@
                         <li><a href="{{ url('notifications') }}"><span
                                     class="badge count-notif">{{ $notification_count }}</span> @lang('Notifications')
                             </a></li>
-                        <li role="presentation" class="divider"></li>
-                        <li>
-                            <a href="{{ url('toggle_dashboard_editor') }}">
-                            <i class="fa fa-bar-chart fa-fw fa-lg" aria-hidden="true"></i>
-                            @if ($hide_dashboard_editor) @lang('Show Dashboard Editor')
-                            @else @lang('Hide Dashboard Editor')
-                            @endif</a>
-                            <form id="toggle_dashboard_editor-form" action="{{ url('toggle_dashboard_editor') }}" method="POST" style="display: none;">
-                                {{ csrf_field() }}
-                            </form>
-
-                        </li>
                         <li role="presentation" class="divider"></li>
                         <li>
                             <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
