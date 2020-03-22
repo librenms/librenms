@@ -2,13 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Device;
-use App\Models\PollerGroups;
+use App\Models\PollerGroup;
 use Illuminate\Http\Request;
 
 class PollerGroupController extends Controller
 {
-    public function destroy(Request $request, PollerGroups $pollergroup)
+    public function destroy(Request $request, PollerGroup $pollergroup)
     {
         if ($request->user()->isAdmin()) {
             $pollergroup->delete();

@@ -18,24 +18,22 @@
             <th>@lang('Description')</th>
             <th>@lang('Action')</th>
         </tr>
-        <tr id="{{ $default_poller_group['id'] }}">
-            <td>{{ $default_poller_group['id'] }}</td>
-            <td>{{ $default_poller_group['group_name'] }}@if($default_poller_group['is_default_poller']) {{ $default_poller_marker }}@endif</td>
-            <td><a href="/devices/poller_group={{ $default_poller_group['id'] }}">{{ $default_poller_group['devices']->count() }}</a></td>
-            <td>{{ $default_poller_group['descr'] }}</td>
+        <tr id="0">
+            <td>0</td>
+            <td>General @if($default_group_id == 0) (@lang('default')) @endif</td>
+            <td><a href="{{ url('devices/poller_group=0') }}">{{ $ungrouped_count }}</a></td>
+            <td></td>
             <td>
         </tr>
         @foreach ($poller_groups as $group)
-        <tr id="{{ $group['id'] }}">
-            <td>{{ $group['id'] }}</td>
-            <td>{{ $group['group_name'] }}@if($group['is_default_poller']) {{ $default_poller_marker }}@endif</td>
-            <td><a href="/devices/poller_group={{ $group['id'] }}">{{ $group['devices']->count() }}</a></td>
-            <td>{{ $group['descr'] }}</td>
+        <tr id="{{ $group->id }}">
+            <td>{{ $group->id }}</td>
+            <td>{{ $group->group_name }}@if($group->id == $default_group_id) (@lang('default')) @endif</td>
+            <td><a href="{{ url('devices/poller_group=' . $group->id) }}">{{ $group->devices_count }}</a></td>
+            <td>{{ $group->descr }}</td>
             <td>
-                @if($group['id'])
-                <button type="button" class="btn btn-success btn-xs" id="{{$group['id']}}" data-group_id="{{$group['id']}}" data-toggle="modal" data-target="#poller-groups">@lang('Edit')</button>
-                <button type="button" class="btn btn-danger btn-xs" id="{{$group['id']}}" data-group_id="{{$group['id']}}" data-toggle="modal" data-target="#confirm-delete">@lang('Delete')</button>
-                @endif
+                <button type="button" class="btn btn-success btn-xs" data-group_id="{{ $group->id }}" data-toggle="modal" data-target="#poller-groups">@lang('Edit')</button>
+                <button type="button" class="btn btn-danger btn-xs" data-group_id="{{ $group->id }}" data-toggle="modal" data-target="#confirm-delete">@lang('Delete')</button>
             </td>
         @endforeach
         </tr>
