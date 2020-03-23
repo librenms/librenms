@@ -517,6 +517,10 @@ return [
             'description' => 'Memcached port',
             'help' => 'The port for the memcached server. Default is 11211'
         ],
+        'distributed_poller_type' => [
+            'description' => 'Device Association to Poller',
+            'help' => 'On \'Static\' each Device has to be associated by hand. On \'Dynamic\' Devices will be handled by designed Rules (on overlapping Rules, last handled Rule decides)'
+        ],
         'email_auto_tls' => [
             'description' => 'Auto TLS support',
             'help' => 'Tries to use TLS before falling back to un-encrypted'
@@ -1251,6 +1255,14 @@ return [
         'device_location_map_open' => [
             'description' => 'Location Map open',
             'help' => 'Location Map is shown by default'
+        ],
+        'force_hostname_to_sysname' => [
+            'description' => 'use SNMP SysName instead of Hostname',
+            'help' => 'When using a dynamic DNS hostname or one that does not resolve, this option would allow you to make use of the SNMP sysName instead as the preferred reference to the device'
+        ],
+        'force_ip_to_sysname' => [
+            'description' => 'use SNMP SysName instead of IP Address',
+            'help' => 'When using IP addresses as a hostname you can instead represent the devices on the WebUI by its SNMP sysName resulting in an easier to read overview of your network. This would apply on networks where you don\'t have DNS records for most of your devices'
         ],
         'whois' => [
             'description' => 'Path to whois'
