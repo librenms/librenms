@@ -187,7 +187,7 @@ class Port extends DeviceRelatedModel
     public function scopeIsActive($query)
     {
         return $query->where([
-            ['ignore', '=', 0],
+            ['deleted', '=', 0],
             ['disabled', '=', 0],
         ]);
     }
