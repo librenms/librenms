@@ -1652,9 +1652,10 @@ line with out a matched variable or # are treated as a disk.
 ```
 #This is a comment
 cache=/var/cache/smart
-smartctl=/usr/local/sbin/smartctl
-useSN=0
+smartctl=/usr/bin/env smartctl
+useSN=1
 ada0
+ada1
 da5 /dev/da5 -d sat
 twl0,0 /dev/twl0 -d 3ware,0
 twl0,1 /dev/twl0 -d 3ware,1
