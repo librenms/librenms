@@ -164,6 +164,9 @@ marker.bindPopup(title);
               AND ld.ignore = 0
               AND rd.disabled = 0
               AND rd.ignore = 0
+              AND lp.ifOutOctets_rate != 0
+              AND lp.ifInOctets_rate != 0
+              AND lp.ifOperStatus = 'up'
               AND ld.status IN " . dbGenPlaceholders(count($show_status)) . "
               AND rd.status IN " . dbGenPlaceholders(count($show_status)) . "
             GROUP BY
@@ -203,6 +206,9 @@ marker.bindPopup(title);
               AND ld.ignore = 0
               AND rd.disabled = 0
               AND rd.ignore = 0
+              AND lp.ifOutOctets_rate != 0
+              AND lp.ifInOctets_rate != 0
+              AND lp.ifOperStatus = 'up'
               AND ld.status IN " . dbGenPlaceholders(count($show_status)) . "
               AND rd.status IN " . dbGenPlaceholders(count($show_status)) . "
               AND ld.device_id IN " . dbGenPlaceholders(count($device_ids)) . "
@@ -224,7 +230,7 @@ marker.bindPopup(title);
                 $width = round(0.77 * pow($speed, 0.25));
             }
     
-            $link_used = ($link["link_out_usage_pct"] + $link["link_in_usage_pct"]) / 2;
+            $link_used = max($link["link_out_usage_pct"], $link["link_in_usage_pct"]);
             $link_used = round(2 * $link_used, -1) / 2;
             if ($link_used > 100) {
                 $link_used = 100;
