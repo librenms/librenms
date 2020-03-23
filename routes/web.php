@@ -34,7 +34,7 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
     Route::get('authlog', 'UserController@authlog');
     Route::get('overview', 'OverviewController@index')->name('overview');
     Route::get('/', 'OverviewController@index');
-    Route::get('device/{device_id}/{tab?}', 'DeviceController@index')->name('device')->where('device_id', '[0-9]+');;
+    Route::match(['get', 'post'], 'device/{device_id}/{tab?}', 'DeviceController@index')->name('device')->where('device_id', '[0-9]+');;
 
     // Dashboard toggle
     Route::get('toggle_dashboard_editor', 'UserPreferencesController@toggleDashboardEditor');

@@ -27,7 +27,11 @@ namespace App\Http\Controllers\Device\Tabs;
 
 
 use App\Models\Device;
+use Carbon\Carbon;
+use DB;
+use LibreNMS\Config;
 use LibreNMS\Interfaces\UI\DeviceTab;
+use Request;
 
 class LatencyController implements DeviceTab
 {
@@ -49,13 +53,48 @@ class LatencyController implements DeviceTab
 
     public function name(): string
     {
-        return __('latency');
+        return __('Latency');
     }
 
     public function data(Device $device): array
     {
-        return [
+        $from = Request::get('dtpickerfrom', Carbon::now()->subDays(2)->format(Config::get('dateformat.byminute')));
+        $to = Request::get('dtpickerto', Carbon::now()->format(Config::get('dateformat.byminute')));
 
+        $perf = $this->fetchPerfData($device, $from, $to);
+        $duration = abs(strtotime($perf->first()->date) - strtotime($perf->last()->date)) * 1000;
+
+        return [
+            'dtpickerfrom' => $from,
+            'dtpickerto' => $to,
+            'duration' => $duration,
+            'perfdata' => $this->formatPerfData($perf),
         ];
+    }
+
+    private function fetchPerfData(Device $device, $from, $to)
+    {
+        return DB::table('device_perf')
+            ->where('device_id', $device->device_id)
+            ->whereBetween('timestamp', [$from, $to])
+            ->select(DB::raw("DATE_FORMAT(timestamp, '%Y-%m-%d %H:%i') date,xmt,rcv,loss,min,max,avg"))
+            ->get();
+    }
+
+    /**
+     * Data ready for json export
+     * @param \Illuminate\Support\Collection $data
+     * @return array
+     */
+    private function formatPerfData($data)
+    {
+        return $data->reduce(function ($data, $entry) {
+            $data[] = ['x' => $entry->date, 'y' => $entry->loss, 'group' => 0];
+            $data[] = ['x' => $entry->date, 'y' => $entry->min, 'group' => 1];
+            $data[] = ['x' => $entry->date, 'y' => $entry->max, 'group' => 2];
+            $data[] = ['x' => $entry->date, 'y' => $entry->avg, 'group' => 3];
+
+            return $data;
+        }, []);
     }
 }
