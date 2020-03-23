@@ -94,3 +94,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.41112.1.5.4.2.1.3.{{ $index }}'
                     index: 'ubntThermTemperature.{{ $index }}'
                     descr: 'Temperatures {{ $index }}'
+                    low_limit: 0
+                    low_warn_limit: 5
+                    warn_limit: 35
+                    high_limit: 40
