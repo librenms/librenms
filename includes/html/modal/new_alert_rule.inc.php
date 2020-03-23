@@ -171,7 +171,6 @@ if (Auth::user()->hasGlobalAdmin()) {
         </div>
     </div>
 
-
     <script src="js/sql-parser.min.js"></script>
     <script src="js/query-builder.standalone.min.js"></script>
     <script>
