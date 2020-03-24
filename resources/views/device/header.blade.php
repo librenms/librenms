@@ -8,7 +8,7 @@
             @if(\LibreNMS\Alert\AlertUtil::isMaintenance($device_id))
                 <span title="@lang('Scheduled Maintenance')" class="fa fa-wrench fa-fw fa-lg"></span>
             @endif
-            <span style="font-size: 20px;">{!! \LibreNMS\Util\Url::deviceLink($device) !!}</span><br/>
+            <span style="font-size: 20px;">@deviceLink($device)</span><br/>
             <a href="{{ url('/devices/location=' . $device->location->location) }}">{{ $device->location->location }}</a>
         </div>
         <div class="pull-right">
