@@ -1227,17 +1227,6 @@
             "order": 2,
             "type": "integer"
         },
-        "distributed_poller_type": {
-            "default": "static",
-            "group": "poller",
-            "section": "distributed",
-            "order": 4,
-            "type": "select",
-            "options": {
-                "static": "Static",
-                "dynamic": "Dynamic"
-            }
-        },
         "dot": {
             "default": "/usr/bin/dot",
             "type": "text"
