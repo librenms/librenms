@@ -27,6 +27,7 @@ namespace App\Http\ViewComposers;
 
 use App\Models\AlertRule;
 use App\Models\BgpPeer;
+use App\Models\Dashboard;
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\Location;
@@ -61,6 +62,9 @@ class MenuComposer
 
         $vars['project_name'] = Config::get('project_name', 'LibreNMS');
         $vars['title_image'] = Config::get('title_image', "images/librenms_logo_$site_style.svg");
+
+        //Dashboards
+        $vars['dashboards'] = Dashboard::select('dashboard_id', 'dashboard_name')->allAvailable($user)->orderBy('dashboard_name')->get();
 
         // Device menu
         $vars['device_groups'] = DeviceGroup::hasAccess($user)->orderBy('name')->get(['device_groups.id', 'name', 'desc']);

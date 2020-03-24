@@ -29,6 +29,10 @@
                             <a href="{{ url('overview') }}"><i class="fa fa-tv fa-fw fa-lg"
                                                                    aria-hidden="true"></i> @lang('Dashboard')</a>
                             <ul class="dropdown-menu">
+                                @foreach($dashboards as $dashboard)
+                                <li><a href="overview/dashboard={{ $dashboard->dashboard_id }}"><i class="fa fa-tv fa-fw fa-lg" aria-hidden="true"></i> {{ $dashboard->dashboard_name }}</a></li>
+                                @endforeach
+                                <li role="presentation" class="divider"></li>
                                 <li>
                                     <a href="{{ url('toggle_dashboard_editor') }}">
                                     <i class="fa fa-bar-chart fa-fw fa-lg" aria-hidden="true"></i>
@@ -42,7 +46,6 @@
                             </ul>
                         </li>
                         <li role="presentation" class="divider"></li>
-
                         <li class="dropdown-submenu">
                             <a><i class="fa fa-map fa-fw fa-lg"
                                                                aria-hidden="true"></i> @lang('Maps')</a>
