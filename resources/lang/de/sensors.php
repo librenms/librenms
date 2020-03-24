@@ -166,10 +166,10 @@ return [
         'unit' => 'l/m',
         'unit_long' => 'Liter pro Minute',
     ],
-    'probes' => [
-        'short' => 'Test Verlust',
-        'long' => 'Prozentualer Paketverlust per Test',
+    'percent' => [
+        'short' => 'Percent',
+        'long' => 'Percentage',
         'unit' => '%',
-        'unit_long' => 'Prozent Verlust',
+        'unit_long' => 'percentage',
     ],
 ];
