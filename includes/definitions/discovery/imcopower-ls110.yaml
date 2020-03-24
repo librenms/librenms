@@ -37,7 +37,7 @@ modules:
                     index: opto3.{{index}}
                     descr: 'Power state'
                     states:
-                        - { descr: Battery, graph: 0, value: 3, generic: 2 }
+                        - { descr: Battery, graph: 0, value: 2, generic: 2 }
                         - { descr: Online, graph: 0, value: 0, generic: 0 }
 
 
