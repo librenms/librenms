@@ -26,8 +26,7 @@
                             class="hidden-sm">@lang('Overview')</span></a>
                     <ul class="dropdown-menu multi-level" role="menu">
                         <li class="dropdown-submenu">
-                            <a href="{{ url('overview') }}"><i class="fa fa-tv fa-fw fa-lg"
-                                                                   aria-hidden="true"></i> @lang('Dashboard')</a>
+                            <a><i class="fa fa-tv fa-fw fa-lg" aria-hidden="true"></i> @lang('Dashboard')</a>
                             <ul class="dropdown-menu">
                                 @foreach($dashboards as $dashboard)
                                 <li><a href="overview/dashboard={{ $dashboard->dashboard_id }}"><i class="fa fa-tv fa-fw fa-lg" aria-hidden="true"></i> {{ $dashboard->dashboard_name }}</a></li>
