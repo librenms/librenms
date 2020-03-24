@@ -1,0 +1,19 @@
+os: edgeos-ep
+text: 'Ubiquiti Edgepower'
+type: power
+icon: ubiquiti
+nobulk: true
+group: ubnt
+over:
+    - { graph: device_current, text: 'Current' }
+    - { graph: device_voltage, text: 'Voltage' }
+    - { graph: device_power, text: 'Power' }
+
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.10002.1
+        snmpget:
+            oid: .1.3.6.1.4.1.41112.1.5.1.1.0
+            op: 'contains'
+            value: 'EP-'
