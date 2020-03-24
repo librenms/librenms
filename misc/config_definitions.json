@@ -790,7 +790,7 @@
             "type": "boolean"
         },
         "device_location_map_open": {
-            "order": 0,
+            "order": 2,
             "group": "webui",
             "section": "device",
             "default": false,
@@ -1481,10 +1481,16 @@
             "type": "text"
         },
         "force_hostname_to_sysname": {
+            "group": "webui",
+            "section": "device",
+            "order": 0,
             "default": false,
             "type": "boolean"
         },
         "force_ip_to_sysname": {
+            "group": "webui",
+            "section": "device",
+            "order": 1,
             "default": false,
             "type": "boolean"
         },
