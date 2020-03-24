@@ -21,7 +21,7 @@ class AddPrimaryKeyToDeviceGraphs extends Migration
     public function up()
     {
         Schema::table('device_graphs', function (Blueprint $table) {
-            $table->bigIncrements('device_graphs_id');
+            $table->bigIncrements('id');
         });
     }
 
@@ -33,7 +33,7 @@ class AddPrimaryKeyToDeviceGraphs extends Migration
     public function down()
     {
         Schema::table('device_graphs', function (Blueprint $table) {
-            $table->dropColumn('device_graphs_id');
+            $table->dropColumn('id');
         });
     }
 }
