@@ -106,20 +106,6 @@ if (!file_exists('vendor/autoload.php')) {
 // init autoloading
 require_once 'vendor/autoload.php';
 
-
-$dep_check = shell_exec('php scripts/composer_wrapper.php install --no-dev --dry-run');
-preg_match_all('/Installing ([^ ]+\/[^ ]+) \(/', $dep_check, $dep_missing);
-if (!empty($dep_missing[0])) {
-    print_fail("Missing dependencies!", "./scripts/composer_wrapper.php install --no-dev");
-    $pre_checks_failed = true;
-    print_list($dep_missing[1], "\t %s\n");
-}
-preg_match_all('/Updating ([^ ]+\/[^ ]+) \(/', $dep_check, $dep_outdated);
-if (!empty($dep_outdated[0])) {
-    print_fail("Outdated dependencies", "./scripts/composer_wrapper.php install --no-dev");
-    print_list($dep_outdated[1], "\t %s\n");
-}
-
 $validator = new Validator();
 $validator->validate(array('dependencies'));
 if ($validator->getGroupStatus('dependencies') == ValidationResult::FAILURE) {

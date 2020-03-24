@@ -122,6 +122,7 @@ librenms. Usually in `/etc/cron.d/librenms` and changing the "16"
 ```
 */5  *    * * *   librenms    /opt/librenms/cronic /opt/librenms/poller-wrapper.py 16
 ```
+Please also see [Dispatcher Service](https://docs.librenms.org/Extensions/Dispatcher-Service/)
 
 ## Recursive DNS
 

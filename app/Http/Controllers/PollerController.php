@@ -5,26 +5,18 @@ namespace App\Http\Controllers;
 use App\Models\Device;
 use App\Models\Poller;
 use App\Models\PollerCluster;
-use App\Models\PollerGroups;
+use App\Models\PollerGroup;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use LibreNMS\Config;
 
 class PollerController extends Controller
 {
     public $rrdstep;
-    public $defaultPollerId;
-
-    public $defaultGroup = [
-        'id' => 0,
-        'group_name' => 'General',
-        'descr' => ''
-    ];
-    public $defaultPollerMarker = '(default Poller)';
 
     public function __construct()
     {
-        $this->authorizeResource(PollerGroups::class, 'poller_groups'); // FIXME is this correct? not a resource anymore
-        $this->rrdstep = \LibreNMS\Config::get('rrd.step');
-        $this->defaultPollerId = \LibreNMS\Config::get('distributed_poller_group');
+        $this->rrdstep = Config::get('rrd.step');
     }
 
     public function logTab(Request $request)
@@ -35,33 +27,16 @@ class PollerController extends Controller
         ]);
     }
 
-    // output for poller groups
     public function groupsTab()
     {
-        $group_list = PollerGroups::get();
-
-        # default poller_group
-        $defaultGroup = $this->defaultGroup;
-        $defaultGroup['devices'] = Device::where('poller_group', $defaultGroup['id'])->get();
-        $defaultGroup['is_default_poller'] = ($defaultGroup['id'] == $this->defaultPollerId) ? true : false;
-
-        # poller_groups
-        $poller_group_list = [];
-        foreach ($group_list as $group) {
-            $group['is_default_poller'] = ($group['id'] == $this->defaultPollerId) ? true : false;
-
-            $poller_group_list[] = $group;
-        }
-
         return view('poller.groups', [
             'current_tab' => 'groups',
-            'default_poller_marker' => $this->defaultPollerMarker,
-            'poller_groups' => $poller_group_list,
-            'default_poller_group' => $defaultGroup,
+            'poller_groups' => PollerGroup::query()->withCount('devices')->get(),
+            'default_group_id' => Config::get('distributed_poller_group'),
+            'ungrouped_count' => Device::where('poller_group', 0)->count(),
         ]);
     }
 
-    // data output for poller view
     public function pollerTab()
     {
         return view('poller.poller', [
@@ -76,54 +51,38 @@ class PollerController extends Controller
         return view('poller.performance', ['current_tab' => 'performance']);
     }
 
-    protected function pollerStatus($poller)
+    protected function pollerStatus($poller, $last)
     {
-        $old = $poller['now'] - strtotime($poller['last_polled']);
+        $since_last_poll = Carbon::parse($last)->diffInSeconds();
 
-        if ($old >= $this->rrdstep) {
-            $poller['row_class'] = 'danger';
-        } elseif ($old >= ($this->rrdstep * 0.95)) {
-            $poller['row_class'] = 'warning';
-        } else {
-            $poller['row_class'] = 'success';
-        }
-
-        $poller['long_not_polled'] = (\Auth::user()->hasGlobalAdmin() && ($old > ($this->rrdstep * 2))) ? true : false;
+        $poller->row_class = $this->checkTimeSinceLastPoll($since_last_poll);
+        $poller->long_not_polled = (\Auth::user()->hasGlobalAdmin() && ($since_last_poll > ($this->rrdstep * 2)));
 
         return $poller;
     }
 
     private function poller()
     {
-        $rows = Poller::orderBy('poller_name')->get();
-
-        $time = time();
-
-        $groups = [];
-
-        foreach ($rows as $poller) {
-            $poller['now'] = $time;
-
-            $poller = $this->pollerStatus($poller);
-
-            $groups[] = $poller;
-        }
-
-        return $groups;
+        return Poller::query()->orderBy('poller_name')->get()->map(function ($poller) {
+            return $this->pollerStatus($poller, $poller->last_polled);
+        });
     }
 
     private function pollerCluster()
     {
-        $rows = PollerCluster::orderBy('poller_name')->get();
+        return PollerCluster::with('stats')->orderBy('poller_name')->get()->map(function ($poller) {
+            return $this->pollerStatus($poller, $poller->last_report);
+        });
+    }
 
-        $cluster = [];
-
-        foreach ($rows as $poller) {
-            $poller = $this->pollerStatus($poller);
-
-            $cluster[] = $poller;
+    private function checkTimeSinceLastPoll($seconds)
+    {
+        if ($seconds >= $this->rrdstep) {
+            return 'danger';
+        } elseif ($seconds >= ($this->rrdstep * 0.95)) {
+            return 'warning';
         }
 
-        return $cluster;
+        return 'success';
     }
 }

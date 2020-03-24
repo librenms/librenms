@@ -23,10 +23,10 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
 
     // pages
     Route::resource('device-groups', 'DeviceGroupController');
-    Route::get('poller', 'PollerController@pollerTab');
-    Route::get('poller/log', 'PollerController@logTab');
-    Route::get('poller/groups', 'PollerController@groupsTab');
-    Route::get('poller/performance', 'PollerController@performanceTab');
+    Route::get('poller', 'PollerController@pollerTab')->name('poller');
+    Route::get('poller/log', 'PollerController@logTab')->name('poller.log');
+    Route::get('poller/groups', 'PollerController@groupsTab')->name('poller.groups');
+    Route::get('poller/performance', 'PollerController@performanceTab')->name('poller.performance');
     Route::get('locations', 'LocationController@index');
     Route::resource('preferences', 'UserPreferencesController', ['only' => ['index', 'store']]);
     Route::resource('users', 'UserController');

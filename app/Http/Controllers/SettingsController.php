@@ -26,7 +26,7 @@ class SettingsController extends Controller
             'active_section' => $section,
             'groups' => $dynamicConfig->getGroups()->reject(function ($group) {
                 return $group == 'global';
-            }),
+            })->values(),
         ];
 
         return view('settings.index', $data);
