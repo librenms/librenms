@@ -167,10 +167,10 @@ return [
         'unit' => 'l/m',
         'unit_long' => 'Liters Per Minute',
     ],
-    'probes' => [
-        'short' => 'Probe loss',
-        'long' => 'Probe loss percentage',
+    'percent' => [
+        'short' => 'Percent',
+        'long' => 'Percentage',
         'unit' => '%',
-        'unit_long' => 'Loss percentage',
+        'unit_long' => 'percentage',
     ],
 ];
