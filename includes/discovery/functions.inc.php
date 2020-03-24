@@ -409,7 +409,6 @@ function sensor_low_limit($class, $current)
         case 'snr':
         case 'frequency':
         case 'pressure':
-        case 'probes':
         case 'cooling':
             $limit = $current * 0.95;
             break;
@@ -453,9 +452,6 @@ function sensor_limit($class, $current)
         case 'pressure':
         case 'cooling':
             $limit = $current * 1.05;
-            break;
-        case 'percent':
-            $limit = 50;
             break;
         default:
             return null;
