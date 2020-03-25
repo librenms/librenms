@@ -170,6 +170,10 @@ class LegacyUserProvider implements UserProvider
         }
 
         $username = $credentials['username'] ?? null;
+        // get the sAMAccountName from the UserPrincipalName
+        if (strpos($username, "@") && $type == "active_directory") {
+            $username = $auth->getUsersAMAccountName($username);
+        }
         $auth_id = $auth->getUserid($username);
         $new_user = $auth->getUser($auth_id);
 
