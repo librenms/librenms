@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+
 use DB;
 use Fico7489\Laravel\Pivot\Traits\PivotEventTrait;
 use Illuminate\Database\Eloquent\Builder;
@@ -16,6 +17,8 @@ use LibreNMS\Util\IPv6;
 use LibreNMS\Util\Url;
 use LibreNMS\Util\Time;
 use Permissions;
+use LibreNMS\SNMP;
+use App\Events\CreatingDevice;
 
 class Device extends BaseModel
 {
@@ -23,7 +26,38 @@ class Device extends BaseModel
 
     public $timestamps = false;
     protected $primaryKey = 'device_id';
-    protected $fillable = ['hostname', 'ip', 'status', 'status_reason'];
+    protected $fillable = [
+        'hostname',
+        'ip',
+        'transport',
+        'community',
+        'port',
+        'snmpver',
+        'transport',
+        'port_association_mode',
+        'force_add',
+        'status',
+        'status_reason',
+        'snmp_disable',
+        'authlevel',
+        'authname',
+        'authpass',
+        'authalgo',
+        'cryptopass',
+        'cryptoalgo',
+        'sysName',
+        'sysDescr',
+        'sysContact',
+        'hardware',
+        'os'
+    ];
+
+    protected $hidden = [
+        'authname',
+        'authpass',
+        'cryptopass'
+    ];
+
     protected $casts = [
         'last_polled' => 'datetime',
         'status' => 'boolean',
@@ -95,6 +129,15 @@ class Device extends BaseModel
             }
         });
     }
+
+    /**
+     * The event map for the model.
+     *
+     * @var array
+     */
+    protected $events = [
+        'creating' => CreatingDevice::class
+    ];
 
     // ---- Helper Functions ----
 
@@ -770,5 +813,57 @@ class Device extends BaseModel
     public function wirelessSensors()
     {
         return $this->hasMany('App\Models\WirelessSensor', 'device_id');
+    }
+    
+    public function portAssocMode()
+    {
+        return $this->hasOne('App\Models\PortAssociationMode', 'pom_id', 'port_association_mode');
+    }
+
+    // ---- Helper Methods
+
+    public function isSNMPable()
+    {
+        $pos = $this->checkSNMP();
+        if ($pos === true) {
+            return true;
+        } else {
+            $pos = SNMP::get($this, "sysObjectID.0", "-Oqv", "SNMPv2-MIB");
+            if ($pos === '' || $pos === false) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+    }
+
+    public function checkSNMP()
+    {
+        $snmp = new SNMP;
+
+        $time_start = microtime(true);
+
+        $oid = '.1.3.6.1.2.1.1.2.0';
+        $options = '-Oqvn';
+        $cmd = $snmp->genSnmpgetCmd($this, $oid, $options);
+        exec($cmd, $data, $code);
+        d_echo("SNMP Check response code: $code".PHP_EOL);
+
+        $snmp->recordSnmpStatistic('snmpget', $time_start);
+
+        if ($code === 0) {
+            return true;
+        }
+        return false;
+    }
+
+    public function snmpV3AuthSet()
+    {
+        return $this->attributes['authlevel'] ||
+        $this->attributes['authname'] ||
+        $this->attributes['authpass'] ||
+        $this->attributes['authalgo'] ||
+        $this->attributes['cryptopass'] ||
+        $this->attributes['cryptoalgo'];
     }
 }

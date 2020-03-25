@@ -14,7 +14,7 @@
 use LibreNMS\Config;
 use LibreNMS\Exceptions\HostUnreachableException;
 
-$init_modules = array();
+$init_modules = array('laravel');
 require __DIR__ . '/includes/init.php';
 
 $options = getopt('Pbg:p:f::');
@@ -71,8 +71,9 @@ if (isset($options['b'])) {
 $transports_regex = implode('|', Config::get('snmp.transports'));
 if (!empty($argv[1])) {
     $host      = strtolower($argv[1]);
-    $community = $argv[2];
-    $snmpver   = strtolower($argv[3]);
+    $community = (!empty($argv[2]) ? $argv[2] : null);
+    $snmpver   = (!empty($argv[3]) ? strtolower($argv[3]) : null);
+
 
     $port      = 161;
     $transport = 'udp';

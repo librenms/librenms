@@ -84,6 +84,8 @@
         "classmap": [
             "database/seeds",
             "database/factories"
+        "files": [
+            "app/helpers.php"
         ],
         "psr-4": {
             "App\\": "app",
