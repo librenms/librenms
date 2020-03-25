@@ -32,5 +32,5 @@ $OIDVersionString = snmp_get($device, ".1.3.6.1.4.1.8072.1.3.2.3.1.2.7.118.101.1
 if (is_string($OIDVersionString)) {
     $OIDVersionArray = preg_split("/ /", $OIDVersionString);
     $version = $OIDVersionArray[1];
-    $hardware = preg_replace('/\(|\)/','',$OIDVersionArray[2]);
+    $hardware = preg_replace('/\(|\)/', '', $OIDVersionArray[2]);
 }
