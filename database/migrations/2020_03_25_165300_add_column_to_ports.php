@@ -31,3 +31,4 @@ class AddColumnToPorts extends Migration
         });
     }
 }
+
