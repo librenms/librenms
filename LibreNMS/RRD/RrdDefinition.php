@@ -91,7 +91,7 @@ class RrdDefinition
      */
     public function isValidDataset($name)
     {
-        return $this->skipNameCheck || isset($this->dataSets[$name]);
+        return $this->skipNameCheck || isset($this->dataSets[$this->escapeName($name)]);
     }
 
     public function disableNameChecking()
