@@ -4,9 +4,14 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+use App\Models\BgpPeer;
+use App\Models\Dashboard;
+use App\Models\Device;
+use App\Models\Port;
+use App\Models\Service;
+use App\Models\Syslog;
 use App\Models\UserPref;
 use App\Models\UserWidget;
-use App\Models\Dashboard;
 use App\Models\Widget;
 use Auth;
 use LibreNMS\Config;
@@ -104,5 +109,70 @@ class OverviewController extends Controller
         $widgets     = Widget::select('widget_id', 'widget_title')->orderBy('widget_title')->get();
 
         return view('overview.default', compact('bare', 'dash_config', 'dashboard', 'user_dashboards', 'shared_dashboards', 'widgets'));
+    }
+
+    public function simple(Request $request)
+    {
+        //TODO: All below missing D.ignore = '0' check
+        $devices_down = [];
+        $ports_down = [];
+        $services_down = [];
+        $bgp_down = [];
+        $devices_uptime = [];
+        $syslog = [];
+
+        $devices_down = Device::hasAccess(Auth::user())
+            ->isDown()
+            ->limit(Config::get('front_page_down_box_limit'))
+            ->get();
+
+        if (Config::get('warn.ifdown')) {
+            $ports_down = Port::hasAccess(Auth::user())
+                ->isDown()
+                ->limit(Config::get('front_page_down_box_limit'))
+                ->with('device')
+                ->get();
+        }
+
+        $services_down = Service::hasAccess(Auth::user())
+            ->isCritical()
+            ->limit(Config::get('front_page_down_box_limit'))
+            ->with('device')
+            ->get();
+
+
+        // TODO: is inAlarm() equal to: bgpPeerAdminStatus != 'start' AND bgpPeerState != 'established' AND bgpPeerState != ''  ?
+        if (Config::get('enable_bgp')) {
+            $bgp_down = BgpPeer::hasAccess(Auth::user())
+                ->inAlarm()
+                ->limit(Config::get('front_page_down_box_limit'))
+                ->with('device')
+                ->get();
+        }
+
+        if (filter_var(Config::get('uptime_warning'), FILTER_VALIDATE_FLOAT) !== false
+            && Config::get('uptime_warning') > 0
+        ) {
+            $devices_uptime = Device::hasAccess(Auth::user())
+                ->isUp()
+                ->whereUptime(Config::get('uptime_warning'))
+                ->limit(Config::get('front_page_down_box_limit'))
+                ->get();
+
+            $devices_uptime = $devices_uptime->reject(function ($device) {
+                $device->loadOs(); // TODO: needed?
+                return Config::get("os.{$device->os}.bad_uptime") == true;
+            });
+        }
+
+        if (Config::get('enable_syslog')) {
+            $syslog = Syslog::hasAccess(Auth::user())
+            ->orderBy('timestamp', 'desc')
+            ->limit(20)
+            ->with('device')
+            ->get();
+        }
+
+        return view('overview.simple', compact('devices_down', 'ports_down', 'services_down', 'bgp_down', 'devices_uptime', 'syslog'));
     }
 }
