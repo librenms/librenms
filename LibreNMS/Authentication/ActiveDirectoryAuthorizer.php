@@ -23,6 +23,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
         $this->connect();
 
         if ($this->ldap_connection) {
+            $credentials['username'] = $this->getUsersAMAccountName($credentials['username']);
             // bind with sAMAccountName instead of full LDAP DN
             if (!empty($credentials['username']) && !empty($credentials['password']) && ldap_bind($this->ldap_connection, $credentials['username'] . '@' . Config::get('auth_ad_domain'), $credentials['password'])) {
                 $this->is_bound = true;
@@ -168,6 +169,28 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
         return -1;
     }
 
+    public function getUsersAMAccountName($username)
+    {
+        $connection = $this->getConnection();
+
+        if (strpos($username, "@")) {
+            $filter = "(userprincipalname=$username)";
+        } else {
+            $filter = "(samaccountname=$username)";
+        }
+        $search = ldap_search(
+            $connection,
+            Config::get('auth_ad_base_dn'),
+            $filter,
+            array('samaccountname')
+        );
+        $entries = ldap_get_entries($connection, $search);
+
+        if ($entries['count']) {
+            return $entries[0]['samaccountname'][0];
+        }
+        return -1;
+    }
 
     /**
      * Bind to AD with the bind user if available, otherwise anonymous bind
