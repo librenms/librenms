@@ -149,14 +149,23 @@
             "type": "boolean"
         },
         "alerts.port.ifdown": {
+            "group": "alerting",
+            "section": "general",
+            "order": 12,
             "default": false,
             "type": "boolean"
         },
         "alerts.port_util_alert": {
+            "group": "alerting",
+            "section": "general",
+            "order": 13,
             "default": false,
             "type": "boolean"
         },
         "alerts.port_util_perc": {
+            "group": "alerting",
+            "section": "general",
+            "order": 14,
             "default": 85,
             "type": "integer",
             "validate": {
