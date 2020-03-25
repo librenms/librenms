@@ -49,11 +49,10 @@ class LegacyController extends Controller
         $vars['page'] = basename($vars['page'] ?? '');
         if ($vars['page'] && is_file("includes/html/pages/" . $vars['page'] . ".inc.php")) {
             require "includes/html/pages/" . $vars['page'] . ".inc.php";
-        } elseif (Config::has('front_page') && is_file('includes/html/' . Config::get('front_page'))) {
-            require 'includes/html/' . Config::get('front_page');
         } else {
-            require 'includes/html/pages/front/default.php';
+            return abort(404);
         }
+
         $html = ob_get_clean();
         ob_end_clean();
 

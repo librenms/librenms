@@ -1532,7 +1532,7 @@
             "type": "text"
         },
         "front_page": {
-            "default": "pages/front/tiles.php",
+            "default": "default",
             "type": "text"
         },
         "front_page_down_box_limit": {

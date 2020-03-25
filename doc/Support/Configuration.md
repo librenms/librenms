@@ -229,19 +229,12 @@ Set how often pages are refreshed in seconds. The default is every 5
 minutes. Some pages don't refresh at all by design.
 
 ```php
-$config['front_page']       = "pages/front/default.php";
-$config['front_page_settings']['top']['ports'] = 10;
-$config['front_page_settings']['top']['devices'] = 10;
-$config['front_page_down_box_limit'] = 10;
-$config['vertical_summary'] = 0; // Enable to use vertical summary on front page instead of horizontal
-$config['top_ports']        = 1; // This enables the top X ports box
-$config['top_devices']      = 1; // This enables the top X devices box
+$config['front_page']       = "default";
 ```
 
-A number of home pages are provided within the install and can be
-found in html/pages/front/. You can change the default by setting
-`front_page`. The other options are used to alter the look of those
-pages that support it (default.php supports these options).
+You can create your own front page by adding a blade file in `resources/views/overview/custom/`
+and setting `front_page` to it's name.
+For example, if you create `resources/views/overview/custom/foobar.blade.php`, set `front_page` to `foobar`.
 
 ```php
 // This option exists in the web UI, edit it under Global Settings -> webui
