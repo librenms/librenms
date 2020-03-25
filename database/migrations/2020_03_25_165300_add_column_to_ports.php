@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddIfSpeedPrevIfHighSpeedPrevToPorts extends Migration
+class AddColumnToPorts extends Migration
 {
     /**
      * Run the migrations.
