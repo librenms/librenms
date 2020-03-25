@@ -77,11 +77,6 @@ class OverviewController extends Controller
                 'dashboard_name' => 'Default',
                 'user_id' => $user->user_id,
             ]);
-
-            // TODO: Is this still needed?
-            UserWidget::where('user_id', $user->user_id)
-              ->where('dashboard_id', 0)
-              ->update(['dashboard_id' => $dashboard->dashboard_id]);
         }
 
         $data = $dashboard
@@ -114,9 +109,7 @@ class OverviewController extends Controller
     public function simple(Request $request)
     {
         //TODO: All below missing D.ignore = '0' check
-        $devices_down = [];
         $ports_down = [];
-        $services_down = [];
         $bgp_down = [];
         $devices_uptime = [];
         $syslog = [];
