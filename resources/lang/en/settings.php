@@ -171,22 +171,6 @@ return [
                 'help' => 'Alert normal users'
             ]
         ],
-        'alerts' => [
-            'port' => [
-                'ifdown' => [
-                    'description' => 'Interface Port down Alert',
-                    'help' => 'Runs Alert if an Interface Port goes down'
-                ],
-            ],
-            'port_util_alert' => [
-                'description' => 'Enable Port Utilization Alert',
-                'help' => 'Runs Alert if a Port Uzlization exceeds configured percentage'
-            ],
-            'port_util_perc' => [
-                'description' => 'Port Utilization Percentage Level',
-                'help' => 'Port Utilization Level in Percent on which Alert will run, if enabled'
-            ]
-        ],
         'alert_log_purge' => [
             'description' => 'Alert log entries older than',
             'help' => 'Cleanup done by daily.sh',
