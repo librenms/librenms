@@ -106,7 +106,12 @@ try {
     `stty echo`;
     echo PHP_EOL;
 
-    echo "Authenticate user $test_username: \n";
+    if (Config::get('auth_mechanism') == "active_directory" && strpos($test_username, "@")) {
+        $test_username = $authorizer->getUsersAMAccountName($test_username);
+        echo "Authenticate user $test_username (" . $options['u'] . "): \n";
+    } else {
+        echo "Authenticate user $test_username: \n";
+    }
     $auth = $authorizer->authenticate(['username' => $test_username, 'password' => $test_password]);
     unset($test_password);
 
