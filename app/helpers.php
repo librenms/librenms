@@ -378,11 +378,11 @@ function ip_exists($ip)
 {
     // Function to check if an IP exists in the DB already
     if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false) {
-        $result = \App\Models\IP\IPv6Address::where('ipv6_address', $ip)->where('ipv6_compressed', $ip)->get()->count();
+        $result = \App\Models\IPv6Address::where('ipv6_address', $ip)->where('ipv6_compressed', $ip)->get()->count();
         // $dbresult = dbFetchRow("SELECT `ipv6_address_id` FROM `ipv6_addresses` WHERE `ipv6_address` = ? OR `ipv6_compressed` = ?", array($ip, $ip));
         return $result > 0;
     } elseif (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) !== false) {
-        $result = \App\Models\IP\IPv4Address::where('ipv4_address', $ip)->get()->count();
+        $result = \App\Models\IPv4Address::where('ipv4_address', $ip)->get()->count();
         // $dbresult = dbFetchRow("SELECT `ipv4_address_id` FROM `ipv4_addresses` WHERE `ipv4_address` = ?", array($ip));
         return $result > 0;
     }

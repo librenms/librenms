@@ -2,23 +2,21 @@
 
 namespace App\Models;
 
-
+use App\Events\CreatingDevice;
 use DB;
 use Fico7489\Laravel\Pivot\Traits\PivotEventTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Query\JoinClause;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use LibreNMS\Exceptions\InvalidIpException;
+use LibreNMS\SNMP;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv4;
 use LibreNMS\Util\IPv6;
-use LibreNMS\Util\Url;
 use LibreNMS\Util\Time;
+use LibreNMS\Util\Url;
 use Permissions;
-use LibreNMS\SNMP;
-use App\Events\CreatingDevice;
 
 class Device extends BaseModel
 {
