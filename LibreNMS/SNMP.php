@@ -217,8 +217,8 @@ class SNMP
             $cmd = " -v3 -n '' -l '".$device['authlevel']."'";
 
             //add context if exist context
-            if (key_exists('context_name', $device)) {
-                $cmd = " -v3 -n '".$device['context_name']."' -l '".$device['authlevel']."'";
+            if (isset($device->context_name)) {
+                $cmd = " -v3 -n '$device->context_name' -l '$device->authlevel'";
             }
 
             if ($device['authlevel'] === 'noAuthNoPriv') {
@@ -288,8 +288,8 @@ class SNMP
     {
         $extra = array();
 
-        if (file_exists(Config::get('mib_dir') . '/' . $device['os'])) {
-            $extra[] = Config::get('mib_dir') . '/' . $device['os'];
+        if (file_exists(Config::get('mib_dir') . '/' . $device->os)) {
+            $extra[] = Config::get('mib_dir') . '/' . $device->os;
         }
 
         if (isset($device['os_group'])) {

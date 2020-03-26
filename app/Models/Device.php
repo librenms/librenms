@@ -133,7 +133,7 @@ class Device extends BaseModel
      *
      * @var array
      */
-    protected $events = [
+    protected $dispatchesEvents = [
         'creating' => CreatingDevice::class
     ];
 
@@ -169,13 +169,19 @@ class Device extends BaseModel
         return $overwrite_ip ?: $hostname;
     }
 
+    /**
+     * Find a device by any IP assigned to one of it's interfaces
+     *
+     * @param string $ip IPv4 or IPv6 address
+     * @return Device|null
+     */
     public static function findByIp($ip)
     {
         if (!IP::isValid($ip)) {
             return null;
         }
 
-        $device = static::where('hostname', $ip)->orWhere('ip', inet_pton($ip))->first();
+        $device = static::query()->where('hostname', $ip)->orWhere('ip', inet_pton($ip))->first();
 
         if ($device) {
             return $device;
@@ -811,52 +817,5 @@ class Device extends BaseModel
     public function wirelessSensors()
     {
         return $this->hasMany('App\Models\WirelessSensor', 'device_id');
-    }
-
-    // ---- Helper Methods
-
-    public function isSNMPable()
-    {
-        $pos = $this->checkSNMP();
-        if ($pos === true) {
-            return true;
-        } else {
-            $pos = SNMP::get($this, "sysObjectID.0", "-Oqv", "SNMPv2-MIB");
-            if ($pos === '' || $pos === false) {
-                return false;
-            } else {
-                return true;
-            }
-        }
-    }
-
-    public function checkSNMP()
-    {
-        $snmp = new SNMP;
-
-        $time_start = microtime(true);
-
-        $oid = '.1.3.6.1.2.1.1.2.0';
-        $options = '-Oqvn';
-        $cmd = $snmp->genSnmpgetCmd($this, $oid, $options);
-        exec($cmd, $data, $code);
-        d_echo("SNMP Check response code: $code".PHP_EOL);
-
-        $snmp->recordSnmpStatistic('snmpget', $time_start);
-
-        if ($code === 0) {
-            return true;
-        }
-        return false;
-    }
-
-    public function snmpV3AuthSet()
-    {
-        return $this->attributes['authlevel'] ||
-        $this->attributes['authname'] ||
-        $this->attributes['authpass'] ||
-        $this->attributes['authalgo'] ||
-        $this->attributes['cryptopass'] ||
-        $this->attributes['cryptoalgo'];
     }
 }

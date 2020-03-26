@@ -1435,27 +1435,11 @@ function fix_integer_value($value)
  * Find a device that has this IP. Checks ipv4_addresses and ipv6_addresses tables.
  *
  * @param string $ip
- * @return \App\Models\Device|false
+ * @return \App\Models\Device|null
  */
 function device_has_ip($ip)
 {
-    if (IPv6::isValid($ip)) {
-        $ip_address = \App\Models\Ipv6Address::query()
-            ->where('ipv6_address', IPv6::parse($ip, true)->uncompressed())
-            ->with('port.device')
-            ->first();
-    } elseif (IPv4::isValid($ip)) {
-        $ip_address = \App\Models\Ipv4Address::query()
-            ->where('ipv4_address', $ip)
-            ->with('port.device')
-            ->first();
-    }
-
-    if (isset($ip_address) && $ip_address->port) {
-        return $ip_address->port->device;
-    }
-
-    return false; // not an ipv4 or ipv6 address...
+    return Device::findByIp($ip);
 }
 
 /**
@@ -1470,51 +1454,7 @@ function device_has_ip($ip)
  */
 function fping($host, $count = 3, $interval = 1000, $timeout = 500, $address_family = 'ipv4')
 {
-    // Default to ipv4
-    $fping_name = $address_family == 'ipv6' ? 'fping6' : 'fping';
-    $interval = max($interval, 20);
-
-    // build the command
-    $cmd = [
-        Config::get($fping_name, $fping_name),
-        '-e',
-        '-q',
-        '-c',
-        max($count, 1),
-        '-p',
-        $interval,
-        '-t',
-        max($timeout, $interval),
-        $host
-    ];
-
-    $process = app()->make(Process::class, ['command' => $cmd]);
-    d_echo('[FPING] ' . $process->getCommandLine() . PHP_EOL);
-    $process->run();
-    $output = $process->getErrorOutput();
-
-    preg_match('#= (\d+)/(\d+)/(\d+)%(, min/avg/max = ([\d.]+)/([\d.]+)/([\d.]+))?$#', $output, $parsed);
-    list(, $xmt, $rcv, $loss, , $min, $avg, $max) = array_pad($parsed, 8, 0);
-
-    if ($loss < 0) {
-        $xmt = 1;
-        $rcv = 1;
-        $loss = 100;
-    }
-
-    $response = [
-        'xmt'  => (int)$xmt,
-        'rcv'  => (int)$rcv,
-        'loss' => (int)$loss,
-        'min'  => (float)$min,
-        'max'  => (float)$max,
-        'avg'  => (float)$avg,
-        'dup'  => substr_count($output, 'duplicate'),
-        'exitcode' => $process->getExitCode(),
-    ];
-    d_echo($response);
-
-    return $response;
+    return \LibreNMS\Net\Fping::ping($host, $count, $interval, $timeout, $address_family);
 }
 
 function function_check($function)

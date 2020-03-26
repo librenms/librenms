@@ -3,7 +3,9 @@
 namespace App\Listeners;
 
 use App\Events\CreatingDevice;
+use App\Models\Device;
 use App\Models\Port;
+use Illuminate\Database\Query\Builder;
 use Librenms\Config;
 use LibreNMS\Exceptions\HostExistsException;
 use LibreNMS\Exceptions\HostIpExistsException;
@@ -11,6 +13,7 @@ use LibreNMS\Exceptions\HostUnreachableException;
 use LibreNMS\Exceptions\HostUnreachablePingException;
 use LibreNMS\Exceptions\InvalidPortAssocModeException;
 use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
+use LibreNMS\Util\DeviceHelper;
 
 /**
  * This Listener Will highjack creating a new Device
@@ -64,19 +67,21 @@ class ValidateSNMP
 
         $host_unreachable_exception = new HostUnreachableException("Could not connect to {$event->device->hostname}, please check the snmp details and snmp reachability");
 
+        $helper = new DeviceHelper($event->device);
+
         foreach ($snmpvers as $snmpver) {
             if ($snmpver === "v3") {
                 // Try each set of parameters from config
                 $event->device->snmpver = $snmpver;
                 $v3Array = Config::get('snmp.v3');
-                if ($event->device->snmpV3AuthSet()) {
-                    array_unshift($v3, [
-                        'authlevel'     => (isset($event->device->authlevel) ? $event->device->authlevel : 'noAuthNoPriv'),
-                        'authname'      => (isset($event->device->authname) ? $event->device->authname : 'root'),
-                        'authpass'      => (isset($event->device->authpass) ? $event->device->authpass : ''),
-                        'authalgo'      => (isset($event->device->authalgo) ? $event->device->authalgo : 'MD5'),
-                        'cryptopass'    => (isset($event->device->cryptopass) ? $event->device->cryptopass : ''),
-                        'cryptoalgo'    => (isset($event->device->cryptoalgo) ? $event->device->cryptoalgo : 'AES')
+                if (isset($event->device->authlevel)) {
+                    array_unshift($v3Array, [
+                        'authlevel'     => $event->device->authlevel,
+                        'authname'      => $event->device->authname ?? 'root',
+                        'authpass'      => $event->device->authpass ?? '',
+                        'authalgo'      => $event->device->authalgo ?? 'MD5',
+                        'cryptopass'    => $event->device->cryptopass ?? '',
+                        'cryptoalgo'    => $event->device->cryptoalgo ?? 'AES',
                     ]);
                 }
                 foreach ($v3Array as $v3) {
@@ -87,7 +92,7 @@ class ValidateSNMP
                     $event->device->cryptopass = $v3['cryptopass'];
                     $event->device->cryptoalgo = $v3['cryptoalgo'];
 
-                    if ($event->device->force_add === true || $event->device->isSNMPable()) {
+                    if ($event->device->force_add === true || $helper->checkSNMP()) {
                         return $this->cleanUpModel($event);
                     } else {
                         $host_unreachable_exception->addReason("SNMP $snmpver: No reply with credentials " . $v3['authname'] . "/" . $v3['authlevel']);
@@ -103,8 +108,8 @@ class ValidateSNMP
                 foreach ($communityStrings as $community) {
                     $event->device->community = $community;
                     $event->device->snmpver = $snmpver;
-    
-                    if ($event->device->force_add === true || $event->device->isSNMPable()) {
+
+                    if ($event->device->force_add === true || $helper->checkSNMP()) {
                         return $this->cleanUpModel($event);
                     } else {
                         $host_unreachable_exception->addReason("SNMP $snmpver: No reply with community $community");
@@ -127,7 +132,7 @@ class ValidateSNMP
 
     private function preChecks($event)
     {
-        if (host_exists($event->device->hostname)) {
+        if ($this->deviceExists($event->device->hostname)) {
             throw new HostExistsException("Already have host {$event->device->hostname}");
         }
         
@@ -145,14 +150,21 @@ class ValidateSNMP
         } else {
             $ip = $event->device->hostname;
         }
-        if ($event->device->force_add !== true && ip_exists($ip)) {
-            throw new HostIpExistsException("Already have host with this IP {$event->device->hostname}");
+
+        if ($event->device->force_add !== true && $device = Device::findByIp($ip)) {
+            $message = "Cannot add {$event->device->hostname}, already have device with this IP $ip";
+            if ($ip != $device->hostname) {
+                $message .= " ($device->hostname)";
+            }
+            $message .= '. You may force add to ignore this.';
+            throw new HostIpExistsException($message);
         }
 
         // Test reachability
         if (!$event->device->force_add) {
-            $address_family = snmpTransportToAddressFamily($event->device->transport);
-            $ping_result = isPingable($event->device->hostname, $address_family);
+            $address_family = $this->snmpTransportToAddressFamily($event->device->transport);
+            $helper = new DeviceHelper($event->device);
+            $ping_result = $helper->checkPing($address_family);
             if (!$ping_result['result']) {
                 throw new HostUnreachablePingException("Could not ping {$event->device->hostname}");
             }
@@ -170,7 +182,7 @@ class ValidateSNMP
             $event->device->os = $discovery->os($event->device);
 
             $snmphost = \LibreNMS\SNMP::get($event->device, "sysName.0", "-Oqv", "SNMPv2-MIB");
-            if (host_exists($event->device->hostname, $snmphost)) {
+            if ($this->deviceExists($event->device->hostname, $snmphost)) {
                 throw new HostExistsException("Already have host {$event->device->hostname} ($snmphost) due to duplicate sysName");
             }
         }
@@ -186,5 +198,56 @@ class ValidateSNMP
         $event->device->status = '1';
 
         return $event;
+    }
+
+    /**
+     * Checks if the $hostname provided exists in the DB already
+     *
+     * @param string $hostname The hostname to check for
+     * @param string $sysName The sysName to check
+     * @return bool true if hostname already exists
+     *              false if hostname doesn't exist
+     */
+    private function deviceExists($hostname, $sysName = null)
+    {
+        $check_sysName = !empty($sysName) && !Config::get('allow_duplicate_sysName');
+
+        return Device::query()->where('hostname', $hostname)
+            ->when($check_sysName, function ($query) use ($hostname, $sysName) {
+                /** @var Builder $query */
+                $query->orWhere('sysName', $hostname);
+
+                if (!empty(Config::get('mydomain'))) {
+                    $full_sysname = rtrim($sysName, '.') . '.' . Config::get('mydomain');
+                    $query->orWhere('sysName', $full_sysname);
+                }
+            })->exists();
+    }
+
+    /**
+     * Try to determine the address family (IPv4 or IPv6) associated with an SNMP
+     * transport specifier (like "udp", "udp6", etc.).
+     *
+     * @param string $transport The SNMP transport specifier, for example "udp",
+     *                          "udp6", "tcp", or "tcp6". See `man snmpcmd`,
+     *                          section "Agent Specification" for a full list.
+     *
+     * @return int The address family associated with the given transport
+     *             specifier: AF_INET for IPv4 (or local connections not associated
+     *             with an IP stack), AF_INET6 for IPv6.
+     */
+    private function snmpTransportToAddressFamily($transport)
+    {
+        if (!isset($transport)) {
+            $transport = 'udp';
+        }
+
+        $ipv6_snmp_transport_specifiers = array('udp6', 'udpv6', 'udpipv6', 'tcp6', 'tcpv6', 'tcpipv6');
+
+        if (in_array($transport, $ipv6_snmp_transport_specifiers)) {
+            return AF_INET6;
+        } else {
+            return AF_INET;
+        }
     }
 }

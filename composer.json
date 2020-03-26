@@ -92,7 +92,6 @@
             "LibreNMS\\Tests\\": "tests"
         },
         "files": [
-            "app/helpers.php",
             "includes/helpers.php"
         ]
     },

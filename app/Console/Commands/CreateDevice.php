@@ -55,7 +55,9 @@ class CreateDevice extends Command
     {
         $deviceArray = [
             'hostname'  => $this->argument('hostname'),
-            'port'      => $this->argument('port')
+            'port'      => $this->argument('port'),
+            'status_reason' => '',
+            'os' => 'generic'
         ];
         
         $customizable = [
@@ -71,7 +73,7 @@ class CreateDevice extends Command
             'authpass'              => 'authpass',
             'authalgo'              => 'authalgo',
             'cryptopass'            => 'cryptopass',
-            'cryptoalgo'            => 'cryptoalgo'
+            'cryptoalgo'            => 'cryptoalgo',
         ];
         
         foreach ($customizable as $key => $value) {
@@ -86,6 +88,12 @@ class CreateDevice extends Command
             $this->line(json_encode($device));
         } catch (\Exception $e) {
             $this->error($e->getMessage());
+            if ($this->output->isVerbose()) {
+                $this->error($e->getFile() . ': ' . $e->getLine());
+            }
+            return 1;
         }
+
+        return 0;
     }
 }
