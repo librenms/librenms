@@ -3,12 +3,13 @@ modules:
     sensors:
         pre-cache:
             data:
-               -    oid:
+                -
+                    oid:
                     - ifDescr
                     - ifName
         temperature:
             data:
-               -
+                -
                     oid: ddmInfoEntry
                     value: ddmTemperature
                     num_oid: '.1.3.6.1.4.1.6486.800.1.2.1.5.1.1.2.5.1.1.{{ $index }}'
@@ -44,7 +45,7 @@ modules:
                     index: 'ddmTxBiasCurrent.{{ $index }}'
 
         dbm:
-           data:
+            data:
                 -
                     oid: ddmRxOpticalPower
                     num_oid: '.1.3.6.1.4.1.6486.800.1.2.1.5.1.1.2.5.1.21.{{ $index }}'
@@ -66,21 +67,6 @@ modules:
                     low_limit: -9.0
                     high_limit: -3.0
         state:
-            temperature:
-                -
-                    oid: ddmInfoTable
-                    value: ddmTemperature
-                    num_oid: '.1.3.6.1.4.1.6486.800.1.2.1.5.1.1.2.5.1.1.{{ $index }}'
-                    divisor: 1
-                    descr: 'Temp {{ $index }}'
-                    index: 'ddmTemperature.{{ $index }}'
-                -
-                    oid: chasChassisEntry
-                    value: chasHardwareBoardTemp
-                    num_oid: '.1.3.6.1.4.1.6486.800.1.1.1.3.1.1.3.1.4.{{ $index }}'
-                    descr: '{{ $entPhysicalName }} Temperature'
-                    index: 'chasHardwareBoardTemp.{{ $index }}'
-
             data:
                 -
                     oid: alaChasEntPhysFanTable
