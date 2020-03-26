@@ -218,25 +218,6 @@ function can_ping_device($attribs)
     }
 } // end can_ping_device
 
-/**
- * Return valid port association modes
- * @return array
- */
-function get_port_assoc_modes()
-{
-    return \App\Models\PortAssociationMode::all()->pluck('name')->toArray();
-}
-
-/**
- * Validate port_association_mode
- * @param string $port_assoc_mode
- * @return bool
- */
-function is_valid_port_assoc_mode($port_assoc_mode)
-{
-    return in_array($port_assoc_mode, get_port_assoc_modes());
-}
-
 /*
  * @param $value
  * @param int $default

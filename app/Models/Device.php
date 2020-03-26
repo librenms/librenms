@@ -812,11 +812,6 @@ class Device extends BaseModel
     {
         return $this->hasMany('App\Models\WirelessSensor', 'device_id');
     }
-    
-    public function portAssocMode()
-    {
-        return $this->hasOne('App\Models\PortAssociationMode', 'pom_id', 'port_association_mode');
-    }
 
     // ---- Helper Methods
 

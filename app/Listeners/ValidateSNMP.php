@@ -2,17 +2,14 @@
 
 namespace App\Listeners;
 
-use Librenms\Config;
 use App\Events\CreatingDevice;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Contracts\Queue\ShouldQueue;
+use App\Models\Port;
+use Librenms\Config;
 use LibreNMS\Exceptions\HostExistsException;
 use LibreNMS\Exceptions\HostIpExistsException;
 use LibreNMS\Exceptions\HostUnreachableException;
 use LibreNMS\Exceptions\HostUnreachablePingException;
-use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Exceptions\InvalidPortAssocModeException;
-use LibreNMS\Exceptions\LockException;
 use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
 
 /**
@@ -135,17 +132,11 @@ class ValidateSNMP
         }
         
         if (!is_numeric($event->device->port_association_mode)) {
-            $event->device->port_association_mode = ($event->device->port_association_mode ?: 'ifIndex');
-            
-            try {
-                $event->device->port_association_mode = \App\Models\PortAssociationMode::where('name', $event->device->port_association_mode)->first()->pom_id;
-            } catch (\Exception $e) {
-                throw new InvalidPortAssocModeException("Invalid port_association_mode id '{$event->device->port_association_mode}'. Valid modes are: " . join(', ', get_port_assoc_modes()));
-            }
+            $event->device->port_association_mode = array_search($event->device->port_association_mode ?: 'ifIndex', Port::associationModes());
         }
 
         // Valid port assoc mode ID
-        if (!\App\Models\PortAssociationMode::exists($event->device->port_association_mode)) {
+        if (!array_key_exists($event->device->port_association_mode, Port::associationModes())) {
             throw new InvalidPortAssocModeException("Invalid port_association_mode id '{$event->device->port_association_mode}'. Valid modes are: " . join(', ', get_port_assoc_modes()));
         }
         // check if we have the host by IP

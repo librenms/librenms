@@ -79,6 +79,20 @@ class Port extends DeviceRelatedModel
         return Permissions::canAccessDevice($this->device_id, $user) || Permissions::canAccessPort($this->port_id, $user);
     }
 
+    /**
+     * Return valid port association modes
+     * @return array
+     */
+    public static function associationModes()
+    {
+        return [
+            'ifIndex',
+            'ifName',
+            'ifDescr',
+            'ifAlias',
+        ];
+    }
+
     // ---- Accessors/Mutators ----
 
     public function getIfPhysAddressAttribute($mac)
