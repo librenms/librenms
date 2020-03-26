@@ -84,7 +84,7 @@ class ServiceConfig:
     db_name = 'librenms'
 
     watchdog_enabled = False
-    watchdog_logfile = '/opt/librenms/logs/librenms.log'
+    watchdog_logfile = 'logs/librenms.log'
 
     def populate(self):
         config = self._get_config_data()
