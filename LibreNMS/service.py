@@ -529,18 +529,18 @@ class Service:
         except pymysql.err.Error:
             exception("Unable to log performance statistics - is the database still online?")
 
-        def logfile_watchdog(self):
-            
-            try:
-                # check that lofgile has been written to within last poll period
-                logfile_mdiff = datetime.now().timestamp() - os.path.getmtime(self.config.watchdog_logfile)
-            except FileNotFoundError as e:
-                error("Log file not found! {}".format(e))
-                return
+    def logfile_watchdog(self):
+        
+        try:
+            # check that lofgile has been written to within last poll period
+            logfile_mdiff = datetime.now().timestamp() - os.path.getmtime(self.config.watchdog_logfile)
+        except FileNotFoundError as e:
+            error("Log file not found! {}".format(e))
+            return
 
-        if logfile_mdiff > self.config.poller.frequency:
-            critical("BARK! Log file older than {}s, restarting service!".format(self.config.poller.frequency))
-            self.restart()
-        else:
-            info("Log file updated {}s ago".format(int(logfile_mdiff)))
+    if logfile_mdiff > self.config.poller.frequency:
+        critical("BARK! Log file older than {}s, restarting service!".format(self.config.poller.frequency))
+        self.restart()
+    else:
+        info("Log file updated {}s ago".format(int(logfile_mdiff)))
 
