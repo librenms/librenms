@@ -60,7 +60,6 @@ class CreateDevice extends Command
         
         $customizable = [
             'port_association_mode' => 'port_association_mode',
-            'group'                 => 'group',
             'snmpver'               => 'snmpver',
             'community'             => 'community',
             'icmp'                  => 'snmp_disable',
