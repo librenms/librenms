@@ -538,9 +538,9 @@ class Service:
             error("Log file not found! {}".format(e))
             return
 
-    if logfile_mdiff > self.config.poller.frequency:
-        critical("BARK! Log file older than {}s, restarting service!".format(self.config.poller.frequency))
-        self.restart()
-    else:
-        info("Log file updated {}s ago".format(int(logfile_mdiff)))
+        if logfile_mdiff > self.config.poller.frequency:
+            critical("BARK! Log file older than {}s, restarting service!".format(self.config.poller.frequency))
+            self.restart()
+        else:
+            info("Log file updated {}s ago".format(int(logfile_mdiff)))
 
