@@ -38,6 +38,10 @@ if ($device['os'] == 'gw-eydfa') {
     include 'includes/discovery/sensors/gw-eydfa.inc.php';
 }
 
+if ($device['os'] == 'aos') {
+    include 'includes/discovery/sensors/aos-ddm.inc.php';
+}
+
 if ($device['os_group'] == 'printer') {
     include 'includes/discovery/sensors/state/printer.inc.php';
 }
