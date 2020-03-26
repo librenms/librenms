@@ -84,8 +84,6 @@
         "classmap": [
             "database/seeds",
             "database/factories"
-        "files": [
-            "app/helpers.php"
         ],
         "psr-4": {
             "App\\": "app",
@@ -94,6 +92,7 @@
             "LibreNMS\\Tests\\": "tests"
         },
         "files": [
+            "app/helpers.php",
             "includes/helpers.php"
         ]
     },
