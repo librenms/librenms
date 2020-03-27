@@ -1,6 +1,6 @@
 <?php
 /**
- * DeviceTab.php
+ * TnmsneController.php
  *
  * -Description-
  *
@@ -23,20 +23,36 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Interfaces\UI;
-
+namespace App\Http\Controllers\Device\Tabs;
 
 use App\Models\Device;
+use App\Models\TnmsneInfo;
+use LibreNMS\Interfaces\UI\DeviceTab;
 
-interface DeviceTab
+class TnmsneController implements DeviceTab
 {
-    public function visible(Device $device): bool;
+    public function visible(Device $device): bool
+    {
+        return $device->os == 'coriant' && TnmsneInfo::query()->where('device_id', $device->device_id)->exists();
+    }
 
-    public function slug(): string;
+    public function slug(): string
+    {
+        return 'tnmsne';
+    }
 
-    public function icon(): string;
+    public function icon(): string
+    {
+        return 'fa-link';
+    }
 
-    public function name(): string;
+    public function name(): string
+    {
+        return __('Hardware');
+    }
 
-    public function data(Device $device): array;
+    public function data(Device $device): array
+    {
+        return [];
+    }
 }

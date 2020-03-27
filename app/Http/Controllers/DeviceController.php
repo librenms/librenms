@@ -47,8 +47,9 @@ class DeviceController extends Controller
         'mib' => \App\Http\Controllers\Device\Tabs\MibController::class,
     ];
 
-    public function index($device_id, $current_tab = 'overview')
+    public function index($device_id, $current_tab)
     {
+        $current_tab = array_key_exists($current_tab, $this->tabs) ? $current_tab : 'overview';
         $device_id = (int)str_replace('device=', '', $device_id);
         DeviceCache::setPrimary($device_id);
         $device = DeviceCache::getPrimary();
@@ -58,7 +59,7 @@ class DeviceController extends Controller
         $overview_graphs = $this->buildDeviceGraphArrays($device);
 
         $tabs = array_map(function ($class) {
-            return new $class;
+            return app()->make($class);
         }, array_filter($this->tabs, 'class_exists')); // TODO remove filter
         $title = $tabs[$current_tab]->name();
         $data = $tabs[$current_tab]->data($device);
@@ -67,11 +68,11 @@ class DeviceController extends Controller
             return view('device.tabs.' . $current_tab, get_defined_vars());
         }
 
-        $tab_content = $this->renderLegacyTab($current_tab, $device);
+        $tab_content = $this->renderLegacyTab($current_tab, $device, $data);
         return view('device.tabs.legacy', get_defined_vars());
     }
 
-    private function renderLegacyTab($tab, Device $device)
+    private function renderLegacyTab($tab, Device $device, $data)
     {
         ob_start();
         $device = $device->toArray();
@@ -83,6 +84,7 @@ class DeviceController extends Controller
         include 'includes/rrdtool.inc.php';
         include 'includes/rewrites.php';
         include 'includes/html/functions.inc.php';
+        extract($data); // set preloaded data into variables
         include "includes/html/pages/device/$tab.inc.php";
         $output = ob_get_clean();
         ob_end_clean();

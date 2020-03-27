@@ -579,6 +579,11 @@ class Device extends BaseModel
 
     // ---- Define Relationships ----
 
+    public function accessPoints()
+    {
+        return $this->hasMany(AccessPoint::class, 'device_id');
+    }
+
     public function alerts()
     {
         return $this->hasMany(\App\Models\Alert::class, 'device_id');
@@ -619,6 +624,16 @@ class Device extends BaseModel
         return $this->hasMany(\App\Models\Component::class, 'device_id');
     }
 
+    public function hostResources()
+    {
+        return $this->hasMany(HrDevice::class, 'device_id');
+    }
+
+    public function entityPhysical()
+    {
+        return $this->hasMany(EntPhysical::class, 'device_id');
+    }
+
     public function eventlogs()
     {
         return $this->hasMany(\App\Models\Eventlog::class, 'device_id', 'device_id');
@@ -644,6 +659,11 @@ class Device extends BaseModel
         return $this->belongsTo(\App\Models\Location::class, 'location_id', 'id');
     }
 
+    public function mefInfo()
+    {
+        return $this->hasMany(MefInfo::class, 'device_id');
+    }
+
     public function muninPlugins()
     {
         return $this->hasMany('App\Models\MuninPlugin', 'device_id');
@@ -652,6 +672,11 @@ class Device extends BaseModel
     public function ospfInstances()
     {
         return $this->hasMany(\App\Models\OspfInstance::class, 'device_id');
+    }
+
+    public function netscalerVservers()
+    {
+        return $this->hasMany(NetscalerVserver::class, 'device_id');
     }
 
     public function packages()
@@ -752,6 +777,11 @@ class Device extends BaseModel
     public function mplsTunnelCHops()
     {
         return $this->hasMany(\App\Models\MplsTunnelCHop::class, 'device_id');
+    }
+
+    public function slas()
+    {
+        return $this->hasMany(Sla::class, 'device_id');
     }
 
     public function syslogs()

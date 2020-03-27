@@ -1,6 +1,6 @@
 <?php
 /**
- * DeviceTab.php
+ * SlasController.php
  *
  * -Description-
  *
@@ -23,20 +23,36 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Interfaces\UI;
-
+namespace App\Http\Controllers\Device\Tabs;
 
 use App\Models\Device;
+use LibreNMS\Interfaces\UI\DeviceTab;
 
-interface DeviceTab
+class SlasController implements DeviceTab
 {
-    public function visible(Device $device): bool;
 
-    public function slug(): string;
+    public function visible(Device $device): bool
+    {
+        return $device->slas()->exists();
+    }
 
-    public function icon(): string;
+    public function slug(): string
+    {
+        return 'slas';
+    }
 
-    public function name(): string;
+    public function icon(): string
+    {
+        return 'fa-flag';
+    }
 
-    public function data(Device $device): array;
+    public function name(): string
+    {
+        return __('SLAs');
+    }
+
+    public function data(Device $device): array
+    {
+        return [];
+    }
 }

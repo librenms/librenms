@@ -1,6 +1,6 @@
 <?php
 /**
- * DeviceTab.php
+ * MefController.php
  *
  * -Description-
  *
@@ -23,20 +23,35 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Interfaces\UI;
-
+namespace App\Http\Controllers\Device\Tabs;
 
 use App\Models\Device;
+use LibreNMS\Interfaces\UI\DeviceTab;
 
-interface DeviceTab
+class MefController implements DeviceTab
 {
-    public function visible(Device $device): bool;
+    public function visible(Device $device): bool
+    {
+        return $device->mefInfo()->exists();
+    }
 
-    public function slug(): string;
+    public function slug(): string
+    {
+        return 'mef';
+    }
 
-    public function icon(): string;
+    public function icon(): string
+    {
+        return 'fa-link';
+    }
 
-    public function name(): string;
+    public function name(): string
+    {
+        return __('Metro Ethernet');
+    }
 
-    public function data(Device $device): array;
+    public function data(Device $device): array
+    {
+        return [];
+    }
 }

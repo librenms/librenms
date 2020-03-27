@@ -1,6 +1,6 @@
 <?php
 /**
- * DeviceTab.php
+ * ServicesController.php
  *
  * -Description-
  *
@@ -23,20 +23,35 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Interfaces\UI;
-
+namespace App\Http\Controllers\Device\Tabs;
 
 use App\Models\Device;
+use LibreNMS\Interfaces\UI\DeviceTab;
 
-interface DeviceTab
+class ServicesController implements DeviceTab
 {
-    public function visible(Device $device): bool;
+    public function visible(Device $device): bool
+    {
+        return (bool)\LibreNMS\Config::get('show_services') && $device->services()->exists();
+    }
 
-    public function slug(): string;
+    public function slug(): string
+    {
+        return 'services';
+    }
 
-    public function icon(): string;
+    public function icon(): string
+    {
+        return 'fa-cogs';
+    }
 
-    public function name(): string;
+    public function name(): string
+    {
+        return __('Services');
+    }
 
-    public function data(Device $device): array;
+    public function data(Device $device): array
+    {
+        return [];
+    }
 }

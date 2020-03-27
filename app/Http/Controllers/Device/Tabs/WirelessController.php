@@ -1,6 +1,6 @@
 <?php
 /**
- * DeviceTab.php
+ * WirelessController.php
  *
  * -Description-
  *
@@ -23,20 +23,36 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Interfaces\UI;
-
+namespace App\Http\Controllers\Device\Tabs;
 
 use App\Models\Device;
+use LibreNMS\Interfaces\UI\DeviceTab;
 
-interface DeviceTab
+class WirelessController implements DeviceTab
 {
-    public function visible(Device $device): bool;
 
-    public function slug(): string;
+    public function visible(Device $device): bool
+    {
+        return $device->wirelessSensors()->exists();
+    }
 
-    public function icon(): string;
+    public function slug(): string
+    {
+        return 'wireless';
+    }
 
-    public function name(): string;
+    public function icon(): string
+    {
+        return 'fa-wifi';
+    }
 
-    public function data(Device $device): array;
+    public function name(): string
+    {
+        return __('Wireless');
+    }
+
+    public function data(Device $device): array
+    {
+        return [];
+    }
 }
