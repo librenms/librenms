@@ -41,13 +41,12 @@ class DeviceController extends Controller
         'alert-stats' => \App\Http\Controllers\Device\Tabs\AlertStatsController::class,
         'showconfig' => \App\Http\Controllers\Device\Tabs\ShowConfigController::class,
         'netflow' => \App\Http\Controllers\Device\Tabs\NetflowController::class,
-        'performance' => \App\Http\Controllers\Device\Tabs\PerformanceController::class,
         'nac' => \App\Http\Controllers\Device\Tabs\NacController::class,
         'notes' => \App\Http\Controllers\Device\Tabs\NotesController::class,
         'mib' => \App\Http\Controllers\Device\Tabs\MibController::class,
     ];
 
-    public function index($device_id, $current_tab)
+    public function index($device_id, $current_tab = 'overview')
     {
         $current_tab = array_key_exists($current_tab, $this->tabs) ? $current_tab : 'overview';
         $device_id = (int)str_replace('device=', '', $device_id);

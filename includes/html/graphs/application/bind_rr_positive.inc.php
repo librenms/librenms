@@ -66,7 +66,7 @@ if (rrdtool_check_rrd_exists($rrd_filename)) {
         );
     }
 } else {
-    echo "file missing: $file";
+    echo "file missing: $rancid_file";
 }
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

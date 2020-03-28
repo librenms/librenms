@@ -48,7 +48,7 @@ class LatencyController implements DeviceTab
 
     public function icon(): string
     {
-        return 'fa-crosshairs';
+        return 'fa-line-chart';
     }
 
     public function name(): string

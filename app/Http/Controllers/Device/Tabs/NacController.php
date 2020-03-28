@@ -1,6 +1,6 @@
 <?php
 /**
- * DeviceTab.php
+ * NacController.php
  *
  * -Description-
  *
@@ -23,42 +23,35 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Interfaces\UI;
-
+namespace App\Http\Controllers\Device\Tabs;
 
 use App\Models\Device;
+use LibreNMS\Interfaces\UI\DeviceTab;
 
-interface DeviceTab
+class NacController implements DeviceTab
 {
-    /**
-     * Check if the tab is visible
-     * @param Device $device
-     * @return bool
-     */
-    public function visible(Device $device): bool;
+    public function visible(Device $device): bool
+    {
+        return $device->portsNac()->exists();
+    }
 
-    /**
-     * The url slug for this tab
-     * @return string
-     */
-    public function slug(): string;
+    public function slug(): string
+    {
+        return 'nac';
+    }
 
-    /**
-     * The icon to display for this tab
-     * @return string
-     */
-    public function icon(): string;
+    public function icon(): string
+    {
+        return 'fa-lock';
+    }
 
-    /**
-     * Name to display for this tab
-     * @return string
-     */
-    public function name(): string;
+    public function name(): string
+    {
+        return __('NAC');
+    }
 
-    /**
-     * Collect data to send to the view
-     * @param Device $device
-     * @return array
-     */
-    public function data(Device $device): array;
+    public function data(Device $device): array
+    {
+        return [];
+    }
 }

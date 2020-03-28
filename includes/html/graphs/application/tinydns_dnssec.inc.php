@@ -47,7 +47,7 @@ if (rrdtool_check_rrd_exists($rrd_filename)) {
         $i++;
     }
 } else {
-    echo "file missing: $file";
+    echo "file missing: $rancid_file";
 }
 
 require 'includes/html/graphs/generic_multi_simplex_seperated.inc.php';

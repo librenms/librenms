@@ -55,7 +55,7 @@ if (rrdtool_check_rrd_exists($rrd_filename)) {
         );
     }
 } else {
-    echo "file missing: $file";
+    echo "file missing: $rancid_file";
 }
 
 $rrd_filename = rrd_name($device['hostname'], array('app', 'bind', $app['app_id'], 'incoming'));
@@ -102,7 +102,7 @@ if (rrdtool_check_rrd_exists($rrd_filename)) {
         );
     }
 } else {
-    echo "file missing: $file";
+    echo "file missing: $rancid_file";
 }
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

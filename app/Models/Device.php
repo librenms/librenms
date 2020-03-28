@@ -734,6 +734,11 @@ class Device extends BaseModel
         return $this->hasMany(\App\Models\Storage::class, 'device_id');
     }
 
+    public function stpInstances()
+    {
+        return $this->hasMany(Stp::class, 'device_id');
+    }
+
     public function mempools()
     {
         return $this->hasMany(\App\Models\Mempool::class, 'device_id');
@@ -777,6 +782,16 @@ class Device extends BaseModel
     public function mplsTunnelCHops()
     {
         return $this->hasMany(\App\Models\MplsTunnelCHop::class, 'device_id');
+    }
+
+    public function printerSupplies()
+    {
+        return $this->hasMany(Toner::class, 'device_id');
+    }
+
+    public function pseudowires()
+    {
+        return $this->hasMany(Pseudowire::class, 'device_id');
     }
 
     public function slas()

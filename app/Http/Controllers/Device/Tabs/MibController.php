@@ -1,6 +1,6 @@
 <?php
 /**
- * DeviceTab.php
+ * MibController.php
  *
  * -Description-
  *
@@ -23,42 +23,36 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Interfaces\UI;
-
+namespace App\Http\Controllers\Device\Tabs;
 
 use App\Models\Device;
+use LibreNMS\Config;
+use LibreNMS\Interfaces\UI\DeviceTab;
 
-interface DeviceTab
+class MibController implements DeviceTab
 {
-    /**
-     * Check if the tab is visible
-     * @param Device $device
-     * @return bool
-     */
-    public function visible(Device $device): bool;
+    public function visible(Device $device): bool
+    {
+        return Config::get("poller_modules.mib") && $device->getAttrib('poll_mib');
+    }
 
-    /**
-     * The url slug for this tab
-     * @return string
-     */
-    public function slug(): string;
+    public function slug(): string
+    {
+        return 'mib';
+    }
 
-    /**
-     * The icon to display for this tab
-     * @return string
-     */
-    public function icon(): string;
+    public function icon(): string
+    {
+        return 'fa-file-text-o';
+    }
 
-    /**
-     * Name to display for this tab
-     * @return string
-     */
-    public function name(): string;
+    public function name(): string
+    {
+        return __('MIB');
+    }
 
-    /**
-     * Collect data to send to the view
-     * @param Device $device
-     * @return array
-     */
-    public function data(Device $device): array;
+    public function data(Device $device): array
+    {
+        return [];
+    }
 }
