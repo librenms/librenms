@@ -1382,13 +1382,21 @@ function list_bills(\Illuminate\Http\Request $request)
         if (strtolower($bill['bill_type']) == "cdr") {
             $allowed = format_si($bill['bill_cdr'])."bps";
             $used    = format_si($rate_data['rate_95th'])."bps";
-            $percent = round(($rate_data['rate_95th'] / $bill['bill_cdr']) * 100, 2);
+            if ($bill['bill_cdr'] > 0) {
+                $percent = round(($rate_data['rate_95th'] / $bill['bill_cdr']) * 100, 2);
+            } else {
+                $percent = "-";
+            }
             $overuse = $rate_data['rate_95th'] - $bill['bill_cdr'];
             $overuse = (($overuse <= 0) ? "-" : format_si($overuse));
         } elseif (strtolower($bill['bill_type']) == "quota") {
             $allowed = format_bytes_billing($bill['bill_quota']);
             $used    = format_bytes_billing($rate_data['total_data']);
-            $percent = round(($rate_data['total_data'] / ($bill['bill_quota'])) * 100, 2);
+            if ($bill['bill_quota'] > 0) {
+                $percent = round(($rate_data['total_data'] / ($bill['bill_quota'])) * 100, 2);
+            } else {
+                $percent = "-";
+            }
             $overuse = $rate_data['total_data'] - $bill['bill_quota'];
             $overuse = (($overuse <= 0) ? "-" : format_bytes_billing($overuse));
         }
