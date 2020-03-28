@@ -644,6 +644,11 @@ class Device extends BaseModel
         return $this->belongsToMany(\App\Models\DeviceGroup::class, 'device_group_device', 'device_id', 'device_group_id');
     }
 
+    public function ipsecTunnels()
+    {
+        return $this->hasMany(IpsecTunnel::class, 'device_id');
+    }
+
     public function ipv4()
     {
         return $this->hasManyThrough(\App\Models\Ipv4Address::class, \App\Models\Port::class, 'device_id', 'port_id', 'device_id', 'port_id');
@@ -712,6 +717,11 @@ class Device extends BaseModel
     public function processors()
     {
         return $this->hasMany(\App\Models\Processor::class, 'device_id');
+    }
+
+    public function routes()
+    {
+        return $this->hasMany(Route::class, 'device_id');
     }
 
     public function rules()
@@ -794,6 +804,11 @@ class Device extends BaseModel
         return $this->hasMany(Pseudowire::class, 'device_id');
     }
 
+    public function rServers()
+    {
+        return $this->hasMany(LoadbalancerRserver::class, 'device_id');
+    }
+
     public function slas()
     {
         return $this->hasMany(Sla::class, 'device_id');
@@ -823,6 +838,11 @@ class Device extends BaseModel
     public function vrfs()
     {
         return $this->hasMany(\App\Models\Vrf::class, 'device_id');
+    }
+
+    public function vServers()
+    {
+        return $this->hasMany(LoadbalancerVserver::class, 'device_id');
     }
 
     public function wirelessSensors()

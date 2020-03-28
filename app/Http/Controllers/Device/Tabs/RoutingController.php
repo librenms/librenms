@@ -25,14 +25,34 @@
 
 namespace App\Http\Controllers\Device\Tabs;
 
+use App\Facades\DeviceCache;
+use App\Models\Component;
 use App\Models\Device;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
 class RoutingController implements DeviceTab
 {
+    private $tabs;
+
+    public function __construct()
+    {
+        $device = DeviceCache::getPrimary();
+        $this->tabs = [
+            'ospf' => $device->ospfInstances()->exists(),
+            'bgp' => $device->bgppeers()->exists(),
+            'vrf' => $device->vrfs()->exists(),
+            'cef' => $device->cefSwitching()->exists(),
+            'mpls' => $device->mplsLsps()->exists(),
+            'cisco-otv' => Component::query()->where('device_id', $device->device_id)->where('type', 'Cisco-OTV')->exists(),
+            'loadbalancer_rservers' => $device->rServers()->exists(),
+            'ipsec_tunnels' => $device->ipsecTunnels()->exists(),
+            'routes' => $device->routes()->exists(),
+        ];
+    }
+
     public function visible(Device $device): bool
     {
-        return true;    // TODO: Implement visible() method.
+        return in_array(true, $this->tabs);
     }
 
     public function slug(): string
@@ -52,6 +72,8 @@ class RoutingController implements DeviceTab
 
     public function data(Device $device): array
     {
-        return [];
+        return [
+            'routing_tabs' => array_keys(array_filter($this->tabs))
+        ];
     }
 }

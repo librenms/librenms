@@ -42,7 +42,7 @@ class StpController implements DeviceTab
 
     public function icon(): string
     {
-        return '';
+        return 'fa-sitemap';
     }
 
     public function name(): string

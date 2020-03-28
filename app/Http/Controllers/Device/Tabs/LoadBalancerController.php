@@ -45,7 +45,7 @@ class LoadBalancerController implements DeviceTab
 
         // Cisco ACE
         if ($device->os == 'acsw') {
-            if (\DB::table('loadbalancer_vservers')->where('device_id', $device->device_id)->exists()) {
+            if ($device->vServers()->exists()) {
                 $this->tabs[] = 'loadbalancer_vservers';
             }
         }
