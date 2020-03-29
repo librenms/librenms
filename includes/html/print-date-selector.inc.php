@@ -2,7 +2,6 @@
 
 use LibreNMS\Config;
 
-//$request_uri = rtrim(Config::get('base_url', ''), '/') . $_SERVER['REQUEST_URI'];
 $request_uri = $_SERVER['REQUEST_URI'];
 
 echo "<div style='text-align: center;'>
