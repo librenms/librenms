@@ -105,7 +105,7 @@ class Url
             $contents .= '<div class="overlib-box">';
             $contents .= '<span class="overlib-title">' . $graphhead . '</span><br />';
             $contents .= Url::minigraphImage($device, $start, $end, $graph);
-            $contents .= Url::minigraphImage($device, Carbon::now()->subWeek(1)->timestamp, $end, $graph);
+            $contents .= Url::minigraphImage($device, Carbon::now()->subWeek()->timestamp, $end, $graph);
             $contents .= '</div>';
         }
 
@@ -221,7 +221,7 @@ class Url
 
     public static function deviceUrl($device, $vars = [])
     {
-        return self::generate(['page' => 'device', 'device' => $device->device_id], $vars);
+       return route('device', $device->device_id) . self::urlParams($vars);
     }
 
     public static function portUrl($port, $vars = [])
@@ -265,9 +265,23 @@ class Url
     {
         $vars = array_merge($vars, $new_vars);
 
-        $url = url($vars['page'] . '') . '/';
+        $url = url($vars['page'] . '');
         unset($vars['page']);
 
+        return $url . self::urlParams($vars);
+    }
+
+    /**
+     * Generate url parameters to append to url
+     * $prefix will only be prepended if there are parameters
+     *
+     * @param array $vars
+     * @param string $prefix
+     * @return string
+     */
+    private static function urlParams($vars, $prefix = '/')
+    {
+        $url = empty($vars) ? '' : $prefix;
         foreach ($vars as $var => $value) {
             if ($value == '0' || $value != '' && !Str::contains($var, 'opt') && !is_numeric($var)) {
                 $url .= $var . '=' . urlencode($value) . '/';

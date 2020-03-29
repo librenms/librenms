@@ -35,7 +35,6 @@
                                     <div class='col-md-3'>{!! $graph !!}</div>
                                 @endforeach
                             </div>
-                            {{--                {{ dd($data['smokeping']->otherGraphs($direction), $data['smokeping']->getFiles(), $direction) }}--}}
                             @foreach($data['smokeping']->otherGraphs($direction) as $info)
                                 <div class="row">
                                     <div class="col-md-12">

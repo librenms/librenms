@@ -6,7 +6,7 @@ use App\Facades\DeviceCache;
 use App\Models\Device;
 use App\Models\Vminfo;
 use Carbon\Carbon;
-use DB;
+use Illuminate\Http\Request;
 use LibreNMS\Config;
 
 class DeviceController extends Controller
@@ -46,12 +46,14 @@ class DeviceController extends Controller
         'mib' => \App\Http\Controllers\Device\Tabs\MibController::class,
     ];
 
-    public function index($device_id, $current_tab = 'overview')
+    public function index(Request $request, $device_id, $current_tab = 'overview', $vars = '')
     {
-        $current_tab = array_key_exists($current_tab, $this->tabs) ? $current_tab : 'overview';
         $device_id = (int)str_replace('device=', '', $device_id);
+        $current_tab = str_replace('tab=', '', $current_tab);
+        $current_tab = array_key_exists($current_tab, $this->tabs) ? $current_tab : 'overview';
         DeviceCache::setPrimary($device_id);
         $device = DeviceCache::getPrimary();
+        $this->authorize('view', [$request->user(), $device]);
 
         $alert_class = $device->disabled ? 'alert-info' : ($device->status ? '' : 'alert-danger');
         $parent_id = Vminfo::query()->whereIn('vmwVmDisplayName', [$device->hostname, $device->hostname . '.' . Config::get('mydomain')])->first(['device_id']);
@@ -77,12 +79,12 @@ class DeviceController extends Controller
         $device = $device->toArray();
         set_debug(false);
         chdir(base_path());
-        include 'includes/common.php';
-        include 'includes/functions.php';
-        include 'includes/dbFacile.php';
-        include 'includes/rrdtool.inc.php';
-        include 'includes/rewrites.php';
-        include 'includes/html/functions.inc.php';
+        $init_modules = ['web', 'auth'];
+        require base_path('/includes/init.php');
+
+        $vars['device'] = $device['device_id'];
+        $vars['tab'] = $tab;
+
         extract($data); // set preloaded data into variables
         include "includes/html/pages/device/$tab.inc.php";
         $output = ob_get_clean();
