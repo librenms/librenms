@@ -31,11 +31,11 @@ use Carbon\Carbon;
 use DB;
 use LibreNMS\Config;
 use LibreNMS\Interfaces\UI\DeviceTab;
+use LibreNMS\Util\Smokeping;
 use Request;
 
 class LatencyController implements DeviceTab
 {
-
     public function visible(Device $device): bool
     {
         return true;
@@ -64,11 +64,22 @@ class LatencyController implements DeviceTab
         $perf = $this->fetchPerfData($device, $from, $to);
         $duration = abs(strtotime($perf->first()->date) - strtotime($perf->last()->date)) * 1000;
 
+        $smokeping = new Smokeping($device);
+        $smokeping_tabs = [];
+        if ($smokeping->hasInGraph()) {
+            $smokeping_tabs[] = 'in';
+        }
+        if ($smokeping->hasOutGraph()) {
+            $smokeping_tabs[] = 'out';
+        }
+
         return [
             'dtpickerfrom' => $from,
             'dtpickerto' => $to,
             'duration' => $duration,
             'perfdata' => $this->formatPerfData($perf),
+            'smokeping' => $smokeping,
+            'smokeping_tabs' => $smokeping_tabs,
         ];
     }
 
