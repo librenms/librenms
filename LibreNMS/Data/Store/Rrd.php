@@ -452,6 +452,11 @@ class Rrd extends BaseDatastore
      */
     public function purge($hostname, $prefix)
     {
+        if (empty($hostname)) {
+            Log::error("Could not purge rrd $prefix, empty hostname");
+            return;
+        }
+
         foreach (glob($this->name($hostname, $prefix, '*.rrd')) as $rrd) {
             unlink($rrd);
         }
