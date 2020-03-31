@@ -402,7 +402,6 @@ foreach ($vars as $var => $value) {
                     } catch (ModelNotFoundException $e) {
                         echo "<div class='alert alert-danger'>Port ID {$vars['purge']} not found! Could not purge port.</div>";
                     }
-
                 }
                 break;
         }
