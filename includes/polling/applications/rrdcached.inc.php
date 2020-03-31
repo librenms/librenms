@@ -48,7 +48,6 @@ if ($agent_data['app'][$name]) {
             }
         }
     }
-
     if ($sock) {
         fwrite($sock, "STATS\n");
         $max = -1;
