@@ -1,0 +1,69 @@
+mib: IMCO-LS110-MIB
+modules:
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: sdsTempSensValue
+                    num_oid: '.1.3.6.1.4.1.33283.1.30.5.1.3.{{ $index }}'
+                    index: sdsTempSensValue.{{index}}
+                    descr: Temperature
+                    divisor: 100
+
+        charge:
+            data:
+                -
+                    oid: sdsBatteryCapacity
+                    num_oid: '.1.3.6.1.4.1.33283.1.30.7.7.{{ $index }}'
+                    index: sdsBatteryCapacity.{{index}}
+                    descr: 'Battery Charge'
+                    divisor: 10
+
+        load:
+            data:
+                -
+                    oid: sdsLoad
+                    num_oid: '.1.3.6.1.4.1.33283.1.30.7.8.{{ $index }}'
+                    index: sdsLoad.{{index}}
+                    descr: 'Load(VA)'
+                    divisor: 10
+
+
+        state:
+            data:
+                -
+                    oid: opto3
+                    num_oid: '.1.3.6.1.4.1.33283.1.30.2.3.{{ $index }}'
+                    index: opto3.{{index}}
+                    descr: 'Power state'
+                    states:
+                        - { descr: Battery, graph: 0, value: 2, generic: 2 }
+                        - { descr: Online, graph: 0, value: 0, generic: 0 }
+
+
+
+        voltage:
+            data:
+                -
+                    oid: sdsOutputVoltage1
+                    num_oid: '.1.3.6.1.4.1.33283.1.30.7.4.{{ $index }}'
+                    index: 'sdsOutputVoltage1.{{ $index }}'
+                    descr: 'Voltage1'
+                    divisor: 100
+                -
+                    oid: sdsOutputVoltage2
+                    num_oid: '.1.3.6.1.4.1.33283.1.30.7.5.{{ $index }}'
+                    index: 'sdsOutputVoltage2.{{ $index }}'
+                    descr: 'Voltage2'
+                    divisor: 100
+                    skip_values: -9999999
+
+        current:
+            data:
+                -
+                    oid: sdsOutputCurrent
+                    num_oid: '.1.3.6.1.4.1.33283.1.30.7.6.{{ $index }}'
+                    index: 'sdsOutputCurrent.{{ $index }}'
+                    descr: 'Current'
+                    divisor: 10
+

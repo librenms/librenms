@@ -1,6 +1,6 @@
 <?php
 /**
- * Widget.php
+ * PollerCluster.php
  *
  * -Description-
  *
@@ -36,6 +36,6 @@ class PollerCluster extends Model
 
     public function stats()
     {
-        return $this->hasMany('App\Models\PollerClusterStats', 'parent_poller', 'id');
+        return $this->hasMany('App\Models\PollerClusterStat', 'parent_poller', 'id');
     }
 }

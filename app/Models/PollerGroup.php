@@ -1,6 +1,6 @@
 <?php
 /**
- * Widget.php
+ * PollerGroup.php
  *
  * -Description-
  *
@@ -27,9 +27,28 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class PollerClusterStats extends Model
+class PollerGroup extends Model
 {
     public $timestamps = false;
     protected $primaryKey = 'id';
-#    protected $fillable = ['poller_name'];
+    protected $fillable = ['group_name', 'descr'];
+
+    /**
+     * Initialize this class
+     */
+    public static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function (PollerGroup $pollergroup) {
+            // handle device pollergroup fallback to default poller
+            $default_poller_id = \LibreNMS\Config::get('distributed_poller_group');
+            $pollergroup->devices()->update(['poller_group' => $default_poller_id]);
+        });
+    }
+
+    public function devices()
+    {
+        return $this->hasMany('App\Models\Device', 'poller_group', 'id');
+    }
 }

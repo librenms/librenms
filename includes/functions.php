@@ -1742,7 +1742,7 @@ function hytera_h2f($number, $nd)
     if (strlen(str_replace(" ", "", $number)) == 4) {
         $hex = '';
         for ($i = 0; $i < strlen($number); $i++) {
-            $byte = strtoupper(dechex(ord($number{$i})));
+            $byte = strtoupper(dechex(ord($number[$i])));
             $byte = str_repeat('0', 2 - strlen($byte)).$byte;
             $hex.=$byte." ";
         }
@@ -2210,7 +2210,7 @@ function cache_peeringdb()
                 $get = Requests::get($peeringdb_url . '/net?depth=2&asn=' . $asn, array(), array('proxy' => get_proxy()));
                 $json_data = $get->body;
                 $data = json_decode($json_data);
-                $ixs = $data->{'data'}{0}->{'netixlan_set'};
+                $ixs = $data->{'data'}[0]->{'netixlan_set'};
                 foreach ($ixs as $ix) {
                     $ixid = $ix->{'ix_id'};
                     $tmp_ix = dbFetchRow("SELECT * FROM `pdb_ix` WHERE `ix_id` = ? AND asn = ?", array($ixid, $asn));
