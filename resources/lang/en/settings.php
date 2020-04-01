@@ -180,7 +180,7 @@ return [
             ],
             'port_util_alert' => [
                 'description' => 'Enable Port Utilization Alert',
-                'help' => 'Runs Alert if a Port Uzlization exceeds configured percentage'
+                'help' => 'Run Alert if a Port Uzlization exceeds configured percentage'
             ],
             'port_util_perc' => [
                 'description' => 'Port Utilization Percentage Level',
