@@ -1,0 +1,10 @@
+os: imcopower-ls110
+text: 'Imco Power LS110'
+type: power
+icon: imco
+group: IMCO POWER
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.33283.1
+mib_dir:
+    - imco
