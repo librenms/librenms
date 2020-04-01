@@ -1361,9 +1361,11 @@ ports:
     - { Field: portName, Type: varchar(128), 'Null': true, Extra: '' }
     - { Field: ifIndex, Type: bigint(20), 'Null': true, Extra: '', Default: '0' }
     - { Field: ifSpeed, Type: bigint(20), 'Null': true, Extra: '' }
+    - { Field: ifSpeed_prev, Type: bigint(20), 'Null': true, Extra: '' }
     - { Field: ifConnectorPresent, Type: varchar(12), 'Null': true, Extra: '' }
     - { Field: ifPromiscuousMode, Type: varchar(12), 'Null': true, Extra: '' }
     - { Field: ifHighSpeed, Type: int(11), 'Null': true, Extra: '' }
+    - { Field: ifHighSpeed_prev, Type: int(11), 'Null': true, Extra: '' }
     - { Field: ifOperStatus, Type: varchar(16), 'Null': true, Extra: '' }
     - { Field: ifOperStatus_prev, Type: varchar(16), 'Null': true, Extra: '' }
     - { Field: ifAdminStatus, Type: varchar(16), 'Null': true, Extra: '' }

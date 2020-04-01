@@ -95,6 +95,7 @@ REDIS_SENTINEL_SERVICE=myservice
 
 REDIS_DB=0
 #REDIS_PASSWORD=
+#REDIS_TIMEOUT=60
 ```
 
 ## Basic Configuration
@@ -153,6 +154,16 @@ You can enable it by setting the following:
 ```php
 $config['service_ping_enabled'] = true;
 ```
+
+# Watchdog
+
+The watchdog scheduler is disabled by default. You can enable it by setting the following:
+
+```php
+$config['service_watchdog_enabled'] = true;
+```
+
+The watchdog scheduler will check that the poller log file has been written to within the last poll period. If there is no change to the log file since, the watchdog will restart the polling service. The poller log file is set by `$config['log_file']` and defaults to `./logs/librenms.log`
 
 # Cron Scripts
 
