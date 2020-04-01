@@ -57,6 +57,10 @@ class MenuComposer
         $user = Auth::user();
         $site_style = Config::get('applied_site_style');
 
+        //global Settings
+        $vars['hide_dashboard_editor'] = UserPref::getPref($user, 'hide_dashboard_editor');
+        // end global Settings
+
         //TODO: should be handled via CSS Themes
         $vars['navbar'] = in_array($site_style, ['mono', 'dark']) ? 'navbar-inverse' : '';
 
