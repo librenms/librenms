@@ -84,10 +84,7 @@ class MenuComposer
 
         $vars['port_counts']['alerted'] = 0; // not actually supported on old...
         $vars['custom_port_descr'] = collect(Config::get('custom_descr', []))
-            ->filter()
-            ->map(function ($descr) {
-                return strtolower($descr);
-            });
+            ->filter();
         $vars['port_groups_exist'] = Config::get('int_customers') ||
             Config::get('int_transit') ||
             Config::get('int_peering') ||
