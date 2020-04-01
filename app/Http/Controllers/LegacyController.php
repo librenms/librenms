@@ -21,7 +21,7 @@ class LegacyController extends Controller
 
         set_debug(str_contains($request->path(), 'debug'));
 
-        ob_start();
+        ob_start(); // protect against bad plugins that output during start
         \LibreNMS\Plugins::start();
         ob_end_clean();
 
