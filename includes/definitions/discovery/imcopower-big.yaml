@@ -1,0 +1,113 @@
+mib: IMCO-BIG-MIB
+modules:
+    sensors:
+        current:
+            data:
+                -
+                    oid: imPm1Power1OutputCurrent
+                    num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.3.24.{{ $index }}'
+                    index: imPm1Power1OutputCurrent.{{ $index }}
+                    descr: 'Power1 Current'
+                    divisor: 10
+                -
+                    oid: imPm1Power2OutputCurrent
+                    num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.4.24.{{ $index }}'
+                    index: imPm1Power2OutputCurrent.{{ $index }}
+                    descr: 'Power2 Current'
+                    divisor: 10
+                -
+                    oid: imPm1Power3OutputCurrent
+                    num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.5.24.{{ $index }}'
+                    index: imPm1Power3OutputCurrent.{{ $index }}
+                    descr: 'Power3 Current'
+                    divisor: 10
+        charge:
+            data:
+                -
+                    oid: imPm1BatLeg1ChargeState
+                    num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.7.12.{{ $index }}'
+                    index: imPm1BatLeg1ChargeState.{{index}}
+                    descr: 'Battery Charge'
+
+        load:
+            data:
+                -
+                    oid: imPm1Power1OutputLoad
+                    num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.3.29.{{ $index }}'
+                    index: imPm1Power1OutputLoad.{{index}}
+                    descr: 'Power1 Load(VA)'
+                -
+                    oid: imPm1Power2OutputLoad
+                    num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.4.29.{{ $index }}'
+                    index: imPm1Power2OutputLoad.{{index}}
+                    descr: 'Power2 Load(VA)'
+                -
+                    oid: imPm1Power3OutputLoad
+                    num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.5.29.{{ $index }}'
+                    index: imPm1Power3OutputLoad.{{index}}
+                    descr: 'Power3 Load(VA)'
+        power:
+            data:
+                -
+                    oid: imPm1Power1OutputPowerW
+                    num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.3.27.{{ $index }}'
+                    index: imPm1Power1OutputPowerW.{{index}}
+                    descr: 'Output Power1'
+                -
+                    oid: imPm1Power2OutputPowerW
+                    num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.4.27.{{ $index }}'
+                    index: imPm1Power2OutputPowerW.{{index}}
+                    descr: 'Output Power2'
+                -
+                    oid: imPm1Power3OutputPowerW
+                    num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.5.27.{{ $index }}'
+                    index: imPm1Power3OutputPowerW.{{index}}
+                    descr: 'Output Power3'
+
+        runtime:
+            data:
+                -
+                    oid: imPm1BatLeg1Autonomytime
+                    num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.7.14.{{ $index }}'
+                    index: imPm1BatLeg1Autonomytime.{{index}}
+                    descr: 'Runtime'
+        state:
+            data:
+                -
+                    oid: imPM1BatLeg1Fuse
+                    num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.7.16.{{ $index }}'
+                    index: imPM1BatLeg1Fuse.{{index}}
+                    descr: 'Power state'
+                    states:
+                        - { descr: Battery, graph: 0, value: 1, generic: 2 }
+                        - { descr: Online, graph: 0, value: 0, generic: 0 }
+
+        voltage:
+            data:
+                -
+                    oid: imPm1Power1OutputVoltage
+                    num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.3.23.{{ $index }}'
+                    index: 'imPm1Power1OutputVoltage.{{ $index }}'
+                    descr: 'Power1 Voltage'
+                    divisor: 10
+                -
+                    oid: imPm1Power2OutputVoltage
+                    num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.4.23.{{ $index }}'
+                    index: 'imPm1Power2OutputVoltage.{{ $index }}'
+                    descr: 'Power2 Voltage'
+                    divisor: 10
+                -
+                    oid: imPm1Power3OutputVoltage
+                    num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.5.23.{{ $index }}'
+                    index: 'imPm1Power3OutputVoltage.{{ $index }}'
+                    descr: 'Power3 Voltage'
+                    divisor: 10
+                -
+                    oid: imPm1BatteryVoltage
+                    num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.6.2.{{ $index }}'
+                    index: 'imPm1BatteryVoltage.{{ $index }}'
+                    descr: 'Battery Voltage'
+                    divisor: 10
+
+
+
