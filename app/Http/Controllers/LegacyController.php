@@ -21,7 +21,9 @@ class LegacyController extends Controller
 
         set_debug(str_contains($request->path(), 'debug'));
 
+        ob_start(); // protect against bad plugins that output during start
         \LibreNMS\Plugins::start();
+        ob_end_clean();
 
         if (str_contains($request->path(), 'widescreen=yes')) {
             $session->put('widescreen', 1);
@@ -50,7 +52,7 @@ class LegacyController extends Controller
         if ($vars['page'] && is_file("includes/html/pages/" . $vars['page'] . ".inc.php")) {
             require "includes/html/pages/" . $vars['page'] . ".inc.php";
         } else {
-            return abort(404);
+            abort(404);
         }
 
         $html = ob_get_clean();
