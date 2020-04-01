@@ -10,7 +10,7 @@
             <button class="btn btn-default disabled" style="min-width:160px;"><span class="pull-left">Dashboards</span></button>
             <div class="btn-group">
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="min-width:160px;">
-                    <span class="pull-left">{{ $dashboard->user_id != Auth::id() ? ($dashboard->user->username ?? 'Deleted User') . ':' : null}} {{ $dashboard->dashboard_name }}</span>
+                    <span class="pull-left">{{ $dashboard->user_id != Auth::id() ? ($dashboard->user->username ?? __('Deleted User')) . ':' : null}} {{ $dashboard->dashboard_name }}</span>
                 <span class="pull-right">
                 <span class="caret"></span>
                 <span class="sr-only">Toggle Dropdown</span>
@@ -34,7 +34,7 @@
                             @if($dash->dashboard_id != $dashboard->dashboard_id)
                             <li>
                                 <a href="{{ url("?dashboard=$dash->dashboard_id") }}">
-                                {{ ($dash->user->username ?? 'Deleted User') . ':' . $dash->dashboard_name . ($dash->access == 1 ? ' (Read)' : '') }}</a>
+                                {{ ($dash->user->username ?? __('Deleted User')) . ':' . $dash->dashboard_name . ($dash->access == 1 ? ' (Read)' : '') }}</a>
                             </li>
                             @endif
                         @endforeach
