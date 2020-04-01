@@ -32,6 +32,8 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
     Route::resource('users', 'UserController');
     Route::get('about', 'AboutController@index');
     Route::get('authlog', 'UserController@authlog');
+    Route::get('overview', 'OverviewController@index');
+    Route::get('/', 'OverviewController@index');
 
     // Dashboard toggle
     Route::get('toggle_dashboard_editor', 'UserPreferencesController@toggleDashboardEditor');

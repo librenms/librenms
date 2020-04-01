@@ -197,6 +197,18 @@ class Port extends DeviceRelatedModel
         });
     }
 
+    /**
+     * @param Builder $query
+     * @return Builder
+     */
+    public function scopeIsValid($query)
+    {
+        return $query->where([
+            ['deleted', '=', 0],
+            ['disabled', '=', 0],
+        ]);
+    }
+
     public function scopeHasAccess($query, User $user)
     {
         return $this->hasPortAccess($query, $user);

@@ -51,6 +51,7 @@ class TopInterfacesController extends WidgetController
         $query = Port::hasAccess($request->user())->with(['device' => function ($query) {
             $query->select('device_id', 'hostname', 'sysName', 'status', 'os');
         }])
+            ->isValid()
             ->select('port_id', 'device_id', 'ifName', 'ifDescr', 'ifAlias')
             ->groupBy('port_id', 'device_id', 'ifName', 'ifDescr', 'ifAlias')
             ->where('poll_time', '>', Carbon::now()->subMinutes($data['time_interval'])->timestamp)

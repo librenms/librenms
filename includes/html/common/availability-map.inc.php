@@ -66,7 +66,7 @@ if (defined('SHOW_SETTINGS')) {
         <div class="form-group">
             <div class="col-sm-4">
                 <label for="tile_size" class="control-label availability-map-widget-header">Tile size</label>
-            </div>      
+            </div>
             <div class="col-sm-6">
                 <input type="text" class="form-control" name="tile_size" value="'.$compact_tile.'">
             </div>
