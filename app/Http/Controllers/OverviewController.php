@@ -98,12 +98,13 @@ class OverviewController extends Controller
                         );
         }
 
-        $bare        = $request->bare;
-        $data        = serialize(json_encode($data));
-        $dash_config = unserialize(stripslashes($data));
-        $widgets     = Widget::select('widget_id', 'widget_title')->orderBy('widget_title')->get();
+        $bare                  = $request->bare;
+        $data                  = serialize(json_encode($data));
+        $dash_config           = unserialize(stripslashes($data));
+        $hide_dashboard_editor = UserPref::getPref($user, 'hide_dashboard_editor');
+        $widgets               = Widget::select('widget_id', 'widget_title')->orderBy('widget_title')->get();
 
-        return view('overview.default', compact('bare', 'dash_config', 'dashboard', 'user_dashboards', 'shared_dashboards', 'widgets'));
+        return view('overview.default', compact('bare', 'dash_config', 'dashboard', 'hide_dashboard_editor', 'user_dashboards', 'shared_dashboards', 'widgets'));
     }
 
     public function simple(Request $request)

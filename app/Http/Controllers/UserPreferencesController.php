@@ -123,10 +123,10 @@ class UserPreferencesController extends Controller
         return response()->json(['status' => 'success']);
     }
 
-    public function toggleDashboardEditor()
+    public function toggleDashboardEditor(Request $request)
     {
-        $visibility = UserPref::getPref(Auth::user(), 'hide_dashboard_editor') ? 0 : 1;
-        UserPref::setPref(Auth::user(), 'hide_dashboard_editor', $visibility);
+        $hide_dashboard_editor = UserPref::getPref(Auth::user(), 'hide_dashboard_editor') ? 0 : 1;
+        UserPref::setPref(Auth::user(), 'hide_dashboard_editor', $hide_dashboard_editor);
         return redirect('overview');
     }
 

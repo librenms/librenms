@@ -4,6 +4,7 @@
 
 @section('content')
 @if (!$bare)
+@if (!$hide_dashboard_editor)
 <div class="row">
     <div class="col-md-6">
         <div class="btn-group btn-lg">
@@ -124,6 +125,7 @@
     <!-- End Widget-Select -->
     <hr>
 </div>
+@endif
 <div class="dash-collapse" id="del_dash" style="display: none;">
     <div class="row" style="margin-top:5px;">
         <div class="col-md-6">
