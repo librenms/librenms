@@ -32,6 +32,8 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
     Route::resource('users', 'UserController');
     Route::get('about', 'AboutController@index');
     Route::get('authlog', 'UserController@authlog');
+    Route::get('overview', 'OverviewController@index');
+    Route::get('/', 'OverviewController@index');
 
     // Maps
     Route::group(['prefix' => 'maps', 'namespace' => 'Maps'], function () {
