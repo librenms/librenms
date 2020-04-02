@@ -132,14 +132,14 @@ $complete = 1;
 <?php
 
 if (!empty($msg)) {
-?>
+    ?>
     <div class="row">
       <div class="col-md-6 col-md-offset-3">
         <div class="alert alert-danger"><?php echo $msg; ?></div>
       </div>
     </div>
 
-<?php
+    <?php
 }
 ?>
 
@@ -157,7 +157,7 @@ if (!empty($msg)) {
 <?php
 
 if ($stage == 0) {
-?>
+    ?>
 
     <div class="row">
       <div class="col-md-6 col-md-offset-3">
@@ -172,68 +172,68 @@ if ($stage == 0) {
             <th>Status</th>
             <th>Comments</th>
           </tr>
-<?php
+    <?php
 
-$complete = true;
-foreach ($modules as $extension) {
-    if (extension_loaded("$extension")) {
-        $status = 'installed';
+    $complete = true;
+    foreach ($modules as $extension) {
+        if (extension_loaded("$extension")) {
+            $status = 'installed';
+            $row_class = 'success';
+        } else {
+            $status = 'missing';
+            $row_class = 'danger';
+            $complete = false;
+        }
+
+        echo "<tr class='$row_class'><td>PHP module <strong>$extension</strong></td><td>$status</td><td></td></tr>";
+    }
+
+    if (is_writable(session_save_path() === '' ? '/tmp' : session_save_path())) {
+        $status = 'yes';
         $row_class = 'success';
     } else {
-        $status = 'missing';
+        $status = 'no';
         $row_class = 'danger';
         $complete = false;
     }
 
-    echo "<tr class='$row_class'><td>PHP module <strong>$extension</strong></td><td>$status</td><td></td></tr>";
-}
-
-if (is_writable(session_save_path() === '' ? '/tmp' : session_save_path())) {
-    $status = 'yes';
-    $row_class = 'success';
-} else {
-    $status = 'no';
-    $row_class = 'danger';
-    $complete = false;
-}
-
-echo "<tr class='$row_class'><td>Session directory writable</td><td>$status</td><td>";
-if ($status == 'no') {
-    echo session_save_path() . " is not writable";
-    if (function_exists('posix_getgrgid')) {
-        $group_info = posix_getgrgid(filegroup(session_save_path()));
-        if ($group_info['gid'] !== 0) {  // don't suggest adding users to the root group
-            $group = $group_info['name'];
-            $user = get_current_user();
-            echo ", suggested fix <strong>usermod -a -G $group $user</strong>";
+    echo "<tr class='$row_class'><td>Session directory writable</td><td>$status</td><td>";
+    if ($status == 'no') {
+        echo session_save_path() . " is not writable";
+        if (function_exists('posix_getgrgid')) {
+            $group_info = posix_getgrgid(filegroup(session_save_path()));
+            if ($group_info['gid'] !== 0) {  // don't suggest adding users to the root group
+                $group = $group_info['name'];
+                $user = get_current_user();
+                echo ", suggested fix <strong>usermod -a -G $group $user</strong>";
+            }
         }
     }
-}
-echo "</td></tr>";
+    echo "</td></tr>";
     
-if (is_writable(Config::get('temp_dir'))) {
-    $status = 'yes';
-    $row_class = 'success';
-} else {
-    $status = 'no';
-    $row_class = 'danger';
-    $complete = false;
-}
+    if (is_writable(Config::get('temp_dir'))) {
+        $status = 'yes';
+        $row_class = 'success';
+    } else {
+        $status = 'no';
+        $row_class = 'danger';
+        $complete = false;
+    }
 
-echo "<tr class='$row_class'><td>Temporary directory writable</td><td>$status</td><td>";
-if ($status == 'no') {
-    echo Config::get('temp_dir') . ' is not writable';
-    if (function_exists('posix_getgrgid')) {
-        $group_info = posix_getgrgid(filegroup(session_save_path()));
-        if ($group_info['gid'] !== 0) {  // don't suggest adding users to the root group
-            $group = $group_info['name'];
-            $user = get_current_user();
-            echo ", suggested fix <strong>chown $user:$group $php_temp_dir</strong>";
+    echo "<tr class='$row_class'><td>Temporary directory writable</td><td>$status</td><td>";
+    if ($status == 'no') {
+        echo Config::get('temp_dir') . ' is not writable';
+        if (function_exists('posix_getgrgid')) {
+            $group_info = posix_getgrgid(filegroup(session_save_path()));
+            if ($group_info['gid'] !== 0) {  // don't suggest adding users to the root group
+                $group = $group_info['name'];
+                $user = get_current_user();
+                echo ", suggested fix <strong>chown $user:$group $php_temp_dir</strong>";
+            }
         }
     }
-}
-echo "</td></tr>";
-?>
+    echo "</td></tr>";
+    ?>
         </table>
       </div>
     </div>
@@ -252,9 +252,9 @@ echo "</td></tr>";
       </div>
     </div>
 
-<?php
+    <?php
 } elseif ($stage == 1) {
-?>
+    ?>
 
     <div class="row">
       <div class="col-md-3">
@@ -306,9 +306,9 @@ echo "</td></tr>";
       </div>
     </div>
 
-<?php
+    <?php
 } elseif ($stage == "2") {
-?>
+    ?>
     <div class="row">
      <div class="col-md-3">
      </div>
@@ -368,17 +368,17 @@ echo "</td></tr>";
         xhr.send();
         $('#install-progress').addClass('active')
     </script>
-<?php
+    <?php
 } elseif ($stage == "5") {
-?>
+    ?>
     <div class="row">
       <div class="col-md-3">
       </div>
       <div class="col-md-6">
-<?php
+    <?php
 
 // Create the config file we will write or display
-$config_file = <<<"EOD"
+    $config_file = <<<"EOD"
 ## Have a look in defaults.inc.php for examples of settings you can set here. DO NOT EDIT defaults.inc.php!
 
 ### Database config
@@ -421,23 +421,23 @@ $config_file = <<<"EOD"
 #\$config\['update'\] = 0;  # uncomment to completely disable updates
 EOD;
 
-if (!file_exists("{$librenms_dir}/config.php")) {
-    $conf = fopen("config.php", 'w');
-    if ($conf != false) {
-        if (fwrite($conf, "<?php\n") === false) {
+    if (!file_exists("{$librenms_dir}/config.php")) {
+        $conf = fopen("config.php", 'w');
+        if ($conf != false) {
+            if (fwrite($conf, "<?php\n") === false) {
+                echo("<div class='alert alert-danger'>We couldn't create the config.php file, please create this manually before continuing by copying the below into a config.php in the root directory of your install (typically /opt/librenms/)</div>");
+                echo("<pre>&lt;?php\n".stripslashes($config_file)."</pre>");
+            } else {
+                $config_file = stripslashes($config_file);
+                fwrite($conf, $config_file);
+                echo("<div class='alert alert-success'>The config file has been created</div>");
+            }
+        } else {
             echo("<div class='alert alert-danger'>We couldn't create the config.php file, please create this manually before continuing by copying the below into a config.php in the root directory of your install (typically /opt/librenms/)</div>");
             echo("<pre>&lt;?php\n".stripslashes($config_file)."</pre>");
-        } else {
-            $config_file = stripslashes($config_file);
-            fwrite($conf, $config_file);
-            echo("<div class='alert alert-success'>The config file has been created</div>");
         }
-    } else {
-        echo("<div class='alert alert-danger'>We couldn't create the config.php file, please create this manually before continuing by copying the below into a config.php in the root directory of your install (typically /opt/librenms/)</div>");
-        echo("<pre>&lt;?php\n".stripslashes($config_file)."</pre>");
     }
-}
-?>
+    ?>
       <form class="form-horizontal" role="form" method="post">
         <?php echo csrf_field() ?>
         <input type="hidden" name="stage" value="6">
@@ -448,16 +448,16 @@ if (!file_exists("{$librenms_dir}/config.php")) {
           <input type="hidden" name="dbsocket" value="<?php echo $dbsocket; ?>">
         <button type="submit" class="btn btn-success pull-right">Finish install</button>
       </form>
-<?php
+    <?php
 
-?>
+    ?>
       </div>
       <div class="col-md-3">
       </div>
     </div>
-<?php
+    <?php
 } elseif ($stage == "3") {
-?>
+    ?>
     <div class="row">
       <div class="col-md-3">
       </div>
@@ -494,31 +494,31 @@ if (!file_exists("{$librenms_dir}/config.php")) {
       <div class="col-md-3">
       </div>
     </div>
-<?php
+    <?php
 } elseif ($stage == "4") {
     $proceed = 1;
-?>
+    ?>
     <div class="row">
       <div class="col-md-3">
       </div>
       <div class="col-md-6">
-<?php
-if (LegacyAuth::get()->canManageUsers()) {
-    if (!LegacyAuth::get()->userExists($add_user)) {
-        if (LegacyAuth::get()->addUser($add_user, $add_pass, '10', $add_email)) {
-            echo("<div class='alert alert-success'>User has been added successfully</div>");
-            $proceed = 0;
+    <?php
+    if (LegacyAuth::get()->canManageUsers()) {
+        if (!LegacyAuth::get()->userExists($add_user)) {
+            if (LegacyAuth::get()->addUser($add_user, $add_pass, '10', $add_email)) {
+                echo("<div class='alert alert-success'>User has been added successfully</div>");
+                $proceed = 0;
+            } else {
+                echo("<div class='alert alert-danger'>User hasn't been added, please try again</div>");
+            }
         } else {
-            echo("<div class='alert alert-danger'>User hasn't been added, please try again</div>");
+            echo("<div class='alert alert-danger'>User $add_user already exists!</div>");
         }
     } else {
-        echo("<div class='alert alert-danger'>User $add_user already exists!</div>");
+        echo("<div class='alert alert-danger'>Auth module isn't loaded</div>");
     }
-} else {
-    echo("<div class='alert alert-danger'>Auth module isn't loaded</div>");
-}
 
-?>
+    ?>
         <form class="form-horizontal" role="form" method="post">
             <?php echo csrf_field() ?>
           <input type="hidden" name="stage" value="5">
@@ -538,9 +538,9 @@ if (LegacyAuth::get()->canManageUsers()) {
       <div class="col-md-3">
       </div>
     </div>
-<?php
+    <?php
 } elseif ($stage == "6") {
-?>
+    ?>
     <div class="row">
         <div class="col-md-offset-3 col-md-6">
             <div class="alert alert-danger">
@@ -559,7 +559,7 @@ if (LegacyAuth::get()->canManageUsers()) {
       </div>
       <div class="col-md-3">
       </div>
-<?php
+    <?php
 }
 ?>
 

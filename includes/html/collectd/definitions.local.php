@@ -49,18 +49,18 @@ function meta_graph_local($host, $plugin, $plugin_instance, $type, $type_instanc
     $opts['rrd_opts'] = array('-v', 'Events');
 
     $files = array();
-/*	$opts['colors'] = array(
-		'ham'     => '00e000',
-		'spam'    => '0000ff',
-		'malware' => '990000',
+/*  $opts['colors'] = array(
+        'ham'     => '00e000',
+        'spam'    => '0000ff',
+        'malware' => '990000',
 
-		'sent'     => '00e000',
-		'deferred' => 'a0e000',
-		'reject'   => 'ff0000',
-		'bounced'  => 'a00050'
-	);
+        'sent'     => '00e000',
+        'deferred' => 'a0e000',
+        'reject'   => 'ff0000',
+        'bounced'  => 'a00050'
+    );
 
-	$type_instances = array('ham', 'spam', 'malware',  'sent', 'deferred', 'reject', 'bounced'); */
+    $type_instances = array('ham', 'spam', 'malware',  'sent', 'deferred', 'reject', 'bounced'); */
     foreach ($type_instances as $inst) {
         $file  = '';
         foreach (\LibreNMS\Config::get('datadirs') as $datadir) {
@@ -76,6 +76,6 @@ function meta_graph_local($host, $plugin, $plugin_instance, $type, $type_instanc
         $sources[] = array('name'=>$inst, 'file'=>$file);
     }
 
-//	return collectd_draw_meta_stack($opts, $sources);
+//  return collectd_draw_meta_stack($opts, $sources);
     return collectd_draw_meta_line($opts, $sources);
 }

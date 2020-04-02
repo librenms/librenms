@@ -12,8 +12,8 @@ if (in_array($device['os'], array("linux", "endian", "proxmox", "recoveryos"))) 
         $hardware = "Generic SPARC 64-bit";
     } elseif (strstr($device['sysDescr'], "mips")) {
         $hardware = "Generic MIPS";
-    } // Except iDrac6 from being detected as armv5
-    elseif (strstr($device['sysDescr'], "armv5") && $device['sysObjectID'] != '.1.3.6.1.4.1.674.10892.2') {
+    } elseif (strstr($device['sysDescr'], "armv5") && $device['sysObjectID'] != '.1.3.6.1.4.1.674.10892.2') {
+        // Except iDrac6 from being detected as armv5
         $hardware = "Generic ARMv5";
     } elseif (strstr($device['sysDescr'], "armv6")) {
         $hardware = "Generic ARMv6";

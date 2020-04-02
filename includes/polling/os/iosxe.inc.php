@@ -10,7 +10,7 @@
  */
 
 ///////////////////////////////////////////////////
-// Include the standard IOS polling file. 
+// Include the standard IOS polling file.
 // Most of the IOSXE os polling code is identical
 ///////////////////////////////////////////////////
 

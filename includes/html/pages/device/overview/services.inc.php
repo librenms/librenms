@@ -38,5 +38,5 @@ if (ObjectCache::serviceCounts(['total'], $device['device_id'])['total'] > 0) {
                 </div>
             </div>
         </div>
-<?php
+    <?php
 }

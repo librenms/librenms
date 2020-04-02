@@ -16,9 +16,7 @@ if (str_contains($device['sysDescr'], array('NetIron', 'MLX', 'CER')) === false)
     }
     $mempool['used']  = ($mempool['total'] - $mempool['free']);
     d_echo($mempool);
-} //end_if
-
-else {
+} else {
     echo 'NetIron: ';
     d_echo('caching');
     $mempool_cache['ironware-dyn'] = array();

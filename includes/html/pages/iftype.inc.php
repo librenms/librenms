@@ -17,8 +17,7 @@ foreach ($ports as $port) {
 
 unset($seperator);
 
-for ($i = 0; $i < count($types_array);
-$i++) {
+for ($i = 0; $i < count($types_array); $i++) {
     $types_array[$i] = ucfirst($types_array[$i]);
 }
 

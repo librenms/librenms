@@ -8,7 +8,7 @@ $COMPONENTS = $COMPONENT->getComponents(null, $options);
 
 foreach ($COMPONENTS as $DEVICE_ID => $COMP) {
     $LINK = generate_url(array('page' => 'device', 'device' => $DEVICE_ID, 'tab' => 'routing', 'proto' => 'cisco-otv'));
-?>
+    ?>
 <div class="panel panel-default" id="overlays-<?php echo $DEVICE_ID?>">
     <div class="panel-heading">
         <h3 class="panel-title"><a href="<?php echo $LINK?>"><?php echo gethostbyid($DEVICE_ID)?> - Overlay's & Adjacencies</a></h3>
@@ -40,16 +40,16 @@ foreach ($COMPONENTS as $DEVICE_ID => $COMP) {
                             }
                             ?>
                             <a class="list-group-item <?php echo $GLI?> small"><i class="fa fa-chevron-right" aria-hidden="true"></i> <?php echo $ADJACENCY['label']?> - <?php echo $ADJACENCY['endpoint']?> <?php echo $ADJ_STATUS?></a>
-                        <?php
+                            <?php
                         }
                     }
                     ?>
                 </div>
-            <?php
+                <?php
             }
         }
         ?>
     </div>
 </div>
-<?php
+    <?php
 }

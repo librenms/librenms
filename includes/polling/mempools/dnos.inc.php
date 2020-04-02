@@ -1,6 +1,6 @@
 <?php
 
-// Code below was borrowed from 'powerconnect-cpu.inc.php' 
+// Code below was borrowed from 'powerconnect-cpu.inc.php'
 
 if (preg_match('/.6027.1.3.[0-9]+$/', $device['sysObjectID'])) {
     $mempool['total'] = snmp_get($device, 'chSysProcessorMemSize.1', '-OvQU', 'F10-S-SERIES-CHASSIS-MIB');

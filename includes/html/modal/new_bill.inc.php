@@ -24,7 +24,7 @@ if (Auth::user()->hasGlobalAdmin()) {
         $bill_data['bill_notes']    = $port['port_descr_speed'];
         $port_device_id             = $port['device_id'];
     }
-?>
+    ?>
 
  <div class="modal fade bs-example-modal-sm" id="create-bill" tabindex="-1" role="dialog" aria-labelledby="Create" aria-hidden="true">
     <div class="modal-dialog">
@@ -49,7 +49,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                                 $selected = $device['device_id'] == $port_device_id ? " selected" : "";
                                 echo "<option value='${device['device_id']}' $selected>" . format_hostname($device) . "</option>\n";
                             }
-                                ?>
+                            ?>
                         </select>
                     </div>
                 </div>
@@ -72,17 +72,17 @@ if (Auth::user()->hasGlobalAdmin()) {
                     </div>
                 </div>
 
-<?php
-if (Config::get('billing.95th_default_agg') == 1) {
-    $bill_data['dir_95th'] = 'agg';
-} else {
-    $bill_data['dir_95th'] = 'in';
-}
-$bill_data['bill_type'] = 'cdr';
-$quota = array('select_gb' => ' selected');
-$cdr = array('select_mbps' => ' selected');
-include 'includes/html/pages/bill/addoreditbill.inc.php';
-?>
+    <?php
+    if (Config::get('billing.95th_default_agg') == 1) {
+        $bill_data['dir_95th'] = 'agg';
+    } else {
+        $bill_data['dir_95th'] = 'in';
+    }
+    $bill_data['bill_type'] = 'cdr';
+    $quota = array('select_gb' => ' selected');
+    $cdr = array('select_mbps' => ' selected');
+    include 'includes/html/pages/bill/addoreditbill.inc.php';
+    ?>
                 <div class="form-group">
                   <div class="col-sm-offset-4 col-sm-4">
                     <button type="submit" class="btn btn-primary"><i class="fa fa-check"></i> Add Bill</button>
@@ -95,5 +95,5 @@ include 'includes/html/pages/bill/addoreditbill.inc.php';
     </div>
 </div>
 
-<?php
+    <?php
 }

@@ -85,11 +85,11 @@ if (bill_permitted($bill_id)) {
         echo '</div></div>';
     }//end print_port_list
 
-?>
+    ?>
 
     <h2><?php   echo "Bill: ${bill_data['bill_name']}"; ?></h2>
 
-<?php
+    <?php
     print_optionbar_start();
     echo "<strong>Bill</strong> &raquo; ";
     $menu_options = array(
@@ -98,56 +98,56 @@ if (bill_permitted($bill_id)) {
         'transfer' => 'Transfer Graphs',
         'history' => 'Historical Graphs'
     );
-if (Auth::user()->hasGlobalAdmin()) {
-    $menu_options['edit'] = 'Edit';
-    $menu_options['delete'] = 'Delete';
-    $menu_options['reset'] = 'Reset';
-}
+    if (Auth::user()->hasGlobalAdmin()) {
+        $menu_options['edit'] = 'Edit';
+        $menu_options['delete'] = 'Delete';
+        $menu_options['reset'] = 'Reset';
+    }
     $sep = '';
-foreach ($menu_options as $option => $text) {
-    echo $sep;
-    if ($vars['view'] == $option) {
-        echo "<span class='pagemenu-selected'>";
-    }
+    foreach ($menu_options as $option => $text) {
+        echo $sep;
+        if ($vars['view'] == $option) {
+            echo "<span class='pagemenu-selected'>";
+        }
 
-    echo generate_link($text, $vars, array('view' => $option));
-    if ($vars['view'] == $option) {
-        echo '</span>';
-    }
+        echo generate_link($text, $vars, array('view' => $option));
+        if ($vars['view'] == $option) {
+            echo '</span>';
+        }
 
-    $sep = ' | ';
-}
+        $sep = ' | ';
+    }
 
     echo '<div style="font-weight: bold; float: right;"><a href="'.generate_url(array('page' => 'bills')).'/"><i class="fa fa-arrow-left fa-lg icon-theme" aria-hidden="true"></i> Back to Bills</a></div>';
 
     print_optionbar_end();
 
-if ($vars['view'] == 'edit' && Auth::user()->hasGlobalAdmin()) {
-    include 'includes/html/pages/bill/edit.inc.php';
-} elseif ($vars['view'] == 'delete' && Auth::user()->hasGlobalAdmin()) {
-    include 'includes/html/pages/bill/delete.inc.php';
-} elseif ($vars['view'] == 'reset' && Auth::user()->hasGlobalAdmin()) {
-    include 'includes/html/pages/bill/reset.inc.php';
-} elseif ($vars['view'] == 'history') {
-    include 'includes/html/pages/bill/history.inc.php';
-} elseif ($vars['view'] == 'transfer') {
-    include 'includes/html/pages/bill/transfer.inc.php';
-} elseif ($vars['view'] == 'quick' || $vars['view'] == 'accurate') {
-?>
+    if ($vars['view'] == 'edit' && Auth::user()->hasGlobalAdmin()) {
+        include 'includes/html/pages/bill/edit.inc.php';
+    } elseif ($vars['view'] == 'delete' && Auth::user()->hasGlobalAdmin()) {
+        include 'includes/html/pages/bill/delete.inc.php';
+    } elseif ($vars['view'] == 'reset' && Auth::user()->hasGlobalAdmin()) {
+        include 'includes/html/pages/bill/reset.inc.php';
+    } elseif ($vars['view'] == 'history') {
+        include 'includes/html/pages/bill/history.inc.php';
+    } elseif ($vars['view'] == 'transfer') {
+        include 'includes/html/pages/bill/transfer.inc.php';
+    } elseif ($vars['view'] == 'quick' || $vars['view'] == 'accurate') {
+        ?>
 
-<?php   if ($bill_data['bill_type'] == 'quota') { ?>
+        <?php   if ($bill_data['bill_type'] == 'quota') { ?>
     <h3>Quota Bill</h3>
-<?php   } elseif ($bill_data['bill_type'] == 'cdr') {  ?>
+        <?php   } elseif ($bill_data['bill_type'] == 'cdr') {  ?>
     <h3>
         CDR / 95th Bill
     </h3>
-<?php           } ?>
+        <?php           } ?>
 <strong>Billing Period from <?php echo $fromtext ?> to <?php echo $totext ?></strong>
 <br /><br />
 
 <div class="row">
 <div class="col-lg-6 col-lg-push-6">
-    <?php print_port_list($ports) ?>
+        <?php print_port_list($ports) ?>
 </div>
 <div class="col-lg-6 col-lg-pull-6">
 <div class="panel panel-default">
@@ -158,14 +158,14 @@ if ($vars['view'] == 'edit' && Auth::user()->hasGlobalAdmin()) {
     </div>
     <table class="table">
     <tr>
-<?php   if ($bill_data['bill_type'] == 'quota') {
+        <?php   if ($bill_data['bill_type'] == 'quota') {
             // The Customer is billed based on a pre-paid quota with overage in xB
             $percent    = round((($total_data) / $bill_data['bill_quota'] * 100), 2);
             $unit       = 'MB';
             $total_data = round($total_data, 2);
             $background = get_percentage_colours($percent);
             $type = '&amp;ave=yes';
-?>
+            ?>
         <td>
             <?php echo format_bytes_billing($total_data) ?> of <?php echo format_bytes_billing($bill_data['bill_quota']).' ('.$percent.'%)' ?>
             - Average rate <?php echo formatRates($rate_average) ?>
@@ -174,12 +174,12 @@ if ($vars['view'] == 'edit' && Auth::user()->hasGlobalAdmin()) {
         </tr>
         <tr>
             <td colspan="2">
-<?php
+            <?php
             echo 'Predicted usage: ' . format_bytes_billing(getPredictedUsage($bill_data['bill_day'], $bill_data['total_data']));
-?>
+            ?>
             </td>
-<?php
-} elseif ($bill_data['bill_type'] == 'cdr') {
+            <?php
+        } elseif ($bill_data['bill_type'] == 'cdr') {
             // The customer is billed based on a CDR with 95th%ile overage
             $unit      = 'kbps';
             $cdr       = $bill_data['bill_cdr'];
@@ -187,7 +187,7 @@ if ($vars['view'] == 'edit' && Auth::user()->hasGlobalAdmin()) {
             $percent = round((($rate_95th) / $cdr * 100), 2);
             $background = get_percentage_colours($percent);
             $type = '&amp;95th=yes';
-?>
+            ?>
         <td>
             <?php echo format_si($rate_95th).'bps' ?> of <?php echo format_si($cdr).'bps ('.$percent.'%)' ?> (95th%ile)
         </td>
@@ -197,86 +197,86 @@ if ($vars['view'] == 'edit' && Auth::user()->hasGlobalAdmin()) {
         </tr>
         <tr>
             <td colspan="2">
-<?php
-            echo 'Predicted usage: ' . format_si(getPredictedUsage($bill_data['bill_day'], $bill_data['rate_95th'])).'bps';
-?>
+            <?php
+                echo 'Predicted usage: ' . format_si(getPredictedUsage($bill_data['bill_day'], $bill_data['rate_95th'])).'bps';
+            ?>
             </td>
 
-<?php           }//end if
-?>
+        <?php           }//end if
+        ?>
     </tr>
     </table>
 </div>
 </div>
 </div>
 
-<?php
+        <?php
 
-    $lastmonth = dbFetchCell('SELECT UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 1 MONTH))');
-    $yesterday = dbFetchCell('SELECT UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 1 DAY))');
-    $rightnow  = date('U');
+        $lastmonth = dbFetchCell('SELECT UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 1 MONTH))');
+        $yesterday = dbFetchCell('SELECT UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 1 DAY))');
+        $rightnow  = date('U');
 
-if ($vars['view'] == 'accurate') {
-    $bi  = "<img src='billing-graph.php?bill_id=".$bill_id.'&amp;bill_code='.$_GET['bill_code'];
-    $bi .= '&amp;from='.$unixfrom.'&amp;to='.$unixto;
-    $bi .= '&amp;x=1190&amp;y=250';
-    $bi .= "$type'>";
+        if ($vars['view'] == 'accurate') {
+            $bi  = "<img src='billing-graph.php?bill_id=".$bill_id.'&amp;bill_code='.$_GET['bill_code'];
+            $bi .= '&amp;from='.$unixfrom.'&amp;to='.$unixto;
+            $bi .= '&amp;x=1190&amp;y=250';
+            $bi .= "$type'>";
 
-    $li  = "<img src='billing-graph.php?bill_id=".$bill_id.'&amp;bill_code='.$_GET['bill_code'];
-    $li .= '&amp;from='.$unix_prev_from.'&amp;to='.$unix_prev_to;
-    $li .= '&amp;x=1190&amp;y=250';
-    $li .= "$type'>";
+            $li  = "<img src='billing-graph.php?bill_id=".$bill_id.'&amp;bill_code='.$_GET['bill_code'];
+            $li .= '&amp;from='.$unix_prev_from.'&amp;to='.$unix_prev_to;
+            $li .= '&amp;x=1190&amp;y=250';
+            $li .= "$type'>";
 
-    $di  = "<img src='billing-graph.php?bill_id=".$bill_id.'&amp;bill_code='.$_GET['bill_code'];
-    $di .= '&amp;from=' . \LibreNMS\Config::get('time.day') . '&amp;to=' . \LibreNMS\Config::get('time.now');
-    $di .= '&amp;x=1190&amp;y=250';
-    $di .= "$type'>";
+            $di  = "<img src='billing-graph.php?bill_id=".$bill_id.'&amp;bill_code='.$_GET['bill_code'];
+            $di .= '&amp;from=' . \LibreNMS\Config::get('time.day') . '&amp;to=' . \LibreNMS\Config::get('time.now');
+            $di .= '&amp;x=1190&amp;y=250';
+            $di .= "$type'>";
 
-    $mi  = "<img src='billing-graph.php?bill_id=".$bill_id.'&amp;bill_code='.$_GET['bill_code'];
-    $mi .= '&amp;from='.$lastmonth.'&amp;to='.$rightnow;
-    $mi .= '&amp;x=1190&amp;y=250';
-    $mi .= "$type'>";
-} else {
-    $bi  = "<img src='graph.php?type=bill_bits&amp;id=".$bill_id;
-    $bi .= '&amp;from='.$unixfrom.'&amp;to='.$unixto;
-    $bi .= "&amp;width=1000&amp;height=200&amp;total=1&amp;dir=".$dir_95th."'>";
+            $mi  = "<img src='billing-graph.php?bill_id=".$bill_id.'&amp;bill_code='.$_GET['bill_code'];
+            $mi .= '&amp;from='.$lastmonth.'&amp;to='.$rightnow;
+            $mi .= '&amp;x=1190&amp;y=250';
+            $mi .= "$type'>";
+        } else {
+            $bi  = "<img src='graph.php?type=bill_bits&amp;id=".$bill_id;
+            $bi .= '&amp;from='.$unixfrom.'&amp;to='.$unixto;
+            $bi .= "&amp;width=1000&amp;height=200&amp;total=1&amp;dir=".$dir_95th."'>";
 
-    $li  = "<img src='graph.php?type=bill_bits&amp;id=".$bill_id;
-    $li .= '&amp;from='.$unix_prev_from.'&amp;to='.$unix_prev_to;
-    $li .= "&amp;width=1000&amp;height=200&amp;total=1&amp;dir=".$dir_95th."'>";
+            $li  = "<img src='graph.php?type=bill_bits&amp;id=".$bill_id;
+            $li .= '&amp;from='.$unix_prev_from.'&amp;to='.$unix_prev_to;
+            $li .= "&amp;width=1000&amp;height=200&amp;total=1&amp;dir=".$dir_95th."'>";
 
-    $di  = "<img src='graph.php?type=bill_bits&amp;id=".$bill_id;
-    $di .= '&amp;from=' . \LibreNMS\Config::get('time.day') . '&amp;to=' . \LibreNMS\Config::get('time.now');
-    $di .= "&amp;width=1000&amp;height=200&amp;total=1&amp;dir=".$dir_95th."'>";
+            $di  = "<img src='graph.php?type=bill_bits&amp;id=".$bill_id;
+            $di .= '&amp;from=' . \LibreNMS\Config::get('time.day') . '&amp;to=' . \LibreNMS\Config::get('time.now');
+            $di .= "&amp;width=1000&amp;height=200&amp;total=1&amp;dir=".$dir_95th."'>";
 
-    $mi  = "<img src='graph.php?type=bill_bits&amp;id=".$bill_id;
-    $mi .= '&amp;from='.$lastmonth.'&amp;to='.$rightnow;
-    $mi .= "&amp;width=1000&amp;height=200&amp;total=1&amp;dir=".$dir_95th."'>";
-}//end if
+            $mi  = "<img src='graph.php?type=bill_bits&amp;id=".$bill_id;
+            $mi .= '&amp;from='.$lastmonth.'&amp;to='.$rightnow;
+            $mi .= "&amp;width=1000&amp;height=200&amp;total=1&amp;dir=".$dir_95th."'>";
+        }//end if
 
-?>
+        ?>
 <div class="panel panel-default">
 <div class="panel-heading">
     <h3 class="panel-title">Billing View</h3>
 </div>
-<?php echo $bi ?>
+        <?php echo $bi ?>
 </div>
 
 <div class="panel panel-default">
 <div class="panel-heading">
     <h3 class="panel-title">24 Hour View</h3>
 </div>
-<?php echo $di ?>
+        <?php echo $di ?>
 </div>
 
 <div class="panel panel-default">
 <div class="panel-heading">
     <h3 class="panel-title">Monthly View</h3>
 </div>
-<?php echo $mi ?>
+        <?php echo $mi ?>
 </div>
-<?php
-} //end if
+        <?php
+    } //end if
 } else {
     include 'includes/html/error-no-perm.inc.php';
 }//end if
