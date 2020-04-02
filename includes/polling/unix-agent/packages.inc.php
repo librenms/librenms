@@ -1,7 +1,7 @@
 <?php
 
-$pkgs_id=[];
-$pkgs_db_id=[];
+$pkgs_id = [];
+$pkgs_db_id = [];
 
 // RPM
 if (!empty($agent_data['rpm'])) {
