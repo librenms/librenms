@@ -74,14 +74,14 @@
                     "app_type": "asterisk"
                 },
                 {
-                    "metric": "stats_sipunmonoffline",
-                    "value": 0,
+                    "metric": "stats_sippeers",
+                    "value": 48,
                     "value_prev": null,
                     "app_type": "asterisk"
                 },
                 {
-                    "metric": "stats_sippeers",
-                    "value": 48,
+                    "metric": "stats_sipunmonoffline",
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "asterisk"
                 },
