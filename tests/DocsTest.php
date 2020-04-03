@@ -1,6 +1,6 @@
 <?php
 /**
- * DocTest.php
+ * DocsTest.php
  *
  * Tests for Docs.
  *
@@ -27,7 +27,7 @@ namespace LibreNMS\Tests;
 
 use Symfony\Component\Yaml\Yaml;
 
-class DocTest extends TestCase
+class DocsTest extends TestCase
 {
     private $hidden_pages = [
         'API/API-Docs.md',

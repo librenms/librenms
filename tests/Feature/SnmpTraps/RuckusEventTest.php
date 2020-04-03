@@ -31,7 +31,7 @@ use App\Models\Device;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
 
-class RuckusEventTrap extends SnmpTrapTestCase
+class RuckusEventTest extends SnmpTrapTestCase
 {
     public function testRuckusAssocTrap()
     {
