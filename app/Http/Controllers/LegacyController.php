@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Checks;
-use App\Models\UserPref;
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -52,8 +51,6 @@ class LegacyController extends Controller
         $vars['page'] = basename($vars['page'] ?? '');
         if ($vars['page'] && is_file("includes/html/pages/" . $vars['page'] . ".inc.php")) {
             require "includes/html/pages/" . $vars['page'] . ".inc.php";
-        } elseif (Config::has('front_page') && is_file('includes/html/' . Config::get('front_page'))) {
-            require 'includes/html/' . Config::get('front_page');
         } else {
             abort(404);
         }
@@ -80,7 +77,6 @@ class LegacyController extends Controller
         return response()->view('layouts.legacy_page', [
             'content' => $html,
             'refresh' => $no_refresh ? 0 : Config::get('page_refresh'),
-            'hide_dashboard_editor' => UserPref::getPref(auth()->user(), 'hide_dashboard_editor'),
         ]);
     }
 }

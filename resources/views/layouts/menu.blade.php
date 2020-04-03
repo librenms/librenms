@@ -38,9 +38,6 @@
                                     @if ($hide_dashboard_editor) @lang('Show Dashboard Editor')
                                     @else @lang('Hide Dashboard Editor')
                                     @endif</a>
-                                    <form id="toggle_dashboard_editor-form" action="{{ url('toggle_dashboard_editor') }}" method="POST" style="display: none;">
-                                        {{ csrf_field() }}
-                                    </form>
                                 </li>
                             </ul>
                         </li>
