@@ -204,5 +204,5 @@ if ($components[$vars['poolid']]['type'] == 'f5-ltm-pool') {
                 </div>
             </div>
         </div>
-<?php
+    <?php
 }

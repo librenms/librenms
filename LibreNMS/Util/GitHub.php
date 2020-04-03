@@ -159,6 +159,14 @@ class GitHub
               name
             }
           }
+          reviews(first: 100) {
+            nodes {
+              author {
+                login
+                url
+              }
+            }
+          }
         }
       }
     }
@@ -230,6 +238,13 @@ GRAPHQL;
 
             $this->recordUserInfo($pr['author']);
             $this->recordUserInfo($pr['mergedBy'], 'changelog_mergers');
+
+            $ignore = [$pr['author']['login'], $pr['mergedBy']['login']];
+            foreach (array_unique($pr['reviews']['nodes'], SORT_REGULAR) as $reviewer) {
+                if (!in_array($reviewer['author']['login'], $ignore)) {
+                    $this->recordUserInfo($reviewer['author'], 'changelog_mergers');
+                }
+            }
         }
     }
 
@@ -262,6 +277,7 @@ GRAPHQL;
     {
         $tmp_markdown = "## $this->tag" . PHP_EOL;
         $tmp_markdown .= '*(' . date('Y-m-d') . ')*' . PHP_EOL . PHP_EOL;
+
         if (!empty($this->changelog_users)) {
             $tmp_markdown .= "A big thank you to the following " . count($this->changelog_users) . " contributors this last month:" . PHP_EOL . PHP_EOL;
             $tmp_markdown .= $this->formatUserList($this->changelog_users);
@@ -270,7 +286,7 @@ GRAPHQL;
         $tmp_markdown .= PHP_EOL;
 
         if (!empty($this->changelog_mergers)) {
-            $tmp_markdown .= "Thanks to maintainers that helped merge pull requests this month:" . PHP_EOL . PHP_EOL;
+            $tmp_markdown .= "Thanks to maintainers that helped with pull requests this month:" . PHP_EOL . PHP_EOL;
             $tmp_markdown .= $this->formatUserList($this->changelog_mergers) . PHP_EOL;
         }
 

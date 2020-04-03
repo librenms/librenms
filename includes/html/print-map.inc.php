@@ -338,19 +338,19 @@ $edges = json_encode($links);
 array_multisort(array_column($devices_by_id, 'label'), SORT_ASC, $devices_by_id);
 
 if (count($devices_by_id) > 1 && count($links) > 0) {
-?>
+    ?>
 
 <form name="printmapform" method="get" action="" class="form-horizontal" role="form">
-<?php if (empty($device['hostname'])) { ?>
+    <?php if (empty($device['hostname'])) { ?>
 <div class="pull-right">
 <select name="highlight_node" id="highlight_node" class="input-sm" onChange="highlightNode()";>
 <option value="0">None</option>
-<?php foreach ($devices_by_id as $dev) { ?>
+        <?php foreach ($devices_by_id as $dev) { ?>
 <option value="<?=$dev['id']?>"><?=$dev['label']?></option>
-<?php } ?>
+        <?php } ?>
 </select>
 </div>
-<?php } ?>
+    <?php } ?>
 <div id="visualization"></div>
 </form>
 <script src="js/vis.min.js"></script>
@@ -359,16 +359,16 @@ var height = $(window).height() - 100;
 $('#visualization').height(height + 'px');
     // create an array with nodes
     var nodes =
-<?php
-echo $nodes;
-?>
+    <?php
+    echo $nodes;
+    ?>
     ;
 
     // create an array with edges
     var edges =
-<?php
-echo $edges;
-?>
+    <?php
+    echo $edges;
+    ?>
     ;
 
     // create a network
@@ -394,7 +394,7 @@ function highlightNode(e) {
 $('#highlight_node option[value="<?=$highlight_node?>"]').prop('selected', true);
 </script>
 
-<?php
+    <?php
 } else {
     print_message("No map to display, this may be because you aren't running autodiscovery or no devices are linked by mac address.");
 }

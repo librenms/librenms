@@ -345,8 +345,7 @@ function collectd_flush($identifier)
         }
 
         fclose($socket);
-    } //end if
-    else {
+    } else {
         error_log(sprintf('graph.php: Failed to open unix-socket to collectd: %d: %s', $u_errno, $u_errmsg));
     }
     return true;
