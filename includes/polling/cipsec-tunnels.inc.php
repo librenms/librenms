@@ -94,6 +94,7 @@ if ($device['os_group'] == 'cisco') {
 
         $rrd_name = array('ipsectunnel', $address);
         $rrd_def = new RrdDefinition();
+        $rrd_def->disableNameChecking();
         foreach ($oids as $oid) {
             $oid_ds = str_replace('cipSec', '', $oid);
             $rrd_def->addDataset($oid_ds, 'COUNTER', null, 1000000000);
