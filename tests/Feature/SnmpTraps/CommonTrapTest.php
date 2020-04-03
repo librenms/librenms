@@ -29,15 +29,12 @@ use App\Models\Device;
 use App\Models\Eventlog;
 use App\Models\Ipv4Address;
 use App\Models\Port;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
 use Log;
 
-class CommonTrapTest extends DBTestCase
+class CommonTrapTest extends SnmpTrapTestCase
 {
-    use DatabaseTransactions;
-
     public function testGarbage()
     {
         $trapText = "Garbage\n";
