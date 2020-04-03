@@ -3,6 +3,8 @@
 @section('title', __('Overview'))
 
 @section('content')
+@include('alerts.modals.ack')
+@include('alerts.modals.notes')
 @if (!$bare)
 <div class="row">
     <div class="col-md-6">
