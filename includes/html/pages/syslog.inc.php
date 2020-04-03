@@ -45,16 +45,16 @@ $pagetitle[] = 'Syslog';
         '<div class="form-group">' +
         <?php
         if (!isset($vars['fromdevice'])) {
-        ?>
+            ?>
         '<select name="device" id="device" class="form-control">' +
         '<option value="">All Devices&nbsp;&nbsp;</option>' +
-        <?php
-        if ($device_id) {
-            echo "'<option value=$device_id>" . format_hostname(device_by_id_cache($device_id)) . "</option>' +";
-        }
-        ?>
+            <?php
+            if ($device_id) {
+                echo "'<option value=$device_id>" . format_hostname(device_by_id_cache($device_id)) . "</option>' +";
+            }
+            ?>
         '</select>' +
-        <?php
+            <?php
         } else {
             echo "'&nbsp;&nbsp;<input type=\"hidden\" name=\"device\" id=\"device\" value=\"" . $device_id . "\">' + ";
         }

@@ -24,7 +24,7 @@ if (Auth::user()->hasGlobalAdmin()) {
             }
         }
     }
-?>
+    ?>
 
 <div class="modal fade bs-example-modal-sm" id="create-service" tabindex="-1" role="dialog" aria-labelledby="Create" aria-hidden="true">
     <div class="modal-dialog">
@@ -165,5 +165,5 @@ $('#service-submit').click('', function(e) {
 });
 
 </script>
-<?php
+    <?php
 }

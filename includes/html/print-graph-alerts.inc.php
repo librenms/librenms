@@ -72,7 +72,7 @@ $query = "SELECT DATE_FORMAT(time_logged, '" . \LibreNMS\Config::get('alert_grap
     }
 
     $graph_data = _json_encode($data);
-?>
+    ?>
     var groups = new vis.DataSet();
 <?php
 
@@ -103,7 +103,7 @@ foreach ($groups as $group) {
         $last_date = end($data);
         $milisec_diff = abs(strtotime($first_date["x"]) - strtotime($last_date["x"])) * 1000;
         echo $milisec_diff;
-?>,
+        ?>,
         orientation:'top'
     };
     var graph2d = new vis.Graph2d(container, items, groups, options);

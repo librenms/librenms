@@ -115,7 +115,7 @@ if (Config::get('enable_bgp')) {
             if (!exist($bgpPeersCache[$vrfName]) ||
                     !exist($bgpPeersCache[$vrfName][$entry['bgpPeerIdentifier']]) ||
                     $bgpPeersCache[$vrfName][$entry['bgpPeerIdentifier']][$entry['afi']] != $afi ||
-                    $bgpPeersCache[$vrfName][$entry['bgpPeerIdentifier']][$entry['safi']] != $safi ) {
+                    $bgpPeersCache[$vrfName][$entry['bgpPeerIdentifier']][$entry['safi']] != $safi) {
                 dbDelete(
                     'bgpPeers_cbgp',
                     '`device_id`=? AND `bgpPeerIdentifier`=? AND context_name=? AND afi=? AND safi=?',

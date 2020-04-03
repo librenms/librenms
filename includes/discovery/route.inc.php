@@ -41,7 +41,7 @@ $delete_row = [];
 //store timestamp so all update / creation will be synced on same timestamp
 $update_timestamp = dbFetchRows('select now() as now')[0]['now'];
 
-//Load current DB entries: 
+//Load current DB entries:
 $dbRoute = dbFetchRows('select * from `route` where `device_id` = ?', array($device['device_id']));
 foreach ($dbRoute as $dbRow) {
     $current = $mixed[$dbRow['context_name']][$dbRow['inetCidrRouteDestType']][$dbRow['inetCidrRouteDest']][$dbRow['inetCidrRoutePfxLen']][$dbRow['inetCidrRoutePolicy']][$dbRow['inetCidrRouteNextHopType']][$dbRow['inetCidrRouteNextHop']];
@@ -217,7 +217,7 @@ if (isset($ipForwardNb['0']['ipCidrRouteNumber']) && $ipForwardNb['0']['ipCidrRo
     }
 }
 
-// We can now check if we have MPLS VPN routing table available : 
+// We can now check if we have MPLS VPN routing table available :
 // MPLS-L3VPN-STD-MIB::mplsL3VpnVrfRteTable
 // Route numbers : MPLS-L3VPN-STD-MIB::mplsL3VpnVrfPerfCurrNumRoutes
 

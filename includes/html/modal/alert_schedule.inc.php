@@ -13,7 +13,7 @@
  */
 
 if (\Auth::user()->hasGlobalAdmin()) {
-?>
+    ?>
 
 <div class="modal fade bs-example-modal-sm" id="schedule-maintenance" tabindex="-1" role="dialog" aria-labelledby="Create" aria-hidden="true">
     <div class="modal-dialog">
@@ -392,5 +392,5 @@ $(function () {
 
 $("[name='recurring']").bootstrapSwitch();
 </script>
-<?php
+    <?php
 }
