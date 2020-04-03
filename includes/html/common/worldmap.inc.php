@@ -167,6 +167,10 @@ marker.bindPopup(title);
               AND lp.ifOutOctets_rate != 0
               AND lp.ifInOctets_rate != 0
               AND lp.ifOperStatus = 'up'
+              AND ll.lat IS NOT NULL
+              AND ll.lng IS NOT NULL
+              AND rl.lat IS NOT NULL
+              AND rl.lng IS NOT NULL
               AND ld.status IN " . dbGenPlaceholders(count($show_status)) . "
               AND rd.status IN " . dbGenPlaceholders(count($show_status)) . "
             GROUP BY
@@ -209,6 +213,10 @@ marker.bindPopup(title);
               AND lp.ifOutOctets_rate != 0
               AND lp.ifInOctets_rate != 0
               AND lp.ifOperStatus = 'up'
+              AND ll.lat IS NOT NULL
+              AND ll.lng IS NOT NULL
+              AND rl.lat IS NOT NULL
+              AND rl.lng IS NOT NULL
               AND ld.status IN " . dbGenPlaceholders(count($show_status)) . "
               AND rd.status IN " . dbGenPlaceholders(count($show_status)) . "
               AND ld.device_id IN " . dbGenPlaceholders(count($device_ids)) . "

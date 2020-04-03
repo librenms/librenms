@@ -667,7 +667,7 @@ foreach ($ports as $port) {
                 $port['update'][$oid] = $this_port[$oid];
 
                 // store the previous values for alerting
-                if ($oid == 'ifOperStatus' || $oid == 'ifAdminStatus') {
+                if (in_array($oid, ['ifOperStatus', 'ifAdminStatus', 'ifSpeed', 'ifHighSpeed'])) {
                     $port['update'][$oid . '_prev'] = $port[$oid];
                 }
 
@@ -678,7 +678,7 @@ foreach ($ports as $port) {
                     echo $oid . ' ';
                 }
             } else {
-                if ($oid == 'ifOperStatus' || $oid == 'ifAdminStatus') {
+                if (in_array($oid, ['ifOperStatus', 'ifAdminStatus', 'ifSpeed', 'ifHighSpeed'])) {
                     if ($port[$oid.'_prev'] == null) {
                         $port['update'][$oid . '_prev'] = $this_port[$oid];
                     }
