@@ -62,7 +62,7 @@
                     "app_type": "asterisk"
                 },
                 {
-                    "metric": "stats_sipeers",
+                    "metric": "stats_sippeers",
                     "value": 48,
                     "value_prev": null,
                     "app_type": "asterisk"
