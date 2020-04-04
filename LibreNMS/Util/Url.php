@@ -171,6 +171,53 @@ class Url
         return Rewrite::normalizeIfName($text);
     }
 
+    /**
+     * @param Sensor $sensor
+     * @param string $text
+     * @param string $type
+     * @param boolean $overlib
+     * @param boolean $single_graph
+     * @return mixed|string
+     */
+    public static function sensorLink($sensor, $text = null, $type = null, $overlib = true, $single_graph = false)
+    {
+
+        $label = $sensor->sensor_descr;
+        if (!$text) {
+            $text = $label;
+        }
+
+        $content = '<div class=list-large>' . addslashes(htmlentities($sensor->device->displayName() . ' - ' . $label)) . '</div>';
+
+        $content .= "<div style=\'width: 850px\'>";
+        $graph_array = [
+            'type' => $type ?: 'sensor_' . $sensor->sensor_class,
+            'legend' => 'yes',
+            'height' => 100,
+            'width' => 340,
+            'to' => Carbon::now()->timestamp,
+            'from' => Carbon::now()->subDay()->timestamp,
+            'id' => $sensor->sensor_id,
+        ];
+
+        $content .= self::graphTag($graph_array);
+        if (!$single_graph) {
+            $graph_array['from'] = Carbon::now()->subWeek()->timestamp;
+            $content .= self::graphTag($graph_array);
+            $graph_array['from'] = Carbon::now()->subMonth()->timestamp;
+            $content .= self::graphTag($graph_array);
+            $graph_array['from'] = Carbon::now()->subYear()->timestamp;
+            $content .= self::graphTag($graph_array);
+        }
+
+        $content .= '</div>';
+
+        if (!$overlib) {
+            return $content;
+        }
+        return self::overlibLink(self::sensorUrl($sensor), $text, $content, self::sensorLinkDisplayClass($sensor));
+    }
+
     public static function deviceUrl($device, $vars = [])
     {
         return self::generate(['page' => 'device', 'device' => $device->device_id], $vars);
@@ -179,6 +226,11 @@ class Url
     public static function portUrl($port, $vars = [])
     {
         return self::generate(['page' => 'device', 'device' => $port->device_id, 'tab' => 'port', 'port' => $port->port_id], $vars);
+    }
+
+    public static function sensorUrl($sensor, $vars = [])
+    {
+        return self::generate(['page' => 'device', 'device' => $sensor->device_id, 'tab' => 'health' , 'metric' => $sensor->sensor_class], $vars);
     }
 
     /**
@@ -367,6 +419,25 @@ class Url
         }
 
         return "interface-upup";
+    }
+
+    /**
+     * Get html class for a sensor
+     *
+     * @param Sensor $sensor
+     * @return string
+     */
+    public static function sensorLinkDisplayClass($sensor)
+    {
+        if ($sensor->sensor_current >> $sensor->sensor_limit) {
+            return "sensor-high";
+        }
+
+        if ($sensor->sensor_current << $sensor->sensor_limit_low) {
+            return "sensor-low";
+        }
+
+        return 'sensor-ok';
     }
 
     /**
