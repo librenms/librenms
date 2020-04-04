@@ -24,7 +24,7 @@
  * @author    JoseUPV
  */
 
-if (empty($fdbPort_table) {
+if (empty($fdbPort_table)) { // no empty if come from aos7 script
     // try nokia/ALCATEL-IND1-MAC-ADDRESS-MIB::slMacAddressDisposition
     $dot1d = snmpwalk_group($device, 'slMacAddressDisposition', 'ALCATEL-IND1-MAC-ADDRESS-MIB', 0, array(), 'nokia');
     if (!empty($dot1d)) {
