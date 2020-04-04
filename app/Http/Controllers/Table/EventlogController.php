@@ -81,7 +81,8 @@ class EventlogController extends TableController
         ];
     }
 
-    private function getSensorType($eventlog) {
+    private function getSensorType($eventlog)
+    {
         # generic search if eventlog happens by a sensor
         return Sensor::where('sensor_id', $eventlog->reference)->first();
     }
