@@ -30,10 +30,8 @@ use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
 use LibreNMS\Tests\DBTestCase;
 
-class ApcPduOutletTest extends DBTestCase
+class ApcPduOutletTest extends SnmpTrapTestCase
 {
-    use DatabaseTransactions;
-
     public function testOutletOff()
     {
         $device = factory(Device::class)->create();
