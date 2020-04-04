@@ -43,7 +43,7 @@ use LibreNMS\RRD\RrdDefinition;
 // adslAturPerfInvalidIntervals.1 = 0
 if (isset($this_port['adslLineCoding'])) {
     $rrd_name = getPortRrdName($port_id, 'adsl');
-    $rrd_def = RrdDefinition::make()
+    $rrd_def = RrdDefinition::make()->disableNameChecking()
         ->addDataset('AtucCurrSnrMgn', 'GAUGE', 0, 635)
         ->addDataset('AtucCurrAtn', 'GAUGE', 0, 635)
         ->addDataset('AtucCurrOutputPwr', 'GAUGE', 0, 635)
