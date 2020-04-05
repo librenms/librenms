@@ -11,10 +11,9 @@ modules:
       data:
         -
           oid: afLTUStaTxRate
+          value: afLTUStaTxRate
           num_oid: '.1.3.6.1.4.1.41112.1.10.1.4.1.1.{{ $index }}'
-          index: afLTUStaTxRate
           descr: Tx Modulation Rate
-          state_name: afLTUStaTxRate
           states:
             - { value: 0, generic: 2, graph: 1, descr: 'qPSK-SISO-1-4x' }
             - { value: 1, generic: 2, graph: 1, descr: 'qPSK-SISO-1x' }
@@ -30,10 +29,9 @@ modules:
             - { value: 11, generic: 0, graph: 1, descr: 'qAM2048-MIMO-11x' }
         -
           oid: afLTUStaRxRate
+          value: afLTUStaRxRate
           num_oid: '.1.3.6.1.4.1.41112.1.10.1.4.1.2.{{$index }}'
-          index: afLTUStaRxRate
           descr: Rx Modulation Rate
-          state_name: afLTUStaRxRate
           states:
             - { value: 0, generic: 2, graph: 1, descr: 'qPSK-SISO-1-4x' }
             - { value: 1, generic: 2, graph: 1, descr: 'qPSK-SISO-1x' }
@@ -58,20 +56,18 @@ modules:
             - { value: 1, generic: 0, graph: 0, descr: CPE }
         -
           oid: afLTUgpsStatus
+          value: afLTUgpsStatus
           num_oid: '.1.3.6.1.4.1.41112.1.10.1.7.1.{{ $index }}'
-          index: 'afLTUgpsStatus.{{ $index }}'
           descr: GPS Status
-          state_name: afLTUgpsStatus
           states:
             - { value: 0, generic: 1, graph: 0, descr: Absent }
             - { value: 1, generic: 1, graph: 0, descr: Off }
             - { value: 2, generic: 0, graph: 0, descr: On }
         -
           oid: afLTUgpsDimensions
+          value: afLTUgpsDimensions
           num_oid: '.1.3.6.1.4.1.41112.1.10.1.7.2.{{ $index }}'
-          index: 'afLTUgpsDimensions.{{ $index }}'
           descr: GPS fix
-          state_name: afLTUgpsDimensions
           states:
             - { value: 0, generic: 1, graph: 0, descr: Unknown }
             - { value: 1, generic: 1, graph: 0, descr: Nofix }
