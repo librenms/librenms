@@ -26,7 +26,6 @@
 namespace App\Http\Controllers\Table;
 
 use App\Models\Eventlog;
-use App\Models\Sensor;
 use Carbon\Carbon;
 use LibreNMS\Config;
 use LibreNMS\Util\Url;
@@ -81,12 +80,6 @@ class EventlogController extends TableController
         ];
     }
 
-    private function getSensorType($eventlog)
-    {
-        # generic search if eventlog happens by a sensor
-        return Sensor::where('sensor_id', $eventlog->reference)->first();
-    }
-
     private function formatType($eventlog)
     {
         if ($eventlog->type == 'interface') {
@@ -96,9 +89,9 @@ class EventlogController extends TableController
                     return '<b>' . Url::portLink($port, $port->getShortLabel()) . '</b>';
                 }
             }
-        } elseif ($sensor = $this->getSensorType($eventlog)) {
-            // not using polimorpic method 'related' to match every Sensor Class which causes an Event
+        } elseif (get_class($eventlog->related) == 'App\Models\Sensor') {
             if (is_numeric($eventlog->reference)) {
+                $sensor = $eventlog->related;
                 if (isset($sensor)) {
                     return '<b>' . Url::sensorLink($sensor, $sensor->sensor_descr) . '</b>';
                 }

@@ -54,6 +54,11 @@ class Sensor extends DeviceRelatedModel
         return collect(self::$icons)->get($this->sensor_class, 'delicius');
     }
 
+    public static function getTypes()
+    {
+        return self::groupBy('sensor_class')->pluck('sensor_class')->toArray();
+    }
+
     // for the legacy menu
     public static function getIconMap()
     {
