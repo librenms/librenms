@@ -168,7 +168,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.2636.3.1.15.1.8.{{ $index }}'
                     descr: jnxFruName
                     index: 'jnxFruName.{{ $index }}'
-                    skip_values: [ 1, 2 ]
+                    skip_value_lt: 3
                     states:
                         - { value: 1, descr: unknown, graph: 1, generic: 3 }
                         - { value: 2, descr: empty, graph: 1, generic: 3 }
