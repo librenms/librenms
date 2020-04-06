@@ -232,7 +232,7 @@ available, but the testing package is working fine, you can grab it on
 package may be updated and have a new version number).
 
 ```
-apt install python3 python-mysqldb
+apt install python3 python-mysqldb python3-pymysql
 cd /tmp
 wget http://ftp.fr.debian.org/debian/pool/main/p/python-dotenv/python3-dotenv_0.9.1-1_all.deb
 dpkg -i python3-dotenv_0.9.1-1_all.deb
