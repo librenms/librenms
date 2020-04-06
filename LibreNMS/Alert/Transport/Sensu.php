@@ -116,10 +116,7 @@ class Sensu extends Transport
                 'metadata' => [
                     'name' => Sensu::checkName($opts['prefix'], $obj['name']),
                     'namespace' => $opts['namespace'],
-                    'annotations' => [
-                        'generated-by' => 'LibreNMS',
-                        'acknowledged' => $obj['state'] === Sensu::ACK ? 'true' : 'false',
-                    ],
+                    'annotations' => Sensu::generateAnnotations($obj, $opts),
                 ],
                 'command' => sprintf('LibreNMS: %s', $obj['builder']),
                 'executed' => time() - $offset,
@@ -135,9 +132,26 @@ class Sensu extends Transport
                 ],
                 'system' => [
                     'hostname' => $obj['hostname'],
+                    'os' => $obj['os'],
                 ]
             ],
         ];
+    }
+
+    public static function generateAnnotations($obj, $opts)
+    {
+        return array_filter([
+            'generated-by' => 'LibreNMS',
+            'acknowledged' => $obj['state'] === Sensu::ACK ? 'true' : 'false',
+            'contact' => $obj['sysContact'],
+            'description' => $obj['sysDescr'],
+            'location' => $obj['location'],
+            'documentation' => $obj['proc'],
+            'librenms-notes' => $obj['notes'],
+            'librenms-device-id' => strval($obj['device_id']),
+            'librenms-rule-id' => strval($obj['rule_id']),
+            'librenms-status-reason' => $obj['status_reason'],
+        ], 'strlen'); // strlen returns 0 for null, false or '', but 1 for integer 0 - unlike empty()
     }
 
     public static function calculateStatus($state, $severity)
