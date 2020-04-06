@@ -10,6 +10,12 @@ modules:
                     descr: Temperature
                     divisor: 100
 
+                    skip_values:
+                    -
+                      oid: sdsTempSensValue
+                      op: '>='
+                      value: 1000
+
         charge:
             data:
                 -
