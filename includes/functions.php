@@ -597,7 +597,7 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
     throw $host_unreachable_exception;
 }
 
-function deviceArray($host, $community, $snmpver, $port = 161, $transport = 'udp', $v3 = array(), $port_assoc_mode = 'ifIndex',  $overwrite_ip = null)
+function deviceArray($host, $community, $snmpver, $port = 161, $transport = 'udp', $v3 = array(), $port_assoc_mode = 'ifIndex', $overwrite_ip = null)
 {
     $device = array();
     $device['hostname'] = $host;
