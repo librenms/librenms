@@ -525,7 +525,7 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
 
     // check if we have the host by IP
     $overwrite_ip = null;
-    if (!empty($overwrite_ip)) {
+    if (!empty($additional['overwrite_ip'])) {
         $overwrite_ip = $additional['overwrite_ip'];
         $ip = $overwrite_ip;
     } elseif (Config::get('addhost_alwayscheckip') === true) {
