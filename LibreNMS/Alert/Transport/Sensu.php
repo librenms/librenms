@@ -58,74 +58,89 @@ class Sensu extends Transport
         'better' => Sensu::BETTER,
     );
 
+    private static $client = null;
+
     public function deliverAlert($obj, $opts)
     {
+        $sensu_opts = [];
         $sensu_opts['url'] = $this->config['sensu-url'] ? $this->config['sensu-url'] : 'http://127.0.0.1:3031';
         $sensu_opts['namespace'] =  $this->config['sensu-namespace'] ? $this->config['sensu-namespace'] : 'default';
         $sensu_opts['prefix'] =  $this->config['sensu-prefix'];
         $sensu_opts['source-key'] = $this->config['sensu-source-key'];
+
+        Sensu::$client = new Client();
 
         return $this->contactSensu($obj, $sensu_opts);
     }
 
     public static function contactSensu($obj, $opts)
     {
-        // We assume the Sensu agent is running on the poller, with the local event listener enabled.
-        // It is possible to submit events directly to the backend API, but this scenario has not been tested, and likely needs mTLS.
+        // The Sensu agent should be running on the poller - events can be sent directly to the backend but this has not been tested, and likely needs mTLS.
         // The agent API is documented at https://docs.sensu.io/sensu-go/latest/reference/agent/#create-monitoring-events-using-the-agent-api
-        $client = new Client();
-
         try {
-            $result = $client->request('GET', $opts['url'] . '/healthz');
+            if (Sensu::$client->request('GET', $opts['url'] . '/healthz')->getStatusCode() !== 200) {
+                return 'Sensu API is not responding';
+            }
 
-            if ($result->getStatusCode() === 200) {
-                // Sensu API is alive
+            if ($obj['state'] !== Sensu::RECOVER && $obj['state'] !== Sensu::ACK && $obj['alerted'] === 0) {
+                // If this is the first event, send a forced "ok" dated (rrd.step / 2) seconds ago to tell Sensu the last time the check was healthy
+                $data = Sensu::generateData($obj, $opts, Sensu::OK, round(Config::get('rrd.step', 300) / 2));
+                Log::debug('Sensu transport sent last good event to socket: ', $data);
 
-                $data = [
-                    'check' => [
-                        'metadata' => [
-                            'name' => Sensu::checkName($opts['prefix'], $obj['name']),
-                            'namespace' => $opts['namespace'],
-                            'annotations' => [
-                                'generated-by' => 'LibreNMS',
-                                'acknowledged' => $obj['state'] === Sensu::ACK ? 'true' : 'false',
-                            ],
-                        ],
-                        'command' => sprintf('LibreNMS: %s', $obj['rule']),
-                        'executed' => time(),
-                        'interval' => Config::get('rrd.step', 300),
-                        'issued' => time(),
-                        'last_ok' => Sensu::lastOk($obj),
-                        'output' => $obj['msg'],
-                        'status' => Sensu::calculateStatus($obj['state'], $obj['severity']),
-                    ],
-                    'entity' => [
-                        'metadata' => [
-                            'name' => Sensu::getEntityName($obj, $opts['source-key']),
-                            'namespace' => $opts['namespace'],
-                        ],
-                        'system' => [
-                            'hostname' => $obj['hostname'],
-                        ]
-                    ],
-                ];
-                
-                Log::debug($data);
-
-                $result = $client->request('POST', $opts['url'] . '/events', ['json' => $data]);
-
-                if ($result->getStatusCode() === 202) {
-                    return true;
+                $result = Sensu::$client->request('POST', $opts['url'] . '/events', ['json' => $data]);
+                if ($result->getStatusCode() !== 202) {
+                    return $result->getReasonPhrase();
                 }
+
+                sleep(5);
+            }
+
+            $data = Sensu::generateData($obj, $opts, Sensu::calculateStatus($obj['state'], $obj['severity']));
+            Log::debug('Sensu transport sent event to socket: ', $data);
+
+            $result = Sensu::$client->request('POST', $opts['url'] . '/events', ['json' => $data]);
+            if ($result->getStatusCode() === 202) {
+                return true;
             }
 
             return $result->getReasonPhrase();
         } catch (GuzzleException $e) {
-            return "Request to Sensu failed. " . $e->getMessage();
+            return "Sending event to Sensu failed: " . $e->getMessage();
         }
     }
 
-    public function calculateStatus($state, $severity)
+    public static function generateData($obj, $opts, $status, $offset = 0)
+    {
+        return [
+            'check' => [
+                'metadata' => [
+                    'name' => Sensu::checkName($opts['prefix'], $obj['name']),
+                    'namespace' => $opts['namespace'],
+                    'annotations' => [
+                        'generated-by' => 'LibreNMS',
+                        'acknowledged' => $obj['state'] === Sensu::ACK ? 'true' : 'false',
+                    ],
+                ],
+                'command' => sprintf('LibreNMS: %s', $obj['builder']),
+                'executed' => time() - $offset,
+                'interval' => Config::get('rrd.step', 300),
+                'issued' => time() - $offset,
+                'output' => $obj['msg'],
+                'status' => $status,
+            ],
+            'entity' => [
+                'metadata' => [
+                    'name' => Sensu::getEntityName($obj, $opts['source-key']),
+                    'namespace' => $opts['namespace'],
+                ],
+                'system' => [
+                    'hostname' => $obj['hostname'],
+                ]
+            ],
+        ];
+    }
+
+    public static function calculateStatus($state, $severity)
     {
         // Sensu only has a single short (status) to indicate both severity and status, so we need to map LibreNMS' state and severity onto it
 
@@ -166,18 +181,6 @@ class Sensu extends Transport
         }
 
         return sprintf('%s.%s', implode('.', $components), $short);
-    }
-
-    public static function lastOk($obj) {
-        // LibreNMS does not normally send events when a check is passing, so we need to spoof the last_ok
-
-        if (Sensu::calculateStatus($obj['state'], $obj['severity']) === Sensu::OK) {
-            // The check is passing, last_ok is now
-            return time();
-        }
-
-        // The check is failing, send the last_ok as rrd.step seconds before the incident began
-        return strtotime($obj['timestamp']) - Config::get('rrd.step', 300);
     }
 
     public static function checkName($prefix, $name)
