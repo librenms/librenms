@@ -3,7 +3,6 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessCapacityDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessDistanceDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
@@ -11,7 +10,6 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\OS;
 
 class AirosAfLtu extends OS implements
-    WirelessCapacityDiscovery,
     WirelessDistanceDiscovery,
     WirelessFrequencyDiscovery,
     WirelessPowerDiscovery,
@@ -28,22 +26,6 @@ class AirosAfLtu extends OS implements
         $oid = '.1.3.6.1.4.1.41112.1.10.1.2.2.0'; //UBNT-AFLTU-MIB::afLTUFrequency.1
         return array(
             new WirelessSensor('frequency', $this->getDeviceId(), $oid, 'airos-af-ltu', 1, 'Radio Frequency'),
-        );
-    }
-
-    /**
-     * Discover wireless capacity.  This is a percent. Type is capacity.
-     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
-     *
-     * @return array Sensors
-     */
-    public function discoverWirelessCapacity()
-    {
-        $tx_oid = '.1.3.6.1.4.1.41112.1.10.1.4.1.4.24.232.41.30.48.222'; //UBNT-AFLTU-MIB::afLTUStaTxCapacity.1
-        $rx_oid = '.1.3.6.1.4.1.41112.1.10.1.4.1.3.24.232.41.30.48.222'; //UBNT-AFLTU-MIB::afLTUStaRxCapacity.1
-        return array(
-            new WirelessSensor('capacity', $this->getDeviceId(), $oid, 'airos-af-ltu-tx', 1, 'airFIBER LTU Capacity'),
-            new WirelessSensor('capacity', $this->getDeviceId(), $oid, 'airos-af-ltu-rx', 1, 'airFIBER LTU Capacity'),
         );
     }
 
