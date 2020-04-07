@@ -70,43 +70,43 @@ class Sensu extends Transport
 
         Sensu::$client = new Client();
 
-        return $this->contactSensu($obj, $sensu_opts);
+        try {
+            return $this->contactSensu($obj, $sensu_opts);
+        } catch (GuzzleException $e) {
+            return "Sending event to Sensu failed: " . $e->getMessage();
+        }
     }
 
     public static function contactSensu($obj, $opts)
     {
         // The Sensu agent should be running on the poller - events can be sent directly to the backend but this has not been tested, and likely needs mTLS.
         // The agent API is documented at https://docs.sensu.io/sensu-go/latest/reference/agent/#create-monitoring-events-using-the-agent-api
-        try {
-            if (Sensu::$client->request('GET', $opts['url'] . '/healthz')->getStatusCode() !== 200) {
-                return 'Sensu API is not responding';
-            }
+        if (Sensu::$client->request('GET', $opts['url'] . '/healthz')->getStatusCode() !== 200) {
+            return 'Sensu API is not responding';
+        }
 
-            if ($obj['state'] !== Sensu::RECOVER && $obj['state'] !== Sensu::ACK && $obj['alerted'] === 0) {
-                // If this is the first event, send a forced "ok" dated (rrd.step / 2) seconds ago to tell Sensu the last time the check was healthy
-                $data = Sensu::generateData($obj, $opts, Sensu::OK, round(Config::get('rrd.step', 300) / 2));
-                Log::debug('Sensu transport sent last good event to socket: ', $data);
-
-                $result = Sensu::$client->request('POST', $opts['url'] . '/events', ['json' => $data]);
-                if ($result->getStatusCode() !== 202) {
-                    return $result->getReasonPhrase();
-                }
-
-                sleep(5);
-            }
-
-            $data = Sensu::generateData($obj, $opts, Sensu::calculateStatus($obj['state'], $obj['severity']));
-            Log::debug('Sensu transport sent event to socket: ', $data);
+        if ($obj['state'] !== Sensu::RECOVER && $obj['state'] !== Sensu::ACK && $obj['alerted'] === 0) {
+            // If this is the first event, send a forced "ok" dated (rrd.step / 2) seconds ago to tell Sensu the last time the check was healthy
+            $data = Sensu::generateData($obj, $opts, Sensu::OK, round(Config::get('rrd.step', 300) / 2));
+            Log::debug('Sensu transport sent last good event to socket: ', $data);
 
             $result = Sensu::$client->request('POST', $opts['url'] . '/events', ['json' => $data]);
-            if ($result->getStatusCode() === 202) {
-                return true;
+            if ($result->getStatusCode() !== 202) {
+                return $result->getReasonPhrase();
             }
 
-            return $result->getReasonPhrase();
-        } catch (GuzzleException $e) {
-            return "Sending event to Sensu failed: " . $e->getMessage();
+            sleep(5);
         }
+
+        $data = Sensu::generateData($obj, $opts, Sensu::calculateStatus($obj['state'], $obj['severity']));
+        Log::debug('Sensu transport sent event to socket: ', $data);
+
+        $result = Sensu::$client->request('POST', $opts['url'] . '/events', ['json' => $data]);
+        if ($result->getStatusCode() === 202) {
+            return true;
+        }
+
+        return $result->getReasonPhrase();
     }
 
     public static function generateData($obj, $opts, $status, $offset = 0)
@@ -116,7 +116,7 @@ class Sensu extends Transport
                 'metadata' => [
                     'name' => Sensu::checkName($opts['prefix'], $obj['name']),
                     'namespace' => $opts['namespace'],
-                    'annotations' => Sensu::generateAnnotations($obj, $opts),
+                    'annotations' => Sensu::generateAnnotations($obj),
                 ],
                 'command' => sprintf('LibreNMS: %s', $obj['builder']),
                 'executed' => time() - $offset,
@@ -138,7 +138,7 @@ class Sensu extends Transport
         ];
     }
 
-    public static function generateAnnotations($obj, $opts)
+    public static function generateAnnotations($obj)
     {
         return array_filter([
             'generated-by' => 'LibreNMS',
