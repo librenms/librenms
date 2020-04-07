@@ -1,0 +1,49 @@
+-- *------------------------------------------------
+-- * Firebrick 2900 L2TP MIB
+-- *
+-- * April 2020, C Malton
+-- *
+-- * Copyright (c) 2020 by Andrews & Arnold
+-- * 
+-- * See the Firebrick Manuals for more information
+-- *------------------------------------------------
+
+FIREBRICK-CPU-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Integer32,
+    enterprises
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    InetAddressType,
+    InetAddress
+        FROM INET-ADDRESS-MIB
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+        ;
+
+fbCpuMib MODULE-IDENTITY
+    LAST-UPDATED "202004060000Z"
+    ORGANIZATION "Andrews & Arnold Limited"
+    CONTACT-INFO
+        "Andrews & Arnold
+        Unit 1&2, Enterprise Court
+        Bracknell, Berkshire, RG12 1QS
+        United Kingdom
+
+        Tel: +44 3333 400 999
+        Email: support@aa.net.uk"
+    DESCRIPTION
+        "This is a MIB Module for monitoring the Firebrick-specific structures
+        for L2tp."
+    REVISION "202004060000Z"
+    DESCRIPTION "Initial version of this MIB module"
+    ::= { firebrick 1701 }
+
+
+firebrick   OBJECT IDENTIFIER ::= { enterprises 24693 }
+
+END

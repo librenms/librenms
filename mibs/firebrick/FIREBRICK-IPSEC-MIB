@@ -1,0 +1,128 @@
+-- *------------------------------------------------
+-- * Firebrick 2900 BGP MIB
+-- *
+-- * April 2020, C Malton
+-- *
+-- * Copyright (c) 2020 by Andrews & Arnold
+-- * 
+-- * See the Firebrick Manuals for more information
+-- *------------------------------------------------
+
+FIREBRICK-BGP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    enterprises
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    InetAddressIPv4,
+    InetAddressIPv6
+        FROM INET-ADDRESS-MIB
+        ;
+
+fbIpsecMib MODULE-IDENTITY
+    LAST-UPDATED "202004060000Z"
+    ORGANIZATION "Andrews & Arnold Limited"
+    CONTACT-INFO
+        "Andrews & Arnold
+        Unit 1&2, Enterprise Court
+        Bracknell, Berkshire, RG12 1QS
+        United Kingdom
+
+        Tel: +44 3333 400 999
+        Email: support@aa.net.uk"
+    DESCRIPTION
+        "This is a MIB Module for monitoring the Firebrick-specific structures
+        for IPSec."
+    REVISION "202004060000Z"
+    DESCRIPTION "Initial version of this MIB module"
+    ::= { firebrick 500 }
+
+firebrick   OBJECT IDENTIFIER ::= { enterprises 24693 }
+
+fbIpsecGeneral    OBJECT IDENTIFIER ::= { fbIpsecMib 0 }
+fbIpsecPeersBase    OBJECT IDENTIFIER ::= { fbIpsecGeneral 2 }
+fbIpsecPeersTable   OBJECT IDENTIFIER ::= { fbIpsecPeersBase 1 }
+
+fbPeerNameTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FbBgpIpv4PeerNameEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The list of BGP peers for this Firebrick"
+    ::= { fbBgpPeerNameTable 4 }
+
+fbBgpIpv4PeerNameEntry OBJECT-TYPE
+    SYNTAX FbBgpIpv4PeerNameEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry in the IPv4 BGP Peer Names Table"
+    INDEX { fbBgpIpv4PeerAddress }
+    ::= { fbBgpIpv4PeerNameTable 1 }
+
+FbBgpIpv4PeerNameEntry ::= SEQUENCE {
+    fbBgpIpv4PeerAddress    InetAddressIPv4,
+    fbBgpIpv4PeerName   DisplayString
+}
+
+fbBgpIpv4PeerName OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The name of the BGP Peer"
+    ::= { fbBgpIpv4PeerNameEntry 2 }
+
+fbBgpIpv4PeerAddress OBJECT-TYPE
+    SYNTAX InetAddressIPv4
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The internet address for the peer.  The type of the address is 
+         determined by the value of the fbBgpPeerAddressType object."
+    ::= { fbBgpIpv4PeerNameEntry 1 }
+
+fbBgpIpv6PeerNameTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FbBgpIpv6PeerNameEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The list of BGP peers for this Firebrick"
+    ::= { fbBgpPeerNameTable 16 }
+
+fbBgpIpv6PeerNameEntry OBJECT-TYPE
+    SYNTAX FbBgpIpv6PeerNameEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry in the IPv6 BGP Peer Names Table"
+    INDEX { fbBgpIpv6PeerAddress }
+    ::= { fbBgpIpv6PeerNameTable 1 }
+
+FbBgpIpv6PeerNameEntry ::= SEQUENCE {
+    fbBgpIpv6PeerAddress    InetAddressIPv6,
+    fbBgpIpv6PeerName   DisplayString
+}
+
+fbBgpIpv6PeerName OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The name of the BGP Peer"
+    ::= { fbBgpIpv6PeerNameEntry 2}
+
+fbBgpIpv6PeerAddress OBJECT-TYPE
+    SYNTAX InetAddressIPv6
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The internet address for the peer.  The type of the address is 
+         determined by the value of the fbBgpPeerAddressType object."
+    ::= { fbBgpIpv6PeerNameEntry 1 }
+
+
+END
