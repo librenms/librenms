@@ -24,5 +24,9 @@ foreach($fanOids as $oid => $cfg){
         'firebrick',
         $cfg["description"],
         (isset($cfg["divisor"]) ? $cfg["divisor"] : '1'),
-        '1');
+        '1',
+        1000,
+        2000,
+        8000,
+        10000);
 }

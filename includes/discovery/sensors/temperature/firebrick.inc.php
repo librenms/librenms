@@ -15,7 +15,11 @@ if(substr($device["sysDescr"], 0, 6) == "FB2900"){
         'firebrick',
         'CPU Temperature',
         '1000',
-        '1');
+        '1',
+        10,
+        20,
+        50,
+        70);
 }elseif((substr($device["sysDescr"], 0, 6) == "FB6000") ||
         (($modelNumber >= 6000) && ($modelNumber <= 7000))){
     // It's a 6000
@@ -29,7 +33,11 @@ if(substr($device["sysDescr"], 0, 6) == "FB2900"){
         'firebrick',
         'Fan Controller Temperature',
         '1000',
-        '1');
+        '1',
+        10,
+        20,
+        50,
+        70);
     discover_sensor(
         $valid['sensor'],
         'temperature',
@@ -39,7 +47,11 @@ if(substr($device["sysDescr"], 0, 6) == "FB2900"){
         'firebrick',
         'CPU Temperature',
         '1000',
-        '1');
+        '1',
+        10,
+        20,
+        60,
+        80);
     discover_sensor(
         $valid['sensor'],
         'temperature',
@@ -49,5 +61,9 @@ if(substr($device["sysDescr"], 0, 6) == "FB2900"){
         'firebrick',
         'RTC Temperature',
         '1000',
-        '1');
+        '1',
+        10,
+        20,
+        50,
+        70);
 }
