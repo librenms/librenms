@@ -1,7 +1,8 @@
 <?php
 $oidBase = '.1.3.6.1.4.1.24693.1.1.';
 $voltageOids = array();
-$monitoringMib = null;
+$sysOid = explode(".", $device["sysObjectID"]);
+$modelNumber = $sysOid[count($sysOid)-1];
 
 if(substr($device["sysDescr"], 0, 6) == "FB2900"){
     // It's a 2900
