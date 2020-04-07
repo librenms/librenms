@@ -8,7 +8,7 @@
 -- * See the Firebrick Manuals for more information
 -- *------------------------------------------------
 
-FIREBRICK-BGP-MIB DEFINITIONS ::= BEGIN
+FIREBRICK-IPSEC-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
     MODULE-IDENTITY,

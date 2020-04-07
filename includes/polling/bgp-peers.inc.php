@@ -14,6 +14,8 @@ if (\LibreNMS\Config::get('enable_bgp')) {
             $peer_data_check = snmpwalk_cache_oid($device, 'aristaBgp4V2PeerRemoteAs', array(), 'ARISTA-BGP4V2-MIB');
         } elseif ($device['os'] === 'timos') {
             $peer_data_check = snmpwalk_cache_multi_oid($device, 'tBgpInstanceRowStatus', [], 'TIMETRA-BGP-MIB', 'nokia');
+        } elseif ($device['os'] === 'firebrick') {
+            $peer_data_check = snmpwalk_cache_multi_oid($device, 'fbBgpPeerTable', [], 'FIREBRICK-BGP-MIB', 'firebrick');
         } else {
             $peer_data_check = snmpwalk_cache_oid($device, 'cbgpPeer2RemoteAs', array(), 'CISCO-BGP4-MIB');
         }
@@ -112,6 +114,26 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                         $peer_data['bgpPeerOutTotalMessages'] = $bgpPeers[$vrfOid][$address]['tBgpPeerNgOperMsgOctetsSent']; // not messages
                         $peer_data['bgpPeerFsmEstablishedTime'] = $establishedTime;
                         // ToDo, It seems that bgpPeer(In|Out)Updates, bgpPeerInUpdateElapsedTime and  bgpLocalAddr are actually not available over SNMP
+                    } else if ($device['os'] == 'firebrick') {
+                        $bgpPeer = null;
+                        foreach ($peer_data_check as $key => $value) {
+                            $oid = explode(".", $key);
+                            $protocol = $oid[0];
+                            $address = str_replace($oid[0].".", '', $key);
+                            if (strlen($address) > 15) {
+                                $address = IP::fromHexString($address)->compressed();
+                            }
+                            if($address == $peer_ip){
+                                $peer_data['bgpPeerState'] = $value["fbBgpPeerState"];
+                                $peer_data['bgpPeerAdminStatus'] = $value["fbBgpPeerState"];
+                                $peer_data['bgpPeerInUpdates'] = 0;
+                                $peer_data['bgpPeerOutUpdates'] = 0;
+                                $peer_data['bgpPeerInTotalMessages'] = 0;
+                                $peer_data['bgpPeerOutTotalMessages'] = 0;
+                                $peer_data['bgpPeerFsmEstablishedTime'] = 0;
+                                break;
+                            }
+                        }
                     } else {
                         $bgp_peer_ident = $peer_ip->toSnmpIndex();
 
@@ -261,7 +283,7 @@ if (\LibreNMS\Config::get('enable_bgp')) {
             }
 
             // --- Populate cbgp data ---
-            if ($device['os_group'] == 'vrp' || $device['os_group'] == 'cisco' || $device['os'] == 'junos' || $device['os_group'] === 'arista') {
+            if ($device['os_group'] == 'vrp' || $device['os_group'] == 'cisco' || $device['os'] == 'junos' || $device['os_group'] === 'arista' || $device["os"] == "firebrick") {
                 // Poll each AFI/SAFI for this peer (using CISCO-BGP4-MIB or BGP4-V2-JUNIPER MIB)
                 $peer_afis = dbFetchRows('SELECT * FROM bgpPeers_cbgp WHERE `device_id` = ? AND bgpPeerIdentifier = ?', array($device['device_id'], $peer['bgpPeerIdentifier']));
                 foreach ($peer_afis as $peer_afi) {
@@ -401,6 +423,22 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                         $key = '0.'.$afi.'.'.$safi.'.ipv4.'.$peer['bgpPeerIdentifier'];
                         $cbgpPeerAcceptedPrefixes = $vrpPrefixes[$key]['hwBgpPeerPrefixRcvCounter'];
                         $cbgpPeerAdvertisedPrefixes  = $vrpPrefixes[$key]['hwBgpPeerPrefixAdvCounter'];
+                    }
+
+                    if($devices["os"] == "firebrick"){
+                        foreach ($peer_data_check as $key => $value) {
+                            $oid = explode(".", $key);
+                            $protocol = $oid[0];
+                            $address = str_replace($oid[0].".", '', $key);
+                            if (strlen($address) > 15) {
+                                $address = IP::fromHexString($address)->compressed();
+                            }
+                            if($address == $peer['bgpPeerIdentifier']){
+                                $cbgpPeerAcceptedPrefixes = $value["fbBgpPeerReceivedIpv4Prefixes"] + $value["fbBgpPeerReceivedIpv6Prefixes"];
+                                $cbgpPeerAdvertisedPrefixes = $value["fbBgpPeerExported"];
+                                break;
+                            }
+                        }
                     }
 
                     // Validate data

@@ -49,7 +49,7 @@ fbBgpPeerTable OBJECT-TYPE
     STATUS current
     DESCRIPTION
         "The list of BGP peers for this Firebrick"
-    ::= { fbBgpMib 179 }
+    ::= { fbBgpMib 1 }
 
 fbBgpPeerEntry OBJECT-TYPE
     SYNTAX FbBgpPeerEntry
@@ -135,5 +135,14 @@ fbBgpPeerReceivedIpv6Prefixes OBJECT-TYPE
     DESCRIPTION
         "The number of IPv6 prefixes received from the BGP Peer"
     ::= { fbBgpPeerEntry 8 }
+
+fbBgpPeerExported OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of prefixes exported to the BGP Peer"
+    ::= { fbBgpPeerEntry 9 }
+
 
 END
