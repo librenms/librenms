@@ -13,13 +13,16 @@ FIREBRICK-BGP-MIB DEFINITIONS ::= BEGIN
 IMPORTS
     MODULE-IDENTITY,
     OBJECT-TYPE,
-    enterprises
+    enterprises,
+    Integer32
         FROM SNMPv2-SMI
     DisplayString
         FROM SNMPv2-TC
     InetAddressType,
     InetAddress
         FROM INET-ADDRESS-MIB
+    firebrickNewStyle
+        FROM FIREBRICK-MIB
         ;
 
 fbBgpMib MODULE-IDENTITY
@@ -38,28 +41,27 @@ fbBgpMib MODULE-IDENTITY
         for general system features."
     REVISION "202004060000Z"
     DESCRIPTION "Initial version of this MIB module"
-    ::= { firebrick 179 }
-
-firebrick   OBJECT IDENTIFIER ::= { enterprises 24693 }
+    ::= { firebrickNewStyle 179 }
 
 fbBgpPeerTable OBJECT-TYPE
     SYNTAX SEQUENCE OF FbBgpPeerEntry
-    MAX-ACCESS read-only
+    MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
         "The list of BGP peers for this Firebrick"
-    ::= { fbBgpMib 8 }
+    ::= { fbBgpMib 179 }
 
 fbBgpPeerEntry OBJECT-TYPE
     SYNTAX FbBgpPeerEntry
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "An entry in the IPv4 BGP Peer Names Table"
-    INDEX { fbBgpPeerAddress }
+        "An entry in the BGP Peer Names Table"
+    INDEX { fbBgpPeerAddressType, fbBgpPeerAddress }
     ::= { fbBgpPeerTable 1 }
 
 FbBgpPeerEntry ::= SEQUENCE {
+    fbBgpPeerAddressType            InetAddressType,
     fbBgpPeerAddress                InetAddress,
     fbBgpPeerName                   DisplayString,
     fbBgpPeerState                  Integer32,
@@ -69,15 +71,22 @@ FbBgpPeerEntry ::= SEQUENCE {
     fbBgpPeerReceivedIpv6Prefixes   Integer32
 }
 
+fbBgpPeerAddressType OBJECT-TYPE
+    SYNTAX InetAddressType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The address type of fbBgpPeerAddressAddr."
+    ::= { fbBgpPeerEntry 1 }
+
 fbBgpPeerAddress OBJECT-TYPE
     SYNTAX InetAddress
-    MAX-ACCESS not-accessible
+    MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
         "The internet address for the peer.  The type of the address is 
          determined by the value of the fbBgpPeerAddressType object."
-    ::= { fbBgpPeerEntry 1 }
-
+    ::= { fbBgpPeerEntry 2 }
 
 fbBgpPeerName OBJECT-TYPE
     SYNTAX  DisplayString
@@ -85,7 +94,7 @@ fbBgpPeerName OBJECT-TYPE
     STATUS  current
     DESCRIPTION
         "The name of the BGP Peer"
-    ::= { fbBgpPeerEntry 2 }
+    ::= { fbBgpPeerEntry 3 }
 
 fbBgpPeerState OBJECT-TYPE
     SYNTAX  Integer32
@@ -93,7 +102,7 @@ fbBgpPeerState OBJECT-TYPE
     STATUS  current
     DESCRIPTION
         "The current state of the BGP Peer"
-    ::= { fbBgpPeerEntry 3 }
+    ::= { fbBgpPeerEntry 4 }
 
 fbBgpPeerRemoteAS OBJECT-TYPE
     SYNTAX  Integer32
@@ -101,7 +110,7 @@ fbBgpPeerRemoteAS OBJECT-TYPE
     STATUS  current
     DESCRIPTION
         "The remote AS of the BGP Peer"
-    ::= { fbBgpPeerEntry 4 }
+    ::= { fbBgpPeerEntry 5 }
 
 fbBgpPeerReceivedIpv4Prefixes OBJECT-TYPE
     SYNTAX  Integer32
@@ -109,7 +118,7 @@ fbBgpPeerReceivedIpv4Prefixes OBJECT-TYPE
     STATUS  current
     DESCRIPTION
         "The number of IPv4 prefixes received from the BGP Peer"
-    ::= { fbBgpPeerEntry 5 }
+    ::= { fbBgpPeerEntry 6 }
 
 fbBgpPeerSecondsSinceLastChange OBJECT-TYPE
     SYNTAX  Integer32
@@ -117,7 +126,7 @@ fbBgpPeerSecondsSinceLastChange OBJECT-TYPE
     STATUS  current
     DESCRIPTION
         "The number of seconds since the last state change for the BGP Peer"
-    ::= { fbBgpPeerEntry 6 }
+    ::= { fbBgpPeerEntry 7 }
 
 fbBgpPeerReceivedIpv6Prefixes OBJECT-TYPE
     SYNTAX  Integer32
@@ -125,6 +134,6 @@ fbBgpPeerReceivedIpv6Prefixes OBJECT-TYPE
     STATUS  current
     DESCRIPTION
         "The number of IPv6 prefixes received from the BGP Peer"
-    ::= { fbBgpPeerEntry 7 }
+    ::= { fbBgpPeerEntry 8 }
 
 END
