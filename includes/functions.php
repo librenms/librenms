@@ -625,7 +625,7 @@ function deviceArray($host, $community, $snmpver, $port = 161, $transport = 'udp
     }
 
     return $device;
-}
+}//end deviceArray()
 
 
 function formatUptime($diff, $format = "long")
