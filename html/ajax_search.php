@@ -50,7 +50,7 @@ if (isset($_REQUEST['search'])) {
         } elseif ($_REQUEST['type'] == 'device') {
             // Device search
 
-            $query = "SELECT * FROM `devices` as `D`
+            $query = "SELECT *, `D`.`device_id` AS `device_id` FROM `devices` as `D`
                       LEFT JOIN `locations` AS `L` ON `L`.`id` = `D`.`location_id`";
 
             // user depending limitation
@@ -114,7 +114,6 @@ if (isset($_REQUEST['search'])) {
                     }
 
                     $num_ports = dbFetchCell('SELECT COUNT(*) FROM `ports` AS `I`, `devices` AS `D` WHERE ' . $perms_sql . ' AND `I`.`device_id` = `D`.`device_id` AND `I`.`ignore` = 0 AND `I`.`deleted` = 0 AND `D`.`device_id` = ?', array_merge($device_ids, [$result['device_id']]));
-
 
                     $device[] = array(
                         'name'            => $name,
