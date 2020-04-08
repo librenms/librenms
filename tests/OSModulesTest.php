@@ -36,7 +36,7 @@ class OSModulesTest extends DBTestCase
     private $discoveryModules;
     private $pollerModules;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -45,7 +45,7 @@ class OSModulesTest extends DBTestCase
         $this->pollerModules = Config::get('poller_modules');
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         // restore modules
         Config::set('discovery_modules', $this->discoveryModules);
