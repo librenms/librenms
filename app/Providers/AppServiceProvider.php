@@ -76,7 +76,7 @@ class AppServiceProvider extends ServiceProvider
     private function configureMorphAliases()
     {
         $sensor_types = [];
-        foreach (Sensor::getTypes() as $type) {
+        foreach (collect(Sensor::getTypes()) as $type) {
             $sensor_types[ucwords($type)] = \App\Models\Sensor::class;
         };
         Relation::morphMap(array_merge([

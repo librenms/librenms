@@ -56,7 +56,7 @@ class Sensor extends DeviceRelatedModel
 
     public static function getTypes()
     {
-        return self::groupBy('sensor_class')->pluck('sensor_class')->toArray();
+        return collect(self::groupBy('sensor_class')->pluck('sensor_class')->toArray());
     }
 
     // for the legacy menu
