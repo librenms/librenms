@@ -33,7 +33,8 @@
                                 @endforeach
                                 <li role="presentation" class="divider"></li>
                                 <li>
-                                    <a href="{{ url('toggle_dashboard_editor') }}"><i class="fa fa-bar-chart fa-fw fa-lg" aria-hidden="true"></i>
+                                    <a href="{{ url('toggle_dashboard_editor') }}">
+                                    <i class="fa fa-bar-chart fa-fw fa-lg" aria-hidden="true"></i>
                                     @if ($hide_dashboard_editor) @lang('Show Dashboard Editor')
                                     @else @lang('Hide Dashboard Editor')
                                     @endif</a>
