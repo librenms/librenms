@@ -155,14 +155,14 @@ foreach ($ordered as $name => $entry) {
         }
     }
     if (sizeof($arch) > 0 && sizeof($vers) > 0) {
-?>
+        ?>
         <tr>
             <td><a href="<?php echo(generate_url(array('page'=>'packages','name'=>$name))); ?>"><?php echo $name; ?></a></td>
             <td><?php echo implode('<br/>', $vers); ?></td>
             <td><?php echo implode('<br/>', $arch); ?></td>
             <td><?php echo implode('<br/>', $devs); ?></td>
         </tr>
-<?php
+        <?php
     }
 }
 if ((int) ($count / $results) > 0 && $count != $results) {
@@ -170,7 +170,7 @@ if ((int) ($count / $results) > 0 && $count != $results) {
         <tr>
             <td colspan="6" align="center"><?php echo generate_pagination($count, $results, $page_number); ?></td>
         </tr>
-<?php
+    <?php
 }
 ?>
 

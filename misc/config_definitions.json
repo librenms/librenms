@@ -148,21 +148,6 @@
             "default": false,
             "type": "boolean"
         },
-        "alerts.port.ifdown": {
-            "default": false,
-            "type": "boolean"
-        },
-        "alerts.port_util_alert": {
-            "default": false,
-            "type": "boolean"
-        },
-        "alerts.port_util_perc": {
-            "default": 85,
-            "type": "integer",
-            "validate": {
-                "value": "integer|between:0,100"
-            }
-        },
         "alert_rule.severity": {
             "default": "warning",
             "group": "alerting",

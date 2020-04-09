@@ -94,9 +94,16 @@ class RrdDefinition
         return $this->skipNameCheck || isset($this->dataSets[$this->escapeName($name)]);
     }
 
+    /**
+     * Disable checking if the name is valid for incoming data and just assign values
+     * based on order
+     *
+     * @return $this
+     */
     public function disableNameChecking()
     {
         $this->skipNameCheck = true;
+        return $this;
     }
 
     /**

@@ -6,7 +6,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
 use LibreNMS\OS;
 
-class FortiWlc extends OS implements
+class Fortiwlc extends OS implements
     WirelessClientsDiscovery,
     WirelessApCountDiscovery
 {

@@ -11,7 +11,7 @@
         $graph_array['type']    = 'device_sla_jitter-latency';
         $graph_array['id']      = $vars['id'];
         require 'includes/html/print-graphrow.inc.php';
-?>
+    ?>
     </div>
 
     <div class="panel-heading">

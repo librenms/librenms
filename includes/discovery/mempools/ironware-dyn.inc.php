@@ -9,8 +9,7 @@ if ($device['os'] == 'ironware' || $device['os_type'] == 'ironware') {
         if (is_numeric($percent)) {
             discover_mempool($valid_mempool, $device, 0, 'ironware-dyn', 'Dynamic Memory', '1', null, null);
         } //end_if
-    } //end_if
-    else {
+    } else {
         echo 'NetIron: ';
 
         d_echo('caching');
