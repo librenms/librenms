@@ -1,14 +1,1 @@
-<svg width="314" height="227" xmlns="http://www.w3.org/2000/svg">
- <style type="text/css">.st0{fill:#F04E23;}</style>
-
- <g>
-  <title>background</title>
-  <rect fill="none" id="canvas_background" height="229" width="316" y="-1" x="-1"/>
- </g>
- <g>
-  <title>Layer 1</title>
-  <polygon id="svg_2" points="246.59,46.36 201.82,1.59 157.05,46.36 179.32,68.64 67.05,180.91 111.82,225.68 156.59,180.91   134.32,158.64 " class="st0"/>
-  <rect id="svg_3" height="63.32" width="158.78" class="st0" transform="matrix(0.7071,-0.7071,0.7071,0.7071,-33.65,78.9869) " y="48.45" x="-0.87"/>
-  <rect id="svg_4" height="63.32" width="158.78" class="st0" transform="matrix(0.7071,-0.7071,0.7071,0.7071,-35.193,209.3551) " y="115.5" x="155.72"/>
- </g>
-</svg>
+<svg width="314" height="227" xmlns="http://www.w3.org/2000/svg"><style>.st0{fill:#f04e23}</style><path fill="none" id="canvas_background" d="M-1-1h316v229H-1z"/><g><path id="svg_2" class="st0" d="M246.6 46.4L201.8 1.6 157 46.4l22.3 22.2L67 181l44.8 44.8 44.8-44.8-22.3-22.3z"/><path id="svg_3" class="st0" transform="rotate(-45 78.5 80.1)" d="M-.9 48.5h158.8v63.3H-.9z"/><path id="svg_4" class="st0" transform="rotate(-45 235.1 147.2)" d="M155.7 115.5h158.8v63.3H155.7z"/></g></svg>
