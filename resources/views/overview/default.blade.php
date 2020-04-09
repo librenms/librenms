@@ -3,6 +3,7 @@
 @section('title', __('Overview'))
 
 @section('content')
+<div class="container-fluid">
 @include('alerts.modals.ack')
 @include('alerts.modals.notes')
 @if (!$bare)
@@ -148,6 +149,7 @@
 <div class="gridster grid">
     <ul></ul>
 </div>
+</div>
 @endsection
 
 @section('javascript')
@@ -178,7 +180,7 @@
         widget_margins: [5, 5],
         avoid_overlapped_widgets: true,
         min_cols: 1,
-        max_cols: 20,
+        max_cols: 18,
         draggable: {
             handle: 'header, span',
             stop: function(e, ui, $widget) {
