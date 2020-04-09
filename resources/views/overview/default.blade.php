@@ -180,7 +180,7 @@
         widget_margins: [5, 5],
         avoid_overlapped_widgets: true,
         min_cols: 1,
-        max_cols: 18,
+        max_cols: 20,
         draggable: {
             handle: 'header, span',
             stop: function(e, ui, $widget) {
