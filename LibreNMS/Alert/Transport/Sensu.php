@@ -183,18 +183,23 @@ class Sensu extends Transport
 
     public static function shortenName($name)
     {
-        // Shrink the last three domain components - e.g. librenms.corp.google.com becomes librenms.cgc
+        // Shrink the last domain components - e.g. librenms.corp.example.net becomes librenms.cen
         $components = explode('.', $name);
         $count = count($components);
-        $short = '';
+        $trim = min([3, $count - 1]);
+        $result = '';
 
-        // Walk the array in reverse order, taking the first letter from the first three
-        for ($i = $count - 1; $i >= $count - 3; $i--) {
-            $short = sprintf('%s%s', substr($components[$i], 0, 1), $short);
+        if ($count <= 2) {  // Can't be shortened
+            return $name;
+        }
+
+        for ($i = $count - 1; $i >= $count - $trim; $i--) {
+            // Walk the array in reverse order, taking the first letter from the $trim sections
+            $result = sprintf('%s%s', substr($components[$i], 0, 1), $result);
             unset($components[$i]);
         }
 
-        return sprintf('%s.%s', implode('.', $components), $short);
+        return sprintf('%s.%s', implode('.', $components), $result);
     }
 
     public static function checkName($prefix, $name)
