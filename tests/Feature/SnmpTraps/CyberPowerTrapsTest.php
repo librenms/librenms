@@ -27,10 +27,8 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use App\Models\Device;
 use App\Models\Ipv4Address;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
-use LibreNMS\Tests\DBTestCase;
 
 class CyberPowerTrapsTest extends SnmpTrapTestCase
 {
@@ -263,5 +261,173 @@ SNMPv2-MIB::snmpTrapEnterprise.0 CPS-MIB::cps";
 
         $trap = new Trap($trapText);
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle CpUpsWokeUp trap');
+    }
+
+    public function testCpUpsRebootStarted()
+    {
+        $device = factory(Device::class)->create();
+        $ipv4 = factory(Ipv4Address::class)->make();
+
+        $trapText = "$device->hostname
+UDP: [$device->ip]:161->[192.168.5.5]:162
+DISMAN-EVENT-MIB::sysUpTimeInstance 488:17:19:10.00
+SNMPv2-MIB::snmpTrapOID.0 CPS-MIB::upsRebootStarted
+CPS-MIB::mtrapinfoString \"The UPS started reboot sequence.\"
+SNMP-COMMUNITY-MIB::snmpTrapAddress.0 $device->ip
+SNMP-COMMUNITY-MIB::snmpTrapCommunity.0 \"comstring\"
+SNMPv2-MIB::snmpTrapEnterprise.0 CPS-MIB::cps";
+
+        $message = "The UPS started reboot sequence.";
+        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 4);
+
+        $trap = new Trap($trapText);
+        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle CpUpsRebootStarted trap');
+    }
+
+    public function testCpUpsOverTemp()
+    {
+        $device = factory(Device::class)->create();
+        $ipv4 = factory(Ipv4Address::class)->make();
+
+        $trapText = "$device->hostname
+UDP: [$device->ip]:161->[192.168.5.5]:162
+DISMAN-EVENT-MIB::sysUpTimeInstance 488:17:19:10.00
+SNMPv2-MIB::snmpTrapOID.0 CPS-MIB::upsOverTemp
+CPS-MIB::mtrapinfoString \"The UPS inner temperature is too high.\"
+SNMP-COMMUNITY-MIB::snmpTrapAddress.0 $device->ip
+SNMP-COMMUNITY-MIB::snmpTrapCommunity.0 \"comstring\"
+SNMPv2-MIB::snmpTrapEnterprise.0 CPS-MIB::cps";
+
+        $message = "The UPS inner temperature is too high.";
+        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 5);
+
+        $trap = new Trap($trapText);
+        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle CpUpsOverTemp trap');
+    }
+
+    public function testCpRtnOverTemp()
+    {
+        $device = factory(Device::class)->create();
+        $ipv4 = factory(Ipv4Address::class)->make();
+
+        $trapText = "$device->hostname
+UDP: [$device->ip]:161->[192.168.5.5]:162
+DISMAN-EVENT-MIB::sysUpTimeInstance 488:17:19:10.00
+SNMPv2-MIB::snmpTrapOID.0 CPS-MIB::returnFromOverTemp
+CPS-MIB::mtrapinfoString \"The UPS over temperature condition cleared.\"
+SNMP-COMMUNITY-MIB::snmpTrapAddress.0 $device->ip
+SNMP-COMMUNITY-MIB::snmpTrapCommunity.0 \"comstring\"
+SNMPv2-MIB::snmpTrapEnterprise.0 CPS-MIB::cps";
+
+        $message = "The UPS over temperature condition cleared.";
+        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 1);
+
+        $trap = new Trap($trapText);
+        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle CpRtnOverTemp trap');
+    }
+
+    public function testCpRtOverLoad()
+    {
+        $device = factory(Device::class)->create();
+        $ipv4 = factory(Ipv4Address::class)->make();
+
+        $trapText = "$device->hostname
+UDP: [$device->ip]:161->[192.168.5.5]:162
+DISMAN-EVENT-MIB::sysUpTimeInstance 488:17:19:10.00
+SNMPv2-MIB::snmpTrapOID.0 CPS-MIB::returnFromOverLoad
+CPS-MIB::mtrapinfoString \"The UPS has returned from an overload condition.\"
+SNMP-COMMUNITY-MIB::snmpTrapAddress.0 $device->ip
+SNMP-COMMUNITY-MIB::snmpTrapCommunity.0 \"comstring\"
+SNMPv2-MIB::snmpTrapEnterprise.0 CPS-MIB::cps";
+
+        $message = "The UPS has returned from an overload condition.";
+        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 1);
+
+        $trap = new Trap($trapText);
+        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle CpRtOverLoad trap');
+    }
+
+    public function testCpRtnDischarged()
+    {
+        $device = factory(Device::class)->create();
+        $ipv4 = factory(Ipv4Address::class)->make();
+
+        $trapText = "$device->hostname
+UDP: [$device->ip]:161->[192.168.5.5]:162
+DISMAN-EVENT-MIB::sysUpTimeInstance 488:17:19:10.00
+SNMPv2-MIB::snmpTrapOID.0 CPS-MIB::returnFromDischarged
+CPS-MIB::mtrapinfoString \"The UPS runtime calibration completed.\"
+SNMP-COMMUNITY-MIB::snmpTrapAddress.0 $device->ip
+SNMP-COMMUNITY-MIB::snmpTrapCommunity.0 \"comstring\"
+SNMPv2-MIB::snmpTrapEnterprise.0 CPS-MIB::cps";
+
+        $message = "The UPS runtime calibration completed.";
+        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 1);
+
+        $trap = new Trap($trapText);
+        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle CpRtnDischarged trap');
+    }
+
+    public function testCpUpsChargerFailure()
+    {
+        $device = factory(Device::class)->create();
+        $ipv4 = factory(Ipv4Address::class)->make();
+
+        $trapText = "$device->hostname
+UDP: [$device->ip]:161->[192.168.5.5]:162
+DISMAN-EVENT-MIB::sysUpTimeInstance 488:17:19:10.00
+SNMPv2-MIB::snmpTrapOID.0 CPS-MIB::upsChargerFailure
+CPS-MIB::mtrapinfoString \"The battery charger is abnormal.\"
+SNMP-COMMUNITY-MIB::snmpTrapAddress.0 $device->ip
+SNMP-COMMUNITY-MIB::snmpTrapCommunity.0 \"comstring\"
+SNMPv2-MIB::snmpTrapEnterprise.0 CPS-MIB::cps";
+
+        $message = "The battery charger is abnormal.";
+        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 4);
+
+        $trap = new Trap($trapText);
+        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle CpUpsChargerFailure trap');
+    }
+
+    public function testCpRtnChargerFailure()
+    {
+        $device = factory(Device::class)->create();
+        $ipv4 = factory(Ipv4Address::class)->make();
+
+        $trapText = "$device->hostname
+UDP: [$device->ip]:161->[192.168.5.5]:162
+DISMAN-EVENT-MIB::sysUpTimeInstance 488:17:19:10.00
+SNMPv2-MIB::snmpTrapOID.0 CPS-MIB::returnFromChargerFailure
+CPS-MIB::mtrapinfoString \"The charger returned from a failure condition.\"
+SNMP-COMMUNITY-MIB::snmpTrapAddress.0 $device->ip
+SNMP-COMMUNITY-MIB::snmpTrapCommunity.0 \"comstring\"
+SNMPv2-MIB::snmpTrapEnterprise.0 CPS-MIB::cps";
+
+        $message = "The charger returned from a failure condition.";
+        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 1);
+
+        $trap = new Trap($trapText);
+        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle CpRtnChargerFailure trap');
+    }
+
+    public function testCpUpsBatteryNotPresent()
+    {
+        $device = factory(Device::class)->create();
+        $ipv4 = factory(Ipv4Address::class)->make();
+
+        $trapText = "$device->hostname
+UDP: [$device->ip]:161->[192.168.5.5]:162
+DISMAN-EVENT-MIB::sysUpTimeInstance 488:17:19:10.00
+SNMPv2-MIB::snmpTrapOID.0 CPS-MIB::upsBatteryNotPresent
+CPS-MIB::mtrapinfoString \"Battery is not present.\"
+SNMP-COMMUNITY-MIB::snmpTrapAddress.0 $device->ip
+SNMP-COMMUNITY-MIB::snmpTrapCommunity.0 \"comstring\"
+SNMPv2-MIB::snmpTrapEnterprise.0 CPS-MIB::cps";
+
+        $message = "Battery is not present.";
+        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
+
+        $trap = new Trap($trapText);
+        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle CpUpsBatteryNotPresent trap');
     }
 }
