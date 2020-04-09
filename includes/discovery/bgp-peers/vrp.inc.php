@@ -98,6 +98,7 @@ if (Config::get('enable_bgp')) {
                         unset($peers['vrf_id']);
                     }
                     dbInsert($peers, 'bgpPeers');
+                    $seenPeer[$address]=1;
 
                     if (Config::get('autodiscovery.bgp')) {
                         $name = gethostbyaddr($address);
@@ -107,6 +108,7 @@ if (Config::get('enable_bgp')) {
                     $vrp_bgp_peer_count ++;
                 } else {
                     dbUpdate(['bgpPeerRemoteAs' => $value['hwBgpPeerRemoteAs'], 'astext' => $astext], 'bgpPeers', 'device_id = ? AND bgpPeerIdentifier = ? AND vrf_id = ?', [$device['device_id'], $address, $vrfId]);
+                    $seenPeer[$address]=1;
                     echo '.';
                     $vrp_bgp_peer_count ++;
                 }
@@ -129,7 +131,9 @@ if (Config::get('enable_bgp')) {
             }
             $vrfName = $map_vrf['byId'][$vrfId]['vrf_name'];
             $address = $value['bgpPeerIdentifier'];
-
+            if (isset($seenPeer[$address])) {
+                continue; //we just added this peer
+            }
             if ((empty($vrfId) && empty($bgpPeers[''][$address])) ||
                 (!empty($vrfId) && !empty($vrfName) && empty($bgpPeers[$vrfName][$address])) ||
                 (!empty($vrfId) && empty($vrfName))) {

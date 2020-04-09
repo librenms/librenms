@@ -24887,7 +24887,27 @@
     },
     "bgp-peers": {
         "discovery": {
-            "bgpPeers": [],
+            "bgpPeers": [
+                {
+                    "astext": "",
+                    "bgpPeerIdentifier": "192.168.189.96",
+                    "bgpPeerRemoteAs": 64512,
+                    "bgpPeerState": "established",
+                    "bgpPeerAdminStatus": "stop",
+                    "bgpLocalAddr": "0.0.0.0",
+                    "bgpPeerRemoteAddr": "192.168.189.96",
+                    "bgpPeerDescr": "",
+                    "bgpPeerInUpdates": 0,
+                    "bgpPeerOutUpdates": 0,
+                    "bgpPeerInTotalMessages": 0,
+                    "bgpPeerOutTotalMessages": 0,
+                    "bgpPeerFsmEstablishedTime": 2078608,
+                    "bgpPeerInUpdateElapsedTime": 0,
+                    "context_name": null,
+                    "bgpLocalAs": 1,
+                    "vrfLocalAs": null
+                }
+            ],
             "bgpPeers_cbgp": [
                 {
                     "bgpPeerIdentifier": "192.168.189.96",
