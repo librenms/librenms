@@ -518,11 +518,19 @@ function list_bgp(\Illuminate\Http\Request $request)
     }
     if (!empty($local_address)) {
         $sql .= ' AND `bgpPeers`.`bgpLocalAddr` = ?';
-        $sql_params[] = IP::parse($local_address)->uncompressed();
+        try {
+            $sql_params[] = IP::parse($local_address)->uncompressed();
+        } catch (InvalidIpException $e) {
+            return api_error(400, "Invalid local address");
+        }
     }
     if (!empty($remote_address)) {
         $sql .= ' AND `bgpPeers`.`bgpPeerIdentifier` = ?';
-        $sql_params[] = IP::parse($remote_address)->uncompressed();
+        try {
+            $sql_params[] = IP::parse($remote_address)->uncompressed();
+        } catch (InvalidIpException $e) {
+            return api_error(400, "Invalid remote address");
+        }
     }
 
     $bgp_sessions       = dbFetchRows("SELECT `bgpPeers`.* FROM `bgpPeers` LEFT JOIN `devices` ON `bgpPeers`.`device_id` = `devices`.`device_id` WHERE `bgpPeerState` IS NOT NULL AND `bgpPeerState` != '' $sql", $sql_params);
