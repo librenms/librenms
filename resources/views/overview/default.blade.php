@@ -3,6 +3,8 @@
 @section('title', __('Overview'))
 
 @section('content')
+@include('alerts.modals.ack')
+@include('alerts.modals.notes')
 @if (!$bare)
 @if (!$hide_dashboard_editor)
 <div class="row">
@@ -428,7 +430,7 @@
                     if (data.status == "ok") {
                         toastr.success(data.message);
                         setTimeout(function (){
-                            window.location.href = "{{ url('/?dashboard=') }} + dashboard_id";
+                            window.location.href = "{{ url('/?dashboard=') }}" + dashboard_id;
                         }, 500);
                     }
                     else {
@@ -457,7 +459,7 @@
                 if( data.status == "ok" ) {
                     toastr.success(data.message);
                     setTimeout(function (){
-                        window.location.href = "{{ url('/?dashboard=') }} + data.dashboard_id";
+                        window.location.href = "{{ url('/?dashboard=') }}" + data.dashboard_id;
                     }, 500);
                 }
                 else {

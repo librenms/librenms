@@ -62,12 +62,6 @@
                     "app_type": "asterisk"
                 },
                 {
-                    "metric": "stats_sipeers",
-                    "value": 48,
-                    "value_prev": null,
-                    "app_type": "asterisk"
-                },
-                {
                     "metric": "stats_sipmonoffline",
                     "value": 20,
                     "value_prev": null,
@@ -76,6 +70,12 @@
                 {
                     "metric": "stats_sipmononline",
                     "value": 28,
+                    "value_prev": null,
+                    "app_type": "asterisk"
+                },
+                {
+                    "metric": "stats_sippeers",
+                    "value": 48,
                     "value_prev": null,
                     "app_type": "asterisk"
                 },

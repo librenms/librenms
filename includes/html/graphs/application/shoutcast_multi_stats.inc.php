@@ -39,8 +39,7 @@ foreach ($rrd_list as $rrd) {
     $colours = (isset($rrd['colour']) ? $rrd['colour'] : 'default');
     $strlen  = ((strlen($rrd['descr']) < $descr_len) ? ($descr_len - strlen($rrd['descr'])) : '0');
     $descr   = (isset($rrd['descr']) ? rrdtool_escape($rrd['descr'], ($desc_len + $strlen)) : 'Unknown');
-    for ($z = 0; $z < $strlen;
-    $z++) {
+    for ($z = 0; $z < $strlen; $z++) {
         $descr .= ' ';
     }
 
@@ -73,8 +72,7 @@ if (!$nototal) {
     $strlen = ((strlen($total_text) < $descr_len) ? ($descr_len - strlen($total_text)) : '0');
     $descr  = (isset($total_text) ? rrdtool_escape($total_text, ($desc_len + $strlen)) : 'Total');
     $colour = \LibreNMS\Config::get("graph_colours.$colours.$x");
-    for ($z = 0; $z < $strlen;
-    $z++) {
+    for ($z = 0; $z < $strlen; $z++) {
         $descr .= ' ';
     }
 

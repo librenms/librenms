@@ -46,14 +46,14 @@ class FilePermissionsException extends \Exception implements UpgradeableExceptio
             return new static();
         }
 
-            // cannot write to bootstrap directory
+        // cannot write to bootstrap directory
         if ($exception instanceof \Exception && $exception->getMessage() == 'The bootstrap/cache directory must be present and writable.') {
-                return new static ();
+            return new static();
         }
 
-            // monolog cannot init log file
+        // monolog cannot init log file
         if ($exception instanceof \UnexpectedValueException && str_contains($exception->getFile(), 'Monolog/Handler/StreamHandler.php')) {
-                return new static();
+            return new static();
         }
 
         return null;

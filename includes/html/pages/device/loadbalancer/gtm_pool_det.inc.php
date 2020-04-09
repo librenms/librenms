@@ -59,5 +59,5 @@ if ($components[$vars['gtmpoolid']]['type'] == 'f5-gtm-pool') {
                 </div>
             </div>
         </div>
-<?php
+    <?php
 }

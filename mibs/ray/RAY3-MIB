@@ -1,0 +1,888 @@
+RAY3-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+    	enterprises, IpAddress, Gauge
+        	FROM RFC1155-SMI
+	MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+	Unsigned32, TimeTicks, Counter32, Gauge32, Integer32, Counter64
+		FROM SNMPv2-SMI
+	DateAndTime, TEXTUAL-CONVENTION
+	FROM SNMPv2-TC
+	MODULE-COMPLIANCE, OBJECT-GROUP
+		FROM SNMPv2-CONF
+	mib-2 FROM SNMPv2-SMI
+	snmpTraps  
+		FROM SNMPv2-MIB;
+
+racom 	MODULE-IDENTITY
+    	LAST-UPDATED 	"201910210000Z"
+    	ORGANIZATION 	"Racom s.r.o"
+    	CONTACT-INFO
+		    	"Racom s.r.o
+			Mirova 1283
+			592 31 Nove Mesto na Morave
+			Czech Republic
+			Tel: +420 722 937 522
+			E-mail: racom@racom.eu"
+    	DESCRIPTION	"The MIB module defines management objects for RAy product series. Revision 201909200000Z."
+    	REVISION 	"201910210000Z"
+    	DESCRIPTION	"Latest version of this MIB module"
+	::= { enterprises 33555 }
+
+Tenths 		::= TEXTUAL-CONVENTION
+		DISPLAY-HINT 	"d-1"
+		STATUS		current
+		DESCRIPTION	"Numeric 32-bit type with 0.1 precision without subtyping."
+		SYNTAX 		Integer32
+
+Hundredths 	::= TEXTUAL-CONVENTION
+		DISPLAY-HINT 	"d-2"
+		STATUS 		current
+		DESCRIPTION	"Numeric 32-bit type with 0.01 precision without subtyping."
+		SYNTAX 		Integer32
+
+Thousandths	::= TEXTUAL-CONVENTION
+		DISPLAY-HINT	"d-3"
+		STATUS 		current
+		DESCRIPTION 	"Numeric 32-bit type with 0.001 precision without subtyping."
+		SYNTAX		Integer32
+
+DisplayStringRaw ::= TEXTUAL-CONVENTION
+		DISPLAY-HINT 	"1t"
+		STATUS 		current
+		DESCRIPTION 	"Unlimited display string - UTF8 encoding."
+		SYNTAX 		OCTET STRING
+
+PhysAddressRaw 	::= TEXTUAL-CONVENTION
+		DISPLAY-HINT 	"1x"
+		STATUS 		current
+		DESCRIPTION 	"Unlimited physic address - hexadecimal encoding for each octet."
+		SYNTAX 		OCTET STRING
+
+ServiceState ::= TEXTUAL-CONVENTION
+      	STATUS      	current
+      	DESCRIPTION	"System service or device state."
+      	SYNTAX      	INTEGER {
+				na (0),	-- service/device state not available
+                  		up (1), -- service is running or device is up
+                  		down (2)  -- service is not running or device is down
+                  		}
+
+AlarmState ::= TEXTUAL-CONVENTION
+      	STATUS      	current
+      	DESCRIPTION	"Alarm status."
+      	SYNTAX      	INTEGER {
+				na (0),	-- alarm state not available
+                  		up (1), -- alarm up
+                  		down (2), -- alarm down
+				ack (3) -- alarm up and acknowledged
+                  		}
+
+OptionSetting ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION	"Setting of some options."
+	SYNTAX		INTEGER {
+				na (0),
+				on (1),
+				off (2)
+				}
+
+ModulationList ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION	"Radio channel modulations numerical list"
+	SYNTAX		INTEGER {
+				na (0),
+				qpskS (1),
+				qpsk (2),
+				qam16 (3),
+				qam32 (4),
+				qam64 (5),
+				qam128 (6),
+				qam256 (7),
+				qam512 (8),
+				qam1024 (9),
+				qam2048 (10),
+				qam4096 (11)
+				}
+
+
+ray3 		OBJECT IDENTIFIER ::= { racom 4 }
+
+station		OBJECT IDENTIFIER ::= {ray3 1}
+interface	OBJECT IDENTIFIER ::= {ray3 2}
+statistic	OBJECT IDENTIFIER ::= {ray3 3}
+switch		OBJECT IDENTIFIER ::= {ray3 4}
+ray3Traps 	OBJECT IDENTIFIER ::= {ray3 12}
+
+-- station MIB
+
+product 	OBJECT IDENTIFIER ::= {station 1}
+info	 	OBJECT IDENTIFIER ::= {station 2}
+status	 	OBJECT IDENTIFIER ::= {station 3}
+chassis 	OBJECT IDENTIFIER ::= {station 4}
+system		OBJECT IDENTIFIER ::= {station 5}
+access		OBJECT IDENTIFIER ::= {station 6}
+alarm		OBJECT IDENTIFIER ::= {station 8}
+
+-- product MIB
+
+productName OBJECT-TYPE
+        SYNTAX          DisplayStringRaw (SIZE(0..16))
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "Product name."
+        ::= { product 1 }
+
+serialNumber OBJECT-TYPE
+        SYNTAX          Gauge32 
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "Product serial number."
+        ::= { product 2 }
+
+unitType OBJECT-TYPE
+        SYNTAX          DisplayStringRaw (SIZE(0..4))
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "Station type (L or H)."
+        ::= { product 3 }
+
+-- info MIB
+
+deviceName OBJECT-TYPE
+        SYNTAX          DisplayStringRaw (SIZE(0..16))
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "Station name."
+        ::= { info 1 }
+
+swVer OBJECT-TYPE
+        SYNTAX          DisplayStringRaw (SIZE(0..16))
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "Firmware version."
+        ::= { info 2 }
+
+swVerRadio OBJECT-TYPE
+        SYNTAX          DisplayStringRaw (SIZE(0..16))
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "Radio firmware version."
+        ::= { info 3 }
+
+-- status mib
+systemStatus OBJECT-TYPE
+        SYNTAX		INTEGER {
+				na (0),
+                            	ok (1),
+			    	warning (2),
+                            	alarm (3)
+                        	}
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "Unit status."
+        ::= { status 1 }
+
+peerNumber OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "Peer station serial number."
+        ::= { status 3 }
+
+securePeerMode OBJECT-TYPE
+	SYNTAX		OptionSetting
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Secure peer mode."
+	::= { status 7 }
+
+lineStatusII OBJECT-TYPE
+        SYNTAX          INTEGER {
+				na (0),
+				setup (1),
+				single (2),
+				connecting (3),
+				authorizing (4),
+				ok (5),
+				analyzer (6)
+                        	}
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "Radio link status."
+        ::= { status 8 }
+
+eth1Link OBJECT-TYPE
+	SYNTAX		ServiceState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Ethernet 1 link status."
+	::= { status 9 }
+
+eth2Link OBJECT-TYPE
+	SYNTAX		ServiceState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Ethernet 2 link status."
+	::= { status 10 }
+
+
+-- chassis mib
+temperatureModem OBJECT-TYPE
+        SYNTAX         	Hundredths (-10000..10000)
+	UNITS		"deg C"
+        MAX-ACCESS	read-only
+        STATUS         	current
+        DESCRIPTION    	"Modem temperature in hundredths of Celsius."
+        ::= { chassis 1 }
+
+temperatureRadio OBJECT-TYPE
+        SYNTAX          Hundredths (-10000..10000)
+	UNITS		"deg C"
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "Radio temperature in hundredths of Celsius."
+        ::= { chassis 2}
+
+voltageUnit OBJECT-TYPE
+        SYNTAX          Tenths (0..1000)
+	UNITS		"V"
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "Power supply voltage in tenths of Volts (V)."
+        ::= { chassis 3 }
+
+voltageSource OBJECT-TYPE
+	SYNTAX		INTEGER {
+				na (0),
+				aux (1),
+				poe (2)
+				}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Source of supply voltage."
+	::= { chassis 4 }
+
+
+-- system mib
+useCpu OBJECT-TYPE
+        SYNTAX          INTEGER
+	UNITS		"%"
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "System use CPU in %."
+        ::= { system 1 }
+
+useMemory OBJECT-TYPE
+        SYNTAX          INTEGER
+	UNITS		"%"
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "System use memory in %."
+        ::= { system 2 }
+
+useLogStorage OBJECT-TYPE
+        SYNTAX          INTEGER
+	UNITS		"%"
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "Use storage for log in %."
+        ::= { system 3 }
+
+-- access mib
+sshd OBJECT-TYPE
+        SYNTAX          INTEGER {
+				on (1),
+				onlykey (2),
+				off (3)
+				}
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "Management interface: SSH."
+        ::= { access 1 }
+
+telnetd OBJECT-TYPE
+        SYNTAX          OptionSetting
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "Management interface: Telnet."
+        ::= { access 2 }
+
+httpd OBJECT-TYPE
+        SYNTAX		OptionSetting
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "Management interface: HTTP."
+        ::= { access 3 }
+
+ip OBJECT-TYPE
+	SYNTAX		IpAddress
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Management interface: IP address."
+	::= { access 4 }
+
+mac OBJECT-TYPE
+	SYNTAX		PhysAddressRaw
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Management interface: MAC address."
+	::= { access 5 }
+
+managementVlan OBJECT-TYPE
+	SYNTAX		OptionSetting
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Management interface: VLAN on/off."
+	::= { access 6 }
+
+managementVlanId OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Management interface: VLAN ID."
+	::= { access 7 }
+
+wifiHAP OBJECT-TYPE
+        SYNTAX          INTEGER {
+				na (0),
+				disabled (1),
+                            	enabled-on-air-link-loss (2),
+                            	force-enabled (3)
+                        	}
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "Management interface: WiFi Host Access Point."
+        ::= { access 8 }
+
+
+-- alarm mib
+alarmTemperature OBJECT-TYPE
+	SYNTAX		AlarmState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Temperature alarm state."
+	::= { alarm 1 }
+
+alarmVoltageLow OBJECT-TYPE
+	SYNTAX		AlarmState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Low voltage alarm state."
+	::= { alarm 2 }
+
+alarmVoltageHigh OBJECT-TYPE
+	SYNTAX		AlarmState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"High voltage alarm state."
+	::= { alarm 3 }
+
+alarmRss OBJECT-TYPE
+	SYNTAX		AlarmState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"RSS alarm state."
+	::= { alarm 4 }
+
+alarmBer OBJECT-TYPE
+	SYNTAX		AlarmState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"BER alarm state."
+	::= { alarm 6 }
+
+alarmPeerDisconnected OBJECT-TYPE
+	SYNTAX		AlarmState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Peer disconnect alarm state."
+	::= { alarm 7 }
+
+alarmEth1Down OBJECT-TYPE
+	SYNTAX		AlarmState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Ethernet 1 Link Down alarm state."
+	::= { alarm 8 }
+
+alarmEth2Down OBJECT-TYPE
+	SYNTAX		AlarmState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Ethernet 2 Link Down alarm state."
+	::= { alarm 9 }
+
+alarmNetBitrate OBJECT-TYPE
+	SYNTAX		AlarmState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Air Speed below Limit alarm state."
+	::= { alarm 11 }
+
+alarmWifiOn OBJECT-TYPE
+	SYNTAX		AlarmState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"WiFi Host Access Point on."
+	::= { alarm 12 }
+
+alarmMse OBJECT-TYPE
+	SYNTAX		AlarmState
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"MSE alarm state."
+	::= { alarm 13 }
+
+
+-- interface mib
+ifRadio		OBJECT IDENTIFIER ::= {interface 1}
+ifEth		OBJECT IDENTIFIER ::= {interface 2}
+
+-- radio mib
+rxChannel OBJECT-TYPE
+        SYNTAX          DisplayStringRaw (SIZE(0..8))
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "Receiver channel ID."
+        ::= { ifRadio 1 }
+
+txChannel OBJECT-TYPE
+        SYNTAX          DisplayStringRaw (SIZE(0..8))
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "Transceiver channel ID."
+        ::= { ifRadio 2 }
+
+rxFreq OBJECT-TYPE
+        SYNTAX          Gauge32
+	UNITS		"kHz"
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "Receiver frequency in kHz."
+        ::= { ifRadio 3 }
+
+txFreq OBJECT-TYPE
+        SYNTAX          Gauge32
+	UNITS		"kHz"
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "Transceiver frequency in kHz."
+        ::= { ifRadio 4 }
+
+rxModulation OBJECT-TYPE
+        SYNTAX          DisplayStringRaw
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "Rx modulation text ID."
+        ::= { ifRadio 5 }
+
+txModulation OBJECT-TYPE
+        SYNTAX          DisplayStringRaw
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "Tx modulation text ID."
+        ::= { ifRadio 6 }
+
+rxModulationIndex OBJECT-TYPE
+        SYNTAX          ModulationList
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "Rx modulation index."
+        ::= { ifRadio 7 }
+
+txModulationIndex OBJECT-TYPE
+        SYNTAX          ModulationList
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "Tx modulation index."
+        ::= { ifRadio 8 }
+
+matching OBJECT-TYPE
+        SYNTAX          OptionSetting
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "Channel matching."
+        ::= { ifRadio 11 }
+
+rfPowerConfigured OBJECT-TYPE
+	SYNTAX		Integer32
+	UNITS		"dBm"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Configured RF Power in dBm."
+	::= { ifRadio 12 }
+
+netBitrate OBJECT-TYPE
+	SYNTAX		Integer32
+	UNITS		"kbps"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Current net bitrate in kbps."
+	::= { ifRadio 13 }
+
+maxNetBitrate OBJECT-TYPE
+	SYNTAX		Integer32
+	UNITS		"Mbps"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Maximum net bitrate in Mbps."
+	::= { ifRadio 14 }
+
+txBandwidthKHz OBJECT-TYPE
+	SYNTAX		Integer32
+	UNITS		"kHz"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Radio Tx channel bandwidth in kHz."
+	::= { ifRadio 15 }
+
+channelArrangement OBJECT-TYPE
+        SYNTAX          INTEGER {
+				na (0),
+                            	accp (1),
+                            	acap (2),
+				ccdp (3)
+                        	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Channel arrangement."
+	::= { ifRadio 16 }
+
+rfPowerCurrent OBJECT-TYPE
+	SYNTAX		Integer32
+	UNITS		"dBm"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Current RF Power in dBm."
+	::= { ifRadio 17 }
+
+acm	OBJECT-TYPE
+	SYNTAX		OptionSetting
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"ACM option."
+	::= { ifRadio 18 }
+
+atpc	OBJECT-TYPE
+	SYNTAX		OptionSetting
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"ATPC option."
+	::= { ifRadio 19 }
+
+frequencyTable OBJECT-TYPE
+        SYNTAX          DisplayStringRaw (SIZE(0..128))
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "Current frequency table name."
+	::= { ifRadio 20 }
+
+rxBandwidthKHz OBJECT-TYPE
+	SYNTAX		Integer32
+	UNITS		"kHz"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Radio Rx channel bandwidth in kHz."
+	::= { ifRadio 21 }
+
+
+-- ifEth mib
+
+ifEthTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF IfEthEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"List of Ethernet interfaces."
+	::= { ifEth 1 }
+
+ifEthEntry OBJECT-TYPE
+	SYNTAX		IfEthEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"Ethernet interface entry."
+	INDEX		{ speed }
+	::= { ifEthTable 1 }
+
+IfEthEntry ::=
+	SEQUENCE {
+		speed		Integer32,
+		duplex		INTEGER,
+		mdix		INTEGER,
+		autonego	OptionSetting,
+		flowControl 	INTEGER
+		}
+		
+speed OBJECT-TYPE
+        SYNTAX          Integer32(1..1000000000)
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "Ethernet speed."
+        ::= { ifEthEntry 1 }
+duplex OBJECT-TYPE
+        SYNTAX          INTEGER {
+				na (0),
+                            	full (1),
+		            	half (2)
+                        	}
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION    	"Ethernet duplex."
+        ::= { ifEthEntry 2 }
+
+mdix OBJECT-TYPE
+        SYNTAX          INTEGER {
+				na (0),
+                            	mdi (1),
+		            	mdi-x (2)
+                        	}
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION    	"Ethernet MDI-X / MDI."
+        ::= { ifEthEntry 3 }
+
+autonego OBJECT-TYPE
+        SYNTAX          OptionSetting
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "Ethernet autonego."
+        ::= { ifEthEntry 4 }
+
+flowControl OBJECT-TYPE
+        SYNTAX          INTEGER {
+				na (0),
+                            	off (1),
+		            	on (2),
+		            	auto (3)
+                        	}
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "Ethernet flow control."
+        ::= { ifEthEntry 7 }
+
+
+-- statistic mib
+radio			OBJECT IDENTIFIER ::= {statistic 2}
+ethernet		OBJECT IDENTIFIER ::= {statistic 3}
+
+-- statistic radio mib
+
+rss OBJECT-TYPE
+        SYNTAX          Tenths (-1000..0)
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "Receiving RSS indicator in tenths of dBm."
+        ::= { radio 1 }
+
+timeAllConnect OBJECT-TYPE
+        SYNTAX          TimeTicks
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "Overall link uptime."
+        ::= { radio 5 }
+
+timeAllDisconnect OBJECT-TYPE
+        SYNTAX          TimeTicks
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "Overall link downtime."
+        ::= { radio 6 }
+
+timeMaxDisconnect OBJECT-TYPE
+        SYNTAX          TimeTicks
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "The longest drop (disconnecting)."
+        ::= { radio 7 }
+	
+numDisconnect OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "Number of drops (disconnecting)."
+        ::= { radio 8 }
+
+reliability OBJECT-TYPE
+	SYNTAX		Thousandths (0..100000)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Reliability in thousandths of %."
+	::= { radio 9 }
+
+linkUptime OBJECT-TYPE
+        SYNTAX          TimeTicks
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "Current radio link uptime."
+        ::= { radio 10 }
+
+ber OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Bit Error Rate (BER) multiplied by 10^9."
+	::= { radio 11 }
+
+mse OBJECT-TYPE
+        SYNTAX          Tenths (-500..0)
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "Receiving MSE indicator in thnths of dB."
+        ::= { radio 12 }
+
+-- statistic Ethernet mib
+
+ethInThroughput OBJECT-TYPE
+        SYNTAX          Integer32
+	UNITS		"kbps"
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "Input Ethernet 1 data port throughput in kbps."
+        ::= { ethernet 1 }
+
+ethOutThroughput OBJECT-TYPE
+        SYNTAX          Integer32
+	UNITS		"kbps"
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "Output Ethernet 1 data port throughput in kbps."
+        ::= { ethernet 2 }
+
+eth2InThroughput OBJECT-TYPE
+        SYNTAX          Integer32
+	UNITS		"kbps"
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "Input Ethernet 2 data port throughput in kbps."
+        ::= { ethernet 3 }
+
+eth2OutThroughput OBJECT-TYPE
+        SYNTAX          Integer32
+	UNITS		"kbps"
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "Output Ethernet 2 data port throughput in kbps."
+        ::= { ethernet 4 }
+
+
+-- switch mib
+egressQueue		OBJECT IDENTIFIER ::= {switch 3}
+
+ -- switch egress mib
+
+speedGuard OBJECT-TYPE
+	SYNTAX		OptionSetting
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Speed guard feature on/off."
+	::= { egressQueue 2 }
+
+
+-- RAy3 trap definitions
+
+ray3TrapsPrefix		OBJECT IDENTIFIER ::= { ray3Traps 0 }
+
+    	
+tr3TemperatureAlarm NOTIFICATION-TYPE
+    OBJECTS { 	temperatureModem,
+    		alarmTemperature }
+    STATUS  current
+    DESCRIPTION
+            "Temperature exceeded the threshold."
+    ::= { ray3TrapsPrefix 1 }
+
+tr3VoltageLowAlarm NOTIFICATION-TYPE
+    OBJECTS { 	voltageUnit,
+    		alarmVoltageLow }
+    STATUS  current
+    DESCRIPTION
+            "Supply voltage below minimal threshold."
+    ::= { ray3TrapsPrefix 2 }
+
+tr3VoltageHighAlarm NOTIFICATION-TYPE
+    OBJECTS { 	voltageUnit,
+    		alarmVoltageHigh }
+    STATUS  current
+    DESCRIPTION
+            "Supply voltage above maximal threshold."
+    ::= { ray3TrapsPrefix 3 }
+
+tr3RssAlarm NOTIFICATION-TYPE
+    OBJECTS { 	rss,
+    		alarmRss }
+    STATUS  current
+    DESCRIPTION
+            "RSS exceeded the threshold."
+    ::= { ray3TrapsPrefix 4 }
+
+tr3MseAlarm NOTIFICATION-TYPE
+    OBJECTS { 	mse,
+    		alarmMse }
+    STATUS  current
+    DESCRIPTION
+            "MSE exceeded the threshold."
+    ::= { ray3TrapsPrefix 5 }
+
+tr3BerAlarm NOTIFICATION-TYPE
+    OBJECTS { 	ber,
+		alarmBer }
+    STATUS  current
+    DESCRIPTION
+            "BER exceeded the threshold."
+    ::= { ray3TrapsPrefix 6 }
+
+tr3AirDisconnect NOTIFICATION-TYPE
+    OBJECTS { 	lineStatusII,
+    		alarmPeerDisconnected }
+    STATUS  current
+    DESCRIPTION
+            "Air line disconnected."
+    ::= { ray3TrapsPrefix 7 }
+
+tr3AirConnect NOTIFICATION-TYPE
+    OBJECTS { 	lineStatusII,
+    		alarmPeerDisconnected }
+    STATUS  current
+    DESCRIPTION
+            "Air line connected after being disconnected."
+    ::= { ray3TrapsPrefix 8 }
+
+tr3Eth1LinkDown NOTIFICATION-TYPE
+    OBJECTS { 	eth1Link,
+    		alarmEth1Down }
+    STATUS  current
+    DESCRIPTION
+            "Local station Ethernet 1 link Up/Down."
+    ::= { ray3TrapsPrefix 9 }
+
+tr3Eth21LinkDown NOTIFICATION-TYPE
+    OBJECTS { 	eth2Link,
+    		alarmEth2Down }
+    STATUS  current
+    DESCRIPTION
+            "Local station Ethernet 2 link Up/Down."
+    ::= { ray3TrapsPrefix 10 }
+
+tr3NetBitrate NOTIFICATION-TYPE
+    OBJECTS { 	netBitrate,
+    		alarmNetBitrate }
+    STATUS  current
+    DESCRIPTION
+            "Air speed below threshold."
+    ::= { ray3TrapsPrefix 11 }
+
+tr3WifiOn NOTIFICATION-TYPE
+    OBJECTS { 	wifiHAP,
+    		alarmWifiOn }
+    STATUS  current
+    DESCRIPTION
+            "WiFi Host Access Point is on."
+    ::= { ray3TrapsPrefix 12 }
+
+tr3EventAirCapacity NOTIFICATION-TYPE
+    OBJECTS {	netBitrate }
+    STATUS	current
+    DESCRIPTION
+    		"Air channel capacity changed."
+    ::= { ray3TrapsPrefix 101 }
+
+END

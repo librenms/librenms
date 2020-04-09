@@ -371,7 +371,7 @@ if ($format == "graph") {
 
         <?php
         if (!isset($vars['searchbar']) && $vars['searchbar'] != "hide") {
-        ?>
+            ?>
         $(".devices-headers-table-menu").append(
             "<div class='pull-left'>" +
             "<form method='post' action='' class='form-inline devices-search-header' role='form'>" +
@@ -392,7 +392,7 @@ if ($format == "graph") {
             "</form>" +
             "</div>"
         );
-        <?php
+            <?php
         }
         ?>
 

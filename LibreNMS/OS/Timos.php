@@ -51,7 +51,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
     {
         // implement other encapsulation values
         $map = sprintf("%032b", $tmnxEncapVal);
-       
+
         if (substr($map, -32, 20) == '00000000000000000000') { // 12-bit IEEE 802.1Q VLAN ID
             if ($tmnxEncapVal == 4095) {
                 return '*';
@@ -66,13 +66,13 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
      * @param scheme
      * @return converted ifName
      * see TIMETRA-TC-MIB::TmnxPortID
-    */
+     */
     private function nokiaIfName($tmnxPortId, $scheme)
     {
         // Fixme implement other schemes and channels
         if ($scheme == 'schemeA') {
             $map = sprintf("%032b", $tmnxPortId);
-            
+
             if (substr($map, -32, 4) == '0101') { // LAG Port
                 if (substr($map, -28, 4) == '1011') { // Pseudowire Port
                     return "pw-" . bindec(substr($map, -10, 10));
@@ -237,7 +237,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
         }
         return $svcs;
     }
-    
+
     /**
      * @return Collection MplsSap objects
      */
@@ -245,7 +245,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
     {
         $mplsSapCache = snmpwalk_cache_multi_oid($this->getDevice(), 'sapBaseInfoTable', [], 'TIMETRA-SAP-MIB', 'nokia', '-OQUst');
         $portScheme = snmp_get($this->getDevice(), 'tmnxChassisPortIdScheme.1', '-Oqv', 'TIMETRA-CHASSIS-MIB', 'nokia');
-        
+
         $saps = collect();
 
         // Workaround, there are some oids not covered by actual MIB, try to filter them
@@ -274,7 +274,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
                 'sapAdminStatus' => $value['sapAdminStatus'],
                 'sapOperStatus' => $value['sapOperStatus'],
                 'sapLastMgmtChange' => round($value['sapLastMgmtChange'] / 100),
-                'sapLastStatusChange' => round($value['sapLastStatusChange'] /100),
+                'sapLastStatusChange' => round($value['sapLastStatusChange'] / 100),
             ]));
         }
         return $saps;
@@ -330,12 +330,12 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
         $mplsTunnelArHopCache = snmpwalk_cache_multi_oid($this->getDevice(), 'vRtrMplsTunnelARHopTable', $mplsTunnelArHopCache, 'TIMETRA-MPLS-MIB', 'nokia', '-OQUsb');
 
         // vRtrMplsTunnelARHopProtection Bits
-        $localAvailable     = 0b10000000;
-        $localInUse         = 0b01000000;
+        $localAvailable = 0b10000000;
+        $localInUse = 0b01000000;
         $bandwidthProtected = 0b00100000;
-        $nodeProtected      = 0b00010000;
-        $preemptionPending  = 0b00001000;
-        $nodeId             = 0b00000100;
+        $nodeProtected = 0b00010000;
+        $preemptionPending = 0b00001000;
+        $nodeId = 0b00000100;
 
 
         $arhops = collect();
@@ -347,7 +347,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
             $localLinkProtection = ($protection & $localAvailable) ? "true" : "false";
             $linkProtectionInUse = ($protection & $localInUse) ? "true" : "false";
             $bandwidthProtection = ($protection & $bandwidthProtected) ? "true" : "false";
-            $nextNodeProtection  = ($protection & $nodeProtected) ? "true" : "false";
+            $nextNodeProtection = ($protection & $nodeProtected) ? "true" : "false";
 
             if (isset($mplsTunnelARHopListIndex, $mplsTunnelARHopIndex, $lsp_path_id)) {
                 $arhops->push(new MplsTunnelArHop([
@@ -385,19 +385,19 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
             $lsp_path_id = $paths->firstWhere('mplsLspPathTunnelCHopListIndex', $mplsTunnelCHopListIndex)->lsp_path_id;
             d_echo('mplsTunnelCHopListIndex: ' . $mplsTunnelCHopListIndex . '  mplsTunnelCHopIndex: ' . $mplsTunnelCHopIndex . '  path: ' . $paths->firstWhere('mplsLspPathTunnelCHopListIndex', $mplsTunnelCHopListIndex));
 
-#            if (isset($mplsTunnelCHopListIndex, $mplsTunnelCHopIndex, $lsp_path_id)) { 
-                $chops->push(new MplsTunnelCHop([
-                    'mplsTunnelCHopListIndex' => $mplsTunnelCHopListIndex,
-                    'mplsTunnelCHopIndex' => $mplsTunnelCHopIndex,
-                    'lsp_path_id' => $lsp_path_id,
-                    'device_id' => $this->getDeviceId(),
-                    'mplsTunnelCHopAddrType' => $value['vRtrMplsTunnelCHopAddrType'],
-                    'mplsTunnelCHopIpv4Addr' => $value['vRtrMplsTunnelCHopIpv4Addr'],
-                    'mplsTunnelCHopIpv6Addr' => $value['vRtrMplsTunnelCHopIpv6Addr'],
-                    'mplsTunnelCHopAsNumber' => $value['vRtrMplsTunnelCHopAsNumber'],
-                    'mplsTunnelCHopStrictOrLoose' => $value['vRtrMplsTunnelCHopStrictOrLoose'],
-                    'mplsTunnelCHopRouterId' => $value['vRtrMplsTunnelCHopRtrID'],
-                ]));
+#            if (isset($mplsTunnelCHopListIndex, $mplsTunnelCHopIndex, $lsp_path_id)) {
+            $chops->push(new MplsTunnelCHop([
+                'mplsTunnelCHopListIndex' => $mplsTunnelCHopListIndex,
+                'mplsTunnelCHopIndex' => $mplsTunnelCHopIndex,
+                'lsp_path_id' => $lsp_path_id,
+                'device_id' => $this->getDeviceId(),
+                'mplsTunnelCHopAddrType' => $value['vRtrMplsTunnelCHopAddrType'],
+                'mplsTunnelCHopIpv4Addr' => $value['vRtrMplsTunnelCHopIpv4Addr'],
+                'mplsTunnelCHopIpv6Addr' => $value['vRtrMplsTunnelCHopIpv6Addr'],
+                'mplsTunnelCHopAsNumber' => $value['vRtrMplsTunnelCHopAsNumber'],
+                'mplsTunnelCHopStrictOrLoose' => $value['vRtrMplsTunnelCHopStrictOrLoose'],
+                'mplsTunnelCHopRouterId' => $value['vRtrMplsTunnelCHopRtrID'],
+            ]));
 #            }
         }
         return $chops;
@@ -605,7 +605,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
                 'sapAdminStatus' => $value['sapAdminStatus'],
                 'sapOperStatus' => $value['sapOperStatus'],
                 'sapLastMgmtChange' => round($value['sapLastMgmtChange'] / 100),
-                'sapLastStatusChange' => round($value['sapLastStatusChange'] /100),
+                'sapLastStatusChange' => round($value['sapLastStatusChange'] / 100),
             ]));
         }
         return $saps;
@@ -660,12 +660,12 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
         $mplsTunnelArHopCache = snmpwalk_cache_multi_oid($this->getDevice(), 'vRtrMplsTunnelARHopTable', $mplsTunnelArHopCache, 'TIMETRA-MPLS-MIB', 'nokia', '-OQUsb');
 
         // vRtrMplsTunnelARHopProtection Bits
-        $localAvailable     = 0b10000000;
-        $localInUse         = 0b01000000;
+        $localAvailable = 0b10000000;
+        $localInUse = 0b01000000;
         $bandwidthProtected = 0b00100000;
-        $nodeProtected      = 0b00010000;
-        $preemptionPending  = 0b00001000;
-        $nodeId             = 0b00000100;
+        $nodeProtected = 0b00010000;
+        $preemptionPending = 0b00001000;
+        $nodeId = 0b00000100;
 
 
         $arhops = collect();
@@ -677,7 +677,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
             $localLinkProtection = ($protection & $localAvailable) ? "true" : "false";
             $linkProtectionInUse = ($protection & $localInUse) ? "true" : "false";
             $bandwidthProtection = ($protection & $bandwidthProtected) ? "true" : "false";
-            $nextNodeProtection  = ($protection & $nodeProtected) ? "true" : "false";
+            $nextNodeProtection = ($protection & $nodeProtected) ? "true" : "false";
 
             if (isset($mplsTunnelARHopListIndex, $mplsTunnelARHopIndex, $lsp_path_id)) {
                 $arhops->push(new MplsTunnelArHop([
@@ -713,19 +713,19 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
             list($mplsTunnelCHopListIndex, $mplsTunnelCHopIndex) = explode('.', $key);
             $lsp_path_id = $paths->firstWhere('mplsLspPathTunnelCHopListIndex', $mplsTunnelCHopListIndex)->lsp_path_id;
 
-#            if (isset($mplsTunnelCHopListIndex, $mplsTunnelCHopIndex, $lsp_path_id)) { 
-                $chops->push(new MplsTunnelCHop([
-                    'mplsTunnelCHopListIndex' => $mplsTunnelCHopListIndex,
-                    'mplsTunnelCHopIndex' => $mplsTunnelCHopIndex,
-                    'lsp_path_id' => $lsp_path_id,
-                    'device_id' => $this->getDeviceId(),
-                    'mplsTunnelCHopAddrType' => $value['vRtrMplsTunnelCHopAddrType'],
-                    'mplsTunnelCHopIpv4Addr' => $value['vRtrMplsTunnelCHopIpv4Addr'],
-                    'mplsTunnelCHopIpv6Addr' => $value['vRtrMplsTunnelCHopIpv6Addr'],
-                    'mplsTunnelCHopAsNumber' => $value['vRtrMplsTunnelCHopAsNumber'],
-                    'mplsTunnelCHopStrictOrLoose' => $value['vRtrMplsTunnelCHopStrictOrLoose'],
-                    'mplsTunnelCHopRouterId' => $value['vRtrMplsTunnelCHopRtrID'],
-                ]));
+#            if (isset($mplsTunnelCHopListIndex, $mplsTunnelCHopIndex, $lsp_path_id)) {
+            $chops->push(new MplsTunnelCHop([
+                'mplsTunnelCHopListIndex' => $mplsTunnelCHopListIndex,
+                'mplsTunnelCHopIndex' => $mplsTunnelCHopIndex,
+                'lsp_path_id' => $lsp_path_id,
+                'device_id' => $this->getDeviceId(),
+                'mplsTunnelCHopAddrType' => $value['vRtrMplsTunnelCHopAddrType'],
+                'mplsTunnelCHopIpv4Addr' => $value['vRtrMplsTunnelCHopIpv4Addr'],
+                'mplsTunnelCHopIpv6Addr' => $value['vRtrMplsTunnelCHopIpv6Addr'],
+                'mplsTunnelCHopAsNumber' => $value['vRtrMplsTunnelCHopAsNumber'],
+                'mplsTunnelCHopStrictOrLoose' => $value['vRtrMplsTunnelCHopStrictOrLoose'],
+                'mplsTunnelCHopRouterId' => $value['vRtrMplsTunnelCHopRtrID'],
+            ]));
 #            }
         }
         return $chops;

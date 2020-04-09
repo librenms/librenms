@@ -109,16 +109,16 @@ function process_syslog($entry, $update)
             if (empty($entry['program']) and preg_match('#^(?P<program>([^(:]+\([^)]+\)|[^\[:]+\[[^\]]+\])) ?: ?(?P<msg>.*)$#', $entry['msg'], $matches)) {
                 $entry['msg']     = $matches['msg'];
                 $entry['program'] = $matches['program'];
-            } // SYSLOG CONNECTION BROKEN; FD='6', SERVER='AF_INET(123.213.132.231:514)', time_reopen='60'
-            // pam_krb5: authentication failure; logname=root uid=0 euid=0 tty=ssh ruser= rhost=123.213.132.231
-            // Disabled because broke this:
-            // diskio.c: don't know how to handle 10 request
-            // elseif($pos = strpos($entry['msg'], ';') or $pos = strpos($entry['msg'], ':')) {
-            // $entry['program'] = substr($entry['msg'], 0, $pos);
-            // $entry['msg'] = substr($entry['msg'], $pos+1);
-            // }
-            // fallback, better than nothing...
-            elseif (empty($entry['program']) and !empty($entry['facility'])) {
+            } elseif (empty($entry['program']) and !empty($entry['facility'])) {
+                // SYSLOG CONNECTION BROKEN; FD='6', SERVER='AF_INET(123.213.132.231:514)', time_reopen='60'
+                // pam_krb5: authentication failure; logname=root uid=0 euid=0 tty=ssh ruser= rhost=123.213.132.231
+                // Disabled because broke this:
+                // diskio.c: don't know how to handle 10 request
+                // elseif($pos = strpos($entry['msg'], ';') or $pos = strpos($entry['msg'], ':')) {
+                // $entry['program'] = substr($entry['msg'], 0, $pos);
+                // $entry['msg'] = substr($entry['msg'], $pos+1);
+                // }
+                // fallback, better than nothing...
                 $entry['program'] = $entry['facility'];
             }
 
