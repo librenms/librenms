@@ -10,11 +10,6 @@
  * the source code distribution for details.
  */
 
-preg_match("/Hardware\[([^\]]+)\]/m", $device['sysDescr'], $matches);
-$hardware = trim($matches[1]);
-
-preg_match("/^([^\[]+)\[([^\]]+)\],/m", $device['sysDescr'], $matches);
-$version = trim($matches[1]) . " " . trim($matches[2]);
-
-preg_match("/ootcode\[([^\]]+)/m", $device['sysDescr'], $matches);
-$version .= ", Bootcode " . trim($matches[1]);
+preg_match("/^(.*)\[([^\]]+)\], Bootcode\[([^\]]+)\], Hardware\[([^\]]+)\]/i", $device['sysDescr'], $matches);
+$version = $matches[1] . ' ' . $matches[2] . ', Bootcode ' . $matches[3];
+$hardware = $matches[4];
