@@ -12,22 +12,14 @@ class AlertScheduleUtc extends Migration
      */
     public function up()
     {
-        Schema::table('alert_schedule', function (Blueprint $table) {
-            $table->dateTime('start')->nullable()->default('1970-01-02 00:00:01')->change();
-            $table->dateTime('end')->nullable()->default('1970-01-02 00:00:01')->change();
-            $table->date('start_recurring_dt')->nullable()->change();
-            $table->time('start_recurring_hr')->nullable()->change();
-            $table->time('end_recurring_hr')->nullable()->change();
-        });
-
-        DB::table('alert_schedule')->update([
-            'start' => DB::raw("CONVERT_TZ(start, @@global.time_zone, '+00:00')"),
-            'end' => DB::raw("CONVERT_TZ(end, @@global.time_zone, '+00:00')"),
-            'start_recurring_dt' => DB::raw("SUBSTRING_INDEX(CONVERT_TZ(STR_TO_DATE(CONCAT(CONCAT(start_recurring_dt, ' '), start_recurring_hr), '%Y-%m-%d %H:%i:%s'), @@global.time_zone, '+00:00'), ' ', 1)"),
-            'start_recurring_hr' => DB::raw("SUBSTRING_INDEX(CONVERT_TZ(STR_TO_DATE(CONCAT(CONCAT(start_recurring_dt, ' '), start_recurring_hr), '%Y-%m-%d %H:%i:%s'), @@global.time_zone, '+00:00'), ' ', -1)"),
-            'end_recurring_dt' => DB::raw("SUBSTRING_INDEX(CONVERT_TZ(STR_TO_DATE(CONCAT(CONCAT(end_recurring_dt, ' '), end_recurring_hr), '%Y-%m-%d %H:%i:%s'), @@global.time_zone, '+00:00'), ' ', 1)"),
-            'end_recurring_hr' => DB::raw("SUBSTRING_INDEX(CONVERT_TZ(STR_TO_DATE(CONCAT(CONCAT(end_recurring_dt, ' '), end_recurring_hr), '%Y-%m-%d %H:%i:%s'), @@global.time_zone, '+00:00'), ' ', -1)"),
+        DB::table('alert_schedule')->where('recurring', 1)->update([
+            'start' => DB::raw("CONVERT_TZ(IF(`recurring` = 1, STR_TO_DATE(CONCAT(start_recurring_dt, ' ', start_recurring_hr), '%Y-%m-%d %H:%i:%s'), start), @@global.time_zone, '+00:00')"),
+            'end' => DB::raw("CONVERT_TZ(IF(`recurring` = 1, STR_TO_DATE(CONCAT(end_recurring_dt, ' ', end_recurring_hr), '%Y-%m-%d %H:%i:%s'), end), @@global.time_zone, '+00:00')"),
         ]);
+
+        Schema::table('alert_schedule', function (Blueprint $table) {
+            $table->dropColumn(['start_recurring_dt', 'start_recurring_hr', 'end_recurring_dt', 'end_recurring_hr']);
+        });
     }
 
     /**
@@ -37,21 +29,20 @@ class AlertScheduleUtc extends Migration
      */
     public function down()
     {
+        Schema::table('alert_schedule', function (Blueprint $table) {
+            $table->date('start_recurring_dt')->nullable(false)->default('1970-01-01')->after('end');
+            $table->time('start_recurring_hr')->nullable(false)->default('00:00:00')->after('start_recurring_dt');
+            $table->date('end_recurring_dt')->nullable()->after('start_recurring_hr');
+            $table->time('end_recurring_hr')->nullable(false)->default('00:00:00')->after('end_recurring_dt');
+        });
+
         DB::table('alert_schedule')->update([
             'start' => DB::raw("CONVERT_TZ(start, '+00:00', @@global.time_zone)"),
             'end' => DB::raw("CONVERT_TZ(end, '+00:00', @@global.time_zone)"),
-            'start_recurring_dt' => DB::raw("SUBSTRING_INDEX(CONVERT_TZ(STR_TO_DATE(CONCAT(CONCAT(start_recurring_dt, ' '), start_recurring_hr), '%Y-%m-%d %H:%i:%s'), '+00:00', @@global.time_zone), ' ', 1)"),
-            'start_recurring_hr' => DB::raw("SUBSTRING_INDEX(CONVERT_TZ(STR_TO_DATE(CONCAT(CONCAT(start_recurring_dt, ' '), start_recurring_hr), '%Y-%m-%d %H:%i:%s'), '+00:00', @@global.time_zone), ' ', -1)"),
-            'end_recurring_dt' => DB::raw("SUBSTRING_INDEX(CONVERT_TZ(STR_TO_DATE(CONCAT(CONCAT(end_recurring_dt, ' '), end_recurring_hr), '%Y-%m-%d %H:%i:%s'), '+00:00', @@global.time_zone), ' ', 1)"),
-            'end_recurring_hr' => DB::raw("SUBSTRING_INDEX(CONVERT_TZ(STR_TO_DATE(CONCAT(CONCAT(end_recurring_dt, ' '), end_recurring_hr), '%Y-%m-%d %H:%i:%s'), '+00:00', @@global.time_zone), ' ', -1)"),
+            'start_recurring_dt' => DB::raw("DATE(CONVERT_TZ(start, '+00:00', @@global.time_zone))"),
+            'start_recurring_hr' => DB::raw("TIME(CONVERT_TZ(start, '+00:00', @@global.time_zone))"),
+            'end_recurring_dt' => DB::raw("DATE(CONVERT_TZ(end, '+00:00', @@global.time_zone))"),
+            'end_recurring_hr' => DB::raw("TIME(CONVERT_TZ(end, '+00:00', @@global.time_zone))"),
         ]);
-
-        Schema::table('alert_schedule', function (Blueprint $table) {
-            $table->dateTime('start')->nullable(false)->default('1970-01-02 00:00:01')->change();
-            $table->dateTime('end')->nullable(false)->default('1970-01-02 00:00:01')->change();
-            $table->date('start_recurring_dt')->nullable(false)->default('1970-01-01')->change();
-            $table->time('start_recurring_hr')->nullable(false)->default('00:00:00')->change();
-            $table->time('end_recurring_hr')->nullable(false)->default('00:00:00')->change();
-        });
     }
 }
