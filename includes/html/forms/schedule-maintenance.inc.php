@@ -12,6 +12,8 @@
  * the source code distribution for details.
  */
 
+use Carbon\Carbon;
+
 if (!Auth::user()->hasGlobalAdmin()) {
     header('Content-type: text/plain');
     die('ERROR: You need to be admin');
@@ -68,7 +70,7 @@ if ($sub_type == 'new-maintenance') {
                 $message .= 'Please check end recurring date<br />';
             }
         } else {
-            $end_recurring_dt = null;
+            $end_recurring_dt = '9000-09-09';
         }
 
         if (empty($start_recurring_hr)) {
@@ -110,13 +112,15 @@ if ($sub_type == 'new-maintenance') {
     }
 
     if (empty($message)) {
-        if (empty($schedule_id)) {
-            $schedule_id = dbInsert(array('recurring' => $recurring, 'start' => $start, 'end' => $end, 'start_recurring_dt' => $start_recurring_dt, 'end_recurring_dt' => $end_recurring_dt, 'start_recurring_hr' => $start_recurring_hr, 'end_recurring_hr' => $end_recurring_hr, 'recurring_day' => $recurring_day, 'title' => $title, 'notes' => $notes), 'alert_schedule');
-        } else {
-            dbUpdate(array('recurring' => $recurring, 'start' => $start, 'end' => $end, 'start_recurring_dt' => $start_recurring_dt, 'end_recurring_dt' => $end_recurring_dt, 'start_recurring_hr' => $start_recurring_hr, 'end_recurring_hr' => $end_recurring_hr, 'recurring_day' => $recurring_day, 'title' => $title, 'notes' => $notes), 'alert_schedule', '`schedule_id`=?', array($schedule_id));
-        }
+        $alert_schedule = \App\Models\AlertSchedule::findOrNew($schedule_id);
+        $alert_schedule->title = $title;
+        $alert_schedule->recurring = $recurring;
+        $alert_schedule->start = Carbon::parse($recurring ? "$start_recurring_dt $start_recurring_hr": $start)->tz('UTC');
+        $alert_schedule->end = Carbon::parse($recurring ? "$end_recurring_dt  $start_recurring_hr" : $end)->tz('UTC');
+        $alert_schedule->notes = $notes;
+        $alert_schedule->save();
 
-        if ($schedule_id > 0) {
+        if ($alert_schedule->schedule_id > 0) {
             $items = array();
             $fail  = 0;
 
