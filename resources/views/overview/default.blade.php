@@ -3,6 +3,7 @@
 @section('title', __('Overview'))
 
 @section('content')
+<div class="container-fluid">
 @include('alerts.modals.ack')
 @include('alerts.modals.notes')
 @if (!$bare)
@@ -147,6 +148,7 @@
 <span class="message" id="message"></span>
 <div class="gridster grid">
     <ul></ul>
+</div>
 </div>
 @endsection
 
