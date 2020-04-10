@@ -158,10 +158,10 @@ class Airos extends OS implements
      */
     public function discoverWirelessQuality()
     {
-        //$oid = '.1.3.6.1.4.1.41112.1.4.6.1.3.1'; //OLD UBNT-AirMAX-MIB::ubntAirMaxQuality.1
+        $oidAirMax = '.1.3.6.1.4.1.41112.1.4.6.1.3.1'; //OLD UBNT-AirMAX-MIB::ubntAirMaxQuality.1
         $oidAirTime = '.1.3.6.1.4.1.41112.1.4.6.1.7.1'; //UBNT-AirMMAX-MIB::ubntAirMaxAirtime.1
         return array(
-            //new WirelessSensor('quality', $this->getDeviceId(), $oid, 'airos', 1, 'airMAX Quality'),
+            new WirelessSensor('quality', $this->getDeviceId(), $oidAirMax, 'airos', 1, 'airMAX Quality'),
             new WirelessSensor('quality', $this->getDeviceId(), $oidAirTime, 'airos', 1, 'Airtime', null, 1, 10),
         );
     }
