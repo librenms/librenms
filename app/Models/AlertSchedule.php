@@ -25,15 +25,54 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class AlertSchedule extends Model
 {
+    /** @property Carbon start */
     public $timestamps = false;
     protected $table = 'alert_schedule';
     protected $primaryKey = 'schedule_id';
+    protected $casts = [
+        'start' => 'datetime',
+        'end' => 'datetime',
+    ];
+    protected $appends = ['start_recurring_dt', 'end_recurring_dt', 'start_recurring_hr', 'end_recurring_hr'];
+
+    private $array = [
+        'start_recurring_dt'     => $schedule->recurring == 0  ? '' : $start->toDateString(),
+        'end_recurring_dt'       => $schedule->recurring == 0 || $end->year == 9000 ? '' : $end->toDateString(),
+        'start_recurring_hr'     => $schedule->recurring == 0 ? '' : $start->toTimeString('minute'),
+        'end_recurring_hr'       => $schedule->recurring == 0 ? '' : $end->toTimeString('minute'),
+        'recurring_day'          => $schedule->recurring == 0 ? '' : str_replace($days['from'], $days['to'], $schedule->recurring_day),
+    ];
+
+    // ---- Accessors/Mutators ----
+
+    public function getStartRecurringDtAttribute()
+    {
+        return $this->start->tz()->toDateString();
+    }
+
+    public function getStartRecurringHrAttribute() {
+        return $this->start->toTimeString('minute');
+    }
+
+    public function getEndRecurringDtAttribute() {
+        return $this->end->toDateString();
+    }
+
+    public function getEndRecurringHrAttribute() {
+        return $this->end->toTimeString('minute');
+    }
+
+    public function setStartRecurringDtAttribute($date) {
+        $date = Carbon::parse($date);
+        $this->attributes['start']->set
+    }
 
     // ---- Query scopes ----
 
