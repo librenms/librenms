@@ -40,7 +40,8 @@ class AlertSchedule extends Model
     public function scopeIsActive($query)
     {
         return $query->where(function ($query) {
-            $now = CarbonImmutable::now();
+            $now = CarbonImmutable::now('UTC');
+
             $query->where(function ($query) use ($now) {
                 // Non recurring simply between start and end
                 $query->where('recurring', 0)
@@ -49,22 +50,14 @@ class AlertSchedule extends Model
             })->orWhere(function ($query) use ($now) {
                 $query->where('recurring', 1)
                     // Check the time is after the start date and before the end date, or end date is not set
-                    ->where(function ($query) use ($now) {
-                        $query->where('start_recurring_dt', '<=', $now->format('%Y-%m-%d'))
-                            ->where(function ($query) use ($now) {
-                                $query->where('end_recurring_dt', '>=', $now->format('%Y-%m-%d'))
-                                    ->orWhereNull('end_recurring_dt')
-                                    ->orWhere('end_recurring_dt', '0000-00-00')
-                                    ->orWhere('end_recurring_dt', '');
-                            });
-                    })
-                    // Check the time is between the start and end hour/minutes/seconds
-                    ->where('start_recurring_hr', '<=', $now->format('%H:%i:%s'))
-                    ->where('end_recurring_hr', '>=', $now->format('%H:%i:%s'))
+                    ->where('start', '<=', $now)
+                    ->where('end', '>=', $now)
+                    ->whereTime('start', '<=', $now->toTimeString())
+                    ->whereTime('end', '>=', $now->toTimeString())
                     // Check we are on the correct day of the week
                     ->where(function ($query) use ($now) {
                             /** @var Builder $query */
-                            $query->where('recurring_day', 'like', '%' . $now->format('%w') . '%')
+                            $query->where('recurring_day', 'like', $now->format('%N%'))
                                 ->orWhereNull('recurring_day')
                                 ->orWhere('recurring_day', '');
                     });
