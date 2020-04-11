@@ -37,7 +37,17 @@ class AlertSchedule extends Model
     protected $table = 'alert_schedule';
     protected $primaryKey = 'schedule_id';
     protected $appends = ['start_recurring_dt', 'end_recurring_dt', 'start_recurring_hr', 'end_recurring_hr'];
+
     private $timezone;
+    private $days = [
+        'Mo' => 1,
+        'Tu' => 2,
+        'We' => 3,
+        'Th' => 4,
+        'Fr' => 5,
+        'Sa' => 6,
+        'Su' => 7,
+    ];
 
     public function __construct(array $attributes = [])
     {
@@ -46,6 +56,23 @@ class AlertSchedule extends Model
     }
 
     // ---- Accessors/Mutators ----
+
+    public function getRecurringDayAttribute() {
+        return explode(',', str_replace(array_values($this->days), array_keys($this->days), $this->attributes['recurring_day']));
+    }
+
+    public function setRecurringDayAttribute($days) {
+        $days = is_array($days) ? $days : explode(',', $days);
+        $new_days = [];
+
+        foreach ($days as $day) {
+            if (isset($this->days[$day])) {
+                $new_days[] = $this->days[$day];
+            }
+        }
+
+        $this->attributes['recurring_day'] = implode(',', $new_days);
+    }
 
     public function getStartAttribute() {
         return Date::parse($this->attributes['start'], 'UTC')->tz($this->timezone);
