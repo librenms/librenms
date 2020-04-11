@@ -155,6 +155,7 @@ $('#schedule-maintenance').on('show.bs.modal', function (event) {
             data: { type: "schedule-maintenance", sub_type: "parse-maintenance", schedule_id: schedule_id },
             dataType: "json",
             success: function(output) {
+                console.log(output);
                 var maps = $('#maps');
                 var selected = [];
                 $.each ( output['targets'], function( key, item ) {

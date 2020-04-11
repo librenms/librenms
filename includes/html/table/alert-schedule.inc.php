@@ -60,35 +60,21 @@ if (isset($sort) && !empty($sort)) {
     $query->orderBy('start')->orderBy('title');
 }
 
-$now = Carbon::now(config('app.timezone'));
-$days = [
-    'from' => ['1', '2', '3', '4', '5', '6', '7'],
-    'to' => ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su']
-];
+$now = Carbon::now();
 
-$schedules = $query->get()->map(function ($schedule) use ($now, $days) {
-    $start = Carbon::parse($schedule->start, 'UTC')->tz(config('app.timezone'));
-    $end   = Carbon::parse($schedule->end, 'UTC')->tz(config('app.timezone'));
-
-    $status = $end < $now ? 1 : 0; // set or lapsed
+$schedules = $query->get()->map(function ($schedule) use ($now) {
+    /** @var \App\Models\AlertSchedule $schedule */
+    $status = $schedule->start < $now ? 1 : 0; // set or lapsed
     // check if current
-    if ($now->between($start, $end) && (!$schedule->recurring || $now->between($start->toTimeString(), $end->toTimeString()))) {
+    if ($now->between($schedule->start, $schedule->end) && (!$schedule->recurring || $now->between($schedule->start_recurring_hr, $schedule->end_recurring_hr))) {
         $status = 2;
     }
 
-    return [
-        'title'                  => $schedule->title,
-        'recurring'              => $schedule->recurring ? 'yes' : 'no',
-        'start'                  => $schedule->recurring ? '' : $start->toDateTimeString('minute'),
-        'end'                    => $schedule->recurring ? '' : $end->toDateTimeString('minute'),
-        'start_recurring_dt'     => $schedule->recurring == 0  ? '' : $start->toDateString(),
-        'end_recurring_dt'       => $schedule->recurring == 0 || $end->year == 9000 ? '' : $end->toDateString(),
-        'start_recurring_hr'     => $schedule->recurring == 0 ? '' : $start->toTimeString('minute'),
-        'end_recurring_hr'       => $schedule->recurring == 0 ? '' : $end->toTimeString('minute'),
-        'recurring_day'          => $schedule->recurring == 0 ? '' : str_replace($days['from'], $days['to'], $schedule->recurring_day),
-        'id'                     => $schedule->schedule_id,
-        'status'                 => $status,
-    ];
+    $data = $schedule->toArray();
+    $data['recurring_day'] = implode(',', $data['recurring_day']);
+    $data['status'] = $status;
+
+    return $data;
 });
 
 echo json_encode([

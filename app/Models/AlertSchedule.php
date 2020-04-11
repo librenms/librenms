@@ -100,7 +100,8 @@ class AlertSchedule extends Model
     }
 
     public function getEndRecurringDtAttribute() {
-        return $this->end->toDateString();
+        $end = $this->end;
+        return $end->year == '9000' ? null : $end->toDateString();
     }
 
     public function getEndRecurringHrAttribute() {

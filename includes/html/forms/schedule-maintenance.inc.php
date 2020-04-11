@@ -114,10 +114,17 @@ if ($sub_type == 'new-maintenance') {
     if (empty($message)) {
         $alert_schedule = \App\Models\AlertSchedule::findOrNew($schedule_id);
         $alert_schedule->title = $title;
-        $alert_schedule->recurring = $recurring;
-        $alert_schedule->start = Carbon::parse($recurring ? "$start_recurring_dt $start_recurring_hr": $start)->tz('UTC');
-        $alert_schedule->end = Carbon::parse($recurring ? "$end_recurring_dt  $start_recurring_hr" : $end)->tz('UTC');
         $alert_schedule->notes = $notes;
+        $alert_schedule->recurring = $recurring;
+        $alert_schedule->start = $start;
+        $alert_schedule->end = $end;
+
+        if ($recurring) {
+            $alert_schedule->start_recurring_dt = $start_recurring_dt;
+            $alert_schedule->start_recurring_hr = $start_recurring_hr;
+            $alert_schedule->end_recurring_dt = $end_recurring_dt;
+            $alert_schedule->end_recurring_hr = $end_recurring_hr;
+        }
         $alert_schedule->save();
 
         if ($alert_schedule->schedule_id > 0) {
@@ -173,7 +180,7 @@ if ($sub_type == 'new-maintenance') {
     );
 } elseif ($sub_type == 'parse-maintenance') {
     $schedule_id = mres($_POST['schedule_id']);
-    $schedule    = dbFetchRow('SELECT * FROM `alert_schedule` WHERE `schedule_id`=?', array($schedule_id));
+    $alert_schedule    = \App\Models\AlertSchedule::findOrFail($schedule_id);
     $items       = [];
     foreach (dbFetchRows('SELECT `alert_schedulable_type`, `alert_schedulable_id` FROM `alert_schedulables` WHERE `schedule_id`=?', [$schedule_id]) as $target) {
         $id = $target['alert_schedulable_id'];
@@ -192,19 +199,9 @@ if ($sub_type == 'new-maintenance') {
         ];
     }
 
-    $response = array(
-        'start'                   => $schedule['start'],
-        'end'                     => $schedule['end'],
-        'title'                   => $schedule['title'],
-        'notes'                   => $schedule['notes'],
-        'recurring'               => $schedule['recurring'],
-        'start_recurring_dt'    => ($schedule['start_recurring_dt'] != '0000-00-00' ? $schedule['start_recurring_dt']: '1970-01-02 00:00:01'),
-        'end_recurring_dt'      => ($schedule['end_recurring_dt']!= '0000-00-00' ? $schedule['end_recurring_dt'] : '1970-01-02 00:00:01'),
-        'start_recurring_hr'    => substr($schedule['start_recurring_hr'], 0, 5),
-        'end_recurring_hr'       => substr($schedule['end_recurring_hr'], 0, 5),
-        'recurring_day'           => $schedule['recurring_day'],
-        'targets'                => $items,
-    );
+    $response = $alert_schedule->toArray();
+    $response['recurring_day'] = $alert_schedule->getAttribute('recurring_day');
+    $response['targets'] = $items;
 } elseif ($sub_type == 'del-maintenance') {
     $schedule_id = mres($_POST['del_schedule_id']);
     dbDelete('alert_schedule', '`schedule_id`=?', array($schedule_id));
