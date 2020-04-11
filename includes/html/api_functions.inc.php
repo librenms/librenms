@@ -24,6 +24,7 @@ use LibreNMS\Config;
 use LibreNMS\Data\Store\Datastore;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IPv4;
+use LibreNMS\Util\IP;
 
 function api_success($result, $result_name, $message = null, $code = 200, $count = null, $extra = null)
 {
@@ -517,11 +518,19 @@ function list_bgp(\Illuminate\Http\Request $request)
     }
     if (!empty($local_address)) {
         $sql .= ' AND `bgpPeers`.`bgpLocalAddr` = ?';
-        $sql_params[] = $local_address;
+        try {
+            $sql_params[] = IP::parse($local_address)->uncompressed();
+        } catch (InvalidIpException $e) {
+            return api_error(400, "Invalid local address");
+        }
     }
     if (!empty($remote_address)) {
         $sql .= ' AND `bgpPeers`.`bgpPeerIdentifier` = ?';
-        $sql_params[] = $remote_address;
+        try {
+            $sql_params[] = IP::parse($remote_address)->uncompressed();
+        } catch (InvalidIpException $e) {
+            return api_error(400, "Invalid remote address");
+        }
     }
 
     $bgp_sessions       = dbFetchRows("SELECT `bgpPeers`.* FROM `bgpPeers` LEFT JOIN `devices` ON `bgpPeers`.`device_id` = `devices`.`device_id` WHERE `bgpPeerState` IS NOT NULL AND `bgpPeerState` != '' $sql", $sql_params);
