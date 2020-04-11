@@ -83,6 +83,12 @@ class OSModulesTest extends DBTestCase
     {
         $this->requireSnmpsim();  // require snmpsim for tests
 
+        // stub out Log::event, we don't need to store them for these tests
+        $this->app->bind('log', function ($app) {
+            return \Mockery::mock('\App\Facades\LogManager[event]', [$app])
+                ->shouldReceive('event');
+        });
+
         try {
             set_debug(false); // avoid all undefined index errors in the legacy code
             $helper = new ModuleTestHelper($modules, $os, $variant);
