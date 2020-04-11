@@ -56,7 +56,32 @@ class Sensor extends DeviceRelatedModel
 
     public static function getTypes()
     {
-        return ['Voltage', 'Temperature', 'Fanspeed'];
+        return ['airflow',
+                'ber',
+                'chromatic_dispersion',
+                'cooling',
+                'count',
+                'current',
+                'dbm',
+                'delay',
+                'eer',
+                'fanspeed',
+                'frequency',
+                'humidity',
+                'load',
+                'power_consumed',
+                'power_factor',
+                'power',
+                'pressure',
+                'quality_factor',
+                'runtime',
+                'signal',
+                'snr',
+                'state',
+                'temperature',
+                'voltage',
+                'waterflow',
+                ];
     }
 
     // for the legacy menu
