@@ -28,15 +28,20 @@ namespace App\Models;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Date;
+use DB;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class AlertSchedule extends Model
 {
+    const SCHEDULE_SET = 0;
+    const SCHEDULE_ACTIVE = 2;
+    const SCHEDULE_LAPSED = 1;
+
     public $timestamps = false;
     protected $table = 'alert_schedule';
     protected $primaryKey = 'schedule_id';
-    protected $appends = ['start_recurring_dt', 'end_recurring_dt', 'start_recurring_hr', 'end_recurring_hr'];
+    protected $appends = ['start_recurring_dt', 'end_recurring_dt', 'start_recurring_hr', 'end_recurring_hr', 'status'];
 
     private $timezone;
     private $days = [
@@ -57,11 +62,13 @@ class AlertSchedule extends Model
 
     // ---- Accessors/Mutators ----
 
-    public function getRecurringDayAttribute() {
+    public function getRecurringDayAttribute()
+    {
         return explode(',', str_replace(array_values($this->days), array_keys($this->days), $this->attributes['recurring_day']));
     }
 
-    public function setRecurringDayAttribute($days) {
+    public function setRecurringDayAttribute($days)
+    {
         $days = is_array($days) ? $days : explode(',', $days);
         $new_days = [];
 
@@ -74,19 +81,23 @@ class AlertSchedule extends Model
         $this->attributes['recurring_day'] = implode(',', $new_days);
     }
 
-    public function getStartAttribute() {
+    public function getStartAttribute()
+    {
         return Date::parse($this->attributes['start'], 'UTC')->tz($this->timezone);
     }
 
-    public function setStartAttribute($start) {
-       $this->attributes['start'] = $this->fromDateTime(Date::parse($start)->tz('UTC'));
+    public function setStartAttribute($start)
+    {
+        $this->attributes['start'] = $this->fromDateTime(Date::parse($start)->tz('UTC'));
     }
 
-    public function getEndAttribute() {
+    public function getEndAttribute()
+    {
         return Date::parse($this->attributes['end'], 'UTC')->tz($this->timezone);
     }
 
-    public function setEndAttribute($end) {
+    public function setEndAttribute($end)
+    {
         $this->attributes['end'] = $this->fromDateTime(Date::parse($end)->tz('UTC'));
     }
 
@@ -95,33 +106,68 @@ class AlertSchedule extends Model
         return $this->start->toDateString();
     }
 
-    public function getStartRecurringHrAttribute() {
+    public function getStartRecurringHrAttribute()
+    {
         return $this->start->toTimeString('minute');
     }
 
-    public function getEndRecurringDtAttribute() {
+    public function getEndRecurringDtAttribute()
+    {
         $end = $this->end;
         return $end->year == '9000' ? null : $end->toDateString();
     }
 
-    public function getEndRecurringHrAttribute() {
+    public function getEndRecurringHrAttribute()
+    {
         return $this->end->toTimeString('minute');
     }
 
-    public function setStartRecurringDtAttribute($date) {
+    public function setStartRecurringDtAttribute($date)
+    {
         $this->start = $this->start->setDateFrom(Date::parse($date, $this->timezone));
     }
 
-    public function setStartRecurringHrAttribute($time) {
+    public function setStartRecurringHrAttribute($time)
+    {
         $this->start = $this->start->setTimeFrom(Date::parse($time, $this->timezone));
     }
 
-    public function setEndRecurringDtAttribute($date) {
+    public function setEndRecurringDtAttribute($date)
+    {
         $this->end = $this->end->setDateFrom(Date::parse($date ?: '9000-09-09', $this->timezone));
     }
 
-    public function setEndRecurringHrAttribute($time) {
+    public function setEndRecurringHrAttribute($time)
+    {
         $this->end = $this->end->setTimeFrom(Date::parse($time, $this->timezone));
+    }
+
+    /**
+     * @return int Status 0: SCHEDULE_SET, 1: SCHEDULE_LAPSED, 2: SCHEDULE_ACTIVE
+     */
+    public function getStatusAttribute()
+    {
+        $now = Carbon::now();
+
+        if ($now > $this->end) {
+            return self::SCHEDULE_LAPSED;
+        }
+
+        if (!$this->recurring) {
+            return $now > $this->start ? self::SCHEDULE_ACTIVE : self::SCHEDULE_SET;
+        }
+
+        // recurring
+        $now_time = $now->secondsSinceMidnight();
+        $start_time = $this->start->secondsSinceMidnight();
+        $end_time = $this->end->secondsSinceMidnight();
+        $after_start = $now > $this->start;
+        $spans_days = $start_time > $end_time;
+
+        // check inside start and end times or outside start and end times (if we span a day)
+        $active = $spans_days ? ($after_start && ($now_time < $end_time || $now_time >= $start_time)) : ($now_time >= $start_time && $now_time < $end_time);
+
+        return $active && str_contains($this->attributes['recurring_day'], $now->format('N')) ? self::SCHEDULE_ACTIVE : self::SCHEDULE_SET;
     }
 
     // ---- Query scopes ----
@@ -130,27 +176,36 @@ class AlertSchedule extends Model
     {
         return $query->where(function ($query) {
             $now = CarbonImmutable::now('UTC');
-
-            $query->where(function ($query) use ($now) {
-                // Non recurring simply between start and end
-                $query->where('recurring', 0)
-                    ->where('start', '<=', $now)
-                    ->where('end', '>=', $now);
-            })->orWhere(function ($query) use ($now) {
-                $query->where('recurring', 1)
-                    // Check the time is after the start date and before the end date, or end date is not set
-                    ->where('start', '<=', $now)
-                    ->where('end', '>=', $now)
-                    ->whereTime('start', '<=', $now->toTimeString())
-                    ->whereTime('end', '>=', $now->toTimeString())
-                    // Check we are on the correct day of the week
-                    ->where(function ($query) use ($now) {
-                            /** @var Builder $query */
-                            $query->where('recurring_day', 'like', $now->format('%N%'))
-                                ->orWhereNull('recurring_day')
-                                ->orWhere('recurring_day', '');
+            $query->where('start', '<=', $now)
+                ->where('end', '>=', $now)
+                ->where(function ($query) use ($now) {
+                    $query->where('recurring', 0) // Non recurring simply between start and end
+                    ->orWhere(function ($query) use ($now) {
+                        $query->where('recurring', 1)
+                            // Check the time is after the start date and before the end date, or end date is not set
+                            ->where(function ($query) use ($now) {
+                                $query->where(function ($query) use ($now) {
+                                    // normal, inside one day
+                                    $query->whereTime('start', '<', DB::raw("time(`end`)"))
+                                        ->whereTime('start', '<=', $now->toTimeString())
+                                        ->whereTime('end', '>', $now->toTimeString());
+                                })->orWhere(function ($query) use ($now) {
+                                    // outside, spans days
+                                    $query->whereTime('start', '>', DB::raw("time(`end`)"))
+                                        ->where(function ($query) use ($now) {
+                                            $query->whereTime('end', '<=', $now->toTimeString())
+                                                ->orWhereTime('start', '>', $now->toTimeString());
+                                        });
+                                });
+                            })
+                            // Check we are on the correct day of the week
+                            ->where(function ($query) use ($now) {
+                                $query->where('recurring_day', 'like', $now->format('%N%'))
+                                    ->orWhereNull('recurring_day')
+                                    ->orWhere('recurring_day', '');
+                            });
                     });
-            });
+                });
         });
     }
 

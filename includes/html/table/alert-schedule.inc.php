@@ -23,15 +23,14 @@ if (!Auth::user()->hasGlobalRead()) {
     ];
 }
 
-$query = \App\Models\AlertSchedule::query();
-
-if (isset($searchPhrase) && !empty($searchPhrase)) {
-    $query->where(function ($query) use ($searchPhrase) {
-        $query->where('title', 'like', "%$searchPhrase%")
-            ->orWhere('start', 'like', "%$searchPhrase%")
-            ->orWhere('end', 'like', "%$searchPhrase%");
+$query = \App\Models\AlertSchedule::query()
+    ->when($searchPhrase, function ($query, $searchPhrase) {
+        $query->where(function ($query) use ($searchPhrase) {
+            $query->where('title', 'like', "%$searchPhrase%")
+                ->orWhere('start', 'like', "%$searchPhrase%")
+                ->orWhere('end', 'like', "%$searchPhrase%");
+        });
     });
-}
 
 $total = $query->count();
 
@@ -64,15 +63,16 @@ $now = Carbon::now();
 
 $schedules = $query->get()->map(function ($schedule) use ($now) {
     /** @var \App\Models\AlertSchedule $schedule */
-    $status = $schedule->start < $now ? 1 : 0; // set or lapsed
-    // check if current
-    if ($now->between($schedule->start, $schedule->end) && (!$schedule->recurring || $now->between($schedule->start_recurring_hr, $schedule->end_recurring_hr))) {
-        $status = 2;
-    }
-
-    $data = $schedule->toArray();
-    $data['recurring_day'] = implode(',', $data['recurring_day']);
-    $data['status'] = $status;
+    $data = $schedule->only(['title', 'notes']);
+    $data['start'] = $schedule->recurring ? '' : $schedule->start->toDateTimeString('minutes');
+    $data['end'] = $schedule->recurring ? '' : $schedule->end->toDateTimeString('minutes');
+    $data['start_recurring_dt'] = $schedule->recurring ? $schedule->start_recurring_dt : '';
+    $data['start_recurring_hr'] = $schedule->recurring ? $schedule->start_recurring_hr : '';
+    $data['end_recurring_dt'] = $schedule->recurring ? $schedule->end_recurring_dt : '';
+    $data['end_recurring_hr'] = $schedule->recurring ? $schedule->end_recurring_hr : '';
+    $data['recurring'] = $schedule->recurring ? __('Yes') : __('No');
+    $data['recurring_day'] = $schedule->recurring ? implode(',', $data['recurring_day']) : '';
+    $data['status'] = $schedule->status;
 
     return $data;
 });

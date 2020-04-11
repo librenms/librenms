@@ -34,7 +34,7 @@ if ($sub_type == 'new-maintenance') {
 
     $title = mres($_POST['title']);
     $notes = mres($_POST['notes']);
-    $recurring = mres($_POST['recurring']);
+    $recurring = $_POST['recurring'] ? 1 : 0;
     $start_recurring_dt = mres($_POST['start_recurring_dt']);
     $end_recurring_dt = mres($_POST['end_recurring_dt']);
     $start_recurring_hr = mres($_POST['start_recurring_hr']);
