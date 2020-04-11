@@ -61,9 +61,12 @@ if (isset($sort) && !empty($sort)) {
 
 $now = Carbon::now();
 
+//header('Caontent-Type: text/html');
+
 $schedules = $query->get()->map(function ($schedule) use ($now) {
     /** @var \App\Models\AlertSchedule $schedule */
     $data = $schedule->only(['title', 'notes']);
+    $data['id'] = $schedule->schedule_id;
     $data['start'] = $schedule->recurring ? '' : $schedule->start->toDateTimeString('minutes');
     $data['end'] = $schedule->recurring ? '' : $schedule->end->toDateTimeString('minutes');
     $data['start_recurring_dt'] = $schedule->recurring ? $schedule->start_recurring_dt : '';
@@ -71,7 +74,7 @@ $schedules = $query->get()->map(function ($schedule) use ($now) {
     $data['end_recurring_dt'] = $schedule->recurring ? $schedule->end_recurring_dt : '';
     $data['end_recurring_hr'] = $schedule->recurring ? $schedule->end_recurring_hr : '';
     $data['recurring'] = $schedule->recurring ? __('Yes') : __('No');
-    $data['recurring_day'] = $schedule->recurring ? implode(',', $data['recurring_day']) : '';
+    $data['recurring_day'] = $schedule->recurring ? implode(',', $schedule->recurring_day) : '';
     $data['status'] = $schedule->status;
 
     return $data;

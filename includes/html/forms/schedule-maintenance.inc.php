@@ -200,7 +200,7 @@ if ($sub_type == 'new-maintenance') {
     }
 
     $response = $alert_schedule->toArray();
-    $response['recurring_day'] = $alert_schedule->getAttribute('recurring_day');
+    $response['recurring_day'] = $alert_schedule->getOriginal('recurring_day');
     $response['targets'] = $items;
 } elseif ($sub_type == 'del-maintenance') {
     $schedule_id = mres($_POST['del_schedule_id']);
