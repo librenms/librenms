@@ -30,6 +30,7 @@
         "ext-session": "*",
         "ext-xml": "*",
         "amenadiel/jpgraph": "^3.6",
+        "clue/socket-raw": "^1.4",
         "dapphp/radius": "^2.0",
         "darkghosthunter/larapoke": "^3.1",
         "doctrine/dbal": "^2.9",
@@ -58,15 +59,14 @@
         "beyondcode/laravel-dump-server": "^1.0",
         "filp/whoops": "^2.0",
         "fzaninotto/faker": "^1.4",
-        "jakub-onderka/php-console-highlighter": "*",
-        "jakub-onderka/php-parallel-lint": "*",
         "justinrainbow/json-schema": "^5.2",
         "laravel/dusk": "^5.0",
         "mockery/mockery": "^1.0",
         "nunomaduro/collision": "^3.0",
+        "php-parallel-lint/php-parallel-lint": "^1.1",
         "phpunit/phpunit": "^7.5",
-        "squizlabs/php_codesniffer": "^2.9.1",
-        "staudenmeir/dusk-updater": "^1.0"
+        "squizlabs/php_codesniffer": "^3.5",
+        "staudenmeir/dusk-updater": "^1.1"
     },
     "suggest": {
         "ext-memcached": "Required if you utilize distributed polling",
@@ -78,7 +78,7 @@
         "exclude-from-classmap": [
             "/vendor/laravel/laravel/database/",
             "/vendor/laravel/laravel/app/",
-            "/vendor/jakub-onderka/php-parallel-lint/src/JsonSerializable.php"
+            "/html/plugins"
         ],
         "classmap": [
             "database/seeds",

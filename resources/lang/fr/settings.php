@@ -4,6 +4,7 @@ return [
     'readonly' => 'Dejà configuré dans config.php, le supprimer avant de pouvoir l\'éditer ici',
     'groups' => [
         'alerting' => 'Alertes',
+        'authorization' => 'Autorisation',
         'auth' => 'Comptes et Utilisateurs',
         'external' => 'Modules Externes',
         'global' => 'Liste Globale',
@@ -17,14 +18,21 @@ return [
         'alerting' => [
             'general' => 'Réglages généraux d\'Alertes',
             'email' => 'Options des emails',
+            'rules' => 'Réglages généraux des Règles d\'Alertes',
         ],
         'auth' => [
-            'general' => 'Réglages généraux d\'Autorisation',
+            'general' => 'Réglages généraux d\'Accès',
             'ad' => 'Réglages Active Directory',
             'ldap' => 'Réglages LDAP'
         ],
+        'authorization' => [
+            'device-group' => 'Réglages de Groupes d\'équipements'
+        ],
         'discovery' => [
-            'general' => 'Réglages généraux de Découverte'
+            'general' => 'Réglages généraux de Découverte',
+            'route' => 'Module: Routes',
+            'discovery_modules' => 'Activation des Modules de Découverte',
+            'storage' => 'Module: Stockage'
         ],
         'external' => [
             'binaries' => 'Emplacements des Exécutables',
@@ -65,6 +73,40 @@ return [
         'addhost_alwayscheckip' => [
             'description' => 'Vérifier les adresses IP déjà connues avant d\'ajouter un équipement',
             'help' => 'Si un équipement est ajouté via son adresse IP, une vérification sera faite pour contrôler que l\'IP n\'est pas déjà connue. Si c\'est le cas, l\'équipement ne sera pas ajouté. Si l\'équipement est ajouté par son nom DNS, cette vérification n\'est pas effectuée. Si ce réglage est actif, les noms DNS sont résolus et la vérification sera bien effectuée. Ceci permet d\'éviter les duplications accidentelles d\'équipements.'
+        ],
+        'alert_rule' => [
+            'severity' => [
+                'description' => 'Sévérité',
+                'help' => 'Séverité par défault de l\'alerte'
+            ],
+            'max_alerts' => [
+                'description' => 'Répétitions',
+                'help' => 'Nombre d\'Alertes à envoyer'
+            ],
+            'delay' => [
+                'description' => 'Delai avant notification',
+                'help' => 'Delai avant de déclencher l\'envoi des notifications'
+            ],
+            'interval' => [
+                'description' => 'Intervalle de répétition',
+                'help' => 'Intervalle avant de déclencher à nouveau une alerte'
+            ],
+            'mute_alerts' => [
+                'description' => 'Silence',
+                'help' => 'Désactiver l\'envoi des notifications et conserver seulement l\'affichage GUI'
+            ],
+            'invert_rule_match' => [
+                'description' => 'Inverser la condition',
+                'help' => 'Alerter seulement si la règle est fausse'
+            ],
+            'recovery_alerts' => [
+                'description' => 'Notifier le rétablissement',
+                'help' => 'Générer une notification quand l\'alerte est désactivée'
+            ],
+            'invert_map' => [
+                'description' => 'Tous les équipements sauf liste',
+                'help' => 'L\'alerte s\'appliquera à tous les équipements sauf ceux spécifiés dans la liste'
+            ]
         ],
         'alert' => [
             'ack_until_clear' => [
@@ -312,6 +354,135 @@ return [
         'device_perf_purge' => [
             'description' => 'Stats de performances plus anciennes que (jours)',
             'help' => 'Statistiques de performances des équipements. Le nettoyage effectué par daily.sh'
+        ],
+        'discovery_modules' => [
+            'arp-table' => [
+                'description' => 'ARP Table'
+            ],
+            'applications' => [
+                'description' => 'Applications'
+            ],
+            'bgp-peers' => [
+                'description' => 'BGP Peers'
+            ],
+            'cisco-cbqos' => [
+                'description' => 'Cisco CBQOS'
+            ],
+            'cisco-cef' => [
+                'description' => 'Cisco CEF'
+            ],
+            'cisco-mac-accounting' => [
+                'description' => 'Cisco MAC Accounting'
+            ],
+            'cisco-otv' => [
+                'description' => 'Cisco OTV'
+            ],
+            'cisco-qfp' => [
+                'description' => 'Cisco QFP'
+            ],
+            'cisco-sla' => [
+                'description' => 'Cisco SLA'
+            ],
+            'cisco-pw' => [
+                'description' => 'Cisco PW'
+            ],
+            'cisco-vrf-lite' => [
+                'description' => 'Cisco VRF Lite'
+            ],
+            'discovery-arp' => [
+                'description' => 'Discovery ARP'
+            ],
+            'discovery-protocols' => [
+                'description' => 'Discovery Protocols'
+            ],
+            'entity-physical' => [
+                'description' => 'Entity Physical'
+            ],
+            'entity-state' => [
+                'description' => 'Entity State'
+            ],
+            'fdb-table' => [
+                'description' => 'FDB Table'
+            ],
+            'hr-device' => [
+                'description' => 'HR Device'
+            ],
+            'ipv4-addresses' => [
+                'description' => 'IPv4 Addresses'
+            ],
+            'ipv6-addresses' => [
+                'description' => 'IPv6 Addresses'
+            ],
+            'junose-atm-vp' => [
+                'description' => 'Junose ATM VP'
+            ],
+            'libvirt-vminfo' => [
+                'description' => 'Libvirt VMInfo'
+            ],
+            'loadbalancers' => [
+                'description' => 'Loadbalancers'
+            ],
+            'mef' => [
+                'description' => 'MEF'
+            ],
+            'mempools' => [
+                'description' => 'Mempools'
+            ],
+            'mpls' => [
+                'description' => 'MPLS'
+            ],
+            'ntp' => [
+                'description' => 'NTP'
+            ],
+            'os' => [
+                'description' => 'OS'
+            ],
+            'ports' => [
+                'description' => 'Ports'
+            ],
+            'ports-stack' => [
+                'description' => 'Ports Stack'
+            ],
+            'processors' => [
+                'description' => 'Processors'
+            ],
+
+            'route' => [
+                'description' => 'Route'
+            ],
+
+            'sensors' => [
+                'description' => 'Sensors'
+            ],
+
+            'services' => [
+                'description' => 'Services'
+            ],
+            'storage' => [
+                'description' => 'Storage'
+            ],
+
+            'stp' => [
+                'description' => 'STP'
+            ],
+            'toner' => [
+                'description' => 'Toner'
+            ],
+            'ucd-diskio' => [
+                'description' => 'UCD DiskIO'
+            ],
+            'vlans' => [
+                'description' => 'VLans'
+            ],
+            'vmware-vminfo' => [
+                'description' => 'VMWare VMInfo'
+            ],
+            'vrf' => [
+                'description' => 'VRF'
+            ],
+            'wireless' => [
+                'description' => 'Wireless'
+            ],
         ],
         'distributed_poller' => [
             'description' => 'Activation des sondeurs distribués (`Distributed Pollers`, nécessite des configurations additionnelles)',
@@ -579,6 +750,13 @@ return [
             'description' => 'Journaux de performances des sondeurs (jours)',
             'help' => 'Nettoyage effectué par daily.sh'
         ],
+        'permission' => [
+            'device_group' => [
+                'allow_dynamic' => [
+                    'description' => 'Activer les permissions par groupes d\'équipements dynamiques',
+                ]
+            ]
+        ],
         'ping' => [
             'description' => 'Chemin vers `ping`'
         ],
@@ -593,6 +771,10 @@ return [
         'public_status' => [
             'description' => 'Afficher le status publiquement',
             'help' => 'Afficher le status de certains équipements sans authentification'
+        ],
+        'routes_max_number' => [
+            'description' => 'Nombre max de routes pour la Découverte',
+            'help' => 'Aucune route ne sera découverte si la taille de la table de routage est supérieure à ce nombre'
         ],
         'rrd' => [
             'heartbeat' => [
@@ -731,6 +913,10 @@ return [
                 'master' => 'master',
                 'release' => 'release'
             ]
+        ],
+        'uptime_warning' => [
+            'description' => 'Warning si l\'uptime est inférieur à (seconds)',
+            'help' => 'Afficher un Warning sur l\'équipement si l\'uptime est inférieur à la durée indiquée. Default 24h'
         ],
         'virsh' => [
             'description' => 'Chemin vers `virsh`'

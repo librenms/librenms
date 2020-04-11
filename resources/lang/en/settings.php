@@ -45,8 +45,12 @@ return [
         ],
         'poller' => [
             'distributed' => 'Distributed Poller',
+            'graphite' => 'Datastore: Graphite',
+            'influxdb' => 'Datastore: InfluxDB',
+            'opentsdb' => 'Datastore: OpenTSDB',
             'ping' => 'Ping',
-            'rrdtool' => 'RRDTool Setup',
+            'prometheus' => 'Datastore: Prometheus',
+            'rrdtool' => 'Datastore: RRDTool',
             'snmp' => 'SNMP',
             'poller_modules' => 'Poller Modules',
         ],
@@ -63,6 +67,7 @@ return [
             'search' => 'Search Settings',
             'style' => 'Style',
             'device' => 'Device Settings',
+            'worldmap' => 'World Map Settings'
         ]
     ],
     'settings' => [
@@ -399,7 +404,7 @@ return [
                 'description' => 'Cisco PW'
             ],
             'cisco-vrf-lite' => [
-                'description' => 'Cisco VRF List'
+                'description' => 'Cisco VRF Lite'
             ],
             'discovery-arp' => [
                 'description' => 'Discovery ARP'
@@ -611,6 +616,24 @@ return [
                 ]
             ]
         ],
+        'graphite' => [
+            'enable' => [
+                'description' => 'Enable',
+                'help' => 'Exports metrics to Graphite'
+            ],
+            'host' => [
+                'description' => 'Server',
+                'help' => 'The IP or hostname of the Graphite server to send data to'
+            ],
+            'port' => [
+                'description' => 'Port',
+                'help' => 'The port to use to connect to the Graphite server'
+            ],
+            'prefix' => [
+                'description' => 'Prefix (Optional)',
+                'help' => 'Will add the prefix to the start of all metrics.  Must be alphanumeric separated by dots'
+            ]
+        ],
         'graylog' => [
             'base_uri' => [
                 'description' => 'Base URI',
@@ -679,6 +702,49 @@ return [
             'description' => 'Mountpoints containing String to be ignored',
             'help' => 'Don\'t monitor Disc Usage of Mountpoints which contains at least one of this Strings'
         ],
+        'influxdb' => [
+            'db' => [
+                'description' => 'Database',
+                'help' => 'Name of the InfluxDB database to store metrics'
+            ],
+            'enable' => [
+                'description' => 'Enable',
+                'help' => 'Exports metrics to InfluxDB'
+            ],
+            'host' => [
+                'description' => 'Server',
+                'help' => 'The IP or hostname of the InfluxDB server to send data to'
+            ],
+            'password' => [
+                'description' => 'Password',
+                'help' => 'Password to connect to InfluxDB, if required'
+            ],
+            'port' => [
+                'description' => 'Port',
+                'help' => 'The port to use to connect to the InfluxDB server'
+            ],
+            'timeout' => [
+                'description' => 'Timeout',
+                'help' => 'How long to wait for InfluxDB server, 0 means default timeout'
+            ],
+            'transport' => [
+                'description' => 'Transport',
+                'help' => 'The port to use to connect to the InfluxDB server',
+                'options' => [
+                    'http' => 'HTTP',
+                    'https' => 'HTTPS',
+                    'udp' => 'UDPRRRRRRR'
+                ]
+            ],
+            'username' => [
+                'description' => 'Username',
+                'help' => 'Username to connect to InfluxDB, if required'
+            ],
+            'verifySSL' => [
+                'description' => 'Verify SSL',
+                'help' => 'Verify the SSL certificate is valid and trusted'
+            ]
+        ],
         'ipmitool' => [
             'description' => 'Path to ipmtool'
         ],
@@ -695,6 +761,10 @@ return [
         'mydomain' => [
             'description' => 'Primary Domain',
             'help' => 'This domain is used for network auto-discovery and other processes. LibreNMS will attempt to append it to unqualified hostnames.'
+        ],
+        'network_map_show_on_worldmap' => [
+            'description' => 'Display network links on the map',
+            'help' => 'Show the networks links between the different location on the worldmap (weathermap-like)'
         ],
         'nfsen_enable' => [
             'description' => 'Enable NfSen',
@@ -743,6 +813,20 @@ return [
         ],
         'nmap' => [
             'description' => 'Path to nmap'
+        ],
+        'opentsdb' => [
+            'enable' => [
+                'description' => 'Enable',
+                'help' => 'Exports metrics to OpenTSDB'
+            ],
+            'host' => [
+                'description' => 'Server',
+                'help' => 'The IP or hostname of the OpenTSDB server to send data to'
+            ],
+            'port' => [
+                'description' => 'Port',
+                'help' => 'The port to use to connect to the OpenTSDB server'
+            ]
         ],
         'own_hostname' => [
             'description' => 'LibreNMS hostname',
@@ -942,6 +1026,20 @@ return [
         'ports_purge' => [
             'description' => 'Ports older than (days)',
             'help' => 'Cleanup done by daily.sh'
+        ],
+        'prometheus' => [
+            'enable' => [
+                'description' => 'Enable',
+                'help' => 'Exports metrics to Prometheus Push Gateway'
+            ],
+            'host' => [
+                'description' => 'Server',
+                'help' => 'The IP or hostname of the Prometheus Push Gateway to send data to'
+            ],
+            'port' => [
+                'description' => 'Job',
+                'help' => 'Job label for exported metrics'
+            ]
         ],
         'public_status' => [
             'description' => 'Show status publicly',
@@ -1153,6 +1251,14 @@ return [
         'device_location_map_open' => [
             'description' => 'Location Map open',
             'help' => 'Location Map is shown by default'
+        ],
+        'force_hostname_to_sysname' => [
+            'description' => 'use SNMP SysName instead of Hostname',
+            'help' => 'When using a dynamic DNS hostname or one that does not resolve, this option would allow you to make use of the SNMP sysName instead as the preferred reference to the device'
+        ],
+        'force_ip_to_sysname' => [
+            'description' => 'use SNMP SysName instead of IP Address',
+            'help' => 'When using IP addresses as a hostname you can instead represent the devices on the WebUI by its SNMP sysName resulting in an easier to read overview of your network. This would apply on networks where you don\'t have DNS records for most of your devices'
         ],
         'whois' => [
             'description' => 'Path to whois'

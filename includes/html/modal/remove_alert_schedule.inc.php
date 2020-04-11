@@ -13,7 +13,7 @@
  */
 
 if (Auth::user()->hasGlobalAdmin()) {
-?>
+    ?>
 
 <div class="modal fade bs-example-modal-sm" id="delete-maintenance" tabindex="-1" role="dialog" aria-labelledby="delete" aria-hidden="true">
     <div class="modal-dialog">
@@ -63,5 +63,5 @@ $('#sched-maintenance-removal').click('', function(e) {
 });
 
 </script>
-<?php
+    <?php
 }

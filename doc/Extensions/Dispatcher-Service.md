@@ -95,6 +95,7 @@ REDIS_SENTINEL_SERVICE=myservice
 
 REDIS_DB=0
 #REDIS_PASSWORD=
+#REDIS_TIMEOUT=60
 ```
 
 ## Basic Configuration
@@ -135,6 +136,15 @@ distributed_poller                             = true;  # Set to true to enable 
 distributed_poller_name                        = null;  # Uniquely identifies the poller instance
 distributed_poller_group                       = 0;     # Which group to poll
 ```
+### Tuning the number of workers
+
+See https://your_librenms_install/poller 
+
+You want to keep Consumed Worker Seconds comfortably below Maximum Worker Seconds. The closer the values are to each other, the flatter the CPU graph of the poller machine. Meaning that you are utilizing your CPU resources well. As long as Consumed WS stays below Maximum WS and Devices Pending is 0, you should be ok.
+
+If Consumed WS is below Maximum WS and Devices Pending is > 0, your hardware is not up to the task.
+
+Maximum WS equals the number of workers multiplied with the number of seconds in the polling period. (default 300)
 
 # Fast Ping
 
@@ -144,6 +154,16 @@ You can enable it by setting the following:
 ```php
 $config['service_ping_enabled'] = true;
 ```
+
+# Watchdog
+
+The watchdog scheduler is disabled by default. You can enable it by setting the following:
+
+```php
+$config['service_watchdog_enabled'] = true;
+```
+
+The watchdog scheduler will check that the poller log file has been written to within the last poll period. If there is no change to the log file since, the watchdog will restart the polling service. The poller log file is set by `$config['log_file']` and defaults to `./logs/librenms.log`
 
 # Cron Scripts
 

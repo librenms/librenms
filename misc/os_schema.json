@@ -197,6 +197,9 @@
                 "junose-atm-vp": {
                     "type": "boolean"
                 },
+                "mpls": {
+                    "type": "boolean"
+                },
                 "netscaler-vsvr": {
                     "type": "boolean"
                 }
@@ -327,6 +330,9 @@
                     "type": "boolean"
                 },
                 "libvirt-vminfo": {
+                    "type": "boolean"
+                },
+                "mpls": {
                     "type": "boolean"
                 },
                 "ip6-addresses": {

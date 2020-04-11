@@ -315,6 +315,11 @@ $graphs['asterisk'] = array(
     'sip',
     'iax2',
 );
+$graphs['mailcow-postfix'] = array(
+    'emails',
+    'traffic',
+    'domains',
+);
 echo '<div class="panel panel-default">';
 echo '<div class="panel-heading">';
 echo "<span style='font-weight: bold;'>Apps</span> &#187; ";

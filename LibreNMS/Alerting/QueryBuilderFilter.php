@@ -169,7 +169,9 @@ class QueryBuilderFilter implements \JsonSerializable
      */
     public function jsonSerialize()
     {
-        return array_values($this->filter);
+        $filter = $this->filter;
+        asort($filter);
+        return array_values($filter);
     }
 
     /**

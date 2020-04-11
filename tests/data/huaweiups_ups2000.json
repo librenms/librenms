@@ -356,7 +356,7 @@
                     "state_descr": "Bypass",
                     "state_draw_graph": 0,
                     "state_value": 4,
-                    "state_generic_value": 2
+                    "state_generic_value": 1
                 },
                 {
                     "state_name": "upsOutputSourceState",

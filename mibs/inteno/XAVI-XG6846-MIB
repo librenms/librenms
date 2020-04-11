@@ -1,0 +1,819 @@
+--*****************************************************************
+-- XAVI-XG6846-MIB.my : XAVI Inteno MIB file
+--      
+-- This MIB defines DSL CPE configuration Management Information Base.
+-- The following objects are part of the enterprise MIB for Broadcom  DSL.
+--
+-- 2012/03/21 Dom Hsu <dom_hsu@xavi.com.tw>
+--
+-- XAVi Technologies Corp. 2012. All Rights Reserved
+--
+--*****************************************************************
+
+XAVI-XG6846-MIB	DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+	TimeTicks, Counter32, snmpModules, enterprises, mib-2, IpAddress, Integer32
+        	FROM SNMPv2-SMI
+	DisplayString, TestAndIncr, TimeStamp
+		FROM SNMPv2-TC
+	MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+		FROM SNMPv2-CONF;
+
+xg6846          OBJECT IDENTIFIER ::= { enterprises 12919 }
+
+catv            OBJECT IDENTIFIER ::= { xg6846 1 } 
+portmode        OBJECT IDENTIFIER ::= { xg6846 2 }
+qos             OBJECT IDENTIFIER ::= { xg6846 3 } 
+vlan            OBJECT IDENTIFIER ::= { xg6846 4 }
+portStatistic   OBJECT IDENTIFIER ::= { xg6846 5 } 
+ddminfo         OBJECT IDENTIFIER ::= { xg6846 6 } 
+internetPort    OBJECT IDENTIFIER ::= { xg6846 7 }
+reboot          OBJECT IDENTIFIER ::= { xg6846 8 }
+tftp            OBJECT IDENTIFIER ::= { xg6846 9 }
+portPower       OBJECT IDENTIFIER ::= { xg6846 10 } 
+jumb            OBJECT IDENTIFIER ::= { xg6846 11 } 
+deviceinfo      OBJECT IDENTIFIER ::= { xg6846 12 } 
+
+catvEnable OBJECT-TYPE
+	SYNTAX INTEGER {
+		enable(1),
+		disable(2)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"catv switch function."
+			::= { catv 1 }
+
+lanportTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF ModeEntry
+	ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"LAN port table."
+			::= { portmode 1 }
+
+modeEntry OBJECT-TYPE
+	SYNTAX ModeEntry
+	ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"set port mode entry."
+	INDEX { lanportIndex }
+		::= { lanportTable 1 }
+	ModeEntry ::= SEQUENCE {
+		lanportIndex Unsigned32,
+		lanportName  DisplayString,
+		lanportspeed INTEGER,
+		lanportpause INTEGER
+	}
+
+lanportIndex OBJECT-TYPE
+	SYNTAX Unsigned32
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"lan port entry index."
+			::= { modeEntry 1 }
+
+lanportName OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"lan port name."
+			::= { modeEntry 2 }
+
+lanportspeed OBJECT-TYPE
+	SYNTAX INTEGER {
+		auto(0),
+		speed10mFD(1),
+		speed10mHD(2),
+		speed100mFD(3),
+		speed100mHD(4)
+	}
+	ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"port speed value."
+			::= { modeEntry 3 }
+
+lanportpause OBJECT-TYPE
+	SYNTAX INTEGER {
+		off(0),
+		on(1)
+	}
+	ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"port 802.1P enable/disable value."
+			::= { modeEntry 4 }
+
+qosTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF QosEntry
+	ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"qos table."
+			::= { qos 1 }
+
+qosEntry OBJECT-TYPE
+	SYNTAX QosEntry
+	ACCESS read-write
+	STATUS current
+	DESCRIPTION 
+		"qos list entry."
+	INDEX { qosIndex }
+		::= { qosTable 1 }
+	QosEntry ::= SEQUENCE {
+		qosIndex Unsigned32,
+		qmapping Unsigned32
+	}
+
+qosIndex OBJECT-TYPE
+	SYNTAX Unsigned32
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"qos list entry index."
+			::= { qosEntry 1 }
+
+qmapping OBJECT-TYPE
+	SYNTAX Unsigned32
+	ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"mapping queue value."
+			::= { qosEntry 2 }
+
+portTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF SettingEntry
+	ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"all port setting table."
+			::= { vlan 1 }
+
+portEntry OBJECT-TYPE
+	SYNTAX SettingEntry
+	ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"port list entry."
+	INDEX { portIndex }
+		::= { portTable 1 }
+	SettingEntry ::= SEQUENCE {
+		portIndex  Unsigned32,
+		vlanid     Unsigned32,
+		priority   Unsigned32,
+		qmode      INTEGER,
+		dscpEnable INTEGER			        
+	}
+
+portIndex OBJECT-TYPE
+	SYNTAX Unsigned32
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"port num index."
+			::= { portEntry 1 }
+
+vlanid OBJECT-TYPE
+	SYNTAX Unsigned32
+	ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"port vlan id value."
+			::= { portEntry 2 }
+
+priority OBJECT-TYPE
+	SYNTAX Unsigned32
+	ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"port default priority value."
+			::= { portEntry 3 }
+
+qmode OBJECT-TYPE
+	SYNTAX INTEGER {
+		disable(0),
+		fallback(1),
+		check(2),
+		secure(3)
+	}
+	ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"port 802.1Q mode value."
+			::= { portEntry 4 }
+
+dscpEnable OBJECT-TYPE
+	SYNTAX INTEGER {
+		enable(1),
+		disable(0)
+	}
+	ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"DSCP enable."
+			::= { portEntry 5 }
+
+vlangroupTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF GroupEntry
+	ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"VLAN group setting table."
+			::= { vlan 2 }
+
+groupEntry OBJECT-TYPE
+	SYNTAX GroupEntry
+	ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"vlan group list entry."
+	INDEX { groupIndex }
+		::= { vlangroupTable 1 }
+	GroupEntry ::= SEQUENCE {
+		groupIndex Unsigned32,
+		groupid    Unsigned32,
+		lan1       INTEGER,
+		lan2       INTEGER,
+		lan3       INTEGER,
+		lan4       INTEGER,
+		wan        INTEGER
+	}
+
+groupIndex OBJECT-TYPE
+	SYNTAX Unsigned32
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"vlan group index."
+			::= { groupEntry 1 }
+
+groupid OBJECT-TYPE
+	SYNTAX Unsigned32
+	ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"vlan group id."
+			::= { groupEntry 2 }
+
+lan1 OBJECT-TYPE
+	SYNTAX INTEGER {
+		notMember(0),
+		egressUntagged(1),
+		egressTagged(2)
+	}
+	ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"vlan group id."
+			::= { groupEntry 3 }
+
+lan2 OBJECT-TYPE
+	SYNTAX INTEGER {
+		notMember(0),
+		egressUntagged(1),
+		egressTagged(2)
+	}
+	ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"vlan group id."
+			::= { groupEntry 4 }
+
+lan3 OBJECT-TYPE
+	SYNTAX INTEGER {
+		notMember(0),
+		egressUntagged(1),
+		egressTagged(2)
+	}
+	ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"vlan group id."
+			::= { groupEntry 5 }
+
+lan4 OBJECT-TYPE
+	SYNTAX INTEGER {
+		notMember(0),
+		egressUntagged(1),
+		egressTagged(2)
+	}
+	ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"vlan group id."
+			::= { groupEntry 6 }
+
+wan OBJECT-TYPE
+	SYNTAX INTEGER {
+		notMember(0),
+		egressUntagged(1),
+		egressTagged(2)
+	}
+	ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"vlan group id."
+			::= { groupEntry 7 }
+
+statisticTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF PortStatEntry
+	ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"port statistics table."
+			::= { portStatistic 1 }
+
+portStatEntry OBJECT-TYPE
+	SYNTAX PortStatEntry
+	ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"port statistics list entry."
+	INDEX { statIndex }
+		::= { statisticTable 1 }
+	PortStatEntry ::= SEQUENCE {
+		statIndex            Unsigned32,
+		portName             DisplayString,
+		unicastsReceived     Unsigned32,
+		broadcastsReceived   Unsigned32,
+		multicastsReceived   Unsigned32,
+		fcsErrorReceived     Unsigned32,
+		pauseReceived        Unsigned32,
+		unicastsTransmitted   Unsigned32,
+		broadcastsTransmitted Unsigned32,
+		multicastsTransmitted Unsigned32,
+		fcsErrorTransmitted   Unsigned32,
+		pauseTransmitted      Unsigned32,
+		speed                DisplayString        			
+	}
+
+statIndex OBJECT-TYPE
+	SYNTAX Unsigned32
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"ports entry index."
+			::= { portStatEntry 1 }
+
+portName OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"port name."
+			::= { portStatEntry 2 }
+
+unicastsReceived OBJECT-TYPE
+	SYNTAX Unsigned32
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"unicasts Received."
+			::= { portStatEntry 3 }
+
+broadcastsReceived OBJECT-TYPE
+	SYNTAX Unsigned32
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"broadcasts Received."
+			::= { portStatEntry 4 }
+
+multicastsReceived OBJECT-TYPE
+	SYNTAX Unsigned32
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"multicasts Received."
+			::= { portStatEntry 5 }
+
+fcsErrorReceived OBJECT-TYPE
+	SYNTAX Unsigned32
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"fcsError Received."
+			::= { portStatEntry 6 }
+
+pauseReceived OBJECT-TYPE
+	SYNTAX Unsigned32
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"pause Received."
+			::= { portStatEntry 7 }
+
+unicastsTransmitted OBJECT-TYPE
+	SYNTAX Unsigned32
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"unicasts Transmitted."
+			::= { portStatEntry 8 }
+
+broadcastsTransmitted OBJECT-TYPE
+	SYNTAX Unsigned32
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"broadcasts Transmitted."
+			::= { portStatEntry 9 }
+
+multicastsTransmitted OBJECT-TYPE
+	SYNTAX Unsigned32
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"multicasts Transmitted."
+			::= { portStatEntry 10 }
+
+fcsErrorTransmitted OBJECT-TYPE
+	SYNTAX Unsigned32
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"fcsError Transmitted."
+			::= { portStatEntry 11 }
+
+pauseTransmitted OBJECT-TYPE
+	SYNTAX Unsigned32
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"pause Transmitted."
+			::= { portStatEntry 12 }
+
+speed OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"port speed duplex mode status."
+			::= { portStatEntry 13 }
+
+vendorName OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"DDM Vendor Name."
+			::= { ddminfo 1 }
+
+vendorOui OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"DDM Vendor OUI."
+			::= { ddminfo 2 }
+
+vendorPn OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"DDM Vendor PN."
+			::= { ddminfo 3 }
+
+vendorRev OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"DDM Vendor REV."
+			::= { ddminfo 4 }
+
+temperature OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"DDM Temperature."
+			::= { ddminfo 5 }
+
+voltage OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"DDM Voltage."
+			::= { ddminfo 6 }
+
+bias OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"DDM Bias."
+			::= { ddminfo 7 }
+
+txPower OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"DDM TX Power."
+			::= { ddminfo 8 }
+
+rxPower OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"DDM Rx Power."
+			::= { ddminfo 9 }
+
+wanType OBJECT-TYPE
+	SYNTAX INTEGER {
+		dhcp(1),
+		staticIp(2)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"wan protocol type."
+			::= { internetPort 1 }
+
+hostname OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS  read-write
+	STATUS current
+	DESCRIPTION
+		"the dns host name."
+			::= { internetPort 2 }
+
+domainame OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"the dns domain name."
+			::= { internetPort 3 }
+
+staticDns OBJECT-TYPE
+	SYNTAX INTEGER {
+		enable(1),
+		disable(2)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"static dns enable."
+			::= { internetPort 4 }
+
+primaryDns OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"the primary dns."
+			::= { internetPort 5 }
+
+secondaryDns OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"the secodary dns."
+			::= { internetPort 6 }
+
+staticIpHostName OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS  read-write
+	STATUS current
+	DESCRIPTION
+		"the static Ip dns host name."
+			::= { internetPort 7 }
+
+staticIpDomainName OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"the static ip dns domain name."
+			::= { internetPort 8 }
+
+staticIpAddr OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The static ip address ."
+			::= { internetPort 9 }
+
+staticIpSubMask OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The static subnet mask ."
+			::=  { internetPort 10 }
+
+staticIpGateway OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The static gateway ."
+			::=  { internetPort 11 }
+
+staticIpPrimaryDns OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"the primary dns."
+			::= { internetPort 12 }
+
+staticIpSecondaryDns OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"the secodary dns."
+			::= { internetPort 13 }
+
+rebootEnable OBJECT-TYPE
+	SYNTAX INTEGER {
+		enable(1),
+		disable(0)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"catv switch function."
+			::= { reboot 1 }
+
+tftpSevIp OBJECT-TYPE
+	SYNTAX IpAddress
+	ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The tftp server ip."
+			::= { tftp 1 }
+
+fileName OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The file name."
+			::= { tftp 2 }
+
+fileType OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		" i for image and c for configuration data"
+			::=  { tftp 3 }
+
+action OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Get or Put file action,g for get file and p for put file."
+			::= { tftp 4 }
+
+adminStatus OBJECT-TYPE
+	SYNTAX INTEGER {
+		enable(1),
+		disable(2)
+	}
+	ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"administrative status."
+			::= { tftp 5 }
+
+operStatus OBJECT-TYPE
+	SYNTAX INTEGER {
+		enable(1),
+		disable(2)
+	}
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"vendor specific info."
+			::= { tftp 6 }
+
+port1 OBJECT-TYPE
+	SYNTAX INTEGER {
+		enable(1),
+		disable(0)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"lan port enable/disable."
+			::= { portPower 1 }
+
+port2 OBJECT-TYPE
+	SYNTAX INTEGER {
+		enable(1),
+		disable(0)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"lan port enable/disable."
+			::= { portPower 2 }
+
+port3 OBJECT-TYPE
+	SYNTAX INTEGER {
+		enable(1),
+		disable(0)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"lan port enable/disable."
+			::= { portPower 3 }
+
+port4 OBJECT-TYPE
+	SYNTAX INTEGER {
+		enable(1),
+		disable(0)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"lan port enable/disable."
+			::= { portPower 4 }
+
+jumblan1 OBJECT-TYPE
+	SYNTAX INTEGER {
+		mode1(0),
+		mode2(1),
+		mode3(2),
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"lan jumb mode 1522/2048/10240."
+			::= { jumb 1 }
+
+jumblan2 OBJECT-TYPE
+	SYNTAX INTEGER {
+		mode1(0),
+		mode2(1),
+		mode3(2),
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"lan jumb mode 1522/2048/10240."
+			::= { jumb 2 }
+
+jumblan3 OBJECT-TYPE
+	SYNTAX INTEGER {
+		mode1(0),
+		mode2(1),
+		mode3(2),
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"lan jumb mode 1522/2048/10240."
+			::= { jumb 3 }
+
+jumblan4 OBJECT-TYPE
+	SYNTAX INTEGER {
+		mode1(0),
+		mode2(1),
+		mode3(2),
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"lan jumb mode 1522/2048/10240."
+			::= { jumb 4 }
+
+jumbwan OBJECT-TYPE
+	SYNTAX INTEGER {
+		mode1(0),
+		mode2(1),
+		mode3(2),
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"lan jumb mode 1522/2048/10240."
+			::= { jumb 5 }
+
+serialnum OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"display device serial number."
+			::= { deviceinfo 1 }
+END 

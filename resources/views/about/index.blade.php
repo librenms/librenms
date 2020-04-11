@@ -28,7 +28,7 @@
             <table class='table table-condensed table-hover'>
                 <tr>
                     <td><b>@lang('Version')</b></td>
-                    <td><a href='http://www.librenms.org/changelog.html'>{{ $version_local }}<span id='version_date' style="display: none;">{{ $git_date }}</span></a></td>
+                    <td><a target="_blank" href='http://www.librenms.org/changelog.html'>{{ $version_local }}<span id='version_date' style="display: none;">{{ $git_date }}</span></a></td>
                 </tr>
                 <tr>
                     <td><b>@lang('Database Schema')</b></td>
@@ -56,13 +56,13 @@
             <h3>@lang('LibreNMS is a community-based project')</h3>
             @lang('Please feel free to join us and contribute code, documentation, and bug reports:')
             <br>
-              <a href="http://www.librenms.org/">@lang('Web site')</a> |
-              <a href="https://docs.librenms.org/">@lang('Docs')</a> |
-              <a href="https://github.com/librenms/">@lang('GitHub')</a> |
-              <a href="https://community.librenms.org/c/help">@lang('Bug tracker')</a> |
-              <a href="https://community.librenms.org">@lang('Community Forum')</a> |
-              <a href="http://twitter.com/librenms">@lang('Twitter')</a> |
-              <a href="http://www.librenms.org/changelog.html">@lang('Changelog')</a> |
+              <a target="_blank" href="http://www.librenms.org/">@lang('Web site')</a> |
+              <a target="_blank" href="https://docs.librenms.org/">@lang('Docs')</a> |
+              <a target="_blank" href="https://github.com/librenms/">@lang('GitHub')</a> |
+              <a target="_blank" href="https://community.librenms.org/c/help">@lang('Bug tracker')</a> |
+              <a target="_blank" href="https://community.librenms.org">@lang('Community Forum')</a> |
+              <a target="_blank" href="http://twitter.com/librenms">@lang('Twitter')</a> |
+              <a target="_blank" href="http://www.librenms.org/changelog.html">@lang('Changelog')</a> |
               <a href="#" data-toggle="modal" data-target="#git_log">@lang('Local git log')</a>
           </p>
 
@@ -94,7 +94,7 @@
                     </span>
                     <input type="checkbox" id="callback" data-size="normal" name="statistics" @if($callback_status) checked @endif>
                     <br />
-                    @lang('Online stats:') <a href='https://stats.librenms.org/'>stats.librenms.org</a>
+                    @lang('Online stats:') <a target="_blank" href='https://stats.librenms.org/'>stats.librenms.org</a>
                 </td>
             </tr>
 
@@ -185,7 +185,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with this program.  If not, see <a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>.</pre>
+along with this program.  If not, see <a target="_blank" href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>.</pre>
 
         </div>
     </div>

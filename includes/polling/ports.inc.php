@@ -470,8 +470,8 @@ foreach ($port_stats as $ifIndex => $port) {
             dbInsert(array('port_id' => $port_id), 'ports_statistics');
             $ports[$port_id] = dbFetchRow('SELECT * FROM `ports` WHERE `port_id` = ?', array($port_id));
             echo 'Adding: '.$ifName.'('.$ifIndex.')('.$port_id.')';
-        } // Port re-discovered after previous deletion?
-        elseif ($ports[$port_id]['deleted'] == 1) {
+        } elseif ($ports[$port_id]['deleted'] == 1) {
+            // Port re-discovered after previous deletion?
             dbUpdate(array('deleted' => '0'), 'ports', '`port_id` = ?', array($port_id));
             $ports[$port_id]['deleted'] = '0';
         }
@@ -492,8 +492,8 @@ foreach ($port_stats as $ifIndex => $port) {
 
     /* Build a list of all ports, identified by their port_id, found within this poller run. */
         $ports_found[] = $port_id;
-    } // Port vanished (mark as deleted) (except when skipped by selective port polling)
-    elseif (empty($ports[$port_id]['skipped'])) {
+    } elseif (empty($ports[$port_id]['skipped'])) {
+        // Port vanished (mark as deleted) (except when skipped by selective port polling)
         if ($ports[$port_id]['deleted'] != '1') {
             dbUpdate(array('deleted' => '1'), 'ports', '`port_id` = ?', array($port_id));
             $ports[$port_id]['deleted'] = '1';
@@ -667,7 +667,7 @@ foreach ($ports as $port) {
                 $port['update'][$oid] = $this_port[$oid];
 
                 // store the previous values for alerting
-                if ($oid == 'ifOperStatus' || $oid == 'ifAdminStatus') {
+                if (in_array($oid, ['ifOperStatus', 'ifAdminStatus', 'ifSpeed', 'ifHighSpeed'])) {
                     $port['update'][$oid . '_prev'] = $port[$oid];
                 }
 
@@ -678,7 +678,7 @@ foreach ($ports as $port) {
                     echo $oid . ' ';
                 }
             } else {
-                if ($oid == 'ifOperStatus' || $oid == 'ifAdminStatus') {
+                if (in_array($oid, ['ifOperStatus', 'ifAdminStatus', 'ifSpeed', 'ifHighSpeed'])) {
                     if ($port[$oid.'_prev'] == null) {
                         $port['update'][$oid . '_prev'] = $this_port[$oid];
                     }
@@ -764,7 +764,7 @@ foreach ($ports as $port) {
             $port['stats']['ifInBits_rate'] = round(($port['stats']['ifInOctets_rate'] * 8));
             $port['stats']['ifOutBits_rate'] = round(($port['stats']['ifOutOctets_rate'] * 8));
 
-            // If we have a valid ifSpeed we should populate the stats for checking.
+            // If we have a valid ifSpeed we should populate the stats for checking
             if (is_numeric($this_port['ifSpeed']) && $this_port['ifSpeed'] > 0) {
                 $port['stats']['ifInBits_perc']  = round(($port['stats']['ifInBits_rate'] / $this_port['ifSpeed'] * 100));
                 $port['stats']['ifOutBits_perc'] = round(($port['stats']['ifOutBits_rate'] / $this_port['ifSpeed'] * 100));
@@ -773,17 +773,6 @@ foreach ($ports as $port) {
             echo 'bps(' . formatRates($port['stats']['ifInBits_rate']) . '/' . formatRates($port['stats']['ifOutBits_rate']) . ')';
             echo 'bytes(' . formatStorage($port['stats']['ifInOctets_diff']) . '/' . formatStorage($port['stats']['ifOutOctets_diff']) . ')';
             echo 'pkts(' . format_si($port['stats']['ifInUcastPkts_rate']) . 'pps/' . format_si($port['stats']['ifOutUcastPkts_rate']) . 'pps)';
-
-            // Port utilisation % threshold alerting. // FIXME allow setting threshold per-port. probably 90% of ports we don't care about.
-            if (Config::get('alerts.port_util_alert') && $port['ignore'] == '0') {
-                // Check for port saturation of 'alerts.port_util_perc' or higher.  Alert if we see this.
-                // Check both inbound and outbound rates
-                $saturation_threshold = ($this_port['ifSpeed'] * (Config::get('alerts.port_util_perc') / 100));
-                echo 'IN: ' . $port['stats']['ifInBits_rate'] . ' OUT: ' . $port['stats']['ifOutBits_rate'] . ' THRESH: ' . $saturation_threshold;
-                if (($port['stats']['ifInBits_rate'] >= $saturation_threshold || $port['stats']['ifOutBits_rate'] >= $saturation_threshold) && $saturation_threshold > 0) {
-                    log_event('Port reached saturation threshold: ' . formatRates($port['stats']['ifInBits_rate']) . '/' . formatRates($port['stats']['ifOutBits_rate']) . ' - ifspeed: ' . formatRates($this_port['stats']['ifSpeed']), $device, 'interface', 4, $port['port_id']);
-                }
-            }
 
             // Update data stores
             $rrd_name = getPortRrdName($port_id);
@@ -823,16 +812,7 @@ foreach ($ports as $port) {
                 'OUTMULTICASTPKTS' => $this_port['ifOutMulticastPkts'],
             );
 
-            if ($tune_port === true) {
-                rrdtool_tune('port', $rrdfile, $this_port['ifSpeed']);
-            }
-
-            $port_descr_type = $port['port_descr_type'];
-            $ifName = $port['ifName'];
-            $ifAlias = $port['ifAlias'];
-            $tags = compact('ifName', 'ifAlias', 'port_descr_type', 'rrd_name', 'rrd_def');
-            rrdtool_data_update($device, 'ports', $tags, $fields);
-
+            // non rrd stats (will be filtered)
             $fields['ifInUcastPkts_rate'] = $port['ifInUcastPkts_rate'];
             $fields['ifOutUcastPkts_rate'] = $port['ifOutUcastPkts_rate'];
             $fields['ifInErrors_rate'] = $port['ifInErrors_rate'];
@@ -844,10 +824,20 @@ foreach ($ports as $port) {
             $fields['ifInBits_rate'] = $port['stats']['ifInBits_rate'];
             $fields['ifOutBits_rate'] = $port['stats']['ifOutBits_rate'];
 
-            prometheus_push($device, 'ports', rrd_array_filter($tags), $fields);
-            influx_update($device, 'ports', rrd_array_filter($tags), $fields);
-            graphite_update($device, 'ports|' . $ifName, $tags, $fields);
-            opentsdb_update($device, 'port', array('ifName' => $this_port['ifName'], 'ifIndex' => getPortRrdName($port_id)), $fields);
+            if ($tune_port === true) {
+                Rrd::tune('port', $rrdfile, $this_port['ifSpeed']);
+            }
+
+            $tags = [
+                'ifName' => $port['ifName'],
+                'ifAlias' => $port['ifAlias'],
+                'ifIndex' => $port['ifIndex'],
+                'port_descr_type' => $port['port_descr_type'],
+                'rrd_name' => $rrd_name,
+                'rrd_def' => $rrd_def,
+            ];
+            app('Datastore')->put($device, 'ports', $tags, $fields);
+
             // End Update IF-MIB
             // Update PAgP
             if ($this_port['pagpOperationMode'] || $port['pagpOperationMode']) {

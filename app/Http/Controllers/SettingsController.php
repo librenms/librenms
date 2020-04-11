@@ -17,17 +17,16 @@ class SettingsController extends Controller
      * @param DynamicConfig $dynamicConfig
      * @param string $tab
      * @param string $section
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\Response|\Illuminate\View\View
      */
     public function index(DynamicConfig $dynamicConfig, $tab = 'global', $section = '')
     {
         $data = [
             'active_tab' => $tab,
             'active_section' => $section,
-            'groups' => $dynamicConfig->getGroups()->reduce(function ($groups, $group) {
-                /** @var Collection $groups */
-                return $groups->put($group, []);
-            }, new Collection())->forget('global'),
+            'groups' => $dynamicConfig->getGroups()->reject(function ($group) {
+                return $group == 'global';
+            })->values(),
         ];
 
         return view('settings.index', $data);

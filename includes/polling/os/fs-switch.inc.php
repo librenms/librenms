@@ -4,7 +4,7 @@ if (!empty($matches[2])) {
     $version .= " (" . trim($matches[2]) . ")";
 }
 
-// List of OIDs for HW recognition, add any potential HW OID here. 
+// List of OIDs for HW recognition, add any potential HW OID here.
 $hwOidList = [
     '.1.3.6.1.4.1.27975.37.1.5.1.4.1.1',
     'FS-MIB::swProdName.0',

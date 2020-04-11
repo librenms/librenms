@@ -78,5 +78,5 @@ if ($components[$vars['wideid']]['type'] == 'f5-gtm-wide') {
                 </div>
             </div>
         </div>
-<?php
+    <?php
 }

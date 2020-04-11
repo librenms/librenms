@@ -32,10 +32,8 @@ use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
 use LibreNMS\Tests\DBTestCase;
 
-class BgpTrapTest extends DBTestCase
+class BgpTrapTest extends SnmpTrapTestCase
 {
-    use DatabaseTransactions;
-
     public function testBgpUp()
     {
         $device = factory(Device::class)->create();

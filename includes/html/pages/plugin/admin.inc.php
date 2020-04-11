@@ -33,47 +33,47 @@ $.ajax({
         }
     }//end if
 
-?>
+    ?>
 
 <div class="panel panel-default panel-condensed">
   <div class="panel-heading">
     <strong>System plugins</strong>
   </div>
-<?php
-if ($new_plugins > 0) {
-    echo '<div class="panel-body">
+    <?php
+    if ($new_plugins > 0) {
+        echo '<div class="panel-body">
     <div class="alert alert-warning">
       We have found '.$new_plugins.' new plugins that need to be configured and enabled
     </div>
   </div>';
-}
-if ($removed_plugins > 0) {
-    echo '<div class="panel-body">
+    }
+    if ($removed_plugins > 0) {
+        echo '<div class="panel-body">
     <div class="alert alert-warning">
       We have found '.$removed_plugins.' removed plugins
     </div>
   </div>';
-}
-?>
+    }
+    ?>
   <table class="table table-condensed">
     <tr>
       <th>Name</th>
       <th>Action</th>
     </tr>
 
-<?php
-foreach (dbFetchRows('SELECT * FROM plugins') as $plugins) {
-    if ($plugins['plugin_active'] == 1) {
-        $plugin_colour = 'bg-success';
-        $plugin_button = 'danger';
-        $plugin_label  = 'Disable';
-    } else {
-        $plugin_colour = 'bg-danger';
-        $plugin_button = 'success';
-        $plugin_label  = 'Enable';
-    }
+    <?php
+    foreach (dbFetchRows('SELECT * FROM plugins') as $plugins) {
+        if ($plugins['plugin_active'] == 1) {
+            $plugin_colour = 'bg-success';
+            $plugin_button = 'danger';
+            $plugin_label  = 'Disable';
+        } else {
+            $plugin_colour = 'bg-danger';
+            $plugin_button = 'success';
+            $plugin_label  = 'Enable';
+        }
 
-    echo '<tr class="'.$plugin_colour.'">
+        echo '<tr class="'.$plugin_colour.'">
             <td>
               '.$plugins['plugin_name'].'
             </td>
@@ -86,12 +86,12 @@ foreach (dbFetchRows('SELECT * FROM plugins') as $plugins) {
               </form>
             </td>
           </tr>';
-}//end foreach
-?>
+    }//end foreach
+    ?>
   </table>
 </div>
 
-<?php
+    <?php
 } else {
     include 'includes/html/error-no-perm.inc.php';
 }//end if

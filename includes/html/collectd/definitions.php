@@ -343,7 +343,7 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
         'GPRINT:rsp_avg:LAST:%5.1lf%s Last',
         'GPRINT:rsp_avg_sum:LAST:(ca. %5.1lf%sB Total)\l',
         "LINE1:qry_avg#$FullBlue:Queries  ",
-//			'GPRINT:qry_min:MIN:%5.1lf %s ',
+//          'GPRINT:qry_min:MIN:%5.1lf %s ',
         'GPRINT:qry_avg:AVERAGE:%5.1lf%s ',
         'GPRINT:qry_max:MAX:%5.1lf%s',
         'GPRINT:qry_avg:LAST:%5.1lf%s Last',
@@ -458,7 +458,7 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
                 'GPRINT:ppm_avg:AVERAGE:%5.2lf',
                 'GPRINT:ppm_max:MAX:%5.2lf',
                 'GPRINT:ppm_avg:LAST:%5.2lf');
-    $GraphDefs['frequency_offset'] = array( // NTPd
+        $GraphDefs['frequency_offset'] = array( // NTPd
         'DEF:ppm_avg={file}:ppm:AVERAGE',
         'DEF:ppm_min={file}:ppm:MIN',
         'DEF:ppm_max={file}:ppm:MAX',
@@ -470,7 +470,7 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
         'GPRINT:ppm_avg:AVERAGE:%5.2lf ',
         'GPRINT:ppm_max:MAX:%5.2lf ',
         'GPRINT:ppm_avg:LAST:%5.2lf');
-    $GraphDefs['gauge'] = array(
+        $GraphDefs['gauge'] = array(
         #'-v', 'Exec value',
         'DEF:temp_avg={file}:value:AVERAGE',
         'DEF:temp_min={file}:value:MIN',
@@ -482,7 +482,7 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
         'GPRINT:temp_avg:AVERAGE:%6.2lf',
         'GPRINT:temp_max:MAX:%6.2lf',
         'GPRINT:temp_avg:LAST:%6.2lf\l');
-    $GraphDefs['hddtemp'] = array(
+        $GraphDefs['hddtemp'] = array(
         #'-v', '°C',
         'DEF:temp_avg={file}:value:AVERAGE',
         'DEF:temp_min={file}:value:MIN',
@@ -494,7 +494,7 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
         'GPRINT:temp_avg:AVERAGE:%4.1lf',
         'GPRINT:temp_max:MAX:%4.1lf',
         'GPRINT:temp_avg:LAST:%4.1lf\l');
-    $GraphDefs['humidity'] = array(
+        $GraphDefs['humidity'] = array(
         #'-v', 'Percent',
         'DEF:temp_avg={file}:value:AVERAGE',
         'DEF:temp_min={file}:value:MIN',
@@ -506,7 +506,7 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
         'GPRINT:temp_avg:AVERAGE:%4.1lf%% ',
         'GPRINT:temp_max:MAX:%4.1lf%%',
         'GPRINT:temp_avg:LAST:%4.1lf%%\l');
-    $GraphDefs['if_errors'] = array(
+        $GraphDefs['if_errors'] = array(
         #'-v', 'Errors/s',
                 '--units=si',
         'DEF:tx_min={file}:tx:MIN',
@@ -532,12 +532,12 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
         'GPRINT:tx_avg:LAST:%5.1lf%s Last',
         'GPRINT:tx_avg_sum:LAST:(ca. %4.0lf%s Total)\l',
         "LINE1:rx_avg#$FullBlue:RX",
-//			'GPRINT:rx_min:MIN:%5.1lf %s ',
+//          'GPRINT:rx_min:MIN:%5.1lf %s ',
         'GPRINT:rx_avg:AVERAGE:%5.1lf%s ',
         'GPRINT:rx_max:MAX:%5.1lf%s',
         'GPRINT:rx_avg:LAST:%5.1lf%s Last',
         'GPRINT:rx_avg_sum:LAST:(ca. %4.0lf%s Total)\l');
-    $GraphDefs['if_collisions'] = array(
+        $GraphDefs['if_collisions'] = array(
         #'-v', 'Collisions/s', '--units=si',
         'DEF:min_raw={file}:value:MIN',
         'DEF:avg_raw={file}:value:AVERAGE',
@@ -552,7 +552,7 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
         'GPRINT:avg:AVERAGE:%5.1lf%s ',
         'GPRINT:max:MAX:%5.1lf%s',
         'GPRINT:avg:LAST:%5.1lf%s\l');
-    $GraphDefs['if_dropped'] = array(
+        $GraphDefs['if_dropped'] = array(
         #'-v', 'Packets/s',
                 '--units=si',
         'DEF:tx_min={file}:tx:MIN',
@@ -578,12 +578,12 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
         'GPRINT:tx_avg:LAST:%5.1lf%s Last',
         'GPRINT:tx_avg_sum:LAST:(ca. %4.0lf%s Total)\l',
         "LINE1:rx_avg#$FullBlue:RX",
-//			'GPRINT:rx_min:MIN:%5.1lf %s ',
+//          'GPRINT:rx_min:MIN:%5.1lf %s ',
         'GPRINT:rx_avg:AVERAGE:%5.1lf%s ',
         'GPRINT:rx_max:MAX:%5.1lf%s',
         'GPRINT:rx_avg:LAST:%5.1lf%s Last',
         'GPRINT:rx_avg_sum:LAST:(ca. %4.0lf%s Total)\l');
-    $GraphDefs['if_packets'] = array(
+        $GraphDefs['if_packets'] = array(
         #'-v', 'Packets/s',
                 '--units=si',
         'DEF:tx_min={file}:tx:MIN',
@@ -609,12 +609,12 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
         'GPRINT:tx_avg:LAST:%5.1lf%s Last',
         'GPRINT:tx_avg_sum:LAST:(ca. %4.0lf%s Total)\l',
         "LINE1:rx_avg#$FullBlue:RX",
-//			'GPRINT:rx_min:MIN:%5.1lf %s ',
+//          'GPRINT:rx_min:MIN:%5.1lf %s ',
         'GPRINT:rx_avg:AVERAGE:%5.1lf%s ',
         'GPRINT:rx_max:MAX:%5.1lf%s',
         'GPRINT:rx_avg:LAST:%5.1lf%s Last',
         'GPRINT:rx_avg_sum:LAST:(ca. %4.0lf%s Total)\l');
-    $GraphDefs['if_rx_errors'] = array(
+        $GraphDefs['if_rx_errors'] = array(
         '-v', 'Errors/s', '--units=si',
         'DEF:min={file}:value:MIN',
         'DEF:avg={file}:value:AVERAGE',
@@ -630,7 +630,7 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
         'GPRINT:max:MAX:%3.1lf%s',
         'GPRINT:avg:LAST:%3.1lf%s Last',
         'GPRINT:avg_sum:LAST:(ca. %2.0lf%s Total)\l');
-    $GraphDefs['ipt_bytes'] = array(
+        $GraphDefs['ipt_bytes'] = array(
         #'-v', 'Bits/s',
         'DEF:min_raw={file}:value:MIN',
         'DEF:avg_raw={file}:value:AVERAGE',
@@ -646,12 +646,12 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
         "AREA:max#$HalfBlue",
         "AREA:min#$Canvas",
         "LINE1:avg#$FullBlue:Bits/s",
-//			'GPRINT:min:MIN:%5.1lf %s ',
+//          'GPRINT:min:MIN:%5.1lf %s ',
         'GPRINT:avg:AVERAGE:%5.1lf%s ',
         'GPRINT:max:MAX:%5.1lf%s',
         'GPRINT:avg:LAST:%5.1lf%s Last',
         'GPRINT:avg_sum:LAST:(ca. %5.1lf%sB Total)\l');
-    $GraphDefs['ipt_packets'] = array(
+        $GraphDefs['ipt_packets'] = array(
         #'-v', 'Packets/s',
         'DEF:min_raw={file}:value:MIN',
         'DEF:avg_raw={file}:value:AVERAGE',
@@ -666,7 +666,7 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
         'GPRINT:avg:AVERAGE:%5.1lf%s ',
         'GPRINT:max:MAX:%5.1lf%s',
         'GPRINT:avg:LAST:%5.1lf%s\l');
-    $GraphDefs['irq'] = array(
+        $GraphDefs['irq'] = array(
         #'-v', 'Issues/s',
         'DEF:avg={file}:value:AVERAGE',
         'DEF:min={file}:value:MIN',
@@ -679,7 +679,7 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
         'GPRINT:avg:AVERAGE:%6.2lf',
         'GPRINT:max:MAX:%6.2lf',
         'GPRINT:avg:LAST:%6.2lf\l');
-    $GraphDefs['load'] = array(
+        $GraphDefs['load'] = array(
         #'-v', 'System load',
         'DEF:s_avg={file}:shortterm:AVERAGE',
         'DEF:s_min={file}:shortterm:MIN',
@@ -707,7 +707,7 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
         'GPRINT:l_avg:AVERAGE:%5.2lf',
         'GPRINT:l_max:MAX:%5.2lf',
         'GPRINT:l_avg:LAST:%5.2lf\\j');
-    $GraphDefs['load_percent'] = array(
+        $GraphDefs['load_percent'] = array(
         'DEF:avg={file}:percent:AVERAGE',
         'DEF:min={file}:percent:MIN',
         'DEF:max={file}:percent:MAX',
@@ -718,7 +718,7 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
         'GPRINT:avg:AVERAGE:%5.1lf%s%% ',
         'GPRINT:max:MAX:%5.1lf%s%%',
         'GPRINT:avg:LAST:%5.1lf%s%%\l');
-    $GraphDefs['mails'] = array(
+        $GraphDefs['mails'] = array(
         'DEF:rawgood={file}:good:AVERAGE',
         'DEF:rawspam={file}:spam:AVERAGE',
         'CDEF:good=rawgood,UN,0,rawgood,IF',
@@ -735,7 +735,7 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
         'GPRINT:spam:MAX:%4.1lf',
         'GPRINT:spam:LAST:%4.1lf',
         'HRULE:0#000000');
-    $GraphDefs['memory'] = array(
+        $GraphDefs['memory'] = array(
         '-b', '1024',
                 #'-v', 'Bytes',
         'DEF:avg={file}:value:AVERAGE',
@@ -748,7 +748,7 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
         'GPRINT:avg:AVERAGE:%5.1lf%sbyte ',
         'GPRINT:max:MAX:%5.1lf%sbyte',
         'GPRINT:avg:LAST:%5.1lf%sbyte\l');
-    $GraphDefs['old_memory'] = array(
+        $GraphDefs['old_memory'] = array(
         'DEF:used_avg={file}:used:AVERAGE',
         'DEF:free_avg={file}:free:AVERAGE',
         'DEF:buffers_avg={file}:buffers:AVERAGE',
@@ -790,7 +790,7 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
         'GPRINT:used_avg:AVERAGE:%5.1lf%s ',
         'GPRINT:used_max:MAX:%5.1lf%s',
         'GPRINT:used_avg:LAST:%5.1lf%s Last');
-    $GraphDefs['mysql_commands'] = array(
+        $GraphDefs['mysql_commands'] = array(
         #'-v', 'Issues/s',
         "DEF:val_avg={file}:value:AVERAGE",
         "DEF:val_min={file}:value:MIN",
@@ -802,7 +802,7 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
         'GPRINT:val_avg:AVERAGE:%5.2lf',
         'GPRINT:val_max:MAX:%5.2lf',
         'GPRINT:val_avg:LAST:%5.2lf');
-    $GraphDefs['mysql_handler'] = array(
+        $GraphDefs['mysql_handler'] = array(
         #'-v', 'Issues/s',
         "DEF:val_avg={file}:value:AVERAGE",
         "DEF:val_min={file}:value:MIN",
@@ -814,7 +814,7 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
         'GPRINT:val_avg:AVERAGE:%5.2lf',
         'GPRINT:val_max:MAX:%5.2lf',
         'GPRINT:val_avg:LAST:%5.2lf');
-    $GraphDefs['mysql_octets'] = array(
+        $GraphDefs['mysql_octets'] = array(
         #'-v', 'Bits/s',
         'DEF:dout_min={file}:tx:MIN',
         'DEF:dout_avg={file}:tx:AVERAGE',
@@ -854,7 +854,7 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
         'GPRINT:inc_bit_max:MAX:%5.1lf%s',
                 'GPRINT:inc_bit_min:MIN:%5.1lf%s\l',
         'GPRINT:inc_avg_sum:LAST:            (ca. %5.1lf%sB Total)\l');
-    $GraphDefs['mysql_qcache'] = array(
+        $GraphDefs['mysql_qcache'] = array(
         #'-v', 'Queries/s',
         "DEF:hits_min={file}:hits:MIN",
         "DEF:hits_avg={file}:hits:AVERAGE",
@@ -904,7 +904,7 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
         'GPRINT:queries_avg:AVERAGE:%4.0lf%s ',
         'GPRINT:queries_max:MAX:%4.0lf%s ',
         'GPRINT:queries_avg:LAST:%4.0lf%s\l');
-    $GraphDefs['mysql_threads'] = array(
+        $GraphDefs['mysql_threads'] = array(
         #'-v', 'Threads',
         "DEF:running_min={file}:running:MIN",
         "DEF:running_avg={file}:running:AVERAGE",
@@ -944,7 +944,7 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
         'GPRINT:created_avg:AVERAGE:%5.0lf',
         'GPRINT:created_max:MAX:%5.0lf',
         'GPRINT:created_avg:LAST:%5.0lf\l');
-    $GraphDefs['nfs_procedure'] = array(
+        $GraphDefs['nfs_procedure'] = array(
         #'-v', 'Issues/s',
         'DEF:avg={file}:value:AVERAGE',
         'DEF:min={file}:value:MIN',
@@ -956,7 +956,7 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
         'GPRINT:avg:AVERAGE:%6.2lf',
         'GPRINT:max:MAX:%6.2lf',
         'GPRINT:avg:LAST:%6.2lf\l');
-    $GraphDefs['nfs3_procedures'] = array(
+        $GraphDefs['nfs3_procedures'] = array(
         "DEF:null_avg={file}:null:AVERAGE",
         "DEF:getattr_avg={file}:getattr:AVERAGE",
         "DEF:setattr_avg={file}:setattr:AVERAGE",
@@ -1051,7 +1051,7 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
         'GPRINT:read_max:MAX:%5.1lf',
         'GPRINT:read_avg:AVERAGE:%5.1lf',
         'GPRINT:read_avg:LAST:%5.1lf\l');
-    $GraphDefs['opcode'] = array(
+        $GraphDefs['opcode'] = array(
         'DEF:avg={file}:value:AVERAGE',
         'DEF:min={file}:value:MIN',
         'DEF:max={file}:value:MAX',
@@ -1062,7 +1062,7 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
         'GPRINT:avg:AVERAGE:%9.3lf Average,',
         'GPRINT:max:MAX:%9.3lf',
         'GPRINT:avg:LAST:%9.3lf\l');
-    $GraphDefs['partition'] = array(
+        $GraphDefs['partition'] = array(
         "DEF:rbyte_avg={file}:rbytes:AVERAGE",
         "DEF:rbyte_min={file}:rbytes:MIN",
         "DEF:rbyte_max={file}:rbytes:MAX",
@@ -1082,7 +1082,7 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
         'GPRINT:rbyte_avg:AVERAGE:%5.1lf%s ',
         'GPRINT:rbyte_max:MAX:%5.1lf%s',
         'GPRINT:rbyte_avg:LAST:%5.1lf%s\l');
-    $GraphDefs['percent'] = array(
+        $GraphDefs['percent'] = array(
         #'-v', 'Percent',
         'DEF:avg={file}:percent:AVERAGE',
         'DEF:min={file}:percent:MIN',
@@ -1094,7 +1094,7 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
         'GPRINT:avg:AVERAGE:%5.1lf%% ',
         'GPRINT:max:MAX:%5.1lf%%',
         'GPRINT:avg:LAST:%5.1lf%%\l');
-    $GraphDefs['ping'] = array(
+        $GraphDefs['ping'] = array(
         'DEF:ping_avg={file}:ping:AVERAGE',
         'DEF:ping_min={file}:ping:MIN',
         'DEF:ping_max={file}:ping:MAX',
@@ -1105,7 +1105,7 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
         'GPRINT:ping_avg:AVERAGE:%4.1lf ms ',
         'GPRINT:ping_max:MAX:%4.1lf ms',
         'GPRINT:ping_avg:LAST:%4.1lf ms Last');
-    $GraphDefs['power'] = array(
+        $GraphDefs['power'] = array(
         #'-v', 'Watt',
         'DEF:avg={file}:value:AVERAGE',
         'DEF:min={file}:value:MIN',
@@ -1117,7 +1117,7 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
         'GPRINT:avg:AVERAGE:%5.1lf%sW ',
         'GPRINT:max:MAX:%5.1lf%sW',
         'GPRINT:avg:LAST:%5.1lf%sW\l');
-    $GraphDefs['processes'] = array(
+        $GraphDefs['processes'] = array(
         "DEF:running_avg={file}:running:AVERAGE",
         "DEF:running_min={file}:running:MIN",
         "DEF:running_max={file}:running:MAX",
@@ -1178,7 +1178,7 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
         'GPRINT:sleeping_avg:AVERAGE:%5.1lf Average,',
         'GPRINT:sleeping_max:MAX:%5.1lf',
         'GPRINT:sleeping_avg:LAST:%5.1lf\l');
-    $GraphDefs['ps_count'] = array(
+        $GraphDefs['ps_count'] = array(
         #'-v', 'Processes',
         'DEF:procs_avg={file}:processes:AVERAGE',
         'DEF:procs_min={file}:processes:MIN',
@@ -1198,7 +1198,7 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
         'GPRINT:procs_avg:AVERAGE:%5.1lf',
         'GPRINT:procs_max:MAX:%5.1lf',
         'GPRINT:procs_avg:LAST:%5.1lf\l');
-    $GraphDefs['ps_cputime'] = array(
+        $GraphDefs['ps_cputime'] = array(
         #'-v', 'Jiffies',
         'DEF:user_avg_raw={file}:user:AVERAGE',
         'DEF:user_min_raw={file}:user:MIN',
@@ -1225,7 +1225,7 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
         'GPRINT:syst_avg:AVERAGE:%5.1lf%s ',
         'GPRINT:syst_max:MAX:%5.1lf%s',
         'GPRINT:syst_avg:LAST:%5.1lf%s\l');
-    $GraphDefs['ps_pagefaults'] = array(
+        $GraphDefs['ps_pagefaults'] = array(
         #'-v', 'Pagefaults/s',
         'DEF:minor_avg={file}:minflt:AVERAGE',
         'DEF:minor_min={file}:minflt:MIN',
@@ -1246,7 +1246,7 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
         'GPRINT:major_avg:AVERAGE:%5.1lf%s ',
         'GPRINT:major_max:MAX:%5.1lf%s',
         'GPRINT:major_avg:LAST:%5.1lf%s\l');
-    $GraphDefs['ps_rss'] = array(
+        $GraphDefs['ps_rss'] = array(
         #'-v', 'Bytes',
         'DEF:avg={file}:value:AVERAGE',
         'DEF:min={file}:value:MIN',
@@ -1257,7 +1257,7 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
         'GPRINT:avg:AVERAGE:%5.1lf%s ',
         'GPRINT:max:MAX:%5.1lf%s',
         'GPRINT:avg:LAST:%5.1lf%s\l');
-    $GraphDefs['ps_state'] = array(
+        $GraphDefs['ps_state'] = array(
         #'-v', 'Processes',
         'DEF:avg={file}:value:AVERAGE',
         'DEF:min={file}:value:MIN',
@@ -1269,7 +1269,7 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
         'GPRINT:avg:AVERAGE:%6.2lf',
         'GPRINT:max:MAX:%6.2lf',
         'GPRINT:avg:LAST:%6.2lf\l');
-    $GraphDefs['qtype'] = array(
+        $GraphDefs['qtype'] = array(
         'DEF:avg={file}:value:AVERAGE',
         'DEF:min={file}:value:MIN',
         'DEF:max={file}:value:MAX',
@@ -1280,7 +1280,7 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
         'GPRINT:avg:AVERAGE:%9.3lf Average,',
         'GPRINT:max:MAX:%9.3lf',
         'GPRINT:avg:LAST:%9.3lf\l');
-    $GraphDefs['rcode'] = array(
+        $GraphDefs['rcode'] = array(
         'DEF:avg={file}:value:AVERAGE',
         'DEF:min={file}:value:MIN',
         'DEF:max={file}:value:MAX',
@@ -1291,7 +1291,7 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
         'GPRINT:avg:AVERAGE:%9.3lf Average,',
         'GPRINT:max:MAX:%9.3lf',
         'GPRINT:avg:LAST:%9.3lf\l');
-    $GraphDefs['swap'] = array(
+        $GraphDefs['swap'] = array(
         #'-v', 'Bytes',
                 '-b', '1024',
         'DEF:avg={file}:value:AVERAGE',
@@ -1305,7 +1305,7 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
         'GPRINT:avg:AVERAGE:%6.2lf%sByte ',
         'GPRINT:max:MAX:%6.2lf%sByte',
         'GPRINT:avg:LAST:%6.2lf%sByte\l');
-    $GraphDefs['old_swap'] = array(
+        $GraphDefs['old_swap'] = array(
         'DEF:used_avg={file}:used:AVERAGE',
         'DEF:used_min={file}:used:MIN',
         'DEF:used_max={file}:used:MAX',
@@ -1348,7 +1348,7 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
         'GPRINT:used_avg:AVERAGE:%5.1lf%s ',
         'GPRINT:used_max:MAX:%5.1lf%s',
         'GPRINT:used_avg:LAST:%5.1lf%s\l');
-    $GraphDefs['tcp_connections'] = array(
+        $GraphDefs['tcp_connections'] = array(
         #'-v', 'Connections',
         'DEF:avg={file}:value:AVERAGE',
         'DEF:min={file}:value:MIN',
@@ -1360,7 +1360,7 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
         'GPRINT:avg:AVERAGE:%4.1lf',
         'GPRINT:max:MAX:%4.1lf',
         'GPRINT:avg:LAST:%4.1lf\l');
-    $GraphDefs['temperature'] = array(
+        $GraphDefs['temperature'] = array(
         #'-v', 'Celsius',
         'DEF:temp_avg={file}:value:AVERAGE',
         'DEF:temp_min={file}:value:MIN',
@@ -1373,7 +1373,7 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
         'GPRINT:temp_avg:AVERAGE:%4.1lf',
         'GPRINT:temp_max:MAX:%4.1lf',
         'GPRINT:temp_avg:LAST:%4.1lf\l');
-    $GraphDefs['signal'] = array(
+        $GraphDefs['signal'] = array(
         'DEF:signal_avg={file}:value:AVERAGE',
         'DEF:signal_min={file}:value:MIN',
         'DEF:signal_max={file}:value:MAX',
@@ -1385,7 +1385,7 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
         'GPRINT:signal_avg:AVERAGE:%4.1lf',
         'GPRINT:signal_max:MAX:%4.1lf',
         'GPRINT:signal_avg:LAST:%4.1lf\l');
-    $GraphDefs['timeleft'] = array(
+        $GraphDefs['timeleft'] = array(
         #'-v', 'Minutes',
         'DEF:avg={file}:timeleft:AVERAGE',
         'DEF:min={file}:timeleft:MIN',
@@ -1397,7 +1397,7 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
         'GPRINT:avg:AVERAGE:%5.1lf%s ',
         'GPRINT:max:MAX:%5.1lf%s',
         'GPRINT:avg:LAST:%5.1lf%s\l');
-    $GraphDefs['time_offset'] = array( # NTPd
+        $GraphDefs['time_offset'] = array( # NTPd
         'DEF:s_avg={file}:seconds:AVERAGE',
         'DEF:s_min={file}:seconds:MIN',
         'DEF:s_max={file}:seconds:MAX',
@@ -1409,7 +1409,7 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
         'GPRINT:s_avg:AVERAGE:%5.2lf%s',
         'GPRINT:s_max:MAX:%5.2lf%s',
         'GPRINT:s_avg:LAST:%5.2lf%s');
-    $GraphDefs['if_octets'] = array(
+        $GraphDefs['if_octets'] = array(
         #'-v', 'Bits/s',
                 '--units=si',
         'DEF:out_min_raw={file}:tx:MIN',
@@ -1441,12 +1441,12 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
         'GPRINT:out_avg:LAST:%5.1lf%s Last',
         'GPRINT:out_avg_sum:LAST:(ca. %5.1lf%sB Total)\l',
         "LINE1:inc_avg#$FullBlue:Incoming",
-//			'GPRINT:inc_min:MIN:%5.1lf %s ',
+//          'GPRINT:inc_min:MIN:%5.1lf %s ',
         'GPRINT:inc_avg:AVERAGE:%5.1lf%s ',
         'GPRINT:inc_max:MAX:%5.1lf%s',
         'GPRINT:inc_avg:LAST:%5.1lf%s Last',
         'GPRINT:inc_avg_sum:LAST:(ca. %5.1lf%sB Total)\l');
-    $GraphDefs['cpufreq'] = array(
+        $GraphDefs['cpufreq'] = array(
         'DEF:cpufreq_avg={file}:value:AVERAGE',
         'DEF:cpufreq_min={file}:value:MIN',
         'DEF:cpufreq_max={file}:value:MAX',
@@ -1457,7 +1457,7 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
         'GPRINT:cpufreq_avg:AVERAGE:%5.1lf%s ',
         'GPRINT:cpufreq_max:MAX:%5.1lf%s',
         'GPRINT:cpufreq_avg:LAST:%5.1lf%s\l');
-    $GraphDefs['multimeter'] = array(
+        $GraphDefs['multimeter'] = array(
         'DEF:multimeter_avg={file}:value:AVERAGE',
         'DEF:multimeter_min={file}:value:MIN',
         'DEF:multimeter_max={file}:value:MAX',
@@ -1468,7 +1468,7 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
         'GPRINT:multimeter_avg:AVERAGE:%4.1lf Average,',
         'GPRINT:multimeter_max:MAX:%4.1lf',
         'GPRINT:multimeter_avg:LAST:%4.1lf\l');
-    $GraphDefs['users'] = array(
+        $GraphDefs['users'] = array(
         #'-v', 'Users',
         'DEF:users_avg={file}:users:AVERAGE',
         'DEF:users_min={file}:users:MIN',
@@ -1481,7 +1481,7 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
         'GPRINT:users_avg:AVERAGE:%5.1lf',
         'GPRINT:users_max:MAX:%5.1lf',
         'GPRINT:users_avg:LAST:%5.1lf\l');
-    $GraphDefs['voltage'] = array(
+        $GraphDefs['voltage'] = array(
         #'-v', 'Voltage',
         'DEF:avg={file}:value:AVERAGE',
         'DEF:min={file}:value:MIN',
@@ -1493,7 +1493,7 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
         'GPRINT:avg:AVERAGE:%5.1lf%sV ',
         'GPRINT:max:MAX:%5.1lf%sV',
         'GPRINT:avg:LAST:%5.1lf%sV\l');
-    $GraphDefs['vmpage_action'] = array(
+        $GraphDefs['vmpage_action'] = array(
         #'-v', 'Actions',
         'DEF:avg={file}:value:AVERAGE',
         'DEF:min={file}:value:MIN',
@@ -1505,8 +1505,8 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
         'GPRINT:avg:AVERAGE:%5.1lf%sV ',
         'GPRINT:max:MAX:%5.1lf%sV',
         'GPRINT:avg:LAST:%5.1lf%sV\l');
-    $GraphDefs['vmpage_faults'] = $GraphDefs['ps_pagefaults'];
-    $GraphDefs['vmpage_io'] = array(
+        $GraphDefs['vmpage_faults'] = $GraphDefs['ps_pagefaults'];
+        $GraphDefs['vmpage_io'] = array(
         #'-v', 'Bytes/s',
         'DEF:out_min={file}:out:MIN',
         'DEF:out_avg={file}:out:AVERAGE',
@@ -1535,7 +1535,7 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
         'GPRINT:inc_max:MAX:%5.1lf%s',
         'GPRINT:inc_avg:LAST:%5.1lf%s Last',
         'GPRINT:inc_avg_sum:LAST:(ca. %5.1lf%sB Total)\l');
-    $GraphDefs['vmpage_number'] = array(
+        $GraphDefs['vmpage_number'] = array(
         #'-v', 'Count',
         'DEF:avg={file}:value:AVERAGE',
         'DEF:min={file}:value:MIN',
@@ -1546,7 +1546,7 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
         'GPRINT:avg:AVERAGE:%5.1lf%s ',
         'GPRINT:max:MAX:%5.1lf%s',
         'GPRINT:avg:LAST:%5.1lf%s\l');
-    $GraphDefs['vs_threads'] = array(
+        $GraphDefs['vs_threads'] = array(
         "DEF:total_avg={file}:total:AVERAGE",
         "DEF:total_min={file}:total:MIN",
         "DEF:total_max={file}:total:MAX",
@@ -1579,7 +1579,7 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
         'GPRINT:onhold_avg:AVERAGE:%5.1lf Avg.,',
         'GPRINT:onhold_max:MAX:%5.1lf',
         'GPRINT:onhold_avg:LAST:%5.1lf\l');
-    $GraphDefs['vs_memory'] = array(
+        $GraphDefs['vs_memory'] = array(
         'DEF:vm_avg={file}:vm:AVERAGE',
         'DEF:vm_min={file}:vm:MIN',
         'DEF:vm_max={file}:vm:MAX',
@@ -1612,7 +1612,7 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
         'GPRINT:anon_avg:AVERAGE:%5.1lf%s Avg.,',
         'GPRINT:anon_max:MAX:%5.1lf%s Avg.,',
         'GPRINT:anon_avg:LAST:%5.1lf%s\l');
-    $GraphDefs['vs_processes'] = array(
+        $GraphDefs['vs_processes'] = array(
         #'-v', 'Processes',
         'DEF:proc_avg={file}:value:AVERAGE',
         'DEF:proc_min={file}:value:MIN',
@@ -1624,43 +1624,43 @@ function load_graph_definitions($logarithmic = false, $tinylegend = false)
         'GPRINT:proc_avg:AVERAGE:%4.1lf Avg.,',
         'GPRINT:proc_max:MAX:%4.1lf',
         'GPRINT:proc_avg:LAST:%4.1lf\l');
-    $GraphDefs['if_multicast'] = $GraphDefs['ipt_packets'];
-    $GraphDefs['if_tx_errors'] = $GraphDefs['if_rx_errors'];
+        $GraphDefs['if_multicast'] = $GraphDefs['ipt_packets'];
+        $GraphDefs['if_tx_errors'] = $GraphDefs['if_rx_errors'];
 
-    $MetaGraphDefs['files_count']       = 'meta_graph_files_count';
-    $MetaGraphDefs['files_size']        = 'meta_graph_files_size';
-    $MetaGraphDefs['cpu']               = 'meta_graph_cpu';
-    $MetaGraphDefs['if_rx_errors']      = 'meta_graph_if_rx_errors';
-    $MetaGraphDefs['if_tx_errors']      = 'meta_graph_if_rx_errors';
-    $MetaGraphDefs['memory']            = 'meta_graph_memory';
-    $MetaGraphDefs['vs_memory']         = 'meta_graph_vs_memory';
-    $MetaGraphDefs['vs_threads']        = 'meta_graph_vs_threads';
-    $MetaGraphDefs['nfs_procedure']     = 'meta_graph_nfs_procedure';
-    $MetaGraphDefs['ps_state']          = 'meta_graph_ps_state';
-    $MetaGraphDefs['swap']              = 'meta_graph_swap';
-    $MetaGraphDefs['apache_scoreboard'] = 'meta_graph_apache_scoreboard';
-    $MetaGraphDefs['mysql_commands']    = 'meta_graph_mysql_commands';
-    $MetaGraphDefs['mysql_handler']     = 'meta_graph_mysql_commands';
-    $MetaGraphDefs['tcp_connections']   = 'meta_graph_tcp_connections';
+        $MetaGraphDefs['files_count']       = 'meta_graph_files_count';
+        $MetaGraphDefs['files_size']        = 'meta_graph_files_size';
+        $MetaGraphDefs['cpu']               = 'meta_graph_cpu';
+        $MetaGraphDefs['if_rx_errors']      = 'meta_graph_if_rx_errors';
+        $MetaGraphDefs['if_tx_errors']      = 'meta_graph_if_rx_errors';
+        $MetaGraphDefs['memory']            = 'meta_graph_memory';
+        $MetaGraphDefs['vs_memory']         = 'meta_graph_vs_memory';
+        $MetaGraphDefs['vs_threads']        = 'meta_graph_vs_threads';
+        $MetaGraphDefs['nfs_procedure']     = 'meta_graph_nfs_procedure';
+        $MetaGraphDefs['ps_state']          = 'meta_graph_ps_state';
+        $MetaGraphDefs['swap']              = 'meta_graph_swap';
+        $MetaGraphDefs['apache_scoreboard'] = 'meta_graph_apache_scoreboard';
+        $MetaGraphDefs['mysql_commands']    = 'meta_graph_mysql_commands';
+        $MetaGraphDefs['mysql_handler']     = 'meta_graph_mysql_commands';
+        $MetaGraphDefs['tcp_connections']   = 'meta_graph_tcp_connections';
 
-    if (function_exists('load_graph_definitions_local')) {
-        load_graph_definitions_local($logarithmic, $tinylegend);
-    }
-
-    if ($logarithmic) {
-        foreach ($GraphDefs as &$GraphDef) {
-            array_unshift($GraphDef, '-o');
+        if (function_exists('load_graph_definitions_local')) {
+            load_graph_definitions_local($logarithmic, $tinylegend);
         }
-    }
-    if ($tinylegend) {
-        foreach ($GraphDefs as &$GraphDef) {
-            for ($i = count($GraphDef)-1; $i >=0; $i--) {
-                if (strncmp('GPRINT:', $GraphDef[$i], 7) == 0) {
-                    unset($GraphDef[$i]);
+
+        if ($logarithmic) {
+            foreach ($GraphDefs as &$GraphDef) {
+                array_unshift($GraphDef, '-o');
+            }
+        }
+        if ($tinylegend) {
+            foreach ($GraphDefs as &$GraphDef) {
+                for ($i = count($GraphDef)-1; $i >=0; $i--) {
+                    if (strncmp('GPRINT:', $GraphDef[$i], 7) == 0) {
+                        unset($GraphDef[$i]);
+                    }
                 }
             }
         }
-    }
 }
 
 function meta_graph_files_count($host, $plugin, $plugin_instance, $type, $type_instances, $opts = array())

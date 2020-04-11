@@ -42,19 +42,19 @@ $pagetitle[] = 'Eventlog';
         '<?php echo csrf_field() ?>' +
         <?php
         if (!isset($vars['fromdevice'])) {
-        ?>
+            ?>
         '<div class="form-group">' +
         '<label><strong>Device&nbsp;&nbsp;</strong></label>' +
         '<select name="device" id="device" class="form-control">' +
         '<option value="">All Devices</option>' +
-        <?php
-        if ($device instanceof Device) {
-            echo "'<option value=$device->device_id>" . $device->displayName() . "</option>' +";
-        }
-        ?>
+            <?php
+            if ($device instanceof Device) {
+                echo "'<option value=$device->device_id>" . $device->displayName() . "</option>' +";
+            }
+            ?>
         '</select>' +
         '</div>&nbsp;&nbsp;&nbsp;&nbsp;' +
-        <?php
+            <?php
         } else {
             echo "'&nbsp;&nbsp;<input type=\"hidden\" name=\"device\" id=\"device\" value=\"" . $vars['device'] . "\">' + ";
         }

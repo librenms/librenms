@@ -61,7 +61,7 @@
             prefix: String,
             initialTab: {type: String, default: 'alerting'},
             initialSection: String,
-            tabs: {type: Object}
+            tabs: {type: Array}
         },
         data() {
             return {
@@ -118,6 +118,9 @@
 
                 return this.checkLogic(setting.when);
             },
+            translatedCompare(prefix, a, b) {
+                return this.$t(prefix + a).localeCompare(this.$t(prefix + b))
+            },
             checkLogic(logic) {
                 switch (logic.operator) {
                     case 'equals':
@@ -136,7 +139,12 @@
         computed: {
             groups() {
                 if (_.isEmpty(this.settings)) {
-                    return this.tabs;
+                    let sorted_tabs = {};
+                    this.tabs.sort((a, b) => this.translatedCompare('settings.groups.', a, b)).forEach(function (tab) {
+                        sorted_tabs[tab] = [];
+                    });
+
+                    return sorted_tabs;
                 }
 
                 // group data
@@ -163,9 +171,9 @@
 
                 // sort groups
                 let sorted = {};
-                Object.keys(groups).sort().forEach(group_key => {
+                Object.keys(groups).sort((a, b) => this.translatedCompare('settings.groups.', a, b)).forEach(group_key => {
                     sorted[group_key] = {};
-                    Object.keys(groups[group_key]).sort().forEach(section_key => {
+                    Object.keys(groups[group_key]).sort((a, b) => this.translatedCompare('settings.sections.' + group_key + '.', a , b)).forEach(section_key => {
                         sorted[group_key][section_key] = _.sortBy(groups[group_key][section_key], 'order').map(a => a.name);
                     });
                 });

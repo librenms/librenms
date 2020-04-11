@@ -25,8 +25,23 @@
                                                  aria-hidden="true"></i> <span
                             class="hidden-sm">@lang('Overview')</span></a>
                     <ul class="dropdown-menu multi-level" role="menu">
-                        <li><a href="{{ url('overview') }}"><i class="fa fa-tv fa-fw fa-lg"
-                                                               aria-hidden="true"></i> @lang('Dashboard')</a></li>
+                        <li class="dropdown-submenu">
+                            <a><i class="fa fa-tv fa-fw fa-lg" aria-hidden="true"></i> @lang('Dashboard')</a>
+                            <ul class="dropdown-menu">
+                                @foreach($dashboards as $dashboard)
+                                <li><a href="{{ route('overview', ['dashboard' => $dashboard->dashboard_id]) }}"><i class="fa fa-tv fa-fw fa-lg" aria-hidden="true"></i> {{ $dashboard->dashboard_name }}</a></li>
+                                @endforeach
+                                <li role="presentation" class="divider"></li>
+                                <li>
+                                    <a href="{{ url('toggle_dashboard_editor') }}">
+                                    <i class="fa fa-bar-chart fa-fw fa-lg" aria-hidden="true"></i>
+                                    @if ($hide_dashboard_editor) @lang('Show Dashboard Editor')
+                                    @else @lang('Hide Dashboard Editor')
+                                    @endif</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li role="presentation" class="divider"></li>
                         <li class="dropdown-submenu">
                             <a><i class="fa fa-map fa-fw fa-lg"
                                                                aria-hidden="true"></i> @lang('Maps')</a>
@@ -526,14 +541,14 @@
                                                               aria-hidden="true"></i> @lang('Auth History')</a></li>
                         <li role="presentation" class="divider"></li>
                         <li class="dropdown-submenu">
-                            <a href="{{ url('pollers') }}"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> @lang('Pollers')</a>
+                            <a href="{{ url('poller') }}"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> @lang('Poller')</a>
                             <ul class="dropdown-menu">
-                                <li><a href="{{ url('pollers/tab=pollers') }}"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> @lang('Pollers')</a></li>
+                                <li><a href="{{ route('poller') }}"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> @lang('Poller')</a></li>
                                 @config('distributed_poller')
-                                <li><a href="{{ url('pollers/tab=groups') }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> @lang('Groups')</a></li>
+                                <li><a href="{{ route('poller.groups') }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> @lang('Groups')</a></li>
                                 @endconfig
-                                <li><a href="{{ url('pollers/tab=performance') }}"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> @lang('Performance')</a></li>
-                                <li><a href="{{ url('pollers/tab=log') }}"><i class="fa fa-file-text fa-fw fa-lg" aria-hidden="true"></i> @lang('History')</a></li>
+                                <li><a href="{{ route('poller.performance') }}"><i class="fa fa-line-chart fa-fw fa-lg" aria-hidden="true"></i> @lang('Performance')</a></li>
+                                <li><a href="{{ route('poller.log') }}"><i class="fa fa-file-text fa-fw fa-lg" aria-hidden="true"></i> @lang('Log')</a></li>
                             </ul>
                         </li>
                         <li role="presentation" class="divider"></li>

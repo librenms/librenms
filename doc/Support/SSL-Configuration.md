@@ -28,7 +28,7 @@ the "snippet" configuration, the main differences come when you get to
 directed to edit `/etc/nginx/sites-available/default`, so we need to
 go to `/etc/nginx/conf.d/librenms.conf`.
 
-`sudo vi /etc/nginx/sites-available/default`
+`sudo vi /etc/nginx/conf.d/librenms.conf`
 
 The top section of this file will look like this:
 

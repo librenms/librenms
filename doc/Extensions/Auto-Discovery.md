@@ -107,6 +107,9 @@ Enabled by default.
 
 This includes FDP, CDP and LLDP support based on the device type.
 
+The LLDP/xDP links with neighbours will always be discovered as soon as the discovery module is enabled.
+However, LibreNMS will only try to add the new devices discovered with LLDP/xDP if `$config['autodiscovery']['xdp'] = true`; 
+
 Devices may be excluded from xdp discovery by sysName and sysDescr.
 
 ```php
