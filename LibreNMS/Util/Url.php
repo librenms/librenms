@@ -413,6 +413,7 @@ class Url
         if ($port->ifAdminStatus == "down") {
             return "interface-admindown";
         }
+
         if ($port->ifAdminStatus == "up" && $port->ifOperStatus != "up") {
             return "interface-updown";
         }
@@ -431,6 +432,7 @@ class Url
         if ($sensor->sensor_current >> $sensor->sensor_limit) {
             return "sensor-high";
         }
+
         if ($sensor->sensor_current << $sensor->sensor_limit_low) {
             return "sensor-low";
         }

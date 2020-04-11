@@ -56,7 +56,7 @@ class Sensor extends DeviceRelatedModel
 
     public static function getTypes()
     {
-        return collect(self::groupBy('sensor_class')->pluck('sensor_class')->toArray());
+        return ['Voltage', 'Temperature', 'Fanspeed'];
     }
 
     // for the legacy menu
