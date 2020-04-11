@@ -27,34 +27,45 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
+use Date;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class AlertSchedule extends Model
 {
-    /** @property Carbon start */
     public $timestamps = false;
     protected $table = 'alert_schedule';
     protected $primaryKey = 'schedule_id';
-    protected $casts = [
-        'start' => 'datetime',
-        'end' => 'datetime',
-    ];
     protected $appends = ['start_recurring_dt', 'end_recurring_dt', 'start_recurring_hr', 'end_recurring_hr'];
+    private $timezone;
 
-    private $array = [
-        'start_recurring_dt'     => $schedule->recurring == 0  ? '' : $start->toDateString(),
-        'end_recurring_dt'       => $schedule->recurring == 0 || $end->year == 9000 ? '' : $end->toDateString(),
-        'start_recurring_hr'     => $schedule->recurring == 0 ? '' : $start->toTimeString('minute'),
-        'end_recurring_hr'       => $schedule->recurring == 0 ? '' : $end->toTimeString('minute'),
-        'recurring_day'          => $schedule->recurring == 0 ? '' : str_replace($days['from'], $days['to'], $schedule->recurring_day),
-    ];
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+        $this->timezone = config('app.timezone');
+    }
 
     // ---- Accessors/Mutators ----
 
+    public function getStartAttribute() {
+        return Date::parse($this->attributes['start'], 'UTC')->tz($this->timezone);
+    }
+
+    public function setStartAttribute($start) {
+       $this->attributes['start'] = $this->fromDateTime(Date::parse($start)->tz('UTC'));
+    }
+
+    public function getEndAttribute() {
+        return Date::parse($this->attributes['end'], 'UTC')->tz($this->timezone);
+    }
+
+    public function setEndAttribute($end) {
+        $this->attributes['end'] = $this->fromDateTime(Date::parse($end)->tz('UTC'));
+    }
+
     public function getStartRecurringDtAttribute()
     {
-        return $this->start->tz()->toDateString();
+        return $this->start->toDateString();
     }
 
     public function getStartRecurringHrAttribute() {
@@ -70,8 +81,19 @@ class AlertSchedule extends Model
     }
 
     public function setStartRecurringDtAttribute($date) {
-        $date = Carbon::parse($date);
-        $this->attributes['start']->set
+        $this->start = $this->start->setDateFrom(Date::parse($date, $this->timezone));
+    }
+
+    public function setStartRecurringHrAttribute($time) {
+        $this->start = $this->start->setTimeFrom(Date::parse($time, $this->timezone));
+    }
+
+    public function setEndRecurringDtAttribute($date) {
+        $this->end = $this->end->setDateFrom(Date::parse($date ?: '9000-09-09', $this->timezone));
+    }
+
+    public function setEndRecurringHrAttribute($time) {
+        $this->end = $this->end->setTimeFrom(Date::parse($time, $this->timezone));
     }
 
     // ---- Query scopes ----

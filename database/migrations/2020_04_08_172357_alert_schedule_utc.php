@@ -14,7 +14,7 @@ class AlertScheduleUtc extends Migration
     {
         DB::table('alert_schedule')->update([
             'start' => DB::raw("CONVERT_TZ(IF(`recurring` = 1, STR_TO_DATE(CONCAT(start_recurring_dt, ' ', start_recurring_hr), '%Y-%m-%d %H:%i:%s'), start), @@global.time_zone, '+00:00')"),
-            'end' => DB::raw("CONVERT_TZ(IF(`recurring` = 1, STR_TO_DATE(CONCAT(IFNULL(end_recurring_dt, '9000-9-9'), ' ', end_recurring_hr), '%Y-%m-%d %H:%i:%s'), end), @@global.time_zone, '+00:00')"),
+            'end' => DB::raw("CONVERT_TZ(IF(`recurring` = 1, STR_TO_DATE(CONCAT(IFNULL(end_recurring_dt, '9000-09-09'), ' ', end_recurring_hr), '%Y-%m-%d %H:%i:%s'), end), @@global.time_zone, '+00:00')"),
             'recurring_day' => DB::raw('REPLACE(recurring_day, 0, 7)'), // convert to RFC N date format
         ]);
 
