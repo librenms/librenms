@@ -535,10 +535,13 @@ class Config
     public static function locateBinary($binary)
     {
         if (!str_contains($binary, '/')) {
-            $target = trim(`which $binary`);
-
-            if (!empty($target)) {
-                return $target;
+            $output = `whereis -b $binary`;
+            $list = trim(substr($output, strpos($output, ':') + 1));
+            $targets = explode(' ', $list);
+            foreach ($targets as $target) {
+                if (is_executable($target)) {
+                    return $target;
+                }
             }
         }
         return $binary;
