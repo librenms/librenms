@@ -884,19 +884,12 @@ function get_astext($asn)
  */
 function log_event($text, $device = null, $type = null, $severity = 2, $reference = null)
 {
-    if (!is_array($device)) {
-        $device = device_by_id_cache($device);
+    // handle legacy device array
+    if (is_array($device) && isset($device['device_id'])) {
+        $device = $device['device_id'];
     }
 
-    dbInsert([
-        'device_id' => ($device['device_id'] ?: 0),
-        'reference' => $reference,
-        'type' => $type,
-        'datetime' => \Carbon\Carbon::now(),
-        'severity' => $severity,
-        'message' => $text,
-        'username'  => Auth::user()->username ?? '',
-    ], 'eventlog');
+    Log::event($text, $device, $type, $severity, $reference);
 }
 
 // Parse string with emails. Return array with email (as key) and name (as value)
