@@ -56,8 +56,7 @@ class MenuComposer
         $user = Auth::user();
         $site_style = Config::get('applied_site_style');
 
-        //TODO: should be handled via CSS Themes
-        $vars['navbar'] = in_array($site_style, ['mono', 'dark']) ? 'navbar-inverse' : '';
+        $vars['navbar'] = '';
 
         $vars['project_name'] = Config::get('project_name', 'LibreNMS');
         $vars['title_image'] = Config::get('title_image', "images/librenms_logo_$site_style.svg");
