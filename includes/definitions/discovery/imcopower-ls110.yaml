@@ -14,7 +14,7 @@ modules:
                     -
                       oid: sdsTempSensValue
                       op: '>='
-                      value: 1000
+                      value: 100000
 
         charge:
             data:
