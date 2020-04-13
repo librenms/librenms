@@ -23,25 +23,6 @@
  * @author     Lars Elgtvedt Susaas
  */
 
-/*
-    Usage (SNMPv1/2c)    : ./addhost.php [-g <poller group>] [-f] [-b] [-p <port assoc mode>] <hostname> [community] [v1|v2c] [port] [udp|udp6|tcp|tcp6]
-    Usage (SNMPv3)       :
-        Config Defaults  : ./addhost.php [-g <poller group>] [-f] [-b] [-p <port assoc mode>] <hostname> any v3 [user] [port] [udp|udp6|tcp|tcp6]
-        No Auth, No Priv : ./addhost.php [-g <poller group>] [-f] [-b] [-p <port assoc mode>] <hostname> nanp v3 [user] [port] [udp|udp6|tcp|tcp6]
-        Auth, No Priv    : ./addhost.php [-g <poller group>] [-f] [-b] [-p <port assoc mode>] <hostname> anp v3 <user> <password> [md5|sha] [port] [udp|udp6|tcp|tcp6]
-        Auth,    Priv    : ./addhost.php [-g <poller group>] [-f] [-b] [-p <port assoc mode>] <hostname> ap v3 <user> <password> <enckey> [md5|sha] [aes|des] [port] [udp|udp6|tcp|tcp6]
-    Usage (ICMP only)    : ./addhost.php [-g <poller group>] [-f] -P <hostname> [os] [hardware]
-
-    -g <poller group> allows you to add a device to be pinned to a specific poller when using distributed polling. X can be any number associated with a poller group
-    -f forces the device to be added by skipping the icmp and snmp check against the host.
-    -p <port assoc mode> allow you to set a port association mode for this device. By default ports are associated by 'ifIndex'.
-        For Linux/Unix based devices 'ifName' or 'ifDescr' might be useful for a stable iface mapping.
-        The default for this installation is 'ifIndex'
-        Valid port assoc modes are: ifIndex, ifName, ifDescr, ifAlias
-    -b Add the host with SNMP if it replies to it, otherwise only ICMP.
-    -P Add the host with only ICMP, no SNMP or OS discovery.
-*/
-
 namespace LibreNMS\Tests;
 
 use App\Models\Device;
@@ -61,141 +42,114 @@ class AddhostCliTest extends DBTestCase
 
     public function testCLIsnmpV1()
     {
-        exec("./addhost.php -g poller_group -f -p ifIndex ".$this->hostName." community v1 111 tcp");
+        $result = \Artisan::call('device:add '.$this->hostName.' -force -ccommunity --v1');
+        $this->assertEquals(0, $result, "command returned non zero value");
         $device = Device::findByHostname($this->hostName);
         $this->assertNotNull($device);
 
         $this->assertEquals(0, $device->snmp_disable, "snmp is disabled");
-        $this->assertEquals(1, $device->port_association_mode, "Wrong port association mode");
         $this->assertEquals("community", $device->community, "Wrong snmp community");
         $this->assertEquals("v1", $device->snmpver, "Wrong snmp version");
-        $this->assertEquals(111, $device->port, "Wrong snmp port");
-        $this->assertEquals("tcp", $device->transport, "Wrong snmp transport (udp/tcp)");
     }
 
     public function testCLIsnmpV2()
     {
-        exec("./addhost.php -g poller_group -f -p ifName ".$this->hostName." community v2c 111 tcp");
+        $result = \Artisan::call('device:add '.$this->hostName.' -force -ccommunity --v2c');
+        $this->assertEquals(0, $result, "command returned non zero value");
         $device = Device::findByHostname($this->hostName);
         $this->assertNotNull($device);
 
         $this->assertEquals(0, $device->snmp_disable, "snmp is disabled");
-        $this->assertEquals(2, $device->port_association_mode, "Wrong port association mode");
         $this->assertEquals("community", $device->community, "Wrong snmp community");
         $this->assertEquals("v2c", $device->snmpver, "Wrong snmp version");
-        $this->assertEquals(111, $device->port, "Wrong snmp port");
-        $this->assertEquals("tcp", $device->transport, "Wrong snmp transport (udp/tcp)");
     }
 
-    public function testCLIsnmpV3Any()
+    public function testCLIsnmpV3UserAndPW()
     {
-        exec("./addhost.php -g poller_group -f -p ifDescr ".$this->hostName." any v3 username 111 tcp");
+        $result = \Artisan::call('device:add '.$this->hostName.' -force -uSecName -AAuthPW -XPrivPW --v3');
+        $this->assertEquals(0, $result, "command returned non zero value");
         $device = Device::findByHostname($this->hostName);
         $this->assertNotNull($device);
 
         $this->assertEquals(0, $device->snmp_disable, "snmp is disabled");
-        $this->assertEquals(3, $device->port_association_mode, "Wrong port association mode");
-        $this->assertEquals("noAuthNoPriv", $device->authlevel, "Wrong snmp v3 authlevel");
-        $this->assertEquals("v3", $device->snmpver, "Wrong snmp version");
-//      $this->assertEquals("username", $device->authname, "Wrong snmp v3 username");
-        $this->assertEquals(111, $device->port, "Wrong snmp port");
-        $this->assertEquals("tcp", $device->transport, "Wrong snmp transport (udp/tcp)");
-    }
-
-    public function testCLIsnmpV3NoAuthNoPriv()
-    {
-        exec("./addhost.php -g poller_group -f -p ifAlias ".$this->hostName." nanp v3 username 111 tcp");
-        $device = Device::findByHostname($this->hostName);
-        $this->assertNotNull($device);
-
-        $this->assertEquals(0, $device->snmp_disable, "snmp is disabled");
-        $this->assertEquals(4, $device->port_association_mode, "Wrong port association mode");
-        $this->assertEquals("noAuthNoPriv", $device->authlevel, "Wrong snmp v3 authlevel");
-        $this->assertEquals("v3", $device->snmpver, "Wrong snmp version");
-//      $this->assertEquals("username", $device->authname, "Wrong snmp v3 username");
-        $this->assertEquals(111, $device->port, "Wrong snmp port");
-        $this->assertEquals("tcp", $device->transport, "Wrong snmp transport (udp/tcp)");
-    }
-
-    public function testCLIsnmpV3AuthNoPriv()
-    {
-        exec("./addhost.php -g poller_group -f -p ifIndex ".$this->hostName." anp v3 username password 111 tcp");
-        $device = Device::findByHostname($this->hostName);
-        $this->assertNotNull($device);
-
-        $this->assertEquals(0, $device->snmp_disable, "snmp is disabled");
-        $this->assertEquals(1, $device->port_association_mode, "Wrong port association mode");
-        $this->assertEquals("authNoPriv", $device->authlevel, "Wrong snmp v3 authlevel");
-        $this->assertEquals("v3", $device->snmpver, "Wrong snmp version");
-        $this->assertEquals("username", $device->authname, "Wrong snmp v3 username");
-        $this->assertEquals("password", $device->authpass, "Wrong snmp v3 password");
-        $this->assertEquals(111, $device->port, "Wrong snmp port");
-        $this->assertEquals("tcp", $device->transport, "Wrong snmp transport (udp/tcp)");
-    }
-
-    public function testCLIsnmpV3AuthNoPrivMd5()
-    {
-        exec("./addhost.php -g poller_group -f -p ifIndex ".$this->hostName." anp v3 username password md5 111 tcp");
-        $device = Device::findByHostname($this->hostName);
-        $this->assertNotNull($device);
-
-        $this->assertEquals(0, $device->snmp_disable, "snmp is disabled");
-        $this->assertEquals(1, $device->port_association_mode, "Wrong port association mode");
-        $this->assertEquals("authNoPriv", $device->authlevel, "Wrong snmp v3 authlevel");
-        $this->assertEquals("v3", $device->snmpver, "Wrong snmp version");
-        $this->assertEquals("username", $device->authname, "Wrong snmp v3 username");
-        $this->assertEquals("password", $device->authpass, "Wrong snmp v3 password");
-        $this->assertEquals("MD5", $device->authalgo, "Wrong snmp v3 password algoritme");
-        $this->assertEquals(111, $device->port, "Wrong snmp port");
-        $this->assertEquals("tcp", $device->transport, "Wrong snmp transport (udp/tcp)");
-    }
-
-    public function testCLIsnmpV3AuthPrivDES()
-    {
-        exec("./addhost.php -g poller_group -f -p ifIndex ".$this->hostName." ap v3 username password encoder sha des 111 tcp");
-        $device = Device::findByHostname($this->hostName);
-        $this->assertNotNull($device);
-
-        $this->assertEquals(0, $device->snmp_disable, "snmp is disabled");
-        $this->assertEquals(1, $device->port_association_mode, "Wrong port association mode");
         $this->assertEquals("authPriv", $device->authlevel, "Wrong snmp v3 authlevel");
+        $this->assertEquals("SecName", $device->authname, "Wrong snmp v3 security username");
+        $this->assertEquals("AuthPW", $device->authpass, "Wrong snmp v3 authentication password");
+        $this->assertEquals("PrivPW", $device->cryptopass, "Wrong snmp v3 crypto password");
         $this->assertEquals("v3", $device->snmpver, "Wrong snmp version");
-        $this->assertEquals("username", $device->authname, "Wrong snmp v3 username");
-        $this->assertEquals("password", $device->authpass, "Wrong snmp v3 password");
-        $this->assertEquals("encoder", $device->cryptopass, "Wrong snmp v3 crypto password");
-        $this->assertEquals("SHA", $device->authalgo, "Wrong snmp v3 auth algoritme");
-        $this->assertEquals("DES", $device->cryptoalgo, "Wrong snmp v3 crypt algoritme");
-        $this->assertEquals(111, $device->port, "Wrong snmp port");
-        $this->assertEquals("tcp", $device->transport, "Wrong snmp transport (udp/tcp)");
     }
 
-    public function testCLIsnmpV3AuthPrivAES()
+    public function testPortAssociationMode()
     {
-        exec("./addhost.php -g poller_group -f -p ifIndex ".$this->hostName." ap v3 username password encoder md5 aes 111 tcp");
-        $device = Device::findByHostname($this->hostName);
-        $this->assertNotNull($device);
+        $modes = array('ifIndex', 'ifName', 'ifDescr', 'ifAlias');
+        foreach ($modes as $index => $mode) {
+            $host = "hostName".$mode;
+            $result = \Artisan::call('device:add '.$host.' -force -p '.$mode.' --v1');
+            $this->assertEquals(0, $result, "command returned non zero value");
+            $device = Device::findByHostname($host);
+            $this->assertNotNull($device);
+            $this->assertEquals($index+1, $device->port_association_mode, "Wrong port association mode ".$mode);
+            exec("./delhost.php ".$host." ");
+        }
+    }
 
-        $this->assertEquals(0, $device->snmp_disable, "snmp is disabled");
-        $this->assertEquals(1, $device->port_association_mode, "Wrong port association mode");
-        $this->assertEquals("authPriv", $device->authlevel, "Wrong snmp v3 authlevel");
-        $this->assertEquals("v3", $device->snmpver, "Wrong snmp version");
-        $this->assertEquals("username", $device->authname, "Wrong snmp v3 username");
-        $this->assertEquals("password", $device->authpass, "Wrong snmp v3 password");
-        $this->assertEquals("encoder", $device->cryptopass, "Wrong snmp v3 crypto password");
-        $this->assertEquals("MD5", $device->authalgo, "Wrong snmp v3 auth algoritme");
-        $this->assertEquals("AES", $device->cryptoalgo, "Wrong snmp v3 crypt algoritme");
-        $this->assertEquals(111, $device->port, "Wrong snmp port");
-        $this->assertEquals("tcp", $device->transport, "Wrong snmp transport (udp/tcp)");
+    public function testSnmpTransport()
+    {
+        $modes = array('udp', 'udp6', 'tcp', 'tcp6');
+        foreach ($modes as $mode) {
+            $host = "hostName".$mode;
+            $result = \Artisan::call('device:add '.$host.' -force -t '.$mode.' --v1');
+            $this->assertEquals(0, $result, "command returned non zero value");
+            $device = Device::findByHostname($host);
+            $this->assertNotNull($device);
+
+            $this->assertEquals($mode, $device->transport, "Wrong snmp transport (udp/tcp) ipv4/ipv6");
+            exec("./delhost.php ".$host." ");
+        }
+    }
+
+    public function testSnmpV3AuthProtocol()
+    {
+//        $modes = array('md5', 'sha', 'sha-512', 'sha-384', 'sha-256', 'sha-224');
+        $modes = array('md5', 'sha');
+        foreach ($modes as $mode) {
+            $host = "hostName".$mode;
+            $result = \Artisan::call('device:add '.$host.' -force -a '.$mode.' --v3');
+            $this->assertEquals(0, $result, "command returned non zero value");
+            $device = Device::findByHostname($host);
+            $this->assertNotNull($device);
+
+            $this->assertEquals(strtoupper($mode), $device->authalgo, "Wrong snmp v3 password algoritme");
+            exec("./delhost.php ".$host." ");
+        }
+    }
+
+    public function testSnmpV3PrivacyProtocol()
+    {
+        $modes = array('des', 'aes');
+        foreach ($modes as $mode) {
+            $host = "hostName".$mode;
+            $result = \Artisan::call('device:add '.$host.' -force -x '.$mode.' --v3');
+            $this->assertEquals(0, $result, "command returned non zero value");
+            $device = Device::findByHostname($host);
+            $this->assertNotNull($device);
+
+            $this->assertEquals(strtoupper($mode), $device->cryptoalgo, "Wrong snmp v3 crypt algoritme");
+            exec("./delhost.php ".$host." ");
+        }
     }
 
     public function testCLIping()
     {
-        exec("./addhost.php -g poller_group -f -P ".$this->hostName." nameOfOS hardware");
+        $result = \Artisan::call('device:add '.$this->hostName.' -force -P -onameOfOS -whardware -sSystem --v1');
+        $this->assertEquals(0, $result, "command returned non zero value");
+
         $device = Device::findByHostname($this->hostName);
         $this->assertNotNull($device);
 
         $this->assertEquals(1, $device->snmp_disable, "snmp is not disabled");
-        $this->assertEquals("hardware", $device->hardware, "Wrong os");
-        $this->assertEquals("nameOfOS", $device->os, "Wrong hardware");
+        $this->assertEquals("hardware", $device->hardware, "Wrong hardware name");
+        $this->assertEquals("nameOfOS", $device->os, "Wrong os name");
+        $this->assertEquals("System", $device->sysName, "Wrong system name");
     }
 }
