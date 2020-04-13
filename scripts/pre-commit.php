@@ -35,8 +35,9 @@ foreach ($changed_files as $file) {
         $map['bash']++;
     }
 
-    if ($file == 'composer.lock') {
-        $map['php']++; // cause full tests to run
+    // cause full tests to run
+    if ($file == 'composer.lock' || $file == '.travis.yml') {
+        $map['php']++;
     }
 
     // check if os owned file or generic php file
