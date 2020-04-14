@@ -1,17 +1,22 @@
 <?php
-echo "Checking Chassis Temperature...\n";
 
-$data=[];
-$descr = '';
+echo 'aos7';
 
-// AOS7+
-$temperature = snmp_get($device, "chasCPMAHardwareBoardTemp.209", '-Oqv', 'ALCATEL-IND1-CHASSIS-MIB', ':mibs/nokia/aos7:mibs'); //chasCPMAHardwareBoardTemp
-if ($descr == '' && is_numeric($temperature) && $temperature > '0') {
-    $baseoid  = ".1.3.6.1.4.1.6486.801.1.1.1.3.1.1.3.1.8";
-    $data=snmpwalk_cache_index($device, 'chasCPMAHardwareBoardTemp', [], 'ALCATEL-IND1-CHASSIS-MIB', 'nokia/aos7');
-    foreach ($data['chasCPMAHardwareBoardTemp'] as $index => $value) {
-        $descr = 'Chassis '.($index - 208). " Temperature";
-        echo "$descr: $value\n";
-        discover_sensor($valid['sensor'], 'temperature', $device, "$baseoid.$index", $index, 'alcatel-lucent', $descr, '1', '1', null, null, null, null, $value, 'snmp');
+$multiplier = 1;
+$divisor    = 1000;
+foreach ($pre_cache['aos7_oids'] as $index => $entry) {
+    if (is_numeric($entry['ddmPortTemperature']) && $entry['ddmPortTemperature'] != 0) {
+        $oid = '.1.3.6.1.4.1.6486.801.1.2.1.5.1.1.2.6.1.2.' . $index ;
+        $limit_low = $port['ddmPortTempLowAlarm']/$divisor;
+        $warn_limit_low = $port['ddmPortTempLowWarning']/$divisor;
+        $limit = $port['ddmPortTempHiAlarm']/$divisor;
+        $warn_limit = $port['ddmPortTempHiWarning']/$divisor;
+        $value = $port['ddmPortTemperature']/$divisor;
+        $curent = $entry['ddmPortTemperature'];
+        $entPhysicalIndex = $index;
+        $entPhysicalIndex_measured = 'ports';
+        $port_descr = get_port_by_index_cache($device['device_id'], str_replace('1.', '', $index));
+        $descr = $port_descr['ifName'] . ' DDM Temperature';
+        discover_sensor($valid['sensor'], 'temperature', $device, $oid, 'rx-'.$index, 'aos7', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $value, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
     }
 }

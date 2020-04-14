@@ -39,4 +39,4 @@ if (!empty($dot1d)) {
         }
     }
 }
-include 'includes/discovery/sensors/fdb-table/aos.inc.php';
+include 'includes/discovery/sensors/fdb-table/aos6.inc.php';
