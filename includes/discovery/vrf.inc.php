@@ -140,7 +140,7 @@ if (Config::get('enable_vrfs')) {
                 }
             }//end if
         }//end foreach
-    } else if ($device['os_group'] == 'nokia') {
+    } elseif ($device['os_group'] == 'nokia') {
         unset($vrf_count);
 
         $vrtr = snmpwalk_cache_oid($device, 'vRtrConfTable', [], 'TIMETRA-VRTR-MIB');
@@ -196,7 +196,8 @@ if (Config::get('enable_vrfs')) {
                 $valid_vrf_if[$vrf_id][$if] = 1;
             }
         } //end foreach
-    } else if ($device['os_group'] == 'arista') {
+    } elseif ($device['os_group'] == 'arista') {
+        echo "Arista\n"; 
         unset($vrf_count);
 
         $aristaVrfTable = snmpwalk_cache_oid($device, 'aristaVrfTable', [], 'ARISTA-VRF-MIB');
@@ -232,14 +233,18 @@ if (Config::get('enable_vrfs')) {
 
         echo "\n  [VRF $vrf_name] PORTS - ";
         foreach ($aristaVrfIfTable as $if_index => $if_data) {
-            $ifVrfName = $if_data['aristaVrfIfMembership'];
-            $vrf_id = dbFetchCell('SELECT vrf_id FROM vrfs WHERE device_id = ? AND `vrf_oid`=?', [$device['device_id'], $ifVrfName]);
-            $valid_vrf[$vrf_id] = 1;
-            $interface = dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?', [$device['device_id'], $if_index]);
-            echo makeshortif($interface['ifDescr']).' ';
-            dbUpdate(['ifVrf' => $vrf_id], 'ports', 'port_id=?', [$interface['port_id']]);
-            $if = $interface['port_id'];
-            $valid_vrf_if[$vrf_id][$if] = 1;
+            try {
+                $ifVrfName = $if_data['aristaVrfIfMembership'];
+                $vrf_id = dbFetchCell('SELECT vrf_id FROM vrfs WHERE device_id = ? AND `vrf_oid`=?', [$device['device_id'], $ifVrfName]);
+                $valid_vrf[$vrf_id] = 1;
+                $interface = dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?', [$device['device_id'], $if_index]);
+                echo makeshortif($interface['ifDescr']).' ';
+                dbUpdate(['ifVrf' => $vrf_id], 'ports', 'port_id=?', [$interface['port_id']]);
+                $if = $interface['port_id'];
+                $valid_vrf_if[$vrf_id][$if] = 1;
+            } catch (Exception $e) {
+                continue;
+            }
         }
     } //end if
 
