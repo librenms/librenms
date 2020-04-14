@@ -523,10 +523,10 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
         throw new InvalidPortAssocModeException("Invalid port association_mode '$port_assoc_mode'. Valid modes are: " . join(', ', get_port_assoc_modes()));
     }
 
-    $overwrite_ip = $additional['overwrite_ip'] ?? false;
-
     // check if we have the host by IP
-    if (!empty($overwrite_ip)) {
+    $overwrite_ip = null;
+    if (!empty($additional['overwrite_ip'])) {
+        $overwrite_ip = $additional['overwrite_ip'];
         $ip = $overwrite_ip;
     } elseif (Config::get('addhost_alwayscheckip') === true) {
         $ip = gethostbyname($host);
@@ -567,7 +567,7 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
         if ($snmpver === "v3") {
             // Try each set of parameters from config
             foreach (Config::get('snmp.v3') as $v3) {
-                $device = deviceArray($host, null, $snmpver, $port, $transport, $v3, $port_assoc_mode);
+                $device = deviceArray($host, null, $snmpver, $port, $transport, $v3, $port_assoc_mode, $overwrite_ip);
                 if ($force_add === true || isSNMPable($device)) {
                     return createHost($host, null, $snmpver, $port, $transport, $v3, $poller_group, $port_assoc_mode, $force_add, $overwrite_ip);
                 } else {
@@ -577,7 +577,7 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
         } elseif ($snmpver === "v2c" || $snmpver === "v1") {
             // try each community from config
             foreach (Config::get('snmp.community') as $community) {
-                $device = deviceArray($host, $community, $snmpver, $port, $transport, null, $port_assoc_mode);
+                $device = deviceArray($host, $community, $snmpver, $port, $transport, null, $port_assoc_mode, $overwrite_ip);
 
                 if ($force_add === true || isSNMPable($device)) {
                     return createHost($host, $community, $snmpver, $port, $transport, array(), $poller_group, $port_assoc_mode, $force_add, $overwrite_ip);
@@ -597,10 +597,11 @@ function addHost($host, $snmp_version = '', $port = '161', $transport = 'udp', $
     throw $host_unreachable_exception;
 }
 
-function deviceArray($host, $community, $snmpver, $port = 161, $transport = 'udp', $v3 = array(), $port_assoc_mode = 'ifIndex')
+function deviceArray($host, $community, $snmpver, $port = 161, $transport = 'udp', $v3 = array(), $port_assoc_mode = 'ifIndex', $overwrite_ip = null)
 {
     $device = array();
     $device['hostname'] = $host;
+    $device['overwrite_ip'] = $overwrite_ip;
     $device['port'] = $port;
     $device['transport'] = $transport;
 
@@ -624,7 +625,7 @@ function deviceArray($host, $community, $snmpver, $port = 161, $transport = 'udp
     }
 
     return $device;
-}
+}//end deviceArray()
 
 
 function formatUptime($diff, $format = "long")
@@ -883,19 +884,12 @@ function get_astext($asn)
  */
 function log_event($text, $device = null, $type = null, $severity = 2, $reference = null)
 {
-    if (!is_array($device)) {
-        $device = device_by_id_cache($device);
+    // handle legacy device array
+    if (is_array($device) && isset($device['device_id'])) {
+        $device = $device['device_id'];
     }
 
-    dbInsert([
-        'device_id' => ($device['device_id'] ?: 0),
-        'reference' => $reference,
-        'type' => $type,
-        'datetime' => \Carbon\Carbon::now(),
-        'severity' => $severity,
-        'message' => $text,
-        'username'  => Auth::user()->username ?? '',
-    ], 'eventlog');
+    Log::event($text, $device, $type, $severity, $reference);
 }
 
 // Parse string with emails. Return array with email (as key) and name (as value)
