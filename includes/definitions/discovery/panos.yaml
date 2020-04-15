@@ -33,14 +33,32 @@ modules:
             data:
                 -
                     oid: panSessionActive
+                    value: panSessionActive
                     num_oid: '.1.3.6.1.4.1.25461.2.1.2.3.3.{{ $index }}'
-                    group: Sessions
+                    index: 'panSessionActive.{{ $index }}'
                     descr: Active Sessions
+                    group: Sessions
+                -
+                    oid: panSessionActiveSslProxy
+                    value: panSessionActiveSslProxy
+                    num_oid: '.1.3.6.1.4.1.25461.2.1.2.3.7.{{ $index }}'
+                    index: 'panSessionActiveSslProxy.{{ $index }}'
+                    descr: Active Sessions in SSL Proxy
+                    group: Sessions
         load:
             data:
                 -
+                    oid: panSessionUtilization
+                    value: panSessionUtilization
+                    num_oid: '.1.3.6.1.4.1.25461.2.1.2.3.1.{{ $index }}'
+                    index: 'panSessionUtilization.{{ $index }}'
+                    descr: Session Utilization
+                    group: Sessions
+                -
                     oid: panSessionSslProxyUtilization
+                    value: panSessionSslProxyUtilization
                     num_oid: '.1.3.6.1.4.1.25461.2.1.2.3.8.{{ $index }}'
-                    descr: SSL Proxy Utilization
+                    index: 'panSessionSslProxyUtilization.{{ $index }}'
+                    descr: Session Utilization in SSL Proxy
                     group: Sessions
 
