@@ -264,48 +264,6 @@ PAN-PRODUCTS-MIB DEFINITIONS ::= BEGIN
 			Sub-tree for WF-600 specific objects."
 		::= { panProductsMibs 45 }
 
-	panPA-220-ZTP OBJECT-IDENTITY
-		STATUS					current
-		DESCRIPTION				"
-			Sub-tree for PA-220-ZTP specific objects."
-		::= { panProductsMibs 46 }
-		
-	panPA-220R-ZTP OBJECT-IDENTITY
-		STATUS					current
-		DESCRIPTION				"
-			Sub-tree for PA-220R-ZTP specific objects."
-		::= { panProductsMibs 47 }
-		
-	panPA-820-ZTP OBJECT-IDENTITY
-		STATUS					current
-		DESCRIPTION				"
-			Sub-tree for PA-820-ZTP specific objects."
-		::= { panProductsMibs 48 }
-		
-	panPA-850-ZTP OBJECT-IDENTITY
-		STATUS					current
-		DESCRIPTION				"
-			Sub-tree for PA-850-ZTP specific objects."
-		::= { panProductsMibs 49 }
-		
-    panPA-3250-ZTP OBJECT-IDENTITY
-        STATUS					current
-        DESCRIPTION				"
-            Sub-tree for PA-3250-ZTP specific objects."
-        ::= { panProductsMibs 50 }
-
-    panPA-3220-ZTP OBJECT-IDENTITY
-        STATUS                  current
-        DESCRIPTION             "
-            Sub-tree for PA-3220-ZTP specific objects."
-        ::= { panProductsMibs 51 }
-    
-    panPA-3260-ZTP OBJECT-IDENTITY
-       STATUS                  current
-       DESCRIPTION             "
-           Sub-tree for PA-3260-ZTP specific objects."
-        ::= { panProductsMibs 52 }
-
 	panProcessingCards OBJECT-IDENTITY
 		STATUS					current
 		DESCRIPTION				"
@@ -356,13 +314,13 @@ PAN-PRODUCTS-MIB DEFINITIONS ::= BEGIN
 			PA-7050 Bennu Switch management card."
 		::= { panProcessingCards 5 }
 
-	panPA-7000-LFC-A OBJECT-IDENTITY
+	panPA-7000-LFC OBJECT-IDENTITY
 		STATUS					current
 		DESCRIPTION				"
 			PA-7000 series Log Forwarding card."
 		::= { panProcessingCards 6 }
 
-	panPA-7000-100G-NPC-A OBJECT-IDENTITY
+	panPA-7000-100G-NPC OBJECT-IDENTITY
 		STATUS					current
 		DESCRIPTION				"
 			PA-7000 series 100G Network Processing card."
