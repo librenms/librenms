@@ -197,7 +197,7 @@ if (Config::get('enable_vrfs')) {
             }
         } //end foreach
     } elseif ($device['os_group'] == 'arista') {
-        echo "Arista\n"; 
+        echo "Arista\n";
         unset($vrf_count);
 
         $aristaVrfTable = snmpwalk_cache_oid($device, 'aristaVrfTable', [], 'ARISTA-VRF-MIB');
