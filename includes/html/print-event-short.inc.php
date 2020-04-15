@@ -17,9 +17,26 @@
 
 unset($icon);
 $severity_colour = eventlog_severity($entry['severity']);
-$icon = '<span class="alert-status ' . $severity_colour . '"></span>';
 
-echo '<tr>';
+switch ($severity_colour) {
+	case 'label-success':
+		$color = "#28a745";
+		break;
+	case 'label-primary':
+		$color = "#0000e6";
+		break;
+	case 'label-warning':
+		$color = "#ff8000";
+		break;
+	case 'label-danger':
+		$color = "#e60000";
+		break;
+	default:
+		$color = "#000";
+		break;
+}
+echo '<tr style="border-left: 10px solid '. $color . '">';
+
 echo '<td>' . $icon . '</td>';
 echo '<td>' . $entry['humandate'] . '</td>';
 
