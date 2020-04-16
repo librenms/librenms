@@ -164,7 +164,7 @@ if ($device['os_group'] == 'cisco') {
                             break;
                         }
                         if ($entity_array[$phys_index]['entPhysicalClass'] === 'port') {
-                            if (str_contains($entity_array[$phys_index][0]['entAliasMappingIdentifier'], 'ifIndex.')) {
+                            if (\Illuminate\Support\Str::contains($entity_array[$phys_index][0]['entAliasMappingIdentifier'], 'ifIndex.')) {
                                 list(, $tmp_ifindex) = explode(".", $entity_array[$phys_index][0]['entAliasMappingIdentifier']);
                                 $tmp_port = get_port_by_index_cache($device['device_id'], $tmp_ifindex);
                                 if (is_array($tmp_port)) {

@@ -33,10 +33,10 @@ $serverscheck_oids = [
 
 $temp_x = 1;
 foreach ($pre_cache['serverscheck_control'] as $oid_name => $oid_value) {
-    if (str_contains($oid_name, 'name')) {
+    if (\Illuminate\Support\Str::contains($oid_name, 'name')) {
         $tmp_oid = 'sensor' . $temp_x . 'Value.0';
         $current = $pre_cache['serverscheck_control'][$tmp_oid];
-        if (str_contains($oid_value, 'Humid')) {
+        if (\Illuminate\Support\Str::contains($oid_value, 'Humid')) {
             if (is_numeric($current)) {
                 $index = str_replace('.0', '', $oid_name);
                 $descr = $oid_value;

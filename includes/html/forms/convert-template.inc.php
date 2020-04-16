@@ -50,7 +50,7 @@ $new_title = convert_template($vars['title']);
 
 function convert_template($line)
 {
-    if (str_contains($line, '{calc')) {
+    if (\Illuminate\Support\Str::contains($line, '{calc')) {
         return preg_replace(
             [
                 '/{calc[ ]*([\w\d\s\%\.\(\)\*\/\-\+\/]+)}/',// Replaces {calc (something*100)}

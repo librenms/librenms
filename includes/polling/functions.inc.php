@@ -572,7 +572,7 @@ function update_application($app, $response, $metrics = array(), $status = '')
     );
 
     if ($response != '' && $response !== false) {
-        if (str_contains($response, array(
+        if (\Illuminate\Support\Str::contains($response, array(
             'Traceback (most recent call last):',
         ))) {
             $data['app_state'] = 'ERROR';

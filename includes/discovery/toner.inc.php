@@ -37,7 +37,7 @@ if ($device['os_group'] == 'printer') {
         }
 
         // trim part & serial number from devices that include it
-        if (str_contains($descr, ', PN')) {
+        if (\Illuminate\Support\Str::contains($descr, ', PN')) {
             $descr = explode(', PN', $descr)[0];
         }
 

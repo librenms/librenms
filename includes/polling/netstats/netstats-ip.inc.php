@@ -2,7 +2,7 @@
 
 use LibreNMS\RRD\RrdDefinition;
 
-if (!starts_with($device['os'], ['Snom', 'asa'])) {
+if (!\Illuminate\Support\Str::startsWith($device['os'], ['Snom', 'asa'])) {
     echo ' IP';
 
     $oids = [

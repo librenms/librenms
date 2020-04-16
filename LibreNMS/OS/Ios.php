@@ -25,6 +25,7 @@
 
 namespace LibreNMS\OS;
 
+use Illuminate\Support\Str;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
@@ -44,7 +45,7 @@ class Ios extends Cisco implements
     {
         $device = $this->getDevice();
 
-        if (!starts_with($device['hardware'], 'AIR-') && !str_contains($device['hardware'], 'ciscoAIR')) {
+        if (!Str::startsWith($device['hardware'], 'AIR-') && !Str::contains($device['hardware'], 'ciscoAIR')) {
             // unsupported IOS hardware
             return array();
         }
@@ -58,7 +59,7 @@ class Ios extends Cisco implements
                 $descr = $ent['entPhysicalDescr'];
                 unset($entPhys[$entIndex]); // only use each one once
 
-                if (ends_with($descr, 'Radio')) {
+                if (Str::endsWith($descr, 'Radio')) {
                     d_echo("Mapping entPhysicalIndex $entIndex to ifIndex $index\n");
                     $data[$index]['entPhysicalIndex'] = $entIndex;
                     $data[$index]['entPhysicalDescr'] = $descr;

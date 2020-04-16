@@ -15,13 +15,13 @@ if (Config::get('enable_libvirt') && $device['os'] == 'linux') {
     }
 
     foreach (Config::get('libvirt_protocols') as $method) {
-        if (str_contains($method, 'qemu')) {
+        if (\Illuminate\Support\Str::contains($method, 'qemu')) {
             $uri = $method.'://'.$userHostname.'/system';
         } else {
             $uri = $method.'://'.$userHostname;
         }
 
-        if (str_contains($method, 'ssh') && !$ssh_ok) {
+        if (\Illuminate\Support\Str::contains($method, 'ssh') && !$ssh_ok) {
             // Check if we are using SSH if we can log in without password - without blocking the discovery
             // Also automatically add the host key so discovery doesn't block on the yes/no question, and run echo so we don't get stuck in a remote shell ;-)
             exec('ssh -o "StrictHostKeyChecking no" -o "PreferredAuthentications publickey" -o "IdentitiesOnly yes" '.$userHostname.' echo -e', $out, $ret);
@@ -30,7 +30,7 @@ if (Config::get('enable_libvirt') && $device['os'] == 'linux') {
             }
         }
 
-        if ($ssh_ok || !str_contains($method, 'ssh')) {
+        if ($ssh_ok || !\Illuminate\Support\Str::contains($method, 'ssh')) {
             // Fetch virtual machine list
             unset($domlist);
             exec(Config::get('virsh').' -rc '.$uri.' list', $domlist);

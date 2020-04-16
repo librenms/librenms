@@ -236,7 +236,7 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                     foreach ($oid_map as $source => $target) {
                         $v = isset($peer_data_raw[$source]) ? $peer_data_raw[$source] : '';
 
-                        if (str_contains($source, 'LocalAddr')) {
+                        if (\Illuminate\Support\Str::contains($source, 'LocalAddr')) {
                             try {
                                 $v = IP::fromHexString($v)->uncompressed();
                             } catch (InvalidIpException $e) {

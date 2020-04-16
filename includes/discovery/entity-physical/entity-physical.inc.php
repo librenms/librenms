@@ -101,7 +101,7 @@ if ($device['os'] == 'saf-cfm') {
         }
 
         foreach ([1 => 'm1Description', 2 => 'm2Description', 3 => 'm3Description', 4 => 'm4Description'] as $index => $item) {
-            if (!str_contains($device_array[$item], 'N/A')) {
+            if (!\Illuminate\Support\Str::contains($device_array[$item], 'N/A')) {
                 $entity_array[] = [
                     'entPhysicalDescr' => $device_array[$item],
                     'entPhysicalVendorType' => 'module',

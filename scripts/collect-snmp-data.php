@@ -98,7 +98,7 @@ if (isset($options['v'])) {
     $variant = $options['variant'];
 }
 
-if (str_contains($variant, '_')) {
+if (\Illuminate\Support\Str::contains($variant, '_')) {
     exit("Variant name cannot contain an underscore (_).\n");
 }
 

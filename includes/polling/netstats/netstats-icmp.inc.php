@@ -2,7 +2,7 @@
 
 use LibreNMS\RRD\RrdDefinition;
 
-if (!starts_with($device['os'], array('Snom', 'asa'))) {
+if (!\Illuminate\Support\Str::startsWith($device['os'], array('Snom', 'asa'))) {
     echo ' ICMP';
 
     // Below have more oids, and are in trees by themselves, so we can snmpwalk_cache_oid them

@@ -4,7 +4,7 @@ $oid = $mempool['mempool_index'];
 
 d_echo('Ironware Mempool'."\n");
 
-if (str_contains($device['sysDescr'], array('NetIron', 'MLX', 'CER')) === false) {
+if (\Illuminate\Support\Str::contains($device['sysDescr'], array('NetIron', 'MLX', 'CER')) === false) {
     echo 'Ironware Dynamic: ';
     $mempool['total'] = snmp_get($device, 'snAgGblDynMemTotal.0', '-OvQ', 'FOUNDRY-SN-AGENT-MIB');
     if ($mempool['total'] < 0) {

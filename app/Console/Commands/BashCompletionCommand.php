@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Device;
 use Illuminate\Console\Command;
+use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -47,11 +48,11 @@ class BashCompletionCommand extends Command
                 $command_def = $commands[$command]->getDefinition();
                 $previous_name = ltrim($previous, '-');
 
-                if (starts_with($previous, '-') && $command_def->hasOption($previous_name) && $command_def->getOption($previous_name)->acceptValue()) {
+                if (Str::startsWith($previous, '-') && $command_def->hasOption($previous_name) && $command_def->getOption($previous_name)->acceptValue()) {
                     $completions = $this->completeOptionValue($command_def->getOption($previous_name), $current);
                 } else {
                     $completions = collect();
-                    if (!starts_with($previous, '-')) {
+                    if (!Str::startsWith($previous, '-')) {
                         $completions = $this->completeArguments($command, $current, end($words));
                     }
                     $completions = $completions->merge($this->completeOption($command_def, $current, $this->getPreviousOptions($words)));
@@ -93,11 +94,11 @@ class BashCompletionCommand extends Command
         });
 
         $completions = $all_commands->filter(function ($cmd) use ($partial) {
-            return empty($partial) || starts_with($cmd, $partial);
+            return empty($partial) || Str::startsWith($cmd, $partial);
         });
 
         // handle : silliness
-        if (str_contains($partial, ':')) {
+        if (Str::contains($partial, ':')) {
             $completions = $completions->map(function ($cmd) {
                 return substr($cmd, strpos($cmd, ':') + 1);
             });
@@ -144,14 +145,14 @@ class BashCompletionCommand extends Command
         }
 
         return $options->filter(function ($option) use ($partial) {
-            return empty($partial) || starts_with($option, $partial);
+            return empty($partial) || Str::startsWith($option, $partial);
         });
     }
 
     private function getPreviousOptions($words)
     {
         return array_reduce($words, function ($result, $word) {
-            if (starts_with($word, '-')) {
+            if (Str::startsWith($word, '-')) {
                 $split = explode('=', $word, 2); // users may use equals for values
                 $result[] = reset($split);
             }
@@ -174,7 +175,7 @@ class BashCompletionCommand extends Command
                     return trim($value);
                 })
                 ->filter(function ($value) use ($partial) {
-                    return empty($partial) || starts_with($value, $partial);
+                    return empty($partial) || Str::startsWith($value, $partial);
                 });
         }
         return collect();

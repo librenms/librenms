@@ -47,7 +47,7 @@ if (!empty($entity_oids)) {
         $high_limit     = null;
 
         // Fix for Cisco ASR920, 15.5(2)S
-        if ($entry['entPhySensorType'] == 'other' && str_contains($entity_array[$index]['entPhysicalName'], ['Rx Power Sensor', 'Tx Power Sensor'])) {
+        if ($entry['entPhySensorType'] == 'other' && \Illuminate\Support\Str::contains($entity_array[$index]['entPhysicalName'], ['Rx Power Sensor', 'Tx Power Sensor'])) {
             $entitysensor['other'] = 'dbm';
         }
         if ($entitysensor[$entry['entPhySensorType']] && is_numeric($entry['entPhySensorValue']) && is_numeric($index)) {
@@ -131,7 +131,7 @@ if (!empty($entity_oids)) {
                     $valid_sensor = false;
                 }
             }
-            if ($current == '-127' || ($device['os'] == 'asa' && ends_with($device['hardware'], 'sc'))) {
+            if ($current == '-127' || ($device['os'] == 'asa' && \Illuminate\Support\Str::endsWith($device['hardware'], 'sc'))) {
                 $valid_sensor = false;
             }
             // Check for valid sensors

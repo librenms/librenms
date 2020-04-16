@@ -27,6 +27,7 @@ namespace LibreNMS\Alerting;
 
 use DB;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Support\Str;
 use Log;
 
 class QueryBuilderFluentParser extends QueryBuilderParser
@@ -132,14 +133,14 @@ class QueryBuilderFluentParser extends QueryBuilderParser
     protected function expandRule($rule)
     {
         $field = $rule['field'];
-        if (starts_with($field, 'macros.')) {
+        if (Str::startsWith($field, 'macros.')) {
             $field = DB::raw($this->expandMacro($field));
         }
 
         $op = $rule['operator'];
 
         $value = $rule['value'];
-        if (!is_array($value) && starts_with($value, '`') && ends_with($value, '`')) {
+        if (!is_array($value) && Str::startsWith($value, '`') && Str::endsWith($value, '`')) {
             $value = DB::raw($this->expandMacro(trim($value, '`')));
         }
 
@@ -175,7 +176,7 @@ class QueryBuilderFluentParser extends QueryBuilderParser
         $joins = [];
         foreach ($this->generateGlue() as $glue) {
             list($left, $right) = explode(' = ', $glue, 2);
-            if (str_contains($right, '.')) { // last line is devices.device_id = ? for alerting... ignore it
+            if (Str::contains($right, '.')) { // last line is devices.device_id = ? for alerting... ignore it
                 list($leftTable, $leftKey) = explode('.', $left);
                 list($rightTable, $rightKey) = explode('.', $right);
                 $target_table = ($rightTable != 'devices' ? $rightTable : $leftTable);  // don't try to join devices
