@@ -176,22 +176,6 @@ function print_message($text)
     }
 }
 
-function delete_port($int_id)
-{
-    $interface = dbFetchRow("SELECT * FROM `ports` AS P, `devices` AS D WHERE P.port_id = ? AND D.device_id = P.device_id", array($int_id));
-
-    $interface_tables = array('ipv4_addresses', 'ipv4_mac', 'ipv6_addresses', 'juniAtmVp', 'mac_accounting', 'ospf_nbrs', 'ospf_ports', 'ports', 'ports_adsl', 'ports_perms', 'ports_statistics', 'ports_stp', 'ports_vlans', 'pseudowires');
-
-    foreach ($interface_tables as $table) {
-        dbDelete($table, "`port_id` =  ?", array($int_id));
-    }
-
-    dbDelete('links', "`local_port_id` = ? OR `remote_port_id` = ?", array($int_id, $int_id));
-    dbDelete('ports_stack', "`port_id_low` = ? OR `port_id_high` = ?", array($int_id, $int_id));
-
-    unlink(get_port_rrdfile_path($interface['hostname'], $interface['port_id']));
-}
-
 function get_sensor_rrd($device, $sensor)
 {
     return rrd_name($device['hostname'], get_sensor_rrd_name($device, $sensor));
@@ -209,11 +193,7 @@ function get_sensor_rrd_name($device, $sensor)
 
 function getPortRrdName($port_id, $suffix = '')
 {
-    if (!empty($suffix)) {
-        $suffix = '-' . $suffix;
-    }
-
-    return "port-id$port_id$suffix";
+    return Rrd::portName($port_id, $suffix);
 }
 
 function get_port_rrdfile_path($hostname, $port_id, $suffix = '')

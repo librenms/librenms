@@ -453,12 +453,16 @@ function delete_device($id)
     dbQuery("DELETE `ipv4_addresses` FROM `ipv4_addresses` INNER JOIN `ports` ON `ports`.`port_id`=`ipv4_addresses`.`port_id` WHERE `device_id`=?", array($id));
     dbQuery("DELETE `ipv6_addresses` FROM `ipv6_addresses` INNER JOIN `ports` ON `ports`.`port_id`=`ipv6_addresses`.`port_id` WHERE `device_id`=?", array($id));
 
-    foreach (dbFetch("SELECT * FROM `ports` WHERE `device_id` = ?", array($id)) as $int_data) {
-        $int_if = $int_data['ifDescr'];
-        $int_id = $int_data['port_id'];
-        delete_port($int_id);
-        $ret .= "Removed interface $int_id ($int_if)\n";
-    }
+
+    \App\Models\Port::where('device_id', $id)
+        ->with('device')
+        ->select(['port_id', 'device_id', 'ifIndex', 'ifName', 'ifAlias', 'ifDescr'])
+        ->chunk(100, function ($ports) use (&$ret) {
+            foreach ($ports as $port) {
+                $port->delete();
+                $ret .= "Removed interface $port->port_id (" . $port->getLabel() . ")\n";
+            }
+        });
 
     // Remove sensors manually due to constraints
     foreach (dbFetchRows("SELECT * FROM `sensors` WHERE `device_id` = ?", array($id)) as $sensor) {
