@@ -54,6 +54,36 @@ class Sensor extends DeviceRelatedModel
         return collect(self::$icons)->get($this->sensor_class, 'delicius');
     }
 
+    public static function getTypes()
+    {
+        return ['airflow',
+                'ber',
+                'chromatic_dispersion',
+                'cooling',
+                'count',
+                'current',
+                'dbm',
+                'delay',
+                'eer',
+                'fanspeed',
+                'frequency',
+                'humidity',
+                'load',
+                'power_consumed',
+                'power_factor',
+                'power',
+                'pressure',
+                'quality_factor',
+                'runtime',
+                'signal',
+                'snr',
+                'state',
+                'temperature',
+                'voltage',
+                'waterflow',
+                ];
+    }
+
     // for the legacy menu
     public static function getIconMap()
     {
