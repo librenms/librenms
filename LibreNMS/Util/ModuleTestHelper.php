@@ -53,6 +53,7 @@ class ModuleTestHelper
     private $exclude_from_all = ['arp-table', 'fdb-table'];
     private static $module_deps = [
         'arp-table' => ['ports', 'arp-table'],
+        'bgp-peers' => ['ports', 'bgp-peers'],
         'fdb-table' => ['ports', 'vlans', 'fdb-table'],
         'vlans' => ['ports', 'vlans'],
         'vrf' => ['ports', 'vrf'],
