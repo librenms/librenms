@@ -6,7 +6,6 @@ class Sensor extends DeviceRelatedModel
 {
     public $timestamps = false;
     protected $primaryKey = 'sensor_id';
-
     protected static $icons = array(
         'airflow' => 'angle-double-right',
         'ber' => 'sort-amount-desc',
@@ -56,31 +55,32 @@ class Sensor extends DeviceRelatedModel
 
     public static function getTypes()
     {
-        return ['airflow',
+        return ['Airflow',
                 'ber',
+                'Battery Charge',
                 'chromatic_dispersion',
-                'cooling',
+                'Cooling',
                 'count',
-                'current',
-                'dbm',
+                'Current',
+                'dBm',
                 'delay',
-                'eer',
-                'fanspeed',
-                'frequency',
-                'humidity',
-                'load',
+                'Energy Efficiency Ratio',
+                'Fanspeed',
+                'Frequency',
+                'Humidity',
+                'Load',
                 'power_consumed',
                 'power_factor',
-                'power',
-                'pressure',
+                'Power',
+                'Pressure',
                 'quality_factor',
-                'runtime',
-                'signal',
+                'Runtime',
+                'Wireless',
                 'snr',
-                'state',
-                'temperature',
-                'voltage',
-                'waterflow',
+                'State',
+                'Temperature',
+                'Voltage',
+                'Water Flow Rate',
                 ];
     }
 
