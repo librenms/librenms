@@ -13,6 +13,7 @@
  * the source code distribution for details.
  */
 
+use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\ValidationResult;
 use LibreNMS\Validator;
@@ -81,18 +82,18 @@ if (!file_exists('config.php')) {
 
 $pre_checks_failed = false;
 $syntax_check = `php -ln config.php`;
-if (!str_contains($syntax_check, 'No syntax errors detected')) {
+if (!Str::contains($syntax_check, 'No syntax errors detected')) {
     print_fail('Syntax error in config.php');
     echo $syntax_check;
     $pre_checks_failed = true;
 }
 
 $first_line = rtrim(`head -n1 config.php`);
-if (!starts_with($first_line, '<?php')) {
+if (!Str::startsWith($first_line, '<?php')) {
     print_fail("config.php doesn't start with a <?php - please fix this ($first_line)");
     $pre_checks_failed = true;
 }
-if (str_contains(`tail config.php`, '?>')) {
+if (Str::contains(`tail config.php`, '?>')) {
     print_fail("Remove the ?> at the end of config.php");
     $pre_checks_failed = true;
 }

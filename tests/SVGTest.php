@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Tests;
 
+use Illuminate\Support\Str;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use RecursiveRegexIterator;
@@ -43,7 +44,7 @@ class SVGTest extends TestCase
             $svg = file_get_contents($file);
 
             $this->assertFalse(
-                str_contains($svg, 'data:image/'),
+                Str::contains($svg, 'data:image/'),
                 "$file contains a bitmap image, please use a regular png or valid svg"
             );
         }
@@ -72,7 +73,7 @@ class SVGTest extends TestCase
             $svg = file_get_contents($file);
 
             $this->assertTrue(
-                str_contains($svg, 'viewBox'),
+                Str::contains($svg, 'viewBox'),
                 "$file: SVG files must have the viewBox attribute set"
             );
         }

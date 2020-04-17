@@ -1,6 +1,7 @@
 #!/usr/bin/php
 <?php
 
+use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Authentication\LegacyAuth;
 
@@ -33,7 +34,7 @@ echo "Authentication Method: " . Config::get('auth_mechanism') . PHP_EOL;
 // if ldap like, check selinux
 if (Config::get('auth_mechanism') == 'ldap' || Config::get('auth_mechanism') == "active_directory") {
     $enforce = shell_exec('getenforce 2>/dev/null');
-    if (str_contains($enforce, 'Enforcing')) {
+    if (Str::contains($enforce, 'Enforcing')) {
         // has selinux
         $output = shell_exec('getsebool httpd_can_connect_ldap');
         if ($output != "httpd_can_connect_ldap --> on\n") {

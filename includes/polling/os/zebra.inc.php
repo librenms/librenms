@@ -26,7 +26,9 @@
 // ESI-MIB::genProductNumber.0 .1.3.6.1.4.1.683.1.4.0
 // ESI-MIB::genSerialNumber.0 .1.3.6.1.4.1.683.1.5.0
 // ESI-MIB::genVersion.0 .1.3.6.1.4.1.683.1.9.0
-if (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.683')) {
+use Illuminate\Support\Str;
+
+if (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.683')) {
     $oids = array(
         'hardware' => '.1.3.6.1.4.1.683.1.4.0',
         'serial' => '.1.3.6.1.4.1.683.1.5.0',
@@ -38,7 +40,7 @@ if (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.683')) {
     }
 }
 
-if (str_contains($device['sysDescr'], 'Wireless')) {
+if (Str::contains($device['sysDescr'], 'Wireless')) {
     $features = 'wireless';
 } else {
     $features = 'wired';

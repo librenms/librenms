@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Data\Store;
 
+use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Data\Measure\Measurement;
 use LibreNMS\Exceptions\FileExistsException;
@@ -439,7 +440,7 @@ class Rrd extends BaseDatastore
         if ($this->rrdcached && version_compare($this->version, '1.5', '>=')) {
             $chk = $this->command('last', $filename, '');
             $filename = str_replace([$this->rrd_dir . '/', $this->rrd_dir], '', $filename);
-            return !str_contains(implode($chk), "$filename': No such file or directory");
+            return !Str::contains(implode($chk), "$filename': No such file or directory");
         } else {
             return is_file($filename);
         }

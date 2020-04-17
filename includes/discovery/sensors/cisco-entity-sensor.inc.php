@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Str;
+
 if ($device['os_group'] == 'cisco') {
     echo ' CISCO-ENTITY-SENSOR: ';
 
@@ -164,7 +166,7 @@ if ($device['os_group'] == 'cisco') {
                             break;
                         }
                         if ($entity_array[$phys_index]['entPhysicalClass'] === 'port') {
-                            if (str_contains($entity_array[$phys_index][0]['entAliasMappingIdentifier'], 'ifIndex.')) {
+                            if (Str::contains($entity_array[$phys_index][0]['entAliasMappingIdentifier'], 'ifIndex.')) {
                                 list(, $tmp_ifindex) = explode(".", $entity_array[$phys_index][0]['entAliasMappingIdentifier']);
                                 $tmp_port = get_port_by_index_cache($device['device_id'], $tmp_ifindex);
                                 if (is_array($tmp_port)) {
