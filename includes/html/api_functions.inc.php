@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Config;
 use LibreNMS\Data\Store\Datastore;
@@ -161,7 +162,7 @@ function get_port_stats_by_port_hostname(\Illuminate\Http\Request $request)
     $ifName = $request->route('ifname');
 
     // handle %2f in paths and pass to get_graph_by_port_hostname if needed
-    if (\Illuminate\Support\Str::contains($ifName, '/')) {
+    if (Str::contains($ifName, '/')) {
         $parts = explode('/', $request->path());
 
         if (isset($parts[5])) {
@@ -212,7 +213,7 @@ function get_graph_generic_by_hostname(\Illuminate\Http\Request $request)
     $vars['output'] = $request->get('output', 'display');
     if (isset($sensor_id)) {
         $vars['id']   = $sensor_id;
-        if (\Illuminate\Support\Str::contains($vars['type'], '_wireless')) {
+        if (Str::contains($vars['type'], '_wireless')) {
             $vars['type'] = str_replace('device_', '', $vars['type']);
         } else {
             // If this isn't a wireless graph we need to fix the name.
@@ -484,7 +485,7 @@ function show_endpoints(\Illuminate\Http\Request $request, Router $router)
     $base = str_replace('api/v0', '', $request->url());
     foreach ($router->getRoutes() as $route) {
         /** @var \Illuminate\Routing\Route $route */
-        if (\Illuminate\Support\Str::startsWith($route->getPrefix(), 'api/v0') && $route->getName()) {
+        if (Str::startsWith($route->getPrefix(), 'api/v0') && $route->getName()) {
             $output[$route->getName()] = $base . $route->uri();
         }
     }

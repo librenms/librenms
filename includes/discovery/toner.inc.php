@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Str;
+
 $valid_toner = array();
 
 if ($device['os_group'] == 'printer') {
@@ -37,7 +39,7 @@ if ($device['os_group'] == 'printer') {
         }
 
         // trim part & serial number from devices that include it
-        if (\Illuminate\Support\Str::contains($descr, ', PN')) {
+        if (Str::contains($descr, ', PN')) {
             $descr = explode(', PN', $descr)[0];
         }
 
