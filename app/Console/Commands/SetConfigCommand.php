@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Console\Commands\Traits\CompletesConfigArgument;
 use App\Console\LnmsCommand;
 use LibreNMS\Config;
 use LibreNMS\DB\Eloquent;
@@ -10,6 +11,8 @@ use Symfony\Component\Console\Input\InputArgument;
 
 class SetConfigCommand extends LnmsCommand
 {
+    use CompletesConfigArgument;
+
     protected $name = 'config:set';
 
     /**
