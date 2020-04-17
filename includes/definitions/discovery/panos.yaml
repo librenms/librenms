@@ -38,3 +38,5 @@ modules:
                     group: Sessions
                     descr: Active Sessions
                     high_limit: panSessionMax
+                    index: 'panSessionActive.{{ $index }}'
+
