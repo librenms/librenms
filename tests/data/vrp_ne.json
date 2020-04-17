@@ -41,7 +41,6 @@
         "discovery": {
             "bgpPeers": [
                 {
-                    "astext": "Telefonos del Noroeste, S.A. de C.V., MX",
                     "bgpPeerIdentifier": "55.7.46.20",
                     "bgpPeerRemoteAs": 6332,
                     "bgpPeerState": "",
@@ -60,7 +59,6 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "ERX-TANET-ASN1 Taiwan Academic Network (TANet) Information Center, TW",
                     "bgpPeerIdentifier": "54.7.42.34",
                     "bgpPeerRemoteAs": 1659,
                     "bgpPeerState": "",
@@ -79,7 +77,6 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "NET-UEN-UTAH, US",
                     "bgpPeerIdentifier": "54.7.42.192",
                     "bgpPeerRemoteAs": 2940,
                     "bgpPeerState": "",
@@ -98,7 +95,6 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "NSU-AS, RU",
                     "bgpPeerIdentifier": "54.7.42.203",
                     "bgpPeerRemoteAs": 3335,
                     "bgpPeerState": "",
@@ -117,7 +113,6 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "RIPE-MEETING-AS, NL",
                     "bgpPeerIdentifier": "54.7.42.252",
                     "bgpPeerRemoteAs": 2121,
                     "bgpPeerState": "",
@@ -136,7 +131,6 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "ISI-ISP, US",
                     "bgpPeerIdentifier": "54.7.42.253",
                     "bgpPeerRemoteAs": 6162,
                     "bgpPeerState": "",
@@ -155,7 +149,6 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "ISI-ISP, US",
                     "bgpPeerIdentifier": "54.7.42.254",
                     "bgpPeerRemoteAs": 6162,
                     "bgpPeerState": "",
@@ -174,7 +167,6 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "INOW-AS, US",
                     "bgpPeerIdentifier": "54.7.43.9",
                     "bgpPeerRemoteAs": 6489,
                     "bgpPeerState": "",
@@ -193,7 +185,6 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "INOW-AS, US",
                     "bgpPeerIdentifier": "54.7.43.10",
                     "bgpPeerRemoteAs": 6489,
                     "bgpPeerState": "",
@@ -212,7 +203,6 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "TXASHLTH, US",
                     "bgpPeerIdentifier": "54.7.43.82",
                     "bgpPeerRemoteAs": 2934,
                     "bgpPeerState": "",
@@ -231,7 +221,6 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "TXASHLTH, US",
                     "bgpPeerIdentifier": "54.7.43.83",
                     "bgpPeerRemoteAs": 2934,
                     "bgpPeerState": "",
@@ -250,7 +239,6 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "TXASHLTH, US",
                     "bgpPeerIdentifier": "54.7.43.207",
                     "bgpPeerRemoteAs": 2934,
                     "bgpPeerState": "",
@@ -269,7 +257,6 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "TXASHLTH, US",
                     "bgpPeerIdentifier": "54.7.43.208",
                     "bgpPeerRemoteAs": 2934,
                     "bgpPeerState": "",
@@ -288,7 +275,6 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "ISI-ISP, US",
                     "bgpPeerIdentifier": "54.7.45.253",
                     "bgpPeerRemoteAs": 6162,
                     "bgpPeerState": "",
@@ -307,7 +293,6 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "ISI-ISP, US",
                     "bgpPeerIdentifier": "54.7.45.254",
                     "bgpPeerRemoteAs": 6162,
                     "bgpPeerState": "",
@@ -326,7 +311,6 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "FRANCE-TELECOM-AS, US",
                     "bgpPeerIdentifier": "54.7.149.45",
                     "bgpPeerRemoteAs": 2320,
                     "bgpPeerState": "",
@@ -345,7 +329,6 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "ASN-ATTGMS, US",
                     "bgpPeerIdentifier": "54.7.253.70",
                     "bgpPeerRemoteAs": 5075,
                     "bgpPeerState": "",
@@ -364,7 +347,6 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "VMX, CH",
                     "bgpPeerIdentifier": "54.7.34.6",
                     "bgpPeerRemoteAs": 64402,
                     "bgpPeerState": "",
@@ -383,7 +365,6 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "ROGERS-AS-8160, CA",
                     "bgpPeerIdentifier": "54.7.34.30",
                     "bgpPeerRemoteAs": 8160,
                     "bgpPeerState": "",
@@ -402,7 +383,6 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "MEMO Str. Octavian Goga nr. 109, RO",
                     "bgpPeerIdentifier": "54.7.253.145",
                     "bgpPeerRemoteAs": 8260,
                     "bgpPeerState": "",

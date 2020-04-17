@@ -10045,7 +10045,6 @@
         "discovery": {
             "bgpPeers": [
                 {
-                    "astext": "Cymru FullBogon Feed",
                     "bgpPeerIdentifier": "38.229.6.20",
                     "bgpPeerRemoteAs": 65332,
                     "bgpPeerState": "idle",
@@ -10061,10 +10060,9 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 35684352,
-                    "vrfLocalAs": 39835
+                    "vrfLocalAs": null
                 },
                 {
-                    "astext": "Cymru FullBogon Feed",
                     "bgpPeerIdentifier": "38.229.46.20",
                     "bgpPeerRemoteAs": 65332,
                     "bgpPeerState": "idle",
@@ -10080,10 +10078,9 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 35684352,
-                    "vrfLocalAs": 39835
+                    "vrfLocalAs": null
                 },
                 {
-                    "astext": "Cymru FullBogon Feed",
                     "bgpPeerIdentifier": "2620:0:6b0:8000::20",
                     "bgpPeerRemoteAs": 65332,
                     "bgpPeerState": "idle",
@@ -10099,10 +10096,9 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 35684352,
-                    "vrfLocalAs": 39835
+                    "vrfLocalAs": null
                 },
                 {
-                    "astext": "Cymru FullBogon Feed",
                     "bgpPeerIdentifier": "2620:0:6b0:ff00::20",
                     "bgpPeerRemoteAs": 65332,
                     "bgpPeerState": "idle",
@@ -10118,7 +10114,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 35684352,
-                    "vrfLocalAs": 39835
+                    "vrfLocalAs": null
                 }
             ],
             "bgpPeers_cbgp": []
@@ -10126,80 +10122,76 @@
         "poller": {
             "bgpPeers": [
                 {
-                    "astext": "Cymru FullBogon Feed",
                     "bgpPeerIdentifier": "38.229.6.20",
                     "bgpPeerRemoteAs": 65332,
-                    "bgpPeerState": "established",
-                    "bgpPeerAdminStatus": "receiveKeepAlive",
+                    "bgpPeerState": "",
+                    "bgpPeerAdminStatus": "",
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
                     "bgpPeerInUpdates": 0,
                     "bgpPeerOutUpdates": 0,
-                    "bgpPeerInTotalMessages": 795188,
-                    "bgpPeerOutTotalMessages": 716485,
-                    "bgpPeerFsmEstablishedTime": 4410415,
+                    "bgpPeerInTotalMessages": 0,
+                    "bgpPeerOutTotalMessages": 0,
+                    "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 35684352,
-                    "vrfLocalAs": 39835
+                    "vrfLocalAs": null
                 },
                 {
-                    "astext": "Cymru FullBogon Feed",
                     "bgpPeerIdentifier": "38.229.46.20",
                     "bgpPeerRemoteAs": 65332,
-                    "bgpPeerState": "established",
-                    "bgpPeerAdminStatus": "receiveKeepAlive",
+                    "bgpPeerState": "",
+                    "bgpPeerAdminStatus": "",
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
                     "bgpPeerInUpdates": 0,
                     "bgpPeerOutUpdates": 0,
-                    "bgpPeerInTotalMessages": 795764,
-                    "bgpPeerOutTotalMessages": 716421,
-                    "bgpPeerFsmEstablishedTime": 4410437,
+                    "bgpPeerInTotalMessages": 0,
+                    "bgpPeerOutTotalMessages": 0,
+                    "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 35684352,
-                    "vrfLocalAs": 39835
+                    "vrfLocalAs": null
                 },
                 {
-                    "astext": "Cymru FullBogon Feed",
                     "bgpPeerIdentifier": "2620:0:6b0:8000::20",
                     "bgpPeerRemoteAs": 65332,
-                    "bgpPeerState": "established",
-                    "bgpPeerAdminStatus": "receiveKeepAlive",
+                    "bgpPeerState": "",
+                    "bgpPeerAdminStatus": "",
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
                     "bgpPeerInUpdates": 0,
                     "bgpPeerOutUpdates": 0,
-                    "bgpPeerInTotalMessages": 1150518,
-                    "bgpPeerOutTotalMessages": 505787,
-                    "bgpPeerFsmEstablishedTime": 8235850,
+                    "bgpPeerInTotalMessages": 0,
+                    "bgpPeerOutTotalMessages": 0,
+                    "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 35684352,
-                    "vrfLocalAs": 39835
+                    "vrfLocalAs": null
                 },
                 {
-                    "astext": "Cymru FullBogon Feed",
                     "bgpPeerIdentifier": "2620:0:6b0:ff00::20",
                     "bgpPeerRemoteAs": 65332,
-                    "bgpPeerState": "established",
-                    "bgpPeerAdminStatus": "receiveKeepAlive",
+                    "bgpPeerState": "",
+                    "bgpPeerAdminStatus": "",
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
                     "bgpPeerInUpdates": 0,
                     "bgpPeerOutUpdates": 0,
-                    "bgpPeerInTotalMessages": 1382477,
-                    "bgpPeerOutTotalMessages": 716497,
-                    "bgpPeerFsmEstablishedTime": 8235855,
+                    "bgpPeerInTotalMessages": 0,
+                    "bgpPeerOutTotalMessages": 0,
+                    "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 35684352,
-                    "vrfLocalAs": 39835
+                    "vrfLocalAs": null
                 }
             ],
             "bgpPeers_cbgp": []

@@ -3,7 +3,6 @@
         "discovery": {
             "bgpPeers": [
                 {
-                    "astext": "",
                     "bgpPeerIdentifier": "10.44.32.13",
                     "bgpPeerRemoteAs": 65083,
                     "bgpPeerState": "idle",
@@ -22,7 +21,6 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
                     "bgpPeerIdentifier": "10.45.63.161",
                     "bgpPeerRemoteAs": 65083,
                     "bgpPeerState": "idle",
@@ -41,7 +39,6 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
                     "bgpPeerIdentifier": "2001:0db8:85a3:0000:341a:8a2e:03e1:000d",
                     "bgpPeerRemoteAs": 65083,
                     "bgpPeerState": "idle",
@@ -60,7 +57,6 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
                     "bgpPeerIdentifier": "2001:0db8:85a3:0000:341a:8a2e:03e2:00a1",
                     "bgpPeerRemoteAs": 65083,
                     "bgpPeerState": "idle",
@@ -181,7 +177,6 @@
         "poller": {
             "bgpPeers": [
                 {
-                    "astext": "",
                     "bgpPeerIdentifier": "10.44.32.13",
                     "bgpPeerRemoteAs": 65083,
                     "bgpPeerState": "established",
@@ -200,7 +195,6 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
                     "bgpPeerIdentifier": "10.45.63.161",
                     "bgpPeerRemoteAs": 65083,
                     "bgpPeerState": "established",
@@ -219,7 +213,6 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
                     "bgpPeerIdentifier": "2001:0db8:85a3:0000:341a:8a2e:03e1:000d",
                     "bgpPeerRemoteAs": 65083,
                     "bgpPeerState": "established",
@@ -238,7 +231,6 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
                     "bgpPeerIdentifier": "2001:0db8:85a3:0000:341a:8a2e:03e2:00a1",
                     "bgpPeerRemoteAs": 65083,
                     "bgpPeerState": "established",

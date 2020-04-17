@@ -24889,7 +24889,6 @@
         "discovery": {
             "bgpPeers": [
                 {
-                    "astext": "",
                     "bgpPeerIdentifier": "192.168.189.96",
                     "bgpPeerRemoteAs": 64512,
                     "bgpPeerState": "established",

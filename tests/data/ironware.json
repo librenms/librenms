@@ -24746,7 +24746,6 @@
         "discovery": {
             "bgpPeers": [
                 {
-                    "astext": "",
                     "bgpPeerIdentifier": "172.31.31.50",
                     "bgpPeerRemoteAs": 23456,
                     "bgpPeerState": "idle",
@@ -24765,7 +24764,6 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
                     "bgpPeerIdentifier": "192.0.2.4",
                     "bgpPeerRemoteAs": 65065,
                     "bgpPeerState": "idle",
@@ -24784,7 +24782,6 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
                     "bgpPeerIdentifier": "192.0.2.5",
                     "bgpPeerRemoteAs": 65065,
                     "bgpPeerState": "idle",
@@ -24803,7 +24800,6 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
                     "bgpPeerIdentifier": "192.0.2.6",
                     "bgpPeerRemoteAs": 23456,
                     "bgpPeerState": "idle",
@@ -24822,7 +24818,6 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
                     "bgpPeerIdentifier": "192.0.2.7",
                     "bgpPeerRemoteAs": 23456,
                     "bgpPeerState": "idle",
@@ -24846,7 +24841,6 @@
         "poller": {
             "bgpPeers": [
                 {
-                    "astext": "",
                     "bgpPeerIdentifier": "172.31.31.50",
                     "bgpPeerRemoteAs": 23456,
                     "bgpPeerState": "established",
@@ -24865,7 +24859,6 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
                     "bgpPeerIdentifier": "192.0.2.4",
                     "bgpPeerRemoteAs": 65065,
                     "bgpPeerState": "connect",
@@ -24884,7 +24877,6 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
                     "bgpPeerIdentifier": "192.0.2.5",
                     "bgpPeerRemoteAs": 65065,
                     "bgpPeerState": "idle",
@@ -24903,7 +24895,6 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
                     "bgpPeerIdentifier": "192.0.2.6",
                     "bgpPeerRemoteAs": 23456,
                     "bgpPeerState": "connect",
@@ -24922,7 +24913,6 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
                     "bgpPeerIdentifier": "192.0.2.7",
                     "bgpPeerRemoteAs": 23456,
                     "bgpPeerState": "idle",
