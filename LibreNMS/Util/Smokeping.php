@@ -47,16 +47,18 @@ class Smokeping
     {
         if (is_null($this->files) && Config::has('smokeping.dir')) {
             $dir = $this->generateFileName();
-            foreach (array_diff(scandir($dir), ['.', '..']) as $file) {
-                if (stripos($file, '.rrd') !== false) {
-                    if (strpos($file, '~') !== false) {
-                        list($target, $slave) = explode('~', $this->filenameToHostname($file));
-                        $this->files['in'][$target][$slave] = $file;
-                        $this->files['out'][$slave][$target] = $file;
-                    } else {
-                        $target = $this->filenameToHostname($file);
-                        $this->files['in'][$target][Config::get('own_hostname')] = $file;
-                        $this->files['out'][Config::get('own_hostname')][$target] = $file;
+            if (is_dir($dir)) {
+                foreach (array_diff(scandir($dir), ['.', '..']) as $file) {
+                    if (stripos($file, '.rrd') !== false) {
+                        if (strpos($file, '~') !== false) {
+                            list($target, $slave) = explode('~', $this->filenameToHostname($file));
+                            $this->files['in'][$target][$slave] = $file;
+                            $this->files['out'][$slave][$target] = $file;
+                        } else {
+                            $target = $this->filenameToHostname($file);
+                            $this->files['in'][$target][Config::get('own_hostname')] = $file;
+                            $this->files['out'][Config::get('own_hostname')][$target] = $file;
+                        }
                     }
                 }
             }
