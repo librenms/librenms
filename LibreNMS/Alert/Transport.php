@@ -2,6 +2,7 @@
 
 namespace LibreNMS\Alert;
 
+use Illuminate\Support\Str;
 use LibreNMS\Interfaces\Alert\Transport as TransportInterface;
 use LibreNMS\Config;
 
@@ -31,7 +32,7 @@ abstract class Transport implements TransportInterface
     {
         $options = [];
         foreach (explode(PHP_EOL, $input) as $option) {
-            if (str_contains($option, '=')) {
+            if (Str::contains($option, '=')) {
                 list($k,$v) = explode('=', $option, 2);
                 $options[$k] = trim($v);
             }

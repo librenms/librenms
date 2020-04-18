@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Tests;
 
+use Illuminate\Support\Str;
 use \PHPUnit\Framework\ExpectationFailedException as PHPUnitException;
 
 class DBSetupTest extends DBTestCase
@@ -53,18 +54,18 @@ class DBSetupTest extends DBTestCase
 
             foreach (explode("\n", $content) as $line) {
                 // skip comments and empty lines
-                if (empty($line) || starts_with($line, array('#', '--'))) {
+                if (empty($line) || Str::startsWith($line, array('#', '--'))) {
                     continue;
                 }
 
                 // each line must end with ;, prevents multiline and makes sql easy to run by hand
                 // Warning may include whitespace such as space and \r
-                if (!ends_with($line, ';')) {
+                if (!Str::endsWith($line, ';')) {
                     throw new PHPUnitException("Each line must end with a semicolin (;)\n$file: $line");
                 }
 
                 // cannot assume user use the librenms database name
-                if (str_contains($line, 'librenms.')) {
+                if (Str::contains($line, 'librenms.')) {
                     throw new PHPUnitException("Do not include the database name in schema files\n$file: $line");
                 }
             }

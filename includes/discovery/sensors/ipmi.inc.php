@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Str;
 use LibreNMS\Config;
 
 // IPMI - We can discover this on poll!
@@ -18,7 +19,7 @@ if ($ipmi['host'] = get_dev_attrib($device, 'ipmi_hostname')) {
         $results = explode(PHP_EOL, external_exec(array_merge($cmd, ['-I', $ipmi_type, 'sensor'])));
 
         array_filter($results, function ($line) {
-            return !str_contains($line, 'discrete');
+            return !Str::contains($line, 'discrete');
         });
 
         if (!empty($results)) {

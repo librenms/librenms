@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Validations;
 
+use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Validator;
 
@@ -68,7 +69,7 @@ class Programs extends BaseValidation
             return;
         }
 
-        if (str_contains($output, '::1 is unreachable') || str_contains($output, 'Address family not supported')) {
+        if (Str::contains($output, '::1 is unreachable') || Str::contains($output, 'Address family not supported')) {
             $validator->warn("IPv6 is disabled on your server, you will not be able to add IPv6 devices.");
             return;
         }
@@ -81,7 +82,7 @@ class Programs extends BaseValidation
             $getcap_out = shell_exec("$getcap $cmd");
             preg_match("#^$cmd = (.*)$#", $getcap_out, $matches);
 
-            if (is_null($matches) || !str_contains($matches[1], 'cap_net_raw+ep')) {
+            if (is_null($matches) || !Str::contains($matches[1], 'cap_net_raw+ep')) {
                 $validator->fail(
                     "$bin should have CAP_NET_RAW!",
                     "setcap cap_net_raw+ep $cmd"

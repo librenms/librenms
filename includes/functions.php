@@ -12,6 +12,7 @@
  */
 
 use App\Models\Device;
+use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\HostExistsException;
 use LibreNMS\Exceptions\HostIpExistsException;
@@ -124,7 +125,7 @@ function parse_modules($type, $options)
         Config::set("{$type}_modules", []);
         foreach (explode(',', $options['m']) as $module) {
             // parse submodules (only supported by some modules)
-            if (str_contains($module, '/')) {
+            if (Str::contains($module, '/')) {
                 list($module, $submodule) = explode('/', $module, 2);
                 $existing_submodules = Config::get("{$type}_submodules.$module", []);
                 $existing_submodules[] = $submodule;
@@ -228,16 +229,16 @@ function checkDiscovery($device, $array)
 {
     // all items must be true
     foreach ($array as $key => $value) {
-        if ($check = ends_with($key, '_except')) {
+        if ($check = Str::endsWith($key, '_except')) {
             $key = substr($key, 0, -7);
         }
 
         if ($key == 'sysObjectID') {
-            if (starts_with($device['sysObjectID'], $value) == $check) {
+            if (Str::startsWith($device['sysObjectID'], $value) == $check) {
                 return false;
             }
         } elseif ($key == 'sysDescr') {
-            if (str_contains($device['sysDescr'], $value) == $check) {
+            if (Str::contains($device['sysDescr'], $value) == $check) {
                 return false;
             }
         } elseif ($key == 'sysDescr_regex') {
@@ -312,17 +313,17 @@ function compare_var($a, $b, $comparison = '=')
         case "<":
             return $a < $b;
         case "contains":
-            return str_contains($a, $b);
+            return Str::contains($a, $b);
         case "not_contains":
-            return !str_contains($a, $b);
+            return !Str::contains($a, $b);
         case "starts":
-            return starts_with($a, $b);
+            return Str::startsWith($a, $b);
         case "not_starts":
-            return !starts_with($a, $b);
+            return !Str::startsWith($a, $b);
         case "ends":
-            return ends_with($a, $b);
+            return Str::endsWith($a, $b);
         case "not_ends":
-            return !ends_with($a, $b);
+            return !Str::endsWith($a, $b);
         case "regex":
             return (bool)preg_match($b, $a);
         case "not regex":
@@ -351,7 +352,7 @@ function percent_colour($perc)
 function getLogo($device)
 {
     $img = getImageName($device, true, 'images/logos/');
-    if (!starts_with($img, 'generic')) {
+    if (!Str::startsWith($img, 'generic')) {
         return 'images/logos/' . $img;
     }
 
@@ -453,12 +454,16 @@ function delete_device($id)
     dbQuery("DELETE `ipv4_addresses` FROM `ipv4_addresses` INNER JOIN `ports` ON `ports`.`port_id`=`ipv4_addresses`.`port_id` WHERE `device_id`=?", array($id));
     dbQuery("DELETE `ipv6_addresses` FROM `ipv6_addresses` INNER JOIN `ports` ON `ports`.`port_id`=`ipv6_addresses`.`port_id` WHERE `device_id`=?", array($id));
 
-    foreach (dbFetch("SELECT * FROM `ports` WHERE `device_id` = ?", array($id)) as $int_data) {
-        $int_if = $int_data['ifDescr'];
-        $int_id = $int_data['port_id'];
-        delete_port($int_id);
-        $ret .= "Removed interface $int_id ($int_if)\n";
-    }
+
+    \App\Models\Port::where('device_id', $id)
+        ->with('device')
+        ->select(['port_id', 'device_id', 'ifIndex', 'ifName', 'ifAlias', 'ifDescr'])
+        ->chunk(100, function ($ports) use (&$ret) {
+            foreach ($ports as $port) {
+                $port->delete();
+                $ret .= "Removed interface $port->port_id (" . $port->getLabel() . ")\n";
+            }
+        });
 
     // Remove sensors manually due to constraints
     foreach (dbFetchRows("SELECT * FROM `sensors` WHERE `device_id` = ?", array($id)) as $sensor) {
@@ -884,19 +889,12 @@ function get_astext($asn)
  */
 function log_event($text, $device = null, $type = null, $severity = 2, $reference = null)
 {
-    if (!is_array($device)) {
-        $device = device_by_id_cache($device);
+    // handle legacy device array
+    if (is_array($device) && isset($device['device_id'])) {
+        $device = $device['device_id'];
     }
 
-    dbInsert([
-        'device_id' => ($device['device_id'] ?: 0),
-        'reference' => $reference,
-        'type' => $type,
-        'datetime' => \Carbon\Carbon::now(),
-        'severity' => $severity,
-        'message' => $text,
-        'username'  => Auth::user()->username ?? '',
-    ], 'eventlog');
+    Log::event($text, $device, $type, $severity, $reference);
 }
 
 // Parse string with emails. Return array with email (as key) and name (as value)
@@ -1092,14 +1090,14 @@ function is_port_valid($port, $device)
     }
 
     foreach (Config::getCombined($device['os'], 'bad_iftype') as $bt) {
-        if (str_contains($ifType, $bt)) {
+        if (Str::contains($ifType, $bt)) {
             d_echo("ignored by ifType: $ifType (matched: $bt )\n");
             return false;
         }
     }
 
     foreach (Config::getCombined($device['os'], 'bad_ifoperstatus') as $bos) {
-        if (str_contains($ifOperStatus, $bos)) {
+        if (Str::contains($ifOperStatus, $bos)) {
             d_echo("ignored by ifOperStatus: $ifOperStatus (matched: $bos)\n");
             return false;
         }
@@ -1951,7 +1949,7 @@ function get_toner_levels($device, $raw_value, $capacity)
             return 0;
         }
     } elseif ($device['os'] == 'brother') {
-        if (!str_contains($device['hardware'], 'MFC-L8850')) {
+        if (!Str::contains($device['hardware'], 'MFC-L8850')) {
             switch ($raw_value) {
                 case '0':
                     return 100;

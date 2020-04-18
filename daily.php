@@ -135,10 +135,13 @@ if ($options['f'] === 'ports_purge') {
         $ports_purge = Config::get('ports_purge');
 
         if ($ports_purge) {
-            $interfaces = dbFetchRows('SELECT * from `ports` AS P, `devices` AS D WHERE `deleted` = 1 AND D.device_id = P.device_id');
-            foreach ($interfaces as $interface) {
-                delete_port($interface['port_id']);
-            }
+            \App\Models\Port::query()->with(['device' => function ($query) {
+                $query->select('device_id', 'hostname');
+            }])->isDeleted()->chunk(100, function ($ports) {
+                foreach ($ports as $port) {
+                    $port->delete();
+                }
+            });
             echo "All deleted ports now purged\n";
         }
     } catch (LockException $e) {

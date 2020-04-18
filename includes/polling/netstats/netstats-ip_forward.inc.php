@@ -1,7 +1,9 @@
 <?php
+
+use Illuminate\Support\Str;
 use LibreNMS\RRD\RrdDefinition;
 
-if (!starts_with($device['os'], array('Snom', 'asa'))) {
+if (!Str::startsWith($device['os'], array('Snom', 'asa'))) {
     echo ' IP-FORWARD';
 
     $oid = 'ipCidrRouteNumber';
