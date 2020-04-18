@@ -237,8 +237,8 @@ Extend` heading top of page.
 1: Create stats file with appropriate permissions:
 
 ```bash
-~$ touch /var/run/named/stats
-~$ chown bind:bind /var/run/named/stats
+~$ touch /var/cache/bind/stats
+~$ chown bind:bind /var/cache/bind/stats
 ```
 
 Change `user:group` to the user and group that's running bind/named.
@@ -248,7 +248,7 @@ Change `user:group` to the user and group that's running bind/named.
 ```text
 options {
     ...
-    statistics-file "/var/run/named/stats";
+    statistics-file "/var/cache/bind/stats";
     zone-statistics yes;
     ...
 };
@@ -294,7 +294,7 @@ own settings.
 rndc = The path to rndc. Default: /usr/bin/env rndc
 call_rndc = A 0/1 boolean on whether or not to call rndc stats.
     Suggest to set to 0 if using netdata. Default: 1
-stats_file = The path to the named stats file. Default: /var/run/named/stats
+stats_file = The path to the named stats file. Default: /var/cache/bind/stats
 agent = A 0/1 boolean for if this is being used as a LibreNMS
     agent or not. Default: 0
 zero_stats = A 0/1 boolean for if the stats file should be zeroed
