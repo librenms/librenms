@@ -13,7 +13,6 @@
  * the source code distribution for details.
  */
 
-use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\ValidationResult;
 use LibreNMS\Validator;
