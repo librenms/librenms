@@ -5,9 +5,12 @@ namespace App\Http\Controllers;
 use App\Facades\DeviceCache;
 use App\Models\Device;
 use App\Models\Vminfo;
+use Auth;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use LibreNMS\Config;
+use LibreNMS\Util\Url;
 
 class DeviceController extends Controller
 {
@@ -44,6 +47,8 @@ class DeviceController extends Controller
         'nac' => \App\Http\Controllers\Device\Tabs\NacController::class,
         'notes' => \App\Http\Controllers\Device\Tabs\NotesController::class,
         'mib' => \App\Http\Controllers\Device\Tabs\MibController::class,
+        'edit' => \App\Http\Controllers\Device\Tabs\EditController::class,
+        'capture' => \App\Http\Controllers\Device\Tabs\CaptureController::class,
     ];
 
     public function index(Request $request, $device_id, $current_tab = 'overview', $vars = '')
@@ -64,6 +69,15 @@ class DeviceController extends Controller
         }, array_filter($this->tabs, 'class_exists')); // TODO remove filter
         $title = $tabs[$current_tab]->name();
         $data = $tabs[$current_tab]->data($device);
+
+        // Device Link Menu, select the primary link
+        $device_links = $this->deviceLinkMenu($device);
+        $primary_device_link_name = Config::get('html.device.primary_link', 'edit');
+        if (!isset($device_links[$primary_device_link_name])) {
+            $primary_device_link_name = array_key_first($device_links);
+        }
+        $primary_device_link = $device_links[$primary_device_link_name];
+        unset($device_links[$primary_device_link_name], $primary_device_link_name);
 
         if (view()->exists('device.tabs.' . $current_tab)) {
             return view('device.tabs.' . $current_tab, get_defined_vars());
@@ -125,5 +139,69 @@ class DeviceController extends Controller
 
         $os_group = Config::getOsSetting($device->os, 'group');
         return Config::get("os.$os_group.over", Config::get('os.default.over'));
+    }
+
+    private function deviceLinkMenu(Device $device)
+    {
+        $can_admin_device = $device->canAccess(Auth::user());
+        $device_links = [];
+
+        if ($can_admin_device) {
+            $device_links['edit'] = [
+                'icon' => 'fa-gear',
+                'url' => route('device', [$device->device_id, 'edit']),
+                'title' => __('Edit'),
+                'external' => false,
+            ];
+        }
+
+        // User defined device links
+        foreach (array_values(Arr::wrap(Config::get('html.device.links'))) as $index => $link) {
+            $device_links['custom' . ($index + 1)] = [
+                'icon' => $link['icon'] ?? 'fa-external-link',
+                'url' => view(['template' => $link['url']], ['device' => $device])->__toString(),
+                'title' => $link['title'],
+                'external' => $link['external'] ?? true,
+            ];
+        }
+
+        // Web
+        $device_links['web'] = [
+            'icon' => 'fa-globe',
+            'url' => 'https://' . $device->hostname,
+            'title' => __('Web'),
+            'external' => true,
+            'onclick' => 'http_fallback(this); return false;',
+        ];
+
+        // SSH
+        $ssh_url = Config::has('gateone.server')
+            ? Config::get('gateone.server') . '?ssh=ssh://' . (Config::get('gateone.use_librenms_user') ? Auth::user()->username . '@' : '') . $device['hostname'] . '&location=' . $device['hostname']
+            : 'ssh://' . $device->hostname;
+        $device_links['ssh'] = [
+            'icon' => 'fa-lock',
+            'url' => $ssh_url,
+            'title' => __('SSH'),
+            'external' => true,
+        ];
+
+        // Telnet
+        $device_links['telnet'] = [
+            'icon' => 'fa-terminal',
+            'url' => 'telnet://' . $device->hostname,
+            'title' => __('Telnet'),
+            'external' => true,
+        ];
+
+        if ($can_admin_device) {
+            $device_links['capture'] = [
+                'icon' => 'fa-bug',
+                'url' => route('device', [$device->device_id, 'capture']),
+                'title' => __('Capture'),
+                'external' => false,
+            ];
+        }
+
+        return $device_links;
     }
 }
