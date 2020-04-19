@@ -37,7 +37,7 @@ class AddHostTest extends DBTestCase
 
     public function tearDown() : void
     {
-        exec("./delhost.php ".$this->host);
+        \Artisan::call('device:remove', ['device spec' => $this->host]);
         parent::tearDown();
     }
 
