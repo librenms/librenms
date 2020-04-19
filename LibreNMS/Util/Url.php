@@ -219,9 +219,20 @@ class Url
         return self::overlibLink(self::sensorUrl($sensor), $text, $content, self::sensorLinkDisplayClass($sensor));
     }
 
+    /**
+     * @param int|Device $device
+     * @param array $vars
+     * @return string
+     */
     public static function deviceUrl($device, $vars = [])
     {
-       return route('device', $device->device_id) . self::urlParams($vars);
+        $routeParams = [is_int($device) ? $device : $device->device_id];
+        if (isset($vars['tab'])) {
+            $routeParams[] = $vars['tab'];
+            unset($vars['tab']);
+        }
+
+       return route('device', $routeParams) . self::urlParams($vars);
     }
 
     public static function portUrl($port, $vars = [])

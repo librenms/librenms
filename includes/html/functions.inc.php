@@ -160,9 +160,8 @@ function generate_minigraph_image($device, $start, $end, $type, $legend = 'no', 
 
 function generate_device_url($device, $vars = array())
 {
-    return generate_url(array('page' => 'device', 'device' => $device['device_id']), $vars);
-}//end generate_device_url()
-
+    return \LibreNMS\Util\Url::deviceUrl((int)$device['device_id'], $vars);
+}
 
 function generate_device_link($device, $text = null, $vars = array(), $start = 0, $end = 0, $escape_text = 1, $overlib = 1)
 {
