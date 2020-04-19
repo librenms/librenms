@@ -35,12 +35,6 @@ class AddHostTest extends DBTestCase
     use DatabaseTransactions;
     private $host = "testHost";
 
-    public function tearDown() : void
-    {
-        \Artisan::call('device:remove', ['device spec' => $this->host]);
-        parent::tearDown();
-    }
-
     public function testAddsnmpV1()
     {
         addHost($this->host, "v1", 111, "tcp", 0, true, "ifIndex");
