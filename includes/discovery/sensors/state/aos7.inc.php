@@ -15,7 +15,10 @@ foreach ($pre_cache['aos7_fan_oids'] as $index => $data) {
      $indexName=strrev($revindex);
      echo "CHASSIS $chassis \n";
      echo "INDEX $indexName \n";
-     $descr = 'Chassis '.($chassis-450). " Fan $indexName";
+     //$descr = 'Chassis '.($chassis-450). " Fan $index";
+     $descr_oid = ".1.3.6.1.2.1.47.1.1.1.1.7.".$chassis;
+     $chas_descr = snmp_get($device, $descr_oid, '-Oqv');
+     $descr = "CHASSIS-".substr($chas_descr,0,strpos($chas_descr,'/'))." Fan $index";
      echo "Current? $current \n";
      $states = [
        ['value' => 0, 'generic' => 2, 'graph' => 1, 'descr' => 'no-error'],
