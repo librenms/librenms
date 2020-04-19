@@ -35,35 +35,6 @@ class Sensor extends DeviceRelatedModel
         'waterflow'            => 'tint',
     ];
 
-    protected static $types = [
-        'airflow'              => 'Airflow',
-        'ber'                  => 'ber',
-        'charge'               => 'Battery Charge',
-        'chromatic_dispersion' => 'chromatic_dispersion',
-        'cooling'              => 'Cooling',
-        'count'                => 'count',
-        'current'              => 'Current',
-        'dbm'                  => 'dBm',
-        'delay'                => 'delay',
-        'eer'                  => 'Energy Efficiency Ratio',
-        'fanspeed'             => 'Fanspeed',
-        'frequency'            => 'Frequency',
-        'humidity'             => 'Humidity',
-        'load'                 => 'Load',
-        'power'                => 'power_consumed',
-        'power_consumed'       => 'power_factor',
-        'power_factor'         => 'Power',
-        'pressure'             => 'Pressure',
-        'quality_factor'       => 'quality_factor',
-        'runtime'              => 'Runtime',
-        'signal'               => 'Wireless',
-        'snr'                  => 'snr',
-        'state'                => 'State',
-        'temperature'          => 'Temperature',
-        'voltage'              => 'Voltage',
-        'waterflow'            => 'Water Flow Rate',
-     ];
-
     // ---- Helper Functions ----
 
     public function classDescr()
@@ -84,7 +55,7 @@ class Sensor extends DeviceRelatedModel
 
     public static function getTypes()
     {
-        return array_values(self::$types);
+        return array_keys(self::$icons);
     }
 
     // for the legacy menu
