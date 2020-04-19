@@ -10,6 +10,8 @@
  * the source code distribution for details.
  */
 
+use Illuminate\Support\Str;
+
 $temp = snmpwalk_cache_multi_oid($device, 'swIfOperSuspendedStatus', [], 'CISCOSB-rlInterfaces');
 $cur_oid = '.1.3.6.1.4.1.9.6.1.101.43.1.1.24.';
 
@@ -25,7 +27,7 @@ if (is_array($temp)) {
     foreach ($temp as $index => $entry) {
         $port_data = get_port_by_index_cache($device['device_id'], str_replace('1.', '', $index));
         $descr = $port_data['ifDescr'] . ' Suspended Status';
-        if (str_contains($descr, ['ethernet','Ethernet']) && $port_data['ifOperStatus'] !== 'notPresent') {
+        if (Str::contains($descr, ['ethernet', 'Ethernet']) && $port_data['ifOperStatus'] !== 'notPresent') {
             //Discover Sensors
             discover_sensor($valid['sensor'], 'state', $device, $cur_oid . $index, $index, $state_name, $descr, 1, 1, null, null, null, null, $temp[$index]['swIfOperSuspendedStatus'], 'snmp', $index);
 

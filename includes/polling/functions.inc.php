@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Exceptions\JsonAppException;
@@ -572,7 +573,7 @@ function update_application($app, $response, $metrics = array(), $status = '')
     );
 
     if ($response != '' && $response !== false) {
-        if (str_contains($response, array(
+        if (Str::contains($response, array(
             'Traceback (most recent call last):',
         ))) {
             $data['app_state'] = 'ERROR';

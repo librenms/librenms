@@ -26,6 +26,9 @@
  *
  */
 
+use App\Models\Port;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+
 chdir(dirname($argv[0]));
 
 $init_modules = array();
@@ -55,7 +58,11 @@ if (! $port_id && ! $port_id_file || ($port_id && $port_id_file)) {
 
 // Purge single port
 if ($port_id) {
-    delete_port($port_id);
+    try {
+        Port::findOrFail($port_id)->delete();
+    } catch (ModelNotFoundException $e) {
+        echo "Port ID $port_id not found!\n";
+    }
 }
 
 // Delete multiple ports
@@ -72,7 +79,11 @@ if ($port_id_file) {
     }
 
     while ($port_id = trim(fgets($fh))) {
-        delete_port($port_id);
+        try {
+            Port::findOrFail($port_id)->delete();
+        } catch (ModelNotFoundException $e) {
+            echo "Port ID $port_id not found!\n";
+        }
     }
 
     if ($fh != STDIN) {

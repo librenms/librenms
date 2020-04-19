@@ -74,7 +74,7 @@ class BashCompletionCommand extends Command
                     $completions = $this->completeOptionValue($option, $current);
                 } else {
                     $completions = collect();
-                    if (!starts_with($previous, '-')) {
+                    if (!Str::startsWith($previous, '-')) {
                         $completions = $this->completeArguments($command_name, $current, end($words));
                     }
                     $completions = $completions->merge($this->completeOption($command_def, $current, $this->getPreviousOptions($words)));
@@ -143,11 +143,11 @@ class BashCompletionCommand extends Command
         });
 
         $completions = $all_commands->filter(function ($cmd) use ($partial) {
-            return empty($partial) || starts_with($cmd, $partial);
+            return empty($partial) || Str::startsWith($cmd, $partial);
         });
 
         // handle : silliness
-        if (str_contains($partial, ':')) {
+        if (Str::contains($partial, ':')) {
             $completions = $completions->map(function ($cmd) {
                 return substr($cmd, strpos($cmd, ':') + 1);
             });
@@ -194,14 +194,14 @@ class BashCompletionCommand extends Command
         }
 
         return $options->filter(function ($option) use ($partial) {
-            return empty($partial) || starts_with($option, $partial);
+            return empty($partial) || Str::startsWith($option, $partial);
         });
     }
 
     private function getPreviousOptions($words)
     {
         return array_reduce($words, function ($result, $word) {
-            if (starts_with($word, '-')) {
+            if (Str::startsWith($word, '-')) {
                 $split = explode('=', $word, 2); // users may use equals for values
                 $result[] = reset($split);
             }
@@ -224,7 +224,7 @@ class BashCompletionCommand extends Command
                     return trim($value);
                 })
                 ->filter(function ($value) use ($partial) {
-                    return empty($partial) || starts_with($value, $partial);
+                    return empty($partial) || Str::startsWith($value, $partial);
                 });
         }
         return collect();

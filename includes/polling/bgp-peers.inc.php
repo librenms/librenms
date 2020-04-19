@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Str;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\IP;
@@ -236,7 +237,7 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                     foreach ($oid_map as $source => $target) {
                         $v = isset($peer_data_raw[$source]) ? $peer_data_raw[$source] : '';
 
-                        if (str_contains($source, 'LocalAddr')) {
+                        if (Str::contains($source, 'LocalAddr')) {
                             try {
                                 $v = IP::fromHexString($v)->uncompressed();
                             } catch (InvalidIpException $e) {

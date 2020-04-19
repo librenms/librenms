@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Data\Store;
 
+use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Data\Measure\Measurement;
 use LibreNMS\Exceptions\FileExistsException;
@@ -270,6 +271,18 @@ class Rrd extends BaseDatastore
     }
 
     /**
+     * Get the name of the port rrd file.  For alternate rrd, specify the suffix.
+     *
+     * @param int $port_id
+     * @param string $suffix
+     * @return string
+     */
+    public function portName($port_id, $suffix = null)
+    {
+        return "port-id$port_id" . (empty($suffix) ? '' : '-' . $suffix);
+    }
+
+    /**
      * rename an rrdfile, can only be done on the LibreNMS server hosting the rrd files
      *
      * @param array $device Device object
@@ -427,9 +440,26 @@ class Rrd extends BaseDatastore
         if ($this->rrdcached && version_compare($this->version, '1.5', '>=')) {
             $chk = $this->command('last', $filename, '');
             $filename = str_replace([$this->rrd_dir . '/', $this->rrd_dir], '', $filename);
-            return !str_contains(implode($chk), "$filename': No such file or directory");
+            return !Str::contains(implode($chk), "$filename': No such file or directory");
         } else {
             return is_file($filename);
+        }
+    }
+
+    /**
+     * Remove RRD file(s).  Use with care as this permanently deletes rrd data.
+     * @param string $hostname rrd subfolder (hostname)
+     * @param string $prefix start of rrd file name all files matching will be deleted
+     */
+    public function purge($hostname, $prefix)
+    {
+        if (empty($hostname)) {
+            Log::error("Could not purge rrd $prefix, empty hostname");
+            return;
+        }
+
+        foreach (glob($this->name($hostname, $prefix, '*.rrd')) as $rrd) {
+            unlink($rrd);
         }
     }
 

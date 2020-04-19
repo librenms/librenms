@@ -29,6 +29,14 @@ for ($i = 0; $i < count($graph_data['ticklabels']); $i++) {
 $graph = new Graph($vars['width'], $vars['height'], $graph_data['graph_name']);
 $graph->img->SetImgFormat('png');
 
+// work around bug in jpgraph error handling
+$graph->title->Set(' ');
+$graph->subtitle->Set(' ');
+$graph->subsubtitle->Set(' ');
+$graph->footer->left->Set(' ');
+$graph->footer->center->Set(' ');
+$graph->footer->right->Set(' ');
+
 $graph->SetScale('textlin');
 $graph->title->SetFont(FF_FONT2, FS_BOLD, 10);
 $graph->SetMarginColor('white');

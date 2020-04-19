@@ -1,6 +1,8 @@
 #!/usr/bin/env php
 <?php
 
+use Illuminate\Support\Str;
+
 $filename = basename(__FILE__);
 $install_dir = realpath(__DIR__ . '/..');
 chdir($install_dir);
@@ -25,13 +27,13 @@ $map = [
 ];
 
 foreach ($changed_files as $file) {
-    if (starts_with($file, 'doc/')) {
+    if (Str::startsWith($file, 'doc/')) {
         $map['docs']++;
     }
-    if (ends_with($file, '.py')) {
+    if (Str::endsWith($file, '.py')) {
         $map['python']++;
     }
-    if (ends_with($file, '.sh')) {
+    if (Str::endsWith($file, '.sh')) {
         $map['bash']++;
     }
 
@@ -43,10 +45,10 @@ foreach ($changed_files as $file) {
     // check if os owned file or generic php file
     if (!empty($os_name = os_from_file($file))) {
         $map['os'][] = $os_name;
-        if (ends_with($file, '.php')) {
+        if (Str::endsWith($file, '.php')) {
             $map['os-php']++;
         }
-    } elseif (ends_with($file, '.php')) {
+    } elseif (Str::endsWith($file, '.php')) {
         $map['php']++;
     }
 }
@@ -178,11 +180,11 @@ exit($return); //return the combined/single return value of tests
 
 function os_from_file($file)
 {
-    if (starts_with($file, 'includes/definitions/')) {
+    if (Str::startsWith($file, 'includes/definitions/')) {
         return basename($file, '.yaml');
-    } elseif (starts_with($file, ['includes/polling', 'includes/discovery'])) {
+    } elseif (Str::startsWith($file, ['includes/polling', 'includes/discovery'])) {
         return os_from_php($file);
-    } elseif (starts_with($file, 'LibreNMS/OS/')) {
+    } elseif (Str::startsWith($file, 'LibreNMS/OS/')) {
         if (preg_match('#LibreNMS/OS/[^/]+.php#', $file)) {
             // convert class name to os name
             preg_match_all("/[A-Z][a-z]*/", basename($file, '.php'), $segments);
@@ -193,7 +195,7 @@ function os_from_file($file)
             }
             return os_from_php(str_replace('-', '_', $osname));
         }
-    } elseif (starts_with($file, ['tests/snmpsim/', 'tests/data/'])) {
+    } elseif (Str::startsWith($file, ['tests/snmpsim/', 'tests/data/'])) {
         list($os,) = explode('_', basename(basename($file, '.json'), '.snmprec'), 2);
         return $os;
     }

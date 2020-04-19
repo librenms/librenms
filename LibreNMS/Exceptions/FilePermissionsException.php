@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Exceptions;
 
+use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Interfaces\Exceptions\UpgradeableException;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
@@ -41,8 +42,8 @@ class FilePermissionsException extends \Exception implements UpgradeableExceptio
     {
         // cannot write to storage directory
         if ($exception instanceof \ErrorException &&
-            starts_with($exception->getMessage(), 'file_put_contents(') &&
-            str_contains($exception->getMessage(), '/storage/')) {
+            Str::startsWith($exception->getMessage(), 'file_put_contents(') &&
+            Str::contains($exception->getMessage(), '/storage/')) {
             return new static();
         }
 
@@ -52,7 +53,7 @@ class FilePermissionsException extends \Exception implements UpgradeableExceptio
         }
 
         // monolog cannot init log file
-        if ($exception instanceof \UnexpectedValueException && str_contains($exception->getFile(), 'Monolog/Handler/StreamHandler.php')) {
+        if ($exception instanceof \UnexpectedValueException && Str::contains($exception->getFile(), 'Monolog/Handler/StreamHandler.php')) {
             return new static();
         }
 

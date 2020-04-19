@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Str;
+
 /*
  * LibreNMS
  *
@@ -126,10 +128,10 @@ if ($sub_type == 'new-maintenance') {
 
             foreach ($_POST['maps'] as $target) {
                 $type = 'device';
-                if (starts_with($target, 'l')) {
+                if (Str::startsWith($target, 'l')) {
                     $type = 'location';
                     $target = substr($target, 1);
-                } elseif (starts_with($target, 'g')) {
+                } elseif (Str::startsWith($target, 'g')) {
                     $type = 'device_group';
                     $target = substr($target, 1);
                 }

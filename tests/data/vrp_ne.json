@@ -117,7 +117,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "RIPE-MEETING-AS, NL",
+                    "astext": "RIPE-MEETING-AS, EU",
                     "bgpPeerIdentifier": "54.7.42.252",
                     "bgpPeerRemoteAs": 2121,
                     "bgpPeerState": "",
@@ -326,7 +326,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "FRANCE-TELECOM-AS, US",
+                    "astext": "FRANCE-TELECOM-AS, EU",
                     "bgpPeerIdentifier": "54.7.149.45",
                     "bgpPeerRemoteAs": 2320,
                     "bgpPeerState": "",

@@ -63,6 +63,14 @@ function YCallback($y)
 $graph = new Graph($vars['width'], $vars['height'], $graph_data['graph_name']);
 $graph->img->SetImgFormat('png');
 
+// work around bug in jpgraph error handling
+$graph->title->Set(' ');
+$graph->subtitle->Set(' ');
+$graph->subsubtitle->Set(' ');
+$graph->footer->left->Set(' ');
+$graph->footer->center->Set(' ');
+$graph->footer->right->Set(' ');
+
 $graph->SetScale('datlin', 0, 0, $graph_data['from'], $graph_data['to']);
 $graph->SetMarginColor('white');
 $graph->SetFrame(false);
