@@ -55,33 +55,7 @@ class Sensor extends DeviceRelatedModel
 
     public static function getTypes()
     {
-        return ['Airflow',
-                'ber',
-                'Battery Charge',
-                'chromatic_dispersion',
-                'Cooling',
-                'count',
-                'Current',
-                'dBm',
-                'delay',
-                'Energy Efficiency Ratio',
-                'Fanspeed',
-                'Frequency',
-                'Humidity',
-                'Load',
-                'power_consumed',
-                'power_factor',
-                'Power',
-                'Pressure',
-                'quality_factor',
-                'Runtime',
-                'Wireless',
-                'snr',
-                'State',
-                'Temperature',
-                'Voltage',
-                'Water Flow Rate',
-                ];
+        return array_keys(self::$icons);
     }
 
     // for the legacy menu
