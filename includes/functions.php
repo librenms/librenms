@@ -758,9 +758,9 @@ function createHost(
     $device = array(
         'hostname' => $host,
         'overwrite_ip' => $overwrite_ip,
-        'sysName' => $additional['sysName'] ? $additional['sysName'] : $host,
-        'os' => $additional['os'] ? $additional['os'] : 'generic',
-        'hardware' => $additional['hardware'] ? $additional['hardware'] : null,
+        'sysName' => $additional['sysName'] ?? $host,
+        'os' => $additional['os'] ?? 'generic',
+        'hardware' => $additional['hardware'] ?? null,
         'community' => $community,
         'port' => $port,
         'transport' => $transport,
@@ -769,7 +769,7 @@ function createHost(
         'poller_group' => $poller_group,
         'status_reason' => '',
         'port_association_mode' => $port_assoc_mode,
-        'snmp_disable' => $additional['snmp_disable'] ? $additional['snmp_disable'] : 0,
+        'snmp_disable' => $additional['snmp_disable'] ?? 0,
     );
 
     $device = array_merge($device, $v3);  // merge v3 settings
