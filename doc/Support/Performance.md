@@ -141,8 +141,9 @@ quick. However for devices with a lot of ports and good % of those are
 either deleted or disabled then this approach isn't optimal. So to
 counter this you can enable 'selected port polling' per device within
 the edit device -> misc section or by globally enabling it (**not
-recommended**): `$config['polling']['selected_ports'] = true;`. You
-can also set it for a specific OS:
+recommended**): `$config['polling']['selected_ports'] = true;`. 
+This is truly not recommended, as it has been proven to affect cpu
+usage of your poller negatively. You can also set it for a specific OS:
 `$config['os']['ios']['polling']['selected_ports'] = true;`.
 
 Running `./scripts/collect-port-polling.php` will poll your devices
@@ -156,6 +157,11 @@ is run. There are a number of options:
 -h <device id> | <device hostname wildcard>  Poll single device or wildcard hostname
 -e <percentage>                              Enable/disable selected ports polling for devices which would benefit <percentage> from a change
 ```
+If you want to run this script to have it set selected port polling
+on devices where a change of **10% or more is evaluated**, run it with 
+`./scripts/collect-port-polling.php -e 10`. But note: it will not 
+blindly use only the 10%. There is a second condition that the change
+has to be more than one second in polling time. 
 
 ## Web interface
 
