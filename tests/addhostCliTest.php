@@ -36,7 +36,7 @@ class AddhostCliTest extends DBTestCase
 
     public function tearDown() : void
     {
-        exec("./delhost.php ".$this->hostName." ");
+        \Artisan::call('device:remove', ['device spec' => $this->hostName]);
         parent::tearDown();
     }
 
@@ -89,7 +89,7 @@ class AddhostCliTest extends DBTestCase
             $device = Device::findByHostname($host);
             $this->assertNotNull($device);
             $this->assertEquals($index+1, $device->port_association_mode, "Wrong port association mode ".$mode);
-            exec("./delhost.php ".$host." ");
+            \Artisan::call('device:remove', ['device spec' => $host]);
         }
     }
 
@@ -104,7 +104,7 @@ class AddhostCliTest extends DBTestCase
             $this->assertNotNull($device);
 
             $this->assertEquals($mode, $device->transport, "Wrong snmp transport (udp/tcp) ipv4/ipv6");
-            exec("./delhost.php ".$host." ");
+            \Artisan::call('device:remove', ['device spec' => $host]);
         }
     }
 
@@ -120,7 +120,7 @@ class AddhostCliTest extends DBTestCase
             $this->assertNotNull($device);
 
             $this->assertEquals(strtoupper($mode), $device->authalgo, "Wrong snmp v3 password algoritme");
-            exec("./delhost.php ".$host." ");
+            \Artisan::call('device:remove', ['device spec' => $host]);
         }
     }
 
@@ -135,7 +135,7 @@ class AddhostCliTest extends DBTestCase
             $this->assertNotNull($device);
 
             $this->assertEquals(strtoupper($mode), $device->cryptoalgo, "Wrong snmp v3 crypt algoritme");
-            exec("./delhost.php ".$host." ");
+            \Artisan::call('device:remove', ['device spec' => $host]);
         }
     }
 
