@@ -1,30 +1,54 @@
 <?php
+/*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*
+* @package    LibreNMS
+* @link       http://librenms.org
+* @copyright  2020 LibreNMS
+* @author     Cercel Valentin <crc@nuamchefazi.ro>
+*/
 
 require 'includes/html/graphs/common.inc.php';
 
-$mysql_rrd = rrd_name($device['hostname'], array('app', 'mysql', $app['app_id']));
+$scale_min=0;
+$colours='mixed';
+$unit_text='Size';
+$unitlen=4;
+$bigdescrlen=25;
+$smalldescrlen=25;
+$dostack=0;
+$printtotal=0;
+$addarea=1;
+$transparency=33;
+$rrd_filename=rrd_name($device['hostname'],array('app',$app['app_type'],$app['app_id']));
 
-if (rrdtool_check_rrd_exists($mysql_rrd)) {
-    $rrd_filename = $mysql_rrd;
+$array=array(
+    'innodb_log_buffer_size'=>array('descr'=>'Buffer size','colour'=>'5ac18e',),
+);
+
+$i=0;
+
+if (rrdtool_check_rrd_exists($rrd_filename)) {
+    foreach ($array as $ds=>$var) {
+        $rrd_list[$i]['filename']=$rrd_filename;
+        $rrd_list[$i]['descr']=$var['descr'];
+        $rrd_list[$i]['ds']=$ds;
+        $rrd_list[$i]['colour']=$var['colour'];
+        $i++;
+    }
+} else {
+    echo "file missing: $rrd_filename";
 }
 
-$rrd_options .= ' DEF:a='.$rrd_filename.':IDBLBSe:AVERAGE ';
-$rrd_options .= ' DEF:b='.$rrd_filename.':IBLFh:AVERAGE ';
-$rrd_options .= ' DEF:c='.$rrd_filename.':IBLWn:AVERAGE ';
-
-$rrd_options .= 'COMMENT:"            Current    Average   Maximum\n" ';
-
-$rrd_options .= 'AREA:a#FAFD9E:"Buffer Size  "      ';
-$rrd_options .= 'GPRINT:a:LAST:"%6.2lf %s"  ';
-$rrd_options .= 'GPRINT:a:AVERAGE:"%6.2lf %s"  ';
-$rrd_options .= 'GPRINT:a:MAX:"%6.2lf %s\\n"  ';
-
-$rrd_options .= 'LINE1:b#22FF22:"KB Flushed "  ';
-$rrd_options .= 'GPRINT:b:LAST:"%6.2lf %s"  ';
-$rrd_options .= 'GPRINT:b:AVERAGE:"%6.2lf %s"  ';
-$rrd_options .= 'GPRINT:b:MAX:"%6.2lf %s\\n"  ';
-
-$rrd_options .= 'LINE1:c#0022FF:"KB Written  "  ';
-$rrd_options .= 'GPRINT:c:LAST:"%6.2lf %s"  ';
-$rrd_options .= 'GPRINT:c:AVERAGE:"%6.2lf %s"  ';
-$rrd_options .= 'GPRINT:c:MAX:"%6.2lf %s\\n"  ';
+require 'includes/html/graphs/generic_v3_multiline.inc.php';

@@ -23,8 +23,8 @@ require 'includes/html/graphs/common.inc.php';
 
 $scale_min=0;
 $colours='mixed';
-$unit_text='Table locks';
-$unitlen=11;
+$unit_text='Key operation';
+$unitlen=13;
 $bigdescrlen=25;
 $smalldescrlen=25;
 $dostack=0;
@@ -34,8 +34,10 @@ $transparency=33;
 $rrd_filename=rrd_name($device['hostname'],array('app',$app['app_type'],$app['app_id']));
 
 $array=array(
-    'table_locks_immediate'=>array('descr'=>'Immediate','colour'=>'5ac18e',),
-    'table_locks_waited'=>array('descr'=>'Waited','colour'=>'800000',),
+    'key_read_requests'=>array('descr'=>'Read request','colour'=>'065535',),
+    'key_reads'=>array('descr'=>'Read','colour'=>'5ac18e',),
+    'key_write_requests'=>array('descr'=>'Write request','colour'=>'fa8072',),
+    'key_writes'=>array('descr'=>'Write','colour'=>'800000',),
 );
 
 $i=0;

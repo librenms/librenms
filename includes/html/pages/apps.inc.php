@@ -15,12 +15,24 @@ $graphs['drbd']      = array(
 $graphs['entropy']   = array(
     'entropy',
 );
+
 $graphs['mysql']     = array(
-    'network_traffic',
-    'connections',
     'command_counters',
+    'connections',
+    'files_tables',
+    'innodb_log',
+    'innodb_row_operations',
+    'keys',
+    'network_traffic',
+    'query_cache',
+    'query_cache_memory',
     'select_types',
+    'slow_queries',
+    'sorts',
+    'table_locks',
+    'temporary_objects',
 );
+
 $graphs['memcached'] = array(
     'bits',
     'commands',

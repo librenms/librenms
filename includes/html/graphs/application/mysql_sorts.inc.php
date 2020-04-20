@@ -1,35 +1,57 @@
 <?php
+/*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*
+* @package    LibreNMS
+* @link       http://librenms.org
+* @copyright  2020 LibreNMS
+* @author     Cercel Valentin <crc@nuamchefazi.ro>
+*/
 
 require 'includes/html/graphs/common.inc.php';
 
-$rrd_filename = rrd_name($device['hostname'], array('app', 'mysql', $app['app_id']));
+$scale_min=0;
+$colours='mixed';
+$unit_text='Stats';
+$unitlen=6;
+$bigdescrlen=25;
+$smalldescrlen=25;
+$dostack=0;
+$printtotal=0;
+$addarea=1;
+$transparency=33;
+$rrd_filename=rrd_name($device['hostname'],array('app',$app['app_type'],$app['app_id']));
 
-$array = array(
-          'SRows'  => 'Rows Sorted',
-          'SRange' => 'Range',
-          'SMPs'   => 'Merge Passes',
-          'SScan'  => 'Scan',
-         );
+$array=array(
+    'sort_rows'=>array('descr'=>'Rows Sorted','colour'=>'ff0000',),
+    'sort_range'=>array('descr'=>'Range','colour'=>'ffa500',),
+    'sort_merge_passes'=>array('descr'=>'Merge Passes','colour'=>'4ca3dd',),
+    'sort_scan'=>array('descr'=>'Scan','colour'=>'5ac18e',),
+);
 
-$i = 0;
+$i=0;
+
 if (rrdtool_check_rrd_exists($rrd_filename)) {
-    foreach ($array as $ds => $var) {
-        $rrd_list[$i]['filename'] = $rrd_filename;
-        if (is_array($var)) {
-            $rrd_list[$i]['descr'] = $var['descr'];
-        } else {
-            $rrd_list[$i]['descr'] = $var;
-        }
-
-        $rrd_list[$i]['ds'] = $ds;
+    foreach ($array as $ds=>$var) {
+        $rrd_list[$i]['filename']=$rrd_filename;
+        $rrd_list[$i]['descr']=$var['descr'];
+        $rrd_list[$i]['ds']=$ds;
+        $rrd_list[$i]['colour']=$var['colour'];
         $i++;
     }
 } else {
-    echo "file missing: $file";
+    echo "file missing: $rrd_filename";
 }
 
-$colours   = 'mixed';
-$nototal   = 0;
-$unit_text = '';
-
-require 'includes/html/graphs/generic_multi_simplex_seperated.inc.php';
+require 'includes/html/graphs/generic_v3_multiline.inc.php';

@@ -1,51 +1,59 @@
 <?php
+/*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*
+* @package    LibreNMS
+* @link       http://librenms.org
+* @copyright  2020 LibreNMS
+* @author     Cercel Valentin <crc@nuamchefazi.ro>
+*/
 
 require 'includes/html/graphs/common.inc.php';
 
-$rrd_filename = rrd_name($device['hostname'], array('app', 'mysql', $app['app_id']));
+$scale_min=0;
+$colours='mixed';
+$unit_text='Stats';
+$unitlen=6;
+$bigdescrlen=25;
+$smalldescrlen=25;
+$dostack=0;
+$printtotal=0;
+$addarea=1;
+$transparency=33;
+$rrd_filename=rrd_name($device['hostname'],array('app',$app['app_type'],$app['app_id']));
 
-$array = array(
-          'MaCs' => array(
-                     'descr'  => 'Max Connections',
-                     'colour' => '22FF22',
-                    ),
-          'MUCs' => array(
-                     'descr'  => 'Max Used Connections',
-                     'colour' => '0022FF',
-                    ),
-          'ACs'  => array(
-                     'descr'  => 'Aborted Clients',
-                     'colour' => 'FF0000',
-                    ),
-          'AdCs' => array(
-                     'descr'  => 'Aborted Connects',
-                     'colour' => '0080C0',
-                    ),
-          'TCd'  => array(
-                     'descr'  => 'Threads Connected',
-                     'colour' => 'FF0000',
-                    ),
-          'Cs'   => array(
-                     'descr'  => 'New Connections',
-                     'colour' => '0080C0',
-                    ),
-         );
+$array=array(
+    'connections'=>array('descr'=>'New','colour'=>'5ac18e',),
+    'max_connections'=>array('descr'=>'Max','colour'=>'4ca3dd',),
+    'max_used_connections'=>array('descr'=>'Max Used','colour'=>'065535',),
+    'threads_connected'=>array('descr'=>'Threads Connected','colour'=>'a0db8e',),
+    'aborted_clients'=>array('descr'=>'Aborted Clients','colour'=>'ff0000',),
+    'aborted_connects'=>array('descr'=>'Aborted Connects','colour'=>'800000',),
+);
 
-$i = 0;
+$i=0;
+
 if (rrdtool_check_rrd_exists($rrd_filename)) {
-    foreach ($array as $ds => $var) {
-        $rrd_list[$i]['filename'] = $rrd_filename;
-        $rrd_list[$i]['descr']    = $var['descr'];
-        $rrd_list[$i]['ds']       = $ds;
-        // $rrd_list[$i]['colour'] = $var['colour'];
+    foreach ($array as $ds=>$var) {
+        $rrd_list[$i]['filename']=$rrd_filename;
+        $rrd_list[$i]['descr']=$var['descr'];
+        $rrd_list[$i]['ds']=$ds;
+        $rrd_list[$i]['colour']=$var['colour'];
         $i++;
     }
 } else {
-    echo "file missing: $file";
+    echo "file missing: $rrd_filename";
 }
 
-$colours   = 'mixed';
-$nototal   = 1;
-$unit_text = 'Connections';
-
-require 'includes/html/graphs/generic_multi_line.inc.php';
+require 'includes/html/graphs/generic_v3_multiline.inc.php';
