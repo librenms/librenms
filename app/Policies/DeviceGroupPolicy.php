@@ -41,6 +41,17 @@ class DeviceGroupPolicy
     }
 
     /**
+     * Determine whether the user can view any device group.
+     *
+     * @param  \App\User $user
+     * @return mixed
+     */
+    public function viewAny(User $user)
+    {
+        return false;
+    }
+
+    /**
      * Determine whether the user can create device groups.
      *
      * @param \App\Models\User $user
