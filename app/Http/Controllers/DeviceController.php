@@ -54,6 +54,7 @@ class DeviceController extends Controller
 
     public function index(Request $request, $device_id, $current_tab = 'overview', $vars = '')
     {
+
         $device_id = (int)str_replace('device=', '', $device_id);
         $current_tab = str_replace('tab=', '', $current_tab);
         $current_tab = array_key_exists($current_tab, $this->tabs) ? $current_tab : 'overview';
@@ -146,7 +147,7 @@ class DeviceController extends Controller
     {
         $device_links = [];
 
-        if (Gate::allows('device', $device)) {
+        if (Gate::allows('global-admin')) {
             $device_links['edit'] = [
                 'icon' => 'fa-gear',
                 'url' => route('device', [$device->device_id, 'edit']),
@@ -193,7 +194,7 @@ class DeviceController extends Controller
             'external' => true,
         ];
 
-        if (Gate::allows('device', $device)) {
+        if (Gate::allows('global-admin')) {
             $device_links['capture'] = [
                 'icon' => 'fa-bug',
                 'url' => route('device', [$device->device_id, 'capture']),

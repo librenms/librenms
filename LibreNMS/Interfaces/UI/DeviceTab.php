@@ -25,7 +25,6 @@
 
 namespace LibreNMS\Interfaces\UI;
 
-
 use App\Models\Device;
 
 interface DeviceTab

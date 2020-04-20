@@ -232,7 +232,7 @@ class Url
             unset($vars['tab']);
         }
 
-       return route('device', $routeParams) . self::urlParams($vars);
+        return route('device', $routeParams) . self::urlParams($vars);
     }
 
     public static function portUrl($port, $vars = [])

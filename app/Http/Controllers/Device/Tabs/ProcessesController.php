@@ -25,7 +25,6 @@
 
 namespace App\Http\Controllers\Device\Tabs;
 
-
 use App\Models\Device;
 use DB;
 use LibreNMS\Interfaces\UI\DeviceTab;

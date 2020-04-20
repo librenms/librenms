@@ -52,6 +52,6 @@ class NeighboursController implements DeviceTab
 
     public function data(Device $device): array
     {
-       return [];
+        return [];
     }
 }
