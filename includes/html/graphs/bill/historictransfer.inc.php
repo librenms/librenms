@@ -49,6 +49,7 @@ $graph->legend->Pos('0.52', '0.91', 'center');
 $graph->xaxis->SetFont(FF_FONT1, FS_BOLD);
 $graph->xaxis->SetPos('min');
 $graph->xaxis->SetTitleMargin(30);
+$graph->xaxis->title->Set(' ');
 $graph->xaxis->SetTickLabels($graph_data['ticklabels']);
 
 $graph->xgrid->Show(true, true);

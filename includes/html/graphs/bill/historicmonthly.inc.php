@@ -13,7 +13,7 @@ for ($i = 0; $i < count($graph_data['ticklabels']); $i++) {
         $parts = explode(' - ', $graph_data['ticklabels'][$i]);
         $start = strtotime($parts[0]);
         $end = strtotime($parts[1]);
-        
+
         if (date('m', $start) == date('m', $end) && date('d', $start == 1)) {
             // Calendar months, omit the date and the end!
             $graph_data['ticklabels'][$i] = strftime("%b %Y", $start);
@@ -48,6 +48,7 @@ $graph->legend->Pos('0.52', '0.91', 'center');
 $graph->xaxis->SetFont(FF_FONT1, FS_BOLD);
 $graph->xaxis->SetPos('min');
 $graph->xaxis->SetTitleMargin(30);
+$graph->xaxis->title->Set(' ');
 $graph->xaxis->SetTickLabels($graph_data['ticklabels']);
 
 $graph->xgrid->Show(true, true);
