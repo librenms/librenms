@@ -76,11 +76,11 @@ class AlertSchedule extends Model
 
     public function devices()
     {
-        return $this->morphedByMany('App\Models\Device', 'alert_schedulable', 'alert_schedulables', 'schedule_id', 'schedule_id');
+        return $this->morphedByMany(\App\Models\Device::class, 'alert_schedulable', 'alert_schedulables', 'schedule_id', 'schedule_id');
     }
 
     public function deviceGroups()
     {
-        return $this->morphedByMany('App\Models\DeviceGroup', 'alert_schedulable');
+        return $this->morphedByMany(\App\Models\DeviceGroup::class, 'alert_schedulable');
     }
 }

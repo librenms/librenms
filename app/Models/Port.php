@@ -262,17 +262,17 @@ class Port extends DeviceRelatedModel
 
     public function fdbEntries()
     {
-        return $this->hasMany('App\Models\PortsFdb', 'port_id', 'port_id');
+        return $this->hasMany(\App\Models\PortsFdb::class, 'port_id', 'port_id');
     }
 
     public function ipv4()
     {
-        return $this->hasMany('App\Models\Ipv4Address', 'port_id');
+        return $this->hasMany(\App\Models\Ipv4Address::class, 'port_id');
     }
 
     public function ipv6()
     {
-        return $this->hasMany('App\Models\Ipv6Address', 'port_id');
+        return $this->hasMany(\App\Models\Ipv6Address::class, 'port_id');
     }
 
     public function macAccounting()
@@ -318,7 +318,7 @@ class Port extends DeviceRelatedModel
     public function users()
     {
         // FIXME does not include global read
-        return $this->belongsToMany('App\Models\User', 'ports_perms', 'port_id', 'user_id');
+        return $this->belongsToMany(\App\Models\User::class, 'ports_perms', 'port_id', 'user_id');
     }
 
     public function vlans()
