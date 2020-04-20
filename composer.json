@@ -20,12 +20,6 @@
         "issues": "https://github.com/librenms/librenms/issues/",
         "irc": "irc://irc.freenode.org/#librenms"
     },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/librenms/StringBladeCompiler"
-        }
-    ],
     "require": {
         "php": "^7.2",
         "ext-curl": "*",
@@ -59,6 +53,7 @@
         "symfony/yaml": "^4.0",
         "tecnickcom/tcpdf": "~6.2.0",
         "tightenco/ziggy": "^0.8.0",
+        "wpb/string-blade-compiler": "4.0.x-dev",
         "xjtuwangke/passwordhash": "dev-master"
     },
     "require-dev": {

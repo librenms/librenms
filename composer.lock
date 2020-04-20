@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a12ad22ccff2ae1db36162cebe580419",
+    "content-hash": "458c9a095abed15368b926e597c9facb",
     "packages": [
         {
             "name": "amenadiel/jpgraph",
@@ -5061,6 +5061,58 @@
             "time": "2020-05-02T13:46:13+00:00"
         },
         {
+            "name": "wpb/string-blade-compiler",
+            "version": "4.0.x-dev",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/TerrePorter/StringBladeCompiler.git",
+                "reference": "7ea77404940e1845a20d0c1e0e68d986be0fb7e4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/TerrePorter/StringBladeCompiler/zipball/7ea77404940e1845a20d0c1e0e68d986be0fb7e4",
+                "reference": "7ea77404940e1845a20d0c1e0e68d986be0fb7e4",
+                "shasum": ""
+            },
+            "require": {
+                "laravel/framework": "^6.0",
+                "php": "^7.2"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Wpb\\String_Blade_Compiler\\StringBladeServiceProvider"
+                    ],
+                    "aliases": {
+                        "StringBlade": "Wpb\\String_Blade_Compiler\\Facades\\StringBlade"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Wpb\\String_Blade_Compiler\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Terre Porter",
+                    "email": "tporter@webpage-builders.com"
+                }
+            ],
+            "description": "Laravel Blade String Compiler, render string as blade templates",
+            "keywords": [
+                "blade",
+                "compiler",
+                "laravel"
+            ],
+            "time": "2019-10-31T23:38:15+00:00"
+        },
+        {
             "name": "xjtuwangke/passwordhash",
             "version": "dev-master",
             "source": {
@@ -8310,6 +8362,7 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "oriceon/toastr-5-laravel": 20,
+        "wpb/string-blade-compiler": 20,
         "xjtuwangke/passwordhash": 20
     },
     "prefer-stable": false,
