@@ -29,7 +29,7 @@ use App\Models\Device;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Tests\DBTestCase;
 
-class AddhostCliTest extends DBTestCase
+class AddHostCliTest extends DBTestCase
 {
     use DatabaseTransactions;
     private $hostName = "testHost";
