@@ -140,24 +140,6 @@ function discover_device(&$device, $force_module = false)
         return false;
     }
 
-    if ($device['os'] == 'generic') {
-        // verify if OS has changed from generic
-        $device['os'] = getHostOS($device);
-
-        if ($device['os'] != 'generic') {
-            echo "\nDevice os was updated to " . $device['os'] . '!';
-            dbUpdate(array('os' => $device['os']), 'devices', '`device_id` = ?', array($device['device_id']));
-        }
-    }
-
-    load_os($device);
-    load_discovery($device);
-    register_mibs($device, Config::getOsSetting($device['os'], 'register_mibs', array()), 'includes/discovery/os/' . $device['os'] . '.inc.php');
-
-    $os = OS::make($device);
-
-    echo "\n";
-
     $discovery_devices = Config::get('discovery_modules', array());
     $discovery_devices = array('core' => true) + $discovery_devices;
 
