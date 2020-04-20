@@ -145,17 +145,19 @@ class Php extends BaseValidation
             );
         } elseif ($sh_tz !== $php_tz) {
             // check if system timezone matches the timezone of the current running php
+            $ini_file = php_ini_loaded_file();
             $validator->fail(
                 "You have a different system timezone ($sh_tz) than the php configured timezone ($php_tz)",
-                "Please correct either your system timezone or your timezone set in php.ini."
+                "Please correct either your system timezone or your timezone set in $ini_file."
             );
         } elseif ($php_tz !== $php_cli_tz) {
             // check if web and cli timezones match (this does nothing if validate.php is run on cli)
             // some distros have different php.ini for cli and the web server
             if ($sh_tz !== $php_cli_tz) {
+                $ini_file = rtrim(shell_exec('php -r "echo php_ini_loaded_file();"'));
                 $validator->fail(
                     "The CLI php.ini ($php_cli_tz) timezone is different than your system's timezone ($sh_tz)",
-                    "Edit your CLI php.ini file and set the correct timezone ($sh_tz)."
+                    "Edit your CLI ini file $ini_file and set the correct timezone ($sh_tz)."
                 );
             }
         }
