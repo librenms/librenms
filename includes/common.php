@@ -1395,7 +1395,7 @@ function load_os(&$device)
 
     // Set type to a predefined type for the OS if it's not already set
     $loaded_os_type = Config::get("os.{$device['os']}.type");
-    if ((!isset($device['attribs']['override_device_type']) && $device['attribs']['override_device_type'] != 1) && $loaded_os_type != $device['type']) {
+    if ((!isset($device['attribs']['override_device_type']) && $device['attribs']['override_device_type'] != 1) && array_key_exists('type', $device) && $loaded_os_type != $device['type']) {
         log_event('Device type changed ' . $device['type'] . ' => ' . $loaded_os_type, $device, 'system', 3);
         $device['type'] = $loaded_os_type;
         dbUpdate(['type' => $loaded_os_type], 'devices', 'device_id=?', [$device['device_id']]);
