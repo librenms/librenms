@@ -16,6 +16,16 @@ return [
             'setting' => 'setting to set in dot notation (example: snmp.community.0)',
             'value' => 'value to set, unset setting if this is omitted',
         ],
+        'options' => [
+            'ignore-checks' => 'Ignore all safety checks'
+        ],
+        'confirm' => 'Reset :setting to the default?',
+        'errors' => [
+            'failed' => 'Failed to set :setting',
+            'invalid' => 'This is not a valid setting. Please check your spelling',
+            'nodb' => 'Database is not connected',
+            'no-validation' => 'Cannot set :setting, it is missing validation definition.',
+        ]
     ],
     'user:add' => [
         'description' => 'Add a local user, you can only log in with this user if auth is set to mysql',

@@ -7,6 +7,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Input\StringInput;
 
 class BashCompletionCommand extends Command
 {
@@ -33,27 +34,48 @@ class BashCompletionCommand extends Command
      */
     public function handle()
     {
+        $completions = collect();
         $line = getenv('COMP_LINE');
         $current = getenv('COMP_CURRENT');
         $previous = getenv('COMP_PREVIOUS');
         $words = explode(' ', $line);
 
-        $command = isset($words[1]) ? $words[1] : $current; // handle : silliness
+        $command_name = isset($words[1]) ? $words[1] : $current; // handle : silliness
 
         if (count($words) < 3) {
-            $completions = $this->completeCommand($command);
+            $completions = $this->completeCommand($command_name);
         } else {
             $commands = $this->getApplication()->all();
-            if (isset($commands[$command])) {
-                $command_def = $commands[$command]->getDefinition();
-                $previous_name = ltrim($previous, '-');
+            if (isset($commands[$command_name])) {
+                $command = $commands[$command_name];
+                $command_def = $command->getDefinition();
+                $input = new StringInput(implode(' ', array_slice($words, 2)));
+                try {
+                    $input->bind($command_def);
+                } catch (\RuntimeException $e) {
+                    // ignore?
+                }
 
-                if (Str::startsWith($previous, '-') && $command_def->hasOption($previous_name) && $command_def->getOption($previous_name)->acceptValue()) {
-                    $completions = $this->completeOptionValue($command_def->getOption($previous_name), $current);
+                // check if the command can complete arguments
+                if (method_exists($command, 'completeArgument')) {
+                    foreach ($input->getArguments() as $name => $value) {
+                        if ($current == $value) {
+                            $values = $command->completeArgument($name, $value);
+                            if (!empty($values)) {
+                                echo implode(PHP_EOL, $values);
+                                return 0;
+                            }
+                            break;
+                        }
+                    }
+                }
+
+                if ($option = $this->optionExpectsValue($current, $previous, $command_def)) {
+                    $completions = $this->completeOptionValue($option, $current);
                 } else {
                     $completions = collect();
                     if (!Str::startsWith($previous, '-')) {
-                        $completions = $this->completeArguments($command, $current, end($words));
+                        $completions = $this->completeArguments($command_name, $current, end($words));
                     }
                     $completions = $completions->merge($this->completeOption($command_def, $current, $this->getPreviousOptions($words)));
                 }
@@ -64,6 +86,33 @@ class BashCompletionCommand extends Command
 
         echo $completions->implode(PHP_EOL);
         return 0;
+    }
+
+    /**
+     * @param string $current
+     * @param string $previous
+     * @param InputDefinition $command_def
+     * @return false|InputOption
+     */
+    private function optionExpectsValue($current, $previous, $command_def)
+    {
+        // handle long option =
+        if (Str::startsWith($current, '--') && Str::contains($current, '=')) {
+            list($previous, $current) = explode('=', $current);
+        }
+
+        if (Str::startsWith($previous, '-')) {
+            $name = ltrim($previous, '-');
+            if ($command_def->hasOption($name) && $command_def->getOption($name)->acceptValue()) {
+                return $command_def->getOption($name);
+            }
+
+            if ($command_def->hasShortcut($name) && $command_def->getOptionForShortcut($name)->acceptValue()) {
+                return $command_def->getOptionForShortcut($name);
+            }
+        }
+
+        return false;
     }
 
     private function parseOption(InputOption $def)
@@ -201,10 +250,8 @@ class BashCompletionCommand extends Command
                 }
 
                 return $device_query->pluck('hostname');
-                break;
             case 'help':
                 return $this->completeCommand($current_word);
-                break;
             default:
                 return collect();
         }
