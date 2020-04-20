@@ -19,8 +19,8 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2017 Tony Murray
- * @author     Tony Murray <murraytony@gmail.com>
+ * @copyright  2020 Martin Kukal
+ * @author     Martin22 <martin@kukal.cz>
  */
 
 namespace LibreNMS\OS;
@@ -71,14 +71,36 @@ class Ray extends OS implements
      */
     public function discoverWirelessFrequency()
     {
-        return array(
-            // RAY-MIB::txFreq.0
-            new WirelessSensor('frequency', $this->getDeviceId(), '.1.3.6.1.4.1.33555.1.2.1.4', 'racom-tx', 1, 'TX Frequency', null, 1, 1000),
-            // RAY-MIB::rxFreq.0
-            new WirelessSensor('frequency', $this->getDeviceId(), '.1.3.6.1.4.1.33555.1.2.1.3', 'racom-rx', 1, 'RX Frequency', null, 1, 1000),
-        );
-    }
 
+        $oid_tx = '.1.3.6.1.4.1.33555.1.2.1.4'; // RAY-MIB::txFreq.0
+        $oid_rx = '.1.3.6.1.4.1.33555.1.2.1.4'; // RAY-MIB::rxFreq.0
+        $cmd = snmp_get($this->getDevice(), $oid_tx, '-Oqv', 'RAY-MIB', 'ray');
+        $data = trim(external_exec($cmd), "\" \n\r");
+        if (preg_match('/(No Such Instance)/i', $data)) {
+            return array(
+              // RAY-MIB::txFreq.0
+              new WirelessSensor('frequency', $this->getDeviceId(), $oid_tx, 'racom-tx', 1, 'TX Frequency', null, 1, 1000),
+              );
+        } else {
+            return array(
+              // RAY-MIB::txFreq.0
+              new WirelessSensor('frequency', $this->getDeviceId(), $oid_tx.'.0', 'racom-tx', 1, 'TX Frequency', null, 1, 1000),
+              );
+        }
+        $cmd = snmp_get($this->getDevice(), $oid_rx, '-Oqv', 'RAY-MIB', 'ray');
+        $data = trim(external_exec($cmd), "\" \n\r");
+        if (preg_match('/(No Such Instance)/i', $data)) {
+            return array(
+              // RAY-MIB::rxFreq.0
+              new WirelessSensor('frequency', $this->getDeviceId(), $oid_rx, 'racom-rx', 1, 'RX Frequency', null, 1, 1000),
+              );
+        } else {
+            return array(
+              // RAY-MIB::rxFreq.0
+              new WirelessSensor('frequency', $this->getDeviceId(), $oid_rx.'.0', 'racom-rx', 1, 'RX Frequency', null, 1, 1000),
+              );
+        }
+    }
     /**
      * Discover wireless tx or rx power. This is in dBm. Type is power.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
@@ -87,12 +109,35 @@ class Ray extends OS implements
      */
     public function discoverWirelessPower()
     {
-        return array(
-            // RAY-MIB::rfPowerCurrent.0
-            new WirelessSensor('power', $this->getDeviceId(), '.1.3.6.1.4.1.33555.1.2.1.17', 'racom-pow-cur', 1, 'Tx Power Current'),
-            //RAY-MIB::rfPowerConfigured.0
-            new WirelessSensor('power', $this->getDeviceId(), '.1.3.6.1.4.1.33555.1.2.1.12', 'racom-pow-conf', 1, 'Tx Power Configured'),
-        );
+        $oid_rfpowercur = '.1.3.6.1.4.1.33555.1.2.1.17';
+        $oid_rfpowerconf = '.1.3.6.1.4.1.33555.1.2.1.12';
+
+        $cmd = snmp_get($this->getDevice(), '$rfpowercur', '-Oqv', 'RAY-MIB', 'ray');
+        $data = trim(external_exec($cmd), "\" \n\r");
+        if (preg_match('/(No Such Instance)/i', $data)) {
+            return array(
+               // RAY-MIB::rfPowerCurrent.0
+               new WirelessSensor('power', $this->getDeviceId(), $rfpowercur, 'racom-pow-cur', 1, 'Tx Power Current'),
+           );
+        } else {
+            return array(
+               // RAY-MIB::rfPowerCurrent.0
+               new WirelessSensor('power', $this->getDeviceId(), $rfpowercur.'.0', 'racom-pow-cur', 1, 'Tx Power Current'),
+            );
+        }
+        $cmd = snmp_get($this->getDevice(), '$rfpowerconf', '-Oqv', 'RAY-MIB', 'ray');
+        $data = trim(external_exec($cmd), "\" \n\r");
+        if (preg_match('/(No Such Instance)/i', $data)) {
+            return array(
+               //RAY-MIB::rfPowerConfigured.0
+               new WirelessSensor('power', $this->getDeviceId(), $rfpowerconf, 'racom-pow-conf', 1, 'Tx Power Configured'),
+           );
+        } else {
+            return array(
+               //RAY-MIB::rfPowerConfigured.0
+               new WirelessSensor('power', $this->getDeviceId(), $rfpowerconf.'.0', 'racom-pow-conf', 1, 'Tx Power Configured'),
+            );
+        }
     }
 
     /**
@@ -104,9 +149,18 @@ class Ray extends OS implements
     public function discoverWirelessRssi()
     {
         $oid = '.1.3.6.1.4.1.33555.1.3.2.1'; // RAY-MIB::rss.0
-        return array(
-            new WirelessSensor('rssi', $this->getDeviceId(), $oid, 'racom', 1, 'RSSI', null, 1, 10),
-        );
+
+        $cmd = snmp_get($this->getDevice(), $oid, '-Oqv', 'RAY-MIB', 'ray');
+        $data = trim(external_exec($cmd), "\" \n\r");
+        if (preg_match('/(No Such Instance)/i', $data)) {
+            return array(
+              new WirelessSensor('rssi', $this->getDeviceId(), $oid, 'racom', 1, 'RSSI', null, 1, 10),
+            );
+        } else {
+            return array(
+              new WirelessSensor('rssi', $this->getDeviceId(), $oid.'.0', 'racom', 1, 'RSSI', null, 1, 10),
+            );
+        }
     }
 
     /**
@@ -118,10 +172,20 @@ class Ray extends OS implements
     public function discoverWirelessSnr()
     {
         $oid = '.1.3.6.1.4.1.33555.1.3.2.2'; // RAY-MIB::snr.0
-        return array(
-            new WirelessSensor('snr', $this->getDeviceId(), $oid, 'racom', 1, 'CINR', null, 1, 10),
-        );
+
+        $cmd = snmp_get($this->getDevice(), $oid, '-Oqv', 'RAY-MIB', 'ray');
+        $data = trim(external_exec($cmd), "\" \n\r");
+        if (preg_match('/(No Such Instance)/i', $data)) {
+            return array(
+              new WirelessSensor('snr', $this->getDeviceId(), $oid, 'racom', 1, 'CINR', null, 1, 10),
+            );
+        } else {
+           return array(
+             new WirelessSensor('snr', $this->getDeviceId(), $oid.'.0', 'racom', 1, 'CINR', null, 1, 10),
+           );
+        }
     }
+
     /**
      * Discover wireless RATE.  This is in bps. Type is rate.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
@@ -132,9 +196,28 @@ class Ray extends OS implements
     {
         $oid_bitrate = '.1.3.6.1.4.1.33555.1.2.1.13'; // RAY-MIB::netBitrate.0
         $oid_maxbitrate = '.1.3.6.1.4.1.33555.1.2.1.14'; // RAY-MIB::maxNetBitrate.0
-        return array(
-            new WirelessSensor('rate', $this->getDeviceId(), $oid_bitrate, 'racom-netBitrate', 1, 'Net Bitrate', null, 1000, 1),
-            new WirelessSensor('rate', $this->getDeviceId(), $oid_maxbitrate, 'racom-maxNetBitrate', 2, 'Max Net Bitrate', null, 1000, 1),
-        );
-    }
+
+        $cmd = snmp_get($this->getDevice(), $oid_bitrate, '-Oqv', 'RAY-MIB', 'ray');
+        $data = trim(external_exec($cmd), "\" \n\r");
+        if (preg_match('/(No Such Instance)/i', $data)) {
+           return array(
+             new WirelessSensor('rate', $this->getDeviceId(), $oid_bitrate, 'racom-netBitrate', 1, 'Net Bitrate', null, 1000, 1),
+           );
+        } else {
+           return array(
+               new WirelessSensor('rate', $this->getDeviceId(), $oid_bitrate.'.0', 'racom-netBitrate', 1, 'Net Bitrate', null, 1000, 1),
+           );
+        }
+        $cmd = snmp_get($this->getDevice(), $oid_maxbitrate, '-Oqv', 'RAY-MIB', 'ray');
+        $data = trim(external_exec($cmd), "\" \n\r");
+        if (preg_match('/(No Such Instance)/i', $data)) {
+            return array(
+              new WirelessSensor('rate', $this->getDeviceId(), $oid_maxbitrate, 'racom-maxNetBitrate', 2, 'Max Net Bitrate', null, 1000, 1),
+            );
+        } else {
+            return array(
+              new WirelessSensor('rate', $this->getDeviceId(), $oid_maxbitrate.'.0', 'racom-maxNetBitrate', 2, 'Max Net Bitrate', null, 1000, 1),
+            );
+        }
+   }
 }
