@@ -40,7 +40,7 @@ class Exa extends OS implements OSDiscovery
 
         $cards = explode("\n", snmp_walk($this->getDevice(), 'e7CardProvType', '-OQv', 'E7-Calix-MIB'));
         $card_count = [];
-        foreach($cards as $card) {
+        foreach ($cards as $card) {
             $card_count[$card] = ($card_count[$card] ?? 0) + 1;
         }
         $device->features = implode(', ', array_map(function ($card) use ($card_count) {

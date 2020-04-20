@@ -21,7 +21,7 @@ foreach ($deviceModel->getDirty() as $attribute) {
 $deviceModel->os = getHostOS($device, false);
 
 if ($deviceModel->isDirty('os')) {
-    Log::event('Device OS changed: ' . $deviceModel->getOriginal('os') . ' -> ' . $deviceModel->os , $deviceModel, 'system', 3);
+    Log::event('Device OS changed: ' . $deviceModel->getOriginal('os') . ' -> ' . $deviceModel->os, $deviceModel, 'system', 3);
     $device['os'] = $deviceModel->os;
 
     echo "Changed ";
