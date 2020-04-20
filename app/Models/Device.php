@@ -611,7 +611,7 @@ class Device extends BaseModel
 
     public function children()
     {
-        return $this->belongsToMany(\App\Models\Device::class, 'device_relationships', 'parent_device_id', 'child_device_id');
+        return $this->belongsToMany(self::class, 'device_relationships', 'parent_device_id', 'child_device_id');
     }
 
     public function components()
@@ -656,7 +656,7 @@ class Device extends BaseModel
 
     public function parents()
     {
-        return $this->belongsToMany(\App\Models\Device::class, 'device_relationships', 'child_device_id', 'parent_device_id');
+        return $this->belongsToMany(self::class, 'device_relationships', 'child_device_id', 'parent_device_id');
     }
 
     public function perf()
