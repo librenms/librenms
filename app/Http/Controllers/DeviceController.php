@@ -7,6 +7,7 @@ use App\Models\Device;
 use App\Models\Vminfo;
 use Auth;
 use Carbon\Carbon;
+use Gate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use LibreNMS\Config;
@@ -143,10 +144,9 @@ class DeviceController extends Controller
 
     private function deviceLinkMenu(Device $device)
     {
-        $can_admin_device = $device->canAccess(Auth::user());
         $device_links = [];
 
-        if ($can_admin_device) {
+        if (Gate::allows('device', $device)) {
             $device_links['edit'] = [
                 'icon' => 'fa-gear',
                 'url' => route('device', [$device->device_id, 'edit']),
@@ -193,7 +193,7 @@ class DeviceController extends Controller
             'external' => true,
         ];
 
-        if ($can_admin_device) {
+        if (Gate::allows('device', $device)) {
             $device_links['capture'] = [
                 'icon' => 'fa-bug',
                 'url' => route('device', [$device->device_id, 'capture']),
