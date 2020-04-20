@@ -147,7 +147,7 @@ class DeviceController extends Controller
     {
         $device_links = [];
 
-        if (Gate::allows('global-admin')) {
+        if (Gate::allows('update', $device)) {
             $device_links['edit'] = [
                 'icon' => 'fa-gear',
                 'url' => route('device', [$device->device_id, 'edit']),
@@ -194,7 +194,7 @@ class DeviceController extends Controller
             'external' => true,
         ];
 
-        if (Gate::allows('global-admin')) {
+        if (Gate::allows('admin')) {
             $device_links['capture'] = [
                 'icon' => 'fa-bug',
                 'url' => route('device', [$device->device_id, 'capture']),
