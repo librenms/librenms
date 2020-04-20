@@ -35,6 +35,13 @@ if (!empty($location)) {
     set_device_location($location, $device, $update_array);
 }
 
+if ($name != $device['name']) {
+    $update_array['sysName'] = $name;
+    log_event('sysName -> ' . $name, $device, 'system', 3);
+}
+
+
+echo 'Name: ' . $name . PHP_EOL;
 echo 'Location: ' . $location . PHP_EOL;
 echo 'Hardware: ' . $hardware . PHP_EOL;
 echo 'Version: ' . $version . PHP_EOL;

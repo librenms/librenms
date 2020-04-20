@@ -167,6 +167,8 @@ $hardware = "Juniper " . preg_replace('/[\r\n\"]+/', ' ', snmp_get($device, "pro
 
 `$location`: Overrides sysLocation of the device.
 
+`$name`: Overrides sysName of the device.
+
 ### MIBs
 
 If the device has MIBs available and you use it in the detection then you can add these in. It is highly
