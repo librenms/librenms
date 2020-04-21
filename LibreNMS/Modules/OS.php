@@ -37,10 +37,18 @@ class OS implements Module
 {
     public function discover(\LibreNMS\OS $os)
     {
+        // null out values in case they aren't filled.
+        $os->getDeviceModel()->fill([
+            'hardware' => null,
+            'version' => null,
+            'features' => null,
+            'serial' => null,
+            'icon' => null,
+//            'location_id' => null, // TODO set location
+        ]);
+
         if ($os instanceof OSDiscovery) {
             $os->discoverOS();
-
-            // TODO Location
         }
 
         $this->handleChanges($os);
@@ -64,11 +72,11 @@ class OS implements Module
                 echo "Generic :(\n";
             }
 
-            // handle legacy variables
-            $deviceModel->version = $version ?? $deviceModel->version;
-            $deviceModel->hardware = $hardware ?? $deviceModel->hardware;
-            $deviceModel->features = $features ?? $deviceModel->features;
-            $deviceModel->serial = $serial ?? $deviceModel->serial;
+            // handle legacy variables, sometimes they are false
+            $deviceModel->version = ($version ?? $deviceModel->version) ?: null;
+            $deviceModel->hardware = ($hardware ?? $deviceModel->hardware) ?: null;
+            $deviceModel->features = ($features ?? $deviceModel->features) ?: null;
+            $deviceModel->serial = ($serial ?? $deviceModel->serial) ?: null;
 
             if (!empty($location)) {
                 set_device_location($location, $device, $update_array);
