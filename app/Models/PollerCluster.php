@@ -36,6 +36,6 @@ class PollerCluster extends Model
 
     public function stats()
     {
-        return $this->hasMany('App\Models\PollerClusterStat', 'parent_poller', 'id');
+        return $this->hasMany(\App\Models\PollerClusterStat::class, 'parent_poller', 'id');
     }
 }

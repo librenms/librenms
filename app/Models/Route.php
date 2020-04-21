@@ -41,11 +41,11 @@ class Route extends DeviceRelatedModel
     // ---- Define Relationships ----
     public function device()
     {
-        return $this->belongsTo('App\Models\Device', 'device_id', 'device_id');
+        return $this->belongsTo(\App\Models\Device::class, 'device_id', 'device_id');
     }
 
     public function port()
     {
-        return $this->belongsTo('App\Models\Port', 'port_id', 'port_id');
+        return $this->belongsTo(\App\Models\Port::class, 'port_id', 'port_id');
     }
 }
