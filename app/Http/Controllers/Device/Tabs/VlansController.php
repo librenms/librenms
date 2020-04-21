@@ -33,7 +33,7 @@ class VlansController implements DeviceTab
 {
     public function visible(Device $device): bool
     {
-        return Vlan::exists();
+        return $device->vlans()->exists();
     }
 
     public function slug(): string

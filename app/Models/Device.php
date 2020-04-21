@@ -830,6 +830,11 @@ class Device extends BaseModel
         return $this->hasMany(\App\Models\Vminfo::class, 'device_id');
     }
 
+    public function vlans()
+    {
+        return $this->hasMany(\App\Models\Vlan::class, 'device_id');
+    }
+
     public function vrfLites()
     {
         return $this->hasMany(\App\Models\VrfLite::class, 'device_id');
