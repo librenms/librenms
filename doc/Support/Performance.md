@@ -174,3 +174,28 @@ For Nginx (1.9.5 and above) change `listen 443 ssl;` to `listen 443
 ssl http2;` in the Virtualhost config.
 
 For Apache (2.4.17 an above) set `Protocols h2 http/1.1` in the Virtualhost config.
+
+## PHP-opcache
+
+A lot of performance can be gained from setting up `php-opcache`correctly. 
+
+### Example CentOS 7 configuration for distributed pollers (PHP 7.2)
+
+Create a cache directory that is writable by the librenms user first:
+`sudo mkdir -p /tmp/cache && sudo chmod 775 /tmp/cache && sudo chown -R librenms /tmp/cache`
+
+In `/etc/php.d/opcache.ini` you can set the following: (Note, your opcache.ini location
+may differ a bit)
+
+```
+zend_extension=opcache
+opcache.enable=1
+opcache.enable_cli=1
+opcache.file_cache="/tmp/cache/"
+opcache.file_cache_only=0
+opcache.file_cache_consistency_checks=1
+opcache.memory_consumption=256
+```
+If you have set this on the pollers only, there is no need to restart anything. However, 
+if you have set this on the webserver, you would need to restart apache/nginx as well as 
+possibly restart php-fpm.
