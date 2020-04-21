@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use LibreNMS\DB\Schema;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv4;
@@ -35,7 +36,9 @@ class Device extends BaseModel
     public static function boot()
     {
         parent::boot();
-        self::loadAllOs(true);
+        if (Schema::isCurrent()) {
+            self::loadAllOs(true);
+        }
 
         static::deleting(function (Device $device) {
             // delete related data
