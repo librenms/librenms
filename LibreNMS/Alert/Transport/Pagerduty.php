@@ -59,7 +59,7 @@ class Pagerduty extends Transport
             'event_action' => $obj['event_type'],
             'dedup_key'    => (string)$obj['alert_id'],
             'payload'    => [
-                'custom_details'  => substr(implode(PHP_EOL, array_column($obj['faults'], 'string')), 0, 1020) . '....' ?: 'Test',
+                'custom_details'  => strip_tags($obj['msg']) ?: 'Test',
                 'source'   => $obj['hostname'],
                 'severity' => $obj['severity'],
                 'summary'  => ($obj['name'] ? $obj['name'] . ' on ' . $obj['hostname'] : $obj['title']),
