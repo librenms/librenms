@@ -7,9 +7,8 @@
 @include('alerts.modals.ack')
 @include('alerts.modals.notes')
 @if (!$bare)
-@if (!$hide_dashboard_editor)
-<div class="row">
-    <div class="col-md-6">
+<div class="row collapse @if(!$hide_dashboard_editor)in @endif" id="dashboard-editor">
+    <div class="col-md-12">
         <div class="btn-group btn-lg">
             <button class="btn btn-default disabled" style="min-width:160px;"><span class="pull-left">Dashboards</span></button>
             <div class="btn-group">
@@ -49,102 +48,101 @@
             <button class="btn btn-danger" href="#del_dash" onclick="dashboard_collapse($(this).attr('href'))" data-toggle="tooltip" data-container="body" data-placement="top" title="Remove Dashboard"><i class="fa fa-trash fa-fw"></i></button>
             <button class="btn btn-success" href="#add_dash" onclick="dashboard_collapse($(this).attr('href'))" data-toggle="tooltip" data-container="body" data-placement="top" title="New Dashboard"><i class="fa fa-plus fa-fw"></i></button>
         </div>
-    </div>
-</div>
-<div class="dash-collapse" id="add_dash" style="display: none;" >
-    <div class="row" style="margin-top:5px;">
-        <div class="col-md-6">
-            <form class="form-inline" onsubmit="dashboard_add(this); return false;" name="add_form" id="add_form">
-                @csrf
-                <div class="col-sm-3 col-sx-6">
-                    <div class="input-group">
-                        <span class="input-group-btn">
-                            <a class="btn btn-default disabled" type="button" style="min-width:160px;"><span class="pull-left">New Dashboard</span></a>
-                        </span>
-                        <input class="form-control" type="text" placeholder="Name" name="dashboard_name" id="dashboard_name" style="min-width:160px;">
-                        <span class="input-group-btn">
-                            <button class="btn btn-primary" type="submit">Add</button>
-                        </span>
+        <div class="dash-collapse" id="add_dash" style="display: none;" >
+            <div class="row" style="margin-top:5px;">
+                <div class="col-md-6">
+                    <form class="form-inline" onsubmit="dashboard_add(this); return false;" name="add_form" id="add_form">
+                        @csrf
+                        <div class="col-sm-3 col-sx-6">
+                            <div class="input-group">
+                                <span class="input-group-btn">
+                                    <a class="btn btn-default disabled" type="button" style="min-width:160px;"><span class="pull-left">New Dashboard</span></a>
+                                </span>
+                                <input class="form-control" type="text" placeholder="Name" name="dashboard_name" id="dashboard_name" style="min-width:160px;">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-primary" type="submit">Add</button>
+                                </span>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <hr>
+        </div>
+        <div class="dash-collapse" id="edit_dash" style="display: none;">
+            <!-- Start Dashboard-Settings -->
+            <div class="row" style="margin-top:5px;">
+                <div class="col-md-12">
+                    <div class="col-md-12">
+                        <form class="form-inline" onsubmit="dashboard_edit(this); return false;">
+                            @csrf
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <span class="input-group-btn">
+                                        <a class="btn btn-default disabled" type="button" style="min-width:160px;"><span class="pull-left">Dashboard Name</span></a>
+                                    </span>
+                                    <input class="form-control" type="text" placeholder="Dashbord Name" name="dashboard_name" value="{{ $dashboard->dashboard_name }}" style="width:160px;">
+                                    <select class="form-control" name="access" style="width:160px;">
+                                    @foreach (array('Private','Shared (Read)','Shared') as $k => $v)
+                                        <option value="{{ $k }}" {{ $dashboard->access == $k ? 'selected' : null }}>{{ $v }}</option>
+                                    @endforeach
+                                    </select>
+                                    <span class="input-group-btn pull-left">
+                                        <button class="btn btn-primary" type="submit">Update</button>
+                                    </span>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
-            </form>
-        </div>
-    </div>
-    <hr>
-</div>
-<div class="dash-collapse" id="edit_dash" style="display: none;">
-    <!-- Start Dashboard-Settings -->
-    <div class="row" style="margin-top:5px;">
-        <div class="col-md-12">
-            <div class="col-md-12">
-                <form class="form-inline" onsubmit="dashboard_edit(this); return false;">
-                    @csrf
-                    <div class="form-group">
-                        <div class="input-group">
-                            <span class="input-group-btn">
-                                <a class="btn btn-default disabled" type="button" style="min-width:160px;"><span class="pull-left">Dashboard Name</span></a>
-                            </span>
-                            <input class="form-control" type="text" placeholder="Dashbord Name" name="dashboard_name" value="{{ $dashboard->dashboard_name }}" style="width:160px;">
-                            <select class="form-control" name="access" style="width:160px;">
-                            @foreach (array('Private','Shared (Read)','Shared') as $k => $v)
-                                <option value="{{ $k }}" {{ $dashboard->access == $k ? 'selected' : null }}>{{ $v }}</option>
-                            @endforeach
-                            </select>
-                            <span class="input-group-btn pull-left">
-                                <button class="btn btn-primary" type="submit">Update</button>
-                            </span>
+            </div>
+            <!-- End Dashboard-Settings -->
+            <!-- Start Widget-Select -->
+            <div class="row" style="margin-top:5px;">
+                <div class="col-md-12">
+                    <div class="col-md-12">
+                        <div class="btn-group" role="group">
+                            <a class="btn btn-default disabled" role="button" style="min-width:160px;"><span class="pull-left">Add Widgets</span></a>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="min-width:160px;"><span class="pull-left">Select Widget</span>
+                                <span class="pull-right">
+                                    <span class="caret"></span>
+                                    <span class="sr-only">Toggle Dropdown</span>
+                                </span>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    @foreach ($widgets as $widget)
+                                    <li>
+                                        <a href="#" onsubmit="return false;" class="place_widget" data-widget_id="{{ $widget->widget_id }}">{{ $widget->widget_title }}</a>
+                                    </li>
+                                    @endforeach
+                                </ul>
+                            </div>
                         </div>
                     </div>
-                </form>
+                </div>
             </div>
+            <!-- End Widget-Select -->
+            <hr>
         </div>
-    </div>
-    <!-- End Dashboard-Settings -->
-    <!-- Start Widget-Select -->
-    <div class="row" style="margin-top:5px;">
-        <div class="col-md-12">
-            <div class="col-md-12">
-                <div class="btn-group" role="group">
-                    <a class="btn btn-default disabled" role="button" style="min-width:160px;"><span class="pull-left">Add Widgets</span></a>
-                    <div class="btn-group">
-                        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="min-width:160px;"><span class="pull-left">Select Widget</span>
-                        <span class="pull-right">
-                            <span class="caret"></span>
-                            <span class="sr-only">Toggle Dropdown</span>
-                        </span>
-                        </button>
-                        <ul class="dropdown-menu">
-                            @foreach ($widgets as $widget)
-                            <li>
-                                <a href="#" onsubmit="return false;" class="place_widget" data-widget_id="{{ $widget->widget_id }}">{{ $widget->widget_title }}</a>
-                            </li>
-                            @endforeach
-                        </ul>
+        <div class="dash-collapse" id="del_dash" style="display: none;">
+            <div class="row" style="margin-top:5px;">
+                <div class="col-md-6">
+                    <div class="col-md-6">
+                        <button class="btn btn-danger" type="button" id="clear_widgets" name="clear_widgets" style="min-width:160px;"><span class="pull-left">Remove</span><strong class="pull-right">Widgets</strong></button>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-    <!-- End Widget-Select -->
-    <hr>
-</div>
-@endif
-<div class="dash-collapse" id="del_dash" style="display: none;">
-    <div class="row" style="margin-top:5px;">
-        <div class="col-md-6">
-            <div class="col-md-6">
-                <button class="btn btn-danger" type="button" id="clear_widgets" name="clear_widgets" style="min-width:160px;"><span class="pull-left">Remove</span><strong class="pull-right">Widgets</strong></button>
+            <div class="row" style="margin-top:5px;">
+                <div class="col-md-6">
+                    <div class="col-md-6">
+                        <button class="btn btn-danger" type="button" onclick="dashboard_delete(this); return false;" data-dashboard="{{ $dashboard->dashboard_id }}" style="min-width:160px;"><span class="pull-left">Delete</span><strong class="pull-right">Dashboard</strong></button>
+                    </div>
+                </div>
             </div>
+            <hr>
         </div>
     </div>
-    <div class="row" style="margin-top:5px;">
-        <div class="col-md-6">
-            <div class="col-md-6">
-                <button class="btn btn-danger" type="button" onclick="dashboard_delete(this); return false;" data-dashboard="{{ $dashboard->dashboard_id }}" style="min-width:160px;"><span class="pull-left">Delete</span><strong class="pull-right">Dashboard</strong></button>
-            </div>
-        </div>
-    </div>
-    <hr>
 </div>
 @endif
 <span class="message" id="message"></span>
