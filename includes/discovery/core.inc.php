@@ -9,7 +9,7 @@ $deviceModel = DeviceCache::getPrimary();
 $deviceModel->fill([
     'sysObjectID' => $snmpdata['.1.3.6.1.2.1.1.2.0'] ?? null,
     'sysName' => strtolower(trim($snmpdata['.1.3.6.1.2.1.1.5.0'] ?? '')),
-    'sysDescr' => $snmpdata['.1.3.6.1.2.1.1.1.0'] ?? null,
+    'sysDescr' => isset($snmpdata['.1.3.6.1.2.1.1.1.0']) ? str_replace(chr(218), "\n", $snmpdata['.1.3.6.1.2.1.1.1.0']) : null,
 ]);
 
 foreach ($deviceModel->getDirty() as $attribute => $value) {
