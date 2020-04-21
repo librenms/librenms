@@ -37,7 +37,7 @@ class Device extends BaseModel
     {
         parent::boot();
         if (Schema::isCurrent()) {
-            Device::loadAllOs(true);
+            self::loadAllOs(true);
         }
 
         static::deleting(function (Device $device) {
