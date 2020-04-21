@@ -93,7 +93,7 @@ class OS implements Module
 
     private function handleChanges(Device $device)
     {
-        $device->icon = Url::findOsImage($device->os, $device->features, null, 'images/os/');
+        $device->icon = basename(Url::findOsImage($device->os, $device->features, null, 'images/os/'));
 
         foreach ($device->getDirty() as $attribute => $value) {
             if ($attribute == 'location_id') {
