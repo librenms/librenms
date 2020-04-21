@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Str;
-use LibreNMS\DB\Schema;
+use LibreNMS\DB\Eloquent;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv4;
@@ -36,7 +36,7 @@ class Device extends BaseModel
     public static function boot()
     {
         parent::boot();
-        if (Schema::isCurrent()) {
+        if (!\App::runningInConsole()) {
             self::loadAllOs(true);
         }
     }
@@ -204,7 +204,7 @@ class Device extends BaseModel
             \LibreNMS\Config::set('os', array_replace_recursive($os_defs, \LibreNMS\Config::get('os')));
         } else {
             // load from yaml
-            if ($existing) {
+            if ($existing && Eloquent::isConnected()) {
                 $os_list = [];
                 foreach (self::distinct('os')->get('os')->toArray() as $os) {
                     $os_list[] = $install_dir . '/includes/definitions/' . $os['os'] . '.yaml';
