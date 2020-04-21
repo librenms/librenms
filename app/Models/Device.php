@@ -402,10 +402,6 @@ class Device extends BaseModel
             $location = Location::firstOrCreate(['location' => $location_text]);
             $this->location()->associate($location);
         }
-
-        if ($this->isDirty('location_id')) {
-            \Log::event('Location -> ' . $location->location, $this, 'system', 3);
-        }
     }
 
     // ---- Accessors/Mutators ----

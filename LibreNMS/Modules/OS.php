@@ -25,13 +25,11 @@
 
 namespace LibreNMS\Modules;
 
-use App\Models\Device;
 use LibreNMS\Config;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\Util\Url;
-use Log;
 
 class OS implements Module
 {
@@ -77,26 +75,15 @@ class OS implements Module
             $deviceModel->hardware = ($hardware ?? $deviceModel->hardware) ?: null;
             $deviceModel->features = ($features ?? $deviceModel->features) ?: null;
             $deviceModel->serial = ($serial ?? $deviceModel->serial) ?: null;
-
-            if (!empty($location)) {
-                set_device_location($location, $device, $update_array);
-                $deviceModel->location_id = $device['location_id'];
-            }
         }
 
+        $this->updateLocation($os, $location ?? null);
         $this->handleChanges($os);
     }
 
     public function cleanup(\LibreNMS\OS $os)
     {
-        // no cleanup needed
-    }
-
-    private function attributeChangedMessage($attribute, $value, $previous)
-    {
-        return trans("device.attributes.$attribute") . ': '
-            . (($previous && $previous != $value) ? ($previous . ' -> ') : '')
-            . $value;
+        // no cleanup needed?
     }
 
     private function handleChanges(\LibreNMS\OS $os)
@@ -105,22 +92,25 @@ class OS implements Module
 
         $device->icon = basename(Url::findOsImage($device->os, $device->features, null, 'images/os/'));
 
-        foreach ($device->getDirty() as $attribute => $value) {
-            $previous = $device->getOriginal($attribute);
-            if ($attribute == 'location_id') {
-                $attribute = 'location';
-                $value = (string)$device->location;
-                $previous = '';
-            }
-            $os->getDevice()[$attribute] = $value; // update the device array
-
-            Log::event($this->attributeChangedMessage($attribute, $value, $previous), $device, 'system', 3);
-        }
-
-        foreach (['location', 'hardware', 'version', 'features', 'serial'] as $attribute) {
-            echo $this->attributeChangedMessage($attribute, $device->$attribute, $device->getOriginal($attribute)) . PHP_EOL;
+        echo trans("device.attributes.location") . ": $device->location\n";
+        foreach (['hardware', 'version', 'features', 'serial'] as $attribute) {
+            echo \App\Observers\DeviceObserver::attributeChangedMessage($attribute, $device->$attribute, $device->getOriginal($attribute)) . PHP_EOL;
         }
 
         $device->save();
+    }
+
+    private function updateLocation(\LibreNMS\OS $os, $altLocation = null)
+    {
+        $device = $os->getDeviceModel();
+        if ($device->override_sysLocation == 0) {
+            $device->setLocation($altLocation ?? snmp_get($os->getDevice(), 'sysLocation.0', '-Ovq', 'SNMPv2-MIB'));
+        }
+
+        // make sure the location has coordinates
+        if (Config::get('geoloc.latlng', true) && !$device->location->hasCoordinates()) {
+            $device->location->lookupCoordinates();
+            $device->location->save();
+        }
     }
 }

@@ -26,7 +26,7 @@ class DeviceObserver
             }
         }
         if ($device->isDirty('location_id')) {
-            \Log::event(self::attributeChangedMessage('location', $device->location, ''), $device, 'system', 3);
+            \Log::event(self::attributeChangedMessage('location', (string)$device->location, null), $device, 'system', 3);
         }
     }
 
@@ -81,7 +81,7 @@ class DeviceObserver
     public static function attributeChangedMessage($attribute, $value, $previous)
     {
         return trans("device.attributes.$attribute") . ': '
-            . (($previous && $previous != $value) ? ($previous . ' -> ') : '')
+            . (($previous && $previous != $value) ? "$previous -> " : '')
             . $value;
     }
 }
