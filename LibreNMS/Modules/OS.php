@@ -41,9 +41,9 @@ class OS implements Module
             $os->discoverOS();
 
             // TODO Location
-
-            $this->handleChanges($os->getDeviceModel());
         }
+
+        $this->handleChanges($os);
     }
 
     public function poll(\LibreNMS\OS $os)
@@ -76,7 +76,7 @@ class OS implements Module
             }
         }
 
-        $this->handleChanges($deviceModel);
+        $this->handleChanges($os);
     }
 
     public function cleanup(\LibreNMS\OS $os)
@@ -84,27 +84,33 @@ class OS implements Module
         // no cleanup needed
     }
 
-    private function attributeChangedMessage(Device $device, $attribute)
+    private function attributeChangedMessage($attribute, $value, $previous)
     {
         return trans("device.attributes.$attribute") . ': '
-            . ($device->isDirty($attribute) ? ($device->getOriginal($attribute) . ' -> ') : '')
-            . $device->$attribute;
+            . (($previous && $previous != $value) ? ($previous . ' -> ') : '')
+            . $value;
     }
 
-    private function handleChanges(Device $device)
+    private function handleChanges(\LibreNMS\OS $os)
     {
+        $device = $os->getDeviceModel();
+
         $device->icon = basename(Url::findOsImage($device->os, $device->features, null, 'images/os/'));
 
         foreach ($device->getDirty() as $attribute => $value) {
+            $previous = $device->getOriginal($attribute);
             if ($attribute == 'location_id') {
                 $attribute = 'location';
+                $value = (string)$device->location;
+                $previous = '';
             }
+            $os->getDevice()[$attribute] = $value; // update the device array
 
-            Log::event($this->attributeChangedMessage($device, $attribute), $device, 'system', 3);
+            Log::event($this->attributeChangedMessage($attribute, $value, $previous), $device, 'system', 3);
         }
 
         foreach (['location', 'hardware', 'version', 'features', 'serial'] as $attribute) {
-            echo $this->attributeChangedMessage($device, $attribute) . PHP_EOL;
+            echo $this->attributeChangedMessage($attribute, $device->$attribute, $device->getOriginal($attribute)) . PHP_EOL;
         }
 
         $device->save();
