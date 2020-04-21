@@ -1388,7 +1388,8 @@ function find_device_id($name = '', $ip = '', $mac_address = '')
             $where[] = '`hostname`=?';
             $params[] = "$name.$mydomain";
 
-            $where[] = 'concat(`hostname`, \'.\', \'' . $mydomain . '\') =?';
+            $where[] = 'concat(`hostname`, \'.\', ?) =?';
+            $params[] = "$mydomain";
             $params[] = "$name";
         }
     }
