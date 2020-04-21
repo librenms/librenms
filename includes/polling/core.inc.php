@@ -23,7 +23,7 @@ $poll_device['sysLocation'] = str_replace("\n", '', $snmpdata['.1.3.6.1.2.1.1.6.
 $poll_device['sysContact']  = str_replace("\n", '', $snmpdata['.1.3.6.1.2.1.1.4.0']);
 $poll_device['sysName']     = str_replace("\n", '', strtolower($snmpdata['.1.3.6.1.2.1.1.5.0']));
 $poll_device['sysObjectID'] = $snmpdata['.1.3.6.1.2.1.1.2.0'];
-$poll_device['sysDescr']    = $snmpdata['.1.3.6.1.2.1.1.1.0'];
+$poll_device['sysDescr']    = str_replace(chr(218), "\n", $snmpdata['.1.3.6.1.2.1.1.1.0']);
 
 if (!empty($agent_data['uptime'])) {
     list($uptime) = explode(' ', $agent_data['uptime']);
