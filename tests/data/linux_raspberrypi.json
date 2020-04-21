@@ -205,10 +205,10 @@
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 57.299999999999997,
-                    "sensor_limit": 77.299999999999997,
+                    "sensor_current": 22.899999999999999,
+                    "sensor_limit": 42.899999999999999,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 47.299999999999997,
+                    "sensor_limit_low": 12.9,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -537,10 +537,10 @@
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 57.299999999999997,
-                    "sensor_limit": 77.299999999999997,
+                    "sensor_current": 22.899999999999999,
+                    "sensor_limit": 42.899999999999999,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 47.299999999999997,
+                    "sensor_limit_low": 12.9,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -661,44 +661,6 @@
                     "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 2
-                }
-            ]
-        }
-    },
-    "os": {
-        "discovery": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.8072.3.2.10",
-                    "sysDescr": "Linux rpi 4.14.98+ #1200 Tue Feb 12 20:11:02 GMT 2019 armv6l",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "linux",
-                    "type": "server",
-                    "serial": null,
-                    "icon": "linux.svg",
-                    "location": null
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.8072.3.2.10",
-                    "sysDescr": "Linux rpi 4.14.98+ #1200 Tue Feb 12 20:11:02 GMT 2019 armv6l",
-                    "sysContact": "<private>",
-                    "version": "4.14.98+",
-                    "hardware": "Generic ARMv6",
-                    "features": null,
-                    "os": "linux",
-                    "type": "server",
-                    "serial": null,
-                    "icon": "linux.svg",
-                    "location": "<private>"
                 }
             ]
         }
