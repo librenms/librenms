@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\Device;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Log;
@@ -42,6 +43,9 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->booted('\LibreNMS\DB\Eloquent::initLegacyListeners');
         $this->app->booted('\LibreNMS\Config::load');
+        $this->app->booted(function () {
+            Device::loadAllOs(true);
+        });
 
         $this->bootCustomBladeDirectives();
         $this->bootCustomValidators();

@@ -424,16 +424,16 @@ class Url
     /**
      * Get html class for a sensor
      *
-     * @param Sensor $sensor
+     * @param \App\Models\Sensor $sensor
      * @return string
      */
     public static function sensorLinkDisplayClass($sensor)
     {
-        if ($sensor->sensor_current >> $sensor->sensor_limit) {
+        if ($sensor->sensor_current > $sensor->sensor_limit) {
             return "sensor-high";
         }
 
-        if ($sensor->sensor_current << $sensor->sensor_limit_low) {
+        if ($sensor->sensor_current < $sensor->sensor_limit_low) {
             return "sensor-low";
         }
 
