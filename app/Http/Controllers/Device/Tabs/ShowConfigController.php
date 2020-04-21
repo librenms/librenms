@@ -26,25 +26,23 @@
 namespace App\Http\Controllers\Device\Tabs;
 
 use App\Facades\DeviceCache;
+use App\Http\Controllers\Controller;
 use App\Models\Device;
-use Auth;
+use Gate;
 use LibreNMS\Config;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
-class ShowConfigController implements DeviceTab
+class ShowConfigController extends Controller implements DeviceTab
 {
     private $rancidFile;
 
-    public function __construct()
-    {
-        if (Auth::user()->hasGlobalAdmin()) {
-            $this->rancidFile = $this->findRancidConfigFile();
-        }
-    }
-
     public function visible(Device $device): bool
     {
-        return Auth::user()->hasGlobalAdmin() && (isset($this->rancidFile) || $this->oxidizedEnabled($device));
+        if (auth()->user()->can('show-config', $device)) {
+            return $this->oxidizedEnabled($device) || $this->getRancidConfigFile() !== false;
+        }
+
+        return false;
     }
 
     public function slug(): string
@@ -65,7 +63,7 @@ class ShowConfigController implements DeviceTab
     public function data(Device $device): array
     {
         return [
-            'rancid_file' => $this->rancidFile,
+            'rancid_file' => $this->getRancidConfigFile(),
         ];
     }
 
@@ -74,6 +72,15 @@ class ShowConfigController implements DeviceTab
         return Config::get('oxidized.enabled') === true
             && Config::has('oxidized.url')
             && !$device->getAttrib('override_Oxidized_disable');
+    }
+
+    private function getRancidConfigFile()
+    {
+        if (is_null($this->rancidFile)) {
+            $this->rancidFile = $this->findRancidConfigFile();
+        }
+
+        return $this->rancidFile;
     }
 
     private function findRancidConfigFile()
@@ -103,6 +110,6 @@ class ShowConfigController implements DeviceTab
             }
         }
 
-        return null;
+        return false;
     }
 }

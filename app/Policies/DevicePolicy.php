@@ -92,4 +92,17 @@ class DevicePolicy
     {
         return $user->isAdmin();
     }
+
+    /**
+     * Determine whether the user can view the stored configuration of the device
+     * from Oxidized or Rancid
+     *
+     * @param \App\Models\User $user
+     * @param \App\Models\Device $device
+     * @return mixed
+     */
+    public function showConfig(User $user, Device $device)
+    {
+        return $user->isAdmin();
+    }
 }

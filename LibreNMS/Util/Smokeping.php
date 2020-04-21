@@ -26,6 +26,7 @@
 namespace LibreNMS\Util;
 
 use App\Models\Device;
+use Illuminate\Support\Str;
 use LibreNMS\Config;
 
 class Smokeping
@@ -86,7 +87,7 @@ class Smokeping
     {
         $remote = $direction == 'in' ? 'src' : 'dest';
         $data = array_keys(array_filter($this->getFiles()[$direction][$this->device->hostname], function ($file) {
-            return str_contains($file, '~');
+            return Str::contains($file, '~');
         }));
 
         return array_map(function ($other) use ($direction, $remote) {
