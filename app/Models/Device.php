@@ -36,7 +36,7 @@ class Device extends BaseModel
     public static function boot()
     {
         parent::boot();
-        if (!\App::runningInConsole()) {
+        if (!app()->runningInConsole()) {
             self::loadAllOs(true);
         }
     }

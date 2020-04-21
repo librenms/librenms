@@ -108,7 +108,7 @@ class OS implements Module
         }
 
         // make sure the location has coordinates
-        if (Config::get('geoloc.latlng', true) && !$device->location->hasCoordinates()) {
+        if (Config::get('geoloc.latlng', true) && $device->location && !$device->location->hasCoordinates()) {
             $device->location->lookupCoordinates();
             $device->location->save();
         }
