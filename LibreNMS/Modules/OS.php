@@ -37,17 +37,17 @@ class OS implements Module
 {
     public function discover(\LibreNMS\OS $os)
     {
-        // null out values in case they aren't filled.
-        $os->getDeviceModel()->fill([
-            'hardware' => null,
-            'version' => null,
-            'features' => null,
-            'serial' => null,
-            'icon' => null,
-//            'location_id' => null, // TODO set location
-        ]);
-
         if ($os instanceof OSDiscovery) {
+            // null out values in case they aren't filled.
+            $os->getDeviceModel()->fill([
+                'hardware' => null,
+                'version' => null,
+                'features' => null,
+                'serial' => null,
+                'icon' => null,
+//            'location_id' => null, // TODO set location
+            ]);
+
             $os->discoverOS();
         }
 
