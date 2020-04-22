@@ -12,7 +12,7 @@ $oids = [
 $data = snmp_get_multi($device, $oids, '-OQUs', $mibs);
 $version    = $data[0]['sysProductVersion'];
 $hardware   = $data[0]['sysPlatformInfoMarketingName'];
-$serial     = $data[0]['sysProductVersion'];
+$serial     = $data[0]['sysGeneralChassisSerialNum'];
 unset($data, $oids);
 
 

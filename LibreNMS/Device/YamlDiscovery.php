@@ -155,6 +155,10 @@ class YamlDiscovery
      */
     public static function getValueFromData($name, $index, $discovery_data, $pre_cache, $default = null)
     {
+        //create the sub-index values in order to try to match them with precache
+        foreach (explode('.', $index) as $pos => $sindex) {
+            $subindex[$pos] = $sindex;
+        }
         if (isset($discovery_data[$name])) {
             $name = $discovery_data[$name];
         }
@@ -167,12 +171,14 @@ class YamlDiscovery
             if (is_array($pre_cache[$name])) {
                 if (isset($pre_cache[$name][$index][$name])) {
                     return $pre_cache[$name][$index][$name];
-                } elseif (isset($pre_cache[$index][$name])) {
-                    return $pre_cache[$index][$name];
+                } elseif (isset($pre_cache[$index][$name])) {   //probably makes no sense here
+                    return $pre_cache[$index][$name];           //same
                 } elseif (isset($pre_cache[$name][$index])) {
                     return $pre_cache[$name][$index];
                 } elseif (count($pre_cache[$name]) === 1) {
                     return current($pre_cache[$name]);
+                } elseif (isset($pre_cache[$name][$subindex[0]][$name])) {
+                    return $pre_cache[$name][$subindex[0]][$name];
                 }
             } else {
                 return $pre_cache[$name];
