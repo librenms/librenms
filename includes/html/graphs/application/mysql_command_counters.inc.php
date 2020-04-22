@@ -53,7 +53,7 @@ if (rrdtool_check_rrd_exists($rrd_filename)) {
         $i++;
     }
 } else {
-    echo "file missing: $rancid_file";
+    echo "file missing: $file";
 }
 
 $colours   = 'mixed';
