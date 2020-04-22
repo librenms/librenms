@@ -96,3 +96,10 @@ modules:
           num_oid: '.1.3.6.1.4.1.41112.1.10.1.7.8.{{ $index }}'
           index: afLTUgpsSatsTracked
           descr: Sat tracked
+    dbm:
+      data:
+        -
+          oid: afLTUTxEIRP
+          num_oid: '.1.3.6.1.4.1.41112.1.10.1.2.6.{{ $index }}'
+          index: afLTUTxEIRP
+          descr: Tx EIRP

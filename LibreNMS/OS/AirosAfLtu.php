@@ -57,6 +57,7 @@ class AirosAfLtu extends OS implements
         $rx_ideal_power1_oid = '.1.3.6.1.4.1.41112.1.10.1.4.1.8.24.232.41.30.48.222'; //UBNT-AFLTU-MIB::afLTUStaIdealRxPower1.1
         $rx_power0_level_oid = '.1.3.6.1.4.1.41112.1.10.1.4.1.9.24.232.41.30.48.222'; //UBNT-AFLTU-MIB::afLTUStaRxPowerLevel0.1
         $rx_power1_level_oid = '.1.3.6.1.4.1.41112.1.10.1.4.1.10.24.232.41.30.48.222'; //UBNT-AFLTU-MIB::afLTUStaRxPowerLevel1.1
+        $tx_eirp_oid = '.1.3.6.1.4.1.41112.1.10.1.2.6.0'; //UBNT-AFLTU-MIB::afLTUTxEIRP
         return array(
             new WirelessSensor('power', $this->getDeviceId(), $rx_power0_oid, 'airos-af-ltu-tx-chain-0', 1, 'Tx Power Chain 0'),
             new WirelessSensor('power', $this->getDeviceId(), $rx_power1_oid, 'airos-af-ltu-tx-chain-1', 1, 'Tx Power Chain 1'),
@@ -64,6 +65,7 @@ class AirosAfLtu extends OS implements
             new WirelessSensor('power', $this->getDeviceId(), $rx_ideal_power1_oid, 'airos-af-ltu-ideal-tx-chain-1', 1, 'Tx Ideal Power Chain 1'),
             new WirelessSensor('quality', $this->getDeviceId(), $rx_power0_level_oid, 'airos-af-ltu-level-rx-chain-0', 1, 'Signal Level Chain 0'),
             new WirelessSensor('quality', $this->getDeviceId(), $rx_power1_level_oid, 'airos-af-ltu-level-rx-chain-1', 1, 'Signal Level Chain 1'),
+            new WirelessSensor('power', $this->getDeviceId(), $tx_eirp_oid, 'airos-af-ltu-tx-eirp', 1, 'Tx EIRP'),
         );
     }
 
