@@ -179,17 +179,28 @@ For Apache (2.4.17 an above) set `Protocols h2 http/1.1` in the Virtualhost conf
 
 A lot of performance can be gained from setting up `php-opcache` correctly. 
 
-### Example CentOS 7 configuration for distributed pollers (PHP 7.2)
+Memory based caching on with PHP cli will increase memory usage and slow things down and file based caching is not as fast as memory based and is more likely to have stale cache issues.
 
-**Note: The file_cache method is not advised for the web servers. If you want to enable opcache on 
-your webservers, delete the lines pertaining to 'file_cache' and do not create the /tmp/cache directory.
-Some OS distributions aslo have separate php configurations for cli and webservers.** 
+Some distributions allow seperate cli, mod_php and php-fpm configurations, we can use this to set the optimal config.
+
+### For web servers using mod_php and php-fpm
+
+Update your web PHP opcache.ini.  Possible locations: `/etc/php/7.2/fpm/conf.d/opcache.ini`, `/etc/php.d/opcache.ini`, or `/etc/php/conf.d/opcache.ini` 
+
+```
+zend_extension=opcache
+opcache.enable=1
+opcache.memory_consumption=256
+```
+
+If you are having caching issues, you can clear the opcache by simply restarting httpd or php-fpm.
+
+### For pollers
 
 Create a cache directory that is writable by the librenms user first:
 `sudo mkdir -p /tmp/cache && sudo chmod 775 /tmp/cache && sudo chown -R librenms /tmp/cache`
 
-In `/etc/php.d/opcache.ini` you can set the following: (Note, your opcache.ini location
-may differ a bit)
+Update your web PHP opcache.ini.  Possible locations: `/etc/php/7.2/cli/conf.d/opcache.ini`, `/etc/php.d/opcache.ini`, or `/etc/php/conf.d/opcache.ini` 
 
 ```
 zend_extension=opcache
@@ -201,10 +212,6 @@ opcache.file_cache_consistency_checks=1
 opcache.memory_consumption=256
 ```
 
-When setting this on the pollers there is no need to restart anything. 
-Just note that by using file-based caching as is the functionality explained here, you might
-in extreme cases face some form of caching issue.
-On pollers, you could reboot your machine, or a little less extreme just `rm -rf /tmp/cache`. Because
-RC poller is python based and calls the `poller.php` this folder should be recreated automatically.
+If you are having caching issues, you can clear the file based opcache with `rm -rf /tmp/cache`. 
 
 
