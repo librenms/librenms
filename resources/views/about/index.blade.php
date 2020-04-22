@@ -156,7 +156,7 @@
                 <td class='text-right'>{{ $stat_events }}</td>
             </tr>
             <tr>
-                <td><i class='fa fa-fw fa-dashboard fa-lg icon-theme' aria-hidden='true'></i> <b>@lang('Sensors')</b></td>
+                <td><i class='fa fa-fw fa-dashboard fa-lg icon-theme' aria-hidden='true'></i> <b>@lang('sensors.title')</b></td>
                 <td class='text-right'>{{ $stat_sensors }}</td>
                 <td><i class='fa fa-fw fa-wifi fa-lg icon-theme' aria-hidden='true'></i> <b>@lang('Wireless Sensors')</b></td>
                 <td class='text-right'>{{ $stat_wireless }}</td>
