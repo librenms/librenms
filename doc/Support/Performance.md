@@ -181,6 +181,10 @@ A lot of performance can be gained from setting up `php-opcache` correctly.
 
 ### Example CentOS 7 configuration for distributed pollers (PHP 7.2)
 
+**Note: The file_cache method is not advised for the web servers. If you want to enable opcache on 
+your webservers, delete the lines pertaining to 'file_cache' and do not create the /tmp/cache directory.
+Some OS distributions aslo have separate php configurations for cli and webservers.** 
+
 Create a cache directory that is writable by the librenms user first:
 `sudo mkdir -p /tmp/cache && sudo chmod 775 /tmp/cache && sudo chown -R librenms /tmp/cache`
 
@@ -199,11 +203,8 @@ opcache.memory_consumption=256
 
 When setting this on the pollers there is no need to restart anything. 
 Just note that by using file-based caching as is the functionality explained here, you might
-in extreme cases face some form of caching issue. Although LibreNMS does not use any
-long-running php services which would make above-mentioned scenario unlikely, it is not impossible.
-On pollers, you could reboot your machine, or a little less extreme just `rm -rf /tmp/cache` and issue
-restart the librenms service. This should again create a new directory into which OPcache will place
-cache files.
+in extreme cases face some form of caching issue.
+On pollers, you could reboot your machine, or a little less extreme just `rm -rf /tmp/cache`. Because
+RC poller is python based and calls the `poller.php` this folder should be recreated automatically.
 
-**Note: The file_cache method is not advised for the web servers. If you want to enable opcache on 
-you webservers, delete the lines pertaining to 'file_cache' and do not create the /tmp/cache directory.
+
