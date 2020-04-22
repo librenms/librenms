@@ -15,7 +15,7 @@
                         <th data-column-id="username">@lang('Username')</th>
                         <th data-column-id="realname">@lang('Real Name')</th>
                         <th data-column-id="level" data-formatter="level" data-type="numeric">@lang('Access')</th>
-                        <th data-column-id="auth_type" data-visible="{{ $multiauth ? 'true' : 'false' }}">@lang('Auth')</th>
+                        <th data-column-id="auth_type" data-visible="{{ $multiauth ? 'true' : 'false' }}">@lang('auth.title')</th>
                         <th data-column-id="email">@lang('Email')</th>
                         @if(\LibreNMS\Authentication\LegacyAuth::getType() == 'mysql')
                         <th data-column-id="enabled" data-formatter="enabled">@lang('Enabled')</th>
