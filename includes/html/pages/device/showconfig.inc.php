@@ -5,7 +5,7 @@ use LibreNMS\Config;
 use Symfony\Component\Process\Process;
 
 if (Auth::user()->hasGlobalAdmin()) {
-    if (isset($rancid_file)) {
+    if (!empty($rancid_file)) {
         echo '<div style="clear: both;">';
 
         print_optionbar_start('', '');
