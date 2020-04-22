@@ -196,12 +196,14 @@ opcache.file_cache_only=0
 opcache.file_cache_consistency_checks=1
 opcache.memory_consumption=256
 ```
-If you have set this on the pollers only, there is no need to restart anything. However, 
-if you have set this on the webserver, you would need to restart apache or php-fpm.
 
+When setting this on the pollers there is no need to restart anything. 
 Just note that by using file-based caching as is the functionality explained here, you might
 in extreme cases face some form of caching issue. Although LibreNMS does not use any
 long-running php services which would make above-mentioned scenario unlikely, it is not impossible.
 On pollers, you could reboot your machine, or a little less extreme just `rm -rf /tmp/cache` and issue
 restart the librenms service. This should again create a new directory into which OPcache will place
 cache files.
+
+**Note: The file_cache method is not advised for the web servers. If you want to enable opcache on 
+you webservers, delete the lines pertaining to 'file_cache' and do not create the /tmp/cache directory.
