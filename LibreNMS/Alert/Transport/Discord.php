@@ -46,9 +46,42 @@ class Discord extends Transport
     {
         $host          = $discord_opts['url'];
         $curl          = curl_init();
+        $discord_title = '#' . $obj['uid'] . ' '  . $obj['title'];
         $discord_msg   = strip_tags($obj['msg']);
+        $color         = self::getColorForState($obj['state']);
         $data          = [
-            'content' => "". $obj['title'] ."\n" . $discord_msg
+            'embeds' => [
+                [
+                    'title' => $discord_title,
+                    'color' => hexdec($color),
+                    'description' => $discord_msg,
+                    'fields' => [
+                        [
+                            'name' => 'Timestamp',
+                            'value' => $obj['timestamp']
+                        ],
+                        [
+                            'name' => 'Severity',
+                            'value' => $obj['severity']
+                        ],
+                        [
+                            'name' => 'Hostname',
+                            'value' => $obj['hostname']
+                        ],
+                        [
+                            'name' => 'Rule Name',
+                            'value' => $obj['name']
+                        ],
+                        [
+                            'name' => 'Rule',
+                            'value' => $obj['rule']
+                        ]
+                    ],
+                    'footer' => [
+                        'text' => 'alert took ' . $obj['elapsed']
+                    ]
+                ]
+            ]
         ];
         if (!empty($discord_opts['options'])) {
             $data = array_merge($data, $discord_opts['options']);
