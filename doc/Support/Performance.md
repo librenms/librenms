@@ -177,7 +177,7 @@ For Apache (2.4.17 an above) set `Protocols h2 http/1.1` in the Virtualhost conf
 
 ## PHP-opcache
 
-A lot of performance can be gained from setting up `php-opcache`correctly. 
+A lot of performance can be gained from setting up `php-opcache` correctly. 
 
 ### Example CentOS 7 configuration for distributed pollers (PHP 7.2)
 
