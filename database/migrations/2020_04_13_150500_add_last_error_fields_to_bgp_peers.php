@@ -31,9 +31,7 @@ class AddLastErrorFieldsToBgpPeers extends Migration
     public function down()
     {
         Schema::table('bgpPeers', function (Blueprint $table) {
-            $table->dropColumn('bgpPeerLastErrorCode');
-            $table->dropColumn('bgpPeerLastErrorSubCode');
-            $table->dropColumn('bgpPeerLastErrorText');
+            $table->dropColumn(['bgpPeerLastErrorCode', 'bgpPeerLastErrorSubCode', 'bgpPeerLastErrorText']);
         });
     }
 }

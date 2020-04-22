@@ -266,7 +266,6 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                                 // if parsing fails, leave the data as-is
                             }
                         }
-                        
                         $peer_data[$target] = $v;
                     }
                 }
