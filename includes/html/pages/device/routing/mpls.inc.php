@@ -329,9 +329,9 @@ sapDown: The SAP associated with the service is down.">Oper State</a></th>
         if ($sdpbind['sdpBindAdminStatus'] == 'up') {
             $adminstate_status_color = 'success';
         }
-        if ($sdpbind['sdpBindAdminStatus'] == 'up' & $sdpbind['sdpBindOperStatus'] == 'up') {
+        if ($sdpbind['sdpBindAdminStatus'] == 'up' && $sdpbind['sdpBindOperStatus'] == 'up') {
             $operstate_status_color = 'success';
-        } elseif ($sdpbind['sdpBindAdminStatus'] == 'up' & $sdpbind['sdpBindOperStatus'] == 'down') {
+        } elseif ($sdpbind['sdpBindAdminStatus'] == 'up' && $sdpbind['sdpBindOperStatus'] == 'down') {
             $operstate_status_color = 'danger';
         }
 
@@ -394,9 +394,9 @@ vprn services are up when the service is administratively up however routing fun
         if ($svc['svcAdminStatus'] == 'up') {
             $adminstate_status_color = 'success';
         }
-        if ($svc['svcAdminStatus'] == 'up' & $svc['svcOperStatus'] == 'up') {
+        if ($svc['svcAdminStatus'] == 'up' && $svc['svcOperStatus'] == 'up') {
             $operstate_status_color = 'success';
-        } elseif ($svc['svcAdminStatus'] == 'up' & $svc['svcOperStatus'] == 'down') {
+        } elseif ($svc['svcAdminStatus'] == 'up' && $svc['svcOperStatus'] == 'down') {
             $operstate_status_color = 'danger';
         }
 
@@ -463,9 +463,9 @@ if ($vars['view'] == 'saps') {
         if ($sap['sapAdminStatus'] == 'up') {
             $adminstate_status_color = 'success';
         }
-        if ($sap['sapAdminStatus'] == 'up' & $sap['sapOperStatus'] == 'up') {
+        if ($sap['sapAdminStatus'] == 'up' && $sap['sapOperStatus'] == 'up') {
             $operstate_status_color = 'success';
-        } elseif ($sap['sapAdminStatus'] == 'up' & $sap['sapOperStatus'] == 'down') {
+        } elseif ($sap['sapAdminStatus'] == 'up' && $sap['sapOperStatus'] == 'down') {
             $operstate_status_color = 'danger';
         }
 
