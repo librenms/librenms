@@ -134,6 +134,24 @@ class Config
     }
 
     /**
+     * Find the default value for a configuration item
+     *
+     * @param string $key period separated config variable name
+     * @param mixed $default optional value to return if the setting is not set
+     * @return mixed
+     */
+    public static function getDefault($key, $default = null)
+    {
+        $definitions = self::getDefinitions();
+
+        if (array_key_exists($key, $definitions) && array_key_exists('default', $definitions[$key])) {
+            return $definitions[$key]['default'];
+        }
+
+        return $default;
+    }
+
+    /**
      * Unset a config setting
      * or multiple
      *
