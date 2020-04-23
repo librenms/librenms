@@ -41,4 +41,3 @@ if ($new_divisor != $prev_divisor) {
 }
 
 unset($pool_size_base_oid, $auth_dhcp_index, $standard_dhcp_index, $pool_size, $prev_divisor, $new_divisor, $descr_tmp, $prev_descr, $new_descr, $update, $updated);
-

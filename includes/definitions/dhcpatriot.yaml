@@ -43,4 +43,3 @@ discovery:
 processor_stacked: true
 bad_if:
     - sit0
-

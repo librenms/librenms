@@ -24,4 +24,4 @@ $hardware = trim(snmp_get($device, ".1.3.6.1.4.1.2021.52.7.4.1.2.5.77.79.68.69.7
 $serial = trim(snmp_get($device, ".1.3.6.1.4.1.2021.52.8.4.1.2.6.83.69.82.73.65.76.1", "-Oqv"), '" ');
 $version = trim(snmp_get($device, ".1.3.6.1.4.1.2021.51.11.4.1.2.7.86.69.82.83.73.79.78.1", "-Oqv"), '" ');
 
-unset($ft_tmp,$ft_epoch,$ft_dt);
+unset($ft_tmp, $ft_epoch, $ft_dt);

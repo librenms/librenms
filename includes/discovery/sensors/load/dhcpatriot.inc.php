@@ -49,7 +49,6 @@ if (is_array($dhcp_networks) && !empty($dhcp_networks)) {
             if (is_array($dhcp_networks[$dhcp_networks_base_oid][$dhcp_type_index]) && !empty($dhcp_networks[$dhcp_networks_base_oid][$dhcp_type_index])) {
                 /* Loop through the DHCP networks and set the network specific discover_sensor variables */
                 foreach ($dhcp_networks[$dhcp_networks_base_oid][$dhcp_type_index] as $index => $entry) {
-
                     if ($dhcp_type_index === intval($auth_dhcp_index)) {
                         $pool_usage = snmp_get($device, $pool_usage_base_oid . '.' . $auth_dhcp_index . '.' . $index, '-Oqv');
                         $pool_size = snmp_get($device, $pool_size_base_oid . '.' . $auth_dhcp_index . '.' . $index, '-Oqv');
