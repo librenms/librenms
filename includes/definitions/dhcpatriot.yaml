@@ -1,0 +1,45 @@
+os: dhcpatriot
+type: server
+group: unix
+text: 'DHCPatriot'
+ifXmcbc: true
+ifname: true
+over:
+    - { graph: device_processor, text: 'Processor Usage' }
+    - { graph: device_ucd_memory, text: 'Memory Usage' }
+    - { graph: device_storage, text: 'Storage Usage' }
+poller_modules:
+    applications: false
+    bgp-peers: false
+    entity-physical: false
+    ipmi: false
+    mpls: false
+    ntp: false
+    ospf: false
+    stp: false
+    ucd-diskio: false
+    wireless: false
+discovery_modules:
+    applications: false
+    bgp-peers: false
+    cisco-vrf-lite: false
+    discovery-protocols: false
+    entity-physical: false
+    fdb-table: false
+    libvirt-vminfo: false
+    mpls: false
+    ntp: false
+    ports-stack: false
+    stp: false
+    ucd-diskio: false
+    vlans: false
+    vmware-vminfo: false
+    wireless: false
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.8072.3.2.10
+    - sysDescr:
+        - 'FNGi'
+processor_stacked: true
+bad_if:
+    - sit0
