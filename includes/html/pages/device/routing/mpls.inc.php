@@ -469,7 +469,6 @@ if ($vars['view'] == 'saps') {
             $operstate_status_color = 'danger';
         }
 
-
         echo "<tr bgcolor=$bg_colour>
             <td>" . $sap['svc_oid'] . '</td>
             <td>' . generate_port_link($port) . '</td>

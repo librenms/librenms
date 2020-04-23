@@ -89,7 +89,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
 
             if (substr($map, -32, 4) == '0101') { // LAG Port
                 if (substr($map, -28, 4) == '1011') { // Pseudowire Port
-                    return "pw-" . bindec(substr($map, -10, 10));
+                    return "pw" . bindec(substr($map, -10, 10));
                 }
                 return "lag-" . bindec(substr($map, -10, 10));
             }
@@ -104,7 +104,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
 
             if (substr($map, -32, 4) == '0101') { // LAG Port
                 if (substr($map, -28, 4) == '1011') { // Pseudowire Port
-                    return "pw-" . bindec(substr($map, -10, 10));
+                    return "pw" . bindec(substr($map, -10, 10));
                 }
                 return "lag-" . bindec(substr($map, -10, 10));
             }
@@ -129,15 +129,13 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
         foreach ($mplsLspCache as $key => $value) {
             list($vrf_oid, $lsp_oid) = explode('.', $key);
 
+            $mplsLspFromAddr = $value['vRtrMplsLspFromAddr'];
             if (isset($value['vRtrMplsLspNgFromAddr'])) {
                 $mplsLspFromAddr = long2ip(hexdec(str_replace(' ', '', $value['vRtrMplsLspNgFromAddr'])));
-            } else {
-                $mplsLspFromAddr = $value['vRtrMplsLspFromAddr'];
             }
+            $mplsLspToAddr = $value['vRtrMplsLspToAddr'];
             if (isset($value['vRtrMplsLspNgToAddr'])) {
                 $mplsLspToAddr = long2ip(hexdec(str_replace(' ', '', $value['vRtrMplsLspNgToAddr'])));
-            } else {
-                $mplsLspToAddr = $value['vRtrMplsLspToAddr'];
             }
 
             $lsps->push(new MplsLsp([
@@ -390,10 +388,9 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
             $bandwidthProtection = ($protection & $bandwidthProtected) ? "true" : "false";
             $nextNodeProtection = ($protection & $nodeProtected) ? "true" : "false";
 
+            $ARHopRouterId = $value['vRtrMplsTunnelARHopRouterId'];
             if (isset($value['vRtrMplsTunnelARHopNgRouterId'])) {
-                $mplsTunnelARHopRouterId = long2ip(hexdec(str_replace(' ', '', $value['vRtrMplsTunnelARHopNgRouterId'])));
-            } else {
-                $mplsTunnelARHopRouterId = $value['vRtrMplsTunnelARHopRouterId'];
+                $ARHopRouterId = long2ip(hexdec(str_replace(' ', '', $value['vRtrMplsTunnelARHopNgRouterId'])));
             }
 
             if (isset($mplsTunnelARHopListIndex, $mplsTunnelARHopIndex, $lsp_path_id)) {
@@ -407,7 +404,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
                     'mplsTunnelARHopIpv6Addr' => $value['mplsTunnelARHopIpv6Addr'],
                     'mplsTunnelARHopAsNumber' => $value['mplsTunnelARHopAsNumber'],
                     'mplsTunnelARHopStrictOrLoose' => $value['mplsTunnelARHopStrictOrLoose'],
-                    'mplsTunnelARHopRouterId' => $mplsTunnelARHopRouterId,
+                    'mplsTunnelARHopRouterId' => $ARHopRouterId,
                     'localProtected' => $localLinkProtection,
                     'linkProtectionInUse' => $linkProtectionInUse,
                     'bandwidthProtected' => $bandwidthProtection,
@@ -465,15 +462,13 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
         foreach ($mplsLspCache as $key => $value) {
             list($vrf_oid, $lsp_oid) = explode('.', $key);
 
+            $mplsLspFromAddr = $value['vRtrMplsLspFromAddr'];
             if (isset($value['vRtrMplsLspNgFromAddr'])) {
                 $mplsLspFromAddr = long2ip(hexdec(str_replace(' ', '', $value['vRtrMplsLspNgFromAddr'])));
-            } else {
-                $mplsLspFromAddr = $value['vRtrMplsLspFromAddr'];
             }
+            $mplsLspToAddr = $value['vRtrMplsLspToAddr'];
             if (isset($value['vRtrMplsLspNgToAddr'])) {
                 $mplsLspToAddr = long2ip(hexdec(str_replace(' ', '', $value['vRtrMplsLspNgToAddr'])));
-            } else {
-                $mplsLspToAddr = $value['vRtrMplsLspToAddr'];
             }
 
             $lsps->push(new MplsLsp([
@@ -738,10 +733,9 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
             $bandwidthProtection = ($protection & $bandwidthProtected) ? "true" : "false";
             $nextNodeProtection = ($protection & $nodeProtected) ? "true" : "false";
 
+            $mplsTunnelARHopRouterId = $value['vRtrMplsTunnelARHopRouterId'];
             if (isset($value['vRtrMplsTunnelARHopNgRouterId'])) {
                 $mplsTunnelARHopRouterId = long2ip(hexdec(str_replace(' ', '', $value['vRtrMplsTunnelARHopNgRouterId'])));
-            } else {
-                $mplsTunnelARHopRouterId = $value['vRtrMplsTunnelARHopRouterId'];
             }
 
             if (isset($mplsTunnelARHopListIndex, $mplsTunnelARHopIndex, $lsp_path_id)) {
