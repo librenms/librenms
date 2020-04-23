@@ -13,6 +13,7 @@ use LibreNMS\Alert\AlertDB;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\LockException;
 use LibreNMS\Util\MemcacheLock;
+use LibreNMS\Validations\Php;
 
 $init_modules = array('alerts');
 require __DIR__ . '/includes/init.php';
@@ -180,13 +181,13 @@ if ($options['f'] === 'handle_notifiable') {
                 $phpver   = '5.6.4';
                 $eol_date = 'January 10th, 2018';
             } elseif ($options['r'] === 'php56') {
-                $phpver   = '7.1.3';
-                $eol_date = 'February 1st, 2019';
+                $phpver   = Php::PHP_MIN_VERSION;
+                $eol_date = Php::PHP_MIN_VERSION_DATE;
             }
             if (isset($phpver)) {
                 new_notification(
                     $error_title,
-                    "PHP version $phpver is the minimum supported version as of $eol_date.  We recommend you update to PHP a supported version of PHP (7.2 suggested) to continue to receive updates.  If you do not update PHP, LibreNMS will continue to function but stop receiving bug fixes and updates.",
+                    "PHP version $phpver is the minimum supported version as of $eol_date.  We recommend you update to PHP a supported version of PHP (" . Php::PHP_RECOMMENDED_VERSION . " suggested) to continue to receive updates.  If you do not update PHP, LibreNMS will continue to function but stop receiving bug fixes and updates.",
                     2,
                     'daily.sh'
                 );

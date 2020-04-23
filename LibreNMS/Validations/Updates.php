@@ -33,6 +33,7 @@ use LibreNMS\Util\Env;
 use LibreNMS\Util\Git;
 use LibreNMS\ValidationResult;
 use LibreNMS\Validator;
+use LibreNMS\Validations\Php;
 
 class Updates extends BaseValidation
 {
@@ -76,12 +77,12 @@ class Updates extends BaseValidation
                 if ($versions['local_branch'] == 'php53') {
                     $validator->warn(
                         "You are on the PHP 5.3 support branch, this will prevent automatic updates.",
-                        "Update to PHP 5.6.4 or newer (PHP 7.2 recommended) to continue to receive updates."
+                        "Update to PHP 5.6.4 or newer (PHP " . Php::PHP_RECOMMENDED_VERSION . " recommended) to continue to receive updates."
                     );
                 } elseif ($versions['local_branch'] == 'php56') {
                     $validator->warn(
                         "You are on the PHP 5.6/7.0 support branch, this will prevent automatic updates.",
-                        "Update to PHP 7.1.3 or newer (PHP 7.2 recommended) to continue to receive updates."
+                        "Update to PHP " . Php::PHP_MIN_VERSION . " or newer (PHP " . Php::PHP_RECOMMENDED_VERSION . " recommended) to continue to receive updates."
                     );
                 } else {
                     $validator->warn(
