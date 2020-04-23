@@ -2,6 +2,7 @@
 <?php
 
 use LibreNMS\Exceptions\InvalidModuleException;
+use LibreNMS\Util\Config;
 use LibreNMS\Util\ModuleTestHelper;
 use LibreNMS\Util\Snmpsim;
 
@@ -23,6 +24,9 @@ $options = getopt(
         'help',
     )
 );
+
+//Load the config early with just the defaults
+Config::load(true);
 
 $init_modules = array('discovery', 'polling');
 require $install_dir . '/includes/init.php';

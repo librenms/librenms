@@ -96,26 +96,6 @@ class ModuleTestHelper
         $influxdb = false;
         Config::set('nographite', true);
 
-        // remove any filtering for consistentency between test environments
-        Config::set('disabled_sensors', Config::getDefault('disabled_sensors', []));
-        Config::set('disabled_sensors_regex', Config::getDefault('disabled_sensors_regex', []));
-
-        Config::set('bad_entity_sensor_regex', Config::getDefault('bad_entity_sensor_regex', []));
-
-        Config::set('bad_if', Config::getDefault('bad_if', []));
-        Config::set('bad_iftype', Config::getDefault('bad_iftype', []));
-        Config::set('bad_if_regexp', Config::getDefault('bad_if_regexp', []));
-
-        Config::set('rewrite_if', Config::getDefault('rewrite_if', []));
-        Config::set('rewrite_if_regexp', Config::getDefault('rewrite_if_regexp', []));
-
-        Config::set('ignore_mount_optical', Config::getDefault('ignore_mount_optical', false));
-        Config::set('ignore_mount_removable', Config::getDefault('ignore_mount_removable', false));
-        Config::set('ignore_mount_network', Config::getDefault('ignore_mount_network', false));
-        Config::set('ignore_mount', Config::getDefault('ignore_mount', []));
-        Config::set('ignore_mount_string', Config::getDefault('ignore_mount_string', []));
-        Config::set('ignore_mount_regexp', Config::getDefault('ignore_mount_regexp', []));
-
         if (is_null(self::$module_tables)) {
             // only load the yaml once, then keep it in memory
             self::$module_tables = Yaml::parse(file_get_contents($install_dir . '/tests/module_tables.yaml'));

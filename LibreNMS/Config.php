@@ -42,7 +42,7 @@ class Config
      *
      * return &array
      */
-    public static function load()
+    public static function load($defaultsOnly = false)
     {
         // don't reload the config if it is already loaded, reload() should be used for that
         if (!is_null(self::$config)) {
@@ -51,8 +51,11 @@ class Config
 
         // merge all config sources together config_definitions.json > db config > config.php
         self::loadDefaults();
-        self::loadDB();
-        self::loadUserConfigFile(self::$config);
+
+        if (!$defaultsOnly) {
+            self::loadDB();
+            self::loadUserConfigFile(self::$config);
+        }
 
         // final cleanups and validations
         self::processConfig();
@@ -112,7 +115,6 @@ class Config
         @include base_path('config.php');
     }
 
-
     /**
      * Get a config value, if non existent null (or default if set) will be returned
      *
@@ -131,24 +133,6 @@ class Config
         }
 
         return Arr::get(self::$config, $key, $default);
-    }
-
-    /**
-     * Find the default value for a configuration item
-     *
-     * @param string $key period separated config variable name
-     * @param mixed $default optional value to return if the setting is not set
-     * @return mixed
-     */
-    public static function getDefault($key, $default = null)
-    {
-        $definitions = self::getDefinitions();
-
-        if (array_key_exists($key, $definitions) && array_key_exists('default', $definitions[$key])) {
-            return $definitions[$key]['default'];
-        }
-
-        return $default;
     }
 
     /**
