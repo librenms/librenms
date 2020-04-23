@@ -179,7 +179,7 @@ For Apache (2.4.17 an above) set `Protocols h2 http/1.1` in the Virtualhost conf
 
 A lot of performance can be gained from setting up `php-opcache` correctly. 
 
-Memory based caching on with PHP cli will increase memory usage and slow things down and file based caching is not as fast as memory based and is more likely to have stale cache issues.
+**Note: Memory based caching with PHP cli will increase memory usage and slow things down. File based caching is not as fast as memory based and is more likely to have stale cache issues.**
 
 Some distributions allow seperate cli, mod_php and php-fpm configurations, we can use this to set the optimal config.
 
@@ -200,10 +200,10 @@ If you are having caching issues, you can clear the opcache by simply restarting
 Create a cache directory that is writable by the librenms user first:
 `sudo mkdir -p /tmp/cache && sudo chmod 775 /tmp/cache && sudo chown -R librenms /tmp/cache`
 
-Update your web PHP opcache.ini.  Possible locations: `/etc/php/7.2/cli/conf.d/opcache.ini`, `/etc/php.d/opcache.ini`, or `/etc/php/conf.d/opcache.ini` 
+Update your PHP opcache.ini.  Possible locations: `/etc/php/7.2/cli/conf.d/opcache.ini`, `/etc/php.d/opcache.ini`, or `/etc/php/conf.d/opcache.ini` 
 
 ```
-zend_extension=opcache
+zend_extension=opcache.so
 opcache.enable=1
 opcache.enable_cli=1
 opcache.file_cache="/tmp/cache/"
