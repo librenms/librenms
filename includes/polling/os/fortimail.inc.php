@@ -2,9 +2,9 @@
 
 use LibreNMS\RRD\RrdDefinition;
 
-$fnSysVersion = snmp_get($device, 'FORTINET-FORTIMAIL-MIB::fmlSysVersion.0', '-Ovq');
+$fmlSysVersion = snmp_get($device, 'FORTINET-FORTIMAIL-MIB::fmlSysVersion.0', '-Ovq');
 $serial       = snmp_get($device, 'ENTITY-MIB::entPhysicalSerialNum.1', '-Ovq');
-$version                 = preg_replace('/(.+),(.+),(.+)/', '\\1||\\2||\\3', $fnSysVersion);
+$version                 = preg_replace('/(.+),(.+),(.+)/', '\\1||\\2||\\3', $fmlSysVersion);
 list($version,$features) = explode('||', $version);
 if (isset($rewrite_fortinet_hardware[$device['sysObjectID']])) {
     $hardware = $rewrite_fortinet_hardware[$device['sysObjectID']];
