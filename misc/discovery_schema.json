@@ -184,7 +184,10 @@
                                                     ]
                                                 }
                                             },
-                                            "state_name": {
+                                            "sensor_name": {
+                                                "type": "string"
+                                            },
+                                            "state_type": {
                                                 "type": "string"
                                             },
                                             "skip_values": {

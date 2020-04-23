@@ -1005,21 +1005,21 @@ function ignore_storage($os, $descr)
 /**
  * @param $valid
  * @param $device
- * @param $sensor_type
+ * @param $sensor_class
  * @param $pre_cache
  */
-function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
+function discovery_process(&$valid, $device, $sensor_class, $pre_cache)
 {
-    if ($device['dynamic_discovery']['modules']['sensors'][$sensor_type] && ! can_skip_sensor($device, $sensor_type, '')) {
+    if ($device['dynamic_discovery']['modules']['sensors'][$sensor_class] && ! can_skip_sensor($device, $sensor_class, '')) {
         $sensor_options = array();
-        if (isset($device['dynamic_discovery']['modules']['sensors'][$sensor_type]['options'])) {
-            $sensor_options = $device['dynamic_discovery']['modules']['sensors'][$sensor_type]['options'];
+        if (isset($device['dynamic_discovery']['modules']['sensors'][$sensor_class]['options'])) {
+            $sensor_options = $device['dynamic_discovery']['modules']['sensors'][$sensor_class]['options'];
         }
 
-        d_echo("Dynamic Discovery ($sensor_type): ");
-        d_echo($device['dynamic_discovery']['modules']['sensors'][$sensor_type]);
+        d_echo("Dynamic Discovery ($sensor_class): ");
+        d_echo($device['dynamic_discovery']['modules']['sensors'][$sensor_class]);
 
-        foreach ($device['dynamic_discovery']['modules']['sensors'][$sensor_type]['data'] as $data) {
+        foreach ($device['dynamic_discovery']['modules']['sensors'][$sensor_class]['data'] as $data) {
             $tmp_name = $data['oid'];
             $raw_data = (array)$pre_cache[$tmp_name];
 
@@ -1036,7 +1036,7 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
 
                 $snmp_value = $snmp_data[$data_name];
                 if (!is_numeric($snmp_value)) {
-                    if ($sensor_type === 'temperature') {
+                    if ($sensor_class === 'temperature') {
                         // For temp sensors, try and detect fahrenheit values
                         if (Str::endsWith($snmp_value, array('f', 'F'))) {
                             $user_function = 'fahrenheit_to_celsius';
@@ -1050,7 +1050,7 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
 
                 if (is_numeric($snmp_value)) {
                     $value = $snmp_value;
-                } elseif ($sensor_type === 'state') {
+                } elseif ($sensor_class === 'state') {
                     // translate string states to values (poller does this as well)
                     $states = array_column($data['states'], 'value', 'descr');
                     $value = isset($states[$snmp_value]) ? $states[$snmp_value] : false;
@@ -1092,11 +1092,11 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                     $entPhysicalIndex = YamlDiscovery::replaceValues('entPhysicalIndex', $index, null, $data, $pre_cache) ?: null;
                     $entPhysicalIndex_measured = isset($data['entPhysicalIndex_measured']) ? $data['entPhysicalIndex_measured'] : null;
 
-                    $sensor_name = $device['os'];
+                    $sensor_type = $data['sensor_type'] ?? $data_name;
 
-                    if ($sensor_type === 'state') {
-                        $sensor_name = $data['state_name'] ?: $data_name;
-                        create_state_index($sensor_name, $data['states']);
+                    if ($sensor_class === 'state') {
+                        $sensor_type = $data['state_name'] ?? $sensor_type;
+                        create_state_index($sensor_type, $data['states']);
                     } else {
                         // We default to 1 for both divisors / multipliers so it should be safe to do the calculation using both.
                         $value = ($value / $divisor) * $multiplier;
@@ -1107,11 +1107,11 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                         $value = $user_function($value);
                     }
 
-                    $uindex = str_replace('{{ $index }}', $index, isset($data['index']) ? $data['index'] : "$data_name.$index");
-                    discover_sensor($valid['sensor'], $sensor_type, $device, $oid, $uindex, $sensor_name, $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $value, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, $user_function, $group);
+                    $uindex = str_replace('{{ $index }}', $index, $data['index'] ?? $index);
+                    discover_sensor($valid['sensor'], $sensor_class, $device, $oid, $uindex, $sensor_type, $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $value, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, $user_function, $group);
 
-                    if ($sensor_type === 'state') {
-                        create_sensor_to_state_index($device, $sensor_name, $uindex);
+                    if ($sensor_class === 'state') {
+                        create_sensor_to_state_index($device, $sensor_type, $uindex);
                     }
                 }
             }
