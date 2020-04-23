@@ -49,26 +49,24 @@ if (is_array($dhcp_networks) && !empty($dhcp_networks)) {
             if (is_array($dhcp_networks[$dhcp_networks_base_oid][$dhcp_type_index]) && !empty($dhcp_networks[$dhcp_networks_base_oid][$dhcp_type_index])) {
                 /* Loop through the DHCP networks and set the network specific discover_sensor variables */
                 foreach ($dhcp_networks[$dhcp_networks_base_oid][$dhcp_type_index] as $index => $entry) {
+                    $oid = ('.' . $pool_usage_base_oid . '.' . $dhcp_type_index . '.' . $index);
+                    $pool_size_oid = ('.' . $pool_size_base_oid . '.' . $dhcp_type_index . '.' . $index);
+                    $pool_data = snmp_get_multi_oid($device, $oid . ' ' . $pool_size_oid);
+
                     if ($dhcp_type_index === intval($auth_dhcp_index)) {
-                        $pool_usage = snmp_get($device, $pool_usage_base_oid . '.' . $auth_dhcp_index . '.' . $index, '-Oqv');
-                        $pool_size = snmp_get($device, $pool_size_base_oid . '.' . $auth_dhcp_index . '.' . $index, '-Oqv');
-                        $oid = '.' . $pool_usage_base_oid . '.' . $auth_dhcp_index . '.' . $index;
                         $type = 'dhcpatriotAuthDHCP';
                         $group = 'Authenticated DHCP';
                     }
 
                     if ($dhcp_type_index === intval($standard_dhcp_index)) {
-                        $pool_usage = snmp_get($device, $pool_usage_base_oid . '.' . $standard_dhcp_index . '.' . $index, '-Oqv');
-                        $pool_size = snmp_get($device, $pool_size_base_oid . '.' . $standard_dhcp_index . '.' . $index, '-Oqv');
-                        $oid = '.' . $pool_usage_base_oid . '.' . $standard_dhcp_index . '.' . $index;
                         $type = 'dhcpatriotStandardDHCP';
                         $group = 'Standard DHCP';
                     }
 
-                    $descr_tmp = explode('[', $entry);
-                    $descr = $descr_tmp[0] . ' (' . $pool_usage . '/' . $pool_size . ')';
-                    $divisor = $pool_size;
-                    $current = (($pool_usage / $pool_size) * 100);
+                    $descr = explode('[', $entry);
+                    $descr = $descr[0] . ' (' . $pool_data[$oid] . '/' . $pool_data[$pool_size_oid] . ')';
+                    $divisor = $pool_data[$pool_size_oid];
+                    $current = (($pool_data[$oid] / $pool_data[$pool_size_oid]) * 100);
 
                     discover_sensor(
                         $valid['sensor'],
@@ -97,4 +95,4 @@ if (is_array($dhcp_networks) && !empty($dhcp_networks)) {
     }
 }
 
-unset($dhcp_networks_base_oid, $pool_usage_base_oid, $pool_size_base_oid, $auth_dhcp_index, $standard_dhcp_index, $auth_dhcp_networks, $standard_dhcp_networks, $dhcp_networks, $class, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $poller_type, $entPhysicalIndex, $entPhysicalIndex_measured, $user_func, $pool_usage, $pool_size, $oid, $type, $group, $descr_tmp, $descr, $divisor, $current);
+unset($dhcp_networks_base_oid, $pool_usage_base_oid, $pool_size_base_oid, $auth_dhcp_index, $standard_dhcp_index, $auth_dhcp_networks, $standard_dhcp_networks, $dhcp_networks, $class, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $poller_type, $entPhysicalIndex, $entPhysicalIndex_measured, $user_func, $oid, $pool_size_oid, $pool_data, $type, $group, $descr, $divisor, $current);
