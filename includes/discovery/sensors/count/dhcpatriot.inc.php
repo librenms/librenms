@@ -57,7 +57,7 @@ foreach ($oids as $index => $entry) {
 
     $current = snmp_get($device, $oid, '-Oqv');
 
-    if ($type === 'dhcpatriotLicenseExpiration' && $current !== 'FULL:0' && gettype($epoch_time) === 'string') {
+    if ($type === 'dhcpatriotLicenseExpiration' && $current !== 'FULL:0' && gettype($current) === 'string') {
         $epoch_time = explode(':', $current);
         $current = round((intval($epoch_time[1]) - $current_time) / (60 * 60 * 24));
     }

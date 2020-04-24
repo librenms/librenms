@@ -20,10 +20,10 @@ $standard_dhcp_index = '2';
 $auth_dhcp_networks = snmpwalk_array_num($device, $dhcp_networks_base_oid . '.' . $auth_dhcp_index, 2);
 $standard_dhcp_networks = snmpwalk_array_num($device, $dhcp_networks_base_oid . '.' . $standard_dhcp_index, 2);
 
-if (!is_array($standard_dhcp_networks) && !empty($auth_dhcp_networks)) {
+if (empty($standard_dhcp_networks) && !empty($auth_dhcp_networks)) {
     $dhcp_networks = $auth_dhcp_networks;
 }
-if (!is_array($auth_dhcp_networks) && !empty($standard_dhcp_networks)) {
+if (empty($auth_dhcp_networks) && !empty($standard_dhcp_networks)) {
     $dhcp_networks = $standard_dhcp_networks;
 }
 if (!empty($auth_dhcp_networks) && !empty($standard_dhcp_networks)) {
