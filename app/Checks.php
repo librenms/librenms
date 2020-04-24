@@ -40,9 +40,9 @@ class Checks
     public static function preAutoload()
     {
         // Check PHP version otherwise it will just say server error
-        if (version_compare('7.1.3', PHP_VERSION, '>=')) {
+        if (version_compare('7.2.5', PHP_VERSION, '>=')) {
             self::printMessage(
-                'PHP version 7.1.3 or newer is required to run LibreNMS',
+                'PHP version 7.2.5 or newer is required to run LibreNMS',
                 null,
                 true
             );
