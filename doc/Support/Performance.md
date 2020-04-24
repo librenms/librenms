@@ -174,3 +174,44 @@ For Nginx (1.9.5 and above) change `listen 443 ssl;` to `listen 443
 ssl http2;` in the Virtualhost config.
 
 For Apache (2.4.17 an above) set `Protocols h2 http/1.1` in the Virtualhost config.
+
+## PHP-opcache
+
+A lot of performance can be gained from setting up `php-opcache` correctly. 
+
+**Note: Memory based caching with PHP cli will increase memory usage and slow things down. File based caching is not as fast as memory based and is more likely to have stale cache issues.**
+
+Some distributions allow seperate cli, mod_php and php-fpm configurations, we can use this to set the optimal config.
+
+### For web servers using mod_php and php-fpm
+
+Update your web PHP opcache.ini.  Possible locations: `/etc/php/7.2/fpm/conf.d/opcache.ini`, `/etc/php.d/opcache.ini`, or `/etc/php/conf.d/opcache.ini` 
+
+```
+zend_extension=opcache
+opcache.enable=1
+opcache.memory_consumption=256
+```
+
+If you are having caching issues, you can clear the opcache by simply restarting httpd or php-fpm.
+
+### For pollers
+
+Create a cache directory that is writable by the librenms user first:
+`sudo mkdir -p /tmp/cache && sudo chmod 775 /tmp/cache && sudo chown -R librenms /tmp/cache`
+
+Update your PHP opcache.ini.  Possible locations: `/etc/php/7.2/cli/conf.d/opcache.ini`, `/etc/php.d/opcache.ini`, or `/etc/php/conf.d/opcache.ini` 
+
+```
+zend_extension=opcache.so
+opcache.enable=1
+opcache.enable_cli=1
+opcache.file_cache="/tmp/cache/"
+opcache.file_cache_only=0
+opcache.file_cache_consistency_checks=1
+opcache.memory_consumption=256
+```
+
+If you are having caching issues, you can clear the file based opcache with `rm -rf /tmp/cache`. 
+
+
