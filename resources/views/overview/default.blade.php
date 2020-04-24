@@ -89,6 +89,7 @@
                             @foreach (array('Private','Shared (Read)','Shared') as $k => $v)
                                 <option value="{{ $k }}" {{ $dashboard->access == $k ? 'selected' : null }}>{{ $v }}</option>
                             @endforeach
+                                <option value="-1">as Default</option>
                             </select>
                             <span class="input-group-btn pull-left">
                                 <button class="btn btn-primary" type="submit">Update</button>
@@ -417,7 +418,7 @@
         for( var field in datas ) {
             data[datas[field].name] = datas[field].value;
         }
-        if (dashboard_id > 0) {
+        if (dashboard_id != 0) {
             $.ajax({
                 type: 'POST',
                 url: 'ajax_form.php',
