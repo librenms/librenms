@@ -733,9 +733,9 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
             $bandwidthProtection = ($protection & $bandwidthProtected) ? "true" : "false";
             $nextNodeProtection = ($protection & $nodeProtected) ? "true" : "false";
 
-            $mplsTunnelARHopRouterId = $value['vRtrMplsTunnelARHopRouterId'];
+            $ARHopRouterId = $value['vRtrMplsTunnelARHopRouterId'];
             if (isset($value['vRtrMplsTunnelARHopNgRouterId'])) {
-                $mplsTunnelARHopRouterId = long2ip(hexdec(str_replace(' ', '', $value['vRtrMplsTunnelARHopNgRouterId'])));
+                $ARHopRouterId = long2ip(hexdec(str_replace(' ', '', $value['vRtrMplsTunnelARHopNgRouterId'])));
             }
 
             if (isset($mplsTunnelARHopListIndex, $mplsTunnelARHopIndex, $lsp_path_id)) {
@@ -749,7 +749,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
                     'mplsTunnelARHopIpv6Addr' => $value['mplsTunnelARHopIpv6Addr'],
                     'mplsTunnelARHopAsNumber' => $value['mplsTunnelARHopAsNumber'],
                     'mplsTunnelARHopStrictOrLoose' => $value['mplsTunnelARHopStrictOrLoose'],
-                    'mplsTunnelARHopRouterId' => $mplsTunnelARHopRouterId,
+                    'mplsTunnelARHopRouterId' => $ARHopRouterId,
                     'localProtected' => $localLinkProtection,
                     'linkProtectionInUse' => $linkProtectionInUse,
                     'bandwidthProtected' => $bandwidthProtection,
