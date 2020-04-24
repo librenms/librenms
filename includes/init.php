@@ -87,7 +87,7 @@ if (module_selected('alerts', $init_modules)) {
 
 //Load the config early with just the defaults to support testing with a known environment
 if ($test_mode) {
-    \LibreNMS\Config::enableTestMode();
+    \LibreNMS\Config::setConfigSourceDefault();
 }
 
 // Boot Laravel

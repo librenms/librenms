@@ -36,7 +36,7 @@ use Log;
 class Config
 {
     private static $config;
-    private static $testMode = false;
+    private static $configSource = 'self::configSourceAll';
 
     /**
      * Load the config, if the database connected, pull in database settings.
@@ -50,13 +50,7 @@ class Config
             return self::$config;
         }
 
-        // merge all config sources together config_definitions.json > db config > config.php
-        self::loadDefaults();
-
-        if (self::$testMode === false) {
-            self::loadDB();
-            self::loadUserConfigFile(self::$config);
-        }
+        call_user_func(self::$configSource);
 
         // final cleanups and validations
         self::processConfig();
@@ -69,11 +63,11 @@ class Config
     }
 
     /**
-     * Sets a flag to prevent the database and user configuration being loaded
+     * Set the config source to only include default settings
      */
-    public static function enableTestMode()
+    public static function setConfigSourceDefault()
     {
-        self::$testMode = true;
+        self::$configSource = 'self::configSourceDefault';
     }
 
     /**
@@ -94,6 +88,24 @@ class Config
     public static function getDefinitions()
     {
         return json_decode(file_get_contents(base_path('misc/config_definitions.json')), true)['config'];
+    }
+
+    /**
+     * Merges configuration from all available sources, config_definitions.json > db config > config.php
+     */
+    private static function configSourceAll()
+    {
+        self::loadDefaults();
+        self::loadDB();
+        self::loadUserConfigFile(self::$config);
+    }
+
+    /**
+     * Completes configuration loading with derived values and legacy $config global
+     */
+    private static function configSourceDefault()
+    {
+        self::loadDefaults();
     }
 
     private static function loadDefaults()
