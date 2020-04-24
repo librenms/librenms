@@ -20,13 +20,13 @@ $standard_dhcp_index = '2';
 $auth_dhcp_networks = snmpwalk_array_num($device, $dhcp_networks_base_oid . '.' . $auth_dhcp_index, 2);
 $standard_dhcp_networks = snmpwalk_array_num($device, $dhcp_networks_base_oid . '.' . $standard_dhcp_index, 2);
 
-if (!is_array($standard_dhcp_networks) && is_array($auth_dhcp_networks) && !empty($auth_dhcp_networks)) {
+if (!is_array($standard_dhcp_networks) && !empty($auth_dhcp_networks)) {
     $dhcp_networks = $auth_dhcp_networks;
 }
-if (!is_array($auth_dhcp_networks) && is_array($standard_dhcp_networks) && !empty($standard_dhcp_networks)) {
+if (!is_array($auth_dhcp_networks) && !empty($standard_dhcp_networks)) {
     $dhcp_networks = $standard_dhcp_networks;
 }
-if (is_array($auth_dhcp_networks) && !empty($auth_dhcp_networks) && is_array($standard_dhcp_networks) && !empty($standard_dhcp_networks)) {
+if (!empty($auth_dhcp_networks) && !empty($standard_dhcp_networks)) {
     $dhcp_networks = array_merge_recursive($auth_dhcp_networks, $standard_dhcp_networks);
 }
 
@@ -42,54 +42,52 @@ $entPhysicalIndex = null;
 $entPhysicalIndex_measured = null;
 $user_func = null;
 
-if (is_array($dhcp_networks) && !empty($dhcp_networks)) {
-    if (is_array($dhcp_networks[$dhcp_networks_base_oid]) && !empty($dhcp_networks[$dhcp_networks_base_oid])) {
-        /* Loop through the DHCP type tier of the array grabbing the dhcp_type_index for later use */
-        foreach ($dhcp_networks[$dhcp_networks_base_oid] as $dhcp_type_index => $ignore_this) {
-            if (is_array($dhcp_networks[$dhcp_networks_base_oid][$dhcp_type_index]) && !empty($dhcp_networks[$dhcp_networks_base_oid][$dhcp_type_index])) {
-                /* Loop through the DHCP networks and set the network specific discover_sensor variables */
-                foreach ($dhcp_networks[$dhcp_networks_base_oid][$dhcp_type_index] as $index => $entry) {
-                    $oid = ('.' . $pool_usage_base_oid . '.' . $dhcp_type_index . '.' . $index);
-                    $pool_size_oid = ('.' . $pool_size_base_oid . '.' . $dhcp_type_index . '.' . $index);
-                    $pool_data = snmp_get_multi_oid($device, $oid . ' ' . $pool_size_oid);
+if (!empty($dhcp_networks[$dhcp_networks_base_oid])) {
+    /* Loop through the DHCP type tier of the array grabbing the dhcp_type_index for later use */
+    foreach ($dhcp_networks[$dhcp_networks_base_oid] as $dhcp_type_index => $ignore_this) {
+        if (!empty($dhcp_networks[$dhcp_networks_base_oid][$dhcp_type_index])) {
+            /* Loop through the DHCP networks and set the network specific discover_sensor variables */
+            foreach ($dhcp_networks[$dhcp_networks_base_oid][$dhcp_type_index] as $index => $entry) {
+                $oid = ('.' . $pool_usage_base_oid . '.' . $dhcp_type_index . '.' . $index);
+                $pool_size_oid = ('.' . $pool_size_base_oid . '.' . $dhcp_type_index . '.' . $index);
+                $pool_data = snmp_get_multi_oid($device, $oid . ' ' . $pool_size_oid);
 
-                    if ($dhcp_type_index === intval($auth_dhcp_index)) {
-                        $type = 'dhcpatriotAuthDHCP';
-                        $group = 'Authenticated DHCP';
-                    }
-
-                    if ($dhcp_type_index === intval($standard_dhcp_index)) {
-                        $type = 'dhcpatriotStandardDHCP';
-                        $group = 'Standard DHCP';
-                    }
-
-                    $descr = explode('[', $entry);
-                    $descr = $descr[0] . ' (' . $pool_data[$oid] . '/' . $pool_data[$pool_size_oid] . ')';
-                    $divisor = $pool_data[$pool_size_oid];
-                    $current = (($pool_data[$oid] / $pool_data[$pool_size_oid]) * 100);
-
-                    discover_sensor(
-                        $valid['sensor'],
-                        $class,
-                        $device,
-                        $oid,
-                        $index,
-                        $type,
-                        $descr,
-                        $divisor,
-                        $multiplier,
-                        $low_limit,
-                        $low_warn_limit,
-                        $warn_limit,
-                        $high_limit,
-                        $current,
-                        $poller_type,
-                        $entPhysicalIndex,
-                        $entPhysicalIndex_measured,
-                        $user_func,
-                        $group
-                    );
+                if ($dhcp_type_index === intval($auth_dhcp_index)) {
+                    $type = 'dhcpatriotAuthDHCP';
+                    $group = 'Authenticated DHCP';
                 }
+
+                if ($dhcp_type_index === intval($standard_dhcp_index)) {
+                    $type = 'dhcpatriotStandardDHCP';
+                    $group = 'Standard DHCP';
+                }
+
+                $descr = explode('[', $entry);
+                $descr = $descr[0] . ' (' . $pool_data[$oid] . '/' . $pool_data[$pool_size_oid] . ')';
+                $divisor = $pool_data[$pool_size_oid];
+                $current = (($pool_data[$oid] / $pool_data[$pool_size_oid]) * 100);
+
+                discover_sensor(
+                    $valid['sensor'],
+                    $class,
+                    $device,
+                    $oid,
+                    $index,
+                    $type,
+                    $descr,
+                    $divisor,
+                    $multiplier,
+                    $low_limit,
+                    $low_warn_limit,
+                    $warn_limit,
+                    $high_limit,
+                    $current,
+                    $poller_type,
+                    $entPhysicalIndex,
+                    $entPhysicalIndex_measured,
+                    $user_func,
+                    $group
+                );
             }
         }
     }

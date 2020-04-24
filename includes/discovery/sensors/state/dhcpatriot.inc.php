@@ -81,13 +81,13 @@ $group = null;
 $current_time = time();
 
 foreach ($oids as $index => $entry) {
-    $oid = $oids[$index]['oid'];
-    $type = $oids[$index]['type'];
-    $descr = $oids[$index]['descr'];
+    $oid = $entry['oid'];
+    $type = $entry['type'];
+    $descr = $entry['descr'];
 
     $tmp_snmp_data = snmp_get($device, $oid, '-Oqv');
 
-    if ($type === 'dhcpatriotServiceStatus') {
+    if ($type === 'dhcpatriotServiceStatus' && gettype($tmp_snmp_data) === 'string') {
         $tmp_snmp_data = explode(':', $tmp_snmp_data);
         $current = intval($tmp_snmp_data[1]);
 
