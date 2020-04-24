@@ -9,59 +9,59 @@
 
 $oids = array(
     1 => array(
-        "type"  => "dhcpatriotServiceStatus",
-        "descr" => "System Software Health",
-        "oid"   => ".1.3.6.1.4.1.2021.51.9.4.1.2.6.72.69.65.76.84.72.1"
+        'type'  => 'dhcpatriotServiceStatus',
+        'descr' => 'System Software Health',
+        'oid'   => '.1.3.6.1.4.1.2021.51.9.4.1.2.6.72.69.65.76.84.72.1'
     ),
     2 => array(
-        "type"  => "dhcpatriotServiceStatus",
-        "descr" => "DHCPv4",
-        "oid"   => ".1.3.6.1.4.1.2021.52.6.4.1.2.4.68.72.67.80.1"
+        'type'  => 'dhcpatriotServiceStatus',
+        'descr' => 'DHCPv4',
+        'oid'   => '.1.3.6.1.4.1.2021.52.6.4.1.2.4.68.72.67.80.1'
     ),
     3 => array(
-        "type"  => "dhcpatriotServiceStatus",
-        "descr" => "DHCPv6",
-        "oid"   => ".1.3.6.1.4.1.2021.52.9.4.1.2.5.68.72.67.80.54.1"
+        'type'  => 'dhcpatriotServiceStatus',
+        'descr' => 'DHCPv6',
+        'oid'   => '.1.3.6.1.4.1.2021.52.9.4.1.2.5.68.72.67.80.54.1'
     ),
     4 => array(
-        "type"  => "dhcpatriotServiceStatus",
-        "descr" => "DNS",
-        "oid"   => ".1.3.6.1.4.1.2021.52.1.4.1.2.3.68.78.83.1"
+        'type'  => 'dhcpatriotServiceStatus',
+        'descr' => 'DNS',
+        'oid'   => '.1.3.6.1.4.1.2021.52.1.4.1.2.3.68.78.83.1'
     ),
     5 => array(
-        "type"  => "dhcpatriotServiceStatus",
-        "descr" => "HTTP",
-        "oid"   => ".1.3.6.1.4.1.2021.52.2.4.1.2.4.72.84.84.80.1"
+        'type'  => 'dhcpatriotServiceStatus',
+        'descr' => 'HTTP',
+        'oid'   => '.1.3.6.1.4.1.2021.52.2.4.1.2.4.72.84.84.80.1'
     ),
     6 => array(
-        "type"  => "dhcpatriotServiceStatus",
-        "descr" => "HTTPS",
-        "oid"   => ".1.3.6.1.4.1.2021.52.3.4.1.2.5.72.84.84.80.83.1"
+        'type'  => 'dhcpatriotServiceStatus',
+        'descr' => 'HTTPS',
+        'oid'   => '.1.3.6.1.4.1.2021.52.3.4.1.2.5.72.84.84.80.83.1'
     ),
     7 => array(
-        "type"  => "dhcpatriotServiceStatus",
-        "descr" => "NTP",
-        "oid"   => ".1.3.6.1.4.1.2021.52.4.4.1.2.3.78.84.80.1"
+        'type'  => 'dhcpatriotServiceStatus',
+        'descr' => 'NTP',
+        'oid'   => '.1.3.6.1.4.1.2021.52.4.4.1.2.3.78.84.80.1'
     ),
     8 => array(
-        "type"  => "dhcpatriotServiceStatus",
-        "descr" => "SSH",
-        "oid"   => ".1.3.6.1.4.1.2021.52.5.4.1.2.3.83.83.72.1"
+        'type'  => 'dhcpatriotServiceStatus',
+        'descr' => 'SSH',
+        'oid'   => '.1.3.6.1.4.1.2021.52.5.4.1.2.3.83.83.72.1'
     ),
     9 => array(
-        "type"  => "dhcpatriotServiceStatus",
-        "descr" => "Database Status",
-        "oid"   => ".1.3.6.1.4.1.2021.51.2.4.1.2.5.77.89.83.81.76.1"
+        'type'  => 'dhcpatriotServiceStatus',
+        'descr' => 'Database Status',
+        'oid'   => '.1.3.6.1.4.1.2021.51.2.4.1.2.5.77.89.83.81.76.1'
     ),
     10 => array(
-        "type"  => "dhcpatriotServiceStatus",
-        "descr" => "Database Sync Status",
-        "oid"   => ".1.3.6.1.4.1.2021.51.3.4.1.2.16.77.89.83.81.76.82.69.80.76.73.67.65.84.73.79.78.1"
+        'type'  => 'dhcpatriotServiceStatus',
+        'descr' => 'Database Sync Status',
+        'oid'   => '.1.3.6.1.4.1.2021.51.3.4.1.2.16.77.89.83.81.76.82.69.80.76.73.67.65.84.73.79.78.1'
     ),
     11 => array(
-        "type"  => "dhcpatriotSystemTime",
-        "descr" => "System Time",
-        "oid"   => ".1.3.6.1.4.1.2021.51.13.4.1.2.4.84.73.77.69.1"
+        'type'  => 'dhcpatriotSystemTime',
+        'descr' => 'System Time',
+        'oid'   => '.1.3.6.1.4.1.2021.51.13.4.1.2.4.84.73.77.69.1'
     )
 );
 

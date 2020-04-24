@@ -9,29 +9,29 @@
 
 $oids = array(
     1 => array(
-        "type"  => "dhcpatriotDatabaseThreads",
-        "descr" => "Database Threads",
-        "oid"   => ".1.3.6.1.4.1.2021.50.45"
+        'type'  => 'dhcpatriotDatabaseThreads',
+        'descr' => 'Database Threads',
+        'oid'   => '.1.3.6.1.4.1.2021.50.45'
     ),
     2 => array(
-        "type"  => "dhcpatriotDatabaseQueriesPerSecond",
-        "descr" => "Database Queries Per Second",
-        "oid"   => ".1.3.6.1.4.1.2021.50.46"
+        'type'  => 'dhcpatriotDatabaseQueriesPerSecond',
+        'descr' => 'Database Queries Per Second',
+        'oid'   => '.1.3.6.1.4.1.2021.50.46'
     ),
     3 => array(
-        "type"  => "dhcpatriotDHCPv4LeasesPerSecond",
-        "descr" => "DHCPv4 Leases Per Second",
-        "oid"   => ".1.3.6.1.4.1.2021.50.70"
+        'type'  => 'dhcpatriotDHCPv4LeasesPerSecond',
+        'descr' => 'DHCPv4 Leases Per Second',
+        'oid'   => '.1.3.6.1.4.1.2021.50.70'
     ),
     4 => array(
-        "type"  => "dhcpatriotDHCPv6LeasesPerSecond",
-        "descr" => "DHCPv6 Leases Per Second",
-        "oid"   => ".1.3.6.1.5.1.2021.50.140"
+        'type'  => 'dhcpatriotDHCPv6LeasesPerSecond',
+        'descr' => 'DHCPv6 Leases Per Second',
+        'oid'   => '.1.3.6.1.5.1.2021.50.140'
     ),
     5 => array(
-        "type"  => "dhcpatriotLicenseExpiration",
-        "descr" => "License Expiration Days Remaining",
-        "oid"   => ".1.3.6.1.4.1.2021.51.12.4.1.2.7.76.73.67.69.78.83.69.1"
+        'type'  => 'dhcpatriotLicenseExpiration',
+        'descr' => 'License Expiration Days Remaining',
+        'oid'   => '.1.3.6.1.4.1.2021.51.12.4.1.2.7.76.73.67.69.78.83.69.1'
     )
 );
 
