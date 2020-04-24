@@ -1519,9 +1519,9 @@
                     "context_name": "",
                     "bgpLocalAs": 65351,
                     "vrfLocalAs": null,
-                    "bgpPeerLastErrorCode": null,
-                    "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorCode": 6,
+                    "bgpPeerLastErrorSubCode": 2,
+                    "bgpPeerLastErrorText": "administrative shutdown"
                 },
                 {
                     "astext": "",
