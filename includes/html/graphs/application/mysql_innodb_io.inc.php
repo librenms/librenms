@@ -23,8 +23,8 @@ require 'includes/html/graphs/common.inc.php';
 
 $scale_min = 0;
 $colours = 'mixed';
-$unit_text = 'Stats';
-$unitlen = 6;
+$unit_text = 'InnoDB IO';
+$unitlen = 9;
 $bigdescrlen = 25;
 $smalldescrlen = 25;
 $dostack = 0;
@@ -34,11 +34,10 @@ $transparency = 33;
 $rrd_filename = rrd_name($device['hostname'], ['app', $app['app_type'], $app['app_id']]);
 
 $array = [
-    'select_full_join' => ['descr' => 'Full Join', 'colour' => 'ff0000',],
-    'select_full_range_join' => ['descr' => 'Full Range', 'colour' => '800000',],
-    'select_range' => ['descr' => 'Range', 'colour' => 'fa8072',],
-    'select_range_check' => ['descr' => 'Range Scan', 'colour' => 'ffa500',],
-    'select_scan' => ['descr' => 'Scan', 'colour' => 'ff6666',],
+    'ib_io_read' => ['descr' => 'File reads', 'colour' => '5ac18e',],
+    'ib_io_write' => ['descr' => 'File write', 'colour' => 'fa8072',],
+    'ib_io_fsync' => ['descr' => 'File syncs', 'colour' => '4ca3dd',],
+    'ib_io_log' => ['descr' => 'Log write', 'colour' => '420420',],
 ];
 
 $i = 0;

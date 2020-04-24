@@ -21,30 +21,32 @@
 
 require 'includes/html/graphs/common.inc.php';
 
-$scale_min=0;
-$colours='mixed';
-$unit_text='Size';
-$unitlen=4;
-$bigdescrlen=25;
-$smalldescrlen=25;
-$dostack=0;
-$printtotal=0;
-$addarea=1;
-$transparency=33;
-$rrd_filename=rrd_name($device['hostname'],array('app',$app['app_type'],$app['app_id']));
+$scale_min = 0;
+$colours = 'mixed';
+$unit_text = 'Size';
+$unitlen = 4;
+$bigdescrlen = 25;
+$smalldescrlen = 25;
+$dostack = 0;
+$printtotal = 0;
+$addarea = 1;
+$transparency = 33;
+$rrd_filename = rrd_name($device['hostname'], ['app', $app['app_type'], $app['app_id']]);
 
-$array=array(
-    'innodb_log_buffer_size'=>array('descr'=>'Buffer size','colour'=>'5ac18e',),
-);
+$array = [
+    'innodb_log_buffer_size' => ['descr' => 'Buffer size', 'colour' => '5ac18e',],
+    'ib_log_flush' => ['descr' => 'Log flush', 'colour' => 'fa8072',],
+    'ib_log_written' => ['descr' => 'Log written', 'colour' => '4ca3dd',],
+];
 
-$i=0;
+$i = 0;
 
 if (rrdtool_check_rrd_exists($rrd_filename)) {
-    foreach ($array as $ds=>$var) {
-        $rrd_list[$i]['filename']=$rrd_filename;
-        $rrd_list[$i]['descr']=$var['descr'];
-        $rrd_list[$i]['ds']=$ds;
-        $rrd_list[$i]['colour']=$var['colour'];
+    foreach ($array as $ds => $var) {
+        $rrd_list[$i]['filename'] = $rrd_filename;
+        $rrd_list[$i]['descr'] = $var['descr'];
+        $rrd_list[$i]['ds'] = $ds;
+        $rrd_list[$i]['colour'] = $var['colour'];
         $i++;
     }
 } else {

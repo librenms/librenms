@@ -21,34 +21,34 @@
 
 require 'includes/html/graphs/common.inc.php';
 
-$scale_min=0;
-$colours='mixed';
-$unit_text='Stats';
-$unitlen=5;
-$bigdescrlen=25;
-$smalldescrlen=25;
-$dostack=0;
-$printtotal=0;
-$addarea=1;
-$transparency=33;
-$rrd_filename=rrd_name($device['hostname'],array('app',$app['app_type'],$app['app_id']));
+$scale_min = 0;
+$colours = 'mixed';
+$unit_text = 'Stats';
+$unitlen = 5;
+$bigdescrlen = 25;
+$smalldescrlen = 25;
+$dostack = 0;
+$printtotal = 0;
+$addarea = 1;
+$transparency = 33;
+$rrd_filename = rrd_name($device['hostname'], ['app', $app['app_type'], $app['app_id']]);
 
-$array=array(
-    'qcache_queries_in_cache'=>array('descr'=>'Queries in cache','colour'=>'ffa500',),
-    'qcache_hits'=>array('descr'=>'Cache hits','colour'=>'5ac18e',),
-    'qcache_inserts'=>array('descr'=>'Inserts','colour'=>'4ca3dd',),
-    'qcache_not_cached'=>array('descr'=>'Not cached','colour'=>'800000',),
-    'qcache_lowmem_prunes'=>array('descr'=>'Low-mem prunes','colour'=>'ff0000',),
-);
+$array = [
+    'qcache_queries_in_cache' => ['descr' => 'Queries in cache', 'colour' => 'ffa500',],
+    'qcache_hits' => ['descr' => 'Cache hits', 'colour' => '5ac18e',],
+    'qcache_inserts' => ['descr' => 'Inserts', 'colour' => '4ca3dd',],
+    'qcache_not_cached' => ['descr' => 'Not cached', 'colour' => '800000',],
+    'qcache_lowmem_prunes' => ['descr' => 'Low-mem prunes', 'colour' => 'ff0000',],
+];
 
-$i=0;
+$i = 0;
 
 if (rrdtool_check_rrd_exists($rrd_filename)) {
-    foreach ($array as $ds=>$var) {
-        $rrd_list[$i]['filename']=$rrd_filename;
-        $rrd_list[$i]['descr']=$var['descr'];
-        $rrd_list[$i]['ds']=$ds;
-        $rrd_list[$i]['colour']=$var['colour'];
+    foreach ($array as $ds => $var) {
+        $rrd_list[$i]['filename'] = $rrd_filename;
+        $rrd_list[$i]['descr'] = $var['descr'];
+        $rrd_list[$i]['ds'] = $ds;
+        $rrd_list[$i]['colour'] = $var['colour'];
         $i++;
     }
 } else {

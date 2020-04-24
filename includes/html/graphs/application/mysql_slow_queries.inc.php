@@ -21,30 +21,30 @@
 
 require 'includes/html/graphs/common.inc.php';
 
-$scale_min=0;
-$colours='mixed';
-$unit_text='Queries';
-$unitlen=8;
-$bigdescrlen=25;
-$smalldescrlen=25;
-$dostack=0;
-$printtotal=0;
-$addarea=1;
-$transparency=33;
-$rrd_filename=rrd_name($device['hostname'],array('app',$app['app_type'],$app['app_id']));
+$scale_min = 0;
+$colours = 'mixed';
+$unit_text = 'Queries';
+$unitlen = 8;
+$bigdescrlen = 25;
+$smalldescrlen = 25;
+$dostack = 0;
+$printtotal = 0;
+$addarea = 1;
+$transparency = 33;
+$rrd_filename = rrd_name($device['hostname'], ['app', $app['app_type'], $app['app_id']]);
 
-$array=array(
-    'slow_queries'=>array('descr'=>'Queries','colour'=>'ff0000',),
-);
+$array = [
+    'slow_queries' => ['descr' => 'Queries', 'colour' => 'ff0000',],
+];
 
-$i=0;
+$i = 0;
 
 if (rrdtool_check_rrd_exists($rrd_filename)) {
-    foreach ($array as $ds=>$var) {
-        $rrd_list[$i]['filename']=$rrd_filename;
-        $rrd_list[$i]['descr']=$var['descr'];
-        $rrd_list[$i]['ds']=$ds;
-        $rrd_list[$i]['colour']=$var['colour'];
+    foreach ($array as $ds => $var) {
+        $rrd_list[$i]['filename'] = $rrd_filename;
+        $rrd_list[$i]['descr'] = $var['descr'];
+        $rrd_list[$i]['ds'] = $ds;
+        $rrd_list[$i]['colour'] = $var['colour'];
         $i++;
     }
 } else {

@@ -21,32 +21,32 @@
 
 require 'includes/html/graphs/common.inc.php';
 
-$scale_min=0;
-$colours='mixed';
-$unit_text='Temporaries';
-$unitlen=11;
-$bigdescrlen=25;
-$smalldescrlen=25;
-$dostack=0;
-$printtotal=0;
-$addarea=1;
-$transparency=33;
-$rrd_filename=rrd_name($device['hostname'],array('app',$app['app_type'],$app['app_id']));
+$scale_min = 0;
+$colours = 'mixed';
+$unit_text = 'Temp Objects';
+$unitlen = 12;
+$bigdescrlen = 25;
+$smalldescrlen = 25;
+$dostack = 0;
+$printtotal = 0;
+$addarea = 1;
+$transparency = 33;
+$rrd_filename = rrd_name($device['hostname'], ['app', $app['app_type'], $app['app_id']]);
 
-$array=array(
-    'created_tmp_disk_tables'=>array('descr'=>'Disk tables','colour'=>'800000',),
-    'created_tmp_tables'=>array('descr'=>'Tables','colour'=>'ffa500',),
-    'created_tmp_files'=>array('descr'=>'Files','colour'=>'5ac18e',),
-);
+$array = [
+    'created_tmp_disk_tables' => ['descr' => 'Disk tables', 'colour' => '800000',],
+    'created_tmp_tables' => ['descr' => 'Tables', 'colour' => 'ffa500',],
+    'created_tmp_files' => ['descr' => 'Files', 'colour' => '5ac18e',],
+];
 
-$i=0;
+$i = 0;
 
 if (rrdtool_check_rrd_exists($rrd_filename)) {
-    foreach ($array as $ds=>$var) {
-        $rrd_list[$i]['filename']=$rrd_filename;
-        $rrd_list[$i]['descr']=$var['descr'];
-        $rrd_list[$i]['ds']=$ds;
-        $rrd_list[$i]['colour']=$var['colour'];
+    foreach ($array as $ds => $var) {
+        $rrd_list[$i]['filename'] = $rrd_filename;
+        $rrd_list[$i]['descr'] = $var['descr'];
+        $rrd_list[$i]['ds'] = $ds;
+        $rrd_list[$i]['colour'] = $var['colour'];
         $i++;
     }
 } else {

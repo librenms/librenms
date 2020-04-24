@@ -21,35 +21,35 @@
 
 require 'includes/html/graphs/common.inc.php';
 
-$scale_min=0;
-$colours='mixed';
-$unit_text='Stats';
-$unitlen=6;
-$bigdescrlen=25;
-$smalldescrlen=25;
-$dostack=0;
-$printtotal=0;
-$addarea=1;
-$transparency=33;
-$rrd_filename=rrd_name($device['hostname'],array('app',$app['app_type'],$app['app_id']));
+$scale_min = 0;
+$colours = 'mixed';
+$unit_text = 'Stats';
+$unitlen = 6;
+$bigdescrlen = 25;
+$smalldescrlen = 25;
+$dostack = 0;
+$printtotal = 0;
+$addarea = 1;
+$transparency = 33;
+$rrd_filename = rrd_name($device['hostname'], ['app', $app['app_type'], $app['app_id']]);
 
-$array=array(
-    'connections'=>array('descr'=>'New','colour'=>'5ac18e',),
-    'max_connections'=>array('descr'=>'Max','colour'=>'4ca3dd',),
-    'max_used_connections'=>array('descr'=>'Max Used','colour'=>'065535',),
-    'threads_connected'=>array('descr'=>'Threads Connected','colour'=>'a0db8e',),
-    'aborted_clients'=>array('descr'=>'Aborted Clients','colour'=>'ff0000',),
-    'aborted_connects'=>array('descr'=>'Aborted Connects','colour'=>'800000',),
-);
+$array = [
+    'connections' => ['descr' => 'New', 'colour' => '5ac18e',],
+    'max_connections' => ['descr' => 'Max', 'colour' => '4ca3dd',],
+    'max_used_connections' => ['descr' => 'Max Used', 'colour' => '065535',],
+    'threads_connected' => ['descr' => 'Threads Connected', 'colour' => 'a0db8e',],
+    'aborted_clients' => ['descr' => 'Aborted Clients', 'colour' => 'ff0000',],
+    'aborted_connects' => ['descr' => 'Aborted Connects', 'colour' => '800000',],
+];
 
-$i=0;
+$i = 0;
 
 if (rrdtool_check_rrd_exists($rrd_filename)) {
-    foreach ($array as $ds=>$var) {
-        $rrd_list[$i]['filename']=$rrd_filename;
-        $rrd_list[$i]['descr']=$var['descr'];
-        $rrd_list[$i]['ds']=$ds;
-        $rrd_list[$i]['colour']=$var['colour'];
+    foreach ($array as $ds => $var) {
+        $rrd_list[$i]['filename'] = $rrd_filename;
+        $rrd_list[$i]['descr'] = $var['descr'];
+        $rrd_list[$i]['ds'] = $ds;
+        $rrd_list[$i]['colour'] = $var['colour'];
         $i++;
     }
 } else {

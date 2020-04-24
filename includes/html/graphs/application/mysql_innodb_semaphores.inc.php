@@ -21,33 +21,32 @@
 
 require 'includes/html/graphs/common.inc.php';
 
-$scale_min=0;
-$colours='mixed';
-$unit_text='Key operation';
-$unitlen=13;
-$bigdescrlen=25;
-$smalldescrlen=25;
-$dostack=0;
-$printtotal=0;
-$addarea=1;
-$transparency=33;
-$rrd_filename=rrd_name($device['hostname'],array('app',$app['app_type'],$app['app_id']));
+$scale_min = 0;
+$colours = 'mixed';
+$unit_text = 'InnoDB Semaphores';
+$unitlen = 17;
+$bigdescrlen = 25;
+$smalldescrlen = 25;
+$dostack = 0;
+$printtotal = 0;
+$addarea = 1;
+$transparency = 33;
+$rrd_filename = rrd_name($device['hostname'], ['app', $app['app_type'], $app['app_id']]);
 
-$array=array(
-    'key_read_requests'=>array('descr'=>'Read request','colour'=>'065535',),
-    'key_reads'=>array('descr'=>'Read','colour'=>'5ac18e',),
-    'key_write_requests'=>array('descr'=>'Write request','colour'=>'fa8072',),
-    'key_writes'=>array('descr'=>'Write','colour'=>'800000',),
-);
+$array = [
+    'ib_spin_rounds' => ['descr' => 'Spin rounds', 'colour' => '4ca3dd',],
+    'ib_spin_waits' => ['descr' => 'Spin waits', 'colour' => '5ac18e',],
+    'ib_os_waits' => ['descr' => 'OS waits', 'colour' => '5ac18e',],
+];
 
-$i=0;
+$i = 0;
 
 if (rrdtool_check_rrd_exists($rrd_filename)) {
-    foreach ($array as $ds=>$var) {
-        $rrd_list[$i]['filename']=$rrd_filename;
-        $rrd_list[$i]['descr']=$var['descr'];
-        $rrd_list[$i]['ds']=$ds;
-        $rrd_list[$i]['colour']=$var['colour'];
+    foreach ($array as $ds => $var) {
+        $rrd_list[$i]['filename'] = $rrd_filename;
+        $rrd_list[$i]['descr'] = $var['descr'];
+        $rrd_list[$i]['ds'] = $ds;
+        $rrd_list[$i]['colour'] = $var['colour'];
         $i++;
     }
 } else {

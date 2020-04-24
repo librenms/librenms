@@ -21,33 +21,33 @@
 
 require 'includes/html/graphs/common.inc.php';
 
-$scale_min=0;
-$colours='mixed';
-$unit_text='Row operation';
-$unitlen=13;
-$bigdescrlen=25;
-$smalldescrlen=25;
-$dostack=0;
-$printtotal=0;
-$addarea=1;
-$transparency=33;
-$rrd_filename=rrd_name($device['hostname'],array('app',$app['app_type'],$app['app_id']));
+$scale_min = 0;
+$colours = 'mixed';
+$unit_text = 'Row operation';
+$unitlen = 13;
+$bigdescrlen = 25;
+$smalldescrlen = 25;
+$dostack = 0;
+$printtotal = 0;
+$addarea = 1;
+$transparency = 33;
+$rrd_filename = rrd_name($device['hostname'], ['app', $app['app_type'], $app['app_id']]);
 
-$array=array(
-    'innodb_rows_deleted'=>array('descr'=>'Delete','colour'=>'990000',),
-    'innodb_rows_inserted'=>array('descr'=>'Insert','colour'=>'5ac18e',),
-    'innodb_rows_read'=>array('descr'=>'Read','colour'=>'4ca3dd',),
-    'innodb_rows_updated'=>array('descr'=>'Update','colour'=>'ffa500',),
-);
+$array = [
+    'innodb_rows_deleted' => ['descr' => 'Delete', 'colour' => '990000',],
+    'innodb_rows_inserted' => ['descr' => 'Insert', 'colour' => '5ac18e',],
+    'innodb_rows_read' => ['descr' => 'Read', 'colour' => '4ca3dd',],
+    'innodb_rows_updated' => ['descr' => 'Update', 'colour' => 'ffa500',],
+];
 
-$i=0;
+$i = 0;
 
 if (rrdtool_check_rrd_exists($rrd_filename)) {
-    foreach ($array as $ds=>$var) {
-        $rrd_list[$i]['filename']=$rrd_filename;
-        $rrd_list[$i]['descr']=$var['descr'];
-        $rrd_list[$i]['ds']=$ds;
-        $rrd_list[$i]['colour']=$var['colour'];
+    foreach ($array as $ds => $var) {
+        $rrd_list[$i]['filename'] = $rrd_filename;
+        $rrd_list[$i]['descr'] = $var['descr'];
+        $rrd_list[$i]['ds'] = $ds;
+        $rrd_list[$i]['colour'] = $var['colour'];
         $i++;
     }
 } else {

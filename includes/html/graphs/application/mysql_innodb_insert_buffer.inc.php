@@ -23,8 +23,8 @@ require 'includes/html/graphs/common.inc.php';
 
 $scale_min = 0;
 $colours = 'mixed';
-$unit_text = 'Stats';
-$unitlen = 6;
+$unit_text = 'InnoDB Insert buffer';
+$unitlen = 20;
 $bigdescrlen = 25;
 $smalldescrlen = 25;
 $dostack = 0;
@@ -34,11 +34,12 @@ $transparency = 33;
 $rrd_filename = rrd_name($device['hostname'], ['app', $app['app_type'], $app['app_id']]);
 
 $array = [
-    'select_full_join' => ['descr' => 'Full Join', 'colour' => 'ff0000',],
-    'select_full_range_join' => ['descr' => 'Full Range', 'colour' => '800000',],
-    'select_range' => ['descr' => 'Range', 'colour' => 'fa8072',],
-    'select_range_check' => ['descr' => 'Range Scan', 'colour' => 'ffa500',],
-    'select_scan' => ['descr' => 'Scan', 'colour' => 'ff6666',],
+    'ib_merged_ops_insert' => ['descr' => 'Merged OPS insert', 'colour' => '5ac18e',],
+    'ib_merged_ops_delete' => ['descr' => 'Merged OPS delete', 'colour' => 'ff6666',],
+    'ib_discarded_ops_insert' => ['descr' => 'Discarded OPS insert', 'colour' => '4ca3dd',],
+    'ib_discarded_ops_delete' => ['descr' => 'Discarded OPS delete', 'colour' => 'f6546a',],
+    'ib_search_cache' => ['descr' => 'Search cache', 'colour' => '065535',],
+    'ib_search_non_cache' => ['descr' => 'Search non-cache', 'colour' => 'ff4040',],
 ];
 
 $i = 0;

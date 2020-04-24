@@ -919,47 +919,21 @@ Verify it is working by running `/usr/lib/check_mk_agent/local/mysql`
 ## SNMP extend
 
 1: Copy the mysql script to the desired host. `wget
-https://github.com/librenms/librenms-agent/raw/master/snmp/mysql -O /etc/snmp/mysql `
+https://github.com/librenms/librenms-agent/raw/master/snmp/mysql-stats -O /etc/snmp/mysql-stats `
 
-2: Run `chmod +x /etc/snmp/mysql`
+2: Run `chmod +x /etc/snmp/mysql-stats`
 
-3: Create the cache directory, '/var/cache/librenms/' and make sure
-that it is owned by the user running the SNMP daemon.
+3: Create mysql account with required privileges
 
-```
-mkdir -p /var/cache/librenms/
-```
-
-4: Unlike most other scripts, the MySQL script requires a
-configuration file `mysql.cnf` in `/etc/snmp/` with following content:
-
-```php
-<?php
-$mysql_user = 'root';
-$mysql_pass = 'toor';
-$mysql_host = 'localhost';
-$mysql_port = 3306;
-```
-
-Note that depending on your MySQL installation (chrooted install for example),
-you may have to specify 127.0.0.1 instead of localhost. Localhost make
-a MySQL connection via the mysql socket, while 127.0.0.1 make a standard
-IP connection to mysql.
+4: Edit line `conn = MySQLdb.connect(host='', user='', passwd='', db='mysql')` and enter the hostname of MySQL/MariaDB server, user and password created earlier
 
 5: Edit your snmpd.conf file and add:
 
 ```
-extend mysql /etc/snmp/mysql
+extend mysql /etc/snmp/mysql-stats
 ```
 
-6: Install the PHP CLI language and your MySQL module of choice for
-PHP.
-
-The application should be auto-discovered as described at the top of
-the page. If it is not, please follow the steps set out under `SNMP
-Extend` heading top of page.
-
-7: Restart snmpd.
+6: Restart snmpd.
 
 # NGINX
 

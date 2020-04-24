@@ -21,38 +21,38 @@
 
 require 'includes/html/graphs/common.inc.php';
 
-$scale_min=0;
-$colours='mixed';
-$unit_text='Stats';
-$unitlen=6;
-$bigdescrlen=25;
-$smalldescrlen=25;
-$dostack=0;
-$printtotal=0;
-$addarea=1;
-$transparency=33;
-$rrd_filename=rrd_name($device['hostname'],array('app',$app['app_type'],$app['app_id']));
+$scale_min = 0;
+$colours = 'mixed';
+$unit_text = 'Stats';
+$unitlen = 6;
+$bigdescrlen = 25;
+$smalldescrlen = 25;
+$dostack = 0;
+$printtotal = 0;
+$addarea = 1;
+$transparency = 33;
+$rrd_filename = rrd_name($device['hostname'], ['app', $app['app_type'], $app['app_id']]);
 
-$array=array(
-    'com_delete'=>array('descr'=>'Delete','colour'=>'ff0000',),
-    'com_insert'=>array('descr'=>'Insert','colour'=>'5ac18e',),
-    'com_insert_select'=>array('descr'=>'Insert Select','colour'=>'008080',),
-    'com_load'=>array('descr'=>'Load data','colour'=>'003366',),
-    'com_replace'=>array('descr'=>'Replace','colour'=>'ffa500',),
-    'com_replace_select'=>array('descr'=>'Replace Select','colour'=>'ff7f50',),
-    'com_select'=>array('descr'=>'Select','colour'=>'4ca3dd',),
-    'com_update'=>array('descr'=>'Update','colour'=>'20b2aa',),
-    'com_update_multi'=>array('descr'=>'Update Multiple','colour'=>'ff6666',),
-);
+$array = [
+    'com_delete' => ['descr' => 'Delete', 'colour' => 'ff0000',],
+    'com_insert' => ['descr' => 'Insert', 'colour' => '5ac18e',],
+    'com_insert_select' => ['descr' => 'Insert Select', 'colour' => '008080',],
+    'com_load' => ['descr' => 'Load data', 'colour' => '003366',],
+    'com_replace' => ['descr' => 'Replace', 'colour' => 'ffa500',],
+    'com_replace_select' => ['descr' => 'Replace Select', 'colour' => 'ff7f50',],
+    'com_select' => ['descr' => 'Select', 'colour' => '4ca3dd',],
+    'com_update' => ['descr' => 'Update', 'colour' => '20b2aa',],
+    'com_update_multi' => ['descr' => 'Update Multiple', 'colour' => 'ff6666',],
+];
 
-$i=0;
+$i = 0;
 
 if (rrdtool_check_rrd_exists($rrd_filename)) {
-    foreach ($array as $ds=>$var) {
-        $rrd_list[$i]['filename']=$rrd_filename;
-        $rrd_list[$i]['descr']=$var['descr'];
-        $rrd_list[$i]['ds']=$ds;
-        $rrd_list[$i]['colour']=$var['colour'];
+    foreach ($array as $ds => $var) {
+        $rrd_list[$i]['filename'] = $rrd_filename;
+        $rrd_list[$i]['descr'] = $var['descr'];
+        $rrd_list[$i]['ds'] = $ds;
+        $rrd_list[$i]['colour'] = $var['colour'];
         $i++;
     }
 } else {
