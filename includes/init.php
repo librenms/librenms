@@ -85,6 +85,11 @@ if (module_selected('alerts', $init_modules)) {
     require_once $install_dir . '/LibreNMS/Alert/RunAlerts.php';
 }
 
+//Load the config early with just the defaults to support testing with a known environment
+if ($test_mode) {
+    \LibreNMS\Config::enableTestMode();
+}
+
 // Boot Laravel
 if (module_selected('auth', $init_modules)) {
     \LibreNMS\Util\Laravel::bootWeb();

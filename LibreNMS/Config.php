@@ -36,13 +36,14 @@ use Log;
 class Config
 {
     private static $config;
+    private static $testMode = false;
 
     /**
      * Load the config, if the database connected, pull in database settings.
      *
      * return &array
      */
-    public static function load($defaultsOnly = false)
+    public static function load()
     {
         // don't reload the config if it is already loaded, reload() should be used for that
         if (!is_null(self::$config)) {
@@ -52,7 +53,7 @@ class Config
         // merge all config sources together config_definitions.json > db config > config.php
         self::loadDefaults();
 
-        if (!$defaultsOnly) {
+        if (self::$testMode === false) {
             self::loadDB();
             self::loadUserConfigFile(self::$config);
         }
@@ -65,6 +66,14 @@ class Config
         $config = self::$config;
 
         return self::$config;
+    }
+
+    /**
+     * Sets a flag to prevent the database and user configuration being loaded
+     */
+    public static function enableTestMode()
+    {
+        self::$testMode = true;
     }
 
     /**
