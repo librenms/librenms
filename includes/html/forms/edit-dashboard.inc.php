@@ -39,7 +39,6 @@ if (isset($dashboard_id) && isset($dashboard_name) && isset($access)) {
         $status  = 'ok';
         $message = 'default Dashboard ' . $dashboard_name . ' set';
     } elseif (dbUpdate(['dashboard_name'=> $dashboard_name,'access'=> $access], 'dashboards', '(user_id = ? || access = 2) && dashboard_id = ?', [Auth::id(), $dashboard_id]) >= 0) {
-//    if (dbUpdate(['dashboard_name'=> $dashboard_name,'access'=> $access], 'dashboards', '(user_id = ? || access = 2) && dashboard_id = ?', [Auth::id(), $dashboard_id]) >= 0) {
         $status  = 'ok';
         $message = 'Dashboard ' . $dashboard_name . ' updated';
     } else {
