@@ -1,28 +1,28 @@
-body {
+  body {
     background: #333;
   }
   .fa-nav-icons {
-      color: #bfc0c0;
+    color: #bfc0c0;
   }
 
   .fa-col-success {
-      color: #3c763d;
+    color: #3c763d;
   }
 
   .fa-col-info {
-      color: #31708f;
+    color: #31708f;
   }
 
   .fa-col-primary {
-      color: #357ebd;
+    color: #357ebd;
   }
 
   .fa-col-danger {
-      color: #e30613;
+    color: #e30613;
   }
 
   .icon-theme {
-      color: black;
+    color: #bfc0c0;
   }
 
   .twitter-typeahead .tt-hint {
@@ -1199,7 +1199,7 @@ body {
     line-height: inherit;
   }
   a {
-    color: #ffffff;
+    color: #bfc0c0;
     text-decoration: none;
   }
   a:hover,
@@ -4083,6 +4083,7 @@ body {
   }
   .nav-tabs > li > a:hover {
     border-color: #1c1e22 #1c1e22 #1c1e22;
+    border-radius: 4px;
   }
   .nav-tabs > li.active > a,
   .nav-tabs > li.active > a:hover,
@@ -4091,8 +4092,8 @@ body {
     cursor: default;
     background-color: #3e444c;
     border: 1px solid #1c1e22;
-    border-bottom-color: transparent;
   }
+
   .nav-tabs.nav-justified {
     width: 100%;
     border-bottom: 0;
@@ -7185,4 +7186,15 @@ body {
   }
   a.list-device{
     color: #acb6bf;
+  }
+  .device-table-metrics>a {
+    color: #babbbb;
+    text-decoration:none;
+  }
+  .nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover{
+    margin-bottom: 5px;
+    border-radius: 4px;
+  }
+  .pagemenu-selected a{
+      color: #353a41
   }
