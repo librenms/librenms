@@ -62,60 +62,6 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
     }
 
     /**
-     * @param tmnxPortID a 32bit encoded value
-     * @param scheme
-     * @return converted ifName
-     * see TIMETRA-TC-MIB::TmnxPortID and TIMETRA-CHASSIS-MIB::tmnxChassisPortIdScheme
-     */
-    private function nokiaIfName($tmnxPortId, $scheme)
-    {
-        // Fixme implement other schemes and channels
-        if ($scheme == 'schemeA') {
-            $map = sprintf("%032b", $tmnxPortId);
-
-            if (substr($map, -32, 4) == '0101') { // LAG Port
-                if (substr($map, -28, 4) == '1011') { // Pseudowire Port
-                    return "pw" . bindec(substr($map, -10, 10));
-                }
-                return "lag-" . bindec(substr($map, -10, 10));
-            }
-            $slot = bindec(substr($map, -29, 4));
-            $mda = bindec(substr($map, -25, 4));
-            $port = bindec(substr($map, -21, 6));
-            return $slot . "/" . $mda . "/" . $port;
-        }
-        if ($scheme == 'schemeB') {
-            $map = sprintf("%032b", $tmnxPortId);
-
-            if (substr($map, -32, 4) == '0101') { // LAG Port
-                if (substr($map, -28, 4) == '1011') { // Pseudowire Port
-                    return "pw" . bindec(substr($map, -10, 10));
-                }
-                return "lag-" . bindec(substr($map, -10, 10));
-            }
-            $slot = bindec(substr($map, -23, 5));
-            $mda = bindec(substr($map, -18, 4));
-            $port = bindec(substr($map, -10, 7));
-            return $slot . "/" . $mda . "/" . $port;
-        }
-        // Fixme schemeD is reverse engineered (copy and modificated from schemeB). Actuall there is no docs from Nokia :-(
-        if ($scheme == 'schemeD') {
-            $map = sprintf("%032b", $tmnxPortId);
-
-            if (substr($map, -32, 4) == '0101') { // LAG Port
-                if (substr($map, -28, 4) == '1011') { // Pseudowire Port
-                    return "pw" . bindec(substr($map, -10, 10));
-                }
-                return "lag-" . bindec(substr($map, -10, 10));
-            }
-            $slot = bindec(substr($map, -24, 5));
-            $mda = bindec(substr($map, -19, 4));
-            $port = bindec(substr($map, -5, 5));
-            return $slot . "/" . $mda . "/" . $port;
-        }
-    }
-
-    /**
      * @return Collection MplsLsp objects
      */
     public function discoverMplsLsps()
@@ -283,7 +229,6 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
     public function discoverMplsSaps($svcs)
     {
         $mplsSapCache = snmpwalk_cache_multi_oid($this->getDevice(), 'sapBaseInfoTable', [], 'TIMETRA-SAP-MIB', 'nokia', '-OQUst');
-        $portScheme = snmp_get($this->getDevice(), 'tmnxChassisPortIdScheme.1', '-Oqv', 'TIMETRA-CHASSIS-MIB', 'nokia');
 
         $saps = collect();
 
@@ -304,7 +249,6 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
                 'svc_id' => $svc_id,
                 'svc_oid' => $svcId,
                 'sapPortId' => $sapPortId,
-                'ifName' => $this->nokiaIfName($sapPortId, $portScheme),
                 'device_id' => $this->getDeviceId(),
                 'sapEncapValue' => $this->nokiaEncap($sapEncapValue),
                 'sapRowStatus' => $value['sapRowStatus'],
@@ -423,13 +367,10 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
         $mplsTunnelCHopCache = snmpwalk_cache_multi_oid($this->getDevice(), 'vRtrMplsTunnelCHopTable', [], 'TIMETRA-MPLS-MIB', 'nokia', '-OQUsb');
 
         $chops = collect();
-        d_echo($mplsTunnelCHopCache);
         foreach ($mplsTunnelCHopCache as $key => $value) {
             list($mplsTunnelCHopListIndex, $mplsTunnelCHopIndex) = explode('.', $key);
             $lsp_path_id = $paths->firstWhere('mplsLspPathTunnelCHopListIndex', $mplsTunnelCHopListIndex)->lsp_path_id;
-            d_echo('mplsTunnelCHopListIndex: ' . $mplsTunnelCHopListIndex . '  mplsTunnelCHopIndex: ' . $mplsTunnelCHopIndex . '  path: ' . $paths->firstWhere('mplsLspPathTunnelCHopListIndex', $mplsTunnelCHopListIndex));
 
-#            if (isset($mplsTunnelCHopListIndex, $mplsTunnelCHopIndex, $lsp_path_id)) {
             $chops->push(new MplsTunnelCHop([
                 'mplsTunnelCHopListIndex' => $mplsTunnelCHopListIndex,
                 'mplsTunnelCHopIndex' => $mplsTunnelCHopIndex,
@@ -442,7 +383,6 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
                 'mplsTunnelCHopStrictOrLoose' => $value['vRtrMplsTunnelCHopStrictOrLoose'],
                 'mplsTunnelCHopRouterId' => $value['vRtrMplsTunnelCHopRtrID'],
             ]));
-#            }
         }
         return $chops;
     }
@@ -629,7 +569,6 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
     public function pollMplsSaps($svcs)
     {
         $mplsSapCache = snmpwalk_cache_multi_oid($this->getDevice(), 'sapBaseInfoTable', [], 'TIMETRA-SAP-MIB', 'nokia', '-OQUst');
-        $portScheme = snmp_get($this->getDevice(), 'tmnxChassisPortIdScheme.1', '-Oqv', 'TIMETRA-CHASSIS-MIB', 'nokia');
 
         $saps = collect();
 
@@ -639,6 +578,9 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
         // remove some default entries we do not want to see
         $filter_value = '/^Internal SAP/';
 
+        // cache a ifIndex -> ifName
+        $ifIndexNames = $this->getDeviceModel()->ports()->pluck('ifName', 'ifIndex');
+
         foreach ($mplsSapCache as $key => $value) {
             if (preg_match($filter_key, $key) || preg_match($filter_value, $value['sapDescription'])) {
                 unset($key);
@@ -646,11 +588,12 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
             }
             list($svcId, $sapPortId, $sapEncapValue) = explode('.', $key);
             $svc_id = $svcs->firstWhere('svc_oid', $svcId)->svc_id;
+
             $saps->push(new MplsSap([
                 'svc_id' => $svc_id,
                 'svc_oid' => $svcId,
                 'sapPortId' => $sapPortId,
-                'ifName' => $this->nokiaIfName($sapPortId, $portScheme),
+                'ifName' => $ifIndexNames->get($sapPortId),
                 'device_id' => $this->getDeviceId(),
                 'sapEncapValue' => $this->nokiaEncap($sapEncapValue),
                 'sapRowStatus' => $value['sapRowStatus'],
@@ -772,7 +715,6 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
             list($mplsTunnelCHopListIndex, $mplsTunnelCHopIndex) = explode('.', $key);
             $lsp_path_id = $paths->firstWhere('mplsLspPathTunnelCHopListIndex', $mplsTunnelCHopListIndex)->lsp_path_id;
 
-#            if (isset($mplsTunnelCHopListIndex, $mplsTunnelCHopIndex, $lsp_path_id)) {
             $chops->push(new MplsTunnelCHop([
                 'mplsTunnelCHopListIndex' => $mplsTunnelCHopListIndex,
                 'mplsTunnelCHopIndex' => $mplsTunnelCHopIndex,
@@ -785,7 +727,6 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
                 'mplsTunnelCHopStrictOrLoose' => $value['vRtrMplsTunnelCHopStrictOrLoose'],
                 'mplsTunnelCHopRouterId' => $value['vRtrMplsTunnelCHopRtrID'],
             ]));
-#            }
         }
         return $chops;
     }
