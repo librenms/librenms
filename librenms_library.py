@@ -10,15 +10,18 @@ import threading
 import time
 from logging.handlers import RotatingFileHandler
 
+try:
+    import pymysql
+    pymysql.install_as_MySQLdb()
+    print("Using pure python SQL client")
+except ImportError:
+    print("Using other SQL client")
 
 try:
     import MySQLdb
 except ImportError as exc:
-    print('ERROR: missing the mysql python module:')
-    print('On ubuntu: apt-get install python-mysqldb')
-    print('On FreeBSD: cd /usr/ports/*/py-MySQLdb && make install clean')
-    print('On RHEL 6: yum install MySQL-python')
-    print('On RHEL 8: dnf install mariadb-connector-c-devel gcc && python -m pip install mysqlclient')
+    print('ERROR: missing the mysql python module please run:')
+    print('pip install -r requirements.txt')
     print('ERROR: %s' % exc)
     sys.exit(2)
 
