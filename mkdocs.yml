@@ -37,7 +37,6 @@ nav:
   - 2. Installing:
       - Installing LibreNMS: Installation/index.md
       - LibreNMS VMs: Installation/Images.md
-      - Debian 10 (Nginx): Installation/Installation-Debian-10-Nginx.md
       - Ubuntu 18.04 (Nginx): Installation/Installation-Ubuntu-1804-Nginx.md
       - Ubuntu 18.04 (Apache): Installation/Installation-Ubuntu-1804-Apache.md
       - Debian 10 (Nginx): Installation/Installation-Debian-10-Nginx.md
