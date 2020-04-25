@@ -2529,3 +2529,31 @@ function oxidized_node_update($hostname, $msg, $username = 'not_provided')
     }
     return false;
 }//end oxidized_node_update()
+
+
+/**
+ * @params int code
+ * @params int subcode
+ * @return string
+ * Take a BGP error code and subcode to return a string representation of it
+ */
+function describe_bgp_error_code($code, $subcode)
+{
+    // https://www.iana.org/assignments/bgp-parameters/bgp-parameters.xhtml#bgp-parameters-3
+
+    $message = "Unknown";
+
+    $error_code_key = "bgp.error_codes.".$code;
+    $error_subcode_key = "bgp.error_subcodes.".$code.".".$subcode;
+
+    $error_code_message = __($error_code_key);
+    $error_subcode_message = __($error_subcode_key);
+
+    if ($error_subcode_message != $error_subcode_key) {
+        $message = $error_code_message . " - " . $error_subcode_message;
+    } elseif ($error_code_message != $error_code_key) {
+        $message = $error_code_message;
+    }
+
+    return $message;
+}

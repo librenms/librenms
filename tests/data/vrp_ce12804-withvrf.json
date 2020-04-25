@@ -24905,7 +24905,10 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 1,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorSubCode": null,
+                    "bgpPeerLastErrorText": null
                 }
             ],
             "bgpPeers_cbgp": [

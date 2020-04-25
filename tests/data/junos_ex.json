@@ -57,7 +57,10 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
                     "bgpLocalAs": 65501,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorSubCode": null,
+                    "bgpPeerLastErrorText": null
                 },
                 {
                     "astext": "",
@@ -76,7 +79,10 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
                     "bgpLocalAs": 65501,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorSubCode": null,
+                    "bgpPeerLastErrorText": null
                 },
                 {
                     "astext": "",
@@ -95,7 +101,10 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
                     "bgpLocalAs": 65501,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorSubCode": null,
+                    "bgpPeerLastErrorText": null
                 }
             ],
             "bgpPeers_cbgp": []
@@ -119,7 +128,10 @@
                     "bgpPeerInUpdateElapsedTime": 21748,
                     "context_name": "",
                     "bgpLocalAs": 65501,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorSubCode": null,
+                    "bgpPeerLastErrorText": null
                 },
                 {
                     "astext": "",
@@ -138,7 +150,10 @@
                     "bgpPeerInUpdateElapsedTime": 785386,
                     "context_name": "",
                     "bgpLocalAs": 65501,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorSubCode": null,
+                    "bgpPeerLastErrorText": null
                 },
                 {
                     "astext": "",
@@ -157,7 +172,10 @@
                     "bgpPeerInUpdateElapsedTime": 774040,
                     "context_name": "",
                     "bgpLocalAs": 65501,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorSubCode": null,
+                    "bgpPeerLastErrorText": null
                 }
             ],
             "bgpPeers_cbgp": []
