@@ -35,9 +35,6 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
     Route::get('overview', 'OverviewController@index')->name('overview');
     Route::get('/', 'OverviewController@index');
 
-    // Dashboard toggle
-    Route::get('toggle_dashboard_editor', 'UserPreferencesController@toggleDashboardEditor');
-
     // Maps
     Route::group(['prefix' => 'maps', 'namespace' => 'Maps'], function () {
         Route::get('devicedependency', 'DeviceDependencyController@dependencyMap');

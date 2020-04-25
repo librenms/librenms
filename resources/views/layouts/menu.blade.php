@@ -33,11 +33,10 @@
                                 @endforeach
                                 <li role="presentation" class="divider"></li>
                                 <li>
-                                    <a href="{{ url('toggle_dashboard_editor') }}">
-                                    <i class="fa fa-bar-chart fa-fw fa-lg" aria-hidden="true"></i>
-                                    @if ($hide_dashboard_editor) @lang('Show Dashboard Editor')
-                                    @else @lang('Hide Dashboard Editor')
-                                    @endif</a>
+                                    <a onclick="toggleDashboardEditor()">
+                                        <i class="fa fa-bar-chart fa-fw fa-lg" aria-hidden="true"></i>
+                                        <span id="toggle-dashboard-editor-text">@if ($hide_dashboard_editor) @lang('Show Dashboard Editor') @else @lang('Hide Dashboard Editor')@endif</span>
+                                    </a>
                                 </li>
                             </ul>
                         </li>
@@ -709,4 +708,32 @@
                 $('.tt-selectable').first().click();
             }
         });
+
+    var hideDashboardEditor = {{ (int)$hide_dashboard_editor }};
+    function toggleDashboardEditor() {
+        $.ajax({
+            url: '{{ route('preferences.store') }}',
+            dataType: 'json',
+            type: 'POST',
+            data: {
+                pref: 'hide_dashboard_editor',
+                value: hideDashboardEditor ? 0 : 1
+            },
+            success: function () {
+                hideDashboardEditor = hideDashboardEditor ? 0 : 1;
+                $('#toggle-dashboard-editor-text').text(hideDashboardEditor ? '@lang('Show Dashboard Editor')' : '@lang('Hide Dashboard Editor')')
+
+                // disable and hide editing
+                if (typeof gridster !== 'undefined') {
+                    gridster.disable();
+                    gridster.disable_resize();
+                    gridster_state = 0;
+                    $('.fade-edit').fadeOut();
+                    dashboard_collapse("#hide_edit");
+                }
+
+                $('#dashboard-editor').collapse(hideDashboardEditor ? 'hide' : 'show');
+            }
+        });
+    }
 </script>
