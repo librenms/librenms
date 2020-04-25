@@ -10061,7 +10061,10 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 35684352,
-                    "vrfLocalAs": 39835
+                    "vrfLocalAs": 39835,
+                    "bgpPeerLastErrorCode": 0,
+                    "bgpPeerLastErrorSubCode": 0,
+                    "bgpPeerLastErrorText": 0
                 },
                 {
                     "astext": "Cymru FullBogon Feed",
@@ -10081,6 +10084,9 @@
                     "context_name": null,
                     "bgpLocalAs": 35684352,
                     "vrfLocalAs": 39835
+                    "bgpPeerLastErrorCode": 0,
+                    "bgpPeerLastErrorSubCode": 0,
+                    "bgpPeerLastErrorText": 0
                 },
                 {
                     "astext": "Cymru FullBogon Feed",
@@ -10100,6 +10106,9 @@
                     "context_name": null,
                     "bgpLocalAs": 35684352,
                     "vrfLocalAs": 39835
+                    "bgpPeerLastErrorCode": 0,
+                    "bgpPeerLastErrorSubCode": 0,
+                    "bgpPeerLastErrorText": 0
                 },
                 {
                     "astext": "Cymru FullBogon Feed",
@@ -10119,6 +10128,9 @@
                     "context_name": null,
                     "bgpLocalAs": 35684352,
                     "vrfLocalAs": 39835
+                    "bgpPeerLastErrorCode": 0,
+                    "bgpPeerLastErrorSubCode": 0,
+                    "bgpPeerLastErrorText": 0
                 }
             ],
             "bgpPeers_cbgp": []
