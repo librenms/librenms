@@ -141,7 +141,9 @@ service nginx reload
 # Configure snmpd
 
 ```bash
+dpkg-divert --rename /etc/snmp/snmpd.conf
 cp /opt/librenms/snmpd.conf.example /etc/snmp/snmpd.conf
+chmod 600 /etc/snmp/snmpd.conf
 nano /etc/snmp/snmpd.conf
 ```
 
