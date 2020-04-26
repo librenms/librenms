@@ -50,7 +50,7 @@ exit
 ## Configure MySQL
 
 ```bash
-systemctl restart mysql
+service mysql restart
 mysql -uroot -p
 ```
 
@@ -76,7 +76,7 @@ lower_case_table_names=0
 ```
 
 ```bash
-systemctl restart mysql
+service mysql restart
 ```
 
 # Web Server
@@ -94,7 +94,7 @@ nano /etc/php/7.3/cli/php.ini
 ```
 
 ```bash
-systemctl restart php7.3-fpm
+service php7.3-fpm restart
 ```
 
 ## Configure NGINX
@@ -134,7 +134,7 @@ server {
 ```
 
 ```bash
-systemctl reload nginx
+service nginx reload
 ```
 
 # Configure snmpd
@@ -149,7 +149,7 @@ Edit the text which says `RANDOMSTRINGGOESHERE` and set your own community strin
 ```bash
 curl -o /usr/bin/distro https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/distro
 chmod +x /usr/bin/distro
-systemctl restart snmpd
+service snmpd restart
 ```
 
 # Cron job
