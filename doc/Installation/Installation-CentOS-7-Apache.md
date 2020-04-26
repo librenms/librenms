@@ -40,17 +40,6 @@ Install the required packages
 yum install mod_php php-cli php-common php-curl php-gd php-mbstring php-process php-snmp php-xml php-zip php-memcached php-mysqlnd
 ```
 
-#### Running with Webtatic PHP
-
-```
-rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm
-```
-
-```
-yum install php72w php72w-cli php72w-common php72w-curl php72w-gd php72w-mbstring php72w-mysqlnd php72w-process php72w-snmp php72w-xml php72w-zip
-```
-
-
 #### Running with CentOS SCL php
 
 ```
