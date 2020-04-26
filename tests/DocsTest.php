@@ -62,7 +62,10 @@ class DocsTest extends TestCase
         'Installation/Ubuntu-image.md',
         'Installation/CentOS-image.md',
     ];
-    
+
+    /**
+     * @group docs
+     */
     public function testDocExist()
     {
         $mkdocs = Yaml::parse(file_get_contents(__DIR__ . '/../mkdocs.yml'));
