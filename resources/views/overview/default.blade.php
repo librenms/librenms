@@ -118,7 +118,7 @@
                                     @endforeach
                                 </ul>
                                 <div class="checkbox-inline">
-                                    <input type="radio" id="dashboard_default" @if ($dashboard_default == $dashboard->dashboard_id) checked disabled @endif> Default Dashboard</input>
+                                    <input type="radio" id="dashboard_default" @if ($dashboard_default == $dashboard->dashboard_id) checked @endif> Default Dashboard</input>
                                 </div>
                             </div>
                         </div>
