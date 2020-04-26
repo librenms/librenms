@@ -69,32 +69,30 @@
             </div>
             <hr>
         </div>
-    </div>
-    <hr>
-</div>
-<div class="dash-collapse" id="edit_dash" style="display: none;">
-    <!-- Start Dashboard-Settings -->
-    <div class="row" style="margin-top:5px;">
-        <div class="col-md-12">
-            <div class="col-md-12">
-                <form class="form-inline" onsubmit="dashboard_edit(this); return false;">
-                    @csrf
-                    <div class="form-group">
-                        <div class="input-group">
-                            <span class="input-group-btn">
-                                <a class="btn btn-default disabled" type="button" style="min-width:160px;"><span class="pull-left">Dashboard Name</span></a>
-                            </span>
-                            <input class="form-control" type="text" placeholder="Dashbord Name" name="dashboard_name" value="{{ $dashboard->dashboard_name }}" style="width:160px;">
-                            <select class="form-control" name="access" style="width:160px;">
-                            @foreach (array('Private','Shared (Read)','Shared') as $k => $v)
-                                <option value="{{ $k }}" {{ $dashboard->access == $k ? 'selected' : null }}>{{ $v }}</option>
-                            @endforeach
-                                <option value="-1">as Default</option>
-                            </select>
-                            <span class="input-group-btn pull-left">
-                                <button class="btn btn-primary" type="submit">Update</button>
-                            </span>
-                        </div>
+        <div class="dash-collapse" id="edit_dash" style="display: none;">
+            <!-- Start Dashboard-Settings -->
+            <div class="row" style="margin-top:5px;">
+                <div class="col-md-12">
+                    <div class="col-md-12">
+                        <form class="form-inline" onsubmit="dashboard_edit(this); return false;">
+                            @csrf
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <span class="input-group-btn">
+                                        <a class="btn btn-default disabled" type="button" style="min-width:160px;"><span class="pull-left">Dashboard Name</span></a>
+                                    </span>
+                                    <input class="form-control" type="text" placeholder="Dashbord Name" name="dashboard_name" value="{{ $dashboard->dashboard_name }}" style="width:160px;">
+                                    <select class="form-control" name="access" style="width:160px;">
+                                    @foreach (array('Private','Shared (Read)','Shared') as $k => $v)
+                                        <option value="{{ $k }}" {{ $dashboard->access == $k ? 'selected' : null }}>{{ $v }}</option>
+                                    @endforeach
+                                    </select>
+                                    <span class="input-group-btn pull-left">
+                                        <button class="btn btn-primary" type="submit">Update</button>
+                                    </span>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -119,6 +117,9 @@
                                     </li>
                                     @endforeach
                                 </ul>
+                                <div class="checkbox-inline">
+                                    <input type="radio" id="dashboard_default" @if ($dashboard_default == $dashboard->dashboard_id) checked disabled @endif> Default Dashboard</input>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -446,6 +447,33 @@
         }
     }
 
+    $("[id='dashboard_default']")
+        .bootstrapSwitch('offColor', 'secondary')
+        .on('switchChange.bootstrapSwitch', function (e, state) {
+            $.ajax({
+                type: 'POST',
+                url: 'ajax_form.php',
+                data: {
+                    type: 'edit-dashboard',
+                    dashboard_name: '{{ $dashboard->dashboard_name}}',
+                    dashboard_id: {{ $dashboard->dashboard_id }},
+                    access: -1
+                },
+                dataType: 'json',
+                success: function (data) {
+                    if (data.status == "ok") {
+                        toastr.success(data.message);
+                    }
+                    else {
+                        toastr.error(data.message);
+                    }
+                },
+                error: function(data) {
+                    toastr.error(data.message);
+                }
+            });
+        });
+
     function dashboard_add(data) {
         datas = $(data).serializeArray();
         data = [];
@@ -607,7 +635,6 @@
     @if (empty($dashboard->dashboard_id) && $default_dash == 0)
         $('#dashboard_name').val('Default');
         dashboard_add($('#add_form'));
-    @endif
-
+        @endif
 </script>
 @endpush

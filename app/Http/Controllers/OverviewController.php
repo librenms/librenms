@@ -43,14 +43,13 @@ class OverviewController extends Controller
         });
 
 
+        $user_default_dash = (int)UserPref::getPref($user, 'dashboard');
+        $global_default = (int)Config::get('webui.default_dashboard_id');
 
         if (!empty($request->dashboard) && isset($dashboards[$request->dashboard])) {
             // specific dashboard
             $dashboard = $dashboards[$request->dashboard];
         } else {
-            $user_default_dash = (int)UserPref::getPref($user, 'dashboard');
-            $global_default = (int)Config::get('webui.default_dashboard_id');
-
             // load user default
             if (isset($dashboards[$user_default_dash])) {
                 $dashboard = $dashboards[$user_default_dash];
@@ -103,8 +102,9 @@ class OverviewController extends Controller
         $dash_config           = unserialize(stripslashes($data));
         $hide_dashboard_editor = UserPref::getPref($user, 'hide_dashboard_editor');
         $widgets               = Widget::select('widget_id', 'widget_title')->orderBy('widget_title')->get();
+        $dashboard_default     = isset($user_default_dash) ? $user_default_dash : $global_default;
 
-        return view('overview.default', compact('bare', 'dash_config', 'dashboard', 'hide_dashboard_editor', 'user_dashboards', 'shared_dashboards', 'widgets'));
+        return view('overview.default', compact('bare', 'dash_config', 'dashboard', 'hide_dashboard_editor', 'user_dashboards', 'shared_dashboards', 'widgets', 'dashboard_default'));
     }
 
     public function simple(Request $request)
