@@ -129,6 +129,22 @@ The example below will use the API named component of my.example.com with id 1, 
 |               | Content-Type=application/json
 | API Body      | { "status": 2 }
 
+
+## aspSMS
+aspSMS is a SMS provider that can be configured by using the generic API Transport.
+You need a token you can find on your personnal space.
+
+[aspSMS docs](https://www.aspsms.com/en/documentation/)
+
+**Example:**
+
+| Config | Example |
+| ------ | ------- |
+| Transport type | Api |
+| API Method | POST |
+| API URL | https://soap.aspsms.com/aspsmsx.asmx/SimpleTextSMS |
+| Options | UserKey=USERKEY<br />Password=APIPASSWORD<br />Recipient=RECIPIENT<br />Originator=ORIGINATOR<br />MessageText={{ $msg }} |
+
 ## Boxcar
 
 Copy your access token from the Boxcar app or from the Boxcar.io
