@@ -65,7 +65,7 @@ exit
 ```
 
 ```bash
-nano /etc/mysql/mariadb.conf.d/50-server.cnf
+editor /etc/mysql/mariadb.conf.d/50-server.cnf
 ```
 
 Within the `[mysqld]` section please add:
@@ -89,8 +89,8 @@ timezones.  Valid examples are: "America/New_York",
 "Australia/Brisbane", "Etc/UTC".
 
 ```bash
-nano /etc/php/7.3/fpm/php.ini
-nano /etc/php/7.3/cli/php.ini
+editor /etc/php/7.3/fpm/php.ini
+editor /etc/php/7.3/cli/php.ini
 ```
 
 ```bash
@@ -101,7 +101,7 @@ service php7.3-fpm restart
 
 ```bash
 rm /etc/nginx/sites-enabled/default
-nano /etc/nginx/sites-available/librenms.vhost
+editor /etc/nginx/sites-available/librenms.vhost
 ```
 
 Add the following config, edit `server_name` as required:
@@ -144,7 +144,7 @@ service nginx reload
 dpkg-divert --rename /etc/snmp/snmpd.conf
 cp /opt/librenms/snmpd.conf.example /etc/snmp/snmpd.conf
 chmod 600 /etc/snmp/snmpd.conf
-nano /etc/snmp/snmpd.conf
+editor /etc/snmp/snmpd.conf
 ```
 
 Edit the text which says `RANDOMSTRINGGOESHERE` and set your own community string.
