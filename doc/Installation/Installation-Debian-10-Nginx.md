@@ -100,8 +100,8 @@ service php7.3-fpm restart
 ## Configure NGINX
 
 ```bash
-rm /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
-nano /etc/nginx/sites-enabled/librenms.vhost
+rm /etc/nginx/sites-enabled/default
+nano /etc/nginx/sites-available/librenms.vhost
 ```
 
 Add the following config, edit `server_name` as required:
@@ -134,6 +134,7 @@ server {
 ```
 
 ```bash
+ln -s /etc/nginx/sites-available/librenms.vhost /etc/nginx/sites-enabled/librenms.vhost
 service nginx reload
 ```
 
