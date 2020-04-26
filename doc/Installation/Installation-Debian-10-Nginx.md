@@ -100,7 +100,7 @@ service php7.3-fpm restart
 ## Configure NGINX
 
 ```bash
-rm /etc/nginx/sites-available/default && rm /etc/nginx/sites-enabled/default
+rm /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
 nano /etc/nginx/sites-enabled/librenms.vhost
 ```
 
