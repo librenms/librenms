@@ -203,6 +203,9 @@ bgpPeers:
     - { Field: bgpPeerRemoteAs, Type: bigint(20), 'Null': false, Extra: '' }
     - { Field: bgpPeerState, Type: text, 'Null': false, Extra: '' }
     - { Field: bgpPeerAdminStatus, Type: text, 'Null': false, Extra: '' }
+    - { Field: bgpPeerLastErrorCode, Type: int(11), 'Null': true, Extra: '' }
+    - { Field: bgpPeerLastErrorSubCode, Type: int(11), 'Null': true, Extra: '' }
+    - { Field: bgpPeerLastErrorText, Type: varchar(254), 'Null': true, Extra: '' }
     - { Field: bgpLocalAddr, Type: text, 'Null': false, Extra: '' }
     - { Field: bgpPeerRemoteAddr, Type: text, 'Null': false, Extra: '' }
     - { Field: bgpPeerDescr, Type: varchar(255), 'Null': false, Extra: '', Default: '' }

@@ -98,6 +98,7 @@ $completed_tests = array(
     'style' => false,
     'unit' => false,
 );
+$docs_only = false;
 
 if ($os = check_opt($options, 'os', 'o')) {
     // enable unit tests, snmpsim, and db
@@ -136,7 +137,11 @@ if (!empty($changed_files) && $map['php'] === 0 && $map['os-php'] === 0) {
 
 // If we have no php files and no OS' found then also skip unit checks.
 if (!empty($changed_files) && $map['php'] === 0 && empty($map['os']) && !$os) {
-    putenv('SKIP_UNIT_CHECK=1');
+    if ($map['docs'] > 0) {
+        $docs_only = true;
+    } else {
+        putenv('SKIP_UNIT_CHECK=1');
+    }
 }
 
 // If we have more than 4 (arbitrary number) of OS' then blank them out
@@ -162,7 +167,7 @@ foreach (array_keys($options) as $opt) {
             echo 'Only checking os: ' . implode(', ', (array)$os) . PHP_EOL;
         }
 
-        $ret = run_check('unit', $passthru, $command_only, compact('fail_fast', 'os', 'module'));
+        $ret = run_check('unit', $passthru, $command_only, compact('fail_fast', 'os', 'module', 'docs_only'));
     }
 
     if ($fail_fast && $ret !== 0 && $ret !== 250) {
@@ -350,6 +355,10 @@ function check_unit($passthru = false, $command_only = false, $options = array()
         $filter = implode('.*|', (array)$options['os']);
         // include tests that don't have data providers and only data sets that match
         $phpunit_cmd .= " --group os --filter '/::test[A-Za-z]+$|::test[A-Za-z]+ with data set \"$filter.*\"$/'";
+    }
+
+    if ($options['docs_only']) {
+        $phpunit_cmd .= " --group docs";
     }
 
     if ($options['module']) {
