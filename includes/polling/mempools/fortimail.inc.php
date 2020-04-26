@@ -2,23 +2,33 @@
 
 // Simple hard-coded poller for Fortinet Fortigate
 // Yes, it really can be this simple.
-echo 'Fortimail MemPool';
+d_echo('fortimail');
+if ($mempool['mempool_index'] == 0) {
+    $perc = snmp_get($device, ".1.3.6.1.4.1.12356.105.1.7.0", '-OvQ');
+    if (is_numeric($perc)) {
+        $mempool['perc'] = $perc;
+        $mempool['used'] = $perc;
+        $mempool['total'] = 100;
+        $mempool['free'] = 100 - $perc;
+    }
+}
 
-// $mempool['total']	= '100';
-// $usage 			= snmp_get($device, 'FORTINET-FORTIMAIL-MIB::fmlSysMemUsage.0', '-OvQ');
-// $usage 			= str_replace('%', '', $usage);
-// $usage                  = str_replace('"', '', $usage);
-// $mempool['used']        = $usage;
-// $mempool['free']        = ($mempool['total'] - $mempool['used']);
+if ($mempool['mempool_index'] == 1) {
+    $perc = snmp_get($device, ".1.3.6.1.4.1.12356.105.1.8.0", '-OvQ');
+    if (is_numeric($perc)) {
+        $mempool['perc'] = $perc;
+        $mempool['used'] = $perc;
+        $mempool['total'] = 100;
+        $mempool['free'] = 100 - $perc;
+    }
+}
 
-// echo '(U: '.$mempool['used'].' T: '.$mempool['total'].' F: '.$mempool['free'].') ';
-
-
-$mempool['total'] = '100';
-$mempool['perc'] = snmp_get($device, 'FORTINET-FORTIMAIL-MIB::fmlSysMemUsage.0', '-OvQ');
-$mempool['perc'] = str_replace('%', '', $mempool['perc']);
-$mempool['perc'] = str_replace('"', '', $mempool['perc']);
-$mempool['used'] = $mempool['perc'];
-$mempool['free'] = ($mempool['total'] - $mempool['used']);
-
-echo '(U: '.$mempool['used'].' T: '.$mempool['total'].' F: '.$mempool['free'].') ';
+if ($mempool['mempool_index'] == 2) {
+    $perc = snmp_get($device, ".1.3.6.1.4.1.12356.105.1.9.0", '-OvQ');
+    if (is_numeric($perc)) {
+        $mempool['perc'] = $perc;
+        $mempool['used'] = $perc;
+        $mempool['total'] = 100;
+        $mempool['free'] = 100 - $perc;
+    }
+}
