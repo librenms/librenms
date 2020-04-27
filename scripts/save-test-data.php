@@ -24,9 +24,12 @@ $options = getopt(
     )
 );
 
-$test_mode = true;
 $init_modules = array('discovery', 'polling');
 require $install_dir . '/includes/init.php';
+
+if (App::environment() !== 'testing') {
+    echo 'In order to collect accurate test data, this script may need to be run with "APP_ENV=testing"' . PHP_EOL;
+}
 
 $debug = (isset($options['d']) || isset($options['debug']));
 $vdebug = $debug;
@@ -37,6 +40,7 @@ if (isset($options['snmpsim'])) {
     $snmpsim->run();
     exit;
 }
+
 
 if (isset($options['h'])
     || isset($options['help'])

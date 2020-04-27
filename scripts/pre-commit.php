@@ -336,6 +336,7 @@ function check_style($passthru = false, $command_only = false)
  */
 function check_unit($passthru = false, $command_only = false, $options = array())
 {
+    putenv('APP_ENV=testing');
     echo 'Running unit tests... ';
 
     $phpunit_bin = check_exec('phpunit');
