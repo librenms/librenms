@@ -32,6 +32,14 @@ use LibreNMS\Alert\Transport;
 
 class Discord extends Transport
 {
+    const ALERT_FIELDS_TO_DISCORD_FIELDS = [
+        'timestamp' => 'Timestamp',
+        'severity' => 'Severity',
+        'hostname' => 'Hostname',
+        'name' => 'Rule Name',
+        'rule' => 'Rule'
+    ];
+
     public function deliverAlert($obj, $opts)
     {
         $discord_opts = [
@@ -55,28 +63,7 @@ class Discord extends Transport
                     'title' => $discord_title,
                     'color' => hexdec($color),
                     'description' => $discord_msg,
-                    'fields' => [
-                        [
-                            'name' => 'Timestamp',
-                            'value' => $obj['timestamp']
-                        ],
-                        [
-                            'name' => 'Severity',
-                            'value' => $obj['severity']
-                        ],
-                        [
-                            'name' => 'Hostname',
-                            'value' => $obj['hostname']
-                        ],
-                        [
-                            'name' => 'Rule Name',
-                            'value' => $obj['name']
-                        ],
-                        [
-                            'name' => 'Rule',
-                            'value' => $obj['rule']
-                        ]
-                    ],
+                    'fields' => $this->createDiscordFields($obj, $discord_opts),
                     'footer' => [
                         'text' => 'alert took ' . $obj['elapsed']
                     ]
@@ -104,6 +91,25 @@ class Discord extends Transport
             return 'HTTP Status code ' . $code;
         }
         return true;
+    }
+
+    public function createDiscordFields($obj, $discord_opts)
+    {
+        $result = [];
+
+        foreach (self::ALERT_FIELDS_TO_DISCORD_FIELDS as $objKey => $discordKey) {
+            // Skip over keys that do not exist so Discord does not give us a 400.
+            if (!$obj[$objKey]) {
+                continue;
+            }
+
+            array_push($result, [
+                'name' => $discordKey,
+                'value' => $obj[$objKey],
+            ]);
+        }
+
+        return $result;
     }
 
     public static function configTemplate()
