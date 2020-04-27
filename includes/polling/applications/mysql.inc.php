@@ -44,7 +44,7 @@ $snmp_fields = [
     'ib_bpool_read','ib_bpool_created','ib_bpool_written',
     'ib_merged_ops_insert','ib_merged_ops_delete','ib_discarded_ops_insert','ib_discarded_ops_delete','ib_search_cache','ib_search_non_cache',
     'ib_io_read','ib_io_write','ib_io_log','ib_io_fsync',
-    'ib_iop_log','ib_iop_sync','ib_iop_flush_log','ib_iop_flush_bpool','ib_iop_ibuf_aio',
+    'ib_iop_log','ib_iop_sync','ib_iop_flush_log','ib_iop_flush_bpool','ib_iop_ibuf_aio', 'ib_iop_aioread', 'ib_iop_aiowrite',
     'innodb_log_buffer_size','ib_log_flush','ib_log_written',
     'innodb_rows_deleted','innodb_rows_inserted','innodb_rows_read','innodb_rows_updated',
     'ib_spin_rounds','ib_spin_waits','ib_os_waits',
