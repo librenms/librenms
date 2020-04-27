@@ -36,7 +36,6 @@ $graphs['mysql']     = array(
     'select_types',
     'slow_queries',
     'sorts',
-    'status',
     'table_locks',
     'temporary_objects',
 );
