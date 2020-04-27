@@ -57,6 +57,10 @@ class Discord extends Transport
         $discord_title = '#' . $obj['uid'] . ' '  . $obj['title'];
         $discord_msg   = strip_tags($obj['msg']);
         $color         = self::getColorForState($obj['state']);
+
+        // Special handling for the elapsed text in the footer if the elapsed is not set.
+        $footer_text = $obj['elapsed'] ? 'alert took ' . $obj['elapsed'] : '';
+
         $data          = [
             'embeds' => [
                 [
@@ -65,7 +69,7 @@ class Discord extends Transport
                     'description' => $discord_msg,
                     'fields' => $this->createDiscordFields($obj, $discord_opts),
                     'footer' => [
-                        'text' => 'alert took ' . $obj['elapsed']
+                        'text' => $footer_text
                     ]
                 ]
             ]
