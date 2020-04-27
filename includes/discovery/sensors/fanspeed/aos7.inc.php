@@ -20,7 +20,7 @@ if (is_array($rpm)) {
             //$descr = 'Chassis '.($chassis-450). " Fan $index";
             $descr_oid = ".1.3.6.1.2.1.47.1.1.1.1.7.".$chassis;
             $chas_descr = snmp_get($device, $descr_oid, '-Oqv');
-            $descr = "CHASSIS-".substr($chas_descr,0,strpos($chas_descr,'/'))." Fan $index";
+            $descr = "CHASSIS-".substr($chas_descr, 0, strpos($chas_descr, '/'))." Fan $index";
             $value = $data[4];
             $id= "$chassis.$index";
             $oid= "$rpm_oid.4.$chassis.$index";

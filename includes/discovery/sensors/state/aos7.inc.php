@@ -10,13 +10,13 @@ foreach ($pre_cache['aos7_fan_oids'] as $index => $data) {
         $indexName=strrev($revindex);
         $descr_oid = ".1.3.6.1.2.1.47.1.1.1.1.7.".$chassis;
         $chas_descr = snmp_get($device, $descr_oid, '-Oqv');
-        $descr = "CHASSIS-".substr($chas_descr,0,strpos($chas_descr,'/'))." Fan $indexName";
+        $descr = "CHASSIS-".substr($chas_descr, 0, strpos($chas_descr, '/'))." Fan $indexName";
         $states = [
             ['value' => 0, 'generic' => 2, 'graph' => 1, 'descr' => 'no-error'],
             ['value' => 1, 'generic' => 1, 'graph' => 1, 'descr' => 'notRunning'],
             ['value' => 2, 'generic' => 0, 'graph' => 1, 'descr' => 'running'],
         ];
-        create_state_index($state_name, $states); 
+        create_state_index($state_name, $states);
         discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $current);
         create_sensor_to_state_index($device, $state_name, $index);
     }
@@ -34,7 +34,7 @@ foreach (explode("\n", $oids) as $chas_entry) {
     if (!empty($data2)) {
         $number = $data2[1];
         $value = $data2[2];
-        $chas_oid_index = $chas_oid.$number; 
+        $chas_oid_index = $chas_oid.$number;
         $chas_current = "chasEntPhysOperStatus.$number";
         $descr_oid = ".1.3.6.1.2.1.47.1.1.1.1.7.".$number;
         $chas_descr = snmp_get($device, $descr_oid, '-Oqv');

@@ -7,8 +7,8 @@ foreach (explode("\n", $oids) as $chas_entry) {
     if (!empty($data2)) {
         $number = $data2[1];
         $value = $data2[2];
-	$chas_oid_index = $chas_oid.$number; 
-	$chas_current = "chasEntPhysOperStatus.$number";
+        $chas_oid_index = $chas_oid.$number;
+        $chas_current = "chasEntPhysOperStatus.$number";
         $descr_oid = ".1.3.6.1.2.1.47.1.1.1.1.7.".$number;
         $chas_descr = snmp_get($device, $descr_oid, '-Oqv');
         $chas_state_name = 'chasEntPhysOperStatus';
@@ -27,4 +27,3 @@ foreach (explode("\n", $oids) as $chas_entry) {
         create_sensor_to_state_index($device, $chas_state_name, $number);
     }
 }
-
