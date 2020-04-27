@@ -1,7 +1,5 @@
 <?php
 
-echo 'aos7';
-
 $multiplier = 1;
 $divisor    = 1000;
 foreach ($pre_cache['aos7_oids'] as $index => $entry) {
@@ -14,7 +12,7 @@ foreach ($pre_cache['aos7_oids'] as $index => $entry) {
         $value = $entry['ddmPortTxBiasCurrent']/$divisor;
         $entPhysicalIndex = $index;
         $entPhysicalIndex_measured = 'ports';
-        $port_descr = get_port_by_index_cache($device['device_id'], str_replace('.1', '', $index));
+        $port_descr = get_port_by_index_cache($device['device_id'], str_replace(array('.1','.2','.3','.4'), '', $index));
         $descr = $port_descr['ifName'] . ' TX Bias';
         discover_sensor($valid['sensor'], 'current', $device, $oid, $index, 'aos7', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $value, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
     }

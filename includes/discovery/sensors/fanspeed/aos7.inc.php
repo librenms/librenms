@@ -1,5 +1,4 @@
 <?php
-echo "Checking Fan Speed...\n";
     $rpm=[];
     $rpm_oid = '.1.3.6.1.4.1.6486.801.1.1.1.3.1.1.11.1'; // alaChasEntPhysFanTable
     $data = snmp_walk($device, 'alaChasEntPhysFanTable', "-OQUn", 'ALCATEL-IND1-CHASSIS-MIB', ':mibs/nokia/aos7:mibs');
@@ -25,7 +24,6 @@ if (is_array($rpm)) {
             $value = $data[4];
             $id= "$chassis.$index";
             $oid= "$rpm_oid.4.$chassis.$index";
-            echo "$descr: $value\n";
             discover_sensor($valid['sensor'], 'fanspeed', $device, $oid, $id, 'alcatel-lucent', $descr, '1', '1', null, null, null, null, $value, 'snmp');
         }
     }
