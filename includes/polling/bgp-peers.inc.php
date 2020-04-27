@@ -196,6 +196,7 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                                 'aristaBgp4V2PeerFsmEstablishedTime' => 'bgpPeerFsmEstablishedTime',
                                 'aristaBgp4V2PeerInUpdatesElapsedTime' => 'bgpPeerInUpdateElapsedTime',
                                 'aristaBgp4V2PeerLocalAddr' => 'bgpLocalAddr',
+                                'aristaBgp4V2PeerDescription' => 'bgpPeerDescr',
                                 'aristaBgp4V2PeerLastErrorCodeReceived' => 'bgpPeerLastErrorCode',
                                 'aristaBgp4V2PeerLastErrorSubCodeReceived' => 'bgpPeerLastErrorSubCode',
                                 'aristaBgp4V2PeerLastErrorReceivedText' => 'bgpPeerLastErrorText',

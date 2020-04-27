@@ -5218,7 +5218,7 @@
                     "bgpPeerAdminStatus": "running",
                     "bgpLocalAddr": "192.168.0.1",
                     "bgpPeerRemoteAddr": "0.0.0.0",
-                    "bgpPeerDescr": "",
+                    "bgpPeerDescr": "peer.example.com EBGP",
                     "bgpPeerInUpdates": 13362513,
                     "bgpPeerOutUpdates": 13579799,
                     "bgpPeerInTotalMessages": 13579799,
