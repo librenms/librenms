@@ -244,6 +244,18 @@
                     "app_type": "mysql"
                 },
                 {
+                    "metric": "ib_iop_aioread",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "ib_iop_aiowrite",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
                     "metric": "ib_iop_flush_bpool",
                     "value": 0,
                     "value_prev": null,
