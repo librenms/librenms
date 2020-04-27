@@ -23,7 +23,7 @@ modules:
                   divisor: 1000
                   entPhysicalIndex: '{{ $index }}'
                   entPhysicalIndex_measured: 'ports'
-                  descr: '{{ $ifDescr }} SFP Temperature'
+                  descr: '{{ $ifName }} SFP Temperature'
                   index: 'ddmTemperature.{{ $index }}'
                   low_limit: -40.0
                   high_limit: 85.0
@@ -42,7 +42,7 @@ modules:
                   divisor: 1000
                   entPhysicalIndex: '{{ $index }}'
                   entPhysicalIndex_measured: 'ports'
-                  descr: '{{ $ifDescr }} SFP Voltage'
+                  descr: '{{ $ifName }} SFP Voltage'
                   index: 'ddmSupplyVoltage.{{ $index }}'
                   low_limit: 3.13
                   high_limit: 3.47
@@ -55,7 +55,7 @@ modules:
                   divisor: 1000
                   entPhysicalIndex: '{{ $index }}'
                   entPhysicalIndex_measured: 'ports'
-                  descr: '{{ $ifDescr }} Tx Bias'
+                  descr: '{{ $ifName }} Tx Bias'
                   index: 'ddmTxBiasCurrent.{{ $index }}'
 
         dbm:
@@ -66,7 +66,7 @@ modules:
                   divisor: 1000
                   entPhysicalIndex: '{{ $index }}'
                   entPhysicalIndex_measured: 'ports'
-                  descr: '{{ $ifDescr }} Rx Power'
+                  descr: '{{ $ifName }} Rx Power'
                   index: 'ddmRxOpticalPower.{{ $index }}'
                   low_limit: -21.0
                   high_limit: -3.0
@@ -76,7 +76,7 @@ modules:
                   divisor: 1000
                   entPhysicalIndex: '{{ $index }}'
                   entPhysicalIndex_measured: 'ports'
-                  descr: '{{ $ifDescr }} Tx Power'
+                  descr: '{{ $ifName }} Tx Power'
                   index: 'ddmTxOutputPower.{{ $index }}'
                   low_limit: -9.0
                   high_limit: -3.0
