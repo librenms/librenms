@@ -20,4 +20,3 @@ if ($device['os'] == 'opengear') {
         discover_mempool($valid_mempool, $device, '0', 'opengear', 'Memory', '1', null, null);
     }
 }
-
