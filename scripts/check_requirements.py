@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 import os
 import pkg_resources
 from pkg_resources import DistributionNotFound, VersionConflict
