@@ -25,6 +25,7 @@
 
 namespace LibreNMS\DB;
 
+use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Util\Version;
 use Symfony\Component\Yaml\Yaml;
@@ -274,7 +275,7 @@ class Schema
 
     public function getTableFromKey($key)
     {
-        if (ends_with($key, '_id')) {
+        if (Str::endsWith($key, '_id')) {
             // hardcoded
             if ($key == 'app_id') {
                 return 'applications';
@@ -283,8 +284,8 @@ class Schema
             // try to guess assuming key_id = keys table
             $guessed_table = substr($key, 0, -3);
 
-            if (!ends_with($guessed_table, 's')) {
-                if (ends_with($guessed_table, 'x')) {
+            if (!Str::endsWith($guessed_table, 's')) {
+                if (Str::endsWith($guessed_table, 'x')) {
                     $guessed_table .= 'es';
                 } else {
                     $guessed_table .= 's';

@@ -29,7 +29,7 @@ $cxr_stats = snmpwalk_cache_oid($device, 'portStatsTable', $cxr_stats, 'CXR-TS-M
 d_echo($cxr_stats);
 
 //We'll create dummy ifIndexes to add the Serial Ports to the LibreNMS port view.
-//These devices are showing only a few interfaces, 1000 seems a sufficient offset. 
+//These devices are showing only a few interfaces, 1000 seems a sufficient offset.
 
 $offset = 1000;
 

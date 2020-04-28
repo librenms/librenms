@@ -4,7 +4,7 @@
  * requires snmp extend agent script from librenms-agent
  */
 if (!empty($pre_cache['raspberry_pi_sensors'])) {
-    $state = "raspberry_codec";
+    $state_name = "raspberry_codec";
     $oid = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.9.114.97.115.112.98.101.114.114.121.';
     for ($codec = 8; $codec < 14; $codec++) {
         switch ($codec) {
@@ -35,8 +35,8 @@ if (!empty($pre_cache['raspberry_pi_sensors'])) {
             ];
             create_state_index($state_name, $states);
 
-            discover_sensor($valid['sensor'], 'state', $device, $oid . $codec, $codec, $state, $descr, 1, 1, null, null, null, null, $value, 'snmp', $codec);
-            create_sensor_to_state_index($device, $state, $codec);
+            discover_sensor($valid['sensor'], 'state', $device, $oid . $codec, $codec, $state_name, $descr, 1, 1, null, null, null, null, $value, 'snmp', $codec);
+            create_sensor_to_state_index($device, $state_name, $codec);
         } else {
             break;
         }

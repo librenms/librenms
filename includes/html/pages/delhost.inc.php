@@ -20,13 +20,13 @@ if (Auth::user()->isDemo()) {
         } else {
             $device = device_by_id_cache($_REQUEST['id']);
             print_error("Are you sure you want to delete device " . $device['hostname'] . "?");
-?>
+            ?>
 <br />
 <center>
   <font color="red"></font><i class="fa fa-exclamation-triangle fa-3x"></i></font>
   <br>
   <form name="form1" method="post" action="" class="form-horizontal" role="form">
-    <?php echo csrf_field() ?>
+            <?php echo csrf_field() ?>
     <div class="form-group">
       <input type="hidden" name="id" value="<?php echo $_REQUEST['id'] ?>" />
       <input type="hidden" name="confirm" value="1" />
@@ -35,13 +35,13 @@ if (Auth::user()->isDemo()) {
     </div>
   </form>
 </center>
-<?php
+            <?php
         }
         echo('
     </div>
   </div>');
     } else {
-?>
+        ?>
 
     <form name="form1" method="post" action="" class="form-horizontal" role="form">
         <?php echo csrf_field() ?>
@@ -79,6 +79,6 @@ if (Auth::user()->isDemo()) {
     <td><input type="checkbox" name="remove_rrd" value="yes"></td>
   </tr>-->
 </form>
-<?php
+        <?php
     }
 }

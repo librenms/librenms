@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
+use App\Models\Sensor;
 use LibreNMS\Config;
 use LibreNMS\Permissions;
 use LibreNMS\Util\IP;
@@ -74,12 +75,16 @@ class AppServiceProvider extends ServiceProvider
 
     private function configureMorphAliases()
     {
-        Relation::morphMap([
+        $sensor_types = [];
+        foreach (Sensor::getTypes() as $sensor_type) {
+            $sensor_types[$sensor_type] = \App\Models\Sensor::class;
+        };
+        Relation::morphMap(array_merge([
             'interface' => \App\Models\Port::class,
             'sensor' => \App\Models\Sensor::class,
             'device' => \App\Models\Device::class,
             'device_group' => \App\Models\DeviceGroup::class,
-        ]);
+        ], $sensor_types));
     }
 
     private function registerFacades()

@@ -24,7 +24,7 @@ if (Auth::user()->hasGlobalAdmin()) {
         $bill_data['bill_notes']    = $port['port_descr_speed'];
         $port_device_id             = $port['device_id'];
     }
-?>
+    ?>
 
  <div class="modal fade bs-example-modal-sm" id="create-bill" tabindex="-1" role="dialog" aria-labelledby="Create" aria-hidden="true">
     <div class="modal-dialog">
@@ -41,16 +41,10 @@ if (Auth::user()->hasGlobalAdmin()) {
                 <div class="form-group">
                     <label class="col-sm-4 control-label" for="device">Device</label>
                     <div class="col-sm-8">
-                        <select class="form-control input-sm" id="device" name="device" onchange="getInterfaceList(this)">
-                            <option value=''>Select a device</option>
-                            <?php
-                              $devices = dbFetchRows('SELECT * FROM `devices` ORDER BY hostname');
-                            foreach ($devices as $device) {
-                                $selected = $device['device_id'] == $port_device_id ? " selected" : "";
-                                echo "<option value='${device['device_id']}' $selected>" . format_hostname($device) . "</option>\n";
-                            }
-                                ?>
-                        </select>
+                        <select class="form-control input-sm" id="device" name="device" onchange="getInterfaceList(this)"></select>
+                        <script type="text/javascript">
+                            init_select2('#device', 'device', {}, <?php echo "{id: $port_device_id, text: '" . format_hostname($device) . "'}"; ?>);
+                        </script>
                     </div>
                 </div>
                 <div class="form-group">
@@ -72,17 +66,17 @@ if (Auth::user()->hasGlobalAdmin()) {
                     </div>
                 </div>
 
-<?php
-if (Config::get('billing.95th_default_agg') == 1) {
-    $bill_data['dir_95th'] = 'agg';
-} else {
-    $bill_data['dir_95th'] = 'in';
-}
-$bill_data['bill_type'] = 'cdr';
-$quota = array('select_gb' => ' selected');
-$cdr = array('select_mbps' => ' selected');
-include 'includes/html/pages/bill/addoreditbill.inc.php';
-?>
+    <?php
+    if (Config::get('billing.95th_default_agg') == 1) {
+        $bill_data['dir_95th'] = 'agg';
+    } else {
+        $bill_data['dir_95th'] = 'in';
+    }
+    $bill_data['bill_type'] = 'cdr';
+    $quota = array('select_gb' => ' selected');
+    $cdr = array('select_mbps' => ' selected');
+    include 'includes/html/pages/bill/addoreditbill.inc.php';
+    ?>
                 <div class="form-group">
                   <div class="col-sm-offset-4 col-sm-4">
                     <button type="submit" class="btn btn-primary"><i class="fa fa-check"></i> Add Bill</button>
@@ -95,5 +89,5 @@ include 'includes/html/pages/bill/addoreditbill.inc.php';
     </div>
 </div>
 
-<?php
+    <?php
 }

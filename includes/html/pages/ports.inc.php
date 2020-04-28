@@ -14,6 +14,7 @@
 */
 
 use App\Models\Port;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 $pagetitle[] = "Ports";
 
@@ -388,18 +389,18 @@ foreach ($vars as $var => $value) {
                 break;
             case 'purge':
                 if ($vars['purge'] === 'all') {
-                    $interfaces = dbFetchRows('SELECT * from `ports` AS P, `devices` AS D WHERE `deleted` = 1 AND D.device_id = P.device_id');
-                    foreach ($interfaces as $interface) {
-                        $interface = cleanPort($interface);
-                        if (port_permitted($interface['port_id'], $interface['device_id'])) {
-                            delete_port($interface['port_id']);
+                    Port::hasAccess(Auth::user())->with(['device' => function ($query) {
+                        $query->select('device_id', 'hostname');
+                    }])->isDeleted()->chunk(100, function ($ports) {
+                        foreach ($ports as $port) {
+                            $port->delete();
                         }
-                    }
+                    });
                 } else {
-                    $interface = dbFetchRow('SELECT * from `ports` AS P, `devices` AS D WHERE `port_id` = ? AND D.device_id = P.device_id', array($vars['purge']));
-                    $interface = cleanPort($interface);
-                    if (port_permitted($interface['port_id'], $interface['device_id'])) {
-                        delete_port($interface['port_id']);
+                    try {
+                        Port::hasAccess(Auth::user())->where('port_id', $vars['purge'])->firstOrFail()->delete();
+                    } catch (ModelNotFoundException $e) {
+                        echo "<div class='alert alert-danger'>Port ID {$vars['purge']} not found! Could not purge port.</div>";
                     }
                 }
                 break;

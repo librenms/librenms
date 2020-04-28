@@ -23,6 +23,8 @@
  * @author     Marcus Pink <mpink@avantgarde-labs.de>
  */
 
+use Illuminate\Support\Str;
+
 $serverscheck_oids = [
     'sensor1Value.0' => '.1.3.6.1.4.1.17095.3.2.0',
     'sensor2Value.0' => '.1.3.6.1.4.1.17095.3.6.0',
@@ -32,7 +34,7 @@ $serverscheck_oids = [
 ];
  
 foreach ($pre_cache['serverscheck_control'] as $oid_name => $oid_value) {
-    if ((str_contains($oid_name, 'name')) && (str_contains($oid_value, ['Flooding', 'Leckage']))) {
+    if ((Str::contains($oid_name, 'name')) && (Str::contains($oid_value, ['Flooding', 'Leckage']))) {
         preg_match("/(\d+)/", $oid_name, $temp_x);
         $tmp_oid = 'sensor' . $temp_x[0] . 'Value.0';
         $current = $pre_cache['serverscheck_control'][$tmp_oid];

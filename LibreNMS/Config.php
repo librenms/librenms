@@ -29,6 +29,7 @@ use App\Models\GraphType;
 use Exception;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use LibreNMS\DB\Eloquent;
 use Log;
 
@@ -125,7 +126,7 @@ class Config
             return self::$config[$key];
         }
 
-        if (!str_contains($key, '.')) {
+        if (!Str::contains($key, '.')) {
             return $default;
         }
 
@@ -183,7 +184,7 @@ class Config
                 return self::$config['os'][$os][$key];
             }
 
-            if (!str_contains($key, '.')) {
+            if (!Str::contains($key, '.')) {
                 return self::get($key, $default);
             }
 
@@ -213,7 +214,7 @@ class Config
         }
 
         if (!isset(self::$config['os'][$os][$key])) {
-            if (!str_contains($key, '.')) {
+            if (!Str::contains($key, '.')) {
                 return self::get($key, $default);
             }
             if (!self::has("os.$os.$key")) {
@@ -298,7 +299,7 @@ class Config
             return true;
         }
 
-        if (!str_contains($key, '.')) {
+        if (!Str::contains($key, '.')) {
             return false;
         }
 
@@ -385,7 +386,7 @@ class Config
         if (isset($_SERVER['SERVER_NAME']) && isset($_SERVER['SERVER_PORT'])) {
             $port = $_SERVER['SERVER_PORT'] != 80 ? ':' . $_SERVER['SERVER_PORT'] : '';
             // handle literal IPv6
-            $server = str_contains($_SERVER['SERVER_NAME'], ':') ? "[{$_SERVER['SERVER_NAME']}]" : $_SERVER['SERVER_NAME'];
+            $server = Str::contains($_SERVER['SERVER_NAME'], ':') ? "[{$_SERVER['SERVER_NAME']}]" : $_SERVER['SERVER_NAME'];
             Arr::set(self::$config, 'base_url', "http://$server$port/");
         }
 
@@ -534,7 +535,7 @@ class Config
      */
     public static function locateBinary($binary)
     {
-        if (!str_contains($binary, '/')) {
+        if (!Str::contains($binary, '/')) {
             $output = `whereis -b $binary`;
             $list = trim(substr($output, strpos($output, ':') + 1));
             $targets = explode(' ', $list);

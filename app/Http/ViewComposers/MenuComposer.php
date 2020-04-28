@@ -27,6 +27,7 @@ namespace App\Http\ViewComposers;
 
 use App\Models\AlertRule;
 use App\Models\BgpPeer;
+use App\Models\Dashboard;
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\Location;
@@ -56,11 +57,18 @@ class MenuComposer
         $user = Auth::user();
         $site_style = Config::get('applied_site_style');
 
+        //global Settings
+        $vars['hide_dashboard_editor'] = UserPref::getPref($user, 'hide_dashboard_editor');
+        // end global Settings
+
         //TODO: should be handled via CSS Themes
         $vars['navbar'] = in_array($site_style, ['mono', 'dark']) ? 'navbar-inverse' : '';
 
         $vars['project_name'] = Config::get('project_name', 'LibreNMS');
         $vars['title_image'] = Config::get('title_image', "images/librenms_logo_$site_style.svg");
+
+        //Dashboards
+        $vars['dashboards'] = Dashboard::select('dashboard_id', 'dashboard_name')->allAvailable($user)->orderBy('dashboard_name')->get();
 
         // Device menu
         $vars['device_groups'] = DeviceGroup::hasAccess($user)->orderBy('name')->get(['device_groups.id', 'name', 'desc']);
@@ -83,11 +91,7 @@ class MenuComposer
         $vars['port_counts']['pseudowire'] = Config::get('enable_pseudowires') ? ObjectCache::portCounts(['pseudowire'])['pseudowire'] : 0;
 
         $vars['port_counts']['alerted'] = 0; // not actually supported on old...
-        $vars['custom_port_descr'] = collect(Config::get('custom_descr', []))
-            ->filter()
-            ->map(function ($descr) {
-                return strtolower($descr);
-            });
+        $vars['custom_port_descr'] = collect(Config::get('custom_descr', []))->filter();
         $vars['port_groups_exist'] = Config::get('int_customers') ||
             Config::get('int_transit') ||
             Config::get('int_peering') ||

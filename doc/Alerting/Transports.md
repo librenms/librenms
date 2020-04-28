@@ -129,6 +129,22 @@ The example below will use the API named component of my.example.com with id 1, 
 |               | Content-Type=application/json
 | API Body      | { "status": 2 }
 
+
+## aspSMS
+aspSMS is a SMS provider that can be configured by using the generic API Transport.
+You need a token you can find on your personnal space.
+
+[aspSMS docs](https://www.aspsms.com/en/documentation/)
+
+**Example:**
+
+| Config | Example |
+| ------ | ------- |
+| Transport type | Api |
+| API Method | POST |
+| API URL | https://soap.aspsms.com/aspsmsx.asmx/SimpleTextSMS |
+| Options | UserKey=USERKEY<br />Password=APIPASSWORD<br />Recipient=RECIPIENT<br />Originator=ORIGINATOR<br />MessageText={{ $msg }} |
+
 ## Boxcar
 
 Copy your access token from the Boxcar app or from the Boxcar.io
@@ -499,6 +515,50 @@ required value is for url, without this then no call to Rocket.chat will be made
 | Webhook URL | https://rocket.url/api/v1/chat.postMessage |
 | Rocket.chat Options | channel=#Alerting <br/> username=myname <br/> icon_url=http://someurl/image.gif <br/> icon_emoji=:smirk: |
 
+## Sensu
+
+The Sensu transport will POST an
+[Event](https://docs.sensu.io/sensu-go/latest/reference/events/) to the
+[Agent API](https://docs.sensu.io/sensu-go/latest/reference/agent/#create-monitoring-events-using-the-agent-api)
+upon an alert being generated.
+
+It will be categorised (ok, warning or critical), and if you configure the
+alert to send recovery notifications, Sensu will also clear the alert
+automatically. No configuration is required - as long as you are running the
+Sensu Agent on your poller with the HTTP socket enabled on tcp/3031, LibreNMS
+will start generating Sensu events as soon as you create the transport.
+
+Acknowledging alerts within LibreNMS is not directly supported, but an
+annotation (`acknowledged`) is set, so a mutator or silence, or even the
+handler could be written to look for it directly in the handler. There is also
+an annotation (`generated-by`) set, to allow you to treat LibreNMS events
+differently from agent events.
+
+The 'shortname' option is a simple way to reduce the length of device names in
+configs. It replaces the last 3 domain components with single letters (e.g.
+websrv08.dc4.eu.corp.example.net gets shortened to websrv08.dc4.eu.cen).
+
+### Limitations
+
+- Only a single namespace is supported
+- Sensu will reject rules with special characters - the Transport will attempt
+to fix up rule names, but it's best to stick to letters, numbers and spaces
+- The transport only deals in absolutes - it ignores the got worse/got better
+states
+- The agent will buffer alerts, but LibreNMS will not - if your agent is
+offline, alerts will be dropped
+- There is no backchannel between Sensu and LibreNMS - if you make changes in
+Sensu to LibreNMS alerts, they'll be lost on the next event (silences will work)
+
+**Example:**
+
+| Config          | Example               |
+| --------------- | --------------------- |
+| Sensu Endpoint  | http://localhost:3031 |
+| Sensu Namespace | eu-west               |
+| Check Prefix    | lnms                  |
+| Source Key      | hostname              |
+
 ## Slack
 
 The Slack transport will POST the alert message to your Slack Incoming
@@ -538,6 +598,22 @@ either local or international dialling format.
 | User | smseagle_user |
 | Password | smseagle_user_password |
 | Mobiles | +3534567890 <br/> 0834567891 |
+
+## SMSmode
+SMSmode is a SMS provider that can be configured by using the generic API Transport.
+You need a token you can find on your personnal space.
+
+[SMSmode docs](https://www.smsmode.com/pdf/fiche-api-http.pdf)
+
+**Example:**
+
+| Config | Example |
+| ------ | ------- |
+| Transport type | Api |
+| API Method | POST |
+| API URL | http://api.smsmode.com/http/1.6/sendSMS.do |
+| Options | accessToken=_PUT_HERE_YOUR_TOKEN_<br />numero=_PUT_HERE_DESTS_NUMBER_COMMA_SEPARATED_<br />message={{ $msg }} |
+
 
 ## Syslog
 

@@ -30,7 +30,7 @@ use RecursiveIteratorIterator;
 use RecursiveRegexIterator;
 use RegexIterator;
 
-class AlertTest extends TestCase
+class AlertingTest extends TestCase
 {
     public function testJsonAlertCollection()
     {

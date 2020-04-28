@@ -12,6 +12,7 @@
  * See COPYING for more details.
  */
 
+use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\HostExistsException;
 use LibreNMS\Exceptions\InvalidIpException;
@@ -913,13 +914,13 @@ function get_device_divisor($device, $os_version, $sensor_type, $oid)
         }
     } elseif ($device['os'] == 'huaweiups') {
         if ($sensor_type == 'frequency') {
-            if (starts_with($device['hardware'], "UPS2000")) {
+            if (Str::startsWith($device['hardware'], "UPS2000")) {
                 return 10;
             }
             return 100;
         }
     } elseif ($device['os'] == 'hpe-rtups') {
-        if ($sensor_type == 'voltage' && !starts_with($oid, '.1.3.6.1.2.1.33.1.2.5.') && !starts_with($oid, '.1.3.6.1.2.1.33.1.3.3.1.3')) {
+        if ($sensor_type == 'voltage' && !Str::startsWith($oid, '.1.3.6.1.2.1.33.1.2.5.') && !Str::startsWith($oid, '.1.3.6.1.2.1.33.1.3.3.1.3')) {
             return 1;
         }
     } elseif ($device['os'] == 'apc-mgeups') {
@@ -934,16 +935,16 @@ function get_device_divisor($device, $os_version, $sensor_type, $oid)
         return 1;
     }
 
-    if ($sensor_type == 'voltage' && !starts_with($oid, '.1.3.6.1.2.1.33.1.2.5.')) {
+    if ($sensor_type == 'voltage' && !Str::startsWith($oid, '.1.3.6.1.2.1.33.1.2.5.')) {
         return 1;
     }
 
     if ($sensor_type == 'runtime') {
-        if (starts_with($oid, '.1.3.6.1.2.1.33.1.2.2.')) {
+        if (Str::startsWith($oid, '.1.3.6.1.2.1.33.1.2.2.')) {
             return 60;
         }
 
-        if (starts_with($oid, '.1.3.6.1.2.1.33.1.2.3.')) {
+        if (Str::startsWith($oid, '.1.3.6.1.2.1.33.1.2.3.')) {
             if ($device['os'] == 'routeros') {
                 return 60;
             } else {
@@ -985,7 +986,7 @@ function ignore_storage($os, $descr)
     }
 
     foreach (Config::getOsSetting($os, 'ignore_mount_string') as $ims) {
-        if (str_contains($descr, $ims)) {
+        if (Str::contains($descr, $ims)) {
             d_echo("ignored $descr (matched: $ims)\n");
             return true;
         }
@@ -1037,7 +1038,7 @@ function discovery_process(&$valid, $device, $sensor_type, $pre_cache)
                 if (!is_numeric($snmp_value)) {
                     if ($sensor_type === 'temperature') {
                         // For temp sensors, try and detect fahrenheit values
-                        if (ends_with($snmp_value, array('f', 'F'))) {
+                        if (Str::endsWith($snmp_value, array('f', 'F'))) {
                             $user_function = 'fahrenheit_to_celsius';
                         }
                     }

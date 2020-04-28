@@ -6,7 +6,7 @@ path: blob/master/doc/
 > at `mysql>` prompts) or temporarily become a user with root
 > privileges with `sudo -s` or `sudo -i`.
 
-**Please note the minimum supported PHP version is 7.1.3**
+**Please note the minimum supported PHP version is 7.2.5**
 
 
 ## Install Common Required Packages ##
@@ -39,17 +39,6 @@ Install the required packages
 ```
 yum install mod_php php-cli php-common php-curl php-gd php-mbstring php-process php-snmp php-xml php-zip php-memcached php-mysqlnd
 ```
-
-#### Running with Webtatic PHP
-
-```
-rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm
-```
-
-```
-yum install php72w php72w-cli php72w-common php72w-curl php72w-gd php72w-mbstring php72w-mysqlnd php72w-process php72w-snmp php72w-xml php72w-zip
-```
-
 
 #### Running with CentOS SCL php
 

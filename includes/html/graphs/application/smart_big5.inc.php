@@ -18,27 +18,27 @@ if (rrdtool_check_rrd_exists($rrd_filename)) {
         'filename' => $rrd_filename,
         'descr'    => 'Reallocated_Sector_Ct',
         'ds'       => 'id5',
-    );
+        );
         $rrd_list[]=array(
         'filename' => $rrd_filename,
         'descr'    => 'Reported_Uncorrect',
         'ds'       => 'id187',
-    );
+        );
         $rrd_list[]=array(
         'filename' => $rrd_filename,
         'descr'    => 'Command_Timeout',
         'ds'       => 'id188',
-    );
+        );
         $rrd_list[]=array(
         'filename' => $rrd_filename,
         'descr'    => 'Current_Pending_Sector',
         'ds'       => 'id197',
-    );
+        );
         $rrd_list[]=array(
         'filename' => $rrd_filename,
         'descr'    => 'Offline_Uncorrectable',
         'ds'       => 'id198',
-    );
+        );
 }
 
 

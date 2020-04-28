@@ -23,11 +23,17 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
 
     // pages
     Route::resource('device-groups', 'DeviceGroupController');
+    Route::get('poller', 'PollerController@pollerTab')->name('poller');
+    Route::get('poller/log', 'PollerController@logTab')->name('poller.log');
+    Route::get('poller/groups', 'PollerController@groupsTab')->name('poller.groups');
+    Route::get('poller/performance', 'PollerController@performanceTab')->name('poller.performance');
     Route::get('locations', 'LocationController@index');
     Route::resource('preferences', 'UserPreferencesController', ['only' => ['index', 'store']]);
     Route::resource('users', 'UserController');
     Route::get('about', 'AboutController@index');
     Route::get('authlog', 'UserController@authlog');
+    Route::get('overview', 'OverviewController@index')->name('overview');
+    Route::get('/', 'OverviewController@index');
 
     // Maps
     Route::group(['prefix' => 'maps', 'namespace' => 'Maps'], function () {
@@ -42,7 +48,7 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
     });
 
     // old route redirects
-    Route::permanentRedirect('poll-log', 'pollers/tab=log/');
+    Route::permanentRedirect('poll-log', 'poller/log');
     Route::get('settings/sub={tab}', function ($tab) {
         return redirect("settings/$tab");
     });
@@ -63,7 +69,7 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
     Route::group(['prefix' => 'ajax'], function () {
         // page ajax controllers
         Route::resource('location', 'LocationController', ['only' => ['update', 'destroy']]);
-
+        Route::resource('pollergroup', 'PollerGroupController', ['only' => ['destroy']]);
         // misc ajax controllers
         Route::group(['namespace' => 'Ajax'], function () {
             Route::post('set_map_group', 'AvailabilityMapController@setGroup');

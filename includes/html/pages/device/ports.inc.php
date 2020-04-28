@@ -123,7 +123,7 @@ if ($vars['view'] == 'minigraphs') {
     if ($vars['view'] == 'details') {
         $port_details = 1;
     }
-?>
+    ?>
 <div style='margin: 0px;'><table class='table'>
   <tr>
     <th width="350"><A href="<?php echo generate_url($vars, array('sort' => "port")); ?>">Port</a></th>
@@ -134,7 +134,7 @@ if ($vars['view'] == 'minigraphs') {
     <th width="100">Mac Address</th>
     <th width="375"></th>
   </tr>
-<?php
+    <?php
 
     $i = '1';
 
@@ -144,25 +144,25 @@ if ($vars['view'] == 'minigraphs') {
     // As we've dragged the whole database, lets pre-populate our caches :)
     // FIXME - we should probably split the fetching of link/stack/etc into functions and cache them here too to cut down on single row queries.
 
-foreach ($ports as $key => $port) {
-    $port_cache[$port['port_id']] = $port;
-    $port_index_cache[$port['device_id']][$port['ifIndex']] = $port;
-    $ports[$key]["ifOctets_rate"] = $port["ifInOctets_rate"] + $port["ifOutOctets_rate"];
-}
+    foreach ($ports as $key => $port) {
+        $port_cache[$port['port_id']] = $port;
+        $port_index_cache[$port['device_id']][$port['ifIndex']] = $port;
+        $ports[$key]["ifOctets_rate"] = $port["ifInOctets_rate"] + $port["ifOutOctets_rate"];
+    }
 
-switch ($vars["sort"]) {
-    case 'traffic':
-        $ports = array_sort_by_column($ports, 'ifOctets_rate', SORT_DESC);
-        break;
-    default:
-        $ports = array_sort_by_column($ports, 'ifIndex', SORT_ASC);
-        break;
-}
+    switch ($vars["sort"]) {
+        case 'traffic':
+            $ports = array_sort_by_column($ports, 'ifOctets_rate', SORT_DESC);
+            break;
+        default:
+            $ports = array_sort_by_column($ports, 'ifIndex', SORT_ASC);
+            break;
+    }
 
-foreach ($ports as $port) {
-    include 'includes/html/print-interface.inc.php';
-    $i++;
-}
+    foreach ($ports as $port) {
+        include 'includes/html/print-interface.inc.php';
+        $i++;
+    }
 
     echo '</table></div>';
 }//end if

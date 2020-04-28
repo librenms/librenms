@@ -76,27 +76,27 @@ if ($notifications['count'] > 0 && !isset($vars['archive'])) {
 </div>
 <?php if (!isset($vars['archive'])) { ?>
 <div class="container">
-<?php
-foreach ($notifications['sticky'] as $notif) {
-    if (is_numeric($notif['source'])) {
-        $notif['source'] = dbFetchCell('select username from users where user_id =?', array($notif['source']));
-    }
-    echo '<div class="well"><div class="row"> <div class="col-md-12">';
+    <?php
+    foreach ($notifications['sticky'] as $notif) {
+        if (is_numeric($notif['source'])) {
+            $notif['source'] = dbFetchCell('select username from users where user_id =?', array($notif['source']));
+        }
+        echo '<div class="well"><div class="row"> <div class="col-md-12">';
 
-    $class = $notif['severity'] == 2 ? 'text-danger' : 'text-warning';
-    echo "<h4 class='$class' id='${notif['notifications_id']}'>";
-    echo "<strong><i class='fa fa-bell-o'></i>&nbsp;${notif['title']}</strong>";
-    echo "<span class='pull-right'>";
+        $class = $notif['severity'] == 2 ? 'text-danger' : 'text-warning';
+        echo "<h4 class='$class' id='${notif['notifications_id']}'>";
+        echo "<strong><i class='fa fa-bell-o'></i>&nbsp;${notif['title']}</strong>";
+        echo "<span class='pull-right'>";
 
-    if ($notif['user_id'] != Auth::id()) {
-        $sticky_user = User::find($notif['user_id']);
-        echo "<code>Sticky by {$sticky_user->username}</code>";
-    } else {
-        echo '<button class="btn btn-primary fa fa-bell-slash-o unstick-notif" data-toggle="tooltip" data-placement="bottom" title="Remove Sticky" style="margin-top:-10px;"></button>';
-    }
+        if ($notif['user_id'] != Auth::id()) {
+            $sticky_user = User::find($notif['user_id']);
+            echo "<code>Sticky by {$sticky_user->username}</code>";
+        } else {
+            echo '<button class="btn btn-primary fa fa-bell-slash-o unstick-notif" data-toggle="tooltip" data-placement="bottom" title="Remove Sticky" style="margin-top:-10px;"></button>';
+        }
 
-    echo '</span></h4>';
-?>
+        echo '</span></h4>';
+        ?>
       </div>
     </div>
     <div class="row">
@@ -108,30 +108,30 @@ foreach ($notifications['sticky'] as $notif) {
       </div>
     </div>
   </div>
-<?php        } ?>
-<?php    if ($notifications['sticky_count'] != 0) { ?>
+    <?php        } ?>
+    <?php    if ($notifications['sticky_count'] != 0) { ?>
 <hr/>
-<?php    } ?>
-<?php
-foreach ($notifications['unread'] as $notif) {
-    if (is_numeric($notif['source'])) {
-        $source_user = User::find($notif['source']);
-        $notif['source'] = $source_user->username;
-    }
-    echo '<div class="well"><div class="row"> <div class="col-md-12">';
-    d_echo($notif);
-    $class = 'text-success';
-    if ($notif['severity'] == 1) {
-        $class='text-warning';
-    } elseif ($notif['severity'] == 2) {
-        $class = 'text-danger';
-    }
-    echo "<h4 class='$class' id='${notif['notifications_id']}'>${notif['title']}<span class='pull-right'>";
+    <?php    } ?>
+    <?php
+    foreach ($notifications['unread'] as $notif) {
+        if (is_numeric($notif['source'])) {
+            $source_user = User::find($notif['source']);
+            $notif['source'] = $source_user->username;
+        }
+        echo '<div class="well"><div class="row"> <div class="col-md-12">';
+        d_echo($notif);
+        $class = 'text-success';
+        if ($notif['severity'] == 1) {
+            $class='text-warning';
+        } elseif ($notif['severity'] == 2) {
+            $class = 'text-danger';
+        }
+        echo "<h4 class='$class' id='${notif['notifications_id']}'>${notif['title']}<span class='pull-right'>";
 
-    if (Auth::user()->hasGlobalAdmin()) {
-        echo '<button class="btn btn-primary fa fa-bell-o stick-notif" data-toggle="tooltip" data-placement="bottom" title="Mark as Sticky" style="margin-top:-10px;"></button>';
-    }
-?>
+        if (Auth::user()->hasGlobalAdmin()) {
+            echo '<button class="btn btn-primary fa fa-bell-o stick-notif" data-toggle="tooltip" data-placement="bottom" title="Mark as Sticky" style="margin-top:-10px;"></button>';
+        }
+        ?>
 
 <button class="btn btn-primary fa fa-eye read-notif" data-toggle="tooltip" data-placement="bottom" title="Mark as Read" style="margin-top:-10px;"></button>
 </span>
@@ -147,7 +147,7 @@ foreach ($notifications['unread'] as $notif) {
       </div>
     </div>
   </div>
-<?php        } ?>
+    <?php        } ?>
   <div class="row">
     <div class="col-md-12">
       <h3><a class="btn btn-default" href="notifications/archive/">Show Archive</a></h3>
@@ -161,20 +161,20 @@ foreach ($notifications['unread'] as $notif) {
       <h2>Archive</h2>
     </div>
   </div>
-<?php
-foreach ($notifications['read'] as $notif) {
-    echo '<div class="well"><div class="row"> <div class="col-md-12"><h4';
-    if ($notif['severity'] == 1) {
-        echo ' class="text-warning"';
-    } elseif ($notif['severity'] == 2) {
-        echo ' class="text-danger"';
-    }
-    echo  " id='${notif['notifications_id']}'>${notif['title']}";
+    <?php
+    foreach ($notifications['read'] as $notif) {
+        echo '<div class="well"><div class="row"> <div class="col-md-12"><h4';
+        if ($notif['severity'] == 1) {
+            echo ' class="text-warning"';
+        } elseif ($notif['severity'] == 2) {
+            echo ' class="text-danger"';
+        }
+        echo  " id='${notif['notifications_id']}'>${notif['title']}";
 
-    if (Auth::user()->isAdmin()) {
-        echo '<span class="pull-right"><button class="btn btn-primary fa fa-bell-o stick-notif" data-toggle="tooltip" data-placement="bottom" title="Mark as Sticky" style="margin-top:-10px;"></button></span>';
-    }
-?>
+        if (Auth::user()->isAdmin()) {
+            echo '<span class="pull-right"><button class="btn btn-primary fa fa-bell-o stick-notif" data-toggle="tooltip" data-placement="bottom" title="Mark as Sticky" style="margin-top:-10px;"></button></span>';
+        }
+        ?>
         </h4>
       </div>
     </div>
@@ -187,7 +187,7 @@ foreach ($notifications['read'] as $notif) {
       </div>
     </div>
   </div>
-<?php    } ?>
+    <?php    } ?>
 </div>
 <?php } ?>
 <script>
