@@ -119,7 +119,7 @@ foreach ($oids as $index => $entry) {
     }
     create_state_index($type, $states);
 
-if (!empty($current)) {
+    if (!empty($current)) {
         discover_sensor(
             $valid['sensor'],
             $class,
