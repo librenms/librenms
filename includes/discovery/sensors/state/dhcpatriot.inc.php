@@ -119,28 +119,29 @@ foreach ($oids as $index => $entry) {
     }
     create_state_index($type, $states);
 
-    discover_sensor(
-        $valid['sensor'],
-        $class,
-        $device,
-        $oid,
-        $index,
-        $type,
-        $descr,
-        $divisor,
-        $multiplier,
-        $low_limit,
-        $low_warn_limit,
-        $warn_limit,
-        $high_limit,
-        $current,
-        $poller_type,
-        $entPhysicalIndex,
-        $entPhysicalIndex_measured,
-        $user_func,
-        $group
-    );
-
+if (!empty($current)) {
+        discover_sensor(
+            $valid['sensor'],
+            $class,
+            $device,
+            $oid,
+            $index,
+            $type,
+            $descr,
+            $divisor,
+            $multiplier,
+            $low_limit,
+            $low_warn_limit,
+            $warn_limit,
+            $high_limit,
+            $current,
+            $poller_type,
+            $entPhysicalIndex,
+            $entPhysicalIndex_measured,
+            $user_func,
+            $group
+        );
+    }
     create_sensor_to_state_index($device, $type, $index);
 }
 
