@@ -87,7 +87,7 @@ foreach ($oids as $index => $entry) {
 
     $tmp_snmp_data = snmp_get($device, $oid, '-Oqv');
 
-    if ($type === 'dhcpatriotServiceStatus' && gettype($tmp_snmp_data) === 'string') {
+    if (!empty($tmp_snmp_data) && gettype($tmp_snmp_data) === 'string' && $type === 'dhcpatriotServiceStatus') {
         $tmp_snmp_data = explode(':', $tmp_snmp_data);
         $current = intval($tmp_snmp_data[1]);
 
@@ -106,7 +106,7 @@ foreach ($oids as $index => $entry) {
         ];
     }
 
-    if ($type === 'dhcpatriotSystemTime') {
+    if (!empty($tmp_snmp_data) && gettype($tmp_snmp_data) === 'string' && $type === 'dhcpatriotSystemTime') {
         $current = 1;
         if ((intval($tmp_snmp_data) - $current_time) > 300) {
             $current = 3;
