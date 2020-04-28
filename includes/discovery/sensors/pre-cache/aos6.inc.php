@@ -15,4 +15,3 @@ $pre_cache['aos6_fan_oids'] = snmpwalk_cache_multi_oid($device, 'alaChasEntPhysF
 
 echo 'chasChassisEntry';
 $pre_cache['aos6_temp_oids'] = snmpwalk_cache_multi_oid($device, 'chasChassisEntry', [], 'ALCATEL-IND1-CHASSIS-MIB', 'aos6', '-OQUse');
-
