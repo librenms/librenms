@@ -1,6 +1,6 @@
 <?php
 
-if ($device['os'] == 'aos') {
+if ($device['os'] == 'aos7') {
     echo 'Alcatel-Lucent OS: ';
     if (strpos($device['sysObjectID'], '1.3.6.1.4.1.6486.801')) { // AOS 7
         $total   = snmp_get($device, '.1.3.6.1.4.1.6486.801.1.1.1.2.1.1.3.4.0', '-OvQ', 'ALCATEL-IND1-SYSTEM-MIB', 'nokia/aos7'); // systemHardwareMemorySize
@@ -10,16 +10,7 @@ if ($device['os'] == 'aos') {
 
         if (is_numeric($total) && is_numeric($percent)) {
             $total *= 1024; // Memory in MB
-            discover_mempool($valid_mempool, $device, 0, 'aos-device', 'Device Memory', 1, null, null);
-        }
-    } else {
-        $total   = snmp_get($device, 'systemHardwareMemorySize.0', '-OvQ', 'ALCATEL-IND1-SYSTEM-MIB', 'aos');
-        $percent = snmp_get($device, 'healthDeviceMemoryLatest.0', '-OvQ', 'ALCATEL-IND1-HEALTH-MIB', 'aos');
-        $used    = ($total / 100 * $perc_used);
-        $free    = ($total - $used);
-
-        if (is_numeric($total) && is_numeric($used)) {
-            discover_mempool($valid_mempool, $device, 0, 'aos-device', 'Device Memory', '1', null, null);
+            discover_mempool($valid_mempool, $device, 0, 'aos7', 'Device Memory', 1, null, null);
         }
     }
 }

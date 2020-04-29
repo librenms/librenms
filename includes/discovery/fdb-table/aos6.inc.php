@@ -24,21 +24,7 @@
  * @author    JoseUPV
  */
 
-// Try nokia/aos7/ALCATEL-IND1-MAC-ADDRESS-MIB::slMacAddressGblManagement first
-$dot1d = snmpwalk_group($device, 'slMacAddressGblManagement', 'ALCATEL-IND1-MAC-ADDRESS-MIB', 0, array(), 'nokia/aos7');
-if (!empty($dot1d)) {
-    echo 'AOS7+ MAC-ADDRESS-MIB:';
-    $fdbPort_table=array();
-    foreach ($dot1d['slMacAddressGblManagement'] as $slMacDomain => $data) {
-        foreach ($data as $slLocaleType => $data2) {
-            foreach ($data2 as $portLocal => $data3) {
-                foreach ($data3 as $vlanLocal => $data4) {
-                    $fdbPort_table[$vlanLocal]=array('dot1qTpFdbPort' => array_combine(array_keys($data4[0]), array_fill(0, count($data4[0]), $portLocal)));
-                }
-            }
-        }
-    }
-} else {
+if (empty($fdbPort_table)) { // no empty if come from aos7 script
     // try nokia/ALCATEL-IND1-MAC-ADDRESS-MIB::slMacAddressDisposition
     $dot1d = snmpwalk_group($device, 'slMacAddressDisposition', 'ALCATEL-IND1-MAC-ADDRESS-MIB', 0, array(), 'nokia');
     if (!empty($dot1d)) {
