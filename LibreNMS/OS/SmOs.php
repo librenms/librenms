@@ -25,30 +25,68 @@ class SmOs extends OS implements
         $sensors = [];
 
         foreach ($oids as $link => $radioEntry) {
+            $totalOids = ['rx' => [], 'tx' => []];
+
             foreach ($radioEntry as $radio => $entry) {
                 $index = "$link.$radio";
+                if (isset($entry['linkTxETHCapacity'])) {
+                    $txOid = '.1.3.6.1.4.1.3373.1103.80.17.1.10.' . $index;
+                    $totalOids['tx'][] = $txOid;
+                    $sensors[] = new WirelessSensor(
+                        'rate',
+                        $this->getDeviceId(),
+                        $txOid,
+                        'tx',
+                        $index,
+                        $this->getLinkLabel($link) . ' Tx ' . $this->getRadioLabel($radio),
+                        $entry['linkTxETHCapacity'],
+                        1000
+                    );
+                }
+
+                if (isset($entry['linkRxETHCapacity'])) {
+                    $rxOid = '.1.3.6.1.4.1.3373.1103.80.17.1.11.' . $index;
+                    $totalOids['rx'][] = $rxOid;
+                    $sensors[] = new WirelessSensor(
+                        'rate',
+                        $this->getDeviceId(),
+                        $rxOid,
+                        'rx',
+                        $index,
+                        $this->getLinkLabel($link) . ' Rx ' . $this->getRadioLabel($radio),
+                        $entry['linkRxETHCapacity'],
+                        1000
+                    );
+                }
+            }
+
+            if (!empty($totalOids['rx'])) {
                 $sensors[] = new WirelessSensor(
                     'rate',
                     $this->getDeviceId(),
-                    '.1.3.6.1.4.1.3373.1103.80.17.1.10.' . $index,
-                    'tx',
+                    $totalOids['rx'],
+                    'total-rx',
                     $index,
-                    $this->getLinkLabel($link) . ' Tx ' . $this->getRadioLabel($radio),
-                    $entry['linkTxETHCapacity'] ?? null,
+                    $this->getLinkLabel($link) . ' Total Rx',
+                    array_sum(array_column($radioEntry, 'linkRxETHCapacity')),
                     1000
                 );
+            }
+
+            if (!empty($totalOids['tx'])) {
                 $sensors[] = new WirelessSensor(
                     'rate',
                     $this->getDeviceId(),
-                    '.1.3.6.1.4.1.3373.1103.80.17.1.11.' . $index,
-                    'rx',
+                    $totalOids['tx'],
+                    'total-tx',
                     $index,
-                    $this->getLinkLabel($link) . ' Rx ' . $this->getRadioLabel($radio),
-                    $entry['linkRxETHCapacity'] ?? null,
+                    $this->getLinkLabel($link) . ' Total Tx',
+                    array_sum(array_column($radioEntry, 'linkTxETHCapacity')),
                     1000
                 );
             }
         }
+
         return $sensors;
     }
 
