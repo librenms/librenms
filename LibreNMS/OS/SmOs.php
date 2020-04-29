@@ -123,6 +123,7 @@ class SmOs extends OS implements
                 $index,
                 'Tx ' . $this->getRadioLabel($index),
                 $entry['radioTxFrequency'],
+                1,
                 1000
             );
         }
