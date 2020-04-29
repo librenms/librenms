@@ -1,4 +1,4 @@
-mib: ALCATEL-IND1-CHASSIS-MIB::ALCATEL-IND1-HEALTH-MIB:ALCATEL-IND1-PORT-MIB 
+mib: ALCATEL-IND1-CHASSIS-MIB:ALCATEL-IND1-HEALTH-MIB:ALCATEL-IND1-PORT-MIB 
 modules:
     processors:
             data:
@@ -9,10 +9,10 @@ modules:
     sensors:
         pre-cache:
             data:
-               -  oid:
-                     - ifDescr
-                     - ifName
-                     - entPhysicalName
+               - oid:
+                  - ifDescr
+                  - ifName
+                  - entPhysicalName
         temperature:
             data:
                -
