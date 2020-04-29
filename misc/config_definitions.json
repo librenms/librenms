@@ -3221,6 +3221,28 @@
                 "new": "New"
             }
         },
+        "html.device.primary_link": {
+            "group": "webui",
+            "section": "device",
+            "order": 3,
+            "type": "select",
+            "default": "edit",
+            "options": {
+                "edit": "Edit",
+                "web": "Web",
+                "ssh": "SSH",
+                "telnet": "Telnet",
+                "capture": "Capture",
+                "custom1": "Custom 1",
+                "custom2": "Custom 2",
+                "custom3": "Custom 3",
+                "custom4": "Custom 4",
+                "custom5": "Custom 5",
+                "custom6": "Custom 6",
+                "custom7": "Custom 7",
+                "custom8": "Custom 8"
+            }
+        },
         "html_dir": {
             "type": "text"
         },
@@ -4500,10 +4522,6 @@
             "type": "boolean"
         },
         "show_locations_dropdown": {
-            "default": true,
-            "type": "boolean"
-        },
-        "show_overview_tab": {
             "default": true,
             "type": "boolean"
         },

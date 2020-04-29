@@ -23,12 +23,17 @@ if (isset($base_url['path']) && strlen($base_url['path']) > 1) {
 
 foreach ($segments as $pos => $segment) {
     $segment = urldecode($segment);
-    if ($pos == '0') {
+    if ($pos === 0) {
         $vars['page'] = $segment;
     } else {
         list($name, $value) = explode('=', $segment);
         if ($value == '' || !isset($value)) {
-            $vars[$name] = 'yes';
+            if ($vars['page'] == 'device' && $pos < 3) {
+                // translate laravel device routes properly
+                $vars[$pos === 1 ? 'device' : 'tab'] = $name;
+            } else {
+                $vars[$name] = 'yes';
+            }
         } else {
             $vars[$name] = $value;
         }

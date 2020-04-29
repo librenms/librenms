@@ -29,6 +29,7 @@ use App\Models\Device;
 use App\Models\Port;
 use Auth;
 use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 
@@ -104,7 +105,7 @@ class Url
             $contents .= '<div class="overlib-box">';
             $contents .= '<span class="overlib-title">' . $graphhead . '</span><br />';
             $contents .= Url::minigraphImage($device, $start, $end, $graph);
-            $contents .= Url::minigraphImage($device, Carbon::now()->subWeek(1)->timestamp, $end, $graph);
+            $contents .= Url::minigraphImage($device, Carbon::now()->subWeek()->timestamp, $end, $graph);
             $contents .= '</div>';
         }
 
@@ -218,9 +219,20 @@ class Url
         return self::overlibLink(self::sensorUrl($sensor), $text, $content, self::sensorLinkDisplayClass($sensor));
     }
 
+    /**
+     * @param int|Device $device
+     * @param array $vars
+     * @return string
+     */
     public static function deviceUrl($device, $vars = [])
     {
-        return self::generate(['page' => 'device', 'device' => $device->device_id], $vars);
+        $routeParams = [is_int($device) ? $device : $device->device_id];
+        if (isset($vars['tab'])) {
+            $routeParams[] = $vars['tab'];
+            unset($vars['tab']);
+        }
+
+        return route('device', $routeParams) . self::urlParams($vars);
     }
 
     public static function portUrl($port, $vars = [])
@@ -264,9 +276,23 @@ class Url
     {
         $vars = array_merge($vars, $new_vars);
 
-        $url = url($vars['page']) . '/';
+        $url = url($vars['page'] . '');
         unset($vars['page']);
 
+        return $url . self::urlParams($vars);
+    }
+
+    /**
+     * Generate url parameters to append to url
+     * $prefix will only be prepended if there are parameters
+     *
+     * @param array $vars
+     * @param string $prefix
+     * @return string
+     */
+    private static function urlParams($vars, $prefix = '/')
+    {
+        $url = empty($vars) ? '' : $prefix;
         foreach ($vars as $var => $value) {
             if ($value == '0' || $value != '' && !Str::contains($var, 'opt') && !is_numeric($var)) {
                 $url .= $var . '=' . urlencode($value) . '/';
@@ -288,6 +314,35 @@ class Url
         }
 
         return '<img src="' . url('graph.php') . '?' . implode('&amp;', $urlargs) . '" style="border:0;" />';
+    }
+
+    public static function graphPopup($args)
+    {
+        // Take $args and print day,week,month,year graphs in overlib, hovered over graph
+        $original_from = $args['from'];
+        $now = CarbonImmutable::now();
+
+        $graph = self::graphTag($args);
+        $content = '<div class=list-large>' . $args['popup_title'] . '</div>';
+        $content .= '<div style="width: 850px">';
+        $args['width'] = 340;
+        $args['height'] = 100;
+        $args['legend'] = 'yes';
+        $args['from'] = $now->subDay()->timestamp;
+        $content .= self::graphTag($args);
+        $args['from'] = $now->subWeek()->timestamp;
+        $content .= self::graphTag($args);
+        $args['from'] = $now->subMonth()->timestamp;
+        $content .= self::graphTag($args);
+        $args['from'] = $now->subYear()->timestamp;
+        $content .= self::graphTag($args);
+        $content .= '</div>';
+
+        $args['from'] = $original_from;
+
+        $args['link'] = self::generate($args, ['page' => 'graphs', 'height' => null, 'width' => null, 'bg' => null]);
+
+        return self::overlibLink($args['link'], $graph, $content, null);
     }
 
     public static function lazyGraphTag($args)

@@ -681,41 +681,16 @@ function get_device_graphs($device)
 
 function get_smokeping_files($device)
 {
-    $smokeping_files = array();
-    if (Config::has('smokeping.dir')) {
-        $smokeping_dir = generate_smokeping_file($device);
-        if ($handle = opendir($smokeping_dir)) {
-            while (false !== ($file = readdir($handle))) {
-                if ($file != '.' && $file != '..') {
-                    if (stripos($file, '.rrd') !== false) {
-                        if (strpos($file, '~') !== false) {
-                            list($target,$slave) = explode('~', str_replace('.rrd', '', $file));
-                            $target = str_replace('_', '.', $target);
-                            $smokeping_files['in'][$target][$slave] = $file;
-                            $smokeping_files['out'][$slave][$target] = $file;
-                        } else {
-                            $target = str_replace('.rrd', '', $file);
-                            $target = str_replace('_', '.', $target);
-                            $smokeping_files['in'][$target][Config::get('own_hostname')] = $file;
-                            $smokeping_files['out'][Config::get('own_hostname')][$target] = $file;
-                        }
-                    }
-                }
-            }
-        }
-    }
-    return $smokeping_files;
-} // end get_smokeping_files
+    $smokeping = new \LibreNMS\Util\Smokeping(DeviceCache::get($device['device_id']));
+    return $smokeping->findFiles();
+}
 
 
 function generate_smokeping_file($device, $file = '')
 {
-    if (Config::get('smokeping.integration') === true) {
-        return Config::get('smokeping.dir') . '/' . $device['type'] . '/' . $file;
-    } else {
-        return Config::get('smokeping.dir') . '/' . $file;
-    }
-} // generate_smokeping_file
+    $smokeping = new \LibreNMS\Util\Smokeping(DeviceCache::get($device['device_id']));
+    return $smokeping->generateFileName($file);
+}
 
 
 /*
