@@ -92,8 +92,8 @@ class SmOs extends OS implements
 
     public function discoverWirelessRssi()
     {
-        $oids = snmpwalk_cache_oid($this->getDevice(), 'radioPrx', array(), 'SIAE-RADIO-SYSTEM-MIB');
-        $sensors = array();
+        $oids = snmpwalk_cache_oid($this->getDevice(), 'radioPrx', [], 'SIAE-RADIO-SYSTEM-MIB');
+        $sensors = [];
 
         foreach ($oids as $index => $entry) {
             $sensors[] = new WirelessSensor(
@@ -111,8 +111,8 @@ class SmOs extends OS implements
 
     public function discoverWirelessFrequency()
     {
-        $oids = snmpwalk_cache_oid($this->getDevice(), 'radioTxFrequency', array(), 'SIAE-RADIO-SYSTEM-MIB');
-        $sensors = array();
+        $oids = snmpwalk_cache_oid($this->getDevice(), 'radioTxFrequency', [], 'SIAE-RADIO-SYSTEM-MIB');
+        $sensors = [];
 
         foreach ($oids as $index => $entry) {
             $sensors[] = new WirelessSensor(
@@ -132,8 +132,8 @@ class SmOs extends OS implements
 
     public function discoverWirelessMse()
     {
-        $oids = snmpwalk_cache_oid($this->getDevice(), 'radioNormalizedMse', array(), 'SIAE-RADIO-SYSTEM-MIB');
-        $sensors = array();
+        $oids = snmpwalk_cache_oid($this->getDevice(), 'radioNormalizedMse', [], 'SIAE-RADIO-SYSTEM-MIB');
+        $sensors = [];
 
         foreach ($oids as $index => $entry) {
             $sensors[] = new WirelessSensor(
