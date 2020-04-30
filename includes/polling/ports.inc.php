@@ -573,8 +573,8 @@ foreach ($ports as $port) {
             }
         }
 
-        // work around invalid values for ifHighSpeed (fortigate)
-        if ($this_port['ifHighSpeed'] == 4294901759) {
+        // work around invalid values for ifHighSpeed (fortinet)
+        if ($this_port['ifHighSpeed'] > 2147483647) {
             $this_port['ifHighSpeed'] = null;
         }
 
