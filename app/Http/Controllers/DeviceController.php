@@ -23,6 +23,7 @@ class DeviceController extends Controller
         'processes' => \App\Http\Controllers\Device\Tabs\ProcessesController::class,
         'collectd' => \App\Http\Controllers\Device\Tabs\CollectdController::class,
         'ports' => \App\Http\Controllers\Device\Tabs\PortsController::class,
+        'port' => \App\Http\Controllers\Device\Tabs\PortController::class,
         'slas' => \App\Http\Controllers\Device\Tabs\SlasController::class,
         'wireless' => \App\Http\Controllers\Device\Tabs\WirelessController::class,
         'accesspoints' => \App\Http\Controllers\Device\Tabs\AccessPointsController::class,
