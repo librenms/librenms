@@ -293,6 +293,21 @@ class Url
     private static function urlParams($vars, $prefix = '/')
     {
         $url = empty($vars) ? '' : $prefix;
+
+        # enforce elements of $order_list to be on first position in url
+        $order_list = ['device', 'tab', 'app'];
+        foreach ($order_list as $order) {
+            if (in_array($order, array_keys($vars))) {
+                $var = $order;
+                $value = $vars[$order];
+                if ($value == '0' || $value != '' && !Str::contains($var, 'opt') && !is_numeric($var)) {
+                    $url .= $var . '=' . urlencode($value) . '/';
+                }
+                unset($vars[$order]);
+            }
+        }
+
+        # now attach rest of url parameters
         foreach ($vars as $var => $value) {
             if ($value == '0' || $value != '' && !Str::contains($var, 'opt') && !is_numeric($var)) {
                 $url .= $var . '=' . urlencode($value) . '/';
