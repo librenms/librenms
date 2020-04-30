@@ -48,6 +48,6 @@
         </div>
     </div>
     @config('login_message')
-    <div class="panel-footer">{{ \LibreNMS\Config::get('login_message') }}</div>
+    <div class="panel-footer" align="center">{{ \LibreNMS\Config::get('login_message') }}</div>
     @endconfig
 </div>
