@@ -259,7 +259,7 @@ echo "
     </select>
     </div>
     <div class='col-sm-2'>
-    <input type='text' name='port' placeholder='port' class='form-control input-sm' value='" . ($device['port'] == Config::get('snmp.port') ? "" : $device['port']) . "'>
+    <input type='number' name='port' placeholder='port' class='form-control input-sm' value='" . ($device['port'] == Config::get('snmp.port') ? "" : $device['port']) . "'>
     </div>
     <div class='col-sm-1'>
     <select name='transport' id='transport' class='form-control input-sm'>";
@@ -279,10 +279,10 @@ echo "      </select>
     <div class='col-sm-2'>
     </div>
     <div class='col-sm-1'>
-    <input id='timeout' name='timeout' class='form-control input-sm' value='".($device['timeout'] ? $device['timeout'] : '')."' placeholder='seconds' />
+    <input type='number' id='timeout' name='timeout' class='form-control input-sm' value='".($device['timeout'] ? $device['timeout'] : '')."' placeholder='seconds' />
     </div>
     <div class='col-sm-1'>
-    <input id='retries' name='retries' class='form-control input-sm' value='".($device['timeout'] ? $device['retries'] : '')."' placeholder='retries' />
+    <input type='number' id='retries' name='retries' class='form-control input-sm' value='".($device['timeout'] ? $device['retries'] : '')."' placeholder='retries' />
     </div>
     </div>
     <div class='form-group'>
@@ -307,13 +307,13 @@ echo "        </select>
     <div class='form-group'>
         <label for='max_repeaters' class='col-sm-2 control-label'>Max Repeaters</label>
         <div class='col-sm-1'>
-            <input id='max_repeaters' name='max_repeaters' class='form-control input-sm' value='".$max_repeaters."' placeholder='max repeaters' />
+            <input type='number' id='max_repeaters' name='max_repeaters' class='form-control input-sm' value='".$max_repeaters."' placeholder='max repeaters' />
         </div>
     </div>
     <div class='form-group'>
         <label for='max_oid' class='col-sm-2 control-label'>Max OIDs</label>
         <div class='col-sm-1'>
-            <input id='max_oid' name='max_oid' class='form-control input-sm' value='".$max_oid."' placeholder='max oids' />
+            <input type='number' id='max_oid' name='max_oid' class='form-control input-sm' value='".$max_oid."' placeholder='max oids' />
         </div>
     </div>
     <div id='snmpv1_2'>
