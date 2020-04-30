@@ -4876,7 +4876,7 @@
             "group": "alerting",
             "section": "general",
             "order": 0,
-            "default": 84600,
+            "default": 86400,
             "type": "integer",
             "validate": {
                 "value": "integer|min:0"
