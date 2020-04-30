@@ -342,12 +342,9 @@ If `devices.ignore = 0` or `macros.device = 1` condition is is set and ignore al
 print_optionbar_start();
 list($sizeondisk, $numrrds) = foldersize(get_rrd_dir($device['hostname']));
 echo("Size on Disk: <b>" . formatStorage($sizeondisk) . "</b> in <b>" . $numrrds . " RRD files</b>.");
-print_optionbar_end();
-
-echo("<small>");
-echo("Last polled: <b>" . $device['last_polled'] . "</b>");
+echo(" | Last polled: <b>" . $device['last_polled'] . "</b>");
 if ($device['last_discovered']) {
-    echo("<br>Last discovered: <b>" . $device['last_discovered'] . "</b>");
+    echo(" | Last discovered: <b>" . $device['last_discovered'] . "</b>");
 }
-echo("</small>");
+print_optionbar_end();
 ?>
