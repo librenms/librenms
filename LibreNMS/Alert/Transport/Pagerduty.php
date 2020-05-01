@@ -24,6 +24,7 @@
 
 namespace LibreNMS\Alert\Transport;
 
+use App\Models\Device;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\Request;
@@ -54,12 +55,18 @@ class Pagerduty extends Transport
      */
     public function contactPagerduty($obj, $config)
     {
+        $groups = Device::find($obj['device_id'])->groups;
+        foreach ($groups as $group)
+        {
+            $device_groups[] = $group->name;
+        }
         $data = [
             'routing_key'  => $config['service_key'],
             'event_action' => $obj['event_type'],
             'dedup_key'    => (string)$obj['alert_id'],
             'payload'    => [
                 'custom_details'  => strip_tags($obj['msg']) ?: 'Test',
+                'device_groups'   => $device_groups,
                 'source'   => $obj['hostname'],
                 'severity' => $obj['severity'],
                 'summary'  => ($obj['name'] ? $obj['name'] . ' on ' . $obj['hostname'] : $obj['title']),
