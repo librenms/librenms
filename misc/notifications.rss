@@ -73,5 +73,10 @@
     <description>Cisco WLC is now classified as type "Wireless" instead of "Network".  Update any alert rules you may have.</description>
     <pubDate>Wed, 18 Dec 2019 00:00:00 +0000</pubDate>
   </item>
+  <item>
+    <title>Minimum Requirements for PHP and Python changed</title>
+    <description><![CDATA[To keep LibreNMS uptodate it's necessary to increase minimum Requirements of PHP and Python<br/>PHP 7.2<br/>Python 3.4<br/>Please ensure you have at least this versions installed.]]></description>
+    <pubDate>Son, 03 May 2020 00:00:00 +0000</pubDate>
+  </item>
 </channel>
 </rss>
