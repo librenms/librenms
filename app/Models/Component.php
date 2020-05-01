@@ -36,4 +36,9 @@ class Component extends DeviceRelatedModel
     {
         return $this->hasMany(\App\Models\ComponentStatusLog::class, 'component_id', 'id');
     }
+
+    public function prefs()
+    {
+        return $this->hasMany(\App\Models\ComponentPref::class, 'component', 'id');
+    }
 }

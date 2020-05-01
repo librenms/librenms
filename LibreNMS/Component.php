@@ -71,12 +71,8 @@ class Component
 
     public function getComponents($device_id = null, $options = array())
     {
-        // Define our results array, this will be set even if no rows are returned.
-        $RESULT = array();
-        $PARAM = array();
-
-        // Our base SQL Query, with no options.
-        $SQL = "SELECT `C`.`id`,`C`.`device_id`,`C`.`type`,`C`.`label`,`C`.`status`,`C`.`disabled`,`C`.`ignore`,`C`.`error`,`CP`.`attribute`,`CP`.`value` FROM `component` as `C` LEFT JOIN `component_prefs` as `CP` on `C`.`id`=`CP`.`component` WHERE ";
+        $query = \App\Models\Component::query()
+            ->with('prefs');
 
         // Device_id is shorthand for filter C.device_id = $device_id.
         if (!is_null($device_id)) {
@@ -88,84 +84,35 @@ class Component
             $options['filter']['type'] = array('=', $options['type']);
         }
 
+        $validFields = ['device_id','type','id','label','status','disabled','ignore','error'];
+
         // filter   field => array(operator,value)
         //          Filters results based on the field, operator and value
-        $COUNT = 0;
-        if (isset($options['filter'])) {
-            $COUNT++;
-            $validFields = array('device_id','type','id','label','status','disabled','ignore','error');
-            $SQL .= " ( ";
-            foreach ($options['filter'] as $field => $array) {
-                // Only add valid fields to the query
-                if (in_array($field, $validFields)) {
-                    if ($array[0] == 'LIKE') {
-                        $SQL .= "`C`.`".$field."` LIKE ? AND ";
-                        $array[1] = "%".$array[1]."%";
-                    } else {
-                        // Equals operator is the default
-                        $SQL .= "`C`.`".$field."` = ? AND ";
-                    }
-                    array_push($PARAM, $array[1]);
-                }
-            }
-            // Strip the last " AND " before closing the bracket.
-            $SQL = substr($SQL, 0, -5)." )";
-        }
-
-        if ($COUNT == 0) {
-            // Strip the " WHERE " that we didn't use.
-            $SQL = substr($SQL, 0, -7);
+        foreach (array_intersect_key($options['filter'], array_flip($validFields)) as $field => $filter) {
+            $op = $filter[0];
+            $value = $op == 'LIKE' ? "%{$filter[1]}%" : $filter[1] ;
+            $query->where($field, $op, $value);
         }
 
         // sort     column direction
         //          Add SQL sorting to the results
         if (isset($options['sort'])) {
-            $SQL .= " ORDER BY ".$options['sort'];
-        }
-
-        // Get our component records using our built SQL.
-        $COMPONENTS = dbFetchRows($SQL, $PARAM);
-
-        // if we have no components we need to return nothing
-        if (count($COMPONENTS) == 0) {
-            return $RESULT;
-        }
-
-        // Add the AVP's to the array.
-        foreach ($COMPONENTS as $COMPONENT) {
-            if ($COMPONENT['attribute'] != "") {
-                // if this component has attributes, set them in the array.
-                $RESULT[$COMPONENT['device_id']][$COMPONENT['id']][$COMPONENT['attribute']] = $COMPONENT['value'];
-            }
-        }
-
-        // Populate our reserved fields into the Array, these cant be used as user attributes.
-        foreach ($COMPONENTS as $COMPONENT) {
-            $component_device_id = (int)$COMPONENT['device_id'];
-            foreach ($this->reserved as $k => $v) {
-                $RESULT[$component_device_id][$COMPONENT['id']][$k] = $COMPONENT[$k];
-            }
+            [$column, $direction] = explode(' ', $options['sort']);
+            $query->orderBy($column, $direction);
         }
 
         // limit    array(start,count)
         if (isset($options['limit'])) {
-            $TEMP = array();
-            $COUNT = 0;
-            // k = device_id, v = array of components for that device_id
-            foreach ($RESULT as $k => $v) {
-                // k1 = component id, v1 = component array
-                foreach ($v as $k1 => $v1) {
-                    if (($COUNT >= $options['limit'][0]) && ($COUNT < $options['limit'][0]+$options['limit'][1])) {
-                        $TEMP[$k][$k1] = $v1;
-                    }
-                    // We are counting components.
-                    $COUNT++;
-                }
-            }
-            $RESULT = $TEMP;
+            $query->offset($options['limit'][0])->limit($options['limit'][1]);
         }
 
-        return $RESULT;
+        // get and format results as expected by receivers
+        return $query->get()->groupBy('device_id')->map(function ($group) {
+            return $group->keyBy('id')->map(function ($component) {
+                return $component->prefs->pluck('value', 'attribute')
+                    ->merge($component->only(array_keys($this->reserved)));
+            });
+        })->toArray();
     }
 
     public function getComponentStatus($device = null)
@@ -313,7 +260,7 @@ class Component
             // Has anything changed, do we need to update?
             if (count($UPDATE) > 0) {
                 // We have data to update
-                dbUpdate($UPDATE, 'component', '`id` = ?', array($COMPONENT));
+                \App\Models\Component::where('id', $COMPONENT)->update($UPDATE);
 
                 // Log the update to the Eventlog.
                 $MSG = "Component ".$COMPONENT." has been modified: ";
@@ -331,14 +278,14 @@ class Component
                 if (!isset($OLD[$device_id][$COMPONENT][$ATTR])) {
                     // We have a newly added attribute, need to insert into the DB
                     $DATA = array('component'=>$COMPONENT, 'attribute'=>$ATTR, 'value'=>$VALUE);
-                    dbInsert($DATA, 'component_prefs');
+                    \DB::table('component_prefs')->insert($DATA);
 
                     // Log the addition to the Eventlog.
                     log_event("Component: " . $AVP[$COMPONENT]['type'] . "(" . $COMPONENT . "). Attribute: " . $ATTR . ", was added with value: " . $VALUE, $device_id, 'component', 3, $COMPONENT);
                 } elseif ($OLD[$device_id][$COMPONENT][$ATTR] != $VALUE) {
                     // Attribute exists but the value is different, need to update
                     $DATA = array('value'=>$VALUE);
-                    dbUpdate($DATA, 'component_prefs', '`component` = ? AND `attribute` = ?', array($COMPONENT, $ATTR));
+                    \DB::table('component_prefs')->where(['component' => $COMPONENT, 'attribute' => $ATTR])->update($DATA);
 
                     // Add the modification to the Eventlog.
                     log_event("Component: " . $AVP[$COMPONENT]['type'] . "(" . $COMPONENT . "). Attribute: " . $ATTR . ", was modified from: " . $OLD[$device_id][$COMPONENT][$ATTR] . ", to: " . $VALUE, $device_id, 'component', 3, $COMPONENT);
@@ -349,7 +296,7 @@ class Component
             $DELETE = array_diff_key($OLD[$device_id][$COMPONENT], $AVP);
             foreach ($DELETE as $KEY => $VALUE) {
                 // As the Attribute has been removed from the array, we should remove it from the database.
-                dbDelete('component_prefs', "`component` = ? AND `attribute` = ?", array($COMPONENT,$KEY));
+                \DB::table('component_prefs')->where(['component' => $COMPONENT, 'attribute' => $KEY])->delete();
 
                 // Log the addition to the Eventlog.
                 log_event("Component: " . $AVP[$COMPONENT]['type'] . "(" . $COMPONENT . "). Attribute: " . $KEY . ", was deleted.", 4, $COMPONENT);

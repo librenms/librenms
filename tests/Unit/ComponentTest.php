@@ -47,6 +47,11 @@ class ComponentTest extends DBTestCase
         $this->assertFalse(\App\Models\Component::where('id', $target->id)->exists(), 'deleteComponent failed to delete the component.');
     }
 
+    public function testGetComponentsEmpty()
+    {
+        $this->assertEquals([], (new Component())->getComponents(43));
+    }
+
     public function testGetComponentsOptionsType()
     {
         $target = factory(\App\Models\Component::class)->create();
@@ -75,24 +80,29 @@ class ComponentTest extends DBTestCase
         factory(\App\Models\Component::class)->create(['label' => 'Search Phrase']);
         factory(\App\Models\Component::class)->times(2)->create(['label' => 'Something Else']);
         $target = factory(\App\Models\Component::class)->times(2)->create(['label' => 'Search Phrase']);
+        factory(\App\Models\Component::class)->create(['label' => 'Search Phrase']);
         $component = new Component();
 
         $options = [
             'filter' => ['label' => ['like', 'Search Phrase']],
             'sort' => 'id desc',
-            'limit' => [0, 2],
+            'limit' => [1, 2],
         ];
         $actual = $component->getComponents(null, $options);
 
         $this->assertEquals($this->buildExpected($target->reverse()->values()), $actual);
     }
 
-
-//    public function testGetFirstComponentID()
-//    {
-//
-//    }
-
+    public function testGetFirstComponentID()
+    {
+        $input = [
+            1 => [37 => [], 14 => []],
+            2 => [19 => []],
+        ];
+        $component = new Component();
+        $this->assertEquals(19, $component->getFirstComponentID($input, 2));
+        $this->assertEquals(37, $component->getFirstComponentID($input[1]));
+    }
 
     public function testGetComponentCount()
     {
@@ -106,6 +116,7 @@ class ComponentTest extends DBTestCase
         $this->assertEquals(['three' => 1, 'one' => 1], $component->getComponentCount(2));
     }
 
+// Nightmare function
 //    public function testSetComponentPrefs()
 //    {
 //
