@@ -21,6 +21,7 @@ If you want to install manually then we have some documentation which should mak
 
 - [Ubuntu 18.04 Apache](http://docs.librenms.org/Installation/Installation-Ubuntu-1804-Apache/)
 - [Ubuntu 18.04 Nginx](http://docs.librenms.org/Installation/Installation-Ubuntu-1804-Nginx/)
+- [Debian 10 Nginx](http://docs.librenms.org/Installation/Installation-Debian-10-Nginx/)
 - [RHEL / CentOS 7 Apache](http://docs.librenms.org/Installation/Installation-CentOS-7-Apache/)
 - [RHEL / CentOS 7 Nginx](http://docs.librenms.org/Installation/Installation-CentOS-7-Nginx/)
 
