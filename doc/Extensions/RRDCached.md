@@ -44,7 +44,7 @@ so you can view the disk I/O usage delta.
 
 1. [RRDCached installation Ubuntu 16](##RRDCached-installation-Ubuntu-16)
 1. [RRDCached installation Debian Buster](##RRDCached-installation-Debian-Buster)
-1. [RRDCached installation Debian Stretch](##RRDCached-installation Debian-Stretch)
+1. [RRDCached installation Debian Stretch](##RRDCached-installation-Debian-Stretch)
 1. [RRDCached installation Debian Jessie](##RRDCached-installation-Debian-Jessie)
 1. [RRDCached installation CentOS 7](##RRDCached-installation-CentOS-7)
 1. [RRDCached installation CentOS 6](##RRDCached-installation-CentOS-6)
