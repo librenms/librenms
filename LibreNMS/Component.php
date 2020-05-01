@@ -25,6 +25,7 @@
 
 namespace LibreNMS;
 
+use App\Models\ComponentPref;
 use App\Models\ComponentStatusLog;
 
 class Component
@@ -268,14 +269,14 @@ class Component
                 if (!isset($OLD[$device_id][$COMPONENT][$ATTR])) {
                     // We have a newly added attribute, need to insert into the DB
                     $DATA = array('component'=>$COMPONENT, 'attribute'=>$ATTR, 'value'=>$VALUE);
-                    \DB::table('component_prefs')->insert($DATA);
+                    ComponentPref::create($DATA);
 
                     // Log the addition to the Eventlog.
                     log_event("Component: " . $AVP[$COMPONENT]['type'] . "(" . $COMPONENT . "). Attribute: " . $ATTR . ", was added with value: " . $VALUE, $device_id, 'component', 3, $COMPONENT);
                 } elseif ($OLD[$device_id][$COMPONENT][$ATTR] != $VALUE) {
                     // Attribute exists but the value is different, need to update
                     $DATA = array('value'=>$VALUE);
-                    \DB::table('component_prefs')->where(['component' => $COMPONENT, 'attribute' => $ATTR])->update($DATA);
+                    ComponentPref::where(['component' => $COMPONENT, 'attribute' => $ATTR])->update($DATA);
 
                     // Add the modification to the Eventlog.
                     log_event("Component: " . $AVP[$COMPONENT]['type'] . "(" . $COMPONENT . "). Attribute: " . $ATTR . ", was modified from: " . $OLD[$device_id][$COMPONENT][$ATTR] . ", to: " . $VALUE, $device_id, 'component', 3, $COMPONENT);
@@ -286,7 +287,7 @@ class Component
             $DELETE = array_diff_key($OLD[$device_id][$COMPONENT], $AVP);
             foreach ($DELETE as $KEY => $VALUE) {
                 // As the Attribute has been removed from the array, we should remove it from the database.
-                \DB::table('component_prefs')->where(['component' => $COMPONENT, 'attribute' => $KEY])->delete();
+                ComponentPref::where(['component' => $COMPONENT, 'attribute' => $KEY])->delete();
 
                 // Log the addition to the Eventlog.
                 log_event("Component: " . $AVP[$COMPONENT]['type'] . "(" . $COMPONENT . "). Attribute: " . $KEY . ", was deleted.", 4, $COMPONENT);
