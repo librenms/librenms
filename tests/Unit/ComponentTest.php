@@ -121,12 +121,23 @@ class ComponentTest extends DBTestCase
     {
         // Nightmare function, no where near exhaustive
         $base = factory(\App\Models\Component::class)->create();
-
-        $nullVal = $this->buildExpected($base)[$base->device_id];
         $component = new Component();
-        $nullVal[$base->id]['null_val'] = null;
-        $component->setComponentPrefs($base->device_id, $nullVal);
-        $this->assertEquals('', ComponentPref::where(['component' => $base->id, 'attribute' => 'null_val'])->first()->value);
+
+//        $nullVal = $this->buildExpected($base)[$base->device_id];
+//        $nullVal[$base->id]['null_val'] = null;
+//        $component->setComponentPrefs($base->device_id, $nullVal);
+//        $this->assertEquals('', ComponentPref::where(['component' => $base->id, 'attribute' => 'null_val'])->first()->value);
+
+        $multiple = $this->buildExpected($base)[$base->device_id];
+        $multiple[$base->id]['label'] = 'new label';
+        $multiple[$base->id]['thirty'] = 30;
+        $multiple[$base->id]['json'] = json_encode(['json' => 'array']);
+        $component->setComponentPrefs($base->device_id, $multiple);
+
+        $uc = \App\Models\Component::find($base->id);
+        $this->assertEquals('new label', $uc->label);
+        $this->assertEquals(30, $uc->prefs->where('attribute', 'thirty')->first()->value);
+        $this->assertEquals($multiple[$base->id]['json'], $uc->prefs->where('attribute', 'json')->first()->value);
     }
 
     public function testCreateComponent()

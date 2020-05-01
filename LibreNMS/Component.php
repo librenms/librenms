@@ -290,7 +290,7 @@ class Component
                 ComponentPref::where(['component' => $COMPONENT, 'attribute' => $KEY])->delete();
 
                 // Log the addition to the Eventlog.
-                log_event("Component: " . $AVP[$COMPONENT]['type'] . "(" . $COMPONENT . "). Attribute: " . $KEY . ", was deleted.", 4, $COMPONENT);
+                log_event("Component: " . $ARRAY[$COMPONENT]['type'] . "(" . $COMPONENT . "). Attribute: " . $KEY . ", was deleted.", 4, $COMPONENT);
             }
         }
 
