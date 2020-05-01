@@ -27,8 +27,6 @@ namespace LibreNMS\Tests\Unit;
 
 use App\Models\ComponentStatusLog;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use LibreNMS\Component;
 use LibreNMS\Tests\DBTestCase;
@@ -37,10 +35,17 @@ class ComponentTest extends DBTestCase
 {
     use DatabaseTransactions;
 
-//    public function testDeleteComponent()
-//    {
-//
-//    }
+    public function testDeleteComponent()
+    {
+        $target = factory(\App\Models\Component::class)->create();
+
+        $this->assertTrue(\App\Models\Component::where('id', $target->id)->exists(), 'Failed to create component, this shouldn\'t happen');
+
+        $component = new Component();
+        $component->deleteComponent($target->id);
+
+        $this->assertFalse(\App\Models\Component::where('id', $target->id)->exists(), 'deleteComponent failed to delete the component.');
+    }
 
     public function testGetComponentsOptionsType()
     {
@@ -108,7 +113,7 @@ class ComponentTest extends DBTestCase
 //
     public function testCreateComponent()
     {
-        $device_id = rand(1,32);
+        $device_id = rand(1, 32);
         $type = Str::random(9);
         $component = (new Component())->createComponent($device_id, $type);
 
@@ -134,17 +139,18 @@ class ComponentTest extends DBTestCase
         $component = new Component();
         $this->assertEquals(0, $component->createStatusLogEntry(434242, 'fail', 'failed'), 'incorrectly added log');
 
-        $status = Str::random(8);
+        $message = Str::random(8);
         $model = factory(\App\Models\Component::class)->create();
-        $log_id = $component->createStatusLogEntry($model->id, $status, 'message');
+        $log_id = $component->createStatusLogEntry($model->id, 1, $message);
         $this->assertNotEquals(0, $log_id, ' failed to create log');
 
         $log = ComponentStatusLog::find($log_id);
-        $this->assertEquals($status, $log->status);
-        $this->assertEquals('message', $log->message);
+        $this->assertEquals(1, $log->status);
+        $this->assertEquals($message, $log->message);
     }
 
-    private function buildExpected($target) {
+    private function buildExpected($target)
+    {
         $collection = $target instanceof \App\Models\Component ? collect([$target]) : $target;
         return $collection->groupBy('device_id')->map(function ($group) {
             return $group->keyBy('id')->map(function ($model) {
