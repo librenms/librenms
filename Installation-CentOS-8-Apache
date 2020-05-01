@@ -289,9 +289,9 @@ cp /opt/librenms/misc/librenms.service /etc/systemd/system/librenms.service
 Insert the following settings into your `config.php` file in order to run the Dispatcher Service
 
 ```
-$config['service_poller_workers']              = 20;     # Processes spawned for polling
+$config['service_poller_workers']              = 16;     # Processes spawned for polling
 $config['service_services_workers']            = 8;      # Processes spawned for service polling
-$config['service_discovery_workers']           = 2;     # Processes spawned for discovery
+$config['service_discovery_workers']           = 8;     # Processes spawned for discovery
 
 
 //Optional Settings
