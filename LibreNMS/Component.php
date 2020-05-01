@@ -183,7 +183,7 @@ class Component
 
     public function createComponent($device_id, $type)
     {
-        $component = \App\Models\Component::create(get_defined_vars());
+        $component = \App\Models\Component::create(['device_id' => $device_id, 'type' => $type]);
 
         // Add a default status log entry - we always start ok.
         $this->createStatusLogEntry($component->id, 0, 'Component Created');
@@ -195,7 +195,7 @@ class Component
     public function createStatusLogEntry($component_id, $status, $message)
     {
         try {
-            return ComponentStatusLog::create(get_defined_vars())->id;
+            return ComponentStatusLog::create(['component_id' => $component_id, 'status' => $status, 'message' => $message])->id;
         } catch (\Exception $e) {
             \Log::debug("Failed to create component status log");
         }
