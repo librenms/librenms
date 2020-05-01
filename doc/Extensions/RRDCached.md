@@ -91,7 +91,7 @@ systemctl restart rrdcached.service
 5: Edit `/opt/librenms/config.php` to include:
 
 ```php
-$config['rrdcached'] = "unix:///var/run/rrdcached.sock";
+$config['rrdcached'] = "unix:/var/run/rrdcached.sock";
 ```
 
 ## RRDCached installation Debian Buster
@@ -137,7 +137,7 @@ chown librenms:librenms /var/lib/rrdcached/journal/
 For local RRDCached server
 
 ```php
-$config['rrdcached'] = "unix:///var/run/rrdcached.sock";
+$config['rrdcached'] = "unix:/var/run/rrdcached.sock";
 ```
 
 For remote RRDCached server make sure you have network option in /var/default/rrdcached
@@ -195,7 +195,7 @@ chown librenms:librenms /var/lib/rrdcached/journal/
 For local RRDCached server
 
 ```php
-$config['rrdcached'] = "unix:///var/run/rrdcached.sock";
+$config['rrdcached'] = "unix:/var/run/rrdcached.sock";
 ```
 
 For remote RRDCached server make sure you have network option in /var/default/rrdcached
@@ -238,7 +238,7 @@ OPTS="$OPTS -w 1800 -z 1800 -f 3600 -t 4"
 4: Edit /opt/librenms/config.php to include:
 
 ```php
-$config['rrdcached'] = "unix:///var/run/rrdcached.sock";
+$config['rrdcached'] = "unix:/var/run/rrdcached.sock";
 ```
 
 ## RRDCached installation CentOS 7
