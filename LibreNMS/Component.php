@@ -236,7 +236,7 @@ class Component
             $UPDATE = array();
             foreach ($this->reserved as $k => $v) {
                 // does the reserved field exist, if not skip.
-                if (isset($AVP[$k])) {
+                if (array_key_exists($k, $AVP)) {
                     // Has the value changed?
                     if ($AVP[$k] != $OLD[$device_id][$COMPONENT][$k]) {
                         // The value has been modified, add it to our update array.
@@ -272,7 +272,7 @@ class Component
                     ComponentPref::create($DATA);
 
                     // Log the addition to the Eventlog.
-                    log_event("Component: " . $AVP[$COMPONENT]['type'] . "(" . $COMPONENT . "). Attribute: " . $ATTR . ", was added with value: " . $VALUE, $device_id, 'component', 3, $COMPONENT);
+                    log_event("Component: " . $ARRAY[$COMPONENT]['type'] . "(" . $COMPONENT . "). Attribute: " . $ATTR . ", was added with value: " . $VALUE, $device_id, 'component', 3, $COMPONENT);
                 } elseif ($OLD[$device_id][$COMPONENT][$ATTR] != $VALUE) {
                     // Attribute exists but the value is different, need to update
                     $DATA = array('value'=>$VALUE);

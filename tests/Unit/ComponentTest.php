@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Tests\Unit;
 
+use App\Models\ComponentPref;
 use App\Models\ComponentStatusLog;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Str;
@@ -116,12 +117,18 @@ class ComponentTest extends DBTestCase
         $this->assertEquals(['three' => 1, 'one' => 1], $component->getComponentCount(2));
     }
 
-// Nightmare function
-//    public function testSetComponentPrefs()
-//    {
-//
-//    }
-//
+    public function testSetComponentPrefs()
+    {
+        // Nightmare function, no where near exhaustive
+        $base = factory(\App\Models\Component::class)->create();
+
+        $nullVal = $this->buildExpected($base)[$base->device_id];
+        $component = new Component();
+        $nullVal[$base->id]['null_val'] = null;
+        $component->setComponentPrefs($base->device_id, $nullVal);
+        $this->assertEquals('', ComponentPref::where(['component' => $base->id, 'attribute' => 'null_val'])->first()->value);
+    }
+
     public function testCreateComponent()
     {
         $device_id = rand(1, 32);
