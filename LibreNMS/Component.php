@@ -183,10 +183,7 @@ class Component
 
     public function createComponent($device_id, $type)
     {
-        $component = new \App\Models\Component();
-        $component->device_id = $device_id;
-        $component->type = $type;
-        $component->save();
+        $component = \App\Models\Component::create(get_defined_vars());
 
         // Add a default status log entry - we always start ok.
         $this->createStatusLogEntry($component->id, 0, 'Component Created');
