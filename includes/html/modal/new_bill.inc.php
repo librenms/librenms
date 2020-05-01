@@ -43,7 +43,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                     <div class="col-sm-8">
                         <select class="form-control input-sm" id="device" name="device" onchange="getInterfaceList(this)"></select>
                         <script type="text/javascript">
-                            init_select2('#device', 'device', {}, <?php echo "{id: $port_device_id, text: '" . format_hostname($device) . "'}"; ?>);
+                            init_select2('#device', 'device', {}, <?php echo "{id: $port_device_id, text: '" . format_hostname($device) . "'}"; ?>, '', {dropdownParent: $('#create-bill .modal-content')});
                         </script>
                     </div>
                 </div>
