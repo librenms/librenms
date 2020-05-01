@@ -298,7 +298,7 @@ If `devices.ignore = 0` or `macros.device = 1` condition is is set and ignore al
 </form>
 <br />
 <script>
-    $('[type="checkbox"]').bootstrapSwitch();
+    $('[type="checkbox"]').bootstrapSwitch('offColor', 'danger');
 
     $("#rediscover").click(function() {
         var device_id = $(this).data("device_id");
