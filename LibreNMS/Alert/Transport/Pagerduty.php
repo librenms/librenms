@@ -107,7 +107,7 @@ class Pagerduty extends Transport
                 [
                     'title' => 'Integration Key',
                     'type'  => 'text',
-                    'name' => 'service_key',
+                    'name'  => 'service_key',
                 ]
             ],
             'validation' => []
