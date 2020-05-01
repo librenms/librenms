@@ -123,10 +123,10 @@ class ComponentTest extends DBTestCase
         $base = factory(\App\Models\Component::class)->create();
         $component = new Component();
 
-//        $nullVal = $this->buildExpected($base)[$base->device_id];
-//        $nullVal[$base->id]['null_val'] = null;
-//        $component->setComponentPrefs($base->device_id, $nullVal);
-//        $this->assertEquals('', ComponentPref::where(['component' => $base->id, 'attribute' => 'null_val'])->first()->value);
+        $nullVal = $this->buildExpected($base)[$base->device_id];
+        $nullVal[$base->id]['null_val'] = null;
+        $component->setComponentPrefs($base->device_id, $nullVal);
+        $this->assertEquals('', ComponentPref::where(['component' => $base->id, 'attribute' => 'null_val'])->first()->value);
 
         $multiple = $this->buildExpected($base)[$base->device_id];
         $multiple[$base->id]['label'] = 'new label';
@@ -138,6 +138,10 @@ class ComponentTest extends DBTestCase
         $this->assertEquals('new label', $uc->label);
         $this->assertEquals(30, $uc->prefs->where('attribute', 'thirty')->first()->value);
         $this->assertEquals($multiple[$base->id]['json'], $uc->prefs->where('attribute', 'json')->first()->value);
+
+        $remove = $this->buildExpected($base)[$base->device_id];
+        $component->setComponentPrefs($base->device_id, $remove);
+        $this->assertFalse(ComponentPref::where('component', $base->id)->exists());
     }
 
     public function testCreateComponent()
