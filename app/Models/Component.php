@@ -29,4 +29,11 @@ class Component extends DeviceRelatedModel
 {
     public $timestamps = false;
     protected $table = 'component';
+
+    // ---- Define Relationships ----
+
+    public function logs()
+    {
+        return $this->hasMany(\App\Models\ComponentStatusLog::class, 'component_id', 'id');
+    }
 }

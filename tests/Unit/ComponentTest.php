@@ -1,0 +1,159 @@
+<?php
+/**
+ * ComponentTest.php
+ *
+ * -Description-
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package    LibreNMS
+ * @link       http://librenms.org
+ * @copyright  2020 Tony Murray
+ * @author     Tony Murray <murraytony@gmail.com>
+ */
+
+namespace LibreNMS\Tests\Unit;
+
+use App\Models\ComponentStatusLog;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
+use LibreNMS\Component;
+use LibreNMS\Tests\DBTestCase;
+
+class ComponentTest extends DBTestCase
+{
+    use DatabaseTransactions;
+
+//    public function testDeleteComponent()
+//    {
+//
+//    }
+
+    public function testGetComponentsOptionsType()
+    {
+        $target = factory(\App\Models\Component::class)->create();
+        $component = new Component();
+
+        $actual = $component->getComponents($target->device_id, ['type' => $target->type]);
+
+        $this->assertCount(1, $actual);
+        $this->assertArrayHasKey($target->device_id, $actual);
+        $this->assertEquals($this->buildExpected($target), $actual);
+    }
+
+    public function testGetComponentsOptionsFilterNotIgnore()
+    {
+        factory(\App\Models\Component::class)->create(['device_id' => 1, 'ignore' => 1]);
+        $target = factory(\App\Models\Component::class)->times(2)->create(['device_id' => 1, 'ignore' => 0]);
+        $component = new Component();
+
+        $actual = $component->getComponents(1, ['filter' => ['ignore' => ['=', 0]]]);
+
+        $this->assertEquals($this->buildExpected($target), $actual);
+    }
+
+    public function testGetComponentsOptionsComplex()
+    {
+        factory(\App\Models\Component::class)->create(['label' => 'Search Phrase']);
+        factory(\App\Models\Component::class)->times(2)->create(['label' => 'Something Else']);
+        $target = factory(\App\Models\Component::class)->times(2)->create(['label' => 'Search Phrase']);
+        $component = new Component();
+
+        $options = [
+            'filter' => ['label' => ['like', 'Search Phrase']],
+            'sort' => 'id desc',
+            'limit' => [0, 2],
+        ];
+        $actual = $component->getComponents(null, $options);
+
+        $this->assertEquals($this->buildExpected($target->reverse()->values()), $actual);
+    }
+
+
+//    public function testGetFirstComponentID()
+//    {
+//
+//    }
+
+
+    public function testGetComponentCount()
+    {
+        factory(\App\Models\Component::class)->times(2)->create(['device_id' => 1, 'type' => 'three']);
+        factory(\App\Models\Component::class)->create(['device_id' => 2, 'type' => 'three']);
+        factory(\App\Models\Component::class)->create(['device_id' => 2, 'type' => 'one']);
+
+        $component = new Component();
+        $this->assertEquals(['three' => 3, 'one' => 1], $component->getComponentCount());
+        $this->assertEquals(['three' => 2], $component->getComponentCount(1));
+        $this->assertEquals(['three' => 1, 'one' => 1], $component->getComponentCount(2));
+    }
+
+//    public function testSetComponentPrefs()
+//    {
+//
+//    }
+//
+    public function testCreateComponent()
+    {
+        $device_id = rand(1,32);
+        $type = Str::random(9);
+        $component = (new Component())->createComponent($device_id, $type);
+
+        $this->assertCount(1, $component);
+        $component_id = array_key_first($component);
+
+        $expected = ['type' => $type, 'label' => '', 'status' => 0, 'ignore' => 0, 'disabled' => 0, 'error' => ''];
+
+        $this->assertEquals([$component_id => $expected], $component);
+
+        $fromDb = \App\Models\Component::find($component_id);
+        $this->assertEquals($device_id, $fromDb->device_id);
+        $this->assertEquals($type, $fromDb->type);
+
+        $log = $fromDb->logs->first();
+        $this->assertEquals($log->status, 0);
+        $this->assertEquals($log->message, 'Component Created');
+    }
+
+    public function testGetComponentStatusLog()
+    {
+        // invalid id fails
+        $component = new Component();
+        $this->assertEquals(0, $component->createStatusLogEntry(434242, 'fail', 'failed'), 'incorrectly added log');
+
+        $status = Str::random(8);
+        $model = factory(\App\Models\Component::class)->create();
+        $log_id = $component->createStatusLogEntry($model->id, $status, 'message');
+        $this->assertNotEquals(0, $log_id, ' failed to create log');
+
+        $log = ComponentStatusLog::find($log_id);
+        $this->assertEquals($status, $log->status);
+        $this->assertEquals('message', $log->message);
+    }
+
+    private function buildExpected($target) {
+        $collection = $target instanceof \App\Models\Component ? collect([$target]) : $target;
+        return $collection->groupBy('device_id')->map(function ($group) {
+            return $group->keyBy('id')->map(function ($model) {
+                $base = ['type' => null, 'label' => null, 'status' => 0, 'ignore' => 0, 'disabled' => 0, 'error' => null];
+                $merge = $model->toArray();
+                unset($merge['device_id'], $merge['id']);
+
+                return array_merge($base, $merge);
+            });
+        })->toArray();
+    }
+}
