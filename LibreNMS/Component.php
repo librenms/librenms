@@ -25,6 +25,8 @@
 
 namespace LibreNMS;
 
+use App\Models\ComponentStatusLog;
+
 class Component
 {
     /*
@@ -179,44 +181,35 @@ class Component
         return $return;
     }
 
-    public function createComponent($device_id, $TYPE)
+    public function createComponent($device_id, $type)
     {
-        // Prepare our default values to be inserted.
-        $DATA = $this->reserved;
-
-        // Add the device_id and type
-        $DATA['device_id']  = $device_id;
-        $DATA['type']       = $TYPE;
-
-        // Insert a new component into the database.
-        $id = dbInsert($DATA, 'component');
+        $component = new \App\Models\Component();
+        $component->device_id = $device_id;
+        $component->type = $type;
+        $component->save();
 
         // Add a default status log entry - we always start ok.
-        $this->createStatusLogEntry($id, 0, 'Component Created');
+        $this->createStatusLogEntry($component->id, 0, 'Component Created');
 
         // Create a default component array based on what was inserted.
-        $ARRAY = array();
-        $ARRAY[$id] = $DATA;
-        unset($ARRAY[$id]['device_id']);     // This doesn't belong here.
-        return $ARRAY;
+        return [$component->id => $component->only(array_keys($this->reserved))];
     }
 
     public function createStatusLogEntry($component_id, $status, $message)
     {
-        // Add an entry to the statuslog table for a particular component.
-        $DATA = array(
-            'component_id'  => $component_id,
-            'status'        => $status,
-            'message'       => $message,
-        );
+        try {
+            return ComponentStatusLog::create(get_defined_vars())->id;
+        } catch (\Exception $e) {
+            \Log::debug("Failed to create component status log");
+        }
 
-        return dbInsert($DATA, 'component_statuslog');
+        return 0;
     }
 
     public function deleteComponent($id)
     {
         // Delete a component from the database.
-        return dbDelete('component', "`id` = ?", array($id));
+        return \App\Models\Component::destroy($id);
     }
 
     public function setComponentPrefs($device_id, $ARRAY)

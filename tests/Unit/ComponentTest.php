@@ -148,7 +148,8 @@ class ComponentTest extends DBTestCase
     {
         // invalid id fails
         $component = new Component();
-        $this->assertEquals(0, $component->createStatusLogEntry(434242, 'fail', 'failed'), 'incorrectly added log');
+
+        $this->assertEquals(0, $component->createStatusLogEntry(434242, 0, 'failed'), 'incorrectly added log');
 
         $message = Str::random(8);
         $model = factory(\App\Models\Component::class)->create();
