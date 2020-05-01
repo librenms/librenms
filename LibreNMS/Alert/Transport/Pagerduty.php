@@ -60,6 +60,7 @@ class Pagerduty extends Transport
             'dedup_key'    => (string)$obj['alert_id'],
             'payload'    => [
                 'custom_details'  => strip_tags($obj['msg']) ?: 'Test',
+				'device_groups'   => $obj['device_groups'],
                 'source'   => $obj['hostname'],
                 'severity' => $obj['severity'],
                 'summary'  => ($obj['name'] ? $obj['name'] . ' on ' . $obj['hostname'] : $obj['title']),
@@ -103,6 +104,11 @@ class Pagerduty extends Transport
                     'title' => 'Service',
                     'type'  => 'hidden',
                     'name'  => 'service_name',
+                ],
+                [
+                    'title' => 'Integration Key',
+                    'type'  => 'text',
+                    'name' => 'service_key',
                 ]
             ],
             'validation' => []

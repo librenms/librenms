@@ -84,6 +84,7 @@ class RunAlerts
         $device      = dbFetchRow('SELECT hostname, sysName, sysDescr, sysContact, os, type, ip, hardware, version, purpose, notes, uptime, status, status_reason, locations.location FROM devices LEFT JOIN locations ON locations.id = devices.location_id WHERE device_id = ?', array($alert['device_id']));
         $attribs     = get_dev_attribs($alert['device_id']);
 
+        $obj['device_groups'] = array_column(dbFetchRows('SELECT name FROM device_groups WHERE id IN (SELECT device_group_id from device_group_device WHERE device_id = ?)', array($alert['device_id'])), 'name');
         $obj['hostname']      = $device['hostname'];
         $obj['sysName']       = $device['sysName'];
         $obj['sysDescr']      = $device['sysDescr'];
