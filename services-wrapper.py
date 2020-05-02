@@ -89,36 +89,29 @@ service_path = config['install_dir'] + '/check-services.php'
 log_dir = config['log_dir']
 db_username = config['db_user']
 db_password = config['db_pass']
+db_port = int(config['db_port'])
 
-if config['db_host'][:5].lower() == 'unix:':
+if config['db_socket']:
     db_server = config['db_host']
-    db_port = 0
-elif config['db_socket']:
-    db_server = config['db_socket']
-    db_port = 0
-elif ':' in config['db_host']:
-    db_server = config['db_host'].rsplit(':')[0]
-    db_port = int(config['db_host'].rsplit(':')[1])
-elif 'db_port' in config:
-    db_server = config['db_host']
-    db_port = int(config['db_port'])
+    db_socket = config['db_socket']
 else:
     db_server = config['db_host']
-    db_port = 0
+    db_socket = None
 
 db_dbname = config['db_name']
 
 
 def db_open():
     try:
-        if db_port == 0:
-            db = MySQLdb.connect(host=db_server, user=db_username, passwd=db_password, db=db_dbname)
+        if db_socket:
+            db = MySQLdb.connect(host=db_server, unix_socket=db_socket, user=db_username, passwd=db_password, db=db_dbname)
         else:
             db = MySQLdb.connect(host=db_server, port=db_port, user=db_username, passwd=db_password, db=db_dbname)
         return db
     except:
         print "ERROR: Could not connect to MySQL database!"
         sys.exit(2)
+
 
 # (c) 2015, GPLv3, Daniel Preussker <f0o@devilcode.org> <<<EOC1
 if 'distributed_poller_group' in config:
