@@ -22,12 +22,3 @@ discovery_modules:
     vmware-vminfo: true
     libvirt-vminfo: true
 processor_stacked: true
-register_mibs:
-    rxCounter: GANDI-MIB
-    txCounter: GANDI-MIB
-    dropCounter: GANDI-MIB
-    acldropCounter: GANDI-MIB
-    ratedropCounter: GANDI-MIB
-    KNIrxCounter: GANDI-MIB
-    KNItxCounter: GANDI-MIB
-    KNIdropCounter: GANDI-MIB
