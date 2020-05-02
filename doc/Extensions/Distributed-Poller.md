@@ -143,7 +143,7 @@ large installs can be significant and will slow polling down enough to
 cause issues with a large number of devices.
 
 A last note to make sure of, is that all pollers writing to the same DB
-needs to have the same `APP_KEY` value set in the `.env` file.
+need to have the same `APP_KEY` value set in the `.env` file.
 
 ### Discovery
 
