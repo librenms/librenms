@@ -407,6 +407,15 @@ tmnxModel7750MGSR12Reg           OBJECT-IDENTITY
 
 alcatelMGVMExtRoutingSystems     OBJECT IDENTIFIER ::= { timetraReg 13 }
 
+alcatelMobileSbaSystems          OBJECT IDENTIFIER ::= { timetraReg 14 }
+
+tmnxModelNrfReg                  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This objectId is to be used as the mib-2 sysObjectID to identify the
+         Nokia Network Repository Function (NRF) device."
+    ::= { alcatelMobileSbaSystems 1 }
+
 alcatel7950ExtRoutingSystems     OBJECT IDENTIFIER ::= { timetraReg 15 }
 
 tmnxModel7950XRS20Reg            OBJECT-IDENTITY
