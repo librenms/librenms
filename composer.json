@@ -114,10 +114,14 @@
         "post-install-cmd": [
             "LibreNMS\\ComposerHelper::postInstall",
             "Illuminate\\Foundation\\ComposerScripts::postInstall",
-            "@php artisan vue-i18n:generate --multi-locales --format=umd"
+            "@php artisan vue-i18n:generate --multi-locales --format=umd",
+            "@python-requirements"
         ],
         "post-update-cmd": [
             "Illuminate\\Foundation\\ComposerScripts::postUpdate"
+        ],
+        "python-requirements": [
+            "scripts/check_requirements.py || pip3 install -r requirements.txt || :"
         ]
     }
 }
