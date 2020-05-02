@@ -190,11 +190,11 @@ class Database extends BaseValidation
                     // MySQL 8.0.19+ fix, deprecated integer width
                     if (!strpos(strtolower($mysql_version), 'mariadb') && version_compare('8.0.18', $mysql_version, '<')) {
                         if (preg_match('/\w*INT/i', $cdata['Type'])) {
-                            $cdata['Type'] = preg_replace('/\(\d+\)/','', $cdata['Type']);
+                            $cdata['Type'] = preg_replace('/\(\d+\)/', '', $cdata['Type']);
                             $cdata['Type'] = preg_replace('/\s+/', ' ', $cdata['Type']);
                         }
                         if (preg_match('/\w*INT/i', $current_columns[$column]['Type'])) {
-                            $current_columns[$column]['Type'] = preg_replace('/\(\d+\)/','', $current_columns[$column]['Type']);
+                            $current_columns[$column]['Type'] = preg_replace('/\(\d+\)/', '', $current_columns[$column]['Type']);
                             $current_columns[$column]['Type'] = preg_replace('/\s+/', ' ', $current_columns[$column]['Type']);
                         }
                     }
