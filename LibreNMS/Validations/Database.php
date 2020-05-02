@@ -214,8 +214,6 @@ class Database extends BaseValidation
                         }
                         $schema_update[] = $this->addColumnSql($table, $cdata, isset($data['Columns'][$index - 1]) ? $data['Columns'][$index - 1]['Field'] : null, $primary);
                     } elseif ($cdata !== $current_columns[$column]) {
-                        print_r($cdata);
-                        print_r($current_columns[$column]); exit;
                         $validator->fail("Database: incorrect column ($table/$column)");
                         $schema_update[] = $this->updateTableSql($table, $column, $cdata);
                     }
