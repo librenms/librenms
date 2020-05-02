@@ -132,7 +132,7 @@ class ComponentTest extends DBTestCase
         \Log::shouldReceive('event')->withArgs(["Component $base->id has been modified: label => new label", $base->device_id, 'component', 3, $base->id]);
         \Log::shouldReceive('event')->withArgs(["Component: $base->type($base->id). Attribute: thirty, was added with value: 30", $base->device_id, 'component', 3, $base->id]);
         \Log::shouldReceive('event')->withArgs(["Component: $base->type($base->id). Attribute: json, was added with value: {\"json\":\"array\"}", $base->device_id, 'component', 3, $base->id]);
-        \Log::shouldReceive('event')->withArgs(["Component: $base->type($base->id). Attribute: null_val, was deleted.", $base->device_id, 'component', 4, null]);
+        \Log::shouldReceive('event')->withArgs(["Component: $base->type($base->id). Attribute: null_val, was deleted.", $base->device_id, 'component', 4]);
         $multiple = $this->buildExpected($base)[$base->device_id];
         $multiple[$base->id]['label'] = 'new label';
         $multiple[$base->id]['thirty'] = 30;
@@ -140,8 +140,8 @@ class ComponentTest extends DBTestCase
         $component->setComponentPrefs($base->device_id, $multiple);
 
         \Log::shouldReceive('event')->withArgs(["Component $base->id has been modified: label => ", $base->device_id, 'component', 3, $base->id]);
-        \Log::shouldReceive('event')->withArgs(["Component: $base->type($base->id). Attribute: thirty, was deleted.", $base->device_id, 'component', 4, null]);
-        \Log::shouldReceive('event')->withArgs(["Component: $base->type($base->id). Attribute: json, was deleted.", $base->device_id, 'component', 4, null]);
+        \Log::shouldReceive('event')->withArgs(["Component: $base->type($base->id). Attribute: thirty, was deleted.", $base->device_id, 'component', 4]);
+        \Log::shouldReceive('event')->withArgs(["Component: $base->type($base->id). Attribute: json, was deleted.", $base->device_id, 'component', 4]);
         $uc = \App\Models\Component::find($base->id);
         $this->assertEquals('new label', $uc->label);
         $this->assertEquals(30, $uc->prefs->where('attribute', 'thirty')->first()->value);

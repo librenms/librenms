@@ -264,7 +264,7 @@ class Component
 
                 foreach ($invalid as $pref) {
                     $pref->delete();
-                    Log::event("Component: $component->type($component->id). Attribute: $pref->attribute, was deleted.", 4, $component->id);
+                    Log::event("Component: $component->type($component->id). Attribute: $pref->attribute, was deleted.", $component->device_id, 'component', 4);
                 }
             });
 
