@@ -30,6 +30,7 @@ class Component extends DeviceRelatedModel
     public $timestamps = false;
     protected $table = 'component';
     protected $fillable = ['device_id', 'type', 'label', 'status', 'disabled', 'ignore', 'error'];
+    protected $casts = ['status' => 'integer', 'disabled' => 'integer', 'ignore' => 'integer']; // should probably change these to boolean
 
     // ---- Define Relationships ----
 
