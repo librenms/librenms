@@ -172,8 +172,6 @@ class Database extends BaseValidation
         $current_schema = dump_db_schema();
         $schema_update = array();
 
-        $mysql_version = $validator->getVersions()['mysql_ver'];
-
         foreach ((array)$master_schema as $table => $data) {
             if (empty($current_schema[$table])) {
                 $validator->fail("Database: missing table ($table)");
@@ -188,15 +186,13 @@ class Database extends BaseValidation
                     $column = $cdata['Field'];
 
                     // MySQL 8.0.19+ fix, deprecated integer width
-                    if (!strpos(strtolower($mysql_version), 'mariadb') && version_compare('8.0.18', $mysql_version, '<')) {
-                        if (preg_match('/\w*INT/i', $cdata['Type'])) {
-                            $cdata['Type'] = preg_replace('/\(\d+\)/', '', $cdata['Type']);
-                            $cdata['Type'] = preg_replace('/\s+/', ' ', $cdata['Type']);
-                        }
-                        if (preg_match('/\w*INT/i', $current_columns[$column]['Type'])) {
-                            $current_columns[$column]['Type'] = preg_replace('/\(\d+\)/', '', $current_columns[$column]['Type']);
-                            $current_columns[$column]['Type'] = preg_replace('/\s+/', ' ', $current_columns[$column]['Type']);
-                        }
+                    if (preg_match('/\w*INT/i', $cdata['Type'])) {
+                        $cdata['Type'] = preg_replace('/\(\d+\)/', '', $cdata['Type']);
+                        $cdata['Type'] = preg_replace('/\s+/', ' ', $cdata['Type']);
+                    }
+                    if (preg_match('/\w*INT/i', $current_columns[$column]['Type'])) {
+                        $current_columns[$column]['Type'] = preg_replace('/\(\d+\)/', '', $current_columns[$column]['Type']);
+                        $current_columns[$column]['Type'] = preg_replace('/\s+/', ' ', $current_columns[$column]['Type']);
                     }
 
                     // MySQL 8 fix, remove DEFAULT_GENERATED from timestamp extra columns
