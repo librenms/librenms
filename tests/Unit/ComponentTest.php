@@ -123,17 +123,21 @@ class ComponentTest extends DBTestCase
         $base = factory(\App\Models\Component::class)->create();
         $component = new Component();
 
+        \Log::shouldReceive('event')->twice();
         $nullVal = $this->buildExpected($base)[$base->device_id];
         $nullVal[$base->id]['null_val'] = null;
         $component->setComponentPrefs($base->device_id, $nullVal);
         $this->assertEquals('', ComponentPref::where(['component' => $base->id, 'attribute' => 'null_val'])->first()->value);
 
+
+        \Log::shouldReceive('event')->times(3);
         $multiple = $this->buildExpected($base)[$base->device_id];
         $multiple[$base->id]['label'] = 'new label';
         $multiple[$base->id]['thirty'] = 30;
         $multiple[$base->id]['json'] = json_encode(['json' => 'array']);
         $component->setComponentPrefs($base->device_id, $multiple);
 
+        \Log::shouldReceive('event')->times(3);
         $uc = \App\Models\Component::find($base->id);
         $this->assertEquals('new label', $uc->label);
         $this->assertEquals(30, $uc->prefs->where('attribute', 'thirty')->first()->value);

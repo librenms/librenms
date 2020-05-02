@@ -29,7 +29,7 @@ class Component extends DeviceRelatedModel
 {
     public $timestamps = false;
     protected $table = 'component';
-    protected $fillable = ['device_id', 'type'];
+    protected $fillable = ['device_id', 'type', 'label', 'status', 'disabled', 'ignore', 'error'];
 
     // ---- Define Relationships ----
 
