@@ -172,6 +172,8 @@ class Database extends BaseValidation
         $current_schema = dump_db_schema();
         $schema_update = array();
 
+        $mysql_version = $validator->getVersions()['mysql_ver'];
+
         foreach ((array)$master_schema as $table => $data) {
             if (empty($current_schema[$table])) {
                 $validator->fail("Database: missing table ($table)");
@@ -185,9 +187,21 @@ class Database extends BaseValidation
                 foreach ($data['Columns'] as $index => $cdata) {
                     $column = $cdata['Field'];
 
+                    // MySQL 8.0.19+ fix, deprecated integer width
+                    if (!strpos(strtolower($mysql_version), 'mariadb') && version_compare('8.0.18', $mysql_version, '<')) {
+                        if (preg_match('/\w*INT/i', $cdata['Type'])) {
+                            $cdata['Type'] = preg_replace('/\(\d+\)/','', $cdata['Type']);
+                            $cdata['Type'] = preg_replace('/\s+/', ' ', $cdata['Type']);
+                        }
+                        if (preg_match('/\w*INT/i', $current_columns[$column]['Type'])) {
+                            $current_columns[$column]['Type'] = preg_replace('/\(\d+\)/','', $current_columns[$column]['Type']);
+                            $current_columns[$column]['Type'] = preg_replace('/\s+/', ' ', $current_columns[$column]['Type']);
+                        }
+                    }
+
                     // MySQL 8 fix, remove DEFAULT_GENERATED from timestamp extra columns
                     if ($cdata['Type'] == 'timestamp') {
-                         $current_columns[$column]['Extra'] = preg_replace("/DEFAULT_GENERATED[ ]*/", '', $current_columns[$column]['Extra']);
+                        $current_columns[$column]['Extra'] = preg_replace("/DEFAULT_GENERATED[ ]*/", '', $current_columns[$column]['Extra']);
                     }
 
                     if (empty($current_columns[$column])) {
@@ -200,6 +214,8 @@ class Database extends BaseValidation
                         }
                         $schema_update[] = $this->addColumnSql($table, $cdata, isset($data['Columns'][$index - 1]) ? $data['Columns'][$index - 1]['Field'] : null, $primary);
                     } elseif ($cdata !== $current_columns[$column]) {
+                        print_r($cdata);
+                        print_r($current_columns[$column]); exit;
                         $validator->fail("Database: incorrect column ($table/$column)");
                         $schema_update[] = $this->updateTableSql($table, $column, $cdata);
                     }
