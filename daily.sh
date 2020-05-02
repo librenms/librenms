@@ -120,31 +120,61 @@ set_notifiable_result() {
 }
 
 #######################################
-# Check the PHP version and branch and switch to the appropriate branch
+# Check the PHP and Python version and branch and switch to the appropriate branch
 # Returns:
 #   Exit-Code: 0 >= min ver, 1 < min ver
 #######################################
-check_php_ver() {
+check_dependencies() {
     local branch=$(git rev-parse --abbrev-ref HEAD)
+    scripts/check_requirements.py > /dev/null 2>&1 || pip3 install -r requirements.txt > /dev/null 2>&1
+
     local ver_56=$(php -r "echo (int)version_compare(PHP_VERSION, '5.6.4', '<');")
     local ver_71=$(php -r "echo (int)version_compare(PHP_VERSION, '7.1.3', '<');")
-    if [[ "$branch" == "php53" ]] && [[ "$ver_56" == "0" ]]; then
-        status_run "Supported PHP version, switched back to master branch." 'git checkout master'
-        branch="master"
-    elif [[ "$branch" == "php56" ]] && [[ "$ver_71" == "0" ]]; then
-        status_run "Supported PHP version, switched back to master branch." 'git checkout master'
-        branch="master"
-    elif [[ "$branch" != "php53" ]] && [[ "$ver_56" == "1" ]]; then
-        status_run "Unsupported PHP version, switched to php53 branch." 'git checkout php53'
-        branch="php53"
-    elif [[ "$branch" != "php56" ]] && [[ "$ver_71" == "1" ]]; then
-        status_run "Unsupported PHP version, switched to php56 branch." 'git checkout php56'
-        branch="php56"
+    local ver_72=$(php -r "echo (int)version_compare(PHP_VERSION, '7.2.5', '<');")
+    local python3=$(python3 -c "import sys;print(int(sys.version_info < (3, 5)))" 2> /dev/null)
+    local python_deps=$(scripts/check_requirements.py > /dev/null 2>&1; echo $?)
+    local phpver="master"
+    local pythonver="master"
+
+    local old_branches="php53 php56 php71-python2"
+    if [[ " $old_branches " =~ " $branch " ]] && [[ "$ver_72" == "0" && "$python3" == "0" && "$python_deps" == "0" ]]; then
+        status_run "Supported PHP and Python version, switched back to master branch." 'git checkout master'
+    elif [[ "$ver_56" != "0" ]]; then
+        phpver="php53"
+        if [[ "$branch" != "php53" ]]; then
+            status_run "Unsupported PHP version, switched to php53 branch." 'git checkout php53'
+        fi
+    elif [[ "$ver_71" != "0" ]]; then
+        phpver="php56"
+        if [[ "$branch" != "php56" ]]; then
+            status_run "Unsupported PHP version, switched to php56 branch." 'git checkout php56'
+        fi
+    elif [[ "$ver_72" != "0" || "$python3" != "0" || "$python_deps" != "0" ]]; then
+        local msg=""
+        if [[ "$ver_72" != "0" ]]; then
+            msg="Unsupported PHP version, $msg"
+            phpver="php71"
+        fi
+        if [[ "$python3" != "0" ]]; then
+            msg="python3 is not available, $msg"
+            pythonver="python3-missing"
+        elif [[ "$python_deps" != "0" ]]; then
+            msg="Python 3 dependencies missing, $msg"
+            pythonver="python3-deps"
+        fi
+
+        if [[ "$branch" != "php71-python2" ]]; then
+            status_run "${msg}switched to php71-python2 branch." 'git checkout php71-python2'
+        fi
     fi
 
-    set_notifiable_result phpver ${branch}
+    set_notifiable_result phpver ${phpver}
+    set_notifiable_result pythonver ${pythonver}
 
-    return ${ver_res};
+    if [[ "$phpver" == "master" && "$pythonver" == "master" ]]; then
+        return 0;
+    fi
+    return 1;
 }
 
 
@@ -192,7 +222,7 @@ main () {
             exit
         fi
 
-        check_php_ver
+        check_dependencies
         php_ver_ret=$?
 
         # make sure the vendor directory is clean
@@ -234,6 +264,9 @@ main () {
                 status_run 'Cleaning up DB' "$DAILY_SCRIPT cleanup"
             ;;
             post-pull)
+                # re-check dependencies after pull with the new code
+                check_dependencies
+
                 # Check for missing vendor dir
                 if [ ! -f vendor/autoload.php ]; then
                     git checkout 609676a9f8d72da081c61f82967e1d16defc0c4e -- vendor/
@@ -244,7 +277,7 @@ main () {
 
                 # Check if we need to revert (Must be in post pull so we can update it)
                 if [[ "$old_version" != "$new_version" ]]; then
-                    check_php_ver # check php version and switch branches
+                    check_dependencies # check php and python version and switch branches
 
                     # new_version may be incorrect if we just switch branches... ignoring that detail
                     status_run "Updated from $old_version to $new_version" ''
