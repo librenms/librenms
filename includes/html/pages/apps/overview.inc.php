@@ -27,7 +27,7 @@ foreach (Application::query()->hasAccess(Auth::user())->with('device')->orderBy(
         $graph_array_zoom['type'] = 'application_'.$app->app_type.'_'.$graph_type;
         $graph_array_zoom['id']   = $app->app_id;
 
-        $overlib_url = route('device', [$app->device_id, "tab=apps", "app=$app->app_type"]);
+        $overlib_url = route('device', [$app->device_id, 'apps', "app=$app->app_type"]);
 
         $overlib_link = '<span style="float:left; margin-left: 10px; font-weight: bold;">'.optional($app->device)->shortDisplayName().'</span>';
         if (!empty($app->app_instance)) {
