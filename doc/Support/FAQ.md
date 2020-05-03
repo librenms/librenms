@@ -125,6 +125,23 @@ using the [included
 snmpd.conf](https://raw.githubusercontent.com/librenms/librenms/master/snmpd.conf.example)
 file.
 
+If you are behind a Proxy or thru a NAT'd ipaddress with an Nginx, you
+need to add this into your nginx.conf file inside the server statement:
+
+   location ~ ^\/.*\/([a-z_\-]+)\.php$   { try_files $uri $uri/ /$1.php?$query_string;     }
+
+   just before: " location /  { ... }"
+
+This works when some urls are like /device/.../.../graph.php and Nginx
+doesn't find graph.php on the specified path that URL states, since
+graph.php is in the html_root. Apache server works well with this concept
+since it allows concept called multiviews that Nginx doesn't has. This
+patch is a simple workaround this fact. We extract the last portion of
+the file that ends with ([a-z_\-]+).php, and try do open it as if it was
+at html_root with $1. Be warned that this workaround works only for files
+that include only characters : [a-z_\-], for now looks valid on this
+librenms version, so you may need to adapt to your needs.
+
 ## <a name="faq7"> How do I debug pages not loading correctly?</a>
 
 A debug system is in place which enables you to see the output from

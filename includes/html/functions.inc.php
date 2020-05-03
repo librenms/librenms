@@ -154,7 +154,7 @@ function get_percentage_colours($percentage, $component_perc_warn = null)
 
 function generate_minigraph_image($device, $start, $end, $type, $legend = 'no', $width = 275, $height = 100, $sep = '&amp;', $class = 'minigraph-image', $absolute_size = 0)
 {
-    return '<img class="' . $class . '" width="' . $width . '" height="' . $height . '" src="graph.php?' . implode($sep, array('device=' . $device['device_id'], "from=$start", "to=$end", "width=$width", "height=$height", "type=$type", "legend=$legend", "absolute=$absolute_size")) . '">';
+    return '<img class="' . $class . '" width="' . $width . '" height="' . $height . '" src="' . asset("graph.php") . '?' . implode($sep, array('device=' . $device['device_id'], "from=$start", "to=$end", "width=$width", "height=$height", "type=$type", "legend=$legend", "absolute=$absolute_size")) . '">';
 }//end generate_minigraph_image()
 
 
@@ -360,7 +360,7 @@ function generate_dynamic_graph_tag($args)
         $urlargs[] = $key . "=" . $value;
     }
 
-    return '<img style="width:'.$width.'px;height:100%" class="graph img-responsive" data-src-template="graph.php?' . implode('&amp;', $urlargs) . '" border="0" />';
+    return '<img style="width:'.$width.'px;height:100%" class="graph img-responsive" data-src-template="' . asset("graph.php") . '?' . implode('&amp;', $urlargs) . '" border="0" />';
 }//end generate_dynamic_graph_tag()
 
 function generate_dynamic_graph_js($args)
@@ -368,9 +368,9 @@ function generate_dynamic_graph_js($args)
     $from = (is_numeric($args['from']) ? $args['from'] : '(new Date()).getTime() / 1000 - 24*3600');
     $range = (is_numeric($args['to']) ? $args['to'] - $args['from'] : '24*3600');
 
-    $output = '<script src="js/RrdGraphJS/q-5.0.2.min.js"></script>
-        <script src="js/RrdGraphJS/moment-timezone-with-data.js"></script>
-        <script src="js/RrdGraphJS/rrdGraphPng.js"></script>
+    $output = '<script src="' . asset("js/RrdGraphJS/q-5.0.2.min.js") . '"></script>
+        <script src="' . asset("js/RrdGraphJS/moment-timezone-with-data.js") . '"></script>
+        <script src="' . asset("js/RrdGraphJS/rrdGraphPng.js") . '"></script>
           <script type="text/javascript">
               q.ready(function(){
                   var graphs = [];
@@ -601,7 +601,7 @@ function generate_port_image($args)
         $args['bg'] = 'FFFFFF00';
     }
 
-    return "<img src='graph.php?type=" . $args['graph_type'] . '&amp;id=' . $args['port_id'] . '&amp;from=' . $args['from'] . '&amp;to=' . $args['to'] . '&amp;width=' . $args['width'] . '&amp;height=' . $args['height'] . '&amp;bg=' . $args['bg'] . "'>";
+    return "<img src='" . asset("graph.php") . "?type=" . $args['graph_type'] . '&amp;id=' . $args['port_id'] . '&amp;from=' . $args['from'] . '&amp;to=' . $args['to'] . '&amp;width=' . $args['width'] . '&amp;height=' . $args['height'] . '&amp;bg=' . $args['bg'] . "'>";
 }//end generate_port_image()
 
 

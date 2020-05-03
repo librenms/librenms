@@ -75,8 +75,8 @@
 @endsection
 
 @section('javascript')
-    <script src="js/leaflet.js"></script>
-    <script src="js/L.Control.Locate.min.js"></script>
+    <?php echo '<script src="'. asset("js/leaflet.js"). '"></script>'; ?>
+    <?php echo '<script src="'. asset("js/L.Control.Locate.min.js"). '"></script>'; ?>
     <script>
         var locationMap = null;
         var locationMarker = null;
