@@ -369,7 +369,7 @@ function generate_dynamic_graph_js($args)
     $range = (is_numeric($args['to']) ? $args['to'] - $args['from'] : '24*3600');
 
     $output = '<script src="' . asset("js/RrdGraphJS/q-5.0.2.min.js") . '"></script>
-        <script src="' . asset("moment-timezone-with-data.js") . '"></script>
+        <script src="' . asset("js/RrdGraphJS/moment-timezone-with-data.js") . '"></script>
         <script src="' . asset("js/RrdGraphJS/rrdGraphPng.js") . '"></script>
           <script type="text/javascript">
               q.ready(function(){
