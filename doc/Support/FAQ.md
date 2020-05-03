@@ -125,7 +125,7 @@ using the [included
 snmpd.conf](https://raw.githubusercontent.com/librenms/librenms/master/snmpd.conf.example)
 file.
 
-If you are behind a Proxy or thru a NAT'd ipaddress with an Ngix, you 
+If you are behind a Proxy or thru a NAT'd ipaddress with an Nginx, you 
 need to add this into your nginx.conf file inside the server statement:
 
    location ~ ^\/.*\/([a-z_\-]+)\.php$   { try_files $uri $uri/ /$1.php?$query_string;     }
