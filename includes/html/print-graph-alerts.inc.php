@@ -44,7 +44,7 @@ $query = "SELECT DATE_FORMAT(time_logged, '" . \LibreNMS\Config::get('alert_grap
     <br>
     <div style="margin:0 auto;width:99%;">
 
-<?php = echo '<script src="'. asset("js/vis.min.js") .'"></script>' ?>
+<?php echo '<script src="'. asset("js/vis.min.js") .'"></script>'; ?>
 <div id="visualization" style="margin-bottom: -120px;"></div>
 <script type="text/javascript">
 
