@@ -75,7 +75,9 @@
   </item>
   <item>
     <title>Minimum Requirements for PHP and Python changed</title>
-    <description><![CDATA[To keep LibreNMS uptodate it's necessary to increase minimum Requirements of PHP and Python<br/>PHP 7.2.5<br/>Python 3.4<br/>Please ensure you have at least this versions installed.<br/>For further information read Article in <a href="https://community.librenms.org/t/dropping-support-for-php-7-1-and-python-2/11851">Community</a>.]></description>
+    <description><![CDATA[
+To keep LibreNMS uptodate it's necessary to increase minimum Requirements of PHP and Python<br/>PHP 7.2.5<br/>Python 3.4<br/>Please ensure you have at least this versions installed.<br/>For further information read Article in <a href="https://community.librenms.org/t/dropping-support-for-php-7-1-and-python-2/11851">Community</a>.
+    ]]></description>
     <pubDate>Son, 03 May 2020 00:00:00 +0000</pubDate>
   </item>
 </channel>
