@@ -36,7 +36,8 @@ class Python extends BaseValidation
 
     const PYTHON_REQUIREMENTS_FILE = 'requirements.txt';
 
-    public static function pythonVersion() {
+    public static function pythonVersion()
+    {
         return explode(' ', exec('python3 --version'))[1];
     }
 
@@ -65,7 +66,7 @@ class Python extends BaseValidation
      *
      * @param array
      */
-    private function dependency_split($list)
+    private function dependencySplit($list)
     {
         $splitted_list = [];
         foreach ($list as $p) {
@@ -100,14 +101,14 @@ class Python extends BaseValidation
     {
         $file_content = explode("\n", file_get_contents(Config::get('install_dir') . '/' . self::PYTHON_REQUIREMENTS_FILE));
 
-        return $this->dependency_split($file_content);
+        return $this->dependencySplit($file_content);
     }
 
     private function checkExtensions(Validator $validator)
     {
         exec('pip3 freeze', $found_packages);
 
-        $installed_packages = $this->dependency_split($found_packages);
+        $installed_packages = $this->dependencySplit($found_packages);
 
         $needed_packages = $this->requirements();
 
