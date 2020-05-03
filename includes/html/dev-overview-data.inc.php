@@ -20,8 +20,8 @@ if (Config::get('overview_show_sysDescr')) {
 
 echo '</div><div class="panel-body">';
 
-echo '<script src="js/leaflet.js"></script>';
-echo '<script src="js/L.Control.Locate.min.js"></script>';
+echo '<script src="' . asset("js/leaflet.js") . '"></script>';
+echo '<script src="' . asset("js/L.Control.Locate.min.js") . '"></script>';
 
 if ($device['os'] == 'ios' || $device['os'] == 'iosxe') {
     formatCiscoHardware($device);

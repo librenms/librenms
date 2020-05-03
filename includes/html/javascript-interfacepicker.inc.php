@@ -1,4 +1,4 @@
-<script type="text/javascript" src="js/tw-sack.js"></script>
+<?php = echo '<script type="text/javascript" src="'. asset("js/tw-sack.js") .'"></script>' ?>
 <script type="text/javascript">
 
 var ajax = new Array();
