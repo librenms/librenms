@@ -171,8 +171,8 @@ if (Auth::user()->hasGlobalAdmin()) {
         </div>
     </div>
 
-    <script src="js/sql-parser.min.js"></script>
-    <script src="js/query-builder.standalone.min.js"></script>
+    <?php = echo '<script src="'.asset("js/sql-parser.min.js").'"></script>' ?>
+    <?php = echo '<script src="'.asset("js/query-builder.standalone.min.js").'"></script>' ?>
     <script>
         $('#builder').on('afterApplyRuleFlags.queryBuilder afterCreateRuleFilters.queryBuilder', function () {
             $("[name$='_filter']").each(function () {

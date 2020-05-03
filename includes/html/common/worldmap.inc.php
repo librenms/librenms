@@ -30,9 +30,9 @@ $install_dir = Config::get('install_dir');
 
 if (Config::get('map.engine', 'leaflet') == 'leaflet') {
     $temp_output = '
-<script src="js/leaflet.js"></script>
-<script src="js/leaflet.markercluster.js"></script>
-<script src="js/leaflet.awesome-markers.min.js"></script>
+<script src="' . asset("js/leaflet.js") . '"></script>
+<script src="' . asset("js/leaflet.markercluster.js") . '"></script>
+<script src="' . asset("js/leaflet.awesome-markers.min.js") . '"></script>
 <div id="leaflet-map"></div>
 <script>
         ';
