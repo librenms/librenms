@@ -353,7 +353,7 @@ if (count($devices_by_id) > 1 && count($links) > 0) {
     <?php } ?>
 <div id="visualization"></div>
 </form>
-<? echo '<script src="' . asset("js/vis.min.js") . '"></script>'; ?>
+<?php echo '<script src="' . asset("js/vis.min.js") . '"></script>'; ?>
 <script type="text/javascript">
 var height = $(window).height() - 100;
 $('#visualization').height(height + 'px');
