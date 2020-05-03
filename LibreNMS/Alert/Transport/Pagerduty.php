@@ -60,6 +60,7 @@ class Pagerduty extends Transport
             'dedup_key'    => (string)$obj['alert_id'],
             'payload'    => [
                 'custom_details'  => strip_tags($obj['msg']) ?: 'Test',
+                'device_groups'   => \DeviceCache::get($obj['device_id'])->groups->pluck('name'),
                 'source'   => $obj['hostname'],
                 'severity' => $obj['severity'],
                 'summary'  => ($obj['name'] ? $obj['name'] . ' on ' . $obj['hostname'] : $obj['title']),
