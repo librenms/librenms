@@ -360,7 +360,7 @@ function generate_dynamic_graph_tag($args)
         $urlargs[] = $key . "=" . $value;
     }
 
-    return '<img style="width:'.$width.'px;height:100%" class="graph img-responsive" data-src-template="graph.php?' . implode('&amp;', $urlargs) . '" border="0" />';
+    return '<img style="width:'.$width.'px;height:100%" class="graph img-responsive" data-src-template="' . asset("graph.php") . '?' . implode('&amp;', $urlargs) . '" border="0" />';
 }//end generate_dynamic_graph_tag()
 
 function generate_dynamic_graph_js($args)
@@ -368,9 +368,9 @@ function generate_dynamic_graph_js($args)
     $from = (is_numeric($args['from']) ? $args['from'] : '(new Date()).getTime() / 1000 - 24*3600');
     $range = (is_numeric($args['to']) ? $args['to'] - $args['from'] : '24*3600');
 
-    $output = '<script src="js/RrdGraphJS/q-5.0.2.min.js"></script>
-        <script src="js/RrdGraphJS/moment-timezone-with-data.js"></script>
-        <script src="js/RrdGraphJS/rrdGraphPng.js"></script>
+    $output = '<script src="' . asset("js/RrdGraphJS/q-5.0.2.min.js") . '"></script>
+        <script src="' . asset("moment-timezone-with-data.js") . '"></script>
+        <script src="' . asset("js/RrdGraphJS/rrdGraphPng.js") . '"></script>
           <script type="text/javascript">
               q.ready(function(){
                   var graphs = [];
