@@ -166,7 +166,7 @@ $edges = json_encode($links);
 if (count($hops) > 1 && count($links) > 0) {
     $visualization = 'visualization-' . $i;
     echo '<div id="visualization-' . $i . '"></div>
-        <script src="js/vis.min.js"></script>
+        <script src="'. asset("js/vis.min.js"). '"></script>
         <script type="text/javascript">
         var height = $(window).height() / 2;
         ';
