@@ -320,7 +320,7 @@ foreach ($list as $items) {
                 'from'=>$items['local_device_id'],
                 'to'=>$items['remote_device_id'],
                 'label'=>shorten_interface_type($local_port['ifName']) . ' > ' . shorten_interface_type($remote_port['ifName']),
-                'title' => generate_port_link($local_port, "<img src='graph.php?type=port_bits&amp;id=" . $items['local_port_id'] . "&amp;from=" . Config::get('time.day') . "&amp;to=" . Config::get('time.now') . "&amp;width=100&amp;height=20&amp;legend=no&amp;bg=" . str_replace("#", "", $row_colour) . "'>\n", '', 0, 1),
+                'title' => generate_port_link($local_port, "<img src='". asset("graph.php"). "?type=port_bits&amp;id=" . $items['local_port_id'] . "&amp;from=" . Config::get('time.day') . "&amp;to=" . Config::get('time.now') . "&amp;width=100&amp;height=20&amp;legend=no&amp;bg=" . str_replace("#", "", $row_colour) . "'>\n", '', 0, 1),
                 'width'=>$width,
             ),
             $link_style
@@ -353,7 +353,7 @@ if (count($devices_by_id) > 1 && count($links) > 0) {
     <?php } ?>
 <div id="visualization"></div>
 </form>
-<script src="js/vis.min.js"></script>
+<? = echo '<script src="'. asset("js/vis.min.js") .'"></script>' ?>
 <script type="text/javascript">
 var height = $(window).height() - 100;
 $('#visualization').height(height + 'px');
