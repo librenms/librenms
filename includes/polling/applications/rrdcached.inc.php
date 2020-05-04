@@ -46,9 +46,6 @@ if ($agent_data['app'][$name]) {
             $socket_file = substr($socket, 5);
             if (file_exists($socket_file)) {
                 $sock = fsockopen("unix://" . $socket_file);
-                if (!$sock) {
-                    $sock = fsockopen("unix:" . $socket_file);
-                }
             }
         }
     }
