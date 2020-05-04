@@ -55,8 +55,6 @@ class Python extends BaseValidation
     public function validate(Validator $validator)
     {
         $this->checkVersion($validator);
-        $this->checkPip($validator);
-        $this->checkExtensions($validator);
     }
 
     private function checkVersion(Validator $validator)
@@ -64,94 +62,6 @@ class Python extends BaseValidation
         // if update is not set to false and version is min or newer
         if (Config::get('update') && version_compare(self::pythonVersion(), self::PYTHON_MIN_VERSION, '<')) {
             $validator->warn("Python version " . self::PYTHON_MIN_VERSION . " is the minimum supported version. We recommend you update Python to a supported version (" . self::PYTHON_RECOMMENDED_VERSION . " suggested) to continue to receive updates. If you do not update Python, LibreNMS will continue to function but stop receiving bug fixes and updates.");
-        }
-    }
-
-    public function checkPip($validator)
-    {
-        $pip_binary = exec('which pip3');
-        if (empty($pip_binary)) {
-            $validator->fail("Missing Python3 Pip");
-        }
-    }
-
-    /**
-     * split string list to associative array of package with condition version
-     *
-     * @param array
-     */
-    private function dependencySplit($list)
-    {
-        $splitted_list = [];
-        foreach ($list as $p) {
-            if (strpos($p, '==') !== false) {
-                $cond = '==';
-                list($package, $version, $condition) = array_merge(explode($cond, $p), [$cond]);
-            } elseif (strpos($p, '<=') !== false) {
-                $cond = '<=';
-                list($package, $version, $condition) = array_merge(explode($cond, $p), [$cond]);
-            } elseif (strpos($p, '>=') !== false) {
-                $cond = '>=';
-                list($package, $version, $condition) = array_merge(explode($cond, $p), [$cond]);
-            } else {
-                # no version specified
-                list($package, $version, $condition) = [$p, null, null];
-            }
-
-            if (empty($package)) {
-                continue;
-            }
-
-            $splitted_list[$package] = ['version' => $version, 'condition' => $condition];
-        }
-        return $splitted_list;
-    }
-
-    /**
-     * reads python requirements file and returns a linewise array of file
-     *
-     */
-    private function requirements()
-    {
-        $file_content = explode("\n", file_get_contents(Config::get('install_dir') . '/' . self::PYTHON_REQUIREMENTS_FILE));
-
-        return $this->dependencySplit($file_content);
-    }
-
-    private function checkExtensions(Validator $validator)
-    {
-        exec('pip3 freeze', $found_packages);
-
-        $installed_packages = $this->dependencySplit($found_packages);
-
-        $needed_packages = $this->requirements();
-
-        $package_list = array_keys($installed_packages);
-
-        foreach ($needed_packages as $package => $args) {
-            $version = $args['version'];
-            $condition = $args['condition'];
-
-            if (!in_array($package, $package_list)) {
-                $validator->fail("Missing Python Package ".$package." ".$condition." ".$version);
-                continue;
-            } elseif ($condition == null) {
-                continue;
-            } elseif ($condition == '<=') {
-                if ($installed_packages[$package]['version'] <= $needed_packages[$package]['version']) {
-                    continue;
-                }
-            } elseif ($condition == '==') {
-                if ($installed_packages[$package]['version'] == $needed_packages[$package]['version']) {
-                    continue;
-                }
-            } elseif ($condition == '>=') {
-                if ($installed_packages[$package]['version'] >= $needed_packages[$package]['version']) {
-                    continue;
-                }
-            }
-
-            $validator->warn("Python Package Version conflict found: ".$package." needs to be ".$condition." ".$version);
         }
     }
 }

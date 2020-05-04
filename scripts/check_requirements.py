@@ -9,10 +9,10 @@ with open(target, 'r') as file:
     requirements = file.read().rstrip().split("\n")
     try:
         pkg_resources.require(requirements)
-    except DistributionNotFound:
+    except DistributionNotFound as req:
+        print (req)
         exit(1)
-    except VersionConflict:
+    except VersionConflict as req:
+        print (req)
         exit(2)
-    exit(0)
-
 exit(3)
