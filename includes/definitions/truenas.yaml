@@ -9,14 +9,12 @@ over:
     - { graph: device_ucd_memory, text: 'Memory Usage' }
     - { graph: device_storage, text: 'Storage Usage' }
 poller_modules:
-    applications: false
     bgp-peers: false
     mpls: false
     ospf: false
     stp: false
     wireless: false
 discovery_modules:
-    applications: false
     bgp-peers: false
     mpls: false
     stp: false
