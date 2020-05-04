@@ -148,8 +148,8 @@
                 }
                 $("#confirm-delete").modal('hide');
             },
-            error: function () {
-                toastr.error(@lang('An error occurred deleting this poller.'));
+            error: function (e) {
+                toastr.error('@lang('An error occurred deleting this poller.'): ' + e.statusText);
                 $("#confirm-delete").modal('hide');
             }
         });
