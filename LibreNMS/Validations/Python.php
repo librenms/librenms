@@ -38,7 +38,12 @@ class Python extends BaseValidation
 
     public static function pythonVersion()
     {
-        return explode(' ', exec('python3 --version'))[1];
+        $python_binary = exec('which python3');
+        if (empty($python_binary)) {
+            return null;
+        }
+        $output = exec($python_binary . ' --version');
+        return explode(' ', $output)[1];
     }
 
     /**
@@ -50,6 +55,7 @@ class Python extends BaseValidation
     public function validate(Validator $validator)
     {
         $this->checkVersion($validator);
+        $this->checkPip($validator);
         $this->checkExtensions($validator);
     }
 
@@ -58,6 +64,14 @@ class Python extends BaseValidation
         // if update is not set to false and version is min or newer
         if (Config::get('update') && version_compare(self::pythonVersion(), self::PYTHON_MIN_VERSION, '<')) {
             $validator->warn("Python version " . self::PYTHON_MIN_VERSION . " is the minimum supported version. We recommend you update Python to a supported version (" . self::PYTHON_RECOMMENDED_VERSION . " suggested) to continue to receive updates. If you do not update Python, LibreNMS will continue to function but stop receiving bug fixes and updates.");
+        }
+    }
+
+    public function checkPip($validator)
+    {
+        $pip_binary = exec('which pip3');
+        if (empty($pip_binary)) {
+            $validator->fail("Missing Python3 Pip");
         }
     }
 
