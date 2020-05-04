@@ -14,18 +14,9 @@ path: blob/master/doc/
 
 ```
 dnf install epel-release
-```
-Enable `PowerTools` repo to be able to install the `whois` package
 
-```
-dnf config-manager --set-enabled PowerTools
-dnf install python3 git cronie fping whois ImageMagick mtr python3-PyMySQL net-snmp net-snmp-utils nmap python3-memcached rrdtool python3-policycoreutils httpd mariadb mariadb-server unzip policycoreutils-python-utils
+dnf install python3 git cronie fping ImageMagick mtr python3-PyMySQL net-snmp net-snmp-utils nmap python3-memcached rrdtool python3-policycoreutils httpd mariadb mariadb-server unzip policycoreutils-python-utils
 pip3 install python-dotenv
-```
-To fix compatibility issues with hardcoded python paths, create a symlink for python3
-
-```
-ln -sf /usr/bin/python3 /usr/bin/python
 ```
 
 ### Install PHP
