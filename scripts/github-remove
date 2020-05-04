@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 import argparse, datetime, sys, subprocess
 from subprocess import call, Popen
 from os.path import dirname, abspath
@@ -9,10 +9,10 @@ def confirm(question):
     valid = {"yes":True, "y":True, "ye":True, "no":False, "n":False}
     while 1:
         sys.stdout.write(question + " [y/N] ")
-        choice = raw_input().lower()
+        choice = input().lower()
         if choice == '':
             return False
-        elif choice in valid.keys():
+        elif choice in list(valid.keys()):
             return valid[choice]
         else:
             sys.stdout.write("Please respond with 'yes' or 'no'  (or 'y' or 'n').\n")
@@ -68,4 +68,4 @@ elif args.restore:
     if "github-remove" in last:
         call(["git", "stash", "pop"], cwd=librenms_dir)
     else:
-        print("Last stash was not created by " + __file__ + ". Aborting.")
+        print(("Last stash was not created by " + __file__ + ". Aborting."))

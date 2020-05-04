@@ -143,9 +143,9 @@ class QueueManager:
     def get_queue(self, group):
         name = self.queue_name(self.type, group)
 
-        if name not in self._queues.keys():
+        if name not in list(self._queues.keys()):
             with self._queue_create_lock:
-                if name not in self._queues.keys():
+                if name not in list(self._queues.keys()):
                     self._queues[name] = self._create_queue(self.type, group)
 
         return self._queues[name]

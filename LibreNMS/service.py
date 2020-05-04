@@ -455,7 +455,7 @@ class Service:
         Start all dispatch timers and begin pushing events into queues.
         This should only be started when we are the master dispatcher.
         """
-        for manager in self.queue_managers.values():
+        for manager in list(self.queue_managers.values()):
             try:
                 manager.start_dispatch()
             except AttributeError:
@@ -465,7 +465,7 @@ class Service:
         """
         Stop all dispatch timers, this should be called when we are no longer the master dispatcher.
         """
-        for manager in self.queue_managers.values():
+        for manager in list(self.queue_managers.values()):
             try:
                 manager.stop_dispatch()
             except AttributeError:
@@ -476,10 +476,10 @@ class Service:
         Stop all QueueManagers, and wait for their processing threads to complete.
         We send the stop signal to all QueueManagers first, then wait for them to finish.
         """
-        for manager in self.queue_managers.values():
+        for manager in list(self.queue_managers.values()):
             manager.stop()
 
-        for manager in self.queue_managers.values():
+        for manager in list(self.queue_managers.values()):
             manager.stop_and_wait()
 
     def check_single_instance(self):
@@ -512,7 +512,7 @@ class Service:
             # Find our ID
             self._db.query('SELECT id INTO @parent_poller_id FROM poller_cluster WHERE node_id="{0}"; '.format(self.config.node_id))
 
-            for worker_type, manager in self.queue_managers.items():
+            for worker_type, manager in list(self.queue_managers.items()):
                 worker_seconds, devices = manager.performance.reset()
 
                 # Record the queue state

@@ -92,7 +92,7 @@ class DB:
         """
 
         # Does a connection exist for this thread
-        if threading.get_ident() not in self._db.keys():
+        if threading.get_ident() not in list(self._db.keys()):
             self.connect()
 
         return self._db[threading.get_ident()]
@@ -236,10 +236,10 @@ class RedisLock(Lock):
         if redis_kwargs.get('sentinel') and redis_kwargs.get('sentinel_service'):
             sentinels = [tuple(l.split(':')) for l in redis_kwargs.pop('sentinel').split(',')]
             sentinel_service = redis_kwargs.pop('sentinel_service')
-            kwargs = {k: v for k, v in redis_kwargs.items() if k in ["decode_responses", "password", "db", "socket_timeout"]}
+            kwargs = {k: v for k, v in list(redis_kwargs.items()) if k in ["decode_responses", "password", "db", "socket_timeout"]}
             self._redis = Sentinel(sentinels, **kwargs).master_for(sentinel_service)
         else:
-            kwargs = {k: v for k, v in redis_kwargs.items() if "sentinel" not in k}
+            kwargs = {k: v for k, v in list(redis_kwargs.items()) if "sentinel" not in k}
             self._redis = redis.Redis(**kwargs)
         self._redis.ping()
         self._namespace = namespace
@@ -287,7 +287,7 @@ class RedisLock(Lock):
     def print_locks(self):
         keys = self._redis.keys(self.__key('*'))
         for key in keys:
-            print("{} locked by {}, expires in {} seconds".format(key, self._redis.get(key), self._redis.ttl(key)))
+            print(("{} locked by {}, expires in {} seconds".format(key, self._redis.get(key), self._redis.ttl(key))))
 
 
 class RedisUniqueQueue(object):
@@ -298,10 +298,10 @@ class RedisUniqueQueue(object):
         if redis_kwargs.get('sentinel') and redis_kwargs.get('sentinel_service'):
             sentinels = [tuple(l.split(':')) for l in redis_kwargs.pop('sentinel').split(',')]
             sentinel_service = redis_kwargs.pop('sentinel_service')
-            kwargs = {k: v for k, v in redis_kwargs.items() if k in ["decode_responses", "password", "db", "socket_timeout"]}
+            kwargs = {k: v for k, v in list(redis_kwargs.items()) if k in ["decode_responses", "password", "db", "socket_timeout"]}
             self._redis = Sentinel(sentinels, **kwargs).master_for(sentinel_service)
         else:
-            kwargs = {k: v for k, v in redis_kwargs.items() if "sentinel" not in k}
+            kwargs = {k: v for k, v in list(redis_kwargs.items()) if "sentinel" not in k}
             self._redis = redis.Redis(**kwargs)
         self._redis.ping()
         self.key = "{}:{}".format(namespace, name)

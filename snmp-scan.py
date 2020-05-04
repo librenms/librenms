@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 Scan networks for snmp hosts and add them to LibreNMS
 
@@ -21,8 +21,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 @author     Tony Murray <murraytony@gmail.com>
 """
 
-from __future__ import print_function
-from __future__ import unicode_literals
+
+
 
 import argparse
 from argparse import RawTextHelpFormatter
@@ -201,7 +201,7 @@ Example: """ + __file__ + """ -P 192.168.0.0/24""")
     networks = []
     for net in (netargs if netargs else CONFIG.get('nets', [])):
         try:
-            networks.append(ip_network(u'%s' % net, True))
+            networks.append(ip_network('%s' % net, True))
             debug('Network parsed: {}'.format(net), 2)
         except ValueError as e:
             parser.error('Invalid network format {}'.format(e))
