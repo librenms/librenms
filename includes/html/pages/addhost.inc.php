@@ -71,7 +71,7 @@ if (!empty($_POST['hostname'])) {
             Config::set('snmp.v3', $v3_config);
 
             $snmpver = 'v3';
-            print_message("Adding SNMPv3 host $hostname port $port");
+            print_message("Adding SNMPv3 host: $hostname port: $port");
         } else {
             print_error('Unsupported SNMP Version. There was a dropdown menu, how did you reach this error ?');
         }//end if
