@@ -94,7 +94,7 @@ echo '"'.$_POST['searchPhrase'].'"+';
             searchPhrase: '<?php echo mres($_POST['searchPhrase']); ?>'
         };
     },
-    url: "ajax_table.php"
+    <?php echo 'url: "' . asset("ajax_table.php") . '"'; ?>
 });
 
 </script>

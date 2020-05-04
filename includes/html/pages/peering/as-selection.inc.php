@@ -52,6 +52,6 @@ echo "<div class='alert alert-info' role='alert'>Cached date: $cache_date</div>"
                 id:          'as-selection',
             };
         },
-        url: "ajax_table.php"
+        <?php echo 'url: "' . asset("ajax_table.php") . '"'; ?>
     });
 </script>

@@ -180,7 +180,7 @@ include 'includes/html/modal/new_bill.inc.php';
                period: $('select#period').val()
            };
        },
-       url: "ajax_table.php"
+       <?php echo 'url: "' . asset("ajax_table.php") . '"'; ?>
     }).on("loaded.rs.jquery.bootgrid", function() {
     });
     $('#table-filters select').on('change', function() { grid.bootgrid('reload'); });

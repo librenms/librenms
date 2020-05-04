@@ -55,6 +55,6 @@ $pagetitle[] = "Health :: Memory";
                 view: '<?php echo $vars['view']; ?>'
             };
         },
-        url: "ajax_table.php"
+        <?php echo 'url: "' . asset("ajax_table.php") . '"'; ?>
     });
 </script>

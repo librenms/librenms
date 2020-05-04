@@ -31,7 +31,7 @@ $pagetitle[] = 'Hardware';
                 device_id: '<?php echo htmlspecialchars($device['device_id']); ?>',
             };
         },
-        url: "ajax_table.php",
+        <?php echo 'url: "' . asset("ajax_table.php") . '",'; ?>
         formatters: {
         },
         templates: {

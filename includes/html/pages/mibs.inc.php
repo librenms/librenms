@@ -47,7 +47,7 @@ if (\LibreNMS\Config::get("poller_modules.mib")) {
                 view: '<?php echo $vars['view']; ?>'
             };
         },
-        url: "ajax_table.php",
+        <?php echo 'url: "' . asset("ajax_table.php") . '",'; ?>
         formatters: {
         },
         templates: {

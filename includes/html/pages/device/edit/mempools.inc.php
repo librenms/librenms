@@ -40,7 +40,7 @@
                 device_id: <?php echo $device['device_id']; ?>,
             };
         },
-        url: "ajax_table.php",
+        <?php echo 'url: "' . asset("ajax_table.php") . '",'; ?>
         formatters: {
             "perc_update": function(column,row) {
                 return "<div class='form-group'><input type='text' class='form-control input-sm mempool' data-device_id='<?php echo $device['device_id']; ?>' data-mempool_id='"+row.mempool_id+"' value='"+row.mempool_perc_warn+"'></div>";

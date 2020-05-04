@@ -74,6 +74,6 @@ $status = $vars['status'];
                 status:      '<?php echo $status; ?>',
             };
         },
-        url: "ajax_table.php"
+        <?php echo 'url: "' . asset("ajax_table.php") . '"'; ?>
     });
 </script>

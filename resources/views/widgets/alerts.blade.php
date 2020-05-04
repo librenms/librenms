@@ -36,7 +36,7 @@
                 device_id: '{{ $device }}'
             }
         },
-        url: "ajax_table.php",
+        <?php echo 'url: "' . asset("ajax_table.php") . '",'; ?>
         rowCount: [50, 100, 250, -1]
     }).on("loaded.rs.jquery.bootgrid", function() {
         alerts_grid = $(this);

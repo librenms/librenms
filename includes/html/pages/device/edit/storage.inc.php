@@ -41,7 +41,7 @@
                 device_id: <?php echo $device['device_id']; ?>,
             };
         },
-        url: "ajax_table.php",
+        <?php echo 'url: "' . asset("ajax_table.php") . '",'; ?>
         formatters: {
             "perc_update": function(column,row) {
                 return "<div class='form-group'><input type='text' class='form-control input-sm storage' data-device_id='<?php echo $device['device_id']; ?>' data-storage_id='"+row.storage_id+"' value='"+row.storage_perc_warn+"'></div>";

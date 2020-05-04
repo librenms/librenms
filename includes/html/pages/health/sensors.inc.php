@@ -111,6 +111,6 @@ switch ($class) {
                 class: '<?php echo $class; ?>'
             };
         },
-        url: "ajax_table.php"
+        <?php echo 'url: "' . asset("ajax_table.php") . '"'; ?>
     });
 </script>

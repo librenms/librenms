@@ -26,6 +26,6 @@
                 time_interval: '{{ $time_interval }}'
             };
         },
-        url: "ajax_table.php"
+        <?php echo 'url: "' . asset("ajax_table.php") . '"'; ?>
     });
 </script>

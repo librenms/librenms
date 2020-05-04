@@ -39,7 +39,7 @@
                 device_id: <?php echo $device['device_id']; ?>,
             };
         },
-        url: "ajax_table.php",
+        <?php echo 'url: "' . asset("ajax_table.php") . '",'; ?>
         formatters: {
             "descr_update": function(column,row) {
                 return "<div class='form-group'><input type='text' class='form-control input-sm routing' data-device_id='<?php echo $device['device_id']; ?>' data-routing_id='"+row.routing_id+"' value='"+row.bgpPeerDescr+"'></div>";

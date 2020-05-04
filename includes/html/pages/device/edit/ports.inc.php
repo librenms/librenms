@@ -36,7 +36,7 @@
         var ifName = $this.data('ifname');
         $.ajax({
             type: 'POST',
-            url: 'ajax_form.php',
+            <?php echo 'url: "' . asset("ajax_table.php") . '",'; ?>
             data: {type: "update-ifalias", descr: descr, ifName: ifName, port_id: port_id, device_id: device_id},
             dataType: "json",
             success: function (data) {

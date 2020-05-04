@@ -121,7 +121,7 @@ var grid = $("#ports").bootgrid({
             errors: '<?php echo mres($vars['errors']); ?>',
         };
     },
-    url: "ajax_table.php"
+    <?php echo 'url: "' . asset("ajax_table.php") . '"'; ?>
 });
 
 $(".actionBar").append("<?php echo $output; ?>");

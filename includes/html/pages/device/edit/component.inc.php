@@ -82,7 +82,7 @@
                 event.preventDefault();
                 $.ajax({
                     type: "POST",
-                    url: "ajax_form.php",
+                    <?php echo 'url: "' . asset("ajax_table.php") . '",'; ?>
                     data: $('form#components').serialize(),
                     dataType: "json",
                     success: function(data){

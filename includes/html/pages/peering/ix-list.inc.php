@@ -52,6 +52,6 @@ $asn = $vars['bgpLocalAs'];
                 asn:         '<?php echo $asn; ?>',
             };
         },
-        url: "ajax_table.php"
+        <?php echo 'url: "' . asset("ajax_table.php") . '"'; ?>
     });
 </script>

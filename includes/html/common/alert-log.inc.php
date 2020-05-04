@@ -152,7 +152,7 @@ $common_output[] = '<div class="form-group"> \
                 min_severity: \'' . htmlspecialchars($_POST['min_severity']). '\'
             };
         },
-        url: "ajax_table.php"
+        url: "' . asset("ajax_table.php") . '"
     }).on("loaded.rs.jquery.bootgrid", function () {
 
         var results = $("div.infos").text().split(" ");

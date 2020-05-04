@@ -41,7 +41,7 @@ if (\LibreNMS\Config::get("poller_modules.mib")) {
                 id: "device_mibs",
             };
         },
-        url: "ajax_table.php",
+        <?php echo 'url: "' . asset("ajax_table.php") . '",'; ?>
         formatters: {
         },
         templates: {

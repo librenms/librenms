@@ -28,7 +28,7 @@
                 min_severity: '{{ $min_severity }}',
             };
         },
-        url: "ajax_table.php"
+        <?php echo 'url: "' . asset("ajax_table.php") . '"'; ?>
     }).on("loaded.rs.jquery.bootgrid", function () {
 
         var results = $("div.infos").text().split(" ");

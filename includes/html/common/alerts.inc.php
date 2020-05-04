@@ -280,7 +280,7 @@ var alerts_grid = $("#alerts_' . $unique_id . '").bootgrid({
             device_id: \'' . $device['device_id'] . '\'
         }
     },
-    url: "ajax_table.php",
+    url: "' . asset("ajax_table.php") . '",
     rowCount: [50, 100, 250, -1],
 
 }).on("loaded.rs.jquery.bootgrid", function() {
