@@ -34,8 +34,6 @@ class Python extends BaseValidation
     const PYTHON_MIN_VERSION = '3.4.0';
     const PYTHON_RECOMMENDED_VERSION = '3.5.2';
 
-    const PYTHON_REQUIREMENTS_FILE = 'requirements.txt';
-
     public static function pythonVersion()
     {
         $python_binary = exec('which python3');
@@ -54,7 +52,16 @@ class Python extends BaseValidation
      */
     public function validate(Validator $validator)
     {
+        $this->checkInstalled($validator);
         $this->checkVersion($validator);
+        $this->checkExtensions($validator);
+    }
+
+    private function checkInstalled(Validator $validator)
+    {
+        if (empty(self::pythonVersion())) {
+            $validator->fail('Python3 not found');
+        }
     }
 
     private function checkVersion(Validator $validator)
@@ -62,6 +69,16 @@ class Python extends BaseValidation
         // if update is not set to false and version is min or newer
         if (Config::get('update') && version_compare(self::pythonVersion(), self::PYTHON_MIN_VERSION, '<')) {
             $validator->warn("Python version " . self::PYTHON_MIN_VERSION . " is the minimum supported version. We recommend you update Python to a supported version (" . self::PYTHON_RECOMMENDED_VERSION . " suggested) to continue to receive updates. If you do not update Python, LibreNMS will continue to function but stop receiving bug fixes and updates.");
+        }
+    }
+
+    private function checkExtensions(Validator $validator)
+    {
+        $pythonExtensions = 'scripts/check_requirements.py';
+        exec(Config::get('install_dir') . '/' . $pythonExtensions . ' -v', $output, $returnval);
+
+        if (in_array(intval($returnval), [1, 2])) {
+                $validator->fail("Python3 Modul issue found: '" . $output. "'");
         }
     }
 }
