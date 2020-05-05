@@ -225,7 +225,7 @@
         function delete_location(locationId) {
             $.ajax({
                 method: 'DELETE',
-                url: "ajax/location/" + locationId
+                <?php echo 'url: "' . asset("/") . 'ajax/location/" + locationId'; ?>
             }).success(function () {
                 locations_grid.bootgrid('reload');
                 toastr.success('@lang('Location deleted')');
