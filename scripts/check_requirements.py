@@ -1,7 +1,16 @@
 #! /usr/bin/env python3
 import os
+import sys
 import pkg_resources
 from pkg_resources import DistributionNotFound, VersionConflict
+
+args = sys.argv
+
+# verbose flag
+if '-v' in args:
+    verbose = True
+else:
+    verbose = False
 
 target = os.path.realpath(os.path.dirname(__file__) + '/../requirements.txt')
 
@@ -10,9 +19,11 @@ with open(target, 'r') as file:
     try:
         pkg_resources.require(requirements)
     except DistributionNotFound as req:
-        print (req)
+        if verbose:
+            print (req)
         exit(1)
     except VersionConflict as req:
-        print (req)
+        if verbose:
+            print (req)
         exit(2)
 exit(3)
