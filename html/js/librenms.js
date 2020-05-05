@@ -303,7 +303,7 @@ function init_map(id, engine, api_key, config) {
             roads.addTo(leaflet);
         });
     } else {
-        var osm = L.tileLayer('//' + config.tile_url + '/{z}/{x}/{y}.png', {
+        var osm = L.tileLayer( document.location.protocol + '//' + config.tile_url + '/{z}/{x}/{y}.png', {
             maxZoom: 19,
             attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         });
