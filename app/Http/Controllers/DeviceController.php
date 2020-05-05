@@ -64,7 +64,7 @@ class DeviceController extends Controller
         $this->authorize('view', [$request->user(), $device]);
 
         $alert_class = $device->disabled ? 'alert-info' : ($device->status ? '' : 'alert-danger');
-        $parent_id = Vminfo::query()->whereIn('vmwVmDisplayName', [$device->hostname, $device->hostname . '.' . Config::get('mydomain')])->first(['device_id']);
+        $parent_id = Vminfo::query()->whereIn('vmwVmDisplayName', [$device->hostname, $device->hostname . '.' . Config::get('mydomain')])->value('device_id');
         $overview_graphs = $this->buildDeviceGraphArrays($device);
 
         $tabs = array_map(function ($class) {
