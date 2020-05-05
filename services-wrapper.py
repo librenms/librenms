@@ -13,7 +13,7 @@
                 that should run simultaneously. If no argument is given it will assume
                 a default of 1 thread.
 
- Ubuntu Linux:  apt-get install python-mysqldb
+ Ubuntu Linux:  apt-get install python3-mysqldb
  FreeBSD:       cd /usr/ports/*/py-MySQLdb && make install clean
 
  License:       This program is free software: you can redistribute it and/or modify it
@@ -51,7 +51,7 @@ try:
     import MySQLdb
 except:
     print("ERROR: missing the mysql python module:")
-    print("On ubuntu: apt-get install python-mysqldb")
+    print("On ubuntu: apt-get install python3-mysqldb")
     print("On FreeBSD: cd /usr/ports/*/py-MySQLdb && make install clean")
     sys.exit(2)
 
@@ -173,8 +173,8 @@ if ('distributed_poller' in config and
         raise
     except ImportError:
         print("ERROR: missing memcache python module:")
-        print("On deb systems: apt-get install python-memcache")
-        print("On other systems: easy_install python-memcached")
+        print("On deb systems: apt-get install python3-memcache")
+        print("On other systems: easy_install python3-memcached")
         print("Disabling distributed discovery.")
         servicedisco = False
 else:
