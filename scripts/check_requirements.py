@@ -7,10 +7,7 @@ from pkg_resources import DistributionNotFound, VersionConflict
 args = sys.argv
 
 # verbose flag
-if '-v' in args:
-    verbose = True
-else:
-    verbose = False
+verbose = '-v' in args
 
 target = os.path.realpath(os.path.dirname(__file__) + '/../requirements.txt')
 
