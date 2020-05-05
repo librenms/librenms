@@ -58,7 +58,7 @@
             var $this = $(this);
             $.ajax({
                 type: 'POST',
-                url: 'ajax_form.php',
+                <?php echo 'url: "' . asset("ajax_form.php") . '",'; ?>
                 data: {type: "processor-update", device_id: device_id, data: data, processor_id: processor_id},
                 dataType: "json",
                 success: function (data) {

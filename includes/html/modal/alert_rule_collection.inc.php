@@ -82,7 +82,7 @@ if (!Auth::user()->hasGlobalAdmin()) {
                                 var template_rule_id = $(this).data("rule_id");
                                 $.ajax({
                                     type: "POST",
-                                    url: "ajax_form.php",
+                                    <?php echo 'url: "' . asset("ajax_form.php") . '",'; ?>
                                     data: {type: 'sql-from-alert-collection', template_id: template_rule_id},
                                     dataType: "json",
                                     success: function (data) {

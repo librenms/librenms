@@ -136,7 +136,7 @@
         var pollertype = $("#pollertype").val();
         $.ajax({
             type: 'POST',
-            url: 'ajax_form.php',
+            <?php echo 'url: "' . asset("ajax_form.php") . '",'; ?>
             data: {type: pollertype, id: id},
             success: function (result) {
                 if (result.status == 0) {

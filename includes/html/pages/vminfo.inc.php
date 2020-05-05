@@ -45,7 +45,7 @@ var grid = $("#vminfo").bootgrid({
             type: "get-vmlist",
         };
     },
-    url: "ajax_form.php",
+    <?php echo 'url: "' . asset("ajax_form.php") . '",'; ?>
     templates: {
         header: '<div id="{{ctx.id}}" class="{{css.header}}"> \
                     <div class="row"> \

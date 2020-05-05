@@ -72,7 +72,7 @@ $('#alert-template').on('show.bs.modal', function (event) {
     }
     $.ajax({
         type: "POST",
-        url: "ajax_form.php",
+        <?php echo 'url: "' . asset("ajax_form.php") . '",'; ?>
         data: { type: "parse-alert-template", template_id: template_id },
         dataType: "json",
         success: function(output) {
@@ -161,7 +161,7 @@ $('#convert-template').click('', function(e) {
     var title    = $("#title").val();
     $.ajax({
         type: "POST",
-        url: "ajax_form.php",
+        <?php echo 'url: "' . asset("ajax_form.php") . '",'; ?>
         data: {type: "convert-template", template: template, title: title},
         dataType: "json",
         success: function(output) {
@@ -183,7 +183,7 @@ $('#convert-template').click('', function(e) {
 function alertTemplateAjaxOps(template, name, template_id, title, title_rec, rules) {
     $.ajax({
         type: "POST",
-        url: "ajax_form.php",
+        <?php echo 'url: "' . asset("ajax_form.php") . '",'; ?>
         data: { type: "alert-templates", template: template, name: name, template_id: template_id, title: title, title_rec: title_rec, rules: rules},
         dataType: "json",
         success: function(output) {

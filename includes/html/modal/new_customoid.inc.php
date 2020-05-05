@@ -136,7 +136,7 @@ $('#create-oid-form').on('show.bs.modal', function(e) {
     if (customoid_id >= 0) {
         $.ajax({
             type: "POST",
-            url: "ajax_form.php",
+            <?php echo 'url: "' . asset("ajax_form.php") . '",'; ?>
             data: { type: "parse-customoid", customoid_id: customoid_id },
                 dataType: "json",
                 success: function (data) {
@@ -180,7 +180,7 @@ $('#save-oid-button').on('click', function (e) {
     $('#action').val('save');
     $.ajax({
         type: "POST",
-        url: "ajax_form.php",
+        <?php echo 'url: "' . asset("ajax_form.php") . '",'; ?>
         data: $('form.coid_form').serializeArray(),
         dataType: "json",
         success: function (data) {
@@ -202,7 +202,7 @@ $('#test-oid-button').on('click', function (e) {
     $('#action').val('test');
     $.ajax({
         type: "POST",
-        url: "ajax_form.php",
+        <?php echo 'url: "' . asset("ajax_form.php") . '",'; ?>
         data: $('form.coid_form').serializeArray(),
         dataType: "json",
         success: function (data) {

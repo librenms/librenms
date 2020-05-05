@@ -77,7 +77,7 @@
         var ifName = $this.data('ifname');
         $.ajax({
             type: 'POST',
-            url: 'ajax_form.php',
+            <?php echo 'url: "' . asset("ajax_form.php") . '",'; ?>
             data: {type: "update-ifspeed", speed: speed, ifName: ifName, port_id: port_id, device_id: device_id},
             dataType: "json",
             success: function (data) {
@@ -175,7 +175,7 @@
                 event.preventDefault();
                 $.ajax({
                     type: "POST",
-                    url: "ajax_form.php",
+                    <?php echo 'url: "' . asset("ajax_form.php") . '",'; ?>
                     data: $('form#ignoreport').serialize(),
                     dataType: "json",
                     success: function(data){
@@ -205,7 +205,7 @@
                 device_id: "<?php echo $device['device_id']; ?>"
             };
         },
-        url: "ajax_table.php"
+        <?php echo 'url: "' . asset("ajax_table.php") . '"'; ?>
     }).on("loaded.rs.jquery.bootgrid", function() {
         $("[type='checkbox']").bootstrapSwitch();
         $("[name='override_config']").bootstrapSwitch('offColor','danger');

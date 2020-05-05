@@ -229,7 +229,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                 $('#builder_json').val(JSON.stringify(result_json));
                 $.ajax({
                     type: "POST",
-                    url: "ajax_form.php",
+                    <?php echo 'url: "' . asset("ajax_form.php") . '",'; ?>
                     data: $('form.alerts-form').serializeArray(),
                     dataType: "json",
                     success: function (data) {
@@ -295,7 +295,7 @@ if (Auth::user()->hasGlobalAdmin()) {
             if (rule_id >= 0) {
                 $.ajax({
                     type: "POST",
-                    url: "ajax_form.php",
+                    <?php echo 'url: "' . asset("ajax_form.php") . '",'; ?>
                     data: { type: "parse-alert-rule", alert_id: rule_id },
                     dataType: "json",
                     success: function (data) {
@@ -426,7 +426,7 @@ if (Auth::user()->hasGlobalAdmin()) {
             width: '100%',
             placeholder: "Devices, Groups or Locations",
             ajax: {
-                url: 'ajax_list.php',
+                <?php echo 'url: "' . asset("ajax_list.php") . '",'; ?>
                 delay: 250,
                 data: function (params) {
                     return {
@@ -441,7 +441,7 @@ if (Auth::user()->hasGlobalAdmin()) {
             width: "100%",
             placeholder: "Transport/Group Name",
             ajax: {
-                url: 'ajax_list.php',
+                <?php echo 'url: "' . asset("ajax_list.php") . '",'; ?>
                 delay: 250,
                 data: function(params) {
                     return {

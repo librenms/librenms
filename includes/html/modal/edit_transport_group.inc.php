@@ -93,7 +93,7 @@ if (Auth::user()->hasGlobalAdmin()) {
         if (group_id > 0) {
             $.ajax({
                 type: "POST",
-                url: "ajax_form.php",
+                <?php echo 'url: "' . asset("ajax_form.php") . '",'; ?>
                 data: { type: "show-transport-group", group_id: group_id},
                 success: function (group) {
                     $("#group-name").val(group.name);
@@ -115,7 +115,7 @@ if (Auth::user()->hasGlobalAdmin()) {
         if (data != null) {
             $.ajax({
                 type: "POST",
-                url: "ajax_form.php",
+                <?php echo 'url: "' . asset("ajax_form.php") . '",'; ?>
                 data: data,
                 dataType: "json",
                 success: function (data) {
@@ -140,7 +140,7 @@ if (Auth::user()->hasGlobalAdmin()) {
         width: "100%",
         placeholder: "Transport Name",
         ajax: {
-            url: 'ajax_list.php',
+            <?php echo 'url: "' . asset("ajax_list.php") . '",'; ?>
             delay: 250,
             data: function(params) {
                 return {
@@ -163,7 +163,7 @@ if (Auth::user()->hasGlobalAdmin()) {
         var group_id = $("#delete_group_id").val();
         $.ajax({
             type: "POST",
-            url: "ajax_form.php",
+            <?php echo 'url: "' . asset("ajax_form.php") . '",'; ?>
             data: { type: "delete-transport-group", group_id: group_id},
             dataType: "json",
             success: function(data) {

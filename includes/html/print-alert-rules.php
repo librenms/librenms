@@ -469,7 +469,7 @@ $('#ack-alert').click('', function(e) {
     var alert_id = $(this).data("alert_id");
     $.ajax({
         type: "POST",
-            url: "ajax_form.php",
+            <?php echo 'url: "' . asset("ajax_form.php") . '",'; ?>
             data: { type: "ack-alert", alert_id: alert_id },
             success: function(msg){
                 $("#message").html('<div class="alert alert-info">'+msg+'</div>');

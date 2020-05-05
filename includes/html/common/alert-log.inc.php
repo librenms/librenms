@@ -190,7 +190,7 @@ $common_output[] = '<div class="form-group"> \
         allowClear: true,
         placeholder: "All Devices",
         ajax: {
-            url: \'ajax_list.php\',
+            url: \'' . asset("ajax_list.php") . '\',
             delay: 250,
             data: function (params) {
                 return {

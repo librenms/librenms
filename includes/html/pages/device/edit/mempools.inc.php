@@ -58,7 +58,7 @@
             var $this = $(this);
             $.ajax({
                 type: 'POST',
-                url: 'ajax_form.php',
+                <?php echo 'url: "' . asset("ajax_form.php") . '",'; ?>
                 data: {type: "mempool-update", device_id: device_id, data: data, mempool_id: mempool_id},
                 dataType: "json",
                 success: function (data) {

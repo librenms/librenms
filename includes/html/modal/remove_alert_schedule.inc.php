@@ -43,7 +43,7 @@ $('#sched-maintenance-removal').click('', function(e) {
     e.preventDefault();
     $.ajax({
         type: "POST",
-        url: "ajax_form.php",
+        <?php echo 'url: "' . asset("ajax_form.php") . '",'; ?>
         data: $('form.schedule-maintenance-del').serialize(),
         dataType: "json",
         success: function(data){

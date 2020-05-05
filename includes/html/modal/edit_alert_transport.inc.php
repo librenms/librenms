@@ -188,7 +188,7 @@ if (Auth::user()->hasGlobalAdmin()) {
             if(transport_id > 0) {
                 $.ajax({
                     type: "POST",
-                    url: "ajax_form.php",
+                    <?php echo 'url: "' . asset("ajax_form.php") . '",'; ?>
                     data: { type: "show-alert-transport", transport_id: transport_id },
                     success: function (data) {
                         loadTransport(data);
@@ -251,7 +251,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                 //post data to ajax form
                 $.ajax({
                     type: "POST",
-                    url: "ajax_form.php",
+                    <?php echo 'url: "' . asset("ajax_form.php") . '",'; ?>
                     data: data,
                     dataType: "json",
                     success: function (data) {
@@ -286,7 +286,7 @@ if (Auth::user()->hasGlobalAdmin()) {
             var transport_id = $("#delete_transport_id").val();
             $.ajax({
                 type: "POST",
-                url: "ajax_form.php",
+                <?php echo 'url: "' . asset("ajax_form.php") . '",'; ?>
                 data: { type: "delete-alert-transport", transport_id: transport_id },
                 dataType: "json",
                 success: function(data) {

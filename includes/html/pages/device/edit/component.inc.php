@@ -112,6 +112,6 @@
                 device_id: "<?php echo $device['device_id']; ?>"
             };
         },
-        url: "ajax_table.php"
+        <?php echo 'url: "' . asset("ajax_table.php") . '"'; ?>
     });
 </script>

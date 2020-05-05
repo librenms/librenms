@@ -177,7 +177,7 @@ if (Auth::user()->hasGlobalAdmin()) {
     var token_id = $(this).data("token_id");
     $.ajax({
       type: 'POST',
-      url: 'ajax_form.php',
+      <?php echo 'url: "' . asset("ajax_form.php") . '",'; ?>
       data: { type: "token-item-disable", token_id: token_id, state: state},
       dataType: "html",
       success: function(data){
@@ -205,7 +205,7 @@ if (Auth::user()->hasGlobalAdmin()) {
     token_id = $("#token_id").val();
     $.ajax({
       type: "POST",
-      url: "ajax_form.php",
+      <?php echo 'url: "' . asset("ajax_form.php") . '",'; ?>
       data: $('form.remove_token_form').serialize() ,
       success: function(msg){
         $("#thanks").html('<div class="alert alert-info">'+msg+'</div>');
@@ -222,7 +222,7 @@ if (Auth::user()->hasGlobalAdmin()) {
     event.preventDefault();
     $.ajax({
       type: "POST",
-      url: "ajax_form.php",
+      <?php echo 'url: "' . asset("ajax_form.php") . '",'; ?>
       data: $('form.create_token_form').serialize(),
       success: function(msg){
         $("#thanks").html('<div class="alert alert-info">'+msg+'</div>');

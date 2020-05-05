@@ -588,7 +588,7 @@
         datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
         queryTokenizer: Bloodhound.tokenizers.whitespace,
         remote: {
-            <?php echo 'url: ajax_url + "' . asset("_search.php") . '?search=%QUERY&type=device",'; ?>
+            <?php echo 'url: "' . asset("ajax_search.php") . '?search=%QUERY&type=device",'; ?>
             filter: function (devices) {
                 return $.map(devices, function (device) {
                     return {
@@ -611,7 +611,7 @@
         datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
         queryTokenizer: Bloodhound.tokenizers.whitespace,
         remote: {
-            <?php echo 'url: ajax_url + "' . asset("_search.php") . '?search=%QUERY&type=ports",'; ?>
+            <?php echo 'url: "' . asset("ajax_search.php") . '?search=%QUERY&type=ports",'; ?>
             filter: function (ports) {
                 return $.map(ports, function (port) {
                     return {
@@ -631,7 +631,7 @@
         datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
         queryTokenizer: Bloodhound.tokenizers.whitespace,
         remote: {
-            <?php echo 'url: ajax_url + "' . asset("_search.php") . '?search=%QUERY&type=bgp",'; ?>
+            <?php echo 'url: "' . asset("ajax_search.php") . '?search=%QUERY&type=bgp",'; ?>
             filter: function (bgp_sessions) {
                 return $.map(bgp_sessions, function (bgp) {
                     return {
