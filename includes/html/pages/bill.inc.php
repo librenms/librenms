@@ -217,39 +217,39 @@ if (bill_permitted($bill_id)) {
         $rightnow  = date('U');
 
         if ($vars['view'] == 'accurate') {
-            $bi  = "<img src='billing-graph.php?bill_id=".$bill_id.'&amp;bill_code='.$_GET['bill_code'];
+            $bi  = "<img src='" . asset("billing-graph.php") . "?bill_id=".$bill_id.'&amp;bill_code='.$_GET['bill_code'];
             $bi .= '&amp;from='.$unixfrom.'&amp;to='.$unixto;
             $bi .= '&amp;x=1190&amp;y=250';
             $bi .= "$type'>";
 
-            $li  = "<img src='billing-graph.php?bill_id=".$bill_id.'&amp;bill_code='.$_GET['bill_code'];
+            $li  = "<img src='" . asset("billing-graph.php") . "?bill_id=".$bill_id.'&amp;bill_code='.$_GET['bill_code'];
             $li .= '&amp;from='.$unix_prev_from.'&amp;to='.$unix_prev_to;
             $li .= '&amp;x=1190&amp;y=250';
             $li .= "$type'>";
 
-            $di  = "<img src='billing-graph.php?bill_id=".$bill_id.'&amp;bill_code='.$_GET['bill_code'];
+            $di  = "<img src='" . asset("billing-graph.php") . "?bill_id=".$bill_id.'&amp;bill_code='.$_GET['bill_code'];
             $di .= '&amp;from=' . \LibreNMS\Config::get('time.day') . '&amp;to=' . \LibreNMS\Config::get('time.now');
             $di .= '&amp;x=1190&amp;y=250';
             $di .= "$type'>";
 
-            $mi  = "<img src='billing-graph.php?bill_id=".$bill_id.'&amp;bill_code='.$_GET['bill_code'];
+            $mi  = "<img src='" . asset("billing-graph.php") . "?bill_id=".$bill_id.'&amp;bill_code='.$_GET['bill_code'];
             $mi .= '&amp;from='.$lastmonth.'&amp;to='.$rightnow;
             $mi .= '&amp;x=1190&amp;y=250';
             $mi .= "$type'>";
         } else {
-            $bi  = "<img src='graph.php?type=bill_bits&amp;id=".$bill_id;
+            $bi  = "<img src='" . asset("graph.php") . "?type=bill_bits&amp;id=".$bill_id;
             $bi .= '&amp;from='.$unixfrom.'&amp;to='.$unixto;
             $bi .= "&amp;width=1000&amp;height=200&amp;total=1&amp;dir=".$dir_95th."'>";
 
-            $li  = "<img src='graph.php?type=bill_bits&amp;id=".$bill_id;
+            $li  = "<img src='" . asset("graph.php") . "?type=bill_bits&amp;id=".$bill_id;
             $li .= '&amp;from='.$unix_prev_from.'&amp;to='.$unix_prev_to;
             $li .= "&amp;width=1000&amp;height=200&amp;total=1&amp;dir=".$dir_95th."'>";
 
-            $di  = "<img src='graph.php?type=bill_bits&amp;id=".$bill_id;
+            $di  = "<img src='" . asset("graph.php") . "?type=bill_bits&amp;id=".$bill_id;
             $di .= '&amp;from=' . \LibreNMS\Config::get('time.day') . '&amp;to=' . \LibreNMS\Config::get('time.now');
             $di .= "&amp;width=1000&amp;height=200&amp;total=1&amp;dir=".$dir_95th."'>";
 
-            $mi  = "<img src='graph.php?type=bill_bits&amp;id=".$bill_id;
+            $mi  = "<img src='" . asset("graph.php") . "?type=bill_bits&amp;id=".$bill_id;
             $mi .= '&amp;from='.$lastmonth.'&amp;to='.$rightnow;
             $mi .= "&amp;width=1000&amp;height=200&amp;total=1&amp;dir=".$dir_95th."'>";
         }//end if

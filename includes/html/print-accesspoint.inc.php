@@ -28,13 +28,13 @@ echo '</td><td width=100>';
 
 echo '</td><td width=150>';
 $ap['graph_type'] = 'accesspoints_numasoclients';
-echo generate_ap_link($ap, "<img src='graph.php?type=$ap[graph_type]&amp;id=" . $ap['accesspoint_id'] . '&amp;from=' . Config::get('time.day') . '&amp;to=' . Config::get('time.now') . '&amp;width=100&amp;height=20&amp;legend=no&amp;bg=' . str_replace('#', '', $row_colour) . "'>");
+echo generate_ap_link($ap, "<img src='" . asset("graph.php") . "?type=$ap[graph_type]&amp;id=" . $ap['accesspoint_id'] . '&amp;from=' . Config::get('time.day') . '&amp;to=' . Config::get('time.now') . '&amp;width=100&amp;height=20&amp;legend=no&amp;bg=' . str_replace('#', '', $row_colour) . "'>");
 echo "<br>\n";
 $ap['graph_type'] = 'accesspoints_radioutil';
-echo generate_ap_link($ap, "<img src='graph.php?type=$ap[graph_type]&amp;id=" . $ap['accesspoint_id'] . '&amp;from=' . Config::get('time.day') . '&amp;to=' . Config::get('time.now') . '&amp;width=100&amp;height=20&amp;legend=no&amp;bg=' . str_replace('#', '', $row_colour) . "'>");
+echo generate_ap_link($ap, "<img src='" . asset("graph.php") . "?type=$ap[graph_type]&amp;id=" . $ap['accesspoint_id'] . '&amp;from=' . Config::get('time.day') . '&amp;to=' . Config::get('time.now') . '&amp;width=100&amp;height=20&amp;legend=no&amp;bg=' . str_replace('#', '', $row_colour) . "'>");
 echo "<br>\n";
 $ap['graph_type'] = 'accesspoints_interference';
-echo generate_ap_link($ap, "<img src='graph.php?type=$ap[graph_type]&amp;id=" . $ap['accesspoint_id'] . '&amp;from=' . Config::get('time.day') . '&amp;to=' . Config::get('time.now') . '&amp;width=100&amp;height=20&amp;legend=no&amp;bg=' . str_replace('#', '', $row_colour) . "'>");
+echo generate_ap_link($ap, "<img src='" . asset("graph.php") . "?type=$ap[graph_type]&amp;id=" . $ap['accesspoint_id'] . '&amp;from=' . Config::get('time.day') . '&amp;to=' . Config::get('time.now') . '&amp;width=100&amp;height=20&amp;legend=no&amp;bg=' . str_replace('#', '', $row_colour) . "'>");
 echo "<br>\n";
 
 echo '</td><td width=120>';

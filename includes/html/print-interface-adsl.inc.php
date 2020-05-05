@@ -59,7 +59,7 @@ echo '<br />';
 $port['graph_type'] = 'port_bits';
 echo generate_port_link(
     $port,
-    "<img src='graph.php?type=" . $port['graph_type'] . '&amp;id=' . $port['port_id'] . '&amp;from=' . $from . '&amp;to=' . Config::get('time.now') . '&amp;width=' . $width . '&amp;height=' . $height . '&amp;legend=no&amp;bg=' . str_replace('#', '', $row_colour) . "'>",
+    "<img src='" . asset("graph.php") . "?type=" . $port['graph_type'] . '&amp;id=' . $port['port_id'] . '&amp;from=' . $from . '&amp;to=' . Config::get('time.now') . '&amp;width=' . $width . '&amp;height=' . $height . '&amp;legend=no&amp;bg=' . str_replace('#', '', $row_colour) . "'>",
     $port['graph_type']
 );
 
@@ -69,7 +69,7 @@ echo '<br />';
 $port['graph_type'] = 'port_adsl_speed';
 echo generate_port_link(
     $port,
-    "<img src='graph.php?type=" . $port['graph_type'] . '&amp;id=' . $port['port_id'] . '&amp;from=' . $from . '&amp;to=' . Config::get('time.now') . '&amp;width=' . $width . '&amp;height=' . $height . '&amp;legend=no&amp;bg=' . str_replace('#', '', $row_colour) . "'>",
+    "<img src='" . asset("graph.php") . "?type=" . $port['graph_type'] . '&amp;id=' . $port['port_id'] . '&amp;from=' . $from . '&amp;to=' . Config::get('time.now') . '&amp;width=' . $width . '&amp;height=' . $height . '&amp;legend=no&amp;bg=' . str_replace('#', '', $row_colour) . "'>",
     $port['graph_type']
 );
 
@@ -79,7 +79,7 @@ echo '<br />';
 $port['graph_type'] = 'port_adsl_attainable';
 echo generate_port_link(
     $port,
-    "<img src='graph.php?type=" . $port['graph_type'] . '&amp;id=' . $port['port_id'] . '&amp;from=' . $from . '&amp;to=' . Config::get('time.now') . '&amp;width=' . $width . '&amp;height=' . $height . '&amp;legend=no&amp;bg=' . str_replace('#', '', $row_colour) . "'>",
+    "<img src='" . asset("graph.php") . "?type=" . $port['graph_type'] . '&amp;id=' . $port['port_id'] . '&amp;from=' . $from . '&amp;to=' . Config::get('time.now') . '&amp;width=' . $width . '&amp;height=' . $height . '&amp;legend=no&amp;bg=' . str_replace('#', '', $row_colour) . "'>",
     $port['graph_type']
 );
 
@@ -89,7 +89,7 @@ echo '<br />';
 $port['graph_type'] = 'port_adsl_attenuation';
 echo generate_port_link(
     $port,
-    "<img src='graph.php?type=" . $port['graph_type'] . '&amp;id=' . $port['port_id'] . '&amp;from=' . $from . '&amp;to=' . Config::get('time.now') . '&amp;width=' . $width . '&amp;height=' . $height . '&amp;legend=no&amp;bg=' . str_replace('#', '', $row_colour) . "'>",
+    "<img src='" . asset("graph.php") . "?type=" . $port['graph_type'] . '&amp;id=' . $port['port_id'] . '&amp;from=' . $from . '&amp;to=' . Config::get('time.now') . '&amp;width=' . $width . '&amp;height=' . $height . '&amp;legend=no&amp;bg=' . str_replace('#', '', $row_colour) . "'>",
     $port['graph_type']
 );
 
@@ -99,7 +99,7 @@ echo '<br />';
 $port['graph_type'] = 'port_adsl_snr';
 echo generate_port_link(
     $port,
-    "<img src='graph.php?type=" . $port['graph_type'] . '&amp;id=' . $port['port_id'] . '&amp;from=' . $from . '&amp;to=' . Config::get('time.now') . '&amp;width=' . $width . '&amp;height=' . $height . '&amp;legend=no&amp;bg=' . str_replace('#', '', $row_colour) . "'>",
+    "<img src='" . asset("graph.php") . "?type=" . $port['graph_type'] . '&amp;id=' . $port['port_id'] . '&amp;from=' . $from . '&amp;to=' . Config::get('time.now') . '&amp;width=' . $width . '&amp;height=' . $height . '&amp;legend=no&amp;bg=' . str_replace('#', '', $row_colour) . "'>",
     $port['graph_type']
 );
 
@@ -109,7 +109,7 @@ echo '<br />';
 $port['graph_type'] = 'port_adsl_power';
 echo generate_port_link(
     $port,
-    "<img src='graph.php?type=" . $port['graph_type'] . '&amp;id=' . $port['port_id'] . '&amp;from=' . $from . '&amp;to=' . Config::get('time.now') . '&amp;width=' . $width . '&amp;height=' . $height . '&amp;legend=no&amp;bg=' . str_replace('#', '', $row_colour) . "'>",
+    "<img src='" . asset("graph.php") . "?type=" . $port['graph_type'] . '&amp;id=' . $port['port_id'] . '&amp;from=' . $from . '&amp;to=' . Config::get('time.now') . '&amp;width=' . $width . '&amp;height=' . $height . '&amp;legend=no&amp;bg=' . str_replace('#', '', $row_colour) . "'>",
     $port['graph_type']
 );
 
