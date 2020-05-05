@@ -44,7 +44,7 @@ if (Config::get('map.engine', 'leaflet') == 'leaflet') {
     $show_status = [0, 1];
     $map_init = "[" . $init_lat . ", " . $init_lng . "], " . sprintf("%01.1f", $init_zoom);
     $temp_output .= 'var map = L.map(\'leaflet-map\', { zoomSnap: 0.1 } ).setView('.$map_init.');
-L.tileLayer(\'//'.$tile_url.'/{z}/{x}/{y}.png\', {
+L.tileLayer( document.location.protocol + \'//'.$tile_url.'/{z}/{x}/{y}.png\', {
     attribution: \'&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors\'
 }).addTo(map);
 
