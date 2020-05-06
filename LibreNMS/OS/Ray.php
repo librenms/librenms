@@ -82,9 +82,7 @@ class Ray extends OS implements
                 // RAY-MIB::txFreq.0
                 new WirelessSensor('frequency', $this->getDeviceId(), $oid_tx, 'racom-tx', 1, 'TX Frequency', null, 1, 1000),
             );
-        } 
-        else 
-        {
+        } else {
             return array(
                 // RAY-MIB::txFreq.0
                 new WirelessSensor('frequency', $this->getDeviceId(), $oid_tx . '.0', 'racom-tx', 1, 'TX Frequency', null, 1, 1000),
@@ -98,9 +96,7 @@ class Ray extends OS implements
                 // RAY-MIB::rxFreq.0
                 new WirelessSensor('frequency', $this->getDeviceId(), $oid_rx, 'racom-rx', 1, 'RX Frequency', null, 1, 1000),
             );
-        }
-        else
-        {
+        } else {
             return array(
                 // RAY-MIB::rxFreq.0
                 new WirelessSensor('frequency', $this->getDeviceId(), $oid_rx . '.0', 'racom-rx', 1, 'RX Frequency', null, 1, 1000),
@@ -126,9 +122,7 @@ class Ray extends OS implements
                 // RAY-MIB::rfPowerCurrent.0
                 new WirelessSensor('power', $this->getDeviceId(), $oid_rfpowercur, 'racom-pow-cur', 1, 'Tx Power Current'),
             );
-        } 
-        else 
-        {
+        } else {
             return array(
                 // RAY-MIB::rfPowerCurrent.0
                 new WirelessSensor('power', $this->getDeviceId(), $oid_rfpowercur . '.0', 'racom-pow-cur', 1, 'Tx Power Current'),
@@ -142,9 +136,7 @@ class Ray extends OS implements
                 //RAY-MIB::rfPowerConfigured.0
                 new WirelessSensor('power', $this->getDeviceId(), $oid_rfpowerconf, 'racom-pow-conf', 1, 'Tx Power Configured'),
             );
-        } 
-        else 
-        {
+        } else {
             return array(
                 //RAY-MIB::rfPowerConfigured.0
                 new WirelessSensor('power', $this->getDeviceId(), $oid_rfpowerconf . '.0', 'racom-pow-conf', 1, 'Tx Power Configured'),
@@ -168,9 +160,7 @@ class Ray extends OS implements
             return array(
                 new WirelessSensor('rssi', $this->getDeviceId(), $oid, 'racom', 1, 'RSSI', null, 1, 10),
             );
-        } 
-        else 
-        {
+        } else {
             return array(
                 new WirelessSensor('rssi', $this->getDeviceId(), $oid . '.0', 'racom', 1, 'RSSI', null, 1, 10),
             );
@@ -193,9 +183,7 @@ class Ray extends OS implements
             return array(
                 new WirelessSensor('snr', $this->getDeviceId(), $oid, 'racom', 1, 'CINR', null, 1, 10),
             );
-        } 
-        else 
-        {
+        } else {
             return array(
                 new WirelessSensor('snr', $this->getDeviceId(), $oid . '.0', 'racom', 1, 'CINR', null, 1, 10),
             );
@@ -219,9 +207,7 @@ class Ray extends OS implements
             return array(
                 new WirelessSensor('rate', $this->getDeviceId(), $oid_bitrate, 'racom-netBitrate', 1, 'Net Bitrate', null, 1000, 1),
             );
-        } 
-        else 
-        {
+        } else {
             return array(
                 new WirelessSensor('rate', $this->getDeviceId(), $oid_bitrate . '.0', 'racom-netBitrate', 1, 'Net Bitrate', null, 1000, 1),
             );
@@ -233,13 +219,11 @@ class Ray extends OS implements
             return array(
                 new WirelessSensor('rate', $this->getDeviceId(), $oid_maxbitrate, 'racom-maxNetBitrate', 2, 'Max Net Bitrate', null, 1000, 1),
             );
-        } 
-        else 
-        {
+        } else {
             return array(
                 new WirelessSensor('rate', $this->getDeviceId(), $oid_maxbitrate . '.0', 'racom-maxNetBitrate', 2, 'Max Net Bitrate', null, 1000, 1),
             );
         }
     }
-} 
+}
 
