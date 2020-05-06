@@ -78,25 +78,14 @@ class Ray extends OS implements
         $data = trim(external_exec($cmd), "\" \n\r");
         if (!preg_match('/(No Such Instance)/i', $data)) {
             return array(
-                // RAY-MIB::txFreq.0
+                // RAY-MIB::txFreq
                 new WirelessSensor('frequency', $this->getDeviceId(), $oid_tx, 'racom-tx', 1, 'TX Frequency', null, 1, 1000),
+                new WirelessSensor('frequency', $this->getDeviceId(), $oid_rx, 'racom-rx', 1, 'RX Frequency', null, 1, 1000),
             );
         } else {
             return array(
                 // RAY-MIB::txFreq.0
                 new WirelessSensor('frequency', $this->getDeviceId(), $oid_tx . '.0', 'racom-tx', 1, 'TX Frequency', null, 1, 1000),
-            );
-        }
-        $cmd = gen_snmpget_cmd($this->getDevice(), $oid_rx, '-Oqv', 'RAY-MIB', 'ray');
-        $data = trim(external_exec($cmd), "\" \n\r");
-        if (!preg_match('/(No Such Instance)/i', $data)) {
-            return array(
-                // RAY-MIB::rxFreq.0
-                new WirelessSensor('frequency', $this->getDeviceId(), $oid_rx, 'racom-rx', 1, 'RX Frequency', null, 1, 1000),
-            );
-        } else {
-            return array(
-                // RAY-MIB::rxFreq.0
                 new WirelessSensor('frequency', $this->getDeviceId(), $oid_rx . '.0', 'racom-rx', 1, 'RX Frequency', null, 1, 1000),
             );
         }
@@ -116,25 +105,14 @@ class Ray extends OS implements
         $data = trim(external_exec($cmd), "\" \n\r");
         if (!preg_match('/(No Such Instance)/i', $data)) {
             return array(
-                // RAY-MIB::rfPowerCurrent.0
+                // RAY-MIB::rfPowerCurrent
                 new WirelessSensor('power', $this->getDeviceId(), $oid_rfpowercur, 'racom-pow-cur', 1, 'Tx Power Current'),
+                new WirelessSensor('power', $this->getDeviceId(), $oid_rfpowerconf, 'racom-pow-conf', 1, 'Tx Power Configured'),
             );
         } else {
             return array(
                 // RAY-MIB::rfPowerCurrent.0
                 new WirelessSensor('power', $this->getDeviceId(), $oid_rfpowercur . '.0', 'racom-pow-cur', 1, 'Tx Power Current'),
-            );
-        }
-        $cmd = gen_snmpget_cmd($this->getDevice(), '$oid_rfpowerconf', '-Oqv', 'RAY-MIB', 'ray');
-        $data = trim(external_exec($cmd), "\" \n\r");
-        if (!preg_match('/(No Such Instance)/i', $data)) {
-            return array(
-                //RAY-MIB::rfPowerConfigured.0
-                new WirelessSensor('power', $this->getDeviceId(), $oid_rfpowerconf, 'racom-pow-conf', 1, 'Tx Power Configured'),
-            );
-        } else {
-            return array(
-                //RAY-MIB::rfPowerConfigured.0
                 new WirelessSensor('power', $this->getDeviceId(), $oid_rfpowerconf . '.0', 'racom-pow-conf', 1, 'Tx Power Configured'),
             );
         }
@@ -199,20 +177,11 @@ class Ray extends OS implements
         if (!preg_match('/(No Such Instance)/i', $data)) {
             return array(
                 new WirelessSensor('rate', $this->getDeviceId(), $oid_bitrate, 'racom-netBitrate', 1, 'Net Bitrate', null, 1000, 1),
-            );
-        } else {
-            return array(
-                new WirelessSensor('rate', $this->getDeviceId(), $oid_bitrate . '.0', 'racom-netBitrate', 1, 'Net Bitrate', null, 1000, 1),
-            );
-        }
-        $cmd = gen_snmpget_cmd($this->getDevice(), $oid_maxbitrate, '-Oqv', 'RAY-MIB', 'ray');
-        $data = trim(external_exec($cmd), "\" \n\r");
-        if (!preg_match('/(No Such Instance)/i', $data)) {
-            return array(
                 new WirelessSensor('rate', $this->getDeviceId(), $oid_maxbitrate, 'racom-maxNetBitrate', 2, 'Max Net Bitrate', null, 1000, 1),
             );
         } else {
             return array(
+                new WirelessSensor('rate', $this->getDeviceId(), $oid_bitrate . '.0', 'racom-netBitrate', 1, 'Net Bitrate', null, 1000, 1),
                 new WirelessSensor('rate', $this->getDeviceId(), $oid_maxbitrate . '.0', 'racom-maxNetBitrate', 2, 'Max Net Bitrate', null, 1000, 1),
             );
         }
