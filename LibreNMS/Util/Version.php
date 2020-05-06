@@ -26,6 +26,7 @@
 namespace LibreNMS\Util;
 
 use LibreNMS\DB\Eloquent;
+use Symfony\Component\Process\Process;
 
 class Version
 {
@@ -87,5 +88,17 @@ class Version
         return $this->is_git_install
             ? rtrim(shell_exec("git show --pretty='%ct' -s HEAD"))
             : '';
+    }
+
+    public static function python()
+    {
+        $proc = new Process(['python3', '--version']);
+        $proc->run();
+
+        if ($proc->getExitCode() !== 0) {
+            return null;
+        }
+
+        return explode(' ', rtrim($proc->getOutput()), 2)[1] ?? null;
     }
 }

@@ -26,23 +26,12 @@
 namespace LibreNMS\Validations;
 
 use LibreNMS\Config;
-use LibreNMS\ValidationResult;
+use LibreNMS\Util\Version;
 use LibreNMS\Validator;
 
 class Python extends BaseValidation
 {
     const PYTHON_MIN_VERSION = '3.4.0';
-    const PYTHON_RECOMMENDED_VERSION = '3.5.2';
-
-    public static function pythonVersion()
-    {
-        $python_binary = exec('which python3 2> /dev/null');
-        if (empty($python_binary)) {
-            return null;
-        }
-        $output = exec($python_binary . ' --version 2> /dev/null');
-        return explode(' ', $output)[1];
-    }
 
     /**
      * Validate this module.
@@ -52,7 +41,7 @@ class Python extends BaseValidation
      */
     public function validate(Validator $validator)
     {
-        $version = self::pythonVersion();
+        $version = Version::python();
 
         if (empty($version)) {
             $validator->fail('python3 not found');
@@ -66,7 +55,7 @@ class Python extends BaseValidation
     private function checkVersion(Validator $validator, $version)
     {
         if (version_compare($version, self::PYTHON_MIN_VERSION, '<')) {
-            $validator->warn("Python version " . self::PYTHON_MIN_VERSION . " is the minimum supported version. We recommend you update Python to a supported version (" . self::PYTHON_RECOMMENDED_VERSION . " suggested).");
+            $validator->warn('Python version ' . self::PYTHON_MIN_VERSION . ' is the minimum supported version. We recommend you update Python to a supported version.');
         }
     }
 
