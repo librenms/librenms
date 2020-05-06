@@ -61,7 +61,7 @@ class DeviceController extends Controller
         $current_tab = array_key_exists($current_tab, $this->tabs) ? $current_tab : 'overview';
         DeviceCache::setPrimary($device_id);
         $device = DeviceCache::getPrimary();
-        $this->authorize('view', [$request->user(), $device]);
+        $this->authorize('view', $device);
 
         $alert_class = $device->disabled ? 'alert-info' : ($device->status ? '' : 'alert-danger');
         $parent_id = Vminfo::query()->whereIn('vmwVmDisplayName', [$device->hostname, $device->hostname . '.' . Config::get('mydomain')])->value('device_id');

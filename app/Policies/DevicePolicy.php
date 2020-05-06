@@ -31,7 +31,7 @@ class DevicePolicy
      */
     public function view(User $user, Device $device)
     {
-        return Permissions::canAccessDevice($device, $user);
+        return $user->hasGlobalRead() || Permissions::canAccessDevice($device, $user);
     }
 
     /**
