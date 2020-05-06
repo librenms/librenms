@@ -44,7 +44,7 @@ class Python extends BaseValidation
         $version = Version::python();
 
         if (empty($version)) {
-            $validator->fail('python3 not found');
+            $validator->fail('python3 not found', 'Install Python 3 for your system.');
             return; // no need to check anything else
         }
 
@@ -55,7 +55,7 @@ class Python extends BaseValidation
     private function checkVersion(Validator $validator, $version)
     {
         if (version_compare($version, self::PYTHON_MIN_VERSION, '<')) {
-            $validator->warn('Python version ' . self::PYTHON_MIN_VERSION . ' is the minimum supported version. We recommend you update Python to a supported version.');
+            $validator->warn("Python version $version too old.", 'Python version ' . self::PYTHON_MIN_VERSION . ' is the minimum supported version. We recommend you update Python to a supported version.');
         }
     }
 
@@ -65,7 +65,7 @@ class Python extends BaseValidation
         exec(Config::get('install_dir') . '/' . $pythonExtensions . ' -v', $output, $returnval);
 
         if ($returnval !== 0) {
-            $validator->fail("Python3 module issue found: '" . ($output[0] ?? '') . "'");
+            $validator->fail("Python3 module issue found: '" . ($output[0] ?? '') . "'", 'pip3 install -r requirements.txt');
         }
     }
 }
