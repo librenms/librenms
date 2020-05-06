@@ -32,6 +32,7 @@ use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
+use Symfony\Component\HttpFoundation\ParameterBag;
 
 class Url
 {
@@ -534,6 +535,27 @@ class Url
 
         // fallback to the generic icon
         return 'generic.svg';
+    }
+
+    /**
+     * parse a legacy path (one without ? or &)
+     *
+     * @param string $path
+     * @return ParameterBag
+     */
+    public static function parseLegacyPath($path)
+    {
+        $parts = array_filter(explode('/', $path), function ($part) {
+            return Str::contains($part, '=');
+        });
+
+        $vars = [];
+        foreach ($parts as $part) {
+            list($key, $value) = explode('=', $part);
+            $vars[$key] = $value;
+        }
+
+        return new ParameterBag($vars);
     }
 
     private static function escapeBothQuotes($string)

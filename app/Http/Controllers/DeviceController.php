@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Facades\DeviceCache;
 use App\Models\Device;
+use App\Models\Port;
 use App\Models\Vminfo;
 use Auth;
 use Carbon\Carbon;
@@ -61,7 +62,13 @@ class DeviceController extends Controller
         $current_tab = array_key_exists($current_tab, $this->tabs) ? $current_tab : 'overview';
         DeviceCache::setPrimary($device_id);
         $device = DeviceCache::getPrimary();
-        $this->authorize('view', [$request->user(), $device]);
+        if ($current_tab == 'port') {
+            $vars = Url::parseLegacyPath($request->path());
+            $port = Port::findOrFail($vars->get('port'));
+            $this->authorize('view', $port);
+        } else {
+            $this->authorize('view', $device);
+        }
 
         $alert_class = $device->disabled ? 'alert-info' : ($device->status ? '' : 'alert-danger');
         $parent_id = Vminfo::query()->whereIn('vmwVmDisplayName', [$device->hostname, $device->hostname . '.' . Config::get('mydomain')])->value('device_id');
