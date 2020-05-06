@@ -121,7 +121,7 @@
             "Illuminate\\Foundation\\ComposerScripts::postUpdate"
         ],
         "python-requirements": [
-            "scripts/check_requirements.py || pip3 install -r requirements.txt || :"
+            "scripts/check_requirements.py || pip3 install --user -r requirements.txt || :"
         ]
     }
 }
