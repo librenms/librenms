@@ -7198,3 +7198,12 @@
   .pagemenu-selected a{
       color: #353a41
   }
+  .bootgrid-table th{
+    background: #3e444c;
+  }
+  .bootgrid-table th>.column-header-anchor{
+    color: #bfc0c0;
+  }
+  .bootgrid-table th:active, .bootgrid-table th:hover {
+    background: #525961;
+  }
