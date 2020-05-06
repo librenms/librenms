@@ -9,9 +9,3 @@ discovery:
         - .1.3.6.1.4.1.818.32.4
 mib_dir:
     - imco
-discovery_modules:
-     cisco-cef: false
-     cisco-sla: false
-     cisco-mac-accounting: false
-     route: false
-     vlans: false
