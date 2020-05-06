@@ -38,6 +38,7 @@ after_failure:
   - tail /tmp/snmpsimd.log
 
 before_script:
+  - phpenv config-rm xdebug.ini
   - test -z "$BROWSER_TEST" || php artisan dusk:update --detect
   - test -z "$BROWSER_TEST" || php artisan serve --env=dusk.testing  2>/dev/null &
 

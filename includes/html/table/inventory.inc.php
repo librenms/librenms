@@ -61,7 +61,7 @@ if ($rowCount != -1) {
     $sql .= " LIMIT $limit_low,$limit_high";
 }
 
-$sql = "SELECT `D`.`device_id` AS `device_id`, `D`.`hostname` AS `hostname`, `D`.`sysName` AS `sysName`,`entPhysicalDescr` AS `description`, `entPhysicalName` AS `name`, `entPhysicalModelName` AS `model`, `entPhysicalSerialNum` AS `serial` $sql";
+$sql = "SELECT `D`.`device_id` AS `device_id`, `D`.`os` AS `os`, `D`.`hostname` AS `hostname`, `D`.`sysName` AS `sysName`,`entPhysicalDescr` AS `description`, `entPhysicalName` AS `name`, `entPhysicalModelName` AS `model`, `entPhysicalSerialNum` AS `serial` $sql";
 
 foreach (dbFetchRows($sql, $param) as $invent) {
     $response[] = array(

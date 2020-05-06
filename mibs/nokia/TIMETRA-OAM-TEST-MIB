@@ -66,8 +66,9 @@ timetraOamTestMIBModule          MODULE-IDENTITY
         "Nokia SROS Support
          Web: http://www.nokia.com"
     DESCRIPTION
-        "This document is the SNMP MIB module to manage and provision the Nokia
-         SROS OAM tests.
+        "This document is the SNMP MIB module to manage and provision most
+         Nokia SROS OAM tests and all Nokia SROS Service Assurance Agent (SAA)
+         tests.
 
          Copyright 2003-2018 Nokia.  All rights reserved.
          Reproduction of this document is authorized on the condition that
@@ -163,6 +164,35 @@ timetraOamTestMIBModule          MODULE-IDENTITY
          Initial version of the TIMETRA-OAM-TEST-MIB."
 
     ::= { timetraSRMIBModules 11 }
+
+TmnxOamBierHistoryReturnCode     ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "An object of type TmnxOamBierHistoryReturnCode indicates the value
+         copied from the Return Code field of a BIER Echo Reply PDU.
+
+         Code points include (but are not restricted to) the following.
+
+         Value    Interpretation
+         -----    -------------------------------
+          0       No return code
+          1       Malformed Echo Request received
+          2       One or more of the TLVs was not understood
+          3       Replying BFR is the only BFER in header Bitstring
+          4       Replying BFR is one of the BFER in header Bitstring
+          5       Packet-Forward-Success
+          6       Invalid Multipath Info Request
+          7       <not defined>
+          8       No matching entry in forwarding table.
+          9       Set-Identifier Mismatch
+         10       DDMAP Mismatch
+
+         Zero is returned if a BIER Echo Reply PDU was not received (e.g. if a
+         timeout occurred)."
+    REFERENCE
+        "IETF draft-ietf-bier-ping-05, 'BIER Ping and Trace', April 24, 2019,
+         Section 3.2, 'Return Code'."
+    SYNTAX      Unsigned32 (0..255)
 
 TmnxOamBuildPktHeaderType        ::= TEXTUAL-CONVENTION
     STATUS      current
@@ -357,8 +387,8 @@ TmnxOamMplsTpPathType            ::= TEXTUAL-CONVENTION
 TmnxOamTestMode                  ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
-        "The value of TmnxOamTestMode is an enumerated integer that indicates
-         the type of OAM test."
+        "A value of type TmnxOamTestMode is an enumerated integer that
+         indicates the type of OAM test."
     SYNTAX      INTEGER {
         notConfigured (0),
         ping          (1),
@@ -368,7 +398,7 @@ TmnxOamTestMode                  ::= TEXTUAL-CONVENTION
 TmnxOamPingRtnCode               ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
-        "The value of TmnxOamPingRtnCode is an enumerated integer that
+        "A value of type TmnxOamPingRtnCode is an enumerated integer that
          indicates the return code received in the OAM ping response common
          header.
 
@@ -433,7 +463,7 @@ TmnxOamPingRtnCode               ::= TEXTUAL-CONVENTION
 TmnxOamAddressType               ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
-        "The value of TmnxOamAddressType is an enumerated integer that
+        "A value of type TmnxOamAddressType is an enumerated integer that
          indicates the type of address used in OAM test requests and responses."
     SYNTAX      INTEGER {
         unknown          (0),
@@ -789,9 +819,12 @@ TmnxOamResponseStatus            ::= TEXTUAL-CONVENTION
             endpoint.
          srPolicySegmentListNotFound(186) - The SR-POLICY's segment list not
             found given segment list Id.
-         ethCfmUnsupportedTestType(187) - The test type is not valid for the MEP.
+         ethCfmUnsupportedTestType(187) - The test type is not valid for the
+             MEP.
          ipPrefixInvalid(188) - The OAM test cannot be performed because the
-            Target FEC prefix entry is not valid for the test."
+            Target FEC prefix entry is not valid for the test.
+         bierError (189) - The BIER OAM test received a reply with an
+            unsuccessful return code."
     SYNTAX      INTEGER {
         responseReceived                 (1),
         unknown                          (2),
@@ -980,7 +1013,8 @@ TmnxOamResponseStatus            ::= TEXTUAL-CONVENTION
         srPolicyNotFound                 (185),
         srPolicySegmentListNotFound      (186),
         ethCfmUnsupportedTestType        (187),
-        ipPrefixInvalid                  (188)
+        ipPrefixInvalid                  (188),
+        bierError                        (189)
     }
 
 TmnxOamSignalProtocol            ::= TEXTUAL-CONVENTION
@@ -1015,7 +1049,7 @@ TmnxOamSignalProtocol            ::= TEXTUAL-CONVENTION
 TmnxOamTestResponsePlane         ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
-        "The value of TmnxOamTestResponsePlane is an enumerated integer that
+        "A value of type TmnxOamTestResponsePlane is an enumerated integer that
          indicates the response plane from which the OAM ping or traceroute
          response was received."
     SYNTAX      INTEGER {
@@ -1027,7 +1061,7 @@ TmnxOamTestResponsePlane         ::= TEXTUAL-CONVENTION
 TmnxOamSaaThreshold              ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
-        "The value of TmnxOamSaaThreshold is a enumerated integer that
+        "A value of type TmnxOamSaaThreshold is a enumerated integer that
          indicates which type of thresholds should be monitored upon completion
          of an OAM ping test run. When the corresponding threshold is crossed,
          a tmnxOamSaaThreshold notification will be generated.
@@ -1159,10 +1193,10 @@ TmnxOamVcType                    ::= TEXTUAL-CONVENTION
 TmnxOamLTtraceDisStatusBits      ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
-        "The value of TmnxOamLTtraceDisStatusBits is an enumerated integer that
-         describes the LDP tree trace discovery status in BITS. This indicates
-         different reason values when the tree discovery of an IP Address FEC
-         is not completely successful.
+        "A value of type TmnxOamLTtraceDisStatusBits is an enumerated integer
+         that describes the LDP tree trace discovery status in BITS. This
+         indicates different reason values when the tree discovery of an IP
+         Address FEC is not completely successful.
 
          Code points:
             timeout (0)        - one or more trace requests for an IP address
@@ -1184,8 +1218,9 @@ TmnxOamLTtraceDisStatusBits      ::= TEXTUAL-CONVENTION
 TmnxOamTestResult                ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
-        "The value of TmnxOamTestResult is an enumerated integer that describes
-         the result of a ping or trace test run.
+        "A value of type TmnxOamTestResult is an enumerated integer that
+         describes the result of a ping or trace test run.
+         Code points:
              undetermined      (0) The result is, as yet, unknown.
              success           (1) The test was successful.
              failed            (2) The test failed.
@@ -1296,7 +1331,7 @@ TmnxOamPingCtlEntry              ::= SEQUENCE
     tmnxOamPingCtlDnsName            OCTET STRING,
     tmnxOamPingCtlDNSRecord          INTEGER,
     tmnxOamPingCtlIntervalUnits      INTEGER,
-    tmnxOamPingCtlSubscriberName     TNamedItemOrEmpty,
+    tmnxOamPingCtlSubscriberName     TLNamedItemOrEmpty,
     tmnxOamPingCtlRouterInstanceName TLNamedItemOrEmpty
 }
 
@@ -1388,7 +1423,7 @@ tmnxOamPingCtlTestMode           OBJECT-TYPE
         gtpPing           (21),
         ethCfmTwoWaySlm   (22),
         vxlanPing         (23),
-        reserved25        (25)
+        bierPing          (25)
     }
     MAX-ACCESS  read-create
     STATUS      current
@@ -1426,7 +1461,7 @@ tmnxOamPingCtlTestMode           OBJECT-TYPE
          cpePing  - determines IP connectivity to a CPE within a specified VPLS
                     service.
 
-         mrInfo   - Get a multicast router's capabilities and the list of
+         mrInfo   - get a multicast router's capabilities and the list of
                     interfaces with neighbors.
 
          vccvPing - Virtual Circuit Connectivity Verification, testing
@@ -1462,6 +1497,9 @@ tmnxOamPingCtlTestMode           OBJECT-TYPE
                     connectivity, checks the status of configured VXLAN Network
                     IDs (VNIs), and allows validation of connected end systems.
 
+         bierPing - performs a Bit Index Explicit Replication (BIER)
+                    multicast connectivity test.
+
          When tmnxOamPingCtlTestMode is set, SROS may automatically create a
          same-INDEX row in a table used to configure objects specific to the
          test type (as shown in the following table).
@@ -1470,6 +1508,7 @@ tmnxOamPingCtlTestMode           OBJECT-TYPE
          ----------------------   -----------------------------------------
          'ancpLoopback'           tmnxOamAncpTestCtlTable
          'atmPing'                tmnxOamAtmPingCtlTable
+         'bierPing'               tmnxOamBierPingCtlTable
          'cpePing'                tmnxOamCpePingCtlTable
          'dnsPing'                none
          'ethCfmLoopback'         tmnxOamEthCfmPingCtlTable
@@ -1501,6 +1540,7 @@ tmnxOamPingCtlTestMode           OBJECT-TYPE
          ----------------------   -------------   -------------
          'ancpLoopback'                      No             Yes
          'atmPing'                           No             Yes
+         'bierPing'                          No             Yes
          'cpePing'                          Yes             Yes
          'dnsPing'                          Yes             Yes
          'ethCfmLoopback'                   Yes              No
@@ -1605,6 +1645,7 @@ tmnxOamPingCtlFcName             OBJECT-TYPE
          tmnxOamPingCtlTestMode   Applicable?   Configurable?   Default
          ----------------------   -----------   -------------   -------
          'cpePing'                yes           yes             'be'
+         'bierPing'               yes           yes             'be'
          'ethCfmLoopback'         yes           yes             'nc'
          'ethCfmTwoWayDelay'      yes           yes             'nc'
           ethCfmTwoWaySlm'        yes           yes             'nc'
@@ -1658,6 +1699,7 @@ tmnxOamPingCtlProfile            OBJECT-TYPE
          tmnxOamPingCtlTestMode   Applicable?   Configurable?   Default
          ----------------------   -----------   -------------   -------
          'cpePing'                yes           yes             'out(2)'
+         'bierPing'               yes           yes             'out(2)'
          'ethCfmLoopback'         yes           yes             'in(1)'
          'ethCfmTwoWayDelay'      yes           yes             'in(1)'
          'ethCfmTwoWaySlm'        yes           yes             'in(1)'
@@ -1923,6 +1965,7 @@ tmnxOamPingCtlTimeOut            OBJECT-TYPE
          tmnxOamPingCtlTestMode  Min  Max  Def   Timer Usage
          ----------------------  ---  ---  ---   -----------
          'atmPing'                 1   10    5   Per Probe
+         'bierPing'                1  120   10   Per Probe
          'dnsPing'                 1  120    5   Per Probe
          'ethCfmLoopback'          1   10    5   Per Probe
          'ethCfmTwoWayDelay'       1   10    5   Per Test
@@ -1951,28 +1994,28 @@ tmnxOamPingCtlProbeCount         OBJECT-TYPE
         "The value of tmnxOamPingCtlProbeCount specifies the number of probes
          to send during the test.
 
-         The maximum probe count depends on the value of
-         tmnxOamPingCtlTestMode, as follows.
+         The relevance, range, and default for tmnxOamPingCtlProbeCount depends
+         on tmnxOamPingCtlTestMode, as follows.
 
-         tmnxOamPingCtlTestMode   Maximum
-         ----------------------   -------
-         'ethCfmTwoWayDelay'         1000
-         'ethCfmTwoWaySlm'           1000
-         'gtpPing'                    100
-         'icmpPing'                100000
-         'macPopulate'                  1
-         'macPurge'                     1
-         'p2mpLspPing'                  1
-         'svcPing'                      1
-         'vxlanPing'                 1024
-         otherwise                    100
-
-         For the following tmnxOamPingCtlTestMode values, the value of
-         tmnxOamPingCtlProbeCount does not affect the behavior of the test:
-         'mrInfo', 'mtuPing'.
-
-         If tmnxOamPingCtlTestMode is 'icmpPing', the default probe count value
-         is 5.  Otherwise, the DEFVAL applies."
+         tmnxOamPingCtlTestMode   Relevant?     Min      Max    Default
+         ----------------------   ---------     ---      ---    -------
+         'ancpLoopback'                 Yes       1       32          1
+         'atmPing'                      Yes       1      100          1
+         'cpePing'                      Yes       1      100          1
+         'dnsPing'                      Yes       1      100          1
+         'ethCfmLoopback'               Yes       1      100          1
+         'ethCfmTwoWayDelay'            Yes       1     1000          1
+         'ethCfmTwoWaySlm'              Yes       1     1000          1
+         'gtpPing'                      Yes       1      100          1
+         'icmpPing'                     Yes       1   100000          5
+         'lspPing'                      Yes       1      100          1
+         'macPing'                      Yes       1      100          1
+         'mfibPing'                     Yes       1      100          1
+         'sdpPing'                      Yes       1      100          1
+         'vccvPing'                     Yes       1      100          1
+         'vprnPing'                     Yes       1      100          1
+         'vxlanPing'                    Yes       1     1024          1
+         otherwise                       No     N/A      N/A        N/A"
     DEFVAL      { 1 }
     ::= { tmnxOamPingCtlEntry 22 }
 
@@ -1995,6 +2038,7 @@ tmnxOamPingCtlInterval           OBJECT-TYPE
 
          tmnxOamPingCtlTestMode    Supported Values (sec)          Default (sec)
          ------------------------  ------------------------------  -------------
+         'bierPing'                not applicable
          'ethCfmLoopback'          1, 2, .. 10                              5
          'ethCfmTwoWayDelay'       0.1, 0.2, .. 0.9;  1, 2, .. 10           5
          'ethCfmTwoWaySlm'         0.1, 0.2, .. 0.9;  1, 2, .. 10           5
@@ -2066,7 +2110,10 @@ tmnxOamPingCtlTrapProbeFailureFilter OBJECT-TYPE
          threshold for generating a tmnxOamPingProbeFailedV3 notification.
 
          The semantics are explained in the tmnxOamPingProbeFailedV3
-         DESCRIPTION clause."
+         DESCRIPTION clause.
+
+         Setting this object to zero is not recommended - results will vary
+         with the test type."
     DEFVAL      { 1 }
     ::= { tmnxOamPingCtlEntry 26 }
 
@@ -2079,7 +2126,9 @@ tmnxOamPingCtlTrapTestFailureFilter OBJECT-TYPE
          threshold for generating a tmnxOamPingTestFailedV3 notification.
 
          The semantics are explained in the tmnxOamPingTestFailedV3 DESCRIPTION
-         clause."
+         clause.
+
+         Setting this object to zero is not recommended."
     DEFVAL      { 1 }
     ::= { tmnxOamPingCtlEntry 27 }
 
@@ -2295,7 +2344,7 @@ tmnxOamPingCtlIntervalUnits      OBJECT-TYPE
     ::= { tmnxOamPingCtlEntry 40 }
 
 tmnxOamPingCtlSubscriberName     OBJECT-TYPE
-    SYNTAX      TNamedItemOrEmpty
+    SYNTAX      TLNamedItemOrEmpty
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -2392,7 +2441,7 @@ tmnxOamPingResultsEntry          OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "tmnxOamPingResultsEntry contains the run-level test results for one
-         OAM ping test.
+         OAM ping test run.
 
          A row is created when a ping test is enabled (using
          tmnxOamPingCtlAdminStatus).
@@ -2401,8 +2450,8 @@ tmnxOamPingResultsEntry          OBJECT-TYPE
          1.  The corresponding test configuration is destroyed (using
          tmnxOamPingCtlRowStatus), or
          2.  A new run result is available, and the limit on the number of
-         run results retained (i.e. tmnxOamPingMaxConcurrentTests) has been
-         reached.  In that case, the oldest run result row is destroyed."
+         run results retained (3, currently) has been reached.  In that case,
+         the oldest run result row is destroyed."
     INDEX       {
         tmnxOamPingCtlOwnerIndex,
         tmnxOamPingCtlTestIndex,
@@ -2456,7 +2505,8 @@ tmnxOamPingResultsOperStatus     OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamPingResultsOperStatus indicates the operational
-         state of the test.  'enabled(1)' indicates the test is running."
+         state of the specified test run.  'enabled(1)' indicates the test is
+         running."
     ::= { tmnxOamPingResultsEntry 1 }
 
 tmnxOamPingResultsMinRtt         OBJECT-TYPE
@@ -2465,11 +2515,10 @@ tmnxOamPingResultsMinRtt         OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The minimum OAM ping round trip time (RTT) received.
+        "The value of tmnxOamPingResultsMinRtt indicates the minimum round trip
+         time for the specified test run.
 
-         This value is relevant when tmnxOamPingCtlTestMode has a value of
-         'sdpPing', 'ethCfmLoopback', 'ethCfmTwoWayDelay', or
-         'ethCfmTwoWaySlm'. Otherwise, this object contains a value of 0."
+         Zero is returned when the information is not available."
     ::= { tmnxOamPingResultsEntry 4 }
 
 tmnxOamPingResultsMaxRtt         OBJECT-TYPE
@@ -2478,12 +2527,10 @@ tmnxOamPingResultsMaxRtt         OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The maximum OAM ping round trip time (RTT) received. A value of 0 for
-         this object implies that no RTT has been received.
+        "The value of tmnxOamPingResultsMaxRtt indicates the maximum round trip
+         time for the specified test run.
 
-         This value is relevant when tmnxOamPingCtlTestMode has a value of
-         'sdpPing', 'ethCfmLoopback', 'ethCfmTwoWayDelay', or
-         'ethCfmTwoWaySlm'. Otherwise, this object contains a value of 0."
+         Zero is returned when the information is not available."
     ::= { tmnxOamPingResultsEntry 5 }
 
 tmnxOamPingResultsAverageRtt     OBJECT-TYPE
@@ -2492,11 +2539,10 @@ tmnxOamPingResultsAverageRtt     OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The current average OAM ping round trip time (RTT).
+        "The value of tmnxOamPingResultsAverageRtt indicates the average round
+         trip time for the specified test run.
 
-         This value is relevant when tmnxOamPingCtlTestMode has a value of
-         'sdpPing', 'ethCfmLoopback', 'ethCfmTwoWayDelay', or
-         'ethCfmTwoWaySlm'. Otherwise, this object contains a value of 0."
+         Zero is returned when the information is not available."
     ::= { tmnxOamPingResultsEntry 6 }
 
 tmnxOamPingResultsRttSumOfSquares OBJECT-TYPE
@@ -2533,11 +2579,16 @@ tmnxOamPingResultsSvcPing        OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The object contains the final results of an OAM 'svcPing' test.
-         The value of this object MUST be reported as 0 when no ping responses
-         have been received or an active test has not yet timed out.  When
-         tmnxOamPingCtlTestMode does not have a value of 'svcPing', this object
-         is not relevant and should contain a value of 0."
+        "The value of tmnxOamPingResultsSvcPing indicates the status of the
+         specified test run.
+
+         When the value is read using an SNMP Get:
+         1.  If the test type is 'svcPing', the status of the test run is
+             returned.
+         2.  If the test type is not 'svcPing', 'undetermined(0)' is returned.
+
+         When the value is reported in a notification, the status of the test
+         run is reported (for any ping test type)."
     ::= { tmnxOamPingResultsEntry 9 }
 
 tmnxOamPingResultsProbeResponses OBJECT-TYPE
@@ -2546,10 +2597,8 @@ tmnxOamPingResultsProbeResponses OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "Number of responses received for the corresponding
-         tmnxOamPingCtlEntry and tmnxOamPingResultsEntry.  The value of
-         this object MUST be reported as 0 when no probe responses have
-         been received."
+        "The value of tmnxOamPingResultsProbeResponses indicates the number of
+         responses received for the specified test run."
     ::= { tmnxOamPingResultsEntry 10 }
 
 tmnxOamPingResultsSentProbes     OBJECT-TYPE
@@ -2558,10 +2607,8 @@ tmnxOamPingResultsSentProbes     OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The value of this object reflects the number of probes sent for the
-         corresponding tmnxOamPingCtlEntry and tmnxOamPingResultsEntry. The
-         value of this object MUST be reported as 0 when no probes have been
-         sent."
+        "The value of tmnxOamPingResultsSentProbes indicates the number of
+         probes sent for the specified test run."
     ::= { tmnxOamPingResultsEntry 11 }
 
 tmnxOamPingResultsLastGoodProbe  OBJECT-TYPE
@@ -2569,9 +2616,12 @@ tmnxOamPingResultsLastGoodProbe  OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "Date and time when the last response was received for
-         an OAM probe.  If a response has not been received,
-         '1970-1-1,0:0:0.0,+0:0' is returned."
+        "The value of tmnxOamPingResultsLastGoodProbe indicates the date and
+         time when the most recent response was received for the specified test
+         run.
+
+         1970-Jan-01 00:00:00 UTC is returned if a response has not been
+         received."
     ::= { tmnxOamPingResultsEntry 12 }
 
 tmnxOamPingResultsLastRespHeader OBJECT-TYPE
@@ -2593,9 +2643,13 @@ tmnxOamPingResultsMinTt          OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The minimum OAM ping outbound one-way trip time received. A value of 0
-         for this object implies that no one-way trip time measurement is
-         available."
+        "The value of tmnxOamPingResultsMinTt indicates the minimum outbound
+         trip time for the specified test run.
+
+         The value is valid if the two nodes have proper clock synchronization.
+         Otherwise, for example, a negative value can be returned.
+
+         Zero is returned when the information is not available."
     ::= { tmnxOamPingResultsEntry 14 }
 
 tmnxOamPingResultsMaxTt          OBJECT-TYPE
@@ -2604,9 +2658,13 @@ tmnxOamPingResultsMaxTt          OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The maximum OAM ping outbound one-way trip time received. A value of 0
-         for this object implies that no one-way trip time measurement is
-         available."
+        "The value of tmnxOamPingResultsMaxTt indicates the maximum outbound
+         trip time for the specified test run.
+
+         The value is valid if the two nodes have proper clock synchronization.
+         Otherwise, for example, a negative value can be returned.
+
+         Zero is returned when the information is not available."
     ::= { tmnxOamPingResultsEntry 15 }
 
 tmnxOamPingResultsAverageTt      OBJECT-TYPE
@@ -2615,9 +2673,13 @@ tmnxOamPingResultsAverageTt      OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The current average OAM ping outbound one-way trip time. A value of 0
-         for this object implies that no one-way trip time measurement is
-         available."
+        "The value of tmnxOamPingResultsAverageTt indicates the average
+         outbound trip time for the specified test run.
+
+         The value is valid if the two nodes have proper clock synchronization.
+         Otherwise, for example, a negative value can be returned.
+
+         Zero is returned when the information is not available."
     ::= { tmnxOamPingResultsEntry 16 }
 
 tmnxOamPingResultsTtSumOfSquares OBJECT-TYPE
@@ -2636,10 +2698,13 @@ tmnxOamPingResultsMinInTt        OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The minimum OAM ping inbound one-way trip time received.
+        "The value of tmnxOamPingResultsMinInTt indicates the minimum inbound
+         trip time for the specified test run.
 
-         A value of 0 for this object implies that no one-way trip time
-         measurement is available."
+         The value is valid if the two nodes have proper clock synchronization.
+         Otherwise, for example, a negative value can be returned.
+
+         Zero is returned when the information is not available."
     ::= { tmnxOamPingResultsEntry 18 }
 
 tmnxOamPingResultsMaxInTt        OBJECT-TYPE
@@ -2648,10 +2713,13 @@ tmnxOamPingResultsMaxInTt        OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The maximum OAM ping inbound one-way trip time received.
+        "The value of tmnxOamPingResultsMaxInTt indicates the maximum inbound
+         trip time for the specified test run.
 
-         A value of 0 for this object implies that no one-way trip time
-         measurement is available."
+         The value is valid if the two nodes have proper clock synchronization.
+         Otherwise, for example, a negative value can be returned.
+
+         Zero is returned when the information is not available."
     ::= { tmnxOamPingResultsEntry 19 }
 
 tmnxOamPingResultsAverageInTt    OBJECT-TYPE
@@ -2660,10 +2728,13 @@ tmnxOamPingResultsAverageInTt    OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The current average OAM ping inbound one-way trip time.
+        "The value of tmnxOamPingResultsAverageInTt indicates the average
+         inbound trip time for the specified test run.
 
-         A value of 0 for this object implies that no one-way trip time
-         measurement is available."
+         The value is valid if the two nodes have proper clock synchronization.
+         Otherwise, for example, a negative value can be returned.
+
+         Zero is returned when the information is not available."
     ::= { tmnxOamPingResultsEntry 20 }
 
 tmnxOamPingResultsInTtSumOfSqrs  OBJECT-TYPE
@@ -2683,11 +2754,9 @@ tmnxOamPingResultsOutJitter      OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamPingResultsOutJitter indicates the amount of
-         one-way trip jitter, expressed in microseconds, for a ping probe
-         request packet sent for this OAM test.
+         jitter in the outbound trip times for the specified test run.
 
-         A value of 0 for this object implies that no one-way trip jitter
-         measurement is available."
+         Zero is returned when the information is not available."
     ::= { tmnxOamPingResultsEntry 22 }
 
 tmnxOamPingResultsInJitter       OBJECT-TYPE
@@ -2696,12 +2765,10 @@ tmnxOamPingResultsInJitter       OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The value of tmnxOamPingResultsInJitter indicates the amount of
-         one-way trip jitter, expressed in microseconds, for a ping probe
-         response packet received for this OAM test.
+        "The value of tmnxOamPingResultsInJitter indicates the amount of jitter
+         in the inbound trip times for the specified test run.
 
-         A value of 0 for this object implies that no one-way trip jitter
-         measurement is available."
+         Zero is returned when the information is not available."
     ::= { tmnxOamPingResultsEntry 23 }
 
 tmnxOamPingResultsRtJitter       OBJECT-TYPE
@@ -2710,12 +2777,10 @@ tmnxOamPingResultsRtJitter       OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The value of tmnxOamPingResultsRtJitter indicates the amount of
-         two-way trip jitter, expressed in microseconds, for a ping probe sent
-         for this OAM test.
+        "The value of tmnxOamPingResultsRtJitter indicates the amount of jitter
+         in the round trip times for the specified test run.
 
-         A value of 0 for this object implies that no two-way-trip jitter
-         measurement is available."
+         Zero is returned when the information is not available."
     ::= { tmnxOamPingResultsEntry 24 }
 
 tmnxOamPingResultsProbeTimeouts  OBJECT-TYPE
@@ -2724,7 +2789,7 @@ tmnxOamPingResultsProbeTimeouts  OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamPingResultsProbeTimeouts indicates the number of
-         probes timed out without receiving a response."
+         probes that timed out for the specified test run."
     ::= { tmnxOamPingResultsEntry 25 }
 
 tmnxOamPingResultsProbeFailures  OBJECT-TYPE
@@ -2734,7 +2799,7 @@ tmnxOamPingResultsProbeFailures  OBJECT-TYPE
     DESCRIPTION
         "The value of tmnxOamPingResultsProbeFailures indicates the total
          number of probes that failed to be transmitted plus the number of
-         probes that timed out without receiving a response."
+         probes that timed out."
     ::= { tmnxOamPingResultsEntry 26 }
 
 tmnxOamPingResultsTestRunIndex   OBJECT-TYPE
@@ -2742,12 +2807,11 @@ tmnxOamPingResultsTestRunIndex   OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "The value of tmnxOamPingResultsTestRunIndex identifies the row entry
-         that reports results for a single OAM test run.
+        "The value of tmnxOamPingResultsTestRunIndex specifies the test run
+         INDEX of the row.
 
-         The agent starts assigning tmnxOamPingResultsTestRunIndex values at 1
-         and wraps after exceeding the maximum possible value as defined by the
-         limit of this object."
+         The first  run of a test is assigned run index 1.
+         The second run of a test is assigned run index 2.  Etc."
     ::= { tmnxOamPingResultsEntry 27 }
 
 tmnxOamPingResultsRttOFSumSquares OBJECT-TYPE
@@ -2766,24 +2830,10 @@ tmnxOamPingResultsRttHCSumSquares OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamPingResultsRttHCSumSquares indicates the sum of
-         squares of the round trip times of the ping test.  Its purpose is to
-         enable the standard deviation calculation.
+         squares of the round trip times for the specified test run.  Its
+         purpose is to enable the standard deviation calculation.
 
-         The value of this object will be reported as 0 when one or more of the
-         following conditions apply:
-         1.  No round trip time measurement is available.
-         2.  The test stopped before completion.
-         3.  The test type (i.e. tmnxOamPingCtlTestMode) is one of the
-             following:
-             'ancpLoopback',
-             'atmPing',
-             'macPopulate',
-             'macPurge',
-             'mfibPing',
-             'mrInfo',
-             'mtuPing',
-             'p2mpLspPing',
-             'svcPing."
+         Zero is returned when the information is not available."
     ::= { tmnxOamPingResultsEntry 29 }
 
 tmnxOamPingResultsTtOFSumSquares OBJECT-TYPE
@@ -2802,26 +2852,10 @@ tmnxOamPingResultsTtHCSumSquares OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamPingResultsTtHCSumSquares indicates the sum of
-         squares of the outbound one-way trip times of the ping test.  Its
+         squares of the outbound trip times for the specified test run.  Its
          purpose is to enable the standard deviation calculation.
 
-         The value of this object will be reported as 0 when one or more of the
-         following conditions apply:
-         1.  No outbound one-way trip time measurement is available.
-         2.  The test stopped before completion.
-         3.  The test type (i.e. tmnxOamPingCtlTestMode) is one of the
-             following:
-             'ancpLoopback',
-             'atmPing',
-             'cpePing' (sum of squares supported for round trip, not outbound),
-             'dnsPing' (sum of squares supported for round trip, not outbound),
-             'macPopulate',
-             'macPurge',
-             'mfibPing',
-             'mrInfo',
-             'mtuPing',
-             'p2mpLspPing',
-             'svcPing."
+         Zero is returned when the information is not available."
     ::= { tmnxOamPingResultsEntry 31 }
 
 tmnxOamPingResultsInTtOFSumSqrs  OBJECT-TYPE
@@ -2840,26 +2874,10 @@ tmnxOamPingResultsInTtHCSumSqrs  OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamPingResultsInTtHCSumSqrs indicates the sum of
-         squares of the inbound one-way trip times of the ping test.  Its
+         squares of the inbound trip times for the specified test run.  Its
          purpose is to enable the standard deviation calculation.
 
-         The value of this object will be reported as 0 when one or more of the
-         following conditions apply:
-         1.  No inbound one-way trip time measurement is available.
-         2.  The test stopped before completion.
-         3.  The test type (i.e. tmnxOamPingCtlTestMode) is one of the
-             following:
-             'ancpLoopback',
-             'atmPing',
-             'cpePing' (sum of squares supported for round trip, not inbound),
-             'dnsPing' (sum of squares supported for round trip, not inbound),
-             'macPopulate',
-             'macPurge',
-             'mfibPing',
-             'mrInfo',
-             'mtuPing',
-             'p2mpLspPing',
-             'svcPing."
+         Zero is returned when the information is not available."
     ::= { tmnxOamPingResultsEntry 33 }
 
 tmnxOamPingResultsTestRunResult  OBJECT-TYPE
@@ -2867,7 +2885,8 @@ tmnxOamPingResultsTestRunResult  OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The object contains the overall state of the ping test."
+        "The value of tmnxOamPingResultsTestRunResult indicates the result of
+         the specified test run."
     ::= { tmnxOamPingResultsEntry 34 }
 
 tmnxOamPingResultsOutOfOrder     OBJECT-TYPE
@@ -2892,17 +2911,9 @@ tmnxOamPingHistoryTable          OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "Defines a table for storing the results of an OAM ping
-         probe operation. The probe results for all OAM ping test types
-         are saved in this table except for 'macPing'.  The 'macPing'
-         results are saved in the tmnxOamMacPingHistoryTable.
-
-         For a configured test, this table will hold the results for up to 3
-         runs.
-
-         An entry in this table is created when the result of an OAM ping
-         probe is determined.  An entry is removed from this table when
-         its corresponding tmnxOamPingCtlEntry is deleted."
+        "tmnxOamPingHistoryTable contains the per-probe results for all ping
+         test types (except 'macPing').  tmnxOamMacPingHistoryTable contains
+         the 'macPing' results."
     ::= { tmnxOamPingObjs 5 }
 
 tmnxOamPingHistoryEntry          OBJECT-TYPE
@@ -2910,11 +2921,22 @@ tmnxOamPingHistoryEntry          OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "Defines an entry in the tmnxOamPingHistoryTable.
-         The first two index elements identify the tmnxOamPingCtlEntry
-         that a tmnxOamPingHistoryEntry belongs to.  The third index
-         identifies a specific OAM test run.  The fourth index
-         element selects a single OAM probe result."
+        "tmnxOamPingHistoryEntry contains the results for one ping probe.
+
+         The first three indices specify the corresponding
+         tmnxOamPingResultsTable row.
+
+         The fourth index specifies the probe yielding the results.
+
+         A row is created when one of the following events occurs.
+         1.  A ping echo request cannot be sent (e.g. the destination IP address
+             is unknown).
+         2.  A ping echo reply (triggered by a ping echo request launched by
+             this node) arrives.
+         3.  A timeout occurs while waiting for a ping echo reply.
+
+         Rows are destroyed when the corresponding tmnxOamPingResultsTable row
+         is destroyed."
     INDEX       {
         tmnxOamPingCtlOwnerIndex,
         tmnxOamPingCtlTestIndex,
@@ -2964,15 +2986,16 @@ tmnxOamPingHistoryIndex          OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "An entry in this table is created when the result of
-         a OAM ping probe is determined.  The initial 2 instance
-         identifier index values identify the tmnxOamPingCtlEntry
-         that a OAM probe result (tmnxOamPingHistoryEntry) belongs
-         to.  The tmnxOamPingHistoryIndex element selects a single OAM
-         probe result.
-         The agent starts assigning tmnxOamPingHistoryIndex values at 1
-         and wraps after exceeding the maximum possible value as defined by
-         the limit of this object."
+        "The value of tmnxOamPingHistoryIndex specifies the probe which yielded
+         the results in this row.
+
+         For example:
+         1.  For a unicast ping test with a send-count of 10, the row with
+             tmnxOamPingHistoryIndex=10 has the result of the last probe to be
+             sent.
+         2.  For a multicast ping test with 10 destinations, the row with
+             tmnxOamPingHistoryIndex=10 has the result for the last destination
+             to be pinged."
     ::= { tmnxOamPingHistoryEntry 1 }
 
 tmnxOamPingHistoryResponse       OBJECT-TYPE
@@ -2981,10 +3004,11 @@ tmnxOamPingHistoryResponse       OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The amount of time measured in microseconds from when
-         a OAM probe was sent to when its response was received or
-         when it timed out.  The value of this object is reported
-         as 0 when it is not possible to transmit an OAM probe."
+        "The value of tmnxOamPingHistoryResponse indicates the round trip time
+         for the specified probe.
+
+         Zero is returned when the information is not available (e.g. the probe
+         timed out)."
     ::= { tmnxOamPingHistoryEntry 2 }
 
 tmnxOamPingHistoryOneWayTime     OBJECT-TYPE
@@ -2993,10 +3017,13 @@ tmnxOamPingHistoryOneWayTime     OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The amount of time measured in microseconds from when a OAM probe was
-         sent to when it was received by the replier. The value of this object
-         is reported as 0 when it is not possible to transmit an OAM probe or
-         the information is not available."
+        "The value of tmnxOamPingHistoryOneWayTime indicates the outbound trip
+         time for the specified probe.
+
+         The value is valid if the two nodes have proper clock synchronization.
+         Otherwise, for example, a negative value can be returned.
+
+         Zero is returned when the information is not available."
     ::= { tmnxOamPingHistoryEntry 3 }
 
 tmnxOamPingHistorySize           OBJECT-TYPE
@@ -3007,7 +3034,7 @@ tmnxOamPingHistorySize           OBJECT-TYPE
     DESCRIPTION
         "The value of tmnxOamPingHistorySize indicates the size of the OAM echo
          request transmitted for this OAM probe.  Zero is returned if no probe
-         has been transmitted.
+         was transmitted.
 
          When tmnxOamPingCtlTestMode is 'ethCfmLoopback', 'ethCfmTwoWayDelay',
          or 'ethCfmTwoWaySlm' the value returned is the size of the transmitted
@@ -3026,7 +3053,8 @@ tmnxOamPingHistoryStatus         OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The result of a particular OAM test probe."
+        "The value of tmnxOamPingHistoryStatus indicates the outcome of the
+         probe.  Example values:  'responseReceived', 'requestTimedOut'."
     ::= { tmnxOamPingHistoryEntry 5 }
 
 tmnxOamPingHistoryTime           OBJECT-TYPE
@@ -3034,7 +3062,8 @@ tmnxOamPingHistoryTime           OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "Time stamp for when this OAM probe result was determined."
+        "The value of tmnxOamPingHistoryTime indicates the date and time when
+         the outcome of the specified probe was determined."
     ::= { tmnxOamPingHistoryEntry 6 }
 
 tmnxOamPingHistoryReturnCode     OBJECT-TYPE
@@ -3042,8 +3071,11 @@ tmnxOamPingHistoryReturnCode     OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The value of tmnxOamPingHistoryReturnCode is an enumerated integer
-         that indicates the OAM return code received in the OAM ping response."
+        "The value of tmnxOamPingHistoryReturnCode indicates the OAM return
+         code received in the probe response.
+
+         For a 'bierPing' test, 'notApplicable(0)' is returned.  The probe's
+         return code can be read using tmnxOamBierPingHistoryReturnCode."
     ::= { tmnxOamPingHistoryEntry 7 }
 
 tmnxOamPingHistorySrcIpAddress   OBJECT-TYPE
@@ -3062,8 +3094,9 @@ tmnxOamPingHistAddressType       OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamPingHistAddressType indicates the type of binding
-         address information returned in response to a 'vprnPing' 'mfibPing',
-         or 'cpePing' test."
+         address information returned in response to the specified probe.
+
+         'unknown(0)' is returned when the information is not available."
     ::= { tmnxOamPingHistoryEntry 9 }
 
 tmnxOamPingHistSapId             OBJECT-TYPE
@@ -3094,7 +3127,7 @@ tmnxOamPingHistoryCpeMacAddr     OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "tmnxOamPingHistoryCpeMacAddr is set to 0 except in case of a
-         'cpePing', where it contains the mac address of the replying CPE for
+         'cpePing', where it contains the MAC address of the replying CPE for
          this OAM ping probe reply."
     ::= { tmnxOamPingHistoryEntry 13 }
 
@@ -3130,12 +3163,12 @@ tmnxOamPingHistoryIfIndex        OBJECT-TYPE
         "The value of tmnxOamPingHistoryIfIndex indicates the ifIndex of the
          interface that this probe was transmitted from.
 
-         This object applies to 'lspPing' and 'vccvPing' tests.  For other test
-         modes, this value is not significant and is set to 0."
+         Zero is returned when the information is not available."
     ::= { tmnxOamPingHistoryEntry 16 }
 
 tmnxOamPingHistoryDataLen        OBJECT-TYPE
     SYNTAX      Unsigned32
+    UNITS       "octets"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -3236,7 +3269,10 @@ tmnxOamPingHistorySrcAddress     OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamPingHistorySrcAddress indicates the Internet
-         address of the remote node that generated this reply to a OAM probe."
+         address of the remote node targeted by the specified ping probe.
+
+         In the case of a 'bierPing' test, the remote node's address can be
+         read using tmnxOamBierPingHistoryBfrPfx."
     ::= { tmnxOamPingHistoryEntry 24 }
 
 tmnxOamPingHistoryInOneWayTime   OBJECT-TYPE
@@ -3245,10 +3281,10 @@ tmnxOamPingHistoryInOneWayTime   OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The value of tmnxOamPingHistoryInOneWayTime indicates the amount of
-         time measured in microseconds from when an OAM probe reply was sent to
-         when it was received by this host (inbound one-way time). The value of
-         this object is reported as 0 when the information is not available."
+        "The value of tmnxOamPingHistoryInOneWayTime indicates the inbound trip
+         time for the specified probe response.
+
+         Zero is returned when the information is not available."
     ::= { tmnxOamPingHistoryEntry 25 }
 
 tmnxOamPingHistoryLspName        OBJECT-TYPE
@@ -3616,7 +3652,7 @@ tmnxOamMacPingHistoryEntry       OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "Defines an entry in the tmnxOamPingHistoryTable.  The first two
+        "Defines an entry in the tmnxOamMacPingHistoryTable.  The first two
          index elements identify the tmnxOamPingCtlEntry that a
          tmnxOamMacPingHistoryEntry belongs to.  The third index identifies
          a specific run of the OAM test.  The fourth index element
@@ -7919,6 +7955,355 @@ tmnxOamBfdOnLspSessBootstrSendPV OBJECT-TYPE
          tmnxOamBfdOnLspOperState) 'bootstrappedSendingPeriodicVerif(3)'."
     ::= { tmnxOamPingReadOnlyScalars 3 }
 
+tmnxOamBierPingCtlTable          OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxOamBierPingCtlEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxOamBierPingCtlTable (along with tmnxOamPingCtlTable) contains the
+         configuration information for BIER (Bit Index Explicit Replication)
+         ping tests."
+    REFERENCE
+        "RFC 8279, 'Multicast Using Bit Index Explicit Replication (BIER)',
+         November 2017.
+         IETF 'BIER Ping and Trace draft-ietf-bier-ping-05', 24-Apr-2019."
+    ::= { tmnxOamPingObjs 31 }
+
+tmnxOamBierPingCtlEntry          OBJECT-TYPE
+    SYNTAX      TmnxOamBierPingCtlEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxOamBierPingCtlEntry (along with tmnxOamPingCtlEntry) contains the
+         configuration information for a BIER ping test.
+
+         A row is created when the corresponding tmnxOamPingCtlTestMode is set
+         to 'bierPing'.
+
+         A row is destroyed when the corresponding tmnxOamPingCtlTable row is
+         destroyed (using tmnxOamPingCtlRowStatus).
+
+         The values in a particular row in this table cannot be changed when
+         the corresponding tmnxOamPingCtlAdminStatus is 'enabled(1)'."
+    INDEX       {
+        tmnxOamPingCtlOwnerIndex,
+        tmnxOamPingCtlTestIndex
+    }
+    ::= { tmnxOamBierPingCtlTable 1 }
+
+TmnxOamBierPingCtlEntry          ::= SEQUENCE
+{
+    tmnxOamBierPingCtlSubDomain      Unsigned32,
+    tmnxOamBierPingCtlBfrId          Unsigned32,
+    tmnxOamBierPingCtlBfrIdStart     Unsigned32,
+    tmnxOamBierPingCtlBfrIdEnd       Unsigned32,
+    tmnxOamBierPingCtlTtl            Unsigned32
+}
+
+tmnxOamBierPingCtlSubDomain      OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamBierPingCtlSubDomain specifies the BIER sub-domain
+         to be tested.
+
+         Zero indicates the default sub-domain."
+    REFERENCE
+        "RFC 8279, 'Multicast Using Bit Index Explicit Replication (BIER)',
+         November 2017, Section 1, 'Introduction'.
+         IETF 'BIER Ping and Trace draft-ietf-bier-ping-05', 24-Apr-2019,
+         Section 4.3, 'Sending BIER Echo Request'."
+    DEFVAL      { 0 }
+    ::= { tmnxOamBierPingCtlEntry 1 }
+
+tmnxOamBierPingCtlBfrId          OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4096)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamBierPingCtlBfrId specifies the identifier of the
+         Bit-Forwarding Router (BFR) to be pinged.
+
+         The BFR-ID must be a member of the tested sub-domain (as configured
+         using tmnxOamBierPingCtlSubDomain).  Otherwise, the test will fail.
+
+         Zero indicates no BFR-ID has been configured.
+
+         There are three methods to configure the destination(s) to be pinged:
+         1.  tmnxOamBierPingCtlBfrId.
+         2.  tmnxOamBierPingCtlBfrIdStart, tmnxOamBierPingCtlBfrIdEnd.
+         3.  tmnxOamBierPingBfrPfxCtlAddrType, tmnxOamBierPingBfrPfxCtlAddress.
+
+         Exactly one of the methods must be used.  Otherwise, the test will
+         fail."
+    REFERENCE
+        "RFC 8279, 'Multicast Using Bit Index Explicit Replication (BIER)',
+         November 2017, Section 1, 'Introduction'."
+    DEFVAL      { 0 }
+    ::= { tmnxOamBierPingCtlEntry 2 }
+
+tmnxOamBierPingCtlBfrIdStart     OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4096)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamBierPingCtlBfrIdStart specifies the start of a
+         contiguous range of Bit-Forwarding Router (BFR) identifiers to be
+         pinged.  tmnxOamBierPingCtlBfrIdEnd specifies the end of the range.
+
+         Each BFR-ID in the range must be a member of the tested sub-domain
+         (as configured using tmnxOamBierPingCtlSubDomain).  Otherwise, the
+         test will fail.
+
+         Zero indicates no start for the BFR-ID range has been configured.
+
+         The following objects must be set together in one SNMP Set PDU:
+             tmnxOamBierPingCtlBfrIdStart,
+             tmnxOamBierPingCtlBfrIdEnd.
+
+         There are three methods to configure the destination(s) to be pinged:
+         1.  tmnxOamBierPingCtlBfrId.
+         2.  tmnxOamBierPingCtlBfrIdStart, tmnxOamBierPingCtlBfrIdEnd.
+         3.  tmnxOamBierPingBfrPfxCtlAddrType, tmnxOamBierPingBfrPfxCtlAddress.
+
+         Exactly one of the methods must be used.  Otherwise, the test will
+         fail."
+    REFERENCE
+        "RFC 8279, 'Multicast Using Bit Index Explicit Replication (BIER)',
+         November 2017, Section 1, 'Introduction'."
+    DEFVAL      { 0 }
+    ::= { tmnxOamBierPingCtlEntry 3 }
+
+tmnxOamBierPingCtlBfrIdEnd       OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4096)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamBierPingCtlBfrIdEnd specifies the end of a
+         contiguous range of Bit-Forwarding Router (BFR) identifiers to be
+         pinged.  tmnxOamBierPingCtlBfrIdStart specifies the start of the range.
+
+         Each BFR-ID in the range must be a member of the tested sub-domain
+         (as configured using tmnxOamBierPingCtlSubDomain).  Otherwise, the
+         test will fail.
+
+         Zero indicates no end for the BFR-ID range has been configured.
+
+         The following objects must be set together in one SNMP Set PDU:
+             tmnxOamBierPingCtlBfrIdStart,
+             tmnxOamBierPingCtlBfrIdEnd.
+
+         There are three methods to configure the destination(s) to be pinged:
+         1.  tmnxOamBierPingCtlBfrId.
+         2.  tmnxOamBierPingCtlBfrIdStart, tmnxOamBierPingCtlBfrIdEnd.
+         3.  tmnxOamBierPingBfrPfxCtlAddrType, tmnxOamBierPingBfrPfxCtlAddress.
+
+         Exactly one of the methods must be used.  Otherwise, the test will
+         fail."
+    REFERENCE
+        "RFC 8279, 'Multicast Using Bit Index Explicit Replication (BIER)',
+         November 2017, Section 1, 'Introduction'."
+    DEFVAL      { 0 }
+    ::= { tmnxOamBierPingCtlEntry 4 }
+
+tmnxOamBierPingCtlTtl            OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamBierPingCtlTtl specifies the MPLS Time To Live
+         (TTL) to be used for the test."
+    DEFVAL      { 255 }
+    ::= { tmnxOamBierPingCtlEntry 5 }
+
+tmnxOamBierPingBfrPfxCtlTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxOamBierPingBfrPfxCtlEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxOamBierPingBfrPfxCtlTable contains IP destination addresses (i.e.
+         Bit-Forwarding Router (BFR) prefixes) for BIER ping tests."
+    REFERENCE
+        "RFC 8279, 'Multicast Using Bit Index Explicit Replication (BIER)',
+         November 2017, Section 2, 'The BFR Identifier and BFR-Prefix'."
+    ::= { tmnxOamPingObjs 32 }
+
+tmnxOamBierPingBfrPfxCtlEntry    OBJECT-TYPE
+    SYNTAX      TmnxOamBierPingBfrPfxCtlEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxOamBierPingBfrPfxCtlEntry contains one BFR prefix.  A BIER ping
+         test can have several BFR prefixes.  Each BFR prefix is an IP
+         destination address for the test.
+
+         A row is created/destroyed using tmnxOamBierPingBfrPfxCtlRowState.
+
+         Rows in this table belonging to a particular test cannot be added,
+         changed, or deleted when the test's tmnxOamPingCtlAdminStatus is
+         'enabled(1)'."
+    INDEX       {
+        tmnxOamPingCtlOwnerIndex,
+        tmnxOamPingCtlTestIndex,
+        tmnxOamBierPingPfxIndex
+    }
+    ::= { tmnxOamBierPingBfrPfxCtlTable 1 }
+
+TmnxOamBierPingBfrPfxCtlEntry    ::= SEQUENCE
+{
+    tmnxOamBierPingPfxIndex          Unsigned32,
+    tmnxOamBierPingBfrPfxCtlRowState RowStatus,
+    tmnxOamBierPingBfrPfxCtlAddrType InetAddressType,
+    tmnxOamBierPingBfrPfxCtlAddress  InetAddress
+}
+
+tmnxOamBierPingPfxIndex          OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..16)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamBierPingPfxIndex specifies a BFR prefix index.  The
+         index allows one test to have several BFR prefixes."
+    ::= { tmnxOamBierPingBfrPfxCtlEntry 1 }
+
+tmnxOamBierPingBfrPfxCtlRowState OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamBierPingBfrPfxCtlRowState specifies the status of
+         the row for the specified BFR prefix."
+    ::= { tmnxOamBierPingBfrPfxCtlEntry 2 }
+
+tmnxOamBierPingBfrPfxCtlAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamBierPingBfrPfxCtlAddrType specifies the address
+         type of tmnxOamBierPingBfrPfxCtlAddress."
+    DEFVAL      { unknown }
+    ::= { tmnxOamBierPingBfrPfxCtlEntry 3 }
+
+tmnxOamBierPingBfrPfxCtlAddress  OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamBierPingBfrPfxCtlAddress specifies a BFR prefix
+         used as a destination address for a BIER ping test.
+
+         There are three methods to configure the destination(s) to be pinged:
+         1.  tmnxOamBierPingCtlBfrId.
+         2.  tmnxOamBierPingCtlBfrIdStart, tmnxOamBierPingCtlBfrIdEnd.
+         3.  tmnxOamBierPingBfrPfxCtlAddrType, tmnxOamBierPingBfrPfxCtlAddress.
+
+         Exactly one of the methods must be used.  Otherwise, the test will
+         fail."
+    DEFVAL      { ''H }
+    ::= { tmnxOamBierPingBfrPfxCtlEntry 4 }
+
+tmnxOamBierPingHistoryTable      OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxOamBierPingHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxOamBierPingHistoryTable (along with tmnxOamPingHistoryTable)
+         contains the per-probe results for Bit Index Explicit Replication
+         (BIER) ping tests."
+    REFERENCE
+        "IETF draft-ietf-bier-ping-05, 'BIER Ping and Trace', April 24, 2019.
+         RFC 8279, 'Multicast Using Bit Index Explicit Replication (BIER)',
+         November 2017."
+    ::= { tmnxOamPingObjs 33 }
+
+tmnxOamBierPingHistoryEntry      OBJECT-TYPE
+    SYNTAX      TmnxOamBierPingHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxOamBierPingHistoryEntry (along with tmnxOamPingHistoryEntry)
+         contains the results for one BIER ping probe.
+
+         A row is created/destroyed when the corresponding
+         tmnxOamPingHistoryEntry is created/destroyed.
+
+         The first two indices specify a 'bierPing' test.
+
+         The third index specifies a test run (started using
+         tmnxOamPingCtlAdminStatus).
+
+         The fourth index specifies a Bit-Forwarding Router (BFR) with results
+         to report.
+
+         All the indices match the corresponding tmnxOamPingHistoryEntry
+         indices."
+    REFERENCE
+        "IETF draft-ietf-bier-ping-05, 'BIER Ping and Trace', April 24, 2019,
+         Section 4.6, 'Receiving Echo Reply'."
+    INDEX       {
+        tmnxOamPingCtlOwnerIndex,
+        tmnxOamPingCtlTestIndex,
+        tmnxOamPingResultsTestRunIndex,
+        tmnxOamPingHistoryIndex
+    }
+    ::= { tmnxOamBierPingHistoryTable 1 }
+
+TmnxOamBierPingHistoryEntry      ::= SEQUENCE
+{
+    tmnxOamBierPingHistoryBfrId      Unsigned32,
+    tmnxOamBierPingHistoryBfrPfxType InetAddressType,
+    tmnxOamBierPingHistoryBfrPfx     InetAddress,
+    tmnxOamBierPingHistoryReturnCode TmnxOamBierHistoryReturnCode
+}
+
+tmnxOamBierPingHistoryBfrId      OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4096)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamBierPingHistoryBfrId indicates the identifier of
+         the Bit-Forwarding Router (BFR) targeted by the launched BIER Echo
+         Request.
+
+         Zero is returned if the BFR-ID cannot be determined."
+    REFERENCE
+        "RFC 8279, 'Multicast Using Bit Index Explicit Replication (BIER)',
+         November 2017, Section 1, 'Introduction'."
+    ::= { tmnxOamBierPingHistoryEntry 1 }
+
+tmnxOamBierPingHistoryBfrPfxType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamBierPingHistoryBfrPfxType indicates the IP address
+         type of the address read using tmnxOamBierPingHistoryBfrPfx."
+    ::= { tmnxOamBierPingHistoryEntry 2 }
+
+tmnxOamBierPingHistoryBfrPfx     OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamBierPingHistoryBfrPfx indicates the IP address of
+         the Bit-Forwarding Router (BFR) targeted by the launched BIER Echo
+         Request."
+    ::= { tmnxOamBierPingHistoryEntry 3 }
+
+tmnxOamBierPingHistoryReturnCode OBJECT-TYPE
+    SYNTAX      TmnxOamBierHistoryReturnCode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamBierPingHistoryReturnCode indicates the value
+         copied from the Return Code field of the BIER Echo Reply PDU.
+
+         Zero (i.e. 'No Return Code') is returned if a BIER Echo Reply PDU did
+         not arrive (e.g. in the case of a timeout)."
+    ::= { tmnxOamBierPingHistoryEntry 4 }
+
 tmnxOamTraceRouteObjs            OBJECT IDENTIFIER ::= { tmnxOamTestObjs 2 }
 
 tmnxOamTraceRouteNotifyObjects   OBJECT IDENTIFIER ::= { tmnxOamTraceRouteObjs 1 }
@@ -8036,7 +8421,7 @@ tmnxOamTrCtlRowStatus            OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamTrCtlRowStatus specifies the status of the row for
-         the specified ping test.
+         the specified trace test.
 
          Deleting a row deletes all the child rows with the same owner name and
          test name, including additional configuration rows (e.g.
@@ -8083,7 +8468,7 @@ tmnxOamTrCtlTestMode             OBJECT-TYPE
         vccvTraceRoute  (7),
         p2mpLspTrace    (8),
         ethCfmLinkTrace (9),
-        reserved10      (10)
+        bierTrace       (10)
     }
     MAX-ACCESS  read-create
     STATUS      current
@@ -8092,6 +8477,8 @@ tmnxOamTrCtlTestMode             OBJECT-TYPE
          test defined by this row.
 
          Code points:
+         'bierTrace'
+             - Bit Index Explicit Replication (BIER) trace route test.
          'ethCfmLinkTrace'
              - Ethernet Connectivity Fault Management (CFM) trace route test.
          'icmpTraceRoute'
@@ -8125,6 +8512,7 @@ tmnxOamTrCtlTestMode             OBJECT-TYPE
 
          tmnxOamTrCtlTestMode   Auto-Gen Row for Additional Configuration
          --------------------   -----------------------------------------
+         'bierTrace'            tmnxOamBierTrCtlTable
          'ethCfmLinkTrace'      tmnxOamEthCfmTrCtlTable
          'icmpTraceRoute'       none
          'ldpTreeTrace'         tmnxOamLTtraceCtlTable
@@ -8142,6 +8530,7 @@ tmnxOamTrCtlTestMode             OBJECT-TYPE
 
          tmnxOamTrCtlTestMode   SAA Supported   OAM Supported
          --------------------   -------------   -------------
+         'bierTrace'                       No             Yes
          'ethCfmLinkTrace'                Yes              No
          'icmpTraceRoute'                 Yes             Yes
          'ldpTreeTrace'                    No             Yes
@@ -8155,7 +8544,8 @@ tmnxOamTrCtlTestMode             OBJECT-TYPE
         "IETF draft-ietf-idmr-traceroute-ipm-07, 'A traceroute facility for IP
          Multicast', 14-Jul-2000.
          IETF draft-ietf-mboned-mtrace-v2-17, 'Mtrace Version 2: Traceroute
-         Facility for IP Multicast', 12-Mar-2017."
+         Facility for IP Multicast', 12-Mar-2017.
+         IETF 'BIER Ping and Trace draft-ietf-bier-ping-05', 24-Apr-2019."
     DEFVAL      { none }
     ::= { tmnxOamTrCtlEntry 6 }
 
@@ -8194,6 +8584,7 @@ tmnxOamTrCtlFcName               OBJECT-TYPE
 
          tmnxOamTrCtlTestMode   Applicable?   Default
          --------------------   -----------   -------
+         bierTrace              yes           'be'
          ethCfmLinkTrace        yes           'nc'
          ldpTreeTrace           yes           'be'
          lspTraceRoute          yes           'be'
@@ -8237,6 +8628,7 @@ tmnxOamTrCtlProfile              OBJECT-TYPE
 
          tmnxOamTrCtlTestMode   Applicable?   Default
          --------------------   -----------   -------
+         bierTrace              yes           'out(2)'
          ethCfmLinkTrace        yes           'in(1)'
          ldpTreeTrace           yes           'out(2)'
          lspTraceRoute          yes           'out(2)'
@@ -8304,35 +8696,25 @@ tmnxOamTrCtlDataSize             OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamTrCtlDataSize specifies (directly or indirectly)
-         the size of the Trace Route request, in octets.
+         the size of the trace PDU.
 
-         The range and interpretation of tmnxOamTrCtlDataSize varies with
-         tmnxOamTrCtlTestMode, as shown in the following table.
+         The relevance of tmnxOamTrCtlDataSize varies with the test type, as
+         shown in the following table.
 
-         tmnxOamTrCtlTestMode  Minimum  Default  TLV Size  Auto-Adjust
-         --------------------  -------  -------  --------  -----------
-         'lspTraceRoute'             1        1        No          Yes
-         'macTraceRoute'             1        1        No          Yes
-         'p2mpLspTrace'              1        1        No          Yes
-         'vccvTraceRoute'            1        1        No          Yes
-         'vprnTraceRoute'            1        1        No          Yes
-         otherwise                  tmnxOamTrCtlDataSize is irrelevant
+         tmnxOamTrCtlTestMode  Relevant?
+         --------------------  ---------
+         'lspTraceRoute'             yes
+         'macTraceRoute'             yes
+         'p2mpLspTrace'              yes
+         'vccvTraceRoute'            yes
+         'vprnTraceRoute'            yes
+         otherwise                    no
 
-         The Minimum column shows the minimum accepted value for
-         tmnxOamTrCtlDataSize.
-
-         If TLV Size is Yes, tmnxOamTrCtlDataSize specifies the total size of
-         the Padding TLV in the ping request.
-
-         If TLV Size is No, tmnxOamTrCtlDataSize specifies the total size of
-         the ping request PDU.
-
-         If Auto-Adjust is Yes:  when the ping request PDU required for the
-         specified test is larger than the PDU size indicated by
-         tmnxOamTrCtlDataSize, SROS sends the smallest valid PDU larger than the
-         size indicated.  For example, if tmnxOamTrCtlDataSize is 1 when a
-         'vccvTraceRoute' test is started on a FEC 128 pseudowire, an 88 octet
-         request PDU is sent.
+         If the request PDU required for the specified test is larger than the
+         PDU size indicated by tmnxOamTrCtlDataSize, SROS sends the smallest
+         valid PDU larger than the size indicated.  For example, if
+         tmnxOamTrCtlDataSize is 1 when a 'vccvTraceRoute' test is started on a
+         FEC 128 pseudowire, an 88 octet request PDU is sent.
 
          Trace route requests are sent unfragmented."
     DEFVAL      { 1 }
@@ -8344,16 +8726,19 @@ tmnxOamTrCtlTimeOut              OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        "Specifies the timeout value, in seconds, for an Nokia SROS
-         OAM Trace Route request.  This parameter is optional.
+        "The value of tmnxOamTrCtlTimeOut specifies the timeout for an OAM
+         trace probe.
 
-         For 'ethCfmLinkTrace', this is the time out for the whole test.
+         For 'ethCfmLinkTrace', this is the timeout for the whole test.
 
-         The minimum, maximum, and default values of this object vary with
-         tmnxOamTrCtlTestMode, as follows:
-           'icmpTraceRoute' :  N/A N/A N/A
-           'ethCfmLinkTrace':    1  10   5
-            otherwise       :    1  60   3
+         The minimum, maximum, and default values of this object vary with the
+         test type, as follows.
+
+         tmnxOamTrCtlTestMode   Minimum   Maximum   Default
+         --------------------   -------   -------   -------
+         'icmpTraceRoute'           N/A       N/A       N/A
+         'ethCfmLinkTrace'            1        10         5
+         otherwise                    1        60         3
 
          If tmnxOamTrCtlTestMode is 'ethCfmLinkTrace', the value of
          tmnxOamTrCtlTimeOut must be less than or equal to the value of
@@ -8367,12 +8752,11 @@ tmnxOamTrCtlProbesPerHop         OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        "Specifies the number of times to reissue an Nokia SROS OAM Trace Route
-         request with the same time-to-live (TTL) value. This parameter is
-         optional.
+        "The value of tmnxOamTrCtlProbesPerHop specifies the number of OAM
+         trace probes to send per TTL.
 
-         This parameter is not configurable for 'icmpTraceRoute'; a default
-         value of 3 is used."
+         This object is not configurable for 'icmpTraceRoute'; a default value
+         of 3 is used."
     DEFVAL      { 1 }
     ::= { tmnxOamTrCtlEntry 14 }
 
@@ -8385,11 +8769,12 @@ tmnxOamTrCtlMaxTtl               OBJECT-TYPE
         "The value of tmnxOamTrCtlMaxTtl specifies the maximum time-to-live
          value.  This parameter is optional.
 
-         The applicablility and default vary with tmnxOamTrCtlTestMode, as
-         shown in the following table.
+         The applicability and default vary with tmnxOamTrCtlTestMode, as shown
+         in the following table.
 
          tmnxOamTrCtlTestMode   Applicable?   Default
          --------------------   -----------   -------
+         'bierTrace'                    yes        30
          'ethCfmLinkTrace'              yes        64
          'icmpTraceRoute'               yes        30
          'ldpTreeTrace'                 yes        30
@@ -8437,9 +8822,7 @@ tmnxOamTrCtlDSField              OBJECT-TYPE
          for the associated data flow).
 
          This object is supported when tmnxOamTrCtlTestMode is
-         'icmpTraceRoute'. Otherwise, it is ignored.
-
-         This object is optional."
+         'icmpTraceRoute'. Otherwise, it is ignored."
     REFERENCE
         "RFC  791, 'Internet Protocol', section 3.1.
          RFC 1812, 'Requirements for IP Version 4 Routers', section 5.3.2.
@@ -8458,22 +8841,19 @@ tmnxOamTrCtlMaxFailures          OBJECT-TYPE
     DESCRIPTION
         "The value of tmnxOamTrCtlMaxFailures specifies the maximum number of
          consecutive timeouts allowed before terminating a trace route test.
-         This object is optional.
 
          As shown in the following table
          1.  This object is applicable to a subset of the test types, and
-         2.  The default value and upper bound depend on the test type.
+         2.  The range and default value depend on the test type.
 
-         tmnxOamTrCtlTestMode   Applicable?   Default   Upper Bound
-         --------------------   -----------   -------   -----------
-         'icmpTraceRoute'               yes        90            90
-         'lspTraceRoute'                yes         5           255
-         'p2mpLspTrace'                 yes         5            10
-         'vccvTraceRoute'               yes         5           255
-         otherwise                       no       N/A           N/A
-
-         In the 'icmpTraceRoute' case, changing the tmnxOamTrCtlMaxFailures
-         value away from the default is not supported."
+         tmnxOamTrCtlTestMode  Applicable?   Lower Bound  Upper Bound   Default
+         --------------------  -----------   -----------  -----------   -------
+         'bierTrace'                   yes             5            5         5
+         'icmpTraceRoute'              yes            90           90        90
+         'lspTraceRoute'               yes             1          255         5
+         'p2mpLspTrace'                yes             1           10         5
+         'vccvTraceRoute'              yes             1          255         5
+         otherwise                      no           N/A          N/A       N/A"
     DEFVAL      { 5 }
     ::= { tmnxOamTrCtlEntry 18 }
 
@@ -8762,14 +9142,13 @@ tmnxOamTrResultsTable            OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "Defines the Nokia SROS OAM Trace Route Test Results Table for keeping
-         track of the status of a tmnxOamTrCtlEntry.
+        "tmnxOamTrResultsTable contains the run-level test results for OAM
+         trace tests.
 
-         An entry is added to the tmnxOamTrResultsTable when an
-         tmnxOamTrCtlEntry is started by successful transition of its
-         tmnxOamTrCtlAdminStatus object to enabled(1). An entry is removed from
-         the tmnxOamTrResultsTable when its corresponding tmnxOamTrCtlEntry is
-         deleted."
+         TTL-level test results for trace tests reside in tmnxOamTrHopsTable.
+
+         Probe-level test results for trace tests reside in
+         tmnxOamTrProbeHistoryTable."
     ::= { tmnxOamTraceRouteObjs 4 }
 
 tmnxOamTrResultsEntry            OBJECT-TYPE
@@ -8777,12 +9156,18 @@ tmnxOamTrResultsEntry            OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "Defines an entry in the tmnxOamTrResultsTable.  The
-         first two indexes of the tmnxOamTrResultsTable are the
-         same as the tmnxOamTrCtlTable in order for a tmnxOamTrResultsEntry
-         to correspond to the tmnxOamTrCtlEntry that caused it to
-         be created.  The third index allows a history of test runs
-         to be stored."
+        "tmnxOamTrResultsEntry contains the run-level test results for one OAM
+         trace test run.
+
+         A row is created when a trace test is enabled (using
+         tmnxOamTrCtlAdminStatus).
+
+         A row is destroyed when:
+         1.  The corresponding test configuration is destroyed (using
+         tmnxOamTrCtlRowStatus), or
+         2.  A new run result is available, and the limit on the number of
+         run results retained (3, currently) has been reached.  In that case,
+         the oldest run result row is destroyed."
     INDEX       {
         tmnxOamTrCtlOwnerIndex,
         tmnxOamTrCtlTestIndex,
@@ -8813,10 +9198,9 @@ tmnxOamTrResultsOperStatus       OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "Reflects the operational state of a tmnxOamTrCtlEntry:
-
-         enabled(1)  - Test is active.
-         disabled(2) - Test has stopped."
+        "The value of tmnxOamTrResultsOperStatus indicates the operational
+         state of the specified test run.  'enabled(1)' indicates the test is
+         running."
     ::= { tmnxOamTrResultsEntry 1 }
 
 tmnxOamTrResultsCurHopCount      OBJECT-TYPE
@@ -8900,7 +9284,11 @@ tmnxOamTrResultsLastGoodPath     OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The date and time when the last complete path was determined."
+        "The value of tmnxOamTrResultsLastGoodPath indicates the date and time
+         when the last complete path was determined.
+
+         1970-Jan-01 00:00:00 UTC is returned when a complete path was not
+         determined."
     ::= { tmnxOamTrResultsEntry 7 }
 
 tmnxOamTrResultsTestRunIndex     OBJECT-TYPE
@@ -8908,12 +9296,11 @@ tmnxOamTrResultsTestRunIndex     OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "The value of tmnxOamTrResultsTestRunIndex identifies the row entry
-         that reports results for a single OAM trace route test run.
+        "The value of tmnxOamTrResultsTestRunIndex specifies the test run INDEX
+         of the row.
 
-         The agent starts assigning tmnxOamTrResultsTestRunIndex values at 1
-         and wraps after exceeding the maximum possible value as defined by the
-         limit of this object."
+         The first  run of a test is assigned run index 1.
+         The second run of a test is assigned run index 2.  Etc."
     ::= { tmnxOamTrResultsEntry 8 }
 
 tmnxOamTrResultsTgtAddrType      OBJECT-TYPE
@@ -8930,11 +9317,14 @@ tmnxOamTrResultsTgtAddress       OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The value of tmnxOamTrResultsTgtAddress indicates the Internet
-         address associated with a tmnxOamTrCtlTgtAddress value when the
-         destination address is specified as a DNS name.  The value of this
-         object should be a zero length octet string when a DNS name is not
-         specified or when a specified DNS name fails to resolve."
+        "The value of tmnxOamTrResultsTgtAddress indicates the IP destination
+         address of the test.
+
+         If the configured destination address of the test has type 'dns(16)',
+         this is the corresponding IPv4 or IPv6 address (if available).
+
+         tmnxOamTrResultsTgtAddrType is 'unknown(0)' when an IP destination
+         address for the test is unavailable."
     ::= { tmnxOamTrResultsEntry 10 }
 
 tmnxOamTrResultsTestRunResult    OBJECT-TYPE
@@ -8942,7 +9332,8 @@ tmnxOamTrResultsTestRunResult    OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The object contains the overall state of the trace test."
+        "The value of tmnxOamTrResultsTestRunResult indicates the result of the
+         specified test run."
     ::= { tmnxOamTrResultsEntry 11 }
 
 tmnxOamTrProbeHistoryTable       OBJECT-TYPE
@@ -8952,9 +9343,6 @@ tmnxOamTrProbeHistoryTable       OBJECT-TYPE
     DESCRIPTION
         "tmnxOamTrProbeHistoryTable contains per-probe results for trace route
          tests.
-
-         The number of rows in this table for a test is limited to the results
-         of 3 runs.
 
          This table is not used for tests which have tmnxOamTrCtlTestMode set
          to 'ldpTreeTrace'."
@@ -8968,12 +9356,8 @@ tmnxOamTrProbeHistoryEntry       OBJECT-TYPE
         "A tmnxOamTrProbeHistoryEntry is created by the system when the result
          of a trace route probe launch is determined.
 
-         A tmnxOamTrProbeHistoryEntry is destroyed when the corresponding
-         tmnxOamTrCtlEntry is destroyed.
-
-         The first two indices identify the parent tmnxOamTrCtlEntry.  The third
-         index identifies a trace route test run.  Each subsequent index is
-         described in its DESCRIPTION clause, below."
+         Rows are destroyed when the corresponding tmnxOamTrHopsTable row is
+         destroyed."
     INDEX       {
         tmnxOamTrCtlOwnerIndex,
         tmnxOamTrCtlTestIndex,
@@ -9018,11 +9402,21 @@ tmnxOamTrProbeHistoryIndex       OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "The value of tmnxOamTrProbeHistoryIndex specifies the entries
-         belonging to a single OAM Trace Route test instance.
+        "The value of tmnxOamTrProbeHistoryIndex specifies a probe belonging to
+         an OAM Trace Route test run.
 
-         The tmnxOamTrProbeHistoryIndex values are assigned starting at 1 and
-         wrap on exceeding the upper bound."
+         The probes are numbered sequentially, starting at one.
+
+         Two indexing methods for uniquely identifying a probe are provided:
+         1.  tmnxOamTrCtlOwnerIndex,
+             tmnxOamTrCtlTestIndex,
+             tmnxOamTrResultsTestRunIndex,
+             tmnxOamTrProbeHistoryIndex.
+         2.  tmnxOamTrCtlOwnerIndex,
+             tmnxOamTrCtlTestIndex,
+             tmnxOamTrResultsTestRunIndex,
+             tmnxOamTrProbeHistoryHopIndex,
+             tmnxOamTrProbeHistoryProbeIndex."
     ::= { tmnxOamTrProbeHistoryEntry 1 }
 
 tmnxOamTrProbeHistoryHopIndex    OBJECT-TYPE
@@ -9040,9 +9434,21 @@ tmnxOamTrProbeHistoryProbeIndex  OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "The value of tmnxOamTrProbeHistoryProbeIndex (combined with the
-         preceding indices) specifies a trace route reply.  The number of probes
-         per hop for a particular test is configured using
+        "The value of tmnxOamTrProbeHistoryProbeIndex specifies a trace route
+         reply, in the context of a hop.
+
+         Two indexing methods for uniquely identifying a probe are provided:
+         1.  tmnxOamTrCtlOwnerIndex,
+             tmnxOamTrCtlTestIndex,
+             tmnxOamTrResultsTestRunIndex,
+             tmnxOamTrProbeHistoryIndex.
+         2.  tmnxOamTrCtlOwnerIndex,
+             tmnxOamTrCtlTestIndex,
+             tmnxOamTrResultsTestRunIndex,
+             tmnxOamTrProbeHistoryHopIndex,
+             tmnxOamTrProbeHistoryProbeIndex.
+
+         The number of probes per hop for a particular test is configured using
          tmnxOamTrCtlProbesPerHop."
     ::= { tmnxOamTrProbeHistoryEntry 3 }
 
@@ -9062,11 +9468,11 @@ tmnxOamTrProbeHistoryResponse    OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The amount of time measured in microseconds from when a probe was sent
-         to when its response was received, two-way time, or when it timed out.
+        "The value of tmnxOamTrProbeHistoryResponse indicates the round trip
+         time for the specified probe.
 
-         The value of this object is reported as 0 when it is not possible to
-         transmit a probe."
+         Zero is returned when the information is not available (e.g. the probe
+         timed out)."
     ::= { tmnxOamTrProbeHistoryEntry 5 }
 
 tmnxOamTrProbeHistoryOneWayTime  OBJECT-TYPE
@@ -9075,11 +9481,13 @@ tmnxOamTrProbeHistoryOneWayTime  OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The amount of time measured in microseconds from when a OAM probe was
-         sent to when it was received by the replier, outbound one-way time.
+        "The value of tmnxOamTrProbeHistoryOneWayTime indicates the outbound
+         trip time for the specified probe.
 
-         The value of this object is reported as 0 when it is not possible to
-         transmit an OAM probe or the information is not available."
+         The value is valid if the two nodes have proper clock synchronization.
+         Otherwise, for example, a negative value can be returned.
+
+         Zero is returned when the information is not available."
     ::= { tmnxOamTrProbeHistoryEntry 6 }
 
 tmnxOamTrProbeHistoryStatus      OBJECT-TYPE
@@ -9087,8 +9495,8 @@ tmnxOamTrProbeHistoryStatus      OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The result of an Nokia SROS OAM Trace Route operation made by a remote
-         node to a particular probe."
+        "The value of tmnxOamTrProbeHistoryStatus indicates the outcome of the
+         probe.  Example values:  'responseReceived', 'requestTimedOut'."
     ::= { tmnxOamTrProbeHistoryEntry 7 }
 
 tmnxOamTrProbeHistoryLastRC      OBJECT-TYPE
@@ -9116,7 +9524,8 @@ tmnxOamTrProbeHistoryTime        OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "Timestamp for when this probe results were determined."
+        "The value of tmnxOamTrProbeHistoryTime indicates the date and time
+         when the outcome of the specified probe was determined."
     ::= { tmnxOamTrProbeHistoryEntry 9 }
 
 tmnxOamTrProbeHistoryResponsePlane OBJECT-TYPE
@@ -9151,9 +9560,9 @@ tmnxOamTrProbeHistorySapId       OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The value of tmnxOamTrProbeHistorySapId is the name of the access port
-         of the SAP supporting the requested IP address returned in response to
-         a 'vprnTraceRoute' probe.
+        "The value of tmnxOamTrProbeHistorySapId indicates the name of the
+         access port of the SAP supporting the requested IP address returned in
+         response to a 'vprnTraceRoute' probe.
 
          If the value of tmnxOamTrProbeHistoryAddressType is not 'sapId', this
          object is not relevant and MUST have a null string ''."
@@ -9217,7 +9626,9 @@ tmnxOamTrProbeHistorySize        OBJECT-TYPE
     DESCRIPTION
         "The value of tmnxOamTrProbeHistorySize indicates the size in octets
          of the user payload in the probe request packet.  It does not
-         include the service encapsulation."
+         include the service encapsulation.
+
+         Zero is returned if no probe was transmitted."
     ::= { tmnxOamTrProbeHistoryEntry 18 }
 
 tmnxOamTrProbeHistoryInOneWayTime OBJECT-TYPE
@@ -9226,11 +9637,13 @@ tmnxOamTrProbeHistoryInOneWayTime OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The amount of time measured in microseconds from when a OAM probe
-         reply was sent to when it was received, inbound one-way time.
+        "The value of tmnxOamTrProbeHistoryInOneWayTime indicates the inbound
+         trip time for the specified probe.
 
-         The value of this object is reported as 0 when the information is not
-         available."
+         The value is valid if the two nodes have proper clock synchronization.
+         Otherwise, for example, a negative value can be returned.
+
+         Zero is returned when the information is not available."
     ::= { tmnxOamTrProbeHistoryEntry 19 }
 
 tmnxOamTrProbeHistoryAddrType    OBJECT-TYPE
@@ -9248,7 +9661,7 @@ tmnxOamTrProbeHistoryAddress     OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamTrProbeHistoryAddress indicates the IP address of
-         the node which sent the specified trace route reply."
+         the replying node for the specified trace request."
     ::= { tmnxOamTrProbeHistoryEntry 21 }
 
 tmnxOamTrProbeHistorySrcGlobalId OBJECT-TYPE
@@ -9333,8 +9746,14 @@ tmnxOamTrHopsTable               OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "Defines the Nokia SROS OAM Trace Route Hop Table for keeping track of
-         the results of an Nokia SROS OAM Trace Route test on a per hop basis."
+        "tmnxOamTrHopsTable contains the TTL-level test results for OAM trace
+         tests.
+
+         Run-level test results for trace tests reside in
+         tmnxOamTrResultsTable.
+
+         Probe-level test results for trace tests reside in
+         tmnxOamTrProbeHistoryTable."
     ::= { tmnxOamTraceRouteObjs 6 }
 
 tmnxOamTrHopsEntry               OBJECT-TYPE
@@ -9342,12 +9761,13 @@ tmnxOamTrHopsEntry               OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "Defines an entry in the tmnxOamTrHopsTable.
-         The first two index elements identify the tmnxOamTrCtlEntry
-         that a tmnxOamTrHopsEntry belongs to.  The third index element
-         identifies a OAM trace route test run.  The fourth index element,
-         tmnxOamTrHopsHopIndex, selects a hop in an Nokia SROS OAM
-         Trace Route path."
+        "tmnxOamTrHopsEntry contains the TTL-level test results for one TTL of
+         one OAM trace test run.
+
+         A row is created when a TTL is probed by a trace test run.
+
+         Rows are destroyed when the corresponding tmnxOamTrResultsTable row is
+         destroyed."
     INDEX       {
         tmnxOamTrCtlOwnerIndex,
         tmnxOamTrCtlTestIndex,
@@ -9395,21 +9815,8 @@ tmnxOamTrHopsHopIndex            OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "Specifies the hop index for an Nokia SROS OAM Trace Route
-         hop.  Values for this object with respect to the same
-         tmnxOamTrCtlOwnerIndex and tmnxOamTrCtlTestIndex MUST start at 1
-         and increase monotonically.
-
-         The tmnxOamTrHopsTable keeps the current Nokia SROS OAM Trace Route
-         path per tmnxOamTrCtlEntry.
-
-         All hops (tmnxOamTrHopsTable entries) in an Nokia SROS OAM
-         Trace Route path MUST be updated at the same time when an
-         Nokia SROS OAM Trace Route operation completes.  Care needs
-         to be applied when either a path changes or can't be determined.
-         The initial portion of the path, up to the first hop change, MUST
-         retain the same tmnxOamTrHopsHopIndex values.  The remaining portion
-         of the path SHOULD be assigned new tmnxOamTrHopsHopIndex values."
+        "The value of tmnxOamTrHopsHopIndex specifies the TTL of the trace test
+         run results reported by this row."
     ::= { tmnxOamTrHopsEntry 1 }
 
 tmnxOamTrHopsIpTgtAddress        OBJECT-TYPE
@@ -9427,9 +9834,10 @@ tmnxOamTrHopsMinRtt              OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The minimum Nokia SROS OAM Trace Route round trip time (RTT)
-         received for this hop.  A value of 0 for this object implies that no
-         RTT has been received."
+        "The value of tmnxOamTrHopsMinRtt indicates the minimum round trip time
+         for the specified TTL of the specified test run.
+
+         Zero is returned when the information is not available."
     ::= { tmnxOamTrHopsEntry 3 }
 
 tmnxOamTrHopsMaxRtt              OBJECT-TYPE
@@ -9438,9 +9846,10 @@ tmnxOamTrHopsMaxRtt              OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The maximum Nokia SROS OAM Trace Route round trip time (RTT)
-         received for this hop.  A value of 0 for this object implies that no
-         RTT has been received."
+        "The value of tmnxOamTrHopsMaxRtt indicates the maximum round trip time
+         for the specified TTL of the specified test run.
+
+         Zero is returned when the information is not available."
     ::= { tmnxOamTrHopsEntry 4 }
 
 tmnxOamTrHopsAverageRtt          OBJECT-TYPE
@@ -9449,8 +9858,10 @@ tmnxOamTrHopsAverageRtt          OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The current average Nokia SROS OAM Trace Route round trip time (RTT)
-         for this hop."
+        "The value of tmnxOamTrHopsAverageRtt indicates the average round trip
+         time for the specified TTL of the specified test run.
+
+         Zero is returned when the information is not available."
     ::= { tmnxOamTrHopsEntry 5 }
 
 tmnxOamTrHopsRttSumOfSquares     OBJECT-TYPE
@@ -9469,9 +9880,13 @@ tmnxOamTrHopsMinTt               OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The minimum Nokia SROS OAM Trace Route outbound one-way trip
-         time received for this hop.  A value of 0 for this object implies
-         that no one-way trip time has been received."
+        "The value of tmnxOamTrHopsMinTt indicates the minimum outbound trip
+         time for the specified TTL of the specified test run.
+
+         The value is valid if the two nodes have proper clock synchronization.
+         Otherwise, for example, a negative value can be returned.
+
+         Zero is returned when the information is not available."
     ::= { tmnxOamTrHopsEntry 7 }
 
 tmnxOamTrHopsMaxTt               OBJECT-TYPE
@@ -9480,9 +9895,13 @@ tmnxOamTrHopsMaxTt               OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The maximum Nokia SROS OAM Trace Route outbound one-way trip
-         time received for this hop.  A value of 0 for this object implies
-         that no one-way trip time has been received."
+        "The value of tmnxOamTrHopsMaxTt indicates the maximum outbound trip
+         time for the specified TTL of the specified test run.
+
+         The value is valid if the two nodes have proper clock synchronization.
+         Otherwise, for example, a negative value can be returned.
+
+         Zero is returned when the information is not available."
     ::= { tmnxOamTrHopsEntry 8 }
 
 tmnxOamTrHopsAverageTt           OBJECT-TYPE
@@ -9491,8 +9910,13 @@ tmnxOamTrHopsAverageTt           OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The current average Nokia SROS OAM Trace Route outbound one-way trip
-         time for this hop."
+        "The value of tmnxOamTrHopsAverageTt indicates the average outbound
+         trip time for the specified TTL of the specified test run.
+
+         The value is valid if the two nodes have proper clock synchronization.
+         Otherwise, for example, a negative value can be returned.
+
+         Zero is returned when the information is not available."
     ::= { tmnxOamTrHopsEntry 9 }
 
 tmnxOamTrHopsTtSumOfSquares      OBJECT-TYPE
@@ -9510,9 +9934,8 @@ tmnxOamTrHopsSentProbes          OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The value of this object reflects the number of probes sent for this
-         hop during this Nokia SROS OAM Trace Route test. The value of this
-         object should start at 0."
+        "The value of tmnxOamTrHopsSentProbes indicates the number of probes
+         sent for the specified TTL of the specified test run."
     ::= { tmnxOamTrHopsEntry 11 }
 
 tmnxOamTrHopsProbeResponses      OBJECT-TYPE
@@ -9520,9 +9943,8 @@ tmnxOamTrHopsProbeResponses      OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "Number of responses received for this hop during this Nokia
-         SROS OAM Trace Route test.  This value of this object should
-         start at 0."
+        "The value of tmnxOamTrHopsProbeResponses indicates the number of
+         responses received for the specified TTL of the specified test run."
     ::= { tmnxOamTrHopsEntry 12 }
 
 tmnxOamTrHopsLastGoodProbe       OBJECT-TYPE
@@ -9530,8 +9952,12 @@ tmnxOamTrHopsLastGoodProbe       OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "Date and time when the last response was received for a probe for this
-         hop during this Nokia SROS OAM Trace Route test."
+        "The value of tmnxOamTrHopsLastGoodProbe indicates the date and time
+         when the most recent response was received for the specified TTL of
+         the specified test run.
+
+         1970-Jan-01 00:00:00 UTC is returned if a response has not been
+         received."
     ::= { tmnxOamTrHopsEntry 13 }
 
 tmnxOamTrHopsMinInTt             OBJECT-TYPE
@@ -9540,9 +9966,13 @@ tmnxOamTrHopsMinInTt             OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The minimum OAM trace route inbound one-way trip time received. A
-         value of 0 for this object implies that no one-way trip time
-         measurement is available."
+        "The value of tmnxOamTrHopsMinInTt indicates the minimum inbound trip
+         time for the specified TTL of the specified test run.
+
+         The value is valid if the two nodes have proper clock synchronization.
+         Otherwise, for example, a negative value can be returned.
+
+         Zero is returned when the information is not available."
     ::= { tmnxOamTrHopsEntry 18 }
 
 tmnxOamTrHopsMaxInTt             OBJECT-TYPE
@@ -9551,9 +9981,13 @@ tmnxOamTrHopsMaxInTt             OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The maximum OAM trace route inbound one-way trip time received. A
-         value of 0 for this object implies that no one-way trip time
-         measurement is available."
+        "The value of tmnxOamTrHopsMaxInTt indicates the maximum inbound trip
+         time for the specified TTL of the specified test run.
+
+         The value is valid if the two nodes have proper clock synchronization.
+         Otherwise, for example, a negative value can be returned.
+
+         Zero is returned when the information is not available."
     ::= { tmnxOamTrHopsEntry 19 }
 
 tmnxOamTrHopsAverageInTt         OBJECT-TYPE
@@ -9562,9 +9996,13 @@ tmnxOamTrHopsAverageInTt         OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The current average OAM inbound inbound one-way trip time. A value of
-         0 for this object implies that no one-way trip time measurement is
-         available."
+        "The value of tmnxOamTrHopsAverageInTt indicates the average inbound
+         trip time for the specified TTL of the specified test run.
+
+         The value is valid if the two nodes have proper clock synchronization.
+         Otherwise, for example, a negative value can be returned.
+
+         Zero is returned when the information is not available."
     ::= { tmnxOamTrHopsEntry 20 }
 
 tmnxOamTrHopsInTtSumOfSqrs       OBJECT-TYPE
@@ -9583,12 +10021,11 @@ tmnxOamTrHopsOutJitter           OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The value of tmnxOamTrHopsOutJitter indicates the amount of outbound
-         one-way trip jitter, expressed in microseconds, for a trace route
-         probe request packet sent for this OAM test.
+        "The value of tmnxOamTrHopsOutJitter indicates the amount of jitter in
+         the outbound trip times for the specified TTL of the specified test
+         run.
 
-         A value of 0 for this object implies that no one-way trip jitter
-         measurement is available."
+         Zero is returned when the information is not available."
     ::= { tmnxOamTrHopsEntry 22 }
 
 tmnxOamTrHopsInJitter            OBJECT-TYPE
@@ -9597,12 +10034,11 @@ tmnxOamTrHopsInJitter            OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The value of tmnxOamTrHopsInJitter indicates the amount of inbound
-         one-way trip jitter, expressed in microseconds, for a trace route
-         probe response packet received for this OAM test.
+        "The value of tmnxOamTrHopsInJitter indicates the amount of jitter in
+         the inbound trip times for the specified TTL of the specified test
+         run.
 
-         A value of 0 for this object implies that no one-way trip jitter
-         measurement is available."
+         Zero is returned when the information is not available."
     ::= { tmnxOamTrHopsEntry 23 }
 
 tmnxOamTrHopsRtJitter            OBJECT-TYPE
@@ -9611,12 +10047,10 @@ tmnxOamTrHopsRtJitter            OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The value of tmnxOamTrHopsRtJitter indicates the amount of two-way
-         trip jitter, expressed in microseconds, for a trace route probe sent
-         for this OAM test.
+        "The value of tmnxOamTrHopsRtJitter indicates the amount of jitter in
+         the round trip times for the specified TTL of the specified test run.
 
-         A value of 0 for this object implies that no two-way-trip jitter
-         measurement is available."
+         Zero is returned when the information is not available."
     ::= { tmnxOamTrHopsEntry 24 }
 
 tmnxOamTrHopsProbeTimeouts       OBJECT-TYPE
@@ -9625,7 +10059,7 @@ tmnxOamTrHopsProbeTimeouts       OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamTrHopsProbeTimeouts indicates the number of probes
-         that timed out without receiving a response."
+         that timed out for the specified TTL of the specified test run."
     ::= { tmnxOamTrHopsEntry 25 }
 
 tmnxOamTrHopsProbeFailures       OBJECT-TYPE
@@ -9633,9 +10067,9 @@ tmnxOamTrHopsProbeFailures       OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The value of tmnxOamTrHopsProbeFailures indicates the total number of
-         probes that failed to be transmitted plus the number of probes that
-         timed out without receiving a response."
+        "The value of tmnxOamTrHopsProbeFailures indicates the number of probes
+         that failed to be transmitted plus the number of probes that timed
+         out."
     ::= { tmnxOamTrHopsEntry 26 }
 
 tmnxOamTrHopsTgtAddrType         OBJECT-TYPE
@@ -9643,8 +10077,8 @@ tmnxOamTrHopsTgtAddrType         OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The value of tmnxOamTrHopsTgtAddrType indicates the Internet address
-         type stored in tmnxOamTrHopsTgtAddress."
+        "The value of tmnxOamTrHopsTgtAddrType indicates the address type of
+         tmnxOamTrHopsTgtAddress."
     ::= { tmnxOamTrHopsEntry 27 }
 
 tmnxOamTrHopsTgtAddress          OBJECT-TYPE
@@ -9652,12 +10086,8 @@ tmnxOamTrHopsTgtAddress          OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The value of tmnxOamTrHopsTgtAddress indicates the Internet
-         address associated with the hop.  A value for this object should
-         be reported as a numeric IP address and not as a DNS name.
-
-         This value of this object is not significant when tmnxOamTrCtlTestMode
-         has a value of 'macTraceRoute' or 'ethCfmLinkTrace'."
+        "The value of tmnxOamTrHopsTgtAddress indicates the IP address of the
+         replying node for the specified TTL of the specified test run."
     ::= { tmnxOamTrHopsEntry 28 }
 
 tmnxOamTrHopsRttOFSumSquares     OBJECT-TYPE
@@ -9676,17 +10106,10 @@ tmnxOamTrHopsRttHCSumSquares     OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamTrHopsRttHCSumSquares indicates the sum of squares
-         of the round trip times of the trace route test for this hop.  Its
-         purpose is to enable the standard deviation calculation.
+         of the round trip times for the specified TTL of the specified test
+         run.  Its purpose is to enable the standard deviation calculation.
 
-         The value of this object will be reported as 0 when one or more of the
-         following conditions apply:
-         1.  No round trip time measurement is available.
-         2.  The test stopped before completion.
-         3.  The test type (i.e. tmnxOamTrCtlTestMode) is one of the following:
-             'ldpTreeTrace',
-             'mcastTraceRoute',
-             'p2mpLspTrace'."
+         Zero is returned when the information is not available."
     ::= { tmnxOamTrHopsEntry 30 }
 
 tmnxOamTrHopsTtOFSumSquares      OBJECT-TYPE
@@ -9705,17 +10128,10 @@ tmnxOamTrHopsTtHCSumSquares      OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamTrHopsTtHCSumSquares indicates the sum of squares
-         of the outbound one-way trip times of the trace route test for this
-         hop.  Its purpose is to enable the standard deviation calculation.
+         of the outbound trip times for the specified TTL of the specified test
+         run.  Its purpose is to enable the standard deviation calculation.
 
-         The value of this object will be reported as 0 when one or more of the
-         following conditions apply:
-         1.  No outbound one-way trip time measurement is available.
-         2.  The test stopped before completion.
-         3.  The test type (i.e. tmnxOamTrCtlTestMode) is one of the following:
-             'ldpTreeTrace',
-             'mcastTraceRoute',
-             'p2mpLspTrace'."
+         Zero is returned when the information is not available."
     ::= { tmnxOamTrHopsEntry 32 }
 
 tmnxOamTrHopsInTtOFSumSqrs       OBJECT-TYPE
@@ -9734,17 +10150,10 @@ tmnxOamTrHopsInTtHCSumSqrs       OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamTrHopsInTtHCSumSqrs indicates the sum of squares
-         of the inbound one-way trip times of the trace route test for this
-         hop. Its purpose is to enable the standard deviation calculation.
+         of the inbound trip times for the specified TTL of the specified test
+         run.  Its purpose is to enable the standard deviation calculation.
 
-         The value of this object will be reported as 0 when one or more of the
-         following conditions apply:
-         1.  No inbound one-way trip time measurement is available.
-         2.  The test stopped before completion.
-         3.  The test type (i.e. tmnxOamTrCtlTestMode) is one of the following:
-             'ldpTreeTrace',
-             'mcastTraceRoute',
-             'p2mpLspTrace'."
+         Zero is returned when the information is not available."
     ::= { tmnxOamTrHopsEntry 34 }
 
 tmnxOamMacTrCtlTable             OBJECT-TYPE
@@ -9793,7 +10202,7 @@ tmnxOamMacTrCtlTargetMacAddr     OBJECT-TYPE
         "The value of tmnxOamMacTrCtlTargetMacAddr is a 6-octet value that
          specifies the target MAC address to be used in the query request for
          performing an OAM Mac Trace Route operation when tmnxOamTrCtlTestMode
-         has a value of 'macTraceRoute'. "
+         has a value of 'macTraceRoute'."
     REFERENCE
         "IEEE 802.3 Subclause 30.7.1.1.9"
     DEFVAL      { '000000000000'H }
@@ -9807,7 +10216,7 @@ tmnxOamMacTrCtlSourceMacAddr     OBJECT-TYPE
         "The value of tmnxOamMacTrCtlSourceMacAddr is a 6-octet value that
          specifies the MAC address to be used as the source in the query
          request for performing an OAM MAC Trace Route operation when
-         tmnxOamTrCtlTestMode has a value of 'macTraceRoute'. "
+         tmnxOamTrCtlTestMode has a value of 'macTraceRoute'."
     REFERENCE
         "IEEE 802.3 Subclause 30.7.1.1.9"
     DEFVAL      { '000000000000'H }
@@ -11118,6 +11527,7 @@ tmnxOamVprnTrL3MapDestAddress    OBJECT-TYPE
 
 tmnxOamVprnTrL3MapDestMaskLen    OBJECT-TYPE
     SYNTAX      InetAddressPrefixLength
+    UNITS       "bits"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -12201,7 +12611,7 @@ tmnxOamMcastTrRespRtgProtocol2   OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The value of tmnxOamMcastTrRespRtgProtocol2 indicates the the unicast
+        "The value of tmnxOamMcastTrRespRtgProtocol2 indicates the unicast
          routing protocol running between this router and the upstream router.
 
          The code points are the IANA-RTPROTO-MIB::IANAipRouteProtocol code
@@ -13256,6 +13666,7 @@ tmnxOamLTtraceFecPrefix          OBJECT-TYPE
 
 tmnxOamLTtraceFecPrefLen         OBJECT-TYPE
     SYNTAX      InetAddressPrefixLength
+    UNITS       "bits"
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
@@ -14378,6 +14789,7 @@ tmnxOamP2mpLspTrMapDSIfAddr      OBJECT-TYPE
 
 tmnxOamP2mpLspTrMapMTU           OBJECT-TYPE
     SYNTAX      Unsigned32 (0..65535)
+    UNITS       "octets"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -14883,6 +15295,7 @@ tmnxOamLspTrFecStackPrefix       OBJECT-TYPE
 
 tmnxOamLspTrFecStackPrefixLen    OBJECT-TYPE
     SYNTAX      InetAddressPrefixLength
+    UNITS       "bits"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -15401,6 +15814,327 @@ tmnxOamIcmpTrLabelStackTtl       OBJECT-TYPE
          5, 'MPLS Label Stack Object'."
     ::= { tmnxOamIcmpTrLabelStackEntry 5 }
 
+tmnxOamBierTrCtlTable            OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxOamBierTrCtlEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxOamBierTrCtlTable (along with tmnxOamTrCtlTable) contains the
+         configuration information for BIER (Bit Index Explicit Replication)
+         trace route tests."
+    REFERENCE
+        "RFC 8279, 'Multicast Using Bit Index Explicit Replication (BIER)',
+         November 2017.
+         IETF 'BIER Ping and Trace draft-ietf-bier-ping-05', 24-Apr-2019."
+    ::= { tmnxOamTraceRouteObjs 37 }
+
+tmnxOamBierTrCtlEntry            OBJECT-TYPE
+    SYNTAX      TmnxOamBierTrCtlEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxOamBierTrCtlEntry (along with tmnxOamTrCtlEntry) contains the
+         configuration information for a BIER trace route test.
+
+         A row is created when the corresponding tmnxOamTrCtlTestMode is set to
+         'bierTrace'.
+
+         A row is destroyed when the corresponding tmnxOamTrCtlTable row is
+         destroyed (using tmnxOamTrCtlRowStatus).
+
+         The values in a particular row in this table cannot be changed when
+         the corresponding tmnxOamTrCtlAdminStatus is 'enabled(1)'."
+    INDEX       {
+        tmnxOamTrCtlOwnerIndex,
+        tmnxOamTrCtlTestIndex
+    }
+    ::= { tmnxOamBierTrCtlTable 1 }
+
+TmnxOamBierTrCtlEntry            ::= SEQUENCE
+{
+    tmnxOamBierTrCtlSubDomain        Unsigned32,
+    tmnxOamBierTrCtlBfrId            Unsigned32,
+    tmnxOamBierTrCtlBfrPfxAddrType   InetAddressType,
+    tmnxOamBierTrCtlBfrPfxAddress    InetAddress
+}
+
+tmnxOamBierTrCtlSubDomain        OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamBierTrCtlSubDomain specifies the BIER sub-domain
+         to be tested.
+
+         Zero indicates the default sub-domain."
+    REFERENCE
+        "RFC 8279, 'Multicast Using Bit Index Explicit Replication (BIER)',
+         November 2017, Section 1, 'Introduction'.
+         IETF 'BIER Ping and Trace draft-ietf-bier-ping-05', 24-Apr-2019,
+         Section 4.3, 'Sending BIER Echo Request'."
+    DEFVAL      { 0 }
+    ::= { tmnxOamBierTrCtlEntry 1 }
+
+tmnxOamBierTrCtlBfrId            OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4096)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamBierTrCtlBfrId specifies the identifier of the
+         Bit-Forwarding Router (BFR) to be traced.
+
+         The BFR-ID must be a member of the tested sub-domain (as configured
+         using tmnxOamBierTrCtlSubDomain).  Otherwise, the test will fail.
+
+         Zero indicates no BFR-ID has been configured.
+
+         There are two methods to configure the destination to be traced:
+         1.  tmnxOamBierTrCtlBfrId.
+         2.  tmnxOamBierTrCtlBfrPfxAddrType, tmnxOamBierTrCtlBfrPfxAddress.
+
+         Exactly one of the methods must be used.  Otherwise, the test will
+         fail."
+    REFERENCE
+        "RFC 8279, 'Multicast Using Bit Index Explicit Replication (BIER)',
+         November 2017, Section 1, 'Introduction'."
+    DEFVAL      { 0 }
+    ::= { tmnxOamBierTrCtlEntry 2 }
+
+tmnxOamBierTrCtlBfrPfxAddrType   OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamBierTrCtlBfrPfxAddrType specifies the address type
+         of tmnxOamBierTrCtlBfrPfxAddress."
+    DEFVAL      { unknown }
+    ::= { tmnxOamBierTrCtlEntry 3 }
+
+tmnxOamBierTrCtlBfrPfxAddress    OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamBierTrCtlBfrPfxAddress specifies a BFR prefix used
+         as a destination address for a BIER trace test.
+
+         There are two methods to configure the destination to be traced:
+         1.  tmnxOamBierTrCtlBfrId.
+         2.  tmnxOamBierTrCtlBfrPfxAddrType, tmnxOamBierTrCtlBfrPfxAddress.
+
+         Exactly one of the methods must be used.  Otherwise, the test will
+         fail."
+    DEFVAL      { ''H }
+    ::= { tmnxOamBierTrCtlEntry 4 }
+
+tmnxOamBierTrProbeHistoryTable   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxOamBierTrProbeHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxOamBierTrProbeHistoryTable (along with tmnxOamTrProbeHistoryTable)
+         contains the per-probe results for Bit Index Explicit Replication
+         (BIER) trace tests."
+    REFERENCE
+        "IETF draft-ietf-bier-ping-05, 'BIER Ping and Trace', April 24, 2019.
+         RFC 8279, 'Multicast Using Bit Index Explicit Replication (BIER)',
+         November 2017."
+    ::= { tmnxOamTraceRouteObjs 38 }
+
+tmnxOamBierTrProbeHistoryEntry   OBJECT-TYPE
+    SYNTAX      TmnxOamBierTrProbeHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tmnxOamBierTrProbeHistoryEntry (along with tmnxOamTrProbeHistoryEntry)
+         contains the results for one BIER trace probe.
+
+         A row is created/destroyed when the corresponding
+         tmnxOamTrProbeHistoryEntry is created/destroyed for a 'bierTrace'
+         test.
+
+         All the indices match the corresponding tmnxOamTrProbeHistoryEntry
+         indices."
+    REFERENCE
+        "IETF draft-ietf-bier-ping-05, 'BIER Ping and Trace', April 24, 2019,
+         Section 4.6, 'Receiving Echo Reply'."
+    INDEX       {
+        tmnxOamTrCtlOwnerIndex,
+        tmnxOamTrCtlTestIndex,
+        tmnxOamTrResultsTestRunIndex,
+        tmnxOamTrProbeHistoryIndex,
+        tmnxOamTrProbeHistoryHopIndex,
+        tmnxOamTrProbeHistoryProbeIndex
+    }
+    ::= { tmnxOamBierTrProbeHistoryTable 1 }
+
+TmnxOamBierTrProbeHistoryEntry   ::= SEQUENCE
+{
+    tmnxOamBierTrHistoryBfrId        Unsigned32,
+    tmnxOamBierTrHistoryReturnCode   TmnxOamBierHistoryReturnCode,
+    tmnxOamBierTrHistoryUpStrIfAddrT InetAddressType,
+    tmnxOamBierTrHistoryUpStrIfAddr  InetAddress,
+    tmnxOamBierTrHistoryUpStrIfNum   Unsigned32,
+    tmnxOamBierTrHistoryDnStrAddrTyp InetAddressType,
+    tmnxOamBierTrHistoryDnStrAddr    InetAddress,
+    tmnxOamBierTrHistoryDnStrIfAddrT InetAddressType,
+    tmnxOamBierTrHistoryDnStrIfAddr  InetAddress,
+    tmnxOamBierTrHistoryDnStrIfNum   Unsigned32
+}
+
+tmnxOamBierTrHistoryBfrId        OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4096)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamBierTrHistoryBfrId indicates the identifier of the
+         Bit-Forwarding Router (BFR) targeted by the launched BIER Echo
+         Request.
+
+         Zero is returned if the BFR-ID cannot be determined.
+
+         The BFR-Prefix (which is an alternative identifier of the target) can
+         be read using tmnxOamTrProbeHistoryAddress."
+    REFERENCE
+        "RFC 8279, 'Multicast Using Bit Index Explicit Replication (BIER)',
+         November 2017, Section 1, 'Introduction'."
+    ::= { tmnxOamBierTrProbeHistoryEntry 1 }
+
+tmnxOamBierTrHistoryReturnCode   OBJECT-TYPE
+    SYNTAX      TmnxOamBierHistoryReturnCode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamBierTrHistoryReturnCode indicates the value copied
+         from the Return Code field of the BIER Echo Reply PDU.
+
+         Zero (i.e. 'No Return Code') is returned if a BIER Echo Reply PDU did
+         not arrive (e.g. in the case of a timeout)."
+    ::= { tmnxOamBierTrProbeHistoryEntry 2 }
+
+tmnxOamBierTrHistoryUpStrIfAddrT OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamBierTrHistoryUpStrIfAddrT indicates the IP address
+         type of the address read using tmnxOamBierTrHistoryUpStrIfAddr."
+    ::= { tmnxOamBierTrProbeHistoryEntry 3 }
+
+tmnxOamBierTrHistoryUpStrIfAddr  OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamBierTrHistoryUpStrIfAddr indicates the IP address
+         copied from the Upstream Address field of the Upstream Interface TLV
+         of the BIER Echo Reply.
+
+         When an IP address is not available, tmnxOamBierTrHistoryUpStrIfAddrT
+         is 'unknown'.
+
+         If the TLV's Upstream Address field contains an interface number (as
+         tagged by the TLV's Address Type field), the interface number is
+         available in tmnxOamBierTrHistoryUpStrIfNum."
+    REFERENCE
+        "IETF draft-ietf-bier-ping-05, 'BIER Ping and Trace', April 24, 2019,
+         Section 3.3.7, 'Upstream Interface TLV'."
+    ::= { tmnxOamBierTrProbeHistoryEntry 4 }
+
+tmnxOamBierTrHistoryUpStrIfNum   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamBierTrHistoryUpStrIfNum indicates the interface
+         number copied from the Upstream Address field of the Upstream
+         Interface TLV of the BIER Echo Reply.
+
+         When an interface number is not available,
+         tmnxOamBierTrHistoryUpStrIfNum is zero.
+
+         If the TLV's Upstream Address field contains an IP address (as tagged
+         by the TLV's Address Type field), the IP address is available in
+         tmnxOamBierTrHistoryUpStrIfAddr."
+    REFERENCE
+        "IETF draft-ietf-bier-ping-05, 'BIER Ping and Trace', April 24, 2019,
+         Section 3.3.7, 'Upstream Interface TLV'."
+    ::= { tmnxOamBierTrProbeHistoryEntry 5 }
+
+tmnxOamBierTrHistoryDnStrAddrTyp OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamBierTrHistoryDnStrAddrTyp indicates the IP address
+         type of the address read using tmnxOamBierTrHistoryDnStrAddr."
+    ::= { tmnxOamBierTrProbeHistoryEntry 6 }
+
+tmnxOamBierTrHistoryDnStrAddr    OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamBierTrHistoryDnStrAddr indicates the IP address
+         copied from the Downstream Address field of the Downstream Mapping TLV
+         of the BIER Echo Reply.
+
+         When an IP address is not available, tmnxOamBierTrHistoryDnStrAddrTyp
+         is 'unknown'."
+    REFERENCE
+        "IETF draft-ietf-bier-ping-05, 'BIER Ping and Trace', April 24, 2019,
+         Section 3.3.4, 'Downstream Mapping TLV'."
+    ::= { tmnxOamBierTrProbeHistoryEntry 7 }
+
+tmnxOamBierTrHistoryDnStrIfAddrT OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamBierTrHistoryDnStrIfAddrT indicates the IP address
+         type of the address read using tmnxOamBierTrHistoryDnStrIfAddr."
+    ::= { tmnxOamBierTrProbeHistoryEntry 8 }
+
+tmnxOamBierTrHistoryDnStrIfAddr  OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamBierTrHistoryDnStrIfAddr indicates the IP address
+         copied from the Downstream Interface Address field of the Downstream
+         Mapping TLV of the BIER Echo Reply.
+
+         When an IP address is not available, tmnxOamBierTrHistoryDnStrIfAddrT
+         is 'unknown'.
+
+         If the TLV's Downstream Interface Address field contains an interface
+         number (as tagged by the TLV's Address Type field), the interface
+         number is available in tmnxOamBierTrHistoryDnStrIfNum."
+    REFERENCE
+        "IETF draft-ietf-bier-ping-05, 'BIER Ping and Trace', April 24, 2019,
+         Section 3.3.4, 'Downstream Mapping TLV'."
+    ::= { tmnxOamBierTrProbeHistoryEntry 9 }
+
+tmnxOamBierTrHistoryDnStrIfNum   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxOamBierTrHistoryDnStrIfNum indicates the interface
+         number copied from the Downstream Interface Address field of the
+         Downstream Mapping TLV of the BIER Echo Reply.
+
+         When an interface number is not available,
+         tmnxOamBierTrHistoryDnStrIfNum is zero.
+
+         If the TLV's Downstream Interface Address field contains an IP address
+         (as tagged by the TLV's Address Type field), the IP address is
+         available in tmnxOamBierTrHistoryDnStrIfAddr."
+    REFERENCE
+        "IETF draft-ietf-bier-ping-05, 'BIER Ping and Trace', April 24, 2019,
+         Section 3.3.4, 'Downstream Mapping TLV'."
+    ::= { tmnxOamBierTrProbeHistoryEntry 10 }
+
 tmnxOamSaaObjs                   OBJECT IDENTIFIER ::= { tmnxOamTestObjs 3 }
 
 tmnxOamSaaNotifyObjects          OBJECT IDENTIFIER ::= { tmnxOamSaaObjs 1 }
@@ -15421,9 +16155,15 @@ tmnxOamSaaCtlTable               OBJECT-TYPE
          configuration information for an OAM test is forgotten across an SROS
          CPM activity switch or an SROS CPM reset.
 
-         The results of an SAA test (or an OAM test) are stored in the ping or
-         trace route results tables (e.g. tmnxOamPingResultsTable,
-         tmnxOamPingHistoryTable, tmnxOamTrResultsTable, tmnxOamTrHopsTable)."
+         SAA tests are supported for a subset of the test types, as described
+         in the following DESCRIPTION clauses:
+             tmnxOamPingCtlTestMode
+             tmnxOamTrCtlTestMode.
+
+         The results of an SAA test run (or an OAM test run) are stored in the
+         ping or trace route results tables (e.g. tmnxOamPingResultsTable,
+         tmnxOamPingHistoryTable, tmnxOamTrResultsTable, tmnxOamTrHopsTable,
+         tmnxOamTrProbeHistoryTable)."
     ::= { tmnxOamSaaObjs 2 }
 
 tmnxOamSaaCtlEntry               OBJECT-TYPE
@@ -15466,29 +16206,8 @@ tmnxOamSaaCtlOwnerIndex          OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "To facilitate the provisioning of access control by a
-         security administrator using the View-Based Access
-         Control Model (RFC 2575, VACM) for tables in which
-         multiple users may need to independently create or
-         modify entries, the initial index is used as an 'owner
-         index'.  Such an initial index has a syntax of
-         SnmpAdminString, and can thus be trivially mapped to a
-         security name or group name as defined in VACM, in
-         accordance with a security policy.
-
-         When used in conjunction with such a security policy all
-         entries in the table belonging to a particular user (or
-         group) will have the same value for this initial index.
-         For a given user's entries in a particular table, the
-         object identifiers for the information in these entries
-         will have the same subidentifiers (except for the 'column'
-         subidentifier) up to the end of the encoded owner index.
-         To configure VACM to permit access to this portion of the
-         table, one would create vacmViewTreeFamilyTable entries
-         with the value of vacmViewTreeFamilySubtree including
-         the owner index portion, and vacmViewTreeFamilyMask
-         'wildcarding' the column subidentifier.  More elaborate
-         configurations are possible."
+        "The value of tmnxOamSaaCtlOwnerIndex specifies the name of the owner
+         of the test."
     ::= { tmnxOamSaaCtlEntry 1 }
 
 tmnxOamSaaCtlTestIndex           OBJECT-TYPE
@@ -15496,9 +16215,12 @@ tmnxOamSaaCtlTestIndex           OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "The test name index of the Nokia SROS OAM Service Assurance
-         Agent, SAA, test.  This is locally unique, within the scope of an
-         tmnxOamSaaCtlOwnerIndex."
+        "The value of tmnxOamSaaCtlTestIndex specifies the test name of the
+         test.
+
+         The test is identified by the owner name and the test name.  One owner
+         typically owns several tests.  This indexing method ensures tests
+         created by several owners have unique indices."
     ::= { tmnxOamSaaCtlEntry 2 }
 
 tmnxOamSaaCtlRowStatus           OBJECT-TYPE
@@ -15506,29 +16228,19 @@ tmnxOamSaaCtlRowStatus           OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        "This object allows entries to be created and deleted
-         in the tmnxOamSaaCtlTable.  Deletion of an entry in this
-         table results in all corresponding control and results entries
-         in either the ping or traceroute tables.
+        "The value of tmnxOamSaaCtlRowStatus specifies the row status of the
+         SAA test.
 
-         Activation of a Nokia SROS OAM ping or trace route operation is
-         controlled via tmnxOamPingCtlAdminStatus or tmnxOamTrCtlAdminStatus
-         and not by changing this object's value to 'active (1)'.
+         When creating an SAA test
+         1.  The tmnxOamSaaCtlTable row must be created first.
+         2.  The tmnxOamPingCtlTable or tmnxOamTrCtlTable row must be created
+             second.
 
-         An attempt to delete an entry in this table by setting this object's
-         value to 'destroy (6)' will fail with an inconsistentValue error if
-         the associated ping or traceroute test is in progress.
+         Destroying a tmnxOamSaaCtlTable row destroys the corresponding
+         tmnxOamPingCtlTable or tmnxOamTrCtlTable row (if any).
 
-         An attempt to delete an entry in this table by setting this object's
-         value to 'destroy (6)' will fail with an inconsistentValue error if
-         the value of tmnxOamSaaCtlAdminStatus is not 'outOfService'.
-
-         The operational state of an Nokia SROS OAM SAA test operation can be
-         determined by examination of its associated
-         tmnxOamPingResultsOperStatus or tmnxOamTrResultsOperStatus object."
-    REFERENCE
-        "See definition of RowStatus in RFC 2579, 'Textual
-         Conventions for SMIv2.'"
+         An attempt to destroy a tmnxOamSaaCtlTable row will fail if
+         tmnxOamSaaCtlAdminStatus is 'inService(2)'."
     ::= { tmnxOamSaaCtlEntry 3 }
 
 tmnxOamSaaCtlStorageType         OBJECT-TYPE
@@ -15559,18 +16271,17 @@ tmnxOamSaaCtlAdminStatus         OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        "The value of tmnxOamSaaCtlAdminStatus specifies the desired
-         administrative state of the Service Assurance Agent, SAA, test.
+        "The value of tmnxOamSaaCtlAdminStatus specifies the administrative
+         state of the SAA test.
 
-         When the value of tmnxOamSaaCtlAdminStatus is 'outOfService', an
-         attempt to start this SAA test by setting its associated
-         tmnxOamPingCtlAdminStatus or tmnxOamTrCtlAdminStatus to 'enabled (1)'
-         will fail with an inconsistentValue error.
+         tmnxOamSaaCtlAdminStatus = 'inService(2)' is a prerequisite for
+         starting an SAA test run.  Once that prerequisite is met, the test run
+         can be started by setting the corresponding tmnxOamPingCtlAdminStatus
+         or tmnxOamTrCtlAdminStatus to 'enabled(1)'.
 
-         When the value of tmnxOamSaaCtlAdminStatus is 'inService' attempts to
-         modify any other object in the associated tmnxOamPingCtlTable,
-         tmnxOamTrCtlTable or the control table for the specific OAM test type
-         will fail with an inconsistentValue error."
+         When the tmnxOamSaaCtlAdminStatus is 'inService(2)', an attempt to
+         modify any other configurable run-time property of the test (e.g.
+         tmnxOamPingCtlProbeCount, tmnxOamTrCtlFcName) will fail."
     DEFVAL      { outOfService }
     ::= { tmnxOamSaaCtlEntry 6 }
 
@@ -15579,9 +16290,8 @@ tmnxOamSaaCtlDescr               OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        "The value of tmnxOamSaaCtlDescr specifies a user provided description
-         string for this SAA test.  It can consist of any printable,
-         seven-bit ASCII characters up to 80 characters in length."
+        "The value of tmnxOamSaaCtlDescr specifies the description of the SAA
+         test."
     DEFVAL      { "" }
     ::= { tmnxOamSaaCtlEntry 7 }
 
@@ -15590,11 +16300,11 @@ tmnxOamSaaCtlTestMode            OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The value of tmnxOamSaaCtlTestMode indicates the type of Service
-         Assurance Agent (SAA) test to be performed.
+        "The value of tmnxOamSaaCtlTestMode indicates the type of SAA test to
+         be performed.
 
          When the value of this object is 'notConfigured(0)', no associated row
-         exists in either the tmnxOamPingCtlTable or tmnxOamTrCtlTable.
+         exists in either tmnxOamPingCtlTable or tmnxOamTrCtlTable.
 
          When the value of this object is 'ping(1)', an associated row exists
          in the tmnxOamPingCtlTable.
@@ -15609,8 +16319,8 @@ tmnxOamSaaCtlRuns                OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The value of tmnxOamSaaCtlRuns indicates the number of times this OAM
-         SAA test has been executed."
+        "The value of tmnxOamSaaCtlRuns indicates the number of times this SAA
+         test has started."
     ::= { tmnxOamSaaCtlEntry 9 }
 
 tmnxOamSaaCtlFailures            OBJECT-TYPE
@@ -15619,7 +16329,7 @@ tmnxOamSaaCtlFailures            OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamSaaCtlFailures indicates the number of times this
-         OAM SAA test has failed."
+         SAA test has failed."
     ::= { tmnxOamSaaCtlEntry 10 }
 
 tmnxOamSaaCtlLastRunResult       OBJECT-TYPE
@@ -15628,7 +16338,7 @@ tmnxOamSaaCtlLastRunResult       OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamSaaCtlLastRunResult indicates the completion
-         status the last time this test was executed.  If this OAM test is
+         status the last time this test was executed.  If this SAA test is
          currently in progress, this object indicates the result of the
          previous test run, if any."
     ::= { tmnxOamSaaCtlEntry 11 }
@@ -15655,11 +16365,12 @@ tmnxOamSaaCtlSuppressAccounting  OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The value of tmnxOamSaaCtlSuppressAccounting specifies whether or not
-         the updating of accounting files is suppressed. The value of 'true
-         (1)' is applicable only when an accounting policy has been specified
-         by tmnxOamSaaCtlAcctPolicyId.
+         the accounting file update is suppressed. The value 'true(1)' is
+         applicable only when an accounting policy has been specified using
+         tmnxOamSaaCtlAcctPolicyId.
 
-         Upon completion of a test, this object is reset to its default value."
+         Upon completion of a test run, this object is reset to its default
+         value."
     DEFVAL      { false }
     ::= { tmnxOamSaaCtlEntry 13 }
 
@@ -15711,11 +16422,7 @@ tmnxOamSaaCtlKeepProbeHistoryAdm OBJECT-TYPE
 
          An attempt to set tmnxOamSaaCtlKeepProbeHistoryAdm to 'drop(2)' when
          tmnxOamSaaCtlTestMode is not 'ping(1)' returns an 'inconsistentValue'
-         error to the manager.
-
-         When the SAA test's test mode is deconfigured (i.e.
-         tmnxOamSaaCtlTestMode becomes 'notConfigured(0)'),
-         tmnxOamSaaCtlKeepProbeHistoryAdm returns to its default value."
+         error to the manager."
     DEFVAL      { auto }
     ::= { tmnxOamSaaCtlEntry 15 }
 
@@ -15999,7 +16706,7 @@ tmnxOamMobGtpPingVRtrId          OBJECT-TYPE
     STATUS      obsolete
     DESCRIPTION
         "The value of tmnxOamMobGtpPingVRtrId specifies the virtual router.
-         duplicate of tmnxOamPingCtlVRtrID This object is obsoleted in 16R01"
+         duplicate of tmnxOamPingCtlVRtrID This object was obsoleted in 16R01."
     ::= { tmnxOamMobGtpPingCtlEntry 2 }
 
 tmnxOamMobGtpPingPort            OBJECT-TYPE
@@ -17539,8 +18246,8 @@ tmnxOamBuildPktIPsecAuthCtlEntry OBJECT-TYPE
              type 'ipsecAuth' is destroyed.
 
          A row created using creation clause 1, above, has the index object
-         tmnxOamBuildPktNumOrZero=0.  The zero indicates the IPsec Authentication
-         Header is a base definition (not an override).
+         tmnxOamBuildPktNumOrZero=0.  The zero indicates the IPsec
+         Authentication Header is a base definition (not an override).
 
          A row created using creation clause 2, above, has
          tmnxOamBuildPktNumOrZero set to the tmnxOamBuildPktNum index of the
@@ -17825,8 +18532,8 @@ tmnxOamBuildPktMplsCtlEntry      OBJECT-TYPE
          used by the OAM Egress Finder.
 
          Fields that influence the routing by SROS of a packet containing an
-         MPLS header (e.g. MPLS Label) are present.  The other MPLS header fields
-         (e.g. Bottom of Stack) are absent.
+         MPLS header (e.g. MPLS Label) are present.  The other MPLS header
+         fields (e.g. Bottom of Stack) are absent.
 
          A row is created by SROS when:
          1.  tmnxOamBuildPktHdrType is set to 'mpls', OR
@@ -17931,7 +18638,7 @@ tmnxOamBuildPktGtpUserCtlEntry   OBJECT-TYPE
          header used by the OAM Egress Finder.
 
          Fields that influence the routing by SROS of a packet containing a
-         GTP-U header (e.g. Tunnel Endpoint Identfier (TEID)) are present. The
+         GTP-U header (e.g. Tunnel Endpoint Identifier (TEID)) are present. The
          other GTP-U header fields (e.g. Message Type) are absent.
 
          A row is created by SROS when:
@@ -18445,6 +19152,17 @@ tmnxOamPing7xx0V19v0Compliance   MODULE-COMPLIANCE
         }
     ::= { tmnxOamPingCompliances 22 }
 
+tmnxOamPing7xx0V20v0Compliance   MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for OAM ping OBJECT-GROUPs added in Nokia
+         SROS series systems, release 20."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxOamBierPingV20v0Group
+        }
+    ::= { tmnxOamPingCompliances 23 }
+
 tmnxOamPingGroups                OBJECT IDENTIFIER ::= { tmnxOamPingConformance 2 }
 
 tmnxOamMacPingL2MapGroup         OBJECT-GROUP
@@ -18611,7 +19329,7 @@ tmnxOamPingGeneralV4v0Group      OBJECT-GROUP
     STATUS      obsolete
     DESCRIPTION
         "The group of objects supporting management of OAM ping tests general
-         capabilities on Nokia SROS series systems 4.0 release"
+         capabilities on Nokia SROS series systems 4.0 release."
     ::= { tmnxOamPingGroups 16 }
 
 tmnxOamLspPingV4v0Group          OBJECT-GROUP
@@ -18930,7 +19648,7 @@ tmnxOamPingGeneralV6v0Group      OBJECT-GROUP
     STATUS      obsolete
     DESCRIPTION
         "The group of objects supporting management of OAM ping tests general
-         capabilities on Nokia SROS series systems 6.0 release"
+         capabilities on Nokia SROS series systems 6.0 release."
     ::= { tmnxOamPingGroups 32 }
 
 tmnxOamP2mpLspPingGroup          OBJECT-GROUP
@@ -19062,7 +19780,7 @@ tmnxOamPingGeneralV7v0Group      OBJECT-GROUP
     STATUS      obsolete
     DESCRIPTION
         "The group of objects supporting management of OAM ping tests general
-         capabilities on Nokia SROS series systems 7.0 release"
+         capabilities on Nokia SROS series systems 7.0 release."
     ::= { tmnxOamPingGroups 35 }
 
 tmnxOamPingNotificationV7v0Group NOTIFICATION-GROUP
@@ -19224,7 +19942,7 @@ tmnxOamPingGeneralV8v0Group      OBJECT-GROUP
     STATUS      obsolete
     DESCRIPTION
         "The group of objects supporting management of OAM ping tests general
-         capabilities on Nokia SROS series systems 8.0 release"
+         capabilities on Nokia SROS series systems 8.0 release."
     ::= { tmnxOamPingGroups 41 }
 
 tmnxOamPingObsoleteV8v0Group     OBJECT-GROUP
@@ -19660,6 +20378,29 @@ tmnxOamPingV19v0Group            OBJECT-GROUP
 
 tmnxOamPingV20v0ObjGroups        OBJECT IDENTIFIER ::= { tmnxOamPingGroups 64 }
 
+tmnxOamBierPingV20v0Group        OBJECT-GROUP
+    OBJECTS     {
+        tmnxOamBierPingBfrPfxCtlAddrType,
+        tmnxOamBierPingBfrPfxCtlAddress,
+        tmnxOamBierPingBfrPfxCtlRowState,
+        tmnxOamBierPingCtlBfrId,
+        tmnxOamBierPingCtlBfrIdEnd,
+        tmnxOamBierPingCtlBfrIdStart,
+        tmnxOamBierPingCtlSubDomain,
+        tmnxOamBierPingCtlTtl,
+        tmnxOamBierPingHistoryBfrId,
+        tmnxOamBierPingHistoryBfrPfx,
+        tmnxOamBierPingHistoryBfrPfxType,
+        tmnxOamBierPingHistoryReturnCode
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of additional objects supporting management of OAM BIER Ping
+         tests on Nokia SROS series systems running release 20."
+    ::= { tmnxOamPingV20v0ObjGroups 1 }
+
+tmnxOamBicObjGroups              OBJECT IDENTIFIER ::= { tmnxOamPingConformance 3 }
+
 tmnxOamTraceRouteConformance     OBJECT IDENTIFIER ::= { tmnxOamTestConformance 2 }
 
 tmnxOamTrCompliances             OBJECT IDENTIFIER ::= { tmnxOamTraceRouteConformance 1 }
@@ -19919,6 +20660,17 @@ tmnxOamTr7xx0V19v0Compliance     MODULE-COMPLIANCE
             tmnxOamTrV19v0Group
         }
     ::= { tmnxOamTrCompliances 18 }
+
+tmnxOamTr7xx0V20v0Compliance     MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for OAM trace OBJECT-GROUPs added in Nokia
+         SROS series systems, release 20."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxOamBierTrV20v0Group
+        }
+    ::= { tmnxOamTrCompliances 19 }
 
 tmnxOamTrGroups                  OBJECT IDENTIFIER ::= { tmnxOamTraceRouteConformance 2 }
 
@@ -20969,6 +21721,29 @@ tmnxOamTrV19v0Group              OBJECT-GROUP
 
 tmnxOamTrV20v0ObjGroups          OBJECT IDENTIFIER ::= { tmnxOamTrGroups 47 }
 
+tmnxOamBierTrV20v0Group          OBJECT-GROUP
+    OBJECTS     {
+        tmnxOamBierTrCtlBfrId,
+        tmnxOamBierTrCtlBfrPfxAddrType,
+        tmnxOamBierTrCtlBfrPfxAddress,
+        tmnxOamBierTrCtlSubDomain,
+        tmnxOamBierTrHistoryBfrId,
+        tmnxOamBierTrHistoryDnStrAddr,
+        tmnxOamBierTrHistoryDnStrAddrTyp,
+        tmnxOamBierTrHistoryDnStrIfAddr,
+        tmnxOamBierTrHistoryDnStrIfAddrT,
+        tmnxOamBierTrHistoryDnStrIfNum,
+        tmnxOamBierTrHistoryReturnCode,
+        tmnxOamBierTrHistoryUpStrIfAddr,
+        tmnxOamBierTrHistoryUpStrIfAddrT,
+        tmnxOamBierTrHistoryUpStrIfNum
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of additional objects supporting management of OAM BIER
+         Trace tests on Nokia SROS series systems running release 20."
+    ::= { tmnxOamTrV20v0ObjGroups 1 }
+
 tmnxOamSaaConformance            OBJECT IDENTIFIER ::= { tmnxOamTestConformance 3 }
 
 tmnxOamSaaCompliances            OBJECT IDENTIFIER ::= { tmnxOamSaaConformance 1 }
@@ -21353,6 +22128,10 @@ tmnxOamDiagNotifyObjsV16v0Group  OBJECT-GROUP
          release 16.0."
     ::= { tmnxOamDiagGroups 3 }
 
+tmnxOamBicConformance            OBJECT IDENTIFIER ::= { tmnxOamTestConformance 7 }
+
+tmnxOamBicCompliances            OBJECT IDENTIFIER ::= { tmnxOamBicConformance 1 }
+
 tmnxOamTestNotifications         OBJECT IDENTIFIER ::= { tmnxSRNotifyPrefix 11 }
 
 tmnxOamPingNotifyPrefix          OBJECT IDENTIFIER ::= { tmnxOamTestNotifications 1 }
@@ -21529,7 +22308,7 @@ tmnxOamPingProbeFailedV3         NOTIFICATION-TYPE
     STATUS      current
     DESCRIPTION
         "[CAUSE] The tmnxOamPingProbeFailedV3 notification is sent at the end
-         of an OAM or SAA test run, when a sufficient number of successive
+         of an OAM or SAA ping test run, when a sufficient number of successive
          probes failed.
 
          The notification is sent if both of the following conditions are met:
@@ -21566,7 +22345,8 @@ tmnxOamPingTestFailedV3          NOTIFICATION-TYPE
     STATUS      current
     DESCRIPTION
         "[CAUSE] The tmnxOamPingTestFailedV3 notification is sent at the end of
-         an OAM or SAA test run, when a sufficient number of probes failed.
+         an OAM or SAA ping test run, when a sufficient number of probes
+         failed.
 
          The notification is sent if both of the following conditions are met:
          1.  The 'testFailure(1)' bit of the tmnxOamPingCtlTrapGeneration BITS
@@ -21600,8 +22380,15 @@ tmnxOamPingTestCompletedV3       NOTIFICATION-TYPE
     }
     STATUS      current
     DESCRIPTION
-        "Generated at the completion of a ping test when the corresponding
-         tmnxOamPingCtlTrapGeneration object is set to testCompletion(2)."
+        "[CAUSE] The tmnxOamPingTestCompletedV3 notification is sent at the end
+         of an OAM or SAA ping test run (if the 'testCompletion(2)' bit of the
+         corresponding tmnxOamPingCtlTrapGeneration object is enabled).
+
+         [EFFECT] Informational.  If the test run failed (e.g. the number of
+         probes received is less than the number of probes sent), there may be a
+         corresponding problem with live traffic flow.
+
+         [RECOVERY] If the test run failed, investigate the cause."
     ::= { tmnxOamPingNotifications 10 }
 
 tmnxOamTraceRouteNotifyPrefix    OBJECT IDENTIFIER ::= { tmnxOamTestNotifications 2 }
@@ -21627,7 +22414,16 @@ tmnxOamTrTestFailed              NOTIFICATION-TYPE
     }
     STATUS      current
     DESCRIPTION
-        "The OAM trace route test failed to complete successfully."
+        "[CAUSE] The tmnxOamTrTestFailed notification is sent when an OAM or
+         SAA trace test run failed (if the 'testFailure(1)' bit of the
+         corresponding tmnxOamTrCtlTrapGeneration object is enabled).
+
+         This notification is sent at most once per test run.
+
+         [EFFECT] Informational.  The test run failure may indicate a problem
+         with the corresponding live traffic flow.
+
+         [RECOVERY] Investigate the cause of the test run failure."
     ::= { tmnxOamTraceRouteNotifications 2 }
 
 tmnxOamTrTestCompleted           NOTIFICATION-TYPE
@@ -21638,7 +22434,14 @@ tmnxOamTrTestCompleted           NOTIFICATION-TYPE
     }
     STATUS      current
     DESCRIPTION
-        "The OAM trace route test has just been completed."
+        "[CAUSE] The tmnxOamTrTestCompleted notification is sent at the end of
+         an OAM or SAA trace test run (if the 'testCompletion(2)' bit of the
+         corresponding tmnxOamTrCtlTrapGeneration object is enabled).
+
+         [EFFECT] Informational.  If the test run failed (e.g. a probe timed
+         out), there may be a corresponding problem with live traffic flow.
+
+         [RECOVERY] If the test run failed, investigate the cause."
     ::= { tmnxOamTraceRouteNotifications 3 }
 
 tmnxOamLdpTtraceAutoDiscState    NOTIFICATION-TYPE

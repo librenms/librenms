@@ -12,11 +12,11 @@ class PortsFdb extends PortRelatedModel
 
     public function device()
     {
-        return $this->belongsTo('App\Models\Device', 'device_id', 'device_id');
+        return $this->belongsTo(\App\Models\Device::class, 'device_id', 'device_id');
     }
 
     public function vlan()
     {
-        return $this->belongsTo('App\Models\Vlan', 'vlan_id', 'vlan_id');
+        return $this->belongsTo(\App\Models\Vlan::class, 'vlan_id', 'vlan_id');
     }
 }

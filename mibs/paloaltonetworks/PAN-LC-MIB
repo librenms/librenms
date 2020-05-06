@@ -1,0 +1,204 @@
+-- ***********************************************
+-- PAN-PRODUCT-MIB.my
+--
+-- MIB for Log Collector specific MIB objects.
+-- ***********************************************
+
+PAN-LC-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+		MODULE-IDENTITY, OBJECT-IDENTITY,
+		OBJECT-TYPE, NOTIFICATION-TYPE,
+		Integer32, Unsigned32
+			FROM SNMPv2-SMI
+--		MODULE-COMPLIANCE, OBJECT-GROUP
+--			FROM SNMPv2-CONF
+		DisplayString, TruthValue
+			FROM SNMPv2-TC
+		panModules, panProductsMibs
+			FROM PAN-GLOBAL-REG
+		panM-100
+			FROM PAN-PRODUCTS-MIB;
+
+	panLogCollectorMibsModule MODULE-IDENTITY
+		LAST-UPDATED			"201201111013Z"
+		ORGANIZATION			"Palo Alto Networks"
+		CONTACT-INFO			"
+					Customer Support
+					Palo Alto Networks
+					4401 Great America Pkwy
+					Santa Clara, CA 95054-1211
+
+					+1 866-898-9087
+					support at paloaltonetworks dot com"
+
+		DESCRIPTION				"
+			A MIB module containing definitions of managed objects
+			implemented by Log Collector Appliances from Palo Alto Networks."
+
+		REVISION				"201201111013Z"
+		DESCRIPTION				"
+			Rev 1.0
+			Initial version of MIB module PAN-LC-MIB."
+
+		::= { panModules 6 }
+
+	----------------------------------------------------------------------
+	-- System objects
+
+	panLcStat OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for the Log collection statistics."
+		::= { panM-100 1 }
+
+	panLcLogRate OBJECT-TYPE
+		SYNTAX      Unsigned32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The write rate in logs/s on the Log Collection"
+		::= { panLcStat 1 }
+
+	panLcLogDuration OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for the Log Duration on the Log Collector. Log 
+            Duration is Expressed in Days of storage."
+		::= { panLcStat 2 }
+
+	panLcDiskUsage OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for the Log Disk Usage on the Log Collector. Log
+            Disk Usage is available as MB in use."
+		::= { panLcStat 3 }
+
+	panLcDiskUsageLd1 OBJECT-TYPE
+		SYNTAX      Unsigned32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The Log disk usage on logical disk 1 on the Log Collector"
+		::= { panLcDiskUsage 1 }
+
+	panLcDiskUsageLd2 OBJECT-TYPE
+		SYNTAX      Unsigned32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The Log disk usage on logical disk 2 on the Log Collector"
+		::= { panLcDiskUsage 2 }
+
+	panLcDiskUsageLd3 OBJECT-TYPE
+		SYNTAX      Unsigned32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The Log disk usage on logical disk 3 on the Log Collector"
+		::= { panLcDiskUsage 3 }
+
+	panLcDiskUsageLd4 OBJECT-TYPE
+		SYNTAX      Unsigned32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The Log disk usage on logical disk 4 on the Log Collector"
+		::= { panLcDiskUsage 4 }
+
+	panLcLogDurationTraffic OBJECT-TYPE
+		SYNTAX      Unsigned32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The Log duration (in days) for the traffic logs on the Log Collector"
+		::= { panLcLogDuration 1 }
+
+	panLcLogDurationConfig OBJECT-TYPE
+		SYNTAX      Unsigned32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The Log duration (in days) for the config logs on the Log Collector"
+		::= { panLcLogDuration 2 }
+
+	panLcLogDurationSystem OBJECT-TYPE
+		SYNTAX      Unsigned32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The Log duration (in days) for the system logs on the Log Collector"
+		::= { panLcLogDuration 3 }
+
+	panLcLogDurationThreat OBJECT-TYPE
+		SYNTAX      Unsigned32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The Log duration (in days) for the threat logs on the Log Collector"
+		::= { panLcLogDuration 4 }
+
+	panLcLogDurationAppstat OBJECT-TYPE
+		SYNTAX      Unsigned32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The Log duration (in days) for the appstat logs on the Log Collector"
+		::= { panLcLogDuration 5 }
+
+	panLcLogDurationTrsum OBJECT-TYPE
+		SYNTAX      Unsigned32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The Log duration (in days) for the trsum logs on the Log Collector"
+		::= { panLcLogDuration 6 }
+
+	panLcLogDurationThsum OBJECT-TYPE
+		SYNTAX      Unsigned32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The Log duration (in days) for the thsum logs on the Log Collector"
+		::= { panLcLogDuration 7 }
+
+	panLcLogDurationEvent OBJECT-TYPE
+		SYNTAX      Unsigned32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The Log duration (in days) for the event logs on the Log Collector"
+		::= { panLcLogDuration 8 }
+
+	panLcLogDurationAlarm OBJECT-TYPE
+		SYNTAX      Unsigned32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The Log duration (in days) for the alarm logs on the Log Collector"
+		::= { panLcLogDuration 9 }
+
+	panLcLogDurationHipmatch OBJECT-TYPE
+		SYNTAX      Unsigned32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The Log duration (in days) for the hipmatch logs on the Log Collector"
+		::= { panLcLogDuration 10 }
+
+	panLcLogDurationUserid OBJECT-TYPE
+		SYNTAX      Unsigned32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The Log duration (in days) for the userid logs on the Log Collector"
+		::= { panLcLogDuration 11 }
+
+    panLcIsRedundancyMember OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "True value indicates this Log Collector is part of a Collector Group with Redundancy is enabled"
+        ::= { panM-100 2 }
+END

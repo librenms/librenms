@@ -137,6 +137,9 @@
                 "ucd-diskio": {
                     "type": "boolean"
                 },
+                "sensors": {
+                    "type": "boolean"
+                },
                 "services": {
                     "type": "boolean"
                 },
@@ -195,6 +198,9 @@
                     "type": "boolean"
                 },
                 "junose-atm-vp": {
+                    "type": "boolean"
+                },
+                "mpls": {
                     "type": "boolean"
                 },
                 "netscaler-vsvr": {
@@ -327,6 +333,9 @@
                     "type": "boolean"
                 },
                 "libvirt-vminfo": {
+                    "type": "boolean"
+                },
+                "mpls": {
                     "type": "boolean"
                 },
                 "ip6-addresses": {

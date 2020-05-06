@@ -95,7 +95,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                                     <div class="col-sm-2" title="How many notifications to issue while active before stopping. -1 means no limit. If interval is 0, this has no effect.">
                                         <input type='text' id='count' name='count' class='form-control' size="4" value="123">
                                     </div>
-                                    <div class="col-sm-3" title="How log to wait before issuing a notification. If the alert clears before the delay, no notification will be issued. (s,m,h,d)">
+                                    <div class="col-sm-3" title="How long to wait before issuing a notification. If the alert clears before the delay, no notification will be issued. (s,m,h,d)">
                                         <label for='delay' class='control-label' style="vertical-align: top;">Delay: </label>
                                         <input type='text' id='delay' name='delay' class='form-control' size="4">
                                     </div>
@@ -194,7 +194,7 @@ if (Auth::user()->hasGlobalAdmin()) {
 
             filters: <?php echo $filters; ?>,
             operators: [
-                'equal', 'not_equal', 'between', 'not_between', 'begins_with', 'not_begins_with', 'contains', 'not_contains', 'ends_with', 'not_ends_with', 'is_empty', 'is_not_empty', 'is_null', 'is_not_null', 'in', 'not_in',
+                'equal', 'not_equal', 'between', 'not_between', 'begins_with', 'not_begins_with', 'contains', 'not_contains', 'ends_with', 'not_ends_with', 'is_empty', 'is_not_empty', 'is_null', 'is_not_null',
                 {type: 'less', nb_inputs: 1, multiple: false, apply_to: ['string', 'number', 'datetime']},
                 {type: 'less_or_equal', nb_inputs: 1, multiple: false, apply_to: ['string', 'number', 'datetime']},
                 {type: 'greater', nb_inputs: 1, multiple: false, apply_to: ['string', 'number', 'datetime']},

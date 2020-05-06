@@ -11,6 +11,7 @@ return [
     |
     */
 
+    'title' => 'Wireless',
     'ap-count' => [
         'short' => 'APs',
         'long' => 'AP Count',

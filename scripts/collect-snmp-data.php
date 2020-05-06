@@ -1,6 +1,7 @@
 #!/usr/bin/env php
 <?php
 
+use Illuminate\Support\Str;
 use LibreNMS\Exceptions\InvalidModuleException;
 use LibreNMS\Util\ModuleTestHelper;
 use LibreNMS\Util\Snmpsim;
@@ -98,7 +99,7 @@ if (isset($options['v'])) {
     $variant = $options['variant'];
 }
 
-if (str_contains($variant, '_')) {
+if (Str::contains($variant, '_')) {
     exit("Variant name cannot contain an underscore (_).\n");
 }
 

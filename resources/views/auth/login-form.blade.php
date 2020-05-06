@@ -39,7 +39,7 @@
                 </div>
                 <div class="form-group">
                     <div class="col-md-12">
-                        <button type="submit" id="login" class="btn btn-primary btn-block" name="submit" type="submit">
+                        <button type="submit" id="login" class="btn btn-primary btn-block" name="submit">
                             <i class="fa fa-btn fa-sign-in"></i> @lang('Login')
                         </button>
                     </div>
@@ -48,6 +48,6 @@
         </div>
     </div>
     @config('login_message')
-    <div class="panel-footer">{{ \LibreNMS\Config::get('login_message') }}</div>
+    <div class="panel-footer" align="center">{{ \LibreNMS\Config::get('login_message') }}</div>
     @endconfig
 </div>

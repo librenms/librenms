@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Tests;
 
+use Illuminate\Support\Str;
 use LibreNMS\Config;
 
 class CommonFunctionsTest extends TestCase
@@ -33,14 +34,14 @@ class CommonFunctionsTest extends TestCase
     {
         $data = 'This is a test. Just Testing.';
 
-        $this->assertTrue(str_contains($data, 'Just'));
-        $this->assertFalse(str_contains($data, 'just'));
+        $this->assertTrue(Str::contains($data, 'Just'));
+        $this->assertFalse(Str::contains($data, 'just'));
 
         $this->assertTrue(str_i_contains($data, 'juSt'));
         $this->assertFalse(str_i_contains($data, 'nope'));
 
-        $this->assertTrue(str_contains($data, array('not', 'this', 'This')));
-        $this->assertFalse(str_contains($data, array('not', 'this')));
+        $this->assertTrue(Str::contains($data, array('not', 'this', 'This')));
+        $this->assertFalse(Str::contains($data, array('not', 'this')));
 
         $this->assertTrue(str_i_contains($data, array('not', 'thIs')));
         $this->assertFalse(str_i_contains($data, array('not', 'anything')));
@@ -50,22 +51,22 @@ class CommonFunctionsTest extends TestCase
     {
         $data = 'This is a test. Just Testing that.';
 
-        $this->assertTrue(starts_with($data, 'This'));
-        $this->assertFalse(starts_with($data, 'this'));
+        $this->assertTrue(Str::startsWith($data, 'This'));
+        $this->assertFalse(Str::startsWith($data, 'this'));
 
-        $this->assertTrue(starts_with($data, array('this', 'Test', 'This')));
-        $this->assertFalse(starts_with($data, array('this', 'Test')));
+        $this->assertTrue(Str::startsWith($data, array('this', 'Test', 'This')));
+        $this->assertFalse(Str::startsWith($data, array('this', 'Test')));
     }
 
     public function testEndsWith()
     {
         $data = 'This is a test. Just Testing';
 
-        $this->assertTrue(ends_with($data, 'Testing'));
-        $this->assertFalse(ends_with($data, 'testing'));
+        $this->assertTrue(Str::endsWith($data, 'Testing'));
+        $this->assertFalse(Str::endsWith($data, 'testing'));
 
-        $this->assertTrue(ends_with($data, array('this', 'Testing', 'This')));
-        $this->assertFalse(ends_with($data, array('this', 'Test')));
+        $this->assertTrue(Str::endsWith($data, array('this', 'Testing', 'This')));
+        $this->assertFalse(Str::endsWith($data, array('this', 'Test')));
     }
 
     public function testRrdDescriptions()

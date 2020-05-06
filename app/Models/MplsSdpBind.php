@@ -43,11 +43,11 @@ class MplsSdpBind extends Model implements Keyable
 
     public function sdp()
     {
-        return $this->belongsTo('App\Models\MplsSdp', 'sdp_id');
+        return $this->belongsTo(\App\Models\MplsSdp::class, 'sdp_id');
     }
 
     public function service()
     {
-        return $this->belongsTo('App\Models\MplsService', 'svc_id');
+        return $this->belongsTo(\App\Models\MplsService::class, 'svc_id');
     }
 }

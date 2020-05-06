@@ -17,10 +17,11 @@ We have some pre-built VirtualBox images you can use to get started:
 
 If you want to install manually then we have some documentation which should make it easy.
 
-**Please note the minimum supported PHP version is 7.1.3**
+**Please note the minimum supported PHP version is 7.2.5**
 
 - [Ubuntu 18.04 Apache](http://docs.librenms.org/Installation/Installation-Ubuntu-1804-Apache/)
 - [Ubuntu 18.04 Nginx](http://docs.librenms.org/Installation/Installation-Ubuntu-1804-Nginx/)
+- [Debian 10 Nginx](http://docs.librenms.org/Installation/Installation-Debian-10-Nginx/)
 - [RHEL / CentOS 7 Apache](http://docs.librenms.org/Installation/Installation-CentOS-7-Apache/)
 - [RHEL / CentOS 7 Nginx](http://docs.librenms.org/Installation/Installation-CentOS-7-Nginx/)
 

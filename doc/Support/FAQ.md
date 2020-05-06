@@ -383,14 +383,11 @@ follow the below steps.
 
 ## <a name="faq20"> What information do you need to add a new OS?</a>
 
-Under the device, click the gear and select Capture.
-
-Please [open an issue on
-GitHub](https://github.com/librenms/librenms/issues/new) and provide
+Please [open a feature request in the community forum](https://community.librenms.org/c/feature-requests) and provide
 the output of Discovery, Poller, and Snmpwalk as separate non-expiring
-<https://p.libren.ms/> links.
+<https://p.libren.ms/> links :
 
-You can also use the command line to obtain the information.
+Please use preferably the command line to obtain the information.
 Especially, if snmpwalk results in a large amount of data. Replace the
 relevant information in these commands such as HOSTNAME and
 COMMUNITY. Use `snmpwalk` instead of `snmpbulkwalk` for v1 devices.
@@ -403,9 +400,10 @@ COMMUNITY. Use `snmpwalk` instead of `snmpbulkwalk` for v1 devices.
 snmpbulkwalk -OUneb -v2c -c COMMUNITY HOSTNAME .  | ./pbin.sh
 ```
 
-You can use the links provided by these commands within the issue.
+You can use the links provided by these commands within the community post.
 
-If possible please also provide what the OS name should be if it doesn't exist already.
+If possible please also provide what the OS name should be if it doesn't exist already,
+as well as any useful link (MIBs from vendor, logo, etc etc)
 
 ## <a name="faq9"> What can I do to help?</a>
 

@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Device;
 
+use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Interfaces\Discovery\DiscoveryItem;
 use LibreNMS\Interfaces\Discovery\DiscoveryModule;
@@ -91,7 +92,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
         $proc->hrDeviceIndex = $hrDeviceIndex;
 
         // handle string indexes
-        if (str_contains($oid, '"')) {
+        if (Str::contains($oid, '"')) {
             $oid = preg_replace_callback('/"([^"]+)"/', function ($matches) {
                 return string_to_oid($matches[1]);
             }, $oid);

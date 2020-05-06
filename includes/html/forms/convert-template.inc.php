@@ -26,6 +26,8 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
+use Illuminate\Support\Str;
+
 header('Content-type: application/json');
 
 if (!Auth::user()->hasGlobalAdmin()) {
@@ -50,7 +52,7 @@ $new_title = convert_template($vars['title']);
 
 function convert_template($line)
 {
-    if (str_contains($line, '{calc')) {
+    if (Str::contains($line, '{calc')) {
         return preg_replace(
             [
                 '/{calc[ ]*([\w\d\s\%\.\(\)\*\/\-\+\/]+)}/',// Replaces {calc (something*100)}

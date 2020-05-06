@@ -18,11 +18,14 @@ use App\Models\PortsFdb;
 use App\Models\Sensor;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Routing\Router;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Config;
 use LibreNMS\Data\Store\Datastore;
 use LibreNMS\Exceptions\InvalidIpException;
+use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv4;
 
 function api_success($result, $result_name, $message = null, $code = 200, $count = null, $extra = null)
@@ -159,7 +162,7 @@ function get_port_stats_by_port_hostname(\Illuminate\Http\Request $request)
     $ifName = $request->route('ifname');
 
     // handle %2f in paths and pass to get_graph_by_port_hostname if needed
-    if (str_contains($ifName, '/')) {
+    if (Str::contains($ifName, '/')) {
         $parts = explode('/', $request->path());
 
         if (isset($parts[5])) {
@@ -210,7 +213,7 @@ function get_graph_generic_by_hostname(\Illuminate\Http\Request $request)
     $vars['output'] = $request->get('output', 'display');
     if (isset($sensor_id)) {
         $vars['id']   = $sensor_id;
-        if (str_contains($vars['type'], '_wireless')) {
+        if (Str::contains($vars['type'], '_wireless')) {
             $vars['type'] = str_replace('device_', '', $vars['type']);
         } else {
             // If this isn't a wireless graph we need to fix the name.
@@ -482,7 +485,7 @@ function show_endpoints(\Illuminate\Http\Request $request, Router $router)
     $base = str_replace('api/v0', '', $request->url());
     foreach ($router->getRoutes() as $route) {
         /** @var \Illuminate\Routing\Route $route */
-        if (starts_with($route->getPrefix(), 'api/v0') && $route->getName()) {
+        if (Str::startsWith($route->getPrefix(), 'api/v0') && $route->getName()) {
             $output[$route->getName()] = $base . $route->uri();
         }
     }
@@ -517,11 +520,19 @@ function list_bgp(\Illuminate\Http\Request $request)
     }
     if (!empty($local_address)) {
         $sql .= ' AND `bgpPeers`.`bgpLocalAddr` = ?';
-        $sql_params[] = $local_address;
+        try {
+            $sql_params[] = IP::parse($local_address)->uncompressed();
+        } catch (InvalidIpException $e) {
+            return api_error(400, "Invalid local address");
+        }
     }
     if (!empty($remote_address)) {
         $sql .= ' AND `bgpPeers`.`bgpPeerIdentifier` = ?';
-        $sql_params[] = $remote_address;
+        try {
+            $sql_params[] = IP::parse($remote_address)->uncompressed();
+        } catch (InvalidIpException $e) {
+            return api_error(400, "Invalid remote address");
+        }
     }
 
     $bgp_sessions       = dbFetchRows("SELECT `bgpPeers`.* FROM `bgpPeers` LEFT JOIN `devices` ON `bgpPeers`.`device_id` = `devices`.`device_id` WHERE `bgpPeerState` IS NOT NULL AND `bgpPeerState` != '' $sql", $sql_params);
@@ -624,7 +635,7 @@ function get_graph_by_portgroup(\Illuminate\Http\Request $request)
 
     if (empty($id)) {
         $ports = get_ports_from_type(explode(',', $group));
-        $if_list = implode(',', array_pluck($ports, 'port_id'));
+        $if_list = implode(',', Arr::pluck($ports, 'port_id'));
     } else {
         $if_list = $id;
     }
