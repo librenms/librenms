@@ -16,7 +16,7 @@ yum install epel-release
 ```
 
 ```
-yum install git cronie fping jwhois ImageMagick mtr MySQL-python net-snmp net-snmp-utils nmap python-memcached rrdtool policycoreutils-python httpd mariadb mariadb-server unzip
+yum install git cronie fping jwhois ImageMagick mtr MySQL-python net-snmp net-snmp-utils nmap python-memcached rrdtool policycoreutils-python httpd mariadb mariadb-server unzip python3 python3-pip
 ```
 
 ### Install PHP
@@ -93,7 +93,7 @@ exit
 ## Configure MySQL
 
 ```
-systemctl start mariadb
+systemctl enable --now mariadb
 mysql -u root
 ```
 
@@ -119,7 +119,6 @@ lower_case_table_names=0
 ```
 
 ```
-systemctl enable mariadb
 systemctl restart mariadb
 ```
 
@@ -178,8 +177,7 @@ Add the following config, edit `ServerName` as required:
 > should be :)) then you will need to disable the default site. `rm -f /etc/httpd/conf.d/welcome.conf`
 
 ```
-systemctl enable httpd
-systemctl restart httpd
+systemctl enable --now httpd
 ```
 
 # SELinux
