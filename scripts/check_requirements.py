@@ -17,10 +17,12 @@ with open(target, 'r') as file:
         pkg_resources.require(requirements)
     except DistributionNotFound as req:
         if verbose:
-            print (req)
+            print(req)
         exit(1)
     except VersionConflict as req:
         if verbose:
-            print (req)
+            print(req)
         exit(2)
+    exit(0)
+
 exit(3)
