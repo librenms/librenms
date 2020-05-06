@@ -112,30 +112,30 @@ class Ray extends OS implements
         $oid_rfpowercur = '.1.3.6.1.4.1.33555.1.2.1.17';
         $oid_rfpowerconf = '.1.3.6.1.4.1.33555.1.2.1.12';
 
-        $cmd = gen_snmpget_cmd($this->getDevice(), '$rfpowercur', '-Oqv', 'RAY-MIB', 'ray');
+        $cmd = gen_snmpget_cmd($this->getDevice(), $oid_rfpowercur, '-Oqv', 'RAY-MIB', 'ray');
         $data = trim(external_exec($cmd), "\" \n\r");
         if (!preg_match('/(No Such Instance)/i', $data)) {
             return array(
                // RAY-MIB::rfPowerCurrent.0
-               new WirelessSensor('power', $this->getDeviceId(), $rfpowercur, 'racom-pow-cur', 1, 'Tx Power Current'),
+               new WirelessSensor('power', $this->getDeviceId(), $oid_rfpowercur, 'racom-pow-cur', 1, 'Tx Power Current'),
            );
         } else {
             return array(
                // RAY-MIB::rfPowerCurrent.0
-               new WirelessSensor('power', $this->getDeviceId(), $rfpowercur.'.0', 'racom-pow-cur', 1, 'Tx Power Current'),
+               new WirelessSensor('power', $this->getDeviceId(), $oid_rfpowercur.'.0', 'racom-pow-cur', 1, 'Tx Power Current'),
             );
         }
-        $cmd = gen_snmpget_cmd($this->getDevice(), '$rfpowerconf', '-Oqv', 'RAY-MIB', 'ray');
+        $cmd = gen_snmpget_cmd($this->getDevice(), '$oid_rfpowerconf', '-Oqv', 'RAY-MIB', 'ray');
         $data = trim(external_exec($cmd), "\" \n\r");
         if (!preg_match('/(No Such Instance)/i', $data)) {
             return array(
                //RAY-MIB::rfPowerConfigured.0
-               new WirelessSensor('power', $this->getDeviceId(), $rfpowerconf, 'racom-pow-conf', 1, 'Tx Power Configured'),
+               new WirelessSensor('power', $this->getDeviceId(), $oid_rfpowerconf, 'racom-pow-conf', 1, 'Tx Power Configured'),
            );
         } else {
             return array(
                //RAY-MIB::rfPowerConfigured.0
-               new WirelessSensor('power', $this->getDeviceId(), $rfpowerconf.'.0', 'racom-pow-conf', 1, 'Tx Power Configured'),
+               new WirelessSensor('power', $this->getDeviceId(), $oid_rfpowerconf.'.0', 'racom-pow-conf', 1, 'Tx Power Configured'),
             );
         }
     }
