@@ -36,11 +36,11 @@ class Python extends BaseValidation
 
     public static function pythonVersion()
     {
-        $python_binary = exec('which python3');
+        $python_binary = exec('which python3 2> /dev/null');
         if (empty($python_binary)) {
             return null;
         }
-        $output = exec($python_binary . ' --version');
+        $output = exec($python_binary . ' --version 2> /dev/null');
         return explode(' ', $output)[1];
     }
 
@@ -52,23 +52,21 @@ class Python extends BaseValidation
      */
     public function validate(Validator $validator)
     {
-        $this->checkInstalled($validator);
-        $this->checkVersion($validator);
+        $version = self::pythonVersion();
+
+        if (empty($version)) {
+            $validator->fail('python3 not found');
+            return; // no need to check anything else
+        }
+
+        $this->checkVersion($validator, $version);
         $this->checkExtensions($validator);
     }
 
-    private function checkInstalled(Validator $validator)
+    private function checkVersion(Validator $validator, $version)
     {
-        if (empty(self::pythonVersion())) {
-            $validator->fail('Python3 not found');
-        }
-    }
-
-    private function checkVersion(Validator $validator)
-    {
-        // if update is not set to false and version is min or newer
-        if (Config::get('update') && version_compare(self::pythonVersion(), self::PYTHON_MIN_VERSION, '<')) {
-            $validator->warn("Python version " . self::PYTHON_MIN_VERSION . " is the minimum supported version. We recommend you update Python to a supported version (" . self::PYTHON_RECOMMENDED_VERSION . " suggested) to continue to receive updates. If you do not update Python, LibreNMS will continue to function but stop receiving bug fixes and updates.");
+        if (version_compare($version, self::PYTHON_MIN_VERSION, '<')) {
+            $validator->warn("Python version " . self::PYTHON_MIN_VERSION . " is the minimum supported version. We recommend you update Python to a supported version (" . self::PYTHON_RECOMMENDED_VERSION . " suggested).");
         }
     }
 
@@ -77,8 +75,8 @@ class Python extends BaseValidation
         $pythonExtensions = 'scripts/check_requirements.py';
         exec(Config::get('install_dir') . '/' . $pythonExtensions . ' -v', $output, $returnval);
 
-        if (in_array(intval($returnval), [1, 2])) {
-                $validator->fail("Python3 Modul issue found: '" . $output. "'");
+        if ($returnval !== 0) {
+            $validator->fail("Python3 module issue found: '" . ($output[0] ?? '') . "'");
         }
     }
 }
