@@ -1342,7 +1342,7 @@ function list_oxidized(\Illuminate\Http\Request $request)
         unset($device['sysname']);
         unset($device['sysDescr']);
         unset($device['hardware']);
-	unset($device['devicegroup']);
+        unset($device['devicegroup']);
         $devices[] = $device;
     }
 
