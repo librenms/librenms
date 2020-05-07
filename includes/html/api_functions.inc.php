@@ -1300,7 +1300,7 @@ function list_oxidized(\Illuminate\Http\Request $request)
         $params = [$hostname];
     }
 
-    foreach (dbFetchRows("SELECT hostname,sysname,sysDescr,hardware,os,locations.location,ip AS ip FROM `devices` LEFT JOIN locations ON devices.location_id = locations.id LEFT JOIN devices_attribs AS `DA` ON devices.device_id = DA.device_id AND `DA`.attrib_type='override_Oxidized_disable' WHERE `disabled`='0' AND `ignore` = 0 AND (DA.attrib_value = 'false' OR DA.attrib_value IS NULL) AND (`type` NOT IN ($device_types) AND `os` NOT IN ($device_os)) $sql", $params) as $device) {
+    foreach (dbFetchRows("SELECT hostname,sysname,hardware,os,locations.location,ip as ip,DG.name AS devicegroup FROM `devices` LEFT JOIN locations ON devices.location_id = locations.id LEFT JOIN devices_attribs AS `DA` ON devices.device_id = DA.device_id AND `DA`.attrib_type='override_Oxidized_disable' LEFT JOIN device_group_device AS `DGD` ON devices.device_id = DGD.device_id LEFT JOIN device_groups AS `DG` on DGD.device_group_id = DG.id WHERE `disabled`='0' AND `ignore` = 0 AND (DA.attrib_value = 'false' OR DA.attrib_value IS NULL) AND (devices.`type` NOT IN ($device_types) AND `os` NOT IN ($device_os)) $sql", $params) as $device) {
         // Convert from packed value to human value
         $device['ip'] = inet6_ntop($device['ip']);
 
@@ -1342,6 +1342,7 @@ function list_oxidized(\Illuminate\Http\Request $request)
         unset($device['sysname']);
         unset($device['sysDescr']);
         unset($device['hardware']);
+	unset($device['devicegroup']);
         $devices[] = $device;
     }
 
