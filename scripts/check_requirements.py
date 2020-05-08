@@ -13,6 +13,7 @@ target = os.path.realpath(os.path.dirname(__file__) + '/../requirements.txt')
 
 with open(target, 'r') as file:
     requirements = file.read().rstrip().split("\n")
+    requirements.reverse()  # reverse so the most important ones show first
     try:
         pkg_resources.require(requirements)
     except DistributionNotFound as req:
