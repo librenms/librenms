@@ -29,7 +29,8 @@ IMPORTS
     ServiceAccessPoint, SvcISID,
     TDSCPFilterActionValue,
     TDSCPNameOrEmpty, TFCTypeOrNone,
-    TFrameType, TIpOption, TIpProtocol,
+    TFrameType, TIcmpCodeOrNone,
+    TIcmpTypeOrNone, TIpOption, TIpProtocol,
     TItemDescription, TLNamedItem,
     TLNamedItemOrEmpty, TMacFilterType,
     TNamedItem, TNamedItemOrEmpty,
@@ -1143,17 +1144,19 @@ TIPvXFilterType                  ::= TEXTUAL-CONVENTION
     DESCRIPTION
         "Specifies the set of available match criteria for a filter policy.
 
-         - normal                  (0): Allows all match criteria except of Src MAC and Packet Length.
-         - srcMac                  (1): Allows all match criteria except of:
-                                        - Src IP, DSCP and all IP Options in IPv4 filters.
-                                        - Src IP in IPv6 filters.
-         - pktLen                  (2): Allows all match criteria except of:
+         - normal                  (0): Allows all match criteria except of:
+                                        - Source MAC, Packet length.
+         - srcMac                  (1): Allows matching Source MAC and all match criteria for type normal except of:
+                                        - Source IP, DSCP and all IP Options in IPv4 filters.
+                                        - Source IP in IPv6 filters.
+         - pktLen                  (2): Allows matching Packet length and all match criteria for type normal except of:
                                         - DSCP and IP Options in IPv4 filters.
                                         - Flow Label in IPv6 filters."
     SYNTAX      INTEGER {
-        normal (0),
-        srcMac (1),
-        pktLen (2)
+        normal    (0),
+        srcMac    (1),
+        pktLen    (2),
+        reserved3 (3)
     }
 
 tFilterObjects                   OBJECT IDENTIFIER ::= { tmnxSRObjs 21 }
@@ -1614,8 +1617,8 @@ TIPFilterParamsEntry             ::= SEQUENCE
     tIPFilterParamsMultipleOption    TItemMatch,
     tIPFilterParamsTcpSyn            TItemMatch,
     tIPFilterParamsTcpAck            TItemMatch,
-    tIPFilterParamsIcmpCode          Integer32,
-    tIPFilterParamsIcmpType          Integer32,
+    tIPFilterParamsIcmpCode          TIcmpCodeOrNone,
+    tIPFilterParamsIcmpType          TIcmpTypeOrNone,
     tIPFilterParamsCflowdSample      TruthValue,
     tIPFilterParamsCflowdIfSample    TruthValue,
     tIPFilterParamsForwardNHInterface DisplayString,
@@ -1995,26 +1998,24 @@ tIPFilterParamsTcpAck            OBJECT-TYPE
     ::= { tIPFilterParamsEntry 30 }
 
 tIPFilterParamsIcmpCode          OBJECT-TYPE
-    SYNTAX      Integer32 (-1 | 0..255)
+    SYNTAX      TIcmpCodeOrNone
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        "Icmp code to be matched. tIPFilterParamsIcmpCode complements the
-         object tIPFilterParamsIcmpType. Both of them need to be set to
-         actually enable ICMP matching. The value -1 means Icmp code matching
-         is not enabled."
+        "ICMP code to be matched.
+
+         The value -1 means ICMP code matching is not enabled."
     DEFVAL      { -1 }
     ::= { tIPFilterParamsEntry 31 }
 
 tIPFilterParamsIcmpType          OBJECT-TYPE
-    SYNTAX      Integer32 (-1 | 0..255)
+    SYNTAX      TIcmpTypeOrNone
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        "Icmp type to be matched. tIPFilterParamsIcmpType complements the
-         object tIPFilterParamsIcmpCode. Both of them need to be set to
-         actually enable ICMP matching. The value -1 means Icmp type matching
-         is not enabled."
+        "ICMP type to be matched.
+
+         The value -1 means ICMP type matching is not enabled."
     DEFVAL      { -1 }
     ::= { tIPFilterParamsEntry 32 }
 
@@ -5817,8 +5818,8 @@ TIPv6FilterParamsEntry           ::= SEQUENCE
     tIPv6FilterParamsDSCP            TDSCPNameOrEmpty,
     tIPv6FilterParamsTcpSyn          TItemMatch,
     tIPv6FilterParamsTcpAck          TItemMatch,
-    tIPv6FilterParamsIcmpCode        Integer32,
-    tIPv6FilterParamsIcmpType        Integer32,
+    tIPv6FilterParamsIcmpCode        TIcmpCodeOrNone,
+    tIPv6FilterParamsIcmpType        TIcmpTypeOrNone,
     tIPv6FilterParamsCflowdSample    TruthValue,
     tIPv6FilterParamsCflowdIfSample  TruthValue,
     tIPv6FilterParamsForwardNHInterface DisplayString,
@@ -6159,26 +6160,24 @@ tIPv6FilterParamsTcpAck          OBJECT-TYPE
     ::= { tIPv6FilterParamsEntry 24 }
 
 tIPv6FilterParamsIcmpCode        OBJECT-TYPE
-    SYNTAX      Integer32 (-1 | 0..255)
+    SYNTAX      TIcmpCodeOrNone
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        "Icmp code to be matched. tIPv6FilterParamsIcmpCode complements the
-         object tIPv6FilterParamsIcmpType. Both of them need to be set to
-         actually enable ICMP matching. The value -1 means Icmp code matching
-         is not enabled."
+        "ICMP code to be matched.
+
+         The value -1 means ICMP code matching is not enabled."
     DEFVAL      { -1 }
     ::= { tIPv6FilterParamsEntry 25 }
 
 tIPv6FilterParamsIcmpType        OBJECT-TYPE
-    SYNTAX      Integer32 (-1 | 0..255)
+    SYNTAX      TIcmpTypeOrNone
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        "Icmp type to be matched. tIPv6FilterParamsIcmpType complements the
-         object tIPv6FilterParamsIcmpCode. Both of them need to be set to
-         actually enable ICMP matching. The value -1 means Icmp type matching
-         is not enabled."
+        "ICMP type to be matched.
+
+         The value -1 means ICMP type matching is not enabled."
     DEFVAL      { -1 }
     ::= { tIPv6FilterParamsEntry 26 }
 
@@ -7988,7 +7987,8 @@ TLiIpFilterParamsEntry           ::= SEQUENCE
     tLiIpFilterParamsSrcPortOper     TOperator,
     tLiIpFilterParamsDstPortValue1   TTcpUdpPort,
     tLiIpFilterParamsDstPortValue2   TTcpUdpPort,
-    tLiIpFilterParamsDstPortOper     TOperator
+    tLiIpFilterParamsDstPortOper     TOperator,
+    tLiIpFilterParamsFragment        TItemMatch
 }
 
 tLiIpFilterParamsId              OBJECT-TYPE
@@ -8242,6 +8242,17 @@ tLiIpFilterParamsDstPortOper     OBJECT-TYPE
          description in TTcpUdpPortOperator."
     DEFVAL      { none }
     ::= { tLiIpFilterParamsEntry 17 }
+
+tLiIpFilterParamsFragment        OBJECT-TYPE
+    SYNTAX      TItemMatch
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "If enabled, matches fragmented/unfragmented packets as per value of
+         the object. The fragment match criterion is not supported for IPv6
+         filter."
+    DEFVAL      { off }
+    ::= { tLiIpFilterParamsEntry 18 }
 
 tLiIpFilterParamsInfoTable       OBJECT-TYPE
     SYNTAX      SEQUENCE OF TLiIpFilterParamsInfoEntry
@@ -16425,6 +16436,592 @@ fltrMdAutoIdMacFilterCount       OBJECT-TYPE
          in model-driven CLI."
     ::= { fltrMdAutoIdGroup 5 }
 
+tIPv6ExceptionTable              OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TIPv6ExceptionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table tIPv6ExceptionTable contains all of the IPv6 exceptions
+         configured on this system."
+    ::= { tFilterObjects 106 }
+
+tIPv6ExceptionEntry              OBJECT-TYPE
+    SYNTAX      TIPv6ExceptionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a particular IPv6 exception entry. Entries are
+         created and destroyed by SNMP operations on the object
+         tIPv6ExceptionRowStatus."
+    INDEX       { tIPv6ExceptionId }
+    ::= { tIPv6ExceptionTable 1 }
+
+TIPv6ExceptionEntry              ::= SEQUENCE
+{
+    tIPv6ExceptionId                 TAnyFilterID,
+    tIPv6ExceptionRowStatus          RowStatus,
+    tIPv6ExceptionDescription        TItemDescription,
+    tIPv6ExceptionName               TLNamedItemOrEmpty
+}
+
+tIPv6ExceptionId                 OBJECT-TYPE
+    SYNTAX      TAnyFilterID (1..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tIPv6ExceptionId uniquely identifies an IPv6
+         exception."
+    ::= { tIPv6ExceptionEntry 1 }
+
+tIPv6ExceptionRowStatus          OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tIPv6ExceptionRowStatus specifies the status
+         of the IPv6 exception. The object allows entries to be created and
+         deleted in the tIPv6ExceptionTable."
+    ::= { tIPv6ExceptionEntry 2 }
+
+tIPv6ExceptionDescription        OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tIPv6ExceptionDescription specifies a
+         user-provided description for this IPv6 exception."
+    DEFVAL      { ''H }
+    ::= { tIPv6ExceptionEntry 3 }
+
+tIPv6ExceptionName               OBJECT-TYPE
+    SYNTAX      TLNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tIPv6ExceptionName specifies the name to
+         associate with this IPv6 exception."
+    DEFVAL      { ''H }
+    ::= { tIPv6ExceptionEntry 4 }
+
+tIPv6ExceptionNameTable          OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TIPv6ExceptionNameEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains IPv6 exception name information."
+    ::= { tFilterObjects 107 }
+
+tIPv6ExceptionNameEntry          OBJECT-TYPE
+    SYNTAX      TIPv6ExceptionNameEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a specific IPv6 exception name. Entries are created
+         and deleted automatically by the system based upon the
+         tIPv6ExceptionName objects in the tIPv6ExceptionTable."
+    INDEX       { tIPv6ExceptionName }
+    ::= { tIPv6ExceptionNameTable 1 }
+
+TIPv6ExceptionNameEntry          ::= SEQUENCE
+{ tIPv6ExceptionNameId             TAnyFilterID }
+
+tIPv6ExceptionNameId             OBJECT-TYPE
+    SYNTAX      TAnyFilterID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tIPv6ExceptionNameId indicates the IPv6
+         exception associated with this name."
+    ::= { tIPv6ExceptionNameEntry 1 }
+
+tIPv6ExceptionParamsTable        OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TIPv6ExceptionParamsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of all IPv6 exception match entries for all IPv6 exceptions."
+    ::= { tFilterObjects 108 }
+
+tIPv6ExceptionParamsEntry        OBJECT-TYPE
+    SYNTAX      TIPv6ExceptionParamsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a particular IPv6 exception match entry. Every IPv6
+         exception can have zero or more IPv6 exception match entries.
+
+         Each match constitutes some criteria by which an unencrypted IPv6
+         packet will be accepted at the interface to which the IPv6 exception
+         is applied.
+
+         Entries are created/deleted by the user."
+    INDEX       {
+        tIPv6ExceptionId,
+        tIPv6ExcParamsIndex
+    }
+    ::= { tIPv6ExceptionParamsTable 1 }
+
+TIPv6ExceptionParamsEntry        ::= SEQUENCE
+{
+    tIPv6ExcParamsIndex              TEntryId,
+    tIPv6ExcParamsRowStatus          RowStatus,
+    tIPv6ExcParamsDescription        TItemDescription,
+    tIPv6ExcParamsNextHeader         TIpProtocol,
+    tIPv6ExcParamsSrcIpAddr          InetAddressIPv6,
+    tIPv6ExcParamsSrcIpMask          InetAddressPrefixLength,
+    tIPv6ExcParamsSrcIpFullMask      InetAddressIPv6,
+    tIPv6ExcParamsSrcIpPrefixList    TNamedItemOrEmpty,
+    tIPv6ExcParamsDstIpAddr          InetAddressIPv6,
+    tIPv6ExcParamsDstIpMask          InetAddressPrefixLength,
+    tIPv6ExcParamsDstIpFullMask      InetAddressIPv6,
+    tIPv6ExcParamsDstIpPrefixList    TNamedItemOrEmpty,
+    tIPv6ExcParamsSourcePortValue1   TTcpUdpPort,
+    tIPv6ExcParamsSourcePortValue2   TTcpUdpPort,
+    tIPv6ExcParamsSourcePortOperator TOperator,
+    tIPv6ExcParamsSourcePortList     TNamedItemOrEmpty,
+    tIPv6ExcParamsDestPortValue1     TTcpUdpPort,
+    tIPv6ExcParamsDestPortValue2     TTcpUdpPort,
+    tIPv6ExcParamsDestPortOperator   TOperator,
+    tIPv6ExcParamsDestPortList       TNamedItemOrEmpty,
+    tIPv6ExcParamsPortSelector       TFltrPortSelector,
+    tIPv6ExcParamsIcmpCode           TIcmpCodeOrNone,
+    tIPv6ExcParamsIcmpType           TIcmpTypeOrNone,
+    tIPv6ExcParamsIngressHitCount    Counter64,
+    tIPv6ExcParamsEgressHitCount     Counter64,
+    tIPv6ExcParamsIngrHitByteCount   Counter64,
+    tIPv6ExcParamsEgrHitByteCount    Counter64
+}
+
+tIPv6ExcParamsIndex              OBJECT-TYPE
+    SYNTAX      TEntryId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is the index for the match entry. Each IPv6 exception can have
+         multiple match entries."
+    ::= { tIPv6ExceptionParamsEntry 1 }
+
+tIPv6ExcParamsRowStatus          OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object allows match entries to be created and deleted in the
+         tIPv6ExceptionParamsTable."
+    ::= { tIPv6ExceptionParamsEntry 2 }
+
+tIPv6ExcParamsDescription        OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tIPv6ExcParamsDescription specifies a
+         user-provided description for this IPv6 exception match entry."
+    DEFVAL      { ''H }
+    ::= { tIPv6ExceptionParamsEntry 3 }
+
+tIPv6ExcParamsNextHeader         OBJECT-TYPE
+    SYNTAX      TIpProtocol
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tIPv6ExcParamsNextHeader specifies the
+         IPv6 next header to match.  A value of -1 disables matching the IPv6
+         next header.
+         Because the match criteria only pertains to the last next-header, the
+         following values are not accepted: 0, 43, 44, 50, 51, and 60."
+    DEFVAL      { -1 }
+    ::= { tIPv6ExceptionParamsEntry 4 }
+
+tIPv6ExcParamsSrcIpAddr          OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tIPv6ExcParamsSrcIpAddr specifies the IPv6
+         address to match the source IPv6 address of the packet."
+    DEFVAL      { '00000000000000000000000000000000'H }
+    ::= { tIPv6ExceptionParamsEntry 5 }
+
+tIPv6ExcParamsSrcIpMask          OBJECT-TYPE
+    SYNTAX      InetAddressPrefixLength (0..128)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "If different from 0, the value of the object tIPv6ExcParamsSrcIpMask
+         specifies the IPv6 prefix length value for the IPv6 exception entry.
+         The mask generated from the prefix length value is ANDed with the
+         received source IPv6 address to match the tIPv6ExcParamsSrcIpAddr.
+
+         If the value of tIPv6ExcParamsSrcIpMask is 0, and the value of
+         tIPv6ExcParamsSrcIpFullMask is non zero then the value of
+         tIPv6ExcParamsSrcIpFullMask is used as a mask.
+
+         If the value of tIPv6ExcParamsSrcIpMask is non zero, it will be equal
+         to the mask expressed in the object tIPv6ExcParamsSrcIpFullMask.
+
+         If both tIPv6ExcParamsSrcIpMask and tIPv6ExcParamsSrcIpFullMask are
+         set to 0, no matching is done on the source IPv6 address.
+
+         If a value is specified for this object, then the value of the object
+         tIPv6ExcParamsSrcIpFullMask will be set to reflect this same mask."
+    DEFVAL      { 0 }
+    ::= { tIPv6ExceptionParamsEntry 6 }
+
+tIPv6ExcParamsSrcIpFullMask      OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "If different from 0, the value of the object
+         tIPv6ExcParamsSrcIpFullMask specifies the IPv6 Mask value for this
+         IPv6 exception entry. The mask is ANDed with the received source IPv6
+         address to match the tIPv6ExcParamsSrcIpAddr.
+
+         If the value of tIPv6ExcParamsSrcIpMask is 0, and the value of
+         tIPv6ExcParamsSrcIpFullMask is non zero then the value of
+         tIPv6ExcParamsSrcIpFullMask is used as a mask.
+
+         If the value of tIPv6ExcParamsSrcIpMask is non zero, it will be equal
+         to the mask expressed in the object tIPv6ExcParamsSrcIpFullMask.
+
+         If both tIPv6ExcParamsSrcIpMask and tIPv6ExcParamsSrcIpFullMask are
+         set to 0, no matching is done on the Source IPv6 address.
+
+         If a regular mask is specified for tIPv6ExcParamsSrcIpFullMask then
+         the value of tIPv6ExcParamsSrcIpMask will be changed to reflect this
+         value."
+    DEFVAL      { '00000000000000000000000000000000'H }
+    ::= { tIPv6ExceptionParamsEntry 7 }
+
+tIPv6ExcParamsSrcIpPrefixList    OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tIPv6ExcParamsSrcIpPrefixList specifies the
+         IPv6 prefix list used as match criterion for the source IPv6 address.
+
+         The value specified for this object must correspond to a prefix list
+         defined in tFilterPrefixListTable.
+
+         If the value of this object is empty then the values of the objects
+         tIPv6ExcParamsSrcIpAddr and tIPv6ExcParamsSrcIpMask are used as source
+         IPv6 address match criterion.
+
+         When this object is set to a non-empty value then the objects
+         tIPv6ExcParamsSrcIpAddr and tIPv6ExcParamsSrcIpMask are reset to their
+         default values by the system.
+
+         Vice versa, when a new (non-default) value is provided for the objects
+         tIPv6ExcParamsSrcIpAddr and tIPv6ExcParamsSrcIpMask then this object
+         is reset to its default (empty) value by the system."
+    DEFVAL      { ''H }
+    ::= { tIPv6ExceptionParamsEntry 8 }
+
+tIPv6ExcParamsDstIpAddr          OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tIPv6ExcParamsDstIpAddr specifies the IPv6
+         address to match the destination IPv6 address of the packet."
+    DEFVAL      { '00000000000000000000000000000000'H }
+    ::= { tIPv6ExceptionParamsEntry 9 }
+
+tIPv6ExcParamsDstIpMask          OBJECT-TYPE
+    SYNTAX      InetAddressPrefixLength (0..128)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "If different from 0, the value of the object tIPv6ExcParamsDstIpMask
+         specifies the IPv6 prefix length value for this IPv6 exception entry.
+         The mask generated from the prefix length value is ANDed with the
+         received destination IPv6 address to match the
+         tIPv6ExcParamsDstIpAddr.
+
+         If the value of tIPv6ExcParamsDstIpMask is 0, and the value of
+         tIPv6ExcParamsDstIpFullMask is non zero then the value of
+         tIPv6ExcParamsDstIpFullMask is used as a mask.
+
+         If the value of tIPv6ExcParamsDstIpMask is non zero, it will be equal
+         to the mask expressed in the object tIPv6ExcParamsDstIpFullMask.
+
+         If both tIPv6ExcParamsDstIpMask and tIPv6ExcParamsDstIpFullMask are
+         set to 0, no matching is done on the destination IPv6 address.
+
+         If a value is specified for this object, then the value of the object
+         tIPv6ExcParamsDstIpFullMask will be set to reflect this same mask."
+    DEFVAL      { 0 }
+    ::= { tIPv6ExceptionParamsEntry 10 }
+
+tIPv6ExcParamsDstIpFullMask      OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "If different from 0, the value of the object
+         tIPv6ExcParamsDstIpFullMask specifies the IPv6 Mask value for this
+         policy IPv6 Filter entry. The mask is ANDed with the received
+         destination IPv6 address to match the tIPv6ExcParamsDstIpAddr.
+
+         If the value of tIPv6ExcParamsDstIpMask is 0, and the value of
+         tIPv6ExcParamsDstIpFullMask is non zero then the value of
+         tIPv6ExcParamsDstIpFullMask is used as a mask.
+
+         If the value of tIPv6ExcParamsDstIpMask is non zero, it will be equal
+         to the mask expressed in the object tIPv6ExcParamsDstIpFullMask.
+
+         If both tIPv6ExcParamsDstIpMask and tIPv6ExcParamsDstIpFullMask are
+         set to 0, no matching is done on the destination IPv6 address.
+
+         If a regular mask is specified for tIPv6ExcParamsDstIpFullMask then
+         the value of tIPv6ExcParamsDstIpMask will be changed to reflect this
+         value."
+    DEFVAL      { '00000000000000000000000000000000'H }
+    ::= { tIPv6ExceptionParamsEntry 11 }
+
+tIPv6ExcParamsDstIpPrefixList    OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tIPv6ExcParamsDstIpPrefixList specifies the
+         IPv6 prefix list used as match criterion for the destination IPv6
+         address.
+
+         The value specified for this object must correspond to a prefix list
+         defined in tFilterPrefixListTable.
+
+         If the value of this object is empty then the values of the objects
+         tIPv6ExcParamsDstIpAddr and tIPv6ExcParamsDstIpMask are used as
+         destination IPv6 address match criterion.
+
+         When this object is set to a non-empty value then the objects
+         tIPv6ExcParamsDstIpAddr and tIPv6ExcParamsDstIpMask are reset to their
+         default values by the system.
+
+         Vice versa, when a new (non-default) value is provided for the objects
+         tIPv6ExcParamsDstIpAddr and tIPv6ExcParamsDstIpMask then this object
+         is reset to its default (empty) value by the system."
+    DEFVAL      { ''H }
+    ::= { tIPv6ExceptionParamsEntry 12 }
+
+tIPv6ExcParamsSourcePortValue1   OBJECT-TYPE
+    SYNTAX      TTcpUdpPort
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tIPv6ExcParamsSourcePortValue1 specifies a
+         protocol port value. The value of this object is used when matching
+         protocol source ports, as per the description for
+         tIPv6ExcParamsSourcePortOperator."
+    DEFVAL      { 0 }
+    ::= { tIPv6ExceptionParamsEntry 13 }
+
+tIPv6ExcParamsSourcePortValue2   OBJECT-TYPE
+    SYNTAX      TTcpUdpPort
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tIPv6ExcParamsSourcePortValue2 specifies a
+         second protocol port value. The value of this object is used when
+         matching protocol source ports, as per the description for
+         tIPv6ExcParamsSourcePortOperator."
+    DEFVAL      { 0 }
+    ::= { tIPv6ExceptionParamsEntry 14 }
+
+tIPv6ExcParamsSourcePortOperator OBJECT-TYPE
+    SYNTAX      TOperator
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tIPv6ExcParamsSourcePortOperator specifies the
+         manner in which tIPv6ExcParamsSourcePortValue1 and
+         tIPv6ExcParamsSourcePortValue2 are to be used to match protocol source
+         ports."
+    DEFVAL      { none }
+    ::= { tIPv6ExceptionParamsEntry 15 }
+
+tIPv6ExcParamsSourcePortList     OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tIPv6ExcParamsSourcePortList specifies the
+         port-list used as match criterion for the protocol source port.
+
+         The value specified for this object must correspond to a port-list
+         defined in tFilterPortListTable.
+
+         If the value of this object is empty then the values of the objects
+         tIPv6ExcParamsSourcePortValue1, tIPv6ExcParamsSourcePortValue2, and
+         tIPv6ExcParamsSourcePortOperator are used as source port match
+         criterion.
+
+         When this object is set to a non-empty value then the objects
+         tIPv6ExcParamsSourcePortValue1, tIPv6ExcParamsSourcePortValue2, and
+         tIPv6ExcParamsSourcePortOperator are reset to their default values by
+         the system.
+
+         Vice versa, when a new (non-default) value is provided for one of the
+         objects tIPv6ExcParamsSourcePortValue1,
+         tIPv6ExcParamsSourcePortValue2, or tIPv6ExcParamsSourcePortOperator
+         then tIPv6ExcParamsSourcePortList is reset to its default (empty)
+         value by the system.
+
+         Setting any one of the objects tIPv6ExcParamsSourcePortValue1,
+         tIPv6ExcParamsSourcePortValue2, or tIPv6ExcParamsSourcePortOperator to
+         a non-default value in combination with a non-default value for the
+         object tIPv6ExcParamsSourcePortList is rejected by the system."
+    DEFVAL      { ''H }
+    ::= { tIPv6ExceptionParamsEntry 16 }
+
+tIPv6ExcParamsDestPortValue1     OBJECT-TYPE
+    SYNTAX      TTcpUdpPort
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tIPv6ExcParamsDestPortValue1 specifies a
+         protocol port value. The value of this object is used when matching
+         protocol destination ports, as per the description for
+         tIPv6ExcParamsDestPortOperator."
+    DEFVAL      { 0 }
+    ::= { tIPv6ExceptionParamsEntry 17 }
+
+tIPv6ExcParamsDestPortValue2     OBJECT-TYPE
+    SYNTAX      TTcpUdpPort
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tIPv6ExcParamsDestPortValue2 specifies a
+         second protocol port value. The value of this object is used when
+         matching protocol destination ports, as per the description for
+         tIPv6ExcParamsDestPortOperator."
+    DEFVAL      { 0 }
+    ::= { tIPv6ExceptionParamsEntry 18 }
+
+tIPv6ExcParamsDestPortOperator   OBJECT-TYPE
+    SYNTAX      TOperator
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tIPv6ExcParamsDestPortOperator specifies the
+         manner in which tIPv6ExcParamsDestPortValue1 and
+         tIPv6ExcParamsDestPortValue2 are to be used to match protocol
+         destination ports."
+    DEFVAL      { none }
+    ::= { tIPv6ExceptionParamsEntry 19 }
+
+tIPv6ExcParamsDestPortList       OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tIPv6ExcParamsDestPortList specifies the
+         port-list used as match criterion for the protocol destination port.
+
+         The value specified for this object must correspond to a port-list
+         defined in tFilterPortListTable.
+
+         If the value of this object is empty then the values of the objects
+         tIPv6ExcParamsDestPortValue1, tIPv6ExcParamsDestPortValue2, and
+         tIPv6ExcParamsDestPortOperator are used as destination port match
+         criterion.
+
+         When this object is set to a non-empty value then the objects
+         tIPv6ExcParamsDestPortValue1, tIPv6ExcParamsDestPortValue2, and
+         tIPv6ExcParamsDestPortOperator are reset to their default values by
+         the system.
+
+         Vice versa, when a new (non-default) value is provided for one of the
+         objects tIPv6ExcParamsDestPortValue1, tIPv6ExcParamsDestPortValue2, or
+         tIPv6ExcParamsDestPortOperator then tIPv6ExcParamsDestPortList is
+         reset to its default (empty) value by the system.
+
+         Setting any one of the objects tIPv6ExcParamsDestPortValue1,
+         tIPv6ExcParamsDestPortValue2, or tIPv6ExcParamsDestPortOperator to a
+         non-default value in combination with a non-default value for the
+         object tIPv6ExcParamsDestPortList is rejected by the system."
+    DEFVAL      { ''H }
+    ::= { tIPv6ExceptionParamsEntry 20 }
+
+tIPv6ExcParamsPortSelector       OBJECT-TYPE
+    SYNTAX      TFltrPortSelector
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tIPv6ExcParamsPortSelector specifies how the
+         source port objects (tIPv6ExcParamsSourcePortValue1,
+         tIPv6ExcParamsSourcePortValue2, tIPv6ExcParamsSourcePortOperator,
+         tIPv6ExcParamsSourcePortList) and destination port objects
+         (tIPv6ExcParamsDestPortValue1, tIPv6ExcParamsDestPortValue2,
+         tIPv6ExcParamsDestPortOperator, tIPv6ExcParamsDestPortList) are
+         combined to form the filter match criterion. See description of
+         TFltrPortSelector."
+    DEFVAL      { and-port }
+    ::= { tIPv6ExceptionParamsEntry 21 }
+
+tIPv6ExcParamsIcmpCode           OBJECT-TYPE
+    SYNTAX      TIcmpCodeOrNone
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tIPv6ExcParamsIcmpCode specifies the ICMP code
+         to be matched.
+
+         The value -1 means ICMP code matching is not enabled."
+    DEFVAL      { -1 }
+    ::= { tIPv6ExceptionParamsEntry 22 }
+
+tIPv6ExcParamsIcmpType           OBJECT-TYPE
+    SYNTAX      TIcmpTypeOrNone
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tIPv6ExcParamsIcmpType specifies the ICMP type
+         to be matched.
+
+         The value -1 means ICMP type matching is not enabled."
+    DEFVAL      { -1 }
+    ::= { tIPv6ExceptionParamsEntry 23 }
+
+tIPv6ExcParamsIngressHitCount    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tIPv6ExcParamsIngressHitCount indicates the
+         number of times an ingress packet matched this entry."
+    ::= { tIPv6ExceptionParamsEntry 24 }
+
+tIPv6ExcParamsEgressHitCount     OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tIPv6ExcParamsEgressHitCount indicates the
+         number of times an egress packet matched this entry."
+    ::= { tIPv6ExceptionParamsEntry 25 }
+
+tIPv6ExcParamsIngrHitByteCount   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tIPv6ExcParamsIngrHitByteCount indicates the
+         number of bytes of all ingress packets that matched this entry."
+    ::= { tIPv6ExceptionParamsEntry 26 }
+
+tIPv6ExcParamsEgrHitByteCount    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tIPv6ExcParamsEgrHitByteCount indicates the
+         number of bytes of all egress packets that matched this entry."
+    ::= { tIPv6ExceptionParamsEntry 27 }
+
 tFilterMIBConformance            OBJECT IDENTIFIER ::= { tmnxSRConfs 21 }
 
 tFilterMIBCompliances            OBJECT IDENTIFIER ::= { tFilterMIBConformance 1 }
@@ -16873,7 +17470,7 @@ tFilterV16v0Compliance           MODULE-COMPLIANCE
     ::= { tFilterMIBCompliances 19 }
 
 tFilterV19v0Compliance           MODULE-COMPLIANCE
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The compliance statement for management of Filter features on Nokia
          SROS series systems release R19.0."
@@ -16932,10 +17529,78 @@ tFilterV19v0Compliance           MODULE-COMPLIANCE
             tFltrFilterNameInLIGroup,
             tFltrCAMTypeGroup,
             tLiFltrAssocFltrNameGroup,
+            tFltrIPv6ExceptionV19v0Group,
             tFltrFwdMplsPlcyEndptGrp,
             tFltrFwdSrtePlcyEndptColorGrp
         }
     ::= { tFilterMIBCompliances 20 }
+
+tFilterV20v0Compliance           MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of Filter features on Nokia
+         SROS series systems release R20.0."
+    MODULE
+        MANDATORY-GROUPS {
+            tFilterScalarGroup,
+            tIPFilterV14v0Group,
+            tIPFilterV13v0Group,
+            tMacFilterV8v0Group,
+            tFilterLogGroup,
+            tFilterLogV5v0Group,
+            tFilterRedirectPolicyV19v0Group,
+            tFilterNotificationsV11v0Group,
+            tFilterNotificationObjV12v0Group,
+            tIPv6FilterV14v0Group,
+            tIPv6FilterV13v0Group,
+            tMacFilterVidFilteringV9v0Group,
+            tDhcpFilterV10v0Group,
+            tDhcpFilterV13v0Group,
+            tFilterNameV10v0Group,
+            tLiFilterV12v0Group,
+            tFilterPrefixListV11v0Group,
+            tFilterEmbeddedInsertV11v0Group,
+            tFilterEmbeddedInsertV12v0Group,
+            tFilterEmbeddedInsertV13v0Group,
+            tFilterPortListV11v0Group,
+            tFilterSystemFilterV13v0Group,
+            tMacFilterV13v0Group,
+            tFilterEmbedFlowspecGroup,
+            tFilterNotificationsV14v0Group,
+            tFilterIPvXRedundantActionGroup,
+            tFilterMacRedundantActionGroup,
+            tFilterEmbedVsdGroup,
+            tFilterEntryStatGroup,
+            tFilterEmbeddedRefGroup,
+            tFilterRemarkDscpGroup,
+            tFilterRemarkDscpExtGroup,
+            tFilterPrefListRtrBgpPeersGroup,
+            tFilterPrefListInfoGroup,
+            tFilterForwardVprnTargetGroup,
+            tFilterNotificationsV15v0Group,
+            tFilterFwdBondingConnectionGroup,
+            tFilterSelectiveFlowspecGroup,
+            tFilterMatchTcpFlagsGroup,
+            tFilterActionFc,
+            tFilterRPPingSrcAddressGroup,
+            tFilterRPActiveDstChangeNotifGrp,
+            tFilterRPActiveDstChangeGrp,
+            tFilterRPlcyBindingGroup,
+            tFltrGreTunTempGroup,
+            tFltrPrefListPrefExcludeGrp,
+            fltrMdAutoIdV16v0Group,
+            tFltrPatternMatchGroup,
+            tFltrMatchMacForIPvXGroup,
+            tFltrMatchPacketLengthGroup,
+            tFltrFilterNameInLIGroup,
+            tFltrCAMTypeGroup,
+            tLiFltrAssocFltrNameGroup,
+            tFltrIPv6ExceptionV19v0Group,
+            tFltrFwdMplsPlcyEndptGrp,
+            tFltrFwdSrtePlcyEndptColorGrp,
+            tLiFltrMatchFragmentGroup
+        }
+    ::= { tFilterMIBCompliances 21 }
 
 tFilterMIBGroups                 OBJECT IDENTIFIER ::= { tFilterMIBConformance 2 }
 
@@ -19659,6 +20324,45 @@ tLiFltrAssocFltrNameGroup        OBJECT-GROUP
          systems in release 19.10."
     ::= { tFilterMIBGroups 102 }
 
+tFltrIPv6ExceptionV19v0Group     OBJECT-GROUP
+    OBJECTS     {
+        tIPv6ExceptionRowStatus,
+        tIPv6ExceptionDescription,
+        tIPv6ExceptionName,
+        tIPv6ExceptionNameId,
+        tIPv6ExcParamsRowStatus,
+        tIPv6ExcParamsDescription,
+        tIPv6ExcParamsNextHeader,
+        tIPv6ExcParamsSrcIpAddr,
+        tIPv6ExcParamsSrcIpMask,
+        tIPv6ExcParamsSrcIpFullMask,
+        tIPv6ExcParamsSrcIpPrefixList,
+        tIPv6ExcParamsDstIpAddr,
+        tIPv6ExcParamsDstIpMask,
+        tIPv6ExcParamsDstIpFullMask,
+        tIPv6ExcParamsDstIpPrefixList,
+        tIPv6ExcParamsSourcePortValue1,
+        tIPv6ExcParamsSourcePortValue2,
+        tIPv6ExcParamsSourcePortOperator,
+        tIPv6ExcParamsSourcePortList,
+        tIPv6ExcParamsDestPortValue1,
+        tIPv6ExcParamsDestPortValue2,
+        tIPv6ExcParamsDestPortOperator,
+        tIPv6ExcParamsDestPortList,
+        tIPv6ExcParamsPortSelector,
+        tIPv6ExcParamsIcmpCode,
+        tIPv6ExcParamsIcmpType,
+        tIPv6ExcParamsIngressHitCount,
+        tIPv6ExcParamsEgressHitCount,
+        tIPv6ExcParamsIngrHitByteCount,
+        tIPv6ExcParamsEgrHitByteCount
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting IPv6 exception filters in Nokia SROS
+         series systems in release 19.10."
+    ::= { tFilterMIBGroups 103 }
+
 tFltrFwdMplsPlcyEndptGrp         OBJECT-GROUP
     OBJECTS     {
         tIPvXFltrFwdMplsPlcyEndptAddrTp,
@@ -19683,6 +20387,16 @@ tFltrFwdSrtePlcyEndptColorGrp    OBJECT-GROUP
          an SR-TE policy endpoint and color for IP-IPv6 in Nokia SROS series
          systems in release 19.10."
     ::= { tFilterMIBGroups 105 }
+
+tLiFltrMatchFragmentGroup        OBJECT-GROUP
+    OBJECTS     {
+        tLiIpFilterParamsFragment
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting LI filter fragment matching in Nokia
+         SROS series systems in release 20.2."
+    ::= { tFilterMIBGroups 106 }
 
 tFilterNotificationsPrefix       OBJECT IDENTIFIER ::= { tmnxSRNotifyPrefix 21 }
 

@@ -149,7 +149,7 @@
                 $("#confirm-delete").modal('hide');
             },
             error: function () {
-                toastr.error(@lang('An error occurred deleting this poller.'));
+                toastr.error('@lang('An error occurred deleting this poller.')');
                 $("#confirm-delete").modal('hide');
             }
         });

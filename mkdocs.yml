@@ -39,6 +39,7 @@ nav:
       - LibreNMS VMs: Installation/Images.md
       - Ubuntu 18.04 (Nginx): Installation/Installation-Ubuntu-1804-Nginx.md
       - Ubuntu 18.04 (Apache): Installation/Installation-Ubuntu-1804-Apache.md
+      - Debian 10 (Nginx): Installation/Installation-Debian-10-Nginx.md
       - CentOS 7 (Nginx): Installation/Installation-CentOS-7-Nginx.md
       - CentOS 7 (Apache): Installation/Installation-CentOS-7-Apache.md
       - Migrating from Observium: Installation/Migrating-from-Observium.md

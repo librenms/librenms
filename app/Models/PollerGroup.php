@@ -49,6 +49,6 @@ class PollerGroup extends Model
 
     public function devices()
     {
-        return $this->hasMany('App\Models\Device', 'poller_group', 'id');
+        return $this->hasMany(\App\Models\Device::class, 'poller_group', 'id');
     }
 }

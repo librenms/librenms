@@ -123,13 +123,6 @@ class UserPreferencesController extends Controller
         return response()->json(['status' => 'success']);
     }
 
-    public function toggleDashboardEditor(Request $request)
-    {
-        $hide_dashboard_editor = UserPref::getPref(Auth::user(), 'hide_dashboard_editor') ? 0 : 1;
-        UserPref::setPref(Auth::user(), 'hide_dashboard_editor', $hide_dashboard_editor);
-        return redirect('overview');
-    }
-
     private function getValidLocales()
     {
         return array_reduce(glob(resource_path('lang') . '/*', GLOB_ONLYDIR), function ($locales, $locale) {

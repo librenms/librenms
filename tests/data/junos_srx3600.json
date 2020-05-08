@@ -10685,8 +10685,8 @@
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.10.1.1.0",
-                    "sensor_index": "10.1.1.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.10.1.1.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node0 FPM Board",
                     "group": null,
                     "sensor_divisor": 1,
@@ -10702,15 +10702,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.10.2.1.0",
-                    "sensor_index": "10.2.1.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.10.2.1.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node1 FPM Board",
                     "group": null,
                     "sensor_divisor": 1,
@@ -10726,15 +10726,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.12.1.0.0",
-                    "sensor_index": "12.1.0.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.12.1.0.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node0 CB 0",
                     "group": null,
                     "sensor_divisor": 1,
@@ -10750,15 +10750,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.12.2.0.0",
-                    "sensor_index": "12.2.0.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.12.2.0.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node0 CB 1",
                     "group": null,
                     "sensor_divisor": 1,
@@ -10774,15 +10774,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.12.3.0.0",
-                    "sensor_index": "12.3.0.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.12.3.0.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node1 CB 0",
                     "group": null,
                     "sensor_divisor": 1,
@@ -10798,15 +10798,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.12.4.0.0",
-                    "sensor_index": "12.4.0.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.12.4.0.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node1 CB 1",
                     "group": null,
                     "sensor_divisor": 1,
@@ -10822,15 +10822,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.2.1.0.0",
-                    "sensor_index": "2.1.0.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.2.1.0.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node0 PEM 0",
                     "group": null,
                     "sensor_divisor": 1,
@@ -10846,15 +10846,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.2.2.0.0",
-                    "sensor_index": "2.2.0.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.2.2.0.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node0 PEM 1",
                     "group": null,
                     "sensor_divisor": 1,
@@ -10870,15 +10870,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.2.3.0.0",
-                    "sensor_index": "2.3.0.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.2.3.0.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node0 PEM 2",
                     "group": null,
                     "sensor_divisor": 1,
@@ -10894,15 +10894,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.2.4.0.0",
-                    "sensor_index": "2.4.0.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.2.4.0.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node0 PEM 3",
                     "group": null,
                     "sensor_divisor": 1,
@@ -10918,15 +10918,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.2.5.0.0",
-                    "sensor_index": "2.5.0.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.2.5.0.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node1 PEM 0",
                     "group": null,
                     "sensor_divisor": 1,
@@ -10942,15 +10942,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.2.6.0.0",
-                    "sensor_index": "2.6.0.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.2.6.0.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node1 PEM 1",
                     "group": null,
                     "sensor_divisor": 1,
@@ -10966,15 +10966,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.2.7.0.0",
-                    "sensor_index": "2.7.0.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.2.7.0.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node1 PEM 2",
                     "group": null,
                     "sensor_divisor": 1,
@@ -10990,15 +10990,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.2.8.0.0",
-                    "sensor_index": "2.8.0.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.2.8.0.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node1 PEM 3",
                     "group": null,
                     "sensor_divisor": 1,
@@ -11014,15 +11014,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.4.1.0.0",
-                    "sensor_index": "4.1.0.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.4.1.0.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node0 Fan Tray",
                     "group": null,
                     "sensor_divisor": 1,
@@ -11038,15 +11038,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.4.1.1.0",
-                    "sensor_index": "4.1.1.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.4.1.1.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node0 Fan 1",
                     "group": null,
                     "sensor_divisor": 1,
@@ -11062,15 +11062,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.4.1.10.0",
-                    "sensor_index": "4.1.10.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.4.1.10.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node0 Fan 10",
                     "group": null,
                     "sensor_divisor": 1,
@@ -11086,15 +11086,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.4.1.2.0",
-                    "sensor_index": "4.1.2.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.4.1.2.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node0 Fan 2",
                     "group": null,
                     "sensor_divisor": 1,
@@ -11110,15 +11110,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.4.1.3.0",
-                    "sensor_index": "4.1.3.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.4.1.3.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node0 Fan 3",
                     "group": null,
                     "sensor_divisor": 1,
@@ -11134,15 +11134,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.4.1.4.0",
-                    "sensor_index": "4.1.4.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.4.1.4.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node0 Fan 4",
                     "group": null,
                     "sensor_divisor": 1,
@@ -11158,15 +11158,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.4.1.5.0",
-                    "sensor_index": "4.1.5.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.4.1.5.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node0 Fan 5",
                     "group": null,
                     "sensor_divisor": 1,
@@ -11182,15 +11182,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.4.1.6.0",
-                    "sensor_index": "4.1.6.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.4.1.6.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node0 Fan 6",
                     "group": null,
                     "sensor_divisor": 1,
@@ -11206,15 +11206,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.4.1.7.0",
-                    "sensor_index": "4.1.7.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.4.1.7.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node0 Fan 7",
                     "group": null,
                     "sensor_divisor": 1,
@@ -11230,15 +11230,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.4.1.8.0",
-                    "sensor_index": "4.1.8.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.4.1.8.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node0 Fan 8",
                     "group": null,
                     "sensor_divisor": 1,
@@ -11254,15 +11254,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.4.1.9.0",
-                    "sensor_index": "4.1.9.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.4.1.9.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node0 Fan 9",
                     "group": null,
                     "sensor_divisor": 1,
@@ -11278,15 +11278,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.4.2.0.0",
-                    "sensor_index": "4.2.0.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.4.2.0.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node1 Fan Tray",
                     "group": null,
                     "sensor_divisor": 1,
@@ -11302,15 +11302,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.4.2.1.0",
-                    "sensor_index": "4.2.1.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.4.2.1.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node1 Fan 1",
                     "group": null,
                     "sensor_divisor": 1,
@@ -11326,15 +11326,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.4.2.10.0",
-                    "sensor_index": "4.2.10.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.4.2.10.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node1 Fan 10",
                     "group": null,
                     "sensor_divisor": 1,
@@ -11350,15 +11350,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.4.2.2.0",
-                    "sensor_index": "4.2.2.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.4.2.2.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node1 Fan 2",
                     "group": null,
                     "sensor_divisor": 1,
@@ -11374,15 +11374,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.4.2.3.0",
-                    "sensor_index": "4.2.3.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.4.2.3.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node1 Fan 3",
                     "group": null,
                     "sensor_divisor": 1,
@@ -11398,15 +11398,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.4.2.4.0",
-                    "sensor_index": "4.2.4.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.4.2.4.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node1 Fan 4",
                     "group": null,
                     "sensor_divisor": 1,
@@ -11422,15 +11422,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.4.2.5.0",
-                    "sensor_index": "4.2.5.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.4.2.5.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node1 Fan 5",
                     "group": null,
                     "sensor_divisor": 1,
@@ -11446,15 +11446,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.4.2.6.0",
-                    "sensor_index": "4.2.6.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.4.2.6.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node1 Fan 6",
                     "group": null,
                     "sensor_divisor": 1,
@@ -11470,15 +11470,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.4.2.7.0",
-                    "sensor_index": "4.2.7.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.4.2.7.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node1 Fan 7",
                     "group": null,
                     "sensor_divisor": 1,
@@ -11494,15 +11494,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.4.2.8.0",
-                    "sensor_index": "4.2.8.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.4.2.8.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node1 Fan 8",
                     "group": null,
                     "sensor_divisor": 1,
@@ -11518,15 +11518,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.4.2.9.0",
-                    "sensor_index": "4.2.9.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.4.2.9.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node1 Fan 9",
                     "group": null,
                     "sensor_divisor": 1,
@@ -11542,15 +11542,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.7.1.0.0",
-                    "sensor_index": "7.1.0.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.7.1.0.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node0 FPC: SRX3k SFB 12GE @ 0/*/*",
                     "group": null,
                     "sensor_divisor": 1,
@@ -11566,15 +11566,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.7.10.0.0",
-                    "sensor_index": "7.10.0.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.7.10.0.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node0 FPC: SRX3k SPC @ 9/*/*",
                     "group": null,
                     "sensor_divisor": 1,
@@ -11590,15 +11590,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.7.11.0.0",
-                    "sensor_index": "7.11.0.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.7.11.0.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node0 FPC: SRX3k NPC @ 10/*/*",
                     "group": null,
                     "sensor_divisor": 1,
@@ -11614,15 +11614,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.7.12.0.0",
-                    "sensor_index": "7.12.0.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.7.12.0.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node0 FPC: SRX3k SPC @ 11/*/*",
                     "group": null,
                     "sensor_divisor": 1,
@@ -11638,15 +11638,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.7.13.0.0",
-                    "sensor_index": "7.13.0.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.7.13.0.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node0 FPC: SRX3k SPC @ 12/*/*",
                     "group": null,
                     "sensor_divisor": 1,
@@ -11662,15 +11662,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.7.14.0.0",
-                    "sensor_index": "7.14.0.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.7.14.0.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node1 FPC: SRX3k SFB 12GE @ 0/*/*",
                     "group": null,
                     "sensor_divisor": 1,
@@ -11686,15 +11686,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.7.15.0.0",
-                    "sensor_index": "7.15.0.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.7.15.0.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node1 FPC: SRX1k3k 2x10GE NP-IOC @ 1/*/*",
                     "group": null,
                     "sensor_divisor": 1,
@@ -11710,15 +11710,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.7.18.0.0",
-                    "sensor_index": "7.18.0.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.7.18.0.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node1 FPC: SRX1k3k 2x10GE NP-IOC @ 4/*/*",
                     "group": null,
                     "sensor_divisor": 1,
@@ -11734,15 +11734,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.7.2.0.0",
-                    "sensor_index": "7.2.0.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.7.2.0.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node0 FPC: SRX1k3k 2x10GE NP-IOC @ 1/*/*",
                     "group": null,
                     "sensor_divisor": 1,
@@ -11758,15 +11758,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.7.20.0.0",
-                    "sensor_index": "7.20.0.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.7.20.0.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node1 FPC: SRX3k SPC @ 6/*/*",
                     "group": null,
                     "sensor_divisor": 1,
@@ -11782,15 +11782,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.7.21.0.0",
-                    "sensor_index": "7.21.0.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.7.21.0.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node1 FPC: SRX3k SPC @ 7/*/*",
                     "group": null,
                     "sensor_divisor": 1,
@@ -11806,15 +11806,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.7.22.0.0",
-                    "sensor_index": "7.22.0.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.7.22.0.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node1 FPC: SRX3k SPC @ 8/*/*",
                     "group": null,
                     "sensor_divisor": 1,
@@ -11830,15 +11830,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.7.23.0.0",
-                    "sensor_index": "7.23.0.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.7.23.0.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node1 FPC: SRX3k SPC @ 9/*/*",
                     "group": null,
                     "sensor_divisor": 1,
@@ -11854,15 +11854,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.7.24.0.0",
-                    "sensor_index": "7.24.0.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.7.24.0.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node1 FPC: SRX3k NPC @ 10/*/*",
                     "group": null,
                     "sensor_divisor": 1,
@@ -11878,15 +11878,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.7.25.0.0",
-                    "sensor_index": "7.25.0.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.7.25.0.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node1 FPC: SRX3k SPC @ 11/*/*",
                     "group": null,
                     "sensor_divisor": 1,
@@ -11902,15 +11902,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.7.26.0.0",
-                    "sensor_index": "7.26.0.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.7.26.0.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node1 FPC: SRX3k SPC @ 12/*/*",
                     "group": null,
                     "sensor_divisor": 1,
@@ -11926,15 +11926,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.7.5.0.0",
-                    "sensor_index": "7.5.0.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.7.5.0.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node0 FPC: SRX1k3k 2x10GE NP-IOC @ 4/*/*",
                     "group": null,
                     "sensor_divisor": 1,
@@ -11950,15 +11950,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.7.7.0.0",
-                    "sensor_index": "7.7.0.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.7.7.0.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node0 FPC: SRX3k SPC @ 6/*/*",
                     "group": null,
                     "sensor_divisor": 1,
@@ -11974,15 +11974,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.7.8.0.0",
-                    "sensor_index": "7.8.0.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.7.8.0.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node0 FPC: SRX3k SPC @ 7/*/*",
                     "group": null,
                     "sensor_divisor": 1,
@@ -11998,15 +11998,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.7.9.0.0",
-                    "sensor_index": "7.9.0.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.7.9.0.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node0 FPC: SRX3k SPC @ 8/*/*",
                     "group": null,
                     "sensor_divisor": 1,
@@ -12022,15 +12022,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.8.1.1.0",
-                    "sensor_index": "8.1.1.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.8.1.1.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node0 PIC: 8x 1GE-TX 4x 1GE-SFP @ 0/0/*",
                     "group": null,
                     "sensor_divisor": 1,
@@ -12046,15 +12046,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.8.10.1.0",
-                    "sensor_index": "8.10.1.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.8.10.1.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node0 PIC: SPU Flow @ 9/0/*",
                     "group": null,
                     "sensor_divisor": 1,
@@ -12070,15 +12070,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.8.11.1.0",
-                    "sensor_index": "8.11.1.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.8.11.1.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node0 PIC: NPC PIC @ 10/0/*",
                     "group": null,
                     "sensor_divisor": 1,
@@ -12094,15 +12094,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.8.12.1.0",
-                    "sensor_index": "8.12.1.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.8.12.1.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node0 PIC: SPU Flow @ 11/0/*",
                     "group": null,
                     "sensor_divisor": 1,
@@ -12118,15 +12118,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.8.13.1.0",
-                    "sensor_index": "8.13.1.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.8.13.1.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node0 PIC: SPU Flow @ 12/0/*",
                     "group": null,
                     "sensor_divisor": 1,
@@ -12142,15 +12142,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.8.14.1.0",
-                    "sensor_index": "8.14.1.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.8.14.1.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node1 PIC: 8x 1GE-TX 4x 1GE-SFP @ 0/0/*",
                     "group": null,
                     "sensor_divisor": 1,
@@ -12166,15 +12166,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.8.15.1.0",
-                    "sensor_index": "8.15.1.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.8.15.1.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node1 PIC: 2x 10GE-SFP+ @ 1/0/*",
                     "group": null,
                     "sensor_divisor": 1,
@@ -12190,15 +12190,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.8.18.1.0",
-                    "sensor_index": "8.18.1.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.8.18.1.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node1 PIC: 2x 10GE-SFP+ @ 4/0/*",
                     "group": null,
                     "sensor_divisor": 1,
@@ -12214,15 +12214,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.8.2.1.0",
-                    "sensor_index": "8.2.1.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.8.2.1.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node0 PIC: 2x 10GE-SFP+ @ 1/0/*",
                     "group": null,
                     "sensor_divisor": 1,
@@ -12238,15 +12238,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.8.20.1.0",
-                    "sensor_index": "8.20.1.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.8.20.1.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node1 PIC: SPU Cp-Flow @ 6/0/*",
                     "group": null,
                     "sensor_divisor": 1,
@@ -12262,15 +12262,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.8.21.1.0",
-                    "sensor_index": "8.21.1.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.8.21.1.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node1 PIC: SPU Flow @ 7/0/*",
                     "group": null,
                     "sensor_divisor": 1,
@@ -12286,15 +12286,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.8.22.1.0",
-                    "sensor_index": "8.22.1.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.8.22.1.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node1 PIC: SPU Flow @ 8/0/*",
                     "group": null,
                     "sensor_divisor": 1,
@@ -12310,15 +12310,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.8.23.1.0",
-                    "sensor_index": "8.23.1.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.8.23.1.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node1 PIC: SPU Flow @ 9/0/*",
                     "group": null,
                     "sensor_divisor": 1,
@@ -12334,15 +12334,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.8.24.1.0",
-                    "sensor_index": "8.24.1.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.8.24.1.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node1 PIC: NPC PIC @ 10/0/*",
                     "group": null,
                     "sensor_divisor": 1,
@@ -12358,15 +12358,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.8.25.1.0",
-                    "sensor_index": "8.25.1.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.8.25.1.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node1 PIC: SPU Flow @ 11/0/*",
                     "group": null,
                     "sensor_divisor": 1,
@@ -12382,15 +12382,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.8.26.1.0",
-                    "sensor_index": "8.26.1.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.8.26.1.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node1 PIC: SPU Flow @ 12/0/*",
                     "group": null,
                     "sensor_divisor": 1,
@@ -12406,15 +12406,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.8.5.1.0",
-                    "sensor_index": "8.5.1.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.8.5.1.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node0 PIC: 2x 10GE-SFP+ @ 4/0/*",
                     "group": null,
                     "sensor_divisor": 1,
@@ -12430,15 +12430,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.8.7.1.0",
-                    "sensor_index": "8.7.1.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.8.7.1.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node0 PIC: SPU Cp-Flow @ 6/0/*",
                     "group": null,
                     "sensor_divisor": 1,
@@ -12454,15 +12454,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.8.8.1.0",
-                    "sensor_index": "8.8.1.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.8.8.1.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node0 PIC: SPU Flow @ 7/0/*",
                     "group": null,
                     "sensor_divisor": 1,
@@ -12478,15 +12478,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.8.9.1.0",
-                    "sensor_index": "8.9.1.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.8.9.1.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node0 PIC: SPU Flow @ 8/0/*",
                     "group": null,
                     "sensor_divisor": 1,
@@ -12502,15 +12502,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.9.1.0.0",
-                    "sensor_index": "9.1.0.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.9.1.0.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node0 Routing Engine 0",
                     "group": null,
                     "sensor_divisor": 1,
@@ -12526,15 +12526,15 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2636.3.1.15.1.8.9.3.0.0",
-                    "sensor_index": "9.3.0.0",
-                    "sensor_type": "jnxFruState",
+                    "sensor_index": "jnxFruName.9.3.0.0",
+                    "sensor_type": "jnxFruTable",
                     "sensor_descr": "node1 Routing Engine 0",
                     "group": null,
                     "sensor_divisor": 1,
@@ -12550,7 +12550,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "jnxFruState"
+                    "state_name": "jnxFruTable"
                 },
                 {
                     "sensor_deleted": 0,
@@ -13179,70 +13179,70 @@
             ],
             "state_indexes": [
                 {
-                    "state_name": "jnxFruState",
+                    "state_name": "jnxFruTable",
                     "state_descr": "unknown",
                     "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
-                    "state_name": "jnxFruState",
+                    "state_name": "jnxFruTable",
                     "state_descr": "empty",
                     "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 3
                 },
                 {
-                    "state_name": "jnxFruState",
+                    "state_name": "jnxFruTable",
                     "state_descr": "present",
                     "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
-                    "state_name": "jnxFruState",
+                    "state_name": "jnxFruTable",
                     "state_descr": "ready",
                     "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
-                    "state_name": "jnxFruState",
+                    "state_name": "jnxFruTable",
                     "state_descr": "announceOnline",
                     "state_draw_graph": 1,
                     "state_value": 5,
                     "state_generic_value": 0
                 },
                 {
-                    "state_name": "jnxFruState",
+                    "state_name": "jnxFruTable",
                     "state_descr": "online",
                     "state_draw_graph": 1,
                     "state_value": 6,
                     "state_generic_value": 0
                 },
                 {
-                    "state_name": "jnxFruState",
+                    "state_name": "jnxFruTable",
                     "state_descr": "anounceOffline",
                     "state_draw_graph": 1,
                     "state_value": 7,
                     "state_generic_value": 1
                 },
                 {
-                    "state_name": "jnxFruState",
+                    "state_name": "jnxFruTable",
                     "state_descr": "offline",
                     "state_draw_graph": 1,
                     "state_value": 8,
                     "state_generic_value": 2
                 },
                 {
-                    "state_name": "jnxFruState",
+                    "state_name": "jnxFruTable",
                     "state_descr": "diagnostic",
                     "state_draw_graph": 1,
                     "state_value": 9,
                     "state_generic_value": 3
                 },
                 {
-                    "state_name": "jnxFruState",
+                    "state_name": "jnxFruTable",
                     "state_descr": "standby",
                     "state_draw_graph": 1,
                     "state_value": 10,

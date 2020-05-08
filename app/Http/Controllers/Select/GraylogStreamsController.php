@@ -28,6 +28,7 @@ namespace App\Http\Controllers\Select;
 use App\ApiClients\GraylogApi;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Log;
 
 class GraylogStreamsController extends Controller
@@ -50,7 +51,7 @@ class GraylogStreamsController extends Controller
         $streams = [];
         try {
             $streams = collect($api->getStreams()['streams'])->filter(function ($stream) use ($search) {
-                return !$search || str_contains(strtolower($stream['title']), $search) || str_contains(strtolower($stream['description']), $search);
+                return !$search || Str::contains(strtolower($stream['title']), $search) || Str::contains(strtolower($stream['description']), $search);
             })->map(function ($stream) {
                 $text = $stream['title'];
                 if ($stream['description']) {

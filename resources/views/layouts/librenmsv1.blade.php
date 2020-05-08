@@ -16,7 +16,7 @@
     @else
         <link rel="shortcut icon" href="{{ LibreNMS\Config::get('favicon') }}" />
     @endif
-    
+
     <link rel="manifest" href="{{ asset('images/manifest.json') }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="msapplication-config" content="{{ asset('images/browserconfig.xml') }}">
@@ -79,7 +79,7 @@
         });
         var ajax_url = "{{ url('/ajax') }}";
     </script>
-    <script src="{{ asset('js/librenms.js?ver=20191025') }}"></script>
+    <script src="{{ asset('js/librenms.js?ver=20200501') }}"></script>
     <script type="text/javascript">
         <!-- Begin
         function popUp(URL)

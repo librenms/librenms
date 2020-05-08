@@ -10,21 +10,23 @@
  * the source code distribution for details.
  */
 
-if (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.259.10.1.24.')) { //ECS4510
+use Illuminate\Support\Str;
+
+if (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.259.10.1.24.')) { //ECS4510
     $temp_mibs = 'ECS4510-MIB';
-} elseif (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.259.10.1.22.')) { //ECS3528
+} elseif (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.259.10.1.22.')) { //ECS3528
     $temp_mibs = 'ES3528MV2-MIB';
-} elseif (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.259.10.1.39.')) { //ECS4110
+} elseif (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.259.10.1.39.')) { //ECS4110
     $temp_mibs = 'ECS4110-MIB';
-} elseif (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.259.10.1.45.')) { //ECS4120
+} elseif (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.259.10.1.45.')) { //ECS4120
     $temp_mibs = 'ECS4120-MIB';
-} elseif (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.259.10.1.42.')) { //ECS4210
+} elseif (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.259.10.1.42.')) { //ECS4210
     $temp_mibs = 'ECS4210-MIB';
-} elseif (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.259.10.1.27.')) { //ECS3510
+} elseif (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.259.10.1.27.')) { //ECS3510
     $temp_mibs = 'ECS3510-MIB';
-} elseif (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.259.8.1.11.')) {  //ECS3510MA
+} elseif (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.259.8.1.11.')) {  //ECS3510MA
     $temp_mibs = 'ES3510MA-MIB';
-} elseif (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.259.10.1.43.')) { //ECS2100
+} elseif (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.259.10.1.43.')) { //ECS2100
     $temp_mibs = 'ECS2100-MIB';
 };
 

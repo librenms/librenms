@@ -110,7 +110,7 @@ if ($vars['view'] == 'macaccounting_pkts') {
 print_optionbar_end();
 
 echo '<table border="0" cellspacing="0" cellpadding="5" width="100%">';
-echo '<tr style="height: 30px"><th>Peer address</th><th>Type</th><th>Family</th><th>Remote AS</th><th>Peer description</th><th>State</th><th>Uptime</th></tr>';
+echo '<tr style="height: 30px"><th>Peer address</th><th>Type</th><th>Family</th><th>Remote AS</th><th>Peer description</th><th>State</th><th>Last error</th><th>Uptime</th></tr>';
 
 $i = '1';
 
@@ -229,6 +229,12 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? $extra_sql 
     $link = generate_url($link_array);
     $peeraddresslink = "<span class=list-large>".overlib_link($link, $peer['bgpPeerIdentifier'], generate_graph_tag($graph_array_zoom), null)."</span>";
 
+    if ($peer['bgpPeerLastErrorCode'] == 0 && $peer['bgpPeerLastErrorSubCode'] == 0) {
+        $last_error = $peer['bgpPeerLastErrorText'];
+    } else {
+        $last_error = describe_bgp_error_code($peer['bgpPeerLastErrorCode'], $peer['bgpPeerLastErrorSubCode'])."<br/>".$peer['bgpPeerLastErrorText'];
+    }
+
     echo '<tr bgcolor="'.$bg_colour.'"'.($peer['alert'] ? ' bordercolor="#cc0000"' : '').($peer['disabled'] ? ' bordercolor="#cccccc"' : '').'>
         ';
 
@@ -238,8 +244,9 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? $extra_sql 
         <td style='font-size: 10px; font-weight: bold; line-height: 10px;'>".(isset($peer['afi']) ? $peer['afi'] : '').'</td>
         <td><strong>AS'.$peer['bgpPeerRemoteAs'].'</strong><br />'.$peer['astext']."</td>
         <td>".$peer['bgpPeerDescr']."</td>
-        <td><strong><span style='color: $admin_col;'>".$peer['bgpPeerAdminStatus']."<span><br /><span style='color: $col;'>".$peer['bgpPeerState'].'</span></strong></td>
-        <td>'.formatUptime($peer['bgpPeerFsmEstablishedTime'])."<br />
+        <td><strong><span style='color: $admin_col;'>".$peer['bgpPeerAdminStatus']."<span><br /><span style='color: $col;'>".$peer['bgpPeerState']."</span></strong></td>
+        <td>".$last_error."</td>
+        <td>".formatUptime($peer['bgpPeerFsmEstablishedTime'])."<br />
         Updates <i class='fa fa-arrow-down icon-theme' aria-hidden='true'></i> ".$peer['bgpPeerInUpdates']."
         <i class='fa fa-arrow-up icon-theme' aria-hidden='true'></i> ".$peer['bgpPeerOutUpdates'].'</td>
         </tr>

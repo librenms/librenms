@@ -2,6 +2,7 @@
 <?php
 
 use LibreNMS\Config;
+use Illuminate\Support\Str;
 
 $install_dir = realpath(__DIR__ . '/..');
 chdir($install_dir);
@@ -36,7 +37,7 @@ if (isset($options['h'])) {
     if (is_numeric($options['h'])) {
         $where = "AND `device_id` = ?";
         $params = array($options['h']);
-    } elseif (str_contains($options['h'], ',')) {
+    } elseif (Str::contains($options['h'], ',')) {
         $device_ids = array_map('trim', explode(',', $options['h']));
         $device_ids = array_filter($device_ids, 'is_numeric');
         $where = 'AND `device_id` in ' . dbGenPlaceholders(count($device_ids));
