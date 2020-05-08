@@ -53,6 +53,7 @@ class ObjectCache
                 ->groupBy('app_type', 'app_instance')
                 ->orderBy('app_type')
                 ->get()
+                ->sortBy('show_name', SORT_NATURAL|SORT_FLAG_CASE)
                 ->groupBy('app_type');
         });
     }
