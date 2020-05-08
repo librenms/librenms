@@ -28,6 +28,9 @@ use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv4;
 
+require realpath(__DIR__ . '/..') . '/generic_search.php';
+
+
 function api_success($result, $result_name, $message = null, $code = 200, $count = null, $extra = null)
 {
     if (isset($result) && !isset($result_name)) {
@@ -70,6 +73,15 @@ function api_error($statusCode, $message)
 function api_not_found()
 {
     return api_error(404, "This API route doesn't exist.");
+}
+
+function search_ports(\Illuminate\Http\Request $request)
+{
+    $search   = $request->get('search');
+    $type        = 'ports';
+    //Log::channel('stderr')->info('for debug -------- value :'.$_REQUEST['map']);
+    $output=generic_search($search,$type,$map);
+    echo $output;
 }
 
 function api_get_graph(array $vars)
@@ -1014,7 +1026,7 @@ function list_alerts(\Illuminate\Http\Request $request)
     }
 
     $order = 'timestamp desc';
-    
+
     $alert_rule = $request->get('alert_rule');
     if (isset($alert_rule)) {
         if (is_numeric($alert_rule)) {
@@ -1022,7 +1034,7 @@ function list_alerts(\Illuminate\Http\Request $request)
             $sql .= ' AND `R`.id=?';
         }
     }
-    
+
     if ($request->has('order')) {
         list($sort_column, $sort_order) = explode(' ', $request->get('order'), 2);
         if (($res = validate_column_list($sort_column, 'alerts')) !== true) {
@@ -2333,7 +2345,7 @@ function validateDeviceIds($ids)
     }
     return true;
 }
-  
+
 function add_location(\Illuminate\Http\Request $request)
 {
     $data = json_decode($request->getContent(), true);
