@@ -9,5 +9,11 @@ class ComponentStatusLog extends Model
     public $timestamps = false;
     protected $table = 'component_statuslog';
     protected $fillable = ['component_id', 'status', 'message'];
-    protected $casts = ['status' => 'integer'];
+
+    // ---- Accessors/Mutators ----
+
+    public function setStatusAttribute($status)
+    {
+        $this->attributes['status'] = (int)$status;
+    }
 }
