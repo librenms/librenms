@@ -28,6 +28,7 @@ namespace LibreNMS\Validations;
 use LibreNMS\Config;
 use LibreNMS\Util\Version;
 use LibreNMS\Validator;
+use Symfony\Component\Process\Process;
 
 class Python extends BaseValidation
 {
@@ -44,7 +45,7 @@ class Python extends BaseValidation
         $version = Version::python();
 
         if (empty($version)) {
-            $validator->fail('python3 not found');
+            $validator->fail('python3 not found', 'Install Python 3 for your system.');
             return; // no need to check anything else
         }
 
@@ -55,17 +56,24 @@ class Python extends BaseValidation
     private function checkVersion(Validator $validator, $version)
     {
         if (version_compare($version, self::PYTHON_MIN_VERSION, '<')) {
-            $validator->warn('Python version ' . self::PYTHON_MIN_VERSION . ' is the minimum supported version. We recommend you update Python to a supported version.');
+            $validator->warn("Python version $version too old.", 'Python version ' . self::PYTHON_MIN_VERSION . ' is the minimum supported version. We recommend you update Python to a supported version.');
         }
     }
 
     private function checkExtensions(Validator $validator)
     {
-        $pythonExtensions = 'scripts/check_requirements.py';
-        exec(Config::get('install_dir') . '/' . $pythonExtensions . ' -v', $output, $returnval);
+        $user = Config::get('user', 'librenms');
+        if (get_current_user() !== $user) {
+            $validator->warn("Could not check Python dependencies because this script is not running as $user");
+            return;
+        }
 
-        if ($returnval !== 0) {
-            $validator->fail("Python3 module issue found: '" . ($output[0] ?? '') . "'");
+        $pythonExtensions = '/scripts/check_requirements.py';
+        $process = new Process([Config::get('install_dir') . $pythonExtensions, '-v']);
+        $process->run();
+
+        if ($process->getExitCode() !== 0) {
+            $validator->fail("Python3 module issue found: '" . $process->getOutput() . "'", 'pip3 install -r requirements.txt');
         }
     }
 }
