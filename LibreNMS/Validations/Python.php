@@ -28,6 +28,7 @@ namespace LibreNMS\Validations;
 use LibreNMS\Config;
 use LibreNMS\Util\Version;
 use LibreNMS\Validator;
+use Symfony\Component\Process\Process;
 
 class Python extends BaseValidation
 {
@@ -61,11 +62,18 @@ class Python extends BaseValidation
 
     private function checkExtensions(Validator $validator)
     {
-        $pythonExtensions = 'scripts/check_requirements.py';
-        exec(Config::get('install_dir') . '/' . $pythonExtensions . ' -v', $output, $returnval);
+        $user = Config::get('user', 'librenms');
+        if (get_current_user() !== $user) {
+            $validator->warn("Could not check Python dependencies because this script is not running as $user");
+            return;
+        }
 
-        if ($returnval !== 0) {
-            $validator->fail("Python3 module issue found: '" . ($output[0] ?? '') . "'", 'pip3 install -r requirements.txt');
+        $pythonExtensions = '/scripts/check_requirements.py';
+        $process = new Process([Config::get('install_dir') . $pythonExtensions, '-v']);
+        $process->run();
+
+        if ($process->getExitCode() !== 0) {
+            $validator->fail("Python3 module issue found: '" . $process->getOutput() . "'", 'pip3 install -r requirements.txt');
         }
     }
 }
