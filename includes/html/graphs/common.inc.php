@@ -84,9 +84,9 @@ if (isset($scale_rigid)) {
 
 $rrd_options .= ' -E --start '.$from.' --end '.$to.' --width '.$width.' --height '.$height.' ';
 
-if(Config::get('applied_site_style') == 'dark'){
+if (Config::get('applied_site_style') == 'dark') {
     $rrd_options .= \LibreNMS\Config::get('rrdgraph_def_text_dark') . ' -c FONT#' . ltrim(\LibreNMS\Config::get('rrdgraph_def_text_color_dark'), '#');
-}else{
+} else {
     $rrd_options .= \LibreNMS\Config::get('rrdgraph_def_text') . ' -c FONT#' . ltrim(\LibreNMS\Config::get('rrdgraph_def_text_color'), '#');
 }
 
