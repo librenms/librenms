@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 """
  discovery-wrapper A small tool which wraps around discovery and tries to
                 guide the discovery process with a more modern approach with a
@@ -37,22 +37,13 @@
                 LICENSE.txt contains a copy of the full GPLv3 licensing conditions.
 """
 
-from __future__ import print_function
-from __future__ import unicode_literals
-
-import librenms_library as LNMS
+import LibreNMS.library as LNMS
 
 try:
 
     import json
     import os
-
-    # Python 2 compatibility where queue is named Queue
-    try:
-        import queue
-    except ImportError:
-        import Queue as queue
-
+    import queue
     import subprocess
     import sys
     import threading
@@ -61,12 +52,12 @@ try:
 
 except:
     print("ERROR: missing one or more of the following python modules:")
-    print("threading, Queue, sys, subprocess, time, os, json")
+    print("threading, queue, sys, subprocess, time, os, json")
     sys.exit(2)
 
 APP_NAME = "discovery_wrapper"
 LOG_FILE = APP_NAME + ".log"
-_DEBUG = True
+_DEBUG = False
 
 # (c) 2015, GPLv3, Daniel Preussker <f0o@devilcode.org> <<<EOC0
 def memc_alive():

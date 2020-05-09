@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 #  -*- coding: utf-8 -*-
 
 import sys
@@ -13,9 +13,8 @@ from logging.handlers import RotatingFileHandler
 try:
     import pymysql
     pymysql.install_as_MySQLdb()
-    print("Using pure python SQL client")
 except ImportError:
-    print("Using other SQL client")
+    pass
 
 try:
     import MySQLdb

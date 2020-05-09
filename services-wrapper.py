@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 """
  services-wrapper A small tool which wraps around check-services.php and tries to
                 guide the services process with a more modern approach with a
@@ -37,22 +37,13 @@
                 LICENSE.txt contains a copy of the full GPLv3 licensing conditions.
 """
 
-from __future__ import print_function
-from __future__ import unicode_literals
-
-import librenms_library as LNMS
+import LibreNMS.library as LNMS
 
 try:
 
     import json
     import os
-
-    # Python 2 compatibility where queue is named Queue
-    try:
-        import queue
-    except ImportError:
-        import Queue as queue
-
+    import queue
     import subprocess
     import sys
     import threading
@@ -61,13 +52,13 @@ try:
 
 except:
     print("ERROR: missing one or more of the following python modules:")
-    print("threading, Queue, sys, subprocess, time, os, json")
+    print("threading, queue, sys, subprocess, time, os, json")
     sys.exit(2)
 
 
-APP_NAME = "poller_wrapper"
+APP_NAME = "services_wrapper"
 LOG_FILE = APP_NAME + ".log"
-_DEBUG = True
+_DEBUG = False
 
 """
  Threading helper functions
@@ -346,8 +337,7 @@ if __name__ == '__main__':
 
     total_time = int(time.time() - s_time)
 
-    print("INFO: services-wrapper checked %s devices in %s seconds with %s workers" % (
-    service_devices, total_time, amount_of_workers))
+    print("INFO: services-wrapper checked %s devices in %s seconds with %s workers" % (service_devices, total_time, amount_of_workers))
 
     # (c) 2015, GPLv3, Daniel Preussker <f0o@devilcode.org> <<<EOC6
     if servicedisco or memc_alive():
@@ -390,77 +380,5 @@ if __name__ == '__main__':
             recommend = int(total_time / 300.0 * amount_of_workers + 1)
             print(
                 "WARNING: Consider setting a minimum of %d threads. (This does not constitute professional advice!)" % recommend)
-
-        sys.exit(2)
-
-
-    poll_queue = queue.Queue()
-    print_queue = queue.Queue()
-
-    print("INFO: starting the service check at %s with %s threads" % (time.strftime("%Y-%m-%d %H:%M:%S"),
-            amount_of_workers))
-
-    for device_id in devices_list:
-        poll_queue.put(device_id)
-
-    for i in range(amount_of_workers):
-        t = threading.Thread(target=poll_worker)
-        t.setDaemon(True)
-        t.start()
-
-    p = threading.Thread(target=printworker)
-    p.setDaemon(True)
-    p.start()
-
-    try:
-        poll_queue.join()
-        print_queue.join()
-    except (KeyboardInterrupt, SystemExit):
-        raise
-
-    total_time = int(time.time() - s_time)
-
-    print("INFO: services-wrapper checked %s devices in %s seconds with %s workers" % (service_devices, total_time, amount_of_workers))
-
-    # (c) 2015, GPLv3, Daniel Preussker <f0o@devilcode.org> <<<EOC6
-    if servicedisco or memc_alive():
-        master = memc.get("service.master")
-        if master == config['distributed_poller_name'] and not IsNode:
-            print("Wait for all service-nodes to finish")
-            nodes = memc.get("service.nodes")
-            while nodes > 0 and nodes is not None:
-                try:
-                    time.sleep(1)
-                    nodes = memc.get("service.nodes")
-                except:
-                    pass
-            print("Clearing Locks")
-            x = minlocks
-            while x <= maxlocks:
-                memc.delete('service.device.' + str(x))
-                x = x + 1
-            print("%s Locks Cleared" % x)
-            print("Clearing Nodes")
-            memc.delete("service.master")
-            memc.delete("service.nodes")
-        else:
-            memc.decr("service.nodes")
-        print("Finished %s." % time.time())
-    # EOC6
-
-    show_stopper = False
-
-    if total_time > 300:
-        print("WARNING: the process took more than 5 minutes to finish, you need faster hardware or more threads")
-        print("INFO: in sequential style service checks the elapsed time would have been: %s seconds" % real_duration)
-        for device in per_device_duration:
-            if per_device_duration[device] > 300:
-                print("WARNING: device %s is taking too long: %s seconds" % (device, per_device_duration[device]))
-                show_stopper = True
-        if show_stopper:
-            print("ERROR: Some devices are taking more than 300 seconds, the script cannot recommend you what to do.")
-        else:
-            recommend = int(total_time / 300.0 * amount_of_workers + 1)
-            print("WARNING: Consider setting a minimum of %d threads. (This does not constitute professional advice!)" % recommend)
 
         sys.exit(2)

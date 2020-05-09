@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 """
  poller-wrapper A small tool which wraps around the poller and tries to
                 guide the polling process with a more modern approach with a
@@ -25,22 +25,13 @@
                 published from: The Netherlands.
 """
 
-from __future__ import print_function
-from __future__ import unicode_literals
-
-import librenms_library as LNMS
+import LibreNMS.library as LNMS
 
 try:
 
     import json
     import os
-
-    # Python 2 compatibility where queue is named Queue
-    try:
-        import queue
-    except ImportError:
-        import Queue as queue
-
+    import queue
     import subprocess
     import sys
     import threading
@@ -49,14 +40,14 @@ try:
 
 except ImportError as exc:
     print('ERROR: missing one or more of the following python modules:')
-    print('threading, Queue, sys, subprocess, time, os, json')
+    print('threading, queue, sys, subprocess, time, os, json')
     print('ERROR: %s' % exc)
     sys.exit(2)
 
 
 APP_NAME = "poller_wrapper"
 LOG_FILE = APP_NAME + ".log"
-_DEBUG = True
+_DEBUG = False
 
 """
  Threading helper functions
