@@ -73,7 +73,7 @@ class Python extends BaseValidation
         $process->run();
 
         if ($process->getExitCode() !== 0) {
-            $validator->fail("Python3 module issue found: '" . $process->getOutput() . "'", 'pip3 install -r requirements.txt');
+            $validator->fail("Python3 module issue found: '" . $process->getOutput() . "'", 'pip3 install -r ' . Config::get('install_dir') . '/requirements.txt');
         }
     }
 }
