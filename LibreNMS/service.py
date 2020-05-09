@@ -15,7 +15,7 @@ from logging import debug, info, warning, error, critical, exception
 from platform import python_version
 from time import sleep
 from socket import gethostname
-from signal import signal, SIGTERM
+from signal import signal, SIGTERM, SIGQUIT, SIGINT, strsignal
 from uuid import uuid1
 
 
@@ -286,6 +286,8 @@ class Service:
     def attach_signals(self):
         info("Attaching signal handlers on thread %s", threading.current_thread().name)
         signal(SIGTERM, self.terminate)  # capture sigterm and exit gracefully
+        signal(SIGQUIT, self.terminate)  # capture sigquit and exit gracefully
+        signal(SIGINT, self.terminate)  # capture sigint and exit gracefully
 
     def start(self):
         debug("Performing startup checks...")
@@ -486,13 +488,13 @@ class Service:
         python = sys.executable
         os.execl(python, python, *sys.argv)
 
-    def terminate(self, _unused=None, _=None):
+    def terminate(self, signalnum=None, flag=None):
         """
         Handle a set the terminate flag to begin a clean shutdown
         :param _unused:
         :param _:
         """
-        info("Received SIGTERM on thead %s, handling", threading.current_thread().name)
+        info("Received %s on thead %s, handling", strsignal(signalnum), threading.current_thread().name)
         self.terminate_flag = True
 
     def shutdown(self, _unused=None, _=None):
