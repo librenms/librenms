@@ -4,8 +4,8 @@ use App\Models\Application;
 
 $graph_array['height']      = '100';
 $graph_array['width']       = '218';
-$graph_array['to'] = \LibreNMS\Config::get('time.now');
-$graph_array['from'] = \LibreNMS\Config::get('time.day');
+$graph_array['to']          = \LibreNMS\Config::get('time.now');
+$graph_array['from']        = \LibreNMS\Config::get('time.day');
 $graph_array_zoom           = $graph_array;
 $graph_array_zoom['height'] = '150';
 $graph_array_zoom['width']  = '400';
@@ -37,7 +37,7 @@ foreach (Application::query()->hasAccess(Auth::user())->with('device')->orderBy(
 
         $overlib_link   .= '<br/>';
         $overlib_link   .= generate_graph_tag($graph_array);
-        $overlib_content = generate_overlib_content($graph_array, optional($app->device)->displayName().' - '.$app->app_type.$content_add);
+        $overlib_content = generate_overlib_content($graph_array, optional($app->device)->displayName().' - '.$app->displayName().$content_add);
 
         echo "<div style='display: block; padding: 1px; padding-top: 3px; margin: 2px; min-width: ".$width_div.'px; max-width:'.$width_div."px; min-height:165px; max-height:165px;
                       text-align: center; float: left; background-color: #f5f5f5;'>";
