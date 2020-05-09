@@ -482,11 +482,14 @@ class Service:
             return
 
         info('Restarting service... ')
-        self._stop_managers_and_wait()
+        self._stop_managers()
         self._release_master()
 
         python = sys.executable
         os.execl(python, python, *sys.argv)
+
+        self._stop_managers_and_wait()
+        sys.stdout.flush()
 
     def terminate(self, signalnum=None, flag=None):
         """
@@ -540,13 +543,16 @@ class Service:
             except AttributeError:
                 pass
 
+    def _stop_managers(self):
+        for manager in self.queue_managers.values():
+            manager.stop()
+
     def _stop_managers_and_wait(self):
         """
         Stop all QueueManagers, and wait for their processing threads to complete.
         We send the stop signal to all QueueManagers first, then wait for them to finish.
         """
-        for manager in self.queue_managers.values():
-            manager.stop()
+        self._stop_managers()
 
         for manager in self.queue_managers.values():
             manager.stop_and_wait()
