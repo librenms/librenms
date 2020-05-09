@@ -56,7 +56,7 @@ except:
     sys.exit(2)
 
 APP_NAME = "discovery_wrapper"
-LOG_FILE = APP_NAME + ".log"
+LOG_FILE = "logs/" + APP_NAME + ".log"
 _DEBUG = False
 
 # (c) 2015, GPLv3, Daniel Preussker <f0o@devilcode.org> <<<EOC0

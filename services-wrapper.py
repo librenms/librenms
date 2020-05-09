@@ -57,7 +57,7 @@ except:
 
 
 APP_NAME = "services_wrapper"
-LOG_FILE = APP_NAME + ".log"
+LOG_FILE = "logs/" + APP_NAME + ".log"
 _DEBUG = False
 
 """

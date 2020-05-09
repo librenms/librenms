@@ -46,7 +46,7 @@ except ImportError as exc:
 
 
 APP_NAME = "poller_wrapper"
-LOG_FILE = APP_NAME + ".log"
+LOG_FILE = "logs/" + APP_NAME + ".log"
 _DEBUG = False
 
 """
