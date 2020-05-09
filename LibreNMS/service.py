@@ -229,7 +229,7 @@ class ServiceConfig:
 
         except ImportError as e:
             exception("Could not import .env - check that the poller user can read the file, and that composer install has been run recently")
-            sys.exit(3)
+            self.exit(3)
 
         config_cmd = ['/usr/bin/env', 'php', '{}/config_to_json.php'.format(self.BASE_DIR), '2>&1']
         try:
@@ -462,12 +462,12 @@ class Service:
             if self.config.distributed:
                 critical("ERROR: Redis connection required for distributed polling")
                 critical("Please install redis-py, either through your os software repository or from PyPI")
-                sys.exit(2)
+                self.exit(2)
         except Exception as e:
             if self.config.distributed:
                 critical("ERROR: Redis connection required for distributed polling")
                 critical("Could not connect to Redis. {}".format(e))
-                sys.exit(2)
+                self.exit(2)
 
         return LibreNMS.ThreadingLock()
 
@@ -517,7 +517,7 @@ class Service:
 
         # try to release master lock
         info('Shutdown of %s/%s complete', os.getpid(), threading.current_thread().name)
-        sys.exit(0)
+        self.exit(0)
 
     def start_dispatch_timers(self):
         """
@@ -566,7 +566,7 @@ class Service:
             fcntl.lockf(self._fp, fcntl.LOCK_EX | fcntl.LOCK_NB)
         except IOError:
             warning("Another instance is already running, quitting.")
-            exit(2)
+            self.exit(2)
 
     def log_performance_stats(self):
         info("Counting up time spent polling")
@@ -613,3 +613,6 @@ class Service:
         else:
             info("Log file updated {}s ago".format(int(logfile_mdiff)))
 
+    def exit(self, code=0):
+        sys.stdout.flush()
+        sys.exit(code)
