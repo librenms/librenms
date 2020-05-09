@@ -15,7 +15,7 @@ from logging import debug, info, warning, error, critical, exception
 from platform import python_version
 from time import sleep
 from socket import gethostname
-from signal import signal, SIGTERM, SIGQUIT, SIGINT, strsignal
+from signal import signal, SIGTERM, SIGQUIT, SIGINT
 from uuid import uuid1
 
 
@@ -497,7 +497,7 @@ class Service:
         :param _unused:
         :param _:
         """
-        info("Received %s on thead %s, handling", strsignal(signalnum), threading.current_thread().name)
+        info("Received signal on thead %s, handling", threading.current_thread().name)
         self.terminate_flag = True
 
     def shutdown(self, _unused=None, _=None):
