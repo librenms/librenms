@@ -215,9 +215,9 @@ if __name__ == '__main__':
         poller_group = False
 
     if ('distributed_poller' in config and
-            'distributed_poller_memcached_host' in config and
-            'distributed_poller_memcached_port' in config and
-            config['distributed_poller']):
+        'distributed_poller_memcached_host' in config and
+        'distributed_poller_memcached_port' in config and
+        config['distributed_poller']):
 
         time_tag = str(get_time_tag(step))
         master_tag = "poller.master." + time_tag
@@ -374,10 +374,9 @@ if __name__ == '__main__':
     db = LNMS.db_open(db_socket, db_server, db_port, db_username, db_password, db_dbname)
     cursor = db.cursor()
     query = "update pollers set last_polled=NOW(), devices='%d', time_taken='%d' where poller_name='%s'" % (
-    polled_devices,
-    total_time,
-    config[
-        'distributed_poller_name'])
+        polled_devices,
+        total_time,
+        config['distributed_poller_name'])
     response = cursor.execute(query)
     if response == 1:
         db.commit()

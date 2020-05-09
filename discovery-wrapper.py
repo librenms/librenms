@@ -216,9 +216,9 @@ if __name__ == '__main__':
         discovery_group = False
 
     if ('distributed_poller' in config and
-            'distributed_poller_memcached_host' in config and
-            'distributed_poller_memcached_port' in config and
-            config['distributed_poller']):
+        'distributed_poller_memcached_host' in config and
+        'distributed_poller_memcached_port' in config and
+        config['distributed_poller']):
         try:
             import memcache
             import uuid
@@ -312,8 +312,8 @@ if __name__ == '__main__':
     print_queue = queue.Queue()
 
     print("INFO: starting the discovery at %s with %s threads, slowest devices first" % (
-    time.strftime("%Y-%m-%d %H:%M:%S"),
-    amount_of_workers))
+        time.strftime("%Y-%m-%d %H:%M:%S"),
+        amount_of_workers))
 
     for device_id in devices_list:
         poll_queue.put(device_id)
@@ -336,7 +336,7 @@ if __name__ == '__main__':
     total_time = int(time.time() - s_time)
 
     print("INFO: discovery-wrapper polled %s devices in %s seconds with %s workers" % (
-    discovered_devices, total_time, amount_of_workers))
+        discovered_devices, total_time, amount_of_workers))
 
     # (c) 2015, GPLv3, Daniel Preussker <f0o@devilcode.org> <<<EOC6
     if distdisco or memc_alive():

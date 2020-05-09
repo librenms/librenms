@@ -105,7 +105,7 @@ def get_time_tag(step):
 def printworker():
     nodeso = 0
     while True:
-# (c) 2015, GPLv3, Daniel Preussker <f0o@devilcode.org> <<<EOC4
+        # (c) 2015, GPLv3, Daniel Preussker <f0o@devilcode.org> <<<EOC4
         global IsNode
         global servicedisco
         if servicedisco:
@@ -132,7 +132,7 @@ def printworker():
                 continue
         else:
             worker_id, device_id, elapsed_time = print_queue.get()
-# EOC4
+        # EOC4
         global real_duration
         global per_device_duration
         global service_devices
@@ -154,7 +154,7 @@ def printworker():
 def poll_worker():
     while True:
         device_id = poll_queue.get()
-# (c) 2015, GPLv3, Daniel Preussker <f0o@devilcode.org> <<<EOC5
+        # (c) 2015, GPLv3, Daniel Preussker <f0o@devilcode.org> <<<EOC5
         if not servicedisco or memc.get('service.device.' + str(device_id)) is None:
             if servicedisco:
                 result = memc.add('service.device.' + str(device_id), config['distributed_poller_name'], 300)
@@ -166,7 +166,7 @@ def poll_worker():
                     print("Lost Memcached, Not service checking Device %s as Node. Master will check it." % device_id)
                     poll_queue.task_done()
                     continue
-# EOC5
+            # EOC5
             try:
                 start_time = time.time()
 
@@ -227,12 +227,12 @@ if __name__ == '__main__':
     if ('distributed_poller' in config and
         'distributed_poller_memcached_host' in config and
         'distributed_poller_memcached_port' in config and
-            config['distributed_poller']):
+        config['distributed_poller']):
         try:
             import memcache
             import uuid
             memc = memcache.Client([config['distributed_poller_memcached_host'] + ':' +
-                str(config['distributed_poller_memcached_port'])])
+                                    str(config['distributed_poller_memcached_port'])])
             if str(memc.get("service.master")) == config['distributed_poller_name']:
                 print("This system is already joined as the service master.")
                 sys.exit(2)
@@ -276,7 +276,7 @@ if __name__ == '__main__':
     description = "Spawn multiple check-services.php processes in parallel."
     parser = OptionParser(usage=usage, description=description)
     parser.add_option('-d', '--debug', action='store_true', default=False,
-                        help="Enable debug output. WARNING: Leaving this enabled will consume a lot of disk space.")
+                      help="Enable debug output. WARNING: Leaving this enabled will consume a lot of disk space.")
     (options, args) = parser.parse_args()
 
     debug = options.debug
