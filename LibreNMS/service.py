@@ -93,7 +93,7 @@ class ServiceConfig:
         self.node_id = os.getenv('NODE_ID')
         self.set_name(config.get('distributed_poller_name', None))
         self.distributed = config.get('distributed_poller', ServiceConfig.distributed)
-        self.group = ServiceConfig.parse_group(config.get('distributed_poller_group', ServiceConfig.group))
+        self.group = ServiceConfig.parse_group(config.get('default_poller_group', ServiceConfig.group))
 
         # backward compatible options
         self.poller.workers = config.get('poller_service_workers', ServiceConfig.poller.workers)

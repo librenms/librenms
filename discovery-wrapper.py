@@ -114,8 +114,8 @@ def db_open():
 
 
 # (c) 2015, GPLv3, Daniel Preussker <f0o@devilcode.org> <<<EOC1
-if 'distributed_poller_group' in config:
-    discovery_group = str(config['distributed_poller_group'])
+if 'default_poller_group' in config:
+    discovery_group = str(config['default_poller_group'])
 else:
     discovery_group = False
 
