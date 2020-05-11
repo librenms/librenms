@@ -178,7 +178,7 @@ class SmokepingGenerateCommand extends LnmsCommand
      * @param array $DEFAULTPROBE A default probe, needed by the smokeping configuration parser
      * @param array $probe The first part of the probe name, e.g. 'lnmsFPing' or 'lnmsFPing6'
      * @param array $binary Path to the relevant probe binary (i.e. the output of `which fping` or `which fping6`)
-     * 
+     *
      * @return array
      */
     private function buildProbes($module, $defaultProbe, $probe, $binary)
@@ -221,16 +221,36 @@ class SmokepingGenerateCommand extends LnmsCommand
 
                 $lines[] = '';
 
-                foreach ($devices as $hostname => $config) {
-                    if ($this->deviceIsResolvable($hostname)) {
-                        $lines[] = sprintf('++ %s', $this->buildMenuEntry($hostname));
-                        $lines[] = sprintf('   menu = %s', $hostname);
-                        $lines[] = sprintf('   title = %s', $hostname);
-                        $lines[] = sprintf('   probe = %s', $this->balanceProbes($config['transport']));
-                        $lines[] = sprintf('   host = %s', $hostname);
-                        $lines[] = '';
-                    }
+                $lines = array_merge($lines, $this->buildDevices($devices));
+            }
+        }
+
+        return $lines;
+    }
+
+    /**
+     * Build the configuration for a set of devices inside a type block
+     *
+     * @param array $devices A list of devices to create a a config block for
+     *
+     * @return array
+     */
+    private function buildDevices($devices)
+    {
+        $lines = [];
+
+        foreach ($devices as $hostname => $config) {
+            if ($this->deviceIsResolvable($hostname)) {
+                $lines[] = sprintf('++ %s', $this->buildMenuEntry($hostname));
+                $lines[] = sprintf('   menu = %s', $hostname);
+                $lines[] = sprintf('   title = %s', $hostname);
+
+                if (!$this->option('single-process')) {
+                    $lines[] = sprintf('   probe = %s', $this->balanceProbes($config['transport']));
                 }
+
+                $lines[] = sprintf('   host = %s', $hostname);
+                $lines[] = '';
             }
         }
 
@@ -239,7 +259,7 @@ class SmokepingGenerateCommand extends LnmsCommand
 
     /**
      * Smokeping refuses to load if it has an unresolvable host, so check for this
-     * 
+     *
      * @param string $hostname Hostname to be checked
      *
      * @return bool
@@ -276,7 +296,7 @@ class SmokepingGenerateCommand extends LnmsCommand
      * Determine if a default probe is needed, and write one if so
      *
      * @return string
-     */  
+     */
     private function getdefaultProbe()
     {
         if (!$this->option('no-default-probe')) {
@@ -307,22 +327,18 @@ class SmokepingGenerateCommand extends LnmsCommand
      */
     private function balanceProbes($transport)
     {
-        if (!$this->option('single-process')) {
-            if ($transport === 'udp') {
-                if ((Config::get('smokeping.probes')) === $this->ip4count) {
-                    $this->ip4count = 0;
-                }
-                
-                return sprintf('%s%s', self::IP4PROBE, $this->ip4count++);
+        if ($transport === 'udp') {
+            if ((Config::get('smokeping.probes')) === $this->ip4count) {
+                $this->ip4count = 0;
             }
 
-            if ((Config::get('smokeping.probes')) === $this->ip6count) {
-                $this->ip6count = 0;
-            }
-            
-            return sprintf('%s%s', self::IP6PROBE, $this->ip6count++);
+            return sprintf('%s%s', self::IP4PROBE, $this->ip4count++);
         }
 
-        return self::DEFAULTPROBE;
+        if ((Config::get('smokeping.probes')) === $this->ip6count) {
+            $this->ip6count = 0;
+        }
+
+        return sprintf('%s%s', self::IP6PROBE, $this->ip6count++);
     }
 }
