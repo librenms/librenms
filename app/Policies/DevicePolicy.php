@@ -31,7 +31,7 @@ class DevicePolicy
      */
     public function view(User $user, Device $device)
     {
-        return Permissions::canAccessDevice($device, $user);
+        return $this->viewAny($user) || Permissions::canAccessDevice($device, $user);
     }
 
     /**

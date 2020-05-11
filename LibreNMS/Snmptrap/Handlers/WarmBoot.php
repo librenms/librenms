@@ -1,6 +1,6 @@
 <?php
 /**
- * DeviceAttrib.php
+ * WarmBoot.php
  *
  * -Description-
  *
@@ -19,17 +19,27 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2019 Tony Murray
- * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace App\Models;
+namespace LibreNMS\Snmptrap\Handlers;
 
-class DeviceAttrib extends DeviceRelatedModel
+use App\Models\Device;
+use LibreNMS\Interfaces\SnmptrapHandler;
+use LibreNMS\Snmptrap\Trap;
+use Log;
+
+class WarmBoot implements SnmptrapHandler
 {
-    protected $table = 'devices_attribs';
-    protected $primaryKey = 'attrib_id';
-    public $timestamps = false;
-    protected $fillable = ['attrib_type', 'attrib_value'];
-//    protected $casts = ['attrib_value' => 'array'];
+    /**
+     * Handle snmptrap.
+     * Data is pre-parsed and delivered as a Trap.
+     *
+     * @param Device $device
+     * @param Trap $trap
+     * @return void
+     */
+    public function handle(Device $device, Trap $trap)
+    {
+        Log::event('SNMP Trap: Device ' . $device->displayName() . ' warm booted', $device->device_id, 'reboot', 4);
+    }
 }

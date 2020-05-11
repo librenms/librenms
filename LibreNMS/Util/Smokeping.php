@@ -120,7 +120,9 @@ class Smokeping
 
     private function filenameToHostname($name)
     {
-        $name = str_replace('.rrd', '', $name);
-        return str_replace('_', '.', $name);
+        if (Config::get('smokeping.integration') === true) {
+            $name = str_replace('_', '.', $name);
+        }
+        return str_replace('.rrd', '', $name);
     }
 }

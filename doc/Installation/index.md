@@ -5,7 +5,7 @@ path: blob/master/doc/
 
 ## Docker
 
-An official LibreNMS docker image based on Alpine Linux and Nginx is available on [DockerHub](https://hub.docker.com/r/librenms/librenms/) and [Quay](https://quay.io/repository/librenms/librenms). Documentation can be found on the [Github repository](https://github.com/librenms/docker).
+An official LibreNMS docker image based on Alpine Linux and Nginx is available on [DockerHub](https://hub.docker.com/r/librenms/librenms/). Documentation can be found on the [Github repository](https://github.com/librenms/docker).
 
 ## Images
 
