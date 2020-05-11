@@ -9,9 +9,9 @@ $state = snmp_get($device, "systemStatus.0", "-Ovqe", 'RAY-MIB');
 $cmd = gen_snmpget_cmd($device, '.1.3.6.1.4.1.33555.1.1.3.1', '-Oqv', 'RAY-MIB', 'ray');
 $data = trim(external_exec($cmd), "\" \n\r");
 if (!preg_match('/(No Such Instance)/i', $data)) {
-$index='';
+    $index='';
 } else {
-$index='.0';
+    $index='.0';
 }
 
 if ($state) {
@@ -57,9 +57,9 @@ $state = snmp_get($device, "lineStatus.0", "-Ovqe", 'RAY-MIB');
 $cmd = gen_snmpget_cmd($device, '.1.3.6.1.4.1.33555.1.1.3.2', '-Oqv', 'RAY-MIB', 'ray');
 $data = trim(external_exec($cmd), "\" \n\r");
 if (!preg_match('/(No Such Instance)/i', $data)) {
-$index='';
+    $index='';
 } else {
-$index='.0';
+    $index='.0';
 }
 
 if ($state) {
@@ -106,9 +106,9 @@ $state = snmp_get($device, "rfPowerStatus.0", "-Ovqe", 'RAY-MIB');
 $cmd = gen_snmpget_cmd($device, '.1.3.6.1.4.1.33555.1.1.3.4', '-Oqv', 'RAY-MIB', 'ray');
 $data = trim(external_exec($cmd), "\" \n\r");
 if (!preg_match('/(No Such Instance)/i', $data)) {
-$index='';
+    $index='';
 } else {
-$index='.0';
+    $index='.0';
 }
 
 if ($state) {
@@ -153,9 +153,9 @@ $state = snmp_get($device, "ethPeer.0", "-Ovqe", 'RAY-MIB');
 $cmd = gen_snmpget_cmd($device, '.1.3.6.1.4.1.33555.1.1.3.6', '-Oqv', 'RAY-MIB', 'ray');
 $data = trim(external_exec($cmd), "\" \n\r");
 if (!preg_match('/(No Such Instance)/i', $data)) {
-$index='';
+    $index='';
 } else {
-$index='.0';
+    $index='.0';
 }
 
 if ($state) {
