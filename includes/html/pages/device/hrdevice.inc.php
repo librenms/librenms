@@ -3,7 +3,7 @@ echo '<h3>Inventory</h3>';
 echo '<hr>';
 echo '<table class="table table-condensed">';
 
-// FIXME missing heading
+echo "<tr class='list'><th>Index</th><th>Description</th><th></th><th>Type</th><th>Status</th><th>Errors</th><th>Load</th></tr>";
 foreach (dbFetchRows('SELECT * FROM `hrDevice` WHERE `device_id` = ? ORDER BY `hrDeviceIndex`', array($device['device_id'])) as $hrdevice) {
     echo "<tr class='list'><td>".$hrdevice['hrDeviceIndex'].'</td>';
 
@@ -30,10 +30,15 @@ foreach (dbFetchRows('SELECT * FROM `hrDevice` WHERE `device_id` = ? ORDER BY `h
         echo '<td>'.$mini_graph.'</td>';
     } elseif ($hrdevice['hrDeviceType'] == 'hrDeviceNetwork') {
         $int       = str_replace('network interface ', '', $hrdevice['hrDeviceDescr']);
-        $interface = dbFetchRow('SELECT * FROM ports WHERE device_id = ? AND ifDescr = ?', array($device['device_id'], $int));
+        $interface = dbFetchRow('SELECT * FROM ports WHERE device_id = ? AND (ifDescr = ? or ifName = ?)', array($device['device_id'], $int, $int));
         $interface = cleanPort($interface);
         if ($interface['ifIndex']) {
-            echo '<td>'.generate_port_link($interface).'</td>';
+            if (!empty($interface['port_descr_type'])) {
+                $interface_text = $interface['port_descr_type'] . ' (' . $int . ')';
+            } else {
+                $interface_text = $int;
+            }
+            echo '<td>'.generate_port_link($interface, $interface_text).'</td>';
 
             $graph_array['height']      = '20';
             $graph_array['width']       = '100';
@@ -45,7 +50,6 @@ foreach (dbFetchRows('SELECT * FROM `hrDevice` WHERE `device_id` = ? ORDER BY `h
             $graph_array_zoom['height'] = '150';
             $graph_array_zoom['width']  = '400';
 
-            // FIXME click on graph should also link to port, but can't use generate_port_link here...
             $mini_graph = overlib_link(generate_port_url($interface), generate_lazy_graph_tag($graph_array), generate_graph_tag($graph_array_zoom), null);
 
             echo "<td>$mini_graph</td>";
