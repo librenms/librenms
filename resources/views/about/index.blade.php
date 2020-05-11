@@ -43,6 +43,10 @@
                     <td>{{ $version_php }}</td>
                 </tr>
                 <tr>
+                    <td><b>@lang('Python')</b></td>
+                    <td>{{ $version_python }}</td>
+                </tr>
+                <tr>
                     <td><b>@lang('MySQL')</b></td>
                     <td>{{ $version_mysql }}</td>
                 </tr>

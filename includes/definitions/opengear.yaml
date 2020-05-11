@@ -4,6 +4,8 @@ type: 'OOB Management'
 icon: opengear
 over:
     - { graph: device_signal, text: 'Signal' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
 mib_dir:
     - opengear
 discovery:

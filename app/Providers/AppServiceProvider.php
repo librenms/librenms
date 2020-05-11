@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Facades\DeviceCache;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Log;

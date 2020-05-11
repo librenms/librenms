@@ -47,7 +47,7 @@ class TopDevicesController extends WidgetController
     protected $defaults = [
         'title' => null,
         'top_query' => 'traffic',
-        'sort_order' => 'asc',
+        'sort_order' => 'desc',
         'device_count' => 5,
         'time_interval' => 15,
         'device_group' => null,

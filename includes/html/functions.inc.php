@@ -160,9 +160,8 @@ function generate_minigraph_image($device, $start, $end, $type, $legend = 'no', 
 
 function generate_device_url($device, $vars = array())
 {
-    return generate_url(array('page' => 'device', 'device' => $device['device_id']), $vars);
-}//end generate_device_url()
-
+    return \LibreNMS\Util\Url::deviceUrl((int)$device['device_id'], $vars);
+}
 
 function generate_device_link($device, $text = null, $vars = array(), $start = 0, $end = 0, $escape_text = 1, $overlib = 1)
 {
@@ -247,41 +246,10 @@ function overlib_link($url, $text, $contents, $class = null)
     return \LibreNMS\Util\Url::overlibLink($url, $text, $contents, $class);
 }
 
-
-function generate_graph_popup($graph_array)
-{
-    // Take $graph_array and print day,week,month,year graps in overlib, hovered over graph
-    $original_from = $graph_array['from'];
-
-    $graph = generate_graph_tag($graph_array);
-    $content = '<div class=list-large>' . $graph_array['popup_title'] . '</div>';
-    $content .= "<div style=\'width: 850px\'>";
-    $graph_array['legend'] = 'yes';
-    $graph_array['height'] = '100';
-    $graph_array['width'] = '340';
-    $graph_array['from'] = Config::get('time.day');
-    $content .= generate_graph_tag($graph_array);
-    $graph_array['from'] = Config::get('time.week');
-    $content .= generate_graph_tag($graph_array);
-    $graph_array['from'] = Config::get('time.month');
-    $content .= generate_graph_tag($graph_array);
-    $graph_array['from'] = Config::get('time.year');
-    $content .= generate_graph_tag($graph_array);
-    $content .= '</div>';
-
-    $graph_array['from'] = $original_from;
-
-    $graph_array['link'] = generate_url($graph_array, array('page' => 'graphs', 'height' => null, 'width' => null, 'bg' => null));
-
-    // $graph_array['link'] = "graphs/type=" . $graph_array['type'] . "/id=" . $graph_array['id'];
-    return overlib_link($graph_array['link'], $graph, $content, null);
-}//end generate_graph_popup()
-
-
 function print_graph_popup($graph_array)
 {
-    echo generate_graph_popup($graph_array);
-}//end print_graph_popup()
+    echo \LibreNMS\Util\Url::graphPopup($graph_array);
+}
 
 function bill_permitted($bill_id)
 {

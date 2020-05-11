@@ -582,6 +582,11 @@ class Device extends BaseModel
 
     // ---- Define Relationships ----
 
+    public function accessPoints()
+    {
+        return $this->hasMany(AccessPoint::class, 'device_id');
+    }
+
     public function alerts()
     {
         return $this->hasMany(\App\Models\Alert::class, 'device_id');
@@ -622,6 +627,16 @@ class Device extends BaseModel
         return $this->hasMany(\App\Models\Component::class, 'device_id');
     }
 
+    public function hostResources()
+    {
+        return $this->hasMany(HrDevice::class, 'device_id');
+    }
+
+    public function entityPhysical()
+    {
+        return $this->hasMany(EntPhysical::class, 'device_id');
+    }
+
     public function eventlogs()
     {
         return $this->hasMany(\App\Models\Eventlog::class, 'device_id', 'device_id');
@@ -630,6 +645,11 @@ class Device extends BaseModel
     public function groups()
     {
         return $this->belongsToMany(\App\Models\DeviceGroup::class, 'device_group_device', 'device_id', 'device_group_id');
+    }
+
+    public function ipsecTunnels()
+    {
+        return $this->hasMany(IpsecTunnel::class, 'device_id');
     }
 
     public function ipv4()
@@ -647,9 +667,24 @@ class Device extends BaseModel
         return $this->belongsTo(\App\Models\Location::class, 'location_id', 'id');
     }
 
+    public function mefInfo()
+    {
+        return $this->hasMany(MefInfo::class, 'device_id');
+    }
+
+    public function muninPlugins()
+    {
+        return $this->hasMany('App\Models\MuninPlugin', 'device_id');
+    }
+
     public function ospfInstances()
     {
         return $this->hasMany(\App\Models\OspfInstance::class, 'device_id');
+    }
+
+    public function netscalerVservers()
+    {
+        return $this->hasMany(NetscalerVserver::class, 'device_id');
     }
 
     public function packages()
@@ -687,6 +722,11 @@ class Device extends BaseModel
         return $this->hasMany(\App\Models\Processor::class, 'device_id');
     }
 
+    public function routes()
+    {
+        return $this->hasMany(Route::class, 'device_id');
+    }
+
     public function rules()
     {
         return $this->belongsToMany(\App\Models\AlertRule::class, 'alert_device_map', 'device_id', 'rule_id');
@@ -705,6 +745,11 @@ class Device extends BaseModel
     public function storage()
     {
         return $this->hasMany(\App\Models\Storage::class, 'device_id');
+    }
+
+    public function stpInstances()
+    {
+        return $this->hasMany(Stp::class, 'device_id');
     }
 
     public function mempools()
@@ -752,6 +797,26 @@ class Device extends BaseModel
         return $this->hasMany(\App\Models\MplsTunnelCHop::class, 'device_id');
     }
 
+    public function printerSupplies()
+    {
+        return $this->hasMany(Toner::class, 'device_id');
+    }
+
+    public function pseudowires()
+    {
+        return $this->hasMany(Pseudowire::class, 'device_id');
+    }
+
+    public function rServers()
+    {
+        return $this->hasMany(LoadbalancerRserver::class, 'device_id');
+    }
+
+    public function slas()
+    {
+        return $this->hasMany(Sla::class, 'device_id');
+    }
+
     public function syslogs()
     {
         return $this->hasMany(\App\Models\Syslog::class, 'device_id', 'device_id');
@@ -768,6 +833,11 @@ class Device extends BaseModel
         return $this->hasMany(\App\Models\Vminfo::class, 'device_id');
     }
 
+    public function vlans()
+    {
+        return $this->hasMany(\App\Models\Vlan::class, 'device_id');
+    }
+
     public function vrfLites()
     {
         return $this->hasMany(\App\Models\VrfLite::class, 'device_id');
@@ -776,6 +846,11 @@ class Device extends BaseModel
     public function vrfs()
     {
         return $this->hasMany(\App\Models\Vrf::class, 'device_id');
+    }
+
+    public function vServers()
+    {
+        return $this->hasMany(LoadbalancerVserver::class, 'device_id');
     }
 
     public function wirelessSensors()

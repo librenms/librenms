@@ -404,7 +404,7 @@ class RunAlerts
             $tolerence_window = Config::get('alert.tolerance_window');
             if (!empty($rextra['count']) && empty($rextra['interval'])) {
                 // This check below is for compat-reasons
-                if (!empty($rextra['delay'])) {
+                if (!empty($rextra['delay']) && $alert['state'] != 0) {
                     if ((time() - strtotime($alert['time_logged']) + $tolerence_window) < $rextra['delay'] || (!empty($alert['details']['delay']) && (time() - $alert['details']['delay'] + $tolerence_window) < $rextra['delay'])) {
                         continue;
                     } else {
@@ -423,7 +423,7 @@ class RunAlerts
                 }
             } else {
                 // This is the new way
-                if (!empty($rextra['delay']) && (time() - strtotime($alert['time_logged']) + $tolerence_window) < $rextra['delay']) {
+                if (!empty($rextra['delay']) && (time() - strtotime($alert['time_logged']) + $tolerence_window) < $rextra['delay'] && $alert['state'] != 0) {
                     continue;
                 }
 
