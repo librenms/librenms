@@ -180,6 +180,7 @@ return [
         App\Providers\RouteServiceProvider::class,
         App\Providers\ComposerServiceProvider::class,
         App\Providers\ViewServiceProvider::class,
+        App\Providers\DatastoreServiceProvider::class,
 
         /*
          * LibreNMS Service Providers...
@@ -241,6 +242,7 @@ return [
         // LibreNMS
         'Permissions' => \App\Facades\Permissions::class,
         'DeviceCache' => \App\Facades\DeviceCache::class,
+        'Rrd' => App\Facades\Rrd::class,
     ],
 
 ];

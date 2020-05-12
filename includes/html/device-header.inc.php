@@ -1,5 +1,6 @@
 <?php
 
+use LibreNMS\Alert\AlertUtil;
 use LibreNMS\Config;
 
 echo getLogoTag($device, 'device-icon-header pull-left') .'
@@ -9,6 +10,10 @@ $host_id = get_vm_parent_id($device);
 if ($host_id > 0) {
     echo '
 <a href="'.generate_url(array('page'=>'device','device'=>$host_id)).'"><i class="fa fa-server fa-fw fa-lg"></i></a>';
+}
+
+if (AlertUtil::isMaintenance($device['device_id'])) {
+    echo ('<span title="Scheduled Maintenance" class="glyphicon glyphicon-wrench"></span>');
 }
 
 echo '

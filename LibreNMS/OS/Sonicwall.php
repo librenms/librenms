@@ -17,6 +17,7 @@
 
 namespace LibreNMS\OS;
 
+use Illuminate\Support\Str;
 use LibreNMS\Device\Processor;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\OS;
@@ -31,7 +32,7 @@ class Sonicwall extends OS implements ProcessorDiscovery
      */
     public function discoverProcessors()
     {
-        if (starts_with($this->getDevice()['sysObjectID'], '.1.3.6.1.4.1.8741.1')) {
+        if (Str::startsWith($this->getDevice()['sysObjectID'], '.1.3.6.1.4.1.8741.1')) {
             return array(
                 Processor::discover(
                     'sonicwall',

@@ -16,7 +16,6 @@
  * @author     Aldemir Akpinar <aldemir.akpinar@gmail.com>
  */
 
-
 $pagetitle[] = 'Virtual Machines';
 ?>
 <div class="table-responsive">
@@ -69,6 +68,8 @@ var grid = $("#vminfo").bootgrid({
                 var response =  '<span class="label label-success">ON</span>';
             } else if (row.powerstat == "powered off") {
                 var response =  '<span class="label label-default">OFF</span>';
+            } else if (row.powerstat == "suspended") {
+                var response =  '<span class="label label-warning">SUSPEND</span>';
             }
             return response;
         },

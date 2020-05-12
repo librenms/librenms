@@ -23,6 +23,8 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
+use LibreNMS\Alerting\QueryBuilderParser;
+
 if (!Auth::user()->hasGlobalAdmin()) {
     die('ERROR: You need to be admin');
 }
@@ -53,7 +55,9 @@ if (!Auth::user()->hasGlobalAdmin()) {
                             echo "
                                 <tr>
                                     <td>{$rule['name']}</td>
-                                    <td>{$rule['rule']}</td>
+                                    <td>";
+                            echo !empty($rule['builder']) ? QueryBuilderParser::fromJson($rule['builder'])->toSql(false) : $rule['rule'];
+                            echo "  </td>
                                     <td>{$rule['rule_id']}</td>
                                 </tr>
                             ";

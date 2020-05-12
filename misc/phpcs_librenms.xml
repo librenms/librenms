@@ -4,7 +4,6 @@
     <exclude-pattern>/vendor/*</exclude-pattern>
     <exclude-pattern>/storage/*</exclude-pattern>
     <exclude-pattern>/bootstrap/cache/*</exclude-pattern>
-    <exclude-pattern>/lib/*</exclude-pattern>
     <exclude-pattern>/html/plugins/*</exclude-pattern>
     <exclude-pattern>/config.php</exclude-pattern>
     <exclude-pattern>/_ide_helper.php</exclude-pattern>

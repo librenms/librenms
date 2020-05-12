@@ -31,6 +31,7 @@ use App\Models\AuthLog;
 use App\Models\Dashboard;
 use App\Models\User;
 use App\Models\UserPref;
+use Illuminate\Support\Str;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
 use Toastr;
@@ -177,7 +178,7 @@ class UserController extends Controller
             }
         }
 
-        return redirect(route(str_contains(URL::previous(), 'preferences') ? 'preferences.index' : 'users.index'));
+        return redirect(route(Str::contains(URL::previous(), 'preferences') ? 'preferences.index' : 'users.index'));
     }
 
     /**

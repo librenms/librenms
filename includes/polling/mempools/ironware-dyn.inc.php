@@ -1,10 +1,12 @@
 <?php
 
+use Illuminate\Support\Str;
+
 $oid = $mempool['mempool_index'];
 
 d_echo('Ironware Mempool'."\n");
 
-if (str_contains($device['sysDescr'], array('NetIron', 'MLX', 'CER')) === false) {
+if (Str::contains($device['sysDescr'], array('NetIron', 'MLX', 'CER')) === false) {
     echo 'Ironware Dynamic: ';
     $mempool['total'] = snmp_get($device, 'snAgGblDynMemTotal.0', '-OvQ', 'FOUNDRY-SN-AGENT-MIB');
     if ($mempool['total'] < 0) {
@@ -16,9 +18,7 @@ if (str_contains($device['sysDescr'], array('NetIron', 'MLX', 'CER')) === false)
     }
     $mempool['used']  = ($mempool['total'] - $mempool['free']);
     d_echo($mempool);
-} //end_if
-
-else {
+} else {
     echo 'NetIron: ';
     d_echo('caching');
     $mempool_cache['ironware-dyn'] = array();

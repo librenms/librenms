@@ -23,3 +23,5 @@ $hardware = str_replace('HP ', '', $hardware);
 $hardware = str_replace('Hewlett-Packard ', '', $hardware);
 $hardware = str_ireplace(' Series', '', $hardware);
 $hardware = ucfirst($hardware);
+
+$serial = trim(snmp_get($device, '1.3.6.1.2.1.43.5.1.1.17.1', '-OQv', '', ''), '" ');

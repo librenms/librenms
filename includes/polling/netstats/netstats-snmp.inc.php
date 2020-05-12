@@ -45,7 +45,7 @@ if ($device['os'] != 'Snom') {
         $fields = array();
         foreach ($oids as $oid) {
             $rrd_def->addDataset($oid, 'COUNTER', null, 100000000000);
-            $fields[$oid] = isset($data[0][$oid]) ? $data[0][$oid] : 'U';
+            $fields[substr($oid, 0, 19)] = isset($data[0][$oid]) ? $data[0][$oid] : 'U';
         }
 
         $tags = compact('rrd_def');

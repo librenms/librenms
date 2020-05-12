@@ -13,7 +13,7 @@
  */
 
 if (\Auth::user()->hasGlobalAdmin()) {
-?>
+    ?>
 
 <div class="modal fade bs-example-modal-sm" id="schedule-maintenance" tabindex="-1" role="dialog" aria-labelledby="Create" aria-hidden="true">
     <div class="modal-dialog">
@@ -264,13 +264,13 @@ $('#sched-submit').click('', function(e) {
 
 $("#maps").select2({
     width: '100%',
-    placeholder: "Devices or Groups",
+    placeholder: "Devices, Groups or Locations",
     ajax: {
         url: 'ajax_list.php',
         delay: 250,
         data: function (params) {
             return {
-                type: 'devices_groups',
+                type: 'devices_groups_locations',
                 search: params.term
             };
         }
@@ -392,5 +392,5 @@ $(function () {
 
 $("[name='recurring']").bootstrapSwitch();
 </script>
-<?php
+    <?php
 }

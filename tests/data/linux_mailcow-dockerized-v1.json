@@ -1,0 +1,121 @@
+{
+    "applications": {
+        "discovery": {
+            "applications": [
+                {
+                    "app_type": "mailcow-postfix",
+                    "app_state": "UNKNOWN",
+                    "discovered": 1,
+                    "app_state_prev": null,
+                    "app_status": "",
+                    "app_instance": ""
+                }
+            ],
+            "application_metrics": []
+        },
+        "poller": {
+            "applications": [
+                {
+                    "app_type": "mailcow-postfix",
+                    "app_state": "OK",
+                    "discovered": 1,
+                    "app_state_prev": "UNKNOWN",
+                    "app_status": "",
+                    "app_instance": ""
+                }
+            ],
+            "application_metrics": [
+                {
+                    "metric": "bounced",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mailcow-postfix"
+                },
+                {
+                    "metric": "bytesdelivered",
+                    "value": 128364,
+                    "value_prev": null,
+                    "app_type": "mailcow-postfix"
+                },
+                {
+                    "metric": "bytesreceived",
+                    "value": 64182,
+                    "value_prev": null,
+                    "app_type": "mailcow-postfix"
+                },
+                {
+                    "metric": "deferred",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mailcow-postfix"
+                },
+                {
+                    "metric": "delivered",
+                    "value": 4,
+                    "value_prev": null,
+                    "app_type": "mailcow-postfix"
+                },
+                {
+                    "metric": "discarded",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mailcow-postfix"
+                },
+                {
+                    "metric": "forwarded",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mailcow-postfix"
+                },
+                {
+                    "metric": "held",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mailcow-postfix"
+                },
+                {
+                    "metric": "received",
+                    "value": 2,
+                    "value_prev": null,
+                    "app_type": "mailcow-postfix"
+                },
+                {
+                    "metric": "recipienthostsdomains",
+                    "value": 2,
+                    "value_prev": null,
+                    "app_type": "mailcow-postfix"
+                },
+                {
+                    "metric": "recipients",
+                    "value": 2,
+                    "value_prev": null,
+                    "app_type": "mailcow-postfix"
+                },
+                {
+                    "metric": "rejected",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mailcow-postfix"
+                },
+                {
+                    "metric": "rejectwarnings",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mailcow-postfix"
+                },
+                {
+                    "metric": "senders",
+                    "value": 2,
+                    "value_prev": null,
+                    "app_type": "mailcow-postfix"
+                },
+                {
+                    "metric": "sendinghostsdomains",
+                    "value": 2,
+                    "value_prev": null,
+                    "app_type": "mailcow-postfix"
+                }
+            ]
+        }
+    }
+}

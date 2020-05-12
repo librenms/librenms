@@ -25,6 +25,7 @@
 
 namespace LibreNMS\OS;
 
+use Illuminate\Support\Str;
 use LibreNMS\Device\Processor;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Polling\ProcessorPolling;
@@ -48,7 +49,7 @@ class Powerconnect extends OS implements ProcessorDiscovery, ProcessorPolling
     public function discoverProcessors()
     {
         $device = $this->getDevice();
-        if (starts_with($device['sysObjectID'], [
+        if (Str::startsWith($device['sysObjectID'], [
             '.1.3.6.1.4.1.674.10895.3020',
             '.1.3.6.1.4.1.674.10895.3021',
             '.1.3.6.1.4.1.674.10895.3030',
@@ -63,7 +64,7 @@ class Powerconnect extends OS implements ProcessorDiscovery, ProcessorPolling
                     0
                 )
             );
-        } elseif (starts_with($device['sysObjectID'], [
+        } elseif (Str::startsWith($device['sysObjectID'], [
             '.1.3.6.1.4.1.674.10895.3024',
             '.1.3.6.1.4.1.674.10895.3042',
             '.1.3.6.1.4.1.674.10895.3053',

@@ -60,7 +60,7 @@ if ($bill_data['bill_type'] == 'cdr') {
         );
     }
 }//end if
-    ?>
+?>
 <div class="row">
 <div class="col-lg-6 col-md-12">
     <div class="panel panel-default">
@@ -104,14 +104,14 @@ if ($bill_data['bill_type'] == 'cdr') {
             );
             
             if (is_array($ports)) {
-        ?>
+                ?>
             <div class="list-group">
-        <?php   foreach ($ports as $port) {
-            $port = cleanPort($port);
+                <?php   foreach ($ports as $port) {
+                    $port = cleanPort($port);
                     $emptyCheck = true;
                     $portalias  = (empty($port['ifAlias']) ? '' : ' - '.$port['ifAlias'].'');
 
-        ?>
+                    ?>
                 <div class="list-group-item">
                     <form action="" class="form-inline" method="post" name="delete<?php echo $port['port_id'] ?>" style="display: none;">
                         <?php echo csrf_field() ?>
@@ -127,16 +127,17 @@ if ($bill_data['bill_type'] == 'cdr') {
                     <i class="fa fa-random"></i>
                     <?php echo generate_port_link($port, $port['ifName'] . '' . $portalias); ?>
                 </div>
-        <?php   }
-if (!$emptyCheck) { ?>
+                <?php   }
+                if (!$emptyCheck) { ?>
                 <div class="alert alert-info">There are no ports assigned to this bill</alert>
-<?php                   } ?>
+                <?php                   } ?>
             
             </div>
                 
-        <?php
+                <?php
             }
-        ?>
+            $port_device_id = -1;
+            ?>
         </div>
 
         <h4>Add Port</h4>
@@ -149,16 +150,10 @@ if (!$emptyCheck) { ?>
             <div class="form-group">
                 <label class="col-sm-2 control-label" for="device">Device</label>
                 <div class="col-sm-8">
-                    <select class="form-control input-sm" id="device" name="device" onchange="getInterfaceList(this)">
-                        <option value=''>Select a device</option>
-                        <?php
-                          $devices = dbFetchRows('SELECT * FROM `devices` ORDER BY hostname');
-                        foreach ($devices as $device) {
-                            echo "<option value='${device['device_id']}'>${device['hostname']}</option>\n";
-                        }
-                          
-                            ?>
-                    </select>
+                    <select class="form-control input-sm" id="device" name="device" onchange="getInterfaceList(this)"></select>
+                    <script type="text/javascript">
+                        init_select2('#device', 'device', {}, <?php echo "{id: $port_device_id, text: '" . format_hostname($device) . "'}"; ?>);
+                    </script>
                 </div>
             </div>
             <div class="form-group">

@@ -6,6 +6,7 @@ use App\Checks;
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use LibreNMS\Config;
 
 class LegacyController extends Controller
@@ -19,14 +20,16 @@ class LegacyController extends Controller
         $init_modules = ['web', 'auth'];
         require base_path('/includes/init.php');
 
-        set_debug(str_contains($request->path(), 'debug'));
+        set_debug(Str::contains($request->path(), 'debug'));
 
+        ob_start(); // protect against bad plugins that output during start
         \LibreNMS\Plugins::start();
+        ob_end_clean();
 
-        if (str_contains($request->path(), 'widescreen=yes')) {
+        if (Str::contains($request->path(), 'widescreen=yes')) {
             $session->put('widescreen', 1);
         }
-        if (str_contains($request->path(), 'widescreen=no')) {
+        if (Str::contains($request->path(), 'widescreen=no')) {
             $session->forget('widescreen');
         }
 
@@ -49,11 +52,10 @@ class LegacyController extends Controller
         $vars['page'] = basename($vars['page'] ?? '');
         if ($vars['page'] && is_file("includes/html/pages/" . $vars['page'] . ".inc.php")) {
             require "includes/html/pages/" . $vars['page'] . ".inc.php";
-        } elseif (Config::has('front_page') && is_file('includes/html/' . Config::get('front_page'))) {
-            require 'includes/html/' . Config::get('front_page');
         } else {
-            require 'includes/html/pages/front/default.php';
+            abort(404);
         }
+
         $html = ob_get_clean();
         ob_end_clean();
 

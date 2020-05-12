@@ -13,6 +13,9 @@
  * @author     LibreNMS Contributors
 */
 
+use App\Models\Port;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+
 $pagetitle[] = "Ports";
 
 // Set Defaults here
@@ -162,14 +165,13 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != "hide") || !isset($vars[
     $output .= "<select name='ifSpeed' id='ifSpeed' class='form-control input-sm'>";
     $output .= "<option value=''>All Speeds</option>";
 
-    if (Auth::user()->hasGlobalRead()) {
-        $sql = "SELECT `ifSpeed` FROM `ports` GROUP BY `ifSpeed` ORDER BY `ifSpeed`";
-    } else {
-        $sql = "SELECT `ifSpeed` FROM `ports` AS `I`, `devices` AS `D`, `devices_perms` AS `P`, `ports_perms` AS `PP` WHERE ((`P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id`) OR (`PP`.`user_id` = ? AND `PP`.`port_id` = `I`.`port_id` AND `I`.`device_id` = `D`.`device_id`)) AND `D`.`device_id` = `I`.`device_id` GROUP BY `ifSpeed` ORDER BY `ifSpeed`";
-        $param[] = array(Auth::id(), Auth::id());
-    }
+    $ifSpeed = Port::select('ifSpeed')
+        ->hasAccess(Auth::user())
+        ->groupBy('ifSpeed')
+        ->orderBy('ifSpeed')
+        ->get();
 
-    foreach (dbFetchRows($sql, $param) as $data) {
+    foreach ($ifSpeed as $data) {
         if ($data['ifSpeed']) {
             if ($data['ifSpeed'] == $vars['ifSpeed']) {
                 $speedselected = "selected";
@@ -186,14 +188,13 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != "hide") || !isset($vars[
     $output .= "<select name='ifType' id='ifType' class='form-control input-sm'>";
     $output .= "<option value=''>All Media</option>";
 
-    if (Auth::user()->hasGlobalRead()) {
-        $sql = "SELECT `ifType` FROM `ports` GROUP BY `ifType` ORDER BY `ifType`";
-    } else {
-        $sql = "SELECT `ifType` FROM `ports` AS `I`, `devices` AS `D`, `devices_perms` AS `P`, `ports_perms` AS `PP` WHERE ((`P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id`) OR (`PP`.`user_id` = ? AND `PP`.`port_id` = `I`.`port_id` AND `I`.`device_id` = `D`.`device_id`)) AND `D`.`device_id` = `I`.`device_id` GROUP BY `ifType` ORDER BY `ifType`";
-        $param[] = array(Auth::id(), Auth::id());
-    }
+    $ifType = Port::select('ifType')
+        ->hasAccess(Auth::user())
+        ->groupBy('ifType')
+        ->orderBy('ifType')
+        ->get();
 
-    foreach (dbFetchRows($sql, $param) as $data) {
+    foreach ($ifType as $data) {
         if ($data['ifType']) {
             if ($data['ifType'] == $vars['ifType']) {
                 $dataselected = "selected";
@@ -214,9 +215,13 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != "hide") || !isset($vars[
         $sql = "SELECT `port_descr_type` FROM `ports` AS `I`, `devices` AS `D`, `devices_perms` AS `P`, `ports_perms` AS `PP` WHERE ((`P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id`) OR (`PP`.`user_id` = ? AND `PP`.`port_id` = `I`.`port_id` AND `I`.`device_id` = `D`.`device_id`)) AND `D`.`device_id` = `I`.`device_id` GROUP BY `port_descr_type` ORDER BY `port_descr_type`";
         $param[] = array(Auth::id(), Auth::id());
     }
-    $ports = dbFetchRows($sql, $param);
+    $port_descr_type = Port::select('port_descr_type')
+        ->hasAccess(Auth::user())
+        ->groupBy('port_descr_type')
+        ->orderBy('port_descr_type')
+        ->get();
 
-    foreach ($ports as $data) {
+    foreach ($port_descr_type as $data) {
         if ($data['port_descr_type']) {
             if ($data['port_descr_type'] == $vars['port_descr_type']) {
                 $portdescrib = "selected";
@@ -384,18 +389,18 @@ foreach ($vars as $var => $value) {
                 break;
             case 'purge':
                 if ($vars['purge'] === 'all') {
-                    $interfaces = dbFetchRows('SELECT * from `ports` AS P, `devices` AS D WHERE `deleted` = 1 AND D.device_id = P.device_id');
-                    foreach ($interfaces as $interface) {
-                        $interface = cleanPort($interface);
-                        if (port_permitted($interface['port_id'], $interface['device_id'])) {
-                            delete_port($interface['port_id']);
+                    Port::hasAccess(Auth::user())->with(['device' => function ($query) {
+                        $query->select('device_id', 'hostname');
+                    }])->isDeleted()->chunk(100, function ($ports) {
+                        foreach ($ports as $port) {
+                            $port->delete();
                         }
-                    }
+                    });
                 } else {
-                    $interface = dbFetchRow('SELECT * from `ports` AS P, `devices` AS D WHERE `port_id` = ? AND D.device_id = P.device_id', array($vars['purge']));
-                    $interface = cleanPort($interface);
-                    if (port_permitted($interface['port_id'], $interface['device_id'])) {
-                        delete_port($interface['port_id']);
+                    try {
+                        Port::hasAccess(Auth::user())->where('port_id', $vars['purge'])->firstOrFail()->delete();
+                    } catch (ModelNotFoundException $e) {
+                        echo "<div class='alert alert-danger'>Port ID {$vars['purge']} not found! Could not purge port.</div>";
                     }
                 }
                 break;

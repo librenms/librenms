@@ -36,6 +36,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessDistanceDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrqDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrpDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSinrDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessQualityDiscovery;
 use LibreNMS\OS;
 
 class Routeros extends OS implements
@@ -48,7 +49,8 @@ class Routeros extends OS implements
     WirelessDistanceDiscovery,
     WirelessRsrqDiscovery,
     WirelessRsrpDiscovery,
-    WirelessSinrDiscovery
+    WirelessSinrDiscovery,
+    WirelessQualityDiscovery
 {
     private $data;
 
@@ -131,6 +133,20 @@ class Routeros extends OS implements
             'rssi',
             'mtxrWl60GRssi',
             '.1.3.6.1.4.1.14988.1.1.1.8.1.12.'
+        );
+    }
+    /**
+     * Discover wireless Quality.  This is in Dbm. Type is Dbm.
+     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
+     *
+     * @return array Sensors
+     */
+    public function discoverWirelessQuality()
+    {
+        return $this->discoverSensor(
+            'quality',
+            'mtxrWl60GSignal',
+            '.1.3.6.1.4.1.14988.1.1.1.8.1.8.'
         );
     }
     /**

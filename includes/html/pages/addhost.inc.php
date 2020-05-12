@@ -75,6 +75,7 @@ if (!empty($_POST['hostname'])) {
         } else {
             print_error('Unsupported SNMP Version. There was a dropdown menu, how did you reach this error ?');
         }//end if
+
         $poller_group = clean($_POST['poller_group']);
         $force_add    = ($_POST['force_add'] == 'on');
 
@@ -114,7 +115,7 @@ $pagetitle[] = 'Add host';
   <div class="alert alert-info">Devices will be checked for Ping/SNMP reachability before being probed.</div>
   <div class="well well-lg">
       <div class="form-group">
-          <label for="hostname" class="col-sm-3 control-label">Hostname</label>
+          <label for="hostname" class="col-sm-3 control-label">Hostname or IP</label>
           <div class="col-sm-9">
               <input type="text" id="hostname" name="hostname" class="form-control input-sm" placeholder="Hostname">
           </div>
@@ -270,7 +271,7 @@ if (Config::get('distributed_poller') === true) {
                       <option value="0"> Default poller group</option>
     ';
 
-    foreach (dbFetchRows('SELECT `id`,`group_name` FROM `poller_groups`') as $group) {
+    foreach (dbFetchRows('SELECT `id`,`group_name` FROM `poller_groups` ORDER BY `group_name`') as $group) {
         echo '<option value="'.$group['id'].'">'.$group['group_name'].'</option>';
     }
 

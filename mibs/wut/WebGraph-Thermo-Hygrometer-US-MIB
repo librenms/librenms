@@ -1,0 +1,2769 @@
+WebGraph-Thermo-Hygrometer-US-MIB DEFINITIONS ::= BEGIN
+----------------------------------------------------------------
+-- Revison: 1.39
+----------------------------------------------------------------
+-- 28.06.2018 	New: 
+--		     syntax error corrected
+----------------------------------------------------------------
+
+-- 12.12.2017 	New: 
+--		     wtWebGraphThermoHygroMQTTLastWillEnable
+--		     wtWebGraphThermoHygroMQTTLastWillTopic
+--		     wtWebGraphThermoHygroMQTTLastWillMsg
+--		     wtWebGraphThermoHygroMQTTLastWillQoS
+--		     wtWebGraphThermoHygroMQTTLastWillRetain
+--		     wtWebGraphThermoHygroMQTTLastWillConnectEnable
+--		     wtWebGraphThermoHygroMQTTLastWillConnectMsg
+----------------------------------------------------------------
+-- Revison: 1.37
+----------------------------------------------------------------
+-- 07.09.2017 	New: wtWebioAnxGraphAlarmManagerPort
+--		     wtWebioAnxGraphAlarmMQTT_QoS
+--		     wtWebioAnxGraphAlarmMQTT_Retain
+----------------------------------------------------------------
+-- Revison: 1.36
+----------------------------------------------------------------
+-- 09.03.2017 	New: wtWebGraphThermoHygroAlarmSensorLostSelection
+--		     		 wtWebGraphThermoHygroAlarmLimitWindow
+----------------------------------------------------------------
+-- Revison: 1.35
+----------------------------------------------------------------
+-- 09.11.2016 	New: wtWebGraphThermoHygroMQTT group
+--		     HTTP Request, MQTT Alarm, REST
+----------------------------------------------------------------
+-- Revison: 1.34
+----------------------------------------------------------------
+-- 15.07.2015 	Changes for new Navigation (__JB__)
+----------------------------------------------------------------
+-- Revison: 1.33
+----------------------------------------------------------------
+-- 28.05.14 	New Language Select
+--		
+----------------------------------------------------------------
+-- Revison: 1.32
+----------------------------------------------------------------
+-- 11.12.13 	Initial Setup
+--		
+		
+
+
+    IMPORTS
+
+    OBJECT-TYPE                                        FROM RFC-1212
+    TRAP-TYPE                                          FROM RFC-1215
+    DisplayString, PhysAddress                         FROM RFC1213-MIB
+    enterprises, TimeTicks, IpAddress, NetworkAddress  FROM RFC1155-SMI;
+
+ 
+--    IpAddress ::=
+--        [APPLICATION 0]
+--            IMPLICIT OCTET STRING (SIZE (4))
+--    Counter ::=
+--        [APPLICATION 1]
+--            IMPLICIT INTEGER (0..4294967295)
+--    Gauge ::=
+--        [APPLICATION 2]
+--            IMPLICIT INTEGER (0..4294967295)
+--    TimeTicks ::=
+--        [APPLICATION 3]
+--            IMPLICIT INTEGER (0..4294967295)
+
+
+--    DisplayString ::= OCTET STRING
+--    PhysAddress   ::= OCTET STRING
+
+--    internet         OBJECT IDENTIFIER ::= { iso org(3) dod(6) 1 }
+--    privat           OBJECT IDENTIFIER ::= { internet 4 }
+--    enterprises      OBJECT IDENTIFIER ::= { privat 1 }
+
+
+
+--  Wiesemann & Theis Com-Server MIB
+
+    wut                				OBJECT IDENTIFIER ::= { enterprises 5040 }
+    wtComServer        				OBJECT IDENTIFIER ::= { wut 1 }
+    wtWebio            				OBJECT IDENTIFIER ::= { wtComServer 2 }
+
+--  wtWebGraph Tree
+
+    wtWebGraphThermoHygro  			OBJECT IDENTIFIER ::= { wtWebio 42 }
+    
+--  wtWebGraphThermoHygro Tree
+
+    wtWebGraphThermoHygroTemp      		OBJECT IDENTIFIER ::= { wtWebGraphThermoHygro 1 }
+    wtWebGraphThermoHygroSessCntrl 		OBJECT IDENTIFIER ::= { wtWebGraphThermoHygro 2 }
+    wtWebGraphThermoHygroConfig    		OBJECT IDENTIFIER ::= { wtWebGraphThermoHygro 3 }
+    wtWebGraphThermoHygroDiag    		OBJECT IDENTIFIER ::= { wtWebGraphThermoHygro 4 }    
+    
+--  wtWebGraphThermoHygroConfig Tree
+
+    wtWebGraphThermoHygroDevice    		OBJECT IDENTIFIER ::= { wtWebGraphThermoHygroConfig 1 }
+    wtWebGraphThermoHygroPorts     		OBJECT IDENTIFIER ::= { wtWebGraphThermoHygroConfig 2 }	
+    wtWebGraphThermoHygroManufact  		OBJECT IDENTIFIER ::= { wtWebGraphThermoHygroConfig 3 }	
+
+--  wtWebGraphThermoHygroDevice Tree
+
+    wtWebGraphThermoHygroText			OBJECT IDENTIFIER ::= { wtWebGraphThermoHygroDevice 1 }	
+    wtWebGraphThermoHygroTimeDate 		OBJECT IDENTIFIER ::= { wtWebGraphThermoHygroDevice 2 }
+    wtWebGraphThermoHygroBasic			OBJECT IDENTIFIER ::= { wtWebGraphThermoHygroDevice 3 }	
+    wtWebGraphThermoHygroDatalogger		OBJECT IDENTIFIER ::= { wtWebGraphThermoHygroDevice 4 }	
+    wtWebGraphThermoHygroAlarm			OBJECT IDENTIFIER ::= { wtWebGraphThermoHygroDevice 5 }
+    wtWebGraphThermoHygroGraphics 		OBJECT IDENTIFIER ::= { wtWebGraphThermoHygroDevice 6 }
+    
+--  wtWebGraphThermoHygroTimeDate Tree
+
+    wtWebGraphThermoHygroTimeZone		OBJECT IDENTIFIER ::= { wtWebGraphThermoHygroTimeDate 1 }
+    wtWebGraphThermoHygroTimeServer		OBJECT IDENTIFIER ::= { wtWebGraphThermoHygroTimeDate 2 }	
+    wtWebGraphThermoHygroDeviceClock		OBJECT IDENTIFIER ::= { wtWebGraphThermoHygroTimeDate 3 }
+
+--  wtWebGraphThermoHygroBasic Tree
+    
+    wtWebGraphThermoHygroNetwork		OBJECT IDENTIFIER ::= { wtWebGraphThermoHygroBasic 1 }
+    wtWebGraphThermoHygroHTTP			OBJECT IDENTIFIER ::= { wtWebGraphThermoHygroBasic 2 }
+    wtWebGraphThermoHygroMail			OBJECT IDENTIFIER ::= { wtWebGraphThermoHygroBasic 3 }	
+    wtWebGraphThermoHygroSNMP			OBJECT IDENTIFIER ::= { wtWebGraphThermoHygroBasic 4 }
+    wtWebGraphThermoHygroUDP			OBJECT IDENTIFIER ::= { wtWebGraphThermoHygroBasic 5 }
+    wtWebGraphThermoHygroSyslog			OBJECT IDENTIFIER ::= { wtWebGraphThermoHygroBasic 6 }    
+    wtWebGraphThermoHygroFTP			OBJECT IDENTIFIER ::= { wtWebGraphThermoHygroBasic 7 }
+    wtWebGraphThermoHygroRSS			OBJECT IDENTIFIER ::= { wtWebGraphThermoHygroBasic 8 }
+    wtWebGraphThermoHygroLanguage		OBJECT IDENTIFIER ::= { wtWebGraphThermoHygroBasic 9 }
+    wtWebGraphThermoHygroMQTT			OBJECT IDENTIFIER ::= { wtWebGraphThermoHygroBasic 12 }
+    wtWebGraphThermoHygroREST			OBJECT IDENTIFIER ::= { wtWebGraphThermoHygroBasic 13 }
+    
+    
+--  wtWebGraphThermoHygroGraphics Tree
+    
+    wtWebGraphThermoHygroGraphicsBase 		OBJECT IDENTIFIER ::= { wtWebGraphThermoHygroGraphics 1 }
+    wtWebGraphThermoHygroGraphicsSelect 		OBJECT IDENTIFIER ::= { wtWebGraphThermoHygroGraphics 2 }
+    wtWebGraphThermoHygroGraphicsScale 		OBJECT IDENTIFIER ::= { wtWebGraphThermoHygroGraphics 3 }
+        
+-- wtWebGraphThermoHygroTemp Group
+------------------------
+
+wtWebGraphThermoHygroSensors OBJECT-TYPE
+    SYNTAX INTEGER (1..2)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Number of sensors"
+    ::= { wtWebGraphThermoHygroTemp 1 }
+
+-- Interface Table
+
+wtWebGraphThermoHygroSensorTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF WtWebGraphThermoHygroSensorEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "List of sensors."
+    ::= { wtWebGraphThermoHygroTemp 2 }
+
+wtWebGraphThermoHygroSensorEntry OBJECT-TYPE
+    SYNTAX WtWebGraphThermoHygroSensorEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "List of sensor numbers."
+    INDEX  { wtWebGraphThermoHygroSensorNo }
+    ::= { wtWebGraphThermoHygroSensorTable 1 }
+
+WtWebGraphThermoHygroSensorEntry ::= SEQUENCE {
+    wtWebGraphThermoHygroSensorNo INTEGER
+}
+
+wtWebGraphThermoHygroSensorNo OBJECT-TYPE
+    SYNTAX INTEGER (1..2)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Sensor number."
+    ::= { wtWebGraphThermoHygroSensorEntry 1 }
+
+
+-- wtWebGraphThermoHygroTempValue Table
+
+wtWebGraphThermoHygroTempValueTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF WtWebGraphThermoHygroTempValueEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "List of measurement values corresponding to the channel numbers."
+    ::= { wtWebGraphThermoHygroTemp 3 }
+
+wtWebGraphThermoHygroTempValueEntry OBJECT-TYPE
+    SYNTAX WtWebGraphThermoHygroTempValueEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Measurement values of the sensors."
+    INDEX  { wtWebGraphThermoHygroSensorNo }
+    ::= { wtWebGraphThermoHygroTempValueTable 1 }
+
+WtWebGraphThermoHygroTempValueEntry ::= SEQUENCE{
+    wtWebGraphThermoHygroTempValue OCTET STRING
+}
+
+wtWebGraphThermoHygroTempValue OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (5))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Measurement value of the sensor, ASCII, 5 characters in length."
+    ::= { wtWebGraphThermoHygroTempValueEntry 1 }
+
+-- wtWebGraphThermoHygroBinaryTempValue Table
+
+wtWebGraphThermoHygroBinaryTempValueTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF WtWebGraphThermoHygroBinaryTempValueEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "List of binary measurement values corresponding to the channel numbers."
+    ::= { wtWebGraphThermoHygroTemp 4 }
+
+wtWebGraphThermoHygroBinaryTempValueEntry OBJECT-TYPE
+    SYNTAX WtWebGraphThermoHygroBinaryTempValueEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Binary measurement values of the sensors."
+    INDEX  { wtWebGraphThermoHygroSensorNo }
+    ::= { wtWebGraphThermoHygroBinaryTempValueTable 1 }
+
+WtWebGraphThermoHygroBinaryTempValueEntry ::= SEQUENCE{
+    wtWebGraphThermoHygroBinaryTempValue INTEGER
+}    
+
+wtWebGraphThermoHygroBinaryTempValue OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Binary measurement value of the sensor in 1/10 degrees Celsius or 1/10 per cent,
+        signed number, 0x4FFF6 indicates an 
+        invalid measured value."
+    ::= { wtWebGraphThermoHygroBinaryTempValueEntry 1 }
+
+-- wtWebGraphThermoHygroTempValuePkt Table
+
+wtWebGraphThermoHygroTempValuePktTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF WtWebGraphThermoHygroTempValuePktEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "List of measurement values corresponding to the channel numbers."
+    ::= { wtWebGraphThermoHygroTemp 8 }
+
+wtWebGraphThermoHygroTempValuePktEntry OBJECT-TYPE
+    SYNTAX WtWebGraphThermoHygroTempValuePktEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Measurement values of the sensors."
+    INDEX  { wtWebGraphThermoHygroSensorNo }
+    ::= { wtWebGraphThermoHygroTempValuePktTable 1 }
+
+WtWebGraphThermoHygroTempValuePktEntry ::= SEQUENCE{
+    wtWebGraphThermoHygroTempValuePkt OCTET STRING
+}
+
+wtWebGraphThermoHygroTempValuePkt OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (5))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Measurement value of the sensor, ASCII, 5 characters in length, delimeter is decimal point."
+    ::= { wtWebGraphThermoHygroTempValuePktEntry 1 }    
+
+-- wtWebGraphThermoHygroSessCntrl Group
+--------------------------------
+
+wtWebGraphThermoHygroSessCntrlPassword OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Entering this password opens a session which is ended by writing a 1 to 
+        wtWebGraphThermoHygroSessCntrlLogout. When read this variable provides a string of
+        length zero."
+    ::= { wtWebGraphThermoHygroSessCntrl 1 }
+
+wtWebGraphThermoHygroSessCntrlConfigMode OBJECT-TYPE
+    SYNTAX INTEGER {
+    wtWebGraphThermoHygroSessCntrl-NoSession(0),
+    wtWebGraphThermoHygroSessCntrl-Session(1)
+    }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "When the device is in SNMP configuration mode, the value 1 is
+        returned, otherwise 0. If the read value is 0 even though the
+        password was written, the device is already in config mode and the
+        variables can only be read."
+    ::= { wtWebGraphThermoHygroSessCntrl 2 }
+
+wtWebGraphThermoHygroSessCntrlLogout OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "If the device is in configuration mode and the session was opened by
+        this SNMP Manager, writing a 1 to this variable will end the session 
+        and all parameters are stored.
+        Writing a 2 discards all entries again.
+        When read this variable provides the value 0."
+    ::= { wtWebGraphThermoHygroSessCntrl 3 }
+
+wtWebGraphThermoHygroSessCntrlAdminPassword OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "This password protects access to the variables with administrator rights.
+        It can only be changed by the administrator. If no password was assigned,
+        the valid password is public."
+    ::= { wtWebGraphThermoHygroSessCntrl 4 }
+
+wtWebGraphThermoHygroSessCntrlConfigPassword OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "This password protects access to the variables with configurator rights. It can
+        be changed by the administrator and by the configurator. If no password was assigned, 
+        the valid password is public. When read this variable provides a null-pointer."
+    ::= { wtWebGraphThermoHygroSessCntrl 5 }
+    
+
+-- wtWebGraphThermoHygroText Group
+------------------------
+
+wtWebGraphThermoHygroDeviceName OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Name of the Webio, which is user definable."
+    ::= { wtWebGraphThermoHygroText 1 }
+
+wtWebGraphThermoHygroDeviceText OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Description of the Webio, which is user definable."
+    ::= { wtWebGraphThermoHygroText 2 }
+
+wtWebGraphThermoHygroDeviceLocation OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Description of the location of the Webio, which is user definable."
+    ::= { wtWebGraphThermoHygroText 3 }
+
+wtWebGraphThermoHygroDeviceContact OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Contact address of the system operator of the Webio, which is user definable."
+    ::= { wtWebGraphThermoHygroText 4 }
+
+-- wtWebGraphThermoHygroTimeZone Group
+----------------------------
+
+wtWebGraphThermoHygroTzOffsetHrs OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Offset hours for the time zone (winter time) with respect to UTC."
+    ::= { wtWebGraphThermoHygroTimeZone 1 }
+
+wtWebGraphThermoHygroTzOffsetMin OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Offset minutes for the time zone (winter time) with respect to UTC."
+    ::= { wtWebGraphThermoHygroTimeZone 2 }
+
+wtWebGraphThermoHygroTzEnable OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(4))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Binary coded conditions:
+        Octet 1: unused
+        Octet 2: unused
+        Octet 3: unused
+        Octet 4:
+        	Bit 1-7: unused
+	        Bit 0  : Apply Timezone"
+    ::= { wtWebGraphThermoHygroTimeZone 3 }    
+    
+wtWebGraphThermoHygroStTzOffsetHrs OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Offset hours of the time zone (summer time) with respect to UTC."
+    ::= { wtWebGraphThermoHygroTimeZone 4 }
+
+wtWebGraphThermoHygroStTzOffsetMin OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Offset minutes of the time zone (summer time) with respect to UTC."
+    ::= { wtWebGraphThermoHygroTimeZone 5 }
+    
+wtWebGraphThermoHygroStTzEnable OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(4))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Binary coded conditions:
+        Octet 1: unused
+        Octet 2: unused
+        Octet 3: unused
+        Octet 4:
+        	Bit 1-7: unused
+	        Bit 0  : Apply Summertime"
+    ::= { wtWebGraphThermoHygroTimeZone 6 }       
+    
+wtWebGraphThermoHygroStTzStartMonth OBJECT-TYPE
+    SYNTAX INTEGER {
+    	wtWebGraphThermoHygroStartMonth-January(1),
+    	wtWebGraphThermoHygroStartMonth-February(2),
+    	wtWebGraphThermoHygroStartMonth-March(3),
+    	wtWebGraphThermoHygroStartMonth-April(4),
+    	wtWebGraphThermoHygroStartMonth-May(5),
+    	wtWebGraphThermoHygroStartMonth-June(6),
+    	wtWebGraphThermoHygroStartMonth-July(7),
+    	wtWebGraphThermoHygroStartMonth-August(8),
+    	wtWebGraphThermoHygroStartMonth-September(9),
+    	wtWebGraphThermoHygroStartMonth-October(10),
+    	wtWebGraphThermoHygroStartMonth-November(11),
+    	wtWebGraphThermoHygroStartMonth-December(12)
+    	}
+    	
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Month in which the change is made from winter time to summer time."
+    ::= { wtWebGraphThermoHygroTimeZone 7 }
+
+wtWebGraphThermoHygroStTzStartMode OBJECT-TYPE
+    SYNTAX INTEGER {
+    	wtWebGraphThermoHygroStartMode-first(1),
+    	wtWebGraphThermoHygroStartMode-second(2),
+    	wtWebGraphThermoHygroStartMode-third(3),
+    	wtWebGraphThermoHygroStartMode-fourth(4),
+    	wtWebGraphThermoHygroStartMode-last(5)
+    	}
+    	
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Mode of the day of the week for which the change is made from winter time to summer time."
+    ::= { wtWebGraphThermoHygroTimeZone 8 }
+
+wtWebGraphThermoHygroStTzStartWday OBJECT-TYPE
+    SYNTAX INTEGER {
+    	wtWebGraphThermoHygroStartWday-Sunday(1),
+    	wtWebGraphThermoHygroStartWday-Monday(2),
+    	wtWebGraphThermoHygroStartWday-Tuesday(3),
+    	wtWebGraphThermoHygroStartWday-Thursday(4),
+    	wtWebGraphThermoHygroStartWday-Wednesday(5),
+    	wtWebGraphThermoHygroStartWday-Friday(6),
+    	wtWebGraphThermoHygroStartWday-Saturday(7)
+    	}
+    	
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Day of the week on which the change is made from winter time to summer time"
+    ::= { wtWebGraphThermoHygroTimeZone 9 }
+    
+wtWebGraphThermoHygroStTzStartHrs OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Hour in which the time zone is changed from winter to summer time with
+        respect to UTC."
+    ::= { wtWebGraphThermoHygroTimeZone 10 }
+
+wtWebGraphThermoHygroStTzStartMin OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Minute in which the time zone is changed from winter to summer time with
+        respect to UTC."
+    ::= { wtWebGraphThermoHygroTimeZone 11 }
+ 
+wtWebGraphThermoHygroStTzStopMonth OBJECT-TYPE
+    SYNTAX INTEGER {
+    	wtWebGraphThermoHygroStopMonth-January(1),
+    	wtWebGraphThermoHygroStopMonth-February(2),
+    	wtWebGraphThermoHygroStopMonth-March(3),
+    	wtWebGraphThermoHygroStopMonth-April(4),
+    	wtWebGraphThermoHygroStopMonth-May(5),
+    	wtWebGraphThermoHygroStopMonth-June(6),
+    	wtWebGraphThermoHygroStopMonth-July(7),
+    	wtWebGraphThermoHygroStopMonth-August(8),
+    	wtWebGraphThermoHygroStopMonth-September(9),
+    	wtWebGraphThermoHygroStopMonth-October(10),
+    	wtWebGraphThermoHygroStopMonth-November(11),
+    	wtWebGraphThermoHygroStopMonth-December(12)
+    	}
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Month in which the change is made from summer time to winter time."
+   ::= { wtWebGraphThermoHygroTimeZone 12 }
+
+wtWebGraphThermoHygroStTzStopMode OBJECT-TYPE
+    SYNTAX INTEGER {
+    	wtWebGraphThermoHygroStopMode-first(1),
+    	wtWebGraphThermoHygroStopMode-second(2),
+    	wtWebGraphThermoHygroStopMode-third(3),
+    	wtWebGraphThermoHygroStopMode-fourth(4),
+    	wtWebGraphThermoHygroStopMode-last(5)
+    	}
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Mode of the week day on which the change is made from summer time to winter time."
+    ::= { wtWebGraphThermoHygroTimeZone 13 }
+
+wtWebGraphThermoHygroStTzStopWday OBJECT-TYPE
+    SYNTAX INTEGER {
+    	wtWebGraphThermoHygroStopWday-Sunday(1),
+    	wtWebGraphThermoHygroStopWday-Monday(2),
+    	wtWebGraphThermoHygroStopWday-Tuesday(3),
+    	wtWebGraphThermoHygroStopWday-Thursday(4),
+    	wtWebGraphThermoHygroStopWday-Wednesday(5),
+    	wtWebGraphThermoHygroStopWday-Friday(6),
+    	wtWebGraphThermoHygroStopWday-Saturday(7)
+    	}
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Day of the week on which the change is made from summer time to winter time."
+    ::= { wtWebGraphThermoHygroTimeZone 14 }
+    
+wtWebGraphThermoHygroStTzStopHrs OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Hour at which the time zone is changed from summer to winter time with
+        respect to UTC."
+    ::= { wtWebGraphThermoHygroTimeZone 15 }
+
+wtWebGraphThermoHygroStTzStopMin OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Minute at which the time zone is changed from summer to winter time with
+        respect to UTC."
+    ::= { wtWebGraphThermoHygroTimeZone 16 }
+
+-- wtWebGraphThermoHygroTimeServer Group
+----------------------------
+
+wtWebGraphThermoHygroTimeServer1 OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "IP address or name of the 1st time server in ASCII"
+    ::= { wtWebGraphThermoHygroTimeServer 1 }
+
+wtWebGraphThermoHygroTimeServer2 OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "IP address or name of the 2nd time server in ASCII"
+    ::= { wtWebGraphThermoHygroTimeServer 2 }
+    
+wtWebGraphThermoHygroTsEnable OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(4))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Binary coded conditions:
+        Octet 1: unused
+        Octet 2: unused
+        Octet 3: unused
+        Octet 4:
+        	Bit 1-7: unused
+	        Bit 0  : Apply Time Server"
+    ::= { wtWebGraphThermoHygroTimeServer 3 }
+    
+wtWebGraphThermoHygroTsSyncTime OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Daily synchronisation time with the time server (hour: 0-23)."
+    ::= { wtWebGraphThermoHygroTimeServer 4 } 
+    
+-- wtWebGraphThermoHygroDeviceClock Group
+----------------------------
+
+wtWebGraphThermoHygroClockHrs OBJECT-TYPE
+    SYNTAX INTEGER (0..23)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Clock hours taking into account the time zone settings."
+    ::= { wtWebGraphThermoHygroDeviceClock 1 }
+
+wtWebGraphThermoHygroClockMin OBJECT-TYPE
+    SYNTAX INTEGER (0..59)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Clock minutes taking into account the time zone settings."
+    ::= { wtWebGraphThermoHygroDeviceClock 2 }
+
+wtWebGraphThermoHygroClockDay OBJECT-TYPE
+    SYNTAX INTEGER (1..31)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Date: Day of the month, taking into account the time zone settings."
+    ::= { wtWebGraphThermoHygroDeviceClock 3 }
+
+wtWebGraphThermoHygroClockMonth OBJECT-TYPE
+   SYNTAX INTEGER {
+    	wtWebGraphThermoHygroClockMonth-January(1),
+    	wtWebGraphThermoHygroClockMonth-February(2),
+    	wtWebGraphThermoHygroClockMonth-March(3),
+    	wtWebGraphThermoHygroClockMonth-April(4),
+    	wtWebGraphThermoHygroClockMonth-May(5),
+    	wtWebGraphThermoHygroClockMonth-June(6),
+    	wtWebGraphThermoHygroClockMonth-July(7),
+    	wtWebGraphThermoHygroClockMonth-August(8),
+    	wtWebGraphThermoHygroClockMonth-September(9),
+    	wtWebGraphThermoHygroClockMonth-October(10),
+    	wtWebGraphThermoHygroClockMonth-November(11),
+    	wtWebGraphThermoHygroClockMonth-December(12)
+    	}
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Date: Month, taking into account the time zone settings."
+    ::= { wtWebGraphThermoHygroDeviceClock 4 }
+
+wtWebGraphThermoHygroClockYear OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Date: Year, taking into account the time zone settings."
+    ::= { wtWebGraphThermoHygroDeviceClock 5 }
+    
+
+-- wtWebGraphThermoHygroNetwork Group
+------------------------
+
+wtWebGraphThermoHygroIpAddress OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "IP address of the Webio"
+    ::= { wtWebGraphThermoHygroNetwork 1 }
+
+wtWebGraphThermoHygroSubnetMask OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Subnet mask of the Webio"
+    ::= { wtWebGraphThermoHygroNetwork 2 }
+
+wtWebGraphThermoHygroGateway OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Gateway of the Webio"
+    ::= { wtWebGraphThermoHygroNetwork 3 }
+
+wtWebGraphThermoHygroDnsServer1 OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "IP address of the 1st DNS server in ASCII"
+    ::= { wtWebGraphThermoHygroNetwork 4 }
+
+wtWebGraphThermoHygroDnsServer2 OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "IP address of the 2nd DNS server in ASCII"
+    ::= { wtWebGraphThermoHygroNetwork 5 }
+
+wtWebGraphThermoHygroAddConfig OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Additional configuration (1=ON):
+        Octet 1: unused
+        Octet 2: unused
+        Octet 3: unused
+        Octet 4:
+	        Bit 1: DHCP disable
+	        Bit 0: BOOTP disable
+	        "
+    ::= { wtWebGraphThermoHygroNetwork 6 }
+
+--  wtWebGraphThermoHygroHTTP Group
+--------------------------------
+
+wtWebGraphThermoHygroStartup OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Binary coded start page:
+        Octet 1: unused
+        Octet 2: unused
+        Octet 3: unused
+        Octet 4:
+	        Bit 1: Index.htm
+	        Bit 2: Home.htm
+	        Bit 3: User.htm
+	Only one page may be selected at a time."
+    ::= { wtWebGraphThermoHygroHTTP 1 }
+
+wtWebGraphThermoHygroGetHeaderEnable OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "If these bits are set, every answer of a short form GET question will be lead
+        by the IP-address and name of the device and/or a HTTP header:
+        Octet 1: unused
+        Octet 2: unused
+        Octet 3: unused
+        Octet 4:
+        	Bit 1-6: unused
+        	Bit 1  : GET HTTP enable
+                Bit 0  : GET Header enable"
+    ::= { wtWebGraphThermoHygroHTTP 2 }  
+    
+wtWebGraphThermoHygroHttpPort OBJECT-TYPE
+    SYNTAX INTEGER (1..65535)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Definition of the standard HTML port (Default: 80)."
+    ::= { wtWebGraphThermoHygroHTTP 3 }    
+
+
+-- wtWebGraphThermoHygroMail Group
+--------------------------------
+
+wtWebGraphThermoHygroMailAdName OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Device name for mail administration."
+    ::= { wtWebGraphThermoHygroMail 1 }
+    
+wtWebGraphThermoHygroMailReply OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Reply address for the mail server."
+    ::= { wtWebGraphThermoHygroMail 2 }
+    
+wtWebGraphThermoHygroMailServer OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Name or IP address of the mail server."
+    ::= { wtWebGraphThermoHygroMail 3 }
+    
+wtWebioAn1MailEnable OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Set this bit to enable the sending of mails:
+        Octet 1: unused
+        Octet 2: unused
+        Octet 3: unused
+        Octet 4:
+        	Bit 1-7: unused
+                Bit 0  : Mail enable"
+    ::= { wtWebGraphThermoHygroMail 4 }
+    
+wtWebGraphThermoHygroMailAuthentication OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (4))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Selection of the authentication modi:
+        The OCTETS are interpreted bit-by-bit, with each bit corresponding to an output. 
+        Bit 0 corresponds to the LSB.
+        OCTET 1: unused
+        OCTET 2: unused
+        OCTET 3: unused
+        OCTET 4: Bit 3-7: unused
+        	 Bit 2  : POP3 before SMTP
+        	 Bit 1  : ESMTP, authentication
+        	 Bit 0  : SMTP, no authentication"
+    ::= { wtWebGraphThermoHygroMail 5 }
+    
+wtWebGraphThermoHygroMailAuthUser OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Name of the user to be authenticated."
+    ::= { wtWebGraphThermoHygroMail 6 }    
+    
+wtWebGraphThermoHygroMailAuthPassword OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Authentication password."
+    ::= { wtWebGraphThermoHygroMail 7 }    
+    
+wtWebGraphThermoHygroMailPop3Server OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Name or Ip-address of the POP3 Servers."
+    ::= { wtWebGraphThermoHygroMail 8 }            
+
+-- wtWebGraphThermoHygroSNMP Group
+--------------------------------
+
+wtWebGraphThermoHygroSnmpCommunityStringRead OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Community string read only"
+    ::= { wtWebGraphThermoHygroSNMP 1 }
+
+wtWebGraphThermoHygroSnmpCommunityStringReadWrite OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Community string read / write"
+    ::= { wtWebGraphThermoHygroSNMP 2 }
+
+wtWebGraphThermoHygroSystemTrapManagerIP OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Name or IP address of the TCP server which accepts the system trap."
+    ::= { wtWebGraphThermoHygroSNMP 3 }
+    
+wtWebGraphThermoHygroSystemTrapEnable OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(4))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Binary coded trigger conditions:
+        Octet 1: unused
+        Octet 2: unused
+        Octet 3: unused
+        Octet 4:
+	        Bit 0:   ColdStart
+	        Bit 1:   WarmStart
+	        Bit 2-7: unused"
+    ::= { wtWebGraphThermoHygroSNMP 4 }
+    
+wtWebGraphThermoHygroSnmpEnable OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Set bit 0 to enable SNMP.
+        If disabled, the device did not respond to any SNMP requests.
+        Bit 1 decided wether the community string of read operations 
+        is compared with the system password or not:
+        Octet 1: unused
+        Octet 2: unused
+        Octet 3: unused
+        Octet 4:
+        	Bit 1-7: unused
+        	Bit 0  : SNMP enable"
+    ::= { wtWebGraphThermoHygroSNMP 5 }
+    
+wtWebGraphThermoHygroSnmpCommunityStringTrap OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Community string send within traps."
+    ::= { wtWebGraphThermoHygroSNMP 6 }    
+            
+wtWebGraphThermoHygroSnmpSystemTrapManagerPort OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Port number of the TCP server which accepts the system trap."
+    ::= { wtWebGraphThermoHygroSNMP 7 }  
+    
+-- wtWebGraphThermoHygroUDP Group
+--------------------------------
+    
+wtWebGraphThermoHygroUdpPort OBJECT-TYPE
+    SYNTAX INTEGER (1..65535)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Udp port to which the Udp queries ( short form GET requests) can be sent. This
+        port number must be unique within the device."
+    ::= { wtWebGraphThermoHygroUDP 1 }
+    
+wtWebGraphThermoHygroUdpEnable OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Set this bit to enable UDP support:
+        Octet 1: unused
+        Octet 2: unused
+        Octet 3: unused
+        Octet 4:
+        	Bit 1-7: unused
+                Bit 0  : UDP enable"
+    ::= { wtWebGraphThermoHygroUDP 2 }
+    
+--  wtWebGraphThermoHygroSyslog Group
+--------------------------------
+    
+wtWebGraphThermoHygroSyslogServerIP OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Name or IP address of the Syslog server, which accepts the Syslog messgaes."
+    ::= { wtWebGraphThermoHygroSyslog 1 }
+    
+wtWebGraphThermoHygroSyslogServerPort OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Portnumber of the Syslog servers, default 514."
+    ::= { wtWebGraphThermoHygroSyslog 2 }
+
+wtWebGraphThermoHygroSyslogSystemMessagesEnable OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(4))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Binary coded trigger conditions:
+        Octet 1: unused
+        Octet 2: unused
+        Octet 3: unused
+        Octet 4:
+	        Bit 0:   ColdStart
+	        Bit 1:   WarmStart
+	        Bit 2:   Diag Messages
+	        Bit 3-7: unused"
+    ::= { wtWebGraphThermoHygroSyslog 3 }    
+
+wtWebGraphThermoHygroSyslogEnable OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Set bit 0to enable Syslog:
+        Octet 1: unused
+        Octet 2: unused
+        Octet 3: unused
+        Octet 4:
+        	Bit 1-7: unused
+                Bit 0  : Syslog enable"
+    ::= { wtWebGraphThermoHygroSyslog 4 }
+    
+--  wtWebGraphThermoHygroFTP Group
+--------------------------------
+
+wtWebGraphThermoHygroFTPServerIP OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Name or IP address of the FTP server, which accepts the FTP messages."
+    ::= { wtWebGraphThermoHygroFTP 1 }
+    
+wtWebGraphThermoHygroFTPServerControlPort OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Portnumber of the control port of the FTP server, default 21."
+    ::= { wtWebGraphThermoHygroFTP 2 }
+    
+wtWebGraphThermoHygroFTPUserName OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "FTP Loggin: user name."
+    ::= { wtWebGraphThermoHygroFTP 3 }
+    
+wtWebGraphThermoHygroFTPPassword OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "FTP Loggin: user password."
+    ::= { wtWebGraphThermoHygroFTP 4 }
+
+wtWebGraphThermoHygroFTPAccount OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "FTP Loggin: name of account."
+    ::= { wtWebGraphThermoHygroFTP 5 }
+
+wtWebGraphThermoHygroFTPOption OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Bit 0 switches the FTP Server in Passiv-Mode,
+        the Client controls the data connection on its own:
+        Octet 1: unused
+        Octet 2: unused
+        Octet 3: unused
+        Octet 4:
+        	Bit 1-7: unused
+                Bit 0  : PASV enable"
+    ::= { wtWebGraphThermoHygroFTP 6 }
+    
+wtWebGraphThermoHygroFTPEnable OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Set Bit 0 to enable FTP:
+        Octet 1: unused
+        Octet 2: unused
+        Octet 3: unused
+        Octet 4:
+        	Bit 1-7: unused
+                Bit 0  : FTP enable"
+    ::= { wtWebGraphThermoHygroFTP 7 }
+    
+--  wtWebGraphThermoHygroLanguage Group
+--------------------------------
+
+wtWebGraphThermoHygroLanguageSelect OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Sprachauswahl:
+        Octet 1: ungenutzt
+        Octet 2: ungenutzt
+        Octet 3: ungenutzt
+        Octet 4:
+        	Bit 2-7: ungenutzt
+        	Bit 1  : Englisch
+                Bit 0  : Deutsch"
+    ::= { wtWebGraphThermoHygroLanguage 1 }   
+
+--  wtWebGraphThermoHygroMQTT Group
+--------------------------------
+
+wtWebGraphThermoHygroMQTTEnable OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Bit 7 schaltet MQTT frei:
+        Octet 1: ungenutzt
+        Octet 2: ungenutzt
+        Octet 3: ungenutzt
+        Octet 4:
+        	Bit 0-6: ungenutzt
+                Bit 7  : MQTT enable"
+    ::= { wtWebGraphThermoHygroMQTT 1 }  
+
+wtWebGraphThermoHygroMQTTBrockerIP OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Name or IP-address of the MQTT-Server."
+    ::= { wtWebGraphThermoHygroMQTT 2 }
+
+wtWebGraphThermoHygroMQTTUserName OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "MQTT login  user name."
+    ::= { wtWebGraphThermoHygroMQTT 3 }
+
+wtWebGraphThermoHygroMQTTPassword OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "MQTT login password."
+    ::= { wtWebGraphThermoHygroMQTT 4 }
+
+wtWebGraphThermoHygroMQTTLocalPort OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Local port number."
+    ::= { wtWebGraphThermoHygroMQTT 5 }
+    
+wtWebGraphThermoHygroMQTTBrokerServerPort OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "MQTT Server port number."
+    ::= { wtWebGraphThermoHygroMQTT 6 }
+    
+wtWebGraphThermoHygroMQTTInterval OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Ping intervall, if no data has to be send: time in seconds."
+    ::= { wtWebGraphThermoHygroMQTT 7 }
+
+wtWebGraphThermoHygroMQTTLastWillEnable OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Bit 0 activate MQTT LastWill message:
+        Octet 1: unused
+        Octet 2: unused
+        Octet 3: unused
+        Octet 4:
+        	Bit 1-7: unused
+            Bit 0  : MQTT Last will enable"
+    ::= { wtWebGraphThermoHygroMQTT 8 }  
+
+wtWebGraphThermoHygroMQTTLastWillTopic OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "MQTT Last Will Topic."
+    ::= { wtWebGraphThermoHygroMQTT 9 }
+	
+wtWebGraphThermoHygroMQTTLastWillMsg OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "MQTT Last Will message."
+    ::= { wtWebGraphThermoHygroMQTT 10 }
+
+wtWebGraphThermoHygroMQTTLastWillQoS OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(4))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Binary coded MQTT Publish QoS:
+        Octet 1: unused
+        Octet 2: unused
+        Octet 3: unused
+        Octet 4:
+		Bit 0:	QoS 0
+        Bit 1:	QoS 1
+        Bit 2:  QoS 2
+        Bit 3-7:unused"
+    ::= { wtWebGraphThermoHygroMQTT 11 }
+    
+wtWebGraphThermoHygroMQTTLastWillRetain OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(4))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Binary coded MQTT Publish Retain properties:
+        Octet 1: unused
+        Octet 2: unused
+        Octet 3: unused
+        Octet 4:
+		Bit 0	: retain enable
+        Bit 1-7	: unused"
+    ::= { wtWebGraphThermoHygroMQTT 12 }  
+	
+wtWebGraphThermoHygroMQTTLastWillConnectEnable OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Bit 0 activate MQTT LastWill Connect message:
+        Octet 1: unused
+        Octet 2: unused
+        Octet 3: unused
+        Octet 4:
+        	Bit 1-7: unused
+            Bit 0  : MQTT Last will connect message enable"
+    ::= { wtWebGraphThermoHygroMQTT 13 }
+
+wtWebGraphThermoHygroMQTTLastWillConnectMsg OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "MQTT Last Will Connect message will be send with the QoS and Retain settings
+		of the LastWill message."
+    ::= { wtWebGraphThermoHygroMQTT 14 }
+	
+	
+--  wtWebGraphThermoHygroREST Group
+--------------------------------
+
+wtWebGraphThermoHygroRESTEnable OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Bit 0 activates REST :
+        Octet 1: unused
+        Octet 2: unused
+        Octet 3: unused
+        Octet 4:
+        	Bit 1-7: unused
+            Bit 0  : REST enable"
+    ::= { wtWebGraphThermoHygroREST 1 }  
+
+wtWebGraphThermoHygroRESTDigestAuthEnable OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Bit 0 activates Digest-Authentification:
+        Octet 1: unused
+        Octet 2: unused
+        Octet 3: unused
+        Octet 4:
+        	Bit 1-7: unused
+            Bit 0  : Digest Auth enable"
+    ::= { wtWebGraphThermoHygroREST 2 }  	
+            
+-- wtWebGraphThermoHygroDatalogger Group
+--------------------------------
+
+wtWebGraphThermoHygroLoggerTimebase OBJECT-TYPE
+    SYNTAX INTEGER {
+    wtWebGraphThermoHygroDatalogger-1Min(1),
+    wtWebGraphThermoHygroDatalogger-5Min(2),
+    wtWebGraphThermoHygroDatalogger-15Min(3),
+    wtWebGraphThermoHygroDatalogger-60Min(4)
+    }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Time base of the data logger"
+    ::= { wtWebGraphThermoHygroDatalogger 1 }
+
+wtWebGraphThermoHygroLoggerSensorSel OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(4))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Binary coded trigger conditions:
+        Octet 1: unused
+        Octet 2: unused
+        Octet 3: unused
+        Octet 4:
+        	Bit 0: Sensor 1
+        	Bit 1: Sensor 2
+        	Bit 2-7: unused"
+    ::= { wtWebGraphThermoHygroDatalogger 2 }
+
+--  wtWebGraphThermoHygroRSS Group
+--------------------------------
+
+wtWebGraphThermoHygroRSSChannelTitle OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Name of the RSS Feed."
+    ::= { wtWebGraphThermoHygroRSS 1 }
+    
+wtWebGraphThermoHygroRSSChannelLink OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Link of the RSS Feed."
+    ::= { wtWebGraphThermoHygroRSS 2 }
+
+wtWebGraphThermoHygroRSSChannelDescription OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Description of the RSS Feed."
+    ::= { wtWebGraphThermoHygroRSS 3 }
+
+wtWebGraphThermoHygroRSSChannelImage OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Link of a picture, which will be shown at the headline of the output window."
+    ::= { wtWebGraphThermoHygroRSS 4 }
+
+wtWebGraphThermoHygroRSSChannelImageTitle OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Alias Name of the picture."
+    ::= { wtWebGraphThermoHygroRSS 5 }
+
+wtWebGraphThermoHygroRSSChannelImageLink OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Link, which can be selected by clicking on the picture."
+    ::= { wtWebGraphThermoHygroRSS 6 }
+    
+wtWebGraphThermoHygroRSSChannelItemTitle OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Title of the RSS Feed."
+    ::= { wtWebGraphThermoHygroRSS 7 }
+
+wtWebGraphThermoHygroRSSChannelItemLink OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Link of the RSS Feed."
+    ::= { wtWebGraphThermoHygroRSS 8 }
+
+wtWebGraphThermoHygroRSSChannelItemDescription OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Text of the RSS Feed."
+    ::= { wtWebGraphThermoHygroRSS 9 }
+
+wtWebGraphThermoHygroRSSChannelItemQuantity OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Number of lines."
+    ::= { wtWebGraphThermoHygroRSS 10 }
+
+-- wtWebGraphThermoHygroAlarm Group
+----------------------------
+
+wtWebGraphThermoHygroAlarmCount OBJECT-TYPE
+    SYNTAX INTEGER (1..8)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Number of independent alarms."
+    ::= { wtWebGraphThermoHygroAlarm 1 }
+    
+-- Alarm Interface Table
+
+wtWebGraphThermoHygroAlarmIfTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF WtWebGraphThermoHygroAlarmIfEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "List of alarm indices."
+    ::= { wtWebGraphThermoHygroAlarm 2 }
+
+wtWebGraphThermoHygroAlarmIfEntry OBJECT-TYPE
+    SYNTAX WtWebGraphThermoHygroAlarmIfEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Numbers of the alarms."
+    INDEX  { wtWebGraphThermoHygroAlarmNo }
+    ::= { wtWebGraphThermoHygroAlarmIfTable 1 }
+
+WtWebGraphThermoHygroAlarmIfEntry ::= SEQUENCE {
+    wtWebGraphThermoHygroAlarmNo INTEGER
+}
+
+wtWebGraphThermoHygroAlarmNo OBJECT-TYPE
+    SYNTAX INTEGER (1..8)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Alarm number."
+    ::= { wtWebGraphThermoHygroAlarmIfEntry 1 }
+
+-- Alarm Table
+
+wtWebGraphThermoHygroAlarmTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF WtWebGraphThermoHygroAlarmEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "List of settings depending on the alarm number."
+    ::= { wtWebGraphThermoHygroAlarm 3 }
+
+wtWebGraphThermoHygroAlarmEntry OBJECT-TYPE
+    SYNTAX WtWebGraphThermoHygroAlarmEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Alarm parameters of the individual alarms."
+    INDEX  { wtWebGraphThermoHygroAlarmNo }
+    ::= { wtWebGraphThermoHygroAlarmTable 1 }
+
+WtWebGraphThermoHygroAlarmEntry ::= SEQUENCE {
+    wtWebGraphThermoHygroAlarmTrigger			OCTET STRING,
+    wtWebGraphThermoHygroAlarmMin			OCTET STRING,
+    wtWebGraphThermoHygroAlarmMax			OCTET STRING,
+    wtWebGraphThermoHygroAlarmHysteresis		OCTET STRING,
+    wtWebGraphThermoHygroAlarmDelay			OCTET STRING,
+    wtWebGraphThermoHygroAlarmInterval			OCTET STRING,
+    wtWebGraphThermoHygroAlarmEnable			OCTET STRING,
+    wtWebGraphThermoHygroAlarmEMailAddr			OCTET STRING,
+    wtWebGraphThermoHygroAlarmMailSubject		OCTET STRING,
+    wtWebGraphThermoHygroAlarmMailText			OCTET STRING,
+    wtWebGraphThermoHygroAlarmManagerIP			OCTET STRING,
+    wtWebGraphThermoHygroAlarmTrapText			OCTET STRING,
+    wtWebGraphThermoHygroAlarmMailOptions		OCTET STRING,
+    wtWebGraphThermoHygroAlarmTcpIpAddr			OCTET STRING,
+    wtWebGraphThermoHygroAlarmTcpPort			INTEGER,
+    wtWebGraphThermoHygroAlarmTcpText			OCTET STRING,
+    wtWebGraphThermoHygroAlarmClearMailSubject		OCTET STRING,
+    wtWebGraphThermoHygroAlarmClearMailText		OCTET STRING,
+    wtWebGraphThermoHygroAlarmClearTrapText		OCTET STRING,
+    wtWebGraphThermoHygroAlarmClearTcpText		OCTET STRING,
+    wtWebGraphThermoHygroAlarmDeltaTemp			OCTET STRING,
+    wtWebGraphThermoHygroAlarmRHMin			OCTET STRING,
+    wtWebGraphThermoHygroAlarmRHMax			OCTET STRING,
+    wtWebGraphThermoHygroAlarmRHHysteresis		OCTET STRING,
+    wtWebGraphThermoHygroAlarmAHMin			OCTET STRING,
+    wtWebGraphThermoHygroAlarmAHMax			OCTET STRING,    
+    wtWebGraphThermoHygroAlarmSyslogIpAddr		OCTET STRING,
+    wtWebGraphThermoHygroAlarmSyslogPort		INTEGER,
+    wtWebGraphThermoHygroAlarmSyslogText		OCTET STRING,
+    wtWebGraphThermoHygroAlarmSyslogClearText		OCTET STRING,
+    wtWebGraphThermoHygroAlarmFtpDataPort		OCTET STRING,
+    wtWebGraphThermoHygroAlarmFtpFileName		OCTET STRING,
+    wtWebGraphThermoHygroAlarmFtpText			OCTET STRING,
+    wtWebGraphThermoHygroAlarmFtpClearText		OCTET STRING,
+    wtWebGraphThermoHygroAlarmFtpOption			OCTET STRING,
+    wtWebGraphThermoHygroAlarmTimerCron			OCTET STRING,
+    wtWebGraphThermoHygroAlarmName 			OCTET STRING,
+    wtWebGraphThermoHygroAlarmActive 			OCTET STRING,
+    wtWebGraphThermoHygroAlarmHttpReqAuthEnable		OCTET STRING,
+    wtWebGraphThermoHygroAlarmHttpReqAuthUser		OCTET STRING,
+    wtWebGraphThermoHygroAlarmHttpReqAuthPassword	OCTET STRING,
+    wtWebGraphThermoHygroAlarmHttpReqSetUrl		OCTET STRING,
+    wtWebGraphThermoHygroAlarmHttpReqClearUrl		OCTET STRING,
+    wtWebGraphThermoHygroAlarmHttpReqServerPort		INTEGER,
+    wtWebGraphThermoHygroAlarmMqttTopicPath		OCTET STRING,
+    wtWebGraphThermoHygroAlarmMqttTopicSetTopic		OCTET STRING,
+    wtWebGraphThermoHygroAlarmMqttTopicClear		OCTET STRING,
+    wtWebGraphThermoHygroAlarmSensorLostSelection	OCTET STRING,
+    wtWebGraphThermoHygroAlarmLimitWindow		OCTET STRING,
+    wtWebGraphThermoHygroAlarmSnmpManagerPort		INTEGER,
+    wtWebGraphThermoHygroAlarmMqttQoS			OCTET STRING,
+    wtWebGraphThermoHygroAlarmMqttRetain		OCTET STRING
+}
+
+wtWebGraphThermoHygroAlarmTrigger OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(4))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Binary coded trigger conditions:
+        Octet 1: unused
+        Octet 2: unused
+        Octet 3:
+        	Bit 0: Timer
+        	Bit 1: ColdStart
+        	Bit 2: WarmStart
+        	
+        Octet 4:
+        	Bit 0: Sensor 1
+        	Bit 1: Sensor 2
+        	Bit 2-7: unused"
+    ::= { wtWebGraphThermoHygroAlarmEntry 1 }
+
+wtWebGraphThermoHygroAlarmMin OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Minimum temperature in degrees with maximum 2 decimal places."
+    ::= { wtWebGraphThermoHygroAlarmEntry 2 }
+
+wtWebGraphThermoHygroAlarmMax OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Maximum temperature in degrees with maximum 2 decimal places."
+    ::= { wtWebGraphThermoHygroAlarmEntry 3 }
+    
+wtWebGraphThermoHygroAlarmHysteresis OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Temperature changes of this size clears the alarm state (MAX-hyst, MIN+hyst.)
+        , in degrees with maximum 2 decimal places."
+    ::= { wtWebGraphThermoHygroAlarmEntry 4 }
+
+wtWebGraphThermoHygroAlarmDelay OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Alarm will be delayed by setting this time while stable alarm 
+        condition occur (time in minutes)."
+    ::= { wtWebGraphThermoHygroAlarmEntry 5 }
+        
+
+wtWebGraphThermoHygroAlarmInterval OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Send interval for alarm messages."
+    ::= { wtWebGraphThermoHygroAlarmEntry 6 }
+
+wtWebGraphThermoHygroAlarmEnable OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(4))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Binary coded alarm enable:
+        Octet 1: unused
+        Octet 2: unused
+        Octet 3: unused
+        Octet 4:
+		Bit 0:	Mail Enable
+        	Bit 1:	SNMP Trap enable
+        	Bit 2:  TCP Client enable"
+    ::= { wtWebGraphThermoHygroAlarmEntry 7 }
+
+wtWebGraphThermoHygroAlarmEMailAddr OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "E-Mail address for sending the alarm mail to."
+    ::= { wtWebGraphThermoHygroAlarmEntry 8 }
+
+wtWebGraphThermoHygroAlarmMailSubject OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Subject line for alarm mail."
+    ::= { wtWebGraphThermoHygroAlarmEntry 9 }
+
+wtWebGraphThermoHygroAlarmMailText OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Alarm mail text: <Tn> provides the current temperature; n = 1..8.
+        <Z> provides the current time."
+    ::= { wtWebGraphThermoHygroAlarmEntry 10 }
+
+wtWebGraphThermoHygroAlarmManagerIP OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Name or IP address of the SNMP Manager which accepts the trap."
+    ::= { wtWebGraphThermoHygroAlarmEntry 11 }
+
+wtWebGraphThermoHygroAlarmTrapText OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "This text is sent in the trap body."
+    ::= { wtWebGraphThermoHygroAlarmEntry 12 }
+    
+wtWebGraphThermoHygroAlarmMailOptions OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(4))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Binary coded options:
+        Octet 1: unused
+        Octet 2: unused
+        Octet 3: unused
+        Octet 4:
+		Bit 0  :	Attach Thermo.csv Enable
+		Bit 1  :	CSV-Data_since_last_report
+        	Bit 2-7:	unused"
+    ::= { wtWebGraphThermoHygroAlarmEntry 13 }    
+    
+wtWebGraphThermoHygroAlarmTcpIpAddr OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Name or IP address of the TCP server which accepts the trap."
+    ::= { wtWebGraphThermoHygroAlarmEntry 14 }    
+
+wtWebGraphThermoHygroAlarmTcpPort OBJECT-TYPE
+    SYNTAX INTEGER (1..65535) 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Port number of the TCP server which accepts the trap."
+    ::= { wtWebGraphThermoHygroAlarmEntry 15 }    
+
+wtWebGraphThermoHygroAlarmTcpText OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "This text is sent in the TCP trap body."
+    ::= { wtWebGraphThermoHygroAlarmEntry 16 }
+
+wtWebGraphThermoHygroAlarmClearMailSubject OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Subject line for alarm clear mail."
+    ::= { wtWebGraphThermoHygroAlarmEntry 17 }
+
+wtWebGraphThermoHygroAlarmClearMailText OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Alarm clear mail text: <Tn> provides the current temperature; n = 1..8.
+        <Z> provides the current time."
+    ::= { wtWebGraphThermoHygroAlarmEntry 18 }
+
+wtWebGraphThermoHygroAlarmClearTrapText OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "This text is sent in the trap body."
+    ::= { wtWebGraphThermoHygroAlarmEntry 19 }
+
+wtWebGraphThermoHygroAlarmClearTcpText OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "This text is sent in the TCP trap body."
+    ::= { wtWebGraphThermoHygroAlarmEntry 20 }
+    
+wtWebGraphThermoHygroAlarmDeltaTemp OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Maximum rate of change  degrees/min with maximum 2 decimal places.
+        Compared with the average of a period of 5 minutes."
+    ::= { wtWebGraphThermoHygroAlarmEntry 21 }
+
+wtWebGraphThermoHygroAlarmRHMin OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Minimum rel. Humidity in percent with maximum 2 decimal places."
+    ::= { wtWebGraphThermoHygroAlarmEntry 22 }
+
+wtWebGraphThermoHygroAlarmRHMax OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Maximum rel.Humidity in percent with maximum 2 decimal places."
+    ::= { wtWebGraphThermoHygroAlarmEntry 23 }
+
+wtWebGraphThermoHygroAlarmRHHysteresis OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Hysterese rel. Humidity in percent with maximum 2 decimal places."
+    ::= { wtWebGraphThermoHygroAlarmEntry 24 }
+
+wtWebGraphThermoHygroAlarmAHMin OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Minimum abs. Humidity in g/(m*m*m) with maximum 2 decimal places."
+    ::= { wtWebGraphThermoHygroAlarmEntry 25 }
+
+wtWebGraphThermoHygroAlarmAHMax OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Maximum abs. Humidity in g/(m*m*m) with maximum 2 decimal places."
+    ::= { wtWebGraphThermoHygroAlarmEntry 26 }
+
+wtWebGraphThermoHygroAlarmSyslogIpAddr OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "IP address of the syslog server to which the Webio device should send syslog messages."
+    ::= { wtWebGraphThermoHygroAlarmEntry 27 }    
+
+wtWebGraphThermoHygroAlarmSyslogPort OBJECT-TYPE
+    SYNTAX INTEGER (1..65535) 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Port number of the syslog server to which the Webio device should send syslog messages."
+    ::= { wtWebGraphThermoHygroAlarmEntry 28 }    
+
+wtWebGraphThermoHygroAlarmSyslogText OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Every message starts with the priority key, a time stamp and the host ip address, according RFC3164.
+        This text appears in the following syslog message body."
+    ::= { wtWebGraphThermoHygroAlarmEntry 29 }
+    
+wtWebGraphThermoHygroAlarmSyslogClearText OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Every message starts with the priority key, a time stamp and the host ip address, according RFC3164.
+        This text appears in the following syslog message body."
+    ::= { wtWebGraphThermoHygroAlarmEntry 30 } 
+    
+wtWebGraphThermoHygroAlarmFtpDataPort OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Local data port: 1..65535 or AUTO: the next free port will be assigned."
+    ::= { wtWebGraphThermoHygroAlarmEntry 31 }
+    
+wtWebGraphThermoHygroAlarmFtpFileName OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Name of the file including path informations."
+    ::= { wtWebGraphThermoHygroAlarmEntry 32 }
+    
+wtWebGraphThermoHygroAlarmFtpText OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Message text to store on the FTP server."
+    ::= { wtWebGraphThermoHygroAlarmEntry 33 }
+
+wtWebGraphThermoHygroAlarmFtpClearText OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Alarm clear message to store on the FTP server."
+    ::= { wtWebGraphThermoHygroAlarmEntry 34 }
+    
+wtWebGraphThermoHygroAlarmFtpOption OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(4))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Binary coded options, select only one option at the same time:
+        STORE  = replace file
+        APPEND = append message at the end of the file
+        
+        Octet 1: unused
+        Octet 2: unused
+        Octet 3: unused
+        Octet 4:
+		Bit 0  :	STORE
+		Bit 1  :	APPEND
+        	Bit 2-7:	unused"
+    ::= { wtWebGraphThermoHygroAlarmEntry 35 }
+    
+wtWebGraphThermoHygroAlarmTimerCron OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "This entry contains 5 space or tab seperated text fields for time trigger definition.
+        Each field must match with the actual time to trigger a message, weekday and day of month
+        are interpreted separatley.
+        1: Minutes	Range 0-59
+        2. Hours	Range 0-23, 0 is midnight
+        3: Day of month	Range 1-31
+        4: Month	Range 1-12
+        5: Weekday	Range 0-6, 0 is sunday
+        
+        Syntax for every field:
+         - an asterix (*) enables every possible setting of a field
+         - single numbers seperated by commas
+         - a partition within the allowed range (1-5)
+         - step size within an partition of the allowed range (0-59/2: every second minute)."
+    ::= { wtWebGraphThermoHygroAlarmEntry 36 }   
+
+-- __JB__
+wtWebGraphThermoHygroAlarmName OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Alert name"
+    ::= { wtWebGraphThermoHygroAlarmEntry 39 } 
+	
+-- __JB__
+wtWebGraphThermoHygroAlarmActive OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Alert active
+			1 = ON
+			0 = OFF"
+    ::= { wtWebGraphThermoHygroAlarmEntry 40 }
+    
+wtWebGraphThermoHygroAlarmHttpReqAuthEnable OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Binary coded options, select only one option at the same time:
+        OCTET 1: unused
+        OCTET 2: unused
+        OCTET 3: unused
+        OCTET 4, Bit 1-7: unused
+        Bit 0  : HHTP Request Authentication enable"
+    ::= { wtWebGraphThermoHygroAlarmEntry 61 }
+
+wtWebGraphThermoHygroAlarmHttpReqAuthUser OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"HTTP Request: User"
+    ::= { wtWebGraphThermoHygroAlarmEntry 62 }
+
+wtWebGraphThermoHygroAlarmHttpReqAuthPassword OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"HTTP Request: Password"
+    ::= { wtWebGraphThermoHygroAlarmEntry 63 }
+
+wtWebGraphThermoHygroAlarmHttpReqSetUrl OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"HTTP Request: Set URL"
+    ::= { wtWebGraphThermoHygroAlarmEntry 64 }
+
+wtWebGraphThermoHygroAlarmHttpReqClearUrl OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"HTTP Request: Clear URL"
+    ::= { wtWebGraphThermoHygroAlarmEntry 65 }
+
+wtWebGraphThermoHygroAlarmHttpReqServerPort OBJECT-TYPE
+    SYNTAX INTEGER (1..65535) 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"HTTP Request: Server Port"
+    ::= { wtWebGraphThermoHygroAlarmEntry 66 }
+
+wtWebGraphThermoHygroAlarmMqttTopicPath OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"MQTT Publish: Topic path"
+    ::= { wtWebGraphThermoHygroAlarmEntry 67 }
+
+wtWebGraphThermoHygroAlarmMqttTopicSetTopic OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"MQTT Publish: Topic SET message"
+    ::= { wtWebGraphThermoHygroAlarmEntry 68 }
+
+wtWebGraphThermoHygroAlarmMqttTopicClear OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"MQTT Publish: Topic CLEAR message"
+    ::= { wtWebGraphThermoHygroAlarmEntry 69 }        
+    
+wtWebGraphThermoHygroAlarmSensorLostSelection OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Binary coded options:
+        OCTET 1: unused
+        OCTET 2: unused
+        OCTET 3: unused
+        OCTET 4, Bit 2-7: unused
+		Bit 1  : Sensor 1
+        Bit 0  : Sensor 0"
+    ::= { wtWebGraphThermoHygroAlarmEntry 70 }
+	
+wtWebGraphThermoHygroAlarmLimitWindow OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "If window type is INSIDE the alarm is genereted when the temperature
+        is greater minumum value and lower than maximum value. If window type is OUTSIDE
+        the alarm is generated when the measured value is lower than the minimum value
+        or greater than the maximum value.
+		Binary coded options, select only one option at the same time:
+        OCTET 1: unused
+        OCTET 2: unused
+        OCTET 3: unused
+        OCTET 4, Bit 2-7: unused
+		Bit 1  : inside window
+        Bit 0  : outside window"
+    ::= { wtWebGraphThermoHygroAlarmEntry 71 }
+    
+wtWebGraphThermoHygroAlarmSnmpManagerPort OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Port number of the SNMP Manager to which the Webio device should send SNMP traps."
+    ::= { wtWebGraphThermoHygroAlarmEntry 76 }     
+    
+wtWebGraphThermoHygroAlarmMqttQoS OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(4))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Binary coded value:
+        Octet 1: unused
+        Octet 2: unused
+        Octet 3: unused
+        Octet 4:
+		Bit 0:	QoS 0
+        	Bit 1:	QoS 1
+        	Bit 2:  QoS 2
+        	Bit 3-7:unused"
+    ::= { wtWebGraphThermoHygroAlarmEntry 77 }
+    
+wtWebGraphThermoHygroAlarmMqttRetain OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(4))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Binary coded value:
+        Octet 1: unused
+        Octet 2: unused
+        Octet 3: unused
+        Octet 4:
+		Bit 0	: retain enable
+        	Bit 1-7	: unused"
+    ::= { wtWebGraphThermoHygroAlarmEntry 78 }        
+    
+-- wtWebGraphThermoHygroGraphicsBase Group
+----------------------------
+
+wtWebGraphThermoHygroGraphicsBaseEnable OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Defines the viewing options of the graphic:
+        Octet 1: unused
+        Octet 2: unused
+        Octet 3: unused
+        Octet 4:
+                Bit 0  : Auto scroll enable
+                Bit 1  : Show table
+                Bit 2  : Show graph
+                Bit 3  : Show control buttons
+                Bit 4  : Show config menu
+                Bit 5-7: unused"
+    ::= { wtWebGraphThermoHygroGraphicsBase 1 }
+
+wtWebGraphThermoHygroGraphicsBaseWidth OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Defines the width of the graphic in pixels."
+    ::= { wtWebGraphThermoHygroGraphicsBase 2 }
+    
+wtWebGraphThermoHygroGraphicsBaseHeight OBJECT-TYPE
+        SYNTAX INTEGER 
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "Defines the height of the graphic in pixels."
+        ::= { wtWebGraphThermoHygroGraphicsBase 3 }
+
+wtWebGraphThermoHygroGraphicsBaseFrameColor OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(3))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Frame color definition in RGB."
+    ::= { wtWebGraphThermoHygroGraphicsBase 4 }
+
+wtWebGraphThermoHygroGraphicsBaseBackgroundColor OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(3))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Background color definition in RGB."
+    ::= { wtWebGraphThermoHygroGraphicsBase 5 }
+    
+wtWebGraphThermoHygroGraphicsBasePollingrate OBJECT-TYPE
+        SYNTAX INTEGER 
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "Defines the pollingrate in seconds, 
+            which defines the refreshing intervall of the graphic."
+        ::= { wtWebGraphThermoHygroGraphicsBase 6 }
+   
+-- wtWebGraphThermoHygroGraphicsSelect Group
+----------------------------
+
+wtWebGraphThermoHygroGraphicsSelectDisplaySensorSel OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(4))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Binary coded sensor selection:
+        only selected sensors will be shown in the graphical presentation:
+        Octet 1: unused
+        Octet 2: unused
+        Octet 3: unused
+        Octet 4:
+        	Bit 0: Sensor 1
+        	Bit 1: Sensor 2
+        	Bit 2-7: unused"
+    ::= { wtWebGraphThermoHygroGraphicsSelect 1 }   
+    
+wtWebGraphThermoHygroGraphicsSelectDisplayShowExtrem OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(4))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Binary coded sensor selection:
+        only selected sensors will be shown with minima and maxima:
+        Octet 1: unused
+        Octet 2: unused
+        Octet 3: unused
+        Octet 4:
+        	Bit 0: Sensor 1
+        	Bit 1: Sensor 2
+        	Bit 2-7: unused"
+     ::= { wtWebGraphThermoHygroGraphicsSelect 2 }   
+
+-- Graph Sensor Color Table
+
+wtWebGraphThermoHygroSensorColorTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF WtWebGraphThermoHygroSensorColorEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "List of sensor colors for the praphical presentation."
+    ::= { wtWebGraphThermoHygroGraphicsSelect 3 }
+
+wtWebGraphThermoHygroSensorColorEntry OBJECT-TYPE
+    SYNTAX WtWebGraphThermoHygroSensorColorEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Numbers of the sensors."
+    INDEX  { wtWebGraphThermoHygroSensorNo }
+    ::= { wtWebGraphThermoHygroSensorColorTable 1 }
+
+WtWebGraphThermoHygroSensorColorEntry ::= SEQUENCE {
+    wtWebGraphThermoHygroGraphicsSensorColor OCTET STRING,
+    wtWebGraphThermoHygroGraphicsSelectScale OCTET STRING
+}
+
+wtWebGraphThermoHygroGraphicsSensorColor OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(3))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Color of the sensors at the praphical presention."
+    ::= { wtWebGraphThermoHygroSensorColorEntry 1 }
+    
+wtWebGraphThermoHygroGraphicsSelectScale OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Assignes one of 4 scales to a sensor:
+        Octet 1: unused
+        Octet 2: unused
+        Octet 3: unused
+        Octet 4:
+                Bit 0  : Use Scale 1
+                Bit 1  : Use Scale 2
+                Bit 2-7: unused"
+    ::= { wtWebGraphThermoHygroSensorColorEntry 2 }
+   
+-- wtWebGraphThermoHygroGraphicsScale Group
+----------------------------
+
+wtWebGraphThermoHygroGraphicsScaleAutoScaleEnable OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Select the Auto Scale Mode:
+        Octet 1: unused
+        Octet 2: unused
+        Octet 3: unused
+        Octet 4:
+                Bit 0  : Scale 1 Auto scale enable
+                Bit 1  : Scale 2 Auto scale enable
+                Bit 2-7: unused"
+    ::= { wtWebGraphThermoHygroGraphicsScale 1 }
+
+
+wtWebGraphThermoHygroGraphicsScaleAutoFitEnable OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Select the Auto Fit Mode::
+        Octet 1: unused
+        Octet 2: unused
+        Octet 3: unused
+        Octet 4:
+                Bit 0  : Scale 1 Auto fit enable
+                Bit 1  : Scale 2 Auto fit enable
+                Bit 2-7: unused"
+    ::= { wtWebGraphThermoHygroGraphicsScale 2 }
+
+wtWebGraphThermoHygroGraphicsScale1Min OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Scale 1: Minimum."
+    ::= { wtWebGraphThermoHygroGraphicsScale 3 }
+   
+wtWebGraphThermoHygroGraphicsScale2Min OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Scale 2: Minimum."
+    ::= { wtWebGraphThermoHygroGraphicsScale 4 }
+
+wtWebGraphThermoHygroGraphicsScale3Min OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Scale 3: Minimum."
+    ::= { wtWebGraphThermoHygroGraphicsScale 5 }
+
+wtWebGraphThermoHygroGraphicsScale4Min OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Scale 4: Minimum."
+    ::= { wtWebGraphThermoHygroGraphicsScale 6 }
+
+wtWebGraphThermoHygroGraphicsScale1Max OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Scale 1: Maximum."
+    ::= { wtWebGraphThermoHygroGraphicsScale 7 }
+
+wtWebGraphThermoHygroGraphicsScale2Max OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Scale 2: Maximum."
+    ::= { wtWebGraphThermoHygroGraphicsScale 8 }
+
+wtWebGraphThermoHygroGraphicsScale3Max OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Scale 3: Maximum."
+    ::= { wtWebGraphThermoHygroGraphicsScale 9 }
+
+wtWebGraphThermoHygroGraphicsScale4Max OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Scale 4: Maximum."
+    ::= { wtWebGraphThermoHygroGraphicsScale 10 }
+
+wtWebGraphThermoHygroGraphicsScale1Unit OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Scale 1: Unit."
+    ::= { wtWebGraphThermoHygroGraphicsScale 11 }
+
+wtWebGraphThermoHygroGraphicsScale2Unit OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Scale 2: Unit."
+    ::= { wtWebGraphThermoHygroGraphicsScale 12 }
+
+wtWebGraphThermoHygroGraphicsScale3Unit OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Scale 3: Unit."
+    ::= { wtWebGraphThermoHygroGraphicsScale 13 }
+
+wtWebGraphThermoHygroGraphicsScale4Unit OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Scale 4: Unit."
+    ::= { wtWebGraphThermoHygroGraphicsScale 14 }
+
+    
+-- wtWebGraphThermoHygroPorts Group
+----------------------------
+
+-- Table
+
+wtWebGraphThermoHygroPortTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF WtWebGraphThermoHygroPortEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "List of settings depending on the sensor number."
+    ::= { wtWebGraphThermoHygroPorts 1 }
+
+wtWebGraphThermoHygroPortEntry OBJECT-TYPE
+    SYNTAX WtWebGraphThermoHygroPortEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Sensor parameters for the individual sensors."
+    INDEX  { wtWebGraphThermoHygroSensorNo }
+    ::= { wtWebGraphThermoHygroPortTable 1 }
+
+WtWebGraphThermoHygroPortEntry ::= SEQUENCE {
+    wtWebGraphThermoHygroPortName		OCTET STRING,
+    wtWebGraphThermoHygroPortText		OCTET STRING,
+    wtWebGraphThermoHygroPortOffset1		OCTET STRING,
+    wtWebGraphThermoHygroPortTemperature1	OCTET STRING,
+    wtWebGraphThermoHygroPortOffset2		OCTET STRING,
+    wtWebGraphThermoHygroPortTemperature2	OCTET STRING,
+    wtWebGraphThermoHygroPortComment		OCTET STRING
+}
+
+wtWebGraphThermoHygroPortName OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Name of the sensor."
+    ::= { wtWebGraphThermoHygroPortEntry 1 }
+
+wtWebGraphThermoHygroPortText OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Description of the sensor."
+    ::= { wtWebGraphThermoHygroPortEntry 2 }
+
+wtWebGraphThermoHygroPortOffset1 OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Offset calibration: Offset in degrees with maximum 2 decimal places at temperature 1."
+    ::= { wtWebGraphThermoHygroPortEntry 3 }
+
+wtWebGraphThermoHygroPortTemperature1 OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Offset calibration: Reference temperature 1 in degrees with maximum 2 decimal places."
+    ::= { wtWebGraphThermoHygroPortEntry 4 }
+
+wtWebGraphThermoHygroPortOffset2 OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Offset calibration: Offset in degrees with maximum 2 decimal places at temperature 2."
+    ::= { wtWebGraphThermoHygroPortEntry 5 }
+
+wtWebGraphThermoHygroPortTemperature2 OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Offset calibration: Reference temperature 1 in degrees with maximum 2 decimal places."
+    ::= { wtWebGraphThermoHygroPortEntry 6 }
+
+wtWebGraphThermoHygroPortComment OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Offset calibration: informations of date, name of operator, reference devices."
+    ::= { wtWebGraphThermoHygroPortEntry 7 }   
+
+wtWebGraphThermoHygroPortAltidude OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Altidude oh the Sensor over mean sea level (MSL)."
+    ::= { wtWebGraphThermoHygroPorts 2 }
+    
+-- wtWebGraphThermoHygroManufact Group
+----------------------------
+
+wtWebGraphThermoHygroMfName OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Manufacturer company name"
+    ::= { wtWebGraphThermoHygroManufact 1 }
+
+wtWebGraphThermoHygroMfAddr OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Manufacturer address."
+    ::= { wtWebGraphThermoHygroManufact 2 }
+
+wtWebGraphThermoHygroMfHotline OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Manufacturer hotline."
+    ::= { wtWebGraphThermoHygroManufact 3 }
+
+wtWebGraphThermoHygroMfInternet OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Manufacturer Internet address."
+    ::= { wtWebGraphThermoHygroManufact 4 }
+
+wtWebGraphThermoHygroMfDeviceTyp OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Manufacturer device name (model number)."
+    ::= { wtWebGraphThermoHygroManufact 5 }
+
+wtWebGraphThermoHygroMfOrderNo OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Manufacturer part number."
+    ::= { wtWebGraphThermoHygroManufact 6 }
+
+-- wtWebGraphThermoHygroDiag Group
+----------------------------
+
+wtWebGraphThermoHygroDiagErrorCount OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Number of entries in the error memory."
+    ::= { wtWebGraphThermoHygroDiag 1 }
+
+wtWebGraphThermoHygroDiagBinaryError OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Error causes coded bit-by-bit."
+    ::= { wtWebGraphThermoHygroDiag 2 }
+
+wtWebGraphThermoHygroDiagErrorIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this variable is used as an index to read 
+        an error massege from wtWebGraphThermoHygroDiagErrorMessage.
+        Errors are numbered from 1 to wtWebGraphThermoHygroDiagErrorCount.
+        Writing a valid value into this variable, making the appropriate 
+        message readable from wtWebGraphThermoHygroDiagErrorMessage."
+    ::= { wtWebGraphThermoHygroDiag 3 }
+
+wtWebGraphThermoHygroDiagErrorMessage OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Using wtWebGraphThermoHygroDiagErrorIndex as an index, the appropriate message is available."
+    ::= { wtWebGraphThermoHygroDiag 4 }
+    
+wtWebGraphThermoHygroDiagErrorClear OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS write-only
+    STATUS mandatory
+    DESCRIPTION
+        "Writing 1 into this variable clears all diagnosis messages."
+    ::= { wtWebGraphThermoHygroDiag 5 }
+
+-- TRAP DEFINITIONS
+
+-- Diese SNMP-Traps werden gesendet, wenn die Alarmtriggerbedingungen zutreffen 
+
+wtWebGraphThermoHygroAlert1 TRAP-TYPE
+    ENTERPRISE  wtWebGraphThermoHygro
+    VARIABLES   { wtWebGraphThermoHygroAlarmTrapText }
+    DESCRIPTION
+        "This SNMP trap is generated when Alarm 1 was triggered,
+        SNMP trap enable is set and
+        SNMP is enabled."
+    -- NMS trap annotation
+    --#TYPE "Thermo-Hygrometer Alarm 1"
+    --#SUMMARY "Alarm 1: %s"
+    --#ARGUMENTS {0}
+    --#SEVERITY INFORMATIONAL
+    --#TIMEINDEX 99
+    --#STATE OPERATIONAL    
+    ::= 31
+
+wtWebGraphThermoHygroAlert2 TRAP-TYPE
+    ENTERPRISE  wtWebGraphThermoHygro
+    VARIABLES   { wtWebGraphThermoHygroAlarmTrapText }
+    DESCRIPTION
+        "This SNMP trap is generated when Alarm 2 was triggered,
+        SNMP trap enable is set and
+        SNMP is enabled."
+    -- NMS trap annotation
+    --#TYPE "Thermo-Hygrometer Alarm 2"
+    --#SUMMARY "Alarm 2: %s"
+    --#ARGUMENTS {0}
+    --#SEVERITY INFORMATIONAL
+    --#TIMEINDEX 99
+    --#STATE OPERATIONAL    
+    ::= 32
+
+wtWebGraphThermoHygroAlert3 TRAP-TYPE
+    ENTERPRISE  wtWebGraphThermoHygro
+    VARIABLES   { wtWebGraphThermoHygroAlarmTrapText }
+    DESCRIPTION
+        "This SNMP trap is generated when Alarm 3 was triggered,
+        SNMP trap enable is set and
+        SNMP is enabled."
+    -- NMS trap annotation
+    --#TYPE "Thermo-Hygrometer Alarm 3"
+    --#SUMMARY "Alarm 3: %s"
+    --#ARGUMENTS {0}
+    --#SEVERITY INFORMATIONAL
+    --#TIMEINDEX 99
+    --#STATE OPERATIONAL    
+    ::= 33
+
+wtWebGraphThermoHygroAlert4 TRAP-TYPE
+    ENTERPRISE  wtWebGraphThermoHygro
+    VARIABLES   { wtWebGraphThermoHygroAlarmTrapText }
+    DESCRIPTION
+        "This SNMP trap is generated when Alarm 4 was triggered,
+        SNMP trap enable is set and
+        SNMP is enabled."
+    -- NMS trap annotation
+    --#TYPE "Thermo-Hygrometer Alarm 4"
+    --#SUMMARY "Alarm 4: %s"
+    --#ARGUMENTS {0}
+    --#SEVERITY INFORMATIONAL
+    --#TIMEINDEX 99
+    --#STATE OPERATIONAL    
+    ::= 34
+
+wtWebGraphThermoHygroAlert5 TRAP-TYPE
+    ENTERPRISE  wtWebGraphThermoHygro
+    VARIABLES   { wtWebGraphThermoHygroAlarmTrapText }
+    DESCRIPTION
+        "This SNMP trap is generated when Alarm 5 was triggered,
+        SNMP trap enable is set and
+        SNMP is enabled."
+    -- NMS trap annotation
+    --#TYPE "Thermo-Hygrometer Alarm 5"
+    --#SUMMARY "Alarm 5: %s"
+    --#ARGUMENTS {0}
+    --#SEVERITY INFORMATIONAL
+    --#TIMEINDEX 99
+    --#STATE OPERATIONAL    
+    ::= 35
+
+wtWebGraphThermoHygroAlert6 TRAP-TYPE
+    ENTERPRISE  wtWebGraphThermoHygro
+    VARIABLES   { wtWebGraphThermoHygroAlarmTrapText }
+    DESCRIPTION
+        "This SNMP trap is generated when Alarm 6 was triggered,
+        SNMP trap enable is set and
+        SNMP is enabled."
+    -- NMS trap annotation
+    --#TYPE "Thermo-Hygrometer Alarm 6"
+    --#SUMMARY "Alarm 6: %s"
+    --#ARGUMENTS {0}
+    --#SEVERITY INFORMATIONAL
+    --#TIMEINDEX 99
+    --#STATE OPERATIONAL    
+    ::= 36
+
+wtWebGraphThermoHygroAlert7 TRAP-TYPE
+    ENTERPRISE  wtWebGraphThermoHygro
+    VARIABLES   { wtWebGraphThermoHygroAlarmTrapText }
+    DESCRIPTION
+        "This SNMP trap is generated when Alarm 7 was triggered,
+        SNMP trap enable is set and
+        SNMP is enabled."
+    -- NMS trap annotation
+    --#TYPE "Thermo-Hygrometer Alarm 7"
+    --#SUMMARY "Alarm 7: %s"
+    --#ARGUMENTS {0}
+    --#SEVERITY INFORMATIONAL
+    --#TIMEINDEX 99
+    --#STATE OPERATIONAL    
+    ::= 37
+
+wtWebGraphThermoHygroAlert8 TRAP-TYPE
+    ENTERPRISE  wtWebGraphThermoHygro
+    VARIABLES   { wtWebGraphThermoHygroAlarmTrapText }
+    DESCRIPTION
+        "This SNMP trap is generated when Alarm 8 was triggered,
+        SNMP trap enable is set and
+        SNMP is enabled."
+    -- NMS trap annotation
+    --#TYPE "Thermo-Hygrometer Alarm 8"
+    --#SUMMARY "Alarm 8: %s"
+    --#ARGUMENTS {0}
+    --#SEVERITY INFORMATIONAL
+    --#TIMEINDEX 99
+    --#STATE OPERATIONAL    
+    ::= 38
+
+    
+wtWebGraphThermoHygroAlert9 TRAP-TYPE
+    ENTERPRISE  wtWebGraphThermoHygro
+    VARIABLES   { wtWebGraphThermoHygroAlarmClearTrapText }
+    DESCRIPTION
+        "This SNMP trap is generated when Alarm 1 was cleared,
+        SNMP trap enable is set and
+        SNMP is enabled."
+    -- NMS trap annotation
+    --#TYPE "Thermo-Hygrometer Release Alarm 1"
+    --#SUMMARY "Release Alarm 1: %s"
+    --#ARGUMENTS {0}
+    --#SEVERITY INFORMATIONAL
+    --#TIMEINDEX 99
+    --#STATE OPERATIONAL    
+    ::= 91
+
+wtWebGraphThermoHygroAlert10 TRAP-TYPE
+    ENTERPRISE  wtWebGraphThermoHygro
+    VARIABLES   { wtWebGraphThermoHygroAlarmClearTrapText }
+    DESCRIPTION
+        "This SNMP trap is generated when Alarm 2 was cleared,
+        SNMP trap enable is set and
+        SNMP is enabled."
+    -- NMS trap annotation
+    --#TYPE "Thermo-Hygrometer Release Alarm 2"
+    --#SUMMARY "Release Alarm 2: %s"
+    --#ARGUMENTS {0}
+    --#SEVERITY INFORMATIONAL
+    --#TIMEINDEX 99
+    --#STATE OPERATIONAL    
+    ::= 92
+
+wtWebGraphThermoHygroAlert11 TRAP-TYPE
+    ENTERPRISE  wtWebGraphThermoHygro
+    VARIABLES   { wtWebGraphThermoHygroAlarmClearTrapText }
+    DESCRIPTION
+        "This SNMP trap is generated when Alarm 3 was cleared,
+        SNMP trap enable is set and
+        SNMP is enabled."
+    -- NMS trap annotation
+    --#TYPE "Thermo-Hygrometer Release Alarm 3"
+    --#SUMMARY "Release Alarm 3: %s"
+    --#ARGUMENTS {0}
+    --#SEVERITY INFORMATIONAL
+    --#TIMEINDEX 99
+    --#STATE OPERATIONAL    
+    ::= 93
+
+wtWebGraphThermoHygroAlert12 TRAP-TYPE
+    ENTERPRISE  wtWebGraphThermoHygro
+    VARIABLES   { wtWebGraphThermoHygroAlarmClearTrapText }
+    DESCRIPTION
+        "This SNMP trap is generated when Alarm 4 was cleared,
+        SNMP trap enable is set and
+        SNMP is enabled."
+    -- NMS trap annotation
+    --#TYPE "Thermo-Hygrometer Release Alarm 4"
+    --#SUMMARY "Release Alarm 4: %s"
+    --#ARGUMENTS {0}
+    --#SEVERITY INFORMATIONAL
+    --#TIMEINDEX 99
+    --#STATE OPERATIONAL    
+    ::= 94
+
+wtWebGraphThermoHygroAlert13 TRAP-TYPE
+    ENTERPRISE  wtWebGraphThermoHygro
+    VARIABLES   { wtWebGraphThermoHygroAlarmClearTrapText }
+    DESCRIPTION
+        "This SNMP trap is generated when Alarm 5 was cleared,
+        SNMP trap enable is set and
+        SNMP is enabled."
+    -- NMS trap annotation
+    --#TYPE "Thermo-Hygrometer Release Alarm 5"
+    --#SUMMARY "Release Alarm 5: %s"
+    --#ARGUMENTS {0}
+    --#SEVERITY INFORMATIONAL
+    --#TIMEINDEX 99
+    --#STATE OPERATIONAL    
+    ::= 95
+
+wtWebGraphThermoHygroAlert14 TRAP-TYPE
+    ENTERPRISE  wtWebGraphThermoHygro
+    VARIABLES   { wtWebGraphThermoHygroAlarmClearTrapText }
+    DESCRIPTION
+        "This SNMP trap is generated when Alarm 6 was cleared,
+        SNMP trap enable is set and
+        SNMP is enabled."
+    -- NMS trap annotation
+    --#TYPE "Thermo-Hygrometer Release Alarm 6"
+    --#SUMMARY "Release Alarm 6: %s"
+    --#ARGUMENTS {0}
+    --#SEVERITY INFORMATIONAL
+    --#TIMEINDEX 99
+    --#STATE OPERATIONAL    
+    ::= 96
+
+wtWebGraphThermoHygroAlert15 TRAP-TYPE
+    ENTERPRISE  wtWebGraphThermoHygro
+    VARIABLES   { wtWebGraphThermoHygroAlarmClearTrapText }
+    DESCRIPTION
+        "This SNMP trap is generated when Alarm 7 was cleared,
+        SNMP trap enable is set and
+        SNMP is enabled."
+    -- NMS trap annotation
+    --#TYPE "Thermo-Hygrometer Release Alarm 7"
+    --#SUMMARY "Release Alarm 7: %s"
+    --#ARGUMENTS {0}
+    --#SEVERITY INFORMATIONAL
+    --#TIMEINDEX 99
+    --#STATE OPERATIONAL    
+    ::= 97
+
+wtWebGraphThermoHygroAlert16 TRAP-TYPE
+    ENTERPRISE  wtWebGraphThermoHygro
+    VARIABLES   { wtWebGraphThermoHygroAlarmClearTrapText }
+    DESCRIPTION
+        "This SNMP trap is generated when Alarm 8 was cleared,
+        SNMP trap enable is set and
+        SNMP is enabled."
+    -- NMS trap annotation
+    --#TYPE "Thermo-Hygrometer Release Alarm 8"
+    --#SUMMARY "Release Alarm 8: %s"
+    --#ARGUMENTS {0}
+    --#SEVERITY INFORMATIONAL
+    --#TIMEINDEX 99
+    --#STATE OPERATIONAL    
+    ::= 98
+
+wtWebGraphThermoHygroAlertDiag TRAP-TYPE
+    ENTERPRISE  wtWebGraphThermoHygro
+    VARIABLES   { 	
+    		wtWebGraphThermoHygroDiagErrorIndex,
+    	  	wtWebGraphThermoHygroDiagErrorMessage
+    		}
+    DESCRIPTION
+        "This SNMP trap is generated when a diagnosis/error message was triggered,
+        SNMP trap enable is set and
+        SNMP is enabled."
+    -- NMS trap annotation
+    --#TYPE "Thermo-Hygrometer Diagnose Error"
+    --#SUMMARY "Diagnose error index: %d, Message: %s."
+    --#ARGUMENTS {0,1}
+    --#SEVERITY MAJOR
+    --#TIMEINDEX 99
+    --#STATE DEGRADED    
+    ::= 110 
+ 
+END

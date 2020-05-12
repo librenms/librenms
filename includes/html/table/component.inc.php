@@ -34,7 +34,7 @@ $response[] = array(
     'label' => '&nbsp;',
     'status' => '<button type="submit" id="warning-select" class="btn btn-default btn-sm" title="Disable alerting on all currently warning components">Warning</button>&nbsp;<button type="submit" id="critical-select" class="btn btn-default btn-sm" title="Disable alerting on all currently critical components">Critical</button>',
     'disable' => '<button type="submit" id="disable-toggle" class="btn btn-default btn-sm" title="Toggle polling for all components">Toggle</button><button type="button" id="disable-select" class="btn btn-default btn-sm" title="Disable polling on all components">Select All</button>',
-    'ignore' => '<button type="submit" id="ignore-toggle" class="btn btn-default btn-sm" title="Toggle alerting for all components">Toggle</button><button type="button" id="ignore-select" class="btn btn-default btn-sm" title="Disable alerting on all components">Select All</button>',
+    'ignore' => '<button type="submit" id="ignore-toggle" class="btn btn-default btn-sm" title="Toggle alert tag for all components">Toggle</button><button type="button" id="ignore-select" class="btn btn-default btn-sm" title="Disable alert tag on all components">Select All</button>',
 );
 
 foreach ($COMPONENTS[$device_id] as $ID => $AVP) {

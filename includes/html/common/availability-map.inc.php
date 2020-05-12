@@ -12,6 +12,7 @@
  * the source code distribution for details.
  */
 
+use LibreNMS\Alert\AlertUtil;
 use LibreNMS\Config;
 
 $mode = Session::get('map_view', 0);
@@ -65,7 +66,7 @@ if (defined('SHOW_SETTINGS')) {
         <div class="form-group">
             <div class="col-sm-4">
                 <label for="tile_size" class="control-label availability-map-widget-header">Tile size</label>
-            </div>      
+            </div>
             <div class="col-sm-6">
                 <input type="text" class="form-control" name="tile_size" value="'.$compact_tile.'">
             </div>
@@ -83,7 +84,7 @@ if (defined('SHOW_SETTINGS')) {
     $common_output[] = '
     <div class="form-group">
         <div class="col-sm-4">
-            <label for="show_disabled_and_ignored" class="control-label availability-map-widget-header">Disabled/ignored</label>
+            <label for="show_disabled_and_ignored" class="control-label availability-map-widget-header">Disabled polling/alerting</label>
         </div>
         <div class="col-sm-6">
             <select class="form-control" name="show_disabled_and_ignored">
@@ -146,7 +147,8 @@ if (defined('SHOW_SETTINGS')) {
     $host_up_count = 0;
     $host_warn_count = 0;
     $host_down_count = 0;
-    $host_ignored_count = 0;
+    $host_maintenance_count = 0;
+    $host_disable_notify_count = 0;
     $host_disabled_count = 0;
     $service_up_count = 0;
     $service_warn_count = 0;
@@ -169,7 +171,7 @@ if (defined('SHOW_SETTINGS')) {
             $in_devices = dbFetchColumn($device_group, [Session::get('group_view')]);
         }
 
-        $sql = 'SELECT `D`.`hostname`, `D`.`sysName`, `D`.`device_id`, `D`.`status`, `D`.`uptime`, `D`.`os`, `D`.`icon`, `D`.`ignore`, `D`.`disabled` FROM `devices` AS `D`';
+        $sql = 'SELECT `D`.`hostname`, `D`.`sysName`, `D`.`device_id`, `D`.`status`, `D`.`uptime`, `D`.`os`, `D`.`icon`, `D`.`disable_notify`, `D`.`disabled` FROM `devices` AS `D`';
 
         if (!Auth::user()->hasGlobalRead()) {
             $sql .= ' , `devices_perms` AS P WHERE D.`device_id` = P.`device_id` AND P.`user_id` = ? AND ';
@@ -180,9 +182,9 @@ if (defined('SHOW_SETTINGS')) {
         }
 
         if ($show_disabled_ignored != 1) {
-            $sql .= '`D`.`ignore` = 0 AND `D`.`disabled` = 0 ';
+            $sql .= '`D`.`disable_notify` = 0 AND `D`.`disabled` = 0 ';
         } else {
-            $sql .= '(`D`.`status` IN (0,1,2) OR `D`.`ignore` = 1 OR `D`.`disabled` = 1)';
+            $sql .= '(`D`.`status` IN (0,1,2) OR `D`.`disable_notify` = 1 OR `D`.`disabled` = 1)';
         }
 
         if (Config::get('webui.availability_map_use_device_groups') != 0 && !empty($in_devices)) {
@@ -199,10 +201,10 @@ if (defined('SHOW_SETTINGS')) {
                 $deviceState = "disabled";
                 $deviceLabel = "blackbg";
                 $host_disabled_count++;
-            } elseif ($device['ignore'] == '1') {
-                $deviceState = "ignored";
+            } elseif ($device['disable_notify'] == '1') {
+                $deviceState = "alert-disabled";
                 $deviceLabel = "label-default";
-                $host_ignored_count++;
+                $host_disable_notify_count++;
             } elseif ($device['status'] == '1') {
                 if (($device['uptime'] < Config::get('uptime_warning')) && ($device['uptime'] != 0)) {
                     $deviceState = 'warn';
@@ -221,13 +223,19 @@ if (defined('SHOW_SETTINGS')) {
                 $deviceLabelOld = 'availability-map-oldview-box-down';
                 $host_down_count++;
             }
+
+            if (AlertUtil::isMaintenance($device['device_id'])) {
+                $deviceLabel = 'label-default';
+                $host_maintenance_count++;
+            }
+
             $device_system_name = format_hostname($device);
 
             if (Config::get('webui.availability_map_compact') == 0) {
                 if ($directpage == "yes") {
                     $deviceIcon = getIconTag($device);
                     $temp_output[] = '
-                    <a href="' .generate_device_url($device). '" title="' . $device_system_name . " - " . formatUptime($device['uptime']) . '">
+                    <a href="' .generate_device_url($device). '" title="' . $device_system_name . ($device['uptime'] ? " - " : "") . formatUptime($device['uptime']) . '">
                     <div class="device-availability ' . $deviceState . '" style="width:' . Config::get('webui.availability_map_box_size') . 'px;">
                         <span class="availability-label label ' . $deviceLabel . ' label-font-border">' . $deviceState . '</span>
                         <span class="device-icon">' . $deviceIcon . '</span><br>
@@ -372,7 +380,7 @@ if (defined('SHOW_SETTINGS')) {
 
     if ($show_disabled_ignored == 1) {
         $disabled_ignored_header = '
-            <span class="label label-default label-font-border label-border">ignored: '.$host_ignored_count.'</span>
+            <span class="label label-default label-font-border label-border">alert-disabled: '.$host_disable_notify_count.'</span>
             <span class="label blackbg label-font-border label-border">disabled: '.$host_disabled_count.'</span>';
     }
 
@@ -382,8 +390,11 @@ if (defined('SHOW_SETTINGS')) {
                 <span>Total hosts</span>
                 <span class="label label-success label-font-border label-border">up: '.$host_up_count.'</span>
                 <span class="label label-warning label-font-border label-border">warn: '.$host_warn_count.'</span>
-                <span class="label label-danger label-font-border label-border">down: '.$host_down_count.'</span>
-                '.$disabled_ignored_header.'
+                <span class="label label-danger label-font-border label-border">down: '.$host_down_count.'</span>';
+        if ($host_maintenance_count) {
+            $temp_header[] = '<span class="label label-default label-font-border label-border">maintenance: '.$host_maintenance_count.'</span>';
+        }
+        $temp_header[] = $disabled_ignored_header.'
             </div>';
     }
 

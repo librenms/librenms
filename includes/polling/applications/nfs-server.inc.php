@@ -254,7 +254,7 @@ foreach ($lines as $line) {
         case 'proc4ops':
             // note : proc2 is dropped for kernels 3.10.0+ (centos 7+)
             // note : proc4ops has changed a few times, and getting the keys is difficult
-            // 		 I only use the version which reports 59 value's (centos 6)
+            //       I only use the version which reports 59 value's (centos 6)
 
             // the first value of the proc* is the amount of fields that will follow;
             // we check this, and if its incorrect, do not polute the chart with wrong values

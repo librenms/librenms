@@ -41,7 +41,7 @@ $delete_row = [];
 //store timestamp so all update / creation will be synced on same timestamp
 $update_timestamp = dbFetchRows('select now() as now')[0]['now'];
 
-//Load current DB entries: 
+//Load current DB entries:
 $dbRoute = dbFetchRows('select * from `route` where `device_id` = ?', array($device['device_id']));
 foreach ($dbRoute as $dbRow) {
     $current = $mixed[$dbRow['context_name']][$dbRow['inetCidrRouteDestType']][$dbRow['inetCidrRouteDest']][$dbRow['inetCidrRoutePfxLen']][$dbRow['inetCidrRoutePolicy']][$dbRow['inetCidrRouteNextHopType']][$dbRow['inetCidrRouteNextHop']];
@@ -66,10 +66,9 @@ if (! isset($ipForwardNb['0']['inetCidrRouteNumber'])) {
     $tableRoute = array();
 
     $oid = '.1.3.6.1.2.1.4.21';
-    $ipRoute = snmpwalk_group($device, $oid, $mib, 1, []);
-    d_echo($res);
-    d_echo('Table routage');
-    d_echo($ipRoute);
+    $tableRoute = snmpwalk_group($device, $oid, $mib, 1, []);
+    d_echo('Routing table:');
+    d_echo($tableRoute);
         echo "RFC1213 ";
     foreach ($tableRoute as $ipRoute) {
         if (empty($ipRoute['ipRouteDest']) || $ipRoute['ipRouteDest'] == '') {
@@ -218,7 +217,7 @@ if (isset($ipForwardNb['0']['ipCidrRouteNumber']) && $ipForwardNb['0']['ipCidrRo
     }
 }
 
-// We can now check if we have MPLS VPN routing table available : 
+// We can now check if we have MPLS VPN routing table available :
 // MPLS-L3VPN-STD-MIB::mplsL3VpnVrfRteTable
 // Route numbers : MPLS-L3VPN-STD-MIB::mplsL3VpnVrfPerfCurrNumRoutes
 
@@ -258,9 +257,9 @@ if ($mpls_skip != 1) {
                         $entry['inetCidrRouteNextHop'] = normalize_snmp_ip_address($inetCidrRouteNextHop);
                         $entry['context_name'] = $vpnId;
                         $entry['device_id'] = $device['device_id'];
+                        $entry['inetCidrRouteIfIndex'] = $entry['mplsL3VpnVrfRteInetCidrIfIndex'];
                         $entry['port_id'] = Device::find($device['device_id'])->ports()->where('ifIndex', '=', $entry['inetCidrRouteIfIndex'])->first()->port_id;
                         $entry['updated_at'] = $update_timestamp;
-                        $entry['inetCidrRouteIfIndex'] = $entry['mplsL3VpnVrfRteInetCidrIfIndex'];
                         $entry['inetCidrRouteType'] = $entry['mplsL3VpnVrfRteInetCidrType'];
                         $entry['inetCidrRouteProto'] = $entry['mplsL3VpnVrfRteInetCidrProto'];
                         $entry['inetCidrRouteMetric1'] = $entry['mplsL3VpnVrfRteInetCidrMetric1'];

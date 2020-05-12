@@ -14,7 +14,7 @@ one. This is needed in order for alerting to work properly.**
 ## Pre installed plugins
 
 Note: Plugins will only load if they are prefixed with "check_" and
-they have that prefix stripped out when displaying in the "Add Serice"
+they have that prefix stripped out when displaying in the "Add Service"
 GUI "Type" dropdown list.
 
 Plugins come from two main places

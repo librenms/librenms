@@ -80,11 +80,11 @@ class AlertRule extends BaseModel
 
     public function alerts()
     {
-        return $this->hasMany('App\Models\Alert', 'rule_id');
+        return $this->hasMany(\App\Models\Alert::class, 'rule_id');
     }
 
     public function devices()
     {
-        return $this->belongsToMany('App\Models\Device', 'alert_device_map', 'device_id', 'device_id');
+        return $this->belongsToMany(\App\Models\Device::class, 'alert_device_map', 'device_id', 'device_id');
     }
 }

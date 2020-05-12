@@ -154,7 +154,8 @@ if ($vars['view'] == 'lsp') {
 } // endif lsp view
 
 if ($vars['view'] == 'paths') {
-    echo '<tr><th><a title="Administrative name for LSP this path belongs to">LSP Name</a></th>
+    echo '<tr><th>&nbsp;</th>
+        <th><a title="Administrative name for LSP this path belongs to">LSP Name</a></th>
         <th><a title="The OID index of this path">Index</a></th>
         <th><a title="This variable is an enum that represents the role this path is taking within this LSP.">Type</a></th>
         <th><a title="The desired administrative state for this LSP Path.">Admin State</a></th>
@@ -195,12 +196,13 @@ if ($vars['view'] == 'paths') {
         }
        
         $host = @dbFetchRow('SELECT * FROM `ipv4_addresses` AS A, `ports` AS I, `devices` AS D WHERE A.ipv4_address = ? AND I.port_id = A.port_id AND D.device_id = I.device_id', [$path['mplsLspPathFailNodeAddr']]);
-        $destination = $lsp['mplsLspPathFailNodeAddr'];
+        $destination = $path['mplsLspPathFailNodeAddr'];
         if (is_array($host)) {
             $destination = generate_device_link($host, 0, array('tab' => 'routing', 'proto' => 'mpls'));
         }
-        echo "<tr bgcolor=$bg_colour>
-            <td>" . $path['mplsLspName'] . '</td>
+        echo '<tr data-toggle="collapse" data-target="#path-map' . $i . '" class="accordion-toggle" bgcolor="' . $bg_colour .'">
+            <td><button class="btn btn-default btn-xs"><span class="fa fa-plus"></span></button></td>
+            <td>' . $path['mplsLspName'] . '</td>
             <td>' . $path['path_oid'] . '</td>
             <td>' . $path['mplsLspPathType'] . '</td>
             <td><span class="label label-' . $adminstate_status_color . '">' . $path['mplsLspPathAdminState'] . '</td>
@@ -215,6 +217,13 @@ if ($vars['view'] == 'paths') {
             <td>' . $path['mplsLspPathMetric'] . '</td>
             <td>' . $path['mplsLspPathOperMetric'] . '</td>';
         echo '</tr>';
+        echo '<tr><td colspan="12" class="hiddenRow">';
+        echo '<div class="accordian-body collapse" id="path-map' . $i . '">';
+        // FIXME include only on expanded data-toggle
+        include 'includes/html/pages/routing/mpls-path-map.inc.php';
+        echo '</div>
+             </td>
+             </tr>';
 
         $i++;
     }
@@ -320,9 +329,9 @@ sapDown: The SAP associated with the service is down.">Oper State</a></th>
         if ($sdpbind['sdpBindAdminStatus'] == 'up') {
             $adminstate_status_color = 'success';
         }
-        if ($sdpbind['sdpBindOperStatus'] == 'up') {
+        if ($sdpbind['sdpBindAdminStatus'] == 'up' && $sdpbind['sdpBindOperStatus'] == 'up') {
             $operstate_status_color = 'success';
-        } else {
+        } elseif ($sdpbind['sdpBindAdminStatus'] == 'up' && $sdpbind['sdpBindOperStatus'] == 'down') {
             $operstate_status_color = 'danger';
         }
 
@@ -385,10 +394,19 @@ vprn services are up when the service is administratively up however routing fun
         if ($svc['svcAdminStatus'] == 'up') {
             $adminstate_status_color = 'success';
         }
-        if ($svc['svcOperStatus'] == 'up') {
+        if ($svc['svcAdminStatus'] == 'up' && $svc['svcOperStatus'] == 'up') {
             $operstate_status_color = 'success';
-        } else {
+        } elseif ($svc['svcAdminStatus'] == 'up' && $svc['svcOperStatus'] == 'down') {
             $operstate_status_color = 'danger';
+        }
+
+        $fdb_usage_perc = $svc['svcTlsFdbNumEntries'] / $svc['svcTlsFdbTableSize'] * 100;
+        if ($fdb_usage_perc > 95) {
+            $fdb_status_color = 'danger';
+        } elseif ($fdb_usage_perc > 75) {
+            $fdb_status_color = 'warning';
+        } else {
+            $fdb_status_color = 'success';
         }
 
         echo "<tr bgcolor=$bg_colour>
@@ -405,7 +423,7 @@ vprn services are up when the service is administratively up however routing fun
             <td>' . $svc['vrf_name'] . '</td>
             <td>' . $svc['svcTlsMacLearning'] . '</td>
             <td>' . $svc['svcTlsFdbTableSize'] . '</td>
-            <td>' . $svc['svcTlsFdbNumEntries'] . '</td>
+            <td><span class="label label-' . $fdb_status_color . '">' . $svc['svcTlsFdbNumEntries'] . '</td>
             <td>' . $svc['svcTlsStpAdminStatus'] . '</td>
             <td>' . $svc['svcTlsStpOperStatus'] . '</td>';
         echo '</tr>';
@@ -445,9 +463,9 @@ if ($vars['view'] == 'saps') {
         if ($sap['sapAdminStatus'] == 'up') {
             $adminstate_status_color = 'success';
         }
-        if ($sap['sapOperStatus'] == 'up') {
+        if ($sap['sapAdminStatus'] == 'up' && $sap['sapOperStatus'] == 'up') {
             $operstate_status_color = 'success';
-        } else {
+        } elseif ($sap['sapAdminStatus'] == 'up' && $sap['sapOperStatus'] == 'down') {
             $operstate_status_color = 'danger';
         }
 

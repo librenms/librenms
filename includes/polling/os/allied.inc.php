@@ -32,7 +32,7 @@ if (!$hardware && !$version) {
     $serial = $data['.1.3.6.1.4.1.207.8.17.1.3.1.8.1'];
 }
 
-//Gets OS outputting "Alliedware Plus" instead of just Alliedware. 
+//Gets OS outputting "Alliedware Plus" instead of just Alliedware.
 if ($hardware && $version) {
     $version = 'Plus ' .$version;
 }

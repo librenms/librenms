@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
-                    "location": null,
                     "os": "eltek-webpower",
                     "type": "power",
                     "serial": null,
-                    "icon": "eltek.png"
+                    "icon": "eltek.png",
+                    "location": null
                 }
             ]
         },
@@ -28,11 +28,11 @@
                     "version": "4.11",
                     "hardware": "smartpack",
                     "features": "Rectifier type: FLATPACK2 48/2000 HE, Battery name: PowerSafe 12V170FS",
-                    "location": "sysLocation",
                     "os": "eltek-webpower",
                     "type": "power",
                     "serial": "142308329523",
-                    "icon": "eltek.png"
+                    "icon": "eltek.png",
+                    "location": "sysLocation"
                 }
             ]
         }
@@ -54,7 +54,7 @@
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
                     "ifHighSpeed": null,
-                    "ifOperStatus": null,
+                    "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
                     "ifAdminStatus_prev": null,
@@ -143,7 +143,9 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "ifSpeed_prev": null,
+                    "ifHighSpeed_prev": null
                 }
             ]
         },
@@ -164,7 +166,7 @@
                     "ifPromiscuousMode": null,
                     "ifHighSpeed": null,
                     "ifOperStatus": "up",
-                    "ifOperStatus_prev": null,
+                    "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
                     "ifAdminStatus_prev": null,
                     "ifDuplex": null,
@@ -252,7 +254,9 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "ifSpeed_prev": null,
+                    "ifHighSpeed_prev": null
                 }
             ]
         }

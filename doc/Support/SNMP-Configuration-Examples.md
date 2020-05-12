@@ -115,6 +115,15 @@ snmp-server location <YOUR-LOCATION>
 1. Add your community name and leave IP addresses empty
 1. Click Apply and Save
 
+### Eaton
+
+#### Network Card-MS
+
+1. Connect to the Web UI of the device
+1. Upgrade to the lastest available manufacturer firmware which applies to your hardware revision. Refer to the releasenotes.   For devices which can use the Lx releases, *do* install LD.
+1. After rebooting the card (safe for connected load), configure Network, System and Access Control. Save config for each step.
+1. Configure SNMP. The device defaults to both SNMP v1 and v3 enabled, with default credentials. Disable what you do not need. SNMP v3 works, but uses MD5/DES. You may have to add another section to your SNMP credentials table in LibreNMS. Save.
+
 ### HPE 3PAR
 
 #### Inform OS 3.2.x
@@ -172,14 +181,23 @@ set snmp view mysnmpv3view oid iso include
 
 #### RouterOS 6.x
 
+CLI SNMP v2 Configuration
 ```
-#Terminal SNMP v2 Configuration
 /snmp community
 set [ find default=yes ] read-access=no
 add addresses=<SRC IP/NETWORK> name=<COMMUNITY>
 /snmp
 set contact="<NAME>" enabled=yes engine-id=<ENGINE ID> location="<LOCALTION>"
 ```
+Notes:
+* About the snmp community commands:
+    * The commands change the default snmp community.  It is probably possible to create a new one instead.
+    * <SRC IP/NETWORK> specify the address and host (not network) netmask of the LibreNMS server.  Example: 192.168.8.71/32
+    * trap-version=2 must also be specified if some other trap-version has been set
+    * trap-interfaces may also be used to limit the interfaces the router listens on
+* About the snmp command:
+    * contact, engine-id and location are optional
+    * trap-community is probably required if a new snmp community has been created.
 
 ### Palo Alto
 
@@ -448,7 +466,7 @@ service snmpd restart
    LibreNMS server IP address
 1. Validate change by clicking "Apply"
 
->Note: SNMPv3 can be supported on Windows playforms with the use of Net-SNMP.
+>Note: SNMPv3 can be supported on Windows platforms with the use of Net-SNMP.
 
 ### Mac OSX
 

@@ -236,13 +236,14 @@ class RedisLock(Lock):
         if redis_kwargs.get('sentinel') and redis_kwargs.get('sentinel_service'):
             sentinels = [tuple(l.split(':')) for l in redis_kwargs.pop('sentinel').split(',')]
             sentinel_service = redis_kwargs.pop('sentinel_service')
-            kwargs = {k: v for k, v in redis_kwargs.items() if k in ["decode_responses", "password", "db"]}
+            kwargs = {k: v for k, v in redis_kwargs.items() if k in ["decode_responses", "password", "db", "socket_timeout"]}
             self._redis = Sentinel(sentinels, **kwargs).master_for(sentinel_service)
         else:
             kwargs = {k: v for k, v in redis_kwargs.items() if "sentinel" not in k}
             self._redis = redis.Redis(**kwargs)
         self._redis.ping()
         self._namespace = namespace
+        info("Created redis lock manager with socket_timeout of {}s".format(redis_kwargs['socket_timeout']))
 
     def __key(self, name):
         return "{}:{}".format(self._namespace, name)
@@ -297,13 +298,14 @@ class RedisUniqueQueue(object):
         if redis_kwargs.get('sentinel') and redis_kwargs.get('sentinel_service'):
             sentinels = [tuple(l.split(':')) for l in redis_kwargs.pop('sentinel').split(',')]
             sentinel_service = redis_kwargs.pop('sentinel_service')
-            kwargs = {k: v for k, v in redis_kwargs.items() if k in ["decode_responses", "password", "db"]}
+            kwargs = {k: v for k, v in redis_kwargs.items() if k in ["decode_responses", "password", "db", "socket_timeout"]}
             self._redis = Sentinel(sentinels, **kwargs).master_for(sentinel_service)
         else:
             kwargs = {k: v for k, v in redis_kwargs.items() if "sentinel" not in k}
             self._redis = redis.Redis(**kwargs)
         self._redis.ping()
         self.key = "{}:{}".format(namespace, name)
+        info("Created redis queue with socket_timeout of {}s".format(redis_kwargs['socket_timeout']))
 
         # clean up from previous implementations
         if self._redis.type(self.key) != 'zset':

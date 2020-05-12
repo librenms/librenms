@@ -176,22 +176,6 @@ function print_message($text)
     }
 }
 
-function delete_port($int_id)
-{
-    $interface = dbFetchRow("SELECT * FROM `ports` AS P, `devices` AS D WHERE P.port_id = ? AND D.device_id = P.device_id", array($int_id));
-
-    $interface_tables = array('ipv4_addresses', 'ipv4_mac', 'ipv6_addresses', 'juniAtmVp', 'mac_accounting', 'ospf_nbrs', 'ospf_ports', 'ports', 'ports_adsl', 'ports_perms', 'ports_statistics', 'ports_stp', 'ports_vlans', 'pseudowires');
-
-    foreach ($interface_tables as $table) {
-        dbDelete($table, "`port_id` =  ?", array($int_id));
-    }
-
-    dbDelete('links', "`local_port_id` = ? OR `remote_port_id` = ?", array($int_id, $int_id));
-    dbDelete('ports_stack', "`port_id_low` = ? OR `port_id_high` = ?", array($int_id, $int_id));
-
-    unlink(get_port_rrdfile_path($interface['hostname'], $interface['port_id']));
-}
-
 function get_sensor_rrd($device, $sensor)
 {
     return rrd_name($device['hostname'], get_sensor_rrd_name($device, $sensor));
@@ -209,11 +193,7 @@ function get_sensor_rrd_name($device, $sensor)
 
 function getPortRrdName($port_id, $suffix = '')
 {
-    if (!empty($suffix)) {
-        $suffix = '-' . $suffix;
-    }
-
-    return "port-id$port_id$suffix";
+    return Rrd::portName($port_id, $suffix);
 }
 
 function get_port_rrdfile_path($hostname, $port_id, $suffix = '')
@@ -436,7 +416,7 @@ function getidbyname($hostname)
 
 function safename($name)
 {
-    return preg_replace('/[^a-zA-Z0-9,._\-]/', '_', $name);
+    return \LibreNMS\Data\Store\Rrd::safeName($name);
 }
 
 /**
@@ -446,7 +426,7 @@ function safename($name)
  */
 function safedescr($descr)
 {
-    return preg_replace('/[^a-zA-Z0-9,._\-\/\ ]/', ' ', $descr);
+    return \LibreNMS\Data\Store\Rrd::safeDescr($descr);
 }
 
 function zeropad($num, $length = 2)
@@ -701,41 +681,16 @@ function get_device_graphs($device)
 
 function get_smokeping_files($device)
 {
-    $smokeping_files = array();
-    if (Config::has('smokeping.dir')) {
-        $smokeping_dir = generate_smokeping_file($device);
-        if ($handle = opendir($smokeping_dir)) {
-            while (false !== ($file = readdir($handle))) {
-                if ($file != '.' && $file != '..') {
-                    if (stripos($file, '.rrd') !== false) {
-                        if (strpos($file, '~') !== false) {
-                            list($target,$slave) = explode('~', str_replace('.rrd', '', $file));
-                            $target = str_replace('_', '.', $target);
-                            $smokeping_files['in'][$target][$slave] = $file;
-                            $smokeping_files['out'][$slave][$target] = $file;
-                        } else {
-                            $target = str_replace('.rrd', '', $file);
-                            $target = str_replace('_', '.', $target);
-                            $smokeping_files['in'][$target][Config::get('own_hostname')] = $file;
-                            $smokeping_files['out'][Config::get('own_hostname')][$target] = $file;
-                        }
-                    }
-                }
-            }
-        }
-    }
-    return $smokeping_files;
-} // end get_smokeping_files
+    $smokeping = new \LibreNMS\Util\Smokeping(DeviceCache::get($device['device_id']));
+    return $smokeping->findFiles();
+}
 
 
 function generate_smokeping_file($device, $file = '')
 {
-    if (Config::get('smokeping.integration') === true) {
-        return Config::get('smokeping.dir') . '/' . $device['type'] . '/' . $file;
-    } else {
-        return Config::get('smokeping.dir') . '/' . $file;
-    }
-} // generate_smokeping_file
+    $smokeping = new \LibreNMS\Util\Smokeping(DeviceCache::get($device['device_id']));
+    return $smokeping->generateFileName($file);
+}
 
 
 /*
@@ -861,6 +816,13 @@ function is_custom_graph($type, $subtype, $device)
     return false;
 } // is_custom_graph
 
+function is_customoid_graph($type, $subtype)
+{
+    if (!empty($subtype) && $type == 'customoid') {
+        return true;
+    }
+    return false;
+} // is_customoid_graph
 
 /*
  * FIXME: Dummy implementation
@@ -1045,6 +1007,7 @@ function version_info($remote = false)
     }
     $output['db_schema']   = vsprintf('%s (%s)', $version->database());
     $output['php_ver']     = phpversion();
+    $output['python_ver']  = \LibreNMS\Util\Version::python();
     $output['mysql_ver']   = dbIsConnected() ? dbFetchCell('SELECT version()') : '?';
     $output['rrdtool_ver'] = str_replace('1.7.01.7.0', '1.7.0', implode(' ', array_slice(explode(' ', shell_exec(
         Config::get('rrdtool', 'rrdtool') . ' --version |head -n1'
@@ -1288,25 +1251,6 @@ function ResolveGlues($tables, $target, $x = 0, $hist = array(), $last = array()
     return false;
 }
 
-if (!function_exists('str_contains')) {
-    /**
-     * Determine if a given string contains a given substring.
-     *
-     * @param  string $haystack
-     * @param  string|array $needles
-     * @return bool
-     */
-    function str_contains($haystack, $needles)
-    {
-        foreach ((array)$needles as $needle) {
-            if ($needle != '' && strpos($haystack, $needle) !== false) {
-                return true;
-            }
-        }
-        return false;
-    }
-}
-
 /**
  * Determine if a given string contains a given substring.
  *
@@ -1324,42 +1268,34 @@ function str_i_contains($haystack, $needles)
     return false;
 }
 
-if (!function_exists('ends_with')) {
     /**
-     * Determine if a given string ends with a given substring.
+     * Get alert_rules sql filter by minimal severity
      *
-     * @param  string $haystack
-     * @param  string|array $needles
-     * @return bool
+     * @param  string|int $min_severity
+     * @param  string $alert_rules_name
+     * @return string
      */
-    function ends_with($haystack, $needles)
-    {
-        foreach ((array)$needles as $needle) {
-            if ((string)$needle === substr($haystack, -strlen($needle))) {
-                return true;
-            }
-        }
-        return false;
-    }
-}
 
-if (!function_exists('starts_with')) {
-    /**
-     * Determine if a given string starts with a given substring.
-     *
-     * @param  string $haystack
-     * @param  string|array $needles
-     * @return bool
-     */
-    function starts_with($haystack, $needles)
-    {
-        foreach ((array)$needles as $needle) {
-            if ($needle != '' && strpos($haystack, $needle) === 0) {
-                return true;
-            }
-        }
-        return false;
+function get_sql_filter_min_severity($min_severity, $alert_rules_name)
+{
+    $alert_severities = array(
+        // alert_rules.status is enum('ok','warning','critical')
+        'ok' => 1,
+        'warning' => 2,
+        'critical' => 3,
+        'ok only' => 4,
+        'warning only' => 5,
+        'critical only' => 6,
+    );
+    if (is_numeric($min_severity)) {
+        $min_severity_id = $min_severity;
+    } elseif (!empty($min_severity)) {
+        $min_severity_id = $alert_severities[$min_severity];
     }
+    if (isset($min_severity_id)) {
+        return " AND `$alert_rules_name`.`severity` " . ($min_severity_id > 3 ? "" : ">") . "= " . ($min_severity_id > 3 ? $min_severity_id - 3 : $min_severity_id);
+    }
+    return "";
 }
 
 /**
@@ -1435,7 +1371,7 @@ function load_os(&$device)
 
     // Set type to a predefined type for the OS if it's not already set
     $loaded_os_type = Config::get("os.{$device['os']}.type");
-    if ((!isset($device['attribs']['override_device_type']) && $device['attribs']['override_device_type'] != 1) && $loaded_os_type != $device['type']) {
+    if ((!isset($device['attribs']['override_device_type']) && $device['attribs']['override_device_type'] != 1) && array_key_exists('type', $device) && $loaded_os_type != $device['type']) {
         log_event('Device type changed ' . $device['type'] . ' => ' . $loaded_os_type, $device, 'system', 3);
         $device['type'] = $loaded_os_type;
         dbUpdate(['type' => $loaded_os_type], 'devices', 'device_id=?', [$device['device_id']]);
@@ -1460,37 +1396,7 @@ function load_os(&$device)
  */
 function load_all_os($existing = false, $cached = true)
 {
-    $install_dir = Config::get('install_dir');
-    $cache_file = $install_dir . '/cache/os_defs.cache';
-
-    if ($cached && is_file($cache_file) && (time() - filemtime($cache_file) < Config::get('os_def_cache_time'))) {
-        // Cached
-        $os_defs = unserialize(file_get_contents($cache_file));
-
-        if ($existing) {
-            // remove unneeded os
-            $os_defs = array_diff_key($os_defs, dbFetchColumn('SELECT DISTINCT(`os`) FROM `devices`'));
-        }
-
-        Config::set('os', array_replace_recursive($os_defs, Config::get('os')));
-    } else {
-        // load from yaml
-        if ($existing) {
-            $os_list = array_map(function ($os) use ($install_dir) {
-                return $install_dir . '/includes/definitions/' . $os . '.yaml';
-            }, dbFetchColumn('SELECT DISTINCT(`os`) FROM `devices`'));
-        } else {
-            $os_list = glob($install_dir . '/includes/definitions/*.yaml');
-        }
-
-        foreach ($os_list as $file) {
-            if (is_readable($file)) {
-                $tmp = Symfony\Component\Yaml\Yaml::parse(file_get_contents($file));
-
-                Config::set("os.{$tmp['os']}", array_replace_recursive($tmp, Config::get("os.{$tmp['os']}", [])));
-            }
-        }
-    }
+    Device::loadAllOs($existing, $cached);
 }
 
 /**
@@ -1535,6 +1441,22 @@ function fahrenheit_to_celsius($value, $scale = 'fahrenheit')
 {
     if ($scale === 'fahrenheit') {
         $value = ($value - 32) / 1.8;
+    }
+    return sprintf('%.02f', $value);
+}
+
+/**
+ * Converts celsius to fahrenheit (with 2 decimal places)
+ * if $scale is not celsius, it assumes celsius and  returns the value
+ *
+ * @param float $value
+ * @param string $scale fahrenheit or celsius
+ * @return string (containing a float)
+ */
+function celsius_to_fahrenheit($value, $scale = 'celsius')
+{
+    if ($scale === 'celsius') {
+        $value = ($value * 1.8) + 32;
     }
     return sprintf('%.02f', $value);
 }

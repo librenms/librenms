@@ -1,7 +1,7 @@
 os: sonus-gsx
-text: 'Sonus GSX'
+text: 'Ribbon GSX'
 type: appliance
-icon: sonus
+icon: ribbon
 discovery:
     - sysObjectID:
         - .1.3.6.1.4.1.2879.1.1.2

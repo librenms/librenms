@@ -50,7 +50,7 @@
                         <div class="col-sm-9">
                         <select class="form-control" id="authalgo" name="authalgo" v-model="item.authalgo" @change="updateItem(id, $event.target.id, $event.target.value)">
                             <option value="MD5">MD5</option>
-                            <option value="AES">AES</option>
+                            <option value="SHA">SHA</option>
                         </select>
                         </div>
                     </div>

@@ -25,6 +25,7 @@
 
 namespace LibreNMS\OS;
 
+use Illuminate\Support\Str;
 use LibreNMS\Device\Processor;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Polling\NacPolling;
@@ -68,7 +69,7 @@ class Vrp extends OS implements
                 $descr = $entry['hwEntityBomEnDesc'];
                 $usage = $entry['hwEntityCpuUsage'];
 
-                if (empty($descr) || str_contains($descr, 'No') || str_contains($usage, 'No')) {
+                if (empty($descr) || Str::contains($descr, 'No') || Str::contains($usage, 'No')) {
                     continue;
                 }
 

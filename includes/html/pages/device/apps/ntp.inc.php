@@ -38,14 +38,14 @@ foreach ($components as $peer) {
         $status = 'Ok';
         $error = '';
     }
-?>
+    ?>
 <tr <?php echo $error; ?>>
 <td><?php echo $string; ?></td>
 <td><?php echo $peer['stratum']; ?></td>
 <td><?php echo $peer['peerref']; ?></td>
 <td><?php echo $status; ?></td>
 </tr>
-<?php
+    <?php
 }
 ?>
 </table>

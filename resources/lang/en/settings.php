@@ -1,10 +1,12 @@
 <?php
 
 return [
+    'title' => 'Settings',
     'readonly' => 'Set in config.php, remove from config.php to enable.',
     'groups' => [
         'alerting' => 'Alerting',
         'auth' => 'Authentication',
+        'authorization' => 'Authorization',
         'external' => 'External',
         'global' => 'Global',
         'os' => 'OS',
@@ -17,15 +19,21 @@ return [
         'alerting' => [
             'general' => 'General Alert Settings',
             'email' => 'Email Options',
+            'rules' => 'Alert Rule Default Settings',
         ],
         'auth' => [
             'general' => 'General Authentication Settings',
             'ad' => 'Active Directory Settings',
             'ldap' => 'LDAP Settings'
         ],
+        'authorization' => [
+            'device-group' => 'Device Group Settings'
+        ],
         'discovery' => [
             'general' => 'General Discovery Settings',
             'route' => 'Routes Discovery Module',
+            'discovery_modules' => 'Discovery Modules',
+            'storage' => 'Storage Module'
         ],
         'external' => [
             'binaries' => 'Binary Locations',
@@ -38,9 +46,14 @@ return [
         ],
         'poller' => [
             'distributed' => 'Distributed Poller',
+            'graphite' => 'Datastore: Graphite',
+            'influxdb' => 'Datastore: InfluxDB',
+            'opentsdb' => 'Datastore: OpenTSDB',
             'ping' => 'Ping',
-            'rrdtool' => 'RRDTool Setup',
+            'prometheus' => 'Datastore: Prometheus',
+            'rrdtool' => 'Datastore: RRDTool',
             'snmp' => 'SNMP',
+            'poller_modules' => 'Poller Modules',
         ],
         'system' => [
             'cleanup' => 'Cleanup',
@@ -54,6 +67,8 @@ return [
             'dashboard' => 'Dashboard Settings',
             'search' => 'Search Settings',
             'style' => 'Style',
+            'device' => 'Device Settings',
+            'worldmap' => 'World Map Settings'
         ]
     ],
     'settings' => [
@@ -66,6 +81,40 @@ return [
         'addhost_alwayscheckip' => [
             'description' => 'Check for duplicate IP when adding devices',
             'help' => 'If a host is added as an ip address it is checked to ensure the ip is not already present. If the ip is present the host is not added. If host is added by hostname this check is not performed. If the setting is true hostnames are resolved and the check is also performed. This helps prevents accidental duplicate hosts.'
+        ],
+        'alert_rule' => [
+            'severity' => [
+                'description' => 'Severity',
+                'help' => 'Severity for an Alert'
+            ],
+            'max_alerts' => [
+                'description' => 'Max Alerts',
+                'help' => 'Count of Alerts to be sent'
+            ],
+            'delay' => [
+                'description' => 'Delay',
+                'help' => 'Delay before an Alert will be sent'
+            ],
+            'interval' => [
+                'description' => 'Interval',
+                'help' => 'Interval to be checked for this Alert'
+            ],
+            'mute_alerts' => [
+                'description' => 'Mute Alerts',
+                'help' => 'Should Alert only be seen in WebUI'
+            ],
+            'invert_rule_match' => [
+                'description' => 'Invert Rule Match',
+                'help' => 'Alert only if rule doesn\'t match'
+            ],
+            'recovery_alerts' => [
+                'description' => 'Recovery Alerts',
+                'help' => 'Notify if Alert recovers'
+            ],
+            'invert_map' => [
+                'description' => 'All devices except in list',
+                'help' => 'Alert only for Devices which are not listed'
+            ]
         ],
         'alert' => [
             'ack_until_clear' => [
@@ -324,6 +373,135 @@ return [
             'description' => 'Device performance entries older than (days)',
             'help' => 'Cleanup done by daily.sh'
         ],
+        'discovery_modules' => [
+            'arp-table' => [
+                'description' => 'ARP Table'
+            ],
+            'applications' => [
+                'description' => 'Applications'
+            ],
+            'bgp-peers' => [
+                'description' => 'BGP Peers'
+            ],
+            'cisco-cbqos' => [
+                'description' => 'Cisco CBQOS'
+            ],
+            'cisco-cef' => [
+                'description' => 'Cisco CEF'
+            ],
+            'cisco-mac-accounting' => [
+                'description' => 'Cisco MAC Accounting'
+            ],
+            'cisco-otv' => [
+                'description' => 'Cisco OTV'
+            ],
+            'cisco-qfp' => [
+                'description' => 'Cisco QFP'
+            ],
+            'cisco-sla' => [
+                'description' => 'Cisco SLA'
+            ],
+            'cisco-pw' => [
+                'description' => 'Cisco PW'
+            ],
+            'cisco-vrf-lite' => [
+                'description' => 'Cisco VRF Lite'
+            ],
+            'discovery-arp' => [
+                'description' => 'Discovery ARP'
+            ],
+            'discovery-protocols' => [
+                'description' => 'Discovery Protocols'
+            ],
+            'entity-physical' => [
+                'description' => 'Entity Physical'
+            ],
+            'entity-state' => [
+                'description' => 'Entity State'
+            ],
+            'fdb-table' => [
+                'description' => 'FDB Table'
+            ],
+            'hr-device' => [
+                'description' => 'HR Device'
+            ],
+            'ipv4-addresses' => [
+                'description' => 'IPv4 Addresses'
+            ],
+            'ipv6-addresses' => [
+                'description' => 'IPv6 Addresses'
+            ],
+            'junose-atm-vp' => [
+                'description' => 'Junose ATM VP'
+            ],
+            'libvirt-vminfo' => [
+                'description' => 'Libvirt VMInfo'
+            ],
+            'loadbalancers' => [
+                'description' => 'Loadbalancers'
+            ],
+            'mef' => [
+                'description' => 'MEF'
+            ],
+            'mempools' => [
+                'description' => 'Mempools'
+            ],
+            'mpls' => [
+                'description' => 'MPLS'
+            ],
+            'ntp' => [
+                'description' => 'NTP'
+            ],
+            'os' => [
+                'description' => 'OS'
+            ],
+            'ports' => [
+                'description' => 'Ports'
+            ],
+            'ports-stack' => [
+                'description' => 'Ports Stack'
+            ],
+            'processors' => [
+                'description' => 'Processors'
+            ],
+
+            'route' => [
+                'description' => 'Route'
+            ],
+
+            'sensors' => [
+                'description' => 'Sensors'
+            ],
+
+            'services' => [
+                'description' => 'Services'
+            ],
+            'storage' => [
+                'description' => 'Storage'
+            ],
+
+            'stp' => [
+                'description' => 'STP'
+            ],
+            'toner' => [
+                'description' => 'Toner'
+            ],
+            'ucd-diskio' => [
+                'description' => 'UCD DiskIO'
+            ],
+            'vlans' => [
+                'description' => 'VLans'
+            ],
+            'vmware-vminfo' => [
+                'description' => 'VMWare VMInfo'
+            ],
+            'vrf' => [
+                'description' => 'VRF'
+            ],
+            'wireless' => [
+                'description' => 'Wireless'
+            ],
+        ],
         'distributed_poller' => [
             'description' => 'Enable Distributed Polling (requires additional setup)',
             'help' => 'Enable distributed polling system wide. This is intended for load sharing, not remote polling. You must read the documentation for steps to enable: https://docs.librenms.org/Extensions/Distributed-Poller/'
@@ -439,6 +617,24 @@ return [
                 ]
             ]
         ],
+        'graphite' => [
+            'enable' => [
+                'description' => 'Enable',
+                'help' => 'Exports metrics to Graphite'
+            ],
+            'host' => [
+                'description' => 'Server',
+                'help' => 'The IP or hostname of the Graphite server to send data to'
+            ],
+            'port' => [
+                'description' => 'Port',
+                'help' => 'The port to use to connect to the Graphite server'
+            ],
+            'prefix' => [
+                'description' => 'Prefix (Optional)',
+                'help' => 'Will add the prefix to the start of all metrics.  Must be alphanumeric separated by dots'
+            ]
+        ],
         'graylog' => [
             'base_uri' => [
                 'description' => 'Base URI',
@@ -479,9 +675,84 @@ return [
                 'help' => 'This is used to automatically create the base_uri for the Graylog API. If you have modified the API uri from the default, set this to other and specify your base_uri.'
             ]
         ],
+        'html' => [
+            'device' => [
+                'primary_link' => [
+                    'description' => 'Primary Dropdown Link',
+                    'help' => 'Sets the primary link in the device dropdown menu'
+                ]
+            ],
+        ],
         'http_proxy' => [
             'description' => 'HTTP(S) Proxy',
             'help' => 'Set this as a fallback if http_proxy or https_proxy environment variable is not available.'
+        ],
+        'ignore_mount' => [
+            'description' => 'Mountpoints to be ignored',
+            'help' => 'Don\'t monitor Disc Usage of this Mountpoints'
+        ],
+        'ignore_mount_network' => [
+            'description' => 'Ignore Network Mountpoints',
+            'help' => 'Don\'t monitor Disc Usage of Network Mountpoints'
+        ],
+        'ignore_mount_optical' => [
+            'description' => 'Ignore Optical Drives',
+            'help' => 'Don\'t monitor Disc Usage of optical Drives'
+        ],
+        'ignore_mount_removable' => [
+            'description' => 'Ignore Removable Drives',
+            'help' => 'Don\'t monitor Disc Usage of removable Devices'
+        ],
+        'ignore_mount_regexp' => [
+            'description' => 'Mountpoints matching Regex to be ignored',
+            'help' => 'Don\'t monitor Disc Usage of Mountpoints which are matching at least one of this Regular Expressions'
+        ],
+        'ignore_mount_string' => [
+            'description' => 'Mountpoints containing String to be ignored',
+            'help' => 'Don\'t monitor Disc Usage of Mountpoints which contains at least one of this Strings'
+        ],
+        'influxdb' => [
+            'db' => [
+                'description' => 'Database',
+                'help' => 'Name of the InfluxDB database to store metrics'
+            ],
+            'enable' => [
+                'description' => 'Enable',
+                'help' => 'Exports metrics to InfluxDB'
+            ],
+            'host' => [
+                'description' => 'Server',
+                'help' => 'The IP or hostname of the InfluxDB server to send data to'
+            ],
+            'password' => [
+                'description' => 'Password',
+                'help' => 'Password to connect to InfluxDB, if required'
+            ],
+            'port' => [
+                'description' => 'Port',
+                'help' => 'The port to use to connect to the InfluxDB server'
+            ],
+            'timeout' => [
+                'description' => 'Timeout',
+                'help' => 'How long to wait for InfluxDB server, 0 means default timeout'
+            ],
+            'transport' => [
+                'description' => 'Transport',
+                'help' => 'The port to use to connect to the InfluxDB server',
+                'options' => [
+                    'http' => 'HTTP',
+                    'https' => 'HTTPS',
+                    'udp' => 'UDPRRRRRRR'
+                ]
+            ],
+            'username' => [
+                'description' => 'Username',
+                'help' => 'Username to connect to InfluxDB, if required'
+            ],
+            'verifySSL' => [
+                'description' => 'Verify SSL',
+                'help' => 'Verify the SSL certificate is valid and trusted'
+            ]
         ],
         'ipmitool' => [
             'description' => 'Path to ipmtool'
@@ -499,6 +770,10 @@ return [
         'mydomain' => [
             'description' => 'Primary Domain',
             'help' => 'This domain is used for network auto-discovery and other processes. LibreNMS will attempt to append it to unqualified hostnames.'
+        ],
+        'network_map_show_on_worldmap' => [
+            'description' => 'Display network links on the map',
+            'help' => 'Show the networks links between the different location on the worldmap (weathermap-like)'
         ],
         'nfsen_enable' => [
             'description' => 'Enable NfSen',
@@ -548,6 +823,20 @@ return [
         'nmap' => [
             'description' => 'Path to nmap'
         ],
+        'opentsdb' => [
+            'enable' => [
+                'description' => 'Enable',
+                'help' => 'Exports metrics to OpenTSDB'
+            ],
+            'host' => [
+                'description' => 'Server',
+                'help' => 'The IP or hostname of the OpenTSDB server to send data to'
+            ],
+            'port' => [
+                'description' => 'Port',
+                'help' => 'The port to use to connect to the OpenTSDB server'
+            ]
+        ],
         'own_hostname' => [
             'description' => 'LibreNMS hostname',
             'help' => 'Should be set to the hostname/ip the librenms server is added as'
@@ -592,8 +881,152 @@ return [
             'description' => 'Poller performance log entries older than (days)',
             'help' => 'Cleanup done by daily.sh'
         ],
+        'permission' => [
+            'device_group' => [
+                'allow_dynamic' => [
+                    'description' => 'Enable user access via dynamic Device Groups',
+                ]
+            ]
+        ],
         'ping' => [
             'description' => 'Path to ping'
+        ],
+        'poller_modules' => [
+            'unix-agent' => [
+                'description' => 'Unix Agent'
+            ],
+            'os' => [
+                'description' => 'OS'
+            ],
+            'ipmi' => [
+                'description' => 'IPMI'
+            ],
+            'sensors' => [
+                'description' => 'Sensors'
+            ],
+            'processors' => [
+                'description' => 'Processors'
+            ],
+            'mempools' => [
+                'description' => 'Mempools'
+            ],
+            'storage' => [
+                'description' => 'Storage'
+            ],
+            'netstats' => [
+                'description' => 'Netstats'
+            ],
+            'hr-mib' => [
+                'description' => 'HR Mib'
+            ],
+            'ucd-mib' => [
+                'description' => 'Ucd Mib'
+            ],
+            'ipSystemStats' => [
+                'description' => 'ipSystemStats'
+            ],
+            'ports' => [
+                'description' => 'Ports'
+            ],
+            'bgp-peers' => [
+                'description' => 'BGP Peers'
+            ],
+            'junose-atm-vp' => [
+                'description' => 'JunOS ATM VP'
+            ],
+            'toner' => [
+                'description' => 'Toner'
+            ],
+            'ucd-diskio' => [
+                'description' => 'UCD DiskIO'
+            ],
+            'wifi' => [
+                'description' => 'Wifi'
+            ],
+            'wireless' => [
+                'description' => 'Wireless'
+            ],
+            'ospf' => [
+                'description' => 'OSPF'
+            ],
+            'cisco-ipsec-flow-monitor' => [
+                'description' => 'Cisco IPSec flow Monitor'
+            ],
+            'cisco-remote-access-monitor' => [
+                'description' => 'Cisco remote access Monitor'
+            ],
+            'cisco-cef' => [
+                'description' => 'Cisco CEF'
+            ],
+            'cisco-sla' => [
+                'description' => 'Cisco SLA'
+            ],
+            'cisco-mac-accounting' => [
+                'description' => 'Cisco MAC Accounting'
+            ],
+            'cipsec-tunnels' => [
+                'description' => 'Cipsec Tunnels'
+            ],
+            'cisco-ace-loadbalancer' => [
+                'description' => 'Cisco ACE Loadbalancer'
+            ],
+            'cisco-ace-serverfarms' => [
+                'description' => 'Cisco ACE Serverfarms'
+            ],
+            'cisco-asa-firewall' => [
+                'description' => 'Cisco ASA Firewall'
+            ],
+            'cisco-voice' => [
+                'description' => 'Cisco Voice'
+            ],
+            'cisco-cbqos' => [
+                'description' => 'Cisco CBQOS'
+            ],
+            'cisco-otv' => [
+                'description' => 'Cisco OTV'
+            ],
+            'cisco-qfp' => [
+                'description' => 'Cisco QFP'
+            ],
+            'cisco-vpdn' => [
+                'description' => 'Cisco VPDN'
+            ],
+            'nac' => [
+                'description' => 'NAC'
+            ],
+            'netscaler-vsvr' => [
+                'description' => 'Netscaler VSVR'
+            ],
+            'aruba-controller' => [
+                'description' => 'Aruba Controller'
+            ],
+            'entity-physical' => [
+                'description' => 'Entity Physical'
+            ],
+            'entity-state' => [
+                'description' => 'Entity State'
+            ],
+            'applications' => [
+                'description' => 'Applications'
+            ],
+            'mib' => [
+                'description' => 'MIB'
+            ],
+            'stp' => [
+                'description' => 'STP'
+            ],
+            'ntp' => [
+                'description' => 'NTP'
+            ],
+            'loadbalancers' => [
+                'description' => 'Loadbalancers'
+            ],
+            'mef' => [
+                'description' => 'MEF'
+            ],
+            'mpls' => [
+                'description' => 'MPLS'
+            ],
         ],
         'ports_fdb_purge' => [
             'description' => 'Port FDB entries older than',
@@ -602,6 +1035,20 @@ return [
         'ports_purge' => [
             'description' => 'Ports older than (days)',
             'help' => 'Cleanup done by daily.sh'
+        ],
+        'prometheus' => [
+            'enable' => [
+                'description' => 'Enable',
+                'help' => 'Exports metrics to Prometheus Push Gateway'
+            ],
+            'host' => [
+                'description' => 'Server',
+                'help' => 'The IP or hostname of the Prometheus Push Gateway to send data to'
+            ],
+            'port' => [
+                'description' => 'Job',
+                'help' => 'Job label for exported metrics'
+            ]
         ],
         'public_status' => [
             'description' => 'Show status publicly',
@@ -650,8 +1097,8 @@ return [
             'description' => 'Path to sfdp'
         ],
         'shorthost_target_length' => [
-            'description' => 'shortend hostname maximum length',
-            'help' => 'shrinks hostname to maximum length, but always complete subdomain parts'
+            'description' => 'Shortened hostname maximum length',
+            'help' => 'Shrinks hostname to maximum length, but always complete subdomain parts'
         ],
         'site_style' => [
             'description' => 'Set the site css style',
@@ -757,6 +1204,10 @@ return [
                 'release' => 'release'
             ]
         ],
+        'uptime_warning' => [
+            'description' => 'Show Device as warning if Uptime below (seconds)',
+            'help' => 'Shows Device as warning if Uptime is below this value. Default 24h'
+        ],
         'virsh' => [
             'description' => 'Path to virsh'
         ],
@@ -805,6 +1256,18 @@ return [
                 'description' => 'Set the minimum graph height',
                 'help' => 'Minimum Graph Height (default: 300)'
             ]
+        ],
+        'device_location_map_open' => [
+            'description' => 'Location Map open',
+            'help' => 'Location Map is shown by default'
+        ],
+        'force_hostname_to_sysname' => [
+            'description' => 'show SysName instead of Hostname',
+            'help' => 'When using a dynamic DNS hostname or one that does not resolve, this option would allow you to make use of the sysName instead as the preferred reference to the device'
+        ],
+        'force_ip_to_sysname' => [
+            'description' => 'show SysName instead of IP Address',
+            'help' => 'When using IP addresses as a hostname you can instead represent the devices on the WebUI by its sysName resulting in an easier to read overview of your network. This would apply on networks where you don\'t have DNS records for most of your devices'
         ],
         'whois' => [
             'description' => 'Path to whois'

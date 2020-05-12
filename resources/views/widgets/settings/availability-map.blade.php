@@ -15,10 +15,11 @@
     </div>
 
     <div class="form-group" id="color_only_select-group-{{ $id }}" style="display: {{ $type == 0 ? 'block' : 'none' }};">
-        <label for="color_only_select-{{ $id }}" class="control-label">@lang('Uniform Tiles')</label>
+        <label for="color_only_select-{{ $id }}" class="control-label">@lang('Display Text')</label>
         <select class="form-control" name="color_only_select" id="color_only_select-{{ $id }}">
-            <option value="1" @if($color_only_select) selected @endif>@lang('yes')</option>
-            <option value="0" @unless($color_only_select) selected @endunless>@lang('no')</option>
+            <option value="1" @if($color_only_select == 1) selected @endif>@lang('empty')</option>
+            <option value="2" @if($color_only_select == 2) selected @endunless>@lang('Hostname')</option>
+            <option value="0" @unless($color_only_select) selected @endunless>@lang('Device Status')</option>
         </select>
     </div>
 
@@ -28,7 +29,7 @@
     </div>
 
     <div class="form-group">
-        <label for="show_disabled_and_ignored-{{ $id }}" class="control-label">@lang('Disabled/ignored')</label>
+        <label for="show_disabled_and_ignored-{{ $id }}" class="control-label">@lang('Disabled polling/alerting')</label>
         <select class="form-control" name="show_disabled_and_ignored" id="show_disabled_and_ignored-{{ $id }}">
             <option value="1" @if($show_disabled_and_ignored) selected @endif>@lang('Show')</option>
             <option value="0" @unless($show_disabled_and_ignored) selected @endunless>@lang('Hide')</option>

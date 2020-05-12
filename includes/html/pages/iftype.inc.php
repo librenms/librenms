@@ -1,12 +1,4 @@
 <table class="table table-condensed table-hover table-striped">
-    <tr bgcolor='$iftype'>
-        <th>Device</th>
-        <th>Interface</th>
-        <th>Speed</th>
-        <th>Circuit</th>
-        <th>Notes</th>
-    </tr>
-
 <?php
 
 if ($bg == '#ffffff') {
@@ -25,10 +17,13 @@ foreach ($ports as $port) {
 
 unset($seperator);
 
-for ($i = 0; $i < count($types_array);
-$i++) {
-    $types_array[$i] = ucfirst($types_array[$i]);
-}
+// show title from config file (but ucwords it)
+$ctypes = collect(\LibreNMS\Config::get('custom_descr', []))->keyBy(function ($descr) {
+    return strtolower($descr);
+});
+array_walk($types_array, function (&$type) use ($ctypes) {
+    $type = ucwords($ctypes->get(strtolower($type), $type));
+});
 
 $types = implode(' + ', $types_array);
 

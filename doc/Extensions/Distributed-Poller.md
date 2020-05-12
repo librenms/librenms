@@ -12,8 +12,8 @@ away or are behind NAT firewalls.
 Devices can be grouped together into a `poller_group` to pin these
 devices to a single or a group of designated pollers.
 
-All pollers need to share their RRD-folder, for example via NFS or a
-combination of NFS and rrdcached.
+All pollers need to write to the same set of RRD files, preferably via
+RRDcached.
 
 It is a requirement that all pollers can access the central memcached
 to communicate with each other.
@@ -141,6 +141,9 @@ such as pdns-recursor and have all of your pollers use this or install
 a recursive dns server on each poller - the volume of DNS requests on
 large installs can be significant and will slow polling down enough to
 cause issues with a large number of devices.
+
+A last note to make sure of, is that all pollers writing to the same DB
+need to have the same `APP_KEY` value set in the `.env` file.
 
 ### Discovery
 
