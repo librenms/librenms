@@ -22,7 +22,7 @@ if (!Auth::user()->hasGlobalAdmin()) {
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title" id="Create">Alert Template :: <a href="https://docs.librenms.org/Alerting/Templates/"><i class="fa fa-book fa-1x"></i> Docs</a></h4>
+                <h4 class="modal-title" id="Create">Alert Template :: <a target="_blank" href="https://docs.librenms.org/Alerting/Templates/"><i class="fa fa-book fa-1x"></i> Docs</a></h4>
             </div>
             <div class="modal-body">
                 <div class="row">

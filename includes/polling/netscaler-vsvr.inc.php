@@ -82,10 +82,11 @@ if ($device['os'] == 'netscaler') {
 
             $fields = array();
             foreach ($oids as $oid) {
+                $oid_ds = str_replace('vsvr', '', $oid);
                 if (is_numeric($vsvr[$oid])) {
-                    $fields[$oid] = $vsvr[$oid];
+                    $fields[$oid_ds] = $vsvr[$oid];
                 } else {
-                    $fields[$oid] = 'U';
+                    $fields[$oid_ds] = 'U';
                 }
             }
 

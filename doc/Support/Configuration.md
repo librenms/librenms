@@ -229,19 +229,12 @@ Set how often pages are refreshed in seconds. The default is every 5
 minutes. Some pages don't refresh at all by design.
 
 ```php
-$config['front_page']       = "pages/front/default.php";
-$config['front_page_settings']['top']['ports'] = 10;
-$config['front_page_settings']['top']['devices'] = 10;
-$config['front_page_down_box_limit'] = 10;
-$config['vertical_summary'] = 0; // Enable to use vertical summary on front page instead of horizontal
-$config['top_ports']        = 1; // This enables the top X ports box
-$config['top_devices']      = 1; // This enables the top X devices box
+$config['front_page']       = "default";
 ```
 
-A number of home pages are provided within the install and can be
-found in html/pages/front/. You can change the default by setting
-`front_page`. The other options are used to alter the look of those
-pages that support it (default.php supports these options).
+You can create your own front page by adding a blade file in `resources/views/overview/custom/`
+and setting `front_page` to it's name.
+For example, if you create `resources/views/overview/custom/foobar.blade.php`, set `front_page` to `foobar`.
 
 ```php
 // This option exists in the web UI, edit it under Global Settings -> webui
@@ -372,7 +365,7 @@ $config['device_traffic_iftype'][] = '/loopback/';
 ```
 
 Interface types that aren't graphed in the WebUI. The default array
-contains more items, please see includes/defaults.inc.php for the full list.
+contains more items, please see misc/config_definitions.json for the full list.
 
 ```php
 $config['enable_clear_discovery'] = 1;
@@ -650,17 +643,40 @@ you don't need to configure full location within snmp.
 
 # Interfaces to be ignored
 
+Interfaces can be automatically ignored during discovery by modifying 
+bad_if\* entries in a default array, unsetting a default array and 
+customizing it, or creating an OS specific array. The preferred method 
+for ignoring interfaces is to use an OS specific array. The default 
+arrays can be found in misc/config_definitions.json. OS specific 
+definitions (includes/definitions/_specific_os_.yaml) can contain 
+bad_if\* arrays, but should only be modified via pull-request as 
+manipulation of the definition files will block updating. 
+
 Examples:
 
+**Add entries to default arrays**
 ```php
 $config['bad_if'][] = "voip-null";
 $config['bad_iftype'][] = "voiceEncap";
 $config['bad_if_regexp'][] = '/^lo[0-9].*/';    // loopback
 ```
 
-Numerous defaults exist for this array already (see
-includes/defaults.inc.php for the full list). You can expand this list
-by continuing the array.
+**Unset and customize a default array**
+```php
+unset($config['bad_if']);
+$config['bad_if'][] = "voip-null";
+$config['bad_if'][] = "voiceEncap";
+$config['bad_if'][] = "voiceFXO";
+...
+```
+
+**Create an OS specific array**
+```php
+$config['os']['iosxe']['bad_iftype'][] = "macSecControlledIF";
+$config['os']['iosxe']['bad_iftype'][] = "macSecUncontrolledIF";
+```
+
+**Various bad_if\* selection options available**
 
 `bad_if` is matched against the ifDescr value.
 

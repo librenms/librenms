@@ -48,11 +48,11 @@ class Dashboard extends Model
 
     public function user()
     {
-        return $this->belongsTo('App\Models\User', 'user_id');
+        return $this->belongsTo(\App\Models\User::class, 'user_id');
     }
 
     public function widgets()
     {
-        return $this->hasMany('App\Models\UserWidget', 'dashboard_id');
+        return $this->hasMany(\App\Models\UserWidget::class, 'dashboard_id');
     }
 }

@@ -17,7 +17,7 @@ if (!isset($vars['section'])) {
     $vars['section'] = "mib";
 }
 if (is_mib_poller_enabled($device)) {
-?>
+    ?>
 
 <h4><i class="fa fa-file-text-o"></i> Device MIB associations</h4>
 <div class="table-responsive">
@@ -87,7 +87,7 @@ if (is_mib_poller_enabled($device)) {
         }
     });
 </script>
-<?php
+    <?php
 } else {
     print_mib_poller_disabled();
 }

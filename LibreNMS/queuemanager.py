@@ -167,7 +167,8 @@ class QueueManager:
                                              password=self.config.redis_pass,
                                              unix_socket_path=self.config.redis_socket,
                                              sentinel=self.config.redis_sentinel,
-                                             sentinel_service=self.config.redis_sentinel_service)
+                                             sentinel_service=self.config.redis_sentinel_service,
+                                             socket_timeout=self.config.redis_timeout)
 
         except ImportError:
             if self.config.distributed:

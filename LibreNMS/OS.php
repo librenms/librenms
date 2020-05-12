@@ -26,6 +26,7 @@
 namespace LibreNMS;
 
 use App\Models\Device;
+use Illuminate\Support\Str;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Device\YamlDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
@@ -111,7 +112,7 @@ class OS implements ProcessorDiscovery
      */
     public function getCacheByIndex($oid, $mib = null, $snmpflags = '-OQUs')
     {
-        if (str_contains($oid, '.')) {
+        if (Str::contains($oid, '.')) {
             echo "Error: don't use this with numeric oids!\n";
             return null;
         }
@@ -136,7 +137,7 @@ class OS implements ProcessorDiscovery
      */
     public function getCacheTable($oid, $mib = null, $depth = 1)
     {
-        if (str_contains($oid, '.')) {
+        if (Str::contains($oid, '.')) {
             echo "Error: don't use this with numeric oids!\n";
             return null;
         }

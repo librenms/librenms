@@ -38,6 +38,6 @@ abstract class PortRelatedModel extends BaseModel
 
     public function port()
     {
-        return $this->belongsTo('App\Models\Port', 'port_id', 'port_id');
+        return $this->belongsTo(\App\Models\Port::class, 'port_id', 'port_id');
     }
 }

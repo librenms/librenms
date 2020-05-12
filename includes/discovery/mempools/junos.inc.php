@@ -26,8 +26,7 @@ if ($device['os'] == 'junos') {
                 }
             } //end if
         } //end foreach
-    } //end if
-    else {
+    } else {
         $srx_mempools_array = snmpwalk_cache_multi_oid($device, 'jnxJsSPUMonitoringMemoryUsage', $srx_mempools_array, 'JUNIPER-SRX5000-SPU-MONITORING-MIB', 'junos');
 
         if (is_array($srx_mempools_array)) {

@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'title' => 'Settings',
     'readonly' => 'Set in config.php, remove from config.php to enable.',
     'groups' => [
         'alerting' => 'Alerting',
@@ -32,6 +33,7 @@ return [
             'general' => 'General Discovery Settings',
             'route' => 'Routes Discovery Module',
             'discovery_modules' => 'Discovery Modules',
+            'storage' => 'Storage Module'
         ],
         'external' => [
             'binaries' => 'Binary Locations',
@@ -44,8 +46,12 @@ return [
         ],
         'poller' => [
             'distributed' => 'Distributed Poller',
+            'graphite' => 'Datastore: Graphite',
+            'influxdb' => 'Datastore: InfluxDB',
+            'opentsdb' => 'Datastore: OpenTSDB',
             'ping' => 'Ping',
-            'rrdtool' => 'RRDTool Setup',
+            'prometheus' => 'Datastore: Prometheus',
+            'rrdtool' => 'Datastore: RRDTool',
             'snmp' => 'SNMP',
             'poller_modules' => 'Poller Modules',
         ],
@@ -61,6 +67,8 @@ return [
             'dashboard' => 'Dashboard Settings',
             'search' => 'Search Settings',
             'style' => 'Style',
+            'device' => 'Device Settings',
+            'worldmap' => 'World Map Settings'
         ]
     ],
     'settings' => [
@@ -397,7 +405,7 @@ return [
                 'description' => 'Cisco PW'
             ],
             'cisco-vrf-lite' => [
-                'description' => 'Cisco VRF List'
+                'description' => 'Cisco VRF Lite'
             ],
             'discovery-arp' => [
                 'description' => 'Discovery ARP'
@@ -609,6 +617,24 @@ return [
                 ]
             ]
         ],
+        'graphite' => [
+            'enable' => [
+                'description' => 'Enable',
+                'help' => 'Exports metrics to Graphite'
+            ],
+            'host' => [
+                'description' => 'Server',
+                'help' => 'The IP or hostname of the Graphite server to send data to'
+            ],
+            'port' => [
+                'description' => 'Port',
+                'help' => 'The port to use to connect to the Graphite server'
+            ],
+            'prefix' => [
+                'description' => 'Prefix (Optional)',
+                'help' => 'Will add the prefix to the start of all metrics.  Must be alphanumeric separated by dots'
+            ]
+        ],
         'graylog' => [
             'base_uri' => [
                 'description' => 'Base URI',
@@ -649,9 +675,84 @@ return [
                 'help' => 'This is used to automatically create the base_uri for the Graylog API. If you have modified the API uri from the default, set this to other and specify your base_uri.'
             ]
         ],
+        'html' => [
+            'device' => [
+                'primary_link' => [
+                    'description' => 'Primary Dropdown Link',
+                    'help' => 'Sets the primary link in the device dropdown menu'
+                ]
+            ],
+        ],
         'http_proxy' => [
             'description' => 'HTTP(S) Proxy',
             'help' => 'Set this as a fallback if http_proxy or https_proxy environment variable is not available.'
+        ],
+        'ignore_mount' => [
+            'description' => 'Mountpoints to be ignored',
+            'help' => 'Don\'t monitor Disc Usage of this Mountpoints'
+        ],
+        'ignore_mount_network' => [
+            'description' => 'Ignore Network Mountpoints',
+            'help' => 'Don\'t monitor Disc Usage of Network Mountpoints'
+        ],
+        'ignore_mount_optical' => [
+            'description' => 'Ignore Optical Drives',
+            'help' => 'Don\'t monitor Disc Usage of optical Drives'
+        ],
+        'ignore_mount_removable' => [
+            'description' => 'Ignore Removable Drives',
+            'help' => 'Don\'t monitor Disc Usage of removable Devices'
+        ],
+        'ignore_mount_regexp' => [
+            'description' => 'Mountpoints matching Regex to be ignored',
+            'help' => 'Don\'t monitor Disc Usage of Mountpoints which are matching at least one of this Regular Expressions'
+        ],
+        'ignore_mount_string' => [
+            'description' => 'Mountpoints containing String to be ignored',
+            'help' => 'Don\'t monitor Disc Usage of Mountpoints which contains at least one of this Strings'
+        ],
+        'influxdb' => [
+            'db' => [
+                'description' => 'Database',
+                'help' => 'Name of the InfluxDB database to store metrics'
+            ],
+            'enable' => [
+                'description' => 'Enable',
+                'help' => 'Exports metrics to InfluxDB'
+            ],
+            'host' => [
+                'description' => 'Server',
+                'help' => 'The IP or hostname of the InfluxDB server to send data to'
+            ],
+            'password' => [
+                'description' => 'Password',
+                'help' => 'Password to connect to InfluxDB, if required'
+            ],
+            'port' => [
+                'description' => 'Port',
+                'help' => 'The port to use to connect to the InfluxDB server'
+            ],
+            'timeout' => [
+                'description' => 'Timeout',
+                'help' => 'How long to wait for InfluxDB server, 0 means default timeout'
+            ],
+            'transport' => [
+                'description' => 'Transport',
+                'help' => 'The port to use to connect to the InfluxDB server',
+                'options' => [
+                    'http' => 'HTTP',
+                    'https' => 'HTTPS',
+                    'udp' => 'UDPRRRRRRR'
+                ]
+            ],
+            'username' => [
+                'description' => 'Username',
+                'help' => 'Username to connect to InfluxDB, if required'
+            ],
+            'verifySSL' => [
+                'description' => 'Verify SSL',
+                'help' => 'Verify the SSL certificate is valid and trusted'
+            ]
         ],
         'ipmitool' => [
             'description' => 'Path to ipmtool'
@@ -669,6 +770,10 @@ return [
         'mydomain' => [
             'description' => 'Primary Domain',
             'help' => 'This domain is used for network auto-discovery and other processes. LibreNMS will attempt to append it to unqualified hostnames.'
+        ],
+        'network_map_show_on_worldmap' => [
+            'description' => 'Display network links on the map',
+            'help' => 'Show the networks links between the different location on the worldmap (weathermap-like)'
         ],
         'nfsen_enable' => [
             'description' => 'Enable NfSen',
@@ -717,6 +822,20 @@ return [
         ],
         'nmap' => [
             'description' => 'Path to nmap'
+        ],
+        'opentsdb' => [
+            'enable' => [
+                'description' => 'Enable',
+                'help' => 'Exports metrics to OpenTSDB'
+            ],
+            'host' => [
+                'description' => 'Server',
+                'help' => 'The IP or hostname of the OpenTSDB server to send data to'
+            ],
+            'port' => [
+                'description' => 'Port',
+                'help' => 'The port to use to connect to the OpenTSDB server'
+            ]
         ],
         'own_hostname' => [
             'description' => 'LibreNMS hostname',
@@ -917,6 +1036,20 @@ return [
             'description' => 'Ports older than (days)',
             'help' => 'Cleanup done by daily.sh'
         ],
+        'prometheus' => [
+            'enable' => [
+                'description' => 'Enable',
+                'help' => 'Exports metrics to Prometheus Push Gateway'
+            ],
+            'host' => [
+                'description' => 'Server',
+                'help' => 'The IP or hostname of the Prometheus Push Gateway to send data to'
+            ],
+            'port' => [
+                'description' => 'Job',
+                'help' => 'Job label for exported metrics'
+            ]
+        ],
         'public_status' => [
             'description' => 'Show status publicly',
             'help' => 'Shows the status of some devices on the logon page without authentication.'
@@ -1071,6 +1204,10 @@ return [
                 'release' => 'release'
             ]
         ],
+        'uptime_warning' => [
+            'description' => 'Show Device as warning if Uptime below (seconds)',
+            'help' => 'Shows Device as warning if Uptime is below this value. Default 24h'
+        ],
         'virsh' => [
             'description' => 'Path to virsh'
         ],
@@ -1119,6 +1256,18 @@ return [
                 'description' => 'Set the minimum graph height',
                 'help' => 'Minimum Graph Height (default: 300)'
             ]
+        ],
+        'device_location_map_open' => [
+            'description' => 'Location Map open',
+            'help' => 'Location Map is shown by default'
+        ],
+        'force_hostname_to_sysname' => [
+            'description' => 'show SysName instead of Hostname',
+            'help' => 'When using a dynamic DNS hostname or one that does not resolve, this option would allow you to make use of the sysName instead as the preferred reference to the device'
+        ],
+        'force_ip_to_sysname' => [
+            'description' => 'show SysName instead of IP Address',
+            'help' => 'When using IP addresses as a hostname you can instead represent the devices on the WebUI by its sysName resulting in an easier to read overview of your network. This would apply on networks where you don\'t have DNS records for most of your devices'
         ],
         'whois' => [
             'description' => 'Path to whois'

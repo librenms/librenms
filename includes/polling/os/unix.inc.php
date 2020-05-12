@@ -12,8 +12,8 @@ if (in_array($device['os'], array("linux", "endian", "proxmox", "recoveryos"))) 
         $hardware = "Generic SPARC 64-bit";
     } elseif (strstr($device['sysDescr'], "mips")) {
         $hardware = "Generic MIPS";
-    } // Except iDrac6 from being detected as armv5
-    elseif (strstr($device['sysDescr'], "armv5") && $device['sysObjectID'] != '.1.3.6.1.4.1.674.10892.2') {
+    } elseif (strstr($device['sysDescr'], "armv5") && $device['sysObjectID'] != '.1.3.6.1.4.1.674.10892.2') {
+        // Except iDrac6 from being detected as armv5
         $hardware = "Generic ARMv5";
     } elseif (strstr($device['sysDescr'], "armv6")) {
         $hardware = "Generic ARMv6";
@@ -28,19 +28,19 @@ if (in_array($device['os'], array("linux", "endian", "proxmox", "recoveryos"))) 
     # Distro "extend" support
 
     # NET-SNMP-EXTEND-MIB::nsExtendOutput1Line.\"distro\"
-    $features = str_replace("\"", "", snmp_get($device, ".1.3.6.1.4.1.8072.1.3.2.3.1.1.6.100.105.115.116.114.111", "-Oqv", "NET-SNMP-EXTEND-MIB"));
+    $features = snmp_get($device, ".1.3.6.1.4.1.8072.1.3.2.3.1.1.6.100.105.115.116.114.111", "-Oqv", "NET-SNMP-EXTEND-MIB");
 
     if (!$features) { # No "extend" support, try legacy UCD-MIB shell support
-        $features = str_replace("\"", "", snmp_get($device, ".1.3.6.1.4.1.2021.7890.1.3.1.1.6.100.105.115.116.114.111", "-Oqv", "UCD-SNMP-MIB"));
+        $features = snmp_get($device, ".1.3.6.1.4.1.2021.7890.1.3.1.1.6.100.105.115.116.114.111", "-Oqv", "UCD-SNMP-MIB");
     }
 
     if (!$features) { # No "extend" support, try "exec" support
-        $features = str_replace("\"", "", snmp_get($device, ".1.3.6.1.4.1.2021.7890.1.101.1", "-Oqv", "UCD-SNMP-MIB"));
+        $features = snmp_get($device, ".1.3.6.1.4.1.2021.7890.1.101.1", "-Oqv", "UCD-SNMP-MIB");
     }
 
     # Detect Dell hardware via OpenManage SNMP
     $hw = snmp_get($device, ".1.3.6.1.4.1.674.10892.1.300.10.1.9.1", "-Oqv", "MIB-Dell-10892");
-    $hw = trim(str_replace("\"", "", $hw));
+    $hw = trim($hw);
     if ($hw) {
         $hardware = "Dell " . $hw;
     } else {
@@ -52,17 +52,17 @@ if (in_array($device['os'], array("linux", "endian", "proxmox", "recoveryos"))) 
 
     if (empty($hw)) {
     # Try detect using the extended option (dmidecode)
-        $version_dmide = str_replace("\"", "", snmp_get($device, ".1.3.6.1.4.1.2021.7890.2.4.1.2.8.104.97.114.100.119.97.114.101.1", "-Oqv"));
+        $version_dmide = snmp_get($device, ".1.3.6.1.4.1.2021.7890.2.4.1.2.8.104.97.114.100.119.97.114.101.1", "-Oqv");
         if (!$version_dmide) { # No "extend" support, try "exec" support
-            $version_dmide = str_replace("\"", "", snmp_get($device, ".1.3.6.1.4.1.2021.7890.2.101.1", "-Oqv"));
+            $version_dmide = snmp_get($device, ".1.3.6.1.4.1.2021.7890.2.101.1", "-Oqv");
         }
-        $version_dmide = trim(str_replace("\"", "", $version_dmide));
+        $version_dmide = trim($version_dmide);
 
-        $hardware_dmide = str_replace("\"", "", snmp_get($device, ".1.3.6.1.4.1.2021.7890.3.4.1.2.12.109.97.110.117.102.97.99.116.117.114.101.114.1", "-Oqv"));
+        $hardware_dmide = snmp_get($device, ".1.3.6.1.4.1.2021.7890.3.4.1.2.12.109.97.110.117.102.97.99.116.117.114.101.114.1", "-Oqv");
         if (!$hardware_dmide) { # No "extend" support, try "exec" support
-            $hardware_dmide = str_replace("\"", "", snmp_get($device, ".1.3.6.1.4.1.2021.7890.3.101.1", "-Oqv"));
+            $hardware_dmide = snmp_get($device, ".1.3.6.1.4.1.2021.7890.3.101.1", "-Oqv");
         }
-        $hardware_dmide = trim(str_replace("\"", "", $hardware_dmide));
+        $hardware_dmide = trim($hardware_dmide);
         if ($hardware_dmide) {
             $hardware = $hardware_dmide;
             if ($version_dmide) {
@@ -72,12 +72,12 @@ if (in_array($device['os'], array("linux", "endian", "proxmox", "recoveryos"))) 
     }
 
     $serial = snmp_get($device, ".1.3.6.1.4.1.674.10892.1.300.10.1.11.1", "-Oqv", "MIB-Dell-10892");
-    $serial = trim(str_replace("\"", "", $serial));
+    $serial = trim($serial);
 
     # Try detect using the SNMP Extend option (dmidecode)
     if (!$serial) {
-        $serial = str_replace("\"", "", snmp_get($device, ".1.3.6.1.4.1.2021.7890.4.4.1.2.6.115.101.114.105.97.108.1", "-Oqv"));
-        $serial = trim(str_replace("\"", "", $serial));
+        $serial = snmp_get($device, ".1.3.6.1.4.1.2021.7890.4.4.1.2.6.115.101.114.105.97.108.1", "-Oqv");
+        $serial = trim($serial);
     }
 
     # Use agent DMI data if available
@@ -107,18 +107,37 @@ if (in_array($device['os'], array("linux", "endian", "proxmox", "recoveryos"))) 
     # Distro "extend" support
 
     # NET-SNMP-EXTEND-MIB::nsExtendOutput1Line.\"distro\"
-    $features = str_replace("\"", "", snmp_get($device, ".1.3.6.1.4.1.8072.1.3.2.3.1.1.6.100.105.115.116.114.111", "-Oqv", "NET-SNMP-EXTEND-MIB"));
+    $features = snmp_get($device, ".1.3.6.1.4.1.8072.1.3.2.3.1.1.6.100.105.115.116.114.111", "-Oqv", "NET-SNMP-EXTEND-MIB");
 
     if (!$features) { # No "extend" support, try legacy UCD-MIB shell support
-        $features = str_replace("\"", "", snmp_get($device, ".1.3.6.1.4.1.2021.7890.1.3.1.1.6.100.105.115.116.114.111", "-Oqv", "UCD-SNMP-MIB"));
+        $features = snmp_get($device, ".1.3.6.1.4.1.2021.7890.1.3.1.1.6.100.105.115.116.114.111", "-Oqv", "UCD-SNMP-MIB");
     }
 
     if (!$features) { # No "extend" support, try "exec" support
-        $features = str_replace("\"", "", snmp_get($device, ".1.3.6.1.4.1.2021.7890.1.101.1", "-Oqv", "UCD-SNMP-MIB"));
+        $features = snmp_get($device, ".1.3.6.1.4.1.2021.7890.1.101.1", "-Oqv", "UCD-SNMP-MIB");
     }
 
     if (!$features) {
         $features = 'GENERIC';
+    }
+
+    # Try detect using the extended option (dmidecode)
+    $version_dmide = snmp_get($device, ".1.3.6.1.4.1.2021.7890.2.4.1.2.8.104.97.114.100.119.97.114.101.1", "-Oqv");
+    if (!$version_dmide) { # No "extend" support, try "exec" support
+        $version_dmide = snmp_get($device, ".1.3.6.1.4.1.2021.7890.2.101.1", "-Oqv");
+    }
+    $version_dmide = trim($version_dmide);
+
+    $hardware_dmide = snmp_get($device, ".1.3.6.1.4.1.2021.7890.3.4.1.2.12.109.97.110.117.102.97.99.116.117.114.101.114.1", "-Oqv");
+    if (!$hardware_dmide) { # No "extend" support, try "exec" support
+        $hardware_dmide = snmp_get($device, ".1.3.6.1.4.1.2021.7890.3.101.1", "-Oqv");
+    }
+    $hardware_dmide = trim($hardware_dmide);
+    if ($hardware_dmide) {
+        $hardware = $hardware_dmide;
+        if ($version_dmide) {
+            $hardware = $hardware . " [" . $version_dmide . "]";
+        }
     }
 } elseif ($device['os'] == "dragonfly") {
     list(,,$version,,,$features,,$hardware) = explode(" ", $device['sysDescr']);
@@ -135,7 +154,6 @@ if (in_array($device['os'], array("linux", "endian", "proxmox", "recoveryos"))) 
     list(,,$version,$hardware,$freebsda, $freebsdb, $arch) = explode(" ", $device['sysDescr']);
     $features = $freebsda . " " . $freebsdb;
     $hardware = "$hardware ($arch)";
-    $hardware = str_replace("\"", "", $hardware);
 } elseif ($device['os'] == "qnap") {
     $hardware = snmp_get($device, "ENTITY-MIB::entPhysicalName.1", "-Osqnv");
     $version  = snmp_get($device, "ENTITY-MIB::entPhysicalFirmwareRev.1", "-Osqnv");

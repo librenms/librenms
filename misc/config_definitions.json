@@ -17,14 +17,14 @@
             "default": false,
             "group": "alerting",
             "section": "general",
-            "order": 10,
+            "order": 11,
             "type": "boolean"
         },
         "alert.admins": {
             "default": true,
             "group": "alerting",
             "section": "general",
-            "order": 1,
+            "order": 2,
             "type": "boolean"
         },
         "alert_colour.ok": {
@@ -51,7 +51,7 @@
             "default": true,
             "group": "alerting",
             "section": "general",
-            "order": 6,
+            "order": 7,
             "type": "boolean"
         },
         "alert.default_if_none": {
@@ -66,42 +66,42 @@
             "default": false,
             "group": "alerting",
             "section": "general",
-            "order": 7,
+            "order": 8,
             "type": "email"
         },
         "alert.default_only": {
             "default": true,
             "group": "alerting",
             "section": "general",
-            "order": 5,
+            "order": 6,
             "type": "boolean"
         },
         "alert.disable": {
             "default": false,
             "group": "alerting",
             "section": "general",
-            "order": 0,
+            "order": 1,
             "type": "boolean"
         },
         "alert.fixed-contacts": {
             "default": true,
             "group": "alerting",
             "section": "general",
-            "order": 9,
+            "order": 10,
             "type": "boolean"
         },
         "alert.globals": {
             "default": true,
             "group": "alerting",
             "section": "general",
-            "order": 2,
+            "order": 3,
             "type": "boolean"
         },
         "alert.syscontact": {
             "default": true,
             "group": "alerting",
             "section": "general",
-            "order": 4,
+            "order": 5,
             "type": "boolean"
         },
         "alert.transports.mail": {
@@ -115,7 +115,7 @@
             "default": 5,
             "group": "alerting",
             "section": "general",
-            "order": 8,
+            "order": 9,
             "type": "integer",
             "units": "m"
         },
@@ -123,7 +123,7 @@
             "default": false,
             "group": "alerting",
             "section": "general",
-            "order": 3,
+            "order": 4,
             "type": "boolean"
         },
         "alert_graph_date_format": {
@@ -147,21 +147,6 @@
         "alerts.email.enable": {
             "default": false,
             "type": "boolean"
-        },
-        "alerts.port.ifdown": {
-            "default": false,
-            "type": "boolean"
-        },
-        "alerts.port_util_alert": {
-            "default": false,
-            "type": "boolean"
-        },
-        "alerts.port_util_perc": {
-            "default": 85,
-            "type": "integer",
-            "validate": {
-                "value": "integer|between:0,100"
-            }
         },
         "alert_rule.severity": {
             "default": "warning",
@@ -787,6 +772,13 @@
         "db_user": {
             "default": "librenms",
             "hidden": true,
+            "type": "boolean"
+        },
+        "device_location_map_open": {
+            "order": 2,
+            "group": "webui",
+            "section": "device",
+            "default": false,
             "type": "boolean"
         },
         "default_port_association_mode": {
@@ -1474,10 +1466,16 @@
             "type": "text"
         },
         "force_hostname_to_sysname": {
+            "group": "webui",
+            "section": "device",
+            "order": 0,
             "default": false,
             "type": "boolean"
         },
         "force_ip_to_sysname": {
+            "group": "webui",
+            "section": "device",
+            "order": 1,
             "default": false,
             "type": "boolean"
         },
@@ -1519,7 +1517,7 @@
             "type": "text"
         },
         "front_page": {
-            "default": "pages/front/tiles.php",
+            "default": "default",
             "type": "text"
         },
         "front_page_down_box_limit": {
@@ -2957,11 +2955,27 @@
             },
             "type": "graph"
         },
+        "graph_types.device.ucd_cpu_steal": {
+            "default": {
+                "section": "system",
+                "order": 0,
+                "descr": "CPU Steal"
+            },
+            "type": "graph"
+        },
         "graph_types.device.ucd_interrupts": {
             "default": {
                 "section": "system",
                 "order": 0,
                 "descr": "Interrupts"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.ucd_io_wait": {
+            "default": {
+                "section": "system",
+                "order": 0,
+                "descr": "I/0 Wait"
             },
             "type": "graph"
         },
@@ -3045,9 +3059,38 @@
             },
             "type": "graph"
         },
+        "graphite.enable": {
+            "default": false,
+            "type": "boolean",
+            "group": "poller",
+            "section": "graphite",
+            "order": 0
+        },
+        "graphite.host": {
+            "default": "127.0.0.1",
+            "type": "text",
+            "group": "poller",
+            "section": "graphite",
+            "order": 1,
+            "validate": {
+                "value": "ip_or_hostname"
+            }
+        },
         "graphite.port": {
             "default": 2003,
-            "type": "integer"
+            "type": "integer",
+            "group": "poller",
+            "section": "graphite",
+            "order": 2
+        },
+        "graphite.prefix": {
+            "type": "text",
+            "group": "poller",
+            "section": "graphite",
+            "order": 3,
+            "validate": {
+                "value": "nullable|regex:/^[.a-zA-Z0-9]*$/"
+            }
         },
         "graphs.mini.normal": {
             "default": {
@@ -3178,6 +3221,28 @@
                 "new": "New"
             }
         },
+        "html.device.primary_link": {
+            "group": "webui",
+            "section": "device",
+            "order": 3,
+            "type": "select",
+            "default": "edit",
+            "options": {
+                "edit": "Edit",
+                "web": "Web",
+                "ssh": "SSH",
+                "telnet": "Telnet",
+                "capture": "Capture",
+                "custom1": "Custom 1",
+                "custom2": "Custom 2",
+                "custom3": "Custom 3",
+                "custom4": "Custom 4",
+                "custom5": "Custom 5",
+                "custom6": "Custom 6",
+                "custom7": "Custom 7",
+                "custom8": "Custom 8"
+            }
+        },
         "html_dir": {
             "type": "text"
         },
@@ -3192,6 +3257,9 @@
             "type": "boolean"
         },
         "ignore_mount": {
+            "group": "discovery",
+            "section": "storage",
+            "order": 3,
             "default": [
                 "/kern",
                 "/mnt/cdrom",
@@ -3203,14 +3271,23 @@
             "type": "array"
         },
         "ignore_mount_network": {
+            "group": "discovery",
+            "section": "storage",
+            "order": 0,
             "default": true,
             "type": "boolean"
         },
         "ignore_mount_optical": {
+            "group": "discovery",
+            "section": "storage",
+            "order": 1,
             "default": true,
             "type": "boolean"
         },
         "ignore_mount_regexp": {
+            "group": "discovery",
+            "section": "storage",
+            "order": 5,
             "default": [
                 "/on: \\/packages/",
                 "/on: \\/dev/",
@@ -3224,13 +3301,22 @@
                 "/UMA/",
                 "/^\\/Volumes\\/OS X Base System/"
             ],
-            "type": "array"
+            "type": "array",
+            "validate": {
+                "value.*": "is_regex"
+            }
         },
         "ignore_mount_removable": {
+            "group": "discovery",
+            "section": "storage",
+            "order": 2,
             "default": true,
             "type": "boolean"
         },
         "ignore_mount_string": {
+            "group": "discovery",
+            "section": "storage",
+            "order": 4,
             "default": [
                 "packages",
                 "devfs",
@@ -3246,13 +3332,74 @@
             "default": false,
             "type": "boolean"
         },
+        "influxdb.enable": {
+            "default": false,
+            "type": "boolean",
+            "group": "poller",
+            "section": "influxdb",
+            "order": 0
+        },
+        "influxdb.transport": {
+            "default": "http",
+            "type": "select",
+            "options": {
+                "http": "HTTP",
+                "https": "HTTPS",
+                "udp": "UDP"
+            },
+            "group": "poller",
+            "section": "influxdb",
+            "order": 1
+        },
+        "influxdb.host": {
+            "default": "127.0.0.1",
+            "type": "text",
+            "group": "poller",
+            "section": "influxdb",
+            "order": 2,
+            "validate": {
+                "value": "ip_or_hostname"
+            }
+        },
+        "influxdb.port": {
+            "default": 8086,
+            "type": "integer",
+            "group": "poller",
+            "section": "influxdb",
+            "order": 3
+        },
+        "influxdb.db": {
+            "default": "librenms",
+            "type": "text",
+            "group": "poller",
+            "section": "influxdb",
+            "order": 4
+        },
+        "influxdb.username": {
+            "type": "text",
+            "group": "poller",
+            "section": "influxdb",
+            "order": 5
+        },
+        "influxdb.password": {
+            "type": "password",
+            "group": "poller",
+            "section": "influxdb",
+            "order": 6
+        },
         "influxdb.timeout": {
             "default": 0,
-            "type": "integer"
+            "type": "integer",
+            "group": "poller",
+            "section": "influxdb",
+            "order": 7
         },
         "influxdb.verifySSL": {
             "default": false,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "poller",
+            "section": "influxdb",
+            "order": 8
         },
         "install_dir": {
             "type": "text"
@@ -3515,6 +3662,13 @@
             },
             "type": "array"
         },
+        "network_map_show_on_worldmap": {
+            "default": false,
+            "type": "boolean",
+            "group": "webui",
+            "section": "worldmap",
+            "order": 1
+        },
         "network_map_vis_options": {
             "default": "{\n  layout:{\n      randomSeed:2\n  },\n  \"edges\": {\n    arrows: {\n          to:     {enabled: true, scaleFactor:0.5},\n    },\n    \"smooth\": {\n        enabled: false\n    },\n    font: {\n        size: 14,\n        color: \"red\",\n        face: \"sans\",\n        background: \"white\",\n        strokeWidth:3,\n        align: \"middle\",\n        strokeWidth: 2\n    }\n  },\n  \"physics\": {\n     \"barnesHut\": {\n      \"gravitationalConstant\": -2000,\n      \"centralGravity\": 0.3,\n      \"springLength\": 200,\n      \"springConstant\": 0.04,\n      \"damping\": 0.09,\n      \"avoidOverlap\": 1\n    },\n\n     \"forceAtlas2Based\": {\n      \"gravitationalConstant\": -50,\n      \"centralGravity\": 0.01,\n      \"springLength\": 200,\n      \"springConstant\": 0.08,\n      \"damping\": 0.4,\n      \"avoidOverlap\": 1\n    },\n\n     \"repulsion\": {\n      \"centralGravity\": 0.2,\n      \"springLength\": 250,\n      \"springConstant\": 0.2,\n      \"nodeDistance\": 200,\n      \"damping\": 0.07\n    },\n\n     \"hierarchicalRepulsion\": {\n      \"nodeDistance\": 300,\n      \"centralGravity\": 0.2,\n      \"springLength\": 300,\n      \"springConstant\": 0.2,\n      \"damping\": 0.07\n    },\n\n  \"maxVelocity\": 50,\n  \"minVelocity\": 0.4,\n  \"solver\": \"hierarchicalRepulsion\",\n  \"stabilization\": {\n    \"enabled\": true,\n    \"iterations\": 1000,\n    \"updateInterval\": 100,\n    \"onlyDynamicEdges\": false,\n    \"fit\": true\n  },\n\n  \"timestep\": 0.4,\n }\n}",
             "type": "text"
@@ -3663,6 +3817,30 @@
         "old_graphs": {
             "default": true,
             "type": "boolean"
+        },
+        "opentsdb.enable": {
+            "default": false,
+            "type": "boolean",
+            "group": "poller",
+            "section": "opentsdb",
+            "order": 0
+        },
+        "opentsdb.host": {
+            "default": "127.0.0.1",
+            "type": "text",
+            "group": "poller",
+            "section": "opentsdb",
+            "order": 1,
+            "validate": {
+                "value": "ip_or_hostname"
+            }
+        },
+        "opentsdb.port": {
+            "default": 4242,
+            "type": "integer",
+            "group": "poller",
+            "section": "opentsdb",
+            "order": 2
         },
         "os.default.over": {
             "default": [
@@ -4189,9 +4367,29 @@
             "default": "LibreNMS",
             "type": "text"
         },
+        "prometheus.enable": {
+            "default": false,
+            "type": "boolean",
+            "group": "poller",
+            "section": "prometheus",
+            "order": 0
+        },
+        "prometheus.url": {
+            "default": "http://127.0.0.1:9091",
+            "type": "text",
+            "group": "poller",
+            "section": "prometheus",
+            "order": 1,
+            "validate": {
+                "value": "url"
+            }
+        },
         "prometheus.job": {
             "default": "librenms",
-            "type": "text"
+            "type": "text",
+            "group": "poller",
+            "section": "prometheus",
+            "order": 2
         },
         "public_status": {
             "default": false,
@@ -4324,10 +4522,6 @@
             "type": "boolean"
         },
         "show_locations_dropdown": {
-            "default": true,
-            "type": "boolean"
-        },
-        "show_overview_tab": {
             "default": true,
             "type": "boolean"
         },
@@ -4487,7 +4681,7 @@
                 }
             ],
             "validate": {
-                "value.*.authalgo": "in:MD5,AES"
+                "value.*.authalgo": "in:MD5,SHA"
             }
         },
         "snmp.version": {
@@ -4679,7 +4873,10 @@
             }
         },
         "uptime_warning": {
-            "default": 84600,
+            "group": "alerting",
+            "section": "general",
+            "order": 0,
+            "default": 86400,
             "type": "integer",
             "validate": {
                 "value": "integer|min:0"

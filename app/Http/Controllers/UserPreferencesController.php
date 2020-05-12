@@ -73,7 +73,7 @@ class UserPreferencesController extends Controller
             'site_style' => UserPref::getPref($user, 'site_style'),
             'site_style_default' => $styles[$default_style] ?? $default_style,
             'site_styles' => $styles,
-
+            'hide_dashboard_editor' => UserPref::getPref($user, 'hide_dashboard_editor') ?? 0,
         ];
 
         if (Config::get('twofactor')) {
@@ -110,6 +110,7 @@ class UserPreferencesController extends Controller
                 'required',
                 Rule::in(array_merge(['default'], array_keys($this->getValidStyles()))),
             ],
+            'hide_dashboard_editor' => 'required|integer',
         ];
 
         $this->validate($request, [

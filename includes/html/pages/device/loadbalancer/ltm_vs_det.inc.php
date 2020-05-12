@@ -78,5 +78,5 @@ if ($components[$vars['vsid']]['type'] == 'f5-ltm-vs') {
                 </div>
             </div>
         </div>
-<?php
+    <?php
 }

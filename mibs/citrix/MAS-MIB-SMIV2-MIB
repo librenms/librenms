@@ -1,0 +1,1709 @@
+
+MAS-MIB-SMIV2-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        Counter32, Gauge32, Integer32, IpAddress, NOTIFICATION-TYPE,OBJECT-TYPE, TimeTicks, enterprises, MODULE-IDENTITY, OBJECT-IDENTITY
+                FROM SNMPv2-SMI
+        Ipv6Address
+                FROM IPV6-TC
+         InetAddressType, InetAddress
+                FROM INET-ADDRESS-MIB;
+
+netScaler MODULE-IDENTITY
+        LAST-UPDATED "201312050000Z"
+        ORGANIZATION "Citrix Systems, Inc."
+        CONTACT-INFO  "Citrix Technical Assistance Center
+                        Postal: Citrix Systems, Inc.
+                                851 West Cypress Creek Road
+                                Fort Lauderdale, Florida  33309
+                                United States
+                        Tel: +1-800-4-CITRIX (+1-800-424-8749)
+                        E-mail: customercare@citrix.com"
+        DESCRIPTION "The enterprise specific MIB for Citrix Application Delivery Management."
+        ::= { enterprises 5951 }
+
+
+masRoot OBJECT IDENTIFIER
+        ::= { netScaler 7}
+
+masEventGroup OBJECT IDENTIFIER
+::= { masRoot  1 }
+
+
+systemGroup OBJECT IDENTIFIER
+::= { masRoot  2 }
+
+systemPlatform OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Platform"
+        ::= { systemGroup 1 }
+
+systemProduct OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Product Name"
+        ::= { systemGroup 2 }
+
+systemBuildNumber OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Build Number"
+        ::= { systemGroup 3 }
+
+systemIPAddressType OBJECT-TYPE
+        SYNTAX  InetAddressType
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Type of systemIPAddress"
+        ::= { systemGroup 4 }
+systemIPAddress OBJECT-TYPE
+        SYNTAX  InetAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "IP Address"
+        ::= { systemGroup 5 }
+
+systemNetmaskType OBJECT-TYPE
+        SYNTAX  InetAddressType
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Type of systemNetmask"
+        ::= { systemGroup 6 }
+systemNetmask OBJECT-TYPE
+        SYNTAX  InetAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Netmask"
+        ::= { systemGroup 7 }
+
+systemGatewayType OBJECT-TYPE
+        SYNTAX  InetAddressType
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Type of systemGateway"
+        ::= { systemGroup 8 }
+systemGateway OBJECT-TYPE
+        SYNTAX  InetAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Gateway "
+        ::= { systemGroup 9 }
+
+systemDnsType OBJECT-TYPE
+        SYNTAX  InetAddressType
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Type of systemDns"
+        ::= { systemGroup 10 }
+systemDns OBJECT-TYPE
+        SYNTAX  InetAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "DNS Server"
+        ::= { systemGroup 11 }
+
+systemSysId OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "System Id"
+        ::= { systemGroup 12 }
+
+systemSerial OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Serial Number"
+        ::= { systemGroup 13 }
+
+systemCurrentTime OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Current Time"
+        ::= { systemGroup 14 }
+
+systemUptime OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Uptime"
+        ::= { systemGroup 15 }
+
+systemBiosVersion OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "BIOS Version"
+        ::= { systemGroup 16 }
+
+systemCustomID OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Custom identification number for appliance"
+        ::= { systemGroup 17 }
+
+systemCpuUsage OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "CPU Usage (%)"
+        ::= { systemGroup 18 }
+
+systemMemoryUsage OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Memory Usage (%)"
+        ::= { systemGroup 19 }
+
+systemDiskUsage OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Disk Usage (%)"
+        ::= { systemGroup 20 }
+
+
+deviceGroup OBJECT IDENTIFIER
+::= { masRoot  3 }
+
+netscalerTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF NetscalerEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "netscalertable"
+        ::= { deviceGroup 2 }
+
+netscalerEntry OBJECT-TYPE
+        SYNTAX  NetscalerEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "..."
+        INDEX { nsIpAddressType, nsIpAddress, nsHostIPAddressType, nsHostIPAddress }
+        ::= { netscalerTable  1}
+
+NetscalerEntry ::= SEQUENCE {
+        nsIpAddressType InetAddressType,
+        nsIpAddress InetAddress,
+        nsHostIPAddressType InetAddressType,
+        nsHostIPAddress InetAddress,
+        nsProfileName OCTET STRING,
+        nsName OCTET STRING,
+        nsNetmaskType InetAddressType,
+        nsNetmask InetAddress,
+        nsGatewayType InetAddressType,
+        nsGateway InetAddress,
+        nsHostname OCTET STRING,
+        nsDescription OCTET STRING,
+        nsVersion OCTET STRING,
+        nsUuid OCTET STRING,
+        nsInstanceState OCTET STRING,
+        nsVirtualFunctions OCTET STRING,
+        nsSslVirtualFunctions OCTET STRING,
+        nsVmState OCTET STRING,
+        nsNumberOfCPU Integer32,
+        nsVmMemoryTotal OCTET STRING,
+        nsUptime OCTET STRING,
+        nsNumberOfSSLCores Integer32,
+        nsCpuCoreMgmt OCTET STRING,
+        nsCpuCorePE OCTET STRING,
+        nsVmDescription OCTET STRING,
+        nsThroughput OCTET STRING,
+        nsNumberOfCores Integer32,
+        nsNsCPUUsage OCTET STRING,
+        nsNsMemoryUsage OCTET STRING,
+        nsNsTx OCTET STRING,
+        nsNsRx OCTET STRING,
+        nsHttpReq OCTET STRING,
+        nsUpsince OCTET STRING,
+        nsLicense OCTET STRING,
+        nsHaMasterState OCTET STRING,
+        nsHaIPAddressType InetAddressType,
+        nsHaIPAddress InetAddress,
+        nsNodeState OCTET STRING,
+        nsHaSync OCTET STRING,
+        nsPps OCTET STRING,
+        nsNumberOfSslCoresUp Integer32,
+        nsIfOby1 OCTET STRING,
+        nsIf0by2 OCTET STRING,
+        nsNsVLANId Integer32,
+        nsNsVLANTagged OCTET STRING,
+        nsVlanType Integer32
+}
+
+nsIpAddressType OBJECT-TYPE
+        SYNTAX  InetAddressType
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Type of nsIpAddress"
+        ::= { netscalerEntry 1 }
+nsIpAddress OBJECT-TYPE
+        SYNTAX  InetAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "IP Address for this managed device"
+        ::= { netscalerEntry 2 }
+
+nsHostIPAddressType OBJECT-TYPE
+        SYNTAX  InetAddressType
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Type of nsHostIPAddress"
+        ::= { netscalerEntry 3 }
+nsHostIPAddress OBJECT-TYPE
+        SYNTAX  InetAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Host IPAddress where VM is provisioned"
+        ::= { netscalerEntry 4 }
+
+nsProfileName OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Device Profile Name that is attached with this managed device"
+        ::= { netscalerEntry 5 }
+
+nsName OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Name of managed device"
+        ::= { netscalerEntry 6 }
+
+nsNetmaskType OBJECT-TYPE
+        SYNTAX  InetAddressType
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Type of nsNetmask"
+        ::= { netscalerEntry 7 }
+nsNetmask OBJECT-TYPE
+        SYNTAX  InetAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Netmask of managed device"
+        ::= { netscalerEntry 8 }
+
+nsGatewayType OBJECT-TYPE
+        SYNTAX  InetAddressType
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Type of nsGateway"
+        ::= { netscalerEntry 9 }
+nsGateway OBJECT-TYPE
+        SYNTAX  InetAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Default Gateway of managed device"
+        ::= { netscalerEntry 10 }
+
+nsHostname OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Assign hostname to managed device, if this is not provided, name will be set as host name "
+        ::= { netscalerEntry 11 }
+
+nsDescription OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Description of managed device"
+        ::= { netscalerEntry 12 }
+
+nsVersion OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Device Version"
+        ::= { netscalerEntry 13 }
+
+nsUuid OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "UUID of VM Instance"
+        ::= { netscalerEntry 14 }
+
+nsInstanceState OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "State of device, UP only if device accessible"
+        ::= { netscalerEntry 15 }
+
+nsVirtualFunctions OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Virtual Functions assigned to VM Instance"
+        ::= { netscalerEntry 16 }
+
+nsSslVirtualFunctions OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "SSL Virtual Functions assigned to VM Instance"
+        ::= { netscalerEntry 17 }
+
+nsVmState OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "State of Virtual Machine (Running | Halted)"
+        ::= { netscalerEntry 18 }
+
+nsNumberOfCPU OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Number of CPU that is assigned to VM Instance"
+        ::= { netscalerEntry 19 }
+
+nsVmMemoryTotal OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Total Memory of VM Instance in MB"
+        ::= { netscalerEntry 21 }
+
+nsUptime OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Uptime of device"
+        ::= { netscalerEntry 26 }
+
+nsNumberOfSSLCores OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Assign number of ssl virtual functions to VM Instance"
+        ::= { netscalerEntry 27 }
+
+nsCpuCoreMgmt OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Management CPU cores assigned to VM Instance"
+        ::= { netscalerEntry 28 }
+
+nsCpuCorePE OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Packet Engine cores assigned to VM Instance"
+        ::= { netscalerEntry 29 }
+
+nsVmDescription OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Description"
+        ::= { netscalerEntry 30 }
+
+nsThroughput OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Assign throughput in Mbps to VM Instance"
+        ::= { netscalerEntry 31 }
+
+nsNumberOfCores OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Number of cores that are assigned to VM Instance"
+        ::= { netscalerEntry 32 }
+
+nsNsCPUUsage OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "CPU Usage (%) of Citrix ADC Instance"
+        ::= { netscalerEntry 33 }
+
+nsNsMemoryUsage OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Memory Usage (%)"
+        ::= { netscalerEntry 35 }
+
+nsNsTx OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Out Throughput of Citrix ADC Instance in Mbps"
+        ::= { netscalerEntry 36 }
+
+nsNsRx OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "In Throughput of Citrix ADC Instance in Mbps"
+        ::= { netscalerEntry 37 }
+
+nsHttpReq OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "HTTP Requests/second"
+        ::= { netscalerEntry 38 }
+
+nsUpsince OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Upsince of managed device"
+        ::= { netscalerEntry 39 }
+
+nsLicense OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Feature License for Citrix ADC Instance, needs to be set while provisioning (standard, enterprise, platinum)"
+        ::= { netscalerEntry 40 }
+
+nsHaMasterState OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Master State (Primary/Secondary)"
+        ::= { netscalerEntry 41 }
+
+nsHaIPAddressType OBJECT-TYPE
+        SYNTAX  InetAddressType
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Type of nsHaIPAddress"
+        ::= { netscalerEntry 42 }
+nsHaIPAddress OBJECT-TYPE
+        SYNTAX  InetAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Peer IP Address"
+        ::= { netscalerEntry 43 }
+
+nsNodeState OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Node State of Citrix ADC Instance"
+        ::= { netscalerEntry 44 }
+
+nsHaSync OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "HA Synchronization State"
+        ::= { netscalerEntry 45 }
+
+nsPps OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Assign packets per seconds to Citrix ADC Instance"
+        ::= { netscalerEntry 46 }
+
+nsNumberOfSslCoresUp OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Number of SSL Cores Up"
+        ::= { netscalerEntry 47 }
+
+nsIfOby1 OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Network 0/1 on VM Instance"
+        ::= { netscalerEntry 48 }
+
+nsIf0by2 OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Network 0/2 on VM Instance"
+        ::= { netscalerEntry 49 }
+
+nsNsVLANId OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "VLAN Id"
+        ::= { netscalerEntry 50 }
+
+nsNsVLANTagged OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "NSVLAN Tagged"
+        ::= { netscalerEntry 51 }
+
+nsVlanType OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "VLAN Type, Citrix ADC or L2 VLAN"
+        ::= { netscalerEntry 52 }
+
+cloudBridgeTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF CloudBridgeEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "cloudBridgetable"
+        ::= { deviceGroup 3 }
+
+cloudBridgeEntry OBJECT-TYPE
+        SYNTAX  CloudBridgeEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "..."
+        INDEX { cbIpAddressType, cbIpAddress, cbHostIPAddressType, cbHostIPAddress }
+        ::= { cloudBridgeTable  1}
+
+CloudBridgeEntry ::= SEQUENCE {
+        cbIpAddressType InetAddressType,
+        cbIpAddress InetAddress,
+        cbHostIPAddressType InetAddressType,
+        cbHostIPAddress InetAddress,
+        cbProfileName OCTET STRING,
+        cbName OCTET STRING,
+        cbNetmaskType InetAddressType,
+        cbNetmask InetAddress,
+        cbGatewayType InetAddressType,
+        cbGateway InetAddress,
+        cbHostname OCTET STRING,
+        cbDescription OCTET STRING,
+        cbVersion OCTET STRING,
+        cbInstanceState OCTET STRING,
+        cbUuid OCTET STRING,
+        cbVirtualFunctions OCTET STRING,
+        cbVmState OCTET STRING,
+        cbNumberOfCPU Integer32,
+        cbVmCPUUsage OCTET STRING,
+        cbVmMemoryTotal OCTET STRING,
+        cbVmMemoryFree OCTET STRING,
+        cbVmMemoryUsage OCTET STRING,
+        cbUptime OCTET STRING,
+        cbDiskAllocation OCTET STRING,
+        cbAPAIPADDRESSType InetAddressType,
+        cbAPAIPADDRESS InetAddress,
+        cbAPANetMaskType InetAddressType,
+        cbAPANetMask InetAddress,
+        cbAPAGatewayType InetAddressType,
+        cbAPAGateway InetAddress,
+        cbPluginIPADDRESSType InetAddressType,
+        cbPluginIPADDRESS InetAddress,
+        cbMgmtIPAddressType InetAddressType,
+        cbMgmtIPAddress InetAddress
+}
+
+cbIpAddressType OBJECT-TYPE
+        SYNTAX  InetAddressType
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Type of cbIpAddress"
+        ::= { cloudBridgeEntry 1 }
+cbIpAddress OBJECT-TYPE
+        SYNTAX  InetAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "IP Address for this managed device"
+        ::= { cloudBridgeEntry 2 }
+
+cbHostIPAddressType OBJECT-TYPE
+        SYNTAX  InetAddressType
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Type of cbHostIPAddress"
+        ::= { cloudBridgeEntry 3 }
+cbHostIPAddress OBJECT-TYPE
+        SYNTAX  InetAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Host IPAddress where VM is provisioned"
+        ::= { cloudBridgeEntry 4 }
+
+cbProfileName OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Device Profile Name that is attached with this managed device"
+        ::= { cloudBridgeEntry 5 }
+
+cbName OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Name of managed device"
+        ::= { cloudBridgeEntry 6 }
+
+cbNetmaskType OBJECT-TYPE
+        SYNTAX  InetAddressType
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Type of cbNetmask"
+        ::= { cloudBridgeEntry 7 }
+cbNetmask OBJECT-TYPE
+        SYNTAX  InetAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Netmask of managed device"
+        ::= { cloudBridgeEntry 8 }
+
+cbGatewayType OBJECT-TYPE
+        SYNTAX  InetAddressType
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Type of cbGateway"
+        ::= { cloudBridgeEntry 9 }
+cbGateway OBJECT-TYPE
+        SYNTAX  InetAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Default Gateway of managed device"
+        ::= { cloudBridgeEntry 10 }
+
+cbHostname OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Assign hostname to managed device, if this is not provided, name will be set as host name "
+        ::= { cloudBridgeEntry 11 }
+
+cbDescription OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Description of managed device"
+        ::= { cloudBridgeEntry 12 }
+
+cbVersion OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Device Version"
+        ::= { cloudBridgeEntry 13 }
+
+cbInstanceState OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "State of device, UP only if device accessible"
+        ::= { cloudBridgeEntry 14 }
+
+cbUuid OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "UUID of VM Instance"
+        ::= { cloudBridgeEntry 15 }
+
+cbVirtualFunctions OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Virtual Functions assigned to VM Instance"
+        ::= { cloudBridgeEntry 16 }
+
+cbVmState OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "State of Virtual Machine (Running | Halted)"
+        ::= { cloudBridgeEntry 17 }
+
+cbNumberOfCPU OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Number of CPU that is assigned to VM Instance"
+        ::= { cloudBridgeEntry 18 }
+
+cbVmCPUUsage OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "CPU Usage (%) of VM Instance"
+        ::= { cloudBridgeEntry 19 }
+
+cbVmMemoryTotal OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Total Memory of VM Instance in MB"
+        ::= { cloudBridgeEntry 20 }
+
+cbVmMemoryFree OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Free Memory (MB) available in VM Instance"
+        ::= { cloudBridgeEntry 21 }
+
+cbVmMemoryUsage OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Memory Usage (%) of VM Instance"
+        ::= { cloudBridgeEntry 22 }
+
+cbUptime OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Uptime of device"
+        ::= { cloudBridgeEntry 25 }
+
+cbDiskAllocation OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Disk allocation for VM Instance"
+        ::= { cloudBridgeEntry 30 }
+
+cbAPAIPADDRESSType OBJECT-TYPE
+        SYNTAX  InetAddressType
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Type of cbAPAIPADDRESS"
+        ::= { cloudBridgeEntry 47 }
+cbAPAIPADDRESS OBJECT-TYPE
+        SYNTAX  InetAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "aPA IP Address"
+        ::= { cloudBridgeEntry 48 }
+
+cbAPANetMaskType OBJECT-TYPE
+        SYNTAX  InetAddressType
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Type of cbAPANetMask"
+        ::= { cloudBridgeEntry 49 }
+cbAPANetMask OBJECT-TYPE
+        SYNTAX  InetAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "aPA Netmask"
+        ::= { cloudBridgeEntry 50 }
+
+cbAPAGatewayType OBJECT-TYPE
+        SYNTAX  InetAddressType
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Type of cbAPAGateway"
+        ::= { cloudBridgeEntry 51 }
+cbAPAGateway OBJECT-TYPE
+        SYNTAX  InetAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "aPA Gateway"
+        ::= { cloudBridgeEntry 52 }
+
+cbPluginIPADDRESSType OBJECT-TYPE
+        SYNTAX  InetAddressType
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Type of cbPluginIPADDRESS"
+        ::= { cloudBridgeEntry 53 }
+cbPluginIPADDRESS OBJECT-TYPE
+        SYNTAX  InetAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Plugin IP Address"
+        ::= { cloudBridgeEntry 54 }
+
+cbMgmtIPAddressType OBJECT-TYPE
+        SYNTAX  InetAddressType
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Type of cbMgmtIPAddress"
+        ::= { cloudBridgeEntry 57 }
+cbMgmtIPAddress OBJECT-TYPE
+        SYNTAX  InetAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Management IP Address for this Managed Device"
+        ::= { cloudBridgeEntry 58 }
+
+cloudBridgeAcceleratorTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF CloudBridgeAcceleratorEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "cloudBridgeAcceleratortable"
+        ::= { deviceGroup 4 }
+
+cloudBridgeAcceleratorEntry OBJECT-TYPE
+        SYNTAX  CloudBridgeAcceleratorEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "..."
+        INDEX { cbAcceleratorIpAddressType, cbAcceleratorIpAddress, cbAcceleratorHostIPAddressType, cbAcceleratorHostIPAddress }
+        ::= { cloudBridgeAcceleratorTable  1}
+
+CloudBridgeAcceleratorEntry ::= SEQUENCE {
+        cbAcceleratorIpAddressType InetAddressType,
+        cbAcceleratorIpAddress InetAddress,
+        cbAcceleratorHostIPAddressType InetAddressType,
+        cbAcceleratorHostIPAddress InetAddress,
+        cbAcceleratorProfileName OCTET STRING,
+        cbAcceleratorName OCTET STRING,
+        cbAcceleratorNetmaskType InetAddressType,
+        cbAcceleratorNetmask InetAddress,
+        cbAcceleratorGatewayType InetAddressType,
+        cbAcceleratorGateway InetAddress,
+        cbAcceleratorHostname OCTET STRING,
+        cbAcceleratorDescription OCTET STRING,
+        cbAcceleratorVersion OCTET STRING,
+        cbAcceleratorInstanceState OCTET STRING,
+        cbAcceleratorUuid OCTET STRING,
+        cbAcceleratorVmState OCTET STRING,
+        cbAcceleratorNumberOfCPU Integer32,
+        cbAcceleratorVmCPUUsage OCTET STRING,
+        cbAcceleratorVmMemoryTotal OCTET STRING,
+        cbAcceleratorVmMemoryFree OCTET STRING,
+        cbAcceleratorVmMemoryUsage OCTET STRING,
+        cbAcceleratorUptime OCTET STRING,
+        cbAcceleratorIpList OCTET STRING,
+        cbAcceleratorMgmtIPAddressType InetAddressType,
+        cbAcceleratorMgmtIPAddress InetAddress
+}
+
+cbAcceleratorIpAddressType OBJECT-TYPE
+        SYNTAX  InetAddressType
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Type of cbAcceleratorIpAddress"
+        ::= { cloudBridgeAcceleratorEntry 1 }
+cbAcceleratorIpAddress OBJECT-TYPE
+        SYNTAX  InetAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "IP Address for this managed device"
+        ::= { cloudBridgeAcceleratorEntry 2 }
+
+cbAcceleratorHostIPAddressType OBJECT-TYPE
+        SYNTAX  InetAddressType
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Type of cbAcceleratorHostIPAddress"
+        ::= { cloudBridgeAcceleratorEntry 3 }
+cbAcceleratorHostIPAddress OBJECT-TYPE
+        SYNTAX  InetAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Host IPAddress where VM is provisioned"
+        ::= { cloudBridgeAcceleratorEntry 4 }
+
+cbAcceleratorProfileName OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Device Profile Name that is attached with this managed device"
+        ::= { cloudBridgeAcceleratorEntry 5 }
+
+cbAcceleratorName OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Name of managed device"
+        ::= { cloudBridgeAcceleratorEntry 6 }
+
+cbAcceleratorNetmaskType OBJECT-TYPE
+        SYNTAX  InetAddressType
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Type of cbAcceleratorNetmask"
+        ::= { cloudBridgeAcceleratorEntry 7 }
+cbAcceleratorNetmask OBJECT-TYPE
+        SYNTAX  InetAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Netmask of managed device"
+        ::= { cloudBridgeAcceleratorEntry 8 }
+
+cbAcceleratorGatewayType OBJECT-TYPE
+        SYNTAX  InetAddressType
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Type of cbAcceleratorGateway"
+        ::= { cloudBridgeAcceleratorEntry 9 }
+cbAcceleratorGateway OBJECT-TYPE
+        SYNTAX  InetAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Default Gateway of managed device"
+        ::= { cloudBridgeAcceleratorEntry 10 }
+
+cbAcceleratorHostname OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Assign hostname to managed device, if this is not provided, name will be set as host name "
+        ::= { cloudBridgeAcceleratorEntry 11 }
+
+cbAcceleratorDescription OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Description of managed device"
+        ::= { cloudBridgeAcceleratorEntry 12 }
+
+cbAcceleratorVersion OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Device Version"
+        ::= { cloudBridgeAcceleratorEntry 13 }
+
+cbAcceleratorInstanceState OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "State of device, UP only if device accessible"
+        ::= { cloudBridgeAcceleratorEntry 14 }
+
+cbAcceleratorUuid OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "UUID of VM Instance"
+        ::= { cloudBridgeAcceleratorEntry 15 }
+
+cbAcceleratorVmState OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "State of Virtual Machine (Running | Halted)"
+        ::= { cloudBridgeAcceleratorEntry 16 }
+
+cbAcceleratorNumberOfCPU OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Number of CPU that is assigned to VM Instance"
+        ::= { cloudBridgeAcceleratorEntry 17 }
+
+cbAcceleratorVmCPUUsage OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "CPU Usage (%) of VM Instance"
+        ::= { cloudBridgeAcceleratorEntry 18 }
+
+cbAcceleratorVmMemoryTotal OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Total Memory of VM Instance in MB"
+        ::= { cloudBridgeAcceleratorEntry 19 }
+
+cbAcceleratorVmMemoryFree OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Free Memory (MB) available in VM Instance"
+        ::= { cloudBridgeAcceleratorEntry 20 }
+
+cbAcceleratorVmMemoryUsage OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Memory Usage (%) of VM Instance"
+        ::= { cloudBridgeAcceleratorEntry 21 }
+
+cbAcceleratorUptime OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Uptime of device"
+        ::= { cloudBridgeAcceleratorEntry 24 }
+
+cbAcceleratorIpList OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Specify the list of Citrix SD-WAN IPs for which this device will act as a Citrix SD-WAN Accelerator."
+        ::= { cloudBridgeAcceleratorEntry 31 }
+
+cbAcceleratorMgmtIPAddressType OBJECT-TYPE
+        SYNTAX  InetAddressType
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Type of cbAcceleratorMgmtIPAddress"
+        ::= { cloudBridgeAcceleratorEntry 38 }
+cbAcceleratorMgmtIPAddress OBJECT-TYPE
+        SYNTAX  InetAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Management IP Address for this Managed Device"
+        ::= { cloudBridgeAcceleratorEntry 39 }
+
+
+eventVarBindOids OBJECT IDENTIFIER
+::= { masEventGroup 1 }
+
+source OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  accessible-for-notify
+        STATUS  current
+        DESCRIPTION
+                "IP address of the device generating the event"
+        ::= { eventVarBindOids 1 }
+
+entityName OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  accessible-for-notify
+        STATUS  current
+        DESCRIPTION
+                "Name of the entity associated with this alarm"
+        ::= { eventVarBindOids 2 }
+
+entityType OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  accessible-for-notify
+        STATUS  current
+        DESCRIPTION
+                "Type of entity associated with this alarm"
+        ::= { eventVarBindOids 3 }
+
+eventMessage OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  accessible-for-notify
+        STATUS  current
+        DESCRIPTION
+                "Message associated with this alarm"
+        ::= { eventVarBindOids 4 }
+
+thresholdValue OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  accessible-for-notify
+        STATUS  current
+        DESCRIPTION
+                "High threshold value configured for this alarm"
+        ::= { eventVarBindOids 5 }
+
+currentValue OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  accessible-for-notify
+        STATUS  current
+        DESCRIPTION
+                "Current value of the entity when high or normal threshold trap is sent"
+        ::= { eventVarBindOids 6 }
+
+severity OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  accessible-for-notify
+        STATUS  current
+        DESCRIPTION
+                "Severity associated with this alarm"
+        ::= { eventVarBindOids 7 }
+
+
+mpsEvents OBJECT IDENTIFIER
+::= { masEventGroup 2 }
+
+cpuUsageHigh NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, currentValue, thresholdValue, severity}
+        STATUS  current
+        DESCRIPTION
+                "CPU utilization has exceeded the high threshold value"
+        ::= { mpsEvents 1 }
+
+cpuUsageNormal NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, currentValue, thresholdValue, severity}
+        STATUS  current
+        DESCRIPTION
+                "CPU utilization has returned to normal"
+        ::= { mpsEvents 2 }
+
+memoryUsageHigh NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, currentValue, thresholdValue, severity}
+        STATUS  current
+        DESCRIPTION
+                "Memory utilization has exceeded the high threshold value."
+        ::= { mpsEvents 3 }
+
+memoryUsageNormal NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, currentValue, thresholdValue, severity}
+        STATUS  current
+        DESCRIPTION
+                "Memory utilization has returned to normal"
+        ::= { mpsEvents 4 }
+
+diskUtilizationHigh NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, currentValue, thresholdValue, severity}
+        STATUS  current
+        DESCRIPTION
+                "This trap is sent when the Disk utilization goes high. 'entityName' and 'eventMessage' will show specific failure information"
+        ::= { mpsEvents 35 }
+
+diskUtilizationNormal NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, currentValue, thresholdValue, severity}
+        STATUS  current
+        DESCRIPTION
+                "This trap is sent when the Disk utilization becomes normal. 'entityName' and 'eventMessage' will show specific failure information"
+        ::= { mpsEvents 36 }
+
+subSystemDown NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "A subsystem has gone DOWN; entityName shows details"
+        ::= { mpsEvents 43 }
+
+subSystemUp NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "A subsystem has returned to the UP state; entityName shows details"
+        ::= { mpsEvents 44 }
+
+subSystemFailed NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "A subsystem has failed; entityName shows details"
+        ::= { mpsEvents 45 }
+
+mpsDown NOTIFICATION-TYPE
+        OBJECTS  {source, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "All subsystems are DOWN"
+        ::= { mpsEvents 46 }
+
+mpsUp NOTIFICATION-TYPE
+        OBJECTS  {source, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "All subsystems are UP"
+        ::= { mpsEvents 47 }
+
+passwordRecoveryFailed NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "Password recovery has failed"
+        ::= { mpsEvents 48 }
+
+passwordRecoverySuccess NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "Password has been recovered successfully"
+        ::= { mpsEvents 49 }
+
+deviceStateChanged NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "Instance state of a managed device has changed"
+        ::= { mpsEvents 54 }
+
+backupFailed NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "This trap is sent when the backup operation fails"
+        ::= { mpsEvents 58 }
+
+loginFailure NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "This trap is sent when User Authentication fails. 'entityName' and 'eventMessage' will show specific failure information"
+        ::= { mpsEvents 71 }
+
+inventoryFailed NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "XenServer inventory collection has failed"
+        ::= { mpsEvents 72 }
+
+trapConfigFailure NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "This trap is sent when failure occurs in adding snmp trap destination"
+        ::= { mpsEvents 78 }
+
+pooledLicenseGrace NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "OnGrace; entityName and eventMessage show License is on grace"
+        ::= { mpsEvents 80 }
+
+pooledLicenseGraceNormal NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "License in not under Grace"
+        ::= { mpsEvents 81 }
+
+licensePoolThresholdWarning NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "licensePoolThresholdWarning; LicensePool is crossed Threshold value"
+        ::= { mpsEvents 84 }
+
+licensePoolThresholdNormal NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "LicensePool is below Threshold value"
+        ::= { mpsEvents 85 }
+
+vipLicenseLimitWarning NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "VIPs are more than License Limit"
+        ::= { mpsEvents 86 }
+
+vipLicenseLimitNormal NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "VIPs are below than License Limit"
+        ::= { mpsEvents 87 }
+
+remoteBackupFailed NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "This trap is sent when Remote Backup fails."
+        ::= { mpsEvents 88 }
+
+remoteBackupResumed NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "This trap is sent when Remote Backup failure is rectified and its running again."
+        ::= { mpsEvents 89 }
+
+perfCounterThresholdHigh NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "perfCounterThresholdHigh; Performance counter value has crossed the Threshold value"
+        ::= { mpsEvents 90 }
+
+perfCounterThresholdNormal NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "perfCounterThresholdNormal; Performance counter value is below the Clear value"
+        ::= { mpsEvents 91 }
+
+devicebackupFailed NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "This trap is sent when the device backup operation fails"
+        ::= { mpsEvents 92 }
+
+remoteDeviceBackupFailed NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "This trap is sent when Remote Device Backup fails."
+        ::= { mpsEvents 93 }
+
+dataStorageExceeded NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "dataStorageExceeded;Database storage exceeds the limit specified in license"
+        ::= { mpsEvents 94 }
+
+dataStorageNormal NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "dataStorageNormal;Database storage is within the limit allowed by license."
+        ::= { mpsEvents 95 }
+
+sslCertThresholdBreached NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "sslCertThresholdBreached;Certificate expiry"
+        ::= { mpsEvents 96 }
+
+sslCertThresholdNormal NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "sslCertThresholdNormal"
+        ::= { mpsEvents 97 }
+
+haFailover NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "HA Failover happened."
+        ::= { mpsEvents 98 }
+
+haNoHeartBeats NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "No Heartbeats from peer."
+        ::= { mpsEvents 99 }
+
+haDatabaseOutOfSync NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "HA nodes database out of sync"
+        ::= { mpsEvents 100 }
+
+inventoryUp NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "Inventory has returned to normal condition"
+        ::= { mpsEvents 101 }
+
+deviceBooted NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "A managed device has failed to start"
+        ::= { mpsEvents 104 }
+
+deviceRebooted NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "A managed device has failed to restart"
+        ::= { mpsEvents 105 }
+
+autoScaleGroupAdded NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "AutoScaleGroup Added"
+        ::= { mpsEvents 106 }
+
+autoScaleGroupModified NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "AutoScaleGroup Modified"
+        ::= { mpsEvents 107 }
+
+autoScaleGroupDeleted NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "AutoScaleGroup Deleted"
+        ::= { mpsEvents 108 }
+
+clusterProvisionStatus NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "AutoScaleGroup: Cluster Provision Status"
+        ::= { mpsEvents 109 }
+
+nodeProvisionStatus NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "AutoScaleGroup: Node Provision Status"
+        ::= { mpsEvents 110 }
+
+coolDownPeriodStatus NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "AutoScaleGroup: Cool Down Period Status"
+        ::= { mpsEvents 111 }
+
+clusterDeprovisionStatus NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "AutoScaleGroup: Cluster Deprovision Status"
+        ::= { mpsEvents 112 }
+
+nodeDeprovisionStatus NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "AutoScaleGroup: Node Deprovision Status"
+        ::= { mpsEvents 113 }
+
+drainConnPeriodStatus NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "AutoScaleGroup: Drain Connection Period Status"
+        ::= { mpsEvents 114 }
+
+deployAppStatus NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "AutoScaleGroup: Deploy application status"
+        ::= { mpsEvents 115 }
+
+modifyAppStatus NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "AutoScaleGroup: Modify application status"
+        ::= { mpsEvents 116 }
+
+deleteAppStatus NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "AutoScaleGroup: Delete application status"
+        ::= { mpsEvents 117 }
+
+ipLimitReached NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "AutoScaleGroup: IP Limit Reached"
+        ::= { mpsEvents 118 }
+
+scaleOutStatus NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "AutoScaleGroup: Scale Out Status"
+        ::= { mpsEvents 119 }
+
+scaleInStatus NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "AutoScaleGroup: Scale In Status"
+        ::= { mpsEvents 120 }
+
+addIPSetStatus NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "AutoScaleGroup: IPSet creation status"
+        ::= { mpsEvents 121 }
+
+deleteIPSetStatus NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "AutoScaleGroup: IPSet deletion status"
+        ::= { mpsEvents 122 }
+
+addZone NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "AutoScaleGroup: Add Zone status"
+        ::= { mpsEvents 123 }
+
+deleteZone NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "AutoScaleGroup: Delete Zone status"
+        ::= { mpsEvents 124 }
+
+addRecord NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "AutoScaleGroup: Add record status"
+        ::= { mpsEvents 125 }
+
+deleteRecord NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "AutoScaleGroup: Add record status"
+        ::= { mpsEvents 126 }
+
+addRRData NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "AutoScaleGroup: Add rrdata status"
+        ::= { mpsEvents 127 }
+
+deleteRRData NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "AutoScaleGroup: delete rrdata status"
+        ::= { mpsEvents 128 }
+
+instancePolicyReconfigurationFailed NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "Reconfiguration of policies failed on an instance"
+        ::= { mpsEvents 131 }
+
+instancePolicyReconfigurationSucceeded NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "Reconfiguration of policies succeeded on an instance"
+        ::= { mpsEvents 132 }
+
+autoscalegroupUpgrade NOTIFICATION-TYPE
+        OBJECTS  {source, entityName, eventMessage, severity}
+        STATUS  current
+        DESCRIPTION
+                "AutoScaleGroup: Upgrade AutoScaleGroup"
+        ::= { mpsEvents 133 }
+
+
+END -- end of module MIB

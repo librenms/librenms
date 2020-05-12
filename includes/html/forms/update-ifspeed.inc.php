@@ -42,7 +42,7 @@ if (!empty($ifName) && is_numeric($port_id) && is_numeric($port_id)) {
                 ($device_tune == "true" && $port_tune != 'false') ||
                 (\LibreNMS\Config::get('rrdtool_tune') == "true" && $port_tune != 'false' && $device_tune != 'false')) {
                 $rrdfile = get_port_rrdfile_path($device['hostname'], $port_id);
-                rrdtool_tune('port', $rrdfile, $speed);
+                Rrd::tune('port', $rrdfile, $speed);
             }
         }
         $status = 'ok';

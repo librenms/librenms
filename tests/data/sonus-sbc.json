@@ -13,7 +13,7 @@
                     "os": "sonus-sbc",
                     "type": "appliance",
                     "serial": null,
-                    "icon": "sonus.png",
+                    "icon": "ribbon.svg",
                     "location": null
                 }
             ]
@@ -31,7 +31,7 @@
                     "os": "sonus-sbc",
                     "type": "appliance",
                     "serial": null,
-                    "icon": "sonus.png",
+                    "icon": "ribbon.svg",
                     "location": "<private>"
                 }
             ]

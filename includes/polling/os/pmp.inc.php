@@ -22,7 +22,9 @@
  * @copyright  2017 Paul Heinrichs
  * @author     Paul Heinrichs<pdheinrichs@gmail.com>
  */
- use LibreNMS\RRD\RrdDefinition;
+
+use Illuminate\Support\Str;
+use LibreNMS\RRD\RrdDefinition;
 
 $cambium_type = $device['sysDescr'];
 $PMP = snmp_get($device, 'boxDeviceType.0', '-Oqv', 'WHISP-BOX-MIBV2-MIB');
@@ -47,10 +49,10 @@ $pmp = array(
 );
 
 foreach ($ptp as $desc => $model) {
-    if (str_contains($cambium_type, $desc)) {
+    if (Str::contains($cambium_type, $desc)) {
         $hardware = $model;
 
-        if (str_contains($model, 'PTP')) {
+        if (Str::contains($model, 'PTP')) {
             $masterSlaveMode = str_replace($filtered_words, "", snmp_get($device, 'bhTimingMode.0', '-Oqv', 'WHISP-BOX-MIBV2-MIB'));
             $hardware = $model . ' '. $masterSlaveMode;
             $version = snmp_get($device, 'boxDeviceTypeID.0', '-Oqv', 'WHISP-BOX-MIBV2-MIB');
@@ -62,15 +64,15 @@ foreach ($ptp as $desc => $model) {
 if (!isset($hardware)) {
     $hardware = 'PMP 100';
     foreach ($pmp as $desc => $model) {
-        if (str_contains($PMP, $desc)) {
+        if (Str::contains($PMP, $desc)) {
             $hardware = $model;
             break;
         }
     }
-    if (str_contains($hardware, 'PMP')) {
-        if (str_contains($version, "AP")) {
+    if (Str::contains($hardware, 'PMP')) {
+        if (Str::contains($version, "AP")) {
             $hardware .= ' AP';
-        } elseif (str_contains($version, "SM")) {
+        } elseif (Str::contains($version, "SM")) {
             $hardware .= ' SM';
         }
     }

@@ -130,6 +130,137 @@ var marker = L.marker(new L.LatLng(".$map_devices['lat'].", ".$map_devices['lng'
 marker.bindPopup(title);
     markers.addLayer(marker);\n";
     }
+
+    if (Config::get('network_map_show_on_worldmap')) {
+        if (Auth::user()->hasGlobalRead()) {
+            $sql = "
+            SELECT 
+              ll.id AS left_id,
+              ll.lat AS left_lat,
+              ll.lng AS left_lng,
+              rl.id AS right_id,
+              rl.lat AS right_lat,
+              rl.lng AS right_lng,
+              sum(lp.ifHighSpeed) AS link_capacity,
+              sum(lp.ifOutOctets_rate) * 8 / sum(lp.ifSpeed) * 100 as link_out_usage_pct,
+              sum(lp.ifInOctets_rate) * 8 / sum(lp.ifSpeed) * 100 as link_in_usage_pct
+            FROM
+              devices AS ld,
+              devices AS rd,
+              links AS l,
+              locations AS ll,
+              locations AS rl,
+              ports as lp
+            WHERE
+              l.local_device_id = ld.device_id
+              AND l.remote_device_id = rd.device_id 
+              AND ld.location_id != rd.location_id
+              AND ld.location_id = ll.id 
+              AND rd.location_id = rl.id
+              AND lp.device_id = ld.device_id
+              AND lp.port_id = l.local_port_id
+              AND lp.ifType = 'ethernetCsmacd'
+              AND ld.disabled = 0
+              AND ld.ignore = 0
+              AND rd.disabled = 0
+              AND rd.ignore = 0
+              AND lp.ifOutOctets_rate != 0
+              AND lp.ifInOctets_rate != 0
+              AND lp.ifOperStatus = 'up'
+              AND ll.lat IS NOT NULL
+              AND ll.lng IS NOT NULL
+              AND rl.lat IS NOT NULL
+              AND rl.lng IS NOT NULL
+              AND ld.status IN " . dbGenPlaceholders(count($show_status)) . "
+              AND rd.status IN " . dbGenPlaceholders(count($show_status)) . "
+            GROUP BY
+              left_id, right_id, ll.lat, ll.lng, rl.lat, rl.lng
+                  ";
+            $param = array_merge($show_status, $show_status);
+        } else {
+            $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
+            $sql = "
+            SELECT 
+              ll.id AS left_id,
+              ll.lat AS left_lat,
+              ll.lng AS left_lng,
+              rl.id AS right_id,
+              rl.lat AS right_lat,
+              rl.lng AS right_lng,
+              sum(lp.ifHighSpeed) AS link_capacity,
+              sum(lp.ifOutOctets_rate) * 8 / sum(lp.ifSpeed) * 100 as link_out_usage_pct,
+              sum(lp.ifInOctets_rate) * 8 / sum(lp.ifSpeed) * 100 as link_in_usage_pct
+            FROM
+              devices AS ld,
+              devices AS rd,
+              links AS l,
+              locations AS ll,
+              locations AS rl,
+              ports as lp
+            WHERE
+              l.local_device_id = ld.device_id
+              AND l.remote_device_id = rd.device_id 
+              AND ld.location_id != rd.location_id
+              AND ld.location_id = ll.id 
+              AND rd.location_id = rl.id
+              AND lp.device_id = ld.device_id
+              AND lp.port_id = l.local_port_id
+              AND lp.ifType = 'ethernetCsmacd'
+              AND ld.disabled = 0
+              AND ld.ignore = 0
+              AND rd.disabled = 0
+              AND rd.ignore = 0
+              AND lp.ifOutOctets_rate != 0
+              AND lp.ifInOctets_rate != 0
+              AND lp.ifOperStatus = 'up'
+              AND ll.lat IS NOT NULL
+              AND ll.lng IS NOT NULL
+              AND rl.lat IS NOT NULL
+              AND rl.lng IS NOT NULL
+              AND ld.status IN " . dbGenPlaceholders(count($show_status)) . "
+              AND rd.status IN " . dbGenPlaceholders(count($show_status)) . "
+              AND ld.device_id IN " . dbGenPlaceholders(count($device_ids)) . "
+              AND rd.device_id IN " . dbGenPlaceholders(count($device_ids)) . "
+            GROUP BY
+              left_id, right_id, ll.lat, ll.lng, rl.lat, rl.lng
+                  ";
+            $param = array_merge($show_status, $show_status, $device_ids, $device_ids);
+        }
+
+        foreach (dbFetchRows($sql, $param) as $link) {
+            $icon = 'greenMarker';
+            $z_offset = 0;
+    
+            $speed = $link['link_capacity']/1000;
+            if ($speed > 500000) {
+                $width = 20;
+            } else {
+                $width = round(0.77 * pow($speed, 0.25));
+            }
+    
+            $link_used = max($link["link_out_usage_pct"], $link["link_in_usage_pct"]);
+            $link_used = round(2 * $link_used, -1) / 2;
+            if ($link_used > 100) {
+                $link_used = 100;
+            }
+            if (is_nan($link_used)) {
+                $link_used = 0;
+            }
+            $link_color = Config::get("network_map_legend.$link_used");
+    
+            $temp_output .= "var marker = new L.Polyline([new L.LatLng(". $link["left_lat"] .", ". $link["left_lng"] ."), new L.LatLng(". $link["right_lat"] .", ". $link["right_lng"] .")], {
+                color: '". $link_color ."',
+                weight: ". $width .",
+                opacity: 0.8,
+                smoothFactor: 1
+            });
+            markers.addLayer(marker);
+            ";
+        }
+    }
+
+
+
     $temp_output .= 'map.addLayer(markers);
 map.scrollWheelZoom.disable();
 $(document).ready(function(){

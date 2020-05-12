@@ -101,7 +101,7 @@ if (Config::get('rrdgraph_real_percentile')) {
     $rrd_options .= ' CDEF:highbits=inoctets,outoctets,MAX,8,*';
     $rrd_options .= ' VDEF:percentilehigh=highbits,' . Config::get('percentile_value') . ',PERCENT';
     if ($_GET['previous'] == 'yes') {
-        $rrd_options .= ' CDEF:highbitsX=inoctetsX,outoctetsX,MAX:start=' . $prev_from . ':end=' . $from . ',8,*';
+        $rrd_options .= ' CDEF:highbitsX=inoctetsX,outoctetsX,MAX,8,*';
         $rrd_options .= ' VDEF:percentilehighX=highbitsX,' . Config::get('percentile_value') . ',PERCENT';
     }
 }

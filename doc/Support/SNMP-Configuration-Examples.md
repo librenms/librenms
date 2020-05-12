@@ -115,6 +115,15 @@ snmp-server location <YOUR-LOCATION>
 1. Add your community name and leave IP addresses empty
 1. Click Apply and Save
 
+### Eaton
+
+#### Network Card-MS
+
+1. Connect to the Web UI of the device
+1. Upgrade to the lastest available manufacturer firmware which applies to your hardware revision. Refer to the releasenotes.   For devices which can use the Lx releases, *do* install LD.
+1. After rebooting the card (safe for connected load), configure Network, System and Access Control. Save config for each step.
+1. Configure SNMP. The device defaults to both SNMP v1 and v3 enabled, with default credentials. Disable what you do not need. SNMP v3 works, but uses MD5/DES. You may have to add another section to your SNMP credentials table in LibreNMS. Save.
+
 ### HPE 3PAR
 
 #### Inform OS 3.2.x

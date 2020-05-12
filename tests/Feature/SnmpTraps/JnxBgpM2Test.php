@@ -25,7 +25,7 @@
  * @author     Heath Barnhart <hbarnhart@kanren.net>
  */
 
-namespace LibreNMS\Tests;
+namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use App\Models\BgpPeer;
 use App\Models\Device;

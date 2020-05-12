@@ -10,6 +10,7 @@ import sys
 import time
 
 from datetime import timedelta
+from datetime import datetime
 from logging import debug, info, warning, error, critical, exception
 from platform import python_version
 from time import sleep
@@ -73,6 +74,7 @@ class ServiceConfig:
     redis_socket = None
     redis_sentinel = None
     redis_sentinel_service = None
+    redis_timeout = 60
 
     db_host = 'localhost'
     db_port = 0
@@ -80,6 +82,9 @@ class ServiceConfig:
     db_user = 'librenms'
     db_pass = ''
     db_name = 'librenms'
+
+    watchdog_enabled = False
+    watchdog_logfile = 'logs/librenms.log'
 
     def populate(self):
         config = self._get_config_data()
@@ -128,6 +133,7 @@ class ServiceConfig:
         self.redis_sentinel_service = os.getenv('REDIS_SENTINEL_SERVICE',
                                                 config.get('redis_sentinel_service',
                                                            ServiceConfig.redis_sentinel_service))
+        self.redis_timeout = os.getenv('REDIS_TIMEOUT', self.alerting.frequency if self.alerting.frequency != 0 else self.redis_timeout)
 
         self.db_host = os.getenv('DB_HOST', config.get('db_host', ServiceConfig.db_host))
         self.db_name = os.getenv('DB_DATABASE', config.get('db_name', ServiceConfig.db_name))
@@ -135,6 +141,9 @@ class ServiceConfig:
         self.db_port = int(os.getenv('DB_PORT', config.get('db_port', ServiceConfig.db_port)))
         self.db_socket = os.getenv('DB_SOCKET', config.get('db_socket', ServiceConfig.db_socket))
         self.db_user = os.getenv('DB_USERNAME', config.get('db_user', ServiceConfig.db_user))
+
+        self.watchdog_enabled = config.get('service_watchdog_enabled', ServiceConfig.watchdog_enabled)
+        self.watchdog_logfile = config.get('log_file', ServiceConfig.watchdog_logfile)
 
         # set convenient debug variable
         self.debug = logging.getLogger().isEnabledFor(logging.DEBUG)
@@ -205,6 +214,11 @@ class Service:
         self._lm = self.create_lock_manager()
         self.daily_timer = LibreNMS.RecurringTimer(self.config.update_frequency, self.run_maintenance, 'maintenance')
         self.stats_timer = LibreNMS.RecurringTimer(self.config.poller.frequency, self.log_performance_stats, 'performance')
+        if self.config.watchdog_enabled:
+            info("Starting watchdog timer for log file: {}".format(self.config.watchdog_logfile))
+            self.watchdog_timer = LibreNMS.RecurringTimer(self.config.poller.frequency, self.logfile_watchdog, 'watchdog')
+        else:
+            info("Watchdog is disabled.")
         self.is_master = False
 
     def attach_signals(self):
@@ -239,6 +253,8 @@ class Service:
         if self.config.update_enabled:
             self.daily_timer.start()
         self.stats_timer.start()
+        if self.config.watchdog_enabled:
+            self.watchdog_timer.start()
 
         info("LibreNMS Service: {} started!".format(self.config.unique_name))
         info("Poller group {}. Using Python {} and {} locks and queues"
@@ -371,7 +387,8 @@ class Service:
                                       password=self.config.redis_pass,
                                       unix_socket_path=self.config.redis_socket,
                                       sentinel=self.config.redis_sentinel,
-                                      sentinel_service=self.config.redis_sentinel_service)
+                                      sentinel_service=self.config.redis_sentinel_service,
+                                      socket_timeout=self.config.redis_timeout)
         except ImportError:
             if self.config.distributed:
                 critical("ERROR: Redis connection required for distributed polling")
@@ -424,6 +441,8 @@ class Service:
 
         self.daily_timer.stop()
         self.stats_timer.stop()
+        if self.config.watchdog_enabled:
+            self.watchdog_timer.stop()
 
         self._stop_managers_and_wait()
 
@@ -509,3 +528,19 @@ class Service:
                                )
         except pymysql.err.Error:
             exception("Unable to log performance statistics - is the database still online?")
+
+    def logfile_watchdog(self):
+        
+        try:
+            # check that lofgile has been written to within last poll period
+            logfile_mdiff = datetime.now().timestamp() - os.path.getmtime(self.config.watchdog_logfile)
+        except FileNotFoundError as e:
+            error("Log file not found! {}".format(e))
+            return
+
+        if logfile_mdiff > self.config.poller.frequency:
+            critical("BARK! Log file older than {}s, restarting service!".format(self.config.poller.frequency))
+            self.restart()
+        else:
+            info("Log file updated {}s ago".format(int(logfile_mdiff)))
+

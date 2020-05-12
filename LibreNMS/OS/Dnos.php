@@ -25,6 +25,7 @@
 
 namespace LibreNMS\OS;
 
+use Illuminate\Support\Str;
 use LibreNMS\Device\Processor;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\OS;
@@ -42,7 +43,7 @@ class Dnos extends OS implements ProcessorDiscovery
         $device = $this->getDevice();
         $processors = array();
 
-        if (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.6027.1.3')) {
+        if (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.6027.1.3')) {
             d_echo('Dell S Series Chassis');
             $this->findProcessors(
                 $processors,
@@ -51,7 +52,7 @@ class Dnos extends OS implements ProcessorDiscovery
                 '.1.3.6.1.4.1.6027.3.10.1.2.9.1.2',
                 'Stack Unit'
             );
-        } elseif (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.6027.1.2')) {
+        } elseif (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.6027.1.2')) {
             d_echo('Dell C Series Chassis');
             $this->findProcessors(
                 $processors,
@@ -68,7 +69,7 @@ class Dnos extends OS implements ProcessorDiscovery
                 '.1.3.6.1.4.1.6027.3.8.1.5.1.1.1',
                 'Line Card'
             );
-        } elseif (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.6027.1.4')) {
+        } elseif (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.6027.1.4')) {
             d_echo('Dell M Series Chassis');
             $this->findProcessors(
                 $processors,
@@ -77,7 +78,7 @@ class Dnos extends OS implements ProcessorDiscovery
                 '.1.3.6.1.4.1.6027.3.19.1.2.8.1.2',
                 'Stack Unit'
             );
-        } elseif (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.6027.1.5')) {
+        } elseif (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.6027.1.5')) {
             d_echo('Dell Z Series Chassis');
             $this->findProcessors(
                 $processors,

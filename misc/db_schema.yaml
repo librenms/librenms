@@ -203,6 +203,9 @@ bgpPeers:
     - { Field: bgpPeerRemoteAs, Type: bigint(20), 'Null': false, Extra: '' }
     - { Field: bgpPeerState, Type: text, 'Null': false, Extra: '' }
     - { Field: bgpPeerAdminStatus, Type: text, 'Null': false, Extra: '' }
+    - { Field: bgpPeerLastErrorCode, Type: int(11), 'Null': true, Extra: '' }
+    - { Field: bgpPeerLastErrorSubCode, Type: int(11), 'Null': true, Extra: '' }
+    - { Field: bgpPeerLastErrorText, Type: varchar(254), 'Null': true, Extra: '' }
     - { Field: bgpLocalAddr, Type: text, 'Null': false, Extra: '' }
     - { Field: bgpPeerRemoteAddr, Type: text, 'Null': false, Extra: '' }
     - { Field: bgpPeerDescr, Type: varchar(255), 'Null': false, Extra: '', Default: '' }
@@ -545,7 +548,9 @@ device_graphs:
   Columns:
     - { Field: device_id, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
     - { Field: graph, Type: varchar(255), 'Null': true, Extra: '' }
+    - { Field: id, Type: 'bigint(20) unsigned', 'Null': false, Extra: auto_increment }
   Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     device_id: { Name: device_id, Columns: [device_id], Unique: false, Type: BTREE }
 device_groups:
   Columns:
@@ -947,7 +952,7 @@ mpls_lsp_paths:
     - { Field: mplsLspPathFailCode, Type: varchar(64), 'Null': false, Extra: '' }
     - { Field: mplsLspPathFailNodeAddr, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: mplsLspPathMetric, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
-    - { Field: mplsLspPathOperMetric, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: mplsLspPathOperMetric, Type: 'int(10) unsigned', 'Null': true, Extra: '' }
     - { Field: mplsLspPathTimeUp, Type: bigint(20), 'Null': true, Extra: '' }
     - { Field: mplsLspPathTimeDown, Type: bigint(20), 'Null': true, Extra: '' }
     - { Field: mplsLspPathTransitionCount, Type: 'int(10) unsigned', 'Null': true, Extra: '' }
@@ -1359,9 +1364,11 @@ ports:
     - { Field: portName, Type: varchar(128), 'Null': true, Extra: '' }
     - { Field: ifIndex, Type: bigint(20), 'Null': true, Extra: '', Default: '0' }
     - { Field: ifSpeed, Type: bigint(20), 'Null': true, Extra: '' }
+    - { Field: ifSpeed_prev, Type: bigint(20), 'Null': true, Extra: '' }
     - { Field: ifConnectorPresent, Type: varchar(12), 'Null': true, Extra: '' }
     - { Field: ifPromiscuousMode, Type: varchar(12), 'Null': true, Extra: '' }
     - { Field: ifHighSpeed, Type: int(11), 'Null': true, Extra: '' }
+    - { Field: ifHighSpeed_prev, Type: int(11), 'Null': true, Extra: '' }
     - { Field: ifOperStatus, Type: varchar(16), 'Null': true, Extra: '' }
     - { Field: ifOperStatus_prev, Type: varchar(16), 'Null': true, Extra: '' }
     - { Field: ifAdminStatus, Type: varchar(16), 'Null': true, Extra: '' }

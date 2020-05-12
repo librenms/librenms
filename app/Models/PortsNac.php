@@ -53,6 +53,6 @@ class PortsNac extends PortRelatedModel
 
     public function device()
     {
-        return $this->belongsTo('App\Models\Device', 'device_id', 'device_id');
+        return $this->belongsTo(\App\Models\Device::class, 'device_id', 'device_id');
     }
 }

@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Validations;
 
+use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Util\Env;
 use LibreNMS\Util\Git;
@@ -99,7 +100,7 @@ class User extends BaseValidation
                 );
 
                 $files = array_filter(explode(PHP_EOL, $find_result), function ($file) use ($ignore_files) {
-                    if (starts_with($file, $ignore_files)) {
+                    if (Str::startsWith($file, $ignore_files)) {
                         return false;
                     }
 

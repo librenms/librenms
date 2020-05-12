@@ -186,6 +186,7 @@ class RunAlerts
         $obj['timestamp'] = $alert['time_logged'];
         $obj['contacts']  = $extra['contacts'];
         $obj['state']     = $alert['state'];
+        $obj['alerted']   = $alert['alerted'];
         $obj['template']  = $template;
         return $obj;
     }
@@ -352,7 +353,7 @@ class RunAlerts
     public function loadAlerts($where)
     {
         $alerts = [];
-        foreach (dbFetchRows("SELECT alerts.id, alerts.device_id, alerts.rule_id, alerts.state, alerts.note, alerts.info FROM alerts WHERE $where") as $alert_status) {
+        foreach (dbFetchRows("SELECT alerts.id, alerts.alerted, alerts.device_id, alerts.rule_id, alerts.state, alerts.note, alerts.info FROM alerts WHERE $where") as $alert_status) {
             $alert = dbFetchRow(
                 'SELECT alert_log.id,alert_log.rule_id,alert_log.device_id,alert_log.state,alert_log.details,alert_log.time_logged,alert_rules.rule,alert_rules.severity,alert_rules.extra,alert_rules.name,alert_rules.query,alert_rules.builder,alert_rules.proc FROM alert_log,alert_rules WHERE alert_log.rule_id = alert_rules.id && alert_log.device_id = ? && alert_log.rule_id = ? && alert_rules.disabled = 0 ORDER BY alert_log.id DESC LIMIT 1',
                 array($alert_status['device_id'], $alert_status['rule_id'])
@@ -365,6 +366,7 @@ class RunAlerts
             } else {
                 $alert['alert_id'] = $alert_status['id'];
                 $alert['state'] = $alert_status['state'];
+                $alert['alerted'] = $alert_status['alerted'];
                 $alert['note'] = $alert_status['note'];
                 if (!empty($alert['details'])) {
                     $alert['details'] = json_decode(gzuncompress($alert['details']), true);
@@ -402,7 +404,7 @@ class RunAlerts
             $tolerence_window = Config::get('alert.tolerance_window');
             if (!empty($rextra['count']) && empty($rextra['interval'])) {
                 // This check below is for compat-reasons
-                if (!empty($rextra['delay'])) {
+                if (!empty($rextra['delay']) && $alert['state'] != 0) {
                     if ((time() - strtotime($alert['time_logged']) + $tolerence_window) < $rextra['delay'] || (!empty($alert['details']['delay']) && (time() - $alert['details']['delay'] + $tolerence_window) < $rextra['delay'])) {
                         continue;
                     } else {
@@ -421,7 +423,7 @@ class RunAlerts
                 }
             } else {
                 // This is the new way
-                if (!empty($rextra['delay']) && (time() - strtotime($alert['time_logged']) + $tolerence_window) < $rextra['delay']) {
+                if (!empty($rextra['delay']) && (time() - strtotime($alert['time_logged']) + $tolerence_window) < $rextra['delay'] && $alert['state'] != 0) {
                     continue;
                 }
 

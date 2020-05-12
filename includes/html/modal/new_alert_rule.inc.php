@@ -35,7 +35,7 @@ if (Auth::user()->hasGlobalAdmin()) {
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h5 class="modal-title" id="Create">Alert Rule :: <a href="https://docs.librenms.org/Alerting/"><i class="fa fa-book fa-1x"></i> Docs</a> </h5>
+                    <h5 class="modal-title" id="Create">Alert Rule :: <a target="_blank" href="https://docs.librenms.org/Alerting/"><i class="fa fa-book fa-1x"></i> Docs</a> </h5>
                 </div>
                 <div class="modal-body">
                     <ul class="nav nav-tabs" role="tablist">
@@ -72,6 +72,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                                                 <li><a href="#" name="import-query" id="import-query">SQL Query</a></li>
                                                 <li><a href="#" name="import-old-format" id="import-old-format">Old Format</a></li>
                                                 <li><a href="#" name="import-collection" id="import-collection">Collection</a></li>
+                                                <li><a href="#" name="import-alert_rule" id="import-alert_rule">Alert Rule</a></li>
                                             </ul>
                                         </div>
                                     </div>
@@ -94,7 +95,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                                     <div class="col-sm-2" title="How many notifications to issue while active before stopping. -1 means no limit. If interval is 0, this has no effect.">
                                         <input type='text' id='count' name='count' class='form-control' size="4" value="123">
                                     </div>
-                                    <div class="col-sm-3" title="How log to wait before issuing a notification. If the alert clears before the delay, no notification will be issued. (s,m,h,d)">
+                                    <div class="col-sm-3" title="How long to wait before issuing a notification. If the alert clears before the delay, no notification will be issued. (s,m,h,d)">
                                         <label for='delay' class='control-label' style="vertical-align: top;">Delay: </label>
                                         <input type='text' id='delay' name='delay' class='form-control' size="4">
                                     </div>
@@ -169,7 +170,6 @@ if (Auth::user()->hasGlobalAdmin()) {
             </div>
         </div>
     </div>
-
 
     <script src="js/sql-parser.min.js"></script>
     <script src="js/query-builder.standalone.min.js"></script>
@@ -280,6 +280,11 @@ if (Auth::user()->hasGlobalAdmin()) {
         $('#import-collection').on('click', function (e) {
             e.preventDefault();
             $("#search_rule_modal").modal('show');
+        });
+
+        $('#import-alert_rule').on('click', function (e) {
+            e.preventDefault();
+            $("#search_alert_rule_modal").modal('show');
         });
 
         $('#create-alert').on('show.bs.modal', function(e) {

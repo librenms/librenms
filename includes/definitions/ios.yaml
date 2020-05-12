@@ -3,6 +3,8 @@ group: cisco
 text: 'Cisco IOS'
 type: network
 ifXmcbc: true
+mib_dir:
+    - cisco
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }

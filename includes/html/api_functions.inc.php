@@ -18,10 +18,14 @@ use App\Models\PortsFdb;
 use App\Models\Sensor;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Routing\Router;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Config;
+use LibreNMS\Data\Store\Datastore;
 use LibreNMS\Exceptions\InvalidIpException;
+use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv4;
 
 function api_success($result, $result_name, $message = null, $code = 200, $count = null, $extra = null)
@@ -83,9 +87,8 @@ function api_get_graph(array $vars)
 
     ob_start();
 
-    rrdtool_initialize(false);
     include 'includes/html/graphs/graph.inc.php';
-    rrdtool_close();
+    Datastore::terminate();
 
     $image = ob_get_contents();
     ob_end_clean();
@@ -159,7 +162,7 @@ function get_port_stats_by_port_hostname(\Illuminate\Http\Request $request)
     $ifName = $request->route('ifname');
 
     // handle %2f in paths and pass to get_graph_by_port_hostname if needed
-    if (str_contains($ifName, '/')) {
+    if (Str::contains($ifName, '/')) {
         $parts = explode('/', $request->path());
 
         if (isset($parts[5])) {
@@ -210,7 +213,7 @@ function get_graph_generic_by_hostname(\Illuminate\Http\Request $request)
     $vars['output'] = $request->get('output', 'display');
     if (isset($sensor_id)) {
         $vars['id']   = $sensor_id;
-        if (str_contains($vars['type'], '_wireless')) {
+        if (Str::contains($vars['type'], '_wireless')) {
             $vars['type'] = str_replace('device_', '', $vars['type']);
         } else {
             // If this isn't a wireless graph we need to fix the name.
@@ -482,7 +485,7 @@ function show_endpoints(\Illuminate\Http\Request $request, Router $router)
     $base = str_replace('api/v0', '', $request->url());
     foreach ($router->getRoutes() as $route) {
         /** @var \Illuminate\Routing\Route $route */
-        if (starts_with($route->getPrefix(), 'api/v0') && $route->getName()) {
+        if (Str::startsWith($route->getPrefix(), 'api/v0') && $route->getName()) {
             $output[$route->getName()] = $base . $route->uri();
         }
     }
@@ -499,14 +502,37 @@ function list_bgp(\Illuminate\Http\Request $request)
     $sql_params = [];
     $hostname   = $request->get('hostname');
     $asn        = $request->get('asn');
+    $remote_asn = $request->get('remote_asn');
+    $local_address = $request->get('local_address');
+    $remote_address = $request->get('remote_address');
     $device_id  = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     if (is_numeric($device_id)) {
-        $sql        = ' AND `devices`.`device_id` = ?';
+        $sql        .= ' AND `devices`.`device_id` = ?';
         $sql_params[] = $device_id;
     }
     if (!empty($asn)) {
-        $sql = ' AND `devices`.`bgpLocalAs` = ?';
+        $sql .= ' AND `devices`.`bgpLocalAs` = ?';
         $sql_params[] = $asn;
+    }
+    if (!empty($remote_asn)) {
+        $sql .= ' AND `bgpPeers`.`bgpPeerRemoteAs` = ?';
+        $sql_params[] = $remote_asn;
+    }
+    if (!empty($local_address)) {
+        $sql .= ' AND `bgpPeers`.`bgpLocalAddr` = ?';
+        try {
+            $sql_params[] = IP::parse($local_address)->uncompressed();
+        } catch (InvalidIpException $e) {
+            return api_error(400, "Invalid local address");
+        }
+    }
+    if (!empty($remote_address)) {
+        $sql .= ' AND `bgpPeers`.`bgpPeerIdentifier` = ?';
+        try {
+            $sql_params[] = IP::parse($remote_address)->uncompressed();
+        } catch (InvalidIpException $e) {
+            return api_error(400, "Invalid remote address");
+        }
     }
 
     $bgp_sessions       = dbFetchRows("SELECT `bgpPeers`.* FROM `bgpPeers` LEFT JOIN `devices` ON `bgpPeers`.`device_id` = `devices`.`device_id` WHERE `bgpPeerState` IS NOT NULL AND `bgpPeerState` != '' $sql", $sql_params);
@@ -609,7 +635,7 @@ function get_graph_by_portgroup(\Illuminate\Http\Request $request)
 
     if (empty($id)) {
         $ports = get_ports_from_type(explode(',', $group));
-        $if_list = implode(',', array_pluck($ports, 'port_id'));
+        $if_list = implode(',', Arr::pluck($ports, 'port_id'));
     } else {
         $if_list = $id;
     }
@@ -1350,14 +1376,19 @@ function list_bills(\Illuminate\Http\Request $request)
     }
 
     if ($period === 'previous') {
-        $select = "SELECT bills.bill_name, bills.bill_notes, bill_history.*, bill_history.traf_total as total_data, bill_history.traf_in as total_data_in, bill_history.traf_out as total_data_out ";
+        $select = "SELECT bills.bill_autoadded, bills.bill_cdr, bills.bill_custid, bills.bill_day, bills.bill_name,
+            bills.bill_notes, bills.bill_quota, bills.bill_ref, bill_history.*, bill_history.traf_total as total_data,
+            bill_history.traf_in as total_data_in, bill_history.traf_out as total_data_out, bill_history.updated as bill_last_calc
+        ";
         $query = 'FROM `bills`
-            INNER JOIN (SELECT bill_id, MAX(bill_hist_id) AS bill_hist_id FROM bill_history WHERE bill_dateto < NOW() AND bill_dateto > subdate(NOW(), 40) GROUP BY bill_id) qLastBills ON bills.bill_id = qLastBills.bill_id
+            INNER JOIN (SELECT bill_id, MAX(bill_hist_id) AS bill_hist_id FROM bill_history
+                        WHERE bill_dateto < NOW() AND bill_dateto > subdate(NOW(), 40)
+                        GROUP BY bill_id) qLastBills ON bills.bill_id = qLastBills.bill_id
             INNER JOIN bill_history ON qLastBills.bill_hist_id = bill_history.bill_hist_id
-    ';
+        ';
     } else {
         $select = "SELECT bills.*,
-            IF(bills.bill_type = 'CDR', bill_cdr, bill_quota) AS bill_allowed
+            IF(bills.bill_type = 'cdr', bill_cdr, bill_quota) AS bill_allowed
         ";
         $query = "FROM `bills`\n";
     }
@@ -1369,16 +1400,24 @@ function list_bills(\Illuminate\Http\Request $request)
         $percent = '';
         $overuse = '';
 
-        if ($bill['bill_type'] == "cdr") {
+        if (strtolower($bill['bill_type']) == "cdr") {
             $allowed = format_si($bill['bill_cdr'])."bps";
             $used    = format_si($rate_data['rate_95th'])."bps";
-            $percent = round(($rate_data['rate_95th'] / $bill['bill_cdr']) * 100, 2);
+            if ($bill['bill_cdr'] > 0) {
+                $percent = round(($rate_data['rate_95th'] / $bill['bill_cdr']) * 100, 2);
+            } else {
+                $percent = "-";
+            }
             $overuse = $rate_data['rate_95th'] - $bill['bill_cdr'];
             $overuse = (($overuse <= 0) ? "-" : format_si($overuse));
-        } elseif ($bill['bill_type'] == "quota") {
+        } elseif (strtolower($bill['bill_type']) == "quota") {
             $allowed = format_bytes_billing($bill['bill_quota']);
             $used    = format_bytes_billing($rate_data['total_data']);
-            $percent = round(($rate_data['total_data'] / ($bill['bill_quota'])) * 100, 2);
+            if ($bill['bill_quota'] > 0) {
+                $percent = round(($rate_data['total_data'] / ($bill['bill_quota'])) * 100, 2);
+            } else {
+                $percent = "-";
+            }
             $overuse = $rate_data['total_data'] - $bill['bill_quota'];
             $overuse = (($overuse <= 0) ? "-" : format_bytes_billing($overuse));
         }
@@ -2216,46 +2255,36 @@ function validate_column_list($columns, $tableName)
     return true;
 }
 
+function missing_fields($required_fields, $data)
+{
+    foreach ($required_fields as $required) {
+        if (empty($data[$required])) {
+            return true;
+        }
+    }
+    return false;
+}
+
 function add_service_for_host(\Illuminate\Http\Request $request)
 {
     $hostname = $request->route('hostname');
-    // use hostname as device_id if it's all digits
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-
     $data = json_decode($request->getContent(), true);
-    $missing_fields = [];
-
-    // Check if some required fields are empty
-    if (empty($data['type'])) {
-        $missing_fields[] = 'type';
+    if (missing_fields(array('type'), $data)) {
+        return api_error(400, 'Required fields missing (hostname and type needed)');
     }
-    if (empty($data['ip'])) {
-        $missing_fields[] = 'ip';
-    }
-
-    // Print error if required fields are missing
-    if (!empty($missing_fields)) {
-        return api_error(400, sprintf("Service field%s %s missing: %s.", ((sizeof($missing_fields)>1)?'s':''), ((sizeof($missing_fields)>1)?'are':'is'), implode(', ', $missing_fields)));
-    }
-
-    // Check if service type exists
     if (!in_array($data['type'], list_available_services())) {
         return api_error(400, "The service " . $data['type'] . " does not exist.\n Available service types: " . implode(', ', list_available_services()));
     }
-
-    // Get parameters
     $service_type = $data['type'];
     $service_ip   = $data['ip'];
     $service_desc = $data['desc'] ? $data['desc'] : '';
     $service_param = $data['param'] ? $data['param'] : '';
     $service_ignore = $data['ignore'] ? true : false; // Default false
-
-    // Set the service
     $service_id = add_service($device_id, $service_type, $service_desc, $service_ip, $service_param, (int)$service_ignore);
     if ($service_id != false) {
         return api_success_noresult(201, "Service $service_type has been added to device $hostname (#$service_id)");
     }
-
     return api_error(500, 'Failed to add the service');
 }
 
@@ -2303,6 +2332,89 @@ function validateDeviceIds($ids)
         }
     }
     return true;
+}
+  
+function add_location(\Illuminate\Http\Request $request)
+{
+    $data = json_decode($request->getContent(), true);
+    if (missing_fields(array('location','lat', 'lng'), $data)) {
+        return api_error(400, 'Required fields missing (location, lat and lng needed)');
+    }
+    // Set the location
+    $timestamp = date("Y-m-d H:m:s");
+    $insert = array('location' => $data['location'], 'lat' => $data['lat'], 'lng' => $data['lng'], 'timestamp' => $timestamp);
+    $location_id = dbInsert($insert, 'locations');
+    if ($location_id != false) {
+        return api_success_noresult(201, "Location added with id #$location_id");
+    }
+    return api_error(500, 'Failed to add the location');
+}
+
+function edit_location(\Illuminate\Http\Request $request)
+{
+    $location = $request->route('location_id_or_name');
+    if (empty($location)) {
+        return api_error(400, 'No location has been provided to edit');
+    }
+    $location_id = ctype_digit($location) ? $location : get_location_id_by_name($location);
+    $data = json_decode($request->getContent(), true);
+    if (empty($location_id)) {
+        return api_error(400, "Failed to delete location");
+    }
+    $result = dbUpdate($data, 'locations', '`id` = ?', [$location_id]);
+    if ($result == 1) {
+        return api_success_noresult(201, "Location updated successfully");
+    }
+    return api_error(500, "Failed to update location");
+}
+
+function get_location_id_by_name($location)
+{
+    return dbFetchCell("SELECT id FROM locations WHERE location = ?", $location);
+}
+
+function del_location(\Illuminate\Http\Request $request)
+{
+    $location = $request->route('location');
+    if (empty($location)) {
+        return api_error(400, 'No location has been provided to delete');
+    }
+    $location_id = get_location_id_by_name($location);
+    if (empty($location_id)) {
+        return api_error(400, "Failed to delete $location (Does not exists)");
+    }
+    $data = [
+        'location_id' => 0
+    ];
+    dbUpdate($data, 'devices', '`location_id` = ?', [$location_id]);
+    $result = dbDelete('locations', '`location` = ? ', [$location]);
+    if ($result == 1) {
+        return api_success_noresult(201, "Location $location has been deleted successfully");
+    }
+    return api_error(500, "Failed to delete the location $location");
+}
+
+function del_service_from_host(\Illuminate\Http\Request $request)
+{
+    $service_id = $request->route('id');
+    if (empty($service_id)) {
+        return api_error(400, 'No service_id has been provided to delete');
+    }
+    $result = delete_service($service_id);
+    if ($result == 1) {
+        return api_success_noresult(201, "Service has been deleted successfully");
+    }
+    return api_error(500, "Failed to delete the service");
+}
+
+function edit_service_for_host(\Illuminate\Http\Request $request)
+{
+    $service_id = $request->route('id');
+    $data = json_decode($request->getContent(), true);
+    if (edit_service($data, $service_id) == 1) {
+        return api_success_noresult(201, "Service updated successfully");
+    }
+    return api_error(500, "Failed to update the service with id $service_id");
 }
 
 /**

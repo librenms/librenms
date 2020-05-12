@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Str;
+
 /*
  * LibreNMS
  *
@@ -126,10 +128,10 @@ if ($sub_type == 'new-maintenance') {
 
             foreach ($_POST['maps'] as $target) {
                 $type = 'device';
-                if (starts_with($target, 'l')) {
+                if (Str::startsWith($target, 'l')) {
                     $type = 'location';
                     $target = substr($target, 1);
-                } elseif (starts_with($target, 'g')) {
+                } elseif (Str::startsWith($target, 'g')) {
                     $type = 'device_group';
                     $target = substr($target, 1);
                 }
@@ -203,7 +205,6 @@ if ($sub_type == 'new-maintenance') {
     );
 } elseif ($sub_type == 'del-maintenance') {
     $schedule_id = mres($_POST['del_schedule_id']);
-    dbDelete('alert_schedule_items', '`schedule_id`=?', array($schedule_id));
     dbDelete('alert_schedule', '`schedule_id`=?', array($schedule_id));
     dbDelete('alert_schedulables', '`schedule_id`=?', array($schedule_id));
     $status   = 'ok';

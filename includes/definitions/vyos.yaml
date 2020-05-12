@@ -1,5 +1,6 @@
 os: vyos
 text: VyOS
+group: unix
 type: network
 ifname: true
 over:

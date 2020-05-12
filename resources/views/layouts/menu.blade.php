@@ -25,8 +25,22 @@
                                                  aria-hidden="true"></i> <span
                             class="hidden-sm">@lang('Overview')</span></a>
                     <ul class="dropdown-menu multi-level" role="menu">
-                        <li><a href="{{ url('overview') }}"><i class="fa fa-tv fa-fw fa-lg"
-                                                               aria-hidden="true"></i> @lang('Dashboard')</a></li>
+                        <li class="dropdown-submenu">
+                            <a href="{{ route('overview') }}"><i class="fa fa-tv fa-fw fa-lg" aria-hidden="true"></i> @lang('Dashboard')</a>
+                            <ul class="dropdown-menu">
+                                @foreach($dashboards as $dashboard)
+                                <li><a href="{{ route('overview', ['dashboard' => $dashboard->dashboard_id]) }}"><i class="fa fa-tv fa-fw fa-lg" aria-hidden="true"></i> {{ $dashboard->dashboard_name }}</a></li>
+                                @endforeach
+                                <li role="presentation" class="divider"></li>
+                                <li>
+                                    <a onclick="toggleDashboardEditor()">
+                                        <i class="fa fa-bar-chart fa-fw fa-lg" aria-hidden="true"></i>
+                                        <span id="toggle-dashboard-editor-text">@if ($hide_dashboard_editor) @lang('Show Dashboard Editor') @else @lang('Hide Dashboard Editor')@endif</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li role="presentation" class="divider"></li>
                         <li class="dropdown-submenu">
                             <a><i class="fa fa-map fa-fw fa-lg"
                                                                aria-hidden="true"></i> @lang('Maps')</a>
@@ -103,7 +117,7 @@
                                                                aria-hidden="true"></i> @lang('Eventlog')</a></li>
                         @config('enable_syslog')
                         <li><a href="{{ url('syslog') }}"><i class="fa fa-clone fa-fw fa-lg"
-                                                             aria-hidden="true"></i> @lang('Syslog')</a></li>
+                                                             aria-hidden="true"></i> @lang('syslog.title')</a></li>
                         @endconfig
                         @config('graylog.server')
                         <li><a href="{{ url('graylog') }}"><i class="fa fa-clone fa-fw fa-lg"
@@ -373,7 +387,7 @@
                         <a href="{{ url('wireless') }}" class="dropdown-toggle" data-hover="dropdown"
                            data-toggle="dropdown"><i class="fa fa-wifi fa-fw fa-lg fa-nav-icons hidden-md"
                                                      aria-hidden="true"></i> <span
-                                class="hidden-sm">@lang('Wireless')</span></a>
+                                class="hidden-sm">@lang('wireless.title')</span></a>
                         <ul class="dropdown-menu">
                         @foreach($wireless_menu as $wireless_menu_entry)
                                 <li><a href="{{ url('wireless/metric=' . $wireless_menu_entry->sensor_class) }}"><i class="fa fa-{{ $wireless_menu_entry->icon() }} fa-fw fa-lg" aria-hidden="true"></i> {{ $wireless_menu_entry->classDescr() }}</a></li>
@@ -511,7 +525,7 @@
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"
                        style="margin-left:5px"><i class="fa fa-cog fa-fw fa-lg fa-nav-icons" aria-hidden="true"></i>
-                        <span class="visible-xs-inline-block">@lang('Settings')</span></a>
+                        <span class="visible-xs-inline-block">@lang('settings.title')</span></a>
                     <ul class="dropdown-menu">
                         @admin
                         <li><a href="{{ url('settings') }}"><i class="fa fa-cogs fa-fw fa-lg"
@@ -526,14 +540,14 @@
                                                               aria-hidden="true"></i> @lang('Auth History')</a></li>
                         <li role="presentation" class="divider"></li>
                         <li class="dropdown-submenu">
-                            <a href="{{ url('pollers') }}"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> @lang('Pollers')</a>
+                            <a href="{{ url('poller') }}"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> @lang('Poller')</a>
                             <ul class="dropdown-menu">
-                                <li><a href="{{ url('pollers/tab=pollers') }}"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> @lang('Pollers')</a></li>
+                                <li><a href="{{ route('poller') }}"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> @lang('Poller')</a></li>
                                 @config('distributed_poller')
-                                <li><a href="{{ url('pollers/tab=groups') }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> @lang('Groups')</a></li>
+                                <li><a href="{{ route('poller.groups') }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> @lang('Groups')</a></li>
                                 @endconfig
-                                <li><a href="{{ url('pollers/tab=performance') }}"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> @lang('Performance')</a></li>
-                                <li><a href="{{ url('pollers/tab=log') }}"><i class="fa fa-file-text fa-fw fa-lg" aria-hidden="true"></i> @lang('History')</a></li>
+                                <li><a href="{{ route('poller.performance') }}"><i class="fa fa-line-chart fa-fw fa-lg" aria-hidden="true"></i> @lang('Performance')</a></li>
+                                <li><a href="{{ route('poller.log') }}"><i class="fa fa-file-text fa-fw fa-lg" aria-hidden="true"></i> @lang('Log')</a></li>
                             </ul>
                         </li>
                         <li role="presentation" class="divider"></li>
@@ -694,4 +708,32 @@
                 $('.tt-selectable').first().click();
             }
         });
+
+    var hideDashboardEditor = {{ (int)$hide_dashboard_editor }};
+    function toggleDashboardEditor() {
+        $.ajax({
+            url: '{{ route('preferences.store') }}',
+            dataType: 'json',
+            type: 'POST',
+            data: {
+                pref: 'hide_dashboard_editor',
+                value: hideDashboardEditor ? 0 : 1
+            },
+            success: function () {
+                hideDashboardEditor = hideDashboardEditor ? 0 : 1;
+                $('#toggle-dashboard-editor-text').text(hideDashboardEditor ? '@lang('Show Dashboard Editor')' : '@lang('Hide Dashboard Editor')')
+
+                // disable and hide editing
+                if (typeof gridster !== 'undefined') {
+                    gridster.disable();
+                    gridster.disable_resize();
+                    gridster_state = 0;
+                    $('.fade-edit').fadeOut();
+                    dashboard_collapse("#hide_edit");
+                }
+
+                $('#dashboard-editor').collapse(hideDashboardEditor ? 'hide' : 'show');
+            }
+        });
+    }
 </script>

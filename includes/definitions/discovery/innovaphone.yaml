@@ -1,0 +1,65 @@
+mib: INNO-MIB
+modules:
+    sensors:
+        state:
+            data:
+                -
+                    oid: l2Table
+                    value: l2State
+                    num_oid: '.1.3.6.1.4.1.6666.1.1.1.2.{{ $index }}'
+                    descr: 'LAPD {{ $l2Label }}'
+                    group: '{{ $l2Label }}'
+                    state_name: L2State
+                    states:
+                        - { descr: down, graph: 0, value: 1, generic: 2 }
+                        - { descr: up,   graph: 0, value: 2, generic: 0 }
+                -
+                    oid: l2Table
+                    value: l2Mode
+                    num_oid: '.1.3.6.1.4.1.6666.1.1.1.3.{{ $index }}'
+                    descr: 'Mode {{ $l2Label }}'
+                    state_name: L2Mode
+                    group: '{{ $l2Label }}'
+                    states:
+                        - { descr: TE, graph: 0, value: 1, generic: 0 }
+                        - { descr: NT, graph: 0, value: 2, generic: 0 }
+
+                -
+                    oid: l1BriTable
+                    value: l1BriState
+                    num_oid: '.1.3.6.1.4.1.6666.1.1.1.3'
+                    descr: 'Basic rate interface {{ $l1BriLabel }}'
+                    state_name: l1BriLabel
+                    group: '{{ $l1BriLabel }}'
+                    states:
+                        - { descr: down, graph: 0, value: 1, generic: 2 }
+                        - { descr: up,   graph: 0, value: 2, generic: 0 }
+                -
+                    oid: l3Table
+                    value: l3Label
+                    num_oid: '.1.3.6.1.4.1.6666.1.4.1.2.{{ $index }}'
+                    descr: 'ISDN signaling protocol {{ $l3Label }}'
+                    state_name: l3Label
+                    group: '{{ $l3Label }}'
+                    states:
+                        - { descr: none, graph: 0, value: 1, generic: 3 }
+                        - { descr: other,   graph: 0, value: 2, generic: 3 }
+                        - { descr: etsi,   graph: 0, value: 3, generic: 0 }
+                        - { descr: qsig,   graph: 0, value: 23, generic: 0 }
+        count:
+            data:
+                -
+                    oid: l3Table
+                    value: l3NumBchanActive
+                    num_oid: '.1.3.6.1.4.1.6666.1.4.1.4.{{ $index }}'
+                    descr: 'Active calls {{ $l3Label }}'
+                -
+                    oid: l3Table
+                    value: l3CallsBoot
+                    num_oid: '.1.3.6.1.4.1.6666.1.4.1.5.{{ $index }}'
+                    descr: "Calls since boot {{ $l3Label }}"
+                -
+                    oid: l3Table
+                    value: l3NumBchan
+                    num_oid: '.1.3.6.1.4.1.6666.1.4.1.3.{{ $index }}'
+                    descr: 'Available Channels {{ $l3Label }}'

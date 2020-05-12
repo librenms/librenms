@@ -1,6 +1,6 @@
 <?php
 
-## Have a look in includes/defaults.inc.php for examples of settings you can set here. DO NOT EDIT defaults.inc.php!
+## Have a look in misc/config_definitions.json for examples of settings you can set here. DO NOT EDIT misc/config_definitions.json!
 
 ### Database config
 $config['db_host'] = 'localhost';

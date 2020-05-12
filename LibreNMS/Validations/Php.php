@@ -31,6 +31,10 @@ use LibreNMS\Validator;
 
 class Php extends BaseValidation
 {
+    const PHP_MIN_VERSION = '7.2.5';
+    const PHP_MIN_VERSION_DATE = 'May, 2020';
+    const PHP_RECOMMENDED_VERSION = '7.3';
+
     /**
      * Validate this module.
      * To return ValidationResults, call ok, warn, fail, or result methods on the $validator
@@ -48,11 +52,9 @@ class Php extends BaseValidation
 
     private function checkVersion(Validator$validator)
     {
-        $min_version = '5.6.4';
-
         // if update is not set to false and version is min or newer
-        if (Config::get('update') && version_compare(PHP_VERSION, $min_version, '<')) {
-            $validator->warn('PHP version 5.6.4 is the minimum supported version as of January 10, 2018.  We recommend you update to PHP a supported version of PHP (7.1 suggested) to continue to receive updates.  If you do not update PHP, LibreNMS will continue to function but stop receiving bug fixes and updates.');
+        if (Config::get('update') && version_compare(PHP_VERSION, self::PHP_MIN_VERSION, '<')) {
+            $validator->warn("PHP version " . self::PHP_MIN_VERSION . " is the minimum supported version as of " . self::PHP_MIN_VERSION_DATE . ". We recommend you update PHP to a supported version (" . self::PHP_RECOMMENDED_VERSION . " suggested) to continue to receive updates. If you do not update PHP, LibreNMS will continue to function but stop receiving bug fixes and updates.");
         }
     }
 
@@ -79,7 +81,7 @@ class Php extends BaseValidation
 
     private function checkExtensions(Validator $validator)
     {
-        $required_modules = ['mysqlnd', 'mbstring', 'pcre', 'curl', 'session', 'xml', 'gd'];
+        $required_modules = ['mysqlnd', 'mbstring', 'pcre', 'curl', 'session', 'xml', 'gd', 'sockets', 'dom'];
 
         if (Config::get('distributed_poller')) {
             $required_modules[] = 'memcached';
@@ -145,17 +147,19 @@ class Php extends BaseValidation
             );
         } elseif ($sh_tz !== $php_tz) {
             // check if system timezone matches the timezone of the current running php
+            $ini_file = php_ini_loaded_file();
             $validator->fail(
                 "You have a different system timezone ($sh_tz) than the php configured timezone ($php_tz)",
-                "Please correct either your system timezone or your timezone set in php.ini."
+                "Please correct either your system timezone or your timezone set in $ini_file."
             );
         } elseif ($php_tz !== $php_cli_tz) {
             // check if web and cli timezones match (this does nothing if validate.php is run on cli)
             // some distros have different php.ini for cli and the web server
             if ($sh_tz !== $php_cli_tz) {
+                $ini_file = rtrim(shell_exec('php -r "echo php_ini_loaded_file();"'));
                 $validator->fail(
                     "The CLI php.ini ($php_cli_tz) timezone is different than your system's timezone ($sh_tz)",
-                    "Edit your CLI php.ini file and set the correct timezone ($sh_tz)."
+                    "Edit your CLI ini file $ini_file and set the correct timezone ($sh_tz)."
                 );
             }
         }
