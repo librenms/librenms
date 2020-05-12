@@ -4,8 +4,8 @@ $multiplier = 1;
 $divisor    = 1;
 
 foreach ($pre_cache['fabos_Sfp'] as $index => $entry) {
-    $entPhysicalIndex = substr($index,-2,2);
-    $entPhysicalIndex = trim($entPhysicalIndex,'.');
+    $entPhysicalIndex = substr($index, -2, 2);
+    $entPhysicalIndex = trim($entPhysicalIndex, '.');
     $entPhysicalIndex          = $entPhysicalIndex + 1073741823;
 
     if (is_numeric($entry['swSfpRxPower']) && $entry['swSfpRxPower'] != -99999999) {
