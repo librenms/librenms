@@ -36,6 +36,20 @@ To include users that have `Global-Read`, `Administrator` or
 You need to install an additional php module : `bcmath` (eg `php72w-bcmath` for
 Centos 7)
 
+## Alerta
+
+The [alerta](https://alerta.io) monitoring system is a tool used to consolidate and de-duplicate alerts from multiple sources for quick ‘at-a-glance’ visualisation. With just one system you can monitor alerts from many other monitoring tools on a single screen.
+
+**Example:**
+
+| Config | Example |
+| ------ | ------- |
+| API Endpoint   | http://alerta.example.com/api/alert |
+| Environment | Production |
+| Apy key | api key with write permission |
+| Alert state | critical |
+| Recover state | cleared |
+
 ## Alertmanager
 
 Alertmanager is an alert handling software, initially developed for
