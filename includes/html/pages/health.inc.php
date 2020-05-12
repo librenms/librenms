@@ -45,6 +45,7 @@ $type_text = [
     'power_factor' => "Power Factor",
     'dbm' => "dBm",
     'load' => "Load",
+    'loss' => 'Loss',
     'state' => "State",
     'count' => "Count",
     'signal' => "Signal",
@@ -58,7 +59,6 @@ $type_text = [
     'ber' => 'Bit Error Rate',
     'eer' => 'Energy Efficiency Ratio',
     'waterflow' => 'Water Flow Rate',
-    'percent' => 'Percentage',
 ];
 
 $active_metric = basename($vars['metric'] ?? 'processor');

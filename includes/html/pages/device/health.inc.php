@@ -32,6 +32,7 @@ $dBm                   = dbFetchCell("select count(*) from sensors WHERE sensor_
 $states                = dbFetchCell("select count(*) from sensors WHERE sensor_class='state' AND device_id = ?", array($device['device_id']));
 $charge                = dbFetchCell("select count(*) from sensors WHERE sensor_class='charge' AND device_id = ?", array($device['device_id']));
 $load                  = dbFetchCell("select count(*) from sensors WHERE sensor_class='load' AND device_id = ?", array($device['device_id']));
+$loss                  = dbFetchCell("select count(*) from sensors WHERE sensor_class='loss' AND device_id = ?", array($device['device_id']));
 $signal                = dbFetchCell("select count(*) from sensors WHERE sensor_class='signal' AND device_id = ?", array($device['device_id']));
 $airflow               = dbFetchCell("select count(*) from sensors WHERE sensor_class='airflow' AND device_id = ?", array($device['device_id']));
 $snr                   = dbFetchCell("select count(*) from sensors WHERE sensor_class='snr' AND device_id = ?", array($device['device_id']));
@@ -43,7 +44,6 @@ $chromatic_dispersion  = dbFetchCell("select count(*) from sensors WHERE sensor_
 $ber                   = dbFetchCell("select count(*) from sensors WHERE sensor_class='ber' AND device_id = ?", array($device['device_id']));
 $eer                   = dbFetchCell("select count(*) from sensors WHERE sensor_class='eer' AND device_id = ?", array($device['device_id']));
 $waterflow             = dbFetchCell("select count(*) from sensors WHERE sensor_class='waterflow' AND device_id = ?", array($device['device_id']));
-$percent               = dbFetchCell("select count(*) from sensors WHERE sensor_class='percent' AND device_id = ?", array($device['device_id']));
 
 unset($datas);
 $datas[] = 'overview';
@@ -171,8 +171,8 @@ if ($waterflow) {
     $datas[] = 'waterflow';
 }
 
-if ($percent) {
-    $datas[] = 'percent';
+if ($loss) {
+    $datas[] = 'loss';
 }
 
 $type_text['overview']             = 'Overview';
@@ -206,7 +206,7 @@ $type_text['chromatic_dispersion'] = 'Chromatic Dispersion';
 $type_text['ber']                  = 'Bit Error Rate';
 $type_text['eer']                  = 'Energy Efficiency Ratio';
 $type_text['waterflow']            = 'Water Flow Rate';
-$type_text['percent']              = 'Percentage';
+$type_text['loss']                 = 'Loss';
 $type_text['qfp']                  = 'QFP';
 
 $link_array = array(

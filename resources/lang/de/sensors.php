@@ -166,10 +166,4 @@ return [
         'unit' => 'l/m',
         'unit_long' => 'Liter pro Minute',
     ],
-    'percent' => [
-        'short' => 'Percent',
-        'long' => 'Percentage',
-        'unit' => '%',
-        'unit_long' => 'percentage',
-    ],
 ];

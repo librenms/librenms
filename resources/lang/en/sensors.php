@@ -96,6 +96,12 @@ return [
         'unit' => '%',
         'unit_long' => 'Percent',
     ],
+    'loss' => [
+        'short' => 'Percent',
+        'long' => 'Loss Percentage',
+        'unit' => '%',
+        'unit_long' => 'percentage',
+    ],
     'power' => [
         'short' => 'Power',
         'long' => 'Power',
@@ -166,11 +172,5 @@ return [
         'long' => 'Water Flow',
         'unit' => 'l/m',
         'unit_long' => 'Liters Per Minute',
-    ],
-    'percent' => [
-        'short' => 'Percent',
-        'long' => 'Percentage',
-        'unit' => '%',
-        'unit_long' => 'percentage',
     ],
 ];

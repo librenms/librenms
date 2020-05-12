@@ -1,5 +1,5 @@
 <?php
-$class     = 'percent';
+$class     = 'loss';
 $unit      = '%';
 $unit_long = 'Percentage';
 

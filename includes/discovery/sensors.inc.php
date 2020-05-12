@@ -51,6 +51,7 @@ $run_sensors = array(
     'frequency',
     'humidity',
     'load',
+    'loss',
     'power',
     'power_consumed',
     'power_factor',
@@ -69,7 +70,6 @@ $run_sensors = array(
     'ber',
     'eer',
     'waterflow',
-    'percent',
 );
 
 // filter submodules
