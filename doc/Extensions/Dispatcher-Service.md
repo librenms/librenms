@@ -21,7 +21,7 @@ behaviour only found in Python3.4+.
 - PyMySQL is recommended as it requires no C compiler to
   install. MySQLclient can also be used, but does require compilation.
 - python-dotenv .env loader
-- redis-py 3.0+ and Redis 5.0+ sever (if using distributed polling)
+- redis-py 3.0+ and Redis 5.0+ server (if using distributed polling)
 
 These can be obtained from your OS package manager, or from PyPI with the below commands.
 
