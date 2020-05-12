@@ -69,7 +69,6 @@ foreach ($sensors as $index => $sensor) {
     $value = snmp_get($device, $oid, '-Osqnv');
     
     if (!empty($value) or $value == "0") {
-        var_dump("IRAN");
         $state_name = $sensor['state_name'];
         $descr = $sensor['descr'];
         $states = [
