@@ -1,6 +1,6 @@
---                                                                                                                           
--- Title: Fibre Channel Switch MIB.                                                                                          
---                                                                                                                           
+--
+-- Title: Fibre Channel Switch MIB.
+--
 
 FA-EXT-MIB DEFINITIONS ::= BEGIN
 
@@ -66,7 +66,7 @@ FA-EXT-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-only
         STATUS     current
         DESCRIPTION "This object identifies the temperature of SFP"
-  ::= { swSfpStatEntry 1 } 
+  ::= { swSfpStatEntry 1 }
 
   swSfpVoltage OBJECT-TYPE
         SYNTAX OCTET STRING (SIZE(8))
