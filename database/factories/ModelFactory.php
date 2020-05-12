@@ -131,3 +131,10 @@ $factory->define(\App\Models\Vminfo::class, function (Faker\Generator $faker) {
         'vmwVmState' => $faker->randomElement(['powered on', 'powered off', 'suspended']),
     ];
 });
+
+$factory->define(\App\Models\Component::class, function (Faker\Generator $faker) {
+    return [
+        'device_id' => $faker->randomDigit,
+        'type' => $faker->regexify('[A-Za-z0-9]{4,20}'),
+    ];
+});

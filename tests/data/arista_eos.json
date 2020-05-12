@@ -5129,7 +5129,10 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
                     "bgpLocalAs": 65000,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorSubCode": null,
+                    "bgpPeerLastErrorText": null
                 },
                 {
                     "astext": "",
@@ -5148,7 +5151,10 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
                     "bgpLocalAs": 65000,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorSubCode": null,
+                    "bgpPeerLastErrorText": null
                 }
             ],
             "bgpPeers_cbgp": [
@@ -5212,7 +5218,7 @@
                     "bgpPeerAdminStatus": "running",
                     "bgpLocalAddr": "192.168.0.1",
                     "bgpPeerRemoteAddr": "0.0.0.0",
-                    "bgpPeerDescr": "",
+                    "bgpPeerDescr": "peer.example.com EBGP",
                     "bgpPeerInUpdates": 13362513,
                     "bgpPeerOutUpdates": 13579799,
                     "bgpPeerInTotalMessages": 13579799,
@@ -5221,7 +5227,10 @@
                     "bgpPeerInUpdateElapsedTime": 4,
                     "context_name": "",
                     "bgpLocalAs": 65000,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerLastErrorCode": 0,
+                    "bgpPeerLastErrorSubCode": 0,
+                    "bgpPeerLastErrorText":  "Cease/administrative shutdown"
                 },
                 {
                     "astext": "",
@@ -5240,7 +5249,10 @@
                     "bgpPeerInUpdateElapsedTime": 17,
                     "context_name": "",
                     "bgpLocalAs": 65000,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorSubCode": null,
+                    "bgpPeerLastErrorText": null
                 }
             ],
             "bgpPeers_cbgp": [

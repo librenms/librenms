@@ -71,6 +71,7 @@ if ($enabled == 1) {
         $response[$name] = $data;
     }
     $response['php_version'][]     = array('total' => 1, 'version' => $version['php_ver']);
+    $response['python_version'][]      = ['total' => 1, 'version' => $version['python_ver']];
     $response['rrdtool_version'][] = array('total' => 1, 'version' => $version['rrdtool_ver']);
     $response['netsnmp_version'][] = array('total' => 1, 'version' => $version['netsnmp_ver']);
 

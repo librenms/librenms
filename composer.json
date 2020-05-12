@@ -117,9 +117,13 @@
             "@php artisan vue-i18n:generate --multi-locales --format=umd",
             "@php artisan view:cache",
             "@php artisan optimize"
+            "@python-requirements"
         ],
         "post-update-cmd": [
             "Illuminate\\Foundation\\ComposerScripts::postUpdate"
+        ],
+        "python-requirements": [
+            "scripts/check_requirements.py || pip3 install --user -r requirements.txt || :"
         ]
     }
 }

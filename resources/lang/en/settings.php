@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'title' => 'Settings',
     'readonly' => 'Set in config.php, remove from config.php to enable.',
     'groups' => [
         'alerting' => 'Alerting',
@@ -673,6 +674,14 @@ return [
                 'description' => 'Version',
                 'help' => 'This is used to automatically create the base_uri for the Graylog API. If you have modified the API uri from the default, set this to other and specify your base_uri.'
             ]
+        ],
+        'html' => [
+            'device' => [
+                'primary_link' => [
+                    'description' => 'Primary Dropdown Link',
+                    'help' => 'Sets the primary link in the device dropdown menu'
+                ]
+            ],
         ],
         'http_proxy' => [
             'description' => 'HTTP(S) Proxy',
