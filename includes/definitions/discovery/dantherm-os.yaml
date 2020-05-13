@@ -1,0 +1,50 @@
+mib: DANTHERM-COOLING-MIB 
+modules:
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: onBoardTempr 
+                    index: onBoardTempr
+                    num_oid: .1.3.6.1.4.1.46651.1.1.1.{{ $index }}
+                    descr: onBoard Tempr
+                -
+                    oid: roomTempr 
+                    index: roomTempr
+                    num_oid: .1.3.6.1.4.1.46651.1.1.2.{{ $index }}
+                    descr: room Tempr  
+                -
+                    oid: hotSpotTempr 
+                    index: hotSpotTempr
+                    num_oid: .1.3.6.1.4.1.46651.1.1.3.{{ $index }}
+                    descr: hotSpot Tempr
+        fanspeed:
+            data:
+                -
+                    oid: fan1RPM 
+                    index: fan1RPM
+                    num_oid: .1.3.6.1.4.1.46651.1.1.8.{{ $index }}
+                    descr: fan1 RPM
+                -
+                    oid: fan2RPM 
+                    index: fan2RPM
+                    num_oid: .1.3.6.1.4.1.46651.1.1.9.{{ $index }}
+                    descr: fan2 RPM  
+        state:
+            data:
+                -
+                    oid: fan1Status
+                    num_oid: .1.3.6.1.4.1.46651.1.1.18.{{ $index }}
+                    descr: Fan 1 operation status
+                    states:
+                        - { value: 0, descr: Off }
+                        - { value: 1, descr: On }
+                        - { value: 2, descr: Emergency/Boost }
+                -
+                    oid: fan2Status
+                    num_oid: .1.3.6.1.4.1.46651.1.1.19.{{ $index }}
+                    descr: Fan 2 operation status
+                    states:
+                        - { value: 0, descr: Off }
+                        - { value: 1, descr: On }
+                        - { value: 2, descr: Emergency/Boost }
