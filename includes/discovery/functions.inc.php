@@ -1306,13 +1306,13 @@ function add_cbgp_peer($device, $peer, $afi, $safi)
 /**
  * check if we should skip this sensor from discovery
  * @param $device
- * @param string $sensor_type
+ * @param string $sensor_class
  * @param string $sensor_descr
  * @return bool
  */
-function can_skip_sensor($device, $sensor_type = '', $sensor_descr = '')
+function can_skip_sensor($device, $sensor_class = '', $sensor_descr = '')
 {
-    if (! empty($sensor_type) && Config::getCombined($device['os'], "disabled_sensors.$sensor_type", false)) {
+    if (! empty($sensor_class) && Config::getCombined($device['os'], "disabled_sensors.$sensor_class", false)) {
         return true;
     }
     foreach (Config::getCombined($device['os'], "disabled_sensors_regex", []) as $skipRegex) {
