@@ -1,0 +1,9 @@
+os: papouch-quido
+text: 'Papouch QUIDO'
+type: environment
+icon: papouch-tme
+mib_dir:
+    - papouch
+discovery:
+    - sysObjectID:
+        - .0.9.43.6.1.4.1
