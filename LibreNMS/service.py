@@ -3,6 +3,7 @@ import LibreNMS
 import json
 import logging
 import os
+import psutil
 import pymysql
 import subprocess
 import threading
@@ -15,7 +16,7 @@ from logging import debug, info, warning, error, critical, exception
 from platform import python_version
 from time import sleep
 from socket import gethostname
-from signal import signal, SIGTERM, SIGQUIT, SIGINT
+from signal import signal, SIGTERM, SIGQUIT, SIGINT, SIGHUP, SIGCHLD, SIG_DFL
 from uuid import uuid1
 
 
@@ -263,6 +264,7 @@ class Service:
     discovery_manager = None
     last_poll = {}
     terminate_flag = False
+    reload_flag = False
     db_failures = 0
 
     def __init__(self):
@@ -288,6 +290,35 @@ class Service:
         signal(SIGTERM, self.terminate)  # capture sigterm and exit gracefully
         signal(SIGQUIT, self.terminate)  # capture sigquit and exit gracefully
         signal(SIGINT, self.terminate)  # capture sigint and exit gracefully
+        signal(SIGHUP, self.reload)  # capture sighup and restart gracefully
+        signal(SIGCHLD, self.reap)  # capture sigchld and reap the process
+
+
+    def reap(self, signum, stackframe):
+        """
+        A process from a previous invocation is trying to report its status
+        """
+        if (signal(SIGCHLD, SIG_DFL) == SIG_DFL):
+            # signal is already being handled, bail out as this handler is not reentrant
+            # the kernel will re-raise the signal later
+            return
+
+        # Speed things up by only looking at direct children - grandchildren will be reaped by their parent
+        for p in psutil.Process().children(recursive=False):
+            try:
+                cmd = p.cmdline()
+                status = p.status()
+                pid = p.pid
+
+                if status == psutil.STATUS_ZOMBIE:
+                    r = os.waitpid(p.pid, os.WNOHANG)
+                    warning('Reaped long running job "%s" in state %s with PID %d - job returned %d', cmd, status,  r[0], r[1])
+            except (OSError, psutil.NoSuchProcess):
+                # process was already reaped
+                continue
+
+        # Re-arm the signal handler
+        signal(SIGCHLD, self.reap)
 
     def start(self):
         debug("Performing startup checks...")
@@ -332,6 +363,10 @@ class Service:
         # Main dispatcher loop
         try:
             while not self.terminate_flag:
+                if self.reload_flag:
+                    info("Picked up reload flag, calling the reload process")
+                    self.restart()
+
                 master_lock = self._acquire_master()
                 if master_lock:
                     if not self.is_master:
@@ -486,10 +521,17 @@ class Service:
         self._release_master()
 
         python = sys.executable
+        sys.stdout.flush()
         os.execl(python, python, *sys.argv)
 
-        self._stop_managers_and_wait()
-        sys.stdout.flush()
+    def reload(self, signalnum=None, flag=None):
+        """
+        Handle a set the reload flag to begin a clean restart
+        :param _unused:
+        :param _:
+        """
+        info("Received signal on thead %s, handling", threading.current_thread().name)
+        self.reload_flag = True
 
     def terminate(self, signalnum=None, flag=None):
         """
@@ -500,7 +542,7 @@ class Service:
         info("Received signal on thead %s, handling", threading.current_thread().name)
         self.terminate_flag = True
 
-    def shutdown(self, _unused=None, _=None):
+    def shutdown(self, signalnum=None, flag=None):
         """
         Stop and exit, waiting for all child processes to exit.
         :param _unused:
