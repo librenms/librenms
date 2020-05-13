@@ -66,7 +66,7 @@ if (!empty($pre_cache['ups_nut'])) {
     foreach ($sensors as $index => $sensor) {
         $sensor_oid = 9 + $index;
         $oid = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.7.117.112.115.45.110.117.116.'. strval($sensor_oid);
-        $value = $pre_cache['ups_nut']["ups_nut." . $sensor_oid]
+        $value = $pre_cache['ups_nut']["ups_nut." . $sensor_oid];
         
         if (!empty($value) or $value == "0") {
             $state_name = $sensor['state_name'];
