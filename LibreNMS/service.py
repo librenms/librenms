@@ -530,7 +530,7 @@ class Service:
         :param _unused:
         :param _:
         """
-        info("Received signal on thead %s, handling", threading.current_thread().name)
+        info("Received signal on thread %s, handling", threading.current_thread().name)
         self.reload_flag = True
 
     def terminate(self, signalnum=None, flag=None):
@@ -539,7 +539,7 @@ class Service:
         :param _unused:
         :param _:
         """
-        info("Received signal on thead %s, handling", threading.current_thread().name)
+        info("Received signal on thread %s, handling", threading.current_thread().name)
         self.terminate_flag = True
 
     def shutdown(self, signalnum=None, flag=None):
