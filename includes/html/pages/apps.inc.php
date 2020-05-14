@@ -27,6 +27,18 @@ $graphs['memcached'] = array(
     'data',
     'items',
 );
+$graphs['redis'] = array(
+    'clients',
+    'objects',
+    'fragmentation',
+    'usage',
+    'defrag',
+    'keyspace',
+    'sync',
+    'commands',
+    'connections',
+    'net',
+);
 $graphs['nginx']     = array(
     'connections',
     'req',
