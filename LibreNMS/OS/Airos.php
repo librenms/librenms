@@ -26,6 +26,7 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCapacityDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCcqDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
@@ -40,6 +41,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessUtilizationDiscovery;
 use LibreNMS\OS;
 
 class Airos extends OS implements
+    OSDiscovery,
     WirelessCapacityDiscovery,
     WirelessCcqDiscovery,
     WirelessClientsDiscovery,
@@ -52,6 +54,21 @@ class Airos extends OS implements
     WirelessRssiDiscovery,
     WirelessUtilizationDiscovery
 {
+    public function discoverOS(): void
+    {
+        $device = $this->getDeviceModel();
+
+        $oids = ['dot11manufacturerProductName', 'dot11manufacturerProductVersion'];
+        $data = snmp_getnext_multi($this->getDevice(), $oids, '-OQUs', 'IEEE802dot11-MIB');
+
+        $device->hardware = $data['dot11manufacturerProductName'] ?? null;
+
+        if (isset($data['dot11manufacturerProductVersion'])) {
+            preg_match('/\.v(.*)$/', $data['dot11manufacturerProductVersion'], $matches);
+            $device->version = $matches[1] ?? null;
+        }
+    }
+
     /**
      * Discover wireless frequency.  This is in Hz. Type is frequency.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
