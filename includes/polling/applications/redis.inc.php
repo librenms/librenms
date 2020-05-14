@@ -206,4 +206,3 @@ $tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_
 data_update($device, 'app', $tags, $fields);
 
 update_application($app, $output, $metrics);
-
