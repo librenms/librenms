@@ -326,7 +326,7 @@ class Service:
         while True:
             try:
                 # Request the state of the first waiting child - don't block if there aren't any
-                r = os.waitpid(-1, os.WNOHANG)
+                r = os.waitpid(0, os.WNOHANG)
             except OSError:
                 # No more processes
                 break
