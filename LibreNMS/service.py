@@ -3,7 +3,6 @@ import LibreNMS
 import json
 import logging
 import os
-import psutil
 import pymysql
 import subprocess
 import threading
@@ -18,6 +17,11 @@ from time import sleep
 from socket import gethostname
 from signal import signal, SIGTERM, SIGQUIT, SIGINT, SIGHUP, SIGCHLD, SIG_DFL
 from uuid import uuid1
+
+try:
+    import psutil
+except ImportError:
+    print("psutil is not available - this is not a supported configuration and may leak process descriptors")
 
 
 class ServiceConfig:
@@ -264,6 +268,7 @@ class Service:
     poller_manager = None
     discovery_manager = None
     last_poll = {}
+    reap_flag = False
     terminate_flag = False
     reload_flag = False
     db_failures = 0
@@ -298,20 +303,14 @@ class Service:
         signal(SIGHUP, self.reload)  # capture sighup and restart gracefully
         signal(SIGCHLD, self.reap)  # capture sigchld and reap the process
 
-
-    def reap(self, signum, stackframe):
+    def reap_psutil(self):
         """
         A process from a previous invocation is trying to report its status
         """
-        if (signal(SIGCHLD, SIG_DFL) == SIG_DFL):
-            # signal is already being handled, bail out as this handler is not reentrant
-            # the kernel will re-raise the signal later
-            return
-
-        # Speed things up by only looking at direct children - grandchildren will be reaped by their parent
+        # Speed things up by only looking at direct zombie children
         for p in psutil.Process().children(recursive=False):
             try:
-                cmd = p.cmdline()
+                cmd = p.cmdline() # cmdline is uncached, so needs to go here to avoid NoSuchProcess
                 status = p.status()
                 pid = p.pid
 
@@ -322,8 +321,19 @@ class Service:
                 # process was already reaped
                 continue
 
-        # Re-arm the signal handler
-        signal(SIGCHLD, self.reap)
+    def reap_fallback(self):
+        # without psutil we must evaluate every single process
+        while True:
+            try:
+                # Request the state of the first waiting child - don't block if there aren't any
+                r = os.waitpid(-1, os.WNOHANG)
+            except OSError:
+                # No more processes
+                break
+
+            if r[0] > 0:
+                # If PID is <= 0, it means that the return code was likely collected already
+                warning('Reaped long running job, install psutil for detail')
 
     def start(self):
         debug("Performing startup checks...")
@@ -371,6 +381,16 @@ class Service:
                 if self.reload_flag:
                     info("Picked up reload flag, calling the reload process")
                     self.restart()
+
+                if self.reap_flag:
+                    try:
+                        self.reap_psutil()
+                    except NameError:
+                        self.reap_fallback()
+
+                    # Re-arm the signal handler
+                    signal(SIGCHLD, self.reap)
+                    self.reap_flag = False
 
                 master_lock = self._acquire_master()
                 if master_lock:
@@ -434,7 +454,7 @@ class Service:
             result = self._db.query('''SELECT `device_id`,
                   `poller_group`,
                   IF (%s < `last_polled_timetaken` * 1.25, 0, COALESCE(`last_polled` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -%s SECOND), INTERVAL `last_polled_timetaken` SECOND), 1)) AS `poll`,
-                  IF(snmp_disable=1 OR status=0, 0, IF (%s < `last_polled_timetaken` * 1.25, 0, COALESCE(`last_discovered` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -%s SECOND), INTERVAL `last_discovered_timetaken` SECOND), 1))) AS `discover`
+                  IF(snmp_disable=1 OR status=0, 0, IF (%s < `last_discovered_timetaken` * 1.25, 0, COALESCE(`last_discovered` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -%s SECOND), INTERVAL `last_discovered_timetaken` SECOND), 1))) AS `discover`
                 FROM `devices`
                 WHERE `disabled` = 0 AND (
                     `last_polled` IS NULL OR
@@ -442,7 +462,7 @@ class Service:
                     `last_polled` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -%s SECOND), INTERVAL `last_polled_timetaken` SECOND) OR
                     `last_discovered` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -%s SECOND), INTERVAL `last_discovered_timetaken` SECOND)
                 )
-                ORDER BY `last_polled_timetaken` DESC''', (self.service_age(), poller_find_time, discovery_find_time, self.service_age(), poller_find_time, discovery_find_time))
+                ORDER BY `last_polled_timetaken` DESC''', (self.service_age(), poller_find_time, self.service_age(), discovery_find_time, poller_find_time, discovery_find_time))
             self.db_failures = 0
             return result
         except pymysql.err.Error:
@@ -529,11 +549,23 @@ class Service:
         sys.stdout.flush()
         os.execl(python, python, *sys.argv)
 
+    def reap(self, signalnum=None, flag=None):
+        """
+        Handle a set the reload flag to begin a clean restart
+        :param signalnum: UNIX signal number
+        :param flag: Flags accompanying signal
+        """
+        if (signal(SIGCHLD, SIG_DFL) == SIG_DFL):
+            # signal is already being handled, bail out as this handler is not reentrant - the kernel will re-raise the signal later
+            return
+
+        self.reap_flag = True
+
     def reload(self, signalnum=None, flag=None):
         """
         Handle a set the reload flag to begin a clean restart
-        :param _unused:
-        :param _:
+        :param signalnum: UNIX signal number
+        :param flag: Flags accompanying signal
         """
         info("Received signal on thread %s, handling", threading.current_thread().name)
         self.reload_flag = True
@@ -541,8 +573,8 @@ class Service:
     def terminate(self, signalnum=None, flag=None):
         """
         Handle a set the terminate flag to begin a clean shutdown
-        :param _unused:
-        :param _:
+        :param signalnum: UNIX signal number
+        :param flag: Flags accompanying signal
         """
         info("Received signal on thread %s, handling", threading.current_thread().name)
         self.terminate_flag = True
@@ -550,8 +582,8 @@ class Service:
     def shutdown(self, signalnum=None, flag=None):
         """
         Stop and exit, waiting for all child processes to exit.
-        :param _unused:
-        :param _:
+        :param signalnum: UNIX signal number
+        :param flag: Flags accompanying signal
         """
         info('Shutting down, waiting for running jobs to complete...')
 
