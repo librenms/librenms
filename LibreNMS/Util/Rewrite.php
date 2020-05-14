@@ -26,6 +26,7 @@
 namespace LibreNMS\Util;
 
 use App\Models\Device;
+use LibreNMS\Config;
 
 class Rewrite
 {
@@ -207,6 +208,36 @@ class Rewrite
 
         return $device['hardware'];
     }
+
+    public static function location($location)
+    {
+        $location = str_replace(["\n", '"'], '', $location);
+
+        if (is_array(Config::get('location_map_regex'))) {
+            foreach (Config::get('location_map_regex') as $reg => $val) {
+                if (preg_match($reg, $location)) {
+                    $location = $val;
+                    break;
+                }
+            }
+        }
+
+        if (is_array(Config::get('location_map_regex_sub'))) {
+            foreach (Config::get('location_map_regex_sub') as $reg => $val) {
+                if (preg_match($reg, $location)) {
+                    $location = preg_replace($reg, $val, $location);
+                    break;
+                }
+            }
+        }
+
+        if (Config::has("location_map.$location")) {
+            $location = Config::get("location_map.$location");
+        }
+
+        return $location;
+    }
+
 
     public static function vmwareGuest($guest_id)
     {

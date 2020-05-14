@@ -162,12 +162,16 @@ function logfile($string)
  * Detect the os of the given device.
  *
  * @param array $device device to check
+ * @param bool $fetch fetch sysDescr and sysObjectID fresh from the device
  * @return string the name of the os
+ * @throws Exception
  */
-function getHostOS($device)
+function getHostOS($device, $fetch = true)
 {
-    $device['sysDescr']    = snmp_get($device, "SNMPv2-MIB::sysDescr.0", "-Ovq");
-    $device['sysObjectID'] = snmp_get($device, "SNMPv2-MIB::sysObjectID.0", "-Ovqn");
+    if ($fetch) {
+        $device['sysDescr']    = snmp_get($device, "SNMPv2-MIB::sysDescr.0", "-Ovq");
+        $device['sysObjectID'] = snmp_get($device, "SNMPv2-MIB::sysObjectID.0", "-Ovqn");
+    }
 
     d_echo("| {$device['sysDescr']} | {$device['sysObjectID']} | \n");
 

@@ -7,15 +7,15 @@ use Fico7489\Laravel\Pivot\Traits\PivotEventTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Query\JoinClause;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use LibreNMS\DB\Schema;
+use LibreNMS\DB\Eloquent;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv4;
 use LibreNMS\Util\IPv6;
-use LibreNMS\Util\Url;
+use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Time;
+use LibreNMS\Util\Url;
 use Permissions;
 
 class Device extends BaseModel
@@ -24,7 +24,7 @@ class Device extends BaseModel
 
     public $timestamps = false;
     protected $primaryKey = 'device_id';
-    protected $fillable = ['hostname', 'ip', 'status', 'status_reason'];
+    protected $fillable = ['hostname', 'ip', 'status', 'status_reason', 'sysName', 'sysDescr', 'sysObjectID', 'hardware', 'version', 'features', 'serial', 'icon'];
     protected $casts = [
         'last_polled' => 'datetime',
         'status' => 'boolean',
@@ -36,67 +36,9 @@ class Device extends BaseModel
     public static function boot()
     {
         parent::boot();
-        if (Schema::isCurrent()) {
+        if (!app()->runningInConsole()) {
             self::loadAllOs(true);
         }
-
-        static::deleting(function (Device $device) {
-            // delete related data
-            $device->ports()->delete();
-            $device->syslogs()->delete();
-            $device->eventlogs()->delete();
-            $device->applications()->delete();
-
-            // handle device dependency updates
-            $device->children->each->updateMaxDepth($device->device_id);
-        });
-
-        // handle device dependency updates
-        static::updated(function (Device $device) {
-            if ($device->isDirty('max_depth')) {
-                $device->children->each->updateMaxDepth();
-            }
-        });
-
-        static::pivotAttached(function (Device $device, $relationName, $pivotIds, $pivotIdsAttributes) {
-            if ($relationName == 'parents') {
-                // a parent attached to this device
-
-                // update the parent's max depth incase it used to be standalone
-                Device::whereIn('device_id', $pivotIds)->get()->each->validateStandalone();
-
-                // make sure this device's max depth is updated
-                $device->updateMaxDepth();
-            } elseif ($relationName == 'children') {
-                // a child device attached to this device
-
-                // if this device used to be standalone, we need to udpate max depth
-                $device->validateStandalone();
-
-                // make sure the child's max depth is updated
-                Device::whereIn('device_id', $pivotIds)->get()->each->updateMaxDepth();
-            }
-        });
-
-        static::pivotDetached(function (Device $device, $relationName, $pivotIds) {
-            if ($relationName == 'parents') {
-                // this device detached from a parent
-
-                // update this devices max depth
-                $device->updateMaxDepth();
-
-                // parent may now be standalone, update old parent
-                Device::whereIn('device_id', $pivotIds)->get()->each->validateStandalone();
-            } elseif ($relationName == 'children') {
-                // a child device detached from this device
-
-                // update the detached child's max_depth
-                Device::whereIn('device_id', $pivotIds)->get()->each->updateMaxDepth();
-
-                // this device may be standalone, update it
-                $device->validateStandalone();
-            }
-        });
     }
 
     // ---- Helper Functions ----
@@ -262,7 +204,7 @@ class Device extends BaseModel
             \LibreNMS\Config::set('os', array_replace_recursive($os_defs, \LibreNMS\Config::get('os')));
         } else {
             // load from yaml
-            if ($existing) {
+            if ($existing && Eloquent::isConnected()) {
                 $os_list = [];
                 foreach (self::distinct('os')->get('os')->toArray() as $os) {
                     $os_list[] = $install_dir . '/includes/definitions/' . $os['os'] . '.yaml';
@@ -449,6 +391,17 @@ class Device extends BaseModel
     public function getAttribs()
     {
         return $this->attribs->pluck('attrib_value', 'attrib_type')->toArray();
+    }
+
+    public function setLocation($location_text)
+    {
+        $location_text = $location_text ? Rewrite::location($location_text) : null;
+
+        $this->location_id = null;
+        if ($location_text) {
+            $location = Location::firstOrCreate(['location' => $location_text]);
+            $this->location()->associate($location);
+        }
     }
 
     // ---- Accessors/Mutators ----

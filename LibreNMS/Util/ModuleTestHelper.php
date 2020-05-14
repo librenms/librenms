@@ -25,10 +25,12 @@
 
 namespace LibreNMS\Util;
 
+use App\Facades\DeviceCache;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\FileNotFoundException;
 use LibreNMS\Exceptions\InvalidModuleException;
+use LibreNMS\OS;
 use Symfony\Component\Yaml\Yaml;
 
 class ModuleTestHelper
@@ -517,6 +519,7 @@ class ModuleTestHelper
         try {
             Config::set('snmp.community', [$this->file_name]);
             $device_id = addHost($snmpsim->getIp(), 'v2c', $snmpsim->getPort());
+            DeviceCache::setPrimary($device_id);
 
             // disable to block normal pollers
             dbUpdate(['disabled' => 1], 'devices', 'device_id=?', [$device_id]);
