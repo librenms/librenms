@@ -205,4 +205,4 @@ Lab
 | Devices        | 670                 |                     |
 | Ports          | 25678               |                     |
 | Health sensors | 2457                |                     |
-| Load           | 30.4                |                     |
+| Load           | 10.92               |                     |
