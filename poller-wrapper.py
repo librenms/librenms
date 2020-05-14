@@ -308,8 +308,8 @@ if __name__ == '__main__':
         query = "select max(device_id),min(device_id) from devices"
         cursor.execute(query)
         devices = cursor.fetchall()
-        maxlocks = devices[0][0]
-        minlocks = devices[0][1]
+        maxlocks = devices[0][0] or 0
+        minlocks = devices[0][1] or 0
     # EOC3
     db.close()
 
