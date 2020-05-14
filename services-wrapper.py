@@ -345,7 +345,7 @@ if __name__ == '__main__':
         if master == config['distributed_poller_name'] and not IsNode:
             print("Wait for all service-nodes to finish")
             nodes = memc.get("service.nodes")
-            while nodes > 0 and nodes is not None:
+            while nodes is not None and nodes > 0:
                 try:
                     time.sleep(1)
                     nodes = memc.get("service.nodes")
