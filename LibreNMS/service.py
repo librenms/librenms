@@ -259,6 +259,7 @@ class Service:
     config = ServiceConfig()
     _fp = False
     _started = False
+    start_time = 0
     queue_managers = {}
     poller_manager = None
     discovery_manager = None
@@ -268,6 +269,7 @@ class Service:
     db_failures = 0
 
     def __init__(self):
+        self.start_time = time.time()
         self.config.populate()
         self._db = LibreNMS.DB(self.config)
         self.config.load_poller_config(self._db)
@@ -284,6 +286,9 @@ class Service:
         else:
             info("Watchdog is disabled.")
         self.is_master = False
+
+    def service_age(self):
+        return time.time() - self.start_time
 
     def attach_signals(self):
         info("Attaching signal handlers on thread %s", threading.current_thread().name)
@@ -428,8 +433,8 @@ class Service:
 
             result = self._db.query('''SELECT `device_id`,
                   `poller_group`,
-                  COALESCE(`last_polled` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -%s SECOND), INTERVAL `last_polled_timetaken` SECOND), 1) AS `poll`,
-                  IF(snmp_disable=1 OR status=0, 0, COALESCE(`last_discovered` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -%s SECOND), INTERVAL `last_discovered_timetaken` SECOND), 1)) AS `discover`
+                  IF (%s < `last_polled_timetaken` * 1.25, 0, COALESCE(`last_polled` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -%s SECOND), INTERVAL `last_polled_timetaken` SECOND), 1)) AS `poll`,
+                  IF(snmp_disable=1 OR status=0, 0, IF (%s < `last_polled_timetaken` * 1.25, 0, COALESCE(`last_discovered` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -%s SECOND), INTERVAL `last_discovered_timetaken` SECOND), 1))) AS `discover`
                 FROM `devices`
                 WHERE `disabled` = 0 AND (
                     `last_polled` IS NULL OR
@@ -437,7 +442,7 @@ class Service:
                     `last_polled` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -%s SECOND), INTERVAL `last_polled_timetaken` SECOND) OR
                     `last_discovered` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -%s SECOND), INTERVAL `last_discovered_timetaken` SECOND)
                 )
-                ORDER BY `last_polled_timetaken` DESC''', (poller_find_time, discovery_find_time, poller_find_time, discovery_find_time))
+                ORDER BY `last_polled_timetaken` DESC''', (self.service_age(), poller_find_time, discovery_find_time, self.service_age(), poller_find_time, discovery_find_time))
             self.db_failures = 0
             return result
         except pymysql.err.Error:
