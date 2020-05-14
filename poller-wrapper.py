@@ -48,6 +48,9 @@ except ImportError as exc:
 APP_NAME = "poller_wrapper"
 LOG_FILE = "logs/" + APP_NAME + ".log"
 _DEBUG = False
+distpoll = False
+real_duration = 0
+polled_devices = 0
 
 """
  Threading helper functions

@@ -59,6 +59,9 @@ except:
 APP_NAME = "services_wrapper"
 LOG_FILE = "logs/" + APP_NAME + ".log"
 _DEBUG = False
+servicedisco = False
+real_duration = 0
+service_devices = 0
 
 """
  Threading helper functions
