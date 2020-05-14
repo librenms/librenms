@@ -1,0 +1,193 @@
+EATON-OIDS DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, enterprises      FROM SNMPv2-SMI
+    Integer32                         FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION                FROM SNMPv2-TC;
+
+eaton MODULE-IDENTITY
+    LAST-UPDATED "201811130000Z"
+    ORGANIZATION "Eaton Corporation"
+    CONTACT-INFO
+        "Eaton Power Quality Technical Support (PQTS) group
+            www.eaton.com/powerxpert 
+            Technical Resource Center phone numbers 
+            United States:  1.800.843.9433 or 919.870.3028
+            Canada:  1.800.461.9166 ext. 260
+            All other countries:  Call your local service representative." 
+    DESCRIPTION
+            "Assigns major branches from the root of 
+             Eaton's OID tree (534).
+
+            Copyright (C) Exide Electronics 1992-98
+            Copyright (C) Powerware Corporation 1999-2004
+            Copyright (C) Eaton Corporation (2005-)."
+
+    REVISION        "201811130000Z"
+    DESCRIPTION
+            "Added assignments for eatonSensor MIB."
+
+    REVISION        "201402190000Z"
+    DESCRIPTION
+            "Added assignments for stsMIB."
+
+    REVISION        "201001240000Z"
+    DESCRIPTION
+            "Added assignments for eatonEpdu and eatonEpduMa."
+
+    REVISION        "200906180000Z"
+    DESCRIPTION
+            "Added assignments for powerCmnd and OSDCIIMIB."
+    
+
+    REVISION        "200708060000Z"
+    DESCRIPTION
+            "Added assignments for pcdMIB and pxmMIB.
+             Added common Textual Conventions for Integers."
+
+    REVISION        "200707050000Z"
+    DESCRIPTION
+            "Added assignment for eatonEpduMIB.
+             Cleaned up file for public consumption."
+
+    REVISION        "200610150000Z"
+    DESCRIPTION
+            "Added assignments for powerChain and pxgMIB."
+
+    REVISION        "200605250000Z"
+    DESCRIPTION
+            "Revised from the original assignments in XUPS-MIB.txt.
+             Note that enterprises.534. was originally assigned to Exide 
+             Electronics before Powerware was acquired by Eaton."
+
+    ::= { enterprises 534 }
+
+-- EATON-OIDS { iso org(3) dod(6) internet(1) private(4)
+--       enterprises(1) eaton(534) }
+
+                                     
+-- The Powerware "PowerMIB" for UPSs
+xupsMIB         OBJECT IDENTIFIER       ::= {eaton 1}
+-- Define the Environment group here since it is used in the Eaton-EMP-MIB as well
+xupsEnvironment OBJECT IDENTIFIER       ::= {xupsMIB 6}
+
+--
+-- The root of the list of Object Identifiers that are used to 
+-- distinguish Eaton's SNMP agents (for use in sysObjId):
+xupsObjectId     OBJECT IDENTIFIER       ::= {eaton 2}
+    powerwareEthernetSnmpAdapter     OBJECT IDENTIFIER   ::= {xupsObjectId 1}
+    powerwareNetworkSnmpAdapterEther OBJECT IDENTIFIER   ::= {xupsObjectId 2}
+    powerwareNetworkSnmpAdapterToken OBJECT IDENTIFIER   ::= {xupsObjectId 3}
+    onlinetDaemon                    OBJECT IDENTIFIER   ::= {xupsObjectId 4}
+    connectUPSAdapterEthernet        OBJECT IDENTIFIER   ::= {xupsObjectId 5}
+    powerwareNetworkDigitalIOEther   OBJECT IDENTIFIER   ::= {xupsObjectId 6}
+    connectUPSAdapterTokenRing       OBJECT IDENTIFIER   ::= {xupsObjectId 7}
+    simpleSnmpAdapter                OBJECT IDENTIFIER   ::= {xupsObjectId 8}
+    powerwareEliSnmpAdapter          OBJECT IDENTIFIER   ::= {xupsObjectId 9}
+    powerwareBasicEmbeddedEthernet   OBJECT IDENTIFIER   ::= {xupsObjectId  10}
+    eatonPowerChainGateway           OBJECT IDENTIFIER   ::= {xupsObjectId  11}
+    eatonPowerChainDevice            OBJECT IDENTIFIER   ::= {xupsObjectId  12}
+    eatonPowerXpertMeter             OBJECT IDENTIFIER   ::= {xupsObjectId  13}
+
+
+-- Digital IO MIB (deprecated)
+--  File XUPSIOV1.MIB
+xupsIoMIB OBJECT IDENTIFIER    ::= {eaton  3}
+
+-- DataTrax Forseer and Powervision branch
+powerVision OBJECT IDENTIFIER    ::= {eaton  4}
+
+-- orphaned: BEEP (Basic Embedded Ethernet Product) 
+-- File XUPS-BASIC-MIB.txt
+--xupsBasic OBJECT IDENTIFIER ::= {eaton  5}
+
+-- A branch for Powerware Product MIBs
+products OBJECT IDENTIFIER    ::= {eaton  6}
+    -- Product assignments
+
+    pduAgent OBJECT IDENTIFIER    ::= {products  6}
+    -- pduAgent product assignments
+        -- File MIB_hdpdu.mib for HD PDU
+        hdpdu OBJECT IDENTIFIER       ::= {pduAgent  2}
+
+        -- MIB for Eaton PDU, first for 9315's 3-phase PDU
+        -- Defined in EATON-PDU-MIB.txt
+        eatonPdu OBJECT IDENTIFIER ::= {pduAgent  4}
+
+        -- MIB for Eaton Powerware first-generation Managed ePDUs
+        -- Defined in EATON-EPDU-MA-MIB.txt
+        -- eatonEpduMa OBJECT IDENTIFIER ::= {pduAgent  6}
+
+        -- MIB for Eaton Powerware ePDUs
+        -- Defined in EATON-EPDU-MIB.txt
+        -- eatonEpdu OBJECT IDENTIFIER ::= {pduAgent  7}
+
+    sensorAgent OBJECT IDENTIFIER    ::= {products  8}
+    -- sensorAgent product assignments
+        -- MIB for Eaton Sensors
+        -- Defined in EATON-SENSOR-MIB.txt
+        -- eatonSensor OBJECT IDENTIFIER ::= {sensorAgent  1}
+
+
+    dataCenter OBJECT IDENTIFIER    ::= {products  7}
+    -- dataCenter product assignments
+        environmentalMonitor OBJECT IDENTIFIER  ::= {dataCenter 1}
+
+
+-- A branch for Eaton IT Department
+itProjects OBJECT IDENTIFIER    ::= {eaton  7}
+    pki OBJECT IDENTIFIER       ::= {itProjects  1}
+
+-- A branch for PowerChain Product MIBs
+powerChain OBJECT IDENTIFIER    ::= {eaton  8}
+    -- Product assignments
+
+    -- MIB to support Alarms and Events in PowerXpert toolkit-enabled 
+    --   Devices, Gateways, PXMeters
+    -- Defined in file EATON-PXG-MIB.txt
+    -- pxgMIB OBJECT IDENTIFIER    ::= {powerChain  1}
+
+    -- MIB to support common measures in Power Chain Devices
+    -- Defined in file EATON-PCD-MIB.txt
+    -- pcdMIB OBJECT IDENTIFIER    ::= {powerChain  2}
+
+    -- MIB to support power measures in Power Meters
+    -- Defined in file EATON-PWR-MTR-MIB.txt
+    -- pxmMIB OBJECT IDENTIFIER    ::= {powerChain  3}
+
+-- A branch for powercomand commercial control Product MIBs
+powerCmnd OBJECT IDENTIFIER    ::= {eaton  9}
+
+    -- Product assignments
+    -- MIB to support the OSDCII controller
+    -- Defined in file EATON-OSDCII-MIB.txt
+    -- osdcMIB OBJECT IDENTIFIER    ::= {powerCmnd  1}
+
+-- A branch for Eaton STS devices MIBs
+sts OBJECT IDENTIFIER    ::= {eaton  10}
+
+    -- Product assignments
+    -- MIB to support the data in STS devices
+    -- Defined in file Eaton-STS.MIB
+    -- stsMIB OBJECT IDENTIFIER    ::= {ats  1}
+
+-- Define some common Textual Conventions
+-- PositiveInteger and NonNegativeInteger are borrowed from RFC1628
+   PositiveInteger ::= TEXTUAL-CONVENTION
+       DISPLAY-HINT "d"
+       STATUS       current
+       DESCRIPTION
+               "This data type is a non-zero and non-negative value."
+       SYNTAX       Integer32 (1..2147483647)
+
+   NonNegativeInteger ::= TEXTUAL-CONVENTION
+       DISPLAY-HINT "d"
+       STATUS       current
+       DESCRIPTION
+               "This data type is a non-negative value."
+       SYNTAX       Integer32 (0..2147483647)
+
+
+
+    END
+
