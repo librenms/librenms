@@ -45,9 +45,9 @@ $rancid_map['routeros']   = 'mikrotik';
 $rancid_map['screenos']   = 'netscreen';
 $rancid_map['xos']        = 'extreme';
 $rancid_map['ciscosb']    = 'cisco-sb';
-$rancid_map['allied'] 	  = 'at';
-$rancid_map['radlan'] 	  = 'at';
-$rancid_map['ciscowlc']	  = 'cisco-wlc8';
+$rancid_map['allied']     = 'at';
+$rancid_map['radlan']     = 'at';
+$rancid_map['ciscowlc']   = 'cisco-wlc8';
 
 
 foreach (dbFetchRows("SELECT `hostname`,`os`,`disabled`,`status` FROM `devices` WHERE `ignore` = 0 AND `type` != '' GROUP BY `hostname`") as $devices) {
