@@ -51,6 +51,6 @@ script:
   - test -z "$BROWSER_TEST" || php artisan config:clear
   - test -z "$BROWSER_TEST" || php artisan dusk
   - bash -n daily.sh
-  - pylint -E poller-wrapper.py discovery-wrapper.py
+  - pylint -E poller-wrapper.py discovery-wrapper.py services-wrapper.py
   - bash scripts/deploy-docs.sh
   - set +e
