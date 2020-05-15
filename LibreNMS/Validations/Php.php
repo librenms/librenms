@@ -59,8 +59,8 @@ class Php extends BaseValidation
 
         $web_version = PHP_VERSION;
         $cli_version = rtrim(shell_exec('php -r "echo PHP_VERSION;"'));
-        if (version_compare($web_version, $cli_version, '!==')) {
-            $validator->fail("PHP version of your webserver ($web_version) does not match the cli version ($cli_version)", "If you update PHP recently, restart php-fpm or apache to switch to the new version");
+        if (version_compare($web_version, $cli_version, '!=')) {
+            $validator->fail("PHP version of your webserver ($web_version) does not match the cli version ($cli_version)", "If you updated PHP recently, restart php-fpm or apache to switch to the new version");
         }
     }
 
