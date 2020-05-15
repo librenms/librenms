@@ -129,9 +129,10 @@ if (Auth::user()->hasGlobalAdmin()) {
                 echo '</div>';
             }
         }
+    $switches[$item['name']] = $item['timerange'];
     ?>
                     <div class="form-group">
-                        <label for="timerange" class="col-sm-4 control-label">Time range <strong class="text-danger">*</strong>: </label>
+                        <label for="timerange" class="col-sm-3 col-md-2 control-label">Time range <strong class="text-danger">*</strong>: </label>
                         <div class="col-sm-8">
                             <input type="checkbox" id="timerange" name="timerange" data-size="small" data-on-text="Yes" data-off-text="No" onChange="timerange_switch();" value=0 />
                         </div>
@@ -319,6 +320,7 @@ if (Auth::user()->hasGlobalAdmin()) {
             transport_id = $(event.relatedTarget).data("transport_id");
             $("#delete_transport_id").val(transport_id);
         });
+        
         function timerange_switch() {
             if (document.getElementById("timerange").checked){
                 $('#timerangegroup').show();
