@@ -48,6 +48,7 @@ script:
   - php scripts/pre-commit.php -q -l
   - php scripts/pre-commit.php -q -s
   - php scripts/pre-commit.php -u --db --snmpsim --fail-fast
+  - test -z "$BROWSER_TEST" || php artisan config:clear
   - test -z "$BROWSER_TEST" || php artisan dusk
   - bash -n daily.sh
   - pylint -E poller-wrapper.py discovery-wrapper.py

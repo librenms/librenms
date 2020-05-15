@@ -115,6 +115,8 @@
             "LibreNMS\\ComposerHelper::postInstall",
             "Illuminate\\Foundation\\ComposerScripts::postInstall",
             "@php artisan vue-i18n:generate --multi-locales --format=umd",
+            "@php artisan view:cache",
+            "@php artisan optimize",
             "@python-requirements"
         ],
         "post-update-cmd": [
