@@ -1369,6 +1369,10 @@ function find_device_id($name = '', $ip = '', $mac_address = '')
         if ($mydomain = Config::get('mydomain')) {
             $where[] = '`hostname`=?';
             $params[] = "$name.$mydomain";
+
+            $where[] = 'concat(`hostname`, \'.\', ?) =?';
+            $params[] = "$mydomain";
+            $params[] = "$name";
         }
     }
 
