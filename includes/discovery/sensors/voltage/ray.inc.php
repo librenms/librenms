@@ -16,7 +16,7 @@ $oid = ".1.3.6.1.4.1.33555.1.1.4.3";
 
 $output = snmp_get($device, $oid, "-Ovqe", 'RAY-MIB');
 if ($output == false) {
-$oid = $oid.".0";
+    $oid = $oid.".0";
 }
 
 $index = 0;

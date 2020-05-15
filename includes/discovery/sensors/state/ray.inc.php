@@ -7,7 +7,7 @@ echo 'RAy Racom State';
 $state = snmp_get($device, "systemStatus", "-Ovqe", 'RAY-MIB');
 
 if ($state == false) {
-$state = snmp_get($device, "systemStatus.0", "-Ovqe", 'RAY-MIB');
+    $state = snmp_get($device, "systemStatus.0", "-Ovqe", 'RAY-MIB');
 }
 
 if ($state) {
@@ -50,7 +50,7 @@ if ($state) {
 // Line Status (Value : na (0) unknown, ok (1) ok, analyzer (2) analyzer, connecting (3) connecting, searching (4)). Supported by RAy10 only.
 $state = snmp_get($device, "lineStatus", "-Ovqe", 'RAY-MIB');
 if ($state == false) {
-$state = snmp_get($device, "lineStatus.0", "-Ovqe", 'RAY-MIB');
+    $state = snmp_get($device, "lineStatus.0", "-Ovqe", 'RAY-MIB');
 }
 
 if ($state) {
@@ -94,7 +94,7 @@ if ($state) {
 // RF Power Status (Value : na (0) unknown, ok (1) ok, fail (2) fail)
 $state = snmp_get($device, "rfPowerStatus", "-Ovqe", 'RAY-MIB');
 if ($state == false) {
-$state = snmp_get($device, "rfPowerStatus.0", "-Ovqe", 'RAY-MIB');
+    $state = snmp_get($device, "rfPowerStatus.0", "-Ovqe", 'RAY-MIB');
 }
 
 
@@ -137,7 +137,7 @@ if ($state) {
 // Peer station user Ethernet link Status (Value : na (0) unknown, up (1) up, down (2) down) Not supported by RAy2.
 $state = snmp_get($device, "ethPeer", "-Ovqe", 'RAY-MIB');
 if ($state == false) {
-$state = snmp_get($device, "ethPeer.0", "-Ovqe", 'RAY-MIB');
+    $state = snmp_get($device, "ethPeer.0", "-Ovqe", 'RAY-MIB');
 }
 
 if ($state) {
