@@ -7,5 +7,5 @@ $version = trim(snmp_get($device, 'upsmgIdentFirmwareVersion.0', '-OQv', 'MG-SNM
 
 $hardware  = trim(snmp_get($device, 'upsmgIdentFamilyName.0', '-OQv', 'MG-SNMP-UPS-MIB'), '" ');
 $hardware .= ' '.trim(snmp_get($device, 'upsmgIdentModelName.0', '-OQv', 'MG-SNMP-UPS-MIB'), '" ');
-
+$features = trim(snmp_get($device, 'upsIdentAgentSoftwareVersion.0', '-OQv', 'UPS-MIB'), '" ');
 $serial = trim(snmp_get($device, 'upsmgIdentSerialNumber.0', '-OQv', 'MG-SNMP-UPS-MIB'), '" ');
