@@ -148,7 +148,7 @@ class OSModulesTest extends DBTestCase
 
     public function dumpedDataProvider()
     {
-        $modules = array();
+        $modules = [];
 
         if (getenv('TEST_MODULES')) {
             $modules = explode(',', getenv('TEST_MODULES'));
