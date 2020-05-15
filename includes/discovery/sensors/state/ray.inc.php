@@ -4,14 +4,10 @@ echo 'RAy Racom State';
 
 
 // System Status (Value : na (0) unknown, ok (1) ok, warning (2) warning, alarm (3) alarm)
-$state = snmp_get($device, "systemStatus.0", "-Ovqe", 'RAY-MIB');
+$state = snmp_get($device, "systemStatus", "-Ovqe", 'RAY-MIB');
 
-$cmd = gen_snmpget_cmd($device, '.1.3.6.1.4.1.33555.1.1.3.1', '-Oqv', 'RAY-MIB', 'ray');
-$data = trim(external_exec($cmd), "\" \n\r");
-if (!preg_match('/(No Such Instance)/i', $data)) {
-    $index='';
-} else {
-    $index='.0';
+if ($state == false) {
+$state = snmp_get($device, "systemStatus.0", "-Ovqe", 'RAY-MIB');
 }
 
 if ($state) {
@@ -32,7 +28,7 @@ if ($state) {
         $valid['sensor'],
         'state',
         $device,
-        '.1.3.6.1.4.1.33555.1.1.3.1'."$index",
+        '.1.3.6.1.4.1.33555.1.1.3.1',
         $sensor_index,
         $state_name,
         'System Status',
@@ -52,14 +48,9 @@ if ($state) {
 }
 
 // Line Status (Value : na (0) unknown, ok (1) ok, analyzer (2) analyzer, connecting (3) connecting, searching (4)). Supported by RAy10 only.
+$state = snmp_get($device, "lineStatus", "-Ovqe", 'RAY-MIB');
+if ($state == false) {
 $state = snmp_get($device, "lineStatus.0", "-Ovqe", 'RAY-MIB');
-
-$cmd = gen_snmpget_cmd($device, '.1.3.6.1.4.1.33555.1.1.3.2', '-Oqv', 'RAY-MIB', 'ray');
-$data = trim(external_exec($cmd), "\" \n\r");
-if (!preg_match('/(No Such Instance)/i', $data)) {
-    $index='';
-} else {
-    $index='.0';
 }
 
 if ($state) {
@@ -81,7 +72,7 @@ if ($state) {
         $valid['sensor'],
         'state',
         $device,
-        '.1.3.6.1.4.1.33555.1.1.3.2'."$index",
+        '.1.3.6.1.4.1.33555.1.1.3.2',
         $sensor_index,
         $state_name,
         'Radio Link Status',
@@ -101,15 +92,11 @@ if ($state) {
 }
 
 // RF Power Status (Value : na (0) unknown, ok (1) ok, fail (2) fail)
+$state = snmp_get($device, "rfPowerStatus", "-Ovqe", 'RAY-MIB');
+if ($state == false) {
 $state = snmp_get($device, "rfPowerStatus.0", "-Ovqe", 'RAY-MIB');
-
-$cmd = gen_snmpget_cmd($device, '.1.3.6.1.4.1.33555.1.1.3.4', '-Oqv', 'RAY-MIB', 'ray');
-$data = trim(external_exec($cmd), "\" \n\r");
-if (!preg_match('/(No Such Instance)/i', $data)) {
-    $index='';
-} else {
-    $index='.0';
 }
+
 
 if ($state) {
     //Create State Index
@@ -148,14 +135,9 @@ if ($state) {
 }
 
 // Peer station user Ethernet link Status (Value : na (0) unknown, up (1) up, down (2) down) Not supported by RAy2.
+$state = snmp_get($device, "ethPeer", "-Ovqe", 'RAY-MIB');
+if ($state == false) {
 $state = snmp_get($device, "ethPeer.0", "-Ovqe", 'RAY-MIB');
-
-$cmd = gen_snmpget_cmd($device, '.1.3.6.1.4.1.33555.1.1.3.6', '-Oqv', 'RAY-MIB', 'ray');
-$data = trim(external_exec($cmd), "\" \n\r");
-if (!preg_match('/(No Such Instance)/i', $data)) {
-    $index='';
-} else {
-    $index='.0';
 }
 
 if ($state) {

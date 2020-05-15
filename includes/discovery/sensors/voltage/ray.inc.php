@@ -14,12 +14,9 @@
 d_echo('RAY');
 $oid = ".1.3.6.1.4.1.33555.1.1.4.3";
 
-$cmd = gen_snmpget_cmd($device, $oid, '-Oqv', 'RAY-MIB', 'ray');
-$data = trim(external_exec($cmd), "\" \n\r");
-if (!preg_match('/(No Such Instance)/i', $data)) {
-    $oid='.1.3.6.1.4.1.33555.1.1.4.3';
-} else {
-    $oid='.1.3.6.1.4.1.33555.1.1.4.3.0';
+$output = snmp_get($device, $oid, "-Ovqe", 'RAY-MIB');
+if ($output == false) {
+$oid = $oid.".0";
 }
 
 $index = 0;
