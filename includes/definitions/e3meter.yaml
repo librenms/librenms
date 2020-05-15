@@ -6,6 +6,8 @@ mib_dir:
     - riedo
 over:
     - { graph: device_power, text: Power }
+    - { graph: device_voltage, text: Voltage }
+    - { graph: device_frequency, text: Frequency }
     - { graph: device_temperature, text: Temperature }
 discovery:
     -
