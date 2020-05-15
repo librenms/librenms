@@ -129,7 +129,6 @@ if (Auth::user()->hasGlobalAdmin()) {
                 echo '</div>';
             }
         }
-    $switches[$item['name']] = $item['timerange'];
     ?>
                     <div class="form-group">
                         <label for="timerange" class="col-sm-3 col-md-2 control-label">Time range <strong class="text-danger">*</strong>: </label>
@@ -313,14 +312,13 @@ if (Auth::user()->hasGlobalAdmin()) {
             }
         });
 
-        // Scripts related to deleting an alert transport
-
+        // Scripts related to deleting an alert transpor
         // Populate transport id value
         $("#delete-alert-transport").on("show.bs.modal", function(event) {
             transport_id = $(event.relatedTarget).data("transport_id");
             $("#delete_transport_id").val(transport_id);
         });
-        
+
         function timerange_switch() {
             if (document.getElementById("timerange").checked){
                 $('#timerangegroup').show();
@@ -330,6 +328,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                 $('#timerange').val(0);
             }
         };
+
         // Delete the alert transport
         $("#remove-alert-transport").click('', function(event) {
             event.preventDefault();
@@ -353,7 +352,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                 }
             });
         });
-
+    $("[name='timerange']").bootstrapSwitch();
     </script>
 
     <?php
