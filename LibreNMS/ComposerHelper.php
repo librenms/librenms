@@ -151,6 +151,7 @@ class ComposerHelper
         // only write if the content has changed
         if ($content !== $original_content) {
             file_put_contents($file, $content);
+            self::exec('php artisan clear:config');
         }
     }
 
