@@ -127,7 +127,7 @@ def get_config_data(install_dir):
         print("ERROR: Could not execute: %s" % config_cmd)
         print(e)
         sys.exit(2)
-    return proc.communicate()[0]
+    return proc.communicate()[0].decode()
 
 # Database functions #######################################################
 
