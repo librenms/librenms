@@ -88,7 +88,7 @@ class Prometheus extends BaseDatastore
 
             foreach ($tags as $t => $v) {
                 if ($v !== null) {
-                    Str::contains($v, "/") ? $promtags .= "/$t@base64/". base64_encode($v) : $promtags .= "/$t/$v";
+                     $promtags .= (Str::contains($v, "/") ? "/$t@base64/". base64_encode($v) : "/$t/$v");
                 }
             }
             $options = $this->getDefaultOptions();
