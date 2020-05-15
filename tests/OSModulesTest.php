@@ -113,34 +113,37 @@ class OSModulesTest extends DBTestCase
         $debug = in_array('--debug', $_SERVER['argv'], true);
 
         foreach ($modules as $module) {
+            // Discovery
             $expected = $expected_data[$module]['discovery'];
             $actual = $results[$module]['discovery'];
-            $this->assertEquals(
-                $expected,
-                $actual,
-                "OS $os: Discovered $module data does not match that found in $filename\n"
-                . print_r(array_diff($expected, $actual), true)
-                . $helper->getDiscoveryOutput($debug ? null : $module)
-                . "\nOS $os: Discovered $module data does not match that found in $filename"
-            );
 
-            if ($expected_data[$module]['poller'] == 'matches discovery') {
-                $expected = $expected_data[$module]['discovery'];
-            } else {
+            foreach (array_merge(array_keys($expected), array_keys($actual)) as $table) {
+                $this->assertModuleTableSame('discovery', $module, $table, $expected, $actual);
+            }
+
+            // Poller
+            if ($expected_data[$module]['poller'] !== 'matches discovery') {
                 $expected = $expected_data[$module]['poller'];
             }
             $actual = $results[$module]['poller'];
-            $this->assertEquals(
-                $expected,
-                $actual,
-                "OS $os: Polled $module data does not match that found in $filename\n"
-                . print_r(array_diff($expected, $actual), true)
-                . $helper->getPollerOutput($debug ? null : $module)
-                . "\nOS $os: Polled $module data does not match that found in $filename"
-            );
+            foreach (array_merge(array_keys($expected), array_keys($actual)) as $table) {
+                $this->assertModuleTableSame('poller', $module, $table, $expected, $actual);
+            }
         }
 
         DeviceCache::flush(); // clear cached devices
+    }
+
+    private function assertModuleTableSame($process, $module, $table, $expected, $actual)
+    {
+        $this->assertArrayHasKey($table, $expected, "\e[0;31mUnexpected $module $process data in table $table: \e[0m\n" . json_encode($actual[$table], JSON_PRETTY_PRINT));
+        $this->assertArrayHasKey($table, $actual, "\e[0;31mMissing $module $process data in table $table, expected: \e[0m\n" . json_encode($expected[$table], JSON_PRETTY_PRINT));
+
+        $expectedCount = count($expected[$table]);
+        $actualCount = count($actual[$table]);
+        $message = $expectedCount < $actualCount ? "More" : "Less";
+        $this->assertCount($expectedCount, $actual[$table], "\e[0;31m$message records than expected for $module $process in table $table\e[0m");
+        $this->assertEquals($expected[$table], $actual[$table]);
     }
 
     public function dumpedDataProvider()
