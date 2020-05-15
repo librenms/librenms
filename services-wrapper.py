@@ -50,9 +50,10 @@ try:
     import time
     from optparse import OptionParser
 
-except:
-    print("ERROR: missing one or more of the following python modules:")
-    print("threading, queue, sys, subprocess, time, os, json")
+except ImportError as exc:
+    print('ERROR: missing one or more of the following python modules:')
+    print('threading, queue, sys, subprocess, time, os, json')
+    print('ERROR: %s' % exc)
     sys.exit(2)
 
 
