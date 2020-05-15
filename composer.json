@@ -117,6 +117,7 @@
             "@php artisan vue-i18n:generate --multi-locales --format=umd",
             "@php artisan view:cache",
             "@php artisan optimize",
+            "@php artisan config:clear",
             "@python-requirements"
         ],
         "post-update-cmd": [
