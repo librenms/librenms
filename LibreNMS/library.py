@@ -123,11 +123,11 @@ def get_config_data(install_dir):
     config_cmd = ['/usr/bin/env', 'php', '%s/config_to_json.php' % install_dir]
     try:
         proc = subprocess.Popen(config_cmd, stdout=subprocess.PIPE, stdin=subprocess.PIPE)
+        return proc.communicate()[0].decode()
     except Exception as e:
         print("ERROR: Could not execute: %s" % config_cmd)
         print(e)
         sys.exit(2)
-    return proc.communicate()[0]
 
 # Database functions #######################################################
 
