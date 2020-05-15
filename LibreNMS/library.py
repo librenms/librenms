@@ -117,65 +117,17 @@ def check_for_file(file):
         sys.exit(2)
 
 
-def command_runner(command, valid_exit_codes=None, timeout=30, shell=False, decoder='utf-8'):
-    """
-    command_runner 2019103101
-    Whenever we can, we need to avoid shell=True in order to preseve better security
-    Runs system command, returns exit code and stdout/stderr output, and logs output on error
-    valid_exit_codes is a list of codes that don't trigger an error
-    """
-
-    try:
-        # universal_newlines=True makes netstat command fail under windows
-        # timeout does not work under Python 2.7 with subprocess32 < 3.5
-        # decoder may be unicode_escape for dos commands or utf-8 for powershell
-        if sys.version_info >= (3, 0):
-            output = subprocess.check_output(command, stderr=subprocess.STDOUT, shell=shell,
-                                             timeout=timeout, universal_newlines=False)
-        else:
-            output = subprocess.check_output(command, stderr=subprocess.STDOUT, shell=shell,
-                                             universal_newlines=False)
-        output = output.decode(decoder, errors='ignore')
-    except subprocess.CalledProcessError as exc:
-        exit_code = exc.returncode
-        try:
-            output = exc.output
-            try:
-                output = output.decode(decoder, errors='ignore')
-            except Exception as subexc:
-                logger.debug(subexc, exc_info=True)
-                logger.debug('Cannot properly decode error. Text is %s' % output)
-        except Exception:
-            output = "command_runner: Could not obtain output from command."
-        if exit_code in valid_exit_codes if valid_exit_codes is not None else [0]:
-            logger.debug('Command [%s] returned with exit code [%s]. Command output was:' % (command, exit_code))
-            if output:
-                logger.debug(output)
-            return exc.returncode, output
-        else:
-            logger.error('Command [%s] failed with exit code [%s]. Command output was:' %
-                         (command, exc.returncode))
-            logger.error(output)
-            return exc.returncode, output
-    # OSError if not a valid executable
-    except OSError as exc:
-        logger.error('Command [%s] returned:\n%s.' % (command, exc))
-        return None, exc
-    except subprocess.TimeoutExpired:
-        logger.error('Timeout [%s seconds] expired for command [%s] execution.' % (timeout, command))
-        return None, 'Timeout of %s seconds expired.' % timeout
-    else:
-        logger.debug('Command [%s] returned with exit code [0]. Command output was:' % command)
-        #if output:
-        #    logger.debug(output)
-        return 0, output
-
-
 # Config functions #########################################################
 
 def get_config_data(install_dir):
-    _, conf = command_runner(['/usr/bin/env', 'php', '%s/config_to_json.php' % install_dir])
-    return conf
+    config_cmd = ['/usr/bin/env', 'php', '%s/config_to_json.php' % install_dir]
+    try:
+        proc = subprocess.Popen(config_cmd, stdout=subprocess.PIPE, stdin=subprocess.PIPE)
+    except Exception as e:
+        print("ERROR: Could not execute: %s" % config_cmd)
+        print(e)
+        sys.exit(2)
+    return proc.communicate()[0]
 
 # Database functions #######################################################
 
