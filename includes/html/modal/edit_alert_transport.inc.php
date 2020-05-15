@@ -129,6 +129,52 @@ if (Auth::user()->hasGlobalAdmin()) {
                 echo '</div>';
             }
         }
+    ?>
+                    <div id="recurringgroup" style="display:none;">
+                        <div class="form-group">
+                            <label for="start_recurring_dt" class="col-sm-4 control-label">Start date <exp>*</exp>: </label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control date" id="start_recurring_dt" name="start_recurring_dt" value="" data-date-format="YYYY-MM-DD">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="end_recurring_dt" class="col-sm-4 control-label">End date: </label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control date" id="end_recurring_dt" name="end_recurring_dt" value="" data-date-format="YYYY-MM-DD">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="start_recurring_hr" class="col-sm-4 control-label">Start hour <exp>*</exp>: </label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control date" id="start_recurring_hr" name="start_recurring_hr" value="" data-date-format="HH:mm">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="end_recurring_hr" class="col-sm-4 control-label">End hour <exp>*</exp>: </label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control date" id="end_recurring_hr" name="end_recurring_hr" value="" data-date-format="HH:mm">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="recurring_day" class="col-sm-4 control-label">Only on weekday: </label>
+                            <div class="col-sm-8">
+                                <div style="float: left;"><label><input type="checkbox" style="width: 20px;" class="form-control" id="recurring_day" name="recurring_day[]" value="1" />Mo</label></div>
+                                <div style="float: left;padding-left: 20px;"><label><input type="checkbox" style="width: 20px;" class="form-control" id="recurring_day" name="recurring_day[]" value="2" />Tu</label></div>
+                                <div style="float: left;padding-left: 20px;"><label><input type="checkbox" style="width: 20px;" class="form-control" id="recurring_day" name="recurring_day[]" value="3" />We</label></div>
+                                <div style="float: left;padding-left: 20px;"><label><input type="checkbox" style="width: 20px;" class="form-control" id="recurring_day" name="recurring_day[]" value="4" />Th</label></div>
+                                <div style="float: left;padding-left: 20px;"><label><input type="checkbox" style="width: 20px;" class="form-control" id="recurring_day" name="recurring_day[]" value="5" />Fr</label></div>
+                                <div style="float: left;padding-left: 20px;"><label><input type="checkbox" style="width: 20px;" class="form-control" id="recurring_day" name="recurring_day[]" value="6" />Sa</label></div>
+                                <div style="float: left;padding-left: 20px;"><label><input type="checkbox" style="width: 20px;" class="form-control" id="recurring_day" name="recurring_day[]" value="0" />Su</label></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                         <label for='maps' class='col-sm-4 control-label'>Map To <exp>*</exp>: </label>
+                        <div class="col-sm-8">
+                            <select id="maps" name="maps[]" class="form-control" multiple="multiple"></select>
+                        </div>
+                    </div>
+    <?php
         echo '<div class="form-group">';
         echo '<div class="col-sm-12 text-center">';
         echo '<button type="button" class="btn btn-success btn-save" name="save-transport">';
