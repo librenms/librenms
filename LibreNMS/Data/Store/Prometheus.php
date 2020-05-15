@@ -30,6 +30,7 @@ use GuzzleHttp\Exception\GuzzleException;
 use LibreNMS\Config;
 use LibreNMS\Data\Measure\Measurement;
 use Log;
+use Illuminate\Support\Str;
 
 class Prometheus extends BaseDatastore
 {
@@ -87,7 +88,7 @@ class Prometheus extends BaseDatastore
 
             foreach ($tags as $t => $v) {
                 if ($v !== null) {
-                    $promtags .= "/$t/$v";
+                    $promtags .= (Str::contains($v, "/") ? "/$t@base64/". base64_encode($v) : "/$t/$v");
                 }
             }
             $options = $this->getDefaultOptions();
