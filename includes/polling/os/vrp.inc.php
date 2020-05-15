@@ -38,6 +38,19 @@ if (empty($hardware_tmp) && !empty($matches[1])) {
     $hardware = "Huawei " . trim($matches[1]);
 }
 
+// Serial
+
+
+$oidList = [
+    'ENTITY-MIB::entPhysicalSerialNum.9',
+];
+foreach ($oidList as $oid) {
+    $serial = snmp_get($device, $oid, '-OQv');
+    if (!empty($serial)) {
+        break;
+    }
+}
+
 // Polling the Wireless data
 
 use LibreNMS\RRD\RrdDefinition;
