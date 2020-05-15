@@ -130,11 +130,14 @@ modules:
                             oid: hw3GDeviceSerialNumber
                             op: '='
                             value: ''
+        runtime:
+            data:
                 -
                     oid: hw3GTable
                     value: hw3GUpTime
                     num_oid: '.1.3.6.1.4.1.2011.5.25.241.1.2.1.1.55.{{ $index }}'
-                    descr: 'Uptime (seconds)'
+                    descr: 'Uptime'
+                    divisor: 6000
                     index: '3guptime-{{ $index }}'
                     group: 'Modem {{ $hw3GDeviceNumber }}, {{ $hw3GDeviceSerialNumber }}'
                     skip_values:
@@ -376,7 +379,6 @@ modules:
                      descr: 'Current Network'
                      group: 'Modem {{ $hw3GDeviceNumber }}, {{ $hw3GDeviceSerialNumber }}'
                      state_name: hw3GCurrentNetworkConnection
-                     userfunc: strlen
                      states:
                          - { descr: '3G', graph: 1, value: 2, generic: 0 }
                          - { descr: 'LTE', graph: 1, value: 3, generic: 0 }

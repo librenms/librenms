@@ -21,6 +21,7 @@ $oidList = [
     'HUAWEI-DEVICE-EXT-MIB::hwProductName.0',
     'HUAWEI-MIB::hwDatacomm.183.1.25.1.5.1',
     'HUAWEI-MIB::mlsr.20.1.1.1.3.0',
+    'HUAWEI-ENTITY-EXTENT-MIB::hwEntityBoardName.9',
 ];
 
 foreach ($oidList as $oid) {
