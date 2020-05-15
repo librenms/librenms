@@ -426,20 +426,6 @@ function poll_device($device, $force_module = false)
     return false; // device not polled
 }//end poll_device()
 
-function get_main_serial($device)
-{
-    if ($device['os_group'] == 'cisco') {
-        $serial_output = snmp_get_multi($device, ['entPhysicalSerialNum.1', 'entPhysicalSerialNum.1001'], '-OQUs', 'ENTITY-MIB:OLD-CISCO-CHASSIS-MIB');
-        if (!empty($serial_output[1]['entPhysicalSerialNum'])) {
-            return $serial_output[1]['entPhysicalSerialNum'];
-        } elseif (!empty($serial_output[1000]['entPhysicalSerialNum'])) {
-            return $serial_output[1000]['entPhysicalSerialNum'];
-        } elseif (!empty($serial_output[1001]['entPhysicalSerialNum'])) {
-            return $serial_output[1001]['entPhysicalSerialNum'];
-        }
-    }
-}//end get_main_serial()
-
 /**
  * Update the application status and output in the database.
  *

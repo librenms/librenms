@@ -28,13 +28,78 @@ namespace LibreNMS\OS\Shared;
 
 use App\Models\PortsNac;
 use LibreNMS\Device\Processor;
+use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Polling\NacPolling;
 use LibreNMS\OS;
+use LibreNMS\OS\Ios;
 use LibreNMS\Util\IP;
 
-class Cisco extends OS implements ProcessorDiscovery, NacPolling
+class Cisco extends OS implements OSDiscovery, ProcessorDiscovery, NacPolling
 {
+    public function discoverOS(): void
+    {
+        $device = $this->getDeviceModel();
+        $device->serial = $this->getMainSerial();
+        $hardware = null;
+
+        if (preg_match('/^Cisco IOS Software, .+? Software \([^\-]+-([^\-]+)-\w\),.+?Version ([^, ]+)/', $device->sysDescr, $regexp_result)) {
+            $device->features = $regexp_result[1];
+            $device->version = $regexp_result[2];
+        } elseif (preg_match('/Cisco Internetwork Operating System Software\s+IOS \(tm\) [^ ]+ Software \([^\-]+-([^\-]+)-\w\),.+?Version ([^, ]+)/', $device->sysDescr, $regexp_result)) {
+            $device->features = $regexp_result[1];
+            $device->version = $regexp_result[2];
+        } elseif (preg_match('/^Cisco IOS Software \[([^\]]+)\],.+Software \(([^\)]+)\), Version ([^, ]+)/', $device->sysDescr, $regexp_result)) {
+            $device->features = $regexp_result[1];
+            $device->version = $regexp_result[2] . " " . $regexp_result[3];
+        } elseif (preg_match('/^Cisco IOS Software.*?, .+? Software(\, )?([\s\w\d]+)? \([^\-]+-([\w\d]+)-\w\), Version ([^,]+)/', $device->sysDescr, $regexp_result)) {
+            $device->features = $regexp_result[3];
+            $device->version  = $regexp_result[4];
+            $hardware = $regexp_result[2];
+            $tmp = preg_split("/\\r\\n|\\r|\\n/", $device->version);
+            if (!empty($tmp[0])) {
+                $device->version = $tmp[0];
+            }
+        }
+
+        $oids = [
+            'entPhysicalModelName.1',
+            'entPhysicalContainedIn.1',
+            'entPhysicalName.1',
+            'entPhysicalSoftwareRev.1',
+            'entPhysicalModelName.1000',
+            'entPhysicalModelName.1001',
+            'entPhysicalContainedIn.1000',
+            'entPhysicalContainedIn.1001',
+        ];
+
+        $data = snmp_get_multi($this->getDevice(), $oids, '-OQUs', 'ENTITY-MIB:OLD-CISCO-CHASSIS-MIB');
+
+        if (isset($data[1]['entPhysicalContainedIn']) && $data[1]['entPhysicalContainedIn'] == '0') {
+            if (!empty($data[1]['entPhysicalSoftwareRev'])) {
+                $device->version = $data[1]['entPhysicalSoftwareRev'];
+            }
+            if (!empty($data[1]['entPhysicalName'])) {
+                $hardware = $data[1]['entPhysicalName'];
+            }
+            if (!empty($data[1]['entPhysicalModelName'])) {
+                $hardware = $data[1]['entPhysicalModelName'];
+            }
+        }
+
+        if (empty($hardware) && !empty($data[1000]['entPhysicalModelName'])) {
+            $hardware = $data[1000]['entPhysicalModelName'];
+        } elseif (empty($hardware) && !empty($data[1000]['entPhysicalContainedIn'])) {
+            $hardware = $data[$data[1000]['entPhysicalContainedIn']]['entPhysicalName'];
+        } elseif ((preg_match('/stack/i', $hardware) || empty($hardware)) && !empty($data[1001]['entPhysicalModelName'])) {
+            $hardware = $data[1001]['entPhysicalModelName'];
+        } elseif (empty($hardware) && !empty($data[1001]['entPhysicalContainedIn'])) {
+            $hardware = $data[$data[1001]['entPhysicalContainedIn']]['entPhysicalName'];
+        }
+
+        $device->hardware = $hardware ?: snmp_translate($device->sysObjectID, 'SNMPv2-MIB:CISCO-PRODUCTS-MIB', 'cisco');
+    }
+
     /**
      * Discover processors.
      * Returns an array of LibreNMS\Device\Processor objects that have been discovered
@@ -44,15 +109,15 @@ class Cisco extends OS implements ProcessorDiscovery, NacPolling
     public function discoverProcessors()
     {
         $processors_data = snmpwalk_group($this->getDevice(), 'cpmCPU', 'CISCO-PROCESS-MIB');
-        $processors = array();
+        $processors = [];
 
         foreach ($processors_data as $index => $entry) {
             if (is_numeric($entry['cpmCPUTotal5minRev'])) {
-                $usage_oid = '.1.3.6.1.4.1.9.9.109.1.1.1.1.8.'.$index;
-                $usage     = $entry['cpmCPUTotal5minRev'];
+                $usage_oid = '.1.3.6.1.4.1.9.9.109.1.1.1.1.8.' . $index;
+                $usage = $entry['cpmCPUTotal5minRev'];
             } elseif (is_numeric($entry['cpmCPUTotal5min'])) {
-                $usage_oid = '.1.3.6.1.4.1.9.9.109.1.1.1.1.5.'.$index;
-                $usage     = $entry['cpmCPUTotal5min'];
+                $usage_oid = '.1.3.6.1.4.1.9.9.109.1.1.1.1.5.' . $index;
+                $usage = $entry['cpmCPUTotal5min'];
             } else {
                 continue; // skip bad data
             }
@@ -66,7 +131,7 @@ class Cisco extends OS implements ProcessorDiscovery, NacPolling
                 }
 
                 if (empty($descr)) {
-                    $descr = snmp_get($this->getDevice(), 'entPhysicalName.'.$entPhysicalIndex, '-Oqv', 'ENTITY-MIB');
+                    $descr = snmp_get($this->getDevice(), 'entPhysicalName.' . $entPhysicalIndex, '-Oqv', 'ENTITY-MIB');
                 }
             }
 
@@ -132,7 +197,7 @@ class Cisco extends OS implements ProcessorDiscovery, NacPolling
                     $qfp_descr = $entPhysicalName_array[$entQfpPhysicalIndex];
                 }
                 if (empty($qfp_descr)) {
-                    $qfp_descr = snmp_get($this->getDevice(), 'entPhysicalName.'.$entQfpPhysicalIndex, '-Oqv', 'ENTITY-MIB');
+                    $qfp_descr = snmp_get($this->getDevice(), 'entPhysicalName.' . $entQfpPhysicalIndex, '-Oqv', 'ENTITY-MIB');
                 }
             }
 
@@ -173,7 +238,7 @@ class Cisco extends OS implements ProcessorDiscovery, NacPolling
 
             // update the DB
             foreach ($portAuthSessionEntry as $index => $portAuthSessionEntryParameters) {
-                list($ifIndex, $auth_id) = explode('.', str_replace("'", '', $index));
+                [$ifIndex, $auth_id] = explode('.', str_replace("'", '', $index));
                 $session_info = $cafSessionMethodsInfoEntry->get($ifIndex . '.' . $auth_id);
                 $mac_address = strtolower(implode(array_map('zeropad', explode(':', $portAuthSessionEntryParameters['cafSessionClientMacAddress']))));
 
@@ -197,5 +262,21 @@ class Cisco extends OS implements ProcessorDiscovery, NacPolling
         }
 
         return $nac;
+    }
+
+    protected function getMainSerial()
+    {
+        $serial_output = snmp_get_multi($this->getDevice(), ['entPhysicalSerialNum.1', 'entPhysicalSerialNum.1001'], '-OQUs', 'ENTITY-MIB:OLD-CISCO-CHASSIS-MIB');
+//        $serial_output = snmp_getnext($this->getDevice(), 'entPhysicalSerialNum', '-OQUs', 'ENTITY-MIB:OLD-CISCO-CHASSIS-MIB');
+
+        if (!empty($serial_output[1]['entPhysicalSerialNum'])) {
+            return $serial_output[1]['entPhysicalSerialNum'];
+        } elseif (!empty($serial_output[1000]['entPhysicalSerialNum'])) {
+            return $serial_output[1000]['entPhysicalSerialNum'];
+        } elseif (!empty($serial_output[1001]['entPhysicalSerialNum'])) {
+            return $serial_output[1001]['entPhysicalSerialNum'];
+        }
+
+        return null;
     }
 }
