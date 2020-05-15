@@ -177,16 +177,8 @@ if __name__ == '__main__':
     logger = LNMS.logger_get_logger(LOG_FILE, debug=_DEBUG)
 
     install_dir = os.path.dirname(os.path.realpath(__file__))
-    config_file = install_dir + '/config.php'
-
-    LNMS.check_for_file(config_file)
-
-    try:
-        conf = LNMS.get_config_data(install_dir)
-        config = json.loads(conf)
-    except:
-        print("ERROR: Could not load or parse configuration, are PATHs correct?")
-        sys.exit(2)
+    LNMS.check_for_file(install_dir + '/config.php')
+    config = json.loads(LNMS.get_config_data(install_dir))
 
     poller_path = config['install_dir'] + '/poller.php'
     log_dir = config['log_dir']
