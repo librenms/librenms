@@ -124,6 +124,7 @@ by following the steps under the `SNMP Extend` heading.
 1. [Puppet Agent](#puppet_agent) - SNMP extend
 1. [PureFTPd](#pureftpd) - SNMP extend
 1. [Raspberry PI](#raspberry-pi) - SNMP extend
+1. [Redis](#redis) - SNMP extend
 1. [SDFS info](#sdfs-info) - SNMP extend
 1. [Seafile](#seafile) - SNMP extend
 1. [SMART](#smart) - SNMP extend
@@ -1574,6 +1575,24 @@ snmp ALL=(ALL) NOPASSWD: /etc/snmp/raspberry.sh, /usr/bin/vcgencmd
 the user snmpd is using with `ps aux | grep snmpd`
 
 5: Restart snmpd on PI host
+
+# Redis
+
+SNMP extend script to monitor your Redis Server
+
+## SNMP Extend
+
+1: Download the script onto the desired host. `wget
+   https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/redis.py
+   -O /etc/snmp/redis.py`
+
+2: Make the script executable: `chmod +x /etc/snmp/redis.py`
+
+3: Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
+
+```
+extend redis /etc/snmp/redis.py
+```
 
 # Seafile
 

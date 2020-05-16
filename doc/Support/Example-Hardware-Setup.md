@@ -189,3 +189,20 @@ Running in Ganeti Cluster with 2x Dell PER730xd - 64GB, Dual E5-2660 v3
 | Ports          | 174                 |                     |
 | Health sensors | 76                  |                     |
 | Load           | < 3                 |                     |
+
+## [lazyb0nes](https://github.com/lazyb0nes)
+
+Lab
+
+|                | LibreNMS            | MariaDB             |
+| -------------- | ------------------- | ------------------- |
+| Type           | VM                  | Same Server         |
+| OS             | RHEL 7.7            |                     |
+| CPU            | 32 cores            |
+| Memory         | 64GB                |                     |
+| Disk Type      | Flash San Array     |                     |
+| Disk Space     | 400GB               |                     |
+| Devices        | 670                 |                     |
+| Ports          | 25678               |                     |
+| Health sensors | 2457                |                     |
+| Load           | 10.92               |                     |

@@ -35,7 +35,7 @@ echo "<h3>$title</h3>";
   </tr>
 <?php
 $rollback = array();
-foreach (dbFetchRows("SELECT * FROM `$table` WHERE `device_id` = ? AND `sensor_deleted`='0'", array($device['device_id'])) as $sensor) {
+foreach (dbFetchRows("SELECT * FROM `$table` WHERE `device_id` = ? AND `sensor_deleted`='0' order by sensor_class, sensor_type, sensor_descr", array($device['device_id'])) as $sensor) {
     $rollback[] = array(
         'sensor_id'        => $sensor['sensor_id'],
         'sensor_limit'     => $sensor['sensor_limit'],

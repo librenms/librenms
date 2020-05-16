@@ -27,6 +27,18 @@ $graphs['memcached'] = array(
     'data',
     'items',
 );
+$graphs['redis'] = array(
+    'clients',
+    'objects',
+    'fragmentation',
+    'usage',
+    'defrag',
+    'keyspace',
+    'sync',
+    'commands',
+    'connections',
+    'net',
+);
 $graphs['nginx']     = array(
     'connections',
     'req',
@@ -329,7 +341,7 @@ $link_array = array(
     'device' => $device['device_id'],
     'tab'    => 'apps',
 );
-$apps = \LibreNMS\Util\ObjectCache::applications()->flatten()->sortBy('app_type');
+$apps = \LibreNMS\Util\ObjectCache::applications()->flatten();
 foreach ($apps as $app) {
     echo $sep;
     if ($vars['app'] == $app->app_type) {

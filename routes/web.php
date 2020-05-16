@@ -16,10 +16,6 @@ Auth::routes();
 
 // WebUI
 Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
-    // Test
-    Route::get('/vue/{sub?}', function () {
-        return view('vue');
-    })->where('sub', '.*');
 
     // pages
     Route::resource('device-groups', 'DeviceGroupController');
@@ -51,9 +47,6 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
 
     // old route redirects
     Route::permanentRedirect('poll-log', 'poller/log');
-    Route::get('settings/sub={tab}', function ($tab) {
-        return redirect("settings/$tab");
-    });
 
     // Two Factor Auth
     Route::group(['prefix' => '2fa', 'namespace' => 'Auth'], function () {
@@ -148,11 +141,6 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
 
     // demo helper
     Route::permanentRedirect('demo', '/');
-
-    // blank page, dummy page for external code using Laravel::bootWeb()
-    Route::any('/blank', function () {
-        return '';
-    });
 
     // Legacy routes
     Route::any('/{path?}', 'LegacyController@index')

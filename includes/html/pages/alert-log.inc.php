@@ -13,6 +13,7 @@
  * @author     LibreNMS Contributors
 */
 
+$no_refresh = true;
 $device_id= '';
 $vars['fromdevice'] = false;
 require_once 'includes/html/common/alert-log.inc.php';

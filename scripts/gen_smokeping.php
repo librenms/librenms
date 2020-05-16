@@ -20,12 +20,12 @@ title = Network Latency Grapher
 
 <?php
 
-foreach (dbFetchRows("SELECT `type` FROM `devices` WHERE `ignore` = 0 AND `disabled` = 0 AND `type` != '' GROUP BY `type`") as $groups) {
+foreach (dbFetchRows("SELECT `type` FROM `devices` WHERE `disabled` = 0 AND `type` != '' GROUP BY `type`") as $groups) {
     //Dot and space need to be replaced, since smokeping doesn't accept it at this level
     echo '+ ' . str_replace(['.', ' '], '_', $groups['type']) . PHP_EOL;
     echo 'menu = ' . $groups['type'] . PHP_EOL;
     echo 'title = ' . $groups['type'] . PHP_EOL;
-    foreach (dbFetchRows("SELECT `hostname` FROM `devices` WHERE `type` = ? AND `ignore` = 0 AND `disabled` = 0", array($groups['type'])) as $devices) {
+    foreach (dbFetchRows("SELECT `hostname` FROM `devices` WHERE `type` = ? AND `disabled` = 0", array($groups['type'])) as $devices) {
         echo '++ ' . str_replace(['.', ' '], '_', $devices['hostname']) . PHP_EOL;
         echo 'menu = ' . $devices['hostname'] . PHP_EOL;
         echo 'title = ' . $devices['hostname'] . PHP_EOL;
