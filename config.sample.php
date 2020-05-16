@@ -52,14 +52,14 @@ $config['show_services'] = 1;
 
 # If LIBRENMS_DATA_PATH env var is defined (from our Docker image), load config files from this path
 if (is_dir(getenv('LIBRENMS_DATA_PATH'))) {
-    foreach (glob( getenv('LIBRENMS_DATA_PATH') . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . '*.php') as $configfile) {
+    foreach (glob(getenv('LIBRENMS_DATA_PATH') . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . '*.php') as $configfile) {
         include $configfile;
     }
 }
 
 # Load from config.d folder
 if (is_dir(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'config.d')) {
-    foreach (glob( dirname(__FILE__) . DIRECTORY_SEPARATOR . 'config.d' . DIRECTORY_SEPARATOR . '*.php') as $configfile) {
+    foreach (glob(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'config.d' . DIRECTORY_SEPARATOR . '*.php') as $configfile) {
         include $configfile;
     }
 }
