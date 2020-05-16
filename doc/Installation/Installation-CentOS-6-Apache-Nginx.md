@@ -338,7 +338,7 @@ $config['fping'] = "/usr/sbin/fping";
 You may skip this section if the web installer succeeded.
 
 ```bash
-cp config.php.default config.php
+cp config.sample.php config.php
 vi config.php
 ```
 

@@ -76,7 +76,7 @@ register_shutdown_function(function () {
 
 // critical config.php checks
 if (!file_exists('config.php')) {
-    print_fail('config.php does not exist, please copy config.php.default to config.php');
+    print_fail('config.php does not exist, please copy config.sample.php to config.php');
     exit;
 }
 

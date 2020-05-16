@@ -18,6 +18,8 @@ __pycache__
 *.swp
 Thumbs.db
 config.php
+config.d/*
+!config.d/.gitkeep
 html/css/custom/*
 html/images/custom/*
 html/plugins/*

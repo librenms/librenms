@@ -113,7 +113,7 @@ continue the setup manually then just keep following these
 instructions.
 
 ```
-cp config.php.default config.php
+cp config.sample.php config.php
 vim config.php
 ```
 

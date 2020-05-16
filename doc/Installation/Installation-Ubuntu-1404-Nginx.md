@@ -234,7 +234,7 @@ if you want to continue the setup manually then just keep following
 these instructions.
 
 ```bash
-cp config.php.default config.php
+cp config.sample.php config.php
 vim config.php
 ```
 
