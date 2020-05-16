@@ -68,7 +68,9 @@ class Python extends BaseValidation
 
         if ($process->getExitCode() !== 0) {
             $user = Config::get('user', 'librenms');
-            if (get_current_user() !== $user) {
+            $user_mismatch = function_exists('posix_getpwuid') ? (posix_getpwuid(posix_geteuid())['name'] ?? null) !== $user : false;
+
+            if ($user_mismatch) {
                 $validator->warn("Could not check Python dependencies because this script is not running as $user");
             } else {
                 $validator->fail("Python3 module issue found: '" . $process->getOutput() . "'", 'pip3 install -r ' . Config::get('install_dir') . '/requirements.txt');
