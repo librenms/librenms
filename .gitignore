@@ -19,7 +19,7 @@ __pycache__
 Thumbs.db
 config.php
 config.d/*
-!config.d/.gitkeep
+!config.d/README.md
 html/css/custom/*
 html/images/custom/*
 html/plugins/*
