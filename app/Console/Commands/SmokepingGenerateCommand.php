@@ -42,8 +42,8 @@ class SmokepingGenerateCommand extends LnmsCommand
     const IP6PROBE = 'lnmsFPing6-';
 
     // These entries are soley used to appease the smokeping config parser and serve no function
-    const DEFAULTIP4PROBE = 'FPing';
-    const DEFAULTIP6PROBE = 'FPing6';
+    const DEFAULTIP4PROBE = 'lnmsFPing';
+    const DEFAULTIP6PROBE = 'lnmsFPing6';
     const DEFAULTPROBE = self::DEFAULTIP4PROBE;
 
     /**
@@ -57,11 +57,9 @@ class SmokepingGenerateCommand extends LnmsCommand
 
         $this->setDescription(__('commands.smokeping:generate.description'));
 
-        $this->addOption('no-probes', null, InputOption::VALUE_NONE);
-        $this->addOption('no-targets', null, InputOption::VALUE_NONE);
+        $this->addOption('probes', null, InputOption::VALUE_NONE);
+        $this->addOption('targets', null, InputOption::VALUE_NONE);
         $this->addOption('no-header', null, InputOption::VALUE_NONE);
-        $this->addOption('no-default-probe', null, InputOption::VALUE_NONE);
-        $this->addOption('no-section-divider', null, InputOption::VALUE_NONE);
         $this->addOption('single-process', null, InputOption::VALUE_NONE);
     }
 
@@ -80,37 +78,51 @@ class SmokepingGenerateCommand extends LnmsCommand
             return 1;
         }
 
+        if ($this->option('probes') xor $this->option('targets')) {
+            $this->error(__('commands.smokeping:generate.args-nonsense'));
+            return 2;
+        }
+
         $devices = Device::isNotDisabled()->orderBy('type')->get();
 
-        $smokelist = [];
-
-        // Take the devices array and build it into a hierarchical list
-        foreach ($devices as $device) {
-            $smokelist[$device->type][$device->hostname] = ['transport' => $device->transport];
+        if (sizeof($devices) <= 0) {
+            $this->error(__('commands.smokeping:generate.no-devices'));
+            return 3;          
         }
-        
-        $probes = $this->assembleProbes();
-        $targets = $this->buildTargets($smokelist);
-        $header = $this->buildHeader(); // header goes last, as it may contain errors from the previous steps
+       
+        if ($this->option('probes')) {
+            $probes = $this->assembleProbes();
+            $header = $this->buildHeader();
+    
+            $this->render($header, $probes); 
+            return 0;
+        } elseif ($this->option('targets')) {
+            // Take the devices array and build it into a hierarchical list
+            foreach ($devices as $device) {
+                $smokelist[$device->type][$device->hostname] = ['transport' => $device->transport];
+            }
 
-        $this->render($header);
-        $this->render($probes);
-        $this->render($targets);
+            $targets = $this->buildTargets($smokelist);
+            $header = $this->buildHeader();
+   
+            $this->render($header, $targets);
+            return 0;
+        }
 
-        return 0;
+        return 4;
     }
 
     /**
      * Take config lines and output them to stdout
      *
-     * @param array $lines Lines of smokeping configuration
+     * @param array ...$blocks Blocks of smokeping configuration arranged in arrays of strings
      *
      * @return array
      */
-    private function render($lines)
+    private function render(...$blocks)
     {
-        foreach ($lines as $l) {
-            $this->line($l);
+        foreach (array_merge(...$blocks) as $line) {
+            $this->line($line);
         }
     }
 
@@ -139,16 +151,7 @@ class SmokepingGenerateCommand extends LnmsCommand
      */
     private function assembleProbes()
     {
-        $lines = [];
-
-        if (!$this->option('no-probes')) {
-            $lines[] = $this->sectionDivider('Probes');
-            $lines[] = '';
-
-            return array_merge($lines, $this->buildprobes4(), $this->buildprobes6());
-        }
-
-        return $lines;
+        return array_merge($lines, $this->buildprobes4(), $this->buildprobes6());
     }
 
     /**
@@ -175,7 +178,7 @@ class SmokepingGenerateCommand extends LnmsCommand
      * Determine if a list of probes is needed, and write one if so
      *
      * @param array $module The smokeping module to use for this probe (FPing or FPing6, typically)
-     * @param array $DEFAULTPROBE A default probe, needed by the smokeping configuration parser
+     * @param array $defaultProbe A default probe, needed by the smokeping configuration parser
      * @param array $probe The first part of the probe name, e.g. 'lnmsFPing' or 'lnmsFPing6'
      * @param array $binary Path to the relevant probe binary (i.e. the output of `which fping` or `which fping6`)
      *
@@ -206,23 +209,17 @@ class SmokepingGenerateCommand extends LnmsCommand
      */
     private function buildTargets($smokelist)
     {
-        $lines = [];
+        $lines[] = 'menu = Top';
+        $lines[] = 'title = Network Latency Grapher';
 
-        if (!$this->option('no-targets')) {
-            $lines[] = $this->sectionDivider('Targets');
-            $lines[] = 'menu = Top';
-            $lines[] = 'title = Network Latency Grapher';
-            $lines[] = $this->getDefaultProbe();
+        foreach ($smokelist as $type => $devices) {
+            $lines[] = sprintf('+ %s', $this->buildMenuEntry($type));
+            $lines[] = sprintf('  menu = %s', $type);
+            $lines[] = sprintf('  title = %s', $type);
 
-            foreach ($smokelist as $type => $devices) {
-                $lines[] = sprintf('+ %s', $this->buildMenuEntry($type));
-                $lines[] = sprintf('  menu = %s', $type);
-                $lines[] = sprintf('  title = %s', $type);
+            $lines[] = '';
 
-                $lines[] = '';
-
-                $lines = array_merge($lines, $this->buildDevices($devices));
-            }
+            $lines = array_merge($lines, $this->buildDevices($devices));
         }
 
         return $lines;
@@ -274,36 +271,6 @@ class SmokepingGenerateCommand extends LnmsCommand
 
         $this->warnings[] = sprintf('# "%s" %s', $hostname, __('commands.smokeping:generate.dns-fail'));
         return false;
-    }
-
-    /**
-     * Determine if a section divider is needed, and write one if so
-     *
-     * @param string $section The section to create a divider for, if needed
-     *
-     * @return string
-     */
-    private function sectionDivider($section)
-    {
-        if (!$this->option('no-section-divider')) {
-            return sprintf('*** %s ***', $section);
-        }
-
-        return '';
-    }
-
-    /**
-     * Determine if a default probe is needed, and write one if so
-     *
-     * @return string
-     */
-    private function getdefaultProbe()
-    {
-        if (!$this->option('no-default-probe')) {
-            return sprintf('probe = %s', self::DEFAULTPROBE);
-        }
-
-        return '';
     }
 
     /**
