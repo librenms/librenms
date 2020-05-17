@@ -3,6 +3,7 @@ group: printer
 text: 'Brother Printer'
 type: printer
 nobulk: true
+mibdir: brother
 over:
     - { graph: device_toner, text: Toner }
 discovery:
