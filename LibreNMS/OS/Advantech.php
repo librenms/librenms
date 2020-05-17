@@ -1,8 +1,8 @@
 <?php
 /**
- * advantech.inc.php
+ * Advantech.php
  *
- * LibreNMS os poller module for Advantech
+ * -Description-
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,9 +19,23 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2020 Mikkel Mondrup Kristensen
- * @author     Mikkel Mondrup Kristensen <mikkel@tdx.dk>
+ * @copyright  2020 Tony Murray
+ * @author     Tony Murray <murraytony@gmail.com>
  */
 
-$version = snmp_get($device, 'sysImageVersion.0', '-OQva', 'ADVANTECH-COMMON-MIB', 'advantech');
-$hardware = snmp_get($device, 'sysModuleID.0', '-OQva', 'ADVANTECH-COMMON-MIB', 'advantech');
+namespace LibreNMS\OS;
+
+use LibreNMS\Interfaces\Discovery\OSDiscovery;
+use LibreNMS\OS;
+
+class Advantech extends OS implements OSDiscovery
+{
+    public function discoverOS(): void
+    {
+        $data = snmp_get_multi($this->getDevice(), ['sysImageVersion.0', 'sysModuleID.0'], '-OQUsa', 'ADVANTECH-COMMON-MIB');
+
+        $device = $this->getDeviceModel();
+        $device->version = $data[0]['sysImageVersion'] ?? null;
+        $device->hardware = $data[0]['sysModuleID'] ?? null;
+    }
+}
