@@ -3,6 +3,7 @@ import LibreNMS
 import json
 import logging
 import os
+import psutil
 import pymysql
 import subprocess
 import threading
@@ -17,11 +18,6 @@ from time import sleep
 from socket import gethostname
 from signal import signal, SIGTERM, SIGQUIT, SIGINT, SIGHUP, SIGCHLD, SIG_DFL
 from uuid import uuid1
-
-try:
-    import psutil
-except ImportError:
-    print("psutil is not available - this is not a supported configuration and may leak process descriptors")
 
 
 class ServiceConfig:
@@ -321,20 +317,6 @@ class Service:
                 # process was already reaped
                 continue
 
-    def reap_fallback(self):
-        # without psutil we must evaluate every single process
-        while True:
-            try:
-                # Request the state of the first waiting child - don't block if there aren't any
-                r = os.waitpid(0, os.WNOHANG)
-            except OSError:
-                # No more processes
-                break
-
-            if r[0] > 0:
-                # If PID is <= 0, it means that the return code was likely collected already
-                warning('Reaped long running job, install psutil for detail')
-
     def start(self):
         debug("Performing startup checks...")
 
@@ -383,10 +365,7 @@ class Service:
                     self.restart()
 
                 if self.reap_flag:
-                    try:
-                        self.reap_psutil()
-                    except NameError:
-                        self.reap_fallback()
+                    self.reap_psutil()
 
                     # Re-arm the signal handler
                     signal(SIGCHLD, self.reap)
