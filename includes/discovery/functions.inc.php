@@ -74,6 +74,7 @@ function discover_new_device($hostname, $device = '', $method = '', $interface =
         echo '+[' . $remote_device['hostname'] . '(' . $remote_device['device_id'] . ')]';
         discover_device($remote_device);
         device_by_id_cache($remote_device_id, 1);
+
         if ($remote_device_id && is_array($device) && !empty($method)) {
             $extra_log = '';
             $int = cleanPort($interface);
