@@ -134,7 +134,7 @@ def get_config_data(install_dir):
 
 def db_open(db_socket, db_server, db_port, db_username, db_password, db_dbname):
     try:
-        options = dict(host=db_server, db_port=int(db_port), user=db_username, passwd=db_password, db=db_dbname)
+        options = dict(host=db_server, port=int(db_port), user=db_username, passwd=db_password, db=db_dbname)
 
         if db_socket:
             options['unix_socket'] = db_socket
