@@ -31,6 +31,7 @@ class Handler extends ExceptionHandler
         \LibreNMS\Exceptions\FilePermissionsException::class,
         \LibreNMS\Exceptions\DatabaseConnectException::class,
         \LibreNMS\Exceptions\DuskUnsafeException::class,
+        \LibreNMS\Exceptions\UnserializableRouteCache::class,
     ];
 
     public function render($request, Exception $exception)
