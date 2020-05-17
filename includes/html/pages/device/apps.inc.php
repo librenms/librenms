@@ -33,7 +33,15 @@ foreach ($app_list as $app) {
     }
 
     $link_add = array('app' => $app['app_type']);
-    $text     = $app['app_display'];
+
+    $app_state = \LibreNMS\Util\Html::appStateIcon($app['app_state']);
+    if (!empty($app_state['icon'])) {
+        $text = "<font color=\"".$app_state['color']."\"><i title=\"".$app_state['hover_text']."\" class=\"fa ".$app_state['icon']." fa-fw fa-lg\" aria-hidden=\"true\"></i></font>";
+    } else {
+        $text = '';
+    }
+    $text .= $app['app_display'];
+
     if (!empty($app['app_instance'])) {
         $text                .= '('.$app['app_instance'].')';
         $link_add['instance'] = $app['app_id'];
