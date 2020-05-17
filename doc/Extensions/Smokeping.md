@@ -8,8 +8,8 @@ keep track of network latency, and visualise this through RRD graphs.
 
 LibreNMS has support for both new and pre-existing SmokePing installations.
 
-For new installations, we can use the included
-`scripts/gen_smokeping.php` script to generate a Smokeping config file.
+For new installations, we can use the `lnms` cli to generate a Smokeping
+configuration file.
 
 ## New Smokeping installation
 
@@ -45,13 +45,24 @@ cgiurl   = http://yourlibrenms/cgi-bin/smokeping.cgi
 
 ### Configure Smokeping to use LibreNMS list of nodes
 
-Add the following line to `/etc/smokeping/config` config file:
+In order for Smokeping to operate with multiple processes, we need to
+generate a list of probes, and a list of targets.
+
+Add the following line to `/etc/smokeping/config` configuration file in
+the `probes` section:
 
 ```bash
-@include /etc/smokeping/config.d/librenms.conf
+@include /etc/smokeping/config.d/librenms-probes.conf
 ```
 
-We will generate the conf file in the next step.
+And the following line to `/etc/smokeping/config` configuration file in
+the `targets` section:
+
+```bash
+@include /etc/smokeping/config.d/librenms-targets.conf
+```
+
+We will generate the configration file in the next step.
 
 ### Generate LibreNMS list of Smokeping Nodes
 
@@ -59,10 +70,11 @@ LibreNMS comes equipped with a script which exports our list of nodes
 from LibreNMS into a configuration file in the format required by
 Smokeping.
 
-To generate the config file once:
+To generate the configuration files once:
 
 ```bash
-(echo "+ LibreNMS"; php -f /opt/librenms/scripts/gen_smokeping.php) | sudo tee /etc/smokeping/config.d/librenms.conf
+/opt/librenms/lnms smokeping:generate --probes | sudo tee /etc/smokeping/config.d/librenms-probes.conf
+/opt/librenms/lnms smokeping:generate --targets | sudo tee /etc/smokeping/config.d/librenms-targets.conf
 ```
 
 **However**, it is more desirable to set up a cron job which
@@ -72,28 +84,9 @@ add the following to the end of your librenms cron job, e.g. `nano /etc/cron.d/l
 **Ubuntu 16.04** Sample cron (will run daily at 00:05) :
 
 ```bash
-05  00    * * *   root (echo "+ LibreNMS"; php -f /opt/librenms/scripts/gen_smokeping.php) > /etc/smokeping/config.d/librenms.conf && systemctl reload smokeping.service >> /dev/null 2>&1
+05 00 * * * root /opt/librenms/lnms smokeping:generate --probes > /etc/smokeping/config.d/librenms-probes.conf && systemctl reload smokeping.service >> /dev/null 2>&1
+05 00 * * * root /opt/librenms/lnms smokeping:generate --targets > /etc/smokeping/config.d/librenms-targets.conf && systemctl reload smokeping.service >> /dev/null 2>&1
 ```
-
-**Ubuntu 14.04** Sample cron (will run daily at 00:05):
-
-```bash
-05  00    * * * root (echo "+ LibreNMS"; php -f /opt/librenms/scripts/gen_smokeping.php) > /opt/smokeping/etc/librenms.conf && /opt/smokeping/bin/smokeping --reload >> /dev/null 2>&1
-```
-
-**Why echo "+ LibreNMS" ?**
-
-This is in the cron job because the `gen_smokeping.php` script contains
-
-```
-menu = Top
-title = Network Latency Grapher
-```
-
-Which can cause Smokeping to not start. `echo "+ LibreNMS"` prepends
-this in our smokeping config file. We could remove the above from the
-gen_smokeping script, however this may cause issues with LibreNMS
-failing to update with `daily.sh` due config files being modified.
 
 ## Configure LibreNMS
 
@@ -105,6 +98,7 @@ Edit `/opt/librenms/config.php` and add the following:
 $config['smokeping']['dir'] = '/var/lib/smokeping'; // Ubuntu 16.04 and newer Location
 #$config['smokeping']['dir'] = '/opt/smokeping/data';
 $config['smokeping']['pings'] = 20;    // should be equal to "pings" in your smokeping config
+$config['smokeping']['probes'] = 2;    // the number of processes to spread pings over
 $config['smokeping']['integration'] = true;
 $config['smokeping']['url'] = 'smokeping/';  // If you have a specific URL or path for smokeping
 ```

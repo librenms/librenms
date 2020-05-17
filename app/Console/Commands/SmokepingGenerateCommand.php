@@ -1,6 +1,6 @@
 <?php
 /**
- * GenerateSmokepingConfigurationCommand.php
+ * SmokepingGenerateCommand.php
  *
  * CLI command to generate a smokeping configuration.
  *
@@ -41,7 +41,7 @@ class SmokepingGenerateCommand extends LnmsCommand
     const IP4PROBE = 'lnmsFPing-';
     const IP6PROBE = 'lnmsFPing6-';
 
-    // These entries are soley used to appease the smokeping config parser and serve no function
+    // These entries are solely used to appease the smokeping config parser and serve no function
     const DEFAULTIP4PROBE = 'lnmsFPing';
     const DEFAULTIP6PROBE = 'lnmsFPing6';
     const DEFAULTPROBE = self::DEFAULTIP4PROBE;
@@ -87,14 +87,26 @@ class SmokepingGenerateCommand extends LnmsCommand
 
         if (sizeof($devices) <= 0) {
             $this->error(__('commands.smokeping:generate.no-devices'));
-            return 3;          
+            return 3;
         }
-       
+
+        return run($devices);       
+    }
+
+    /**
+     * Build and output the configuration
+     *
+     * @param array $devices List of device objects
+     *
+     * @return int
+     */
+    private function run($devices)
+    {
         if ($this->option('probes')) {
             $probes = $this->assembleProbes();
             $header = $this->buildHeader();
-    
-            $this->render($header, $probes); 
+
+            $this->render($header, $probes);
             return 0;
         } elseif ($this->option('targets')) {
             // Take the devices array and build it into a hierarchical list
@@ -104,7 +116,7 @@ class SmokepingGenerateCommand extends LnmsCommand
 
             $targets = $this->buildTargets($smokelist);
             $header = $this->buildHeader();
-   
+
             $this->render($header, $targets);
             return 0;
         }
@@ -133,15 +145,15 @@ class SmokepingGenerateCommand extends LnmsCommand
      */
     private function buildHeader()
     {
-        $lines = [];
-
         if (!$this->option('no-header')) {
             $lines[] = sprintf('# %s', __('commands.smokeping:generate.header-first'));
             $lines[] = sprintf('# %s', __('commands.smokeping:generate.header-second'));
             $lines[] = sprintf('# %s', __('commands.smokeping:generate.header-third'));
+ 
+            return array_merge($lines, $this->warnings, ['']);
         }
 
-        return array_merge($lines, $this->warnings, ['']);
+        return [''];
     }
 
     /**
@@ -209,9 +221,6 @@ class SmokepingGenerateCommand extends LnmsCommand
      */
     private function buildTargets($smokelist)
     {
-        $lines[] = 'menu = Top';
-        $lines[] = 'title = Network Latency Grapher';
-
         foreach ($smokelist as $type => $devices) {
             $lines[] = sprintf('+ %s', $this->buildMenuEntry($type));
             $lines[] = sprintf('  menu = %s', $type);
