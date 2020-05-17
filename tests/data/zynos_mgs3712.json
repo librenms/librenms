@@ -8,11 +8,11 @@
                     "sysDescr": "MGS-3712",
                     "sysContact": null,
                     "version": null,
-                    "hardware": null,
+                    "hardware": "MGS-3712",
                     "features": null,
                     "os": "zynos",
                     "type": "network",
-                    "serial": null,
+                    "serial": "S100Z16017355",
                     "icon": "zyxel.svg",
                     "location": null
                 }

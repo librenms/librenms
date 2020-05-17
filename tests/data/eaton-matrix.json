@@ -8,11 +8,11 @@
                     "sysDescr": "Network Management Card for UPS",
                     "sysContact": null,
                     "version": null,
-                    "hardware": null,
+                    "hardware": "Telecom Power",
                     "features": null,
                     "os": "eaton-matrix",
                     "type": "power",
-                    "serial": null,
+                    "serial": "000000000",
                     "icon": "eaton.svg",
                     "location": null
                 }

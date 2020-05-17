@@ -8,7 +8,7 @@
                     "sysDescr": "ZTE ACCESS NODE AGENT",
                     "sysContact": null,
                     "version": null,
-                    "hardware": null,
+                    "hardware": "ZXDSL 9806V",
                     "features": null,
                     "os": "zxdsl",
                     "type": "network",

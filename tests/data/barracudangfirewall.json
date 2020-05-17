@@ -8,7 +8,7 @@
                     "sysDescr": "Barracuda Firewall",
                     "sysContact": null,
                     "version": null,
-                    "hardware": null,
+                    "hardware": "<private>",
                     "features": null,
                     "os": "barracudangfirewall",
                     "type": "firewall",

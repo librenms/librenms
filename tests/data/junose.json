@@ -26,7 +26,7 @@
                     "sysDescr": null,
                     "sysContact": null,
                     "version": null,
-                    "hardware": null,
+                    "hardware": "Juniper juniperUni",
                     "features": null,
                     "os": "junose",
                     "type": "network",

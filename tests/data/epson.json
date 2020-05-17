@@ -12,7 +12,7 @@
                     "features": null,
                     "os": "epson",
                     "type": "printer",
-                    "serial": null,
+                    "serial": "X3B8022793",
                     "icon": "epson.svg",
                     "location": null
                 }

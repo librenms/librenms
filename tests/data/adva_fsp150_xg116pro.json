@@ -8,7 +8,7 @@
                     "sysDescr": "FSP150CC-XG116PRO",
                     "sysContact": null,
                     "version": null,
-                    "hardware": null,
+                    "hardware": "XG116Pro V",
                     "features": null,
                     "os": "adva_fsp150",
                     "type": "network",

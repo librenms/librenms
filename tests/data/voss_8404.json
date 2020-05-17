@@ -26,7 +26,7 @@
                     "sysDescr": "VSP-8404 (5.1.1.1)",
                     "sysContact": null,
                     "version": null,
-                    "hardware": null,
+                    "hardware": "VSP-8404",
                     "features": null,
                     "os": "voss",
                     "type": "network",

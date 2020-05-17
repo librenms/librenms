@@ -406,7 +406,7 @@
                     "sysDescr": "Netonix WS-12-250-AC",
                     "sysContact": null,
                     "version": null,
-                    "hardware": null,
+                    "hardware": "WS-12-250-AC",
                     "features": null,
                     "os": "netonix",
                     "type": "network",

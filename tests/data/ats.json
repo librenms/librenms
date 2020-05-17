@@ -8,7 +8,7 @@
                     "sysDescr": "SNMP Smart II Card v1.05 (SN 11230031806015)",
                     "sysContact": null,
                     "version": null,
-                    "hardware": null,
+                    "hardware": "ATS11747",
                     "features": null,
                     "os": "ats",
                     "type": "power",

@@ -7,12 +7,12 @@
                     "sysObjectID": null,
                     "sysDescr": null,
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
+                    "version": "2.7.4",
+                    "hardware": "Micropack System",
                     "features": null,
                     "os": "enexus",
                     "type": "power",
-                    "serial": null,
+                    "serial": "183909001102",
                     "icon": "eltek.png",
                     "location": null
                 }

@@ -27,7 +27,7 @@
                     "sysContact": null,
                     "version": null,
                     "hardware": null,
-                    "features": null,
+                    "features": "Ver. ",
                     "os": "apsoluteos",
                     "type": "network",
                     "serial": null,

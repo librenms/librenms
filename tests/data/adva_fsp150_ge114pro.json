@@ -8,7 +8,7 @@
                     "sysDescr": "FSP 150-GE114Pro",
                     "sysContact": null,
                     "version": null,
-                    "hardware": null,
+                    "hardware": "GE114Pro V",
                     "features": null,
                     "os": "adva_fsp150",
                     "type": "network",

@@ -7,12 +7,12 @@
                     "sysObjectID": ".1.3.6.1.4.1.12356.101.1.626",
                     "sysDescr": null,
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
+                    "version": "v5.6.5",
+                    "hardware": "FWF_60D",
+                    "features": "build1600",
                     "os": "fortigate",
                     "type": "firewall",
-                    "serial": null,
+                    "serial": "<private>",
                     "icon": "fortinet.svg",
                     "location": null
                 }

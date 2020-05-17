@@ -7,12 +7,12 @@
                     "sysObjectID": ".1.3.6.1.4.1.8072.3.2.10",
                     "sysDescr": "Barracuda Web Application Firewall",
                     "sysContact": null,
-                    "version": null,
+                    "version": "10.0.1.003 ",
                     "hardware": null,
                     "features": null,
                     "os": "barracudawafirewall",
                     "type": "firewall",
-                    "serial": null,
+                    "serial": "888888",
                     "icon": "barracuda.svg",
                     "location": null
                 }

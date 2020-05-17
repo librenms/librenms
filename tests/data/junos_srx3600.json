@@ -9598,7 +9598,7 @@
                     "sysDescr": "Juniper Networks, Inc. srx3600 internet router, kernel JUNOS 12.1X46-D35.1 #0: 2015-05-14 23:47:27 UTC     builder@dagmath.juniper.net:/volume/build/junos/12.1/service/12.1X46-D35.1/obj-powerpc/junos/bsd/kernels/JUNIPER-SRX/kernel Build date: 2015-05-15",
                     "sysContact": null,
                     "version": null,
-                    "hardware": null,
+                    "hardware": "Juniper SRX3600",
                     "features": null,
                     "os": "junos",
                     "type": "network",
