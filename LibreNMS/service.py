@@ -441,7 +441,7 @@ class Service:
                     `last_polled` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -%s SECOND), INTERVAL `last_polled_timetaken` SECOND) OR
                     `last_discovered` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -%s SECOND), INTERVAL `last_discovered_timetaken` SECOND)
                 )
-                ORDER BY `last_polled_timetaken` DESC''', (self.service_age(), poller_find_time, self.service_age(), discovery_find_time, poller_find_time, discovery_find_time))
+                ORDER BY `last_polled_timetaken` DESC''', (poller_find_time, self.service_age(), discovery_find_time, poller_find_time, discovery_find_time))
             self.db_failures = 0
             return result
         except pymysql.err.Error:
