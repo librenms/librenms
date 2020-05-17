@@ -51,6 +51,7 @@ return [
         'header-second' => 'Local changes may be overwritten without notice or backups being taken',
         'header-third' => 'For more information see https://docs.librenms.org/Extensions/Smokeping/"',
         'no-devices' => 'No eligible devices found - devices must not be disabled.',
+        'no-probes' => 'At least one probe is required.',
         'options' => [
             'probes' => 'Generate probe list - used for splitting the smokeping configuration into multiple files. Conflicts with "--targets"',
             'targets' => 'Generate the target list - used for splitting the smokeping configuration into multiple files. Conflicts with "--probes"',
