@@ -1,0 +1,7296 @@
+-- This file was included in Ciena MIB release MIBS-CIENA-CES-08-07-00-024
+ --
+
+ -- CIENA-CES-CFM-MIB.my
+
+ --    
+
+
+
+ CIENA-CES-CFM-MIB DEFINITIONS ::= BEGIN
+
+
+
+ IMPORTS                
+
+   TimeTicks, Integer32, Unsigned32, Counter32, Counter64, NOTIFICATION-TYPE, OBJECT-TYPE, MODULE-IDENTITY
+
+        FROM SNMPv2-SMI                 
+
+   DisplayString, MacAddress, TruthValue, TEXTUAL-CONVENTION
+
+        FROM SNMPv2-TC                                                  
+
+    cienaGlobalSeverity, cienaGlobalMacAddress
+
+   		FROM  CIENA-GLOBAL-MIB
+
+   CienaGlobalState, CienaStatsClear,CienaMacAddress
+
+   		FROM CIENA-TC
+
+   cienaCesConfig,cienaCesStatistics, cienaCesNotifications         
+
+        FROM CIENA-SMI;
+
+        
+
+ cienaCesCfmMIB MODULE-IDENTITY
+
+                LAST-UPDATED "201706070000Z"
+                ORGANIZATION "Ciena Corp."
+                CONTACT-INFO
+                "   Mib Meister
+                    7035 Ridge Road
+                    Hanover, Maryland 21076
+                    USA
+                    Phone:  +1 800 921 1144
+                    Email:  support@ciena.com"
+
+                DESCRIPTION
+
+	             "This module defines the CFM configuration and notification objects."
+
+                REVISION   "201706070000Z"
+                DESCRIPTION
+
+	             "Updated contact info."
+
+                REVISION      "201705030000Z"
+                DESCRIPTION
+                "Added cienaCesCfmServiceFaultTime, cienaCesCfmServiceFaultType, cienaCesCfmServiceFaultDesc,
+                cienaCesCfmServiceFaultMep to cienaCesCfmFaultTrapClear."
+
+                REVISION    "201705190000Z"
+                DESCRIPTION
+ 
+	            "Added cienaCesCfmMEPSignalDegradeMonitoringStatus and cienaCesCfmMEPSignalDegradeTriggerMode
+	            to cienaCesCfmMEPEntry
+	            Added cienaCesCfmSyntheticLossSessionSdSetThreshold and cienaCesCfmSyntheticLossSessionSdClearThreshold 
+	            to CienaCesCfmSyntheticLossSessionEntry.  
+	            Added cienaCesCfmSyntheticLossSessionSignalDegradeFaultSetTrap and cienaCesCfmSyntheticLossSessionSignalDegradeFaultClearTrap
+	            to cienaCesCfmNotifMIBNotification."
+
+                REVISION    "201703160000Z"
+                DESCRIPTION
+ 		                 
+	            "Modified description section of following objects:
+                     - cienaCesCfmServiceAlarmPriority
+                     - cienaCesCfmGlobalSLMDefaultInterval
+                     - cienaCesCfmServiceDMMInterval
+                     - cienaCesCfmServiceLMMInterval."
+
+                REVISION    "201702230000Z"
+                DESCRIPTION
+
+	             "Added new attribute cienaCesCfmMepStatsToTxLoopbackMessages to 
+                  cienaCesCfmMepStatsEntry."
+
+                REVISION    "201610240000Z"
+                DESCRIPTION
+
+	             "Added Synthetic Loss Measurement responder table"
+
+                REVISION    "201608030000Z"
+                DESCRIPTION
+
+	             "Added attribute cienaCesCfmSyntheticLossSessionFrameLossRatioNear and
+                      cienaCesCfmSyntheticLossSessionFrameLossRatioFar to CienaCesCfmSyntheticLossSessionEntry."          
+	         
+                REVISION    "201507270000Z"
+                DESCRIPTION
+
+	             "Added object cienaCesCfmServiceCCMRxStats to cienaCesCfmServiceEntry."          
+ 
+                REVISION    "201505110000Z"
+                DESCRIPTION
+
+                "Fixed trap OIDs from cienaCesCfmDelayMaximumDelay to cienaCesCfmDelayMsgMaximumDelay. "
+ 
+	          REVISION    "201503020000Z"
+	          DESCRIPTION
+	          
+	          "Added object cienaCesCfmMEPL2XformType to cienaCesCfmMEPEntry."          
+	          
+              REVISION    "201404100000Z"
+              DESCRIPTION
+              
+              "Added new enumeration - i3dot33msecCCM (8) to the cienaCesCfmServiceCCMInterval object."                            	           
+	          
+	          REVISION    "201401270000Z"
+	          DESCRIPTION
+	          
+	          "Added new object cienaCesCfmGlobalStatsRxTotalMalformedFrames to 
+	           cienaCesCfmGlobalStats.
+	           Added new objects cienaCesCfmGlobalCCMStatsRxTotalErrorCCM, cienaCesCfmGlobalCCMStatsRxTotalMalformedCCM,
+	           cienaCesCfmGlobalCCMStatsRxTotalMEPCCM and cienaCesCfmGlobalCCMStatsRxTotalMIPCCM to
+	           cienaCesCfmGlobalCCMStats.
+	           Added new object cienaCesCfmGlobalLoopbackStatsRxTotalMalformedLBM to
+	           cienaCesCfmGlobalLoopbackStats.
+	           Added new objects cienaCesCfmMepStatsRxCCMWithErrorCCMFault, cienaCesCfmMepStatsRxCCMWithXCONFault,
+	           cienaCesCfmMepStatsRxCCMWithRMEPLOCFault, cienaCesCfmMepStatsRxCCMWithRDI0, cienaCesCfmMepStatsRxCCMWithRDI1,
+	           cienaCesCfmMepStatsRxCCMWithSequenceNumberMismatch, cienaCesCfmMepStatsRxCCMDroppedWithMalformedTlv to
+	           cienaCesCfmMepStatsEntry."  
+
+	       	  REVISION    "201401160000Z"
+			  DESCRIPTION
+
+	          "Added a new object cienaCesCfmGlobalSyntheticLossMeasurementStatsRxDropSLM to
+	           cienaCesCfmGlobalSyntheticLossMeasurementStats."
+                      
+	       	  REVISION    "201311050000Z"
+			  DESCRIPTION
+
+	          "Added new objects for supporting Inter Frame Delay Variation in CienaCesCfmDelayMsgEntry
+                   cienaCesCfmDelayMsgAverageDelayVariation,.. and cienaCesCfmDelayMsgMaximumDelayVariationThreshold
+                   New traps added to support the Inter Frame Delay Variation Threshold variables
+                   cienaCesCfmAverageDelayVariationTrapSet,.. and cienaCesCfmMaximumDelayVariationTrapClear"
+
+	       	  REVISION    "201310290000Z"
+			  DESCRIPTION
+
+	          "Added new objects for supporting synthetic loss global attributes cienaCesCfmGlobalSLMDefaultCount, 
+	          cienaCesCfmGlobalSLMDefaultInterval and cienaCesCfmGlobalSLMDefaultTimeout. Added new objects to 
+	          support synthetic loss global statistics cienaCesCfmGlobalSyntheticLossMeasurementStatsTxTotalSLM,
+	          cienaCesCfmGlobalSyntheticLossMeasurementStatsTxTotalSLR, cienaCesCfmGlobalSyntheticLossMeasurementStatsRxTotalSLM,
+	          cienaCesCfmGlobalSyntheticLossMeasurementStatsRxTotalSLR.        
+	          Added new objects for retrieving MEP level synthetic loss statistics cienaCesCfmMepStatsTxSyntheticLossMeasurementMessage,
+	          cienaCesCfmMepStatsTxSyntheticLossMeasurementReply,  cienaCesCfmMepStatsRxSyntheticLossMeasurementMessage,
+	          cienaCesCfmMepStatsRxSyntheticLossMeasurementReply .
+	          Added new table cienaCesCfmSyntheticLossSessionTable for retrieving synthetic loss test session parameters and results .
+	          New traps added to support synthetic loss tests are cienaCesSyntheticLossSessionNearFaultTrap,
+	          cienaCesSyntheticLossSessionFarFaultTrap, cienaCesSyntheticLossSessionNearFaultClearTrap and
+	          cienaCesSyntheticLossSessionFarFaultClearTrap"
+
+	       	  REVISION    "201110040000Z"
+			  DESCRIPTION
+
+	          "Added new attributes cienaCesCfmState, cienaCesCfmEtherType, cienaCesCfmMEPHoldTime and cienaCesCfmY1731EtherType
+	          under cienaCesCfmGlobal."
+
+              REVISION    "201107260000Z"
+              DESCRIPTION
+
+              "Added new table cienaCesCfmRemoteMepStatsTable"
+
+	       	  REVISION    "201012100000Z"
+       	      DESCRIPTION
+
+	          "cienaCesCfmService,cienaCesCfmMEP,cienaCesCfmRemoteMEP now support a larger number of objects.
+
+		      New tables cienaCesCfmMaintenanceDomainTable,cienaCesCfmServiceFrameBudgetTable,
+
+			  cienaCesCfmFrameBudgetGlobalTable are added. cienaCesCfmGlobalFrameBudgetTable has been deprecated."
+
+              REVISION "201003280000Z"
+	          DESCRIPTION
+
+	          "Initial creation."
+
+              ::= { cienaCesConfig 4 }
+
+
+
+ --
+
+ -- Node definitions
+
+ --        
+
+ cienaCesCfmMIBObjects 						OBJECT IDENTIFIER ::= { cienaCesCfmMIB 1 }
+
+
+
+ cienaCesCfmService  						OBJECT IDENTIFIER ::= { cienaCesCfmMIBObjects 2 }
+
+
+
+ cienaCesCfmMEP         					OBJECT IDENTIFIER ::= { cienaCesCfmMIBObjects 3}
+
+
+
+ cienaCesCfmRemoteMEP 						OBJECT IDENTIFIER ::= { cienaCesCfmMIBObjects 4 }
+
+
+
+ cienaCesCfmDelay		   					OBJECT IDENTIFIER ::= { cienaCesCfmMIBObjects 5}
+
+
+
+ cienaCesCfmFrameLoss    					OBJECT IDENTIFIER ::= { cienaCesCfmMIBObjects 6}
+
+ 
+
+ cienaCesCfmServiceFaultNotifAttrs 			OBJECT IDENTIFIER ::= { cienaCesCfmMIBObjects 7 } 
+
+ 
+
+ cienaCesCfmMaintenance  					OBJECT IDENTIFIER ::= { cienaCesCfmMIBObjects 8 }
+
+   
+
+ cienaCesCfmServiceFrameBudget				OBJECT IDENTIFIER ::= { cienaCesCfmMIBObjects 9 }
+
+  
+
+ cienaCesCfmFrameBudgetGlobal	            OBJECT IDENTIFIER ::= { cienaCesCfmMIBObjects 10 }
+
+ 
+
+ cienaCesCfmGlobal 							OBJECT IDENTIFIER ::= { cienaCesCfmMIBObjects 11 }  
+
+ cienaCesCfmSyntheticLoss                   OBJECT IDENTIFIER ::= { cienaCesCfmMIBObjects 12 }   
+
+ 
+
+ -- Statistics 
+
+ cienaCesCfmStatisticsMIBObjects			OBJECT IDENTIFIER ::= { cienaCesStatistics 4 }
+
+
+
+ cienaCesCfmMibObjects						OBJECT IDENTIFIER ::= { cienaCesCfmStatisticsMIBObjects 1 }   
+
+ 	
+
+ cienaCesCfmGlobalMIBObjects				OBJECT IDENTIFIER ::= { cienaCesCfmMibObjects 1 } 
+
+	
+
+ cienaCesCfmGlobalFrameBudget				OBJECT IDENTIFIER ::= { cienaCesCfmGlobalMIBObjects 2 }     
+
+	
+
+ cienaCesCfmGlobalStats						OBJECT IDENTIFIER ::= { cienaCesCfmGlobalMIBObjects 3 } 
+
+	
+
+ cienaCesCfmGlobalCCMStats 					OBJECT IDENTIFIER ::= { cienaCesCfmGlobalMIBObjects 4 }  
+
+	
+
+ cienaCesCfmGlobalLoopbackStats				OBJECT IDENTIFIER ::= { cienaCesCfmGlobalMIBObjects 5 }
+
+ 	
+
+ cienaCesCfmGlobalLinkTraceStats			OBJECT IDENTIFIER ::= { cienaCesCfmGlobalMIBObjects 6 }
+
+    
+
+ cienaCesCfmGlobalDelayMeasurementStats 	OBJECT IDENTIFIER ::= { cienaCesCfmGlobalMIBObjects 7 }
+
+ 	
+
+ cienaCesCfmGlobalLossMeasurementStats	  	OBJECT IDENTIFIER ::= { cienaCesCfmGlobalMIBObjects 8 }
+
+ cienaCesCfmGlobalSyntheticLossMeasurementStats  OBJECT IDENTIFIER ::= { cienaCesCfmGlobalMIBObjects 9 }
+  	
+
+ cienaCesCfmServiceStats					OBJECT IDENTIFIER ::= { cienaCesCfmMibObjects 2 } 
+
+ 	
+
+ cienaCesCfmMepStats  						OBJECT IDENTIFIER ::= { cienaCesCfmMibObjects 3 }         
+
+ 
+
+ 
+
+
+
+ -- Notifications 
+
+  
+
+ cienaCesCfmNotifMIBNotificationPrefix  	OBJECT IDENTIFIER ::= { cienaCesNotifications 5 } 
+
+ 
+
+ cienaCesCfmNotifMIBNotification       		OBJECT IDENTIFIER ::=  { cienaCesCfmNotifMIBNotificationPrefix 0 }
+
+
+
+ CfmDisplayString ::= TEXTUAL-CONVENTION
+
+    DISPLAY-HINT "1x:"
+
+    STATUS       current
+
+    DESCRIPTION
+
+            "Specifies the CFM display string."
+
+    SYNTAX       OCTET STRING (SIZE(1..2))
+
+                                          
+
+ CienaCesCfmInterfaceType  ::= TEXTUAL-CONVENTION
+
+     STATUS       current
+
+     DESCRIPTION  "Interface type of the PM instance."
+
+     SYNTAX       INTEGER {
+
+                        subport(1),
+
+    					encapPbt(2),
+
+    					decapPbt(3),
+
+   						pbtService(4),
+
+   						mplsVc(5),
+
+   						unknown(99)
+
+                    }       
+
+  
+
+  EthType ::= TEXTUAL-CONVENTION
+
+    DISPLAY-HINT "1x:"
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "Specifies the Ethertype."
+
+    SYNTAX      OCTET STRING (SIZE(1..2))
+
+                   
+ CfmFrameLossRatio ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-4"
+    STATUS      current
+    DESCRIPTION
+        "Denotes Frame Loss Ratio in accuracy of four digits.
+         So a value of 1000 here would mean 0.1% loss."
+    SYNTAX      Unsigned32 (0..1000000)
+
+--
+
+--Global Attributes
+
+--
+
+ cienaCesCfmState OBJECT-TYPE
+
+    SYNTAX      CienaGlobalState
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "This object indicates the globally configured CFM state."
+
+    ::= { cienaCesCfmGlobal 1 } 
+
+  
+
+ cienaCesCfmEtherType  OBJECT-TYPE
+
+    SYNTAX      EthType
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "This object indicates the Ethertype value used for CFM frames."    
+
+    ::= { cienaCesCfmGlobal 2 }
+
+    
+
+ cienaCesCfmMEPHoldTime OBJECT-TYPE
+
+    SYNTAX      Integer32
+
+    UNITS       "milliseconds"
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "This object indicates the time to hold a MEP in an inactive state."
+
+    ::= { cienaCesCfmGlobal 3 }                                                  
+
+ 
+
+ cienaCesCfmY1731EtherType  OBJECT-TYPE
+
+    SYNTAX      EthType
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "This object indicates the optional alternate Ethertype for Y.1731 frames."    
+
+    ::= { cienaCesCfmGlobal 4 } 
+
+  cienaCesCfmGlobalSLMDefaultCount OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The global default count for synthetic loss measurement tests."
+    ::= { cienaCesCfmGlobal 5 }  
+   
+  cienaCesCfmGlobalSLMDefaultInterval OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The global default interval for synthetic loss measurement tests.
+
+         The value ranges from 3 to 7.
+
+         The values 3-7 represent indices to CFM intervals as follows:
+         3 --> 100ms,
+         4 --> 1sec,
+         5 --> 10sec,
+         6 --> 1min,
+         7 --> 10min."
+    ::= { cienaCesCfmGlobal 6 } 
+    
+  cienaCesCfmGlobalSLMDefaultTimeout OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The global default timeout for synthetic loss measurement tests."
+    ::= { cienaCesCfmGlobal 7 }    
+ 
+
+ --
+
+ -- CFM Service Table
+
+ --                           
+
+ cienaCesCfmServiceTable OBJECT-TYPE
+
+     SYNTAX     SEQUENCE OF CienaCesCfmServiceEntry
+
+     MAX-ACCESS not-accessible
+
+     STATUS     current
+
+     DESCRIPTION
+
+            "The (conceptual) table listing the configuration 
+
+            parameters for the CFM service table."  
+
+     ::= { cienaCesCfmService 1 }
+
+                
+
+ cienaCesCfmServiceEntry OBJECT-TYPE
+
+     SYNTAX      CienaCesCfmServiceEntry
+
+     MAX-ACCESS  not-accessible
+
+     STATUS      current
+
+     DESCRIPTION
+
+           "An entry (conceptual row) in the cienaCesCfmServiceTable."
+
+     INDEX {cienaCesCfmServiceIndex}
+
+     ::= { cienaCesCfmServiceTable 1 }
+
+        
+
+ CienaCesCfmServiceEntry ::=  SEQUENCE {               
+
+     cienaCesCfmServiceIndex                             Unsigned32,
+
+     cienaCesCfmServiceType                              INTEGER,
+
+     cienaCesCfmServiceValue                             INTEGER,     
+
+     cienaCesCfmServiceAdminState                        CienaGlobalState,
+
+     cienaCesCfmServiceOperState                         CienaGlobalState,
+
+     cienaCesCfmServiceName                              DisplayString,
+
+     cienaCesCfmServiceMdLevel                           INTEGER,  
+
+     cienaCesCfmServiceFaultState						 CienaGlobalState,
+
+     cienaCesCfmServiceAlarmTime                         INTEGER,
+
+     cienaCesCfmServiceCCMInterval                       INTEGER,
+
+     cienaCesCfmServiceResetTime                         INTEGER,
+
+     cienaCesCfmServiceLastFaultCCM                  	 CfmDisplayString,     
+
+     cienaCesCfmServiceRMEPFailureFlag                   TruthValue,
+
+     cienaCesCfmServiceCCMErrorFlag                      TruthValue,
+
+     cienaCesCfmServiceCrossConnectErrorFlag             TruthValue,     
+
+     cienaCesCfmServiceNumMEP                            Counter32,
+
+     cienaCesCfmServiceNumRemoteMEP                      Counter32,
+
+     cienaCesCfmServiceNumActiveMEP                      Counter32,
+
+     cienaCesCfmServiceNextMepId                       	 Unsigned32,
+
+     cienaCesCfmServiceAlarmPriority                     Unsigned32,
+
+     cienaCesCfmServiceNumCCMForFault                    Unsigned32,
+
+     cienaCesCfmServiceDMMInterval					     INTEGER,
+
+     cienaCesCfmServiceLMMInterval						 INTEGER,
+
+     cienaCesCfmServiceCCMLossStatsState				 CienaGlobalState,
+
+     cienaCesCfmServiceCCMLossBucketInterval			 INTEGER,
+
+	 cienaCesCfmServiceY1731                             TruthValue,
+
+ 	 cienaCesCfmServiceTlvSenderIdType                   INTEGER,
+
+     cienaCesCfmServiceRMEPHoldTime                      Unsigned32,
+
+     cienaCesCfmServiceCCMTxState                        CienaGlobalState,
+
+     cienaCesCfmServicePortStatusFlag                    TruthValue,
+
+     cienaCesCfmServiceRDIFlag                           TruthValue,
+
+     cienaCesCfmServiceInstabilityFlag                   TruthValue,
+
+     cienaCesCfmServiceRMEPAging                         TruthValue,
+
+     cienaCesCfmServiceRMEPDiscovery                     TruthValue,
+
+     cienaCesCfmServiceChargedAgainstGlobalBudget		 TruthValue,
+
+     cienaCesCfmServiceControlModuleFrameBudget			 Counter32,
+
+     cienaCesCfmServiceMulticastDa                       TruthValue,
+
+     cienaCesCfmServiceCCMRxStats                       TruthValue
+ }
+
+
+
+ cienaCesCfmServiceIndex OBJECT-TYPE
+
+     SYNTAX      Unsigned32  
+
+     MAX-ACCESS  not-accessible
+
+     STATUS      current
+
+     DESCRIPTION
+
+             "A unique identifier for a CFM domain entry."
+
+     ::= { cienaCesCfmServiceEntry 1 }
+
+
+
+ cienaCesCfmServiceType OBJECT-TYPE
+
+     SYNTAX      INTEGER {
+
+                                mplsVs(1),
+
+                                ethVs(2),
+
+                                vlan(3),
+
+                                pbtTunnel(4),
+
+                                vs(5),
+
+                                other(9)                                 
+
+                                }
+
+     MAX-ACCESS  read-only
+
+     STATUS      current
+
+     DESCRIPTION
+
+             "This object is used to specify the service type.
+
+              The meaning of cienaCesCfmServiceValue depends on the value of this MIB object.
+
+              This MIB object along with cienaCesCfmServiceValue must be unique for each entry in this table."
+
+     ::= { cienaCesCfmServiceEntry 2 } 
+
+                
+
+ cienaCesCfmServiceValue OBJECT-TYPE
+
+     SYNTAX       INTEGER 
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This object is used to specify the service value.
+
+              The meaning of this object depends on the value of cienaCesCfmServiceType.
+
+              This MIB object along with cienaCesCfmServiceType must be unique for each entry in this table."
+
+     ::= { cienaCesCfmServiceEntry 3 }
+
+ 
+
+ cienaCesCfmServiceAdminState OBJECT-TYPE
+
+     SYNTAX       CienaGlobalState                          
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This object indicates the administrative state of CFM for this service type."
+
+     ::= { cienaCesCfmServiceEntry 4 }
+
+ 
+
+ cienaCesCfmServiceOperState OBJECT-TYPE
+
+     SYNTAX       CienaGlobalState
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This object indicates the operational state of CFM for this service type."
+
+     ::= { cienaCesCfmServiceEntry 5 }
+
+ 
+
+ cienaCesCfmServiceName OBJECT-TYPE
+
+     SYNTAX       DisplayString 
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This MIB object indicates the CFM service name."
+
+     ::= { cienaCesCfmServiceEntry 6 }        
+
+
+
+ cienaCesCfmServiceMdLevel OBJECT-TYPE
+
+     SYNTAX       INTEGER 
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This MIB object indicates the maintenance domain level associated with the CFM service."
+
+     ::= { cienaCesCfmServiceEntry 7 }        
+
+     
+
+ cienaCesCfmServiceFaultState		OBJECT-TYPE
+
+ 	SYNTAX		CienaGlobalState
+
+ 	MAX-ACCESS	read-only
+
+ 	STATUS		current
+
+ 	DESCRIPTION
+
+ 		"When this object's state is disabled it suppresses all the corresponding CFM service related
+
+ 		traps."
+
+ 	DEFVAL { enabled }
+
+ 	::= { cienaCesCfmServiceEntry 8 }   
+
+ 	 
+
+ cienaCesCfmServiceAlarmTime OBJECT-TYPE
+
+     SYNTAX       INTEGER 
+
+     UNITS        "milliseconds"
+
+	 MAX-ACCESS   read-only
+
+     STATUS       current    
+
+     DESCRIPTION
+
+             "This MIB object indicates the time interval that a service fault detected 
+
+              by cienaCesCfmServiceType must be present prior to triggering a fault alarm."
+
+     ::= { cienaCesCfmServiceEntry 9 }
+
+
+
+ cienaCesCfmServiceCCMInterval OBJECT-TYPE
+
+     SYNTAX       INTEGER {
+
+                    unknown(0), 
+
+                    i4msecCCM(1),
+
+                    i10msecCCM(2),
+
+                    i100msecCCM(3),
+
+                    i1secCCM(4),
+
+                    i10secCCM(5),
+
+                    i1minCCM(6),
+
+                    i10minCCM(7),
+                    
+                    i3dot33msecCCM(8)
+
+                  }
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This MIB object identifies the CCM transmission interval index for the service specified by cienaCesCfmServiceType. 
+
+              This determines the frequency at which CCMs are transmitted. The length of the interval increases exponentially 
+
+              with the index value. When the interval is zero (0), CCM transmission is disabled from all MEPs in the MA."
+
+     ::= { cienaCesCfmServiceEntry 10 }
+
+ 	
+
+ cienaCesCfmServiceResetTime OBJECT-TYPE
+
+     SYNTAX       INTEGER 
+
+     UNITS		  "milliseconds"
+
+     MAX-ACCESS   read-only
+
+     STATUS       current  
+
+     DESCRIPTION
+
+             "This MIB object indicates the time interval during which no service faults can be detected
+
+              before the service will reset a fault alarm."
+
+     DEFVAL		  {3000} 
+
+     ::= { cienaCesCfmServiceEntry 11 } 
+
+  
+
+  cienaCesCfmServiceLastFaultCCM OBJECT-TYPE
+
+     SYNTAX       CfmDisplayString
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This MIB object shows the last received CCM fault."
+
+     ::= { cienaCesCfmServiceEntry 12 }            
+
+
+
+  cienaCesCfmServiceRMEPFailureFlag OBJECT-TYPE
+
+     SYNTAX       TruthValue
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This MIB object indicates whether the RMEP failure flag is set."
+
+     ::= { cienaCesCfmServiceEntry 13 }
+
+   
+
+  cienaCesCfmServiceCCMErrorFlag OBJECT-TYPE
+
+     SYNTAX       TruthValue
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This MIB object indicates whether the CCM error flag is set."
+
+     ::= { cienaCesCfmServiceEntry 14 }        
+
+
+
+  cienaCesCfmServiceCrossConnectErrorFlag OBJECT-TYPE
+
+     SYNTAX       TruthValue
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This MIB object indicates whether the cross-connect error flag is set."
+
+     ::= { cienaCesCfmServiceEntry 15 }  
+
+     
+
+  cienaCesCfmServiceNumMEP OBJECT-TYPE
+
+     SYNTAX       Counter32
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This MIB object shows the total number of MEPs."
+
+     ::= { cienaCesCfmServiceEntry 16 }        
+
+ 
+
+ cienaCesCfmServiceNumRemoteMEP OBJECT-TYPE
+
+     SYNTAX       Counter32
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This MIB object shows the total number of remote MEPs."
+
+     ::= { cienaCesCfmServiceEntry 17 } 
+
+            
+
+  cienaCesCfmServiceNumActiveMEP OBJECT-TYPE
+
+     SYNTAX       Counter32
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This MIB object shows the number of active MEPs."
+
+     ::= { cienaCesCfmServiceEntry 18 }         
+
+         
+
+   cienaCesCfmServiceNextMepId OBJECT-TYPE
+
+     SYNTAX      Unsigned32  
+
+     MAX-ACCESS  read-only
+
+     STATUS      current
+
+     DESCRIPTION
+
+             "This MIB object indicates the next MEP ID for the given service."
+
+     ::= { cienaCesCfmServiceEntry 19 }
+
+     
+
+  cienaCesCfmServiceAlarmPriority OBJECT-TYPE
+
+     SYNTAX      Unsigned32  
+
+     MAX-ACCESS  read-only
+
+     STATUS      current
+
+     DESCRIPTION
+
+             "This MIB object indicates the alarm priority for a given service.
+
+              The value ranges from 1 to 5.
+
+              The value 1-5 represent the priority according to faults:
+              1 --> RDI,
+              2 --> Mac Status,
+              3 --> Remote Mep,
+              4 --> Error Ccm,
+              5 --> Xcon Ccm."
+
+     DEFVAL		{3}
+
+     ::= { cienaCesCfmServiceEntry 20 }   
+
+     
+
+  cienaCesCfmServiceNumCCMForFault OBJECT-TYPE
+
+     SYNTAX      Unsigned32  
+
+     MAX-ACCESS  read-only
+
+     STATUS      current
+
+     DESCRIPTION
+
+             "This MIB object indicates the number of CCM frames that must go undelivered 
+
+              for the PBB-TE tunnel before declaring the PBB-TE tunnel as operationally down.
+
+              This object is only applicable if cienaCesCfmServiceType is set to pbtTunnel, else this object
+
+              should be ignored."
+
+     DEFVAL		{3}
+
+     ::= { cienaCesCfmServiceEntry 21 }
+
+
+
+
+
+   cienaCesCfmServiceDMMInterval OBJECT-TYPE
+
+     SYNTAX       INTEGER 
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This MIB object indicates the DMM transmission interval index for the service specified by cienaCesCfmServiceType. 
+
+              This determines the frequency at which DMMs are transmitted. The length of the interval increases exponentially 
+
+              with the index value. The value ranges from 3 to 7. The values 3-7 represent indices to CFM intervals as follows:
+              3 --> 100ms,
+              4 --> 1sec,
+              5 --> 10sec,
+              6 --> 1min,
+              7 --> 10min."
+
+     ::= { cienaCesCfmServiceEntry 22 }   
+
+     
+
+  cienaCesCfmServiceLMMInterval OBJECT-TYPE
+
+     SYNTAX       INTEGER 
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This MIB object indicates the LMM transmission interval index for the service specified by cienaCesCfmServiceType. 
+
+              This determines the frequency at which LMMs are transmitted. The length of the interval increases exponentially 
+
+              with the index value. The value ranges from 1 to 7. The values 1-7 represent indices to CFM intervals as follows:
+              1 --> 3.33ms,
+              2 --> 10ms,
+              3 --> 100ms,
+              4 --> 1sec,
+              5 --> 10sec,
+              6 --> 1min,
+              7 --> 10min."
+
+     ::= { cienaCesCfmServiceEntry 23 }
+
+ 
+
+ cienaCesCfmServiceCCMLossStatsState OBJECT-TYPE
+
+     SYNTAX       CienaGlobalState
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This object indicates the operational state of CCM loss accounting
+
+             for RMEPs learned by this service type."
+
+     DEFVAL {enabled}
+
+     ::= { cienaCesCfmServiceEntry 24 }    
+
+     
+
+   cienaCesCfmServiceCCMLossBucketInterval OBJECT-TYPE
+
+     SYNTAX       INTEGER 
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This object indicates the interval in minutes that each of the 96
+
+             CCM loss history buckets spans. The default is 15 minutes, which
+
+             means the default history covers 24 hours."
+
+     ::= { cienaCesCfmServiceEntry 25 }
+
+
+
+ cienaCesCfmServiceY1731 OBJECT-TYPE
+
+     SYNTAX       TruthValue
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This object indicates whether Y.1731 is enabled for the service."
+
+     ::= { cienaCesCfmServiceEntry 26 }  
+
+ 
+
+ cienaCesCfmServiceTlvSenderIdType OBJECT-TYPE
+
+     SYNTAX      INTEGER {
+
+                    none(1),
+
+                    chassis(2),
+
+                    manage(3),
+
+                    chassisManage(4)
+
+                 } 
+
+     MAX-ACCESS  read-only
+
+     STATUS      current
+
+     DESCRIPTION
+
+             "This MIB object indicates the sender ID TLV Type."
+
+     DEFVAL		{chassis}
+
+     ::= { cienaCesCfmServiceEntry 27 }
+
+
+
+  cienaCesCfmServiceRMEPHoldTime OBJECT-TYPE
+
+     SYNTAX      Unsigned32
+
+     UNITS		 "milliseconds" 
+
+     MAX-ACCESS  read-only
+
+     STATUS      current   
+
+     DESCRIPTION
+
+             "This MIB object indicates the remote MEP hold time in milliseconds."
+
+     DEFVAL		{2500}
+
+     ::= { cienaCesCfmServiceEntry 28 }    
+
+     
+
+   cienaCesCfmServiceCCMTxState OBJECT-TYPE
+
+     SYNTAX      CienaGlobalState
+
+     MAX-ACCESS  read-only
+
+     STATUS      current
+
+     DESCRIPTION
+
+             "This MIB object indicates the administrative state of the CCM Tx."
+
+     DEFVAL		{enabled}
+
+     ::= { cienaCesCfmServiceEntry 29 }
+
+
+
+ cienaCesCfmServicePortStatusFlag OBJECT-TYPE
+
+     SYNTAX       TruthValue
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This MIB object shows the port status defect flag."
+
+     ::= { cienaCesCfmServiceEntry 30 }          
+
+     
+
+   cienaCesCfmServiceRDIFlag OBJECT-TYPE
+
+     SYNTAX       TruthValue
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This MIB object shows the RDI defect flag."
+
+     ::= { cienaCesCfmServiceEntry 31 }        
+
+
+
+  cienaCesCfmServiceInstabilityFlag OBJECT-TYPE
+
+     SYNTAX       TruthValue
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This MIB object shows the instability defect flag."
+
+     ::= { cienaCesCfmServiceEntry 32 } 
+
+  
+
+   cienaCesCfmServiceRMEPAging OBJECT-TYPE
+
+     SYNTAX       TruthValue
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "Controls automatic remote MEP aging for the service."
+
+     ::= { cienaCesCfmServiceEntry 33 }
+
+
+
+   cienaCesCfmServiceRMEPDiscovery OBJECT-TYPE
+
+     SYNTAX       TruthValue
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "Controls automatic remote MEP discovery for the service."
+
+     ::= { cienaCesCfmServiceEntry 34 }  
+
+      
+
+    cienaCesCfmServiceChargedAgainstGlobalBudget OBJECT-TYPE
+
+  	SYNTAX       TruthValue
+
+    MAX-ACCESS   read-only
+
+    STATUS       current
+
+    DESCRIPTION
+
+             "This MIB object reflects if this service is charged against
+
+             the global frame budget."
+
+     ::= { cienaCesCfmServiceEntry 35 }
+
+  
+
+  cienaCesCfmServiceControlModuleFrameBudget  OBJECT-TYPE
+
+  	 SYNTAX       Counter32 
+
+  	 UNITS		  "frames/sec"
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "CFM frame budget for the control timing module for the given service."
+
+     ::= { cienaCesCfmServiceEntry 36 }  
+
+   
+
+    
+
+  cienaCesCfmServiceMulticastDa OBJECT-TYPE
+
+     SYNTAX       TruthValue
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This object indicates if multicast DA mode is enabled for the service. This object is relevant 
+
+             when the cienaCesCfmServiceType is PBT."    
+
+     DEFVAL		{false}
+
+     ::= { cienaCesCfmServiceEntry 37 }  
+
+     
+
+    cienaCesCfmServiceCCMRxStats OBJECT-TYPE
+
+     SYNTAX       TruthValue
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "Controls cfm rx debug stats for the service."
+
+     ::= { cienaCesCfmServiceEntry 38 }  
+
+ 
+
+      
+
+  --
+
+  --  CFM Remote MEP Table
+
+  --                                   
+
+ cienaCesCfmRemoteMEPTable OBJECT-TYPE
+
+     SYNTAX     SEQUENCE OF CienaCesCfmRemoteMEPEntry
+
+     MAX-ACCESS not-accessible
+
+     STATUS     current
+
+     DESCRIPTION
+
+            "The (conceptual) table listing the display 
+
+             parameters for the remote MEP table."  
+
+     ::= { cienaCesCfmRemoteMEP 1 }
+
+                
+
+ cienaCesCfmRemoteMEPEntry OBJECT-TYPE
+
+     SYNTAX      CienaCesCfmRemoteMEPEntry
+
+     MAX-ACCESS  not-accessible
+
+     STATUS      current
+
+     DESCRIPTION
+
+           "An entry (conceptual row) in the cienaCesCfmRemoteMEPTable."
+
+     INDEX {cienaCesCfmServiceIndex, cienaCesCfmRemoteMEPID}
+
+     ::= { cienaCesCfmRemoteMEPTable 1 }
+
+                
+
+ CienaCesCfmRemoteMEPEntry ::=  SEQUENCE { 
+
+     cienaCesCfmRemoteMEPID                              Unsigned32,
+
+     cienaCesCfmRemoteMEPMacAddr                         MacAddress,
+
+     cienaCesCfmRemoteMEPAdminState                      CienaGlobalState,     
+
+     cienaCesCfmRemoteMEPOperState                       INTEGER,
+
+     cienaCesCfmRemoteMEPTime                            TimeTicks,
+
+     cienaCesCfmRemoteMEPKLastMacStatus      		 TruthValue,
+
+     cienaCesCfmRemoteMEPFailureFlag                     TruthValue,
+
+     cienaCesCfmRemoteMEPCCMErrorFlag            	 TruthValue,
+
+     cienaCesCfmRemoteMEPRDIErrorFlag            	 TruthValue,
+
+     cienaCesCfmRemoteMEPSubPortName                     DisplayString,
+
+     cienaCesCfmRemoteMEPServiceName                     DisplayString,
+
+     cienaCesCfmRemoteMEPLastPortStatus                  INTEGER,
+
+     cienaCesCfmRemoteMEPLastInterfaceStatus             INTEGER,
+
+     cienaCesCfmRemoteMEPCCMLevel                        INTEGER,
+
+     cienaCesCfmRemoteMEPHoldState                       INTEGER
+
+      }
+
+
+
+ cienaCesCfmRemoteMEPID OBJECT-TYPE
+
+     SYNTAX      Unsigned32  
+
+     MAX-ACCESS  not-accessible
+
+     STATUS      current
+
+     DESCRIPTION
+
+             "This object is used as an index in the table and is used to specify the MEP ID."
+
+     ::= { cienaCesCfmRemoteMEPEntry 1 }
+
+  
+
+ cienaCesCfmRemoteMEPMacAddr OBJECT-TYPE
+
+     SYNTAX      MacAddress 
+
+     MAX-ACCESS  read-only
+
+     STATUS      current
+
+     DESCRIPTION
+
+             "This object is used to specify the MAC address of the logical port where the remote MEP is configured."
+
+     ::= { cienaCesCfmRemoteMEPEntry 2 }
+
+   
+
+ cienaCesCfmRemoteMEPAdminState OBJECT-TYPE
+
+     SYNTAX      CienaGlobalState
+
+     MAX-ACCESS  read-only
+
+     STATUS      current
+
+     DESCRIPTION
+
+             "This object is used to specify the administrative state of the remote MEP state machine."
+
+     ::= { cienaCesCfmRemoteMEPEntry 3 }
+
+     
+
+  cienaCesCfmRemoteMEPOperState OBJECT-TYPE
+
+     SYNTAX      INTEGER  {
+
+                                disabled(1),
+
+                                enabled(2),
+
+                                hold(3)
+
+                                }
+
+     MAX-ACCESS  read-only
+
+     STATUS      current
+
+     DESCRIPTION
+
+             "This object is used to specify the operational state of the remote MEP state machine."
+
+     ::= { cienaCesCfmRemoteMEPEntry 4 }
+
+  
+
+ cienaCesCfmRemoteMEPTime OBJECT-TYPE
+
+     SYNTAX      TimeTicks 
+
+     MAX-ACCESS  read-only
+
+     STATUS      current
+
+     DESCRIPTION
+
+             "This object is used to specify the time at which the remote MEP state machine last 
+
+              entered RMEP_FAILED or RMEP_OK states."
+
+     ::= { cienaCesCfmRemoteMEPEntry 5 }
+
+ 
+
+ cienaCesCfmRemoteMEPKLastMacStatus OBJECT-TYPE
+
+     SYNTAX      TruthValue 
+
+     MAX-ACCESS  read-only
+
+     STATUS      current
+
+     DESCRIPTION
+
+             "This object is used to specify the last MAC status received."
+
+     ::= { cienaCesCfmRemoteMEPEntry 6 }
+
+ 
+
+ cienaCesCfmRemoteMEPFailureFlag OBJECT-TYPE
+
+     SYNTAX      TruthValue 
+
+     MAX-ACCESS  read-only
+
+     STATUS      current
+
+     DESCRIPTION
+
+             "This object is used to specify the remote MEP failure flag."
+
+     ::= { cienaCesCfmRemoteMEPEntry  7 }
+
+ 
+
+ cienaCesCfmRemoteMEPCCMErrorFlag OBJECT-TYPE
+
+     SYNTAX      TruthValue 
+
+     MAX-ACCESS  read-only
+
+     STATUS      current
+
+     DESCRIPTION
+
+             "This object is used to specify the MEP CCM error flag."
+
+     ::= { cienaCesCfmRemoteMEPEntry 8 }
+
+ 
+
+ cienaCesCfmRemoteMEPRDIErrorFlag OBJECT-TYPE
+
+     SYNTAX      TruthValue 
+
+     MAX-ACCESS  read-only
+
+     STATUS      current
+
+     DESCRIPTION
+
+             "This object is used to specify the MEP RDI error flag."
+
+     ::= { cienaCesCfmRemoteMEPEntry 9 }
+
+ 
+
+ cienaCesCfmRemoteMEPSubPortName   OBJECT-TYPE
+
+     SYNTAX          DisplayString 
+
+     MAX-ACCESS      read-only
+
+     STATUS          current
+
+     DESCRIPTION
+
+           "The object indicates the subport name of the remote MEP."               
+
+     ::= { cienaCesCfmRemoteMEPEntry 10 }
+
+
+
+ cienaCesCfmRemoteMEPServiceName OBJECT-TYPE
+
+     SYNTAX      DisplayString 
+
+     MAX-ACCESS  read-only
+
+     STATUS      current
+
+     DESCRIPTION
+
+             "This object is used to specify the service name of the remote MEP."
+
+     ::= { cienaCesCfmRemoteMEPEntry 11 }
+
+  
+
+ cienaCesCfmRemoteMEPLastPortStatus OBJECT-TYPE
+
+     SYNTAX      INTEGER {
+
+                   unknown(1),
+
+                   none(2),
+
+                   blocked(3),
+
+                   up(4)
+
+                 }
+
+     MAX-ACCESS  read-only
+
+     STATUS      current
+
+     DESCRIPTION
+
+             "This object is used as to specify the remote MEP last port status."
+
+     ::= { cienaCesCfmRemoteMEPEntry 12 }
+
+
+
+ cienaCesCfmRemoteMEPLastInterfaceStatus OBJECT-TYPE
+
+     SYNTAX      INTEGER {
+
+                   none(1),
+
+                   up(2),
+
+                   down(3),
+
+                   testing(4),
+
+                   dormant(5),
+
+                   lowerLayerDown(6),
+
+                   notPresent(7)
+
+                 }
+
+     MAX-ACCESS  read-only
+
+     STATUS      current
+
+     DESCRIPTION
+
+             "This object is used as to specify the remote MEP interface status."
+
+     ::= { cienaCesCfmRemoteMEPEntry 13 }
+
+
+
+ cienaCesCfmRemoteMEPCCMLevel OBJECT-TYPE
+
+     SYNTAX      INTEGER 
+
+     MAX-ACCESS  read-only
+
+     STATUS      current
+
+     DESCRIPTION
+
+             "This object indicates the remote MEP CCM level."
+
+     ::= { cienaCesCfmRemoteMEPEntry 14 }     
+
+     
+
+   cienaCesCfmRemoteMEPHoldState OBJECT-TYPE
+
+     SYNTAX      INTEGER  {
+
+                                disable(1),
+
+                                enable(2),
+
+                                lock(3)
+
+                                }
+
+     MAX-ACCESS  read-only
+
+     STATUS      current
+
+     DESCRIPTION
+
+             "This object indicates the hold state for the remote MEP entry."
+
+     ::= { cienaCesCfmRemoteMEPEntry 15 }
+
+
+
+   
+
+  --
+
+  --  CFM MEP Table 
+
+  --                                   
+
+ cienaCesCfmMEPTable OBJECT-TYPE
+
+     SYNTAX     SEQUENCE OF CienaCesCfmMEPEntry
+
+     MAX-ACCESS not-accessible
+
+     STATUS     current
+
+     DESCRIPTION
+
+            "The (conceptual) table listing the configuration 
+
+            parameters for the CFM MEP table."  
+
+     ::= { cienaCesCfmMEP 1 }
+
+                
+
+ cienaCesCfmMEPEntry OBJECT-TYPE
+
+     SYNTAX      CienaCesCfmMEPEntry
+
+     MAX-ACCESS  not-accessible
+
+     STATUS      current
+
+     DESCRIPTION
+
+           "An entry (conceptual row) in the cienaCesCfmMEPTable."  
+
+     INDEX {cienaCesCfmServiceIndex, cienaCesCfmMEPId}
+
+     ::= { cienaCesCfmMEPTable 1 }
+
+                
+
+ CienaCesCfmMEPEntry ::=  SEQUENCE { 
+
+     cienaCesCfmMEPId						                     Unsigned32,
+
+     cienaCesCfmMEPMacAddr                                       MacAddress,
+
+     cienaCesCfmMEPAdminState                                    CienaGlobalState,        
+
+     cienaCesCfmMEPOperState                                     CienaGlobalState,        
+
+     cienaCesCfmMEPDirection                                     INTEGER,
+
+     cienaCesCfmMEPCCMState            				             CienaGlobalState ,
+
+     cienaCesCfmMEPCCMPriority         				             INTEGER,
+
+     cienaCesCfmMEPLTMPriority         				             INTEGER,  
+
+     cienaCesCfmMEPLiType					                     INTEGER,
+
+     cienaCesCfmMEPLiIndex					                     Unsigned32,
+
+     cienaCesCfmMEPServiceName                                   DisplayString,
+
+     cienaCesCfmMEPSubPortName                                   DisplayString,
+
+     cienaCesCfmMEPVsPbtName                                     DisplayString,
+
+     cienaCesCfmMEPLogicalPortName                               DisplayString,
+
+     cienaCesCfmMEPSubPortIndex                                  Unsigned32,
+
+     cienaCesCfmMEPEncapsulation                                 INTEGER,
+
+     cienaCesCfmMEPLeadPortSlotIndex                             Unsigned32,
+
+     cienaCesCfmMEPPBTBvid                                       Unsigned32,
+
+     cienaCesCfmMEPPBTEtype                                      Unsigned32,
+     
+     cienaCesCfmMEPL2XformType                                   INTEGER,
+
+     cienaCesCfmMEPSignalDegradeMonitoringStatus                 TruthValue,
+
+     cienaCesCfmMEPSignalDegradeTriggerMode                      INTEGER      
+
+ }
+
+   
+
+ cienaCesCfmMEPId OBJECT-TYPE
+
+     SYNTAX      Unsigned32 
+
+     MAX-ACCESS  not-accessible
+
+     STATUS      current
+
+     DESCRIPTION
+
+             "This MIB object is used as the index in the table and indicates 
+
+             the MEP ID for the given service."
+
+     ::= { cienaCesCfmMEPEntry 1 }
+
+
+
+ cienaCesCfmMEPMacAddr OBJECT-TYPE
+
+     SYNTAX      MacAddress
+
+     MAX-ACCESS  read-only
+
+     STATUS      current
+
+     DESCRIPTION
+
+             "This object indicates the MAC address received on the 
+
+             given service and MEP ID."
+
+     ::= { cienaCesCfmMEPEntry 2 }
+
+ 
+
+  cienaCesCfmMEPAdminState OBJECT-TYPE
+
+     SYNTAX      CienaGlobalState
+
+     MAX-ACCESS  read-only
+
+     STATUS      current
+
+     DESCRIPTION
+
+             "This object is used to specify the administrative state of the CFM MEP."
+
+     ::= { cienaCesCfmMEPEntry 3 }
+
+ 
+
+ cienaCesCfmMEPOperState OBJECT-TYPE
+
+     SYNTAX      CienaGlobalState
+
+     MAX-ACCESS  read-only
+
+     STATUS      current
+
+     DESCRIPTION
+
+             "This object is used to specify the operational state of the CFM MEP."
+
+     ::= { cienaCesCfmMEPEntry 4 }
+
+     
+
+ cienaCesCfmMEPDirection OBJECT-TYPE
+
+     SYNTAX      INTEGER {
+
+                                up(1),
+
+                                down(2)
+
+                         }
+
+     MAX-ACCESS  read-only
+
+     STATUS      current
+
+     DESCRIPTION
+
+             "This object is used to specify the MEP direction of the service."
+
+              
+
+     ::= { cienaCesCfmMEPEntry 5 } 
+
+ 
+
+ cienaCesCfmMEPCCMState OBJECT-TYPE
+
+     SYNTAX       CienaGlobalState 
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This object indicates the CCM transmission for the service specified by cienaCesCfmServiceType."
+
+     ::= { cienaCesCfmMEPEntry 6 }
+
+     
+
+ cienaCesCfmMEPCCMPriority OBJECT-TYPE
+
+     SYNTAX       INTEGER 
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This object indicates the priority of CCM messages transmitted."
+
+     ::= { cienaCesCfmMEPEntry 7 }
+
+     
+
+ cienaCesCfmMEPLTMPriority OBJECT-TYPE
+
+     SYNTAX      INTEGER 
+
+     MAX-ACCESS  read-only
+
+     STATUS      current
+
+     DESCRIPTION
+
+             "This object indicates the priority received on the given service and port."
+
+     ::= { cienaCesCfmMEPEntry 8 } 
+
+     
+
+ cienaCesCfmMEPLiType   OBJECT-TYPE
+
+ 	 SYNTAX      INTEGER {
+
+ 	 				   vs(1),
+
+ 	 				   pbtService(2), 
+
+	 				   mplsStaticPeMeshVC(3),
+
+					   mplsDynamicPeMeshVC(4),
+
+					   mplsStaticPeSpokeVC(5), 
+
+					   mplsDynamicPeSpokeVC(6),
+
+					   mplsStaticMtuSpokeVC(7),
+
+					   mplsDynamicMtuSpokeVC(8),
+
+ 	 				   none(99)
+
+ 	 		     }
+
+     MAX-ACCESS  read-only
+
+     STATUS      current
+
+     DESCRIPTION
+
+             "This object indicates the logical interface type on which the MEP is created."
+
+     ::= { cienaCesCfmMEPEntry 9 }  
+
+ 
+
+ cienaCesCfmMEPLiIndex OBJECT-TYPE
+
+ 	SYNTAX    Unsigned32
+
+ 	MAX-ACCESS read-only
+
+ 	STATUS current
+
+ 	DESCRIPTION
+
+ 		"This object indicates the logical interface index for creating the MEP." 
+
+ 	::= { cienaCesCfmMEPEntry 10 } 
+
+  
+
+ cienaCesCfmMEPServiceName OBJECT-TYPE
+
+     SYNTAX      DisplayString 
+
+     MAX-ACCESS  read-only
+
+     STATUS      current
+
+     DESCRIPTION
+
+             "This object is used to specify the service name assigned to this port."
+
+     ::= { cienaCesCfmMEPEntry 11 }
+
+  
+
+ cienaCesCfmMEPSubPortName OBJECT-TYPE
+
+     SYNTAX      DisplayString 
+
+     MAX-ACCESS  read-only
+
+     STATUS      current
+
+     DESCRIPTION
+
+             "This object indicates the sub-port, PBB-TE service or MPLS VC name assigned to the given service and port." 
+
+     ::= { cienaCesCfmMEPEntry 12 }
+
+
+
+ cienaCesCfmMEPVsPbtName OBJECT-TYPE
+
+     SYNTAX      DisplayString 
+
+     MAX-ACCESS  read-only
+
+     STATUS      current
+
+     DESCRIPTION
+
+             "This object indicates the virtual switch or PBB-TE tunnel assigned to the given service and port." 
+
+     ::= { cienaCesCfmMEPEntry 13 }
+
+
+
+ cienaCesCfmMEPLogicalPortName OBJECT-TYPE
+
+     SYNTAX      DisplayString
+
+     MAX-ACCESS  read-only
+
+     STATUS      current
+
+     DESCRIPTION
+
+             "This object indicates the logical port name assigned to the given service and port." 
+
+     ::= { cienaCesCfmMEPEntry 14 }
+
+
+
+ cienaCesCfmMEPSubPortIndex OBJECT-TYPE
+
+     SYNTAX      Unsigned32
+
+     MAX-ACCESS  read-only
+
+     STATUS      current
+
+     DESCRIPTION
+
+             "This object is used to specify the CFM sub-port index."
+
+     ::= { cienaCesCfmMEPEntry 15 }
+
+
+
+ cienaCesCfmMEPEncapsulation OBJECT-TYPE
+
+     SYNTAX      INTEGER {
+
+                                ieee802dot1d(1),
+
+                                pbtCfmEncap(2)
+
+                         }
+
+     MAX-ACCESS  read-only
+
+     STATUS      current
+
+     DESCRIPTION
+
+             "This object is used to specify the encapsulation applied to the service and port."
+
+     ::= { cienaCesCfmMEPEntry 16 } 
+
+ 
+
+ cienaCesCfmMEPLeadPortSlotIndex OBJECT-TYPE
+
+     SYNTAX          Unsigned32 
+
+     MAX-ACCESS      read-only
+
+     STATUS          current
+
+     DESCRIPTION
+
+           "This object is used as to specify the agent slot that the MEP is in."               
+
+     ::= { cienaCesCfmMEPEntry 17 }
+
+     
+
+ cienaCesCfmMEPPBTBvid OBJECT-TYPE
+
+     SYNTAX          Unsigned32 
+
+     MAX-ACCESS      read-only
+
+     STATUS          current
+
+     DESCRIPTION
+
+             "This object indicates the BVID assigned to the given service and port."
+
+     ::= { cienaCesCfmMEPEntry 18 }
+
+
+
+ cienaCesCfmMEPPBTEtype OBJECT-TYPE
+
+     SYNTAX          Unsigned32 
+
+     MAX-ACCESS      read-only
+
+     STATUS          current
+
+     DESCRIPTION
+
+             "This object indicates the Ethertype assigned to the given service and port."
+
+     ::= { cienaCesCfmMEPEntry 19 }
+
+
+ cienaCesCfmMEPL2XformType OBJECT-TYPE
+ 
+     SYNTAX           INTEGER {
+
+                                no-op(1),
+
+                                auto(2)
+                      }
+
+     
+     MAX-ACCESS       read-only
+     
+     STATUS           current
+     
+     DESCRIPTION
+     
+             "This object indicates the type of MEP L2 transform.
+              no-op(1) type indicates that there is no MEP level transform.
+              auto(2) type indicates that the MEP inherits the sub-port vtag-stack."
+             
+     ::= { cienaCesCfmMEPEntry 20 } 
+    
+
+ cienaCesCfmMEPSignalDegradeMonitoringStatus OBJECT-TYPE
+ 
+     SYNTAX           TruthValue
+     
+     MAX-ACCESS       read-only
+     
+     STATUS           current
+     
+     DESCRIPTION
+     
+             "This object enables/disables signal degrading monitoring on the mep."
+             
+     DEFVAL { false }
+
+     ::= { cienaCesCfmMEPEntry 21 } 
+    
+
+ cienaCesCfmMEPSignalDegradeTriggerMode OBJECT-TYPE
+ 
+     SYNTAX           INTEGER {
+
+                                nearEnd(1),
+
+                                nearFarEnd(2)
+                      }
+
+     
+     MAX-ACCESS       read-only
+     
+     STATUS           current
+     
+     DESCRIPTION
+     
+             "This object sets the signal degrade trigger mode on the mep.
+              nearEnd: In this mode, near end frame loss shall be compared with cienaCesCfmSyntheticLossSessionSdSetThreshold
+              and cienaCesCfmSyntheticLossSessionSdClearThreshold.
+              nearFarEnd: In this mode, both near end and far end frame loss shall be compared with
+              cienaCesCfmSyntheticLossSessionSdSetThreshold and cienaCesCfmSyntheticLossSessionSdClearThreshold."
+             
+     DEFVAL { nearEnd }
+
+     ::= { cienaCesCfmMEPEntry 22 } 
+    
+
+ --
+
+  -- Delay Measurement Msg table
+
+  -- 
+
+  cienaCesCfmDelayMsgTable OBJECT-TYPE
+
+     SYNTAX     SEQUENCE OF CienaCesCfmDelayMsgEntry
+
+     MAX-ACCESS not-accessible
+
+     STATUS     current
+
+     DESCRIPTION
+
+            "The (conceptual) table listing the configuration 
+
+            parameters for the DelayMeasurementMsg."
+
+            
+
+     ::= { cienaCesCfmDelay 1 }
+
+                
+
+ cienaCesCfmDelayMsgEntry OBJECT-TYPE
+
+     SYNTAX      CienaCesCfmDelayMsgEntry
+
+     MAX-ACCESS  not-accessible
+
+     STATUS      current
+
+     DESCRIPTION
+
+           "An entry (conceptual row) in the cienaCesCfmDelayMsgTable."
+
+     INDEX {cienaCesCfmServiceIndex, cienaCesCfmDelayMsgLocalMEPId}
+
+     ::= { cienaCesCfmDelayMsgTable 1 }
+
+                
+
+ CienaCesCfmDelayMsgEntry ::=  SEQUENCE { 
+
+     cienaCesCfmDelayMsgLocalMEPId                  	INTEGER,
+
+     cienaCesCfmDelayMsgTargetMEPID                     Unsigned32,
+
+     cienaCesCfmDelayMsgServiceName                     DisplayString,
+
+     cienaCesCfmDelayMsgAverageDelayThreshold           INTEGER,
+
+     cienaCesCfmDelayMsgAverageJitterThreshold          INTEGER,
+
+     cienaCesCfmDelayMsgMaximumDelayThreshold           INTEGER,
+
+     cienaCesCfmDelayMsgMaximumJitterThreshold          INTEGER,
+
+     cienaCesCfmDelayMsgAverageDelay                    Unsigned32,
+
+     cienaCesCfmDelayMsgAverageJitter                   Unsigned32,
+
+     cienaCesCfmDelayMsgMaximumDelay                    Unsigned32,
+
+     cienaCesCfmDelayMsgMaximumJitter                   Unsigned32,
+
+     cienaCesCfmDelayMsgMinimumDelay                    Unsigned32,
+
+     cienaCesCfmDelayMsgMinimumJitter                   Unsigned32,
+
+     cienaCesCfmDelayMsgAverageDelayVariation           Unsigned32,
+
+     cienaCesCfmDelayMsgMaximumDelayVariation           Unsigned32,
+
+     cienaCesCfmDelayMsgMinimumDelayVariation           Unsigned32,
+
+     cienaCesCfmDelayMsgAverageDelayVariationThreshold  Integer32,
+
+     cienaCesCfmDelayMsgMaximumDelayVariationThreshold  Integer32,
+
+     cienaCesCfmDelayMsgPriority                        Unsigned32,
+
+     cienaCesCfmDelayMsgCount                           Unsigned32,
+
+     cienaCesCfmDelayMsgIterations                      Unsigned32,
+
+     cienaCesCfmDelayMsgRepeatDelay                     Unsigned32,
+
+     cienaCesCfmDelayMsgDuration                        Unsigned32
+
+ }
+
+
+
+ cienaCesCfmDelayMsgLocalMEPId OBJECT-TYPE
+
+     SYNTAX       INTEGER 
+
+     MAX-ACCESS   not-accessible
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This object is used to specify the local MEP ID."
+
+     ::= { cienaCesCfmDelayMsgEntry 1 }
+
+ 
+
+ cienaCesCfmDelayMsgTargetMEPID OBJECT-TYPE
+
+     SYNTAX       Unsigned32 (1..8191)
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This object is used to specify the MEP ID."
+
+     ::= { cienaCesCfmDelayMsgEntry 2 }
+
+  
+
+  cienaCesCfmDelayMsgServiceName OBJECT-TYPE
+
+     SYNTAX       DisplayString (SIZE(1..31))
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This object indicates the service associated with the 
+
+             delay message."
+
+     ::= { cienaCesCfmDelayMsgEntry 3 } 
+
+     
+
+  cienaCesCfmDelayMsgAverageDelayThreshold OBJECT-TYPE
+
+     SYNTAX       INTEGER (1..65535)
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This object indicates the threshold for the average delay in microseconds."
+
+     ::= {cienaCesCfmDelayMsgEntry 4 }
+
+  
+
+  cienaCesCfmDelayMsgAverageJitterThreshold OBJECT-TYPE
+
+     SYNTAX       INTEGER  (1..65535)
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This object indicates the threshold value for average jitter in microseconds."
+
+     ::= { cienaCesCfmDelayMsgEntry 5 }   
+
+
+
+   cienaCesCfmDelayMsgMaximumDelayThreshold OBJECT-TYPE
+
+     SYNTAX       INTEGER (1..65535)
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This object indicates the threshold for the maximum delay."
+
+     ::= {cienaCesCfmDelayMsgEntry 6 }
+
+  
+
+  cienaCesCfmDelayMsgMaximumJitterThreshold OBJECT-TYPE
+
+     SYNTAX       INTEGER  (1..65535)
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This object indicates the threshold value for maximum jitter."
+
+     ::= { cienaCesCfmDelayMsgEntry 7 }   
+
+
+
+  cienaCesCfmDelayMsgAverageDelay OBJECT-TYPE
+
+     SYNTAX       Unsigned32
+
+     UNITS		  "microseconds"
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This object indicates the average delay."
+
+     ::= { cienaCesCfmDelayMsgEntry 8 }
+
+  
+
+  cienaCesCfmDelayMsgAverageJitter OBJECT-TYPE
+
+     SYNTAX       Unsigned32
+
+     UNITS		  "microseconds"
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This object indicates the average jitter."
+
+     ::= { cienaCesCfmDelayMsgEntry 9 }   
+
+
+
+  cienaCesCfmDelayMsgMaximumDelay OBJECT-TYPE
+
+     SYNTAX       Unsigned32
+
+     UNITS		  "microseconds"
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This object indicates the maximum delay."
+
+     ::= { cienaCesCfmDelayMsgEntry 10 }
+
+  
+
+  cienaCesCfmDelayMsgMaximumJitter OBJECT-TYPE
+
+     SYNTAX       Unsigned32
+
+     UNITS		  "microseconds"
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This object indicates the maximum jitter."
+
+     ::= { cienaCesCfmDelayMsgEntry 11 }   
+
+  
+
+  cienaCesCfmDelayMsgMinimumDelay  OBJECT-TYPE
+
+     SYNTAX       Unsigned32
+
+     UNITS		  "microseconds"
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This object indicates the minimum delay."
+
+     ::= { cienaCesCfmDelayMsgEntry 12 }
+
+  
+
+  cienaCesCfmDelayMsgMinimumJitter  OBJECT-TYPE
+
+     SYNTAX       Unsigned32
+
+     UNITS		  "microseconds"
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This object indicates the minimum jitter."
+
+     ::= { cienaCesCfmDelayMsgEntry 13 }      
+
+  cienaCesCfmDelayMsgAverageDelayVariation  OBJECT-TYPE
+     SYNTAX           Unsigned32
+     UNITS           "microseconds"
+     MAX-ACCESS       read-only
+     STATUS           current
+     DESCRIPTION
+             "This object indicates the Average Inter Frame Delay Variation."
+     ::= { cienaCesCfmDelayMsgEntry 14 }      
+
+  cienaCesCfmDelayMsgMaximumDelayVariation  OBJECT-TYPE
+     SYNTAX           Unsigned32
+     UNITS           "microseconds"
+     MAX-ACCESS       read-only
+     STATUS           current
+     DESCRIPTION
+             "This object indicates the Maximum Inter Frame Delay Variation."
+     ::= { cienaCesCfmDelayMsgEntry 15 }      
+
+  cienaCesCfmDelayMsgMinimumDelayVariation  OBJECT-TYPE
+     SYNTAX           Unsigned32
+     UNITS           "microseconds"
+     MAX-ACCESS       read-only
+     STATUS           current
+     DESCRIPTION
+             "This object indicates the Minimum Inter Frame Delay Variation."
+     ::= { cienaCesCfmDelayMsgEntry 16 }      
+
+  cienaCesCfmDelayMsgAverageDelayVariationThreshold  OBJECT-TYPE
+     SYNTAX           Integer32  (-1..65535)
+     UNITS           "microseconds"
+     MAX-ACCESS       read-only
+     STATUS           current
+     DESCRIPTION
+             "This object indicates the threshold value for average Inter Frame Delay Variation.
+              A value of -1 disables the generation of faults.  A value of 0 or greater
+              is compared to the Average Delay Variation measured in the test and a fault is generated
+              if the threshold is exceeded."
+     ::= { cienaCesCfmDelayMsgEntry 17 }      
+
+  cienaCesCfmDelayMsgMaximumDelayVariationThreshold  OBJECT-TYPE
+     SYNTAX           Integer32  (-1..65535)
+     UNITS           "microseconds"
+     MAX-ACCESS       read-only
+     STATUS           current
+     DESCRIPTION
+             "This object indicates the threshold value for maximum Inter Frame Delay Variation.
+              A value of -1 disables the generation of faults.  A value of 0 or greater
+              is compared to the Maximum Delay Variation measured in the test and a fault is generated
+              if the threshold is exceeded."
+     ::= { cienaCesCfmDelayMsgEntry 18 }      
+
+  cienaCesCfmDelayMsgPriority  OBJECT-TYPE  
+     SYNTAX           Unsigned32 (0..7)
+     MAX-ACCESS       read-only
+     STATUS           current
+     DESCRIPTION
+             "This object specifies the priority that will be encoded in the DMM message."
+     ::= { cienaCesCfmDelayMsgEntry 19 }      
+     
+  cienaCesCfmDelayMsgCount  OBJECT-TYPE
+     SYNTAX           Unsigned32 (2..65535) 
+     MAX-ACCESS       read-only
+     STATUS           current
+     DESCRIPTION
+             "This object specifies the number of DMM messages that will be transmitted for one Iteration."
+     ::= { cienaCesCfmDelayMsgEntry 20 }      
+     
+  cienaCesCfmDelayMsgIterations  OBJECT-TYPE  
+     SYNTAX           Unsigned32 (0..60)
+     MAX-ACCESS       read-only
+     STATUS           current
+     DESCRIPTION
+             "This object specifies the number of iterations the test has to be conducted. 
+              A zero value means that test is continuous, and iterations are infinite. "
+     ::= { cienaCesCfmDelayMsgEntry 21 }      
+          
+  cienaCesCfmDelayMsgRepeatDelay  OBJECT-TYPE  
+     SYNTAX           Unsigned32 (0..1440)
+     MAX-ACCESS       read-only
+     STATUS           current
+     DESCRIPTION
+             "This object specifies the delay in minutes between consecutive test iterations."
+     ::= { cienaCesCfmDelayMsgEntry 22 }      
+     
+  cienaCesCfmDelayMsgDuration OBJECT-TYPE
+     SYNTAX	      Unsigned32 (0..65535)
+     MAX-ACCESS       read-only
+     STATUS	      current                                   
+     DESCRIPTION
+             "This object specifies the duration of time the test took in seconds to complete one iteration."
+     ::= { cienaCesCfmDelayMsgEntry 23 }      
+
+  --
+
+  -- Frame Loss Measurement Msg table
+
+  -- 
+
+  cienaCesCfmFrameLossMsgTable OBJECT-TYPE
+
+     SYNTAX     SEQUENCE OF CienaCesCfmFrameLossMsgEntry
+
+     MAX-ACCESS not-accessible
+
+     STATUS     current
+
+     DESCRIPTION
+
+            "The (conceptual) table listing the configuration 
+
+            parameters for the FrameLossMeasurementMsg."  
+
+     ::= { cienaCesCfmFrameLoss 1 }
+
+                
+
+ cienaCesCfmFrameLossMsgEntry OBJECT-TYPE
+
+     SYNTAX      CienaCesCfmFrameLossMsgEntry
+
+     MAX-ACCESS  not-accessible
+
+     STATUS      current
+
+     DESCRIPTION
+
+           "An entry (conceptual row) in the cienaCesCfmFrameLossMsgTable."
+
+
+
+     INDEX {cienaCesCfmServiceIndex, cienaCesCfmFrameLossMsgLocalMEPId}
+
+     ::= { cienaCesCfmFrameLossMsgTable 1 }
+
+                
+
+ CienaCesCfmFrameLossMsgEntry ::=  SEQUENCE { 
+
+     cienaCesCfmFrameLossMsgLocalMEPId               INTEGER,
+
+     cienaCesCfmFrameLossMsgTargetMEPID              Unsigned32,
+
+     cienaCesCfmFrameLossMsgNearLossThreshold     	 INTEGER,
+
+     cienaCesCfmFrameLossMsgFarLossThreshold		 INTEGER,
+
+     cienaCesCfmFrameLossMsgServiceName				 DisplayString,
+
+     cienaCesCfmFrameLossMsgFrameLossNear			 Unsigned32,
+
+     cienaCesCfmFrameLossMsgFrameLossFar			 Unsigned32
+
+ }
+
+  cienaCesCfmFrameLossMsgLocalMEPId OBJECT-TYPE
+
+     SYNTAX       INTEGER (1..65535)
+
+     MAX-ACCESS   not-accessible
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This object is used to specify the local MEP ID at the source."
+
+     ::= { cienaCesCfmFrameLossMsgEntry 1 }
+
+ 
+
+ cienaCesCfmFrameLossMsgTargetMEPID OBJECT-TYPE
+
+     SYNTAX       Unsigned32 (1..8191)
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This object is used to specify the MEP ID."
+
+     ::= { cienaCesCfmFrameLossMsgEntry 2 }
+
+     
+
+ cienaCesCfmFrameLossMsgNearLossThreshold OBJECT-TYPE
+
+     SYNTAX       INTEGER (0..600)
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "Indicates the threshold value for the near-end frame loss."
+
+     ::= { cienaCesCfmFrameLossMsgEntry 3 }
+
+ 
+
+ cienaCesCfmFrameLossMsgFarLossThreshold OBJECT-TYPE
+
+     SYNTAX       INTEGER (0..600)
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This object indicates the threshold value for the far-end frame loss."
+
+     ::= { cienaCesCfmFrameLossMsgEntry 4 }
+
+
+
+  cienaCesCfmFrameLossMsgServiceName OBJECT-TYPE
+
+     SYNTAX       DisplayString (SIZE(1..31))
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This object indicates the service associated with
+
+              the frame loss measurement message (LMM)."
+
+     ::= { cienaCesCfmFrameLossMsgEntry 5 }
+
+ 
+
+ cienaCesCfmFrameLossMsgFrameLossNear OBJECT-TYPE
+
+     SYNTAX       Unsigned32
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This object indicates the near-end frame loss. For a MEP,
+
+             near-end frame loss refers to frame loss associated with the 
+
+             ingress data frames."
+
+     ::= { cienaCesCfmFrameLossMsgEntry 6 }
+
+
+
+cienaCesCfmFrameLossMsgFrameLossFar OBJECT-TYPE
+
+     SYNTAX       Unsigned32
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This object indicates the far-end frame loss. For a MEP,
+
+             far-end frame loss refers to frame loss associated with the 
+
+             egress data frames."
+
+     ::= { cienaCesCfmFrameLossMsgEntry 7 }
+
+
+
+ 
+
+ --
+
+ -- CFM Service Fault Notification Attributes Table
+
+ --                           
+
+ cienaCesCfmServiceFaultNotifTable OBJECT-TYPE
+
+     SYNTAX     SEQUENCE OF CienaCesCfmServiceFaultNotifEntry
+
+     MAX-ACCESS not-accessible
+
+     STATUS     current
+
+     DESCRIPTION
+
+            "The (conceptual) table listing the configuration 
+
+            parameters for the CFM service table."  
+
+     ::= { cienaCesCfmServiceFaultNotifAttrs 1 }
+
+                
+
+ cienaCesCfmServiceFaultNotifEntry OBJECT-TYPE
+
+     SYNTAX      CienaCesCfmServiceFaultNotifEntry
+
+     MAX-ACCESS  not-accessible
+
+     STATUS      current
+
+     DESCRIPTION
+
+           "An entry (conceptual row) in the cienaCesCfmServiceFaultNotifTable."
+
+     INDEX {cienaCesCfmServiceIndex}
+
+     ::= { cienaCesCfmServiceFaultNotifTable 1 }
+
+        
+
+ CienaCesCfmServiceFaultNotifEntry ::=  SEQUENCE {               
+
+     cienaCesCfmServiceFaultTime    					  TimeTicks,
+
+ 	 cienaCesCfmServiceFaultType						  INTEGER,
+
+ 	 cienaCesCfmServiceFaultDesc						  DisplayString,
+
+ 	 cienaCesCfmServiceFaultMep						      INTEGER,
+
+     cienaCesCfmServiceVsPbtName      					  DisplayString
+
+ }
+
+ 
+
+  cienaCesCfmServiceFaultTime OBJECT-TYPE
+
+     SYNTAX      TimeTicks 
+
+     MAX-ACCESS  accessible-for-notify
+
+     STATUS      current
+
+     DESCRIPTION
+
+             "This object indicates the time at which the fault occurred."
+
+     ::= { cienaCesCfmServiceFaultNotifEntry 1 }
+
+ 
+
+ cienaCesCfmServiceFaultType OBJECT-TYPE
+
+     SYNTAX      INTEGER  {         
+
+     				none(1),
+
+     				errorRDIDefect(2),
+
+     				errorMACStatusDefect(3),
+
+     				errorRMEPCCMDefect(4),
+
+     				errorCCMDefect(5),
+
+     				xconCCMDefect(6)
+
+     				}
+
+     MAX-ACCESS  accessible-for-notify
+
+     STATUS      current
+
+     DESCRIPTION
+
+             "This object indicates the type of fault."
+
+     ::= { cienaCesCfmServiceFaultNotifEntry 2 }
+
+
+
+cienaCesCfmServiceFaultDesc OBJECT-TYPE
+
+     SYNTAX      DisplayString
+
+     MAX-ACCESS  accessible-for-notify
+
+     STATUS      current
+
+     DESCRIPTION
+
+             "This object indicates the description of the fault."
+
+     ::= { cienaCesCfmServiceFaultNotifEntry 3 }
+
+ 
+
+cienaCesCfmServiceFaultMep OBJECT-TYPE
+
+     SYNTAX      INTEGER (1..8191)
+
+     MAX-ACCESS  accessible-for-notify
+
+     STATUS      current
+
+     DESCRIPTION
+
+             "This object indicates the MEP ID of the MEP reporting the fault."
+
+     ::= { cienaCesCfmServiceFaultNotifEntry 4 }
+
+     
+
+ cienaCesCfmServiceVsPbtName OBJECT-TYPE
+
+     SYNTAX      DisplayString (SIZE(0..31))
+
+     MAX-ACCESS  accessible-for-notify
+
+     STATUS      current
+
+     DESCRIPTION
+
+             "This object indicates the virtual switch or PBB-TE tunnel
+
+              assigned to the given service." 
+
+     ::= { cienaCesCfmServiceFaultNotifEntry 5 }   
+
+     
+
+  --
+
+  --  CFM Maintainence Domain Table 
+
+  --                                   
+
+ cienaCesCfmMaintenanceDomainTable OBJECT-TYPE
+
+     SYNTAX     SEQUENCE OF CienaCesCfmMaintenanceDomainEntry
+
+     MAX-ACCESS not-accessible
+
+     STATUS     current
+
+     DESCRIPTION
+
+            "The (conceptual) table listing the configuration 
+
+            parameters for the CFM maintenance domain table."  
+
+     ::= { cienaCesCfmMaintenance 1 }
+
+                
+
+ cienaCesCfmMaintenanceDomainEntry OBJECT-TYPE
+
+     SYNTAX      CienaCesCfmMaintenanceDomainEntry
+
+     MAX-ACCESS  not-accessible
+
+     STATUS      current
+
+     DESCRIPTION
+
+           "An entry (conceptual row) in the cienaCesCfmMaintenanceDomainTable."
+
+     INDEX {cienaCesCfmMaintenanceDomainIndex }
+
+     ::= { cienaCesCfmMaintenanceDomainTable 1 }
+
+                
+
+ CienaCesCfmMaintenanceDomainEntry ::=  SEQUENCE { 
+
+     cienaCesCfmMaintenanceDomainIndex                   Unsigned32,
+
+     cienaCesCfmMaintenanceDomainLevel                   INTEGER,
+
+     cienaCesCfmMaintenanceDomainName                    DisplayString,
+
+     cienaCesCfmMaintenanceDomainServiceCount			 Unsigned32
+
+ }
+
+ 
+
+ cienaCesCfmMaintenanceDomainIndex OBJECT-TYPE
+
+     SYNTAX      Unsigned32 
+
+     MAX-ACCESS  read-only
+
+     STATUS      current
+
+     DESCRIPTION
+
+             "This object indicates the unique index in the table."
+
+     ::= { cienaCesCfmMaintenanceDomainEntry 1 }
+
+     
+
+ cienaCesCfmMaintenanceDomainLevel OBJECT-TYPE
+
+     SYNTAX      INTEGER 
+
+     MAX-ACCESS  read-only
+
+     STATUS      current
+
+     DESCRIPTION
+
+             "This object indicates the maintenance domain level."
+
+     ::= { cienaCesCfmMaintenanceDomainEntry 2 }
+
+ 
+
+ cienaCesCfmMaintenanceDomainName OBJECT-TYPE
+
+     SYNTAX      DisplayString 
+
+     MAX-ACCESS  read-only
+
+     STATUS      current
+
+     DESCRIPTION
+
+             "This object indicates the maintenance domain name."
+
+     ::= { cienaCesCfmMaintenanceDomainEntry 3 }
+
+  
+
+ cienaCesCfmMaintenanceDomainServiceCount OBJECT-TYPE
+
+ 	SYNTAX		Unsigned32
+
+     MAX-ACCESS  read-only
+
+     STATUS      current
+
+     DESCRIPTION
+
+             "This object indicates the number of CFM services mapped to this maintenance domain."
+
+     ::= { cienaCesCfmMaintenanceDomainEntry 4 }
+
+     
+
+ --
+
+ -- CFM Service Frame Budget Table
+
+ --                           
+
+ cienaCesCfmServiceFrameBudgetTable OBJECT-TYPE
+
+     SYNTAX     SEQUENCE OF CienaCesCfmServiceFrameBudgetEntry
+
+     MAX-ACCESS not-accessible
+
+     STATUS     current
+
+     DESCRIPTION
+
+            "The (conceptual) table listing the configuration 
+
+            parameters for the CFM service frame budget table."  
+
+     ::= { cienaCesCfmServiceFrameBudget 1 }
+
+                
+
+ cienaCesCfmServiceFrameBudgetEntry OBJECT-TYPE
+
+     SYNTAX      CienaCesCfmServiceFrameBudgetEntry
+
+     MAX-ACCESS  not-accessible
+
+     STATUS      current
+
+     DESCRIPTION
+
+           "An entry (conceptual row) in the cienaCesCfmServiceFrameBudgetTable."
+
+     INDEX {cienaCesCfmServiceIndex, cienaCesCfmSlotIndex}
+
+     ::= { cienaCesCfmServiceFrameBudgetTable 1 }
+
+        
+
+ CienaCesCfmServiceFrameBudgetEntry ::=  SEQUENCE {           
+
+              
+
+     cienaCesCfmSlotIndex                        INTEGER,
+
+     cienaCesCfmServiceFrameBudgetSlot			 Counter32
+
+     }
+
+
+
+  cienaCesCfmSlotIndex  OBJECT-TYPE
+
+     SYNTAX       INTEGER(1..256) 
+
+     MAX-ACCESS   not-accessible
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This object indicates the slot number."
+
+     ::= { cienaCesCfmServiceFrameBudgetEntry 1 } 
+
+  
+
+  cienaCesCfmServiceFrameBudgetSlot   OBJECT-TYPE
+
+  	 SYNTAX       Counter32
+
+  	 UNITS 		  "frames/sec"
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This object indicates the CFM frame budget for the slot for the given service."
+
+     ::= { cienaCesCfmServiceFrameBudgetEntry 2 } 
+
+   
+
+  --
+
+ -- CFM Global Frame Budget Table
+
+ --        
+
+    
+
+ cienaCesCfmGlobalControlModuleFrameBudget OBJECT-TYPE
+
+  	  SYNTAX    Counter32
+
+  	  MAX-ACCESS read-only
+
+  	  STATUS 	   current
+
+  	  DESCRIPTION
+
+  		"Control Module Frame Budget."
+
+  	::= { cienaCesCfmFrameBudgetGlobal 1}
+
+                
+
+ cienaCesCfmFrameBudgetGlobalTable OBJECT-TYPE
+
+     SYNTAX     SEQUENCE OF CienaCesCfmFrameBudgetGlobalEntry
+
+     MAX-ACCESS not-accessible
+
+     STATUS     current
+
+     DESCRIPTION
+
+            "The (conceptual) table listing the configuration 
+
+            parameters for the CFM global frame budget table."  
+
+     ::= { cienaCesCfmFrameBudgetGlobal 2}
+
+                
+
+ cienaCesCfmFrameBudgetGlobalEntry OBJECT-TYPE
+
+     SYNTAX      CienaCesCfmFrameBudgetGlobalEntry
+
+     MAX-ACCESS  not-accessible
+
+     STATUS      current
+
+     DESCRIPTION
+
+           "An entry (conceptual row) in the cienaCesCfmGlobalFrameBudgetTable."
+
+     INDEX {cienaCesCfmSlotIndex}
+
+     ::= { cienaCesCfmFrameBudgetGlobalTable 1 }
+
+        
+
+ CienaCesCfmFrameBudgetGlobalEntry ::=  SEQUENCE {           
+
+              
+
+     cienaCesCfmFrameBudgetGlobalSlot			 Counter32
+
+     }
+
+
+
+  cienaCesCfmFrameBudgetGlobalSlot   OBJECT-TYPE
+
+  	 SYNTAX       Counter32
+
+  	 UNITS		  "frames/sec"
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This object indicates the global CFM frame budget for the slot."
+
+     ::= { cienaCesCfmFrameBudgetGlobalEntry 1 } 
+
+ 
+
+  
+
+ --
+
+ --CFM STATISTICS
+
+ --
+
+  cienaCesCfmGlobalStatsClear OBJECT-TYPE
+
+    	SYNTAX     CienaStatsClear
+
+    	MAX-ACCESS read-write
+
+    	STATUS current
+
+    	DESCRIPTION
+
+    		"Setting this object clears CFM statistics globally."
+
+    	::=  {cienaCesCfmGlobalMIBObjects 1 }
+
+	
+
+  -- Global Frame Budget 	
+
+ 
+
+	cienaCesCfmGlobalFrameBudgetControlModule OBJECT-TYPE
+
+  	  SYNTAX    Counter32
+
+  	  MAX-ACCESS read-only
+
+  	  STATUS 	   deprecated
+
+  	  DESCRIPTION
+
+  		"Control Module Frame Budget is deprecated because it is moved from statistics to node definitions."
+
+  	::= { cienaCesCfmGlobalFrameBudget 1}
+
+  
+
+	cienaCesCfmGlobalFrameBudgetSlot1 OBJECT-TYPE
+
+  	  SYNTAX    Counter32
+
+  	  MAX-ACCESS read-only
+
+  	  STATUS 	   deprecated
+
+  	  DESCRIPTION
+
+  		"Slot1 Frame Budget."
+
+  	::= { cienaCesCfmGlobalFrameBudget 2 }
+
+  
+
+  	cienaCesCfmGlobalFrameBudgetSlot2 OBJECT-TYPE
+
+  	  SYNTAX    Counter32
+
+  	  MAX-ACCESS read-only
+
+  	  STATUS 	   deprecated
+
+  	  DESCRIPTION
+
+  		"Slot2 Frame Budget."
+
+  	::= { cienaCesCfmGlobalFrameBudget 3}
+
+  
+
+	cienaCesCfmGlobalFrameBudgetSlot3 OBJECT-TYPE
+
+  	  SYNTAX    Counter32
+
+  	  MAX-ACCESS read-only
+
+  	  STATUS 	   deprecated
+
+  	  DESCRIPTION
+
+  		"Slot3 Frame Budget."
+
+  	::= { cienaCesCfmGlobalFrameBudget 4 }
+
+  	
+
+	cienaCesCfmGlobalFrameBudgetSlot4 OBJECT-TYPE
+
+  	  SYNTAX    Counter32
+
+  	  MAX-ACCESS read-only
+
+  	  STATUS 	   deprecated
+
+  	  DESCRIPTION
+
+  		"Slot4 Frame Budget."
+
+  	::= { cienaCesCfmGlobalFrameBudget 5 } 
+
+  	
+
+	cienaCesCfmGlobalFrameBudgetSlot5 OBJECT-TYPE
+
+  	  SYNTAX    Counter32
+
+  	  MAX-ACCESS read-only
+
+  	  STATUS 	   deprecated
+
+  	  DESCRIPTION
+
+  		"Slot5 Frame Budget."
+
+  	::= { cienaCesCfmGlobalFrameBudget 6 }
+
+
+
+	cienaCesCfmGlobalFrameBudgetSlot6 OBJECT-TYPE
+
+  	  SYNTAX    Counter32
+
+  	  MAX-ACCESS read-only
+
+  	  STATUS 	   deprecated
+
+  	  DESCRIPTION
+
+  		"Slot6 Frame Budget."
+
+  	::= { cienaCesCfmGlobalFrameBudget 7 }
+
+   
+
+	cienaCesCfmGlobalFrameBudgetSlot7 OBJECT-TYPE
+
+  	  SYNTAX    Counter32
+
+  	  MAX-ACCESS read-only
+
+  	  STATUS 	   deprecated
+
+  	  DESCRIPTION
+
+  		"Slot7 Frame Budget."
+
+  	::= { cienaCesCfmGlobalFrameBudget 8 }
+
+
+
+	cienaCesCfmGlobalFrameBudgetSlot8 OBJECT-TYPE
+
+  	  SYNTAX    Counter32
+
+  	  MAX-ACCESS read-only
+
+  	  STATUS 	   deprecated
+
+  	  DESCRIPTION
+
+  		"Slot8 Frame Budget."
+
+  	::= { cienaCesCfmGlobalFrameBudget 9 }
+
+ 
+
+ 	cienaCesCfmGlobalFrameBudgetSlot9 OBJECT-TYPE
+
+  	  SYNTAX    Counter32
+
+  	  MAX-ACCESS read-only
+
+  	  STATUS 	   deprecated
+
+  	  DESCRIPTION
+
+  		"Slot9 Frame Budget."
+
+  	::= { cienaCesCfmGlobalFrameBudget 10 }
+
+
+
+	cienaCesCfmGlobalFrameBudgetSlot10 OBJECT-TYPE
+
+	  SYNTAX    Counter32
+
+  	  MAX-ACCESS read-only
+
+  	  STATUS 	   deprecated
+
+  	  DESCRIPTION
+
+  		"Slot10 Frame Budget."
+
+  	::= { cienaCesCfmGlobalFrameBudget 11 } 
+
+
+
+  
+
+  -- Global CFM Statistics
+
+        
+
+  cienaCesCfmGlobalStatsTxTotalFrames OBJECT-TYPE
+
+ 	SYNTAX		Counter64
+
+ 	MAX-ACCESS	read-only
+
+ 	STATUS		current
+
+ 	DESCRIPTION	
+
+ 		"The number of CFM frames sent."
+
+ 	::= { cienaCesCfmGlobalStats 1 }
+
+   
+
+  cienaCesCfmGlobalStatsTxFloodedframes OBJECT-TYPE
+
+ 	SYNTAX		Counter64
+
+ 	MAX-ACCESS	read-only
+
+ 	STATUS		current
+
+ 	DESCRIPTION	
+
+ 		"The number of flooded frames sent."
+
+ 	::= { cienaCesCfmGlobalStats 2 } 
+
+
+
+ cienaCesCfmGlobalStatsTxFloodignoredInvalidLevel  OBJECT-TYPE
+
+ 	SYNTAX		Counter64
+
+ 	MAX-ACCESS	read-only
+
+ 	STATUS		current
+
+ 	DESCRIPTION	
+
+ 		"This counter is incremented when the frame's destination MAC is not the expected multicast destination MAC for the frame's MD level."
+
+ 	::= { cienaCesCfmGlobalStats 3 }
+
+                                                    
+
+  cienaCesCfmGlobalStatsTxFloodignoredHighLevelMepExist  OBJECT-TYPE
+
+ 	SYNTAX		Counter64
+
+ 	MAX-ACCESS	read-only
+
+ 	STATUS		current
+
+ 	DESCRIPTION	
+
+ 		"This counter is incremented when there is a MEP at a higher MD level than the frame's MD level that blocks the frame from being flooded."
+
+ 	::= { cienaCesCfmGlobalStats 4 }
+
+
+
+ cienaCesCfmGlobalStatsTxFloodignoredSTPState  OBJECT-TYPE
+
+ 	SYNTAX		Counter64
+
+ 	MAX-ACCESS	read-only
+
+ 	STATUS		current
+
+ 	DESCRIPTION	
+
+ 		"This counter is incremented when the STP state of the ingress or egress port is something other than forwarding."
+
+ 	::= { cienaCesCfmGlobalStats 5 } 
+
+ 	
+
+ cienaCesCfmGlobalStatsRxTotalFrames OBJECT-TYPE
+
+	SYNTAX		Counter64
+
+ 	MAX-ACCESS	read-only
+
+ 	STATUS		current
+
+ 	DESCRIPTION	
+
+ 		"The number of frames received."
+
+ 	::= { cienaCesCfmGlobalStats 6 }
+
+
+
+ cienaCesCfmGlobalStatsRxDropInvalidEtype OBJECT-TYPE
+
+  	SYNTAX Counter64
+
+  	MAX-ACCESS read-only
+
+  	STATUS current        
+
+  	DESCRIPTION 
+
+  		"The number of frames dropped when the mode is administratively disabled."
+
+  	::= { cienaCesCfmGlobalStats 7 }
+
+  
+
+  cienaCesCfmGlobalStatsRxDropInvalidOpCode OBJECT-TYPE
+
+  	SYNTAX Counter64
+
+  	MAX-ACCESS read-only
+
+  	STATUS current
+
+  	DESCRIPTION 
+
+  		"The number of received invalid opcode frames dropped."
+
+  	::= { cienaCesCfmGlobalStats 8 }
+
+  	
+
+  cienaCesCfmGlobalStatsRxDropL2DAHeaderLevelMismatch OBJECT-TYPE
+
+  	SYNTAX Counter64
+
+  	MAX-ACCESS read-only
+
+  	STATUS current
+
+  	DESCRIPTION 
+
+  		"The number of frames dropped when the system is not in STP forwarding mode."
+
+  	::= { cienaCesCfmGlobalStats 9 } 
+  
+  cienaCesCfmGlobalStatsRxTotalMalformedFrames OBJECT-TYPE
+
+  	SYNTAX Counter64
+
+  	MAX-ACCESS read-only
+
+  	STATUS current
+
+  	DESCRIPTION 
+
+  		"The number of malformed CFM frames received."
+
+  	::= { cienaCesCfmGlobalStats 10 } 
+    
+	
+
+  -- Global CCM Stats
+
+  cienaCesCfmGlobalCCMStatsTxTotalCCM OBJECT-TYPE
+
+  	SYNTAX Counter64
+
+  	MAX-ACCESS read-only
+
+  	STATUS current
+
+  	DESCRIPTION 
+
+  		"The total number of CCM frames sent."
+
+  	::= { cienaCesCfmGlobalCCMStats  1 }
+
+  
+
+  cienaCesCfmGlobalCCMStatsTxTotalCCMFlooded OBJECT-TYPE
+
+  	SYNTAX Counter64
+
+  	MAX-ACCESS read-only
+
+  	STATUS current
+
+  	DESCRIPTION 
+
+  		"The total number of flooded CCM frames sent."
+
+  	::= { cienaCesCfmGlobalCCMStats  2 }
+
+  
+
+  cienaCesCfmGlobalCCMStatsRxTotalCCM OBJECT-TYPE
+
+  	SYNTAX Counter64
+
+  	MAX-ACCESS read-only
+
+  	STATUS current
+
+  	DESCRIPTION 
+
+  		"The number of valid frames received."
+
+  	::= { cienaCesCfmGlobalCCMStats  3 }
+
+  
+
+ cienaCesCfmGlobalCCMStatsRxTotalCCMSequenceErrors OBJECT-TYPE
+
+  	SYNTAX Counter64
+
+  	MAX-ACCESS read-only
+
+  	STATUS current
+
+  	DESCRIPTION 
+
+  		"The number of errored CCM frames received in sequence."
+
+  	::= { cienaCesCfmGlobalCCMStats  5 }
+
+   
+
+   cienaCesCfmGlobalCCMStatsRxInvalidMAID OBJECT-TYPE
+
+  	SYNTAX Counter64
+
+  	MAX-ACCESS read-only
+
+  	STATUS current
+
+  	DESCRIPTION 
+
+  		"The number of MD level CFM frames received."
+
+  	::= { cienaCesCfmGlobalCCMStats  6 }  
+
+  	
+
+  cienaCesCfmGlobalCCMStatsRxInvalidCCMInterval OBJECT-TYPE
+
+  	SYNTAX Counter64
+
+  	MAX-ACCESS read-only
+
+  	STATUS current
+
+  	DESCRIPTION 
+
+  		"The number of MAID Xcon CFM frames received."
+
+  	::= { cienaCesCfmGlobalCCMStats  7 } 
+
+  
+
+  cienaCesCfmGlobalCCMStatsRxInvalidFirstTlvOffset OBJECT-TYPE
+
+  	SYNTAX Counter64
+
+  	MAX-ACCESS read-only
+
+  	STATUS current
+
+  	DESCRIPTION 
+
+  		"The number of frames dropped when the mode is administratively disabled."
+
+  	::= { cienaCesCfmGlobalCCMStats  8 }
+
+  
+
+   cienaCesCfmGlobalCCMStatsRxInvalidPortStatusTlv OBJECT-TYPE
+
+   	SYNTAX Counter64
+
+  	MAX-ACCESS read-only
+
+  	STATUS current
+
+  	DESCRIPTION 
+
+  		"The number of CCM frames received with invalid port status TLV."
+
+  	::= { cienaCesCfmGlobalCCMStats  9 }
+
+    
+
+   cienaCesCfmGlobalCCMStatsRxInvalidInterfaceStatusTlv OBJECT-TYPE
+
+    	SYNTAX Counter64
+
+    	MAX-ACCESS read-only
+
+    	STATUS current
+
+    	DESCRIPTION
+
+    		"The number of invalid CCM frames received with invalid interface status TLV."
+
+        ::= { cienaCesCfmGlobalCCMStats  11 } 
+
+        
+
+  cienaCesCfmGlobalCCMStatsRxInvalidLogicalInterface OBJECT-TYPE
+
+	SYNTAX Counter64
+
+    MAX-ACCESS read-only
+
+    STATUS current
+
+    DESCRIPTION
+
+    		"The number of invalid CCM frames received with invalid logical interface status TLV."
+
+    ::= { cienaCesCfmGlobalCCMStats  12 }
+
+  
+
+  cienaCesCfmGlobalCCMStatsRxInvalidServiceInstance OBJECT-TYPE
+
+	SYNTAX Counter64
+
+	MAX-ACCESS read-only
+
+    STATUS current
+
+    DESCRIPTION
+
+    		"The number of invalid CCM frames received on invalid service instance."
+
+        ::= { cienaCesCfmGlobalCCMStats  13 }
+
+
+
+cienaCesCfmGlobalCCMStatsRxInvalidPBTEncapTunnel OBJECT-TYPE
+
+	SYNTAX Counter64
+
+    MAX-ACCESS read-only
+
+    STATUS current
+
+    DESCRIPTION
+
+    		"The number of invalid CCM frames received on invalid PBB-TE encapsulation tunnel."
+
+    ::= { cienaCesCfmGlobalCCMStats  14 }
+
+
+
+cienaCesCfmGlobalCCMStatsRxDropAdminDisable OBJECT-TYPE
+
+	SYNTAX Counter64
+
+    MAX-ACCESS read-only
+
+    STATUS current
+
+    DESCRIPTION
+
+    		"The number of CCM frames dropped because of a disabled administrative state."
+
+    ::= { cienaCesCfmGlobalCCMStats  15 }
+
+
+
+	cienaCesCfmGlobalCCMStatsRxDropSTPstatenotForwarding OBJECT-TYPE
+
+	  SYNTAX Counter64
+
+      MAX-ACCESS read-only
+
+      STATUS current
+
+      DESCRIPTION
+
+      "The number of CCM frames dropped because STP state was not forwarding."
+
+   ::= { cienaCesCfmGlobalCCMStats  16 }
+
+
+
+cienaCesCfmGlobalCCMStatsRxDropCCMBlockedbyOppMep  OBJECT-TYPE
+
+	  SYNTAX Counter64
+
+      MAX-ACCESS read-only
+
+      STATUS current
+
+      DESCRIPTION
+
+      "The number of invalid CCM frames dropped because CCM was blocked by opposite MEP."
+
+   ::= { cienaCesCfmGlobalCCMStats  17 }
+
+
+
+cienaCesCfmGlobalCCMStatsRxDropCCMLeakage  OBJECT-TYPE
+
+	  SYNTAX Counter64
+
+      MAX-ACCESS read-only
+
+      STATUS current
+
+      DESCRIPTION
+
+      "The number of CCM frames dropped because of CCM leakage."
+
+   ::= { cienaCesCfmGlobalCCMStats  18 }
+
+
+
+cienaCesCfmGlobalCCMStatsRxDropCCMTooLong  OBJECT-TYPE
+
+	  SYNTAX Counter64
+
+      MAX-ACCESS read-only
+
+      STATUS current
+
+      DESCRIPTION
+
+      "The number of invalid CCM received frames dropped because CCM was too long."
+
+   ::= { cienaCesCfmGlobalCCMStats  19 }
+
+  
+
+cienaCesCfmGlobalCCMStatsRxDropCCMServiceDisabled OBJECT-TYPE
+
+	  SYNTAX Counter64
+
+      MAX-ACCESS read-only
+
+      STATUS current
+
+      DESCRIPTION
+
+      "The number of CCM frames received and dropped because the service was disabled."
+
+   ::= { cienaCesCfmGlobalCCMStats  20 }
+
+
+cienaCesCfmGlobalCCMStatsRxTotalErrorCCM OBJECT-TYPE
+
+	  SYNTAX Counter64
+
+      MAX-ACCESS read-only
+
+      STATUS current
+
+      DESCRIPTION
+
+      "The number of CCM frames received with Error CCM fault."
+
+   ::= { cienaCesCfmGlobalCCMStats  21 }
+
+
+cienaCesCfmGlobalCCMStatsRxTotalMalformedCCM OBJECT-TYPE
+
+	  SYNTAX Counter64
+
+      MAX-ACCESS read-only
+
+      STATUS current
+
+      DESCRIPTION
+
+      "The number of malformed CCM frames received."
+
+   ::= { cienaCesCfmGlobalCCMStats  22 }
+
+
+cienaCesCfmGlobalCCMStatsRxTotalMEPCCM OBJECT-TYPE
+
+	  SYNTAX Counter64
+
+      MAX-ACCESS read-only
+
+      STATUS current
+
+      DESCRIPTION
+
+      "The number of CCM frames received by CFM MEPs."
+
+   ::= { cienaCesCfmGlobalCCMStats  23 }
+
+cienaCesCfmGlobalCCMStatsRxTotalMIPCCM OBJECT-TYPE
+
+	  SYNTAX Counter64
+
+      MAX-ACCESS read-only
+
+      STATUS current
+
+      DESCRIPTION
+
+      "The number of CCM frames received by CFM MIPs."
+
+   ::= { cienaCesCfmGlobalCCMStats  24 }
+	
+
+-- Global Loopback Statististics     
+
+
+
+	cienaCesCfmGlobalLoopbackStatsTxTotalLBM OBJECT-TYPE
+
+	  	SYNTAX Counter64
+
+    	MAX-ACCESS read-only
+
+    	STATUS current
+
+    	DESCRIPTION
+
+    		"The number of loopback message frames sent."
+
+        ::= { cienaCesCfmGlobalLoopbackStats  1 }
+
+     
+
+	cienaCesCfmGlobalLoopbackStatsTxTotalLBR  OBJECT-TYPE
+
+	    SYNTAX Counter64
+
+    	MAX-ACCESS read-only
+
+    	STATUS current
+
+    	DESCRIPTION
+
+    		"The total number of loopback reply frames sent."
+
+        ::= { cienaCesCfmGlobalLoopbackStats  2 }
+
+
+
+	cienaCesCfmGlobalLoopbackStatsRxTotalLBM OBJECT-TYPE
+
+   		SYNTAX Counter64
+
+    	MAX-ACCESS read-only
+
+    	STATUS current
+
+    	DESCRIPTION
+
+    		"The total number of loopback message frames received."
+
+        ::= { cienaCesCfmGlobalLoopbackStats  3 }
+
+
+
+		
+
+	cienaCesCfmGlobalLoopbackStatsRxTotalLBR  OBJECT-TYPE
+
+	   SYNTAX Counter64
+
+    	MAX-ACCESS read-only
+
+    	STATUS current
+
+    	DESCRIPTION
+
+    		"The total number of loopback reply frames received."
+
+        ::= { cienaCesCfmGlobalLoopbackStats  4 }
+
+
+
+
+
+	cienaCesCfmGlobalLoopbackStatsRxTotalInOrderLBR  OBJECT-TYPE
+
+	   SYNTAX Counter64
+
+    	MAX-ACCESS read-only
+
+    	STATUS current
+
+    	DESCRIPTION
+
+    		"The total number of in order loopback reply frames received."
+
+        ::= { cienaCesCfmGlobalLoopbackStats  5 }
+
+
+
+
+
+	cienaCesCfmGlobalLoopbackStatsRxTotalOutOfOrderLBR  OBJECT-TYPE  
+
+	   SYNTAX Counter64
+
+    	MAX-ACCESS read-only
+
+    	STATUS current
+
+    	DESCRIPTION
+
+    		"The total number of out of order loopback reply frames received."
+
+        ::= { cienaCesCfmGlobalLoopbackStats  6 }
+
+
+
+
+
+	cienaCesCfmGlobalLoopbackStatsRxTotalContentMismatchLBR OBJECT-TYPE
+
+	   SYNTAX Counter64
+
+    	MAX-ACCESS read-only
+
+    	STATUS current
+
+    	DESCRIPTION
+
+    		"The total number of content mismatch loopback reply frames sent."
+
+        ::= { cienaCesCfmGlobalLoopbackStats  7 }
+
+
+
+
+
+	cienaCesCfmGlobalLoopbackStatsRxTotalUnexpectedLBR OBJECT-TYPE
+
+	   SYNTAX Counter64
+
+    	MAX-ACCESS read-only
+
+    	STATUS current
+
+    	DESCRIPTION
+
+    		"The total number of unexpected loopback reply frames received."
+
+        ::= { cienaCesCfmGlobalLoopbackStats  8 }
+
+
+
+
+
+	cienaCesCfmGlobalLoopbackStatsRxLBMInvalidFirstTLVOffset OBJECT-TYPE
+
+	   SYNTAX Counter64
+
+    	MAX-ACCESS read-only
+
+    	STATUS current
+
+    	DESCRIPTION
+
+    		"The total number of loopback message frames received with invalid TLV offset."
+
+        ::= { cienaCesCfmGlobalLoopbackStats  9 }
+
+
+
+
+
+	cienaCesCfmGlobalLoopbackStatsRxLBRInvalidFirstTLVOffset OBJECT-TYPE
+
+	   SYNTAX Counter64
+
+    	MAX-ACCESS read-only
+
+    	STATUS current
+
+    	DESCRIPTION
+
+    		"The total number of loopback reply frames received with invalid first TLV offset."
+
+        ::= { cienaCesCfmGlobalLoopbackStats  10 }
+
+
+
+
+
+	cienaCesCfmGlobalLoopbackStatsRxUnresolvedLBM OBJECT-TYPE
+
+	   SYNTAX Counter64
+
+    	MAX-ACCESS read-only
+
+    	STATUS current
+
+    	DESCRIPTION
+
+    		"The total number of unresolved loopback message frames received."
+
+        ::= { cienaCesCfmGlobalLoopbackStats  11 }
+
+
+
+
+
+	cienaCesCfmGlobalLoopbackStatsRxUnresolvedLBR OBJECT-TYPE 
+
+		SYNTAX Counter64
+
+    	MAX-ACCESS read-only
+
+    	STATUS current
+
+    	DESCRIPTION
+
+    		"The total number of unresolved loopback reply frames received."
+
+        ::= { cienaCesCfmGlobalLoopbackStats  12 }
+
+
+	cienaCesCfmGlobalLoopbackStatsRxTotalMalformedLBM OBJECT-TYPE 
+
+        SYNTAX Counter64
+
+    	MAX-ACCESS read-only
+
+    	STATUS current
+
+    	DESCRIPTION
+
+    		"The total number of malformed loopback messages received."
+
+        ::= { cienaCesCfmGlobalLoopbackStats  13 }
+
+
+
+
+
+ -- Global LinkTrace Statistics
+
+    cienaCesCfmGlobalLinkTraceStatsTxTotalLTM OBJECT-TYPE
+
+       	SYNTAX Counter64
+
+    	MAX-ACCESS read-only
+
+    	STATUS current
+
+    	DESCRIPTION
+
+    		"The number of linktrace messages transmitted."
+
+        ::= { cienaCesCfmGlobalLinkTraceStats  1 }
+
+
+
+	cienaCesCfmGlobalLinkTraceStatsTxTotalLTR  OBJECT-TYPE
+
+       	SYNTAX Counter64
+
+    	MAX-ACCESS read-only
+
+    	STATUS current
+
+    	DESCRIPTION
+
+    		"The number of linktrace replies transmitted."
+
+        ::= { cienaCesCfmGlobalLinkTraceStats  2 }
+
+
+
+	cienaCesCfmGlobalLinkTraceStatsRxTotalLTM  OBJECT-TYPE
+
+       	SYNTAX Counter64
+
+    	MAX-ACCESS read-only
+
+    	STATUS current
+
+    	DESCRIPTION
+
+    		"The number of linktrace messages received."
+
+        ::= { cienaCesCfmGlobalLinkTraceStats  3 }
+
+
+
+	cienaCesCfmGlobalLinkTraceStatsRxTotalLTR OBJECT-TYPE
+
+       	SYNTAX Counter64
+
+    	MAX-ACCESS read-only
+
+    	STATUS current
+
+    	DESCRIPTION
+
+    		"The number of linktrace replies received."
+
+        ::= { cienaCesCfmGlobalLinkTraceStats  4 }
+
+
+
+	cienaCesCfmGlobalLinkTraceStatsRxTotalUnexpectedLTR OBJECT-TYPE
+
+       	SYNTAX Counter64
+
+    	MAX-ACCESS read-only
+
+    	STATUS current
+
+    	DESCRIPTION
+
+    		"The number of unexpected linktrace replies received."
+
+        ::= { cienaCesCfmGlobalLinkTraceStats  5 }
+
+
+
+	cienaCesCfmGlobalLinkTraceStatsRxLTMInvalidFirstTLVOffset OBJECT-TYPE
+
+       	SYNTAX Counter64
+
+    	MAX-ACCESS read-only
+
+    	STATUS current
+
+    	DESCRIPTION
+
+    		"The number of linktrace messages received with an invalid first TLV offset."
+
+        ::= { cienaCesCfmGlobalLinkTraceStats  6 }
+
+
+
+	cienaCesCfmGlobalLinkTraceStatsRxLTRInvalidFirstTLVOffset OBJECT-TYPE
+
+       	SYNTAX Counter64
+
+    	MAX-ACCESS read-only
+
+    	STATUS current
+
+    	DESCRIPTION
+
+    		"The number of linktrace replies received with an invalid first TLV offset."
+
+        ::= { cienaCesCfmGlobalLinkTraceStats  7 }
+
+
+
+	cienaCesCfmGlobalLinkTraceStatsRxLTRInvalidRelayAction  OBJECT-TYPE
+
+       	SYNTAX Counter64
+
+    	MAX-ACCESS read-only
+
+    	STATUS current
+
+    	DESCRIPTION
+
+    		"The number of linktrace replies received with an invalid relay action."
+
+        ::= { cienaCesCfmGlobalLinkTraceStats  8 }
+
+
+
+	cienaCesCfmGlobalLinkTraceStatsRxUnresolvedLTM  OBJECT-TYPE
+
+       	SYNTAX Counter64
+
+    	MAX-ACCESS read-only
+
+    	STATUS current
+
+    	DESCRIPTION
+
+    		"The number of linktrace messages received that could not be resolved."
+
+        ::= { cienaCesCfmGlobalLinkTraceStats  9 }
+
+
+
+	cienaCesCfmGlobalLinkTraceStatsRxUnresolvedLTR  OBJECT-TYPE
+
+       	SYNTAX Counter64
+
+    	MAX-ACCESS read-only
+
+    	STATUS current
+
+    	DESCRIPTION
+
+    		"The number of linktrace replies received that could not be resolved."
+
+        ::= { cienaCesCfmGlobalLinkTraceStats  10 }
+
+
+
+ 	
+
+--Global Delay Measurement Statistics
+
+	cienaCesCfmGlobalDelayMeasurementStatsTxTotalDMM   OBJECT-TYPE
+
+       	SYNTAX Counter64
+
+    	MAX-ACCESS read-only
+
+    	STATUS current
+
+    	DESCRIPTION
+
+    		"The number of DMM frames transmitted."
+
+        ::= { cienaCesCfmGlobalDelayMeasurementStats  1 }
+
+
+
+	cienaCesCfmGlobalDelayMeasurementStatsTxTotalDMR  OBJECT-TYPE
+
+       	SYNTAX Counter64
+
+    	MAX-ACCESS read-only
+
+    	STATUS current
+
+    	DESCRIPTION
+
+    		"The number of DMR frames transmitted."
+
+        ::= { cienaCesCfmGlobalDelayMeasurementStats  2 }
+
+
+
+	cienaCesCfmGlobalDelayMeasurementStatsRxTotalDMM OBJECT-TYPE
+
+       	SYNTAX Counter64
+
+    	MAX-ACCESS read-only
+
+    	STATUS current
+
+    	DESCRIPTION
+
+    		"The number of DMM frames received."
+
+        ::= { cienaCesCfmGlobalDelayMeasurementStats  3 }
+
+
+
+	cienaCesCfmGlobalDelayMeasurementStatsRxTotalDMR OBJECT-TYPE
+
+       	SYNTAX Counter64
+
+    	MAX-ACCESS read-only
+
+    	STATUS current
+
+    	DESCRIPTION
+
+    		"The number of DMR frames received."
+
+        ::= { cienaCesCfmGlobalDelayMeasurementStats  4 }
+
+
+
+	
+
+--Global Loss Measurement Statistics  
+
+    
+
+  cienaCesCfmGlobalLossMeasurementStatsTxTotalLMM OBJECT-TYPE
+
+       	SYNTAX Counter64
+
+    	MAX-ACCESS read-only
+
+    	STATUS current
+
+    	DESCRIPTION
+
+    		"The number of LMM frames transmitted."
+
+        ::= { cienaCesCfmGlobalLossMeasurementStats  1 }
+
+
+
+	cienaCesCfmGlobalLossMeasurementStatsTxTotalLMR   OBJECT-TYPE
+
+       	SYNTAX Counter64
+
+    	MAX-ACCESS read-only
+
+    	STATUS current
+
+    	DESCRIPTION
+
+    		"The number of LMR frames transmitted."
+
+        ::= { cienaCesCfmGlobalLossMeasurementStats  2 }
+
+
+
+	cienaCesCfmGlobalLossMeasurementStatsRxTotalLMM  OBJECT-TYPE
+
+       	SYNTAX Counter64
+
+    	MAX-ACCESS read-only
+
+    	STATUS current
+
+    	DESCRIPTION
+
+    		"The number of LMM frames received."
+
+        ::= { cienaCesCfmGlobalLossMeasurementStats  3 }
+
+
+
+	cienaCesCfmGlobalLossMeasurementStatsRxTotalLMR  OBJECT-TYPE
+
+       	SYNTAX Counter64
+
+    	MAX-ACCESS read-only
+
+    	STATUS current
+
+    	DESCRIPTION
+
+    		"The number of LMR frames received."
+
+        ::= { cienaCesCfmGlobalLossMeasurementStats 4 }
+
+       	 	
+--
+-- cienaCesCfmGlobalSyntheticLossMeasurementStats
+--        
+        cienaCesCfmGlobalSyntheticLossMeasurementStatsTxTotalSLM  OBJECT-TYPE
+        	SYNTAX Counter64
+        	MAX-ACCESS  read-only
+        	STATUS current
+        	DESCRIPTION
+        		"The total number of synthetic loss messages transmitted."
+        	::= {cienaCesCfmGlobalSyntheticLossMeasurementStats  1 }  
+       
+       cienaCesCfmGlobalSyntheticLossMeasurementStatsTxTotalSLR OBJECT-TYPE
+        	SYNTAX Counter64
+        	MAX-ACCESS  read-only
+        	STATUS current
+        	DESCRIPTION
+        		"The total number of synthetic loss replies transmitted."
+        	::= {cienaCesCfmGlobalSyntheticLossMeasurementStats 2 }  
+        
+       cienaCesCfmGlobalSyntheticLossMeasurementStatsRxTotalSLM OBJECT-TYPE
+       		SYNTAX Counter64
+       		MAX-ACCESS read-only
+       		STATUS current
+       		DESCRIPTION
+       			"The total number of synthetic loss messages received."
+       	 	::= { cienaCesCfmGlobalSyntheticLossMeasurementStats  3 }
+       	
+       	cienaCesCfmGlobalSyntheticLossMeasurementStatsRxTotalSLR  OBJECT-TYPE
+       		SYNTAX Counter64
+       		MAX-ACCESS read-only
+       		STATUS current
+       		DESCRIPTION
+       			"The total number of synthetic loss replies received."
+       	 	::= { cienaCesCfmGlobalSyntheticLossMeasurementStats  4 }
+
+       cienaCesCfmGlobalSyntheticLossMeasurementStatsRxTotalValidSLM  OBJECT-TYPE
+        	SYNTAX Counter64
+        	MAX-ACCESS  read-only
+        	STATUS current
+        	DESCRIPTION
+        		"The total number of valid synthetic loss messages received."
+        	::= {cienaCesCfmGlobalSyntheticLossMeasurementStats  5 }  
+       
+       cienaCesCfmGlobalSyntheticLossMeasurementStatsRxTotalValidSLR OBJECT-TYPE
+        	SYNTAX Counter64
+        	MAX-ACCESS  read-only
+        	STATUS current
+        	DESCRIPTION
+        		"The total number of valid synthetic loss replies received."
+        	::= {cienaCesCfmGlobalSyntheticLossMeasurementStats 6 }  
+        
+       cienaCesCfmGlobalSyntheticLossMeasurementStatsRxTotalInvalidSLM OBJECT-TYPE
+       		SYNTAX Counter64
+       		MAX-ACCESS read-only
+       		STATUS current
+       		DESCRIPTION
+       			"The total number of invalid synthetic loss messages received."
+       	 	::= { cienaCesCfmGlobalSyntheticLossMeasurementStats  7 }
+       	
+       	cienaCesCfmGlobalSyntheticLossMeasurementStatsRxTotalInvalidSLR  OBJECT-TYPE
+       		SYNTAX Counter64
+       		MAX-ACCESS read-only
+       		STATUS current
+       		DESCRIPTION
+       			"The total number of invalid synthetic loss replies received."
+       	 	::= { cienaCesCfmGlobalSyntheticLossMeasurementStats  8 }
+         
+       	cienaCesCfmGlobalSyntheticLossMeasurementStatsRxDropSLM  OBJECT-TYPE
+       		SYNTAX Counter64
+       		MAX-ACCESS read-only
+       		STATUS current
+       		DESCRIPTION
+       			"The total number of synthetic loss messages dropped due to lack of responder resources."
+       	 	::= { cienaCesCfmGlobalSyntheticLossMeasurementStats  9 }
+ 
+-- CFM Service Statistics
+
+	
+
+	cienaCesCfmServiceStatsTable OBJECT-TYPE
+
+     SYNTAX     SEQUENCE OF CienaCesCfmServiceStatsEntry
+
+     MAX-ACCESS not-accessible
+
+     STATUS     current
+
+     DESCRIPTION
+
+            "The (conceptual) table listing the statistics 
+
+            for a given CFM service."  
+
+     ::= { cienaCesCfmServiceStats 1 }
+
+
+
+ 
+
+ cienaCesCfmServiceStatsEntry OBJECT-TYPE
+
+     SYNTAX      CienaCesCfmServiceStatsEntry
+
+     MAX-ACCESS  not-accessible
+
+     STATUS      current
+
+     DESCRIPTION
+
+           "An entry (conceptual row) in the CienaCesCfmServiceTable."
+
+     INDEX {cienaCesCfmServiceIndex}
+
+     ::= { cienaCesCfmServiceStatsTable 1 }
+
+ 
+
+ CienaCesCfmServiceStatsEntry ::=  SEQUENCE { 
+
+	cienaCesCfmServiceStatsTotalTx						Counter64,
+
+ 	cienaCesCfmServiceStatsTotalRx 						Counter64,
+
+ 	cienaCesCfmServiceStatsTotalTxLTM 					Counter64,
+
+ 	cienaCesCfmServiceStatsTotalTxLTR  					Counter64,
+
+ 	cienaCesCfmServiceStatsTotalRxLTM 					Counter64,
+
+ 	cienaCesCfmServiceStatsTotalRxLTR 					Counter64,
+
+ 	cienaCesCfmServiceStatsTotalRxUnexpectedLTR 		Counter64,
+
+ 	cienaCesCfmServiceStatsTotalTxLBM 					Counter64,
+
+ 	cienaCesCfmServiceStatsTotalTxLBR 					Counter64,
+
+ 	cienaCesCfmServiceStatsTotalRxLBM 					Counter64,
+
+ 	cienaCesCfmServiceStatsTotalRxInorderLBR 			Counter64,
+
+ 	cienaCesCfmServiceStatsTotalRxOutOforderLBR    		Counter64, 
+
+ 	cienaCesCfmServiceStatsTotalRxContentMismatchLBR  	Counter64,
+
+ 	cienaCesCfmServiceStatsTotalRxUnexpectedLBR 		Counter64,
+
+ 	cienaCesCfmServiceStatsClear						CienaStatsClear
+
+	}
+
+    
+
+    cienaCesCfmServiceStatsTotalTx	OBJECT-TYPE
+
+ 		SYNTAX Counter64
+
+ 		MAX-ACCESS read-only
+
+ 		STATUS current
+
+ 		DESCRIPTION
+
+ 		"The total CFM frames sent for the service."
+
+ 	::= { cienaCesCfmServiceStatsEntry 1 } 
+
+
+
+	cienaCesCfmServiceStatsTotalRx  OBJECT-TYPE
+
+ 		SYNTAX Counter64
+
+ 		MAX-ACCESS read-only
+
+ 		STATUS current
+
+ 		DESCRIPTION
+
+ 		"The total CFM frames received for the service."
+
+ 	::= { cienaCesCfmServiceStatsEntry 2 } 
+
+
+
+	
+
+	cienaCesCfmServiceStatsTotalTxLTM OBJECT-TYPE
+
+ 		SYNTAX Counter64
+
+ 		MAX-ACCESS read-only
+
+ 		STATUS current
+
+ 		DESCRIPTION
+
+ 		"The total number of linktrace messages transmitted for the CFM service."
+
+ 	::= { cienaCesCfmServiceStatsEntry 3 } 
+
+
+
+
+
+	cienaCesCfmServiceStatsTotalTxLTR OBJECT-TYPE
+
+ 		SYNTAX Counter64
+
+ 		MAX-ACCESS read-only
+
+ 		STATUS current
+
+ 		DESCRIPTION
+
+ 		"The total number of linktrace replies transmitted for the CFM service."
+
+ 	::= { cienaCesCfmServiceStatsEntry 4 } 
+
+
+
+	cienaCesCfmServiceStatsTotalRxLTM  OBJECT-TYPE
+
+ 		SYNTAX Counter64
+
+ 		MAX-ACCESS read-only
+
+ 		STATUS current
+
+ 		DESCRIPTION
+
+ 		"The total number of link trace messages received for the CFM service."
+
+ 	::= { cienaCesCfmServiceStatsEntry 5 } 
+
+
+
+
+
+	cienaCesCfmServiceStatsTotalRxLTR  OBJECT-TYPE
+
+ 		SYNTAX Counter64
+
+ 		MAX-ACCESS read-only
+
+ 		STATUS current
+
+ 		DESCRIPTION
+
+ 		"The total number of linktrace replies received for the CFM service."
+
+ 	::= { cienaCesCfmServiceStatsEntry 6 } 
+
+
+
+
+
+	cienaCesCfmServiceStatsTotalRxUnexpectedLTR   OBJECT-TYPE
+
+ 		SYNTAX Counter64
+
+ 		MAX-ACCESS read-only
+
+ 		STATUS current
+
+ 		DESCRIPTION
+
+ 		"The total number of unexpected linktrace replies received for the CFM service."
+
+ 	::= { cienaCesCfmServiceStatsEntry 7 } 
+
+
+
+
+
+	cienaCesCfmServiceStatsTotalTxLBM  OBJECT-TYPE
+
+ 		SYNTAX Counter64
+
+ 		MAX-ACCESS read-only
+
+ 		STATUS current
+
+ 		DESCRIPTION
+
+ 		"The total number of loopback messages transmitted for the CFM service."
+
+ 	::= { cienaCesCfmServiceStatsEntry 8 } 
+
+
+
+
+
+	cienaCesCfmServiceStatsTotalTxLBR   OBJECT-TYPE
+
+ 		SYNTAX Counter64
+
+ 		MAX-ACCESS read-only
+
+ 		STATUS current
+
+ 		DESCRIPTION
+
+ 		"The total number of loopback replies transmitted for the CFM service."
+
+ 	::= { cienaCesCfmServiceStatsEntry 9 } 
+
+
+
+
+
+	cienaCesCfmServiceStatsTotalRxLBM    OBJECT-TYPE
+
+ 		SYNTAX Counter64
+
+ 		MAX-ACCESS read-only
+
+ 		STATUS current
+
+ 		DESCRIPTION
+
+ 		"The total  number of loopback messages received for the CFM service."
+
+ 	::= { cienaCesCfmServiceStatsEntry 10 } 
+
+
+
+
+
+	cienaCesCfmServiceStatsTotalRxInorderLBR  OBJECT-TYPE
+
+ 		SYNTAX Counter64
+
+ 		MAX-ACCESS read-only
+
+ 		STATUS current
+
+ 		DESCRIPTION
+
+ 		"The total number of in-order loopback replies received."
+
+ 	::= { cienaCesCfmServiceStatsEntry 11 } 
+
+
+
+
+
+	cienaCesCfmServiceStatsTotalRxOutOforderLBR OBJECT-TYPE
+
+ 		SYNTAX Counter64
+
+ 		MAX-ACCESS read-only
+
+ 		STATUS current
+
+ 		DESCRIPTION
+
+ 		"The total number of out-of-order loopback replies received."
+
+ 	::= { cienaCesCfmServiceStatsEntry 12 } 
+
+
+
+
+
+	cienaCesCfmServiceStatsTotalRxContentMismatchLBR  OBJECT-TYPE
+
+ 		SYNTAX Counter64
+
+ 		MAX-ACCESS read-only
+
+ 		STATUS current
+
+ 		DESCRIPTION
+
+ 		"The total number of content mismatched loopback replies received."
+
+ 	::= { cienaCesCfmServiceStatsEntry 13 } 
+
+
+
+
+
+	cienaCesCfmServiceStatsTotalRxUnexpectedLBR  OBJECT-TYPE
+
+ 		SYNTAX Counter64
+
+ 		MAX-ACCESS read-only
+
+ 		STATUS current
+
+ 		DESCRIPTION
+
+ 		"The total number of unexpectecd loopback replies received."
+
+ 	::= { cienaCesCfmServiceStatsEntry 14 } 
+
+   
+
+   cienaCesCfmServiceStatsClear	OBJECT-TYPE
+
+   	    SYNTAX CienaStatsClear
+
+   	    MAX-ACCESS read-write
+
+   	    STATUS current
+
+   	    DESCRIPTION
+
+   	    	"To clear statistics for a given service, set this object to clear(1). During GET this object returns none(0)"
+
+   	    
+
+   	    ::=  { cienaCesCfmServiceStatsEntry 15 }   
+
+
+
+-- CFM Mep Statistics
+
+  cienaCesCfmMepStatsTable OBJECT-TYPE
+
+     SYNTAX     SEQUENCE OF CienaCesCfmMepStatsEntry
+
+     MAX-ACCESS not-accessible
+
+     STATUS     current
+
+     DESCRIPTION
+
+            "The (conceptual) table listing the configuration 
+
+            parameters for the CFM MEP table."  
+
+     ::= { cienaCesCfmMepStats 1 }
+
+                
+
+ cienaCesCfmMepStatsEntry OBJECT-TYPE
+
+     SYNTAX      CienaCesCfmMepStatsEntry
+
+     MAX-ACCESS  not-accessible
+
+     STATUS      current
+
+     DESCRIPTION
+
+           "An entry (conceptual row) in the cienaCesCfmMepStatsTable."   
+
+     INDEX {cienaCesCfmServiceIndex, cienaCesCfmMEPId}
+
+     ::= { cienaCesCfmMepStatsTable 1 }   
+
+ 
+
+  CienaCesCfmMepStatsEntry ::=  SEQUENCE {  
+
+     cienaCesCfmMepInterfaceType			CienaCesCfmInterfaceType,
+
+     cienaCesCfmMepInterfaceIndex			Unsigned32,
+
+     cienaCesCfmMepStatsTxTotalCCM 			Counter64,
+
+     cienaCesCfmMepStatsRxTotalCCM			Counter64,
+
+     cienaCesCfmMepStatsTxLoopbackMessages      	Counter64,
+
+     cienaCesCfmMepStatsTxLoopbackReply   		Counter64,
+
+     cienaCesCfmMepStatsRxLoopbackMessages        	Counter64,     
+
+     cienaCesCfmMepStatsRxInorderLoopbackReply    	Counter64,
+
+     cienaCesCfmMepStatsRxOutoforderLoopbackReply   	Counter64,
+
+     cienaCesCfmMepStatsRxContentMismatchLoopbackReply  Counter64,
+
+     cienaCesCfmMepStatsRxUnexpectedLoopbackReply   	Counter64,  
+
+     cienaCesCfmMepStatsTxLinktraceMessage        	Counter64,     
+
+     cienaCesCfmMepStatsTxLinktraceReply            	Counter64,
+
+     cienaCesCfmMepStatsRxLinktraceMessage          	Counter64,
+
+     cienaCesCfmMepStatsRxLinktraceReply             	Counter64,
+
+     cienaCesCfmMepStatsRxUnexpectedLinktraceReply    	Counter64,
+
+     cienaCesCfmMepStatsTxDelayMeasurementMessage     	Counter64,
+
+     cienaCesCfmMepStatsTxDelayMeasurementReply        	Counter64,
+
+     cienaCesCfmMepStatsRxDelayMeasurementMessage     	Counter64,
+
+     cienaCesCfmMepStatsRxDelayMeasurementReply         Counter64,
+
+     cienaCesCfmMepStatsTxLossMeasurementMessage        Counter64,
+
+     cienaCesCfmMepStatsTxLossMeasurementReply          Counter64,
+
+     cienaCesCfmMepStatsRxLossMeasurementMessage        Counter64,
+
+     cienaCesCfmMepStatsRxLossMeasurementReply          Counter64,
+
+     cienaCesCfmMepStatsLastLBMTargetRemoteMepId	Unsigned32,
+
+     cienaCesCfmMepStatsLastLBMTargetMacAddress	 	CienaMacAddress,
+
+     cienaCesCfmMepStatsLastLBMPriority			Unsigned32,
+
+     cienaCesCfmMepStatsLastLBMCount			Unsigned32,
+
+     cienaCesCfmMepStatsLastLBMFirstSeqNum		Unsigned32,
+
+     cienaCesCfmMepStatsLastLTMTargetRemoteMepId  	Unsigned32,
+
+     cienaCesCfmMepStatsLastLTMTargetMacAddress		CienaMacAddress,
+
+     cienaCesCfmMepStatsLastLTMPriority			Unsigned32,
+
+     cienaCesCfmMepStatsLastLTMSeqNum			Unsigned32,
+
+     cienaCesCfmMepStatsLastLTMInitialTTL		Unsigned32,  
+
+     cienaCesCfmMepStatsLastDMMTargetRemoteMepId	Unsigned32,
+
+     cienaCesCfmMepStatsLastDMMTargetMacAddress		CienaMacAddress,
+
+     cienaCesCfmMepStatsLastDMMPriority			Unsigned32,
+
+     cienaCesCfmMepStatsLastDMMRepeatInterval		Unsigned32,
+
+     cienaCesCfmMepStatsLastDMMNumOfDmmToSend		Unsigned32,
+
+     cienaCesCfmMepStatsLastLMMTargetRemoteMepId	Unsigned32,
+
+     cienaCesCfmMepStatsLastLMMTargetMacAddress		CienaMacAddress,
+
+     cienaCesCfmMepStatsLastLMMPriority			Unsigned32,
+
+     cienaCesCfmMepStatsLastLMMRepeatInterval		Unsigned32,
+
+     cienaCesCfmMepStatsLastLMMNumOfLmmToSend		Unsigned32,
+
+     cienaCesCfmMepStatsNextLBMSeqNumber                Counter32,
+
+     cienaCesCfmMepStatsNextLTMSeqNumber                Counter32,
+     
+     cienaCesCfmMepStatsTxSyntheticLossMeasurementMessage     	Counter64,
+
+     cienaCesCfmMepStatsTxSyntheticLossMeasurementReply        	Counter64,
+
+     cienaCesCfmMepStatsRxSyntheticLossMeasurementMessage     	Counter64,
+
+     cienaCesCfmMepStatsRxSyntheticLossMeasurementReply         Counter64,
+     
+     cienaCesCfmMepStatsRxValidSyntheticLossMeasurementMessage     	Counter64,
+
+     cienaCesCfmMepStatsRxValidSyntheticLossMeasurementReply        	Counter64,
+
+     cienaCesCfmMepStatsRxInvalidSyntheticLossMeasurementMessage     	Counter64,
+
+     cienaCesCfmMepStatsRxInvalidSyntheticLossMeasurementReply         Counter64,
+     
+     cienaCesCfmMepStatsRxCCMWithErrorCCMFault                         Counter64,
+     
+     cienaCesCfmMepStatsRxCCMWithXCONFault                             Counter64,
+     
+     cienaCesCfmMepStatsRxCCMWithRMEPLOCFault                          Counter64,
+     
+     cienaCesCfmMepStatsRxCCMWithRDI0                                  Counter64,
+     
+     cienaCesCfmMepStatsRxCCMWithRDI1                                  Counter64,
+     
+     cienaCesCfmMepStatsRxCCMWithSequenceNumberMismatch                Counter64,
+     
+     cienaCesCfmMepStatsRxCCMDroppedWithMalformedTlv                   Counter64,
+
+     cienaCesCfmMepStatsToTxLoopbackMessages      	                   Counter64
+  } 
+
+    
+
+  cienaCesCfmMepInterfaceType 	OBJECT-TYPE
+
+     SYNTAX      CienaCesCfmInterfaceType
+
+     MAX-ACCESS  read-only
+
+     STATUS      current
+
+     DESCRIPTION
+
+             "This object is used as the index in the table and indicates 
+
+             the MEP interface for the given service."
+
+     ::= { cienaCesCfmMepStatsEntry 1 }  
+
+    
+
+  cienaCesCfmMepInterfaceIndex OBJECT-TYPE
+
+  	 SYNTAX      Unsigned32
+
+     MAX-ACCESS  read-only
+
+     STATUS      current
+
+     DESCRIPTION
+
+             "This object is used as the index in the table and indicates 
+
+             the MEP interface index for the given service."
+
+     ::= { cienaCesCfmMepStatsEntry 2 }  
+
+
+
+  cienaCesCfmMepStatsTxTotalCCM OBJECT-TYPE 
+
+    SYNTAX Counter64
+
+	MAX-ACCESS read-only
+
+ 	STATUS current
+
+ 	DESCRIPTION
+
+ 		"The total number of CCM messages transmitted by the CFM MEP."
+
+ 	::= { cienaCesCfmMepStatsEntry 3 }
+
+  
+
+  cienaCesCfmMepStatsRxTotalCCM  OBJECT-TYPE 
+
+  	SYNTAX Counter64
+
+	MAX-ACCESS read-only
+
+ 	STATUS current
+
+ 	DESCRIPTION
+
+ 		"The total number of CCM messages received by the CFM MEP."
+
+ 	::= { cienaCesCfmMepStatsEntry 4 }
+
+  
+
+  cienaCesCfmMepStatsTxLoopbackMessages  OBJECT-TYPE
+
+  	SYNTAX Counter64
+
+	MAX-ACCESS read-only
+
+ 	STATUS current
+
+ 	DESCRIPTION
+
+ 		"The total number of loopback messages transmitted by the CFM MEP."
+
+ 	::= { cienaCesCfmMepStatsEntry 5 }
+
+  
+
+  cienaCesCfmMepStatsTxLoopbackReply OBJECT-TYPE
+
+  	SYNTAX Counter64
+
+	MAX-ACCESS read-only
+
+ 	STATUS current
+
+ 	DESCRIPTION
+
+ 		"The total number of loopback replies transmitted by the CFM MEP."
+
+ 	::= { cienaCesCfmMepStatsEntry 6 }
+
+
+
+  cienaCesCfmMepStatsRxLoopbackMessages  OBJECT-TYPE
+
+  	SYNTAX Counter64
+
+	MAX-ACCESS read-only
+
+ 	STATUS current
+
+ 	DESCRIPTION
+
+ 		"The total number of loopback messages received by the CFM MEP."
+
+ 	::= { cienaCesCfmMepStatsEntry 7 }
+
+  
+
+  cienaCesCfmMepStatsRxInorderLoopbackReply  OBJECT-TYPE
+
+  	SYNTAX Counter64
+
+	MAX-ACCESS read-only
+
+ 	STATUS current
+
+ 	DESCRIPTION
+
+ 		"The total number of in-order loopback replies received by the CFM MEP."
+
+ 	::= { cienaCesCfmMepStatsEntry 8 }
+
+  
+
+  cienaCesCfmMepStatsRxOutoforderLoopbackReply OBJECT-TYPE
+
+  	SYNTAX Counter64
+
+	MAX-ACCESS read-only
+
+ 	STATUS current
+
+ 	DESCRIPTION
+
+ 		"The total number of out-of-order loopback replies received by the CFM MEP."
+
+ 	::= { cienaCesCfmMepStatsEntry 9 }
+
+
+
+  cienaCesCfmMepStatsRxContentMismatchLoopbackReply	OBJECT-TYPE
+
+  	SYNTAX Counter64
+
+	MAX-ACCESS read-only
+
+ 	STATUS current
+
+ 	DESCRIPTION
+
+ 		"The total number of content mismatched loopback replies received by the CFM MEP."
+
+ 	::= { cienaCesCfmMepStatsEntry 10 }
+
+
+
+  cienaCesCfmMepStatsRxUnexpectedLoopbackReply  OBJECT-TYPE
+
+  	SYNTAX Counter64
+
+	MAX-ACCESS read-only
+
+ 	STATUS current
+
+ 	DESCRIPTION
+
+ 		"The total number of unexpected loopback replies received by the CFM MEP."
+
+ 	::= { cienaCesCfmMepStatsEntry 11 }
+
+
+
+  cienaCesCfmMepStatsTxLinktraceMessage  OBJECT-TYPE
+
+  	SYNTAX Counter64
+
+	MAX-ACCESS read-only
+
+ 	STATUS current
+
+ 	DESCRIPTION
+
+ 		"The total number of linktrace messages transmitted by the CFM MEP."
+
+ 	::= { cienaCesCfmMepStatsEntry 12 }
+
+  
+
+  cienaCesCfmMepStatsTxLinktraceReply OBJECT-TYPE
+
+  	SYNTAX Counter64
+
+	MAX-ACCESS read-only
+
+ 	STATUS current
+
+ 	DESCRIPTION
+
+ 		"The total number of linktrace replies transmitted by the CFM MEP."
+
+ 	::= { cienaCesCfmMepStatsEntry 13 }
+
+  
+
+  cienaCesCfmMepStatsRxLinktraceMessage  OBJECT-TYPE
+
+  	SYNTAX Counter64
+
+	MAX-ACCESS read-only
+
+ 	STATUS current
+
+ 	DESCRIPTION
+
+ 		"The total number of linktrace messages received by the CFM MEP."
+
+ 	::= { cienaCesCfmMepStatsEntry 14 }
+
+  
+
+  cienaCesCfmMepStatsRxLinktraceReply  OBJECT-TYPE
+
+  	SYNTAX Counter64
+
+	MAX-ACCESS read-only
+
+ 	STATUS current
+
+ 	DESCRIPTION
+
+ 		"The total number of linktrace replies received by the CFM MEP."
+
+ 	::= { cienaCesCfmMepStatsEntry 15 }
+
+  
+
+  cienaCesCfmMepStatsRxUnexpectedLinktraceReply OBJECT-TYPE
+
+  	SYNTAX Counter64
+
+	MAX-ACCESS read-only
+
+ 	STATUS current
+
+ 	DESCRIPTION
+
+ 		"The total number of unexpected linktrace replies received by the CFM MEP."
+
+ 	::= { cienaCesCfmMepStatsEntry 16 }
+
+
+
+  cienaCesCfmMepStatsTxDelayMeasurementMessage  OBJECT-TYPE
+
+  	SYNTAX Counter64
+
+	MAX-ACCESS read-only
+
+ 	STATUS current
+
+ 	DESCRIPTION
+
+ 		"The total number of DMM messages transmitted by the CFM MEP."
+
+ 	::= { cienaCesCfmMepStatsEntry 17 }
+
+  
+
+  cienaCesCfmMepStatsTxDelayMeasurementReply OBJECT-TYPE
+
+  	SYNTAX Counter64
+
+	MAX-ACCESS read-only
+
+ 	STATUS current
+
+ 	DESCRIPTION
+
+ 		"The total number of DMM replies transmitted by the CFM MEP."
+
+ 	::= { cienaCesCfmMepStatsEntry 18 } 
+
+ 
+
+  cienaCesCfmMepStatsRxDelayMeasurementMessage  OBJECT-TYPE
+
+  	SYNTAX Counter64
+
+	MAX-ACCESS read-only
+
+ 	STATUS current
+
+ 	DESCRIPTION
+
+ 		"The total number of DMM messages received by the CFM MEP."
+
+ 	::= { cienaCesCfmMepStatsEntry 19 } 
+
+  
+
+  cienaCesCfmMepStatsRxDelayMeasurementReply  OBJECT-TYPE
+
+  	SYNTAX Counter64
+
+	MAX-ACCESS read-only
+
+ 	STATUS current
+
+ 	DESCRIPTION
+
+ 		"The total number of DMM replies received by the CFM MEP."
+
+ 	::= { cienaCesCfmMepStatsEntry 20 } 
+
+  
+
+  cienaCesCfmMepStatsTxLossMeasurementMessage OBJECT-TYPE
+
+  	SYNTAX Counter64
+
+	MAX-ACCESS read-only
+
+ 	STATUS current
+
+ 	DESCRIPTION
+
+ 		"The total number of LMM messages transmitted by the CFM MEP."
+
+ 	::= { cienaCesCfmMepStatsEntry 21 } 
+
+
+
+  cienaCesCfmMepStatsTxLossMeasurementReply OBJECT-TYPE
+
+  	SYNTAX Counter64
+
+	MAX-ACCESS read-only
+
+ 	STATUS current
+
+ 	DESCRIPTION
+
+ 		"The total number of LMM replies transmitted by the CFM MEP."
+
+ 	::= { cienaCesCfmMepStatsEntry 22 } 
+
+
+
+  cienaCesCfmMepStatsRxLossMeasurementMessage  OBJECT-TYPE
+
+  	SYNTAX Counter64
+
+	MAX-ACCESS read-only
+
+ 	STATUS current
+
+ 	DESCRIPTION
+
+ 		"The total number of LMM messages received by the CFM MEP."
+
+ 	::= { cienaCesCfmMepStatsEntry 23 } 
+
+  
+
+  cienaCesCfmMepStatsRxLossMeasurementReply OBJECT-TYPE
+
+  	SYNTAX Counter64
+
+	MAX-ACCESS read-only
+
+ 	STATUS current
+
+ 	DESCRIPTION
+
+ 		"The total number of LMM replies received by the CFM MEP."
+
+ 	::= { cienaCesCfmMepStatsEntry 24 } 
+
+ 
+
+  cienaCesCfmMepStatsLastLBMTargetRemoteMepId	OBJECT-TYPE
+
+ 	SYNTAX	Unsigned32
+
+ 	MAX-ACCESS read-only
+
+ 	STATUS current
+
+ 	DESCRIPTION
+
+ 		"This object indicates the remote MEP ID of the last loopback message."
+
+ 	::= { cienaCesCfmMepStatsEntry 25 } 
+
+
+
+   cienaCesCfmMepStatsLastLBMTargetMacAddress OBJECT-TYPE
+
+   	 SYNTAX	 CienaMacAddress
+
+   	 MAX-ACCESS read-only
+
+   	 STATUS current
+
+   	 DESCRIPTION
+
+   	 	"This object indicates the target MAC address for the last loopback message."
+
+   	 ::= { cienaCesCfmMepStatsEntry 26 }  
+
+   
+
+   cienaCesCfmMepStatsLastLBMPriority	OBJECT-TYPE
+
+	 SYNTAX	Unsigned32
+
+	 MAX-ACCESS  read-only
+
+   	 STATUS current
+
+   	 DESCRIPTION
+
+   	 	"This object indicates the last loopback message priority."
+
+   	 ::= { cienaCesCfmMepStatsEntry 27 }  
+
+
+
+   cienaCesCfmMepStatsLastLBMCount OBJECT-TYPE
+
+   	  SYNTAX Unsigned32
+
+      MAX-ACCESS read-only
+
+      STATUS current
+
+      DESCRIPTION
+
+     		"This object indicates the last loopback message count."
+
+     	::= { cienaCesCfmMepStatsEntry 28 } 
+
+     	
+
+   cienaCesCfmMepStatsLastLBMFirstSeqNum	OBJECT-TYPE
+
+   	  SYNTAX Unsigned32
+
+      MAX-ACCESS read-only
+
+      STATUS current
+
+      DESCRIPTION
+
+     		"This object indicates the last loopback message first sequence number."
+
+     	::= { cienaCesCfmMepStatsEntry 29 } 
+
+			
+
+   cienaCesCfmMepStatsLastLTMTargetRemoteMepId  OBJECT-TYPE
+
+   	  SYNTAX Unsigned32
+
+      MAX-ACCESS read-only
+
+      STATUS current
+
+      DESCRIPTION
+
+     		"This object indicates the last linktrace message target remote MEP ID."
+
+     	::= { cienaCesCfmMepStatsEntry 30 } 
+
+	
+
+   cienaCesCfmMepStatsLastLTMTargetMacAddress	OBJECT-TYPE
+
+   	  SYNTAX CienaMacAddress
+
+      MAX-ACCESS read-only
+
+      STATUS current
+
+      DESCRIPTION
+
+     		"This object indicates the target MAC address of the the last linktrace message. "
+
+     	::= { cienaCesCfmMepStatsEntry 31 } 
+
+	
+
+   cienaCesCfmMepStatsLastLTMPriority OBJECT-TYPE
+
+   	  SYNTAX Unsigned32
+
+      MAX-ACCESS read-only
+
+      STATUS current
+
+      DESCRIPTION
+
+     		"This object indicates the last linktrace message priority of the CFM MEP."
+
+     	::= { cienaCesCfmMepStatsEntry 32 } 
+
+					
+
+   cienaCesCfmMepStatsLastLTMSeqNum		OBJECT-TYPE
+
+   	  SYNTAX Unsigned32
+
+      MAX-ACCESS read-only
+
+      STATUS current
+
+      DESCRIPTION
+
+     		"This object indicates the last linktrace message sequence number of the CFM MEP."
+
+     	::= { cienaCesCfmMepStatsEntry 33 }
+
+     	 
+
+   cienaCesCfmMepStatsLastLTMInitialTTL		OBJECT-TYPE
+
+   	  SYNTAX Unsigned32
+
+      MAX-ACCESS read-only
+
+      STATUS current
+
+      DESCRIPTION
+
+     		"This object indicates the last linktrace message initial TTL of the CFM MEP."
+
+     	::= { cienaCesCfmMepStatsEntry 34 } 
+
+     	
+
+   cienaCesCfmMepStatsLastDMMTargetRemoteMepId	OBJECT-TYPE
+
+      SYNTAX Unsigned32
+
+      MAX-ACCESS read-only
+
+      STATUS current
+
+      DESCRIPTION
+
+     		"This object indicates the last DMM target remote MEP ID for the CFM MEP."
+
+     	::= { cienaCesCfmMepStatsEntry 35 } 
+
+   
+
+   cienaCesCfmMepStatsLastDMMTargetMacAddress	OBJECT-TYPE
+
+      SYNTAX CienaMacAddress
+
+      MAX-ACCESS read-only
+
+      STATUS current
+
+      DESCRIPTION
+
+     		"This object indicates the last DMM target MAC address for the CFM MEP."
+
+     	::= { cienaCesCfmMepStatsEntry 36 }
+
+     	 
+
+   cienaCesCfmMepStatsLastDMMPriority  OBJECT-TYPE
+
+   	 SYNTAX Unsigned32
+
+     MAX-ACCESS read-only
+
+     STATUS current
+
+     DESCRIPTION
+
+     		"This object indicates the last DMM priority for the CFM MEP."
+
+     ::= { cienaCesCfmMepStatsEntry 37 }
+
+
+
+   cienaCesCfmMepStatsLastDMMRepeatInterval	OBJECT-TYPE
+
+	 SYNTAX Unsigned32
+
+     MAX-ACCESS read-only
+
+     STATUS current
+
+     DESCRIPTION
+
+     		"This object indicates the last DMM repeat interval for the CFM MEP."
+
+     ::= { cienaCesCfmMepStatsEntry 38 }
+
+
+
+   cienaCesCfmMepStatsLastDMMNumOfDmmToSend	 OBJECT-TYPE
+
+	 SYNTAX Unsigned32
+
+     MAX-ACCESS read-only
+
+     STATUS current
+
+     DESCRIPTION
+
+     		"This object indicates the number of DMMs to send for the last DMM for the CFM MEP."
+
+     ::= { cienaCesCfmMepStatsEntry 39 }
+
+
+
+   cienaCesCfmMepStatsLastLMMTargetRemoteMepId	OBJECT-TYPE
+
+ 	 SYNTAX Unsigned32
+
+     MAX-ACCESS read-only
+
+     STATUS current
+
+     DESCRIPTION
+
+     		"This object indicates the last LMM target remote MEP ID for the CFM MEP."
+
+     ::= { cienaCesCfmMepStatsEntry 40 } 
+
+     
+
+   cienaCesCfmMepStatsLastLMMTargetMacAddress OBJECT-TYPE
+
+ 	 SYNTAX CienaMacAddress
+
+     MAX-ACCESS read-only
+
+     STATUS current
+
+     DESCRIPTION
+
+     		"This object indicates the last LMM target MAC Address for the CFM MEP."
+
+     ::= { cienaCesCfmMepStatsEntry 41 } 
+
+
+
+   cienaCesCfmMepStatsLastLMMPriority OBJECT-TYPE
+
+ 	 SYNTAX Unsigned32
+
+     MAX-ACCESS read-only
+
+     STATUS current
+
+     DESCRIPTION
+
+     		"This object indicates the last LMM priority for the CFM MEP."
+
+     ::= { cienaCesCfmMepStatsEntry 42 } 
+
+
+
+   cienaCesCfmMepStatsLastLMMRepeatInterval	OBJECT-TYPE
+
+ 	 SYNTAX Unsigned32
+
+     MAX-ACCESS read-only
+
+     STATUS current
+
+     DESCRIPTION
+
+     		"This object indicates the last LMM repeat interval for the CFM MEP."
+
+     ::= { cienaCesCfmMepStatsEntry 43 } 
+
+
+
+   cienaCesCfmMepStatsLastLMMNumOfLmmToSend	OBJECT-TYPE
+
+ 	 SYNTAX Unsigned32
+
+     MAX-ACCESS read-only
+
+     STATUS current
+
+     DESCRIPTION
+
+     		"This object indicates the number of LMMs to send for the last LMM for the CFM MEP."
+
+     ::= { cienaCesCfmMepStatsEntry 44 } 
+
+ 
+
+  cienaCesCfmMepStatsNextLBMSeqNumber OBJECT-TYPE
+
+     SYNTAX      Counter32 
+
+     MAX-ACCESS  read-only
+
+     STATUS      current
+
+     DESCRIPTION
+
+             "This object indicates the next LBM sequence number received on the given service and port."
+
+     ::= { cienaCesCfmMepStatsEntry 45 }
+
+      
+
+ cienaCesCfmMepStatsNextLTMSeqNumber OBJECT-TYPE
+
+     SYNTAX      Counter32 
+
+     MAX-ACCESS  read-only
+
+     STATUS      current
+
+     DESCRIPTION
+
+             "This object indicates the next LTM sequence number received on the given service and port."
+
+     ::= { cienaCesCfmMepStatsEntry 46 }
+
+    cienaCesCfmMepStatsTxSyntheticLossMeasurementMessage  OBJECT-TYPE
+
+  	SYNTAX Counter64
+
+	MAX-ACCESS read-only
+
+ 	STATUS current
+
+ 	DESCRIPTION
+
+ 		"The total number of synthetic loss messages transmitted by the CFM MEP."
+
+ 	::= { cienaCesCfmMepStatsEntry 47 }
+
+  
+
+  cienaCesCfmMepStatsTxSyntheticLossMeasurementReply OBJECT-TYPE
+
+  	SYNTAX Counter64
+
+	MAX-ACCESS read-only
+
+ 	STATUS current
+
+ 	DESCRIPTION
+
+ 		"The total number of synthetic loss replies transmitted by the CFM MEP."
+
+ 	::= { cienaCesCfmMepStatsEntry 48 } 
+
+ 
+
+  cienaCesCfmMepStatsRxSyntheticLossMeasurementMessage  OBJECT-TYPE
+
+  	SYNTAX Counter64
+
+	MAX-ACCESS read-only
+
+ 	STATUS current
+
+ 	DESCRIPTION
+
+ 		"The total number of synthetic loss messages received by the CFM MEP."
+
+ 	::= { cienaCesCfmMepStatsEntry 49 } 
+
+  
+
+  cienaCesCfmMepStatsRxSyntheticLossMeasurementReply  OBJECT-TYPE
+
+  	SYNTAX Counter64
+
+	MAX-ACCESS read-only
+
+ 	STATUS current
+
+ 	DESCRIPTION
+
+ 		"The total number of synthetic loss replies received by the CFM MEP."
+
+ 	::= { cienaCesCfmMepStatsEntry 50 } 
+
+  cienaCesCfmMepStatsRxValidSyntheticLossMeasurementMessage  OBJECT-TYPE
+
+  	SYNTAX Counter64
+
+	MAX-ACCESS read-only
+
+ 	STATUS current
+
+ 	DESCRIPTION
+
+ 		"The total number valid of synthetic loss messages received by the CFM MEP."
+
+ 	::= { cienaCesCfmMepStatsEntry 51 } 
+
+  cienaCesCfmMepStatsRxValidSyntheticLossMeasurementReply  OBJECT-TYPE
+
+  	SYNTAX Counter64
+
+	MAX-ACCESS read-only
+
+ 	STATUS current
+
+ 	DESCRIPTION
+
+ 		"The total number valid of synthetic loss replies received by the CFM MEP."
+
+ 	::= { cienaCesCfmMepStatsEntry 52 } 
+
+    cienaCesCfmMepStatsRxInvalidSyntheticLossMeasurementMessage  OBJECT-TYPE
+
+  	SYNTAX Counter64
+
+	MAX-ACCESS read-only
+
+ 	STATUS current
+
+ 	DESCRIPTION
+
+ 		"The total number invalid of synthetic loss messages received by the CFM MEP."
+
+ 	::= { cienaCesCfmMepStatsEntry 53 } 
+
+  cienaCesCfmMepStatsRxInvalidSyntheticLossMeasurementReply  OBJECT-TYPE
+
+  	SYNTAX Counter64
+
+	MAX-ACCESS read-only
+
+ 	STATUS current
+
+ 	DESCRIPTION
+
+ 		"The total number invalid of synthetic loss replies received by the CFM MEP."
+
+ 	::= { cienaCesCfmMepStatsEntry 54 } 
+
+  cienaCesCfmMepStatsRxCCMWithErrorCCMFault  OBJECT-TYPE
+
+  	SYNTAX Counter64
+
+	MAX-ACCESS read-only
+
+ 	STATUS current
+
+ 	DESCRIPTION
+
+ 		"The total number of CCMs with Error CCM fault received by the CFM MEP."
+
+ 	::= { cienaCesCfmMepStatsEntry 55 }     
+ 	
+  cienaCesCfmMepStatsRxCCMWithXCONFault  OBJECT-TYPE
+
+  	SYNTAX Counter64
+
+	MAX-ACCESS read-only
+
+ 	STATUS current
+
+ 	DESCRIPTION
+
+ 		"The total number of CCMs with XCON fault received by the CFM MEP."
+
+ 	::= { cienaCesCfmMepStatsEntry 56 } 
+ 	
+  cienaCesCfmMepStatsRxCCMWithRMEPLOCFault  OBJECT-TYPE
+
+  	SYNTAX Counter64
+
+	MAX-ACCESS read-only
+
+ 	STATUS current
+
+ 	DESCRIPTION
+
+ 		"The total number of CCMs with RMEP LOC fault received by the CFM MEP."
+
+ 	::= { cienaCesCfmMepStatsEntry 57 } 
+ 	
+  cienaCesCfmMepStatsRxCCMWithRDI0  OBJECT-TYPE
+
+  	SYNTAX Counter64
+
+	MAX-ACCESS read-only
+
+ 	STATUS current
+
+ 	DESCRIPTION
+
+ 		"The total number of CCMs with RDI bit 0 received by the CFM MEP."
+
+ 	::= { cienaCesCfmMepStatsEntry 58 } 
+ 	
+  cienaCesCfmMepStatsRxCCMWithRDI1  OBJECT-TYPE
+
+  	SYNTAX Counter64
+
+	MAX-ACCESS read-only
+
+ 	STATUS current
+
+ 	DESCRIPTION
+
+ 		"The total number of CCMs with RDI bit set received by the CFM MEP."
+
+ 	::= { cienaCesCfmMepStatsEntry 59 } 
+ 	
+  cienaCesCfmMepStatsRxCCMWithSequenceNumberMismatch  OBJECT-TYPE
+
+  	SYNTAX Counter64
+
+	MAX-ACCESS read-only
+
+ 	STATUS current
+
+ 	DESCRIPTION
+
+ 		"The total number of CCMs with sequence number mismatch received by the CFM MEP."
+
+ 	::= { cienaCesCfmMepStatsEntry 60 } 
+ 	
+  cienaCesCfmMepStatsRxCCMDroppedWithMalformedTlv  OBJECT-TYPE
+
+  	SYNTAX Counter64
+
+	MAX-ACCESS read-only
+
+ 	STATUS current
+
+ 	DESCRIPTION
+
+ 		"The total number of CCMs received by the CFM MEP which were dropped because of malformed TLV."
+
+ 	::= { cienaCesCfmMepStatsEntry 61 }
+
+  cienaCesCfmMepStatsToTxLoopbackMessages  OBJECT-TYPE
+
+  	SYNTAX Counter64
+
+	MAX-ACCESS read-only
+
+ 	STATUS current
+
+ 	DESCRIPTION
+
+ 		"The total number of loopback messages left to be transmitted by the CFM MEP."
+
+ 	::= { cienaCesCfmMepStatsEntry 62 }
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+
+
+-- CFM Remote Mep Statistics
+
+  cienaCesCfmRemoteMepStatsTable OBJECT-TYPE
+
+     SYNTAX     SEQUENCE OF CienaCesCfmRemoteMepStatsEntry
+
+     MAX-ACCESS not-accessible
+
+     STATUS     current
+
+     DESCRIPTION
+
+            "The (conceptual) table listing the configuration 
+
+            parameters for the CFM remote MEP table."  
+
+     ::= { cienaCesCfmMepStats 2 }
+
+                
+
+ cienaCesCfmRemoteMepStatsEntry OBJECT-TYPE
+
+     SYNTAX      CienaCesCfmRemoteMepStatsEntry
+
+     MAX-ACCESS  not-accessible
+
+     STATUS      current
+
+     DESCRIPTION
+
+           "An entry (conceptual row) in the cienaCesCfmMepStatsTable."   
+
+     INDEX {cienaCesCfmServiceIndex, cienaCesCfmRemoteMEPID }
+
+     ::= { cienaCesCfmRemoteMepStatsTable 1 }   
+
+ 
+
+  CienaCesCfmRemoteMepStatsEntry ::=  SEQUENCE {  
+
+     cienaCesCfmRemoteMepStatsRxTotalCCM  				 Counter32,
+
+     cienaCesCfmRemoteMepStatsLastSeqNum                 Unsigned32,
+
+     cienaCesCfmRemoteMepStatsCCMSeqErrors               Unsigned32,
+
+     cienaCesCfmRemoteMepStatsClear                      CienaStatsClear
+
+
+
+     }
+
+
+
+ cienaCesCfmRemoteMepStatsRxTotalCCM     OBJECT-TYPE
+
+     SYNTAX      Counter32
+
+     MAX-ACCESS  read-only
+
+     STATUS      current
+
+     DESCRIPTION
+
+             "This object is used to show the number of MEP CCM frames received."
+
+     ::= { cienaCesCfmRemoteMepStatsEntry 1 }  
+
+ 
+
+  cienaCesCfmRemoteMepStatsLastSeqNum     OBJECT-TYPE
+
+     SYNTAX      Unsigned32
+
+     MAX-ACCESS  read-only
+
+     STATUS      current
+
+     DESCRIPTION
+
+             "This object is used to show the last sequence number."
+
+     ::= { cienaCesCfmRemoteMepStatsEntry 2 }
+
+ 
+
+  cienaCesCfmRemoteMepStatsCCMSeqErrors     OBJECT-TYPE
+
+     SYNTAX      Unsigned32
+
+     MAX-ACCESS  read-only
+
+     STATUS      current
+
+     DESCRIPTION
+
+             "This object is used to show the number of MEP CCM frames sequence errors."
+
+     ::= { cienaCesCfmRemoteMepStatsEntry 3 }
+
+  
+
+  cienaCesCfmRemoteMepStatsClear OBJECT-TYPE
+
+     SYNTAX      CienaStatsClear
+
+     MAX-ACCESS  read-write
+
+     STATUS      current
+
+     DESCRIPTION
+
+             "Setting this object to clear(1) resets the statistics for the remote MEP
+
+              for this service."
+
+     ::= { cienaCesCfmRemoteMepStatsEntry 4 }
+
+
+  --
+  --  CFM Synthetic Loss Measurement Msg Table
+  --
+  cienaCesCfmSyntheticLossSessionTable OBJECT-TYPE
+  	  SYNTAX     SEQUENCE OF CienaCesCfmSyntheticLossSessionEntry
+  	  MAX-ACCESS not-accessible
+      STATUS     current
+      DESCRIPTION
+            "The (conceptual) table listing the configuration
+            parameters for the SyntheticLossMeasurement(SLM) message."
+     ::= { cienaCesCfmSyntheticLoss 1 }    
+     
+  cienaCesCfmSyntheticLossSessionEntry OBJECT-TYPE   
+      SYNTAX     CienaCesCfmSyntheticLossSessionEntry   
+  	  MAX-ACCESS not-accessible
+      STATUS     current
+      DESCRIPTION
+           "An entry in the cienaCesCfmSyntheticLossSessionTable."
+      INDEX {
+             cienaCesCfmSyntheticLossSessionServiceIndex, 
+			 cienaCesCfmSyntheticLossSessionLocalMEPId,
+             cienaCesCfmSyntheticLossSessionTargetMEPId,
+             cienaCesCfmSyntheticLossSessionTestId
+            }
+     ::= { cienaCesCfmSyntheticLossSessionTable 1 }       
+     
+  CienaCesCfmSyntheticLossSessionEntry ::= SEQUENCE {      
+       cienaCesCfmSyntheticLossSessionServiceIndex              Unsigned32,
+       cienaCesCfmSyntheticLossSessionLocalMEPId                Integer32,
+       cienaCesCfmSyntheticLossSessionTargetMEPId               Integer32,
+       cienaCesCfmSyntheticLossSessionTestId             		Unsigned32,
+       cienaCesCfmSyntheticLossSessionServiceName               DisplayString,
+       cienaCesCfmSyntheticLossSessionPriority           		Unsigned32,
+       cienaCesCfmSyntheticLossSessionCount              		Unsigned32,
+       cienaCesCfmSyntheticLossSessionSLMInterval        		Unsigned32,  
+       cienaCesCfmSyntheticLossSessionIterations         		Unsigned32,
+       cienaCesCfmSyntheticLossSessionRepeatDelay               Unsigned32,
+       cienaCesCfmSyntheticLossSessionFrameSize          		Unsigned32,      
+       cienaCesCfmSyntheticLossSessionTimeout            		Unsigned32,
+       cienaCesCfmSyntheticLossSessionDuration                  Unsigned32,       
+       cienaCesCfmSyntheticLossSessionLossNearThreshold    		Integer32,
+       cienaCesCfmSyntheticLossSessionLossFarThreshold     		Integer32,
+       cienaCesCfmSyntheticLossSessionNumSLMSent         		Unsigned32,
+       cienaCesCfmSyntheticLossSessionNumSLRReceived     		Unsigned32,
+       cienaCesCfmSyntheticLossSessionFrameLossNear             Integer32,
+       cienaCesCfmSyntheticLossSessionFrameLossFar             	Integer32,
+       cienaCesCfmSyntheticLossSessionAvgFrameLossNear          Integer32,
+       cienaCesCfmSyntheticLossSessionMinFrameLossNear          Integer32,
+       cienaCesCfmSyntheticLossSessionMaxFrameLossNear          Integer32,
+       cienaCesCfmSyntheticLossSessionAvgFrameLossFar         	Integer32,
+       cienaCesCfmSyntheticLossSessionMinFrameLossFar          	Integer32,
+       cienaCesCfmSyntheticLossSessionMaxFrameLossFar          	Integer32,
+       cienaCesCfmSyntheticLossSessionFrameLossRatioNear    	CfmFrameLossRatio,
+       cienaCesCfmSyntheticLossSessionFrameLossRatioFar         CfmFrameLossRatio,
+       cienaCesCfmSyntheticLossSessionSdSetThreshold            Integer32,
+       cienaCesCfmSyntheticLossSessionSdClearThreshold          Integer32
+  } 
+  cienaCesCfmSyntheticLossSessionServiceIndex  OBJECT-TYPE
+      SYNTAX 	   Unsigned32 (1..4294967295)
+  	  MAX-ACCESS   not-accessible
+      STATUS       current      
+      DESCRIPTION
+      		  "This object specifies the service index of the SLM message."
+      ::= { cienaCesCfmSyntheticLossSessionEntry 1 }
+
+  cienaCesCfmSyntheticLossSessionLocalMEPId  OBJECT-TYPE
+      SYNTAX 	   Integer32 (1..65535)
+  	  MAX-ACCESS   not-accessible
+      STATUS       current      
+      DESCRIPTION
+      		  "This object specifies the local mep id of the SLM message."
+      ::= { cienaCesCfmSyntheticLossSessionEntry 2 }
+
+  cienaCesCfmSyntheticLossSessionTargetMEPId  OBJECT-TYPE
+      SYNTAX 	   Integer32 (1..8191)
+  	  MAX-ACCESS   not-accessible
+      STATUS       current      
+      DESCRIPTION
+      		  "This object specifies the target mepid of the SLM message."
+      ::= { cienaCesCfmSyntheticLossSessionEntry 3 }
+   
+  cienaCesCfmSyntheticLossSessionTestId  OBJECT-TYPE
+      SYNTAX 	   Unsigned32 (1..4294967295)
+  	  MAX-ACCESS   not-accessible
+      STATUS       current      
+      DESCRIPTION
+      		  "This object specifies the test ID of the SLM message."
+      ::= { cienaCesCfmSyntheticLossSessionEntry 4 }
+  
+   cienaCesCfmSyntheticLossSessionServiceName  OBJECT-TYPE
+      SYNTAX 	   DisplayString
+  	  MAX-ACCESS   read-only
+      STATUS       current      
+      DESCRIPTION
+      		  "This object specifies the service name of the SLM message."
+      ::= { cienaCesCfmSyntheticLossSessionEntry 5 }
+    
+  cienaCesCfmSyntheticLossSessionPriority  OBJECT-TYPE  
+     SYNTAX       Unsigned32 (0..7)
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "This object specifies the priority that will be encoded in the SLM message."
+     ::= { cienaCesCfmSyntheticLossSessionEntry 6 } 
+     
+  cienaCesCfmSyntheticLossSessionCount  OBJECT-TYPE
+      SYNTAX       Unsigned32 (0 | 2..65535) 
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+             "This object specifies the number of SLM messages that will be transmitted during this session."
+     ::= { cienaCesCfmSyntheticLossSessionEntry 7 }
+     
+  cienaCesCfmSyntheticLossSessionSLMInterval  OBJECT-TYPE
+     SYNTAX       Unsigned32 (0 | 3..7)
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "This object specifies the message interval at which SLMs will be transmitted.	                        
+              The values 3-7 represent indices to CFM intervals as follows:
+              3 --> 100ms,
+              4 --> 1sec,
+              5 --> 10sec,
+              6 --> 1min,
+              7 --> 10min."
+     ::= { cienaCesCfmSyntheticLossSessionEntry 8 }      
+     
+  cienaCesCfmSyntheticLossSessionIterations  OBJECT-TYPE  
+     SYNTAX       Unsigned32 (0..60)
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "This object specifies the number of iterations the test
+              has to be conducted. Each test iteration is defined by <cienaCesCfmSyntheticLossMsgSLMInterval,
+              cienaCesCfmSyntheticLossMsgCount>. Whereas, the test sessions is defined by test iterations over 
+              <cienaCesCfmSyntheticLossMsgRepeatCount>.
+              If this object specifies zero, it means that test is continuous, and iterations are infinite. "
+     ::= { cienaCesCfmSyntheticLossSessionEntry 9 }     
+          
+  cienaCesCfmSyntheticLossSessionRepeatDelay  OBJECT-TYPE  
+     SYNTAX       Unsigned32 (0..1440)
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "This object specifies the delay in minutes between consecutive test iterations."
+     ::= { cienaCesCfmSyntheticLossSessionEntry 10 } 
+     
+  cienaCesCfmSyntheticLossSessionFrameSize  OBJECT-TYPE  
+     SYNTAX       Unsigned32 (0 | 65..1400)
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "This object specifies the size in bytes of the CFM base frame.
+              If this object specifies zero there is no padding."
+     ::= { cienaCesCfmSyntheticLossSessionEntry 11 }   
+       
+  cienaCesCfmSyntheticLossSessionTimeout  OBJECT-TYPE  
+     SYNTAX       Unsigned32 (0 | 2000..10000)
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "This object specifies the timeout interval in milliseconds within which
+              the source should receive a SLR for a corresponding SLM Msg."
+     ::= { cienaCesCfmSyntheticLossSessionEntry 12 }
+       
+  cienaCesCfmSyntheticLossSessionDuration OBJECT-TYPE
+	  SYNTAX	  Unsigned32 (0..65535)
+	  MAX-ACCESS  read-only
+	  STATUS	  current                                   
+	  DESCRIPTION
+	   "This object specifies the duration of time the test took in milliseconds to complete one iteration."
+	  ::= { cienaCesCfmSyntheticLossSessionEntry 13 }
+   
+  cienaCesCfmSyntheticLossSessionLossNearThreshold OBJECT-TYPE
+ 	  SYNTAX			Integer32 (-1..65535)
+ 	  MAX-ACCESS		read-only
+ 	  STATUS			current
+ 	  DESCRIPTION
+	 		  "This object represents the Near Loss Threshold Fault for the Synthetic Loss Measurement test.
+	 		   A value of -1 disables the generation of faults.  A value of 0 or greater
+	 		   is compared to the synthetic loss near result of the
+	 		   test and a fault is generated if the threshold is exceeded."
+ 	  ::= { cienaCesCfmSyntheticLossSessionEntry 14 }  
+ 	
+  cienaCesCfmSyntheticLossSessionLossFarThreshold OBJECT-TYPE
+ 	  SYNTAX			Integer32 (-1..65535)
+ 	  MAX-ACCESS		read-only
+ 	  STATUS			current
+ 	  DESCRIPTION
+ 			  "This object represents the Far Loss Threshold Fault for the Synthetic Loss Measurement test.
+ 			   A value of -1 disables the generation of faults. A value of 0 or greater
+ 			   is compared to the synthetic loss near result of the
+ 			   test and a fault is generated if the threshold is exceeded."
+ 	  ::= { cienaCesCfmSyntheticLossSessionEntry 15 }          
+  
+  cienaCesCfmSyntheticLossSessionNumSLMSent OBJECT-TYPE
+ 	  SYNTAX			Unsigned32 (1..65535)
+ 	  MAX-ACCESS		read-only
+ 	  STATUS			current
+ 	  DESCRIPTION
+ 	     "This object specifies the number of SLM messages sent in the latest test iteration."
+ 	  ::= { cienaCesCfmSyntheticLossSessionEntry 16 }
+
+   cienaCesCfmSyntheticLossSessionNumSLRReceived OBJECT-TYPE
+ 	  SYNTAX			Unsigned32 (1..65535)
+ 	  MAX-ACCESS		read-only
+ 	  STATUS			current
+ 	  DESCRIPTION
+ 	      "This object specifies the number of SLR messages received in the latest test iteration."
+ 	  ::= { cienaCesCfmSyntheticLossSessionEntry 17 }
+ 	  
+  cienaCesCfmSyntheticLossSessionFrameLossNear OBJECT-TYPE
+ 	  SYNTAX			Integer32 
+ 	  MAX-ACCESS		read-only
+ 	  STATUS			current
+ 	  DESCRIPTION
+ 	    "This object specifies the Near Loss Threshold in the latest test iteration."
+ 	  ::= { cienaCesCfmSyntheticLossSessionEntry 18 }
+ 	  
+  cienaCesCfmSyntheticLossSessionFrameLossFar OBJECT-TYPE
+ 	  SYNTAX			Integer32
+ 	  MAX-ACCESS		read-only
+ 	  STATUS			current
+ 	  DESCRIPTION
+ 	    "This object specifies the Far Loss Threshold in the latest test iteration."
+ 	  ::= { cienaCesCfmSyntheticLossSessionEntry 19 }
+ 	  
+  cienaCesCfmSyntheticLossSessionAvgFrameLossNear OBJECT-TYPE
+ 	  SYNTAX			Integer32 
+ 	  MAX-ACCESS		read-only
+ 	  STATUS			current
+ 	  DESCRIPTION
+ 		  "This object specifies the average Near Loss Threshold of the test session."
+ 	  ::= { cienaCesCfmSyntheticLossSessionEntry 20 }
+ 	  
+  cienaCesCfmSyntheticLossSessionMinFrameLossNear OBJECT-TYPE
+ 	  SYNTAX			Integer32 
+ 	  MAX-ACCESS		read-only
+ 	  STATUS			current
+ 	  DESCRIPTION
+ 		 "This object specifies the minimum Near Loss Threshold of the test session."
+ 	  ::= { cienaCesCfmSyntheticLossSessionEntry 21 }
+ 	  
+  cienaCesCfmSyntheticLossSessionMaxFrameLossNear OBJECT-TYPE
+ 	  SYNTAX			Integer32 
+ 	  MAX-ACCESS		read-only
+ 	  STATUS			current
+ 	  DESCRIPTION
+ 		"This object specifies the maximum Near Loss Threshold of the test session."
+ 	  ::= { cienaCesCfmSyntheticLossSessionEntry 22 }
+ 	  
+  cienaCesCfmSyntheticLossSessionAvgFrameLossFar OBJECT-TYPE
+ 	  SYNTAX			Integer32 
+ 	  MAX-ACCESS		read-only
+ 	  STATUS			current
+ 	  DESCRIPTION
+ 	   "This object specifies the average Far Loss Threshold of the test session."
+ 	  ::= { cienaCesCfmSyntheticLossSessionEntry 23 }
+ 	  
+  cienaCesCfmSyntheticLossSessionMinFrameLossFar OBJECT-TYPE
+ 	  SYNTAX			Integer32 
+ 	  MAX-ACCESS		read-only
+ 	  STATUS			current
+ 	  DESCRIPTION
+ 	     "This object specifies the minimum Far Loss Threshold of the test session."
+ 	  ::= { cienaCesCfmSyntheticLossSessionEntry 24 }
+ 	  
+  cienaCesCfmSyntheticLossSessionMaxFrameLossFar OBJECT-TYPE
+ 	  SYNTAX			Integer32 
+ 	  MAX-ACCESS		read-only
+ 	  STATUS			current
+ 	  DESCRIPTION
+ 	     "This object specifies the maximum Far Loss Threshold of the test session."
+ 	  ::= { cienaCesCfmSyntheticLossSessionEntry 25 } 
+ 
+  cienaCesCfmSyntheticLossSessionFrameLossRatioNear OBJECT-TYPE
+ 	  SYNTAX			CfmFrameLossRatio 
+          MAX-ACCESS		read-only
+ 	  STATUS			current
+ 	  DESCRIPTION
+ 	     "This object specifies the Frame Loss Ratio in percentile of loss at Nearend in the last
+              iteration of the completed test."
+ 	  ::= { cienaCesCfmSyntheticLossSessionEntry 26 } 
+ 
+  cienaCesCfmSyntheticLossSessionFrameLossRatioFar OBJECT-TYPE
+ 	  SYNTAX			CfmFrameLossRatio 
+          MAX-ACCESS		read-only
+ 	  STATUS			current
+ 	  DESCRIPTION
+ 	     "This object specifies the Frame Loss Ratio in percentile of loss at Farend in the last
+              iteration of the completed test."
+ 	  ::= { cienaCesCfmSyntheticLossSessionEntry 27 } 
+
+  cienaCesCfmSyntheticLossSessionSdSetThreshold OBJECT-TYPE
+ 	  SYNTAX			Integer32 (-1..65535) 
+ 	  MAX-ACCESS		read-only
+ 	  STATUS			current
+ 	  DESCRIPTION
+             "This object represents the signal degrade set threshold value for the synthetic loss measurement test. 
+              A value of 0 or greater is compared to the frame loss result and fault is set, if the loss exceeds 
+              this threshold. A value of -1 disables the generation of signal degrade fault notification. 
+              This object works in conjunction with cienaCesCfmSyntheticLossSessionSdClearThreshold. If one object is given  
+              non-default value, other should be also set to non-default value." 
+
+ 	  DEFVAL {-1} 
+ 	  ::= { cienaCesCfmSyntheticLossSessionEntry 28 } 
+
+  cienaCesCfmSyntheticLossSessionSdClearThreshold OBJECT-TYPE
+ 	  SYNTAX			Integer32 (-1..65535) 
+ 	  MAX-ACCESS		read-only
+ 	  STATUS			current
+ 	  DESCRIPTION
+             "This object represents the signal degrade clear threshold value for the synthetic loss measurement test. 
+              A value of 0 or greater is compared to the frame loss result and a fault is cleared, if loss  
+              is equal to or below this threshold. A value of -1 disables the generation of signal degrade fault notification 
+              This object works in conjunction with cienaCesCfmSyntheticLossSessionSdSetThreshold. If one object is given  
+              non-default value, other should be also set to non-default value." 
+
+ 	  DEFVAL {-1} 
+ 	  ::= { cienaCesCfmSyntheticLossSessionEntry 29 } 
+
+  ---
+  --- Synthetic Loss Responder Table
+  ---
+ 	 
+  cienaCesCfmSyntheticLossResponderTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF CienaCesCfmSyntheticLossResponderEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table lists the Synthetic Loss Measurement (SLM) responders."
+     ::= { cienaCesCfmSyntheticLoss 2 }
+     
+  cienaCesCfmSyntheticLossResponderEntry OBJECT-TYPE
+     SYNTAX      CienaCesCfmSyntheticLossResponderEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+           "An entry (conceptual row) in the cienaCesCfmSyntheticLossResponderTable."
+     INDEX {cienaCesCfmSyntheticLossResponderServiceIndex, 
+            cienaCesCfmSyntheticLossResponderLocalMEPId,
+            cienaCesCfmSyntheticLossResponderRemoteMEPId,
+            cienaCesCfmSyntheticLossResponderTestId }
+     ::= { cienaCesCfmSyntheticLossResponderTable 1 }  
+     
+  CienaCesCfmSyntheticLossResponderEntry ::=  SEQUENCE {  
+     cienaCesCfmSyntheticLossResponderServiceIndex     Unsigned32,
+     cienaCesCfmSyntheticLossResponderLocalMEPId       Integer32,
+     cienaCesCfmSyntheticLossResponderRemoteMEPId      Integer32,
+     cienaCesCfmSyntheticLossResponderTestId           Unsigned32,
+     cienaCesCfmSyntheticLossResponderServiceName      DisplayString,
+     cienaCesCfmSyntheticLossResponderLocalMac         MacAddress,     
+     cienaCesCfmSyntheticLossResponderRemoteMac        MacAddress,   
+     cienaCesCfmSyntheticLossResponderNumSLMReceived   Unsigned32,
+     cienaCesCfmSyntheticLossResponderNumSLRSent       Unsigned32 	 
+ } 
+    
+  cienaCesCfmSyntheticLossResponderServiceIndex  OBJECT-TYPE
+      SYNTAX 	   Unsigned32 (1..4294967295)
+      MAX-ACCESS   not-accessible
+      STATUS       current      
+      DESCRIPTION
+      		  "This object specifies the service index of the SLM responder."
+      ::= { cienaCesCfmSyntheticLossResponderEntry 1 }
+
+  cienaCesCfmSyntheticLossResponderLocalMEPId  OBJECT-TYPE
+      SYNTAX 	   Integer32 (1..8191)
+      MAX-ACCESS   not-accessible
+      STATUS       current      
+      DESCRIPTION
+      		  "This object specifies the local mep id of the SLM responder."
+      ::= { cienaCesCfmSyntheticLossResponderEntry 2 }
+
+  cienaCesCfmSyntheticLossResponderRemoteMEPId  OBJECT-TYPE
+      SYNTAX 	   Integer32 (1..8191)
+      MAX-ACCESS   not-accessible
+      STATUS       current      
+      DESCRIPTION
+      		  "This object specifies the remote mep id of the SLM responder."
+      ::= { cienaCesCfmSyntheticLossResponderEntry 3 }
+   
+  cienaCesCfmSyntheticLossResponderTestId  OBJECT-TYPE
+      SYNTAX 	   Unsigned32 (1..4294967295)
+      MAX-ACCESS   not-accessible
+      STATUS       current      
+      DESCRIPTION
+      		  "This object specifies the test ID of the SLM responder."
+      ::= { cienaCesCfmSyntheticLossResponderEntry 4 }
+  
+  cienaCesCfmSyntheticLossResponderServiceName  OBJECT-TYPE
+      SYNTAX 	   DisplayString
+      MAX-ACCESS   read-only
+      STATUS       current      
+      DESCRIPTION
+      		  "This object specifies the service name of the SLM responder."
+      ::= { cienaCesCfmSyntheticLossResponderEntry 5 }
+     
+  cienaCesCfmSyntheticLossResponderLocalMac OBJECT-TYPE
+     SYNTAX      MacAddress
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "This object identifies the MAC address of the local mep."
+     ::= { cienaCesCfmSyntheticLossResponderEntry 6 }  
+     
+  cienaCesCfmSyntheticLossResponderRemoteMac OBJECT-TYPE
+     SYNTAX      MacAddress
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "This object identifies the MAC address of the remote mep."
+     ::= { cienaCesCfmSyntheticLossResponderEntry 7 } 
+     
+  cienaCesCfmSyntheticLossResponderNumSLMReceived OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "This object specifies the number of SLM frames received by this responder." 
+     ::= { cienaCesCfmSyntheticLossResponderEntry 8 } 
+     
+ cienaCesCfmSyntheticLossResponderNumSLRSent OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "This object specifies the number of SLR frames sent by this responder." 
+     ::= { cienaCesCfmSyntheticLossResponderEntry 9 }
+
+ --
+
+ -- Notifications
+
+ --  
+
+ cienaCesCfmFaultTrapSet  NOTIFICATION-TYPE
+
+        OBJECTS      {   
+
+          
+
+          cienaGlobalSeverity,
+
+          cienaGlobalMacAddress,
+
+          cienaCesCfmServiceName,                                      
+
+          cienaCesCfmServiceType,
+
+          cienaCesCfmServiceValue,
+
+          cienaCesCfmServiceAdminState,                 
+
+          cienaCesCfmServiceOperState,
+
+          cienaCesCfmServiceMdLevel,                 
+
+          cienaCesCfmServiceFaultTime, 
+
+          cienaCesCfmServiceFaultType,
+
+          cienaCesCfmServiceFaultDesc,
+
+          cienaCesCfmServiceFaultMep,
+
+          cienaCesCfmServiceVsPbtName
+
+       }
+
+   STATUS      current
+
+   DESCRIPTION
+
+      "A notification is sent whenever the fault is detected. Setting the
+       cienaCesCfmFaultTrapState object to 'disabled' causes this trap to be
+       suppressed. Variable bindings include cienaGlobalSeverity,
+       cienaGlobalMacAddress, cienaCesCfmServiceName,
+       cienaCesCfmServiceType, cienaCesCfmServiceValue,
+       cienaCesCfmServiceAdminState, cienaCesCfmServiceOperState,
+       cienaCesCfmServiceMdLevel, cienaCesCfmServiceFaultTime,
+       cienaCesCfmServiceFaultType, cienaCesCfmServiceFaultDesc,
+       cienaCesCfmServiceFaultMep, and cienaCesCfmServiceVsPbtName."
+
+   ::= { cienaCesCfmNotifMIBNotification 1 }
+
+
+
+ cienaCesCfmFaultTrapClear  NOTIFICATION-TYPE
+
+        OBJECTS      {
+
+          
+
+          cienaGlobalSeverity,
+
+          cienaGlobalMacAddress,
+
+          cienaCesCfmServiceName,                                      
+
+          cienaCesCfmServiceType,
+
+          cienaCesCfmServiceValue,
+
+          cienaCesCfmServiceAdminState,                 
+
+          cienaCesCfmServiceOperState,
+
+          cienaCesCfmServiceMdLevel,
+
+          cienaCesCfmServiceVsPbtName,
+
+          cienaCesCfmServiceFaultTime, 
+
+          cienaCesCfmServiceFaultType,
+
+          cienaCesCfmServiceFaultDesc,
+
+          cienaCesCfmServiceFaultMep
+
+       }
+
+   STATUS      current
+
+   DESCRIPTION
+
+      "A notification is sent whenever the fault is resolved and cleared. Setting the
+       cienaCesCfmFaultTrapState object to 'disabled' causes this trap to be
+       suppressed. Variable bindings include: cienaGlobalSeverity,
+       cienaGlobalMacAddress, cienaCesCfmServiceName,
+       cienaCesCfmServiceType, cienaCesCfmServiceValue,
+       cienaCesCfmServiceAdminState, cienaCesCfmServiceOperState,
+       cienaCesCfmServiceMdLevel, cienaCesCfmServiceVsPbtName,
+       cienaCesCfmServiceFaultTime, cienaCesCfmServiceFaultType,
+       cienaCesCfmServiceFaultDesc, and cienaCesCfmServiceFaultMep."
+
+   ::= { cienaCesCfmNotifMIBNotification 2 }
+
+  
+
+  cienaCesCfmAverageDelayFaultTrapSet  NOTIFICATION-TYPE
+
+        OBJECTS      {
+
+          
+
+          cienaGlobalSeverity,
+
+          cienaGlobalMacAddress,
+
+		  cienaCesCfmDelayMsgServiceName,                                      
+
+          cienaCesCfmDelayMsgLocalMEPId,
+
+          cienaCesCfmDelayMsgAverageDelayThreshold,
+
+          cienaCesCfmDelayMsgAverageDelay
+
+         }
+
+   STATUS      current
+
+   DESCRIPTION
+
+      "A notification is sent whenever average delay goes above delay-threshold 
+       during a delay measurement test. Setting the cienaCesCfmDelayFaultTrapState 
+       object to 'disabled' causes this trap to be suppressed. Variable bindings 
+       include: cienaGlobalSeverity, cienaGlobalMacAddress, 
+       cienaCesCfmDelayMsgServiceName, cienaCesCfmDelayMsgLocalMEPId,
+       cienaCesCfmDelayMsgAverageDelayThreshold, and cienaCesCfmDelayMsgAverageDelay." 
+
+      ::= { cienaCesCfmNotifMIBNotification 3 }
+
+
+
+  cienaCesCfmAverageDelayFaultTrapClear  NOTIFICATION-TYPE
+
+        OBJECTS      {
+
+          
+
+          cienaGlobalSeverity,
+
+          cienaGlobalMacAddress,
+
+		  cienaCesCfmDelayMsgServiceName,                                      
+
+          cienaCesCfmDelayMsgLocalMEPId,
+
+          cienaCesCfmDelayMsgAverageDelayThreshold,
+
+          cienaCesCfmDelayMsgAverageDelay
+
+         }
+
+   STATUS      current
+
+   DESCRIPTION
+
+      "A notification is sent whenever average delay comes back to normal. Setting the
+       cienaCesCfmDelayFaultTrapState object to 'disabled' causes this trap to be
+       suppressed. Variable bindings include: cienaGlobalSeverity, cienaGlobalMacAddress, 
+       cienaCesCfmDelayMsgServiceName, cienaCesCfmDelayMsgLocalMEPId,
+       cienaCesCfmDelayMsgAverageDelayThreshold, and cienaCesCfmDelayMsgAverageDelay."
+
+   ::= { cienaCesCfmNotifMIBNotification 4 }
+
+
+
+  cienaCesCfmMaximumDelayFaultTrapSet  NOTIFICATION-TYPE
+
+        OBJECTS      {
+
+          
+
+          cienaGlobalSeverity,
+
+          cienaGlobalMacAddress,
+
+		  cienaCesCfmDelayMsgServiceName,                                      
+
+          cienaCesCfmDelayMsgLocalMEPId,
+
+          cienaCesCfmDelayMsgMaximumDelayThreshold,
+
+          cienaCesCfmDelayMsgMaximumDelay
+
+         }
+
+   STATUS      current
+
+   DESCRIPTION
+
+      "A notification is sent whenever maximum delay goes above delay-threshold during
+       a delay measurement test. Setting the cienaCesCfmDelayFaultTrapState object to  
+       'disabled' causes this trap to be suppressed. Variable bindings include: 
+       cienaGlobalSeverity, cienaGlobalMacAddress, cienaCesCfmDelayMsgServiceName,
+       cienaCesCfmDelayMsgLocalMEPId, cienaCesCfmDelayMsgMaximumDelayThreshold, and
+       cienaCesCfmDelayMsgMaximumDelay." 
+
+   ::= { cienaCesCfmNotifMIBNotification 5 }
+
+
+
+  cienaCesCfmMaximumDelayFaultTrapClear  NOTIFICATION-TYPE
+
+        OBJECTS      {
+
+          
+
+          cienaGlobalSeverity,
+
+          cienaGlobalMacAddress,
+
+		  cienaCesCfmDelayMsgServiceName,                                      
+
+          cienaCesCfmDelayMsgLocalMEPId,
+
+          cienaCesCfmDelayMsgMaximumDelayThreshold,
+
+          cienaCesCfmDelayMsgMaximumDelay
+
+         }
+
+   STATUS      current
+
+   DESCRIPTION
+
+      "A notification is sent whenever maximum delay comes back to normal. Setting
+       the cienaCesCfmDelayFaultTrapState object to 'disabled' causes this trap to
+       be suppressed. Variable bindings include: cienaGlobalSeverity,
+       cienaGlobalMacAddress, cienaCesCfmDelayMsgServiceName, cienaCesCfmDelayMsgLocalMEPId,
+       cienaCesCfmDelayMsgMaximumDelayThreshold, and cienaCesCfmDelayMsgMaximumDelay."
+
+   ::= { cienaCesCfmNotifMIBNotification 6 }
+
+
+
+  cienaCesCfmAverageJitterTrapSet  NOTIFICATION-TYPE
+
+        OBJECTS      {
+
+          
+
+          cienaGlobalSeverity,
+
+          cienaGlobalMacAddress,
+
+		  cienaCesCfmDelayMsgServiceName,                                      
+
+          cienaCesCfmDelayMsgLocalMEPId,
+
+          cienaCesCfmDelayMsgAverageJitterThreshold,
+
+          cienaCesCfmDelayMsgAverageJitter
+
+        }
+
+   STATUS      current
+
+   DESCRIPTION
+
+      "A notification is sent whenever average jitter goes above average jitter-threshold 
+       during a jitter measurement test. Setting the cienaCesCfmJitterFaultTrapState object 
+       to 'disabled' causes this trap to be suppressed. Variable bindings include: 
+       cienaGlobalSeverity, cienaGlobalMacAddress, cienaCesCfmDelayMsgServiceName,
+       cienaCesCfmDelayMsgLocalMEPId, cienaCesCfmDelayMsgAverageJitterThreshold, and
+       cienaCesCfmDelayMsgAverageJitter."
+
+   ::= { cienaCesCfmNotifMIBNotification 7 }
+
+
+
+  cienaCesCfmAverageJitterTrapClear  NOTIFICATION-TYPE
+
+        OBJECTS      {
+
+          
+
+          cienaGlobalSeverity,
+
+          cienaGlobalMacAddress,
+
+		  cienaCesCfmDelayMsgServiceName,                                      
+
+          cienaCesCfmDelayMsgLocalMEPId,
+
+          cienaCesCfmDelayMsgAverageJitterThreshold,
+
+          cienaCesCfmDelayMsgAverageJitter
+
+        }
+
+   STATUS      current
+
+   DESCRIPTION
+
+      "A notification is sent whenever average jitter comes back to normal. Setting
+       the cienaCesCfmJitterFaultTrapState object to 'disabled' causes this trap to be
+       suppressed. Variable bindings include: cienaGlobalSeverity, cienaGlobalMacAddress, 
+       cienaCesCfmDelayMsgServiceName, cienaCesCfmDelayMsgLocalMEPId,
+       cienaCesCfmDelayMsgAverageJitterThreshold, and cienaCesCfmDelayMsgAverageJitter." 
+
+   ::= { cienaCesCfmNotifMIBNotification 8 }
+
+
+
+  cienaCesCfmMaximumJitterTrapSet  NOTIFICATION-TYPE
+
+        OBJECTS      {
+
+          
+
+          cienaGlobalSeverity,
+
+          cienaGlobalMacAddress,
+
+		  cienaCesCfmDelayMsgServiceName,                                      
+
+          cienaCesCfmDelayMsgLocalMEPId,
+
+          cienaCesCfmDelayMsgMaximumJitterThreshold,
+
+          cienaCesCfmDelayMsgMaximumJitter
+
+        }
+
+   STATUS      current
+
+   DESCRIPTION
+
+      "A notification is sent whenever maximum jitter goes above maximum jitter-threshold during 
+       a jitter measurement test. Setting the cienaCesCfmJitterFaultTrapState object to 'disabled' 
+       causes this trap to be suppressed. Variable bindings include: cienaGlobalSeverity,
+       cienaGlobalMacAddress, cienaCesCfmDelayMsgServiceName, cienaCesCfmDelayMsgLocalMEPId,
+       cienaCesCfmDelayMsgMaximumJitterThreshold, and cienaCesCfmDelayMsgMaximumJitter."
+
+   ::= { cienaCesCfmNotifMIBNotification 9 }
+
+
+
+  cienaCesCfmMaximumJitterTrapClear  NOTIFICATION-TYPE
+
+        OBJECTS      {
+
+          
+
+          cienaGlobalSeverity,
+
+          cienaGlobalMacAddress,
+
+		  cienaCesCfmDelayMsgServiceName,                                      
+
+          cienaCesCfmDelayMsgLocalMEPId,
+
+          cienaCesCfmDelayMsgMaximumJitterThreshold,
+
+          cienaCesCfmDelayMsgMaximumJitter
+
+        }
+
+   STATUS      current
+
+   DESCRIPTION
+
+      "A notification is sent whenever maximum jitter comes back to normal. Setting
+       the cienaCesCfmJitterFaultTrapState object to 'disabled' causes this trap to be
+       suppressed. Variable bindings include: cienaGlobalSeverity,cienaGlobalMacAddress, 
+       cienaCesCfmDelayMsgServiceName, cienaCesCfmDelayMsgLocalMEPId, 
+       cienaCesCfmDelayMsgMaximumJitterThreshold, and cienaCesCfmDelayMsgMaximumJitter." 
+
+   ::= { cienaCesCfmNotifMIBNotification 10 }
+
+  
+
+  cienaCesCfmFrameLossNearTrapSet  NOTIFICATION-TYPE
+
+        OBJECTS      {
+
+          
+
+          cienaGlobalSeverity,
+
+          cienaGlobalMacAddress,
+
+          cienaCesCfmFrameLossMsgServiceName,                                      
+
+          cienaCesCfmFrameLossMsgLocalMEPId,
+
+          cienaCesCfmFrameLossMsgNearLossThreshold,
+
+          cienaCesCfmFrameLossMsgFrameLossNear
+
+       }
+
+   STATUS      current
+
+   DESCRIPTION
+
+      "A notification is sent whenever frame-loss-near goes above frame-loss-near threshold during a 
+       frame loss measurement test. Setting the cienaCesCfmFrameLossNearFaultTrapState object to 
+       'disabled' causes this trap to be suppressed. Variable bindings include: cienaGlobalSeverity,
+       cienaGlobalMacAddress, cienaCesCfmFrameLossMsgServiceName,cienaCesCfmFrameLossMsgLocalMEPId,
+       cienaCesCfmFrameLossMsgNearLossThreshold, and cienaCesCfmFrameLossMsgFrameLossNear." 
+
+   ::= { cienaCesCfmNotifMIBNotification 11 }
+
+
+
+  cienaCesCfmFrameLossNearTrapClear  NOTIFICATION-TYPE
+
+        OBJECTS      {
+
+          
+
+          cienaGlobalSeverity,
+
+          cienaCesCfmFrameLossMsgServiceName,                                      
+
+          cienaCesCfmFrameLossMsgLocalMEPId,
+
+          cienaCesCfmFrameLossMsgNearLossThreshold,
+
+          cienaCesCfmFrameLossMsgFrameLossNear
+
+       }
+
+   STATUS      current
+
+   DESCRIPTION
+
+      "A notification is sent whenever frame-loss-near returns to normal during a 
+       frame loss measurement test. Setting the cienaCesCfmFrameLossNearFaultTrapState 
+       object to 'disabled' causes this trap to be suppressed. Variable bindings include: 
+       cienaGlobalSeverity, cienaCesCfmFrameLossMsgServiceName,
+       cienaCesCfmFrameLossMsgLocalMEPId, cienaCesCfmFrameLossMsgNearLossThreshold, and
+       cienaCesCfmFrameLossMsgFrameLossNear." 
+
+   ::= { cienaCesCfmNotifMIBNotification 12 }
+
+
+
+  cienaCesCfmFrameLossFarTrapSet  NOTIFICATION-TYPE
+
+        OBJECTS      {
+
+          
+
+          cienaGlobalSeverity,
+
+          cienaGlobalMacAddress,
+
+          cienaCesCfmFrameLossMsgServiceName,                                      
+
+          cienaCesCfmFrameLossMsgLocalMEPId,
+
+          cienaCesCfmFrameLossMsgFarLossThreshold,
+
+          cienaCesCfmFrameLossMsgFrameLossFar
+
+          
+
+                 }
+
+   STATUS      current
+
+   DESCRIPTION
+
+      "A notification is sent whenever frame-loss-far goes above frame-loss-far threshold during a 
+       frame loss measurement test. Setting the cienaCesCfmFrameLossFarFaultTrapState object to 
+       'disabled' causes this trap to be suppressed. Variable bindings include: cienaGlobalSeverity,
+       cienaGlobalMacAddress, cienaCesCfmFrameLossMsgServiceName, cienaCesCfmFrameLossMsgLocalMEPId,
+       cienaCesCfmFrameLossMsgFarLossThreshold, and cienaCesCfmFrameLossMsgFrameLossFar." 
+
+   ::= { cienaCesCfmNotifMIBNotification 13 }
+
+
+
+  cienaCesCfmFrameLossFarTrapClear  NOTIFICATION-TYPE
+
+        OBJECTS      {
+
+          
+
+          cienaGlobalSeverity,
+
+          cienaGlobalMacAddress,
+
+          cienaCesCfmFrameLossMsgServiceName,                                      
+
+          cienaCesCfmFrameLossMsgLocalMEPId,
+
+          cienaCesCfmFrameLossMsgFarLossThreshold,
+
+          cienaCesCfmFrameLossMsgFrameLossFar
+
+          
+
+                 }
+
+   STATUS      current
+
+   DESCRIPTION
+
+      "A notification is sent whenever frame-loss-far returns to normal during a 
+       frame loss measurement test. Setting the cienaCesCfmFrameLossFarFaultTrapState 
+       object to 'disabled' causes this trap to be suppressed. Variable bindings 
+       include: cienaGlobalSeverity, cienaGlobalMacAddress, cienaCesCfmFrameLossMsgServiceName,
+       cienaCesCfmFrameLossMsgLocalMEPId, cienaCesCfmFrameLossMsgFarLossThreshold, and
+       cienaCesCfmFrameLossMsgFrameLossFar." 
+
+   ::= { cienaCesCfmNotifMIBNotification 14 }
+  
+   cienaCesSyntheticLossSessionNearFaultTrap   NOTIFICATION-TYPE
+     OBJECTS {
+	            cienaGlobalSeverity,
+				cienaGlobalMacAddress,
+        		cienaCesCfmSyntheticLossSessionServiceName,
+        		cienaCesCfmSyntheticLossSessionFrameLossNear,
+        		cienaCesCfmSyntheticLossSessionLossNearThreshold        				        				
+		   	}
+	STATUS	   current
+	DESCRIPTION
+		"A notification is sent whenever the fault is detected during
+		a Synthetic Loss Measurement test with a near loss threshold fault. Setting the 
+		cienaCesCfmSyntheticLossNearFaultTrapState object to 'disabled' causes this trap to be suppressed.
+		Variable bindings include : cienaGlobalSeverity, cienaGlobalMacAddress, cienaCesCfmSyntheticLossSessionServiceName,
+		cienaCesCfmSyntheticLossSessionFrameLossNear, cienaCesCfmSyntheticLossSessionLossNearThreshold."
+	::= { cienaCesCfmNotifMIBNotification 15}  
+
+  cienaCesSyntheticLossSessionFarFaultTrap   NOTIFICATION-TYPE
+     OBJECTS {
+ 	            cienaGlobalSeverity,
+				cienaGlobalMacAddress,
+        		cienaCesCfmSyntheticLossSessionServiceName,
+        		cienaCesCfmSyntheticLossSessionFrameLossFar,
+        		cienaCesCfmSyntheticLossSessionLossFarThreshold        				        				
+		   	}
+	STATUS	   current
+	DESCRIPTION
+		"A notification is sent whenever the fault is detected during
+		a Synthetic Loss Measurement test with a far loss threshold fault. Setting the 
+		cienaCesCfmSyntheticLossFarFaultTrapState object to 'disabled' causes this trap to be suppressed.
+		Variable bindings include: cienaCesCfmSyntheticLossSessionServiceName, cienaCesCfmSyntheticLossSessionFrameLossFar,
+		cienaCesCfmSyntheticLossSessionLossFarThreshold."
+	::= { cienaCesCfmNotifMIBNotification 16}  	   
+ 
+ cienaCesSyntheticLossSessionNearFaultClearTrap   NOTIFICATION-TYPE
+     OBJECTS {
+ 	            cienaGlobalSeverity,
+				cienaGlobalMacAddress,
+        		cienaCesCfmSyntheticLossSessionServiceName,
+        		cienaCesCfmSyntheticLossSessionFrameLossNear,
+        		cienaCesCfmSyntheticLossSessionLossNearThreshold        				        				
+		   	}
+	STATUS	   current
+	DESCRIPTION
+		"A notification is sent whenever the fault is cleared during
+		a Synthetic Loss Measurement test with a near loss threshold fault.Setting the 
+		cienaCesCfmSyntheticLossNearFaultTrapState object to 'disabled' causes this trap to be suppressed.
+		Variable bindings include: cienaGlobalSeverity, cienaGlobalMacAddress, cienaCesCfmSyntheticLossSessionServiceName,
+		cienaCesCfmSyntheticLossSessionFrameLossNear, cienaCesCfmSyntheticLossSessionLossNearThreshold."
+
+	::= { cienaCesCfmNotifMIBNotification 17}  
+	
+  cienaCesSyntheticLossSessionFarFaultClearTrap   NOTIFICATION-TYPE
+     OBJECTS {
+ 	            cienaGlobalSeverity,
+				cienaGlobalMacAddress,
+        		cienaCesCfmSyntheticLossSessionServiceName,
+        		cienaCesCfmSyntheticLossSessionFrameLossFar,
+        		cienaCesCfmSyntheticLossSessionLossFarThreshold        				        				
+		   	}
+	STATUS	   current
+	DESCRIPTION
+		"A notification is sent whenever the fault is cleared during
+		a Synthetic Loss Measurement test with a far loss threshold fault.Setting the 
+		cienaCesCfmSyntheticLossFarFaultTrapState object to 'disabled' causes this trap to be suppressed.
+		Variable Bindings include: cienaGlobalSeverity, cienaGlobalMacAddress, cienaCesCfmSyntheticLossSessionServiceName,
+		cienaCesCfmSyntheticLossSessionFrameLossFar,cienaCesCfmSyntheticLossSessionLossFarThreshold"
+
+	::= { cienaCesCfmNotifMIBNotification 18} 
+
+  cienaCesCfmAverageDelayVariationTrapSet  NOTIFICATION-TYPE
+        OBJECTS { cienaGlobalSeverity,
+                  cienaGlobalMacAddress,
+		  cienaCesCfmDelayMsgServiceName,                                      
+                  cienaCesCfmDelayMsgLocalMEPId,
+                  cienaCesCfmDelayMsgAverageDelayVariationThreshold,
+                  cienaCesCfmDelayMsgAverageDelayVariation
+                }
+        STATUS      current
+        DESCRIPTION
+             "A notification is sent whenever Average Delay Variation goes above Average Delay Variation threshold during 
+              a Delay Variation measurement test. Setting the cienaCesCfmDelayVariationFaultTrapState object to 'disabled' 
+              causes this trap to be suppressed. Variable bindings include: cienaGlobalSeverity,
+              cienaGlobalMacAddress, cienaCesCfmDelayMsgServiceName, cienaCesCfmDelayMsgLocalMEPId,
+              cienaCesCfmDelayMsgAverageDelayVariationThreshold, and cienaCesCfmDelayMsgAverageDelayVariation."
+        ::= { cienaCesCfmNotifMIBNotification 19}
+
+  cienaCesCfmAverageDelayVariationTrapClear  NOTIFICATION-TYPE
+        OBJECTS { cienaGlobalSeverity,
+                  cienaGlobalMacAddress,
+		  cienaCesCfmDelayMsgServiceName,                                      
+                  cienaCesCfmDelayMsgLocalMEPId,
+                  cienaCesCfmDelayMsgAverageDelayVariationThreshold,
+                  cienaCesCfmDelayMsgAverageDelayVariation
+                }
+        STATUS      current
+        DESCRIPTION
+             "A notification is sent whenever Average Delay Variation comes back below the threshold level during
+              a Delay Variation measurement test. Setting the cienaCesCfmDelayVariationFaultTrapState object to 'disabled' 
+              causes this trap to be suppressed. Variable bindings include: cienaGlobalSeverity,
+              cienaGlobalMacAddress, cienaCesCfmDelayMsgServiceName, cienaCesCfmDelayMsgLocalMEPId,
+              cienaCesCfmDelayMsgAverageDelayVariationThreshold, and cienaCesCfmDelayMsgAverageDelayVariation."
+        ::= { cienaCesCfmNotifMIBNotification 20}
+
+  cienaCesCfmMaximumDelayVariationTrapSet  NOTIFICATION-TYPE
+        OBJECTS { cienaGlobalSeverity,
+                  cienaGlobalMacAddress,
+		  cienaCesCfmDelayMsgServiceName,                                      
+                  cienaCesCfmDelayMsgLocalMEPId,
+                  cienaCesCfmDelayMsgMaximumDelayVariationThreshold,
+                  cienaCesCfmDelayMsgMaximumDelayVariation
+                }
+        STATUS      current
+        DESCRIPTION
+             "A notification is sent whenever Maximum Delay Variation goes above Maximum Delay Variation threshold during 
+              a Delay Variation measurement test. Setting the cienaCesCfmDelayVariationFaultTrapState object to 'disabled' 
+              causes this trap to be suppressed. Variable bindings include: cienaGlobalSeverity,
+              cienaGlobalMacAddress, cienaCesCfmDelayMsgServiceName, cienaCesCfmDelayMsgLocalMEPId,
+              cienaCesCfmDelayMsgMaximumDelayVariationThreshold, and cienaCesCfmDelayMsgMaximumDelayVariation."
+        ::= { cienaCesCfmNotifMIBNotification 21}
+
+  cienaCesCfmMaximumDelayVariationTrapClear  NOTIFICATION-TYPE
+        OBJECTS { cienaGlobalSeverity,
+                  cienaGlobalMacAddress,
+		  cienaCesCfmDelayMsgServiceName,                                      
+                  cienaCesCfmDelayMsgLocalMEPId,
+                  cienaCesCfmDelayMsgMaximumDelayVariationThreshold,
+                  cienaCesCfmDelayMsgMaximumDelayVariation
+                }
+        STATUS      current
+        DESCRIPTION
+             "A notification is sent whenever Maximum Delay Variation comes back below the threshold level during
+              a Delay Variation measurement test. Setting the cienaCesCfmDelayVariationFaultTrapState object to 'disabled' 
+              causes this trap to be suppressed. Variable bindings include: cienaGlobalSeverity,
+              cienaGlobalMacAddress, cienaCesCfmDelayMsgServiceName, cienaCesCfmDelayMsgLocalMEPId,
+              cienaCesCfmDelayMsgMaximumDelayVariationThreshold, and cienaCesCfmDelayMsgMaximumDelayVariation."
+        ::= { cienaCesCfmNotifMIBNotification 22}
+
+  cienaCesCfmSyntheticLossSessionSignalDegradeFaultTrapSet  NOTIFICATION-TYPE 
+        OBJECTS { cienaGlobalSeverity,
+                  cienaGlobalMacAddress,
+                  cienaCesCfmServiceName, 
+                  cienaCesCfmSyntheticLossSessionFrameLossNear, 
+                  cienaCesCfmSyntheticLossSessionFrameLossFar, 
+                  cienaCesCfmSyntheticLossSessionSdSetThreshold
+                } 
+        STATUS      current 
+        DESCRIPTION 
+             "A notification is sent whenever the signal degrade fault is detected during 
+              a Synthetic Loss Measurement test." 
+        ::= { cienaCesCfmNotifMIBNotification 23} 
+
+  cienaCesCfmSyntheticLossSessionSignalDegradeFaultTrapClear  NOTIFICATION-TYPE 
+        OBJECTS { cienaGlobalSeverity,
+                  cienaGlobalMacAddress,
+                  cienaCesCfmServiceName, 
+                  cienaCesCfmSyntheticLossSessionFrameLossNear, 
+                  cienaCesCfmSyntheticLossSessionFrameLossFar, 
+                  cienaCesCfmSyntheticLossSessionSdClearThreshold
+                } 
+        STATUS      current 
+        DESCRIPTION 
+             "A notification is sent whenever the signal degrade fault is cleared during 
+              a Synthetic Loss Measurement test." 
+        ::= { cienaCesCfmNotifMIBNotification 24} 
+
+ END
