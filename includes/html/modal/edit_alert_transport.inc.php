@@ -35,6 +35,44 @@ if (Auth::user()->hasGlobalAdmin()) {
                                 <input type='text' id='name' name='name' class='form-control validation' maxlength='200' required>
                             </div>
                         </div>
+                    <div class="form-group">
+                        <label for="timerange" class="col-sm-3 col-md-2 control-label">Time range <strong class="text-danger">*</strong>: </label>
+                        <div class="col-sm-8">
+                            <input type="checkbox" id="timerange" name="timerange" data-on-text="Yes" data-off-text="No" onchange="timerange_switch();" value=0 />
+                        </div>
+                    </div>
+                    <div id="timerangegroup" style="display:none;">
+                        <div class="form-group">
+                            <label for="start_hr" class="col-sm-3 col-md-2 control-label">Start hour <exp>*</exp>: </label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control date" id="start_timerange_hr" name="start_timerange_hr" value="" data-date-format="HH:mm">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="end_hr" class="col-sm-3 col-md-2 control-label">End hour <exp>*</exp>: </label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control date" id="end_timerange_hr" name="end_timerange_hr" value="" data-date-format="HH:mm">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="timerange_day" class="col-sm-3 col-md-2 control-label">Only on weekday: </label>
+                            <div class="col-sm-8">
+                                <div style="float: left;"><label><input type="checkbox" style="width: 20px;" class="form-control" id="timerange_day" name="timerange_day[]" value="1" />Mo</label></div>
+                                <div style="float: left;padding-left: 20px;"><label><input type="checkbox" style="width: 20px;" class="form-control" id="timerange_day" name="timerange_day[]" value="2" />Tu</label></div>
+                                <div style="float: left;padding-left: 20px;"><label><input type="checkbox" style="width: 20px;" class="form-control" id="timerange_day" name="timerange_day[]" value="3" />We</label></div>
+                                <div style="float: left;padding-left: 20px;"><label><input type="checkbox" style="width: 20px;" class="form-control" id="timerange_day" name="timerange_day[]" value="4" />Th</label></div>
+                                <div style="float: left;padding-left: 20px;"><label><input type="checkbox" style="width: 20px;" class="form-control" id="timerange_day" name="timerange_day[]" value="5" />Fr</label></div>
+                                <div style="float: left;padding-left: 20px;"><label><input type="checkbox" style="width: 20px;" class="form-control" id="timerange_day" name="timerange_day[]" value="6" />Sa</label></div>
+                                <div style="float: left;padding-left: 20px;"><label><input type="checkbox" style="width: 20px;" class="form-control" id="timerange_day" name="timerange_day[]" value="0" />Su</label></div>
+                            </div>
+                        </div>
+                    <div class="form-group">
+                         <label for='maps' class='col-sm-3 col-md-2 control-label'>Map To <exp>*</exp>: </label>
+                        <div class="col-sm-8">
+                            <select id="maps" name="maps[]" class="form-control" multiple="multiple"></select>
+                        </div>
+                    </div>
+                </div>
                         <div class="form-group" title="The type of transport.">
                             <label for='transport-choice' class='col-sm-3 col-md-2 control-label'>Transport type: </label>
                             <div class="col-sm-3">
@@ -130,44 +168,6 @@ if (Auth::user()->hasGlobalAdmin()) {
             }
         }
     ?>
-                    <div class="form-group">
-                        <label for="timerange" class="col-sm-3 col-md-2 control-label">Time range <strong class="text-danger">*</strong>: </label>
-                        <div class="col-sm-8">
-                            <input type="checkbox" id="timerange" name="timerange" data-size="small" data-on-text="Yes" data-off-text="No" onChange="timerange_switch();" value=0 />
-                        </div>
-                    </div>
-                    <div id="timerangegroup" style="display:none;">
-                        <div class="form-group">
-                            <label for="start_hr" class="col-sm-4 control-label">Start hour <exp>*</exp>: </label>
-                            <div class="col-sm-8">
-                                <input type="text" class="form-control date" id="start_timerange_hr" name="start_timerange_hr" value="" data-date-format="HH:mm">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="end_hr" class="col-sm-4 control-label">End hour <exp>*</exp>: </label>
-                            <div class="col-sm-8">
-                                <input type="text" class="form-control date" id="end_timerange_hr" name="end_timerange_hr" value="" data-date-format="HH:mm">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="timerange_day" class="col-sm-4 control-label">Only on weekday: </label>
-                            <div class="col-sm-8">
-                                <div style="float: left;"><label><input type="checkbox" style="width: 20px;" class="form-control" id="timerange_day" name="timerange_day[]" value="1" />Mo</label></div>
-                                <div style="float: left;padding-left: 20px;"><label><input type="checkbox" style="width: 20px;" class="form-control" id="timerange_day" name="timerange_day[]" value="2" />Tu</label></div>
-                                <div style="float: left;padding-left: 20px;"><label><input type="checkbox" style="width: 20px;" class="form-control" id="timerange_day" name="timerange_day[]" value="3" />We</label></div>
-                                <div style="float: left;padding-left: 20px;"><label><input type="checkbox" style="width: 20px;" class="form-control" id="timerange_day" name="timerange_day[]" value="4" />Th</label></div>
-                                <div style="float: left;padding-left: 20px;"><label><input type="checkbox" style="width: 20px;" class="form-control" id="timerange_day" name="timerange_day[]" value="5" />Fr</label></div>
-                                <div style="float: left;padding-left: 20px;"><label><input type="checkbox" style="width: 20px;" class="form-control" id="timerange_day" name="timerange_day[]" value="6" />Sa</label></div>
-                                <div style="float: left;padding-left: 20px;"><label><input type="checkbox" style="width: 20px;" class="form-control" id="timerange_day" name="timerange_day[]" value="0" />Su</label></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                         <label for='maps' class='col-sm-4 control-label'>Map To <exp>*</exp>: </label>
-                        <div class="col-sm-8">
-                            <select id="maps" name="maps[]" class="form-control" multiple="multiple"></select>
-                        </div>
-                    </div>
     <?php
         echo '<div class="form-group">';
         echo '<div class="col-sm-12 text-center">';
@@ -245,6 +245,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                 $(".transport").hide();
                 $("#" + $("#transport-choice").val()).show().find("input:text").val("");
                 $("#is_default").bootstrapSwitch('state', false);
+                $("#timerange").bootstrapSwitch('state', false);
                 
                 // Turn on all switches in form
                 var switches = <?php echo json_encode($switches);?>;
@@ -261,6 +262,7 @@ if (Auth::user()->hasGlobalAdmin()) {
             $("#name").val(transport.name);
             $("#transport-choice").val(form_id);
             $("#is_default").bootstrapSwitch('state', transport.is_default);
+            $("#timerange").bootstrapSwitch('state', transport.timerange);
             $(".transport").hide();
             transport_form.show().find("input:text").val("");
              
@@ -312,7 +314,7 @@ if (Auth::user()->hasGlobalAdmin()) {
             }
         });
 
-        // Scripts related to deleting an alert transpor
+        // Scripts related to deleting an alert transport
         // Populate transport id value
         $("#delete-alert-transport").on("show.bs.modal", function(event) {
             transport_id = $(event.relatedTarget).data("transport_id");
@@ -327,7 +329,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                 $('#timerangegroup').hide();
                 $('#timerange').val(0);
             }
-        };
+        }
 
         // Delete the alert transport
         $("#remove-alert-transport").click('', function(event) {
@@ -350,6 +352,97 @@ if (Auth::user()->hasGlobalAdmin()) {
                 error: function() {
                     toastr.error("The alert transport could not be deleted.");
                 }
+            });
+        });
+        $("#maps").select2({
+            width: '100%',
+            placeholder: "Devices, Groups or Locations",
+            ajax: {
+                url: 'ajax_list.php',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        type: 'devices_groups_locations',
+                        search: params.term
+                    };
+                }
+            }
+        });
+
+        $(function () {
+            $("#start_timerange_dt").datetimepicker({
+                defaultDate: moment(),
+                minDate: moment().format('YYYY-MM-DD'),
+                icons: {
+                    time: 'fa fa-clock-o',
+                    date: 'fa fa-calendar',
+                    up: 'fa fa-chevron-up',
+                    down: 'fa fa-chevron-down',
+                    previous: 'fa fa-chevron-left',
+                    next: 'fa fa-chevron-right',
+                    today: 'fa fa-calendar-check-o',
+                    clear: 'fa fa-trash-o',
+                    close: 'fa fa-close'
+                }
+            });
+            $("#end_timerange_dt").datetimepicker({
+                minDate: moment().format('YYYY-MM-DD'),
+                icons: {
+                    time: 'fa fa-clock-o',
+                    date: 'fa fa-calendar',
+                    up: 'fa fa-chevron-up',
+                    down: 'fa fa-chevron-down',
+                    previous: 'fa fa-chevron-left',
+                    next: 'fa fa-chevron-right',
+                    today: 'fa fa-calendar-check-o',
+                    clear: 'fa fa-trash-o',
+                    close: 'fa fa-close'
+                }
+            });
+            $("#start_timerange_dt").on("dp.change", function (e) {
+                var $endRecurringDt = $("#end_timerange_dt");
+                var val = $endRecurringDt.val();
+                $endRecurringDt.data("DateTimePicker").minDate(e.date);
+                // work around annoying event interaction
+                if (!val) {
+                    $endRecurringDt.val('');
+                    $("#start_timerange_dt").data("DateTimePicker").maxDate(false);
+                }
+            });
+            $("#end_timerange_dt").on("dp.change", function (e) {
+                $("#start_timerange_dt").data("DateTimePicker").maxDate(e.date);
+            });
+            $("#start_timerange_hr").datetimepicker({
+                icons: {
+                    time: 'fa fa-clock-o',
+                    date: 'fa fa-calendar',
+                    up: 'fa fa-chevron-up',
+                    down: 'fa fa-chevron-down',
+                    previous: 'fa fa-chevron-left',
+                    next: 'fa fa-chevron-right',
+                    today: 'fa fa-calendar-check-o',
+                    clear: 'fa fa-trash-o',
+                    close: 'fa fa-close'
+                }
+            });
+            $("#end_timerange_hr").datetimepicker({
+                icons: {
+                    time: 'fa fa-clock-o',
+                    date: 'fa fa-calendar',
+                    up: 'fa fa-chevron-up',
+                    down: 'fa fa-chevron-down',
+                    previous: 'fa fa-chevron-left',
+                    next: 'fa fa-chevron-right',
+                    today: 'fa fa-calendar-check-o',
+                    clear: 'fa fa-trash-o',
+                    close: 'fa fa-close'
+                }
+            });
+            $("#start_timerange_hr").on("dp.change", function (e) {
+                $("#end_timerange_hr").data("DateTimePicker").minDate(e.date);
+            });
+            $("#end_timerange_hr").on("dp.change", function (e) {
+                $("#start_timerange_hr").data("DateTimePicker").maxDate(e.date);
             });
         });
     $("[name='timerange']").bootstrapSwitch();
