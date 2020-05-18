@@ -10,11 +10,11 @@ env:
 matrix:
   fast_finish: true
   include:
-  - php: 7.3
+  - php: 7.4
     env: SKIP_STYLE_CHECK=1
-  - php: 7.2
+  - php: 7.3
     env: SKIP_UNIT_CHECK=1 BROWSER_TEST=1 CHROME_HEADLESS=1
-  - php: 7.1
+  - php: 7.2
     env: SKIP_STYLE_CHECK=1 EXECUTE_BUILD_DOCS=true
 
 cache:
