@@ -72,6 +72,19 @@ function api_not_found()
     return api_error(404, "This API route doesn't exist.");
 }
 
+function search_ports(\Illuminate\Http\Request $request)
+{
+    $search = $request->get('search');
+    $value = "%$search%";
+    $ports = \App\Models\Port::hasAccess(Auth::user())
+    ->where('ifAlias', 'like', $value)
+    ->orWhere('ifDescr', 'like', $value)
+    ->orWhere('ifName', 'like', $value)
+    ->orderBy('ifName')
+    ->get();
+    $json = json_encode($ports);
+    die($json);
+}
 function api_get_graph(array $vars)
 {
     global $dur;        // Needed for callback within graph code
@@ -1014,7 +1027,7 @@ function list_alerts(\Illuminate\Http\Request $request)
     }
 
     $order = 'timestamp desc';
-    
+
     $alert_rule = $request->get('alert_rule');
     if (isset($alert_rule)) {
         if (is_numeric($alert_rule)) {
@@ -1022,7 +1035,7 @@ function list_alerts(\Illuminate\Http\Request $request)
             $sql .= ' AND `R`.id=?';
         }
     }
-    
+
     if ($request->has('order')) {
         list($sort_column, $sort_order) = explode(' ', $request->get('order'), 2);
         if (($res = validate_column_list($sort_column, 'alerts')) !== true) {
@@ -2333,7 +2346,7 @@ function validateDeviceIds($ids)
     }
     return true;
 }
-  
+
 function add_location(\Illuminate\Http\Request $request)
 {
     $data = json_decode($request->getContent(), true);

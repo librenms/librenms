@@ -19,6 +19,7 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
 
     // global read only access required
     Route::middleware(['can:global-read'])->group(function () {
+        Route::get('search_ports', 'LegacyApiController@search_ports')->name('search_ports');
         Route::get('bgp', 'LegacyApiController@list_bgp')->name('list_bgp');
         Route::get('bgp/{id}', 'LegacyApiController@get_bgp')->name('get_bgp');
         Route::get('ospf', 'LegacyApiController@list_ospf')->name('list_ospf');
