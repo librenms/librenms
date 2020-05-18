@@ -1,6 +1,8 @@
 <?php
 /**
- * allworx.inc.php
+ * AllworxVoip.php
+ *
+ * -Description-
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,10 +16,25 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package    LibreNMS
+ * @link       http://librenms.org
+ * @copyright  2020 Tony Murray
+ * @author     Tony Murray <murraytony@gmail.com>
  */
 
-$data = snmp_get_multi_oid($device, ['.1.3.6.1.2.1.1.1.0', '.1.3.6.1.2.1.27.1.1.4.1', '.1.3.6.1.2.1.1.5.0']);
+namespace LibreNMS\OS;
 
-$hardware = $data['.1.3.6.1.2.1.1.1.0'];
-$version = $data['.1.3.6.1.2.1.27.1.1.4.1'];
-$serial = $data['.1.3.6.1.2.1.1.5.0'];
+use LibreNMS\Interfaces\Discovery\OSDiscovery;
+use LibreNMS\OS;
+
+class AllworxVoip extends OS implements OSDiscovery
+{
+    public function discoverOS(): void
+    {
+        $device = $this->getDeviceModel();
+        $device->hardware = $device->sysDescr;
+        $device->serial = $device->sysName;
+        $device->version = snmp_get($this->getDevice(), 'applVersion.1', '-OQv', 'NETWORK-SERVICES-MIB');
+    }
+}
