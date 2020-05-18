@@ -10,6 +10,7 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessMseDiscovery;
@@ -18,12 +19,20 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessErrorRateDiscovery;
 use LibreNMS\OS;
 
 class ApexLynx extends OS implements
+    OSDiscovery,
     WirelessRssiDiscovery,
     WirelessFrequencyDiscovery,
     WirelessMseDiscovery,
     WirelessRateDiscovery,
     WirelessErrorRateDiscovery
 {
+    public function discoverOS(): void
+    {
+        $device = $this->getDeviceModel();
+        $device->version = snmp_get($this->getDevice(), '.1.3.6.1.4.1.5454.1.80.1.1.2.0', '-OQv');
+        $device->hardware = 'Trango ' . $device->sysDescr;
+    }
+
     public function discoverWirelessRssi()
     {
         // GIGA-PLUS-MIB::rfRSSIInt
