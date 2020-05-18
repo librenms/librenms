@@ -1,6 +1,6 @@
 <?php
 /**
- * AristaEos.php
+ * ArrisC4.php
  *
  * -Description-
  *
@@ -19,6 +19,8 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
+ * @copyright  2016 Neil Lathwood
+ * @author     Neil Lathwood <neil@lathwood.co.uk>
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -28,14 +30,21 @@ namespace LibreNMS\OS;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\OS;
 
-class AristaEos extends OS implements OSDiscovery
+class ArrisC4 extends OS implements OSDiscovery
 {
     public function discoverOS(): void
     {
         $device = $this->getDeviceModel();
-        preg_match('/.+ version (.+) running on .+ (\S+)$/', $device->sysDescr, $matches);
-        $device->version = $matches[1] ?? null;
-        $device->hardware = $matches[2] ?? null;
-        $device->serial = snmp_get($this->getDevice(), '.1.3.6.1.2.1.47.1.1.1.1.11.1', '-OQv');
+
+        preg_match("/CMTS_V([0-9\.]+),/", $device->sysDescr, $match);
+        $device->version = $match[1];
+
+        $data = explode(".", $device->sysObjectID);
+        $id = end($data);
+        if ($id == "1") {
+            $device->hardware = "C4";
+        } elseif ($id == "2") {
+            $device->hardware = "C4c";
+        }
     }
 }
