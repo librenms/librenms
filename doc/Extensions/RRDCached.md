@@ -45,7 +45,6 @@ so you can view the disk I/O usage delta.
 1. [RRDCached installation Ubuntu 16](#RRDCached-installation-Ubuntu-16)
 1. [RRDCached installation Debian Buster](#RRDCached-installation-Debian-Buster)
 1. [RRDCached installation Debian Stretch](#RRDCached-installation-Debian-Stretch)
-1. [RRDCached installation Debian Jessie](#RRDCached-installation-Debian-Jessie)
 1. [RRDCached installation CentOS 7](#RRDCached-installation-CentOS-7)
 1. [RRDCached installation CentOS 6](#RRDCached-installation-CentOS-6)
 1. [Securing RRCached](#Securing-RRCached)
@@ -209,37 +208,6 @@ $config['rrdcached'] = "IPADDRESS:42217";
 ```
 
 NOTE: change IPADDRESS to the ip the rrdcached server is listening on.
-
-## RRDCached installation Debian Jessie
-(rrdcached 1.4.8)
-
-1: Install rrdcached
-
-```bash
-sudo apt-get install rrdcached
-```
-
-2: Edit /etc/default/rrdcached to include:
-
-```bash
-OPTS="-s librenms"
-OPTS="$OPTS -l unix:///var/run/rrdcached.sock"
-OPTS="$OPTS -j /var/lib/rrdcached/journal/ -F"
-OPTS="$OPTS -b /opt/librenms/rrd/ -B"
-OPTS="$OPTS -w 1800 -z 1800 -f 3600 -t 4 -U librenms -G librenms"
-```
-
-3: Restart the rrdcached service
-
-```bash
-    systemctl restart rrdcached.service
-```
-
-4: Edit /opt/librenms/config.php to include:
-
-```php
-$config['rrdcached'] = "unix:/var/run/rrdcached.sock";
-```
 
 ## RRDCached installation CentOS 7
 
