@@ -3,6 +3,7 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessDistanceDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
@@ -11,12 +12,21 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\OS;
 
 class AirosAfLtu extends OS implements
+    OSDiscovery,
     WirelessDistanceDiscovery,
     WirelessFrequencyDiscovery,
     WirelessPowerDiscovery,
     WirelessQualityDiscovery,
     WirelessRateDiscovery
 {
+    public function discoverOS(): void
+    {
+        $device = $this->getDeviceModel();
+        $osdata = snmp_get_multi_oid($this->getDevice(), ['afLTUDevModel.0', 'afLTUFirmwareVersion.0'], '-OQUs', 'UBNT-AFLTU-MIB');
+        $device->hardware = $osdata['afLTUDevModel.0'] ?? null;
+        $device->version = $osdata['afLTUFirmwareVersion.0'] ?? null;
+    }
+
     /**
      * Discover wireless frequency.  This is in Hz. Type is frequency.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered

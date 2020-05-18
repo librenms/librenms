@@ -26,6 +26,7 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessDistanceDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
@@ -33,11 +34,18 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\OS;
 
 class AirosAf extends OS implements
+    OSDiscovery,
     WirelessFrequencyDiscovery,
     WirelessPowerDiscovery,
     WirelessDistanceDiscovery,
     WirelessRateDiscovery
 {
+    public function discoverOS(): void
+    {
+        $device = $this->getDeviceModel();
+        $device->hardware = 'Ubiquiti AF '.trim(snmp_get($this->getDevice(), 'dot11manufacturerProductName.5', '-Ovq', 'IEEE802dot11-MIB'));
+        $device->version  = snmp_get($this->getDevice(), 'fwVersion.1', '-Ovq', 'UBNT-AirFIBER-MIB');
+    }
 
     /**
      * Discover wireless distance.  This is in Kilometers. Type is distance.
