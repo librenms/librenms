@@ -82,6 +82,9 @@ class SmokepingCliTest extends \LibreNMS\Tests\TestCase
 
     public function setUp(): void
     {
+        // We need an app instance available for these tests to load the translation machinary
+        $this->app = $this->createApplication();
+
         $this->instance = new SmokePingGenerateCommand();
         $this->instance->disableDNSLookup();
         parent::setUp();
