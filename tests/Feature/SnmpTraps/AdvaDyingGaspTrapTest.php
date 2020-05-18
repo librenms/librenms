@@ -1,6 +1,6 @@
 <?php
 /**
- * AdvaDyingGaspTest.php
+ * AdvaDyingGaspTrapTest.php
  *
  * -Description-
  *
@@ -29,7 +29,7 @@ use App\Models\Device;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
 
-class AdvaSnmpDyingGaspTest extends SnmpTrapTestCase
+class AdvaDyingGaspTrapTest extends SnmpTrapTestCase
 {
     public function testDyingGasp()
     {

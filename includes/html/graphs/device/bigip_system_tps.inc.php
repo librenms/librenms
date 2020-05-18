@@ -1,7 +1,7 @@
 <?php
 
 
-require 'includes/graphs/common.inc.php';
+require 'includes/html/graphs/common.inc.php';
 
 $scale_min = '0';
 $descr = rrdtool_escape('SSL TPS');

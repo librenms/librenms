@@ -20,7 +20,7 @@ timetraTCMGMIBModule             MODULE-IDENTITY
         "This document is the SNMP MIB module for the SNMP Textual Conventions
          (TCs) used in the Nokia SROS manageability instrumentation.
 
-         Copyright 2003-2017 Nokia. All rights reserved. Reproduction of this
+         Copyright 2003-2018 Nokia. All rights reserved. Reproduction of this
          document is authorized on the condition that the foregoing copyright
          notice is included.
 

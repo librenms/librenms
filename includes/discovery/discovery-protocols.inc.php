@@ -5,7 +5,7 @@ use LibreNMS\Util\IP;
 
 global $link_exists;
 
-if ($device['os'] == 'ironware' && Config::get('autodiscovery.xdp') === true) {
+if ($device['os'] == 'ironware') {
     echo ' Brocade FDP: ';
     $fdp_array = snmpwalk_group($device, 'snFdpCacheEntry', 'FOUNDRY-SN-SWITCH-GROUP-MIB', 2);
 
@@ -19,7 +19,9 @@ if ($device['os'] == 'ironware' && Config::get('autodiscovery.xdp') === true) {
             if (!$remote_device_id &&
                 !can_skip_discovery($fdp['snFdpCacheDeviceId'], $fdp['snFdpCacheVersion'])
             ) {
-                $remote_device_id = discover_new_device($fdp['snFdpCacheDeviceId'], $device, 'FDP', $interface);
+                if (Config::get('autodiscovery.xdp') === true) {
+                    $remote_device_id = discover_new_device($fdp['snFdpCacheDeviceId'], $device, 'FDP', $interface);
+                }
             }
 
             $remote_port_id = find_port_id($fdp['snFdpCacheDevicePort'], '', $remote_device_id);
@@ -40,48 +42,47 @@ if ($device['os'] == 'ironware' && Config::get('autodiscovery.xdp') === true) {
 }//end if
 
 echo ' CISCO-CDP-MIB: ';
-if (Config::get('autodiscovery.xdp') === true) {
-    $cdp_array = snmpwalk_group($device, 'cdpCache', 'CISCO-CDP-MIB', 2);
+$cdp_array = snmpwalk_group($device, 'cdpCache', 'CISCO-CDP-MIB', 2);
 
-    foreach ($cdp_array as $key => $cdp_if_array) {
-        $interface = get_port_by_ifIndex($device['device_id'], $key);
+foreach ($cdp_array as $key => $cdp_if_array) {
+    $interface = get_port_by_ifIndex($device['device_id'], $key);
 
-        foreach ($cdp_if_array as $entry_key => $cdp) {
-            d_echo($cdp);
+    foreach ($cdp_if_array as $entry_key => $cdp) {
+        d_echo($cdp);
 
-            $cdp_ip = IP::fromHexString($cdp['cdpCacheAddress'], true);
-            $remote_device_id = find_device_id($cdp['cdpCacheDeviceId'], $cdp_ip);
+        $cdp_ip = IP::fromHexString($cdp['cdpCacheAddress'], true);
+        $remote_device_id = find_device_id($cdp['cdpCacheDeviceId'], $cdp_ip);
 
-            if (!$remote_device_id &&
-                !can_skip_discovery($cdp['cdpCacheDeviceId'], $cdp['cdpCacheVersion'], $cdp['cdpCachePlatform'])
-            ) {
-                $remote_device_id = discover_new_device($cdp['cdpCacheDeviceId'], $device, 'CDP', $interface);
+        if (!$remote_device_id &&
+            !can_skip_discovery($cdp['cdpCacheDeviceId'], $cdp['cdpCacheVersion'], $cdp['cdpCachePlatform'] &&
+            Config::get('autodiscovery.xdp') === true)
+        ) {
+            $remote_device_id = discover_new_device($cdp['cdpCacheDeviceId'], $device, 'CDP', $interface);
 
-                if (!$remote_device_id && Config::get('discovery_by_ip', false)) {
-                    $remote_device_id = discover_new_device($cdp_ip, $device, 'CDP', $interface);
-                }
+            if (!$remote_device_id && Config::get('discovery_by_ip', false)) {
+                $remote_device_id = discover_new_device($cdp_ip, $device, 'CDP', $interface);
             }
+        }
 
-            if ($interface['port_id'] && $cdp['cdpCacheDeviceId'] && $cdp['cdpCacheDevicePort']) {
-                $remote_port_id = find_port_id($cdp['cdpCacheDevicePort'], '', $remote_device_id);
-                discover_link(
-                    $interface['port_id'],
-                    'cdp',
-                    $remote_port_id,
-                    $cdp['cdpCacheDeviceId'],
-                    $cdp['cdpCacheDevicePort'],
-                    $cdp['cdpCachePlatform'],
-                    $cdp['cdpCacheVersion'],
-                    $device['device_id'],
-                    $remote_device_id
-                );
-            }
-        }//end foreach
+        if ($interface['port_id'] && $cdp['cdpCacheDeviceId'] && $cdp['cdpCacheDevicePort']) {
+            $remote_port_id = find_port_id($cdp['cdpCacheDevicePort'], '', $remote_device_id);
+            discover_link(
+                $interface['port_id'],
+                'cdp',
+                $remote_port_id,
+                $cdp['cdpCacheDeviceId'],
+                $cdp['cdpCacheDevicePort'],
+                $cdp['cdpCachePlatform'],
+                $cdp['cdpCacheVersion'],
+                $device['device_id'],
+                $remote_device_id
+            );
+        }
     }//end foreach
-    echo PHP_EOL;
-}//end if
+}//end foreach
+echo PHP_EOL;
 
-if (($device['os'] == 'routeros') && Config::get('autodiscovery.xdp') === true) {
+if (($device['os'] == 'routeros')) {
     echo ' LLDP-MIB: ';
     $lldp_array  = snmpwalk_group($device, 'lldpRemEntry', 'LLDP-MIB', 3);
     if (!empty($lldp_array)) {
@@ -101,7 +102,8 @@ if (($device['os'] == 'routeros') && Config::get('autodiscovery.xdp') === true) 
 
             if (!$remote_device_id &&
                 is_valid_hostname($lldp['lldpRemSysName']) &&
-                !can_skip_discovery($lldp['lldpRemSysName'], $lldp['lldpRemSysDesc'])) {
+                !can_skip_discovery($lldp['lldpRemSysName'], $lldp['lldpRemSysDesc']) &&
+                Config::get('autodiscovery.xdp') === true) {
                 $remote_device_id = discover_new_device($lldp['lldpRemSysName'], $device, 'LLDP', $interface);
             }
 
@@ -122,7 +124,7 @@ if (($device['os'] == 'routeros') && Config::get('autodiscovery.xdp') === true) 
         }//end foreach
     }
     echo PHP_EOL;
-} elseif (($device['os'] == 'pbn' || $device['os'] == 'bdcom') && Config::get('autodiscovery.xdp') === true) {
+} elseif (($device['os'] == 'pbn' || $device['os'] == 'bdcom')) {
     echo ' NMS-LLDP-MIB: ';
     $lldp_array  = snmpwalk_group($device, 'lldpRemoteSystemsData', 'NMS-LLDP-MIB');
 
@@ -133,7 +135,8 @@ if (($device['os'] == 'routeros') && Config::get('autodiscovery.xdp') === true) 
 
         if (!$remote_device_id &&
             is_valid_hostname($lldp['lldpRemSysName']) &&
-            !can_skip_discovery($lldp['lldpRemSysName'], $lldp['lldpRemSysDesc'])
+            !can_skip_discovery($lldp['lldpRemSysName'], $lldp['lldpRemSysDesc'] &&
+            Config::get('autodiscovery.xdp') === true)
         ) {
             $remote_device_id = discover_new_device($lldp['lldpRemSysName'], $device, 'LLDP', $interface);
         }
@@ -154,7 +157,7 @@ if (($device['os'] == 'routeros') && Config::get('autodiscovery.xdp') === true) 
         }
     }//end foreach
     echo PHP_EOL;
-} elseif (($device['os'] == 'timos') && Config::get('autodiscovery.xdp') === true) {
+} elseif (($device['os'] == 'timos')) {
     echo ' TIMETRA-LLDP-MIB: ';
     $lldp_array  = snmpwalk_group($device, 'tmnxLldpRemoteSystemsData', 'TIMETRA-LLDP-MIB');
     foreach ($lldp_array as $key => $lldp) {
@@ -166,7 +169,8 @@ if (($device['os'] == 'routeros') && Config::get('autodiscovery.xdp') === true) 
 
         if (!$remote_device_id &&
             is_valid_hostname($lldp['tmnxLldpRemSysName'][$ifIndex][$MacIndex][$RemIndex]) &&
-            !can_skip_discovery($lldp['tmnxLldpRemSysName'][$ifIndex][$MacIndex][$RemIndex], $lldp['tmnxLldpRemSysDesc'][$ifIndex][$MacIndex][$RemIndex])
+            !can_skip_discovery($lldp['tmnxLldpRemSysName'][$ifIndex][$MacIndex][$RemIndex], $lldp['tmnxLldpRemSysDesc'][$ifIndex][$MacIndex][$RemIndex]) &&
+            Config::get('autodiscovery.xdp') === true
         ) {
             $remote_device_id = discover_new_device($lldp['tmnxLldpRemSysName'][$ifIndex][$MacIndex][$RemIndex], $device, 'LLDP', $interface);
         }
@@ -187,7 +191,7 @@ if (($device['os'] == 'routeros') && Config::get('autodiscovery.xdp') === true) 
         }
     }//end foreach
     echo PHP_EOL;
-} elseif (Config::get('autodiscovery.xdp') === true) {
+} else {
     echo ' LLDP-MIB: ';
     $lldp_array = snmpwalk_group($device, 'lldpRemTable', 'LLDP-MIB', 3);
     if (!empty($lldp_array)) {
@@ -241,7 +245,8 @@ if (($device['os'] == 'routeros') && Config::get('autodiscovery.xdp') === true) 
                 $remote_device_id = find_device_id($lldp['lldpRemSysName'], $lldp['lldpRemManAddr'], $remote_port_mac);
 
                 // add device if configured to do so
-                if (!$remote_device_id && !can_skip_discovery($lldp['lldpRemSysName'], $lldp['lldpRemSysDesc'])) {
+                if (!$remote_device_id && !can_skip_discovery($lldp['lldpRemSysName'], $lldp['lldpRemSysDesc']) &&
+                Config::get('autodiscovery.xdp') === true) {
                     $remote_device_id = discover_new_device($lldp['lldpRemSysName'], $device, 'LLDP', $interface);
 
                     if (!$remote_device_id && Config::get('discovery_by_ip', false)) {

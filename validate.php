@@ -47,6 +47,7 @@ if (isset($options['h'])) {
           - php: check that various PHP modules and functions exist
           - poller: check that the poller and discovery are running properly
           - programs: check that external programs exist and are executable
+          - python: check that various Python modules and functions exist
           - updates: checks the status of git and updates
           - user: check that the LibreNMS user is set properly
 
@@ -81,18 +82,18 @@ if (!file_exists('config.php')) {
 
 $pre_checks_failed = false;
 $syntax_check = `php -ln config.php`;
-if (!str_contains($syntax_check, 'No syntax errors detected')) {
+if (strpos($syntax_check, 'No syntax errors detected') === false) {
     print_fail('Syntax error in config.php');
     echo $syntax_check;
     $pre_checks_failed = true;
 }
 
 $first_line = rtrim(`head -n1 config.php`);
-if (!starts_with($first_line, '<?php')) {
+if (!strpos($first_line, '<?php') === 0) {
     print_fail("config.php doesn't start with a <?php - please fix this ($first_line)");
     $pre_checks_failed = true;
 }
-if (str_contains(`tail config.php`, '?>')) {
+if (strpos(`tail config.php`, '?>') !== false) {
     print_fail("Remove the ?> at the end of config.php");
     $pre_checks_failed = true;
 }
@@ -105,20 +106,6 @@ if (!file_exists('vendor/autoload.php')) {
 
 // init autoloading
 require_once 'vendor/autoload.php';
-
-
-$dep_check = shell_exec('php scripts/composer_wrapper.php install --no-dev --dry-run');
-preg_match_all('/Installing ([^ ]+\/[^ ]+) \(/', $dep_check, $dep_missing);
-if (!empty($dep_missing[0])) {
-    print_fail("Missing dependencies!", "./scripts/composer_wrapper.php install --no-dev");
-    $pre_checks_failed = true;
-    print_list($dep_missing[1], "\t %s\n");
-}
-preg_match_all('/Updating ([^ ]+\/[^ ]+) \(/', $dep_check, $dep_outdated);
-if (!empty($dep_outdated[0])) {
-    print_fail("Outdated dependencies", "./scripts/composer_wrapper.php install --no-dev");
-    print_list($dep_outdated[1], "\t %s\n");
-}
 
 $validator = new Validator();
 $validator->validate(array('dependencies'));
@@ -173,6 +160,7 @@ Component | Version
 LibreNMS  | ${versions['local_ver']}
 DB Schema | ${versions['db_schema']}
 PHP       | ${versions['php_ver']}
+Python    | ${versions['python_ver']}
 MySQL     | ${versions['mysql_ver']}
 RRDTool   | ${versions['rrdtool_ver']}
 SNMP      | ${versions['netsnmp_ver']}

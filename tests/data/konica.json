@@ -8,13 +8,13 @@
                     "sysDescr": "KONICA MINOLTA bizhub C3110",
                     "sysContact": null,
                     "version": null,
-                    "hardware": "",
+                    "hardware": null,
                     "features": null,
-                    "location": null,
                     "os": "konica",
                     "type": "printer",
                     "serial": null,
-                    "icon": "konica.svg"
+                    "icon": "konica.svg",
+                    "location": null
                 }
             ]
         },
@@ -28,11 +28,11 @@
                     "version": "1.80",
                     "hardware": "Develop ineo+ 280",
                     "features": null,
-                    "location": "<private>",
                     "os": "konica",
                     "type": "printer",
                     "serial": null,
-                    "icon": "konica.svg"
+                    "icon": "konica.svg",
+                    "location": "<private>"
                 }
             ]
         }
@@ -54,7 +54,7 @@
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
                     "ifHighSpeed": null,
-                    "ifOperStatus": null,
+                    "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
                     "ifAdminStatus_prev": null,
@@ -143,7 +143,9 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "ifSpeed_prev": null,
+                    "ifHighSpeed_prev": null
                 },
                 {
                     "port_descr_type": null,
@@ -159,7 +161,7 @@
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
                     "ifHighSpeed": null,
-                    "ifOperStatus": null,
+                    "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
                     "ifAdminStatus_prev": null,
@@ -248,7 +250,9 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "ifSpeed_prev": null,
+                    "ifHighSpeed_prev": null
                 }
             ]
         },
@@ -269,7 +273,7 @@
                     "ifPromiscuousMode": null,
                     "ifHighSpeed": null,
                     "ifOperStatus": "up",
-                    "ifOperStatus_prev": null,
+                    "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
                     "ifAdminStatus_prev": null,
                     "ifDuplex": null,
@@ -357,7 +361,9 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "ifSpeed_prev": null,
+                    "ifHighSpeed_prev": null
                 },
                 {
                     "port_descr_type": null,
@@ -374,7 +380,7 @@
                     "ifPromiscuousMode": null,
                     "ifHighSpeed": null,
                     "ifOperStatus": "up",
-                    "ifOperStatus_prev": null,
+                    "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
                     "ifAdminStatus_prev": null,
                     "ifDuplex": null,
@@ -462,7 +468,9 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "ifSpeed_prev": null,
+                    "ifHighSpeed_prev": null
                 }
             ]
         }
@@ -732,6 +740,74 @@
                     "toner_capacity": 100,
                     "toner_current": 59,
                     "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.9"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "sensors": {
+        "discovery": {
+            "sensors": [
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.2.1.25.3.2.1.5.1",
+                    "sensor_index": "0",
+                    "sensor_type": "hrDeviceStatus",
+                    "sensor_descr": "Printer Device Status",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 3,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": "0",
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": "hrDeviceStatus"
+                }
+            ],
+            "state_indexes": [
+                {
+                    "state_name": "hrDeviceStatus",
+                    "state_descr": "Unknown",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "hrDeviceStatus",
+                    "state_descr": "Running",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "hrDeviceStatus",
+                    "state_descr": "Warning",
+                    "state_draw_graph": 0,
+                    "state_value": 3,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "hrDeviceStatus",
+                    "state_descr": "Testing",
+                    "state_draw_graph": 0,
+                    "state_value": 4,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "hrDeviceStatus",
+                    "state_descr": "Down",
+                    "state_draw_graph": 0,
+                    "state_value": 5,
+                    "state_generic_value": 2
                 }
             ]
         },

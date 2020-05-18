@@ -99,22 +99,22 @@ class AvailabilityMapController extends WidgetController
         }
 
         if (!$settings['show_disabled_and_ignored']) {
-            $device_query->isActive();
+            $device_query->isNotDisabled();
         }
         $device_query->orderBy($settings['order_by']);
-        $devices = $device_query->select('devices.device_id', 'hostname', 'sysName', 'status', 'uptime', 'disabled', 'ignore')->get();
+        $devices = $device_query->select('devices.device_id', 'hostname', 'sysName', 'status', 'uptime', 'disabled', 'disable_notify', 'location_id')->get();
 
         // process status
         $uptime_warn = Config::get('uptime_warning', 84600);
-        $totals = ['warn' => 0, 'up' => 0, 'down' => 0, 'ignored' => 0, 'disabled' => 0];
+        $totals = ['warn' => 0, 'up' => 0, 'down' => 0, 'maintenance' => 0, 'ignored' => 0, 'disabled' => 0];
         foreach ($devices as $device) {
             if ($device->disabled) {
                 $totals['disabled']++;
                 $device->stateName = "disabled";
                 $device->labelClass = "blackbg";
-            } elseif ($device->ignore) {
+            } elseif ($device->disable_notify) {
                 $totals['ignored']++;
-                $device->stateName = "ignored";
+                $device->stateName = "alert-dis";
                 $device->labelClass = "label-default";
             } elseif ($device->status == 1) {
                 if (($device->uptime < $uptime_warn) && ($device->uptime != 0)) {
@@ -130,6 +130,11 @@ class AvailabilityMapController extends WidgetController
                 $totals['down']++;
                 $device->stateName = 'down';
                 $device->labelClass = 'label-danger';
+            }
+
+            if ($device->isUnderMaintenance()) {
+                $device->labelClass = 'label-default';
+                $totals['maintenance']++;
             }
         }
         return [$devices, $totals];

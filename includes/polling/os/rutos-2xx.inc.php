@@ -26,9 +26,9 @@ if ($usage_sent >= 0 && $usage_received >= 0) {
         $fields = array(
         'usage_sent' => $usage_sent,
         'usage_received' => $usage_received,
-    );
+        );
 
-    $tags = compact('rrd_def');
-    data_update($device, 'rutos_2xx_mobileDataUsage', $tags, $fields);
-    $graphs['rutos_2xx_mobileDataUsage'] = true;
+        $tags = compact('rrd_def');
+        data_update($device, 'rutos_2xx_mobileDataUsage', $tags, $fields);
+        $graphs['rutos_2xx_mobileDataUsage'] = true;
 }

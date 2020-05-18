@@ -29,4 +29,34 @@ class Component extends DeviceRelatedModel
 {
     public $timestamps = false;
     protected $table = 'component';
+    protected $fillable = ['device_id', 'type', 'label', 'status', 'disabled', 'ignore', 'error'];
+
+    // ---- Accessors/Mutators ----
+
+    public function setStatusAttribute($status)
+    {
+        $this->attributes['status'] = (int)$status;
+    }
+
+    public function setDisabledAttribute($disabled)
+    {
+        $this->attributes['disabled'] = (int)$disabled;
+    }
+
+    public function setIgnoreAttribute($ignore)
+    {
+        $this->attributes['ignore'] = (int)$ignore;
+    }
+
+    // ---- Define Relationships ----
+
+    public function logs()
+    {
+        return $this->hasMany(\App\Models\ComponentStatusLog::class, 'component_id', 'id');
+    }
+
+    public function prefs()
+    {
+        return $this->hasMany(\App\Models\ComponentPref::class, 'component', 'id');
+    }
 }

@@ -2,6 +2,16 @@
   {
     "rule": "macros.device_down = \"1\"",
     "name": "Devices up/down",
+    "default": false
+  },
+  {
+    "rule": "macros.device_down = \"1\" && devices.status_reason = \"icmp\"",
+    "name": "Device Down! Due to no ICMP response.",
+    "default": true
+  },
+  {
+    "rule": "macros.device_down = \"1\" && devices.status_reason = \"snmp\"",
+    "name": "SNMP not responding on Device - Check on SNMP Service - Device marked Down!",
     "default": true
   },
   {
@@ -26,6 +36,11 @@
     "rule": "macros.port_down = \"1\"",
     "name": "Port status up/down",
     "extra": "{\"count\": 1}",
+    "default": true
+  },
+  {
+    "rule": "devices.last_ping_timetaken > \"10\"",
+    "name": "Ping Latency",
     "default": true
   },
   {
@@ -117,7 +132,11 @@
     "name": "Interface Errors Rate greater than 100"
   },
   {
-    "rule": "eventlog.type = \"discovery\" && eventlog.message ~ \"@autodiscovered@\" && eventlog.datetime >= macros.past_60m",
+    "rule": "devices.inserted >= `macros.past_60m`",
+    "name": "Device added within the last 60 minutes"
+  },
+  {
+    "rule": "eventlog.type = \"discovery\" && eventlog.message ~ \"@autodiscovered@\" && eventlog.datetime >= `macros.past_60m`",
     "name": "Device discovered within the last 60 minutes"
   },
   {
@@ -125,7 +144,7 @@
     "name": "Too many wireless clients"
   },
   {
-    "rule": "syslog.timestamp >= macros.past_5m && syslog.msg ~ \"@authentication failure@\"",
+    "rule": "syslog.timestamp >= `macros.past_5m` && syslog.msg ~ \"@authentication failure@\"",
     "name": "Syslog, Authentication failure on Device"
   },
   {
@@ -137,15 +156,15 @@
     "name": "Service critical"
   },
   {
-    "rule": "syslog.timestamp >= macros.past_5m && syslog.priority ~ \"alert\"",
+    "rule": "syslog.timestamp >= `macros.past_5m` && syslog.priority ~ \"alert\"",
     "name": "Syslog, received Alert Priority Message"
   },
   {
-    "rule": "syslog.timestamp >= macros.past_5m && syslog.priority ~ \"emergency\"",
+    "rule": "syslog.timestamp >= `macros.past_5m` && syslog.priority ~ \"emergency\"",
     "name": "Syslog, received Emergency Priority Message"
   },
   {
-    "rule": "syslog.timestamp = macros.past_5m && syslog.msg ~ \"@arp table is full@\"",
+    "rule": "syslog.timestamp >= `macros.past_5m` && syslog.msg ~ \"@arp table is full@\"",
     "name": "Syslog, ARP table is full check on device "
   },
   {
@@ -153,7 +172,11 @@
     "name": "APC UPS Battery Needs Replacement"
   },
   {
-    "rule": "sensors.sensor_current = \"3\" && sensors.sensor_type = \"upsBasicOutputStatus\"",
+    "builder": {"condition":"AND","rules":[{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"upsAdvTestDiagnosticsResults"},{"condition":"OR","rules":[{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"2"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"3"}]}],"valid":true},
+    "name": "APC UPS Diagonstics Test Result"
+  },
+  {
+    "builder": {"condition":"AND","rules":[{"condition":"AND","rules":[{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"3"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"upsBasicOutputStatus"}]},{"condition":"AND","rules":[{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"4"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"upsAdvTestDiagnosticsResults"}]}],"valid":true},
     "name": "APC UPS Switched to Battery Power"
   },
   {
@@ -411,5 +434,27 @@
   {
     "rule": "%applications.app_type='portactivity' && %applications_metrics.imaps_total_from>'0'",
     "name": "IRCD Connections From"
+  },
+ {
+    "rule": "customoids.customoid_current >= `customoids.customoid_limit` && customoids.customoid_alert = \"1\" && macros.device_up = \"1\"",
+    "name": "CustomOID over limit",
+    "default": true
+  },
+  {
+    "rule": "customoids.customoid_current <= `customoids.customoid_limit_low` && customoids.customoid_alert = \"1\" && macros.device_up = \"1\"",
+    "name": "CustomOID under limit",
+    "default": true
+  },
+  {
+    "rule": "customoids.customoid_current >= `customoids.customoid_limit_warn` && customoids.customoid_alert = \"1\" && macros.device_up = \"1\"",
+    "name": "CustomOID over warning limit",
+    "severity": "warning",
+    "default": true
+  },
+  {
+    "rule": "customoids.customoid_current <= `customoids.customoid_limit_low_warn` && customoids.customoid_alert = \"1\" && macros.device_up = \"1\"",
+    "name": "CustomOID under warning limit",
+    "severity": "warning",
+    "default": true
   }
 ]

@@ -18,7 +18,8 @@ use LibreNMS\Config;
  * Compare $t with the value of $vars[$v], if that exists
  * @param string $v Name of the var to test
  * @param string $t Value to compare $vars[$v] to
- * @return boolean true, if values are the same, false if $vars[$v] is unset or values differ
+ * @return boolean true, if values are the same, false if $vars[$v]
+ * is unset or values differ
  */
 function var_eq($v, $t)
 {
@@ -159,9 +160,8 @@ function generate_minigraph_image($device, $start, $end, $type, $legend = 'no', 
 
 function generate_device_url($device, $vars = array())
 {
-    return generate_url(array('page' => 'device', 'device' => $device['device_id']), $vars);
-}//end generate_device_url()
-
+    return \LibreNMS\Util\Url::deviceUrl((int)$device['device_id'], $vars);
+}
 
 function generate_device_link($device, $text = null, $vars = array(), $start = 0, $end = 0, $escape_text = 1, $overlib = 1)
 {
@@ -174,9 +174,6 @@ function generate_device_link($device, $text = null, $vars = array(), $start = 0
     }
 
     $class = devclass($device);
-    if (!$text) {
-        $text = $device['hostname'];
-    }
 
     $text = format_hostname($device, $text);
 
@@ -249,41 +246,10 @@ function overlib_link($url, $text, $contents, $class = null)
     return \LibreNMS\Util\Url::overlibLink($url, $text, $contents, $class);
 }
 
-
-function generate_graph_popup($graph_array)
-{
-    // Take $graph_array and print day,week,month,year graps in overlib, hovered over graph
-    $original_from = $graph_array['from'];
-
-    $graph = generate_graph_tag($graph_array);
-    $content = '<div class=list-large>' . $graph_array['popup_title'] . '</div>';
-    $content .= "<div style=\'width: 850px\'>";
-    $graph_array['legend'] = 'yes';
-    $graph_array['height'] = '100';
-    $graph_array['width'] = '340';
-    $graph_array['from'] = Config::get('time.day');
-    $content .= generate_graph_tag($graph_array);
-    $graph_array['from'] = Config::get('time.week');
-    $content .= generate_graph_tag($graph_array);
-    $graph_array['from'] = Config::get('time.month');
-    $content .= generate_graph_tag($graph_array);
-    $graph_array['from'] = Config::get('time.year');
-    $content .= generate_graph_tag($graph_array);
-    $content .= '</div>';
-
-    $graph_array['from'] = $original_from;
-
-    $graph_array['link'] = generate_url($graph_array, array('page' => 'graphs', 'height' => null, 'width' => null, 'bg' => null));
-
-    // $graph_array['link'] = "graphs/type=" . $graph_array['type'] . "/id=" . $graph_array['id'];
-    return overlib_link($graph_array['link'], $graph, $content, null);
-}//end generate_graph_popup()
-
-
 function print_graph_popup($graph_array)
 {
-    echo generate_graph_popup($graph_array);
-}//end print_graph_popup()
+    echo \LibreNMS\Util\Url::graphPopup($graph_array);
+}
 
 function bill_permitted($bill_id)
 {
@@ -333,6 +299,33 @@ function print_graph_tag($args)
     echo generate_graph_tag($args);
 }//end print_graph_tag()
 
+function alert_layout($severity)
+{
+    switch ($severity) {
+        case 'critical':
+            $icon = 'exclamation';
+            $color = 'danger';
+            $background = 'danger';
+            break;
+        case 'warning':
+            $icon = 'warning';
+            $color = 'warning';
+            $background = 'warning';
+            break;
+        case 'ok':
+            $icon = 'check';
+            $color = 'success';
+            $background = 'success';
+            break;
+        default:
+            $icon = 'info';
+            $color = 'info';
+            $background = 'info';
+    }
+    return ['icon' => $icon,
+            'icon_color' => $color,
+            'background_color' => $background];
+}
 
 function generate_graph_tag($args)
 {
@@ -680,7 +673,7 @@ function devclass($device)
         $class = 'list-device';
     }
 
-    if (isset($device['ignore']) && $device['ignore'] == '1') {
+    if (isset($device['disable_notify']) && $device['disable_notify'] == '1') {
         $class = 'list-device-ignored';
         if (isset($device['status']) && $device['status'] == '1') {
             $class = 'list-device-ignored-up';
@@ -969,6 +962,7 @@ function alert_details($details)
             $fault_detail .= generate_sensor_link($tmp_alerts, $tmp_alerts['name']) . ';&nbsp; <br>' . $details;
             $fallback = false;
         }
+
         if ($tmp_alerts['bgpPeer_id']) {
             // If we have a bgpPeer_id, we format the data accordingly
             $fault_detail .= "BGP peer <a href='" .
@@ -981,6 +975,7 @@ function alert_details($details)
             $fault_detail .= ", State " . $tmp_alerts['bgpPeerState'];
             $fallback = false;
         }
+
         if ($tmp_alerts['type'] && $tmp_alerts['label']) {
             if ($tmp_alerts['error'] == "") {
                 $fault_detail .= ' ' . $tmp_alerts['type'] . ' - ' . $tmp_alerts['label'] . ';&nbsp;';
@@ -990,12 +985,29 @@ function alert_details($details)
             $fallback = false;
         }
 
+        if (in_array('app_id', array_keys($tmp_alerts))) {
+            $fault_detail .= "<a href='" . generate_url(array('page' => 'device',
+                                                              'device' => $tmp_alerts['device_id'],
+                                                              'tab' => 'apps',
+                                                              'app' => $tmp_alerts['app_type'])) . "'>";
+            $fault_detail .= $tmp_alerts['metric'];
+            $fault_detail .= "</a>";
+
+            $fault_detail .= " => ". $tmp_alerts['value'];
+            $fallback = false;
+        }
+
         if ($fallback === true) {
+            $fault_detail_data = [];
             foreach ($tmp_alerts as $k => $v) {
-                if (!empty($v) && $k != 'device_id' && (stristr($k, 'id') || stristr($k, 'desc') || stristr($k, 'msg')) && substr_count($k, '_') <= 1) {
-                    $fault_detail .= "$k => '$v', ";
+                if (in_array($k, ['device_id', 'sysObjectID', 'sysDescr', 'location_id'])) {
+                    continue;
+                }
+                if (!empty($v) && str_i_contains($k, ['id', 'desc', 'msg', 'last'])) {
+                    $fault_detail_data[] = "$k => '$v'";
                 }
             }
+            $fault_detail .= count($fault_detail_data) ? implode('<br>&nbsp;&nbsp;&nbsp', $fault_detail_data) : '';
 
             $fault_detail = rtrim($fault_detail, ', ');
         }
@@ -1114,7 +1126,14 @@ function search_oxidized_config($search_in_conf_textbox)
         )
     );
     $context = stream_context_create($opts);
-    return json_decode(file_get_contents($oxidized_search_url, false, $context), true);
+    
+    $nodes = json_decode(file_get_contents($oxidized_search_url, false, $context), true);
+    // Look up Oxidized node names to LibreNMS devices for a link
+    foreach ($nodes as &$n) {
+        $dev = device_by_name($n['node']);
+        $n['dev_id'] = $dev ? $dev['device_id'] : false;
+    }
+    return $nodes;
 }
 
 /**
@@ -1186,50 +1205,16 @@ function get_oxidized_nodes_list()
             //user cannot see this device, so let's skip it.
             continue;
         }
-        $fa_color = $object['status'] == 'success' ? 'success' : 'danger';
-        echo "
-        <tr>
-        <td>
-        " . generate_device_link($device);
-        if ($device['device_id'] == 0) {
-            echo "(device '" . $object['name'] . "' not in LibreNMS)";
-        }
-        echo "
-        </td>
-        <td>
-        " . $device['sysName'] . "
-        </td>
-        <td>
-        <i class='fa fa-square text-" . $fa_color . "'></i>
-        </td>
-        <td>
-        " . $object['time'] . "
-        </td>
-        <td>
-        " . $object['model'] . "
-        </td>
-        <td>
-        " . $object['group'] . "
-        </td>
-        <td>
-        ";
-        if (! $device['device_id'] == 0) {
-            echo "
-          <button class='btn btn-default btn-sm' name='btn-refresh-node-devId" . $device['device_id'] . "' id='btn-refresh-node-devId" . $device['device_id'] . "' onclick='refresh_oxidized_node(\"" . $device['hostname'] . "\")'>
-            <i class='fa fa-refresh'></i>
-          </button>
-          <a href='" . generate_url(array('page' => 'device', 'device' => $device['device_id'], 'tab' => 'showconfig')) . "'>
-            <i class='fa fa-align-justify fa-lg icon-theme'></i>
-          </a>
-            ";
-        } else {
-            echo "
-          <button class='btn btn-default btn-sm' disabled name='btn-refresh-node-devId" . $device['device_id'] . "' id='btn-refresh-node-devId" . $device['device_id'] . "'>
-            <i class='fa fa-refresh'></i>
-          </button>";
-        }
-        echo "
-        </td>
+        
+        echo "<tr>
+        <td>" . $device['device_id'] . "</td>
+        <td>" . $object['name'] . "</td>
+        <td>" . $device['sysName'] . "</td>
+        <td>" . $object['status'] . "</td>
+        <td>" . $object['time'] . "</td>
+        <td>" . $object['model'] . "</td>
+        <td>" . $object['group'] . "</td>
+        <td></td>
         </tr>";
     }
 }

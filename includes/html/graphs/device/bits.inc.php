@@ -4,7 +4,7 @@
 $ds_in  = 'INOCTETS';
 $ds_out = 'OUTOCTETS';
 
-foreach (dbFetchRows('SELECT * FROM `ports` WHERE `device_id` = ? AND `disabled` = 0', array($device['device_id'])) as $port) {
+foreach (dbFetchRows('SELECT * FROM `ports` WHERE `device_id` = ? AND `disabled` = 0 AND `deleted` = 0', array($device['device_id'])) as $port) {
     $ignore = 0;
     if (is_array(\LibreNMS\Config::get('device_traffic_iftype'))) {
         foreach (\LibreNMS\Config::get('device_traffic_iftype') as $iftype) {

@@ -25,9 +25,12 @@
 
 namespace LibreNMS\Util;
 
+use App\Facades\DeviceCache;
+use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\FileNotFoundException;
 use LibreNMS\Exceptions\InvalidModuleException;
+use LibreNMS\OS;
 use Symfony\Component\Yaml\Yaml;
 
 class ModuleTestHelper
@@ -149,11 +152,11 @@ class ModuleTestHelper
 
             $snmp_options = ['-OUneb', '-Ih'];
             if ($oid_data['method'] == 'walk') {
-                $data = snmp_walk($device, $oid_data['oid'], $snmp_options, $oid_data['mib']);
+                $data = snmp_walk($device, $oid_data['oid'], $snmp_options, $oid_data['mib'], $oid_data['mibdir']);
             } elseif ($oid_data['method'] == 'get') {
-                $data = snmp_get($device, $oid_data['oid'], $snmp_options, $oid_data['mib']);
+                $data = snmp_get($device, $oid_data['oid'], $snmp_options, $oid_data['mib'], $oid_data['mibdir']);
             } elseif ($oid_data['method'] == 'getnext') {
-                $data = snmp_getnext($device, $oid_data['oid'], $snmp_options, $oid_data['mib']);
+                $data = snmp_getnext($device, $oid_data['oid'], $snmp_options, $oid_data['mib'], $oid_data['mibdir']);
             }
 
             if (isset($data) && $data !== false) {
@@ -203,6 +206,8 @@ class ModuleTestHelper
         foreach ($snmp_matches[0] as $index => $line) {
             preg_match("/'-m' '\+?([a-zA-Z0-9:\-]+)'/", $line, $mib_matches);
             $mib = $mib_matches[1];
+            preg_match("/'-M' '\+?([a-zA-Z0-9:\-\/]+)'/", $line, $mibdir_matches);
+            $mibdir = $mibdir_matches[1];
             $method = $snmp_matches[1][$index];
             $oids = explode("' '", trim($snmp_matches[2][$index]));
 
@@ -210,6 +215,7 @@ class ModuleTestHelper
                 $snmp_oids["{$oid}_$method"] = [
                     'oid' => $oid,
                     'mib' => $mib,
+                    'mibdir' => $mibdir,
                     'method' => $method,
                 ];
             }
@@ -282,7 +288,7 @@ class ModuleTestHelper
     {
         $full_name = basename($os_file, '.json');
 
-        if (!str_contains($full_name, '_')) {
+        if (!Str::contains($full_name, '_')) {
             return [$full_name, ''];
         } elseif (is_file(Config::get('install_dir') . "/includes/definitions/$full_name.yaml")) {
             return [$full_name, ''];
@@ -359,7 +365,7 @@ class ModuleTestHelper
                     $result[] = "$oid|4|"; // empty data, we don't know type, put string
                 } else {
                     list($raw_type, $data) = explode(':', $raw_data, 2);
-                    if (starts_with($raw_type, 'Wrong Type (should be ')) {
+                    if (Str::startsWith($raw_type, 'Wrong Type (should be ')) {
                         // device returned the wrong type, save the wrong type to emulate the device behavior
                         list($raw_type, $data) = explode(':', ltrim($data), 2);
                     }
@@ -513,6 +519,7 @@ class ModuleTestHelper
         try {
             Config::set('snmp.community', [$this->file_name]);
             $device_id = addHost($snmpsim->getIp(), 'v2c', $snmpsim->getPort());
+            DeviceCache::setPrimary($device_id);
 
             // disable to block normal pollers
             dbUpdate(['disabled' => 1], 'devices', 'device_id=?', [$device_id]);
@@ -670,7 +677,7 @@ class ModuleTestHelper
 
         // only dump data for the given modules
         foreach ($modules as $module) {
-            foreach ($module_dump_info[$module] as $table => $info) {
+            foreach ($module_dump_info[$module] ?: [] as $table => $info) {
                 // check for custom where
                 $where = isset($info['custom_where']) ? $info['custom_where'] : "WHERE `$table`.`device_id`=?";
                 $params = [$device_id];
@@ -678,7 +685,7 @@ class ModuleTestHelper
                 // build joins
                 $join = '';
                 $select = ["`$table`.*"];
-                foreach ($info['joins'] as $join_info) {
+                foreach ($info['joins'] ?: [] as $join_info) {
                     if (isset($join_info['custom'])) {
                         $join .= ' ' . $join_info['custom'];
 

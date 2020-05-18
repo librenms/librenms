@@ -13,6 +13,7 @@ use LibreNMS\Alert\AlertDB;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\LockException;
 use LibreNMS\Util\MemcacheLock;
+use LibreNMS\Validations\Php;
 
 $init_modules = array('alerts');
 require __DIR__ . '/includes/init.php';
@@ -135,10 +136,13 @@ if ($options['f'] === 'ports_purge') {
         $ports_purge = Config::get('ports_purge');
 
         if ($ports_purge) {
-            $interfaces = dbFetchRows('SELECT * from `ports` AS P, `devices` AS D WHERE `deleted` = 1 AND D.device_id = P.device_id');
-            foreach ($interfaces as $interface) {
-                delete_port($interface['port_id']);
-            }
+            \App\Models\Port::query()->with(['device' => function ($query) {
+                $query->select('device_id', 'hostname');
+            }])->isDeleted()->chunk(100, function ($ports) {
+                foreach ($ports as $port) {
+                    $port->delete();
+                }
+            });
             echo "All deleted ports now purged\n";
         }
     } catch (LockException $e) {
@@ -168,22 +172,46 @@ if ($options['f'] === 'handle_notifiable') {
         }
     } elseif ($options['t'] === 'phpver') {
         $error_title = 'Error: PHP version too low';
-        $warn_title = 'Warning: PHP version too low';
-        remove_notification($warn_title); // remove warning
 
         // if update is not set to false and version is min or newer
         if (Config::get('update') && $options['r']) {
             if ($options['r'] === 'php53') {
                 $phpver   = '5.6.4';
                 $eol_date = 'January 10th, 2018';
-            } elseif ($options['r'] === 'php56') {
-                $phpver   = '7.1.3';
-                $eol_date = 'February 1st, 2019';
+            } elseif ($options['r'] === 'php56' || $options['r'] === 'php71') {
+                $phpver   = Php::PHP_MIN_VERSION;
+                $eol_date = Php::PHP_MIN_VERSION_DATE;
             }
             if (isset($phpver)) {
                 new_notification(
                     $error_title,
-                    "PHP version $phpver is the minimum supported version as of $eol_date.  We recommend you update to PHP a supported version of PHP (7.2 suggested) to continue to receive updates.  If you do not update PHP, LibreNMS will continue to function but stop receiving bug fixes and updates.",
+                    "PHP version $phpver is the minimum supported version as of $eol_date.  We recommend you update to PHP a supported version of PHP (" . Php::PHP_RECOMMENDED_VERSION . " suggested) to continue to receive updates.  If you do not update PHP, LibreNMS will continue to function but stop receiving bug fixes and updates.",
+                    2,
+                    'daily.sh'
+                );
+                exit(1);
+            }
+        }
+
+        remove_notification($error_title);
+        exit(0);
+    } elseif ($options['t'] === 'pythonver') {
+        $error_title = 'Error: Python requirements not met';
+
+        // if update is not set to false and version is min or newer
+        if (Config::get('update') && $options['r']) {
+            if ($options['r'] === 'python3-missing') {
+                new_notification(
+                    $error_title,
+                    "Python 3 is required to run LibreNMS as of May, 2020. You need to install Python 3 to continue to receive updates.  If you do not install Python 3 and required packages, LibreNMS will continue to function but stop receiving bug fixes and updates.",
+                    2,
+                    'daily.sh'
+                );
+                exit(1);
+            } elseif ($options['r'] === 'python3-deps') {
+                new_notification(
+                    $error_title,
+                    "Python 3 dependencies are missing. You need to install them via pip3 install -r requirements.txt or system packages to continue to receive updates.  If you do not install Python 3 and required packages, LibreNMS will continue to function but stop receiving bug fixes and updates.",
                     2,
                     'daily.sh'
                 );
@@ -215,7 +243,7 @@ if ($options['f'] === 'bill_data') {
     $table = 'bill_data';
     $sql = "DELETE bill_data
             FROM bill_data
-                INNER JOIN (SELECT bill_id, 
+                INNER JOIN (SELECT bill_id,
                     SUBDATE(
                         SUBDATE(
                             ADDDATE(
@@ -238,7 +266,7 @@ if ($options['f'] === 'alert_log') {
                 WHERE alerts.state=0 AND alert_log.time_logged < DATE_SUB(NOW(),INTERVAL ? DAY)
                 ";
     lock_and_purge_query($table, $sql, $msg);
-    
+
     # alert_log older than $config['alert_log_purge'] days match now only the alert_log of active alerts
     # in case of flapping of an alert, many entries are kept in alert_log
     # we want only to keep the last alert_log that contains the alert details

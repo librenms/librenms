@@ -34,8 +34,14 @@ $graphfile = Config::get('temp_dir') . '/' . strgen();
 
 require Config::get('install_dir') . "/includes/html/graphs/$type/auth.inc.php";
 
+//set default graph title
+$graph_title = format_hostname($device);
+
 if ($auth && is_custom_graph($type, $subtype, $device)) {
     include(Config::get('install_dir') . "/includes/html/graphs/custom.inc.php");
+} elseif ($auth && is_customoid_graph($type, $subtype)) {
+    $unit   = $vars['unit'];
+    include(Config::get('install_dir') . "/includes/html/graphs/customoid/customoid.inc.php");
 } elseif ($auth && is_mib_graph($type, $subtype)) {
     include Config::get('install_dir') . "/includes/html/graphs/$type/mib.inc.php";
 } elseif ($auth && is_file(Config::get('install_dir') . "/includes/html/graphs/$type/$subtype.inc.php")) {
@@ -111,7 +117,7 @@ if ($error_msg) {
         echo "<div class='infobox'>";
         echo "<p style='font-size: 16px; font-weight: bold;'>RRDTool Command</p>";
         echo "<pre class='rrd-pre'>";
-        echo "rrdtool ".rrdtool_build_command("graph", $graphfile, $rrd_options);
+        echo "rrdtool ". Rrd::buildCommand("graph", $graphfile, $rrd_options);
         echo "</pre>";
         $return = rrdtool_graph($graphfile, $rrd_options);
         echo "<p style='font-size: 16px; font-weight: bold;'>RRDTool Output</p>";

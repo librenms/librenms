@@ -187,11 +187,11 @@ include 'includes/html/modal/new_bill.inc.php';
 
 <?php
 if ($vars['view'] == 'add') {
-?>
+    ?>
 $(function() {
     $('#create-bill').modal('show');
 });
-<?php
+    <?php
 }
 ?>
 </script>

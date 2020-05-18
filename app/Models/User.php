@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use LibreNMS\Authentication\LegacyAuth;
+use Permissions;
 
 class User extends Authenticatable
 {
@@ -83,7 +84,7 @@ class User extends Authenticatable
      */
     public function canAccessDevice($device)
     {
-        return $this->hasGlobalRead() || $this->devices->contains($device);
+        return $this->hasGlobalRead() || Permissions::canAccessDevice($device, $this->user_id);
     }
 
     /**
@@ -163,20 +164,33 @@ class User extends Authenticatable
         $this->attributes['enabled'] = $enable ? 1 : 0;
     }
 
+    public function getDevicesAttribute()
+    {
+        // pseudo relation
+        if (!array_key_exists('devices', $this->relations)) {
+            $this->setRelation('devices', $this->devices()->get());
+        }
+        return $this->getRelation('devices');
+    }
+
     // ---- Define Relationships ----
 
     public function apiToken()
     {
-        return $this->hasOne('App\Models\ApiToken', 'user_id', 'user_id');
+        return $this->hasOne(\App\Models\ApiToken::class, 'user_id', 'user_id');
     }
 
     public function devices()
     {
-        if ($this->hasGlobalRead()) {
-            return Device::query();
-        } else {
-            return $this->belongsToMany('App\Models\Device', 'devices_perms', 'user_id', 'device_id');
-        }
+        // pseudo relation
+        return Device::query()->when(!$this->hasGlobalRead(), function ($query) {
+            return $query->whereIn('device_id', Permissions::devicesForUser($this));
+        });
+    }
+
+    public function deviceGroups()
+    {
+        return $this->belongsToMany(\App\Models\DeviceGroup::class, 'devices_group_perms', 'user_id', 'device_group_id');
     }
 
     public function ports()
@@ -185,22 +199,22 @@ class User extends Authenticatable
             return Port::query();
         } else {
             //FIXME we should return all ports for a device if the user has been given access to the whole device.
-            return $this->belongsToMany('App\Models\Port', 'ports_perms', 'user_id', 'port_id');
+            return $this->belongsToMany(\App\Models\Port::class, 'ports_perms', 'user_id', 'port_id');
         }
     }
 
     public function dashboards()
     {
-        return $this->hasMany('App\Models\Dashboard', 'user_id');
+        return $this->hasMany(\App\Models\Dashboard::class, 'user_id');
     }
 
     public function preferences()
     {
-        return $this->hasMany('App\Models\UserPref', 'user_id');
+        return $this->hasMany(\App\Models\UserPref::class, 'user_id');
     }
 
     public function widgets()
     {
-        return $this->hasMany('App\Models\UserWidget', 'user_id');
+        return $this->hasMany(\App\Models\UserWidget::class, 'user_id');
     }
 }

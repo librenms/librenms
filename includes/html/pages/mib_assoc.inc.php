@@ -14,7 +14,7 @@
  */
 
 if (\LibreNMS\Config::get("poller_modules.mib")) {
-?>
+    ?>
 
 <h4>MIB associations for all devices</h4>
 <div class="table-responsive">
@@ -48,7 +48,7 @@ if (\LibreNMS\Config::get("poller_modules.mib")) {
         }
     });
 </script>
-<?php
+    <?php
 } else {
     print_mib_poller_disabled();
 }

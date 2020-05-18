@@ -47,83 +47,34 @@ while (isset($lines[$int])) {
         $id196, $id197, $id198, $id199, $id231, $id233, $completed, $interrupted, $read_failure,
         $unknown_failure, $extended, $short, $conveyance, $selective)=explode(",", $lines[$int]);
 
-    if (is_int($id5)) {
-        $id=null;
-    }
-    if (is_int($id10)) {
-        $id10=null;
-    }
-    if (is_int($id173)) {
-        $id173=null;
-    }
-    if (is_int($id177)) {
-        $id177=null;
-    }
-    if (is_int($id183)) {
-        $id183=null;
-    }
-    if (is_int($id184)) {
-        $id184=null;
-    }
-    if (is_int($id187)) {
-        $id187=null;
-    }
-    if (is_int($id188)) {
-        $id188=null;
-    }
-    if (is_int($id190)) {
-        $id190=null;
-    }
-    if (is_int($id194)) {
-        $id194=null;
-    }
-    if (is_int($id196)) {
-        $id196=null;
-    }
-    if (is_int($id197)) {
-        $id197=null;
-    }
-    if (is_int($id198)) {
-        $id198=null;
-    }
-    if (is_int($id199)) {
-        $id199=null;
-    }
-    if (is_int($id231)) {
-        $id231=null;
-    }
-    if (is_int($id233)) {
-        $id233=null;
-    }
-
     $rrd_name = array('app', $name, $app_id, $disk);
 
-    $fields = array(
-        'id5'=>$id5,
-        'id10'=>$id10,
-        'id173'=>$id173,
-        'id177'=>$id177,
-        'id183'=>$id183,
-        'id184'=>$id184,
-        'id187'=>$id187,
-        'id188'=>$id188,
-        'id190'=>$id190,
-        'id194'=>$id194,
-        'id196'=>$id196,
-        'id197'=>$id197,
-        'id198'=>$id198,
-        'id199'=>$id199,
-        'id231'=>$id231,
-        'id233'=>$id233,
-        'completed'=>$completed,
-        'interrupted'=>$interrupted,
-        'readfailure'=>$read_failure,
-        'unknownfail'=>$unknown_failure,
-        'extended'=>$extended,
-        'short'=>$short,
-        'conveyance'=>$conveyance,
-        'selective'=>$selective
-    );
+    $fields = [
+        'id5' => is_numeric($id5) ? $id5 : null,
+        'id10' => is_numeric($id10) ? $id10 : null,
+        'id173' => is_numeric($id173) ? $id173 : null,
+        'id177' => is_numeric($id177) ? $id177 : null,
+        'id183' => is_numeric($id183) ? $id183 : null,
+        'id184' => is_numeric($id184) ? $id184 : null,
+        'id187' => is_numeric($id187) ? $id187 : null,
+        'id188' => is_numeric($id188) ? $id188 : null,
+        'id190' => is_numeric($id190) ? $id190 : null,
+        'id194' => is_numeric($id194) ? $id194 : null,
+        'id196' => is_numeric($id196) ? $id196 : null,
+        'id197' => is_numeric($id197) ? $id197 : null,
+        'id198' => is_numeric($id198) ? $id198 : null,
+        'id199' => is_numeric($id199) ? $id199 : null,
+        'id231' => is_numeric($id231) ? $id231 : null,
+        'id233' => is_numeric($id233) ? $id233 : null,
+        'completed' => is_numeric($completed) ? $completed : null,
+        'interrupted' => is_numeric($interrupted) ? $interrupted : null,
+        'readfailure' => is_numeric($read_failure) ? $read_failure : null,
+        'unknownfail' => is_numeric($unknown_failure) ? $unknown_failure : null,
+        'extended' => is_numeric($extended) ? $extended : null,
+        'short' => is_numeric($short) ? $short : null,
+        'conveyance' => is_numeric($conveyance) ? $conveyance : null,
+        'selective' => is_numeric($selective) ? $selective : null
+    ];
 
     $metrics[$disk] = $fields;
     $tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
@@ -146,7 +97,7 @@ while (isset($lines[$int])) {
 
     $fields = ['id9' => $id9];
     $metrics[$disk]['id9'] = $id9;
-    
+
     $tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
     data_update($device, 'app', $tags, $fields);
 

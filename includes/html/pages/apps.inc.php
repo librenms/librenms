@@ -27,6 +27,18 @@ $graphs['memcached'] = array(
     'data',
     'items',
 );
+$graphs['redis'] = array(
+    'clients',
+    'objects',
+    'fragmentation',
+    'usage',
+    'defrag',
+    'keyspace',
+    'sync',
+    'commands',
+    'connections',
+    'net',
+);
 $graphs['nginx']     = array(
     'connections',
     'req',
@@ -44,6 +56,11 @@ $graphs['powerdns-recursor'] = array(
     'answers',
     'cache_performance',
     'outqueries'
+);
+$graphs['pureftpd'] = array(
+    'bitrate',
+    'connections',
+    'users'
 );
 $graphs['rrdcached'] = array(
     'queue_length',
@@ -245,6 +262,13 @@ $graphs['certificate'] = array(
     'age',
     'remaining_days',
 );
+$graphs['puppet-agent'] = array(
+    'last_run',
+    'changes',
+    'events',
+    'resources',
+    'time',
+);
 $graphs['mdadm'] = array(
     'level',
     'size',
@@ -301,6 +325,12 @@ $graphs['asterisk'] = array(
     'calls',
     'channels',
     'sip',
+    'iax2',
+);
+$graphs['mailcow-postfix'] = array(
+    'emails',
+    'traffic',
+    'domains',
 );
 echo '<div class="panel panel-default">';
 echo '<div class="panel-heading">';
@@ -311,7 +341,7 @@ $link_array = array(
     'device' => $device['device_id'],
     'tab'    => 'apps',
 );
-$apps = \LibreNMS\Util\ObjectCache::applications()->flatten()->sortBy('app_type');
+$apps = \LibreNMS\Util\ObjectCache::applications()->flatten();
 foreach ($apps as $app) {
     echo $sep;
     if ($vars['app'] == $app->app_type) {

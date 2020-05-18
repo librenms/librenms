@@ -1,8 +1,9 @@
 <?php
 
+use Illuminate\Support\Str;
 use LibreNMS\RRD\RrdDefinition;
 
-if (!starts_with($device['os'], array('Snom', 'asa'))) {
+if (!Str::startsWith($device['os'], array('Snom', 'asa'))) {
     echo ' ICMP';
 
     // Below have more oids, and are in trees by themselves, so we can snmpwalk_cache_oid them
@@ -43,7 +44,7 @@ if (!starts_with($device['os'], array('Snom', 'asa'))) {
         $fields = array();
         foreach ($oids as $oid) {
             $rrd_def->addDataset($oid, 'COUNTER', null, 100000000000);
-            $fields[$oid] = isset($data[$oid]) ? $data[$oid] : 'U';
+            $fields[substr($oid, 0, 19)] = isset($data[$oid]) ? $data[$oid] : 'U';
         }
 
         $tags = compact('rrd_def');

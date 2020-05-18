@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Str;
+
 $regexp = '/
     \.1\.3\.6\.1\.4\.1\.22626\.1\.5\.2\.
     (?P<id>\d+)
@@ -51,7 +53,7 @@ if ($oids) {
 $temp_unit = snmp_get($device, 'tempUnit.0', '-OevTQUs', 'T3610-MIB');
 $user_func = '';
 
-if (str_contains($temp_unit, 'F')) {
+if (Str::contains($temp_unit, 'F')) {
     $user_func = 'fahrenheit_to_celsius';
 }
 

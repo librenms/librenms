@@ -6,35 +6,34 @@ class Sensor extends DeviceRelatedModel
 {
     public $timestamps = false;
     protected $primaryKey = 'sensor_id';
-
-    protected static $icons = array(
-        'airflow' => 'angle-double-right',
-        'ber' => 'sort-amount-desc',
-        'charge' => 'battery-half',
+    protected static $icons = [
+        'airflow'              => 'angle-double-right',
+        'ber'                  => 'sort-amount-desc',
+        'charge'               => 'battery-half',
         'chromatic_dispersion' => 'indent',
-        'cooling' => 'thermometer-full',
-        'count' => 'hashtag',
-        'current' => 'bolt fa-flip-horizontal',
-        'dbm' => 'sun-o',
-        'delay' => 'clock-o',
-        'eer' => 'snowflake-o',
-        'fanspeed' => 'refresh',
-        'frequency' => 'line-chart',
-        'humidity' => 'tint',
-        'load' => 'percent',
-        'power' => 'power-off',
-        'power_consumed' => 'plug',
-        'power_factor' => 'calculator',
-        'pressure' => 'thermometer-empty',
-        'quality_factor' => 'arrows',
-        'runtime' => 'hourglass-half',
-        'signal' => 'wifi',
-        'snr' => 'signal',
-        'state' => 'bullseye',
-        'temperature' => 'thermometer-three-quarters',
-        'voltage' => 'bolt',
-        'waterflow' => 'tint',
-    );
+        'cooling'              => 'thermometer-full',
+        'count'                => 'hashtag',
+        'current'              => 'bolt fa-flip-horizontal',
+        'dbm'                  => 'sun-o',
+        'delay'                => 'clock-o',
+        'eer'                  => 'snowflake-o',
+        'fanspeed'             => 'refresh',
+        'frequency'            => 'line-chart',
+        'humidity'             => 'tint',
+        'load'                 => 'percent',
+        'power'                => 'power-off',
+        'power_consumed'       => 'plug',
+        'power_factor'         => 'calculator',
+        'pressure'             => 'thermometer-empty',
+        'quality_factor'       => 'arrows',
+        'runtime'              => 'hourglass-half',
+        'signal'               => 'wifi',
+        'snr'                  => 'signal',
+        'state'                => 'bullseye',
+        'temperature'          => 'thermometer-three-quarters',
+        'voltage'              => 'bolt',
+        'waterflow'            => 'tint',
+    ];
 
     // ---- Helper Functions ----
 
@@ -52,6 +51,11 @@ class Sensor extends DeviceRelatedModel
     public function icon()
     {
         return collect(self::$icons)->get($this->sensor_class, 'delicius');
+    }
+
+    public static function getTypes()
+    {
+        return array_keys(self::$icons);
     }
 
     // for the legacy menu

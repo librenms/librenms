@@ -77,7 +77,7 @@ mib_dir:
 ```
 
 `poller_modules`: This is a list of poller modules to either enable
-(1) or disable (0). Check `includes/defaults.inc.php` to see which
+(1) or disable (0). Check `misc/config_definitions.json` to see which
 modules are enabled/disabled by default.
 
 ```yaml
@@ -87,7 +87,7 @@ poller_modules:
 ```
 
 `discovery_modules`: This is the list of discovery modules to either
-enable (1) or disable (0). Check `includes/defaults.inc.php` to see
+enable (1) or disable (0). Check `misc/config_definitions.json` to see
 which modules are enabled/disabled by default.
 
 ```yaml
@@ -164,6 +164,8 @@ $hardware = "Juniper " . preg_replace('/[\r\n\"]+/', ' ', snmp_get($device, "pro
 `$features`: Features for the device, for example a list of cards in the slots of a modular chassis.
 
 `$serial`: The main serial number of the device.
+
+`$location`: Overrides sysLocation of the device.
 
 ### MIBs
 

@@ -1,0 +1,669 @@
+IBOOTPDU-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	NOTIFICATION-TYPE, OBJECT-TYPE, MODULE-IDENTITY, 
+	enterprises, IpAddress, Integer32
+		FROM SNMPv2-SMI
+	TEXTUAL-CONVENTION, MacAddress, DisplayString
+		FROM SNMPv2-TC;
+
+iBoot-PDU-Agent MODULE-IDENTITY
+	LAST-UPDATED "201710251323Z"
+	ORGANIZATION 
+		""
+	CONTACT-INFO 
+		""
+	DESCRIPTION 
+		"iBoot-PDU Agent
+		Version 1.1"
+
+	REVISION "201710251323Z"
+	DESCRIPTION 
+		"New Version"
+::= { dataprobe 6 }
+
+
+TC1 ::= TEXTUAL-CONVENTION
+	STATUS     current
+	DESCRIPTION 
+		""
+	SYNTAX  Integer32
+
+dataprobe            OBJECT IDENTIFIER ::= { enterprises 1418 }
+
+-- System Information
+
+device               OBJECT IDENTIFIER ::= { iBoot-PDU-Agent 1 }
+console              OBJECT IDENTIFIER ::= { iBoot-PDU-Agent 2 }
+network              OBJECT IDENTIFIER ::= { iBoot-PDU-Agent 3 }
+snmp                 OBJECT IDENTIFIER ::= { iBoot-PDU-Agent 4 }
+sensors              OBJECT IDENTIFIER ::= { iBoot-PDU-Agent 6 }
+notifications        OBJECT IDENTIFIER ::= { iBoot-PDU-Agent 7 }
+
+firmwareVersion  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { device 1 }
+
+deviceName  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"This is a 20 character string that contains the name of the iBootBar."
+	::= { device 2 }
+
+deviceFamily  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { device 3 }
+
+deviceModelName  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { device 4 }
+
+deviceConnector  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		nema (0),
+		iec (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { device 5 }
+
+deviceNumberOfOutlets  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { device 6 }
+
+deviceNumberOfLineCords  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		one (0),
+		two (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { device 7 }
+
+deviceMaxCurrent  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { device 8 }
+
+-- Changing the temperature unit requires a reboot.
+
+deviceTemperatureUnit  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		fahrenheit (0),
+		celsius (1)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"fahrenheit (0)
+		celsius (1)"
+	::= { device 9 }
+
+deviceTimeZone  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { device 10 }
+
+deviceCalibrated  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		false (0),
+		true (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { device 11 }
+
+modemCountryCode  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { device 12 }
+
+outletDelayTime  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { device 13 }
+
+cloudServiceEnabled  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		false (0),
+		true (1)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { device 14 }
+
+cloudServerAddress  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(128))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { device 15 }
+
+cloudActivationCode  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { device 16 }
+
+cloudUUID  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { device 17 }
+
+-- Setting this to true requires a reboot
+
+setFactoryDefaults  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		false (0),
+		true (1)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"true(1)
+		false(0)"
+	::= { device 18 }
+
+rebootSystem  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		false (0),
+		true (1)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"true(1)
+		false(0)"
+	::= { device 19 }
+
+rebootRequired  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		false (0),
+		true (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { device 20 }
+
+-- Chaning this setting requires a reboot.
+
+serialPortEnabled  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		false (0),
+		true (1)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { console 1 }
+
+-- Range is 0-60.
+
+consoleTimeout  OBJECT-TYPE
+	SYNTAX     Integer32 (0..60)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { console 2 }
+
+-- Reboot required to take effect.
+
+telnetEnabled  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		false (0),
+		true (1)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Eanlbe the telnet server."
+	::= { console 3 }
+
+-- Reboot required for this change to take effect
+
+telnetPort  OBJECT-TYPE
+	SYNTAX     Integer32 (1..65535)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The port for the telnet server to use."
+	::= { console 4 }
+
+sshEnabled  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		false (0),
+		true (1)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { console 5 }
+
+sshPort  OBJECT-TYPE
+	SYNTAX     Integer32 (1..65535)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { console 6 }
+
+macAddress  OBJECT-TYPE
+	SYNTAX     MacAddress
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { network 1 }
+
+ipMode  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		static (0),
+		dhcp (1)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"static(0)
+		dhcp(1)
+		"
+	::= { network 2 }
+
+ipAddress  OBJECT-TYPE
+	SYNTAX     IpAddress
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The IP Address of the device"
+	::= { network 3 }
+
+subnetMask  OBJECT-TYPE
+	SYNTAX     IpAddress
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { network 4 }
+
+gateway  OBJECT-TYPE
+	SYNTAX     IpAddress
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Address of the default gateway"
+	::= { network 5 }
+
+dnsServer1  OBJECT-TYPE
+	SYNTAX     IpAddress
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { network 6 }
+
+dnsServer2  OBJECT-TYPE
+	SYNTAX     IpAddress
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { network 7 }
+
+-- reboot required to active this change.
+-- To access the webserver https://<ipAddress>:<webPort>
+
+sslEnabled  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		false (0),
+		true (1)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable secure sockest layer on the web server."
+	::= { network 8 }
+
+sslPort  OBJECT-TYPE
+	SYNTAX     Integer32 (1..65535)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { network 9 }
+
+webEnabled  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		false (0),
+		true (1)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Use this variable to enable/disable the web server"
+	::= { network 10 }
+
+-- Reset or Power cycle required
+
+webPort  OBJECT-TYPE
+	SYNTAX     Integer32 (0..65535)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The port number that the web server will use.  Changing this var will not take effect until 
+		the unit has be reset."
+	::= { network 11 }
+
+snmpEnabled  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		false (0),
+		true (1)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { snmp 1 }
+
+snmpReadCommunity  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { snmp 2 }
+
+snmpWriteCommunity  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { snmp 3 }
+
+snmpManagerTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF SnmpManagerEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { snmp 4 }
+
+snmpManagerEntry  OBJECT-TYPE
+	SYNTAX 	SnmpManagerEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		""
+	INDEX { snmpManagerIndex }
+	::= { snmpManagerTable 1 }
+
+SnmpManagerEntry ::= SEQUENCE {
+	snmpManagerIndex
+		Integer32,
+	snmpManagerAddress
+		DisplayString,
+	snmpManagerName
+		DisplayString,
+	snmpTrapCommunity
+		DisplayString
+}
+
+snmpManagerIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (0..255)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The table index"
+	::= { snmpManagerEntry 1 }
+
+snmpManagerAddress  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(16))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { snmpManagerEntry 2 }
+
+snmpManagerName  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { snmpManagerEntry 3 }
+
+snmpTrapCommunity  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { snmpManagerEntry 4 }
+
+outletTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF OutletEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { iBoot-PDU-Agent 5 }
+
+outletEntry  OBJECT-TYPE
+	SYNTAX 	OutletEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		""
+	INDEX { outletIndex }
+	::= { outletTable 1 }
+
+OutletEntry ::= SEQUENCE {
+	outletIndex
+		Integer32,
+	outletName
+		DisplayString,
+	outletInitialState
+		INTEGER,
+	outletCycleTime
+		Integer32,
+	outletControl
+		INTEGER,
+	outletStatus
+		INTEGER,
+	outletActualStatus
+		INTEGER
+}
+
+outletIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (0..64)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { outletEntry 1 }
+
+outletName  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The name of the outlet up to 20 characters"
+	::= { outletEntry 2 }
+
+outletInitialState  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		off (0),
+		on (1),
+		last (2)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { outletEntry 3 }
+
+-- This variable sets the cycle time for reboots and power cycles.
+
+outletCycleTime  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { outletEntry 4 }
+
+outletControl  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		off (0),
+		on (1),
+		cycle (2)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Use this a a write only variable.  It is used to change the outlets status"
+	::= { outletEntry 5 }
+
+outletStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		off (0),
+		on (1),
+		cycle (2),
+		reboot (3),
+		pend-on (4)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { outletEntry 6 }
+
+outletActualStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		off (0),
+		on (1)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Status of the physical outlet"
+	::= { outletEntry 7 }
+
+-- divide by 100 to convert to floating point
+-- 
+
+voltageLC1  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { sensors 1 }
+
+-- divide by 100 to convert to floating point
+
+currentLC1  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { sensors 2 }
+
+-- divide by 100 to convert to floating point
+
+voltageLC2  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { sensors 3 }
+
+-- divide by 100 to convert to floating point
+
+currentLC2  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { sensors 4 }
+
+-- This variable display 999 when no temperature is present
+
+temperature1  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { sensors 5 }
+
+-- This variable display 999 when no temperature is present
+
+temperature2  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { sensors 6 }
+
+outletChange  NOTIFICATION-TYPE
+	OBJECTS { outletIndex, 
+		outletName, 
+		outletStatus }
+	STATUS     current
+	DESCRIPTION 
+		"This trap is sent when ever an outlet changes state.  It contains the name of the outlet."
+	::= { notifications 1 }
+END

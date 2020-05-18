@@ -32,7 +32,7 @@
                     "type": "power",
                     "serial": "999999999999",
                     "icon": "eltek.png",
-                    "location": null
+                    "location": "Site"
                 }
             ]
         }

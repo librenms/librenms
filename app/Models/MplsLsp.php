@@ -48,6 +48,6 @@ class MplsLsp extends Model implements Keyable
 
     public function paths()
     {
-        return $this->hasMany('App\Models\MplsLspPath', 'lsp_id');
+        return $this->hasMany(\App\Models\MplsLspPath::class, 'lsp_id');
     }
 }

@@ -11,9 +11,9 @@
         <tbody>
         @foreach($ports as $port)
             <tr>
-                <td class="text-left">{!! \LibreNMS\Util\Url::deviceLink($port->device, $port->device->shortDisplayName()) !!}</td>
-                <td class="text-left">{!! \LibreNMS\Util\Url::portLink($port, $port->getShortLabel()) !!}</td>
-                <td class="text-left">{!! \LibreNMS\Util\Url::portLink($port, \LibreNMS\Util\Url::portThumbnail($port)) !!}</td>
+                <td class="text-left">@deviceLink($port->device, $port->device->shortDisplayName())</td>
+                <td class="text-left">@portLink($port, $port->getShortLabel())</td>
+                <td class="text-left">@portLink($port, \LibreNMS\Util\Url::portThumbnail($port))</td>
             </tr>
         @endforeach
         </tbody>

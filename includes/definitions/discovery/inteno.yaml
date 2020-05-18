@@ -1,0 +1,41 @@
+mib: XAVI-XG6846-MIB
+modules:
+    sensors:
+        pre-cache:
+            data:
+                - oid:
+                    - entPhysicalName
+        temperature:
+            data:
+                -
+                    oid: ddminfo
+                    value: temperature
+                    num_oid: '.1.3.6.1.4.1.12919.6.5.{{ $index }}'
+                    index: 'ddmTp{{ $index }}'
+                    group: 'DDM for {{ $vendorName }} {{ $vendorPn }}'
+                    descr: 'SFP {{ $index }}'
+        dbm:
+            data:
+                -
+                    oid: ddminfo
+                    value: txPower
+                    num_oid: '.1.3.6.1.4.1.12919.6.8.{{ $index }}'
+                    index: 'ddmtxPw{{ $index }}'
+                    group: 'DDM for {{ $vendorName }} {{ $vendorPn }}'
+                    descr: 'SFP {{ $index }} TX'
+                -
+                    oid: ddminfo
+                    value: rxPower
+                    num_oid: '.1.3.6.1.4.1.12919.6.9.{{ $index }}'
+                    index: 'ddmrxPw{{ $index }}'
+                    group: 'DDM for {{ $vendorName }} {{ $vendorPn }}'
+                    descr: 'SFP {{ $index }} RX'
+        voltage:
+            data:
+                -
+                    oid: ddminfo
+                    value: voltage
+                    num_oid: '.1.3.6.1.4.1.12919.6.6.{{ $index }}'
+                    index: 'ddmVolt{{ $index }}'
+                    group: 'DDM for {{ $vendorName }} {{ $vendorPn }}'
+                    descr: 'SFP {{ $index }}'

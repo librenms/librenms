@@ -51,7 +51,7 @@ require 'includes/html/graphs/generic_v3_multiline.inc.php';
 
 /*
 This would create a graph with reads above and write belows;
-I can't find out how to adapt the legend. If you wish to swap graphs, 
+I can't find out how to adapt the legend. If you wish to swap graphs,
 uncomment all the above untill <?php and uncomment below this note
 
 $rrd_filename  = rrd_name($device['hostname'], array('app', 'nfs-server-default', $app['app_id']));

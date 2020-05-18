@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Exceptions\JsonAppException;
@@ -9,6 +10,7 @@ use LibreNMS\Exceptions\JsonAppBlankJsonException;
 use LibreNMS\Exceptions\JsonAppMissingKeysException;
 use LibreNMS\Exceptions\JsonAppWrongVersionException;
 use LibreNMS\Exceptions\JsonAppExtendErroredException;
+use App\Models\Location;
 
 function bulk_sensor_snmpget($device, $sensors)
 {
@@ -198,10 +200,10 @@ function record_sensor_data($device, $all_sensors)
         // FIXME also warn when crossing WARN level!
         if ($sensor['sensor_limit_low'] != '' && $prev_sensor_value > $sensor['sensor_limit_low'] && $sensor_value < $sensor['sensor_limit_low'] && $sensor['sensor_alert'] == 1) {
             echo 'Alerting for '.$device['hostname'].' '.$sensor['sensor_descr']."\n";
-            log_event("$class {$sensor['sensor_descr']} under threshold: $sensor_value $unit (< {$sensor['sensor_limit_low']} $unit)", $device, $class, 4, $sensor['sensor_id']);
+            log_event("$class under threshold: $sensor_value $unit (< {$sensor['sensor_limit_low']} $unit)", $device, $sensor['sensor_class'], 4, $sensor['sensor_id']);
         } elseif ($sensor['sensor_limit'] != '' && $prev_sensor_value < $sensor['sensor_limit'] && $sensor_value > $sensor['sensor_limit'] && $sensor['sensor_alert'] == 1) {
             echo 'Alerting for '.$device['hostname'].' '.$sensor['sensor_descr']."\n";
-            log_event("$class {$sensor['sensor_descr']} above threshold: $sensor_value $unit (> {$sensor['sensor_limit']} $unit)", $device, $class, 4, $sensor['sensor_id']);
+            log_event("$class above threshold: $sensor_value $unit (> {$sensor['sensor_limit']} $unit)", $device, $sensor['sensor_class'], 4, $sensor['sensor_id']);
         }
         if ($sensor['sensor_class'] == 'state' && $prev_sensor_value != $sensor_value) {
             $trans = array_column(
@@ -243,11 +245,20 @@ function poll_device($device, $force_module = false)
     echo 'Hostname:    ' . $device['hostname'] . PHP_EOL;
     echo 'Device ID:   ' . $device['device_id'] . PHP_EOL;
     echo 'OS:          ' . $device['os'] . PHP_EOL;
-    $ip = dnslookup($device);
+
+    if (empty($device['overwrite_ip'])) {
+        $ip = dnslookup($device);
+    } else {
+        $ip = $device['overwrite_ip'];
+    }
 
     $db_ip = null;
     if (!empty($ip)) {
-        echo 'Resolved IP: '.$ip.PHP_EOL;
+        if (empty($device['overwrite_ip'])) {
+            echo 'Resolved IP: '.$ip.PHP_EOL;
+        } else {
+            echo 'Assigned IP: '.$ip.PHP_EOL;
+        }
         $db_ip = inet_pton($ip);
     }
 
@@ -562,7 +573,7 @@ function update_application($app, $response, $metrics = array(), $status = '')
     );
 
     if ($response != '' && $response !== false) {
-        if (str_contains($response, array(
+        if (Str::contains($response, array(
             'Traceback (most recent call last):',
         ))) {
             $data['app_state'] = 'ERROR';

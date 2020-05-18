@@ -28,6 +28,9 @@ use LibreNMS\RRD\RrdDefinition;
 // UCD-SNMP-MIB::ssCpuRawSoftIRQ.0 = Counter32: 2605010
 // UCD-SNMP-MIB::ssRawSwapIn.0 = Counter32: 602002
 // UCD-SNMP-MIB::ssRawSwapOut.0 = Counter32: 937422
+// UCD-SNMP-MIB::ssCpuRawWait.0
+// UCD-SNMP-MIB::ssCpuRawSteal.0
+
 $ss = snmpwalk_cache_oid($device, 'systemStats', array(), 'UCD-SNMP-MIB');
 $ss = $ss[0];
 
@@ -67,6 +70,8 @@ $collect_oids = array(
     'ssRawContexts',
     'ssRawSwapIn',
     'ssRawSwapOut',
+    'ssCpuRawWait',
+    'ssCpuRawSteal',
 );
 
 foreach ($collect_oids as $oid) {
@@ -100,6 +105,14 @@ if (is_numeric($ss['ssRawContexts'])) {
 
 if (is_numeric($ss['ssRawInterrupts'])) {
     $graphs['ucd_interrupts'] = true;
+}
+
+if (is_numeric($ss['ssCpuRawWait'])) {
+    $graphs['ucd_io_wait'] = true;
+}
+
+if (is_numeric($ss['ssCpuRawSteal'])) {
+    $graphs['ucd_cpu_steal'] = true;
 }
 
 // #

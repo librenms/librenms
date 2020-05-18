@@ -1,6 +1,8 @@
 #!/usr/bin/env php
 <?php
 
+use Illuminate\Support\Str;
+
 $filename = basename(__FILE__);
 $install_dir = realpath(__DIR__ . '/..');
 chdir($install_dir);
@@ -25,27 +27,28 @@ $map = [
 ];
 
 foreach ($changed_files as $file) {
-    if (starts_with($file, 'doc/')) {
+    if (Str::startsWith($file, 'doc/')) {
         $map['docs']++;
     }
-    if (ends_with($file, '.py')) {
+    if (Str::endsWith($file, '.py')) {
         $map['python']++;
     }
-    if (ends_with($file, '.sh')) {
+    if (Str::endsWith($file, '.sh')) {
         $map['bash']++;
     }
 
-    if ($file == 'composer.lock') {
-        $map['php']++; // cause full tests to run
+    // cause full tests to run
+    if ($file == 'composer.lock' || $file == '.travis.yml') {
+        $map['php']++;
     }
 
     // check if os owned file or generic php file
     if (!empty($os_name = os_from_file($file))) {
         $map['os'][] = $os_name;
-        if (ends_with($file, '.php')) {
+        if (Str::endsWith($file, '.php')) {
             $map['os-php']++;
         }
-    } elseif (ends_with($file, '.php')) {
+    } elseif (Str::endsWith($file, '.php')) {
         $map['php']++;
     }
 }
@@ -95,6 +98,7 @@ $completed_tests = array(
     'style' => false,
     'unit' => false,
 );
+$docs_only = false;
 
 if ($os = check_opt($options, 'os', 'o')) {
     // enable unit tests, snmpsim, and db
@@ -133,7 +137,11 @@ if (!empty($changed_files) && $map['php'] === 0 && $map['os-php'] === 0) {
 
 // If we have no php files and no OS' found then also skip unit checks.
 if (!empty($changed_files) && $map['php'] === 0 && empty($map['os']) && !$os) {
-    putenv('SKIP_UNIT_CHECK=1');
+    if ($map['docs'] > 0) {
+        $docs_only = true;
+    } else {
+        putenv('SKIP_UNIT_CHECK=1');
+    }
 }
 
 // If we have more than 4 (arbitrary number) of OS' then blank them out
@@ -159,7 +167,7 @@ foreach (array_keys($options) as $opt) {
             echo 'Only checking os: ' . implode(', ', (array)$os) . PHP_EOL;
         }
 
-        $ret = run_check('unit', $passthru, $command_only, compact('fail_fast', 'os', 'module'));
+        $ret = run_check('unit', $passthru, $command_only, compact('fail_fast', 'os', 'module', 'docs_only'));
     }
 
     if ($fail_fast && $ret !== 0 && $ret !== 250) {
@@ -177,11 +185,11 @@ exit($return); //return the combined/single return value of tests
 
 function os_from_file($file)
 {
-    if (starts_with($file, 'includes/definitions/')) {
+    if (Str::startsWith($file, 'includes/definitions/')) {
         return basename($file, '.yaml');
-    } elseif (starts_with($file, ['includes/polling', 'includes/discovery'])) {
+    } elseif (Str::startsWith($file, ['includes/polling', 'includes/discovery'])) {
         return os_from_php($file);
-    } elseif (starts_with($file, 'LibreNMS/OS/')) {
+    } elseif (Str::startsWith($file, 'LibreNMS/OS/')) {
         if (preg_match('#LibreNMS/OS/[^/]+.php#', $file)) {
             // convert class name to os name
             preg_match_all("/[A-Z][a-z]*/", basename($file, '.php'), $segments);
@@ -192,7 +200,7 @@ function os_from_file($file)
             }
             return os_from_php(str_replace('-', '_', $osname));
         }
-    } elseif (starts_with($file, ['tests/snmpsim/', 'tests/data/'])) {
+    } elseif (Str::startsWith($file, ['tests/snmpsim/', 'tests/data/'])) {
         list($os,) = explode('_', basename(basename($file, '.json'), '.snmprec'), 2);
         return $os;
     }
@@ -347,6 +355,10 @@ function check_unit($passthru = false, $command_only = false, $options = array()
         $filter = implode('.*|', (array)$options['os']);
         // include tests that don't have data providers and only data sets that match
         $phpunit_cmd .= " --group os --filter '/::test[A-Za-z]+$|::test[A-Za-z]+ with data set \"$filter.*\"$/'";
+    }
+
+    if ($options['docs_only']) {
+        $phpunit_cmd .= " --group docs";
     }
 
     if ($options['module']) {

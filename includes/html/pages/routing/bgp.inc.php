@@ -205,7 +205,7 @@ if (!Auth::user()->hasGlobalRead()) {
     print_optionbar_end();
 
     echo "<table border=0 cellspacing=0 cellpadding=5 width=100% class='table sortable'>";
-    echo '<tr style="height: 30px"><td width=1></td><th>Local address</th><th></th><th>Peer address</th><th>Type</th><th>Family</th><th>Remote AS</th><th>Peer description</th><th>State</th><th width=200>Uptime / Updates</th></tr>';
+    echo '<tr style="height: 30px"><td width=1></td><th>Local address</th><th></th><th>Peer address</th><th>Type</th><th>Family</th><th>Remote AS</th><th>Peer description</th><th>State</th><th>Last error</th><th width=200>Uptime / Updates</th></tr>';
 
     if ($vars['type'] == 'external') {
         $where = 'AND D.bgpLocalAs != B.bgpPeerRemoteAs';
@@ -290,6 +290,12 @@ if (!Auth::user()->hasGlobalRead()) {
         $overlib_link = "device/device=".$peer['device_id']."/tab=routing/proto=bgp/";
         $localaddresslink = "<span class=list-large>".overlib_link($overlib_link, $peer_ip, generate_graph_tag($graph_array_zoom), null)."</span>";
 
+        if ($peer['bgpPeerLastErrorCode'] == 0 && $peer['bgpPeerLastErrorSubCode'] == 0) {
+            $last_error = $peer['bgpPeerLastErrorText'];
+        } else {
+            $last_error = describe_bgp_error_code($peer['bgpPeerLastErrorCode'], $peer['bgpPeerLastErrorSubCode'])."<br/>".$peer['bgpPeerLastErrorText'];
+        }
+
         echo '<tr class="bgp"'.($peer['alert'] ? ' bordercolor="#cc0000"' : '').($peer['disabled'] ? ' bordercolor="#cccccc"' : '').'>';
 
         unset($sep);
@@ -313,8 +319,9 @@ if (!Auth::user()->hasGlobalRead()) {
             <td width=50>".$peer['afi'].'</td>
             <td><strong>AS'.$peer['bgpPeerRemoteAs'].'</strong><br />'.$peer['astext']."</td>
             <td>".$peer['bgpPeerDescr']."</td>
-            <td><strong><span style='color: $admin_col;'>".$peer['bgpPeerAdminStatus']."</span><br /><span style='color: $col;'>".$peer['bgpPeerState'].'</span></strong></td>
-            <td>'.formatUptime($peer['bgpPeerFsmEstablishedTime'])."<br />
+            <td><strong><span style='color: $admin_col;'>".$peer['bgpPeerAdminStatus']."</span><br /><span style='color: $col;'>".$peer['bgpPeerState']."</span></strong></td>
+            <td>".$last_error."</td>
+            <td>".formatUptime($peer['bgpPeerFsmEstablishedTime'])."<br />
             Updates <i class='fa fa-arrow-down icon-theme' aria-hidden='true'></i> ".format_si($peer['bgpPeerInUpdates'])."
             <i class='fa fa-arrow-up icon-theme' aria-hidden='true'></i> ".format_si($peer['bgpPeerOutUpdates']).'</td></tr>';
 

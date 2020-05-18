@@ -11,6 +11,7 @@ return [
     |
     */
 
+    'title' => 'Sensors',
     'airflow' => [
         'short' => 'Airflow',
         'long' => 'Airflow',

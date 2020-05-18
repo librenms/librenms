@@ -36,11 +36,9 @@ class RrdDefinitionTest extends TestCase
         $this->assertEmpty((string)new RrdDefinition());
     }
 
-    /**
-     * @expectedException \LibreNMS\Exceptions\InvalidRrdTypeException
-     */
     public function testWrongType()
     {
+        $this->expectException(\LibreNMS\Exceptions\InvalidRrdTypeException::class);
         Config::set('rrd.step', 300);
         Config::set('rrd.heartbeat', 600);
         $def = new RrdDefinition();

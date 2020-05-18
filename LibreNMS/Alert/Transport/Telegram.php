@@ -44,6 +44,9 @@ class Telegram extends Transport
         $format="";
         if ($data['format']) {
                 $format="&parse_mode=" . $data['format'];
+            if ($data['format'] == 'Markdown') {
+                $text = urlencode(preg_replace("/([a-z0-9]+)_([a-z0-9]+)/", "$1\_$2", $obj['msg']));
+            }
         }
         curl_setopt($curl, CURLOPT_URL, ("https://api.telegram.org/bot{$data['token']}/sendMessage?chat_id={$data['chat_id']}&text=$text{$format}"));
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);

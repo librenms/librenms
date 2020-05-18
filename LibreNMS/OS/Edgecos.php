@@ -25,6 +25,7 @@
 
 namespace LibreNMS\OS;
 
+use Illuminate\Support\Str;
 use LibreNMS\Device\Processor;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\OS;
@@ -41,19 +42,19 @@ class Edgecos extends OS implements ProcessorDiscovery
     {
         $device = $this->getDevice();
 
-        if (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.259.10.1.24.')) { //ECS4510
+        if (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.259.10.1.24.')) { //ECS4510
             $oid = '.1.3.6.1.4.1.259.10.1.24.1.39.2.1.0';
-        } elseif (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.259.10.1.22.')) { //ECS3528
+        } elseif (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.259.10.1.22.')) { //ECS3528
             $oid = '.1.3.6.1.4.1.259.10.1.22.1.39.2.1.0';
-        } elseif (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.259.10.1.39.')) { //ECS4110
+        } elseif (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.259.10.1.39.')) { //ECS4110
             $oid = '.1.3.6.1.4.1.259.10.1.39.1.39.2.1.0';
-        } elseif (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.259.10.1.45.')) { //ECS4120
+        } elseif (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.259.10.1.45.')) { //ECS4120
             $oid = '.1.3.6.1.4.1.259.10.1.45.1.39.2.1.0';
-        } elseif (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.259.10.1.42.')) { //ECS4210
+        } elseif (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.259.10.1.42.')) { //ECS4210
             $oid = '.1.3.6.1.4.1.259.10.1.42.101.1.39.2.1.0';
-        } elseif (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.259.10.1.27.')) { //ECS3510
+        } elseif (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.259.10.1.27.')) { //ECS3510
             $oid = '.1.3.6.1.4.1.259.10.1.27.1.39.2.1.0';
-        } elseif (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.259.8.1.11.')) { //ES3510MA
+        } elseif (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.259.8.1.11.')) { //ES3510MA
             $oid = '.1.3.6.1.4.1.259.8.1.11.1.39.2.1.0';
         };
 

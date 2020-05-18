@@ -5,29 +5,7 @@ use LibreNMS\Util\Rewrite;
 
 function rewrite_location($location)
 {
-    if (is_array(Config::get('location_map_regex'))) {
-        foreach (Config::get('location_map_regex') as $reg => $val) {
-            if (preg_match($reg, $location)) {
-                $location = $val;
-                break;
-            }
-        }
-    }
-
-    if (is_array(Config::get('location_map_regex_sub'))) {
-        foreach (Config::get('location_map_regex_sub') as $reg => $val) {
-            if (preg_match($reg, $location)) {
-                $location = preg_replace($reg, $val, $location);
-                break;
-            }
-        }
-    }
-
-    if (Config::has("location_map.$location")) {
-        $location = Config::get("location_map.$location");
-    }
-
-    return $location;
+    return \LibreNMS\Util\Rewrite::location($location);
 }
 
 

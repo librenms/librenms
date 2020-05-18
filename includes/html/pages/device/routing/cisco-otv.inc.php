@@ -24,27 +24,27 @@ foreach ($components as $oid => $overlay) {
             $overlay_status = "<span class='pull-right'>".$overlay['error']." - <span class='red'>Alert</span></span>";
             $gli = "list-group-item-danger";
         }
-?>
+        ?>
         <a class="list-group-item <?php echo $gli?>" data-toggle="collapse" data-target="#<?php echo $overlay['index']?>" data-parent="#overlays"><?php echo $overlay['label']?> - <?php echo $overlay['transport']?> <?php echo $overlay_status?></a>
         <div id="<?php echo $overlay['index']?>" class="sublinks collapse">
-<?php
-foreach ($components as $aid => $adjacency) {
-    if (($adjacency['otvtype'] == 'adjacency') && ($adjacency['index'] == $overlay['index'])) {
-        if ($adjacency['status'] == 0) {
-            $adj_status = "<span class='green pull-right'>Normal</span>";
-            $gli = "";
-        } else {
-            $adj_status = "<span class='pull-right'>".$adjacency['error']." - <span class='red'>Alert</span></span>";
-            $gli = "list-group-item-danger";
-        }
-?>
+        <?php
+        foreach ($components as $aid => $adjacency) {
+            if (($adjacency['otvtype'] == 'adjacency') && ($adjacency['index'] == $overlay['index'])) {
+                if ($adjacency['status'] == 0) {
+                    $adj_status = "<span class='green pull-right'>Normal</span>";
+                    $gli = "";
+                } else {
+                    $adj_status = "<span class='pull-right'>".$adjacency['error']." - <span class='red'>Alert</span></span>";
+                    $gli = "list-group-item-danger";
+                }
+                ?>
     <a class="list-group-item <?php echo $gli?> small"><i class="fa fa-chevron-right" aria-hidden="true"></i> <?php echo $adjacency['label']?> - <?php echo $adjacency['endpoint']?> <?php echo $adj_status?></a>
-<?php
-    }
-}
-?>
+                <?php
+            }
+        }
+        ?>
         </div>
-<?php
+        <?php
     }
 }
 ?>
@@ -85,6 +85,6 @@ $graph_array['to'] = \LibreNMS\Config::get('time.now');
 $graph_array['type']   = 'device_cisco-otv-mac';
 require 'includes/html/print-graphrow.inc.php';
 
-        ?>
+?>
     </div>
 </div>

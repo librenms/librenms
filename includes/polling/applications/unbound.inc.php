@@ -94,6 +94,34 @@ $metrics['operations'] = $fields;
 $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);
  
+#Unbound requestlist
+$rrd_name =  array('app', $name,'requestlist',$app_id);
+$rrd_def = RrdDefinition::make()
+    ->addDataset('max', 'DERIVE', 0, 125000000000)
+    ->addDataset('overwritten', 'DERIVE', 0, 125000000000)
+    ->addDataset('exceeded', 'DERIVE', 0, 125000000000);
+$fields = array (
+    'max' => $unbound['total.requestlist.max'],
+    'overwritten' => $unbound['total.requestlist.overwritten'],
+    'exceeded' => $unbound['total.requestlist.exceeded']
+    );
+$metrics['requestlist'] = $fields;
+$tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
+data_update($device, 'app', $tags, $fields);
+
+#Unbound recursiontime
+$rrd_name =  array('app', $name,'recursiontime',$app_id);
+$rrd_def = RrdDefinition::make()
+    ->addDataset('avg', 'GAUGE', 0, 125000000000)
+    ->addDataset('median', 'GAUGE', 0, 125000000000);
+$fields = array (
+    'avg' => $unbound['total.recursion.time.avg'],
+    'median' => $unbound['total.recursion.time.median']
+    );
+$metrics['recursiontime'] = $fields;
+$tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
+data_update($device, 'app', $tags, $fields);
+
 update_application($app, $rawdata, $metrics);
 
 unset($lines, $unbound, $rrd_name, $rrd_def, $fields, $tags);

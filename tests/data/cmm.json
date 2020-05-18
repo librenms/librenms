@@ -8,13 +8,13 @@
                     "sysDescr": "CMM 3.1",
                     "sysContact": null,
                     "version": null,
-                    "hardware": "",
+                    "hardware": null,
                     "features": null,
-                    "location": null,
                     "os": "cmm",
                     "type": "wireless",
                     "serial": null,
-                    "icon": "cambium.svg"
+                    "icon": "cambium.svg",
+                    "location": null
                 }
             ]
         },
@@ -26,13 +26,13 @@
                     "sysDescr": "CMM 3.1",
                     "sysContact": "<private>",
                     "version": null,
-                    "hardware": "",
+                    "hardware": null,
                     "features": null,
-                    "location": "<private>",
                     "os": "cmm",
                     "type": "wireless",
                     "serial": null,
-                    "icon": "cambium.svg"
+                    "icon": "cambium.svg",
+                    "location": "<private>"
                 }
             ]
         }
@@ -54,7 +54,7 @@
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
                     "ifHighSpeed": null,
-                    "ifOperStatus": null,
+                    "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
                     "ifAdminStatus_prev": null,
@@ -143,7 +143,9 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "ifSpeed_prev": null,
+                    "ifHighSpeed_prev": null
                 },
                 {
                     "port_descr_type": null,
@@ -159,7 +161,7 @@
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
                     "ifHighSpeed": null,
-                    "ifOperStatus": null,
+                    "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
                     "ifAdminStatus_prev": null,
@@ -248,7 +250,9 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "ifSpeed_prev": null,
+                    "ifHighSpeed_prev": null
                 }
             ]
         },
@@ -357,7 +361,9 @@
                     "ifOutMulticastPkts": 8725689,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "ifSpeed_prev": null,
+                    "ifHighSpeed_prev": null
                 },
                 {
                     "port_descr_type": null,
@@ -374,7 +380,7 @@
                     "ifPromiscuousMode": "0",
                     "ifHighSpeed": 0,
                     "ifOperStatus": "up",
-                    "ifOperStatus_prev": null,
+                    "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
                     "ifAdminStatus_prev": null,
                     "ifDuplex": "fullDuplex",
@@ -462,7 +468,9 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "ifSpeed_prev": null,
+                    "ifHighSpeed_prev": null
                 },
                 {
                     "port_descr_type": null,
@@ -479,7 +487,7 @@
                     "ifPromiscuousMode": "0",
                     "ifHighSpeed": 0,
                     "ifOperStatus": "up",
-                    "ifOperStatus_prev": null,
+                    "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
                     "ifAdminStatus_prev": null,
                     "ifDuplex": "fullDuplex",
@@ -567,7 +575,9 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "ifSpeed_prev": null,
+                    "ifHighSpeed_prev": null
                 },
                 {
                     "port_descr_type": null,
@@ -672,7 +682,9 @@
                     "ifOutMulticastPkts": 8725689,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "ifSpeed_prev": null,
+                    "ifHighSpeed_prev": null
                 },
                 {
                     "port_descr_type": null,
@@ -777,7 +789,9 @@
                     "ifOutMulticastPkts": 8725689,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "ifSpeed_prev": null,
+                    "ifHighSpeed_prev": null
                 },
                 {
                     "port_descr_type": null,
@@ -882,7 +896,9 @@
                     "ifOutMulticastPkts": 8355360,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "ifSpeed_prev": null,
+                    "ifHighSpeed_prev": null
                 },
                 {
                     "port_descr_type": null,
@@ -987,7 +1003,9 @@
                     "ifOutMulticastPkts": 8725031,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "ifSpeed_prev": null,
+                    "ifHighSpeed_prev": null
                 },
                 {
                     "port_descr_type": null,
@@ -1092,7 +1110,9 @@
                     "ifOutMulticastPkts": 752498,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "ifSpeed_prev": null,
+                    "ifHighSpeed_prev": null
                 },
                 {
                     "port_descr_type": null,
@@ -1197,7 +1217,9 @@
                     "ifOutMulticastPkts": 8725689,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "ifSpeed_prev": null,
+                    "ifHighSpeed_prev": null
                 }
             ]
         }

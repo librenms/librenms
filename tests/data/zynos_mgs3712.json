@@ -30,7 +30,7 @@
                     "features": null,
                     "os": "zynos",
                     "type": "network",
-                    "serial": null,
+                    "serial": "S100Z16017355",
                     "icon": "zyxel.svg",
                     "location": "<private>"
                 }
@@ -54,7 +54,7 @@
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
                     "ifHighSpeed": null,
-                    "ifOperStatus": null,
+                    "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
                     "ifAdminStatus_prev": null,
@@ -143,7 +143,9 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "ifSpeed_prev": null,
+                    "ifHighSpeed_prev": null
                 },
                 {
                     "port_descr_type": null,
@@ -159,7 +161,7 @@
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
                     "ifHighSpeed": null,
-                    "ifOperStatus": null,
+                    "ifOperStatus": "down",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
                     "ifAdminStatus_prev": null,
@@ -248,7 +250,9 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "ifSpeed_prev": null,
+                    "ifHighSpeed_prev": null
                 },
                 {
                     "port_descr_type": null,
@@ -264,7 +268,7 @@
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
                     "ifHighSpeed": null,
-                    "ifOperStatus": null,
+                    "ifOperStatus": "down",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
                     "ifAdminStatus_prev": null,
@@ -353,7 +357,9 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "ifSpeed_prev": null,
+                    "ifHighSpeed_prev": null
                 },
                 {
                     "port_descr_type": null,
@@ -369,7 +375,7 @@
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
                     "ifHighSpeed": null,
-                    "ifOperStatus": null,
+                    "ifOperStatus": "down",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
                     "ifAdminStatus_prev": null,
@@ -458,7 +464,9 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "ifSpeed_prev": null,
+                    "ifHighSpeed_prev": null
                 },
                 {
                     "port_descr_type": null,
@@ -474,7 +482,7 @@
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
                     "ifHighSpeed": null,
-                    "ifOperStatus": null,
+                    "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
                     "ifAdminStatus_prev": null,
@@ -563,7 +571,9 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "ifSpeed_prev": null,
+                    "ifHighSpeed_prev": null
                 },
                 {
                     "port_descr_type": null,
@@ -579,7 +589,7 @@
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
                     "ifHighSpeed": null,
-                    "ifOperStatus": null,
+                    "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
                     "ifAdminStatus_prev": null,
@@ -668,7 +678,9 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "ifSpeed_prev": null,
+                    "ifHighSpeed_prev": null
                 },
                 {
                     "port_descr_type": null,
@@ -684,7 +696,7 @@
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
                     "ifHighSpeed": null,
-                    "ifOperStatus": null,
+                    "ifOperStatus": "down",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
                     "ifAdminStatus_prev": null,
@@ -773,7 +785,9 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "ifSpeed_prev": null,
+                    "ifHighSpeed_prev": null
                 },
                 {
                     "port_descr_type": null,
@@ -789,7 +803,7 @@
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
                     "ifHighSpeed": null,
-                    "ifOperStatus": null,
+                    "ifOperStatus": "down",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
                     "ifAdminStatus_prev": null,
@@ -878,7 +892,9 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "ifSpeed_prev": null,
+                    "ifHighSpeed_prev": null
                 },
                 {
                     "port_descr_type": null,
@@ -894,7 +910,7 @@
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
                     "ifHighSpeed": null,
-                    "ifOperStatus": null,
+                    "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
                     "ifAdminStatus_prev": null,
@@ -983,7 +999,9 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "ifSpeed_prev": null,
+                    "ifHighSpeed_prev": null
                 },
                 {
                     "port_descr_type": null,
@@ -999,7 +1017,7 @@
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
                     "ifHighSpeed": null,
-                    "ifOperStatus": null,
+                    "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
                     "ifAdminStatus_prev": null,
@@ -1088,7 +1106,9 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "ifSpeed_prev": null,
+                    "ifHighSpeed_prev": null
                 },
                 {
                     "port_descr_type": null,
@@ -1104,7 +1124,7 @@
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
                     "ifHighSpeed": null,
-                    "ifOperStatus": null,
+                    "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
                     "ifAdminStatus_prev": null,
@@ -1193,7 +1213,9 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "ifSpeed_prev": null,
+                    "ifHighSpeed_prev": null
                 },
                 {
                     "port_descr_type": null,
@@ -1209,7 +1231,7 @@
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
                     "ifHighSpeed": null,
-                    "ifOperStatus": null,
+                    "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
                     "ifAdminStatus_prev": null,
@@ -1298,7 +1320,9 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "ifSpeed_prev": null,
+                    "ifHighSpeed_prev": null
                 },
                 {
                     "port_descr_type": null,
@@ -1314,7 +1338,7 @@
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
                     "ifHighSpeed": null,
-                    "ifOperStatus": null,
+                    "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
                     "ifAdminStatus_prev": null,
@@ -1403,7 +1427,9 @@
                     "ifOutMulticastPkts": null,
                     "ifOutMulticastPkts_prev": null,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "ifSpeed_prev": null,
+                    "ifHighSpeed_prev": null
                 }
             ]
         },
@@ -1424,7 +1450,7 @@
                     "ifPromiscuousMode": "true",
                     "ifHighSpeed": 1000,
                     "ifOperStatus": "up",
-                    "ifOperStatus_prev": null,
+                    "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
                     "ifAdminStatus_prev": null,
                     "ifDuplex": "3",
@@ -1512,7 +1538,9 @@
                     "ifOutMulticastPkts": 4256146,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "ifSpeed_prev": null,
+                    "ifHighSpeed_prev": null
                 },
                 {
                     "port_descr_type": null,
@@ -1529,7 +1557,7 @@
                     "ifPromiscuousMode": "true",
                     "ifHighSpeed": 0,
                     "ifOperStatus": "down",
-                    "ifOperStatus_prev": null,
+                    "ifOperStatus_prev": "down",
                     "ifAdminStatus": "up",
                     "ifAdminStatus_prev": null,
                     "ifDuplex": "2",
@@ -1617,7 +1645,9 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "ifSpeed_prev": null,
+                    "ifHighSpeed_prev": null
                 },
                 {
                     "port_descr_type": null,
@@ -1634,7 +1664,7 @@
                     "ifPromiscuousMode": "true",
                     "ifHighSpeed": 0,
                     "ifOperStatus": "down",
-                    "ifOperStatus_prev": null,
+                    "ifOperStatus_prev": "down",
                     "ifAdminStatus": "up",
                     "ifAdminStatus_prev": null,
                     "ifDuplex": "2",
@@ -1722,7 +1752,9 @@
                     "ifOutMulticastPkts": 748,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "ifSpeed_prev": null,
+                    "ifHighSpeed_prev": null
                 },
                 {
                     "port_descr_type": null,
@@ -1739,7 +1771,7 @@
                     "ifPromiscuousMode": "true",
                     "ifHighSpeed": 0,
                     "ifOperStatus": "down",
-                    "ifOperStatus_prev": null,
+                    "ifOperStatus_prev": "down",
                     "ifAdminStatus": "up",
                     "ifAdminStatus_prev": null,
                     "ifDuplex": "2",
@@ -1827,7 +1859,9 @@
                     "ifOutMulticastPkts": 12034,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "ifSpeed_prev": null,
+                    "ifHighSpeed_prev": null
                 },
                 {
                     "port_descr_type": null,
@@ -1844,7 +1878,7 @@
                     "ifPromiscuousMode": "true",
                     "ifHighSpeed": 1000,
                     "ifOperStatus": "up",
-                    "ifOperStatus_prev": null,
+                    "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
                     "ifAdminStatus_prev": null,
                     "ifDuplex": "3",
@@ -1932,7 +1966,9 @@
                     "ifOutMulticastPkts": 4344340,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "ifSpeed_prev": null,
+                    "ifHighSpeed_prev": null
                 },
                 {
                     "port_descr_type": null,
@@ -1949,7 +1985,7 @@
                     "ifPromiscuousMode": "true",
                     "ifHighSpeed": 1000,
                     "ifOperStatus": "up",
-                    "ifOperStatus_prev": null,
+                    "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
                     "ifAdminStatus_prev": null,
                     "ifDuplex": "3",
@@ -2037,7 +2073,9 @@
                     "ifOutMulticastPkts": 4121981,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "ifSpeed_prev": null,
+                    "ifHighSpeed_prev": null
                 },
                 {
                     "port_descr_type": null,
@@ -2054,7 +2092,7 @@
                     "ifPromiscuousMode": "true",
                     "ifHighSpeed": 0,
                     "ifOperStatus": "down",
-                    "ifOperStatus_prev": null,
+                    "ifOperStatus_prev": "down",
                     "ifAdminStatus": "up",
                     "ifAdminStatus_prev": null,
                     "ifDuplex": "2",
@@ -2142,7 +2180,9 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "ifSpeed_prev": null,
+                    "ifHighSpeed_prev": null
                 },
                 {
                     "port_descr_type": null,
@@ -2159,7 +2199,7 @@
                     "ifPromiscuousMode": "true",
                     "ifHighSpeed": 0,
                     "ifOperStatus": "down",
-                    "ifOperStatus_prev": null,
+                    "ifOperStatus_prev": "down",
                     "ifAdminStatus": "up",
                     "ifAdminStatus_prev": null,
                     "ifDuplex": "2",
@@ -2247,7 +2287,9 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "ifSpeed_prev": null,
+                    "ifHighSpeed_prev": null
                 },
                 {
                     "port_descr_type": null,
@@ -2264,7 +2306,7 @@
                     "ifPromiscuousMode": "true",
                     "ifHighSpeed": 100,
                     "ifOperStatus": "up",
-                    "ifOperStatus_prev": null,
+                    "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
                     "ifAdminStatus_prev": null,
                     "ifDuplex": "3",
@@ -2352,7 +2394,9 @@
                     "ifOutMulticastPkts": 4156562,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "ifSpeed_prev": null,
+                    "ifHighSpeed_prev": null
                 },
                 {
                     "port_descr_type": null,
@@ -2369,7 +2413,7 @@
                     "ifPromiscuousMode": "true",
                     "ifHighSpeed": 1000,
                     "ifOperStatus": "up",
-                    "ifOperStatus_prev": null,
+                    "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
                     "ifAdminStatus_prev": null,
                     "ifDuplex": "3",
@@ -2457,7 +2501,9 @@
                     "ifOutMulticastPkts": 644180,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "ifSpeed_prev": null,
+                    "ifHighSpeed_prev": null
                 },
                 {
                     "port_descr_type": null,
@@ -2474,7 +2520,7 @@
                     "ifPromiscuousMode": "true",
                     "ifHighSpeed": 1000,
                     "ifOperStatus": "up",
-                    "ifOperStatus_prev": null,
+                    "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
                     "ifAdminStatus_prev": null,
                     "ifDuplex": "3",
@@ -2562,7 +2608,9 @@
                     "ifOutMulticastPkts": 4527817,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "ifSpeed_prev": null,
+                    "ifHighSpeed_prev": null
                 },
                 {
                     "port_descr_type": null,
@@ -2579,7 +2627,7 @@
                     "ifPromiscuousMode": "true",
                     "ifHighSpeed": 1000,
                     "ifOperStatus": "up",
-                    "ifOperStatus_prev": null,
+                    "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
                     "ifAdminStatus_prev": null,
                     "ifDuplex": "3",
@@ -2667,7 +2715,9 @@
                     "ifOutMulticastPkts": 197014,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "ifSpeed_prev": null,
+                    "ifHighSpeed_prev": null
                 },
                 {
                     "port_descr_type": null,
@@ -2684,7 +2734,7 @@
                     "ifPromiscuousMode": "true",
                     "ifHighSpeed": 100,
                     "ifOperStatus": "up",
-                    "ifOperStatus_prev": null,
+                    "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
                     "ifAdminStatus_prev": null,
                     "ifDuplex": null,
@@ -2772,7 +2822,9 @@
                     "ifOutMulticastPkts": 0,
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
-                    "ifOutMulticastPkts_rate": null
+                    "ifOutMulticastPkts_rate": null,
+                    "ifSpeed_prev": null,
+                    "ifHighSpeed_prev": null
                 }
             ]
         }
@@ -2795,7 +2847,56 @@
                     "vlan_mtu": null
                 },
                 {
+                    "vlan_vlan": 2012,
+                    "vlan_domain": 1,
+                    "vlan_name": "<private>",
+                    "vlan_type": null,
+                    "vlan_mtu": null
+                },
+                {
+                    "vlan_vlan": 2013,
+                    "vlan_domain": 1,
+                    "vlan_name": "<private>",
+                    "vlan_type": null,
+                    "vlan_mtu": null
+                },
+                {
+                    "vlan_vlan": 2015,
+                    "vlan_domain": 1,
+                    "vlan_name": "<private>",
+                    "vlan_type": null,
+                    "vlan_mtu": null
+                },
+                {
+                    "vlan_vlan": 2018,
+                    "vlan_domain": 1,
+                    "vlan_name": "<private>",
+                    "vlan_type": null,
+                    "vlan_mtu": null
+                },
+                {
+                    "vlan_vlan": 2019,
+                    "vlan_domain": 1,
+                    "vlan_name": "<private>",
+                    "vlan_type": null,
+                    "vlan_mtu": null
+                },
+                {
+                    "vlan_vlan": 2100,
+                    "vlan_domain": 1,
+                    "vlan_name": "<private>",
+                    "vlan_type": null,
+                    "vlan_mtu": null
+                },
+                {
                     "vlan_vlan": 2512,
+                    "vlan_domain": 1,
+                    "vlan_name": "<private>",
+                    "vlan_type": null,
+                    "vlan_mtu": null
+                },
+                {
+                    "vlan_vlan": 2701,
                     "vlan_domain": 1,
                     "vlan_name": "<private>",
                     "vlan_type": null,
@@ -2908,6 +3009,142 @@
                     "untagged": 0
                 },
                 {
+                    "vlan": 2012,
+                    "baseport": 1,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 2012,
+                    "baseport": 5,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 2012,
+                    "baseport": 10,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 2012,
+                    "baseport": 11,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 2013,
+                    "baseport": 1,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 2013,
+                    "baseport": 5,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 2013,
+                    "baseport": 8,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 2013,
+                    "baseport": 10,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 2013,
+                    "baseport": 11,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 2015,
+                    "baseport": 8,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 2015,
+                    "baseport": 10,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 2018,
+                    "baseport": 5,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 2018,
+                    "baseport": 10,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 2019,
+                    "baseport": 5,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 2019,
+                    "baseport": 10,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 2100,
+                    "baseport": 10,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 2100,
+                    "baseport": 11,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
                     "vlan": 2512,
                     "baseport": 3,
                     "priority": 0,
@@ -2930,8 +3167,290 @@
                     "state": "unknown",
                     "cost": 0,
                     "untagged": 0
+                },
+                {
+                    "vlan": 2701,
+                    "baseport": 10,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 2701,
+                    "baseport": 11,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
                 }
             ]
         }
+    },
+    "processors": {
+        "discovery": {
+            "processors": [
+                {
+                    "entPhysicalIndex": 0,
+                    "hrDeviceIndex": 0,
+                    "processor_oid": ".1.3.6.1.4.1.890.1.5.8.47.11.7.0",
+                    "processor_index": "0",
+                    "processor_type": "zynos",
+                    "processor_usage": 6,
+                    "processor_descr": "Processor",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "sensors": {
+        "discovery": {
+            "sensors": [
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "fanspeed",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.890.1.5.8.47.8.1.1.2.1",
+                    "sensor_index": "fanRpmCurValue.1",
+                    "sensor_type": "zynos",
+                    "sensor_descr": "Fan 1 ()",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 6642,
+                    "sensor_limit": 11955.6,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": 5313.6,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "fanspeed",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.890.1.5.8.47.8.1.1.2.2",
+                    "sensor_index": "fanRpmCurValue.2",
+                    "sensor_type": "zynos",
+                    "sensor_descr": "Fan 2 ()",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 6758,
+                    "sensor_limit": 12164.4,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": 5406.4,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "temperature",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.890.1.5.8.47.8.2.1.2.1",
+                    "sensor_index": "tempCurValue.1",
+                    "sensor_type": "zynos",
+                    "sensor_descr": "Temp 1 ()",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 45,
+                    "sensor_limit": 65,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": 35,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "temperature",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.890.1.5.8.47.8.2.1.2.2",
+                    "sensor_index": "tempCurValue.2",
+                    "sensor_type": "zynos",
+                    "sensor_descr": "Temp 2 ()",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 52,
+                    "sensor_limit": 72,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": 42,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "temperature",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.890.1.5.8.47.8.2.1.2.3",
+                    "sensor_index": "tempCurValue.3",
+                    "sensor_type": "zynos",
+                    "sensor_descr": "Temp 3 ()",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 50,
+                    "sensor_limit": 70,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": 40,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "voltage",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.890.1.5.8.47.8.3.1.2.1",
+                    "sensor_index": "voltageCurValue.1",
+                    "sensor_type": "zynos",
+                    "sensor_descr": "mV ()",
+                    "group": null,
+                    "sensor_divisor": 1000,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 1.217,
+                    "sensor_limit": 1.39955,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": 1.03445,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "voltage",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.890.1.5.8.47.8.3.1.2.2",
+                    "sensor_index": "voltageCurValue.2",
+                    "sensor_type": "zynos",
+                    "sensor_descr": "mV ()",
+                    "group": null,
+                    "sensor_divisor": 1000,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 1.843,
+                    "sensor_limit": 2.11945,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": 1.56655,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "voltage",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.890.1.5.8.47.8.3.1.2.3",
+                    "sensor_index": "voltageCurValue.3",
+                    "sensor_type": "zynos",
+                    "sensor_descr": "mV ()",
+                    "group": null,
+                    "sensor_divisor": 1000,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 3.342,
+                    "sensor_limit": 3.8433,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": 2.8407,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "voltage",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.890.1.5.8.47.8.3.1.2.4",
+                    "sensor_index": "voltageCurValue.4",
+                    "sensor_type": "zynos",
+                    "sensor_descr": "mV ()",
+                    "group": null,
+                    "sensor_divisor": 1000,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 2.539,
+                    "sensor_limit": 2.91985,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": 2.15815,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "voltage",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.890.1.5.8.47.8.3.1.2.5",
+                    "sensor_index": "voltageCurValue.5",
+                    "sensor_type": "zynos",
+                    "sensor_descr": "mV ()",
+                    "group": null,
+                    "sensor_divisor": 1000,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 1.012,
+                    "sensor_limit": 1.1638,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": 0.8602,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                }
+            ],
+            "state_indexes": []
+        },
+        "poller": "matches discovery"
     }
 }

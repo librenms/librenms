@@ -77,9 +77,9 @@ $query = 'SELECT packages.name FROM packages,devices ';
 $param = array();
 
 if (!Auth::user()->hasGlobalRead()) {
-    $query .= " LEFT JOIN `devices_perms` AS `DP` ON `devices`.`device_id` = `DP`.`device_id`";
-    $sql_where .= " AND `DP`.`user_id`=?";
-    $param[] = Auth::id();
+    $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
+    $where .= " AND `D`.`device_id` IN " .dbGenPlaceholders(count($device_ids));
+    $param = array_merge($param, $device_ids);
 }
 
 $query .= " WHERE packages.device_id = devices.device_id AND packages.name LIKE '%".mres($_POST['package'])."%' $sql_where GROUP BY packages.name";
@@ -155,14 +155,14 @@ foreach ($ordered as $name => $entry) {
         }
     }
     if (sizeof($arch) > 0 && sizeof($vers) > 0) {
-?>
+        ?>
         <tr>
             <td><a href="<?php echo(generate_url(array('page'=>'packages','name'=>$name))); ?>"><?php echo $name; ?></a></td>
             <td><?php echo implode('<br/>', $vers); ?></td>
             <td><?php echo implode('<br/>', $arch); ?></td>
             <td><?php echo implode('<br/>', $devs); ?></td>
         </tr>
-<?php
+        <?php
     }
 }
 if ((int) ($count / $results) > 0 && $count != $results) {
@@ -170,7 +170,7 @@ if ((int) ($count / $results) > 0 && $count != $results) {
         <tr>
             <td colspan="6" align="center"><?php echo generate_pagination($count, $results, $page_number); ?></td>
         </tr>
-<?php
+    <?php
 }
 ?>
 

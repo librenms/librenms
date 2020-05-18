@@ -31,10 +31,8 @@ use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
 use LibreNMS\Tests\DBTestCase;
 
-class FgTrapLogRateThresholdTest extends DBTestCase
+class FmTrapLogRateThresholdTest extends SnmpTrapTestCase
 {
-    use DatabaseTransactions;
-
     public function testAvOversize()
     {
         $device = factory(Device::class)->create();

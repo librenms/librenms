@@ -8,13 +8,13 @@
                     "sysDescr": "Poseidon 4002 SNMP Supervisor v2.0.15",
                     "sysContact": null,
                     "version": null,
-                    "hardware": "",
+                    "hardware": null,
                     "features": null,
-                    "location": null,
                     "os": "hwg-poseidon",
                     "type": "environment",
                     "serial": null,
-                    "icon": "hwg-poseidon.png"
+                    "icon": "hwg-poseidon.png",
+                    "location": null
                 }
             ]
         },
@@ -28,11 +28,11 @@
                     "version": "2.0.1",
                     "hardware": "Poseidon 4002",
                     "features": null,
-                    "location": "<private>",
                     "os": "hwg-poseidon",
                     "type": "environment",
                     "serial": null,
-                    "icon": "hwg-poseidon.png"
+                    "icon": "hwg-poseidon.png",
+                    "location": "<private>"
                 }
             ]
         }

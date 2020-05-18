@@ -11,5 +11,5 @@
     $graph_array['type']    = 'device_sla';
     $graph_array['id']      = $vars['id'];
     require 'includes/html/print-graphrow.inc.php';
-?>
+    ?>
     </div>

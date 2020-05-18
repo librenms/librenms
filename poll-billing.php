@@ -11,6 +11,8 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
+use LibreNMS\Data\Store\Datastore;
+
 $init_modules = array();
 require __DIR__ . '/includes/init.php';
 
@@ -22,14 +24,13 @@ if (isset($argv[1]) && is_numeric($argv[1])) {
 }
 
 set_debug(isset($options['d']));
+Datastore::init();
 
 // Wait for schema update, as running during update can break update
 if (get_db_schema() < 107) {
     logfile("BILLING: Cannot continue until the database schema update to >= 107 is complete");
     exit(1);
 }
-
-rrdtool_initialize();
 
 $poller_start = microtime(true);
 echo "Starting Polling Session ... \n\n";
@@ -88,15 +89,30 @@ foreach ($query->get(['bill_id', 'bill_name']) as $bill) {
             $port_data['in_delta'] = '0';
             $port_data['out_delta'] = '0';
         }
+        //////////////////////////////////CountersValidation$DB-Update
+        echo "\nDB SNMP counters received.\n";
+        echo " in_measurement: ",$port_data['in_measurement']," out_measurement: ",$port_data['out_measurement'],"\n";
+        echo " The data types are --> in_measurement:".gettype($port_data['in_measurement'])." and out_measurement: ".gettype($port_data['out_measurement'])."\n";
+        //For debugging
+        logfile("\n****$now: ".$bill->bill_name."\nDB SNMP counters received.");
+        logfile("in_measurement: ".$port_data['in_measurement']."  out_measurement: ".$port_data['out_measurement']."\nThe data types are. in_measurement:".gettype($port_data['in_measurement'])." and out_measurement: ".gettype($port_data['out_measurement']));
+        logfile("IN_delta: ".$port_data['in_delta']." OUT_delta: ".$port_data['out_delta']."\nLast_IN_delta: ".$port_data['last_in_delta']." last_OUT_delta: ".$port_data['last_out_delta']);
 
-        // NOTE: casting to string for mysqli bug (fixed by mysqlnd)
-        $fields = array('timestamp' => $now, 'in_counter' => (string)set_numeric($port_data['in_measurement']), 'out_counter' => (string)set_numeric($port_data['out_measurement']), 'in_delta' => (string)set_numeric($port_data['in_delta']), 'out_delta' => (string)set_numeric($port_data['out_delta']));
-        if (dbUpdate($fields, 'bill_port_counters', "`port_id`='" . mres($port_id) . "' AND `bill_id`='$bill_id'") == 0) {
-            $fields['bill_id'] = $bill_id;
-            $fields['port_id'] = $port_id;
-            dbInsert($fields, 'bill_port_counters');
+        if (is_numeric($port_data['in_measurement']) && is_numeric($port_data['out_measurement'])) {
+            echo "Nice, valid counters 'in/out_measurement', lets use them\n";
+            logfile("Nice, valid counters 'in/out_measurement', lets use them");
+            // NOTE: casting to string for mysqli bug (fixed by mysqlnd)
+            $fields = array('timestamp' => $now, 'in_counter' => (string)set_numeric($port_data['in_measurement']), 'out_counter' => (string)set_numeric($port_data['out_measurement']), 'in_delta' => (string)set_numeric($port_data['in_delta']), 'out_delta' => (string)set_numeric($port_data['out_delta']));
+            if (dbUpdate($fields, 'bill_port_counters', "`port_id`='" . mres($port_id) . "' AND `bill_id`='$bill_id'") == 0) {
+                $fields['bill_id'] = $bill_id;
+                $fields['port_id'] = $port_id;
+                dbInsert($fields, 'bill_port_counters');
+            }
+        } else {
+            echo "WATCH out! - Wrong counters. Table 'bill_port_counters' not updated\n";
+            logfile("WATCH out! - Wrong counters. Table 'bill_port_counters' not updated");
         }
-
+        ////////////////////////////////EndCountersValidation&DB-Update
         $delta     = ($delta + $port_data['in_delta'] + $port_data['out_delta']);
         $in_delta  = ($in_delta + $port_data['in_delta']);
         $out_delta = ($out_delta + $port_data['out_delta']);
@@ -149,4 +165,4 @@ if ($poller_time > 300) {
 }
 echo "\nCompleted in $poller_time sec\n";
 
-rrdtool_close();
+Datastore::terminate();

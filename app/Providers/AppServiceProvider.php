@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\Sensor;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Log;
@@ -45,6 +46,7 @@ class AppServiceProvider extends ServiceProvider
         $this->bootCustomBladeDirectives();
         $this->bootCustomValidators();
         $this->configureMorphAliases();
+        $this->bootObservers();
     }
 
     private function bootCustomBladeDirectives()
@@ -58,16 +60,32 @@ class AppServiceProvider extends ServiceProvider
         Blade::if('admin', function () {
             return auth()->check() && auth()->user()->isAdmin();
         });
+
+        Blade::directive('deviceLink', function ($arguments) {
+            return "<?php echo \LibreNMS\Util\Url::deviceLink($arguments); ?>";
+        });
+
+        Blade::directive('deviceUrl', function ($arguments) {
+            return "<?php echo \LibreNMS\Util\Url::deviceUrl($arguments); ?>";
+        });
+
+        Blade::directive('portLink', function ($arguments) {
+            return "<?php echo \LibreNMS\Util\Url::portLink($arguments); ?>";
+        });
     }
 
     private function configureMorphAliases()
     {
-        Relation::morphMap([
+        $sensor_types = [];
+        foreach (Sensor::getTypes() as $sensor_type) {
+            $sensor_types[$sensor_type] = \App\Models\Sensor::class;
+        };
+        Relation::morphMap(array_merge([
             'interface' => \App\Models\Port::class,
             'sensor' => \App\Models\Sensor::class,
             'device' => \App\Models\Device::class,
             'device_group' => \App\Models\DeviceGroup::class,
-        ]);
+        ], $sensor_types));
     }
 
     private function registerFacades()
@@ -102,6 +120,11 @@ class AppServiceProvider extends ServiceProvider
         });
     }
 
+    private function bootObservers()
+    {
+        \App\Models\Device::observe(\App\Observers\DeviceObserver::class);
+    }
+
     private function bootCustomValidators()
     {
         Validator::extend('alpha_space', function ($attribute, $value) {
@@ -112,6 +135,10 @@ class AppServiceProvider extends ServiceProvider
             $ip = substr($value, 0, strpos($value, '/') ?: strlen($value)); // allow prefixes too
             return IP::isValid($ip) || Validate::hostname($value);
         }, __('The :attribute must a valid IP address/network or hostname.'));
+
+        Validator::extend('is_regex', function ($attribute, $value) {
+            return @preg_match($value, null) !== false;
+        }, __(':attribute is not a valid regular expression'));
 
         Validator::extend('zero_or_exists', function ($attribute, $value, $parameters, $validator) {
             if ($value === 0) {

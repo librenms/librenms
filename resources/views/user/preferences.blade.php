@@ -1,6 +1,6 @@
 @extends('layouts.librenmsv1')
 
-@section('title', __('Preferences'))
+@section('title', __('preferences.title'))
 
 @section('content')
 <div class="container">
@@ -54,7 +54,7 @@
     @endif
 
     <div class="panel panel-default panel-condensed">
-        <div class="panel-heading">@lang('Preferences')</div>
+        <div class="panel-heading">@lang('preferences.title')</div>
         <div class="panel-body">
             <form class="form-horizontal" role="form">
                 @csrf
@@ -170,7 +170,7 @@
                 <strong class="green">@lang('Global Viewing Access')</strong>
             @else
                 @forelse($devices as $device)
-                    {!! \LibreNMS\Util\Url::deviceLink($device) !!} <br />
+                    @deviceLink($device) <br />
                 @empty
                     <strong class="red">@lang('No access!')</strong>
                 @endforelse

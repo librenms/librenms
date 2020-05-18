@@ -199,12 +199,12 @@ if ($vars['view'] == 'paths') {
         }
 
         $host = @dbFetchRow('SELECT * FROM `ipv4_addresses` AS A, `ports` AS I, `devices` AS D WHERE A.ipv4_address = ? AND I.port_id = A.port_id AND D.device_id = I.device_id', [$path['mplsLspPathFailNodeAddr']]);
-        $destination = $lsp['mplsLspPathFailNodeAddr'];
+        $destination = $path['mplsLspPathFailNodeAddr'];
         if (is_array($host)) {
             $destination = generate_device_link($host, 0, array('tab' => 'routing', 'proto' => 'mpls'));
         }
         echo "<tr bgcolor=$bg_colour>
-            <td>" . generate_device_link($device, 0, array('tab' => 'routing', 'proto' => 'mpls')) . '</td>
+            <td>" . generate_device_link($device, 0, array('tab' => 'routing', 'proto' => 'mpls', 'view' => 'paths')) . '</td>
             <td>' . $path['mplsLspName'] . '</td>
             <td>' . $path['path_oid'] . '</td>
             <td>' . $path['mplsLspPathType'] . '</td>
@@ -269,7 +269,7 @@ if ($vars['view'] == 'sdps') {
             $destination = generate_device_link($host, 0, array('tab' => 'routing', 'proto' => 'mpls'));
         }
         echo "<tr bgcolor=$bg_colour>
-            <td>" . generate_device_link($device, 0, array('tab' => 'routing', 'proto' => 'mpls')) . '</td>
+            <td>" . generate_device_link($device, 0, array('tab' => 'routing', 'proto' => 'mpls', 'view' => 'sdps')) . '</td>
             <td>' . $sdp['sdp_oid'] . '</td>
             <td>' . $destination . '</td>
             <td>' . $sdp['sdpDelivery'] . '</td>
@@ -330,14 +330,14 @@ sapDown: The SAP associated with the service is down.">Oper State</a></th>
         if ($sdpbind['sdpBindAdminStatus'] == 'up') {
             $adminstate_status_color = 'success';
         }
-        if ($sdpbind['sdpBindOperStatus'] == 'up') {
+        if ($sdpbind['sdpBindAdminStatus'] == 'up' && $sdpbind['sdpBindOperStatus'] == 'up') {
             $operstate_status_color = 'success';
-        } else {
+        } elseif ($sdpbind['sdpBindAdminStatus'] == 'up' && $sdpbind['sdpBindOperStatus'] == 'down') {
             $operstate_status_color = 'danger';
         }
 
         echo "<tr bgcolor=$bg_colour>
-            <td>" . generate_device_link($device, 0, array('tab' => 'routing', 'proto' => 'mpls')) . '</td>
+            <td>" . generate_device_link($device, 0, array('tab' => 'routing', 'proto' => 'mpls', 'view' => 'sdpbinds')) . '</td>
             <td>' . $sdpbind['svcId'] . '</td>
             <td>' . $sdpbind['sdp_oid'] . ':' . $sdpbind['svc_oid'] . '</td>
             <td>' . $sdpbind['sdpBindType'] . '</td>
@@ -398,14 +398,23 @@ vprn services are up when the service is administratively up however routing fun
         if ($svc['svcAdminStatus'] == 'up') {
             $adminstate_status_color = 'success';
         }
-        if ($svc['svcOperStatus'] == 'up') {
+        if ($svc['svcAdminStatus'] == 'up' && $svc['svcOperStatus'] == 'up') {
             $operstate_status_color = 'success';
-        } else {
+        } elseif ($svc['svcAdminStatus'] == 'up' && $svc['svcOperStatus'] == 'down') {
             $operstate_status_color = 'danger';
         }
 
+        $fdb_usage_perc = $svc['svcTlsFdbNumEntries'] / $svc['svcTlsFdbTableSize'] * 100;
+        if ($fdb_usage_perc > 95) {
+            $fdb_status_color = 'danger';
+        } elseif ($fdb_usage_perc > 75) {
+            $fdb_status_color = 'warning';
+        } else {
+            $fdb_status_color = 'success';
+        }
+
         echo "<tr bgcolor=$bg_colour>
-            <td>" . generate_device_link($device, 0, array('tab' => 'routing', 'proto' => 'mpls')) . '</td>
+            <td>" . generate_device_link($device, 0, array('tab' => 'routing', 'proto' => 'mpls', 'view' => 'services')) . '</td>
             <td>' . $svc['svc_oid'] . '</td>
             <td>' . $svc['svcType'] . '</td>
             <td>' . $svc['svcCustId'] . '</td>
@@ -419,7 +428,7 @@ vprn services are up when the service is administratively up however routing fun
             <td>' . $svc['vrf_name'] . '</td>
             <td>' . $svc['svcTlsMacLearning'] . '</td>
             <td>' . $svc['svcTlsFdbTableSize'] . '</td>
-            <td>' . $svc['svcTlsFdbNumEntries'] . '</td>
+            <td><span class="label label-' . $fdb_status_color . '">' . $svc['svcTlsFdbNumEntries'] . '</td>
             <td>' . $svc['svcTlsStpAdminStatus'] . '</td>
             <td>' . $svc['svcTlsStpOperStatus'] . '</td>';
         echo '</tr>';
@@ -461,14 +470,14 @@ if ($vars['view'] == 'saps') {
         if ($sap['sapAdminStatus'] == 'up') {
             $adminstate_status_color = 'success';
         }
-        if ($sap['sapOperStatus'] == 'up') {
+        if ($sap['sapAdminStatus'] == 'up' && $sap['sapOperStatus'] == 'up') {
             $operstate_status_color = 'success';
-        } else {
+        } elseif ($sap['sapAdminStatus'] == 'up' && $sap['sapOperStatus'] == 'down') {
             $operstate_status_color = 'danger';
         }
 
         echo "<tr bgcolor=$bg_colour>
-            <td>" . generate_device_link($device, 0, array('tab' => 'routing', 'proto' => 'mpls')) . '</td>
+            <td>" . generate_device_link($device, 0, array('tab' => 'routing', 'proto' => 'mpls', 'view' => 'saps')) . '</td>
             <td>' . $sap['svc_oid'] . '</td>
             <td>' . generate_port_link($port) . '</td>
             <td>' . $sap['sapEncapValue'] . '</td>
