@@ -637,7 +637,7 @@ foreach ($ports as $port) {
         }
 
         // Correct invalid truth values from some devices.
-        if (!in_array($this_port['ifConnectorPresent'],$truth_array)) {
+        if (!in_array($this_port['ifConnectorPresent'], $truth_array)) {
             $this_port['ifConnectorPresent'] = 'false';
         }
 
