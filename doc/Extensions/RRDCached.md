@@ -226,7 +226,7 @@ OPTS="-s librenms"
 OPTS="$OPTS -l unix:///var/run/rrdcached.sock"
 OPTS="$OPTS -j /var/lib/rrdcached/journal/ -F"
 OPTS="$OPTS -b /opt/librenms/rrd/ -B"
-OPTS="$OPTS -w 1800 -z 1800 -f 3600 -t 4"
+OPTS="$OPTS -w 1800 -z 1800 -f 3600 -t 4 -U librenms -G librenms"
 ```
 
 3: Restart the rrdcached service
