@@ -28,6 +28,7 @@ namespace LibreNMS\OS;
 
 use LibreNMS\Device\Processor;
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
@@ -42,6 +43,7 @@ use LibreNMS\OS;
 use LibreNMS\Util\Rewrite;
 
 class ArubaInstant extends OS implements
+    OSDiscovery,
     ProcessorDiscovery,
     WirelessApCountDiscovery,
     WirelessApCountPolling,
@@ -53,6 +55,18 @@ class ArubaInstant extends OS implements
     WirelessPowerDiscovery,
     WirelessUtilizationDiscovery
 {
+    public function discoverOS(): void
+    {
+        $device = $this->getDeviceModel();
+
+        // ArubaOS (MODEL: 225), Version 8.4.0.0-8.4.0.0
+        // ArubaOS (MODEL: 105), Version 6.4.4.8-4.2.4.12
+        $badchars = ['(', ')', ',',];
+        [, , $device->hardware, , $device->version,] = str_replace($badchars, '', explode(' ', $device->sysDescr));
+
+        $device->serial = snmp_getnext($this->getDevice(), 'aiAPSerialNum', '-Oqv', 'AI-AP-MIB');
+    }
+
     /**
      * Discover processors.
      * Returns an array of LibreNMS\Device\Processor objects that have been discovered
