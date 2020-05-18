@@ -71,7 +71,7 @@ WRITE_JITTER=1800
 BASE_PATH=/opt/librenms/rrd/
 JOURNAL_PATH=/var/lib/rrdcached/journal/
 PIDFILE=/run/rrdcached.pid
-SOCKFILE=/var/run/rrdcached.sock
+SOCKFILE=/run/rrdcached.sock
 SOCKGROUP=librenms
 BASE_OPTIONS="-B -F -R"
 ```
