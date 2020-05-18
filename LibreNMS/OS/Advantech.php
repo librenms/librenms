@@ -19,6 +19,8 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
+ * @copyright  2020 Mikkel Mondrup Kristensen
+ * @author     Mikkel Mondrup Kristensen <mikkel@tdx.dk>
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */

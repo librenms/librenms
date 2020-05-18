@@ -19,6 +19,7 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
+ * @author     Christoph Zilian <czilian@hotmail.com>
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */

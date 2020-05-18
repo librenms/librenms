@@ -19,6 +19,8 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
+ * @copyright  2016 Neil Lathwood
+ * @author     Neil Lathwood <neil@lathwood.co.uk>
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
