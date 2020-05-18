@@ -28,7 +28,7 @@ class ApexPlus extends OS implements
     public function discoverOS(): void
     {
         $device = $this->getDeviceModel();
-        $device->version = snmp_get($this->getDevice(), '.1.3.6.1.4.1.5454.1.80.1.1.2.0', '-OQv');
+        $device->version = snmp_get($this->getDevice(), '.1.3.6.1.4.1.5454.1.80.1.1.2.0', '-OQv') ?: null;
         $device->hardware = 'Trango ' . $device->sysDescr;
     }
 
