@@ -230,7 +230,7 @@ function record_sensor_data($device, $all_sensors)
  */
 function poll_device($device, $force_module = false)
 {
-    global $device;
+    global $device, $graphs;
 
     $device_start = microtime(true);
 

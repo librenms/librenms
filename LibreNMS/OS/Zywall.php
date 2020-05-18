@@ -1,6 +1,6 @@
 <?php
 /**
- * Anyos.php
+ * Zywall.php
  *
  * -Description-
  *
@@ -26,15 +26,38 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
+use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\OS\Shared\Zyxel;
+use LibreNMS\RRD\RrdDefinition;
 
-class Anyos extends Zyxel implements OSDiscovery
+class Zywall extends Zyxel implements OSDiscovery, OSPolling
 {
     public function discoverOS(): void
     {
+        parent::discoverOS();
+
         $device = $this->getDeviceModel();
-        $device->version = $device->sysDescr;
-        // ZYXEL-MIB::p200Series.2.0
-        $device->serial = snmp_get($this->getDevice(), '.1.3.6.1.4.1.890.1.2.2.2.0', '-OQv');
+        $device->hardware = $device->hardware ?: $device->sysDescr;
+        // ZYXEL-ES-COMMON::sysSwVersionString.0
+        $pos = strpos($device->version, 'ITS');
+        if ($pos) {
+            $device->version = substr($device->version, 0, $pos);
+        }
+    }
+
+    public function pollOS()
+    {
+        $sessions = snmp_get($this->getDevice(), '.1.3.6.1.4.1.890.1.6.22.1.6.0', '-Ovq');
+        if (is_numeric($sessions)) {
+            $rrd_def = RrdDefinition::make()->addDataset('sessions', 'GAUGE', 0, 3000000);
+            $fields = [
+                'sessions' => $sessions,
+            ];
+            $tags = compact('rrd_def');
+            data_update($this->getDevice(), 'zywall-sessions', $tags, $fields);
+
+            global $graphs;
+            $graphs['zywall_sessions'] = true;
+        }
     }
 }

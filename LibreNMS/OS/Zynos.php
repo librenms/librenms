@@ -1,6 +1,6 @@
 <?php
 /**
- * Anyos.php
+ * Zynos.php
  *
  * -Description-
  *
@@ -28,13 +28,32 @@ namespace LibreNMS\OS;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\OS\Shared\Zyxel;
 
-class Anyos extends Zyxel implements OSDiscovery
+class Zynos extends Zyxel implements OSDiscovery
 {
-    public function discoverOS(): void
-    {
-        $device = $this->getDeviceModel();
-        $device->version = $device->sysDescr;
-        // ZYXEL-MIB::p200Series.2.0
-        $device->serial = snmp_get($this->getDevice(), '.1.3.6.1.4.1.890.1.2.2.2.0', '-OQv');
+public function discoverOS(): void
+{
+    parent::discoverOS();
+    $device = $this->getDeviceModel();
+
+    // if not already set, let's fill the gaps
+    if (empty($device->hardware)) {
+        $device->hardware = $device->sysDescr;
     }
+
+    if (empty($device->serial)) {
+        $serial_oids = [
+            '.1.3.6.1.4.1.890.1.5.8.20.1.10.0', // ZYXEL-GS4012F-MIB::sysSerialNumber.0
+            '.1.3.6.1.4.1.890.1.5.8.47.1.10.0', // ZYXEL-MGS3712-MIB::sysSerialNumber.0
+            '.1.3.6.1.4.1.890.1.5.8.55.1.10.0', // ZYXEL-GS2200-24-MIB::sysSerialNumber.0
+        ];
+        $serials = snmp_get_multi_oid($this->getDevice(), $serial_oids);
+
+        foreach ($serial_oids as $oid) {
+            if (!empty($serials[$oid])) {
+                $device->serial = $serials[$oid];
+                break;
+            }
+        }
+    }
+}
 }

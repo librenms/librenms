@@ -1,6 +1,6 @@
 <?php
 /**
- * Anyos.php
+ * Zyxel.php
  *
  * -Description-
  *
@@ -23,18 +23,24 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\OS;
+namespace LibreNMS\OS\Shared;
 
-use LibreNMS\Interfaces\Discovery\OSDiscovery;
-use LibreNMS\OS\Shared\Zyxel;
+use LibreNMS\OS;
 
-class Anyos extends Zyxel implements OSDiscovery
+class Zyxel extends OS
 {
     public function discoverOS(): void
     {
+        $oids = [
+            '.1.3.6.1.4.1.890.1.15.3.1.11.0', // ZYXEL-ES-COMMON::sysProductModel.0
+            '.1.3.6.1.4.1.890.1.15.3.1.6.0', // ZYXEL-ES-COMMON::sysSwVersionString.0
+            '.1.3.6.1.4.1.890.1.15.3.1.12.0', // ZYXEL-ES-COMMON::sysProductSerialNumber.0
+        ];
+        $data = snmp_get_multi_oid($this->getDevice(), $oids, '-OUQnt');
+
         $device = $this->getDeviceModel();
-        $device->version = $device->sysDescr;
-        // ZYXEL-MIB::p200Series.2.0
-        $device->serial = snmp_get($this->getDevice(), '.1.3.6.1.4.1.890.1.2.2.2.0', '-OQv');
+        $device->hardware = $data['.1.3.6.1.4.1.890.1.15.3.1.11.0'];
+        [$device->version,] = explode(' | ', $data['.1.3.6.1.4.1.890.1.15.3.1.6.0']);
+        $device->serial = $data['.1.3.6.1.4.1.890.1.15.3.1.12.0'];
     }
 }
