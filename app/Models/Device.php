@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Str;
-use LibreNMS\DB\Eloquent;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv4;
@@ -158,50 +157,6 @@ class Device extends BaseModel
             });
 
         return $query->exists();
-    }
-
-    public function loadOs()
-    {
-        \LibreNMS\Util\OS::loadDefinition($this->os);
-
-        // load ping os if snmp_disable
-        if ($this->snmp_disable) {
-            \LibreNMS\Util\OS::loadDefinition('ping');
-        }
-    }
-
-    /**
-     * Load all OS, optionally load just the OS used by existing devices
-     * Default cache time is 1 day. Controlled by os_def_cache_time.
-     *
-     * @param bool $existing Only load OS that have existing OS in the database
-     * @param bool $cached Load os definitions from the cache file
-     */
-    public static function loadAllOs($existing = false, $cached = true)
-    {
-        $install_dir = \LibreNMS\Config::get('install_dir');
-        $cache_file = $install_dir . '/cache/os_defs.cache';
-        if ($cached && is_file($cache_file) && (time() - filemtime($cache_file) < \LibreNMS\Config::get('os_def_cache_time'))) {
-            // Cached
-            $os_defs = unserialize(file_get_contents($cache_file));
-            if ($existing) {
-                // remove unneeded os
-                $exists = self::query()->distinct()->pluck('os')->flip()->all();
-                $os_defs = array_intersect_key($os_defs, $exists);
-            }
-            \LibreNMS\Config::set('os', array_replace_recursive($os_defs, \LibreNMS\Config::get('os')));
-        } else {
-            // load from yaml
-            if ($existing && Eloquent::isConnected()) {
-                $os_list = self::query()->distinct()->pluck('os');
-            } else {
-                $os_list = glob($install_dir . '/includes/definitions/*.yaml');
-            }
-            foreach ($os_list as $file) {
-                $os = basename($file, '.yaml');
-                \LibreNMS\Util\OS::loadDefinition($os);
-            }
-        }
     }
 
     /**
@@ -391,7 +346,6 @@ class Device extends BaseModel
 
     public function getIconAttribute($icon)
     {
-        $this->loadOs();
         return Str::start(Url::findOsImage($this->os, $this->features, $icon), 'images/os/');
     }
 

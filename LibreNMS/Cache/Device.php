@@ -111,7 +111,6 @@ class Device
             return new \App\Models\Device;
         }
 
-        $device->loadOs();
         $this->devices[$device->device_id] = $device;
         return $device;
     }
