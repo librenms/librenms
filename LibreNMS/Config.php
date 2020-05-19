@@ -185,10 +185,6 @@ class Config
                 return self::$config['os'][$os][$key];
             }
 
-            if (!Str::contains($key, '.')) {
-                return self::get($key, $default);
-            }
-
             $os_key = "os.$os.$key";
             if (self::has($os_key)) {
                 return self::get($os_key);
