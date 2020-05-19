@@ -49,11 +49,11 @@ class OspfNbrStateChange implements SnmptrapHandler
 
         $severity = 1;
 
-        if ($ospfNbr->ospfNbrState != full) { 
+        if ($ospfNbr->ospfNbrState != 'full') { 
             $severity = 5;
         }
 
-        Log::event("Ospf neighbor $ospfNbrIpAddr changed state to $ospfNbr->ospfNbrState", $device->device_id , 'trap', $severity);
+        Log::event("OSPF neighbor $ospfNbrIpAddr changed state to $ospfNbr->ospfNbrState", $device->device_id , 'trap', $severity);
 
         $ospfNbr->save();
     }

@@ -132,6 +132,22 @@ $factory->define(\App\Models\Vminfo::class, function (Faker\Generator $faker) {
     ];
 });
 
+$factory->define(\App\Models\OspfNbr::class, function (Faker\Generator $faker) {
+    return [
+        'id' => $faker->randomDigit,
+        'ospfNbrIpAddr' => $faker->ipv4,
+        'ospfNbrAddressLessIndex' => $faker->randomDigit,
+        'ospfNbrRtrId' => $faker->ipv4,
+        'ospfNbrOptions' => 0,
+        'ospfNbrPriority' => 1,
+        'ospfNbrEvents' => $faker->randomDigit,
+        'ospfNbrLsRetransQLen' => 0,
+        'ospfNbmaNbrStatus' => 'active',
+        'ospfNbmaNbrPermanence' => 'dynamic',
+        'ospfNbrHelloSuppressed'=> 'false',
+    ];
+});
+
 $factory->define(\App\Models\OspfPort::class, function (Faker\Generator $faker) {
     return [
         'id' => $faker->randomDigit,

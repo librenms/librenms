@@ -4,6 +4,10 @@
  *
  * -Description-
  *
+ * Unit test for the OspfIfStateChange SNMP trap handler. Will verify
+ * trap is properly logged and ospf_ports.ospfIfState is updated in the
+ * database.
+ * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -19,8 +23,8 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2019 Tony Murray
- * @author     Tony Murray <murraytony@gmail.com>
+ * @copyright  2020 KanREN, Inc
+ * @author     Heath Barnhart <hbarnhart@kanren.net>
  */
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
