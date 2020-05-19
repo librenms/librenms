@@ -818,7 +818,7 @@
                     "ifPhysAddress": "0080ea8ea583",
                     "ifHardType": null,
                     "ifLastChange": 30814,
-                    "ifVlan": "troll",
+                    "ifVlan": "3",
                     "ifTrunk": null,
                     "counter_in": null,
                     "counter_out": null,
