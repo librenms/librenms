@@ -202,7 +202,6 @@ class DeviceController extends TableController
      */
     private function getOsText($device)
     {
-        $device->loadOs();
         $os_text = Config::getOsSetting($device->os, 'text');
 
         if ($this->isDetailed()) {

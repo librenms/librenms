@@ -126,7 +126,7 @@ function parse_modules($type, $options)
         foreach (explode(',', $options['m']) as $module) {
             // parse submodules (only supported by some modules)
             if (Str::contains($module, '/')) {
-                list($module, $submodule) = explode('/', $module, 2);
+                [$module, $submodule] = explode('/', $module, 2);
                 $existing_submodules = Config::get("{$type}_submodules.$module", []);
                 $existing_submodules[] = $submodule;
                 Config::set("{$type}_submodules.$module", $existing_submodules);
@@ -1049,7 +1049,7 @@ function is_port_valid($port, $device)
         }
 
         // ifDescr should not be empty unless it is explicitly allowed
-        if (!Config::getOsSetting($device['os'], 'empty_ifdescr', false)) {
+        if (!Config::getOsSetting($device['os'], 'empty_ifdescr', Config::get('empty_ifdescr', false))) {
             d_echo("ignored: empty ifDescr\n");
             return false;
         }
@@ -1061,7 +1061,7 @@ function is_port_valid($port, $device)
     $ifType  = $port['ifType'];
     $ifOperStatus = $port['ifOperStatus'];
 
-    if (str_i_contains($ifDescr, Config::getOsSetting($device['os'], 'good_if'))) {
+    if (str_i_contains($ifDescr, Config::getOsSetting($device['os'], 'good_if', Config::get('good_if')))) {
         return true;
     }
 
@@ -1495,7 +1495,7 @@ function fping($host, $count = 3, $interval = 1000, $timeout = 500, $address_fam
     $output = $process->getErrorOutput();
 
     preg_match('#= (\d+)/(\d+)/(\d+)%(, min/avg/max = ([\d.]+)/([\d.]+)/([\d.]+))?$#', $output, $parsed);
-    list(, $xmt, $rcv, $loss, , $min, $avg, $max) = array_pad($parsed, 8, 0);
+    [, $xmt, $rcv, $loss, , $min, $avg, $max] = array_pad($parsed, 8, 0);
 
     if ($loss < 0) {
         $xmt = 1;

@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Str;
-use LibreNMS\DB\Eloquent;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv4;
@@ -29,17 +28,6 @@ class Device extends BaseModel
         'last_polled' => 'datetime',
         'status' => 'boolean',
     ];
-
-    /**
-     * Initialize this class
-     */
-    public static function boot()
-    {
-        parent::boot();
-        if (!app()->runningInConsole()) {
-            self::loadAllOs(true);
-        }
-    }
 
     // ---- Helper Functions ----
 
@@ -169,56 +157,6 @@ class Device extends BaseModel
             });
 
         return $query->exists();
-    }
-
-    public function loadOs($force = false)
-    {
-        $yaml_file = base_path('/includes/definitions/' . $this->os . '.yaml');
-
-        if ((!\LibreNMS\Config::getOsSetting($this->os, 'definition_loaded') || $force) && file_exists($yaml_file)) {
-            $os = \Symfony\Component\Yaml\Yaml::parse(file_get_contents($yaml_file));
-
-            \LibreNMS\Config::set("os.$this->os", array_replace_recursive($os, \LibreNMS\Config::get("os.$this->os", [])));
-            \LibreNMS\Config::set("os.$this->os.definition_loaded", true);
-        }
-    }
-
-    /**
-     * Load all OS, optionally load just the OS used by existing devices
-     * Default cache time is 1 day. Controlled by os_def_cache_time.
-     *
-     * @param bool $existing Only load OS that have existing OS in the database
-     * @param bool $cached Load os definitions from the cache file
-     */
-    public static function loadAllOs($existing = false, $cached = true)
-    {
-        $install_dir = \LibreNMS\Config::get('install_dir');
-        $cache_file = $install_dir . '/cache/os_defs.cache';
-        if ($cached && is_file($cache_file) && (time() - filemtime($cache_file) < \LibreNMS\Config::get('os_def_cache_time'))) {
-            // Cached
-            $os_defs = unserialize(file_get_contents($cache_file));
-            if ($existing) {
-                // remove unneeded os
-                $os_defs = array_diff_key($os_defs, self::distinct('os')->get('os')->toArray());
-            }
-            \LibreNMS\Config::set('os', array_replace_recursive($os_defs, \LibreNMS\Config::get('os')));
-        } else {
-            // load from yaml
-            if ($existing && Eloquent::isConnected()) {
-                $os_list = [];
-                foreach (self::distinct('os')->get('os')->toArray() as $os) {
-                    $os_list[] = $install_dir . '/includes/definitions/' . $os['os'] . '.yaml';
-                }
-            } else {
-                $os_list = glob($install_dir . '/includes/definitions/*.yaml');
-            }
-            foreach ($os_list as $file) {
-                if (is_readable($file)) {
-                    $tmp = \Symfony\Component\Yaml\Yaml::parse(file_get_contents($file));
-                    \LibreNMS\Config::set("os.{$tmp['os']}", array_replace_recursive($tmp, \LibreNMS\Config::get("os.{$tmp['os']}", [])));
-                }
-            }
-        }
     }
 
     /**
@@ -408,7 +346,6 @@ class Device extends BaseModel
 
     public function getIconAttribute($icon)
     {
-        $this->loadOs();
         return Str::start(Url::findOsImage($this->os, $this->features, $icon), 'images/os/');
     }
 

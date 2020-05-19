@@ -960,21 +960,21 @@ function get_toner_capacity($raw_capacity)
  */
 function ignore_storage($os, $descr)
 {
-    foreach (Config::getOsSetting($os, 'ignore_mount') as $im) {
+    foreach (Config::getCombined($os, 'ignore_mount', []) as $im) {
         if ($im == $descr) {
             d_echo("ignored $descr (matched: $im)\n");
             return true;
         }
     }
 
-    foreach (Config::getOsSetting($os, 'ignore_mount_string') as $ims) {
+    foreach (Config::getCombined($os, 'ignore_mount_string', []) as $ims) {
         if (Str::contains($descr, $ims)) {
             d_echo("ignored $descr (matched: $ims)\n");
             return true;
         }
     }
 
-    foreach (Config::getOsSetting($os, 'ignore_mount_regexp') as $imr) {
+    foreach (Config::getCombined($os, 'ignore_mount_regexp', []) as $imr) {
         if (preg_match($imr, $descr)) {
             d_echo("ignored $descr (matched: $imr)\n");
             return true;
