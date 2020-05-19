@@ -134,68 +134,13 @@ def get_config_data(install_dir):
 
 def db_open(db_socket, db_server, db_port, db_username, db_password, db_dbname):
     try:
+        options = dict(host=db_server, port=int(db_port), user=db_username, passwd=db_password, db=db_dbname)
+
         if db_socket:
-            database = MySQLdb.connect(host=db_server, unix_socket=db_socket, user=db_username, passwd=db_password,
-                                       db=db_dbname)
-        else:
-            database = MySQLdb.connect(host=db_server, port=db_port, user=db_username, passwd=db_password, db=db_dbname)
-        return database
+            options['unix_socket'] = db_socket
+
+        return MySQLdb.connect(**options)
     except Exception as dbexc:
         print('ERROR: Could not connect to MySQL database!')
         print('ERROR: %s' % dbexc)
         sys.exit(2)
-
-
-class DB:
-    conn = None
-
-    def __init__(self, db_socket, db_server, db_port, db_username, db_password, db_dbname):
-        self.db_socket = db_socket
-        self.db_server = db_server
-        self.db_port = db_port
-        self.db_username = db_username
-        self.db_password = db_password
-        self.db_dbname = db_dbname
-        self.in_use = threading.Lock()
-        self.connect()
-
-    def connect(self):
-        self.in_use.acquire(True)
-        while True:
-            try:
-                self.conn.close()
-            except:
-                pass
-
-            try:
-                if self.db_port == 0:
-                    self.conn = MySQLdb.connect(host=self.db_server, user=self.db_username, passwd=self.db_password, db=self.db_dbname)
-                else:
-                    self.conn = MySQLdb.connect(host=self.db_server, port=self.db_port, user=self.db_username, passwd=self.db_password,
-                                                db=self.db_dbname)
-                break
-            except (AttributeError, MySQLdb.OperationalError):
-                logger.warning('WARNING: MySQL Error, reconnecting.')
-                time.sleep(.5)
-
-        self.conn.autocommit(True)
-        self.conn.ping(True)
-        self.in_use.release()
-
-    def query(self, sql):
-        self.in_use.acquire(True)
-        while True:
-            try:
-                cursor = self.conn.cursor()
-                cursor.execute(sql)
-                ret = cursor.fetchall()
-                cursor.close()
-                self.in_use.release()
-                return ret
-            except (AttributeError, MySQLdb.OperationalError):
-                logger.warning('WARNING: MySQL Operational Error during query, reconnecting.')
-                self.in_use.release()
-                self.connect()
-            except (AttributeError, MySQLdb.ProgrammingError):
-                logger.warning('WARNING: MySQL Programming Error during query, attempting query again.')
-                cursor.close()
