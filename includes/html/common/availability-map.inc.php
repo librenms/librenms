@@ -218,13 +218,13 @@ if (defined('SHOW_SETTINGS')) {
                     $deviceLabelOld = 'availability-map-oldview-box-up';
                     $host_up_count++;
                 }
-                $updowntime = "" . ($device['uptime'] ? " - " : "") . formatUptime($device['uptime']);
+                $updowntime = ($device['uptime'] ? " - " : "") . formatUptime($device['uptime']);
             } else {
                 $deviceState = 'down';
                 $deviceLabel = 'label-danger';
                 $deviceLabelOld = 'availability-map-oldview-box-down';
                 $host_down_count++;
-                $updowntime = "" . ($device['last_polled'] ? " - " . formatUptime(time() - strtotime($device['last_polled'])) : "") ;
+                $updowntime = ($device['last_polled'] ? " - " . formatUptime(time() - strtotime($device['last_polled'])) : "") ;
             }
 
             if (AlertUtil::isMaintenance($device['device_id'])) {
