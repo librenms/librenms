@@ -1,6 +1,6 @@
 <?php
 
-$chas_oid = '.1.3.6.1.4.1.6486.800.1.1.1.1.1.1.1.2.1.'; // chasEntPhysOperStatus
+$chas_oid = '.1.3.6.1.4.1.6486.800.1.1.1.1.1.1.1.2.'; // chasEntPhysOperStatus
 $oids   = snmp_walk($device, 'chasEntPhysOperStatus', '-OQUse', 'ALCATEL-IND1-CHASSIS-MIB', 'nokia');
 foreach (explode("\n", $oids) as $chas_entry) {
     preg_match('/chasEntPhysOperStatus.(.) = (.+)/', $chas_entry, $data2); // entPhysicalName.284 = "5/PS-2"
