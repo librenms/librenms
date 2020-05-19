@@ -44,8 +44,8 @@ class SmokepingGenerateCommand extends LnmsCommand
     const IP6PROBE = 'lnmsFPing6-';
 
     // These entries are solely used to appease the smokeping config parser and serve no function
-    const DEFAULTIP4PROBE = 'lnmsFPing';
-    const DEFAULTIP6PROBE = 'lnmsFPing6';
+    const DEFAULTIP4PROBE = 'FPing';
+    const DEFAULTIP6PROBE = 'FPing6';
     const DEFAULTPROBE = self::DEFAULTIP4PROBE;
 
     /**
