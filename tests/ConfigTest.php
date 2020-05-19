@@ -33,7 +33,7 @@ class ConfigTest extends TestCase
 {
     private $config;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
         $this->config = new \ReflectionProperty(Config::class, 'config');
