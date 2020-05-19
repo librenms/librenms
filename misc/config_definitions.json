@@ -3859,6 +3859,19 @@
             "default": 86400,
             "type": "integer"
         },
+        "os_group.unix.over": {
+            "default": [
+                {
+                    "graph": "device_processor",
+                    "text": "Processor Usage"
+                },
+                {
+                    "graph": "device_ucd_memory",
+                    "text": "Memory Usage"
+                }
+            ],
+            "type": "array"
+        },
         "os_group.unix.processor_stacked": {
             "default": true,
             "type": "boolean"

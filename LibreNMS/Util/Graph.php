@@ -92,6 +92,7 @@ class Graph
             return $graphs;
         }
 
-        return Config::getOsSetting('default', 'over');
+        $os_group = Config::getOsSetting($device->os, 'group');
+        return Config::get("os_group.$os_group.over", Config::get('os.default.over'));
     }
 }
