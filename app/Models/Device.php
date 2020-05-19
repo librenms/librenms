@@ -171,26 +171,13 @@ class Device extends BaseModel
         return $query->exists();
     }
 
-    public function loadOs($force = false)
+    public function loadOs()
     {
-        $yaml_file = base_path('/includes/definitions/' . $this->os . '.yaml');
+        \LibreNMS\Util\OS::loadOsDefinition($this->os);
 
-        if ((!\LibreNMS\Config::getOsSetting($this->os, 'definition_loaded') || $force) && file_exists($yaml_file)) {
-            $os = \Symfony\Component\Yaml\Yaml::parse(file_get_contents($yaml_file));
-
-            \LibreNMS\Config::set("os.$this->os", array_replace_recursive($os, \LibreNMS\Config::get("os.$this->os", [])));
-            \LibreNMS\Config::set("os.$this->os.definition_loaded", true);
-        }
-
+        // load ping os if snmp_disable
         if ($this->snmp_disable) {
-            // load ping os if snmp_disable
-            $yaml_file = base_path('/includes/definitions/ping.yaml');
-            if ((!\LibreNMS\Config::getOsSetting('ping', 'definition_loaded') || $force) && file_exists($yaml_file)) {
-                $os = \Symfony\Component\Yaml\Yaml::parse(file_get_contents($yaml_file));
-
-                \LibreNMS\Config::set('os.ping', array_replace_recursive($os, \LibreNMS\Config::get('os.ping', [])));
-                \LibreNMS\Config::set('os.ping.definition_loaded', true);
-            }
+            \LibreNMS\Util\OS::loadOsDefinition('ping');
         }
     }
 

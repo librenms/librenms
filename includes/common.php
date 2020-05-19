@@ -1361,13 +1361,7 @@ function load_os(&$device)
         return;
     }
 
-    if (!Config::get("os.{$device['os']}.definition_loaded")) {
-        $tmp_os = Symfony\Component\Yaml\Yaml::parse(
-            file_get_contents(Config::get('install_dir') . '/includes/definitions/' . $device['os'] . '.yaml')
-        );
-
-        Config::set("os.{$device['os']}", array_replace_recursive($tmp_os, Config::get("os.{$device['os']}", [])));
-    }
+    \LibreNMS\Util\OS::loadOsDefinition($device['os']);
 
     // Set type to a predefined type for the OS if it's not already set
     $loaded_os_type = Config::get("os.{$device['os']}.type");
@@ -1383,8 +1377,6 @@ function load_os(&$device)
     } else {
         unset($device['os_group']);
     }
-
-    Config::set("os.{$device['os']}.definition_loaded", true);
 }
 
 /**
