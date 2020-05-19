@@ -83,7 +83,7 @@ function search_ports(\Illuminate\Http\Request $request)
     ->orderBy('ifName')
     ->get();
     $json = json_encode($ports);
-    die($json);
+    return $json;
 }
 function api_get_graph(array $vars)
 {
