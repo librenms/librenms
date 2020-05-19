@@ -46,12 +46,12 @@ class OspfIfStateChange implements SnmptrapHandler
         $ospfPort = $device->ospfPorts()->where('ospfIfIpAddress', $ospfIfIpAddress)->first();
 
         $port = $device->ports()->where('port_id', $ospfPort->port_id)->first();
-
+/*
         if (!$port) {
             Log::warning("Snmptrap linkDown: Could not find port at port_id $ospfPort->port_id for device: " . $device->hostname);
             return;
         }
-
+*/
         $ospfPort->ospfIfState = $trap->getOidData($trap->findOid('OSPF-MIB::ospfIfState'));
 
         switch($ospfPort->ospfIfState) {
@@ -74,19 +74,11 @@ class OspfIfStateChange implements SnmptrapHandler
                 $severity = 4;
                 break;
             case 'loopback':
-                $severity = 4;  
+                $severity = 4;
+                break; 
         }
 
-/*
-        if ($ospfPort->ospfIfState == 'full') { 
-            $severity = 1;
-        } elseif ($ospfPort->ospfIfState == 'down') {
-            $severity = 5;
-        } else {
-            $severity = 4;
-        }
-*/
-        Log::event("Ospf interface $port->ifName is $ospfPort->ospfIfState", $device->device_id , 'trap', $severity);
+        Log::event("OSPF interface $port->ifName is $ospfPort->ospfIfState", $device->device_id, 'trap', $severity);
 
         $ospfPort->save();
     }

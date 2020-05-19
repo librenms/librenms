@@ -132,6 +132,16 @@ $factory->define(\App\Models\Vminfo::class, function (Faker\Generator $faker) {
     ];
 });
 
+$factory->define(\App\Models\OspfPort::class, function (Faker\Generator $faker) {
+    return [
+        'id' => $faker->randomDigit,
+        'ospf_port_id' => $faker->randomDigit,
+        'ospfIfIpAddress' => $faker->ipv4,
+        'ospfAddressLessIf' => $faker->randomDigit,
+        'ospfIfAreaId' => '0.0.0.0',
+    ];
+});
+
 $factory->define(\App\Models\Component::class, function (Faker\Generator $faker) {
     return [
         'device_id' => $faker->randomDigit,
