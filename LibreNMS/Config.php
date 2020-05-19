@@ -170,7 +170,6 @@ class Config
 
     /**
      * Get a setting from the $config['os'] array using the os of the given device
-     * If that is not set, fallback to the same global config key
      *
      * @param string $os The os name
      * @param string $key period separated config variable name
@@ -196,7 +195,7 @@ class Config
             }
         }
 
-        return self::get($key, $default);
+        return $default;
     }
 
     /**
@@ -212,7 +211,7 @@ class Config
     public static function getCombined($os, $key, $default = array())
     {
         if (!self::has($key)) {
-            return self::get("os.$os.$key", $default);
+            return self::getOsSetting($os, $key, $default);
         }
 
         if (!isset(self::$config['os'][$os][$key])) {
