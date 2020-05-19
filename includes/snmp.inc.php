@@ -274,7 +274,7 @@ function snmp_get($device, $oid, $options = null, $mib = null, $mibdir = null)
     }
 
     $cmd = gen_snmpget_cmd($device, $oid, $options, $mib, $mibdir);
-    $data = trim(external_exec($cmd), "\" \n\r");
+    $data = trim(external_exec($cmd), "\\\" \n\r");
 
     recordSnmpStatistic('snmpget', $time_start);
     if (preg_match('/(No Such Instance|No Such Object|No more variables left|Authentication failure)/i', $data)) {
