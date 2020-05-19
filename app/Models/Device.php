@@ -270,6 +270,11 @@ class Device extends BaseModel
         return Time::formatInterval($this->uptime, $short);
     }
 
+    public function formatDowntime($short = false)
+    {
+        return Time::formatInterval(time() - $this->last_polled, $short);
+    }
+
     /**
      * @return string
      */

@@ -195,9 +195,9 @@ if (defined('SHOW_SETTINGS')) {
         $sql .= " ORDER BY `".$deviceOrderBy."`";
 
         $temp_output = array();
-        $updowntime = "";
 
         foreach (dbFetchRows($sql, $param) as $device) {
+            $updowntime = "";
             if ($device['disabled'] == '1') {
                 $deviceState = "disabled";
                 $deviceLabel = "blackbg";
