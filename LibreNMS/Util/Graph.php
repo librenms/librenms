@@ -81,4 +81,17 @@ class Graph
     {
         return Config::get("graph_types.$type.$subtype.section") == 'mib';
     }
+
+    public static function getOverviewGraphsForDevice($device)
+    {
+        if ($device->snmp_disable) {
+            return Config::getOsSetting('ping', 'over');
+        }
+
+        if ($graphs = Config::getOsSetting($device->os, 'over')) {
+            return $graphs;
+        }
+
+        return Config::getOsSetting('default', 'over');
+    }
 }

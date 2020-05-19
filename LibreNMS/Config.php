@@ -180,6 +180,8 @@ class Config
     public static function getOsSetting($os, $key, $default = null)
     {
         if ($os) {
+            \LibreNMS\Util\OS::loadDefinition($os);
+
             if (isset(self::$config['os'][$os][$key])) {
                 return self::$config['os'][$os][$key];
             }

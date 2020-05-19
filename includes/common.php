@@ -1361,7 +1361,7 @@ function load_os(&$device)
         return;
     }
 
-    \LibreNMS\Util\OS::loadOsDefinition($device['os']);
+    \LibreNMS\Util\OS::loadDefinition($device['os']);
 
     // Set type to a predefined type for the OS if it's not already set
     $loaded_os_type = Config::get("os.{$device['os']}.type");

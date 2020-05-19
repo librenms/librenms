@@ -31,19 +31,20 @@ use Symfony\Component\Yaml\Yaml;
 class OS
 {
     /**
-     * Load os from yaml into config, preserving user os config
+     * Load os from yaml into config if not already loaded, preserving user os config
      * @param string $os
      * @param bool $force (reload the config)
      */
-    public static function loadOsDefinition($os)
+    public static function loadDefinition($os)
     {
-        $yaml_file = base_path("/includes/definitions/$os.yaml");
+        if (!Config::get("os.$os.definition_loaded")) {
+            $yaml_file = base_path("/includes/definitions/$os.yaml");
+            if (file_exists($yaml_file)) {
+                $os_def = Yaml::parse(file_get_contents($yaml_file));
 
-        if (!Config::getOsSetting($os, 'definition_loaded') && file_exists($yaml_file)) {
-            $os_def = Yaml::parse(file_get_contents($yaml_file));
-
-            Config::set("os.$os", array_replace_recursive($os_def, Config::get("os.$os", [])));
-            Config::set("os.$os.definition_loaded", true);
+                Config::set("os.$os", array_replace_recursive($os_def, Config::get("os.$os", [])));
+                Config::set("os.$os.definition_loaded", true);
+            }
         }
     }
 }

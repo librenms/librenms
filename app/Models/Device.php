@@ -30,17 +30,6 @@ class Device extends BaseModel
         'status' => 'boolean',
     ];
 
-    /**
-     * Initialize this class
-     */
-    public static function boot()
-    {
-        parent::boot();
-        if (!app()->runningInConsole()) {
-            self::loadAllOs(true);
-        }
-    }
-
     // ---- Helper Functions ----
 
     public static function findByHostname($hostname)
@@ -173,11 +162,11 @@ class Device extends BaseModel
 
     public function loadOs()
     {
-        \LibreNMS\Util\OS::loadOsDefinition($this->os);
+        \LibreNMS\Util\OS::loadDefinition($this->os);
 
         // load ping os if snmp_disable
         if ($this->snmp_disable) {
-            \LibreNMS\Util\OS::loadOsDefinition('ping');
+            \LibreNMS\Util\OS::loadDefinition('ping');
         }
     }
 
@@ -197,24 +186,20 @@ class Device extends BaseModel
             $os_defs = unserialize(file_get_contents($cache_file));
             if ($existing) {
                 // remove unneeded os
-                $os_defs = array_diff_key($os_defs, self::distinct('os')->get('os')->toArray());
+                $exists = self::query()->distinct()->pluck('os')->flip()->all();
+                $os_defs = array_intersect_key($os_defs, $exists);
             }
             \LibreNMS\Config::set('os', array_replace_recursive($os_defs, \LibreNMS\Config::get('os')));
         } else {
             // load from yaml
             if ($existing && Eloquent::isConnected()) {
-                $os_list = [];
-                foreach (self::distinct('os')->get('os')->toArray() as $os) {
-                    $os_list[] = $install_dir . '/includes/definitions/' . $os['os'] . '.yaml';
-                }
+                $os_list = self::query()->distinct()->pluck('os');
             } else {
                 $os_list = glob($install_dir . '/includes/definitions/*.yaml');
             }
             foreach ($os_list as $file) {
-                if (is_readable($file)) {
-                    $tmp = \Symfony\Component\Yaml\Yaml::parse(file_get_contents($file));
-                    \LibreNMS\Config::set("os.{$tmp['os']}", array_replace_recursive($tmp, \LibreNMS\Config::get("os.{$tmp['os']}", [])));
-                }
+                $os = basename($file, '.yaml');
+                \LibreNMS\Util\OS::loadDefinition($os);
             }
         }
     }
