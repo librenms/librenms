@@ -26,7 +26,7 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', env('DBTEST') ? 'testing_mysql' : 'mysql'),
+    'default' => env('DB_CONNECTION', env('DBTEST') ? 'testing' : 'mysql'),
 
     /*
     |--------------------------------------------------------------------------
@@ -74,7 +74,7 @@ return [
             ]) : [],
         ],
 
-        'testing_mysql' => [
+        'testing' => [
             'driver' => env('DB_TEST_DRIVER', 'mysql'),
             'host' => env('DB_TEST_HOST', 'localhost'),
             'port' => env('DB_TEST_PORT', ''),
@@ -117,7 +117,7 @@ return [
             'prefix_indexes' => true,
         ],
 
-        'testing' => [
+        'testing_memory' => [
             'driver'   => 'sqlite',
             'database' => ':memory:',
             'prefix'   => '',

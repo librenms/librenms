@@ -31,7 +31,7 @@ use DB;
 class DBSetupTest extends DBTestCase
 {
     protected $db_name;
-    protected $connection = 'testing_mysql';
+    protected $connection = 'testing';
 
     protected function setUp(): void
     {
