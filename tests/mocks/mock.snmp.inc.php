@@ -51,15 +51,7 @@ function cache_snmprec($file)
         } elseif ($type == '6') {
             $data = trim($data, '.');
         } elseif ($type == '4x') {
-            try {
-                $data = hex2str($data);
-            } catch (Exception $e) {
-                if ($data === "<private>") {
-                    $data = trim($data);
-                } else {
-                    throw new Exception(sprintf('snmprec may be faulty - \'%s\' claimed to be \'4x\', but data was \'%s\'', $oid, $data));
-                }
-            }
+            $data = hex2str($data);
         }
 
         $snmpMockCache[$file][$oid] = array($type, $data);

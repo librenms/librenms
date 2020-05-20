@@ -487,7 +487,7 @@ class ModuleTestHelper
         foreach ($private_oid as $oid) {
             if (isset($data[$oid])) {
                 $parts = explode('|', $data[$oid], 3);
-                $parts[2] = '<private>';
+                $parts[2] = $parts[1] === '4' ? '<private>' : '3C707269766174653E';
                 $data[$oid] = implode('|', $parts);
             }
         }
