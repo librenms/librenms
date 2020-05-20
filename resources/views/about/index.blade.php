@@ -43,6 +43,10 @@
                     <td>{{ $version_php }}</td>
                 </tr>
                 <tr>
+                    <td><b>@lang('Laravel')</b></td>
+                    <td>{{ $version_laravel }}</td>
+                </tr>
+                <tr>
                     <td><b>@lang('Python')</b></td>
                     <td>{{ $version_python }}</td>
                 </tr>
@@ -80,7 +84,6 @@
           <b>Dennis de Houx</b> Application monitors for PowerDNS, Shoutcast, NTPD (Client, Server).<br />
           <b>Erik Bosrup</b> Overlib Library.<br />
           <b>Jonathan De Graeve</b> SNMP code improvements.<br />
-          <b>Mark James</b> Silk Iconset.<br />
           <b>Observium</b> Codebase for fork.<br />
 
       </div>
