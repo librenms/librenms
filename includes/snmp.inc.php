@@ -1387,7 +1387,7 @@ function snmpwalk_array_num($device, $oid, $indexes = 1)
 function get_device_max_repeaters($device)
 {
     return $device['attribs']['snmp_max_repeaters'] ??
-        Config::getOsSetting($device['os'], 'snmp.max_repeaters', false);
+        Config::getOsSetting($device['os'], 'snmp.max_repeaters', Config::get('snmp.max_repeaters', false));
 }
 
 /**

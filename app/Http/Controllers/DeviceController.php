@@ -12,6 +12,7 @@ use Gate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use LibreNMS\Config;
+use LibreNMS\Util\Graph;
 use LibreNMS\Util\Url;
 
 class DeviceController extends Controller
@@ -130,25 +131,13 @@ class DeviceController extends Controller
         ];
 
         $graphs = [];
-        foreach ($this->getDeviceGraphs($device) as $graph) {
+        foreach (Graph::getOverviewGraphsForDevice($device) as $graph) {
             $graph_array['type'] = $graph['graph'];
             $graph_array['popup_title'] = __($graph['text']);
             $graphs[] = $graph_array;
         }
 
         return $graphs;
-    }
-
-    private function getDeviceGraphs(Device $device)
-    {
-        if ($device->snmp_disable) {
-            return Config::get('os.ping.over');
-        } elseif (Config::has("os.$device->os.over")) {
-            return Config::get("os.$device->os.over");
-        }
-
-        $os_group = Config::getOsSetting($device->os, 'group');
-        return Config::get("os.$os_group.over", Config::get('os.default.over'));
     }
 
     private function deviceLinkMenu(Device $device)

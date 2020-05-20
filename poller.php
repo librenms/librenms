@@ -115,7 +115,7 @@ EOH;
     if (isset($options['v'])) {
         $vdebug = true;
     }
-    update_os_cache(true); // Force update of OS Cache
+    \LibreNMS\Util\OS::updateCache(true); // Force update of OS Cache
 }
 
 // If we've specified modules with -m, use them

@@ -82,7 +82,6 @@ class DeviceFieldController extends SelectController
 
         $text = $device[$field];
         if ($field == 'os') {
-            $device->loadOs();
             $text = Config::getOsSetting($text, 'text');
         } elseif ($field == 'type') {
             $text = ucfirst($text);

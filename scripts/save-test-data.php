@@ -128,7 +128,7 @@ try {
         }
         echo PHP_EOL;
 
-        update_os_cache(true); // Force update of OS Cache
+        \LibreNMS\Util\OS::updateCache(true); // Force update of OS Cache
         $tester = new ModuleTestHelper($modules, $target_os, $target_variant);
         if (!$no_save && !empty($output_file)) {
             $tester->setJsonSavePath($output_file);

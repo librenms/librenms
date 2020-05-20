@@ -124,7 +124,7 @@ try {
 
 
     echo "Capturing Data: ";
-    update_os_cache(true); // Force update of OS Cache
+    \LibreNMS\Util\OS::updateCache(true); // Force update of OS Cache
     $capture->captureFromDevice($device['device_id'], true, $prefer_new_snmprec);
 } catch (InvalidModuleException $e) {
     echo $e->getMessage() . PHP_EOL;

@@ -21,6 +21,7 @@ use LibreNMS\Exceptions\HostUnreachablePingException;
 use LibreNMS\Exceptions\InvalidPortAssocModeException;
 use LibreNMS\Exceptions\LockException;
 use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
+use LibreNMS\Fping;
 use LibreNMS\Util\IPv4;
 use LibreNMS\Util\IPv6;
 use LibreNMS\Util\MemcacheLock;
@@ -126,7 +127,7 @@ function parse_modules($type, $options)
         foreach (explode(',', $options['m']) as $module) {
             // parse submodules (only supported by some modules)
             if (Str::contains($module, '/')) {
-                list($module, $submodule) = explode('/', $module, 2);
+                [$module, $submodule] = explode('/', $module, 2);
                 $existing_submodules = Config::get("{$type}_submodules.$module", []);
                 $existing_submodules[] = $submodule;
                 Config::set("{$type}_submodules.$module", $existing_submodules);
@@ -676,7 +677,7 @@ function isPingable($hostname, $address_family = 'ipv4', $attribs = [])
         ];
     }
 
-    $status = fping(
+    $status = app()->make(Fping::class)->ping(
         $hostname,
         Config::get('fping_options.count', 3),
         Config::get('fping_options.interval', 500),
@@ -1049,7 +1050,7 @@ function is_port_valid($port, $device)
         }
 
         // ifDescr should not be empty unless it is explicitly allowed
-        if (!Config::getOsSetting($device['os'], 'empty_ifdescr', false)) {
+        if (!Config::getOsSetting($device['os'], 'empty_ifdescr', Config::get('empty_ifdescr', false))) {
             d_echo("ignored: empty ifDescr\n");
             return false;
         }
@@ -1061,7 +1062,7 @@ function is_port_valid($port, $device)
     $ifType  = $port['ifType'];
     $ifOperStatus = $port['ifOperStatus'];
 
-    if (str_i_contains($ifDescr, Config::getOsSetting($device['os'], 'good_if'))) {
+    if (str_i_contains($ifDescr, Config::getOsSetting($device['os'], 'good_if', Config::get('good_if')))) {
         return true;
     }
 
@@ -1457,70 +1458,6 @@ function device_has_ip($ip)
     }
 
     return false; // not an ipv4 or ipv6 address...
-}
-
-/**
- * Run fping against a hostname/ip in count mode and collect stats.
- *
- * @param string $host
- * @param int $count (min 1)
- * @param int $interval (min 20)
- * @param int $timeout (not more than $interval)
- * @param string $address_family ipv4 or ipv6
- * @return array
- */
-function fping($host, $count = 3, $interval = 1000, $timeout = 500, $address_family = 'ipv4')
-{
-    // Default to ipv4
-    $fping_name = $address_family == 'ipv6' ? 'fping6' : 'fping';
-    $interval = max($interval, 20);
-
-    // build the command
-    $cmd = [
-        Config::get($fping_name, $fping_name),
-        '-e',
-        '-q',
-        '-c',
-        max($count, 1),
-        '-p',
-        $interval,
-        '-t',
-        max($timeout, $interval),
-        $host
-    ];
-
-    $process = app()->make(Process::class, ['command' => $cmd]);
-    d_echo('[FPING] ' . $process->getCommandLine() . PHP_EOL);
-    $process->run();
-    $output = $process->getErrorOutput();
-
-    preg_match('#= (\d+)/(\d+)/(\d+)%(, min/avg/max = ([\d.]+)/([\d.]+)/([\d.]+))?$#', $output, $parsed);
-    list(, $xmt, $rcv, $loss, , $min, $avg, $max) = array_pad($parsed, 8, 0);
-
-    if ($loss < 0) {
-        $xmt = 1;
-        $rcv = 1;
-        $loss = 100;
-    }
-
-    $response = [
-        'xmt'  => (int)$xmt,
-        'rcv'  => (int)$rcv,
-        'loss' => (int)$loss,
-        'min'  => (float)$min,
-        'max'  => (float)$max,
-        'avg'  => (float)$avg,
-        'dup'  => substr_count($output, 'duplicate'),
-        'exitcode' => $process->getExitCode(),
-    ];
-    d_echo($response);
-
-    return $response;
-}
-
-function function_check($function)
-{
-    return function_exists($function);
 }
 
 /**

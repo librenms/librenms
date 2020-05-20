@@ -27,12 +27,15 @@ namespace LibreNMS\Tests;
 
 use Illuminate\Support\Str;
 use LibreNMS\Config;
+use LibreNMS\Util\OS;
+use const false;
+use const true;
 
 class OSDiscoveryTest extends TestCase
 {
     private static $unchecked_files;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         parent::setUpBeforeClass();
 
@@ -145,7 +148,7 @@ class OSDiscoveryTest extends TestCase
         // make sure all OS are loaded
         $config_os = array_keys(Config::get('os'));
         if (count($config_os) < count(glob(Config::get('install_dir').'/includes/definitions/*.yaml'))) {
-            load_all_os();
+            OS::loadAllDefinitions(false, true);
             $config_os = array_keys(Config::get('os'));
         }
 

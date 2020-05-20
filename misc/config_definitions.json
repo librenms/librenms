@@ -4996,6 +4996,34 @@
         "xirrus_disable_stations": {
             "default": false,
             "type": "boolean"
+        },
+        "smokeping_integration": {
+            "default": false,
+            "group": "external",
+            "section": "smokeping",
+            "order": 0,
+            "type": "boolean"
+        },
+        "smokeping_dir": {
+            "default": "/var/lib/smokeping/rrd",
+            "group": "external",
+            "section": "smokeping",
+            "order": 1,
+            "type": "text"
+        },
+        "smokeping_pings": {
+            "default": 5,
+            "group": "external",
+            "section": "smokeping",
+            "order": 2,
+            "type": "integer",
+            "units": "pings"
+        },
+        "smokeping_url": {
+            "group": "external",
+            "section": "smokeping",
+            "order": 3,
+            "type": "text"
         }
     }
 }

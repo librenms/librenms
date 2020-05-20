@@ -4,7 +4,7 @@
     @if($data['smokeping']->hasGraphs())
         <div class="panel with-nav-tabs panel-default">
             <div class="panel-heading">
-                <span class="panel-title">@lang('Smokeping')</span>
+                <a href="{{ \LibreNMS\Config::get('smokeping.url') }}?target={{ $device->type }}.{{ str_replace('.','_',$device->hostname) }}" target="_blank"><span class="panel-title">@lang('Smokeping') <i class="glyphicon glyphicon-share-alt"></i></span></a>
                 <ul class="nav nav-tabs" style="display: inline-block">
                     @foreach($data['smokeping_tabs'] as $tab)
                         <li @if($loop->first) class="active" @endif><a href="#{{ $tab }}" data-toggle="tab">@lang('smokeping.' . $tab)</a></li>

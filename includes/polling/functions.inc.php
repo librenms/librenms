@@ -555,7 +555,7 @@ function get_main_serial($device)
  * The special group "none" will not be prefixed.
  *
  * @param array $app app from the db, including app_id
- * @param string $response This should be the full output
+ * @param string $response This should be the return state of Application polling
  * @param array $metrics an array of additional metrics to store in the database for alerting
  * @param string $status This is the current value for alerting
  */
@@ -577,13 +577,45 @@ function update_application($app, $response, $metrics = array(), $status = '')
             'Traceback (most recent call last):',
         ))) {
             $data['app_state'] = 'ERROR';
+        } elseif (in_array($response, ['OK', 'ERROR', 'LEGACY', 'UNSUPPORTED'])) {
+            $data['app_state'] = $response;
         } else {
+            # should maybe be 'unknown' as state
             $data['app_state'] = 'OK';
         }
     }
 
     if ($data['app_state'] != $app['app_state']) {
         $data['app_state_prev'] = $app['app_state'];
+
+        $device = dbFetchRow('SELECT * FROM devices LEFT JOIN applications ON devices.device_id=applications.device_id WHERE applications.app_id=?', array($app['app_id']));
+
+        $app_name = \LibreNMS\Util\StringHelpers::nicecase($app['app_type']);
+
+        # $severity 1: ok, 2: info, 3: notice, 4: warning, 5: critical, 0: unknown
+        switch ($data['app_state']) {
+            case 'OK':
+                $severity = 1;
+                $event_msg = "changed to OK";
+                break;
+            case 'ERROR':
+                $severity = 5;
+                $event_msg = "ends with ERROR";
+                break;
+            case 'LEGACY':
+                $severity = 4;
+                $event_msg = "Client Agent is deprecated";
+                break;
+            case 'UNSUPPORTED':
+                $severity = 5;
+                $event_msg = "Client Agent Version is not supported";
+                break;
+            default:
+                $severity = 0;
+                $event_msg = "has UNKNOWN state";
+                break;
+        }
+        log_event("Application ".$app_name." ".$event_msg, $device, 'application', $severity);
     }
     dbUpdate($data, 'applications', '`app_id` = ?', array($app['app_id']));
 
