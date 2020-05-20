@@ -26,13 +26,27 @@
 namespace LibreNMS\Tests\Unit;
 
 use Artisan;
+use Illuminate\Database\QueryException;
 use LibreNMS\Tests\TestCase;
 
 class SqliteTest extends TestCase
 {
+    private $connection = 'testing';
+
     public function testMigrationsRunWithoutError()
     {
-        $result = Artisan::call('migrate', ['--database' => 'testing', '--seed' => true]);
-        $this->assertEquals(0, $result, "SQlite migration failed:\n" . Artisan::output());
+        try {
+            $result = Artisan::call('migrate', ['--database' => $this->connection, '--seed' => true]);
+            $output = Artisan::output();
+
+            $this->assertEquals(0, $result, "SQlite migration failed:\n$output");
+            $this->assertNotEmpty($output, 'Migrations not run');
+        } catch (QueryException $queryException) {
+            preg_match('/Migrating: (\w+)$/', Artisan::output(), $matches);
+            $this->fail("Could not run migration {$matches[1]}) on SQlite\n\n" . $queryException->getMessage());
+        }
+
+        $count = \DB::connection($this->connection)->table('alert_templates')->count();
+        $this->assertGreaterThan(0, $count, 'Database content check failed.');
     }
 }
