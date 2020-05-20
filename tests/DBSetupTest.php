@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Tests;
 
+use Artisan;
 use DB;
 
 class DBSetupTest extends DBTestCase
@@ -40,13 +41,13 @@ class DBSetupTest extends DBTestCase
 
     public function testSetupDB()
     {
-        $result = \Artisan::call('migrate:fresh', [
+        $result = Artisan::call('migrate:fresh', [
             '--seed' => true,
             '--env' => 'testing',
             '--database' => $this->connection
         ]);
 
-        $this->assertSame(0, $result, "Errors loading DB Schema: " . \Artisan::output());
+        $this->assertSame(0, $result, "Errors loading DB Schema: " . Artisan::output());
     }
 
     public function testSchemaFiles()
