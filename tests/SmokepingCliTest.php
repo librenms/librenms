@@ -90,7 +90,8 @@ class SmokepingCliTest extends \LibreNMS\Tests\TestCase
         parent::setUp();
     }
 
-    public function testNonsense() {
+    public function testNonsense()
+    {
         $this->assertNotEquals(0, \Artisan::call('smokeping:generate --probes --targets --no-header'));
         $this->assertNotEquals(0, \Artisan::call('smokeping:generate --probes --targets --single-process'));
         $this->assertNotEquals(0, \Artisan::call('smokeping:generate --probes --targets'));
