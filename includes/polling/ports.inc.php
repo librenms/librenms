@@ -634,10 +634,6 @@ foreach ($ports as $port) {
         // Fixed invalid truth values for some devices.
         if ($this_port['ifConnectorPresent'] !== 'true') {
             $this_port['ifConnectorPresent'] = 'false';
-        } 
-        
-        if (!in_array($this_port['ifConnectorPresent'], $truth_array)) {
-            $this_port['ifConnectorPresent'] = 'false';
         }
 
         // FIXME use $q_bridge_mib[$this_port['ifIndex']] to see if it is a trunk (>1 array count)
