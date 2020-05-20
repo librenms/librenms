@@ -22,8 +22,6 @@ use LibreNMS\Util\Git;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Laravel;
 use LibreNMS\Util\OS;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 
 function generate_priority_label($priority)
 {
@@ -1183,8 +1181,8 @@ function get_port_id($ports_mapped, $port, $port_association_mode)
  */
 function ResolveGlues($tables, $target, $x = 0, $hist = array(), $last = array())
 {
-    if (count($tables) == 1 && $x != 0) {
-        if (Schema::hasColumn($tables[0], $target)) {
+    if (sizeof($tables) == 1 && $x != 0) {
+        if (dbFetchCell('SELECT 1 FROM information_schema.COLUMNS WHERE TABLE_NAME = ? && COLUMN_NAME = ?', array($tables[0],$target)) == 1) {
             return array_merge($last, array($tables[0].'.'.$target));
         } else {
             return false;
@@ -1215,32 +1213,31 @@ function ResolveGlues($tables, $target, $x = 0, $hist = array(), $last = array()
                 ]);
             }
 
-            $glues = collect(Schema::getColumnListing($table))->filter(function ($column) {
-                return Str::endsWith($column, '_id');
-            });
-            if ($glues->count() == 1 && $glues->first() != $target) {
+            $glues = dbFetchRows('SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_NAME = ? && COLUMN_NAME LIKE "%\_id"', array($table));
+            if (sizeof($glues) == 1 && $glues[0]['COLUMN_NAME'] != $target) {
                 //Search for new candidates to expand
-                $ntables = collect(DB::connection()->getDoctrineSchemaManager()->listTableNames())->filter(function ($listTable) use ($table) {
-                    return Str::startsWith($listTable, substr($table, 0, -1) . '_') && $listTable != $table;
-                });
-                [$tmp] = explode('_', $glues->first(), 2);
-                $ntables->prepend($tmp.'s');
-                $ntables->prepend($tmp);
-
-                $tmp = ResolveGlues($ntables->toArray(), $target, $x++, array_merge($tables, $ntables), array_merge($last, array($table.'.'.$glues->first())));
+                $ntables = array();
+                [$tmp] = explode('_', $glues[0]['COLUMN_NAME'], 2);
+                $ntables[] = $tmp;
+                $ntables[] = $tmp.'s';
+                $tmp = dbFetchRows('SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_NAME LIKE "'.substr($table, 0, -1).'_%" && TABLE_NAME != "'.$table.'"');
+                foreach ($tmp as $expand) {
+                    $ntables[] = $expand['TABLE_NAME'];
+                }
+                $tmp = ResolveGlues($ntables, $target, $x++, array_merge($tables, $ntables), array_merge($last, array($table.'.'.$glues[0]['COLUMN_NAME'])));
                 if (is_array($tmp)) {
                     return $tmp;
                 }
             } else {
-                foreach ($glues as $column) {
-                    if ($column == $target) {
+                foreach ($glues as $glue) {
+                    if ($glue['COLUMN_NAME'] == $target) {
                         return array_merge($last, array($table.'.'.$target));
                     } else {
-                        [$tmp] = explode('_', $column);
+                        [$tmp] = explode('_', $glue['COLUMN_NAME']);
                         $tmp .= 's';
                         if (!in_array($tmp, $tables) && !in_array($tmp, $hist)) {
                             //Expand table
-                            $tmp = ResolveGlues(array($tmp), $target, $x++, array_merge($tables, array($tmp)), array_merge($last, array($table.'.'.$column)));
+                            $tmp = ResolveGlues(array($tmp), $target, $x++, array_merge($tables, array($tmp)), array_merge($last, array($table.'.'.$glue['COLUMN_NAME'])));
                             if (is_array($tmp)) {
                                 return $tmp;
                             }
