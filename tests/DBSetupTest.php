@@ -31,8 +31,6 @@ class DBSetupTest extends DBTestCase
 {
     protected $db_name;
     protected $connection = 'testing_mysql';
-    protected $migration_output;
-    protected $migration_result;
 
     protected function setUp(): void
     {
