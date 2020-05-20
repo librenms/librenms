@@ -28,13 +28,9 @@ namespace LibreNMS\Tests;
 use App\Models\ApiToken;
 use App\Models\Device;
 use App\Models\User;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class BasicApiTest extends DBTestCase
 {
-    use RefreshDatabase;
-
     public function testListDevices()
     {
         $user = factory(User::class)->state('admin')->create();

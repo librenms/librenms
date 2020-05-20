@@ -25,15 +25,10 @@
 
 namespace LibreNMS\Tests;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use LibreNMS\Config;
-use LibreNMS\DB\Eloquent;
-use ReflectionClass;
 
 class ConfigTest extends TestCase
 {
-    use RefreshDatabase;
-
     private $config;
 
     protected function setUp(): void
