@@ -3,6 +3,9 @@
  * OspfNbrStateChange.php
  *
  * -Description-
+ * Handles ospfNbrStateChange SNMP traps. Trap is sent when an OSPF
+ * neighbor changes state. Handler logs the change and updates the
+ * neighbor's information in the ospf_nbrs table.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,15 +52,14 @@ class OspfNbrStateChange implements SnmptrapHandler
 
         $severity = 4;
 
-        if ($ospfNbr->ospfNbrState == 'full') { 
+        if ($ospfNbr->ospfNbrState == 'full') {
             $severity = 1;
         } elseif ($ospfNbr->ospfNbrState == 'down') {
             $severity = 5;
         }
 
-        Log::event("OSPF neighbor $ospfNbrIpAddr changed state to $ospfNbr->ospfNbrState", $device->device_id , 'trap', $severity);
+        Log::event("OSPF neighbor $ospfNbrIpAddr changed state to $ospfNbr->ospfNbrState", $device->device_id, 'trap', $severity);
 
         $ospfNbr->save();
     }
 }
-

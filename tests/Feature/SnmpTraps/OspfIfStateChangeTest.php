@@ -7,7 +7,7 @@
  * Unit test for the OspfIfStateChange SNMP trap handler. Will verify
  * trap is properly logged and ospf_ports.ospfIfState is updated in the
  * database.
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -42,7 +42,7 @@ class OspfIfStateChangeTest extends SnmpTrapTestCase
     public function testOspfIfDown()
     {
         $device = factory(Device::class)->create();
-        $port = factory(Port::class)->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up', 'ifName' => 'int1.0']);
+        $port = factory(Port::class)->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up']);
 
         $device->ports()->save($port);
 
@@ -75,7 +75,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameSRX2
     public function testOspfIfDr()
     {
         $device = factory(Device::class)->create();
-        $port = factory(Port::class)->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up', 'ifName' => 'int1.0']);
+        $port = factory(Port::class)->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up']);
 
         $device->ports()->save($port);
 
@@ -108,7 +108,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameSRX2
     public function testOspfIfBdr()
     {
         $device = factory(Device::class)->create();
-        $port = factory(Port::class)->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up', 'ifName' => 'int1.0']);
+        $port = factory(Port::class)->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up']);
 
         $device->ports()->save($port);
 
@@ -141,7 +141,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameSRX2
     public function testOspfIfOdr()
     {
         $device = factory(Device::class)->create();
-        $port = factory(Port::class)->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up', 'ifName' => 'int1.0']);
+        $port = factory(Port::class)->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up']);
 
         $device->ports()->save($port);
 
@@ -174,7 +174,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameSRX2
     public function testOspfIfPtp()
     {
         $device = factory(Device::class)->create();
-        $port = factory(Port::class)->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up', 'ifName' => 'int1.0']);
+        $port = factory(Port::class)->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up']);
 
         $device->ports()->save($port);
 
@@ -207,7 +207,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameSRX2
     public function testOspfIfWait()
     {
         $device = factory(Device::class)->create();
-        $port = factory(Port::class)->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up', 'ifName' => 'int1.0']);
+        $port = factory(Port::class)->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up']);
 
         $device->ports()->save($port);
 
@@ -240,7 +240,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameSRX2
     public function testOspfIfLoop()
     {
         $device = factory(Device::class)->create();
-        $port = factory(Port::class)->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up', 'ifName' => 'int1.0']);
+        $port = factory(Port::class)->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up']);
 
         $device->ports()->save($port);
 

@@ -69,7 +69,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameSRX2
         $this->assertEquals($ospfNbr->ospfNbrState, 'down');
     }
 
-    //Test OSPF neighbor state up trap
+    //Test OSPF neighbor state full trap
     public function testOspfNbrFull()
     {
         $device = factory(Device::class)->create();

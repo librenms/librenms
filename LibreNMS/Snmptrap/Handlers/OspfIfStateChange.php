@@ -3,6 +3,9 @@
  * OspfIfStateChange.php
  *
  * -Description-
+ * Handles the ospfIfStateChange SNMP trap signaling an interface
+ * in the OSPF topology has changed its state. The handler logs the
+ * change and updates the interface's state in ospf_ports table.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -46,15 +49,15 @@ class OspfIfStateChange implements SnmptrapHandler
         $ospfPort = $device->ospfPorts()->where('ospfIfIpAddress', $ospfIfIpAddress)->first();
 
         $port = $device->ports()->where('port_id', $ospfPort->port_id)->first();
-        
+
         if (!$port) {
-            Log::warning("Snmptrap linkDown: Could not find port at port_id $ospfPort->port_id for device: " . $device->hostname);
+            Log::warning("Snmptrap ospfIfStateChange: Could not find port at port_id $ospfPort->port_id for device: " . $device->hostname);
             return;
         }
 
         $ospfPort->ospfIfState = $trap->getOidData($trap->findOid('OSPF-MIB::ospfIfState'));
 
-        switch($ospfPort->ospfIfState) {
+        switch ($ospfPort->ospfIfState) {
             case 'down':
                 $severity = 5;
                 break;
@@ -75,7 +78,7 @@ class OspfIfStateChange implements SnmptrapHandler
                 break;
             case 'loopback':
                 $severity = 4;
-                break; 
+                break;
         }
 
         Log::event("OSPF interface $port->ifName is $ospfPort->ospfIfState", $device->device_id, 'trap', $severity);
@@ -83,4 +86,3 @@ class OspfIfStateChange implements SnmptrapHandler
         $ospfPort->save();
     }
 }
-

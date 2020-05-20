@@ -144,7 +144,7 @@ $factory->define(\App\Models\OspfNbr::class, function (Faker\Generator $faker) {
         'ospfNbrLsRetransQLen' => 0,
         'ospfNbmaNbrStatus' => 'active',
         'ospfNbmaNbrPermanence' => 'dynamic',
-        'ospfNbrHelloSuppressed'=> 'false',
+        'ospfNbrHelloSuppressed' => 'false',
     ];
 });
 
