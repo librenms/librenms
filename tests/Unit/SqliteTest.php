@@ -39,11 +39,11 @@ class SqliteTest extends TestCase
             $result = Artisan::call('migrate', ['--database' => $this->connection, '--seed' => true]);
             $output = Artisan::output();
 
-            $this->assertEquals(0, $result, "SQlite migration failed:\n$output");
+            $this->assertEquals(0, $result, "SQLite migration failed:\n$output");
             $this->assertNotEmpty($output, 'Migrations not run');
         } catch (QueryException $queryException) {
             preg_match('/Migrating: (\w+)$/', Artisan::output(), $matches);
-            $this->fail("Could not run migration {$matches[1]}) on SQlite\n\n" . $queryException->getMessage());
+            $this->fail("Could not run migration {$matches[1]}) on SQLite\n\n" . $queryException->getMessage());
         }
 
         $count = \DB::connection($this->connection)->table('alert_templates')->count();
