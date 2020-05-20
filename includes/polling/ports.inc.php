@@ -189,11 +189,6 @@ $dot3_oids = [
     'dot3StatsDuplexStatus',
 ];
 
-$truth_array = array(
-    'true',
-    'false',
-);
-
 // Query known ports and mapping table in order of discovery to make sure
 // the latest discoverd/polled port is in the mapping tables.
 $ports_mapped = get_ports_mapped($device['device_id'], true);
@@ -636,7 +631,11 @@ foreach ($ports as $port) {
             $this_port['ifVlan'] = $this_port['dot1qPvid'];
         }
 
-        // Correct invalid truth values from some devices.
+        // Fixed invalid truth values for some devices.
+        if ($this_port['ifConnectorPresent'] !== 'true') {
+            $this_port['ifConnectorPresent'] = 'false';
+        } 
+        
         if (!in_array($this_port['ifConnectorPresent'], $truth_array)) {
             $this_port['ifConnectorPresent'] = 'false';
         }
