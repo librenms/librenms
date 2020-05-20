@@ -47,9 +47,11 @@ class OspfNbrStateChange implements SnmptrapHandler
 
         $ospfNbr->ospfNbrState = $trap->getOidData($trap->findOid('OSPF-MIB::ospfNbrState'));
 
-        $severity = 1;
+        $severity = 4;
 
-        if ($ospfNbr->ospfNbrState != 'full') { 
+        if ($ospfNbr->ospfNbrState == 'full') { 
+            $severity = 1;
+        } elseif ($ospfNbr->ospfNbrState == 'down') {
             $severity = 5;
         }
 
