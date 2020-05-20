@@ -4,7 +4,7 @@ $multiplier = 1;
 $divisor    = 1;
 
 foreach ($pre_cache['fabos_Sfp'] as $index => $entry) {
-    $entPhysicalIndex = substr($index, -2, 2);
+    $entPhysicalIndex = substr($index, strrpos($index, '.'));
     $entPhysicalIndex = trim($entPhysicalIndex, '.');
     $entPhysicalIndex          = $entPhysicalIndex + 1073741823;
 
