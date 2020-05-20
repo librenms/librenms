@@ -11,8 +11,8 @@ $init_modules = array();
 require $install_dir . '/includes/init.php';
 $options = getopt('dh:e:', array("help"));
 
-Config::set('norrd', true);
-Config::set('noinfluxdb', true);
+Config::set('rrd.enable', false);
+Config::set('influxdb.enable', false);
 Config::set('nographite', true);
 
 function print_help()
