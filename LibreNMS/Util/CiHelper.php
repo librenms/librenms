@@ -182,24 +182,17 @@ class CiHelper
 
         putenv('APP_ENV=testing');
 
-        $host = '127.0.0.1';
-        $port = 8000;
         // check if web server is running
-        $connection = @fsockopen($host, $port);
-        if (!is_resource($connection)) {
-            echo "Starting PHP web server...";
-
-            $server = new Process("php -S $host:$port ../server.php", 'html', ['APP_ENV' => 'dusk.testing']);
-            $server->setTimeout(3600);
-            $server->setIdleTimeout(3600);
-            $server->start();
-            $server->waitUntil(function ($type, $output) {
-                return strpos($output, 'Development Server (http://127.0.0.1:8000) started') !== false;
-            });
-            echo " done.\n";
-        } else {
-            fclose($connection);
-        }
+        $server = new Process("php -S 127.0.0.1:8000 ../server.php", 'html', ['APP_ENV' => 'dusk.testing']);
+        $server->setTimeout(3600);
+        $server->setIdleTimeout(3600);
+        $server->start();
+        $server->waitUntil(function ($type, $output) {
+            return strpos($output, 'Development Server (http://127.0.0.1:8000) started') !== false;
+        });
+       if ($server->isRunning()) {
+           echo "Started server http://127.0.0.1:8000\n";
+       }
 
         $dusk_cmd = "php artisan dusk";
 
