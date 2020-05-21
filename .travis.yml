@@ -39,7 +39,6 @@ after_failure:
 
 before_script:
   - phpenv config-rm xdebug.ini
-  - test -n "$SKIP_DUSK_CHECK" || php artisan serve --env=dusk.testing  2>/dev/null &
 
 script:
   - php scripts/pre-commit.php --ci

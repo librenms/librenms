@@ -26,6 +26,7 @@
 namespace LibreNMS\Util;
 
 use Illuminate\Support\Str;
+use Symfony\Component\Process\Process;
 
 class CiHelper
 {
@@ -177,7 +178,36 @@ class CiHelper
     public function checkDusk()
     {
         exec('php artisan config:clear'); // make sure config is not cached
-        return $this->execute('dusk', 'php artisan dusk');
+        exec('php artisan dusk:update --detect');  // make sure driver is correct
+
+        putenv('APP_ENV=testing');
+
+        $host = '127.0.0.1';
+        $port = 8000;
+        // check if web server is running
+        $connection = @fsockopen($host, $port);
+        if (!is_resource($connection)) {
+            echo "Starting PHP web server...";
+
+            $server = new Process("php -S $host:$port ../server.php", 'html', ['APP_ENV' => 'dusk.testing']);
+            $server->setTimeout(3600);
+            $server->setIdleTimeout(3600);
+            $server->start();
+            $server->waitUntil(function ($type, $output) {
+                return strpos($output, 'Development Server (http://127.0.0.1:8000) started') !== false;
+            });
+            echo " done.\n";
+        } else {
+            fclose($connection);
+        }
+
+        $dusk_cmd = "php artisan dusk";
+
+        if ($this->failFast) {
+            $dusk_cmd .= ' --stop-on-error --stop-on-failure';
+        }
+
+        return $this->execute('dusk', $dusk_cmd);
     }
 
     /**
@@ -418,6 +448,10 @@ Running $filename without options runs all checks.
         $this->failFast = $this->checkOpt('f', 'fail-fast', 'ci');
         $this->inCi = $this->checkOpt('ci');
         $this->fullChecks = $this->checkOpt('full');
+
+        if ($this->inCi) {
+            putenv('CHROME_HEADLESS=1');
+        }
 
         if ($os = $this->checkOpt('os', 'o')) {
             // enable unit tests, snmpsim, and db
