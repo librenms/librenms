@@ -39,6 +39,7 @@ class CiHelper
         'php' => [],
         'os-php' => [],
         'os' => [],
+        'resources' => [],
     ];
     private $quiet = false;
     private $commandOnly = false;
@@ -366,6 +367,8 @@ class CiHelper
                 $this->changed['python'][] = $file;
             } elseif (Str::endsWith($file, '.sh')) {
                 $this->changed['bash'][] = $file;
+            } elseif (Str::startsWith($file, 'resources/')) {
+                $this->changed['resources'][] = $file;
             }
 
             // cause full tests to run
@@ -487,6 +490,9 @@ Running $filename without options runs all checks.
                 $this->docsOnly = true;
             } else {
                 putenv('SKIP_UNIT_CHECK=1');
+            }
+            if (empty($this->changed['resources'])) {
+                putenv('SKIP_DUSK_CHECK=1');
             }
         }
     }
