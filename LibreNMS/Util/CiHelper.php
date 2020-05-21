@@ -125,7 +125,7 @@ class CiHelper
      */
     public function checkUnit()
     {
-        $phpunit_bin = $this->checkExec('phpunit');
+        $phpunit_bin = $this->checkPhpExec('phpunit');
 
         $phpunit_cmd = "$phpunit_bin --colors=always";
 
@@ -161,13 +161,17 @@ class CiHelper
      */
     public function checkStyle()
     {
-        $phpcs_bin = $this->checkExec('phpcs');
+        if ($this->fullChecks || !empty($this->changed['php'])) {
+            $phpcs_bin = $this->checkPhpExec('phpcs');
 
-        $files = empty($this->changed['php']) ? './' : implode(' ', $this->changed['php']);
+            $files = ($this->fullChecks) ? './' : implode(' ', $this->changed['php']);
 
-        $cs_cmd = "$phpcs_bin -n -p --colors --extensions=php --standard=misc/phpcs_librenms.xml $files";
+            $cs_cmd = "$phpcs_bin -n -p --colors --extensions=php --standard=misc/phpcs_librenms.xml $files";
 
-        return $this->execute('style', $cs_cmd);
+            return $this->execute('style', $cs_cmd);
+        }
+
+        return 0;
     }
 
     public function checkDusk()
@@ -185,7 +189,7 @@ class CiHelper
     {
         $return = 0;
         if ($this->fullChecks || !empty($this->changed['php'])) {
-            $parallel_lint_bin = $this->checkExec('parallel-lint');
+            $parallel_lint_bin = $this->checkPhpExec('parallel-lint');
 
             // matches a substring of the relative path, leading / is treated as absolute path
             $lint_excludes = ['vendor/'];
@@ -199,24 +203,24 @@ class CiHelper
         }
 
         if ($this->fullChecks || !empty(($this->changed['python']))) {
-            $pylint_bin = $this->checkExec('pylint');
+            $pylint_bin = $this->checkPythonExec('pylint');
 
             $files = $this->fullChecks
-                ? str_replace("\n", ' ', rtrim(exec("find . -name '*.py' -not -path './vendor/*' -not -path './tests/*'")))
+                ? str_replace(PHP_EOL, ' ', rtrim(shell_exec("find . -name '*.py' -not -path './vendor/*' -not -path './tests/*'")))
                 : implode(' ', $this->changed['python']);
 
-            $py_lint_cmd = "$pylint_bin -E $files";
+            $py_lint_cmd = "$pylint_bin -E -j 0 $files";
             $return += $this->execute('Python lint', $py_lint_cmd);
         }
 
-        if ($this->fullChecks || !empty(($this->changed['sh']))) {
-            $bash_bin = $this->checkExec('bash');
-
+        if ($this->fullChecks || !empty(($this->changed['bash']))) {
             $files = $this->fullChecks
-                ? str_replace("\n", ' ', rtrim(exec(" find . -name '*.sh' -not -path './node_modules/*' -not -path './vendor/*'")))
-                : implode(' ', $this->changed['sh']);
+                ? explode(PHP_EOL, rtrim(shell_exec("find . -name '*.sh' -not -path './node_modules/*' -not -path './vendor/*'")))
+                : $this->changed['bash'];
 
-            $bash_cmd = "$bash_bin -n $files";
+            $bash_cmd = implode(' && ', array_map(function ($file) {
+                return "bash -n $file";
+            }, $files));
             $return += $this->execute('Bash lint', $bash_cmd);
         }
 
@@ -329,14 +333,14 @@ class CiHelper
         $this->changedFiles = $changed_files ? explode(' ', $changed_files) : [];
 
         foreach ($this->changedFiles as $file) {
-            if (Str::startsWith($file, 'doc/')) {
+            if (Str::endsWith($file, '.php')) {
+                $this->changed['php'][] = $file;
+            } elseif (Str::startsWith($file, 'doc/') || $file == 'mkdocs.yml') {
                 $this->changed['docs'][] = $file;
             } elseif (Str::endsWith($file, '.py')) {
                 $this->changed['python'][] = $file;
             } elseif (Str::endsWith($file, '.sh')) {
                 $this->changed['bash'][] = $file;
-            } elseif (Str::endsWith($file, '.php')) {
-                $this->changed['php'][] = $file;
             }
 
             // cause full tests to run
@@ -367,18 +371,19 @@ class CiHelper
         $short_opts = 'ldsufqcho:m:';
         $long_opts = [
             'ci',
-            'lint',
-            'style',
-            'unit',
+            'commands',
+            'db',
             'dusk',
-            'os:',
-            'module:',
             'fail-fast',
+            'full',
+            'help',
+            'lint',
+            'module:',
+            'os:',
             'quiet',
             'snmpsim',
-            'db',
-            'commands',
-            'help',
+            'style',
+            'unit',
         ];
         $this->options = getopt($short_opts, $long_opts);
 
@@ -396,6 +401,7 @@ Running $filename without options runs all checks.
   -q, --quiet     Hide output unless there is an error
       --db        Run unit tests that require a database
       --snmpsim   Use snmpsim for unit tests
+      --full      Run full checks ignoring changed file filtering
       --ci        Use preset config for running continuous integration
   -c, --commands  Print commands only, no checks
   -h, --help      Show this help text.\n";
@@ -409,6 +415,7 @@ Running $filename without options runs all checks.
         $this->commandOnly = $this->checkOpt('c', 'commands');
         $this->failFast = $this->checkOpt('f', 'fail-fast', 'ci');
         $this->inCi = $this->checkOpt('ci');
+        $this->fullChecks = $this->checkOpt('full');
 
         if ($os = $this->checkOpt('os', 'o')) {
             // enable unit tests, snmpsim, and db
@@ -477,14 +484,14 @@ Running $filename without options runs all checks.
     }
 
     /**
-     * Check for an executable and return the path to it
-     * If it does not exist, run composer update.
+     * Check for a PHP executable and return the path to it
+     * If it does not exist, run composer.
      * If composer isn't installed, print error and exit.
      *
      * @param string $exec the name of the executable to check
      * @return string path to the executable
      */
-    private function checkExec($exec)
+    private function checkPhpExec($exec)
     {
         $path = "vendor/bin/$exec";
 
@@ -500,6 +507,41 @@ Running $filename without options runs all checks.
         }
 
         echo "\nRunning installing deps with composer failed.\n You should try running './scripts/composer_wrapper.php install' by hand\n";
+        echo "You can find more info at http://docs.librenms.org/Developing/Validating-Code/\n";
+        exit(1);
+    }
+
+    /**
+     * Check for a Python executable and return the path to it
+     * If it does not exist, run pip3.
+     * If pip3 isn't installed, print error and exit.
+     *
+     * @param string $exec the name of the executable to check
+     * @return string path to the executable
+     */
+    private function checkPythonExec($exec)
+    {
+        $home = getenv('HOME');
+        $path = "$home/.local/bin/$exec";
+
+        if (is_executable($path)) {
+            return $path;
+        }
+
+        // check system
+        $system_path = rtrim(exec("which pylint 2>/dev/null"));
+        if (is_executable($system_path)) {
+            return $system_path;
+        }
+
+        echo "Running pip3 install to install developer dependencies.\n";
+        passthru("pip3 install $exec"); // probably wrong in other cases...
+
+        if (is_executable($path)) {
+            return $path;
+        }
+
+        echo "\nRunning installing deps with pip3 failed.\n You should try running 'pip3 install -r requirements.txt' by hand\n";
         echo "You can find more info at http://docs.librenms.org/Developing/Validating-Code/\n";
         exit(1);
     }
