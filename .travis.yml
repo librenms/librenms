@@ -42,5 +42,5 @@ before_script:
   - test -n "$SKIP_DUSK_CHECK" || php artisan serve --env=dusk.testing  2>/dev/null &
 
 script:
-  - php scripts/pre-commit.php -ci
+  - php scripts/pre-commit.php --ci
 
