@@ -334,14 +334,7 @@ class CiHelper
             return $this->osFromPhp($file);
         } elseif (Str::startsWith($file, 'LibreNMS/OS/')) {
             if (preg_match('#LibreNMS/OS/[^/]+.php#', $file)) {
-                // convert class name to os name
-                preg_match_all("/[A-Z][a-z]*/", basename($file, '.php'), $segments);
-                $osname = implode('-', array_map('strtolower', $segments[0]));
-                $os = $this->osFromPhp($osname);
-                if ($os) {
-                    return $os;
-                }
-                return $this->osFromPhp(str_replace('-', '_', $osname));
+                return $this->osFromClass(basename($file, '.php'));
             }
         } elseif (Str::startsWith($file, ['tests/snmpsim/', 'tests/data/'])) {
             [$os,] = explode('_', basename(basename($file, '.json'), '.snmprec'), 2);
@@ -349,6 +342,27 @@ class CiHelper
         }
 
         return null;
+    }
+
+    /**
+     * convert class name to os name
+     *
+     * @param string $class
+     * @return string|null
+     */
+    private function osFromClass($class)
+    {
+        preg_match_all("/[A-Z][a-z0-9]*/", $class, $segments);
+        $osname = implode('-', array_map('strtolower', $segments[0]));
+        $osname = preg_replace(
+            ['/^zero-/', '/^one-/', '/^two-/', '/^three-/', '/^four-/', '/^five-/', '/^six-/', '/^seven-/', '/^eight-/', '/^nine-/',],
+            ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'],
+            $osname);
+
+        if ($os = $this->osFromPhp($osname)) {
+            return $os;
+        }
+        return $this->osFromPhp(str_replace('-', '_', $osname));
     }
 
     private function detectChangedFiles()
@@ -359,6 +373,9 @@ class CiHelper
         $this->changedFiles = $changed_files ? explode(' ', $changed_files) : [];
 
         foreach ($this->changedFiles as $file) {
+            if ($file == 'LibreNMS/Util/CiHelper.php') {
+                continue;
+            }
             if (Str::endsWith($file, '.php')) {
                 $this->changed['php'][] = $file;
             } elseif (Str::startsWith($file, 'doc/') || $file == 'mkdocs.yml') {
@@ -386,6 +403,7 @@ class CiHelper
         }
 
         $this->changed['os'] = array_unique($this->changed['os']);
+        dd($this->changed['os']);
 
         // If we have more than 4 (arbitrary number) of OS' then blank them out
         // Unit tests may take longer to run in a loop so fall back to all.
