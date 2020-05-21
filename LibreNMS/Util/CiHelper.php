@@ -190,9 +190,9 @@ class CiHelper
         $server->waitUntil(function ($type, $output) {
             return strpos($output, 'Development Server (http://127.0.0.1:8000) started') !== false;
         });
-       if ($server->isRunning()) {
-           echo "Started server http://127.0.0.1:8000\n";
-       }
+        if ($server->isRunning()) {
+            echo "Started server http://127.0.0.1:8000\n";
+        }
 
         $dusk_cmd = "php artisan dusk";
 
