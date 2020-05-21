@@ -13,4 +13,9 @@ $return = $helper->run();
 if ($helper->allChecksComplete() && $return === 0) {
     echo "\033[32mTests ok, submit away :)\033[0m \n";
 }
+
+if (!empty($helper->getChanged('docs'))) {
+    exec('bash scripts/deploy-docs.sh');
+}
+
 exit($return); //return the combined/single return value of tests

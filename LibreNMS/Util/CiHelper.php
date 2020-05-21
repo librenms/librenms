@@ -32,7 +32,7 @@ class CiHelper
     private $options;
     private $changedFiles;
     private $changed = [
-        'docs' => 0,
+        'docs' => [],
         'python' => [],
         'bash' => [],
         'php' => [],
@@ -83,11 +83,27 @@ class CiHelper
         return $return;
     }
 
+    /**
+     * Confirm that all possible checks have been completed
+     *
+     * @return bool
+     */
     public function allChecksComplete()
     {
         return array_reduce($this->completedTests, function ($result, $check) {
             return $result && $check;
         }, false);
+    }
+
+    /**
+     * Get the changed files, optionally only one type
+     *
+     * @param string $type
+     * @return array|array[]|null
+     */
+    public function getChanged($type = null)
+    {
+        return $type !== null ? ($this->changed[$type] ?? null) : $this->changed;
     }
 
     /**
@@ -135,7 +151,9 @@ class CiHelper
     {
         $phpcs_bin = $this->checkExec('phpcs');
 
-        $cs_cmd = "$phpcs_bin -n -p --colors --extensions=php --standard=misc/phpcs_librenms.xml ./";
+        $files = empty($this->changed['php']) ? './' : implode(' ', $this->changed['php']);
+
+        $cs_cmd = "$phpcs_bin -n -p --colors --extensions=php --standard=misc/phpcs_librenms.xml $files";
 
         return $this->execute('style', $cs_cmd);
     }
@@ -147,15 +165,40 @@ class CiHelper
      */
     public function checkLint()
     {
-        $parallel_lint_bin = $this->checkExec('parallel-lint');
+        $return = 0;
+        if (!empty($this->changed['php'])) {
+            $parallel_lint_bin = $this->checkExec('parallel-lint');
 
-        // matches a substring of the relative path, leading / is treated as absolute path
-        $lint_excludes = ['vendor/'];
+            // matches a substring of the relative path, leading / is treated as absolute path
+            $lint_excludes = ['vendor/'];
+            $lint_exclude = $this->buildPhpLintExcludes('--exclude ', $lint_excludes);
 
-        $lint_exclude = $this->buildPhpLintExcludes('--exclude ', $lint_excludes);
-        $lint_cmd = "$parallel_lint_bin $lint_exclude ./";
+            $files = $this->fullChecks ? './' : implode(' ', $this->changed['php']);
 
-        return $this->execute('PHP lint', $lint_cmd);
+            $php_lint_cmd = "$parallel_lint_bin $lint_exclude $files";
+
+            $return += $this->execute('PHP lint', $php_lint_cmd);
+        }
+
+        if (!empty(($this->changed['python']))) {
+            $pylint_bin = $this->checkExec('pylint');
+
+            $files = implode(' ', $this->changed['python']);
+
+            $py_lint_cmd = "$pylint_bin -E $files";
+            $return += $this->execute('Python lint', $py_lint_cmd);
+        }
+
+        if (!empty(($this->changed['sh']))) {
+            $bash_bin = $this->checkExec('bash');
+
+            $files =  implode(' ', $this->changed['sh']);
+
+            $bash_cmd = "$bash_bin -n $files";
+            $return += $this->execute('Bash lint', $bash_cmd);
+        }
+
+        return $return;
     }
 
     /**
@@ -163,7 +206,6 @@ class CiHelper
      * Make sure it isn't skipped by SKIP_TYPE_CHECK env variable and hasn't been run already
      *
      * @param string $type type of check lint, style, or unit
-     * @param array $options command specific options
      * @return int the return value from the check (0 = success)
      */
     public function runCheck($type)
@@ -265,7 +307,7 @@ class CiHelper
 
         foreach ($this->changedFiles as $file) {
             if (Str::startsWith($file, 'doc/')) {
-                $this->changed['docs']++;
+                $this->changed['docs'][] = $file;
             } elseif (Str::endsWith($file, '.py')) {
                 $this->changed['python'][] = $file;
             } elseif (Str::endsWith($file, '.sh')) {
