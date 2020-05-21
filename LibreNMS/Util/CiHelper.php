@@ -184,7 +184,7 @@ class CiHelper
     public function checkLint()
     {
         $return = 0;
-        if (!empty($this->changed['php'])) {
+        if ($this->fullChecks || !empty($this->changed['php'])) {
             $parallel_lint_bin = $this->checkExec('parallel-lint');
 
             // matches a substring of the relative path, leading / is treated as absolute path
@@ -198,19 +198,23 @@ class CiHelper
             $return += $this->execute('PHP lint', $php_lint_cmd);
         }
 
-        if (!empty(($this->changed['python']))) {
+        if ($this->fullChecks || !empty(($this->changed['python']))) {
             $pylint_bin = $this->checkExec('pylint');
 
-            $files = implode(' ', $this->changed['python']);
+            $files = $this->fullChecks
+                ? str_replace("\n", ' ', rtrim(exec("find . -name '*.py' -not -path './vendor/*' -not -path './tests/*'")))
+                : implode(' ', $this->changed['python']);
 
             $py_lint_cmd = "$pylint_bin -E $files";
             $return += $this->execute('Python lint', $py_lint_cmd);
         }
 
-        if (!empty(($this->changed['sh']))) {
+        if ($this->fullChecks || !empty(($this->changed['sh']))) {
             $bash_bin = $this->checkExec('bash');
 
-            $files =  implode(' ', $this->changed['sh']);
+            $files = $this->fullChecks
+                ? str_replace("\n", ' ', rtrim(exec(" find . -name '*.sh' -not -path './node_modules/*' -not -path './vendor/*'")))
+                : implode(' ', $this->changed['sh']);
 
             $bash_cmd = "$bash_bin -n $files";
             $return += $this->execute('Bash lint', $bash_cmd);
