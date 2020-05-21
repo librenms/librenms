@@ -389,12 +389,14 @@ Running $filename without options runs all checks.
   -l, --lint      Run php lint checks to test for valid syntax
   -s, --style     Run phpcs check to check for PSR-2 compliance
   -u, --unit      Run phpunit tests
+  -d, --dusk      Run Laravel Dusk tests
   -o, --os        Specific OS to run tests on. Implies --unit, --db, --snmpsim
   -m, --module    Specific Module to run tests on. Implies --unit, --db, --snmpsim
   -f, --fail-fast Quit when any failure is encountered
   -q, --quiet     Hide output unless there is an error
       --db        Run unit tests that require a database
       --snmpsim   Use snmpsim for unit tests
+      --ci        Use preset config for running continuous integration
   -c, --commands  Print commands only, no checks
   -h, --help      Show this help text.\n";
             exit();

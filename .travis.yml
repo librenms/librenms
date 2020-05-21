@@ -31,7 +31,7 @@ before_install:
 
 install:
   - travis_retry composer install --no-interaction --prefer-dist --no-suggest
-  - pip3 install --user snmpsim mysql-python pylint
+  - pip3 install --user snmpsim PyMySQL pylint
   - test -n "$SKIP_DUSK_CHECK" || php artisan dusk:update --detect
 
 after_failure:
