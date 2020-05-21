@@ -45,9 +45,4 @@ class OspfNbr extends DeviceRelatedModel
         'ospfNbmaNbrPermanence',
         'ospfNbrHelloSuppressed',
     ];
-
-    public function device()
-    {
-        return $this->belongsTo(\App\Models\Device::class, 'device_id');
-    }
 }
