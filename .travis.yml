@@ -42,7 +42,5 @@ before_script:
   - test -n "$SKIP_DUSK_CHECK" || php artisan serve --env=dusk.testing  2>/dev/null &
 
 script:
-  - php scripts/pre-commit.php -q -l
-  - php scripts/pre-commit.php -q -s
-  - php scripts/pre-commit.php -u --db --snmpsim --fail-fast
+  - php scripts/pre-commit.php -ci
 

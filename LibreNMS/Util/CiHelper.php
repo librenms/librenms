@@ -2,7 +2,7 @@
 /**
  * CiHelper.php
  *
- * -Description-
+ * Code for CI operation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,12 +42,21 @@ class CiHelper
     private $quiet = false;
     private $commandOnly = false;
     private $failFast = false;
+    private $inCi = false;
     private $docsOnly = false;
     private $completedTests = [
         'lint' => false,
         'style' => false,
         'unit' => false,
         'dusk' => false,
+    ];
+    private $ciDefaults = [
+        'quiet' => [
+            'lint' => true,
+            'style' => true,
+            'unit' => false,
+            'dusk' => false,
+        ],
     ];
     private $fullChecks = false;
     private $modules;
@@ -137,7 +146,7 @@ class CiHelper
                 $phpunit_cmd .= " --group docs";
             }
 
-            if ($this->checkOpt('m', 'module')) {
+            if (!empty($this->modules)) {
                 $phpunit_cmd .= ' tests/OSModulesTest.php';
             }
         }
@@ -217,7 +226,7 @@ class CiHelper
      * @param string $type type of check lint, style, or unit
      * @return int the return value from the check (0 = success)
      */
-    public function runCheck($type)
+    private function runCheck($type)
     {
         if (getenv('SKIP_' . strtoupper($type) . '_CHECK') || $this->completedTests[$type]) {
             echo ucfirst($type) . " check skipped.\n";
@@ -247,7 +256,8 @@ class CiHelper
 
         echo "Running $name check... ";
 
-        if (!$this->quiet) {
+        $quiet = $this->inCi ? $this->ciDefaults['quiet'][$name] : $this->quiet;
+        if (!$quiet) {
             echo PHP_EOL;
             passthru($command, $return);
             return $return;
@@ -352,6 +362,7 @@ class CiHelper
     {
         $short_opts = 'ldsufqcho:m:';
         $long_opts = [
+            'ci',
             'lint',
             'style',
             'unit',
@@ -390,7 +401,8 @@ Running $filename without options runs all checks.
     {
         $this->quiet = $this->checkOpt('q', 'quiet');
         $this->commandOnly = $this->checkOpt('c', 'commands');
-        $this->failFast = $this->checkOpt('f', 'fail-fast');
+        $this->failFast = $this->checkOpt('f', 'fail-fast', 'ci');
+        $this->inCi = $this->checkOpt('ci');
 
         if ($os = $this->checkOpt('os', 'o')) {
             // enable unit tests, snmpsim, and db
@@ -413,11 +425,11 @@ Running $filename without options runs all checks.
             $this->options += ['u' => false, 's' => false, 'l' => false, 'd' => false];
         }
 
-        if ($this->checkOpt('snmpsim')) {
+        if ($this->checkOpt('snmpsim', 'ci')) {
             putenv('SNMPSIM=1');
         }
 
-        if ($this->checkOpt('db')) {
+        if ($this->checkOpt('db', 'ci')) {
             putenv('DBTEST=1');
         }
 
@@ -429,7 +441,7 @@ Running $filename without options runs all checks.
 
         // If we have no php files and no OS' found then also skip unit checks.
         if (!empty($this->changedFiles) && empty($this->changed['php']) && empty($this->changed['os'])) {
-            if ($this->changed['docs'] > 0) {
+            if (!empty($this->changed['docs'])) {
                 $this->docsOnly = true;
             } else {
                 putenv('SKIP_UNIT_CHECK=1');
