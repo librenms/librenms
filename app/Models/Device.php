@@ -45,7 +45,7 @@ class Device extends BaseModel
      */
     public static function pollerTarget($device)
     {
-        if (! is_array($device)) {
+        if (!is_array($device)) {
             $ret = static::where('hostname', $device)->first(['hostname', 'overwrite_ip']);
             if (empty($ret)) {
                 return $device;
@@ -222,7 +222,7 @@ class Device extends BaseModel
         ];
 
         foreach ($options as $file) {
-            if (is_file(public_path()."/$file")) {
+            if (is_file(public_path() . "/$file")) {
                 return asset($file);
             }
         }
@@ -281,9 +281,9 @@ class Device extends BaseModel
     public function validateStandalone()
     {
         if ($this->max_depth === 0 && $this->children()->count() > 0) {
-            $this->max_depth = 1;  // has children
+            $this->max_depth = 1; // has children
         } elseif ($this->max_depth === 1 && $this->parents()->count() === 0) {
-            $this->max_depth = 0;  // no children or parents
+            $this->max_depth = 0; // no children or parents
         }
 
         $this->save();
@@ -306,7 +306,7 @@ class Device extends BaseModel
         }
 
         $attrib->attrib_value = $value;
-        return (bool)$this->attribs()->save($attrib);
+        return (bool) $this->attribs()->save($attrib);
     }
 
     public function forgetAttrib($name)
@@ -316,7 +316,7 @@ class Device extends BaseModel
         });
 
         if ($attrib_index !== false) {
-            $deleted=(bool)$this->attribs->get($attrib_index)->delete();
+            $deleted = (bool) $this->attribs->get($attrib_index)->delete();
             // only forget the attrib_index after delete, otherwise delete() will fail fatally with:
             // Symfony\\Component\\Debug\Exception\\FatalThrowableError(code: 0):  Call to a member function delete() on null
             $this->attribs->forget($attrib_index);
@@ -365,7 +365,7 @@ class Device extends BaseModel
 
     public function setStatusAttribute($status)
     {
-        $this->attributes['status'] = (int)$status;
+        $this->attributes['status'] = (int) $status;
     }
 
     // ---- Query scopes ----
@@ -376,7 +376,7 @@ class Device extends BaseModel
             ['status', '=', 1],
             ['ignore', '=', 0],
             ['disable_notify', '=', 0],
-            ['disabled', '=', 0]
+            ['disabled', '=', 0],
         ]);
     }
 
@@ -384,7 +384,7 @@ class Device extends BaseModel
     {
         return $query->where([
             ['ignore', '=', 0],
-            ['disabled', '=', 0]
+            ['disabled', '=', 0],
         ]);
     }
 
@@ -394,7 +394,7 @@ class Device extends BaseModel
             ['status', '=', 0],
             ['disable_notify', '=', 0],
             ['ignore', '=', 0],
-            ['disabled', '=', 0]
+            ['disabled', '=', 0],
         ]);
     }
 
@@ -402,28 +402,28 @@ class Device extends BaseModel
     {
         return $query->where([
             ['ignore', '=', 1],
-            ['disabled', '=', 0]
+            ['disabled', '=', 0],
         ]);
     }
 
     public function scopeNotIgnored($query)
     {
         return $query->where([
-            ['ignore', '=', 0]
+            ['ignore', '=', 0],
         ]);
     }
 
     public function scopeIsDisabled($query)
     {
         return $query->where([
-            ['disabled', '=', 1]
+            ['disabled', '=', 1],
         ]);
     }
 
     public function scopeIsDisableNotify($query)
     {
         return $query->where([
-            ['disable_notify', '=', 1]
+            ['disable_notify', '=', 1],
         ]);
     }
 
@@ -431,7 +431,7 @@ class Device extends BaseModel
     {
         return $query->where([
             ['disable_notify', '=', 0],
-            ['disabled', '=', 0]
+            ['disabled', '=', 0],
         ]);
     }
 
@@ -439,7 +439,7 @@ class Device extends BaseModel
     {
         return $query->where([
             ['uptime', '>', 0],
-            ['uptime', $modifier, $uptime]
+            ['uptime', $modifier, $uptime],
         ]);
     }
 
@@ -570,6 +570,15 @@ class Device extends BaseModel
     public function ospfInstances()
     {
         return $this->hasMany(\App\Models\OspfInstance::class, 'device_id');
+    }
+    public function ospfNbrs()
+    {
+        return $this->hasMany(\App\Models\OspfNbr::class, 'device_id');
+    }
+
+    public function ospfPorts()
+    {
+        return $this->hasMany(\App\Models\OspfPort::class, 'device_id');
     }
 
     public function netscalerVservers()
