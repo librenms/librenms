@@ -47,6 +47,7 @@ class CiHelper
         'lint' => false,
         'style' => false,
         'unit' => false,
+        'dusk' => false,
     ];
     private $fullChecks = false;
     private $modules;
@@ -71,6 +72,8 @@ class CiHelper
                 $ret = $this->runCheck('style');
             } elseif ($opt == 'u' || $opt == 'unit') {
                 $ret = $this->runCheck('unit');
+            } elseif ($opt == 'd' || $opt == 'dusk') {
+                $ret = $this->runCheck('dusk');
             }
 
             if ($this->failFast && $ret !== 0 && $ret !== 250) {
@@ -156,6 +159,12 @@ class CiHelper
         $cs_cmd = "$phpcs_bin -n -p --colors --extensions=php --standard=misc/phpcs_librenms.xml $files";
 
         return $this->execute('style', $cs_cmd);
+    }
+
+    public function checkDusk()
+    {
+        exec('php artisan config:clear'); // make sure config is not cached
+        return $this->execute('dusk', 'php artisan dusk');
     }
 
     /**
@@ -341,11 +350,12 @@ class CiHelper
 
     private function parseOptions(): void
     {
-        $short_opts = 'lsufqcho:m:';
+        $short_opts = 'ldsufqcho:m:';
         $long_opts = [
             'lint',
             'style',
             'unit',
+            'dusk',
             'os:',
             'module:',
             'fail-fast',
@@ -398,9 +408,9 @@ Running $filename without options runs all checks.
             $this->options['db'] = false;
         }
 
-        if (!$this->checkOpt('l', 'lint', 's', 'style', 'u', 'unit')) {
+        if (!$this->checkOpt('l', 'lint', 's', 'style', 'u', 'unit', 'd', 'dusk')) {
             // no test specified, run all tests in this order
-            $this->options += ['u' => false, 's' => false, 'l' => false];
+            $this->options += ['u' => false, 's' => false, 'l' => false, 'd' => false];
         }
 
         if ($this->checkOpt('snmpsim')) {

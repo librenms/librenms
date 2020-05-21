@@ -14,7 +14,7 @@ if ($helper->allChecksComplete() && $return === 0) {
     echo "\033[32mTests ok, submit away :)\033[0m \n";
 }
 
-if (!empty($helper->getChanged('docs'))) {
+if (getenv('EXECUTE_BUILD_DOCS') && !empty($helper->getChanged('docs'))) {
     exec('bash scripts/deploy-docs.sh');
 }
 
