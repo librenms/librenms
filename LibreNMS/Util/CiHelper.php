@@ -263,8 +263,10 @@ class CiHelper
         }
 
         echo "Running $name check... ";
+        $space = strrpos($name, ' ');
+        $type = substr($name, $space ? $space + 1 : 0);
 
-        $quiet = $this->inCi ? $this->ciDefaults['quiet'][$name] : $this->quiet;
+        $quiet = $this->inCi ? $this->ciDefaults['quiet'][$type] : $this->quiet;
         if (!$quiet) {
             echo PHP_EOL;
             passthru($command, $return);
