@@ -46,7 +46,7 @@ class CiHelper
     private $commandOnly = false;
     private $failFast = false;
     private $inCi = false;
-    private $completedTests = [
+    private $completedChecks = [
         'lint' => false,
         'style' => false,
         'unit' => false,
@@ -64,57 +64,81 @@ class CiHelper
     private $modules;
     private $os;
     private $flags = [
-        'style' => [
-            'skip' => false,
-        ],
-        'lint' => [
-            'skip' => false,
-            'skip_php' => false,
-            'skip_python' => false,
-            'skip_bash' => false,
-        ],
-        'unit' => [
-            'skip' => false,
-            'os' => false,
-            'docs' => false,
-            'svg' => false,
-            'modules' => false,
-        ],
-        'dusk' => [
-            'skip' => false,
-        ],
-        'docs' => [
-            'changed' => false,
-        ]
+        'style_enable' => true,
+        'style_skip' => false,
+        'lint_enable' => true,
+        'lint_skip' => false,
+        'lint_skip_php' => false,
+        'lint_skip_python' => false,
+        'lint_skip_bash' => false,
+        'unit_enable' => true,
+        'unit_skip' => false,
+        'unit_os' => false,
+        'unit_docs' => false,
+        'unit_svg' => false,
+        'unit_modules' => false,
+        'dusk_enable' => true,
+        'dusk_skip' => false,
+        'docs_changed' => false,
+        'quiet' => false,
+        'commands' => false,
+        'fail-fast' => false,
+        'full' => false,
+        'ci' => false,
     ];
 
-    public function __construct()
+    public function __construct(array $flags = [])
     {
-        $this->parseOptions();
+        $this->setFlags($flags);
         $this->detectChangedFiles();
         $this->parseChangedFiles();
         $this->checkEnv();
     }
 
+    public function enable($check, $enabled = true)
+    {
+        $this->flags[$check]['enabled'] = $enabled;
+    }
+
+    public static function duskHeadless()
+    {
+        putenv('CHROME_HEADLESS=1');
+    }
+
+    public static function enableDb()
+    {
+        putenv('DBTEST=1');
+    }
+
+    public static function enableSnmpsim()
+    {
+        putenv('SNMPSIM=1');
+    }
+
+    public function setModules(array $modules)
+    {
+        putenv("TEST_MODULES=" . implode(',', $modules));
+        $this->modules = $modules;
+    }
+
+    public function setOS(array $os)
+    {
+        $this->os = $os;
+    }
+
+    public function setFlags(array $flags)
+    {
+        $this->flags = array_intersect_key($flags, $this->flags) + $this->flags;
+    }
+
     public function run()
     {
-        // run tests in the order they were specified
-
         $return = 0;
-        foreach (array_keys($this->options) as $opt) {
-            $ret = 0;
-            if ($opt == 'l' || $opt == 'lint') {
-                $ret = $this->runCheck('lint');
-            } elseif ($opt == 's' || $opt == 'style') {
-                $ret = $this->runCheck('style');
-            } elseif ($opt == 'u' || $opt == 'unit') {
-                $ret = $this->runCheck('unit');
-            } elseif ($opt == 'd' || $opt == 'dusk') {
-                $ret = $this->runCheck('dusk');
-            }
+        foreach (array_keys($this->completedChecks) as $check) {
+            $ret = $this->runCheck($check);
 
             if ($this->failFast && $ret !== 0 && $ret !== 250) {
-                exit($ret);
+                return $return;
             } else {
                 $return += $ret;
             }
@@ -130,7 +154,7 @@ class CiHelper
      */
     public function allChecksComplete()
     {
-        return array_reduce($this->completedTests, function ($result, $check) {
+        return array_reduce($this->completedChecks, function ($result, $check) {
             return $result && $check;
         }, false);
     }
@@ -166,16 +190,16 @@ class CiHelper
         }
 
         // exclusive tests
-        if ($this->flags['unit']['os']) {
+        if ($this->flags['unit_os']) {
             echo 'Only checking os: ' . implode(', ', $this->changed['os']) . PHP_EOL;
             $filter = implode('.*|', $this->os ?: $this->changed['os']);
             // include tests that don't have data providers and only data sets that match
             $phpunit_cmd .= " --group os --filter '/::test[A-Za-z]+$|::test[A-Za-z]+ with data set \"$filter.*\"$/'";
-        } elseif ($this->flags['unit']['docs']) {
+        } elseif ($this->flags['unit_docs']) {
             $phpunit_cmd .= " --group docs";
-        } elseif ($this->flags['unit']['svg']) {
+        } elseif ($this->flags['unit_svg']) {
             $phpunit_cmd .= ' tests/SVGTest.php';
-        } elseif ($this->flags['unit']['modules']) {
+        } elseif ($this->flags['unit_modules']) {
             $phpunit_cmd .= ' tests/OSModulesTest.php';
         }
 
@@ -198,7 +222,7 @@ class CiHelper
         return $this->execute('style', $cs_cmd);
     }
 
-    public function checkDusk()
+    public function checkWeb()
     {
         exec('php artisan config:clear'); // make sure config is not cached
         exec('php artisan dusk:update --detect');  // make sure driver is correct
@@ -223,7 +247,7 @@ class CiHelper
             $dusk_cmd .= ' --stop-on-error --stop-on-failure';
         }
 
-        return $this->execute('dusk', $dusk_cmd);
+        return $this->execute('web', $dusk_cmd);
     }
 
     /**
@@ -234,7 +258,7 @@ class CiHelper
     public function checkLint()
     {
         $return = 0;
-        if (!$this->flags['lint']['skip_php']) {
+        if (!$this->flags['lint_skip_php']) {
             $parallel_lint_bin = $this->checkPhpExec('parallel-lint');
 
             // matches a substring of the relative path, leading / is treated as absolute path
@@ -248,7 +272,7 @@ class CiHelper
             $return += $this->execute('PHP lint', $php_lint_cmd);
         }
 
-        if (!$this->flags['lint']['skip_python']) {
+        if (!$this->flags['lint_skip_python']) {
             $pylint_bin = $this->checkPythonExec('pylint');
 
             $files = $this->fullChecks
@@ -259,7 +283,7 @@ class CiHelper
             $return += $this->execute('Python lint', $py_lint_cmd);
         }
 
-        if (!$this->flags['lint']['skip_bash']) {
+        if (!$this->flags['lint_skip_bash']) {
             $files = $this->fullChecks
                 ? explode(PHP_EOL, rtrim(shell_exec("find . -name '*.sh' -not -path './node_modules/*' -not -path './vendor/*'")))
                 : $this->changed['bash'];
@@ -283,7 +307,7 @@ class CiHelper
     private function runCheck($type)
     {
         if ($method = $this->canCheck($type)) {
-            $this->completedTests[$type] = true;
+            $this->completedChecks[$type] = true;
             return $this->$method();
         }
 
@@ -297,12 +321,12 @@ class CiHelper
      */
     private function canCheck($type)
     {
-        if ($this->flags[$type]['skip'] || $this->completedTests[$type]) {
+        if ($this->flags["{$type}_skip"] || $this->completedChecks[$type]) {
             return false;
         }
 
         $method = 'check' . ucfirst($type);
-        if (method_exists($this, $method)) {
+        if (method_exists($this, $method) && $this->flags["{$type}_enable"]) {
             return $method;
         }
 
@@ -449,95 +473,12 @@ class CiHelper
         }
     }
 
-    private function parseOptions(): void
-    {
-        $short_opts = 'ldsufqcho:m:';
-        $long_opts = [
-            'ci',
-            'commands',
-            'db',
-            'dusk',
-            'fail-fast',
-            'full',
-            'help',
-            'lint',
-            'module:',
-            'os:',
-            'quiet',
-            'snmpsim',
-            'style',
-            'unit',
-        ];
-        $this->options = getopt($short_opts, $long_opts);
-
-        $filename = basename($_SERVER["SCRIPT_FILENAME"]);
-        if ($this->checkOpt('h', 'help')) {
-            echo "LibreNMS Code Tests Script
-Running $filename without options runs all checks.
-  -l, --lint      Run php lint checks to test for valid syntax
-  -s, --style     Run phpcs check to check for PSR-2 compliance
-  -u, --unit      Run phpunit tests
-  -d, --dusk      Run Laravel Dusk tests
-  -o, --os        Specific OS to run tests on. Implies --unit, --db, --snmpsim
-  -m, --module    Specific Module to run tests on. Implies --unit, --db, --snmpsim
-  -f, --fail-fast Quit when any failure is encountered
-  -q, --quiet     Hide output unless there is an error
-      --db        Run unit tests that require a database
-      --snmpsim   Use snmpsim for unit tests
-      --full      Run full checks ignoring changed file filtering
-      --ci        Use preset config for running continuous integration
-  -c, --commands  Print commands only, no checks
-  -h, --help      Show this help text.\n";
-            exit();
-        }
-
-        $this->quiet = $this->checkOpt('q', 'quiet');
-        $this->commandOnly = $this->checkOpt('c', 'commands');
-        $this->failFast = $this->checkOpt('f', 'fail-fast', 'ci');
-        $this->inCi = $this->checkOpt('ci');
-        $this->fullChecks = $this->checkOpt('full');
-
-        if ($this->inCi) {
-            putenv('CHROME_HEADLESS=1');
-        }
-
-        if ($os = $this->checkOpt('os', 'o')) {
-            $this->os = explode(',', $os);
-            // enable unit tests, snmpsim, and db
-            $this->options['u'] = false;
-            $this->options['snmpsim'] = false;
-            $this->options['db'] = false;
-        }
-
-        if ($modules = $this->checkOpt('m', 'module')) {
-            $this->modules = $modules;
-            putenv("TEST_MODULES=$modules"); // set to pass to unit test
-            // enable unit tests, snmpsim, and db
-            $this->options['u'] = false;
-            $this->options['snmpsim'] = false;
-            $this->options['db'] = false;
-        }
-
-        if (!$this->checkOpt('l', 'lint', 's', 'style', 'u', 'unit', 'd', 'dusk')) {
-            // no test specified, run all tests in this order
-            $this->options += ['u' => false, 's' => false, 'l' => false, 'd' => false];
-        }
-
-        if ($this->checkOpt('snmpsim', 'ci')) {
-            putenv('SNMPSIM=1');
-        }
-
-        if ($this->checkOpt('db', 'ci')) {
-            putenv('DBTEST=1');
-        }
-    }
-
     private function checkEnv()
     {
-        $this->flags['unit']['skip'] = getenv('SKIP_UNIT_CHECK') ? true : $this->flags['unit']['skip'];
-        $this->flags['lint']['skip'] = getenv('SKIP_LINT_CHECK') ? true : $this->flags['lint']['skip'];
-        $this->flags['dusk']['skip'] = getenv('SKIP_DUSK_CHECK') ? true : $this->flags['dusk']['skip'];
-        $this->flags['style']['skip'] = getenv('SKIP_STYLE_CHECK') ? true : $this->flags['style']['skip'];
+        $this->flags['unit_skip'] = (bool)getenv('SKIP_UNIT_CHECK');
+        $this->flags['lint_skip'] = (bool)getenv('SKIP_LINT_CHECK');
+        $this->flags['dusk_skip'] = (bool)getenv('SKIP_WEB_CHECK');
+        $this->flags['style_skip'] = (bool)getenv('SKIP_STYLE_CHECK');
     }
 
     private function parseChangedFiles()
@@ -551,30 +492,20 @@ Running $filename without options runs all checks.
         $onlyOs = empty(array_diff($this->changed['php'], $this->changed['os-php']));
         $noPhp = !$hasOs && empty($this->changed['php']);
 
-        $this->flags = [
-            'style' => [
-                'skip' => empty($this->changed['php'])
-            ],
-            'lint' => [
-                'skip' => empty($this->changed['php']) && empty($this->changed['python']) && empty($this->changed['bash']),
-                'skip_php' => empty($this->changed['php']),
-                'skip_python' => empty($this->changed['python']),
-                'skip_bash' => empty($this->changed['bash']),
-            ],
-            'unit' => [
-                'skip' => !$hasOs && $noPhp && empty($this->changed['docs']) && empty($this->changed['svg']),
-                'os' => !empty($this->os) || ($hasOs && $onlyOs),
-                'docs' => !empty($this->changed['docs']) && $noPhp,
-                'svg' => !empty($this->changed['svg']) && $noPhp,
-                'modules' => !empty($this->modules),
-            ],
-            'dusk' => [
-                'skip' => !$noPhp && empty($this->changed['resources']),
-            ],
-            'docs' => [
-                'changed' => !empty($this->changed['docs']),
-            ]
-        ];
+        $this->setFlags([
+            'style_skip' => empty($this->changed['php']),
+            'lint_skip' => empty($this->changed['php']) && empty($this->changed['python']) && empty($this->changed['bash']),
+            'lint_skip_php' => empty($this->changed['php']),
+            'lint_skip_python' => empty($this->changed['python']),
+            'lint_skip_bash' => empty($this->changed['bash']),
+            'unit_skip' => !$hasOs && $noPhp && empty($this->changed['docs']) && empty($this->changed['svg']),
+            'unit_os' => !empty($this->os) || ($hasOs && $onlyOs),
+            'unit_docs' => !empty($this->changed['docs']) && $noPhp,
+            'unit_svg' => !empty($this->changed['svg']) && $noPhp,
+            'unit_modules' => !empty($this->modules),
+            'dusk_skip' => !$noPhp && empty($this->changed['resources']),
+            'docs_changed' => !empty($this->changed['docs']),
+        ]);
     }
 
     /**
