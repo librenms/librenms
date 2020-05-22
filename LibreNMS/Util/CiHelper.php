@@ -376,20 +376,20 @@ class CiHelper
 
         $hasOs = !empty($this->changed['os']);
         $onlyOs = empty(array_diff($this->changed['php'], $this->changed['os-files']));
-        $noPhp = !$hasOs && empty($this->changed['php']);
+        $php = $hasOs && empty($this->changed['php']);
 
         $this->setFlags([
-            'style_skip' => empty($this->changed['php']),
-            'lint_skip' => empty($this->changed['php']) && empty($this->changed['python']) && empty($this->changed['bash']),
+            'style_enable' => !empty($this->changed['php']),
+            'lint_enable' => !empty($this->changed['php']) || !empty($this->changed['python']) || !empty($this->changed['bash']),
             'lint_skip_php' => empty($this->changed['php']),
             'lint_skip_python' => empty($this->changed['python']),
             'lint_skip_bash' => empty($this->changed['bash']),
-            'unit_skip' => !$hasOs && $noPhp && empty($this->changed['docs']) && empty($this->changed['svg']),
+            'unit_enable' => $hasOs || $php || !empty($this->changed['docs']) || !empty($this->changed['svg']),
             'unit_os' => !empty($this->os) || ($hasOs && $onlyOs),
-            'unit_docs' => !empty($this->changed['docs']) && $noPhp,
-            'unit_svg' => !empty($this->changed['svg']) && $noPhp,
+            'unit_docs' => !empty($this->changed['docs']) && !$php,
+            'unit_svg' => !empty($this->changed['svg']) && !$php,
             'unit_modules' => !empty($this->modules),
-            'dusk_skip' => !$noPhp && empty($this->changed['resources']),
+            'web_enable' => $php || !empty($this->changed['resources']),
             'docs_changed' => !empty($this->changed['docs']),
             'full' => !empty($this->changed['full-checks']),
         ]);
