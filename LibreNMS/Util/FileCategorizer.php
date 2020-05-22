@@ -63,14 +63,13 @@ class FileCategorizer extends Categorizer
             return in_array($item, ['composer.lock', '.travis.yml']) ? $item : false;
         });
         $this->addCategory('os-files', function ($item) {
-            if (!empty($os_name = $this->osFromFile($item))) {
+            if (($os_name = $this->osFromFile($item)) !== null) {
                 return ['os' => $os_name, 'file' => $item];
             }
 
             return false;
         });
     }
-
 
     public function categorize()
     {
@@ -89,21 +88,9 @@ class FileCategorizer extends Categorizer
         return $this->categorized;
     }
 
-    /**
-     * Extract os name from path and validate it exists.
-     *
-     * @param $php_file
-     * @return null|string
-     */
-    private function osFromPhp($php_file)
+    private function validateOs($os)
     {
-        $os = basename($php_file, '.inc.php');
-
-        if (file_exists("includes/definitions/$os.yaml")) {
-            return $os;
-        }
-
-        return null;
+        return file_exists("includes/definitions/$os.yaml") ? $os : null;
     }
 
     private function osFromFile($file)
@@ -111,15 +98,15 @@ class FileCategorizer extends Categorizer
         if (Str::startsWith($file, 'includes/definitions/')) {
             return basename($file, '.yaml');
         } elseif (Str::startsWith($file, ['includes/polling', 'includes/discovery'])) {
-            return $this->osFromPhp($file);
+            return $this->validateOs(basename($file, '.inc.php'));
         } elseif (preg_match('#LibreNMS/OS/[^/]+.php#', $file)) {
             return $this->osFromClass(basename($file, '.php'));
         } elseif (preg_match(self::TESTS_REGEX, $file, $matches)) {
-            if ($this->osFromPhp($matches[2])) {
-                return $matches[2];
-            }
-            if ($this->osFromPhp($matches[3])) {
+            if ($this->validateOs($matches[3])) {
                 return $matches[3];
+            }
+            if ($this->validateOs($matches[2])) {
+                return $matches[2];
             }
         }
 
@@ -142,9 +129,9 @@ class FileCategorizer extends Categorizer
             $osname
         );
 
-        if ($os = $this->osFromPhp($osname)) {
+        if ($os = $this->validateOs($osname)) {
             return $os;
         }
-        return $this->osFromPhp(str_replace('-', '_', $osname));
+        return $this->validateOs(str_replace('-', '_', $osname));
     }
 }
