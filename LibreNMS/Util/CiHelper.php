@@ -54,7 +54,7 @@ class CiHelper
         'lint_enable' => true,
         'style_enable' => true,
         'unit_enable' => true,
-        'web_enable' => true,
+        'web_enable' => false,
         'lint_skip' => false,
         'style_skip' => false,
         'unit_skip' => false,
@@ -214,6 +214,11 @@ class CiHelper
 
     public function checkWeb()
     {
+        if (!$this->getFlag('ci')) {
+            echo "Warning: dusk may erase your primary database, do not use yet\n";
+            return 0;
+        }
+
         if ($this->canCheck('web')) {
             echo "Preparing for web checks\n";
             $this->execute('config:clear', ['php', 'artisan', 'config:clear'], true);

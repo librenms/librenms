@@ -259,7 +259,7 @@ class CiHelperTest extends TestCase
             'lint_enable' => true,
             'style_enable' => true,
             'unit_enable' => true,
-            'web_enable' => true,
+            'web_enable' => false,
             'lint_skip' => false,
             'style_skip' => false,
             'unit_skip' => false,
