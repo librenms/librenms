@@ -342,7 +342,7 @@ class CiHelper
         $space = strrpos($name, ' ');
         $type = substr($name, $space ? $space + 1 : 0);
 
-        $quiet = $this->flags['ci'] ? $this->ciDefaults['quiet'][$type] : $this->flags['quiet'];
+        $quiet = ($this->flags['ci'] && isset($this->ciDefaults['quiet'][$type])) ? $this->ciDefaults['quiet'][$type] : $this->flags['quiet'];
         if (!$quiet) {
             echo PHP_EOL;
             $proc->setTty(Process::isTtySupported());
