@@ -69,7 +69,7 @@ class DevCheckCommand extends LnmsCommand
             exec('bash scripts/deploy-docs.sh');
         }
 
-        if ($result == 0) {
+        if ($result == 0 && $this->helper->allChecksComplete()) {
             $this->line("\033[32mTests ok, submit away :)\033[0m");
         }
 
