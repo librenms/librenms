@@ -205,16 +205,25 @@ class CiHelper
 
     public function checkWeb()
     {
-        exec('php artisan config:clear'); // make sure config is not cached
-        exec('php artisan dusk:update --detect');  // make sure driver is correct
+        $this->execute('config:clear', ['php', 'artisan', 'config:clear']);
+        $this->execute('dusk:update', ['php', 'artisan', 'dusk:update', ' --detect']);
+//        $config_clear = new Process(['php', 'artisan', 'config:clear']);
+//        $config_clear->run();
+//        if ($config_clear->getExitCode() !== 0) {
+//            echo $config_clear->getOutput() . PHP_EOL;
+//            echo $config_clear->getErrorOutput() . PHP_EOL;
+//        }
+//        ()->setTty(Process::isTtySupported())->run(); // make sure config is not cached
+//        (new Process(['php', 'artisan', 'dusk:update', ' --detect']))->setTty(Process::isTtySupported())->run(); // make sure driver is correct
 
         putenv('APP_ENV=testing');
 
         // check if web server is running
-        $server = new Process("php -S 127.0.0.1:8000 ../server.php", 'html', ['APP_ENV' => 'dusk.testing']);
-        $server->setTimeout(3600);
-        $server->setIdleTimeout(3600);
-        $server->start();
+        $server = new Process(['php', '-S', '127.0.0.1:8000', base_path('server.php')], public_path(), ['APP_ENV' => 'dusk.testing']);
+        $server->setTimeout(3600)
+            ->setIdleTimeout(3600)
+            ->setTty(Process::isTtySupported())
+            ->start();
         $server->waitUntil(function ($type, $output) {
             return strpos($output, 'Development Server (http://127.0.0.1:8000) started') !== false;
         });
@@ -316,13 +325,16 @@ class CiHelper
 
     /**
      * @param string $name
-     * @param string $command
+     * @param string|array $command
      * @return int
      */
-    private function execute(string $name, string $command): int
+    private function execute(string $name, $command): int
     {
+        $start = microtime(true);
+        $proc = new Process($command);
+
         if ($this->flags['commands']) {
-            echo $command . PHP_EOL;
+            echo $proc->getCommandLine() . PHP_EOL;
             return 250;
         }
 
@@ -333,20 +345,23 @@ class CiHelper
         $quiet = $this->flags['ci'] ? $this->ciDefaults['quiet'][$type] : $this->flags['quiet'];
         if (!$quiet) {
             echo PHP_EOL;
-            passthru($command, $return);
-            return $return;
+            $proc->setTty(Process::isTtySupported());
         }
 
-        exec($command, $output, $return);
+        $proc->run();
 
-        if ($return > 0) {
-            echo "failed\n";
-            print(implode(PHP_EOL, $output) . PHP_EOL);
+        $duration = sprintf('%.2fs', microtime(true) - $start);
+        if ($proc->getExitCode() > 0) {
+            echo "failed ($duration)\n";
+            if ($quiet) {
+                echo $proc->getOutput() . PHP_EOL;
+                echo $proc->getErrorOutput() . PHP_EOL;
+            }
         } else {
-            echo "success\n";
+            echo "success ($duration)\n";
         }
 
-        return $return;
+        return $proc->getExitCode();
     }
 
 
