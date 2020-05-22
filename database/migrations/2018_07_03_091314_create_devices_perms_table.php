@@ -14,7 +14,7 @@ class CreateDevicesPermsTable extends Migration
     public function up()
     {
         Schema::create('devices_perms', function (Blueprint $table) {
-            $table->unsignedInteger('user_id')->index('user_id');
+            $table->unsignedInteger('user_id')->index();
             $table->unsignedInteger('device_id');
         });
     }

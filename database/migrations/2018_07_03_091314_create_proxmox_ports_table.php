@@ -17,8 +17,8 @@ class CreateProxmoxPortsTable extends Migration
             $table->increments('id');
             $table->integer('vm_id');
             $table->string('port', 10);
-            $table->timestamp('last_seen')->default(DB::raw('CURRENT_TIMESTAMP'));
-            $table->unique(['vm_id','port'], 'vm_port');
+            $table->timestamp('last_seen')->useCurrent();
+            $table->unique(['vm_id','port']);
         });
     }
 

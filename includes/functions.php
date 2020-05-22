@@ -2225,49 +2225,55 @@ function cache_peeringdb()
  * Each entry in the Columns array contains these keys: Field, Type, Null, Default, Extra
  * Each entry in the Indexes array contains these keys: Name, Columns(array), Unique
  *
+ * @param string $connection use a specific connection
  * @return array
  */
-function dump_db_schema()
+function dump_db_schema($connection = null)
 {
     $output = [];
-    $db_name = dbFetchCell('SELECT DATABASE()');
+    $db_name = DB::connection($connection)->getDatabaseName();
 
-    foreach (dbFetchRows("SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = '$db_name' ORDER BY TABLE_NAME;") as $table) {
-        $table = $table['TABLE_NAME'];
-        foreach (dbFetchRows("SELECT COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE, COLUMN_DEFAULT, EXTRA FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '$db_name' AND TABLE_NAME='$table'") as $data) {
+    foreach (DB::connection($connection)->select(DB::raw("SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = '$db_name' ORDER BY TABLE_NAME;")) as $table) {
+        $table = $table->TABLE_NAME;
+        foreach (DB::connection($connection)->select(DB::raw("SELECT COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE, COLUMN_DEFAULT, EXTRA FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '$db_name' AND TABLE_NAME='$table'")) as $data) {
             $def = [
-                'Field'   => $data['COLUMN_NAME'],
-                'Type'    => $data['COLUMN_TYPE'],
-                'Null'    => $data['IS_NULLABLE'] === 'YES',
-                'Extra'   => str_replace('current_timestamp()', 'CURRENT_TIMESTAMP', $data['EXTRA']),
+                'Field'   => $data->COLUMN_NAME,
+                'Type'    => $data->COLUMN_TYPE,
+                'Null'    => $data->IS_NULLABLE === 'YES',
+                'Extra'   => str_replace('current_timestamp()', 'CURRENT_TIMESTAMP', $data->EXTRA),
             ];
 
-            if (isset($data['COLUMN_DEFAULT']) && $data['COLUMN_DEFAULT'] != 'NULL') {
-                $default = trim($data['COLUMN_DEFAULT'], "'");
+            if (isset($data->COLUMN_DEFAULT) && $data->COLUMN_DEFAULT != 'NULL') {
+                $default = trim($data->COLUMN_DEFAULT, "'");
                 $def['Default'] = str_replace('current_timestamp()', 'CURRENT_TIMESTAMP', $default);
             }
 
             $output[$table]['Columns'][] = $def;
         }
 
-        foreach (array_sort_by_column(dbFetchRows("SHOW INDEX FROM `$table`"), 'Key_name') as $key) {
-            $key_name = $key['Key_name'];
+        $keys = DB::connection($connection)->select(DB::raw("SHOW INDEX FROM `$table`"));
+        usort($keys, function ($a, $b) {
+            return $a->Key_name <=> $b->Key_name;
+        });
+        foreach ($keys as $key) {
+            $key_name = $key->Key_name;
             if (isset($output[$table]['Indexes'][$key_name])) {
-                $output[$table]['Indexes'][$key_name]['Columns'][] = $key['Column_name'];
+                $output[$table]['Indexes'][$key_name]['Columns'][] = $key->Column_name;
             } else {
                 $output[$table]['Indexes'][$key_name] = [
-                    'Name'    => $key['Key_name'],
-                    'Columns' => [$key['Column_name']],
-                    'Unique'  => !$key['Non_unique'],
-                    'Type'    => $key['Index_type'],
+                    'Name'    => $key->Key_name,
+                    'Columns' => [$key->Column_name],
+                    'Unique'  => !$key->Non_unique,
+                    'Type'    => $key->Index_type,
                 ];
             }
         }
 
-        $create = dbFetchRow("SHOW CREATE TABLE `$table`");
-        if (isset($create['Create Table'])) {
+        $create = DB::connection($connection)->select(DB::raw("SHOW CREATE TABLE `$table`"))[0];
+
+        if (isset($create->{'Create Table'})) {
             $constraint_regex = '/CONSTRAINT `(?<name>[A-Za-z_0-9]+)` FOREIGN KEY \(`(?<foreign_key>[A-Za-z_0-9]+)`\) REFERENCES `(?<table>[A-Za-z_0-9]+)` \(`(?<key>[A-Za-z_0-9]+)`\) ?(?<extra>[ A-Z]+)?/';
-            $constraint_count = preg_match_all($constraint_regex, $create['Create Table'], $constraints);
+            $constraint_count = preg_match_all($constraint_regex, $create->{'Create Table'}, $constraints);
             for ($i = 0; $i < $constraint_count; $i++) {
                 $constraint_name = $constraints['name'][$i];
                 $output[$table]['Constraints'][$constraint_name] = [
@@ -2283,10 +2289,6 @@ function dump_db_schema()
 
     return $output;
 }
-
-
-
-
 
 
 /**
