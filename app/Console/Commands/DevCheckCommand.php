@@ -78,9 +78,14 @@ class DevCheckCommand extends LnmsCommand
 
     private function parseInput()
     {
+        $check = $this->argument('check');
+        if (!in_array($check, ['all', 'lint', 'style', 'unit', 'web', 'ci'])) {
+            $this->error("Invalid check: $check");
+            exit(1);
+        }
+
         $this->helper->setFlags(Arr::only($this->options(), ['quiet', 'commands', 'fail-fast', 'full']));
 
-        $check = $this->argument('check');
         $all = $check == 'all' || $check == 'ci';
         $this->helper->enable('style', $all || $check === 'style');
         $this->helper->enable('lint', $all || $check === 'lint');

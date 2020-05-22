@@ -38,14 +38,14 @@ class CiHelper
         'lint' => false,
         'style' => false,
         'unit' => false,
-        'dusk' => false,
+        'web' => false,
     ];
     private $ciDefaults = [
         'quiet' => [
             'lint' => true,
             'style' => true,
             'unit' => false,
-            'dusk' => false,
+            'web' => false,
         ],
     ];
     private $flags = [
@@ -62,8 +62,8 @@ class CiHelper
         'unit_docs' => false,
         'unit_svg' => false,
         'unit_modules' => false,
-        'dusk_enable' => true,
-        'dusk_skip' => false,
+        'web_enable' => true,
+        'web_skip' => false,
         'docs_changed' => false,
         'quiet' => false,
         'commands' => false,
@@ -82,7 +82,7 @@ class CiHelper
 
     public function enable($check, $enabled = true)
     {
-        $this->flags[$check]['enabled'] = $enabled;
+        $this->flags["{$check}_enable"] = $enabled;
     }
 
     public static function duskHeadless()

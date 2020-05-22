@@ -11,11 +11,11 @@ matrix:
   fast_finish: true
   include:
   - php: 7.4
-    env: SKIP_STYLE_CHECK=1 SKIP_DUSK_CHECK=1
+    env: SKIP_STYLE_CHECK=1 SKIP_WEB_CHECK=1
   - php: 7.3
-    env: SKIP_UNIT_CHECK=1 CHROME_HEADLESS=1
+    env: SKIP_UNIT_CHECK=1
   - php: 7.2
-    env: SKIP_STYLE_CHECK=1 SKIP_DUSK_CHECK=1 EXECUTE_BUILD_DOCS=true
+    env: SKIP_STYLE_CHECK=1 SKIP_WEB_CHECK=1 EXECUTE_BUILD_DOCS=true
 
 cache:
   directories:
