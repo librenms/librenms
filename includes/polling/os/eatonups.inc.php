@@ -17,9 +17,9 @@
 
 // This add the software version of the UPS and the management card separated by a "/"
 $version_tmp = trim(snmp_get($device, 'xupsIdentSoftwareVersion.0', '-OQv', 'XUPS-MIB'), '" ');
-if ($version_tmp == '' ) {
+if ($version_tmp == '') {
     $version_tmp = trim(snmp_get($device, 'xupsMIB.14.3.0', '-OQv', 'EATON-OIDS'), '" ');
-    if ($version_tmp == '' ) {
+    if ($version_tmp == '') {
         $version = "";
     } else {
         $version = $version_tmp;
@@ -27,7 +27,7 @@ if ($version_tmp == '' ) {
 } else {
     $version = $version_tmp;
     $version_tmp = trim(snmp_get($device, 'xupsMIB.14.3.0', '-OQv', 'EATON-OIDS'), '" ');
-    if ($version_tmp != '' ) {
+    if ($version_tmp != '') {
         $version .= ' / '.$version_tmp;
     }
 }
@@ -35,9 +35,9 @@ if ($version_tmp == '' ) {
 
 // This add the hardware of the UPS and the management card separated by a "/"
 $hardware_tmp  = trim(snmp_get($device, 'xupsIdentModel.0', '-OQv', 'XUPS-MIB'), '" ');
-if ($hardware_tmp == '' ) {
+if ($hardware_tmp == '') {
     $hardware_tmp = trim(snmp_get($device, 'xupsMIB.14.4.0', '-OQv', 'EATON-OIDS'), '" ');
-    if ($hardware_tmp == '' ) {
+    if ($hardware_tmp == '') {
         $hardware = "";
     } else {
         $hardware = $hardware_tmp;
@@ -45,7 +45,7 @@ if ($hardware_tmp == '' ) {
 } else {
     $hardware = $hardware_tmp;
     $hardware_tmp = trim(snmp_get($device, 'xupsMIB.14.4.0', '-OQv', 'EATON-OIDS'), '" ');
-    if ($hardware_tmp != '' ) {
+    if ($hardware_tmp != '') {
         $hardware .= ' / '.$hardware_tmp;
     }
 }
@@ -54,9 +54,9 @@ if ($hardware_tmp == '' ) {
 // This add the serial of the UPS and the management card separated by a "/"
 $serial_tmp = trim(snmp_get($device, 'xupsIdent.6.0', '-OQv', 'XUPS-MIB'), '" ');
 
-if ($serial_tmp == '' ) {
+if ($serial_tmp == '') {
     $serial_tmp = trim(snmp_get($device, 'xupsMIB.14.5.0', '-OQv', 'EATON-OIDS'), '" ');
-    if ($serial_tmp == '' ) {
+    if ($serial_tmp == '') {
         $serial = "";
     } else {
         $serial = $serial_tmp;
@@ -64,9 +64,7 @@ if ($serial_tmp == '' ) {
 } else {
     $serial = $serial_tmp;
     $serial_tmp = trim(snmp_get($device, 'xupsMIB.14.5.0', '-OQv', 'EATON-OIDS'), '" ');
-    if ($serial_tmp != '' ) {
+    if ($serial_tmp != '') {
         $serial .= ' / '.$serial_tmp;
     }
 }
-
-
