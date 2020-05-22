@@ -405,25 +405,38 @@ Extend` heading top of page.
 
 # DHCP Stats
 
-A small shell script that reports current DHCP leases stats.
+A small python3 script that reports current DHCP leases stats and pool usage.
+
+Also you have to install the dhcpd-pools Package.
+Under Ubuntu/Debian just run `apt install dhcpd-pools`
 
 ## SNMP Extend
 
 1: Copy the shell script to the desired host.
 
 ```
-wget https://github.com/librenms/librenms-agent/raw/master/snmp/dhcp-status.sh -O /etc/snmp/dhcp-status.sh
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/dhcp.py -O /etc/snmp/dhcp.py
 ```
 
-2: Run `chmod +x /etc/snmp/dhcp-status.sh`
+2: Run `chmod +x /etc/snmp/dhcp.py`
 
-3: Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+
+3: edit a config file:
+
+Content of an example /etc/snmp/dhcp.json . Please edit with your own settings.
+```
+{"leasefile": "/var/lib/dhcp/dhcpd.leases"
+}
+```
+Key 'leasefile' specifies the path to your lease file.
+
+4: Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 
 ```
-extend dhcpstats /etc/snmp/dhcp-status.sh
+extend dhcpstats /etc/snmp/dhcp.py
 ```
 
-4: Restart snmpd on your host
+5: Restart snmpd on your host
 
 The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
