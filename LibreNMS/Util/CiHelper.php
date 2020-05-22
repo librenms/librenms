@@ -33,6 +33,8 @@ class CiHelper
     private $changedFiles;
     private $changed;
     private $os;
+    private $unitEnv = ['APP_ENV' => 'testing'];
+    private $duskEnv = ['APP_ENV' => 'testing'];
 
     private $completedChecks = [
         'lint' => false,
@@ -81,24 +83,24 @@ class CiHelper
         $this->flags["{$check}_enable"] = $enabled;
     }
 
-    public static function duskHeadless()
+    public function duskHeadless()
     {
-        putenv('CHROME_HEADLESS=1');
+        $this->duskEnv['CHROME_HEADLESS'] = 1;
     }
 
-    public static function enableDb()
+    public function enableDb()
     {
-        putenv('DBTEST=1');
+        $this->unitEnv['DBTEST'] = 1;
     }
 
-    public static function enableSnmpsim()
+    public function enableSnmpsim()
     {
-        putenv('SNMPSIM=1');
+        $this->unitEnv['SNMPSIM'] = 1;
     }
 
     public function setModules(array $modules)
     {
-        putenv("TEST_MODULES=" . implode(',', $modules));
+        $this->unitEnv['TEST_MODULES'] = implode(',', $modules);
         $this->flags['unit_modules'] = true;
     }
 
@@ -191,7 +193,7 @@ class CiHelper
             $phpunit_cmd .= ' tests/OSModulesTest.php';
         }
 
-        return $this->execute('unit', $phpunit_cmd);
+        return $this->execute('unit', $phpunit_cmd, false, $this->unitEnv);
     }
 
     /**
@@ -236,7 +238,7 @@ class CiHelper
             $dusk_cmd .= ' --stop-on-error --stop-on-failure';
         }
 
-        return $this->execute('web', $dusk_cmd, false, ['APP_ENV' => 'testing']);
+        return $this->execute('web', $dusk_cmd, false, $this->duskEnv);
     }
 
     /**

@@ -97,30 +97,30 @@ class DevCheckCommand extends LnmsCommand
         if ($os = $this->option('os')) {
             $this->helper->setFlags(['style_enable' => false, 'lint_enable' => false, 'unit_enable' => true, 'web_enable' => false]);
             $this->helper->setOS(explode(',', $os));
-            CiHelper::enableSnmpsim();
-            CiHelper::enableDb();
+            $this->helper->enableSnmpsim();
+            $this->helper->enableDb();
         }
 
         if ($modules = $this->option('module')) {
             $this->helper->setFlags(['style_enable' => false, 'lint_enable' => false, 'unit_enable' => true, 'web_enable' => false]);
             $this->helper->setModules($modules);
-            CiHelper::enableSnmpsim();
-            CiHelper::enableDb();
+            $this->helper->enableSnmpsim();
+            $this->helper->enableDb();
         }
 
         if ($check == 'ci') {
             $this->helper->setFlags(['ci' => true]);
-            CiHelper::duskHeadless();
-            CiHelper::enableSnmpsim();
-            CiHelper::enableDb();
+            $this->helper->duskHeadless();
+            $this->helper->enableSnmpsim();
+            $this->helper->enableDb();
         }
 
         if ($this->option('snmpsim')) {
-            CiHelper::enableSnmpsim();
+            $this->helper->enableSnmpsim();
         }
 
         if ($this->option('db')) {
-            CiHelper::enableDb();
+            $this->helper->enableDb();
         }
     }
 }
