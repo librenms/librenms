@@ -29,6 +29,7 @@ use Illuminate\Support\Str;
 
 class FileCategorizer extends Categorizer
 {
+    private const TESTS_REGEX = '#^tests/(snmpsim|data)/(([0-9a-z\-]+)(_[0-9a-z\-]+)?)(_[0-9a-z\-]+)?\.(json|snmprec)$#';
 
     public function __construct($items = [])
     {
@@ -111,13 +112,15 @@ class FileCategorizer extends Categorizer
             return basename($file, '.yaml');
         } elseif (Str::startsWith($file, ['includes/polling', 'includes/discovery'])) {
             return $this->osFromPhp($file);
-        } elseif (Str::startsWith($file, 'LibreNMS/OS/')) {
-            if (preg_match('#LibreNMS/OS/[^/]+.php#', $file)) {
-                return $this->osFromClass(basename($file, '.php'));
+        } elseif (preg_match('#LibreNMS/OS/[^/]+.php#', $file)) {
+            return $this->osFromClass(basename($file, '.php'));
+        } elseif (preg_match(self::TESTS_REGEX, $file, $matches)) {
+            if ($this->osFromPhp($matches[2])) {
+                return $matches[2];
             }
-        } elseif (Str::startsWith($file, ['tests/snmpsim/', 'tests/data/'])) {
-            [$os,] = explode('_', basename(basename($file, '.json'), '.snmprec'), 2);
-            return $os;
+            if ($this->osFromPhp($matches[3])) {
+                return $matches[3];
+            }
         }
 
         return null;

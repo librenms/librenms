@@ -32,13 +32,14 @@ before_install:
 install:
   - travis_retry composer install --no-interaction --prefer-dist --no-suggest
   - pip3 install --user snmpsim PyMySQL pylint
-  - test -n "$SKIP_DUSK_CHECK" || php artisan dusk:update --detect
+  - test -n "$SKIP_WEB_CHECK" || php artisan dusk:update --detect
 
 after_failure:
   - tail /tmp/snmpsimd.log
 
 before_script:
   - phpenv config-rm xdebug.ini
+  - test -n "$SKIP_WEB_CHECK" || php artisan dusk
 
 script:
   - php artisan dev:check ci
