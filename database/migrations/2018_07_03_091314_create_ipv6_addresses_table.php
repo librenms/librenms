@@ -20,7 +20,7 @@ class CreateIpv6AddressesTable extends Migration
             $table->integer('ipv6_prefixlen');
             $table->string('ipv6_origin', 16);
             $table->string('ipv6_network_id', 128);
-            $table->unsignedInteger('port_id')->index('interface_id');
+            $table->unsignedInteger('port_id')->index();
             $table->string('context_name', 128)->nullable();
         });
     }

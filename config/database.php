@@ -46,13 +46,13 @@ return [
 
     'connections' => [
 
-//        'sqlite' => [
-//            'driver' => 'sqlite',
-//            'url' => env('DATABASE_URL'),
-//            'database' => env('DB_DATABASE', database_path('database.sqlite')),
-//            'prefix' => '',
-//            'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
-//        ],
+        'sqlite' => [
+            'driver' => 'sqlite',
+            'url' => env('DATABASE_URL'),
+            'database' => env('DB_DATABASE', storage_path('librenms.sqlite')),
+            'prefix' => '',
+            'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
+        ],
 
         'mysql' => [
             'driver' => 'mysql',
@@ -117,10 +117,18 @@ return [
             'prefix_indexes' => true,
         ],
 
-        'memory' => [
+        'testing_memory' => [
             'driver'   => 'sqlite',
             'database' => ':memory:',
             'prefix'   => '',
+            'foreign_key_constraints' => true,
+        ],
+
+        'testing_persistent' => [
+            'driver' => 'sqlite',
+            'database' => storage_path('testing.sqlite'),
+            'prefix' => '',
+            'foreign_key_constraints' => true,
         ]
 
     ],

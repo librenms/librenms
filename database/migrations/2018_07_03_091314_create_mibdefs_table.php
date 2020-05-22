@@ -23,7 +23,11 @@ class CreateMibdefsTable extends Migration
             $table->string('max_access')->nullable();
             $table->string('status')->nullable();
             $table->string('included_by');
-            $table->timestamp('last_modified')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
+            if (\LibreNMS\DB\Eloquent::getDriver() == 'mysql') {
+                $table->timestamp('last_modified')->default(DB::raw('CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP'));
+            } else {
+                $table->timestamp('last_modified')->useCurrent();
+            }
             $table->primary(['module','mib','object_type']);
         });
     }

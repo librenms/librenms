@@ -17,7 +17,7 @@ class CreateMplsTunnelCHopsTable extends Migration
             $table->increments('c_hop_id');
             $table->unsignedInteger('mplsTunnelCHopListIndex');
             $table->unsignedInteger('mplsTunnelCHopIndex');
-            $table->unsignedInteger('device_id')->index('device_id');
+            $table->unsignedInteger('device_id')->index();
             $table->unsignedInteger('lsp_path_id')->nullable();
             $table->enum('mplsTunnelCHopAddrType', array('unknown','ipV4','ipV6','asNumber','lspid','unnum'))->nullable();
             $table->string('mplsTunnelCHopIpv4Addr', 15)->nullable();
