@@ -39,7 +39,8 @@ after_failure:
 
 before_script:
   - phpenv config-rm xdebug.ini
-  - test -n "$SKIP_WEB_CHECK" || php artisan dusk
+  - test -n "$SKIP_WEB_CHECK" || php artisan serve --env=dusk.testing  2>/dev/null &
+
 
 script:
   - php artisan dev:check ci
