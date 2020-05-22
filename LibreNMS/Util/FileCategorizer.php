@@ -63,7 +63,6 @@ class FileCategorizer extends Categorizer
         });
         $this->addCategory('os-files', function ($item) {
             if (!empty($os_name = $this->osFromFile($item))) {
-
                 return ['os' => $os_name, 'file' => $item];
             }
 
@@ -137,7 +136,8 @@ class FileCategorizer extends Categorizer
         $osname = preg_replace(
             ['/^zero-/', '/^one-/', '/^two-/', '/^three-/', '/^four-/', '/^five-/', '/^six-/', '/^seven-/', '/^eight-/', '/^nine-/',],
             ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'],
-            $osname);
+            $osname
+        );
 
         if ($os = $this->osFromPhp($osname)) {
             return $os;

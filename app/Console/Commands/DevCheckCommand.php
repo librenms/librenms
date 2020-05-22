@@ -116,5 +116,4 @@ class DevCheckCommand extends LnmsCommand
             CiHelper::enableDb();
         }
     }
-
 }
