@@ -62,10 +62,12 @@ class DevCheckCommand extends LnmsCommand
     {
         $this->helper = new CiHelper();
         $this->parseInput();
+        $this->helper->detectChangedFiles();
+        $this->helper->checkEnvSkips();
 
         $result = $this->helper->run();
 
-        if (getenv('EXECUTE_BUILD_DOCS') && $this->helper->getFlags('docs_changed')) {
+        if (getenv('EXECUTE_BUILD_DOCS') && $this->helper->getFlag('docs_changed')) {
             exec('bash scripts/deploy-docs.sh');
         }
 

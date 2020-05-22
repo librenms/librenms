@@ -49,35 +49,32 @@ class CiHelper
         ],
     ];
     private $flags = [
-        'style_enable' => true,
-        'style_skip' => false,
         'lint_enable' => true,
+        'style_enable' => true,
+        'unit_enable' => true,
+        'web_enable' => true,
         'lint_skip' => false,
+        'style_skip' => false,
+        'unit_skip' => false,
+        'web_skip' => false,
         'lint_skip_php' => false,
         'lint_skip_python' => false,
         'lint_skip_bash' => false,
-        'unit_enable' => true,
-        'unit_skip' => false,
         'unit_os' => false,
         'unit_docs' => false,
         'unit_svg' => false,
         'unit_modules' => false,
-        'web_enable' => true,
-        'web_skip' => false,
         'docs_changed' => false,
-        'quiet' => false,
+        'ci' => false,
         'commands' => false,
         'fail-fast' => false,
         'full' => false,
-        'ci' => false,
+        'quiet' => false,
     ];
 
     public function __construct(array $flags = [])
     {
         $this->setFlags($flags);
-        $this->detectChangedFiles();
-        $this->parseChangedFiles();
-        $this->checkEnv();
     }
 
     public function enable($check, $enabled = true)
@@ -145,14 +142,22 @@ class CiHelper
     }
 
     /**
-     * Fetch flags
-     * if no parameters are specified, all are fetch or all for type if only type is specified
-     * @param string $item
-     * @return bool|bool[]
+     * Get a flag value
+     * @param string $name
+     * @return bool
      */
-    public function getFlags($item = null)
+    public function getFlag($name)
     {
-        return isset($this->flags[$item]) ? $this->flags[$item] : $this->flags;
+        return $this->flags[$name] ?? null;
+    }
+
+    /**
+     * Fetch all flags
+     * @return bool[]
+     */
+    public function getFlags()
+    {
+        return $this->flags;
     }
 
     /**
@@ -368,7 +373,7 @@ class CiHelper
     }
 
 
-    private function checkEnv()
+    public function checkEnvSkips()
     {
         $this->flags['unit_skip'] = (bool)getenv('SKIP_UNIT_CHECK');
         $this->flags['lint_skip'] = (bool)getenv('SKIP_LINT_CHECK');
@@ -376,13 +381,15 @@ class CiHelper
         $this->flags['style_skip'] = (bool)getenv('SKIP_STYLE_CHECK');
     }
 
-    private function detectChangedFiles()
+    public function detectChangedFiles()
     {
-        $changed_files = getenv('FILES')
-            ? rtrim(getenv('FILES'))
-            : exec("git diff --diff-filter=d --name-only master | tr '\n' ' '|sed 's/,*$//g'");
-        $categorizor = new FileCategorizer($this->changedFiles = $changed_files ? explode(' ', $changed_files) : []);
-        $this->changed = $categorizor->categorize();
+        $files = trim(getenv('FILES'));
+        $changed_files = $files ?: shell_exec("git diff --diff-filter=d --name-only master | tr '\n' ' '|sed 's/,*$//g'");
+        $this->changedFiles = $changed_files ? explode(' ', $changed_files) : [];
+
+        $this->changed = (new FileCategorizer($this->changedFiles))->categorize();
+
+        $this->parseChangedFiles();
     }
 
     private function parseChangedFiles()
@@ -392,22 +399,20 @@ class CiHelper
             return;
         }
 
-        $hasOs = !empty($this->changed['os']);
         $onlyOs = empty(array_diff($this->changed['php'], $this->changed['os-files']));
-        $php = $hasOs && empty($this->changed['php']);
 
         $this->setFlags([
-            'style_enable' => !empty($this->changed['php']),
-            'lint_enable' => !empty($this->changed['php']) || !empty($this->changed['python']) || !empty($this->changed['bash']),
+            'lint_skip' => empty($this->changed['php']) && empty($this->changed['python']) && empty($this->changed['bash']),
+            'style_skip' => empty($this->changed['php']),
+            'unit_skip' => empty($this->changed['os']) && empty($this->changed['php']) && empty($this->changed['docs']) && empty($this->changed['svg']),
+            'web_skip' => empty($this->changed['php']) && empty($this->changed['resources']),
             'lint_skip_php' => empty($this->changed['php']),
             'lint_skip_python' => empty($this->changed['python']),
             'lint_skip_bash' => empty($this->changed['bash']),
-            'unit_enable' => $hasOs || $php || !empty($this->changed['docs']) || !empty($this->changed['svg']),
-            'unit_os' => !empty($this->os) || ($hasOs && $onlyOs),
-            'unit_docs' => !empty($this->changed['docs']) && !$php,
-            'unit_svg' => !empty($this->changed['svg']) && !$php,
+            'unit_os' => !empty($this->os) || (!empty($this->changed['os']) && $onlyOs),
+            'unit_docs' => !empty($this->changed['docs']) && empty($this->changed['php']),
+            'unit_svg' => !empty($this->changed['svg']) && empty($this->changed['php']),
             'unit_modules' => !empty($this->modules),
-            'web_enable' => $php || !empty($this->changed['resources']),
             'docs_changed' => !empty($this->changed['docs']),
             'full' => !empty($this->changed['full-checks']),
         ]);
