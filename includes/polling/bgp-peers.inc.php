@@ -95,6 +95,7 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                         if (!isset($bgpPeers)) {
                             $bgpPeersCache = snmpwalk_cache_oid($device, 'hwBgpPeerEntry', [], 'HUAWEI-BGP-VPN-MIB', 'huawei');
                             $bgpPeersStats = snmpwalk_cache_oid($device, 'hwBgpPeerStatisticTable', [], 'HUAWEI-BGP-VPN-MIB', 'huawei', '-OQUbs');
+                            $bgp4updates = snmpwalk_cache_oid($device, 'bgpPeerEntry', [], 'BGP4-MIB', 'huawei', '-OQUbs');
                             foreach ($bgpPeersCache as $key => $value) {
                                 $oid = explode(".", $key, 5);
                                 $vrfInstance = $oid[0];
@@ -138,8 +139,27 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                             $peer_data['bgpPeerOutTotalMessages'] = $bgpPeers[$address][$vrfInstance]['hwBgpPeerOutTotalMsgs'];
                             $peer_data['bgpPeerFsmEstablishedTime'] = $bgpPeers[$address][$vrfInstance]['hwBgpPeerFsmEstablishedTime'];
                         }
-                        d_echo("VPN : $vrfInstance for $address :");
+                        d_echo("VPN : $vrfInstance for $address :\n");
                         d_echo($peer_data);
+                        if (empty($peer_data['bgpPeerInUpdates']) || empty($peer_data['bgpPeerOutUpdates'] )) {
+                            $bgp4updates = snmpwalk_cache_oid($device, 'bgpPeerEntry', [], 'BGP4-MIB', 'huawei', '-OQUbs');
+                            $peer_data['bgpPeerInUpdates'] = $bgp4updates[$address]['bgpPeerInUpdates'];
+                            $peer_data['bgpPeerOutUpdates'] = $bgp4updates[$address]['bgpPeerOutUpdates'];
+                        }
+                        if (empty($peer_data['bgpPeerInTotalMessages']) || empty($peer_data['bgpPeerOutTotalMessages'] )) {
+                            $bgp4updates = snmpwalk_cache_oid($device, 'bgpPeerEntry', [], 'BGP4-MIB', 'huawei', '-OQUbs');
+                            $peer_data['bgpPeerInTotalMessages'] = $bgp4updates[$address]['bgpPeerInTotalMessages'];
+                            $peer_data['bgpPeerOutTotalMessages'] = $bgp4updates[$address]['bgpPeerOutTotalMessages'];
+                        }
+                        if (empty($peer_data['bgpPeerAdminStatus']) || empty($peer_data['bgpPeerState'] )) {
+                            $bgp4updates = snmpwalk_cache_oid($device, 'bgpPeerEntry', [], 'BGP4-MIB', 'huawei', '-OQUbs');
+                            $peer_data['bgpPeerState'] = $bgp4updates[$address]['bgpPeerState'];
+                            $peer_data['bgpPeerAdminStatus'] = $bgp4updates[$address]['bgpPeerAdminStatus'];
+                        }
+                        if (empty($peer_data['bgpPeerLastError'])) {
+                            $bgp4updates = snmpwalk_cache_oid($device, 'bgpPeerEntry', [], 'BGP4-MIB', 'huawei', '-OQUbs');
+                            $peer_data['bgpPeerLastError'] = $bgp4updates[$address]['bgpPeerLastError'];
+                        }
                     } elseif ($device['os'] == 'timos') {
                         if (!isset($bgpPeers)) {
                             echo "\nCaching Oids...";
