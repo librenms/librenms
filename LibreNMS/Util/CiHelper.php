@@ -354,7 +354,7 @@ class CiHelper
     {
         $this->flags['unit_skip'] = (bool)getenv('SKIP_UNIT_CHECK');
         $this->flags['lint_skip'] = (bool)getenv('SKIP_LINT_CHECK');
-        $this->flags['dusk_skip'] = (bool)getenv('SKIP_WEB_CHECK');
+        $this->flags['web_skip'] = (bool)getenv('SKIP_WEB_CHECK');
         $this->flags['style_skip'] = (bool)getenv('SKIP_STYLE_CHECK');
     }
 
