@@ -205,22 +205,24 @@ class CiHelper
 
     public function checkWeb()
     {
-        $this->execute('config:clear', ['php', 'artisan', 'config:clear'], true);
-        $this->execute('dusk:update', ['php', 'artisan', 'dusk:update', '--detect'], true);
+        if ($this->canCheck('web')) {
+            $this->execute('config:clear', ['php', 'artisan', 'config:clear'], true);
+            $this->execute('dusk:update', ['php', 'artisan', 'dusk:update', '--detect'], true);
 
-        putenv('APP_ENV=testing');
+            putenv('APP_ENV=testing');
 
-        // check if web server is running
-        $server = new Process(['php', '-S', '127.0.0.1:8000', base_path('server.php')], public_path(), ['APP_ENV' => 'dusk.testing']);
-        $server->setTimeout(3600)
-            ->setIdleTimeout(3600)
-            ->setTty(Process::isTtySupported())
-            ->start();
-        $server->waitUntil(function ($type, $output) {
-            return strpos($output, 'Development Server (http://127.0.0.1:8000) started') !== false;
-        });
-        if ($server->isRunning()) {
-            echo "Started server http://127.0.0.1:8000\n";
+            // check if web server is running
+            $server = new Process(['php', '-S', '127.0.0.1:8000', base_path('server.php')], public_path(), ['APP_ENV' => 'dusk.testing']);
+            $server->setTimeout(3600)
+                ->setIdleTimeout(3600)
+                ->setTty(Process::isTtySupported())
+                ->start();
+            $server->waitUntil(function ($type, $output) {
+                return strpos($output, 'Development Server (http://127.0.0.1:8000) started') !== false;
+            });
+            if ($server->isRunning()) {
+                echo "Started server http://127.0.0.1:8000\n";
+            }
         }
 
         $dusk_cmd = "php artisan dusk";
@@ -293,7 +295,9 @@ class CiHelper
             return $this->$method();
         }
 
-        echo ucfirst($type) . " check skipped.\n";
+        if ($this->flags["{$type}_skip"]) {
+            echo ucfirst($type) . " check skipped.\n";
+        }
         return 0;
     }
 
@@ -318,10 +322,10 @@ class CiHelper
     /**
      * @param string $name
      * @param string|array $command
-     * @param bool $quiet
+     * @param bool $silence
      * @return int
      */
-    private function execute(string $name, $command, $quiet = false): int
+    private function execute(string $name, $command, $silence = false): int
     {
         $start = microtime(true);
         $proc = new Process($command);
@@ -331,12 +335,15 @@ class CiHelper
             return 250;
         }
 
-        echo "Running $name check... ";
+        if (!$silence) {
+            echo "Running $name check... ";
+        }
+
         $space = strrpos($name, ' ');
         $type = substr($name, $space ? $space + 1 : 0);
-        $quiet = $quiet || (($this->flags['ci'] && isset($this->ciDefaults['quiet'][$type])) ? $this->ciDefaults['quiet'][$type] : $this->flags['quiet']);
+        $quiet = ($this->flags['ci'] && isset($this->ciDefaults['quiet'][$type])) ? $this->ciDefaults['quiet'][$type] : $this->flags['quiet'];
 
-        if (!$quiet) {
+        if (!($silence || $quiet)) {
             echo PHP_EOL;
             $proc->setTty(Process::isTtySupported());
         }
@@ -345,12 +352,14 @@ class CiHelper
 
         $duration = sprintf('%.2fs', microtime(true) - $start);
         if ($proc->getExitCode() > 0) {
-            echo "failed ($duration)\n";
+            if (!$silence) {
+                echo "failed ($duration)\n";
+            }
             if ($quiet) {
                 echo $proc->getOutput() . PHP_EOL;
                 echo $proc->getErrorOutput() . PHP_EOL;
             }
-        } else {
+        } elseif (!$silence) {
             echo "success ($duration)\n";
         }
 
