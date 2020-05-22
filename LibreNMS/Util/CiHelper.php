@@ -25,13 +25,13 @@
 
 namespace LibreNMS\Util;
 
+use Illuminate\Support\Arr;
 use Symfony\Component\Process\Process;
 
 class CiHelper
 {
     private $changedFiles;
     private $changed;
-    private $modules;
     private $os;
 
     private $completedChecks = [
@@ -100,7 +100,7 @@ class CiHelper
     public function setModules(array $modules)
     {
         putenv("TEST_MODULES=" . implode(',', $modules));
-        $this->modules = $modules;
+        $this->flags['unit_modules'] = true;
     }
 
     public function setOS(array $os)
@@ -111,7 +111,9 @@ class CiHelper
 
     public function setFlags(array $flags)
     {
-        $this->flags = array_intersect_key($flags, $this->flags) + $this->flags;
+        foreach (array_intersect_key($flags, $this->flags) as $key => $value) {
+            $this->flags[$key] = $value;
+        }
     }
 
     public function run()
@@ -400,22 +402,22 @@ class CiHelper
             return;
         }
 
-        $onlyOs = empty(array_diff($this->changed['php'], $this->changed['os-files']));
-
         $this->setFlags([
-            'lint_skip' => empty($this->changed['php']) && empty($this->changed['python']) && empty($this->changed['bash']),
-            'style_skip' => empty($this->changed['php']),
-            'unit_skip' => empty($this->os) && empty($this->changed['os']) && empty($this->changed['php']) && empty($this->changed['docs']) && empty($this->changed['svg']),
-            'web_skip' => empty($this->changed['php']) && empty($this->changed['resources']),
             'lint_skip_php' => empty($this->changed['php']),
             'lint_skip_python' => empty($this->changed['python']),
             'lint_skip_bash' => empty($this->changed['bash']),
-            'unit_os' => !empty($this->os) || (!empty($this->changed['os']) && $onlyOs),
+            'unit_os' => $this->getFlag('unit_os') || (!empty($this->changed['os']) && empty(array_diff($this->changed['php'], $this->changed['os-files']))),
             'unit_docs' => !empty($this->changed['docs']) && empty($this->changed['php']),
             'unit_svg' => !empty($this->changed['svg']) && empty($this->changed['php']),
-            'unit_modules' => !empty($this->modules),
             'docs_changed' => !empty($this->changed['docs']),
             'full' => !empty($this->changed['full-checks']),
+        ]);
+
+        $this->setFlags([
+            'unit_skip' => empty($this->changed['php']) && !array_sum(Arr::only($this->getFlags(), ['unit_os', 'unit_docs', 'unit_svg', 'unit_modules', 'docs_changed'])),
+            'lint_skip' => array_sum(Arr::only($this->getFlags(), ['lint_skip_php', 'lint_skip_python', 'lint_skip_bash'])) === 3,
+            'style_skip' => empty($this->changed['php']),
+            'web_skip' => empty($this->changed['php']) && empty($this->changed['resources']),
         ]);
     }
 

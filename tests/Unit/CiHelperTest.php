@@ -87,7 +87,72 @@ class CiHelperTest extends TestCase
 
         putenv('FILES=none');
         $helper = new CiHelper();
-        $helper->setOS(['netonix', 'e3meter']);
+        $helper->setOS(['netonix']);
+        $helper->detectChangedFiles();
+        $this->assertFlagsSet($helper, [
+            'lint_skip' => true,
+            'style_skip' => true,
+            'web_skip' => true,
+            'unit_os' => true,
+            'lint_skip_php' => true,
+            'lint_skip_python' => true,
+            'lint_skip_bash' => true,
+        ]);
+
+        putenv('FILES=includes/definitions/ios.yaml tests/data/fxos.json');
+        $helper = new CiHelper();
+        $helper->detectChangedFiles();
+        $this->assertFlagsSet($helper, [
+            'lint_skip' => true,
+            'style_skip' => true,
+            'web_skip' => true,
+            'unit_os' => true,
+            'lint_skip_php' => true,
+            'lint_skip_python' => true,
+            'lint_skip_bash' => true,
+        ]);
+    }
+
+    public function testSetModules()
+    {
+        $helper = new CiHelper();
+        $helper->setModules(['sensors', 'processors']);
+        $this->assertFlagsSet($helper, [
+            'unit_modules' => true,
+        ]);
+
+        putenv('FILES=none');
+        $helper = new CiHelper();
+        $helper->setModules(['os']);
+        $helper->detectChangedFiles();
+        $this->assertFlagsSet($helper, [
+            'lint_skip' => true,
+            'style_skip' => true,
+            'web_skip' => true,
+            'unit_modules' => true,
+            'lint_skip_php' => true,
+            'lint_skip_python' => true,
+            'lint_skip_bash' => true,
+        ]);
+
+        putenv('FILES=none');
+        $helper = new CiHelper();
+        $helper->setOS(['linux']);
+        $helper->setModules(['os']);
+        $helper->detectChangedFiles();
+        $this->assertFlagsSet($helper, [
+            'lint_skip' => true,
+            'style_skip' => true,
+            'web_skip' => true,
+            'unit_os' => true,
+            'unit_modules' => true,
+            'lint_skip_php' => true,
+            'lint_skip_python' => true,
+            'lint_skip_bash' => true,
+        ]);
+
+        putenv('FILES=includes/definitions/ios.yaml tests/data/fxos.json');
+        $helper = new CiHelper();
         $helper->detectChangedFiles();
         $this->assertFlagsSet($helper, [
             'lint_skip' => true,
