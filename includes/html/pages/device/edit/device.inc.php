@@ -267,6 +267,13 @@ if (\LibreNMS\Config::get('distributed_poller') === true) {
         </div>
     </div>
     <div class="form-group">
+      <label for="maintenance" class="col-sm-2 control-label"></label>
+      <div class="col-sm-6">
+      <button type="submit" id="maintenance" data-device_id="<?php echo($device['device_id']); ?>" <?php echo(\LibreNMS\Alert\AlertUtil::isMaintenance($device['device_id']) ? 'disabled class="btn btn-warning"' : 'class="btn btn-success"')?> name="maintenance"><i class="fa fa-wrench"></i> Maintenance Mode (1 hour)</button>
+      </div>
+    </div>
+
+    <div class="form-group">
       <label for="disable_notify" class="col-sm-2 control-label">Disable alerting:</label>
       <div class="col-sm-6">
         <input id="disable_notify" type="checkbox" name="disable_notify" data-size="small"
@@ -300,6 +307,38 @@ If `devices.ignore = 0` or `macros.device = 1` condition is is set and ignore al
 <script>
     $('[type="checkbox"]').bootstrapSwitch('offColor', 'danger');
 
+    $("#maintenance").click(function() {
+        var device_id = $(this).data("device_id");
+        var title = '<?=display($device['hostname']);?>';
+        var notes = '';
+        var recurring = 0;
+        var start = '<?=date("Y-m-d H:i:00");?>';
+        var duration = 1;
+        $.ajax({
+            type: 'POST',
+            url: 'ajax_form.php',
+            data: { type: "schedule-maintenance",
+                    sub_type: 'new-maintenance',
+                    title: title,
+                    notes: notes,
+                    recurring: recurring,
+                    start: start,
+                    duration: duration,
+                    maps: [device_id]
+                  },
+            dataType: "json",
+            success: function(data){
+                if(data['status'] == 'ok') {
+                    toastr.success(data['message']);
+                } else {
+                    toastr.error(data['message']);
+                }
+            },
+            error:function(){
+                toastr.error('An error occured setting this device into maintenance mode');
+            }
+        });
+    });
     $("#rediscover").click(function() {
         var device_id = $(this).data("device_id");
         $.ajax({
