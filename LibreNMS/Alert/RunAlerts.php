@@ -33,6 +33,7 @@ namespace LibreNMS\Alert;
 use App\Models\DevicePerf;
 use LibreNMS\Config;
 use LibreNMS\Util\Time;
+use LibreNMS\Enum\Alert;
 use Log;
 
 class RunAlerts
@@ -553,26 +554,26 @@ class RunAlerts
         $prefix[4] = &$prefix[0];
 
         if ($obj['state'] == 0) {
-            $severity = \LibreNMS\Enum\Alert::OK;
+            $severity = Alert::OK;
         } elseif ($obj['state'] == 1) {
             switch ($obj['severity']) {
                 case 'ok':
-                    $severity = \LibreNMS\Enum\Alert::OK;
+                    $severity = Alert::OK;
                     break;
                 case 'warning':
-                    $severity = \LibreNMS\Enum\Alert::WARNING;
+                    $severity = Alert::WARNING;
                     break;
                 case 'critical':
-                    $severity = \LibreNMS\Enum\Alert::ERROR;
+                    $severity = Alert::ERROR;
                     break;
                 default:
-                    $severity = \LibreNMS\Enum\Alert::UNKNOWN;
+                    $severity = Alert::UNKNOWN;
                     break;
             }
         } elseif ($obj['state'] == 2) {
-            $severity = \LibreNMS\Enum\Alert::NOTICE;
+            $severity = Alert::NOTICE;
         } else {
-            $severity = \LibreNMS\Enum\Alert::UNKNOWN;
+            $severity = Alert::UNKNOWN;
         }
 
         if ($result === true) {
@@ -580,10 +581,10 @@ class RunAlerts
             Log::event('Issued ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "'", $obj['device_id'], 'alert', $severity);
         } elseif ($result === false) {
             echo 'ERROR';
-            Log::event('Could not issue ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "'", $obj['device_id'], null, \LibreNMS\Enum\Alert::ERROR);
+            Log::event('Could not issue ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "'", $obj['device_id'], null, Alert::ERROR);
         } else {
             echo "ERROR: $result\r\n";
-            Log::event('Could not issue ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "' Error: " . $result, $obj['device_id'], 'error', \LibreNMS\Enum::ERROR);
+            Log::event('Could not issue ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "' Error: " . $result, $obj['device_id'], 'error', Alert::ERROR);
         }
         return;
     }
