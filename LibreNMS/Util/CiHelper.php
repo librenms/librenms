@@ -206,6 +206,7 @@ class CiHelper
     public function checkWeb()
     {
         if ($this->canCheck('web')) {
+            echo "Preparing for web checks\n";
             $this->execute('config:clear', ['php', 'artisan', 'config:clear'], true);
             $this->execute('dusk:update', ['php', 'artisan', 'dusk:update', '--detect'], true);
 
