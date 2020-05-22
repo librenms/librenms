@@ -40,13 +40,13 @@ class Categorizer
         $this->items = $items;
     }
 
-    public function addCategory(string $category, Callable $function)
+    public function addCategory(string $category, callable $function)
     {
         $this->categories[$category] = $function;
         $this->categorized[$category] = [];
     }
 
-    public function setSkippable(Callable $function)
+    public function setSkippable(callable $function)
     {
         $this->skippable = $function;
     }
