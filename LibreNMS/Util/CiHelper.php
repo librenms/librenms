@@ -375,7 +375,7 @@ class CiHelper
         }
 
         $hasOs = !empty($this->changed['os']);
-        $onlyOs = empty(array_diff($this->changed['php'], $this->changed['os-php']));
+        $onlyOs = empty(array_diff($this->changed['php'], $this->changed['os-files']));
         $noPhp = !$hasOs && empty($this->changed['php']);
 
         $this->setFlags([
@@ -391,6 +391,7 @@ class CiHelper
             'unit_modules' => !empty($this->modules),
             'dusk_skip' => !$noPhp && empty($this->changed['resources']),
             'docs_changed' => !empty($this->changed['docs']),
+            'full' => !empty($this->changed['full-checks']),
         ]);
     }
 

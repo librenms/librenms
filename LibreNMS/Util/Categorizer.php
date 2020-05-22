@@ -57,7 +57,7 @@ class Categorizer
             foreach ($this->categories as $category => $test) {
                 $result = call_user_func($test, $item);
                 if ($result !== false) {
-                    $this->categorized[$category] = $result;
+                    $this->categorized[$category][] = $result;
                 }
             }
         }

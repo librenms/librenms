@@ -50,7 +50,7 @@ class FileCategorizer extends Categorizer
             return Str::endsWith($item, '.py') ? $item : false;
         });
         $this->addCategory('bash', function ($item) {
-            return Str::endsWith($item, '.py') ? $item : false;
+            return Str::endsWith($item, '.sh') ? $item : false;
         });
         $this->addCategory('svg', function ($item) {
             return Str::endsWith($item, '.svg') ? $item : false;
@@ -79,6 +79,12 @@ class FileCategorizer extends Categorizer
         // split out os
         $this->categorized['os'] = array_unique(array_column($this->categorized['os-files'], 'os'));
         $this->categorized['os-files'] = array_column($this->categorized['os-files'], 'file');
+
+        // If we have more than 4 (arbitrary number) of OS' then blank them out
+        // Unit tests may take longer to run in a loop so fall back to all.
+        if (count($this->categorized['os']) > 4) {
+            $this->categorized['full-checks'] = [true];
+        }
 
         return $this->categorized;
     }
