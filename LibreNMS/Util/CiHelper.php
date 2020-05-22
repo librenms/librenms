@@ -205,16 +205,8 @@ class CiHelper
 
     public function checkWeb()
     {
-        $this->execute('config:clear', ['php', 'artisan', 'config:clear']);
-        $this->execute('dusk:update', ['php', 'artisan', 'dusk:update', ' --detect']);
-//        $config_clear = new Process(['php', 'artisan', 'config:clear']);
-//        $config_clear->run();
-//        if ($config_clear->getExitCode() !== 0) {
-//            echo $config_clear->getOutput() . PHP_EOL;
-//            echo $config_clear->getErrorOutput() . PHP_EOL;
-//        }
-//        ()->setTty(Process::isTtySupported())->run(); // make sure config is not cached
-//        (new Process(['php', 'artisan', 'dusk:update', ' --detect']))->setTty(Process::isTtySupported())->run(); // make sure driver is correct
+        $this->execute('config:clear', ['php', 'artisan', 'config:clear'], true);
+        $this->execute('dusk:update', ['php', 'artisan', 'dusk:update', '--detect'], true);
 
         putenv('APP_ENV=testing');
 
@@ -326,9 +318,10 @@ class CiHelper
     /**
      * @param string $name
      * @param string|array $command
+     * @param bool $quiet
      * @return int
      */
-    private function execute(string $name, $command): int
+    private function execute(string $name, $command, $quiet = false): int
     {
         $start = microtime(true);
         $proc = new Process($command);
@@ -341,8 +334,8 @@ class CiHelper
         echo "Running $name check... ";
         $space = strrpos($name, ' ');
         $type = substr($name, $space ? $space + 1 : 0);
+        $quiet = $quiet || (($this->flags['ci'] && isset($this->ciDefaults['quiet'][$type])) ? $this->ciDefaults['quiet'][$type] : $this->flags['quiet']);
 
-        $quiet = ($this->flags['ci'] && isset($this->ciDefaults['quiet'][$type])) ? $this->ciDefaults['quiet'][$type] : $this->flags['quiet'];
         if (!$quiet) {
             echo PHP_EOL;
             $proc->setTty(Process::isTtySupported());
