@@ -63,7 +63,17 @@ class DevCheckCommand extends LnmsCommand
         $this->helper = new CiHelper();
         $this->parseInput();
 
-        return $this->helper->run();
+        $result = $this->helper->run();
+
+        if (getenv('EXECUTE_BUILD_DOCS') && $this->helper->getFlags('docs_changed')) {
+            exec('bash scripts/deploy-docs.sh');
+        }
+
+        if ($result == 0) {
+            $this->line("\033[32mTests ok, submit away :)\033[0m");
+        }
+
+        return $result;
     }
 
     private function parseInput()

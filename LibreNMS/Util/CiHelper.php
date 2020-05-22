@@ -25,27 +25,15 @@
 
 namespace LibreNMS\Util;
 
-use Illuminate\Support\Str;
 use Symfony\Component\Process\Process;
 
 class CiHelper
 {
-    private $options;
     private $changedFiles;
-    private $changed = [
-        'docs' => [],
-        'python' => [],
-        'bash' => [],
-        'php' => [],
-        'os-php' => [],
-        'os' => [],
-        'resources' => [],
-        'svg' => [],
-    ];
-    private $quiet = false;
-    private $commandOnly = false;
-    private $failFast = false;
-    private $inCi = false;
+    private $changed;
+    private $modules;
+    private $os;
+
     private $completedChecks = [
         'lint' => false,
         'style' => false,
@@ -60,9 +48,6 @@ class CiHelper
             'dusk' => false,
         ],
     ];
-    private $fullChecks = false;
-    private $modules;
-    private $os;
     private $flags = [
         'style_enable' => true,
         'style_skip' => false,
@@ -137,7 +122,7 @@ class CiHelper
         foreach (array_keys($this->completedChecks) as $check) {
             $ret = $this->runCheck($check);
 
-            if ($this->failFast && $ret !== 0 && $ret !== 250) {
+            if ($this->flags['fail-fast'] && $ret !== 0 && $ret !== 250) {
                 return $return;
             } else {
                 $return += $ret;
@@ -162,16 +147,12 @@ class CiHelper
     /**
      * Fetch flags
      * if no parameters are specified, all are fetch or all for type if only type is specified
-     * @param string $type
-     * @return bool|bool[]|bool[][]
+     * @param string $item
+     * @return bool|bool[]
      */
-    public function getFlags($type = null, $item = null)
+    public function getFlags($item = null)
     {
-        if (isset($this->flags[$type][$item])) {
-            return $this->flags[$type][$item];
-        }
-
-        return isset($this->flags[$type]) ? $this->flags[$type] : $this->flags;
+        return isset($this->flags[$item]) ? $this->flags[$item] : $this->flags;
     }
 
     /**
@@ -185,7 +166,7 @@ class CiHelper
 
         $phpunit_cmd = "$phpunit_bin --colors=always";
 
-        if ($this->failFast) {
+        if ($this->flags['fail-fast']) {
             $phpunit_cmd .= ' --stop-on-error --stop-on-failure';
         }
 
@@ -215,7 +196,7 @@ class CiHelper
     {
         $phpcs_bin = $this->checkPhpExec('phpcs');
 
-        $files = ($this->fullChecks) ? './' : implode(' ', $this->changed['php']);
+        $files = ($this->flags['full']) ? './' : implode(' ', $this->changed['php']);
 
         $cs_cmd = "$phpcs_bin -n -p --colors --extensions=php --standard=misc/phpcs_librenms.xml $files";
 
@@ -243,7 +224,7 @@ class CiHelper
 
         $dusk_cmd = "php artisan dusk";
 
-        if ($this->failFast) {
+        if ($this->flags['fail-fast']) {
             $dusk_cmd .= ' --stop-on-error --stop-on-failure';
         }
 
@@ -265,7 +246,7 @@ class CiHelper
             $lint_excludes = ['vendor/'];
             $lint_exclude = $this->buildPhpLintExcludes('--exclude ', $lint_excludes);
 
-            $files = $this->fullChecks ? './' : implode(' ', $this->changed['php']);
+            $files = $this->flags['full'] ? './' : implode(' ', $this->changed['php']);
 
             $php_lint_cmd = "$parallel_lint_bin $lint_exclude $files";
 
@@ -275,7 +256,7 @@ class CiHelper
         if (!$this->flags['lint_skip_python']) {
             $pylint_bin = $this->checkPythonExec('pylint');
 
-            $files = $this->fullChecks
+            $files = $this->flags['full']
                 ? str_replace(PHP_EOL, ' ', rtrim(shell_exec("find . -name '*.py' -not -path './vendor/*' -not -path './tests/*'")))
                 : implode(' ', $this->changed['python']);
 
@@ -284,7 +265,7 @@ class CiHelper
         }
 
         if (!$this->flags['lint_skip_bash']) {
-            $files = $this->fullChecks
+            $files = $this->flags['full']
                 ? explode(PHP_EOL, rtrim(shell_exec("find . -name '*.sh' -not -path './node_modules/*' -not -path './vendor/*'")))
                 : $this->changed['bash'];
 
@@ -340,7 +321,7 @@ class CiHelper
      */
     private function execute(string $name, string $command): int
     {
-        if ($this->commandOnly) {
+        if ($this->flags['commands']) {
             echo $command . PHP_EOL;
             return 250;
         }
@@ -349,7 +330,7 @@ class CiHelper
         $space = strrpos($name, ' ');
         $type = substr($name, $space ? $space + 1 : 0);
 
-        $quiet = $this->inCi ? $this->ciDefaults['quiet'][$type] : $this->quiet;
+        $quiet = $this->flags['ci'] ? $this->ciDefaults['quiet'][$type] : $this->flags['quiet'];
         if (!$quiet) {
             echo PHP_EOL;
             passthru($command, $return);
@@ -368,110 +349,6 @@ class CiHelper
         return $return;
     }
 
-    /**
-     * Extract os name from path and validate it exists.
-     *
-     * @param $php_file
-     * @return null|string
-     */
-    private function osFromPhp($php_file)
-    {
-        $os = basename($php_file, '.inc.php');
-
-        if (file_exists("includes/definitions/$os.yaml")) {
-            return $os;
-        }
-
-        return null;
-    }
-
-    private function osFromFile($file)
-    {
-        if (Str::startsWith($file, 'includes/definitions/')) {
-            return basename($file, '.yaml');
-        } elseif (Str::startsWith($file, ['includes/polling', 'includes/discovery'])) {
-            return $this->osFromPhp($file);
-        } elseif (Str::startsWith($file, 'LibreNMS/OS/')) {
-            if (preg_match('#LibreNMS/OS/[^/]+.php#', $file)) {
-                return $this->osFromClass(basename($file, '.php'));
-            }
-        } elseif (Str::startsWith($file, ['tests/snmpsim/', 'tests/data/'])) {
-            [$os,] = explode('_', basename(basename($file, '.json'), '.snmprec'), 2);
-            return $os;
-        }
-
-        return null;
-    }
-
-    /**
-     * convert class name to os name
-     *
-     * @param string $class
-     * @return string|null
-     */
-    private function osFromClass($class)
-    {
-        preg_match_all("/[A-Z][a-z0-9]*/", $class, $segments);
-        $osname = implode('-', array_map('strtolower', $segments[0]));
-        $osname = preg_replace(
-            ['/^zero-/', '/^one-/', '/^two-/', '/^three-/', '/^four-/', '/^five-/', '/^six-/', '/^seven-/', '/^eight-/', '/^nine-/',],
-            ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'],
-            $osname);
-
-        if ($os = $this->osFromPhp($osname)) {
-            return $os;
-        }
-        return $this->osFromPhp(str_replace('-', '_', $osname));
-    }
-
-    private function detectChangedFiles()
-    {
-        $changed_files = getenv('FILES')
-            ? rtrim(getenv('FILES'))
-            : exec("git diff --diff-filter=d --name-only master | tr '\n' ' '|sed 's/,*$//g'");
-        $this->changedFiles = $changed_files ? explode(' ', $changed_files) : [];
-
-        $debug = getenv('CIHELPER_DEBUG');
-        foreach ($this->changedFiles as $file) {
-            if ($debug && $file == 'LibreNMS/Util/CiHelper.php') {
-                continue;
-            }
-            if (Str::endsWith($file, '.php')) {
-                $this->changed['php'][] = $file;
-            } elseif (Str::startsWith($file, 'doc/') || $file == 'mkdocs.yml') {
-                $this->changed['docs'][] = $file;
-            } elseif (Str::endsWith($file, '.py')) {
-                $this->changed['python'][] = $file;
-            } elseif (Str::endsWith($file, '.sh')) {
-                $this->changed['bash'][] = $file;
-            } elseif (Str::endsWith($file, '.svg')) {
-                $this->changed['svg'][] = $file;
-            } elseif (Str::startsWith($file, 'resources/')) {
-                $this->changed['resources'][] = $file;
-            }
-
-            // cause full tests to run
-            if ($file == 'composer.lock' || $file == '.travis.yml') {
-                $this->fullChecks = true;
-            }
-
-            // check if os owned file or generic php file
-            if (!empty($os_name = $this->osFromFile($file))) {
-                $this->changed['os'][] = $os_name;
-                if (Str::endsWith($file, '.php')) {
-                    $this->changed['os-php'][] = $file;
-                }
-            }
-        }
-
-        $this->changed['os'] = array_unique($this->changed['os']);
-
-        // If we have more than 4 (arbitrary number) of OS' then blank them out
-        // Unit tests may take longer to run in a loop so fall back to all.
-        if (count($this->changed['os']) > 4) {
-            $this->changed['os'] = [];
-        }
-    }
 
     private function checkEnv()
     {
@@ -481,9 +358,18 @@ class CiHelper
         $this->flags['style_skip'] = (bool)getenv('SKIP_STYLE_CHECK');
     }
 
+    private function detectChangedFiles()
+    {
+        $changed_files = getenv('FILES')
+            ? rtrim(getenv('FILES'))
+            : exec("git diff --diff-filter=d --name-only master | tr '\n' ' '|sed 's/,*$//g'");
+        $categorizor = new FileCategorizer($this->changedFiles = $changed_files ? explode(' ', $changed_files) : []);
+        $this->changed = $categorizor->categorize();
+    }
+
     private function parseChangedFiles()
     {
-        if (empty($this->changedFiles) || $this->fullChecks) {
+        if (empty($this->changedFiles) || $this->flags['full']) {
             // nothing to do
             return;
         }
@@ -506,27 +392,6 @@ class CiHelper
             'dusk_skip' => !$noPhp && empty($this->changed['resources']),
             'docs_changed' => !empty($this->changed['docs']),
         ]);
-    }
-
-    /**
-     *  Check if the given options array contains any of the $opts specified
-     *
-     * @param string ...$opts options to check for
-     * @return bool If one of the specified options is set
-     */
-    private function checkOpt(...$opts)
-    {
-        foreach ($opts as $option) {
-            if (isset($this->options[$option])) {
-                if ($this->options[$option] === false) {
-                    // no data, return that option is enabled
-                    return true;
-                }
-                return $this->options[$option];
-            }
-        }
-
-        return false;
     }
 
     /**

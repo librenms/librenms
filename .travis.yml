@@ -41,5 +41,4 @@ before_script:
   - phpenv config-rm xdebug.ini
 
 script:
-  - php scripts/pre-commit.php --ci
-
+  - php artisan dev:check --ci
