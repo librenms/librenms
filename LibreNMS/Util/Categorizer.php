@@ -55,6 +55,10 @@ class Categorizer
     {
         foreach ($this->items as $item) {
             foreach ($this->categories as $category => $test) {
+                if (call_user_func($this->skippable, $item)) {
+                    continue;
+                }
+
                 $result = call_user_func($test, $item);
                 if ($result !== false) {
                     $this->categorized[$category][] = $result;
