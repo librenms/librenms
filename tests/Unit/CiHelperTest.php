@@ -77,6 +77,106 @@ class CiHelperTest extends TestCase
         ]);
     }
 
+    public function testSetOs()
+    {
+        $helper = new CiHelper();
+        $helper->setOS(['netonix', 'e3meter']);
+        $this->assertFlagsSet($helper, [
+            'unit_os' => true,
+        ]);
+
+        putenv('FILES=none');
+        $helper = new CiHelper();
+        $helper->setOS(['netonix', 'e3meter']);
+        $helper->detectChangedFiles();
+        $this->assertFlagsSet($helper, [
+            'lint_skip' => true,
+            'style_skip' => true,
+            'web_skip' => true,
+            'unit_os' => true,
+            'lint_skip_php' => true,
+            'lint_skip_python' => true,
+            'lint_skip_bash' => true,
+        ]);
+
+        putenv('FILES=includes/definitions/ios.yaml tests/data/fxos.json');
+        $helper = new CiHelper();
+        $helper->detectChangedFiles();
+        $this->assertFlagsSet($helper, [
+            'lint_skip' => true,
+            'style_skip' => true,
+            'web_skip' => true,
+            'unit_os' => true,
+            'lint_skip_php' => true,
+            'lint_skip_python' => true,
+            'lint_skip_bash' => true,
+        ]);
+    }
+
+    public function testFileCategorization()
+    {
+        putenv('FILES=LibreNMS/Alert/Transport/Sensu.php includes/services.inc.php');
+        $helper = new CiHelper();
+        $helper->detectChangedFiles();
+        $this->assertFlagsSet($helper, [
+            'lint_skip_python' => true,
+            'lint_skip_bash' => true,
+        ]);
+
+        putenv('FILES=/daily.sh includes/services.inc.php');
+        $helper = new CiHelper();
+        $helper->detectChangedFiles();
+
+        $this->assertFlagsSet($helper, [
+            'lint_skip_python' => true,
+        ]);
+
+        putenv('FILES=daily.sh LibreNMS/__init__.py');
+        $helper = new CiHelper();
+        $helper->detectChangedFiles();
+        $this->assertFlagsSet($helper, [
+            'style_skip' => true,
+            'unit_skip' => true,
+            'web_skip' => true,
+            'lint_skip_php' => true,
+        ]);
+
+        putenv('FILES=includes/polling/sensors/ios.inc.php');
+        $helper = new CiHelper();
+        $helper->detectChangedFiles();
+        $this->assertFlagsSet($helper, [
+            'lint_skip_python' => true,
+            'lint_skip_bash' => true,
+            'unit_os' => true,
+        ]);
+
+        putenv('FILES=html/images/os/ios.svg');
+        $helper = new CiHelper();
+        $helper->detectChangedFiles();
+        $this->assertFlagsSet($helper, [
+            'lint_skip' => true,
+            'style_skip' => true,
+            'web_skip' => true,
+            'lint_skip_php' => true,
+            'lint_skip_python' => true,
+            'lint_skip_bash' => true,
+            'unit_svg' => true,
+        ]);
+
+        putenv('FILES=html/images/os/ios.svg');
+        $helper = new CiHelper();
+        $helper->detectChangedFiles();
+        $this->assertFlagsSet($helper, [
+            'lint_skip' => true,
+            'style_skip' => true,
+            'web_skip' => true,
+            'lint_skip_php' => true,
+            'lint_skip_python' => true,
+            'lint_skip_bash' => true,
+            'unit_svg' => true,
+        ]);
+    }
+
     private function assertFlagsSet(CiHelper $helper, $flags = [])
     {
         $full = $this->getDefaultFlags();

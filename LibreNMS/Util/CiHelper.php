@@ -106,6 +106,7 @@ class CiHelper
     public function setOS(array $os)
     {
         $this->os = $os;
+        $this->flags['unit_os'] = true;
     }
 
     public function setFlags(array $flags)
@@ -404,7 +405,7 @@ class CiHelper
         $this->setFlags([
             'lint_skip' => empty($this->changed['php']) && empty($this->changed['python']) && empty($this->changed['bash']),
             'style_skip' => empty($this->changed['php']),
-            'unit_skip' => empty($this->changed['os']) && empty($this->changed['php']) && empty($this->changed['docs']) && empty($this->changed['svg']),
+            'unit_skip' => empty($this->os) && empty($this->changed['os']) && empty($this->changed['php']) && empty($this->changed['docs']) && empty($this->changed['svg']),
             'web_skip' => empty($this->changed['php']) && empty($this->changed['resources']),
             'lint_skip_php' => empty($this->changed['php']),
             'lint_skip_python' => empty($this->changed['python']),
