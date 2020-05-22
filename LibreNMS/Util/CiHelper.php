@@ -72,9 +72,8 @@ class CiHelper
         'quiet' => false,
     ];
 
-    public function __construct(array $flags = [])
+    public function __construct()
     {
-        $this->setFlags($flags);
     }
 
     public function enable($check, $enabled = true)
@@ -218,13 +217,10 @@ class CiHelper
             $this->execute('config:clear', ['php', 'artisan', 'config:clear'], true);
             $this->execute('dusk:update', ['php', 'artisan', 'dusk:update', '--detect'], true);
 
-            putenv('APP_ENV=testing');
-
             // check if web server is running
             $server = new Process(['php', '-S', '127.0.0.1:8000', base_path('server.php')], public_path(), ['APP_ENV' => 'dusk.testing']);
             $server->setTimeout(3600)
                 ->setIdleTimeout(3600)
-                ->setTty(Process::isTtySupported())
                 ->start();
             $server->waitUntil(function ($type, $output) {
                 return strpos($output, 'Development Server (http://127.0.0.1:8000) started') !== false;
@@ -240,7 +236,7 @@ class CiHelper
             $dusk_cmd .= ' --stop-on-error --stop-on-failure';
         }
 
-        return $this->execute('web', $dusk_cmd);
+        return $this->execute('web', $dusk_cmd, false, ['APP_ENV' => 'testing']);
     }
 
     /**
@@ -300,8 +296,9 @@ class CiHelper
     private function runCheck($type)
     {
         if ($method = $this->canCheck($type)) {
+            $ret = $this->$method();
             $this->completedChecks[$type] = true;
-            return $this->$method();
+            return $ret;
         }
 
         if ($this->flags["{$type}_skip"]) {
@@ -329,15 +326,18 @@ class CiHelper
     }
 
     /**
-     * @param string $name
+     * Run a check command
+     *
+     * @param string $name name for status output
      * @param string|array $command
-     * @param bool $silence
+     * @param bool $silence silence the status ouput (still shows error output)
+     * @param array $env environment to set
      * @return int
      */
-    private function execute(string $name, $command, $silence = false): int
+    private function execute(string $name, $command, $silence = false, $env = null): int
     {
         $start = microtime(true);
-        $proc = new Process($command);
+        $proc = new Process($command, null, $env);
 
         if ($this->flags['commands']) {
             echo $proc->getCommandLine() . PHP_EOL;
@@ -352,6 +352,7 @@ class CiHelper
         $type = substr($name, $space ? $space + 1 : 0);
         $quiet = ($this->flags['ci'] && isset($this->ciDefaults['quiet'][$type])) ? $this->ciDefaults['quiet'][$type] : $this->flags['quiet'];
 
+        $proc->setTimeout(3600)->setIdleTimeout(3600);
         if (!($silence || $quiet)) {
             echo PHP_EOL;
             $proc->setTty(Process::isTtySupported());
@@ -364,7 +365,7 @@ class CiHelper
             if (!$silence) {
                 echo "failed ($duration)\n";
             }
-            if ($quiet) {
+            if ($quiet || $silence) {
                 echo $proc->getOutput() . PHP_EOL;
                 echo $proc->getErrorOutput() . PHP_EOL;
             }
