@@ -12,8 +12,6 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Config;
-
 $scale_min = '0';
 
 require 'includes/html/graphs/common.inc.php';
@@ -22,11 +20,7 @@ $rrd_filename = rrd_name($device['hostname'], 'ping-perf');
 
 $rrd_options .= ' DEF:ping='.$rrd_filename.':ping:AVERAGE';
 $rrd_options .= " 'COMMENT:Milliseconds      Cur      Min     Max     Avg\\n'";
-if (Config::get('applied_site_style') == 'dark') {
-    $rrd_options .= ' LINE1.25:ping#63636d:Ping';
-} else {
-    $rrd_options .= ' LINE1.25:ping#36393d:Ping';
-}
+$rrd_options .= ' LINE1.25:ping#36393D:Ping';
 $rrd_options .= ' GPRINT:ping:LAST:%14.2lf  GPRINT:ping:AVERAGE:%6.2lf';
 $rrd_options .= " GPRINT:ping:MAX:%6.2lf  'GPRINT:ping:AVERAGE:%6.2lf\\n'";
 
