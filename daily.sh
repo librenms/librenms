@@ -297,11 +297,11 @@ main () {
             latest_hash=$(git rev-list --tags --max-count=1)
             latest_tag=$(git describe --exact-match --tags "${latest_hash}")
 
-            #compare current base and latest version numbers
+            #compare current base and latest version numbers (only the first two sections)
             version_compare "$base_ver" "$latest_tag" 2
-            newer=$?
+            newer_check=$?
 
-            if [[ -z $old_ver ]] && [[ $newer -eq 0 ]]; then
+            if [[ -z $old_ver ]] && [[ $newer_check -eq 0 ]]; then
                 echo 'Between releases, waiting for newer release'
             else
                 status_run 'Updating to latest release' "git checkout ${latest_hash}" 'update'
