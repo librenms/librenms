@@ -105,7 +105,7 @@ class DevCheckCommand extends LnmsCommand
         }
 
         if ($check == 'ci') {
-            $this->helper->setFlags(['ci' => true]);
+            $this->helper->setFlags(['ci' => true, 'fail-fast' => true]);
             $this->helper->duskHeadless();
             $this->helper->enableSnmpsim();
             $this->helper->enableDb();
