@@ -33,7 +33,7 @@ class CiHelper
     private $changedFiles;
     private $changed;
     private $os;
-    private $unitEnv = ['APP_ENV' => 'testing'];
+    private $unitEnv = [];
     private $duskEnv = ['APP_ENV' => 'testing'];
 
     private $completedChecks = [
@@ -102,12 +102,16 @@ class CiHelper
     {
         $this->unitEnv['TEST_MODULES'] = implode(',', $modules);
         $this->flags['unit_modules'] = true;
+        $this->enableDb();
+        $this->enableSnmpsim();
     }
 
     public function setOS(array $os)
     {
         $this->os = $os;
         $this->flags['unit_os'] = true;
+        $this->enableDb();
+        $this->enableSnmpsim();
     }
 
     public function setFlags(array $flags)
@@ -181,8 +185,9 @@ class CiHelper
 
         // exclusive tests
         if ($this->flags['unit_os']) {
-            echo 'Only checking os: ' . implode(', ', $this->changed['os']) . PHP_EOL;
-            $filter = implode('.*|', $this->os ?: $this->changed['os']);
+            $selected_os = $this->os ?: $this->changed['os'];
+            echo 'Only checking os: ' . implode(', ', $selected_os) . PHP_EOL;
+            $filter = implode('.*|', $selected_os);
             // include tests that don't have data providers and only data sets that match
             $phpunit_cmd .= " --group os --filter '/::test[A-Za-z]+$|::test[A-Za-z]+ with data set \"$filter.*\"$/'";
         } elseif ($this->flags['unit_docs']) {
@@ -347,7 +352,12 @@ class CiHelper
         $proc = new Process($command, null, $env);
 
         if ($this->flags['commands']) {
-            echo $proc->getCommandLine() . PHP_EOL;
+            $prefix = '';
+            if ($env) {
+                $prefix .= http_build_query($env,'',' ') . ' ';
+            }
+
+            echo $prefix . $proc->getCommandLine() . PHP_EOL;
             return 250;
         }
 

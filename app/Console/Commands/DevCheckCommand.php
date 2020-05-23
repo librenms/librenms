@@ -43,8 +43,8 @@ class DevCheckCommand extends LnmsCommand
     {
         parent::__construct();
         $this->addArgument('check', InputArgument::OPTIONAL, __('commands.dev:check.arguments.check', ['checks' => '[unit, lint, style, dusk]']), 'all');
-        $this->addOption('os', 'o', InputArgument::IS_ARRAY | InputArgument::REQUIRED);
-        $this->addOption('module', 'm', InputArgument::IS_ARRAY | InputArgument::REQUIRED);
+        $this->addOption('os', 'o', InputOption::VALUE_REQUIRED);
+        $this->addOption('module', 'm', InputOption::VALUE_REQUIRED);
         $this->addOption('fail-fast', 'f', InputOption::VALUE_NONE);
         $this->addOption('quiet', 'q', InputOption::VALUE_NONE);
         $this->addOption('db', null, InputOption::VALUE_NONE);
@@ -97,15 +97,11 @@ class DevCheckCommand extends LnmsCommand
         if ($os = $this->option('os')) {
             $this->helper->setFlags(['style_enable' => false, 'lint_enable' => false, 'unit_enable' => true, 'web_enable' => false]);
             $this->helper->setOS(explode(',', $os));
-            $this->helper->enableSnmpsim();
-            $this->helper->enableDb();
         }
 
         if ($modules = $this->option('module')) {
             $this->helper->setFlags(['style_enable' => false, 'lint_enable' => false, 'unit_enable' => true, 'web_enable' => false]);
-            $this->helper->setModules($modules);
-            $this->helper->enableSnmpsim();
-            $this->helper->enableDb();
+            $this->helper->setModules(explode(',', $modules));
         }
 
         if ($check == 'ci') {
