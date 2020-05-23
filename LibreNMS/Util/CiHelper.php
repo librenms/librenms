@@ -418,7 +418,7 @@ class CiHelper
             // nothing to do
             return;
         }
-        $this->os = $this->os ?: $changed['os'];
+        $this->os = $this->os ?: $this->changed['os'];
 
         $this->setFlags([
             'lint_skip_php' => empty($this->changed['php']),
