@@ -27,6 +27,7 @@ namespace LibreNMS\Alert\Transport;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\Request;
+use LibreNMS\Enum\AlertState;
 use LibreNMS\Alert\Transport;
 use Log;
 use Validator;

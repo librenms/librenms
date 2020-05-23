@@ -26,6 +26,7 @@
 namespace LibreNMS\Alert;
 
 use App\Models\AlertTemplate;
+use LibreNMS\Enum\AlertState;
 
 class Template
 {

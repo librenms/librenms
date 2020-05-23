@@ -23,6 +23,7 @@
  */
 namespace LibreNMS\Alert\Transport;
 
+use LibreNMS\Enum\AlertState;
 use Illuminate\Support\Str;
 use LibreNMS\Alert\Transport;
 

@@ -23,6 +23,7 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
+use LibreNMS\Enum\AlertState;
 use LibreNMS\Config;
 
 class Alertmanager extends Transport
