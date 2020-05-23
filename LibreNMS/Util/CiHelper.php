@@ -30,7 +30,6 @@ use Symfony\Component\Process\Process;
 
 class CiHelper
 {
-    private $changedFiles;
     private $changed;
     private $os;
     private $unitEnv = [];
@@ -185,9 +184,8 @@ class CiHelper
 
         // exclusive tests
         if ($this->flags['unit_os']) {
-            $selected_os = $this->os ?: $this->changed['os'];
-            echo 'Only checking os: ' . implode(', ', $selected_os) . PHP_EOL;
-            $filter = implode('.*|', $selected_os);
+            echo 'Only checking os: ' . implode(', ', $this->os) . PHP_EOL;
+            $filter = implode('.*|', $this->os);
             // include tests that don't have data providers and only data sets that match
             $phpunit_cmd .= " --group os --filter '/::test[A-Za-z]+$|::test[A-Za-z]+ with data set \"$filter.*\"$/'";
         } elseif ($this->flags['unit_docs']) {
@@ -210,7 +208,7 @@ class CiHelper
     {
         $phpcs_bin = $this->checkPhpExec('phpcs');
 
-        $files = ($this->flags['full']) ? './' : implode(' ', $this->changed['php']);
+        $files = $this->flags['full'] ? './' : implode(' ', $this->changed['php']);
 
         $cs_cmd = "$phpcs_bin -n -p --colors --extensions=php --standard=misc/phpcs_librenms.xml $files";
 
@@ -219,7 +217,7 @@ class CiHelper
 
     public function checkWeb()
     {
-        if (!$this->getFlag('ci')) {
+        if (!$this->flags['ci']) {
             echo "Warning: dusk may erase your primary database, do not use yet\n";
             return 0;
         }
@@ -404,21 +402,23 @@ class CiHelper
 
     public function detectChangedFiles()
     {
-        $files = trim(getenv('FILES'));
-        $changed_files = $files ?: shell_exec("git diff --diff-filter=d --name-only master | tr '\n' ' '|sed 's/,*$//g'");
-        $this->changedFiles = $changed_files ? explode(' ', $changed_files) : [];
+        $changed_files = trim(getenv('FILES')) ?:
+            exec("git diff --diff-filter=d --name-only master | tr '\n' ' '|sed 's/,*$//g'");
 
-        $this->changed = (new FileCategorizer($this->changedFiles))->categorize();
+        $this->flags['full'] = $this->flags['full'] || empty($changed_files); // don't disable full if already set
+        $files = $changed_files ? explode(' ', $changed_files) : [];
 
+        $this->changed = (new FileCategorizer($files))->categorize();
         $this->parseChangedFiles();
     }
 
     private function parseChangedFiles()
     {
-        if (empty($this->changedFiles) || $this->flags['full']) {
+        if ($this->flags['full']) {
             // nothing to do
             return;
         }
+        $this->os = $this->os ?: $this->changed['os'];
 
         $this->setFlags([
             'lint_skip_php' => empty($this->changed['php']),
