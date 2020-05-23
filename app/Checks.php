@@ -90,7 +90,7 @@ class Checks
         $user = Auth::user();
 
         if ($user->isAdmin()) {
-            $notifications = Notification::isUnread($user)->where('severity', '>', 1)->get();
+            $notifications = Notification::isUnread($user)->where('severity', '>', \LibreNMS\Enum\Alert::OK)->get();
             foreach ($notifications as $notification) {
                 Toastr::error("<a href='notifications/'>$notification->body</a>", $notification->title);
             }
