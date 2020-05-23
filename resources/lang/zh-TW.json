@@ -1,4 +1,6 @@
 {
+    "Device Group Dependencies": "裝置群組相依性",
+    "Device Dependency": "裝置相依性",
     "The device group could not be deleted": "無法刪除裝置群組",
     "Operating System": "作業系統",
     "Vendor": "廠商",
