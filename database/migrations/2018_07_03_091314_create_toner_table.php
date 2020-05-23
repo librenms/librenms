@@ -15,7 +15,7 @@ class CreateTonerTable extends Migration
     {
         Schema::create('toner', function (Blueprint $table) {
             $table->increments('toner_id');
-            $table->unsignedInteger('device_id')->default(0)->index('device_id');
+            $table->unsignedInteger('device_id')->default(0)->index();
             $table->integer('toner_index');
             $table->string('toner_type', 64);
             $table->string('toner_oid', 64);

@@ -1,0 +1,337 @@
+-- This file was included in Ciena MIB release MIBS-CIENA-CES-08-07-00-024
+
+ --
+ -- CIENA-CES-MAC-MIB.my
+ --
+
+ CIENA-CES-MAC-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS       
+   Integer32, Unsigned32, OBJECT-TYPE, MODULE-IDENTITY
+       FROM SNMPv2-SMI        
+   DisplayString, MacAddress     
+       FROM SNMPv2-TC   
+   OBJECT-GROUP
+         FROM SNMPv2-CONF              
+   cienaCesConfig,cienaCesStatistics, cienaCesNotifications         
+        FROM CIENA-SMI;
+
+   
+ cienaCesMacMIB MODULE-IDENTITY
+       LAST-UPDATED "201706070000Z"
+       ORGANIZATION "Ciena Corp."
+       CONTACT-INFO
+       "   Mib Meister
+           7035 Ridge Road
+           Hanover, Maryland 21076
+           USA
+           Phone:  +1 800 921 1144
+           Email:  support@ciena.com"
+       DESCRIPTION
+          "The MIB module defines the managed objects for the MAC tables 
+          available on the Ciena specific products."
+       REVISION    "201706070000Z"
+       DESCRIPTION 
+          "Updated contact info."
+       REVISION    "201507030000Z"
+       DESCRIPTION
+          "Added cienaCesMacScanPortChannelId to support channelized interfaces"
+       REVISION    "201205150000Z"
+       DESCRIPTION
+          "Initial creation."
+       ::= { cienaCesConfig 26 }
+                  
+ --
+ -- Node definitions
+ --   
+ cienaCesMacMIBObjects OBJECT IDENTIFIER ::= { cienaCesMacMIB 1 }
+ cienaCesMacScan       OBJECT IDENTIFIER ::= { cienaCesMacMIBObjects 1 }
+ cienaCesMacScanAttr   OBJECT IDENTIFIER ::= { cienaCesMacScan 1}
+
+ --
+ -- Notifications 
+ --
+ cienaCesMacMIBNotificationPrefix   OBJECT IDENTIFIER ::= { cienaCesMacMIB 2 } 
+ cienaCesMacMIBNotifications        OBJECT IDENTIFIER ::=  
+                                             {cienaCesMacMIBNotificationPrefix 0 }
+
+ --
+ -- Conformance information 
+ --
+ cienaCesMacMIBConformance  OBJECT IDENTIFIER ::= { cienaCesMacMIB 3 } 
+ cienaCesMacMIBCompliances  OBJECT IDENTIFIER ::= { cienaCesMacMIBConformance 1 }                
+ cienaCesMacMIBGroups       OBJECT IDENTIFIER ::= { cienaCesMacMIBConformance 2 }
+ 
+ --
+ -- The dynamic MAC table attributes
+ --
+ cienaCesMacScanAttrVs  OBJECT-TYPE
+     SYNTAX          Integer32 (-1 | 0..65535)
+     MAX-ACCESS      read-write
+     STATUS          current
+     DESCRIPTION
+           "The virtual switch (VS) attribute allows the user to 
+            display MAC scan table entries that are associated with the 
+            specified VS. Setting to -1 will enable all VSs to be included in the
+            MAC scan table."
+     DEFVAL { -1 }
+     ::= { cienaCesMacScanAttr 1 } 
+  
+ cienaCesMacScanAttrRlan  OBJECT-TYPE
+     SYNTAX          Integer32 (-1 | 0..65535)
+     MAX-ACCESS      read-write
+     STATUS          current
+     DESCRIPTION
+            "The RLAN attribute allows the user to display MAC scan table entries 
+             that are associated with the specified RLAN. If the RLAN attribute 
+             is set to -1, then all RLANs will be shown (default value)."
+     DEFVAL { -1 }
+     ::= { cienaCesMacScanAttr 2 }
+ 
+ cienaCesMacScanAttrMac  OBJECT-TYPE
+     SYNTAX          MacAddress
+     MAX-ACCESS      read-write
+     STATUS          current
+     DESCRIPTION
+           "The MAC and mask attributes allow the user to construct MAC scan 
+            table entries that match all or part of the specified MAC and mask attributes.
+            The MAC scan table will only contain entries that have bits set, 
+            matching the specified MAC address and mask.  This will allow the user 
+            to specify that certain bits in the MAC address must be 1's or 0's.
+
+            A mask of ff:ff:ff:ff:ff:ff will be implied only when the specified 
+            MAC address will be included in the MAC table.
+
+            A MAC attribute of 00:00:00:00:00:00 allowing all MACs to be included 
+            in the table (provided the other attributes match allowing the table 
+            entry to be returned)."
+     DEFVAL {'000000000000'H}
+     ::= { cienaCesMacScanAttr 3 }
+ 
+ cienaCesMacScanAttrMask  OBJECT-TYPE
+     SYNTAX          MacAddress
+     MAX-ACCESS      read-write
+     STATUS          current
+     DESCRIPTION
+           "Refer to cienaCesMacScanAttrMac description."
+     DEFVAL {'000000000000'H}
+     ::= { cienaCesMacScanAttr 4 }
+ 
+ --
+ -- The MAC table
+ --
+ cienaCesMacScanTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF CienaCesMacScanEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table contains current MAC table per the 
+            cienaCesMacScanAttr objects." 
+    ::= { cienaCesMacScan 2 }
+
+ cienaCesMacScanEntry OBJECT-TYPE
+    SYNTAX     CienaCesMacScanEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the cienaCesMacScanTable."
+    INDEX      { cienaCesMacScanVsIndex, 
+                 cienaCesMacScanRlanIndex, 
+                 cienaCesMacScanMacIndex }
+    ::= { cienaCesMacScanTable 1 }
+ 
+ CienaCesMacScanEntry ::= SEQUENCE {                  
+    cienaCesMacScanVsIndex           Unsigned32,
+    cienaCesMacScanRlanIndex         Unsigned32,
+    cienaCesMacScanMacIndex          MacAddress,
+    cienaCesMacScanVsId              Unsigned32,
+    cienaCesMacScanRlanId            Unsigned32,
+    cienaCesMacScanMacAddr           DisplayString,
+    cienaCesMacScanLiType            INTEGER,
+    cienaCesMacScanLiIndex           Unsigned32,
+    cienaCesMacScanPortBayIndex      Unsigned32,
+    cienaCesMacScanPortShelfIndex    Unsigned32,
+    cienaCesMacScanPortSlotIndex     Unsigned32,
+    cienaCesMacScanPortPortId        Unsigned32,
+    cienaCesMacScanMacType           INTEGER,
+    cienaCesMacScanPortChannelId     Unsigned32
+ }                                 
+ 
+ cienaCesMacScanVsIndex   OBJECT-TYPE
+     SYNTAX          Unsigned32
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+           "The object indicates the VS value associated with the MAC entry."               
+     ::= { cienaCesMacScanEntry 1 }
+     
+ cienaCesMacScanRlanIndex  OBJECT-TYPE
+     SYNTAX          Unsigned32
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+           "The object indicates the RLAN value associated with the MAC entry."               
+     ::= { cienaCesMacScanEntry 2 }
+
+ cienaCesMacScanMacIndex  OBJECT-TYPE
+     SYNTAX          MacAddress
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+           "The object indicates the MAC address of the MAC entry."               
+     ::= { cienaCesMacScanEntry 3 }
+
+ cienaCesMacScanVsId   OBJECT-TYPE
+     SYNTAX          Unsigned32
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+           "The object has the same definition as the cienaCesMacScanVsIndex."               
+     ::= { cienaCesMacScanEntry 4 }
+     
+ cienaCesMacScanRlanId  OBJECT-TYPE
+     SYNTAX          Unsigned32
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+           "The object has the same definition as the cienaCesMacScanRlanIndex."
+     ::= { cienaCesMacScanEntry 5 }
+
+ cienaCesMacScanMacAddr  OBJECT-TYPE
+     SYNTAX          DisplayString
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+           "The object has the same definition as the cienaCesMacScanMacIndex.
+            The format is ASCII '00:00:00:00:00:00'."
+     ::= { cienaCesMacScanEntry 6 }
+
+
+ cienaCesMacScanLiType   OBJECT-TYPE
+     SYNTAX          INTEGER {
+                        unknown(1),
+                        port(2),
+                        tunnelEncapPbt(3),
+                        tunnelDecapPbt(4),
+                        tunnelGroupPbt(5),
+                        transitPbt(6),
+                        tunnelEncapMpls(7),
+                        tunnelDecapMpls(8),
+                        transitMpls(9),
+                        subPort(10),
+                        qosFlow(11),
+                        accessFlow(12),
+                        servicePbt(13),
+                        servicePbb(14),
+                        serviceMplsMesh(15),
+                        cpuInterface(16),
+                        cpuSubInterface(17),
+                        tunnelGroupMpls(18),
+                        vcMpls(19),
+                        lspEncapMpls(20),
+                        lspDecapMpls(21),
+                        l3Interface(22)
+                     }
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+           "The object indicates the logical interface type associated with the MAC
+            table entry. This is an enumerated integer which contains a listing of 
+            possible liType values."
+     ::= { cienaCesMacScanEntry 7 }
+
+ cienaCesMacScanLiIndex   OBJECT-TYPE
+     SYNTAX          Unsigned32
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+           "The object indicates logical interface index number associated with 
+            the MAC table entry."
+     ::= { cienaCesMacScanEntry 8 }
+
+ cienaCesMacScanPortBayIndex   OBJECT-TYPE
+     SYNTAX          Unsigned32
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+           "The object indicates the bay index of the port in the associated with the MAC entry."
+     ::= { cienaCesMacScanEntry 9 }
+
+ cienaCesMacScanPortShelfIndex   OBJECT-TYPE
+     SYNTAX          Unsigned32
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+           "The object indicates the shelf index of the port associated with the MAC entry."
+     ::= { cienaCesMacScanEntry 10 }
+
+ cienaCesMacScanPortSlotIndex   OBJECT-TYPE
+     SYNTAX          Unsigned32
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+           "The object indicates the slot index of the port associated with the MAC entry."
+     ::= { cienaCesMacScanEntry 11 }
+
+ cienaCesMacScanPortPortId   OBJECT-TYPE
+     SYNTAX          Unsigned32
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+           "The object indicates the port ID of the port associated with the MAC entry."
+     ::= { cienaCesMacScanEntry 12 }
+
+ cienaCesMacScanMacType   OBJECT-TYPE
+     SYNTAX          INTEGER {
+                        dynamic(1),
+                        static(2)
+                     }
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+           "The object indicates the MAC entry type."
+     ::= { cienaCesMacScanEntry 13 }
+
+ cienaCesMacScanPortChannelId   OBJECT-TYPE
+     SYNTAX          Unsigned32
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+           "For rows with a corresponding cienaCesMacScanLiType value of port(2), the object
+            indicates the channel number of the port associated with the MAC entry.
+            The value 0 is used if the cienaCesMacScanLiType is not port(2), or if the
+            cienaCesMacScanLiType is port(2) and the port, as identified by the value of
+            cieanCesMacScanLiIndex, is not channelized."
+     ::= { cienaCesMacScanEntry 14 }
+
+ --
+ -- Notifications
+ --           
+
+ --
+ -- Groups definition
+ --
+ cienaCesMacScanGroup    OBJECT-GROUP
+       OBJECTS { cienaCesMacScanAttrVs,
+                 cienaCesMacScanAttrRlan,
+                 cienaCesMacScanAttrMac,
+                 cienaCesMacScanAttrMask,
+                 cienaCesMacScanVsId,
+                 cienaCesMacScanMacAddr,
+                 cienaCesMacScanLiType,
+                 cienaCesMacScanLiIndex,
+                 cienaCesMacScanPortBayIndex,
+                 cienaCesMacScanPortShelfIndex,
+                 cienaCesMacScanPortSlotIndex,
+                 cienaCesMacScanPortPortId,
+                 cienaCesMacScanMacType,
+                 cienaCesMacScanPortChannelId }
+       STATUS  current
+       DESCRIPTION
+               "A collection of objects providing information about MAC scan table."
+       ::= { cienaCesMacMIBGroups 1 }
+
+
+ 
+ END  
+ 

@@ -92,11 +92,11 @@ class ModuleTestHelper
         $this->json_file = $this->json_dir . $this->file_name . ".json";
 
         // never store time series data
-        Config::set('norrd', true);
+        Config::set('rrd.enable', false);
         Config::set('hide_rrd_disabled', true);
-        Config::set('noinfluxdb', true);
-        $influxdb = false;
-        Config::set('nographite', true);
+        Config::set('influxdb.enable', false);
+        Config::set('graphite.enable', false);
+        Config::set('prometheus.enable', false);
 
         if (is_null(self::$module_tables)) {
             // only load the yaml once, then keep it in memory
@@ -487,7 +487,7 @@ class ModuleTestHelper
         foreach ($private_oid as $oid) {
             if (isset($data[$oid])) {
                 $parts = explode('|', $data[$oid], 3);
-                $parts[2] = '<private>';
+                $parts[2] = $parts[1] === '4' ? '<private>' : '3C707269766174653E';
                 $data[$oid] = implode('|', $parts);
             }
         }
@@ -505,6 +505,7 @@ class ModuleTestHelper
     public function generateTestData(Snmpsim $snmpsim, $no_save = false)
     {
         global $device, $debug, $vdebug;
+        Config::set('rrd.enable', false); // disable rrd
 
         if (!is_file($this->snmprec_file)) {
             throw new FileNotFoundException("$this->snmprec_file does not exist!");

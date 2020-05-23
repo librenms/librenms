@@ -15,7 +15,7 @@ class CreateEntityStateTable extends Migration
     {
         Schema::create('entityState', function (Blueprint $table) {
             $table->increments('entity_state_id');
-            $table->unsignedInteger('device_id')->nullable();
+            $table->unsignedInteger('device_id')->nullable()->index();
             $table->unsignedInteger('entPhysical_id')->nullable();
             $table->dateTime('entStateLastChanged')->nullable();
             $table->integer('entStateAdmin')->nullable();
@@ -23,7 +23,6 @@ class CreateEntityStateTable extends Migration
             $table->integer('entStateUsage')->nullable();
             $table->text('entStateAlarm')->nullable();
             $table->integer('entStateStandby')->nullable();
-            $table->index('device_id', 'entityState_device_id_index');
         });
     }
 

@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Str;
-use LibreNMS\DB\Eloquent;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv4;
@@ -30,17 +29,6 @@ class Device extends BaseModel
         'status' => 'boolean',
     ];
 
-    /**
-     * Initialize this class
-     */
-    public static function boot()
-    {
-        parent::boot();
-        if (!app()->runningInConsole()) {
-            self::loadAllOs(true);
-        }
-    }
-
     // ---- Helper Functions ----
 
     public static function findByHostname($hostname)
@@ -57,7 +45,7 @@ class Device extends BaseModel
      */
     public static function pollerTarget($device)
     {
-        if (! is_array($device)) {
+        if (!is_array($device)) {
             $ret = static::where('hostname', $device)->first(['hostname', 'overwrite_ip']);
             if (empty($ret)) {
                 return $device;
@@ -171,56 +159,6 @@ class Device extends BaseModel
         return $query->exists();
     }
 
-    public function loadOs($force = false)
-    {
-        $yaml_file = base_path('/includes/definitions/' . $this->os . '.yaml');
-
-        if ((!\LibreNMS\Config::getOsSetting($this->os, 'definition_loaded') || $force) && file_exists($yaml_file)) {
-            $os = \Symfony\Component\Yaml\Yaml::parse(file_get_contents($yaml_file));
-
-            \LibreNMS\Config::set("os.$this->os", array_replace_recursive($os, \LibreNMS\Config::get("os.$this->os", [])));
-            \LibreNMS\Config::set("os.$this->os.definition_loaded", true);
-        }
-    }
-
-    /**
-     * Load all OS, optionally load just the OS used by existing devices
-     * Default cache time is 1 day. Controlled by os_def_cache_time.
-     *
-     * @param bool $existing Only load OS that have existing OS in the database
-     * @param bool $cached Load os definitions from the cache file
-     */
-    public static function loadAllOs($existing = false, $cached = true)
-    {
-        $install_dir = \LibreNMS\Config::get('install_dir');
-        $cache_file = $install_dir . '/cache/os_defs.cache';
-        if ($cached && is_file($cache_file) && (time() - filemtime($cache_file) < \LibreNMS\Config::get('os_def_cache_time'))) {
-            // Cached
-            $os_defs = unserialize(file_get_contents($cache_file));
-            if ($existing) {
-                // remove unneeded os
-                $os_defs = array_diff_key($os_defs, self::distinct('os')->get('os')->toArray());
-            }
-            \LibreNMS\Config::set('os', array_replace_recursive($os_defs, \LibreNMS\Config::get('os')));
-        } else {
-            // load from yaml
-            if ($existing && Eloquent::isConnected()) {
-                $os_list = [];
-                foreach (self::distinct('os')->get('os')->toArray() as $os) {
-                    $os_list[] = $install_dir . '/includes/definitions/' . $os['os'] . '.yaml';
-                }
-            } else {
-                $os_list = glob($install_dir . '/includes/definitions/*.yaml');
-            }
-            foreach ($os_list as $file) {
-                if (is_readable($file)) {
-                    $tmp = \Symfony\Component\Yaml\Yaml::parse(file_get_contents($file));
-                    \LibreNMS\Config::set("os.{$tmp['os']}", array_replace_recursive($tmp, \LibreNMS\Config::get("os.{$tmp['os']}", [])));
-                }
-            }
-        }
-    }
-
     /**
      * Get the shortened display name of this device.
      * Length is always overridden by shorthost_target_length.
@@ -284,7 +222,7 @@ class Device extends BaseModel
         ];
 
         foreach ($options as $file) {
-            if (is_file(public_path()."/$file")) {
+            if (is_file(public_path() . "/$file")) {
                 return asset($file);
             }
         }
@@ -343,9 +281,9 @@ class Device extends BaseModel
     public function validateStandalone()
     {
         if ($this->max_depth === 0 && $this->children()->count() > 0) {
-            $this->max_depth = 1;  // has children
+            $this->max_depth = 1; // has children
         } elseif ($this->max_depth === 1 && $this->parents()->count() === 0) {
-            $this->max_depth = 0;  // no children or parents
+            $this->max_depth = 0; // no children or parents
         }
 
         $this->save();
@@ -368,7 +306,7 @@ class Device extends BaseModel
         }
 
         $attrib->attrib_value = $value;
-        return (bool)$this->attribs()->save($attrib);
+        return (bool) $this->attribs()->save($attrib);
     }
 
     public function forgetAttrib($name)
@@ -378,7 +316,7 @@ class Device extends BaseModel
         });
 
         if ($attrib_index !== false) {
-            $deleted=(bool)$this->attribs->get($attrib_index)->delete();
+            $deleted = (bool) $this->attribs->get($attrib_index)->delete();
             // only forget the attrib_index after delete, otherwise delete() will fail fatally with:
             // Symfony\\Component\\Debug\Exception\\FatalThrowableError(code: 0):  Call to a member function delete() on null
             $this->attribs->forget($attrib_index);
@@ -408,7 +346,6 @@ class Device extends BaseModel
 
     public function getIconAttribute($icon)
     {
-        $this->loadOs();
         return Str::start(Url::findOsImage($this->os, $this->features, $icon), 'images/os/');
     }
 
@@ -428,7 +365,7 @@ class Device extends BaseModel
 
     public function setStatusAttribute($status)
     {
-        $this->attributes['status'] = (int)$status;
+        $this->attributes['status'] = (int) $status;
     }
 
     // ---- Query scopes ----
@@ -439,7 +376,7 @@ class Device extends BaseModel
             ['status', '=', 1],
             ['ignore', '=', 0],
             ['disable_notify', '=', 0],
-            ['disabled', '=', 0]
+            ['disabled', '=', 0],
         ]);
     }
 
@@ -447,7 +384,7 @@ class Device extends BaseModel
     {
         return $query->where([
             ['ignore', '=', 0],
-            ['disabled', '=', 0]
+            ['disabled', '=', 0],
         ]);
     }
 
@@ -457,7 +394,7 @@ class Device extends BaseModel
             ['status', '=', 0],
             ['disable_notify', '=', 0],
             ['ignore', '=', 0],
-            ['disabled', '=', 0]
+            ['disabled', '=', 0],
         ]);
     }
 
@@ -465,28 +402,28 @@ class Device extends BaseModel
     {
         return $query->where([
             ['ignore', '=', 1],
-            ['disabled', '=', 0]
+            ['disabled', '=', 0],
         ]);
     }
 
     public function scopeNotIgnored($query)
     {
         return $query->where([
-            ['ignore', '=', 0]
+            ['ignore', '=', 0],
         ]);
     }
 
     public function scopeIsDisabled($query)
     {
         return $query->where([
-            ['disabled', '=', 1]
+            ['disabled', '=', 1],
         ]);
     }
 
     public function scopeIsDisableNotify($query)
     {
         return $query->where([
-            ['disable_notify', '=', 1]
+            ['disable_notify', '=', 1],
         ]);
     }
 
@@ -494,7 +431,7 @@ class Device extends BaseModel
     {
         return $query->where([
             ['disable_notify', '=', 0],
-            ['disabled', '=', 0]
+            ['disabled', '=', 0],
         ]);
     }
 
@@ -502,7 +439,7 @@ class Device extends BaseModel
     {
         return $query->where([
             ['uptime', '>', 0],
-            ['uptime', $modifier, $uptime]
+            ['uptime', $modifier, $uptime],
         ]);
     }
 
@@ -633,6 +570,15 @@ class Device extends BaseModel
     public function ospfInstances()
     {
         return $this->hasMany(\App\Models\OspfInstance::class, 'device_id');
+    }
+    public function ospfNbrs()
+    {
+        return $this->hasMany(\App\Models\OspfNbr::class, 'device_id');
+    }
+
+    public function ospfPorts()
+    {
+        return $this->hasMany(\App\Models\OspfPort::class, 'device_id');
     }
 
     public function netscalerVservers()

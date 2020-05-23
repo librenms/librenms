@@ -73,7 +73,7 @@ class Url
         }
 
         $class = self::deviceLinkDisplayClass($device);
-        $graphs = self::getOverviewGraphsForDevice($device);
+        $graphs = Graph::getOverviewGraphsForDevice($device);
         $url = Url::deviceUrl($device, $vars);
 
         // beginning of overlib box contains large hostname followed by hardware & OS details
@@ -421,26 +421,6 @@ class Url
         return '<img class="' . $class . '" width="' . $width . '" height="' . $height . '" src="' . url('graph.php') . '?' . implode($sep, $vars) . '">';
     }
 
-    private static function getOverviewGraphsForDevice($device)
-    {
-        if ($device->snmp_disable) {
-            return Config::getOsSetting('ping', 'over');
-        }
-
-        if ($graphs = Config::getOsSetting($device->os, 'over')) {
-            return $graphs;
-        }
-
-        if ($os_group = Config::getOsSetting($device->os, 'os_group')) {
-            $name = key($os_group);
-            if (isset($os_group[$name]['over'])) {
-                return $os_group[$name]['over'];
-            }
-        }
-
-        return Config::getOsSetting('default', 'over');
-    }
-
     /**
      * @param Device $device
      * @return string
@@ -551,7 +531,7 @@ class Url
 
         $vars = [];
         foreach ($parts as $part) {
-            list($key, $value) = explode('=', $part);
+            [$key, $value] = explode('=', $part);
             $vars[$key] = $value;
         }
 

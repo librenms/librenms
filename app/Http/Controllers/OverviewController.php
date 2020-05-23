@@ -154,8 +154,7 @@ class OverviewController extends Controller
                 ->get();
 
             $devices_uptime = $devices_uptime->reject(function ($device) {
-                $device->loadOs(); // TODO: needed?
-                return Config::get("os.{$device->os}.bad_uptime") == true;
+                return Config::getOsSetting($device->os, 'bad_uptime') == true;
             });
         }
 

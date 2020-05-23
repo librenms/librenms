@@ -27,7 +27,7 @@ namespace LibreNMS\Tests;
 
 abstract class DBTestCase extends TestCase
 {
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         if (!getenv('DBTEST')) {
             static::markTestSkipped('Database tests not enabled.  Set DBTEST=1 to enable.');

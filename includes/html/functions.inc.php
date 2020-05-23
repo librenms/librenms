@@ -177,15 +177,7 @@ function generate_device_link($device, $text = null, $vars = array(), $start = 0
 
     $text = format_hostname($device, $text);
 
-    if ($device['snmp_disable']) {
-        $graphs = Config::get('os.ping.over');
-    } elseif (Config::has("os.{$device['os']}.over")) {
-        $graphs = Config::get("os.{$device['os']}.over");
-    } elseif (isset($device['os_group']) && Config::has("os.{$device['os_group']}.over")) {
-        $graphs = Config::get("os.{$device['os_group']}.over");
-    } else {
-        $graphs = Config::get('os.default.over');
-    }
+    $graphs = \LibreNMS\Util\Graph::getOverviewGraphsForDevice(DeviceCache::get($device['device_id']));
 
     $url = generate_device_url($device, $vars);
 
@@ -196,7 +188,7 @@ function generate_device_link($device, $text = null, $vars = array(), $start = 0
     }
 
     if ($device['os']) {
-        $contents .= ' - ' . Config::get("os.{$device['os']}.text");
+        $contents .= ' - ' . Config::getOsSetting($device['os'], 'text');
     }
 
     if ($device['version']) {
@@ -1126,7 +1118,7 @@ function search_oxidized_config($search_in_conf_textbox)
         )
     );
     $context = stream_context_create($opts);
-    
+
     $nodes = json_decode(file_get_contents($oxidized_search_url, false, $context), true);
     // Look up Oxidized node names to LibreNMS devices for a link
     foreach ($nodes as &$n) {
@@ -1205,7 +1197,7 @@ function get_oxidized_nodes_list()
             //user cannot see this device, so let's skip it.
             continue;
         }
-        
+
         echo "<tr>
         <td>" . $device['device_id'] . "</td>
         <td>" . $object['name'] . "</td>

@@ -191,20 +191,6 @@ if __name__ == '__main__':
     discovery_path = config['install_dir'] + '/discovery.php'
     log_dir = config['log_dir']
 
-    # TODO: Use LibreNMS.DB
-    db_username = config['db_user']
-    db_password = config['db_pass']
-    db_port = int(config['db_port'])
-
-    if config['db_socket']:
-        db_server = config['db_host']
-        db_socket = config['db_socket']
-    else:
-        db_server = config['db_host']
-        db_socket = None
-
-    db_dbname = config['db_name']
-
     # (c) 2015, GPLv3, Daniel Preussker <f0o@devilcode.org> <<<EOC1
     if 'distributed_poller_group' in config:
         discovery_group = str(config['distributed_poller_group'])
@@ -288,7 +274,7 @@ if __name__ == '__main__':
         query = "select device_id from devices where disabled = 0 order by last_polled_timetaken desc"
     # EOC2
 
-    db = LNMS.db_open(db_socket, db_server, db_port, db_username, db_password, db_dbname)
+    db = LNMS.db_open(config['db_socket'], config['db_host'], int(config['db_port']), config['db_user'], config['db_pass'], config['db_name'])
     cursor = db.cursor()
     cursor.execute(query)
     devices = cursor.fetchall()

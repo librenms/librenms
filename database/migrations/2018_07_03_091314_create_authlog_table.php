@@ -15,10 +15,10 @@ class CreateAuthlogTable extends Migration
     {
         Schema::create('authlog', function (Blueprint $table) {
             $table->increments('id');
-            $table->timestamp('datetime')->default(DB::raw('CURRENT_TIMESTAMP'));
-            $table->text('user', 65535);
-            $table->text('address', 65535);
-            $table->text('result', 65535);
+            $table->timestamp('datetime')->useCurrent();
+            $table->text('user');
+            $table->text('address');
+            $table->text('result');
         });
     }
 
