@@ -127,7 +127,7 @@ class CiHelper
             $ret = $this->runCheck($check);
 
             if ($this->flags['fail-fast'] && $ret !== 0 && $ret !== 250) {
-                return $return;
+                return $ret;
             } else {
                 $return += $ret;
             }
@@ -311,7 +311,7 @@ class CiHelper
             return $ret;
         }
 
-        if ($this->flags["{$type}_skip"]) {
+        if ($this->flags["{$type}_enable"] && $this->flags["{$type}_skip"]) {
             echo ucfirst($type) . " check skipped.\n";
         }
         return 0;
@@ -394,10 +394,10 @@ class CiHelper
 
     public function checkEnvSkips()
     {
-        $this->flags['unit_skip'] = (bool)getenv('SKIP_UNIT_CHECK');
-        $this->flags['lint_skip'] = (bool)getenv('SKIP_LINT_CHECK');
-        $this->flags['web_skip'] = (bool)getenv('SKIP_WEB_CHECK');
-        $this->flags['style_skip'] = (bool)getenv('SKIP_STYLE_CHECK');
+        $this->flags['unit_skip'] = $this->flags['unit_skip'] || getenv('SKIP_UNIT_CHECK');
+        $this->flags['lint_skip'] = $this->flags['lint_skip'] || getenv('SKIP_LINT_CHECK');
+        $this->flags['web_skip'] = $this->flags['web_skip'] || getenv('SKIP_WEB_CHECK');
+        $this->flags['style_skip'] = $this->flags['style_skip'] || getenv('SKIP_STYLE_CHECK');
     }
 
     public function detectChangedFiles()
