@@ -46,7 +46,7 @@ class Hue extends Transport
     public function contactHue($obj, $opts)
     {
         // Don't alert on resolve at this time
-        if ($obj['state'] == 0) {
+        if ($obj['state'] == AlertState::RECOVERED) {
             return true;
         } else {
             $device = device_by_id_cache($obj['device_id']); // for event logging

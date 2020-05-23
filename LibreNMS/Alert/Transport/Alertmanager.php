@@ -37,7 +37,7 @@ class Alertmanager extends Transport
 
     public static function contactAlertmanager($obj, $api)
     {
-        if ($obj['state'] == 0) {
+        if ($obj['state'] == AlertState::RECOVERED) {
             $alertmanager_status = 'endsAt';
         } else {
             $alertmanager_status = 'startsAt';

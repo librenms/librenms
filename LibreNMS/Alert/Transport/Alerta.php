@@ -34,7 +34,7 @@ class Alerta extends Transport
         $host = $opts['url'];
         $curl = curl_init();
         $text = strip_tags($obj['msg']);
-        $severity = ($obj['state'] == 0 ? $opts['recoverstate'] : $opts['alertstate']);
+        $severity = ($obj['state'] == AlertState::RECOVERED ? $opts['recoverstate'] : $opts['alertstate']);
         $deviceurl = (Config::get('base_url') . 'device/device=' . $obj['device_id']);
         $devicehostname = $obj['hostname'];
         $data = [

@@ -37,9 +37,9 @@ class Pagerduty extends Transport
 
     public function deliverAlert($obj, $opts)
     {
-        if ($obj['state'] == 0) {
+        if ($obj['state'] == AlertState::RECOVERED) {
             $obj['event_type'] = 'resolve';
-        } elseif ($obj['state'] == 2) {
+        } elseif ($obj['state'] == AlertState::ACKNOWLEDGED) {
             $obj['event_type'] = 'acknowledge';
         } else {
             $obj['event_type'] = 'trigger';

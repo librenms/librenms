@@ -69,7 +69,7 @@ class Pushover extends Transport
                 break;
         }
         switch ($obj['state']) {
-            case 0:
+            case AlertState::RECOVERED:
                 $data['priority'] = 0;
                 if (!empty($api['options']['sound_ok'])) {
                     $data['sound'] = $api['options']['sound_ok'];

@@ -65,19 +65,19 @@ class Elasticsearch extends Transport
         $host = $es_host . ':' . $es_port . '/' . $index . '/' . $type;
 
         switch ($obj['state']) {
-            case 0:
+            case AlertState::RECOVERED:
                 $state = "ok";
                 break;
-            case 1:
+            case AlertState::ACTIVE:
                 $state = $severity;
                 break;
-            case 2:
+            case AlertState::ACKNOWLEDGED:
                 $state = "acknowledged";
                 break;
-            case 3:
+            case AlertState::WORSE:
                 $state = "worse";
                 break;
-            case 4:
+            case AlertState::BETTER:
                 $state = "better";
                 break;
         }

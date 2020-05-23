@@ -79,14 +79,14 @@ class Syslog extends Transport
         }
 
         switch ($obj['state']) {
-            case 0:
+            case AlertState::RECOVERED:
                 $state    = "OK";
                 $severity = 6;
                 break;
-            case 1:
+            case AlertState::ACTIVE:
                 $state = $sev_txt;
                 break;
-            case 2:
+            case AlertState::ACKNOWLEDGED:
                 $state    = "Acknowledged";
                 $severity = 6;
                 break;
