@@ -354,7 +354,7 @@ class CiHelper
         if ($this->flags['commands']) {
             $prefix = '';
             if ($env) {
-                $prefix .= http_build_query($env,'',' ') . ' ';
+                $prefix .= http_build_query($env, '', ' ') . ' ';
             }
 
             echo $prefix . $proc->getCommandLine() . PHP_EOL;
