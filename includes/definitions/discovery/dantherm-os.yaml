@@ -44,9 +44,9 @@ modules:
                     descr: Fan 1 operation status
                     state_name: fan1Status_states
                     states:
-                        - { value: 0, descr: Off }
-                        - { value: 1, descr: On }
-                        - { value: 2, descr: Emergency/Boost }
+                        - { value: 0, graph: 0, generic: 2, descr: Off }
+                        - { value: 1, graph: 0, generic: 0, descr: On }
+                        - { value: 2, graph: 0, generic: 1, descr: Emergency/Boost }
                 -
                     oid: fan2Status
                     value: fan2Status
@@ -54,6 +54,6 @@ modules:
                     descr: Fan 2 operation status
                     state_name: fan2Status_states
                     states:
-                        - { value: 0, descr: Off }
-                        - { value: 1, descr: On }
-                        - { value: 2, descr: Emergency/Boost }
+                        - { value: 0, graph: 0, generic: 2, descr: Off }
+                        - { value: 1, graph: 0, generic: 0, descr: On }
+                        - { value: 2, graph: 0, generic: 1, descr: Emergency/Boost }
