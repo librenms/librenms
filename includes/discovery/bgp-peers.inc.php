@@ -43,7 +43,7 @@ if (Config::get('enable_bgp')) {
 
             if (empty($peers_data)) {
                 $bgp4_mib = true;
-                $peers_data = snmp_walk($device, 'bgpPeerRemoteAs', '-OQ', 'BGP4-MIB');
+                $peers_data=preg_replace('/= /', '', snmp_walk($device, 'bgpPeerRemoteAs', '-OQ', 'BGP4-MIB'));
             }
         } else {
             echo 'No BGP on host';

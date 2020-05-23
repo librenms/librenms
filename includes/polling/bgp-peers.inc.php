@@ -143,15 +143,15 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                         }
                         d_echo("VPN : $vrfInstance for $address :\n");
                         d_echo($peer_data);
-                        if (empty($peer_data['bgpPeerInUpdates']) || empty($peer_data['bgpPeerOutUpdates'] )) {
+                        if (empty($peer_data['bgpPeerInUpdates']) || empty($peer_data['bgpPeerOutUpdates'])) {
                             $peer_data['bgpPeerInUpdates'] = $bgp4updates[$address]['bgpPeerInUpdates'];
                             $peer_data['bgpPeerOutUpdates'] = $bgp4updates[$address]['bgpPeerOutUpdates'];
                         }
-                        if (empty($peer_data['bgpPeerInTotalMessages']) || empty($peer_data['bgpPeerOutTotalMessages'] )) {
+                        if (empty($peer_data['bgpPeerInTotalMessages']) || empty($peer_data['bgpPeerOutTotalMessages'])) {
                             $peer_data['bgpPeerInTotalMessages'] = $bgp4updates[$address]['bgpPeerInTotalMessages'];
                             $peer_data['bgpPeerOutTotalMessages'] = $bgp4updates[$address]['bgpPeerOutTotalMessages'];
                         }
-                        if (empty($peer_data['bgpPeerAdminStatus']) || empty($peer_data['bgpPeerState'] )) {
+                        if (empty($peer_data['bgpPeerAdminStatus']) || empty($peer_data['bgpPeerState'])) {
                             $peer_data['bgpPeerState'] = $bgp4updates[$address]['bgpPeerState'];
                             $peer_data['bgpPeerAdminStatus'] = $bgp4updates[$address]['bgpPeerAdminStatus'];
                         }
