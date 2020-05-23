@@ -270,16 +270,6 @@ if (\LibreNMS\Config::get('enable_bgp')) {
 
                     $peer_data = array();
 
-                    if (strpos($peer_data_raw['cbgpPeer2LastError'], " ")) {
-                        // Some device return both Code and SubCode in the same snmp field, we need to split it
-                        $splitted_codes = explode(" ", $peer_data_raw['cbgpPeer2LastError']);
-                        $error_code = intval($splitted_codes[0]);
-                        $error_subcode = intval($splitted_codes[1]);
-                        $peer_data['bgpPeerLastErrorCode'] = $error_code;
-                        $peer_data['bgpPeerLastErrorSubCode'] = $error_subcode;
-                        unset($oid_map['cbgpPeer2LastError']);
-                    }
-
                     foreach ($oid_map as $source => $target) {
                         $v = isset($peer_data_raw[$source]) ? $peer_data_raw[$source] : '';
 
@@ -291,6 +281,15 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                             }
                         }
                         $peer_data[$target] = $v;
+                    }
+
+                    if (strpos($peer_data['bgpPeerLastErrorCode'], " ")) {
+                        // Some device return both Code and SubCode in the same snmp field, we need to split it
+                        $splitted_codes = explode(" ", $peer_data['bgpPeerLastErrorCode']);
+                        $error_code = intval($splitted_codes[0]);
+                        $error_subcode = intval($splitted_codes[1]);
+                        $peer_data['bgpPeerLastErrorCode'] = $error_code;
+                        $peer_data['bgpPeerLastErrorSubCode'] = $error_subcode;
                     }
                 }
 
