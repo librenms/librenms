@@ -69,7 +69,7 @@ class Splunk extends Transport
         }
 
         switch ($obj['state']) {
-            case AlertState::RECOVERY:
+            case AlertState::RECOVERED:
                 $severity = 6;
                 break;
             case AlertState::ACKNOWLEDGED:
