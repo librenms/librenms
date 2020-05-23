@@ -1,23 +1,20 @@
-mib: DANTHERM-COOLING-MIB 
+mib: DANTHERM-COOLING-MIB
 modules:
     sensors:
         temperature:
             data:
                 -
                     oid: onBoardTempr
-                    value: onBoardTempr
                     index: onBoardTempr.{{ $index }}
                     num_oid: .1.3.6.1.4.1.46651.1.1.1.{{ $index }}
                     descr: onBoard Tempr
                 -
                     oid: roomTempr
-                    value: roomTempr
                     index: roomTempr.{{ $index }}
                     num_oid: .1.3.6.1.4.1.46651.1.1.2.{{ $index }}
-                    descr: room Tempr  
+                    descr: room Tempr
                 -
                     oid: hotSpotTempr
-                    value: hotSpotTempr
                     index: hotSpotTempr.{{ $index }}
                     num_oid: .1.3.6.1.4.1.46651.1.1.3.{{ $index }}
                     descr: hotSpot Tempr
@@ -25,13 +22,11 @@ modules:
             data:
                 -
                     oid: fan1RPM
-                    value: fan1RPM
                     index: fan1RPM.{{ $index }}
                     num_oid: .1.3.6.1.4.1.46651.1.1.8.{{ $index }}
                     descr: fan1 RPM
                 -
                     oid: fan2RPM
-                    value: fan2RPM
                     index: fan2RPM.{{ $index }}
                     num_oid: .1.3.6.1.4.1.46651.1.1.9.{{ $index }}
                     descr: fan2 RPM
@@ -39,20 +34,20 @@ modules:
             data:
                 -
                     oid: fan1Status
-                    value: fan1Status
                     num_oid: .1.3.6.1.4.1.46651.1.1.18.{{ $index }}
                     descr: Fan 1 operation status
-                    state_name: fan1Status_states
+                    index: fan1Status.{{ $index }}
+                    state_name: fanStatus_states
                     states:
                         - { value: 0, graph: 0, generic: 2, descr: Off }
                         - { value: 1, graph: 0, generic: 0, descr: On }
                         - { value: 2, graph: 0, generic: 1, descr: Emergency/Boost }
                 -
                     oid: fan2Status
-                    value: fan2Status
                     num_oid: .1.3.6.1.4.1.46651.1.1.19.{{ $index }}
                     descr: Fan 2 operation status
-                    state_name: fan2Status_states
+                    index: fan2Status.{{ $index }}
+                    state_name: fanStatus_states
                     states:
                         - { value: 0, graph: 0, generic: 2, descr: Off }
                         - { value: 1, graph: 0, generic: 0, descr: On }

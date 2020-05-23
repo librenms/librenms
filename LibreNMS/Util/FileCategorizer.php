@@ -37,7 +37,13 @@ class FileCategorizer extends Categorizer
 
         if (getenv('CIHELPER_DEBUG')) {
             $this->setSkippable(function ($item) {
-                return in_array($item, ['.travis.yml', 'LibreNMS/Util/CiHelper.php', 'LibreNMS/Util/FileCategorizer.php']);
+                return in_array($item, [
+                    '.travis.yml',
+                    'LibreNMS/Util/CiHelper.php',
+                    'LibreNMS/Util/FileCategorizer.php',
+                    'app/Console/Commands/DevCheckCommand.php',
+                    'tests/Unit/CiHelperTest.php',
+                ]);
             });
         }
 
