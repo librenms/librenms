@@ -151,8 +151,10 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                             $peer_data['bgpPeerInTotalMessages'] = $bgp4updates[$address]['bgpPeerInTotalMessages'];
                             $peer_data['bgpPeerOutTotalMessages'] = $bgp4updates[$address]['bgpPeerOutTotalMessages'];
                         }
-                        if (empty($peer_data['bgpPeerAdminStatus']) || empty($peer_data['bgpPeerState'])) {
+                        if (empty($peer_data['bgpPeerState'])) {
                             $peer_data['bgpPeerState'] = $bgp4updates[$address]['bgpPeerState'];
+                        }
+                        if (empty($peer_data['bgpPeerAdminStatus'])) {
                             $peer_data['bgpPeerAdminStatus'] = $bgp4updates[$address]['bgpPeerAdminStatus'];
                         }
                         if (empty($peer_data['bgpPeerLastError'])) {
