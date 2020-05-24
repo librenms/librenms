@@ -558,7 +558,7 @@
                     "state_descr": "True",
                     "state_draw_graph": 1,
                     "state_value": 1,
-                    "state_generic_value": 0
+                    "state_generic_value": 1
                 },
                 {
                     "state_name": "UPSBatteryDischarging",
@@ -684,7 +684,7 @@
                     "state_descr": "True",
                     "state_draw_graph": 1,
                     "state_value": 1,
-                    "state_generic_value": 0
+                    "state_generic_value": 1
                 },
                 {
                     "state_name": "UPSUPSBoost",
@@ -712,7 +712,7 @@
                     "state_descr": "True",
                     "state_draw_graph": 1,
                     "state_value": 1,
-                    "state_generic_value": 0
+                    "state_generic_value": 1
                 },
                 {
                     "state_name": "UPSUPSBypass",
@@ -1404,7 +1404,7 @@
                     "state_descr": "True",
                     "state_draw_graph": 1,
                     "state_value": 1,
-                    "state_generic_value": 0
+                    "state_generic_value": 1
                 },
                 {
                     "state_name": "UPSUPSBuck",
