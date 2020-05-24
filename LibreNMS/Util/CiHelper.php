@@ -219,12 +219,6 @@ class CiHelper
 
     public function checkWeb()
     {
-        if (! $this->flags['ci']) {
-            echo "Warning: dusk may erase your primary database, do not use yet\n";
-
-            return 0;
-        }
-
         if ($this->canCheck('web')) {
             echo "Preparing for web checks\n";
             $this->execute('config:clear', ['php', 'artisan', 'config:clear'], true);

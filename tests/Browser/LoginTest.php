@@ -38,6 +38,9 @@ class LoginTest extends DuskTestCase
                 ->type('username', $user->username)
                 ->type('password', $password)
                 ->press('@login')
+                ->waitUsing(60, 3, function () {
+                    return false;
+                })
                 ->assertPathIs('/')
                 ->logout();
 

@@ -47,8 +47,8 @@
                     <td>{{ $version_python }}</td>
                 </tr>
                 <tr>
-                    <td><b>@lang('MySQL')</b></td>
-                    <td>{{ $version_mysql }}</td>
+                    <td><b>@lang("database.driver.$db_server_driver")</b></td>
+                    <td>{{ $version_db_server }}</td>
                 </tr>
                 <tr>
                     <td><a href="https://laravel.com/"><b>@lang('Laravel')</b></a></td>

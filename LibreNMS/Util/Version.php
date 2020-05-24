@@ -24,7 +24,9 @@
 
 namespace LibreNMS\Util;
 
+use DB;
 use LibreNMS\DB\Eloquent;
+use SQLite3;
 use Symfony\Component\Process\Process;
 
 class Version
@@ -100,5 +102,16 @@ class Version
         }
 
         return explode(' ', rtrim($proc->getOutput()), 2)[1] ?? null;
+    }
+
+    public static function dbServer()
+    {
+        if (Eloquent::getDriver() == 'mysql') {
+            return optional(DB::selectOne('select version() as version '))->version;
+        } elseif (Eloquent::getDriver() == 'sqlite') {
+            return SQLite3::version()['versionString'] ?? null;
+        }
+
+        return null;
     }
 }

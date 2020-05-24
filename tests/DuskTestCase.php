@@ -9,7 +9,18 @@ use Laravel\Dusk\TestCase as BaseTestCase;
 
 abstract class DuskTestCase extends BaseTestCase
 {
-    use CreatesApplication;
+    use CreatesApplication { createApplication as baseCreateApplication; }
+
+    public function createApplication()
+    {
+        $app = $this->baseCreateApplication();
+
+        // set database to persistent sqlite
+        /** @var \Illuminate\Config\Repository $config */
+        $app->make('config')->set('database.default', 'testing_persistent');
+
+        return $app;
+    }
 
     /**
      * Prepare for Dusk test execution.

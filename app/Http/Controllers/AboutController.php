@@ -51,6 +51,7 @@ use App\Models\WirelessSensor;
 use DB;
 use Illuminate\Http\Request;
 use LibreNMS\Config;
+use LibreNMS\DB\Eloquent;
 use LibreNMS\Util\Version;
 
 class AboutController extends Controller
@@ -70,7 +71,8 @@ class AboutController extends Controller
             'project_name' => Config::get('project_name'),
 
             'version_local'     => $version->local(),
-            'version_mysql'     => current(DB::selectOne('select version()')),
+            'db_server_driver'  => Eloquent::getDriver(),
+            'version_db_server' => Version::dbServer(),
             'version_php'       => phpversion(),
             'version_laravel'   => App::VERSION(),
             'version_python'    => Version::python(),
