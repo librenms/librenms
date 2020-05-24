@@ -70,8 +70,9 @@ if ($enabled == 1) {
         $data            = dbFetchRows($query);
         $response[$name] = $data;
     }
+    $response['kernel_version'][]  = ['total' => 1, 'version' => $version['kernel_ver']];
     $response['php_version'][]     = array('total' => 1, 'version' => $version['php_ver']);
-    $response['python_version'][]      = ['total' => 1, 'version' => $version['python_ver']];
+    $response['python_version'][]  = ['total' => 1, 'version' => $version['python_ver']];
     $response['rrdtool_version'][] = array('total' => 1, 'version' => $version['rrdtool_ver']);
     $response['netsnmp_version'][] = array('total' => 1, 'version' => $version['netsnmp_ver']);
 

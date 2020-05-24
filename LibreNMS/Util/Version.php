@@ -101,4 +101,38 @@ class Version
 
         return explode(' ', rtrim($proc->getOutput()), 2)[1] ?? null;
     }
+
+    /**
+     * Returns kernel version
+     * - 4.19.0-6-amd64 (Debian 10)
+     * - 5.3.18-2-pve (Proxmox VE)
+     * - 4.19.0-8-amd64-docker (Docker container)
+     * - 4.19.67-microsoft-standard (Windows with WSL2)
+     * @return string|null
+     */
+    public static function kernel()
+    {
+        $procVersion = file_get_contents('/proc/version');
+        if (preg_match('/version\s+(\S+)/', $procVersion, $arProcVer)) {
+            $result = $arProcVer[1];
+            if (preg_match('/SMP/', $procVersion)) {
+                $result .= '-smp';
+            }
+        } else {
+            return null;
+        }
+
+        $cgroup = file_get_contents('/proc/self/cgroup');
+        if ($cgroup !== false) {
+            if (preg_match('/:\/lxc\//m', $cgroup)) {
+                $result .= '-lxc';
+            } elseif (preg_match('/:\/docker\//m', $cgroup)) {
+                $result .= '-docker';
+            } elseif (preg_match('/:\/system\.slice\/docker-/m', $cgroup)) {
+                $result .= '-docker';
+            }
+        }
+
+        return $result;
+    }
 }

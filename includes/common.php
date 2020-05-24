@@ -1006,6 +1006,7 @@ function version_info($remote = false)
         $output['local_branch'] = rtrim(`git rev-parse --abbrev-ref HEAD`);
     }
     $output['db_schema']   = vsprintf('%s (%s)', $version->database());
+    $output['kernel_ver']  = \LibreNMS\Util\Version::kernel();
     $output['php_ver']     = phpversion();
     $output['python_ver']  = \LibreNMS\Util\Version::python();
     $output['mysql_ver']   = dbIsConnected() ? dbFetchCell('SELECT version()') : '?';
