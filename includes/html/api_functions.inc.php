@@ -72,7 +72,6 @@ function api_not_found()
     return api_error(404, "This API route doesn't exist.");
 }
 
-
 function api_get_graph(array $vars)
 {
     global $dur;        // Needed for callback within graph code
