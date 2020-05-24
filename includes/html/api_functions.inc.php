@@ -77,6 +77,7 @@ function search_ports(\Illuminate\Http\Request $request)
     $search = $request->get('search');
     $value = "%$search%";
     return \App\Models\Port::hasAccess(Auth::user())
+        ->select(['device_id', 'port_id', 'ifIndex', 'ifName'])
         ->where('ifAlias', 'like', $value)
         ->orWhere('ifDescr', 'like', $value)
         ->orWhere('ifName', 'like', $value)
