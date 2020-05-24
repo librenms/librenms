@@ -26,6 +26,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
+use LibreNMS\Enum\AlertState;
 
 class AlertRule extends BaseModel
 {
@@ -52,7 +53,7 @@ class AlertRule extends BaseModel
     {
         return $query->enabled()
             ->join('alerts', 'alerts.rule_id', 'alert_rules.id')
-            ->whereNotIn('alerts.state', [0, 2]);
+            ->whereNotIn('alerts.state', [AlertState::CLEAR, AlertState::ACKNOWLEDGED, AlertState::RECOVERED]);
     }
 
     /**

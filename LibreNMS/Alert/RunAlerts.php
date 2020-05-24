@@ -33,6 +33,7 @@ namespace LibreNMS\Alert;
 use App\Models\DevicePerf;
 use LibreNMS\Config;
 use LibreNMS\Util\Time;
+use LibreNMS\Enum\AlertState;
 use Log;
 
 class RunAlerts
@@ -122,13 +123,13 @@ class RunAlerts
         $tpl                 = new Template;
         $template            = $tpl->getTemplate($obj);
 
-        if ($alert['state'] >= 1) {
+        if ($alert['state'] >= AlertState::ACTIVE) {
             $obj['title'] = $template->title ?: 'Alert for device '.$device['hostname'].' - '.($alert['name'] ? $alert['name'] : $alert['rule']);
-            if ($alert['state'] == 2) {
+            if ($alert['state'] == AlertState::ACKNOWLEDGED) {
                 $obj['title'] .= ' got acknowledged';
-            } elseif ($alert['state'] == 3) {
+            } elseif ($alert['state'] == AlertState::WORSE) {
                 $obj['title'] .= ' got worse';
-            } elseif ($alert['state'] == 4) {
+            } elseif ($alert['state'] == AlertState::BETTER) {
                 $obj['title'] .= ' got better';
             }
 
@@ -146,9 +147,9 @@ class RunAlerts
             if (!empty($extra['diff'])) {
                 $obj['diff'] = $extra['diff'];
             }
-        } elseif ($alert['state'] == 0) {
+        } elseif ($alert['state'] == AlertState::RECOVERED) {
             // Alert is now cleared
-            $id = dbFetchRow('SELECT alert_log.id,alert_log.time_logged,alert_log.details FROM alert_log WHERE alert_log.state != 2 && alert_log.state != 0 && alert_log.rule_id = ? && alert_log.device_id = ? && alert_log.id < ? ORDER BY id DESC LIMIT 1', array($alert['rule_id'], $alert['device_id'], $alert['id']));
+            $id = dbFetchRow('SELECT alert_log.id,alert_log.time_logged,alert_log.details FROM alert_log WHERE alert_log.state != ? && alert_log.state != ? && alert_log.rule_id = ? && alert_log.device_id = ? && alert_log.id < ? ORDER BY id DESC LIMIT 1', array(AlertState::ACKNOWLEDGED, AlertState::RECOVERED, $alert['rule_id'], $alert['device_id'], $alert['id']));
             if (empty($id['id'])) {
                 return false;
             }
@@ -222,7 +223,7 @@ class RunAlerts
 
     public function clearStaleAlerts()
     {
-        $sql = "SELECT `alerts`.`id` AS `alert_id`, `devices`.`hostname` AS `hostname` FROM `alerts` LEFT JOIN `devices` ON `alerts`.`device_id`=`devices`.`device_id`  RIGHT JOIN `alert_rules` ON `alerts`.`rule_id`=`alert_rules`.`id` WHERE `alerts`.`state`!=0 AND `devices`.`hostname` IS NULL";
+        $sql = "SELECT `alerts`.`id` AS `alert_id`, `devices`.`hostname` AS `hostname` FROM `alerts` LEFT JOIN `devices` ON `alerts`.`device_id`=`devices`.`device_id`  RIGHT JOIN `alert_rules` ON `alerts`.`rule_id`=`alert_rules`.`id` WHERE `alerts`.`state`!=".AlertState::CLEAR." AND `devices`.`hostname` IS NULL";
         foreach (dbFetchRows($sql) as $alert) {
             if (empty($alert['hostname']) && isset($alert['alert_id'])) {
                 dbDelete('alerts', '`id` = ?', array($alert['alert_id']));
@@ -289,9 +290,9 @@ class RunAlerts
     public function runAcks()
     {
 
-        foreach ($this->loadAlerts('alerts.state = 2 && alerts.open = 1') as $alert) {
+        foreach ($this->loadAlerts('alerts.state = '.AlertState::ACKNOWLEDGED.' && alerts.open = '.AlertState::ACTIVE) as $alert) {
             $this->issueAlert($alert);
-            dbUpdate(array('open' => 0), 'alerts', 'rule_id = ? && device_id = ?', array($alert['rule_id'], $alert['device_id']));
+            dbUpdate(array('open' => AlertState::CLEAR), 'alerts', 'rule_id = ? && device_id = ?', array($alert['rule_id'], $alert['device_id']));
         }
     }
 
@@ -301,8 +302,8 @@ class RunAlerts
      */
     public function runFollowUp()
     {
-        foreach ($this->loadAlerts('alerts.state > 0 && alerts.open = 0') as $alert) {
-            if ($alert['state'] != 2 || ($alert['info']['until_clear'] === false)) {
+        foreach ($this->loadAlerts('alerts.state > '.AlertState::CLEAR.' && alerts.open = 0') as $alert) {
+            if ($alert['state'] != AlertState::ACKNOWLEDGED || ($alert['info']['until_clear'] === false)) {
                 $rextra = json_decode($alert['extra'], true);
                 if ($rextra['invert']) {
                     continue;
@@ -322,18 +323,18 @@ class RunAlerts
                 $o = sizeof($alert['details']['rule']);
                 $n = sizeof($chk);
                 $ret = 'Alert #' . $alert['id'];
-                $state = 0;
+                $state = AlertState::CLEAR;
                 if ($n > $o) {
                     $ret .= ' Worsens';
-                    $state = 3;
+                    $state = AlertState::WORSE;
                     $alert['details']['diff'] = array_diff($chk, $alert['details']['rule']);
                 } elseif ($n < $o) {
                     $ret .= ' Betters';
-                    $state = 4;
+                    $state = AlertState::BETTER;
                     $alert['details']['diff'] = array_diff($alert['details']['rule'], $chk);
                 }
 
-                if ($state > 0 && $n > 0) {
+                if ($state > AlertState::CLEAR && $n > 0) {
                     $alert['details']['rule'] = $chk;
                     if (dbInsert(array(
                         'state' => $state,
@@ -385,7 +386,7 @@ class RunAlerts
      */
     public function runAlerts()
     {
-        foreach ($this->loadAlerts('alerts.state != 2 && alerts.open = 1') as $alert) {
+        foreach ($this->loadAlerts('alerts.state != '.AlertState::ACKNOWLEDGED.' && alerts.open = 1') as $alert) {
             $noiss            = false;
             $noacc            = false;
             $updet            = false;
@@ -404,7 +405,7 @@ class RunAlerts
             $tolerence_window = Config::get('alert.tolerance_window');
             if (!empty($rextra['count']) && empty($rextra['interval'])) {
                 // This check below is for compat-reasons
-                if (!empty($rextra['delay']) && $alert['state'] != 0) {
+                if (!empty($rextra['delay']) && $alert['state'] != AlertState::RECOVERED) {
                     if ((time() - strtotime($alert['time_logged']) + $tolerence_window) < $rextra['delay'] || (!empty($alert['details']['delay']) && (time() - $alert['details']['delay'] + $tolerence_window) < $rextra['delay'])) {
                         continue;
                     } else {
@@ -413,7 +414,7 @@ class RunAlerts
                     }
                 }
 
-                if ($alert['state'] == 1 && !empty($rextra['count']) && ($rextra['count'] == -1 || $alert['details']['count']++ < $rextra['count'])) {
+                if ($alert['state'] == AlertState::ACTIVE && !empty($rextra['count']) && ($rextra['count'] == -1 || $alert['details']['count']++ < $rextra['count'])) {
                     if ($alert['details']['count'] < $rextra['count']) {
                         $noacc = true;
                     }
@@ -423,7 +424,7 @@ class RunAlerts
                 }
             } else {
                 // This is the new way
-                if (!empty($rextra['delay']) && (time() - strtotime($alert['time_logged']) + $tolerence_window) < $rextra['delay'] && $alert['state'] != 0) {
+                if (!empty($rextra['delay']) && (time() - strtotime($alert['time_logged']) + $tolerence_window) < $rextra['delay'] && $alert['state'] != AlertState::RECOVERED) {
                     continue;
                 }
 
@@ -436,7 +437,7 @@ class RunAlerts
                     }
                 }
 
-                if (in_array($alert['state'], [1,3,4]) && !empty($rextra['count']) && ($rextra['count'] == -1 || $alert['details']['count']++ < $rextra['count'])) {
+                if (in_array($alert['state'], [AlertState::ACTIVE, AlertState::WORSE, AlertState::BETTER]) && !empty($rextra['count']) && ($rextra['count'] == -1 || $alert['details']['count']++ < $rextra['count'])) {
                     if ($alert['details']['count'] < $rextra['count']) {
                         $noacc = true;
                     }
@@ -470,7 +471,7 @@ class RunAlerts
                 Log::event('Skipped alerts because all parent devices are down', $alert['device_id'], 'alert', 1);
             }
 
-            if ($alert['state'] == 0 && $rextra['recovery'] == false) {
+            if ($alert['state'] == AlertState::RECOVERED && $rextra['recovery'] == false) {
                 // Rule is set to not send a recovery alert
                 $noiss = true;
             }
@@ -545,9 +546,9 @@ class RunAlerts
     public function alertLog($result, $obj, $transport)
     {
         $prefix = [
-            0 => "recovery",
-            1 => $obj['severity']." alert",
-            2 => "acknowledgment"
+            AlertState::RECOVERED => "recovery",
+            AlertState::ACTIVE => $obj['severity']." alert",
+            AlertState::ACKNOWLEDGED => "acknowledgment"
         ];
         $prefix[3] = &$prefix[0];
         $prefix[4] = &$prefix[0];
