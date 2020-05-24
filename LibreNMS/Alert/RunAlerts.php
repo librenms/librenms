@@ -554,9 +554,9 @@ class RunAlerts
         $prefix[3] = &$prefix[0];
         $prefix[4] = &$prefix[0];
 
-        if ($obj['state'] == 0) {
+        if ($obj['state'] == AlerState::RECOVERED) {
             $severity = Alert::OK;
-        } elseif ($obj['state'] == 1) {
+        } elseif ($obj['state'] == AlertState::ACTIVE) {
             switch ($obj['severity']) {
                 case 'ok':
                     $severity = Alert::OK;
@@ -571,7 +571,7 @@ class RunAlerts
                     $severity = Alert::UNKNOWN;
                     break;
             }
-        } elseif ($obj['state'] == 2) {
+        } elseif ($obj['state'] == AlertState::ACKNOWLEDGED) {
             $severity = Alert::NOTICE;
         } else {
             $severity = Alert::UNKNOWN;
