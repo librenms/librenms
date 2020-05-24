@@ -44,6 +44,52 @@ Output:
 }
 ```
 
+### `search_ports`
+
+Search for ports matching the query.
+
+Route: `/api/v0/ports/search/:search`
+
+- search string to search in fields: ifAlias, ifDescr, and ifName
+
+Input:
+
+  -
+
+Example:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/ports/search/lo
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "ports": [
+        {
+            "device_id": 1,
+            "port_id": 1,
+            "ifIndex": 1,
+            "ifName": "lo"
+        },
+        {
+            "device_id": 2,
+            "port_id": 3,
+            "ifIndex": 1,
+            "ifName": "lo"
+        },
+        {
+            "device_id": 3,
+            "port_id": 5,
+            "ifIndex": 1,
+            "ifName": "lo"
+        }
+    ]
+}
+```
+
 ### `get_port_info`
 
 Get all info for a particular port.
