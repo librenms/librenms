@@ -76,15 +76,15 @@ function search_ports(\Illuminate\Http\Request $request)
 {
     $search = $request->get('search');
     $value = "%$search%";
-    $ports = \App\Models\Port::hasAccess(Auth::user())
-    ->where('ifAlias', 'like', $value)
-    ->orWhere('ifDescr', 'like', $value)
-    ->orWhere('ifName', 'like', $value)
-    ->orderBy('ifName')
-    ->get();
-    $json = json_encode($ports);
-    return $json;
+    return \App\Models\Port::hasAccess(Auth::user())
+        ->where('ifAlias', 'like', $value)
+        ->orWhere('ifDescr', 'like', $value)
+        ->orWhere('ifName', 'like', $value)
+        ->orderBy('ifName')
+        ->get()
+        ->toJson();
 }
+
 function api_get_graph(array $vars)
 {
     global $dur;        // Needed for callback within graph code
