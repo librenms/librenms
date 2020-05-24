@@ -26,8 +26,6 @@
 namespace LibreNMS\Tests;
 
 use LibreNMS\Config;
-use LibreNMS\DB\Eloquent;
-use ReflectionClass;
 
 class ConfigTest extends TestCase
 {

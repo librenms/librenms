@@ -3,6 +3,7 @@
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Enum\Alert;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\Exceptions\JsonAppPollingFailedException;
 use LibreNMS\Exceptions\JsonAppParsingFailedException;
@@ -592,26 +593,25 @@ function update_application($app, $response, $metrics = array(), $status = '')
 
         $app_name = \LibreNMS\Util\StringHelpers::nicecase($app['app_type']);
 
-        # $severity 1: ok, 2: info, 3: notice, 4: warning, 5: critical, 0: unknown
         switch ($data['app_state']) {
             case 'OK':
-                $severity = 1;
+                $severity = Alert::OK;
                 $event_msg = "changed to OK";
                 break;
             case 'ERROR':
-                $severity = 5;
+                $severity = Alert::ERROR;
                 $event_msg = "ends with ERROR";
                 break;
             case 'LEGACY':
-                $severity = 4;
+                $severity = Alert::WARNING;
                 $event_msg = "Client Agent is deprecated";
                 break;
             case 'UNSUPPORTED':
-                $severity = 5;
+                $severity = Alert::ERROR;
                 $event_msg = "Client Agent Version is not supported";
                 break;
             default:
-                $severity = 0;
+                $severity = Alert::UNKNOWN;
                 $event_msg = "has UNKNOWN state";
                 break;
         }

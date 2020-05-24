@@ -14,8 +14,8 @@ class CreatePortsAdslTable extends Migration
     public function up()
     {
         Schema::create('ports_adsl', function (Blueprint $table) {
-            $table->unsignedInteger('port_id')->unique('interface_id');
-            $table->timestamp('port_adsl_updated')->default(DB::raw('CURRENT_TIMESTAMP'));
+            $table->unsignedInteger('port_id')->unique();
+            $table->timestamp('port_adsl_updated')->useCurrent();
             $table->string('adslLineCoding', 8);
             $table->string('adslLineType', 16);
             $table->string('adslAtucInvVendorID', 8);
