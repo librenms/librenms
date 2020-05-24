@@ -53,14 +53,14 @@ if (!empty($pre_cache['ups_nut_sensors'])) {
         ['state_name' => 'UPSLowBattery'        , 'genericT' => 2, 'genericF' => 0, 'descr' => 'UPS low battery'],
         ['state_name' => 'UPSHighBattery'       , 'genericT' => 1, 'genericF' => 0, 'descr' => 'UPS high battery'],
         ['state_name' => 'UPSBatteryReplace'    , 'genericT' => 1, 'genericF' => 0, 'descr' => 'UPS the battery needs to be replaced'],
-        ['state_name' => 'UPSBatteryCharging'   , 'genericT' => 0, 'genericF' => 0, 'descr' => 'UPS the battery is charging'],
+        ['state_name' => 'UPSBatteryCharging'   , 'genericT' => 1, 'genericF' => 0, 'descr' => 'UPS the battery is charging'],
         ['state_name' => 'UPSBatteryDischarging', 'genericT' => 1, 'genericF' => 0, 'descr' => 'UPS the battery is discharging'],
         ['state_name' => 'UPSUPSBypass'         , 'genericT' => 1, 'genericF' => 0, 'descr' => 'UPS bypass circuit is active' ],
-        ['state_name' => 'UPSRuntimeCalibration', 'genericT' => 0, 'genericF' => 0, 'descr' => 'UPS is currently performing runtime calibration'],
+        ['state_name' => 'UPSRuntimeCalibration', 'genericT' => 1, 'genericF' => 0, 'descr' => 'UPS is currently performing runtime calibration'],
         ['state_name' => 'UPSOffline'           , 'genericT' => 2, 'genericF' => 0, 'descr' => 'UPS is offline and is not supplying power to the load'],
         ['state_name' => 'UPSUPSOverloaded'     , 'genericT' => 2, 'genericF' => 0, 'descr' => 'UPS is overloaded.'],
-        ['state_name' => 'UPSUPSBuck'           , 'genericT' => 0, 'genericF' => 0, 'descr' => 'UPS is trimming incoming voltage'],
-        ['state_name' => 'UPSUPSBoost'          , 'genericT' => 0, 'genericF' => 0, 'descr' => 'UPS is boosting incoming voltage'],
+        ['state_name' => 'UPSUPSBuck'           , 'genericT' => 1, 'genericF' => 0, 'descr' => 'UPS is trimming incoming voltage'],
+        ['state_name' => 'UPSUPSBoost'          , 'genericT' => 1, 'genericF' => 0, 'descr' => 'UPS is boosting incoming voltage'],
         ['state_name' => 'UPSForcedShutdown'    , 'genericT' => 2, 'genericF' => 0, 'descr' => 'UPS forced shutdown'],
     ];
     foreach ($sensors as $index => $sensor) {
