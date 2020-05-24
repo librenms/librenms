@@ -64,9 +64,9 @@ if (getenv('DBTEST')) {
     unset($connection); // close connection
 
     // sqlite db file
-     $dbFile = fopen(storage_path('testing.sqlite'), 'a+');
-     ftruncate($dbFile, 0);
-     fclose($dbFile);
+    $dbFile = fopen(storage_path('testing.sqlite'), 'a+');
+    ftruncate($dbFile, 0);
+    fclose($dbFile);
 
     // try to avoid erasing people's primary databases
     if ($db_config['database'] !== \config('database.connections.mysql.database', 'librenms')) {
