@@ -63,12 +63,6 @@ if (getenv('DBTEST')) {
     }
     unset($connection); // close connection
 
-    // sqlite db file
-    $dbFile = storage_path('testing.sqlite');
-    if (!is_file($dbFile)) {
-        file_put_contents($dbFile, '');
-    }
-
     // try to avoid erasing people's primary databases
     if ($db_config['database'] !== \config('database.connections.mysql.database', 'librenms')) {
         if (! getenv('SKIP_DB_REFRESH')) {

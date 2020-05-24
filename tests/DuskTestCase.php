@@ -17,8 +17,10 @@ abstract class DuskTestCase extends BaseTestCase
     {
         $app = $this->baseCreateApplication();
 
-        // set database to persistent sqlite
-        $app->make('config')->set('database.default', 'testing_persistent');
+        // set database to persistent sqlite and make sure it exists
+        $database = 'testing_persistent';
+        touch($app->make('config')->get("database.connections.$database.database"));
+        $app->make('config')->set('database.default', $database);
 
         return $app;
     }
