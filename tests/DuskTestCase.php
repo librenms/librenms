@@ -9,7 +9,9 @@ use Laravel\Dusk\TestCase as BaseTestCase;
 
 abstract class DuskTestCase extends BaseTestCase
 {
-    use CreatesApplication { createApplication as baseCreateApplication; }
+    use CreatesApplication {
+        createApplication as baseCreateApplication;
+    }
 
     public function createApplication()
     {
