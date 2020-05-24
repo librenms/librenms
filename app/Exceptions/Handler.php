@@ -60,7 +60,7 @@ class Handler extends ExceptionHandler
         return parent::render($request, $exception);
     }
 
-    protected function convertExceptionToArray(Exception $e)
+    protected function convertExceptionToArray(Throwable $e)
     {
         // override the non-debug error output to clue in user on how to debug
         if (!config('app.debug') && !$this->isHttpException($e)) {
