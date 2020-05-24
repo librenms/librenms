@@ -42,7 +42,7 @@ class PollerGroup extends Model
 
         static::deleting(function (PollerGroup $pollergroup) {
             // handle device pollergroup fallback to default poller
-            $default_poller_id = \LibreNMS\Config::get('distributed_poller_group');
+            $default_poller_id = \LibreNMS\Config::get('default_poller_group');
             $pollergroup->devices()->update(['poller_group' => $default_poller_id]);
         });
     }

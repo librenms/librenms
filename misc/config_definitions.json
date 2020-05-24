@@ -1190,6 +1190,10 @@
         },
         "distributed_poller_group": {
             "default": 0,
+            "type": "integer"
+        },
+        "default_poller_group": {
+            "default": 0,
             "type": "integer",
             "group": "poller",
             "section": "distributed",
