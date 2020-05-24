@@ -557,20 +557,7 @@ class RunAlerts
         if ($obj['state'] == AlerState::RECOVERED) {
             $severity = Alert::OK;
         } elseif ($obj['state'] == AlertState::ACTIVE) {
-            switch ($obj['severity']) {
-                case 'ok':
-                    $severity = Alert::OK;
-                    break;
-                case 'warning':
-                    $severity = Alert::WARNING;
-                    break;
-                case 'critical':
-                    $severity = Alert::ERROR;
-                    break;
-                default:
-                    $severity = Alert::UNKNOWN;
-                    break;
-            }
+            $severity = Alert::SEVERITIES[$obj['severity']] ??  Alert::UNKNOWN;
         } elseif ($obj['state'] == AlertState::ACKNOWLEDGED) {
             $severity = Alert::NOTICE;
         } else {
