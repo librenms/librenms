@@ -1,6 +1,6 @@
 <?php
 
-if ($device['os'] == 'ies52xxm') {
+if ($device['os'] == 'ies52xxM') {
     $array = snmpwalk_cache_oid($device, 'memStatsTable', null, 'IES5206-MIB', 'zyxel');
 
     if (is_array($array)) {
