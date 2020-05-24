@@ -16,7 +16,6 @@ abstract class DuskTestCase extends BaseTestCase
         $app = $this->baseCreateApplication();
 
         // set database to persistent sqlite
-        /** @var \Illuminate\Config\Repository $config */
         $app->make('config')->set('database.default', 'testing_persistent');
 
         return $app;
