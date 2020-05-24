@@ -27,10 +27,8 @@ namespace LibreNMS\Tests;
 
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
-use LibreNMS\Exceptions\AuthenticationException;
 
-// Note that as this test set depends on mres(), it is a DBTestCase even though the database is unused
-class AuthHTTPTest extends DBTestCase
+class AuthHTTPTest extends TestCase
 {
     private $original_auth_mech;
     private $server;
