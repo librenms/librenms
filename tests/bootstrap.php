@@ -42,7 +42,7 @@ chdir($install_dir);
 ini_set('display_errors', 1);
 //error_reporting(E_ALL & ~E_WARNING);
 
-$snmpsim = new Snmpsim('127.1.6.2', 1162);
+$snmpsim = new Snmpsim('127.1.6.2', 1162, null);
 if (getenv('SNMPSIM')) {
     $snmpsim->fork();
 
