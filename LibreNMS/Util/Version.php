@@ -104,16 +104,16 @@ class Version
 
     /**
      * Returns kernel version
-     * - 4.19.0-6-amd64 (Debian 10)
-     * - 5.3.18-2-pve (Proxmox VE)
-     * - 4.19.0-8-amd64-docker (Docker container)
-     * - 4.19.67-microsoft-standard (Windows with WSL2)
+     * - 4.19 (Debian 10)
+     * - 5.3 (Proxmox VE)
+     * - 4.19-docker (Docker container)
      * @return string|null
      */
     public static function kernel()
     {
-        if (preg_match('/version\s+(\S+)/', file_get_contents('/proc/version'), $procVer)) {
-            $result = $procVer[1];
+        $procVersion = file_get_contents('/proc/version');
+        if (preg_match('/^Linux version\s+(\d+.\d+)/', $procVersion, $matches)) {
+            $result = $matches[1];
             $cgroup = file_get_contents('/proc/self/cgroup');
             if (preg_match('/:\/lxc\//m', $cgroup)) {
                 $result .= '-lxc';
