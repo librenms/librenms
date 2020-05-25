@@ -334,7 +334,23 @@ if (Config::get('enable_ports_poe')) {
             $port_ent_to_if = [];
             foreach ($ifTable_ifDescr as $if_index => $if_descr) {
                 if (preg_match('/^[[:alpha:]]+ethernet([0-9\/.]+)$/i', $if_descr['ifDescr'], $matches)) {
-                    $port_ent_to_if[str_replace('/', '.', $matches[1])] = ['portIfIndex' => $if_index];
+                    /*
+                    The ...EthernetX/Y/Z SNMP entries on Catalyst 9x00 iosxe
+                    are cpeExtStuff.X.Z instead of cpeExtStuff.X.Y.Z
+                    Creating both:
+                      $port_ent_to_if[slot.subslot.port]
+                      $port_ent_to_if[slot.port]
+                    will find the PoE stats for Cat9K and will also match for
+                    devices that do include the subslot (for subslot == 0)
+                    */
+                    $iface_parts = explode('/', $matches[1]);
+                    while (1) {
+                        $port_ent_to_if[implode('.', $iface_parts)] = ['portIfIndex' => $if_index];
+                        if (count($iface_parts) < 3 || $iface_parts[1] != '0') {
+                            break;
+                        }
+                        array_splice($iface_parts, 1, 1);
+                    }
                 }
             }
         }
