@@ -91,7 +91,7 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
             }
         }
 
-        // Processes
+        // Unix Processes
         if (!empty($agent_data['ps'])) {
             echo 'Processes: ';
             dbDelete('processes', 'device_id = ?', array($device['device_id']));
@@ -105,6 +105,31 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
             }
             if (count($data) > 0) {
                 dbBulkInsert($data, 'processes');
+            }
+            echo "\n";
+        }
+
+        // Windows Processes
+        if (!empty($agent_data['ps:sep(9)'])) {
+            echo 'Processes: ';
+            dbDelete('processes', 'device_id = ?', array($device['device_id']));
+            $data=array();
+            foreach (explode("\n", $agent_data['ps:sep(9)']) as $process) {
+                $process = preg_replace('/\((.*),([0-9]*),([0-9]*),([0-9]*),([0-9]*),([0-9]*),([0-9]*),([0-9]*),([0-9]*),([0-9]*)\)(.*)/', '\\1|\\2|\\3|\\4|\\5|\\6|\\7|\\8|\\9|\\10|\\11', $process);
+                list($user, $VirtualSize, $WorkingSetSize, $zero, $processId, $PageFileUsage, $UserModeTime, $KernelModeTime, $HandleCount, $ThreadCount, $process_name) = explode('|', $process, 11);
+                if (!empty($process_name)) {
+		    $cputime = ($UserModeTime + $KernelModeTime) / 10000000;
+		    $days = floor($cputime / 86400);
+		    $hours = str_pad(floor(($cputime / 3600) % 24), 2, '0', STR_PAD_LEFT);
+		    $minutes = str_pad(floor(($cputime / 60) % 60), 2, '0', STR_PAD_LEFT);
+		    $seconds = str_pad(($cputime % 60), 2, '0', STR_PAD_LEFT);
+		    $cputime = ($days > 0 ? "$days-" : '') . "$hours:$minutes:$seconds";
+
+                    $data[]=array('device_id' => $device['device_id'], 'pid' => $processId, 'user' => $user, 'vsz' => $PageFileUsage + $WorkingSetSize, 'rss' => $WorkingSetSize, 'cputime' => $cputime, 'command' => $process_name);
+                }
+            }
+	    if (count($data) > 0) {
+               dbBulkInsert($data, 'processes');
             }
             echo "\n";
         }
