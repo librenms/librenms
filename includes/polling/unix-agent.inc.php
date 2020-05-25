@@ -3,7 +3,7 @@
 use App\Models\Device;
 use LibreNMS\RRD\RrdDefinition;
 
-if ($device['os_group'] == 'unix') {
+if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
     echo \LibreNMS\Config::get('project_name') . ' UNIX Agent: ';
 
     $agent_port = get_dev_attrib($device, 'override_Unixagent_port');
